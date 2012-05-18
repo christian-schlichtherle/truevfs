@@ -84,102 +84,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         return this.writeLock;
     }
 
-    <T> T readOrWriteLocked(IOOperation<T> operation)
-    throws IOException {
-        try {
-            return readLocked(operation);
-        } catch (FsNeedsWriteLockException ex) {
-            return writeLocked(operation);
-        }
-    }
-
-    <T> T readLocked(IOOperation<T> operation) throws IOException {
-        return locked(operation, readLock());
-    }
-
-    <T> T writeLocked(IOOperation<T> operation) throws IOException {
-        assert !getModel().isReadLockedByCurrentThread()
-                : "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!";
-        return locked(operation, writeLock());
-    }
-
-    /**
-     * Tries to call the given consistent operation while holding the given
-     * lock.
-     * <p>
-     * If this is the first execution of this method on the call stack of the
-     * current thread, then the lock gets acquired using {@link Lock#lock()}.
-     * Once the lock has been acquired the operation gets called.
-     * If this fails for some reason and the thrown exception chain contains a
-     * {@link FsNeedsLockRetryException}, then the lock gets temporarily
-     * released and the current thread gets paused for a small random time
-     * interval before this procedure starts over again.
-     * Otherwise, the exception chain gets just passed on to the caller.
-     * <p>
-     * If this is <em>not</em> the first execution of this method on the call
-     * stack of the current thread, then the lock gets acquired using
-     * {@link Lock#tryLock()} instead.
-     * If this fails, an {@code FsNeedsLockRetryException} gets created and
-     * passed to the given exception handler for mapping before finally
-     * throwing the resulting exception by executing
-     * {@code throw handler.fail(new FsNeedsLockRetryException())}.
-     * Once the lock has been acquired the operation gets called.
-     * If this fails for some reason then the exception chain gets just passed
-     * on to the caller.
-     * <p>
-     * This algorithm prevents dead locks effectively by temporarily unwinding
-     * the stack and releasing all locks for a small random time interval.
-     * Note that this requires some minimal cooperation by the operation:
-     * Whenever it throws an exception, it MUST leave its resources in a
-     * consistent state so that it can get retried again!
-     * Mind that this is standard requirement for any {@link FsController}.
-     * 
-     * @param  <T> The return type of the operation.
-     * @param  operation The atomic operation.
-     * @param  lock The lock to hold while calling the operation.
-     * @return The result of the operation.
-     * @throws IOException As thrown by the operation.
-     * @throws FsNeedsLockRetryException See above.
-     */
-    private <T> T locked(final IOOperation<T> operation, final Lock lock)
-    throws IOException {
-        final Account account = accounts.get();
-        if (0 < account.lockCount) {
-            if (!lock.tryLock())
-                throw FsNeedsLockRetryException.get(getModel());
-            account.lockCount++;
-            try {
-                return operation.call();
-            } finally {
-                account.lockCount--;
-                lock.unlock();
-            }
-        } else {
-            try {
-                while (true) {
-                    try {
-                        lock.lock();
-                        account.lockCount++;
-                        try {
-                            return operation.call();
-                        } finally {
-                            account.lockCount--;
-                            lock.unlock();
-                        }
-                    } catch (FsNeedsLockRetryException ex) {
-                        account.pause();
-                    }
-                }
-            } finally {
-                accounts.remove();
-            }
-        }
-    }
-
-    static int getLockCount() {
-        return accounts.get().lockCount;
-    }
-
     @Override
     @Deprecated
     public Icon getOpenIcon() throws IOException {
@@ -376,21 +280,105 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         writeLocked(new Sync());
     }
 
-    void close(final Closeable closeable) throws IOException {
-        final class Close implements IOOperation<Void> {
-            @Override
-            public Void call() throws IOException {
-                closeable.close();
-                return null;
-            }
-        } // Close
-
-        writeLocked(new Close());
-    }
-
     private interface IOOperation<T> {
         @Nullable T call() throws IOException;
     } // IOOperation
+
+    <T> T readOrWriteLocked(IOOperation<T> operation)
+    throws IOException {
+        try {
+            return readLocked(operation);
+        } catch (FsNeedsWriteLockException ex) {
+            return writeLocked(operation);
+        }
+    }
+
+    <T> T readLocked(IOOperation<T> operation) throws IOException {
+        return locked(operation, readLock());
+    }
+
+    <T> T writeLocked(IOOperation<T> operation) throws IOException {
+        assert !getModel().isReadLockedByCurrentThread()
+                : "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!";
+        return locked(operation, writeLock());
+    }
+
+    /**
+     * Tries to call the given consistent operation while holding the given
+     * lock.
+     * <p>
+     * If this is the first execution of this method on the call stack of the
+     * current thread, then the lock gets acquired using {@link Lock#lock()}.
+     * Once the lock has been acquired the operation gets called.
+     * If this fails for some reason and the thrown exception chain contains a
+     * {@link FsNeedsLockRetryException}, then the lock gets temporarily
+     * released and the current thread gets paused for a small random time
+     * interval before this procedure starts over again.
+     * Otherwise, the exception chain gets just passed on to the caller.
+     * <p>
+     * If this is <em>not</em> the first execution of this method on the call
+     * stack of the current thread, then the lock gets acquired using
+     * {@link Lock#tryLock()} instead.
+     * If this fails, an {@code FsNeedsLockRetryException} gets created and
+     * passed to the given exception handler for mapping before finally
+     * throwing the resulting exception by executing
+     * {@code throw handler.fail(new FsNeedsLockRetryException())}.
+     * Once the lock has been acquired the operation gets called.
+     * If this fails for some reason then the exception chain gets just passed
+     * on to the caller.
+     * <p>
+     * This algorithm prevents dead locks effectively by temporarily unwinding
+     * the stack and releasing all locks for a small random time interval.
+     * Note that this requires some minimal cooperation by the operation:
+     * Whenever it throws an exception, it MUST leave its resources in a
+     * consistent state so that it can get retried again!
+     * Mind that this is standard requirement for any {@link FsController}.
+     * 
+     * @param  <T> The return type of the operation.
+     * @param  operation The atomic operation.
+     * @param  lock The lock to hold while calling the operation.
+     * @return The result of the operation.
+     * @throws IOException As thrown by the operation.
+     * @throws FsNeedsLockRetryException See above.
+     */
+    private <T> T locked(final IOOperation<T> operation, final Lock lock)
+    throws IOException {
+        final Account account = accounts.get();
+        if (0 < account.lockCount) {
+            if (!lock.tryLock())
+                throw FsNeedsLockRetryException.get(getModel());
+            account.lockCount++;
+            try {
+                return operation.call();
+            } finally {
+                account.lockCount--;
+                lock.unlock();
+            }
+        } else {
+            try {
+                while (true) {
+                    try {
+                        lock.lock();
+                        account.lockCount++;
+                        try {
+                            return operation.call();
+                        } finally {
+                            account.lockCount--;
+                            lock.unlock();
+                        }
+                    } catch (FsNeedsLockRetryException ex) {
+                        account.pause();
+                    }
+                }
+            } finally {
+                accounts.remove();
+            }
+        }
+    }
+
+    static int getLockCount() {
+        return accounts.get().lockCount;
+    }
 
     @Immutable
     private enum SocketFactory {
@@ -625,6 +613,18 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         }
     } // LockOutputStream
 
+    void close(final Closeable closeable) throws IOException {
+        final class Close implements IOOperation<Void> {
+            @Override
+            public Void call() throws IOException {
+                closeable.close();
+                return null;
+            }
+        } // Close
+
+        writeLocked(new Close());
+    }
+
     @NotThreadSafe
     private static final class Account {
         int lockCount;
@@ -669,5 +669,5 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         };
 
         abstract ThreadLocal<Account> newThreadLocalAccount();
-    } // ThreadLocalToolFactory
+    } // ThreadLocalAccountFactory
 }
