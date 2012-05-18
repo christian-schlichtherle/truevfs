@@ -15,7 +15,7 @@ import de.truezip.kernel.cio.Entry;
 import de.truezip.kernel.cio.InputSocket;
 import de.truezip.kernel.cio.OutputSocket;
 import de.truezip.kernel.util.BitField;
-import static de.truezip.kernel.util.Maps.initialCapacity;
+import static de.truezip.kernel.util.HashMaps.initialCapacity;
 import de.truezip.kernel.util.Paths;
 import de.truezip.kernel.util.QuotedUriSyntaxException;
 import de.truezip.kernel.util.UriBuilder;

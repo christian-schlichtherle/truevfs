@@ -7,7 +7,7 @@ package de.truezip.file;
 import de.truezip.kernel.*;
 import de.truezip.kernel.sl.FsDriverLocator;
 import de.truezip.kernel.util.ExtensionSet;
-import static de.truezip.kernel.util.Maps.initialCapacity;
+import static de.truezip.kernel.util.HashMaps.initialCapacity;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Collection;

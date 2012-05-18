@@ -10,7 +10,7 @@ import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.Sink;
 import de.truezip.kernel.io.Source;
 import de.truezip.kernel.util.BitField;
-import de.truezip.kernel.util.Maps;
+import de.truezip.kernel.util.HashMaps;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.NoSuchFileException;
@@ -41,7 +41,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
             config = TestConfig.get();
         this.config = config;
         this.containers = new ConcurrentHashMap<>(
-                Maps.initialCapacity(config.getNumEntries()));
+                HashMaps.initialCapacity(config.getNumEntries()));
     }
 
     /**

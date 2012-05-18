@@ -14,7 +14,7 @@ import static de.truezip.driver.zip.io.ZipParametersUtils.parameters;
 import de.truezip.kernel.io.DecoratingOutputStream;
 import de.truezip.kernel.io.LittleEndianOutputStream;
 import de.truezip.kernel.io.Sink;
-import static de.truezip.kernel.util.Maps.initialCapacity;
+import static de.truezip.kernel.util.HashMaps.initialCapacity;
 import de.truezip.key.param.AesKeyStrength;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;

@@ -4,7 +4,7 @@
  */
 package de.truezip.key.sl;
 
-import static de.truezip.kernel.util.Maps.initialCapacity;
+import static de.truezip.kernel.util.HashMaps.initialCapacity;
 import de.truezip.kernel.util.ServiceLocator;
 import de.truezip.key.AbstractKeyManagerProvider;
 import de.truezip.key.KeyManager;

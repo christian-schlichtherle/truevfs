@@ -12,7 +12,7 @@ import de.truezip.kernel.cio.Entry.Access;
 import de.truezip.kernel.cio.Entry.Size;
 import de.truezip.kernel.cio.*;
 import de.truezip.kernel.io.DecoratingOutputStream;
-import de.truezip.kernel.util.Maps;
+import de.truezip.kernel.util.HashMaps;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +39,7 @@ implements Container<MockArchiveDriverEntry> {
             config = TestConfig.get();
         return new MockArchive(
                 new LinkedHashMap<String, MockArchiveDriverEntry>(
-                    Maps.initialCapacity(config.getNumEntries())),
+                    HashMaps.initialCapacity(config.getNumEntries())),
                 config);
     }
 

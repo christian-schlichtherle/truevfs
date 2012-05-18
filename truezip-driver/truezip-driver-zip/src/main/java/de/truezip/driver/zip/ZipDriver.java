@@ -19,7 +19,7 @@ import de.truezip.kernel.cio.OutputService;
 import de.truezip.kernel.io.Sink;
 import de.truezip.kernel.io.Source;
 import de.truezip.kernel.util.BitField;
-import de.truezip.kernel.util.Maps;
+import de.truezip.kernel.util.HashMaps;
 import de.truezip.key.KeyManagerProvider;
 import de.truezip.key.KeyProvider;
 import de.truezip.key.sl.KeyManagerLocator;
@@ -287,7 +287,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      */
     @Override
     public int getOverheadSize() {
-        return Maps.OVERHEAD_SIZE;
+        return HashMaps.OVERHEAD_SIZE;
     }
 
     /**

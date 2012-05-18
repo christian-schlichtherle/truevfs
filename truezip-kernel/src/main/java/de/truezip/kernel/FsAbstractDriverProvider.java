@@ -5,7 +5,7 @@
 package de.truezip.kernel;
 
 import de.truezip.kernel.util.ExtensionSet;
-import de.truezip.kernel.util.Maps;
+import de.truezip.kernel.util.HashMaps;
 import de.truezip.kernel.util.ServiceLocator;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -47,7 +47,7 @@ public abstract class FsAbstractDriverProvider implements FsDriverProvider {
      */
     public static Map<FsScheme, FsDriver> newMap(final Object[][] config) {
         final Map<FsScheme, FsDriver> drivers = new HashMap<>(
-                Maps.initialCapacity(config.length) * 2); // heuristics
+                HashMaps.initialCapacity(config.length) * 2); // heuristics
         for (final Object[] param : config) {
             final Collection<FsScheme> schemes = toSchemes(param[0]);
             if (schemes.isEmpty())
