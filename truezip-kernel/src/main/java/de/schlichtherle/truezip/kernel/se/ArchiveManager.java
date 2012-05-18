@@ -14,7 +14,6 @@ import static de.truezip.kernel.util.Link.Type.WEAK;
 import static de.truezip.kernel.util.Links.target;
 import java.util.*;
 import java.util.logging.Logger;
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
