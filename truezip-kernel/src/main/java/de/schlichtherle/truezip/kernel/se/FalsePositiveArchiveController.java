@@ -132,7 +132,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
         apply(name, new SetReadOnly());
     }
-    
+
     @Override
     public boolean setTime(
             final BitField<FsAccessOption> options,
