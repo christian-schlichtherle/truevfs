@@ -27,12 +27,6 @@
     </description>
 
     <dependencies>
-        <!--dependency>
-            <groupId>de.schlichtherle.truevfs</groupId>
-            <artifactId>truevfs-kernel-ee</artifactId>
-            <version>${project.version}</version>
-            <scope>runtime</scope>
-        </dependency-->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-file</artifactId>
