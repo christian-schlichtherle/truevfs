@@ -25,7 +25,7 @@ Encrypted Application File Format
 * Accessing Encrypted and Authenticated Application File Formats
 
     Thanks to the
-    {{{../truezip-file/index.html}TrueZIP File*}}
+    {{{../truezip-file/index.html}TrueVFS File*}}
     module, here's your relief:
     The
     {{{../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}},
@@ -50,20 +50,20 @@ TConfig.get().setArchiveDetector(
     file extensions <<<fox>>> and <<<bax>>>, whereby case is ignored,
     and assume the ZIP.RAES file format to read or write these files.
 
-    Note that TrueZIP automatically recognizes false positive archive files,
+    Note that TrueVFS automatically recognizes false positive archive files,
     so it cannot get confused by files with arbitrary content which accidently
     use the extension of your custom application file format.
 
     Please also note the usage of the class
     {{{../apidocs/de/truezip/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
     for accessing the ZIP.RAES file format.
-    This is one of two available archive driver implementations for TrueZIP's
+    This is one of two available archive driver implementations for TrueVFS's
     custom encrypted ZIP.RAES file format (or TZP for short).
     The other one is the class
     {{{../apidocs/de/truezip/driver/zip/raes/ParanoidZipRaesDriver.html}<<<ParanoidZipRaesDriver>>>}}.
     A TZP file is a ZIP file with UTF-8 encoded entry names (like the JAR file
     format) which is wrapped in a RAES file envelope.
-    RAES is TrueZIP's custom Random Access Encryption Specification which
+    RAES is TrueVFS's custom Random Access Encryption Specification which
     supports SHA-256 authentication and AES-256 decryption in CTR block
     mode for transparent, read/write access to its encrypted payload.
     By using CTR mode, RAES supports transparent <random> read access to
@@ -73,7 +73,7 @@ TConfig.get().setArchiveDetector(
     {{{../truezip-key/apidocs/de/truezip/key/sl/KeyManagerLocator.html#SINGLETON}<<<KeyManagerLocator.SINGLETON>>>}}
     to get a secret key manager.
     The reference implementation of its service provider interface in the
-    module {{{../truezip-key/index.html}TrueZIP Key}} will prompt the user for
+    module {{{../truezip-key/index.html}TrueVFS Key}} will prompt the user for
     entering the secret keys, either with a Swing GUI or - if the JVM is
     running headless - on the console.
     You can change this by following the instructions on the page about

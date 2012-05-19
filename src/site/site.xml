@@ -34,7 +34,7 @@
             <link rel="alternate" type="application/rss+xml" title="The TrueZIP Blog - Announcements Feed" href="http://truezip.schlichtherle.de/category/announcements/feed/"/>
         </head>
         <breadcrumbs>
-            <item name="TrueZIP" href="index.html"/>
+            <item name="TrueVFS" href="index.html"/>
         </breadcrumbs>
         <menu name="Documentation">
             <item name="About" href="index.html"/>
@@ -61,47 +61,6 @@
             </item>
             <item name="Concepts" href="concepts.html"/>
             <item name="Glossary" href="glossary.html"/>
-            <item name="TrueZIP 6 (Obsolete)" href="6/index.html" collapse="true">
-                <item name="Migration" href="migration.html"/>
-                <item name="Tutorial" href="6/tutorial.html"/>
-                <item name="News Archive" href="6/news/index.html" collapse="true">
-                    <item name="6.8 Release" href="6/news/20100831.html"/>
-                    <item name="6.7 Release" href="6/news/20100716.html"/>
-                    <item name="6.7 RC1 Release" href="6/news/20091103.html"/>
-                    <item name="6.6 Release" href="6/news/20070403.html"/>
-                    <item name="6.5.4 Release" href="6/news/20070227.html"/>
-                    <item name="6.4 Release" href="6/news/20061221.html"/>
-                    <item name="6.3.1 Release" href="6/news/20061010.html"/>
-                    <item name="6.3 Release" href="6/news/20061006.html"/>
-                    <item name="6.2.1 Release" href="6/news/20060907.html"/>
-                    <item name="6.2 / 5.1.8 Release" href="6/news/20060807.html"/>
-                    <item name="6.1 / 5.1.7 Release" href="6/news/20060710.html"/>
-                    <item name="6.0 / 5.1.6 Release" href="6/news/20060405.html"/>
-                    <item name="6.0 RC1 Release" href="6/news/20060313.html"/>
-                    <item name="5.1.5 Release" href="6/news/20060306-2.html"/>
-                    <item name="6.0 Development" href="6/news/20060306-1.html"/>
-                    <item name="5.1.2 Release" href="6/news/20060224.html"/>
-                    <item name="5.0.1 Release" href="6/news/20060124.html"/>
-                    <item name="5.0 Release" href="6/news/20060120.html"/>
-                    <item name="4.0 Release" href="6/news/20051219.html"/>
-                    <item name="3.3 Release" href="6/news/20051205.html"/>
-                    <item name="3.2 Release" href="6/news/20051022-2.html"/>
-                    <item name="3.1 Release" href="6/news/20051022-1.html"/>
-                </item>
-                <item name="Release Notes Archive" href="6/relnotes/index.html" collapse="true">
-                    <item name="6.8" href="6/relnotes/release-6_8.html"/>
-                    <item name="6.7" href="6/relnotes/release-6_7.html"/>
-                    <item name="6.6" href="6/relnotes/release-6_6.html"/>
-                    <item name="6.5.4" href="6/relnotes/release-6_5_4.html"/>
-                    <item name="6.4" href="6/relnotes/release-6_4.html"/>
-                    <item name="6.3.2" href="6/relnotes/release-6_3_2.html"/>
-                    <item name="6.3" href="6/relnotes/release-6_3.html"/>
-                    <item name="6.2.1" href="6/relnotes/release-6_2_1.html"/>
-                    <item name="6.2" href="6/relnotes/release-6_2.html"/>
-                    <item name="6.1" href="6/relnotes/release-6_1.html"/>
-                    <item name="6.0" href="6/relnotes/release-6_0.html"/>
-                </item>
-            </item>
         </menu>
         <menu name="External Resources">
             <item name="Road Map" href="http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:roadmap-panel"/>

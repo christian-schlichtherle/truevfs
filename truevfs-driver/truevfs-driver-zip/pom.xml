@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2012 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
+  -->
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.schlichtherle.truevfs</groupId>
+        <artifactId>truevfs-driver</artifactId>
+        <version>1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>truevfs-driver-zip</artifactId>
+
+    <name>TrueVFS Driver ZIP</name>
+    <description>
+        The file system driver family for ZIP and related archive file types.
+
+        Add the JAR artifact of this module to the run time class path to
+        make its file system drivers available for service location in the
+        client API modules.
+    </description>
+
+    <dependencies>
+        <!--dependency>
+            <groupId>de.schlichtherle.truevfs</groupId>
+            <artifactId>truevfs-kernel-ee</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency-->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-file</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-file</artifactId>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-key</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-key</artifactId>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-path</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-path</artifactId>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk16</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <configuration>
+                        <excludes>
+                            <!-- Still unreliable when run in parallel.
+                                 Run manually when required. -->
+                            <exclude>**/swing/*IT.class</exclude>
+                        </excludes>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>sonatype-oss-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>test-jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

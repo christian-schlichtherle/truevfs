@@ -16,7 +16,7 @@ new TFile("directory").cp_rp(new TFile("archive.tar.gz"));
     preserves all file attributes.
 
     However, in order to prevent ambiguities, unlike the <<<cp>>> command line
-    utility, TrueZIP does not support auto-completion of path names or mixing
+    utility, TrueVFS does not support auto-completion of path names or mixing
     file and directory parameters.
     So you must provide <complete path names> for both the source and the
     destination.
@@ -54,9 +54,9 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
 #configuring("<<<tar.gz>>> or <<<zip>>>",
   "TAR.GZ or ZIP",
   "modules
-   {{{../truezip-driver/truezip-driver-tar/index.html}TrueZIP Driver TAR}}
+   {{{../truezip-driver/truezip-driver-tar/index.html}TrueVFS Driver TAR}}
    and
-   {{{../truezip-driver/truezip-driver-zip/index.html}TrueZIP Driver ZIP}}
+   {{{../truezip-driver/truezip-driver-zip/index.html}TrueVFS Driver ZIP}}
    need",
   "<<<truezip-driver-tar>>> and <<<truezip-driver-zip>>>")
 #cleaningUp()

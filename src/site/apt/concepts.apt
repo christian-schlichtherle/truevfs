@@ -6,23 +6,23 @@
 
 Concepts
 
-    TrueZIP is a Java based plug-in framework for virtual file systems (VFS)
+    TrueVFS is a Java based plug-in framework for virtual file systems (VFS)
     which provides transparent access to archive files as if they were just
     plain directories.
 
 * Overall Architecture
 
-    TrueZIP applies the (in)famous three-tier architecture pattern:
+    TrueVFS applies the (in)famous three-tier architecture pattern:
 
     [[1]] The <Access Tier> is a facade for the Kernel Tier which provides
-          convenient-to-use client APIs for TrueZIP applications.
-          No file system state is managed by this tier, which enables a TrueZIP
+          convenient-to-use client APIs for TrueVFS applications.
+          No file system state is managed by this tier, which enables a TrueVFS
           application to work with any client API concurrently.
           This tier consists of the modules
-          {{{./truezip-file/index.html}TrueZIP&#160;File*}}
+          {{{./truezip-file/index.html}TrueVFS&#160;File*}}
           and
-          {{{./truezip-path/index.html}TrueZIP&#160;Path}}
-          (since TrueZIP 7.2).
+          {{{./truezip-path/index.html}TrueVFS&#160;Path}}
+          (since TrueVFS 7.2).
           In addition to the canonical term <i>access module<i>, each of these
           may also get referred to by the term <i>client API module</i> for
           better comprehensibility.
@@ -30,18 +30,18 @@ Concepts
     [[1]] The <Kernel Tier> manages all virtual file system state.
           It also provides multithreading, multiplexing, caching and buffering
           so that the driver tier does not need to take care of this.
-          This tier solely consists of the module TrueZIP Kernel.
+          This tier solely consists of the module TrueVFS Kernel.
 
     [[1]] The <Driver Tier> implements the I/O operations for their respective
           (federated) file system type.
-          This tier consists of all file system driver modules like TrueZIP
-          Driver FILE, TrueZIP Driver ZIP etc.
+          This tier consists of all file system driver modules like TrueVFS
+          Driver FILE, TrueVFS Driver ZIP etc.
 
     []
 
 * Design Paradigms
 
-    The TrueZIP project employs several high level design paradigms which have
+    The TrueVFS project employs several high level design paradigms which have
     proven to be beneficial.
     However, after all these are guidelines - not rules.
     So they should get applied with some care.
@@ -66,7 +66,7 @@ Concepts
     {{{./apidocs/de/truezip/file/TConfig.html#setArchiveDetector(de.truezip.file.TArchiveDetector)}explicitly override}}
     it.
     Check the {{{./faq.html#file}FAQ}} for the
-    {{{./truezip-file/index.html}TrueZIP File*}}
+    {{{./truezip-file/index.html}TrueVFS File*}}
     API for a discussion of some options to adapt the archive detection to your
     needs.
 
@@ -74,7 +74,7 @@ Concepts
 
     As an implication of the Convention Over Configuration design paradigm,
     the
-    {{{./truezip-kernel/index.html}TrueZIP Kernel}}
+    {{{./truezip-kernel/index.html}TrueVFS Kernel}}
     module provides service locator singletons for the
     {{{./apidocs/de/truezip/kernel/sl/FsManagerLocator.html}file system manager}},
     the
@@ -84,24 +84,24 @@ Concepts
 
 ** Dependency Injection
 
-    Although the service locator singletons are provided by the TrueZIP Kernel
+    Although the service locator singletons are provided by the TrueVFS Kernel
     module, it does not actually use them.
-    To the contrary, the TrueZIP Kernel module fully relies on the Dependency
+    To the contrary, the TrueVFS Kernel module fully relies on the Dependency
     Injection design paradigm.
-    This enables the TrueZIP modules and TrueZIP application to inject a custom
+    This enables the TrueVFS modules and TrueVFS application to inject a custom
     implementation instance or simply a service locator singleton as a
-    dependency of a TrueZIP Kernel object.
+    dependency of a TrueVFS Kernel object.
 
     For example, the file system manager service locator singleton and the file
-    system driver service locator singleton are used by the APIs of the TrueZIP
+    system driver service locator singleton are used by the APIs of the TrueVFS
     File* and
-    {{{./truezip-path/index.html}TrueZIP Path}}
+    {{{./truezip-path/index.html}TrueVFS Path}}
     modules in order to implement the Convention Over Configuration design
     paradigm.
     Likewise, the temporary I/O entry pool service locator singleton is used by
     the file system driver modules.
 
-    No Dependency Injection framework is used in order to reduce TrueZIP's
+    No Dependency Injection framework is used in order to reduce TrueVFS's
     dependency on third party projects.
 
     Constructor injection is favored wherever possible in order to enable
@@ -111,7 +111,7 @@ Concepts
 
     Immutable classes are favored wherever possible because they inherently
     provide support for multithreading,
-    which is a key requirement for most TrueZIP Kernel classes.
+    which is a key requirement for most TrueVFS Kernel classes.
 
     For example, the classes
     {{{./apidocs/de/truezip/kernel/addr/FsPath.html}<<<FsPath>>>}},

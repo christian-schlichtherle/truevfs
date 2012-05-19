@@ -1,13 +1,13 @@
     -----------------------
-    Migrating TrueZIP 6 Applications to TrueZIP 7
+    Migrating TrueVFS 6 Applications to TrueVFS 7
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-Migrating TrueZIP 6 Applications to TrueZIP 7
+Migrating TrueVFS 6 Applications to TrueVFS 7
 
-    This guide outlines the required steps to migrate a TrueZIP 6 application
-    to TrueZIP 7.
+    This guide outlines the required steps to migrate a TrueVFS 6 application
+    to TrueVFS 7.
     This guide is <not> complete - additional steps may or may not be required
     by you!
 
@@ -24,12 +24,12 @@ Migrating TrueZIP 6 Applications to TrueZIP 7
     and integrate your sources into its directory tree or - as a secondary
     option -
     {{{http://truezip.schlichtherle.de/2011/05/13/no-maven/}download the all-in-one JAR-with-dependencies}}
-    for the module TrueZIP Samples and put it wherever your build script
+    for the module TrueVFS Samples and put it wherever your build script
     expects it.
 
 * Setup Class Path
 
-    While TrueZIP 6 consists of a single monolithic module, TrueZIP 7 is a
+    While TrueVFS 6 consists of a single monolithic module, TrueVFS 7 is a
     multi-module project in order to reduce application dependencies and enable
     them to apply the convention-over-configuration paradigm for the initial
     set up of the detectable archive file types.
@@ -120,9 +120,9 @@ Migrating TrueZIP 6 Applications to TrueZIP 7
     Now fix compilation errors.
 
     Mind that the signature of the bulk I/O methods has changed:
-    In TrueZIP 6, bulk I/O methods like <<<archiveCopyAll>>> etc. return a
+    In TrueVFS 6, bulk I/O methods like <<<archiveCopyAll>>> etc. return a
     boolean value to indicate success or failure.
-    In TrueZIP 7, their substitutes throw an <<<IOException>>> on failure
+    In TrueVFS 7, their substitutes throw an <<<IOException>>> on failure
     instead and return <<<void>>> or <<<this>>> in order to enable a fluent
     coding style.
 
@@ -134,7 +134,7 @@ Migrating TrueZIP 6 Applications to TrueZIP 7
     (alias ZIP.RAES alias TZP) and programmatically sets authentication
     passwords, you need to migrate the key management part of your
     application, too.
-    In the documentation of the module TrueZIP Samples, there's an article
+    In the documentation of the module TrueVFS Samples, there's an article
     about
     {{{./truezip-driver/truezip-driver-tzp/key-management.html}key management}}
     which demonstrates this.
@@ -142,7 +142,7 @@ Migrating TrueZIP 6 Applications to TrueZIP 7
 ** Optional: Configure {Archive Detection}
 
     Once you've set up your run time class path correctly, it should not be
-    necessary to configure archive detection because TrueZIP 7 supports the
+    necessary to configure archive detection because TrueVFS 7 supports the
     convention-over-configuration paradigm.
 
     One notable exception is if you need to detect custom archive file formats.
@@ -158,7 +158,7 @@ Migrating TrueZIP 6 Applications to TrueZIP 7
 
     Now cross fingers and build your project.
     If it compiles, chances are that it will work straight away because the
-    semantics of the classes and methods of the TrueZIP File* API haven't
-    really changed between TrueZIP 6 and 7:
+    semantics of the classes and methods of the TrueVFS File* API haven't
+    really changed between TrueVFS 6 and 7:
     After all, a recursive archive copy operation (once <<<archiveCopyAll>>>)
     is still a recursive archive copy operation (now <<<cp_rp>>>).

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2012 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.schlichtherle.truevfs</groupId>
+        <artifactId>truevfs</artifactId>
+        <version>1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>truevfs-driver</artifactId>
+    <packaging>pom</packaging>
+
+    <name>TrueVFS Driver</name>
+    <description>Parent POM for pluggable file system drivers.</description>
+
+    <modules>
+        <module>truevfs-driver-file</module>
+        <module>truevfs-driver-http</module>
+        <module>truevfs-driver-tar</module>
+        <module>truevfs-driver-zip</module>
+        <module>truevfs-driver-tzp</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Change default scope from compile time to test time for driver
+                 integration tests. -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-file</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-path</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!-- All drivers depend on the JAR and the test JAR of the TrueVFS
+             Kernel. -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-kernel</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-kernel</artifactId>
+            <type>test-jar</type>
+        </dependency>
+    </dependencies>
+</project>
