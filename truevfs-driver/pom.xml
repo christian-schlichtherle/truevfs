@@ -46,6 +46,12 @@
     </dependencyManagement>
 
     <dependencies>
+        <!--dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-kernel-ee</artifactId>
+            <version>${project.version}</version>
+            <scope>runtime</scope>
+        </dependency-->
         <!-- All drivers depend on the JAR and the test JAR of the TrueVFS
              Kernel. -->
         <dependency>
