@@ -3,8 +3,8 @@
 #set( $symbol_escape = '\' )
 package ${package}.java;
 
-import de.truezip.kernel.FsSyncException;
-import de.truezip.path.TPath;
+import net.truevfs.kernel.FsSyncException;
+import net.truevfs.path.TPath;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -21,7 +21,7 @@ import java.util.TreeSet;
  * Instead of a directory, you can name any configured archive file type as an
  * argument, too.
  * <p>
- * For example, if the JAR for the module {@code truezip-driver-zip} is present
+ * For example, if the JAR for the module {@code truevfs-driver-zip} is present
  * on the run time class path and the path name argument is {@code archive.zip}
  * and this file actually exists as a ZIP file, then the tree graph of the
  * directory structure of this ZIP file gets printed.

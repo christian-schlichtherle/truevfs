@@ -38,7 +38,7 @@ As a framework, TrueVFS provides the interfaces and classes to
 write file system drivers which plug-in to its federated file
 system space.
     </description>
-    <url>http://truezip.java.net</url>
+    <url>http://truevfs.java.net</url>
     <inceptionYear>2005</inceptionYear>
     <licenses>
         <license>
@@ -50,23 +50,23 @@ system space.
     <mailingLists>
         <mailingList>
             <name>Announce Mailing List</name>
-            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20announce</subscribe>
-            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20announce</unsubscribe>
-            <archive>http://java.net/projects/truezip/lists/announce/archive</archive>
+            <subscribe>mailto:sympa@truevfs.java.net?subject=subscribe%20announce</subscribe>
+            <unsubscribe>mailto:sympa@truevfs.java.net?subject=unsubscribe%20announce</unsubscribe>
+            <archive>http://java.net/projects/truevfs/lists/announce/archive</archive>
         </mailingList>
         <mailingList>
             <name>Users Mailing List</name>
-            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20users</subscribe>
-            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20users</unsubscribe>
-            <post>users@truezip.java.net</post>
-            <archive>http://java.net/projects/truezip/lists/users/archive</archive>
+            <subscribe>mailto:sympa@truevfs.java.net?subject=subscribe%20users</subscribe>
+            <unsubscribe>mailto:sympa@truevfs.java.net?subject=unsubscribe%20users</unsubscribe>
+            <post>users@truevfs.java.net</post>
+            <archive>http://java.net/projects/truevfs/lists/users/archive</archive>
         </mailingList>
         <mailingList>
             <name>Developers Mailing List</name>
-            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20dev</subscribe>
-            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20dev</unsubscribe>
-            <post>dev@truezip.java.net</post>
-            <archive>http://java.net/projects/truezip/lists/dev/archive</archive>
+            <subscribe>mailto:sympa@truevfs.java.net?subject=subscribe%20dev</subscribe>
+            <unsubscribe>mailto:sympa@truevfs.java.net?subject=unsubscribe%20dev</unsubscribe>
+            <post>dev@truevfs.java.net</post>
+            <archive>http://java.net/projects/truevfs/lists/dev/archive</archive>
         </mailingList>
     </mailingLists>
     <issueManagement>
@@ -74,9 +74,9 @@ system space.
         <url>http://java.net/jira/browse/TRUEZIP</url>
     </issueManagement>
     <scm>
-        <connection>scm:hg:https://hg.java.net/hg/truezip~v7</connection>
-        <developerConnection>scm:hg:ssh://hg.java.net/truezip~v7</developerConnection>
-        <url>http://java.net/projects/truezip/sources/v7/show</url>
+        <connection>scm:hg:https://hg.java.net/hg/truevfs~v7</connection>
+        <developerConnection>scm:hg:ssh://hg.java.net/truevfs~v7</developerConnection>
+        <url>http://java.net/projects/truevfs/sources/v7/show</url>
     </scm>
 
     <properties>

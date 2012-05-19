@@ -25,13 +25,13 @@ Encrypted Application File Format
 * Accessing Encrypted and Authenticated Application File Formats
 
     Thanks to the
-    {{{../truezip-file/index.html}TrueVFS File*}}
+    {{{../truevfs-file/index.html}TrueVFS File*}}
     module, here's your relief:
     The
-    {{{../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}},
-    {{{../apidocs/de/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}}
+    {{{../apidocs/net/truevfs/file/TFile.html}<<<TFile>>>}},
+    {{{../apidocs/net/truevfs/file/TFileInputStream.html}<<<TFileInputStream>>>}}
     and
-    {{{../apidocs/de/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
+    {{{../apidocs/net/truevfs/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
     classes can read and write entries within an encrypted and authenticated
     archive file as if they were plain files in regular directories in the file
     system.
@@ -55,12 +55,12 @@ TConfig.get().setArchiveDetector(
     use the extension of your custom application file format.
 
     Please also note the usage of the class
-    {{{../apidocs/de/truezip/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
+    {{{../apidocs/net/truevfs/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
     for accessing the ZIP.RAES file format.
     This is one of two available archive driver implementations for TrueVFS's
     custom encrypted ZIP.RAES file format (or TZP for short).
     The other one is the class
-    {{{../apidocs/de/truezip/driver/zip/raes/ParanoidZipRaesDriver.html}<<<ParanoidZipRaesDriver>>>}}.
+    {{{../apidocs/net/truevfs/driver/zip/raes/ParanoidZipRaesDriver.html}<<<ParanoidZipRaesDriver>>>}}.
     A TZP file is a ZIP file with UTF-8 encoded entry names (like the JAR file
     format) which is wrapped in a RAES file envelope.
     RAES is TrueVFS's custom Random Access Encryption Specification which
@@ -70,14 +70,14 @@ TConfig.get().setArchiveDetector(
     its encrypted payload, which makes reading a TZP file pretty fast.
 
     Note that the <<<SafeZipRaesDriver>>> uses the
-    {{{../truezip-key/apidocs/de/truezip/key/sl/KeyManagerLocator.html#SINGLETON}<<<KeyManagerLocator.SINGLETON>>>}}
+    {{{../truevfs-key/apidocs/net/truevfs/key/sl/KeyManagerLocator.html#SINGLETON}<<<KeyManagerLocator.SINGLETON>>>}}
     to get a secret key manager.
     The reference implementation of its service provider interface in the
-    module {{{../truezip-key/index.html}TrueVFS Key}} will prompt the user for
+    module {{{../truevfs-key/index.html}TrueVFS Key}} will prompt the user for
     entering the secret keys, either with a Swing GUI or - if the JVM is
     running headless - on the console.
     You can change this by following the instructions on the page about
-    {{{../truezip-driver/truezip-driver-tzp/key-management.html}Key Management}}.
+    {{{../truevfs-driver/truevfs-driver-tzp/key-management.html}Key Management}}.
 
     Now you can easily create or overwrite an entry in your custom application
     file format like this:
@@ -92,7 +92,7 @@ try {
 +--+
 
     Alternatively, you could use a 
-    {{{../apidocs/de/truezip/file/TFileWriter.html}<<<TFileWriter>>>}}.
+    {{{../apidocs/net/truevfs/file/TFileWriter.html}<<<TFileWriter>>>}}.
 
     This is how you could read the entry again:
 
@@ -106,7 +106,7 @@ try {
 +--+
 
     Alternatively, you could use a 
-    {{{../apidocs/de/truezip/file/TFileReader.html}<<<TFileReader>>>}}.
+    {{{../apidocs/net/truevfs/file/TFileReader.html}<<<TFileReader>>>}}.
 
     And finally, to delete a virtual directory tree - in this case your custom
     application file - you could use this:

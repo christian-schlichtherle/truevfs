@@ -7,17 +7,17 @@
 About TrueVFS Driver TAR
 
     This module contains the file system driver service class
-    {{{./apidocs/de/truezip/driver/tar/TarDriverService.html}TarDriverService}}
+    {{{./apidocs/net/truevfs/driver/tar/TarDriverService.html}TarDriverService}}
     which provides the following map of file system drivers:
 
 *--*--*
 ||URI Schemes / Archive File Extensions||File System Driver Class|
 *--+--+
-|<<<tar>>>|{{{./apidocs/de/truezip/driver/tar/TarDriver.html}<<<TarDriver>>>}}|
+|<<<tar>>>|{{{./apidocs/net/truevfs/driver/tar/TarDriver.html}<<<TarDriver>>>}}|
 *--+--+
-|<<<tar.bz2>>>, <<<tb2>>>, <<<tbz>>>|{{{./apidocs/de/truezip/driver/tar/TarBZip2Driver.html}<<<TarBZip2Driver>>>}}|
+|<<<tar.bz2>>>, <<<tb2>>>, <<<tbz>>>|{{{./apidocs/net/truevfs/driver/tar/TarBZip2Driver.html}<<<TarBZip2Driver>>>}}|
 *--+--+
-|<<<tar.gz>>>, <<<tgz>>>|{{{./apidocs/de/truezip/driver/tar/TarGZipDriver.html}<<<TarGZipDriver>>>}}|
+|<<<tar.gz>>>, <<<tgz>>>|{{{./apidocs/net/truevfs/driver/tar/TarGZipDriver.html}<<<TarGZipDriver>>>}}|
 *--+--+
 
     Add the JAR artifact of this module to the run time class path to
@@ -25,4 +25,4 @@ About TrueVFS Driver TAR
     client API modules.
     The URI schemes will then get recognized as default archive file extensions
     by the class
-    {{{../../apidocs/de/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+    {{{../../apidocs/net/truevfs/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.

@@ -11,7 +11,7 @@ Getting Started
     TrueVFS is a multi-module project which is built by
     {{{http://maven.apache.org}Apache Maven}}, so all its artifacts are hosted
     on
-    {{{http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22de.schlichtherle.truezip%22%20AND%20v%3A%22${project.version}%22}Maven Central}}.
+    {{{http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22de.schlichtherle.truevfs%22%20AND%20v%3A%22${project.version}%22}Maven Central}}.
     If you are using Maven too, then you you can generate, build and run your
     first TrueVFS application for the two client APIs TrueVFS&#160;File* or
     TrueVFS&#160;Path in about ten minutes by following these guides:
@@ -33,9 +33,9 @@ Getting Started
 *--+--+--+--+--+
 || Client API || Requires || Archetype Group Id || Archetype Artifact Id || Archetype Version
 *--+--+--+--+--+
-| {{{../truezip-file/index.html}TrueVFS File*}} | JSE&#160;6 | <<<de.schlichtherle.truezip>>> | <<<truezip-archetype-file>>> | <<<${project.version}>>>
+| {{{../truevfs-file/index.html}TrueVFS File*}} | JSE&#160;6 | <<<de.schlichtherle.truevfs>>> | <<<truevfs-archetype-file>>> | <<<${project.version}>>>
 *--+--+--+--+--+
-| {{{../truezip-path/index.html}TrueVFS Path}} | JSE&#160;7 | <<<de.schlichtherle.truezip>>> | <<<truezip-archetype-path>>> | <<<${project.version}>>>
+| {{{../truevfs-path/index.html}TrueVFS Path}} | JSE&#160;7 | <<<de.schlichtherle.truevfs>>> | <<<truevfs-archetype-path>>> | <<<${project.version}>>>
 *--+--+--+--+--+
 
 * Manual Download
@@ -46,9 +46,9 @@ Getting Started
 
     If you are looking for more sample code and applications, then please
     {{{../source-repository.html}check out}} or
-    {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
+    {{{http://repo1.maven.org/maven2/de/schlichtherle/truevfs/truevfs-samples/${project.version}/truevfs-samples-${project.version}-sources.jar}download}}
     the source code of the module
-    {{{../truezip-samples/index.html}TrueVFS Samples}}.
+    {{{../truevfs-samples/index.html}TrueVFS Samples}}.
 
 * Tutorial (new)
 

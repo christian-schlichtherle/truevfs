@@ -19,9 +19,9 @@ Concepts
           No file system state is managed by this tier, which enables a TrueVFS
           application to work with any client API concurrently.
           This tier consists of the modules
-          {{{./truezip-file/index.html}TrueVFS&#160;File*}}
+          {{{./truevfs-file/index.html}TrueVFS&#160;File*}}
           and
-          {{{./truezip-path/index.html}TrueVFS&#160;Path}}
+          {{{./truevfs-path/index.html}TrueVFS&#160;Path}}
           (since TrueVFS 7.2).
           In addition to the canonical term <i>access module<i>, each of these
           may also get referred to by the term <i>client API module</i> for
@@ -57,16 +57,16 @@ Concepts
     driver modules - no XML or property file editing is required.
 
     The application can simply accept this
-    {{{./apidocs/de/truezip/file/TArchiveDetector.html#ALL}initial setup}}
+    {{{./apidocs/net/truevfs/file/TArchiveDetector.html#ALL}initial setup}}
     of the
-    {{{./apidocs/de/truezip/file/TConfig.html#getArchiveDetector()}archive detection}}
+    {{{./apidocs/net/truevfs/file/TConfig.html#getArchiveDetector()}archive detection}}
     in its 
-    {{{./apidocs/de/truezip/file/TConfig.html#get()}current configuration}}
+    {{{./apidocs/net/truevfs/file/TConfig.html#get()}current configuration}}
     or it can
-    {{{./apidocs/de/truezip/file/TConfig.html#setArchiveDetector(de.truezip.file.TArchiveDetector)}explicitly override}}
+    {{{./apidocs/net/truevfs/file/TConfig.html#setArchiveDetector(net.truevfs.file.TArchiveDetector)}explicitly override}}
     it.
     Check the {{{./faq.html#file}FAQ}} for the
-    {{{./truezip-file/index.html}TrueVFS File*}}
+    {{{./truevfs-file/index.html}TrueVFS File*}}
     API for a discussion of some options to adapt the archive detection to your
     needs.
 
@@ -74,13 +74,13 @@ Concepts
 
     As an implication of the Convention Over Configuration design paradigm,
     the
-    {{{./truezip-kernel/index.html}TrueVFS Kernel}}
+    {{{./truevfs-kernel/index.html}TrueVFS Kernel}}
     module provides service locator singletons for the
-    {{{./apidocs/de/truezip/kernel/sl/FsManagerLocator.html}file system manager}},
+    {{{./apidocs/net/truevfs/kernel/sl/FsManagerLocator.html}file system manager}},
     the
-    {{{./apidocs/de/truezip/kernel/sl/FsDriverLocator.html}file system drivers}}
+    {{{./apidocs/net/truevfs/kernel/sl/FsDriverLocator.html}file system drivers}}
     and the
-    {{{./apidocs/de/truezip/kernel/sl/IOPoolLocator.html}temporary I/O entry pool}}.
+    {{{./apidocs/net/truevfs/kernel/sl/IOPoolLocator.html}temporary I/O entry pool}}.
 
 ** Dependency Injection
 
@@ -95,7 +95,7 @@ Concepts
     For example, the file system manager service locator singleton and the file
     system driver service locator singleton are used by the APIs of the TrueVFS
     File* and
-    {{{./truezip-path/index.html}TrueVFS Path}}
+    {{{./truevfs-path/index.html}TrueVFS Path}}
     modules in order to implement the Convention Over Configuration design
     paradigm.
     Likewise, the temporary I/O entry pool service locator singleton is used by
@@ -114,10 +114,10 @@ Concepts
     which is a key requirement for most TrueVFS Kernel classes.
 
     For example, the classes
-    {{{./apidocs/de/truezip/kernel/addr/FsPath.html}<<<FsPath>>>}},
-    {{{./apidocs/de/truezip/kernel/addr/FsMountPoint.html}<<<FsMountPoint>>>}}
+    {{{./apidocs/net/truevfs/kernel/addr/FsPath.html}<<<FsPath>>>}},
+    {{{./apidocs/net/truevfs/kernel/addr/FsMountPoint.html}<<<FsMountPoint>>>}}
     and
-    {{{./apidocs/de/truezip/kernel/addr/FsEntryName.html}<<<FsEntryName>>>}}
+    {{{./apidocs/net/truevfs/kernel/addr/FsEntryName.html}<<<FsEntryName>>>}}
     are immutable so that their instances can get safely shared among many
     objects and threads.
 
@@ -127,9 +127,9 @@ Concepts
     implementation classes in order to ease exchanging implementation classes.
 
     For example, the abstract classes
-    {{{./apidocs/de/truezip/kernel/FsModel.html}<<<FsModel>>>}}
+    {{{./apidocs/net/truevfs/kernel/FsModel.html}<<<FsModel>>>}}
     and
-    {{{./apidocs/de/truezip/kernel/FsController.html}<<<FsController>>>}}
+    {{{./apidocs/net/truevfs/kernel/FsController.html}<<<FsController>>>}}
     participate in a variant of the MVC design pattern which is known as the
     Front Controller design pattern.
     The numerous implementation classes participate in the different file
@@ -163,9 +163,9 @@ Concepts
     reduced as much as reasonable in order to ease implementation classes.
 
     For example, the abstract class
-    {{{./apidocs/de/truezip/kernel/FsDriver.html}<<<FsDriver>>>}}
+    {{{./apidocs/net/truevfs/kernel/FsDriver.html}<<<FsDriver>>>}}
     consists of only one abstract method
-    {{{./apidocs/de/truezip/kernel/FsDriver.html#newController(de.schlichtherle.fs.FsModel,de.schlichtherle.fs.FsController)}<<<FsDriver.newController(FsModel, FsController)>>>}}
+    {{{./apidocs/net/truevfs/kernel/FsDriver.html#newController(de.schlichtherle.fs.FsModel,de.schlichtherle.fs.FsController)}<<<FsDriver.newController(FsModel, FsController)>>>}}
     which needs to get implemented in any file system driver module.    
 
 ** Composition Over Inheritance

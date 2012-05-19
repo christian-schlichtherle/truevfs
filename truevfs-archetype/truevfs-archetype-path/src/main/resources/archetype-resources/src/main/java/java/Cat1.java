@@ -3,8 +3,8 @@
 #set( $symbol_escape = '\' )
 package ${package}.java;
 
-import de.truezip.kernel.io.Streams;
-import de.truezip.path.TPath;
+import net.truevfs.kernel.io.Streams;
+import net.truevfs.path.TPath;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;

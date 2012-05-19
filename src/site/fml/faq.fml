@@ -203,12 +203,12 @@ TConfig.get().setArchiveDetector(
                 <p>
                     Furthermore, this example presumes that you want no other
                     archive file extensions to get detected, hence the use of
-                    <a href="apidocs/de/truezip/file/TArchiveDetector.html#NULL"><code>TArchiveDetector.NULL</code></a>
+                    <a href="apidocs/net/truevfs/file/TArchiveDetector.html#NULL"><code>TArchiveDetector.NULL</code></a>
                     as the decorated archive detector.
                     The class <code>TArchiveDetector</code> has many different
                     constructors.
                     Check the
-                    <a href="apidocs/de/truezip/file/TArchiveDetector.html">Javadoc</a>
+                    <a href="apidocs/net/truevfs/file/TArchiveDetector.html">Javadoc</a>
                     to make sure you get what you need.
                 </p>
             </answer>
@@ -332,7 +332,7 @@ long length = file.length();
                 <source>TVFS.umount();</source>
                 <p>
                     Please have a look at the method's
-                    <a href="apidocs/de/truezip/file/TVFS.html#umount()">Javadoc</a>
+                    <a href="apidocs/net/truevfs/file/TVFS.html#umount()">Javadoc</a>
                     for more options.
                 </p>
             </answer>
@@ -352,10 +352,10 @@ long length = file.length();
                 <ul>
                 <li>If your application uses a JSE&#160;7 compliant JVM,
                     you can simply use the API of the
-                    <a href="truezip-path/index.html">TrueVFS Path</a>
+                    <a href="truevfs-path/index.html">TrueVFS Path</a>
                     module.</li>
                 <li>Otherwise, you can use the API of the
-                    <a href="truezip-kernel/index.html">TrueVFS Kernel</a>
+                    <a href="truevfs-kernel/index.html">TrueVFS Kernel</a>
                     module.
                 </li>
                 </ul>
@@ -567,7 +567,7 @@ long size = Files.size(path);
                     Starting from version 7.0, the TrueVFS project has it's
                     own blog for announcements, release notes, feature show
                     cases and more named
-                    <a href="http://truezip.schlichtherle.de">The TrueVFS Blog</a>.
+                    <a href="http://truevfs.schlichtherle.de">The TrueVFS Blog</a>.
                 </p>
             </answer>
         </faq>
@@ -758,9 +758,9 @@ long size = Files.size(path);
                     normalized entry name.
                     Then, an application can read the contents of the file
                     entry by using e.g.
-                    <a href="apidocs/de/truezip/file/TFileInputStream.html"><code>TFileInputStream</code></a>
+                    <a href="apidocs/net/truevfs/file/TFileInputStream.html"><code>TFileInputStream</code></a>
                     and list the members of the directory entry by using
-                    <a href="apidocs/de/truezip/file/TFile.html#listFiles()"><code>TFile.listFiles()</code></a>.
+                    <a href="apidocs/net/truevfs/file/TFile.html#listFiles()"><code>TFile.listFiles()</code></a>.
                 </p>
                 <p>
                     Note that this feature solely exists to enable applications
@@ -781,9 +781,9 @@ long size = Files.size(path);
                 <p>
                     For any bug report, improvement request, feature request,
                     task request, help request etc. please
-                    <a href="mailto:users@truezip.java.net">post</a>
+                    <a href="mailto:users@truevfs.java.net">post</a>
                     it to the User Mailing List once you have
-                    <a href="mailto:sympa@truezip.java.net?subject=subscribe%20users">subscribed</a>
+                    <a href="mailto:sympa@truevfs.java.net?subject=subscribe%20users">subscribed</a>
                     to it.
                     The User Mailing List is your direct connection to the
                     community.

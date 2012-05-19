@@ -3,8 +3,8 @@
 #set( $symbol_escape = '\' )
 package ${package}.java;
 
-import de.truezip.file.TConfig;
-import de.truezip.path.TPath;
+import net.truevfs.file.TConfig;
+import net.truevfs.path.TPath;
 import java.io.IOException;
 import java.nio.file.Files;
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
@@ -18,7 +18,7 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
  * If you name any archive files in the destination path name, they get
  * automatically created.
  * <p>
- * For example, if the JAR for the module {@code truezip-driver-zip} is
+ * For example, if the JAR for the module {@code truevfs-driver-zip} is
  * present on the run time class path and the destination path name is
  * {@code archive.zip}, a ZIP file with this name gets created unless it
  * already exists.

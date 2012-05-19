@@ -47,7 +47,7 @@ new TFile("archive.jar/META-INF/MANIFEST.MF").rm();
 #configuring("<<<jar>>> or <<<war>>>",
   "JAR or WAR",
   "module
-   {{{../truezip-driver/truezip-driver-zip/index.html}TrueVFS Driver ZIP}}
+   {{{../truevfs-driver/truevfs-driver-zip/index.html}TrueVFS Driver ZIP}}
    needs",
-  "<<<truezip-driver-zip>>>")
+  "<<<truevfs-driver-zip>>>")
 #cleaningUp()

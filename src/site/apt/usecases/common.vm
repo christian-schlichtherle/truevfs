@@ -43,10 +43,10 @@ $title
 * $heading
 
     Thanks to the module
-    {{{../truezip-file/index.html}TrueVFS File*}},
+    {{{../truevfs-file/index.html}TrueVFS File*}},
     here's your relief:
     The
-    {{{../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}}
+    {{{../apidocs/net/truevfs/file/TFile.html}<<<TFile>>>}}
     class extends the <<<java.io.File>>> class in order to add the
     required functionality.
 

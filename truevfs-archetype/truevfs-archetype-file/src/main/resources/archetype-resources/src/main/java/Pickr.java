@@ -3,7 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package};
 
-import de.truezip.file.swing.TFileChooser;
+import net.truevfs.file.swing.TFileChooser;
 import javax.swing.SwingUtilities;
 
 /**
@@ -11,7 +11,7 @@ import javax.swing.SwingUtilities;
  * and prints it's path.
  * Of course, {@code TFileChooser} can browse archive files, too.
  * <p>
- * For example, if the JAR for the module {@code truezip-driver-zip} is present
+ * For example, if the JAR for the module {@code truevfs-driver-zip} is present
  * on the run time class path and a ZIP file {@code archive.zip} exists, then
  * you can double click it to browse its entries.
  *

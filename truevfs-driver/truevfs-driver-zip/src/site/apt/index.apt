@@ -7,19 +7,19 @@
 About TrueVFS Driver ZIP
 
     This module contains the file system driver service class
-    {{{./apidocs/de/truezip/driver/zip/ZipDriverService.html}ZipDriverService}}
+    {{{./apidocs/net/truevfs/driver/zip/ZipDriverService.html}ZipDriverService}}
     which provides the following map of file system drivers:
 
 *--*--*
 ||URI Schemes / Archive File Extensions||File System Driver Class|
 *--+--+
-|<<<ear>>>, <<<jar>>>, <<<war>>>|{{{./apidocs/de/truezip/driver/zip/JarDriver.html}<<<JarDriver>>>}}|
+|<<<ear>>>, <<<jar>>>, <<<war>>>|{{{./apidocs/net/truevfs/driver/zip/JarDriver.html}<<<JarDriver>>>}}|
 *--+--+
-|<<<exe>>>|{{{./apidocs/de/truezip/driver/zip/ReadOnlySfxDriver.html}<<<ReadOnlySfxDriver>>>}}|
+|<<<exe>>>|{{{./apidocs/net/truevfs/driver/zip/ReadOnlySfxDriver.html}<<<ReadOnlySfxDriver>>>}}|
 *--+--+
-|<<<odt>>>, <<<ott>>>, <<<odg>>>, <<<otg>>>, <<<odp>>>, <<<otp>>>, <<<ods>>>, <<<ots>>>, <<<odc>>>, <<<otc>>>, <<<odi>>>, <<<oti>>>, <<<odf>>>, <<<otf>>>, <<<odm>>>, <<<oth>>>, <<<odb>>>|{{{./apidocs/de/truezip/driver/zip/OdfDriver.html}<<<OdfDriver>>>}}|
+|<<<odt>>>, <<<ott>>>, <<<odg>>>, <<<otg>>>, <<<odp>>>, <<<otp>>>, <<<ods>>>, <<<ots>>>, <<<odc>>>, <<<otc>>>, <<<odi>>>, <<<oti>>>, <<<odf>>>, <<<otf>>>, <<<odm>>>, <<<oth>>>, <<<odb>>>|{{{./apidocs/net/truevfs/driver/zip/OdfDriver.html}<<<OdfDriver>>>}}|
 *--+--+
-|<<<zip>>>|{{{./apidocs/de/truezip/driver/zip/ZipDriver.html}<<<ZipDriver>>>}}|
+|<<<zip>>>|{{{./apidocs/net/truevfs/driver/zip/ZipDriver.html}<<<ZipDriver>>>}}|
 *--+--+
 
     Add the JAR artifact of this module to the run time class path to
@@ -27,7 +27,7 @@ About TrueVFS Driver ZIP
     client API modules.
     The URI schemes will then get recognized as default archive file extensions
     by the class
-    {{{../../apidocs/de/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+    {{{../../apidocs/net/truevfs/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
 
 * Key Features
 
@@ -36,12 +36,12 @@ About TrueVFS Driver ZIP
         API with a file system driver or the ZIP classes directly.
 
         To use this feature with a client API, set
-        {{{./apidocs/de/truezip/kernel/option/FsOutputOption.html#GROW}<<<FsOutputOption.GROW>>>}},
+        {{{./apidocs/net/truevfs/kernel/option/FsOutputOption.html#GROW}<<<FsOutputOption.GROW>>>}},
         e.g. in
-        {{{./apidocs/de/truezip/file/TConfig.html#setOutputPreferences(de.truezip.kernel.util.BitField)}<<<TConfig.setOutputPreferences(BitField)>>>}}.
+        {{{./apidocs/net/truevfs/file/TConfig.html#setOutputPreferences(net.truevfs.kernel.util.BitField)}<<<TConfig.setOutputPreferences(BitField)>>>}}.
 
         To use this feature with the ZIP API, call
-        {{{./apidocs/de/truezip/driver/zip/io/ZipOutputStream.html#ZipOutputStream(java.io.OutputStream,de.truezip.driver.zip.io.ZipFile)}<<<ZipOutputStream(OutputStream, ZipFile)>>>}}.
+        {{{./apidocs/net/truevfs/driver/zip/io/ZipOutputStream.html#ZipOutputStream(java.io.OutputStream,net.truevfs.driver.zip.io.ZipFile)}<<<ZipOutputStream(OutputStream, ZipFile)>>>}}.
 
     [Recovery Of Lost ZIP Entries]
         When reading truncated ZIP files, lost entries can get recovered.
@@ -51,7 +51,7 @@ About TrueVFS Driver ZIP
         for reading ZIP files.
 
         To use this feature with the ZIP API, call
-        {{{./apidocs/de/truezip/driver/zip/io/ZipFile.html#recoverLostEntries()}<<<ZipFile.recoverLostEntries()>>>}}.
+        {{{./apidocs/net/truevfs/driver/zip/io/ZipFile.html#recoverLostEntries()}<<<ZipFile.recoverLostEntries()>>>}}.
 
     [WinZip AES Specification]
         When reading or writing a ZIP file, ZIP entry data can get encrypted
@@ -59,36 +59,36 @@ About TrueVFS Driver ZIP
         {{{http://www.winzip.com/win/en/aes_info.htm}WinZip AES specification}}.
 
         To use this feature with a client API, set
-        {{{./apidocs/de/truezip/kernel/option/FsOutputOption.html#ENCRYPT}<<<FsOutputOption.ENCRYPT>>>}},
+        {{{./apidocs/net/truevfs/kernel/option/FsOutputOption.html#ENCRYPT}<<<FsOutputOption.ENCRYPT>>>}},
         e.g. in
-        {{{./apidocs/de/truezip/file/TConfig.html#setOutputPreferences(de.truezip.kernel.util.BitField)}<<<TConfig.setOutputPreferences(BitField)>>>}},
+        {{{./apidocs/net/truevfs/file/TConfig.html#setOutputPreferences(net.truevfs.kernel.util.BitField)}<<<TConfig.setOutputPreferences(BitField)>>>}},
         or
         {{{../../faq.html#installDriverFile}install a custom file system driver}}
         which sets this option before calling its super-class implementation in
-        {{{./apidocs/de/truezip/driver/zip/ZipDriver.html#newEntry(java.lang.String,de.truezip.kernel.entry.Entry.Type,de.truezip.kernel.entry.Entry,de.truezip.kernel.util.BitField)}<<<ZipDriver.newEntry(String, Entry.Type, Entry, BitField)>>>}}.
+        {{{./apidocs/net/truevfs/driver/zip/ZipDriver.html#newEntry(java.lang.String,net.truevfs.kernel.entry.Entry.Type,net.truevfs.kernel.entry.Entry,net.truevfs.kernel.util.BitField)}<<<ZipDriver.newEntry(String, Entry.Type, Entry, BitField)>>>}}.
         In either case, if you don't want to use the built-in
-        {{{./apidocs/de/truezip/driver/zip/KeyManagerZipCryptoParameters.html}<<<KeyManagerZipCryptoParameters>>>}}
+        {{{./apidocs/net/truevfs/driver/zip/KeyManagerZipCryptoParameters.html}<<<KeyManagerZipCryptoParameters>>>}}
         for prompting the user for a password using a Swing GUI or the console,
         then you should override
-        {{{./apidocs/de/truezip/driver/zip/ZipDriver.html#zipCryptoParameters(de.truezip.kernel.FsModel,java.nio.charset.Charset)}<<<ZipDriver.zipCryptoParameters(FsModel, Charset)>>>}}
+        {{{./apidocs/net/truevfs/driver/zip/ZipDriver.html#zipCryptoParameters(net.truevfs.kernel.FsModel,java.nio.charset.Charset)}<<<ZipDriver.zipCryptoParameters(FsModel, Charset)>>>}}
         in order to provide custom
-        {{{./apidocs/de/truezip/driver/zip/io/WinZipAesParameters.html}<<<WinZipAesParameters>>>}},
+        {{{./apidocs/net/truevfs/driver/zip/io/WinZipAesParameters.html}<<<WinZipAesParameters>>>}},
         too.
 
         To use this feature with the ZIP API, call
-        {{{./apidocs/de/truezip/driver/zip/io/ZipEntry.html#setEncrypted(boolean)}<<<ZipEntry.setEncrypted(boolean)>>>}}
+        {{{./apidocs/net/truevfs/driver/zip/io/ZipEntry.html#setEncrypted(boolean)}<<<ZipEntry.setEncrypted(boolean)>>>}}
         first.
         Then call
-        {{{./apidocs/de/truezip/driver/zip/io/ZipFile.html#setCryptoParameters(de.truezip.driver.zip.io.ZipCryptoParameters)}<<<ZipFile.setCryptoParameters(ZipCryptoParameters)>>>}}
+        {{{./apidocs/net/truevfs/driver/zip/io/ZipFile.html#setCryptoParameters(net.truevfs.driver.zip.io.ZipCryptoParameters)}<<<ZipFile.setCryptoParameters(ZipCryptoParameters)>>>}}
         or
-        {{{./apidocs/de/truezip/driver/zip/io/ZipOutputStream.html#setCryptoParameters(de.truezip.driver.zip.io.ZipCryptoParameters)}<<<ZipOutputStream.setCryptoParameters(ZipCryptoParameters)>>>}}
+        {{{./apidocs/net/truevfs/driver/zip/io/ZipOutputStream.html#setCryptoParameters(net.truevfs.driver.zip.io.ZipCryptoParameters)}<<<ZipOutputStream.setCryptoParameters(ZipCryptoParameters)>>>}}
         respectively.
 
         Note that the WinZip AES encryption scheme does <not> encrypt and <not>
         authenticate the ZIP entry meta data, e.g. the comments or ZIP entry
         names.
         If you want this, then please use the
-        {{{../truezip-driver-tzp/index.html}ZIP.RAES}} file format instead.
+        {{{../truevfs-driver-tzp/index.html}ZIP.RAES}} file format instead.
 
     [BZIP2 Compression]
         When reading or writing a ZIP file, ZIP entry data can get decompressed
@@ -100,11 +100,11 @@ About TrueVFS Driver ZIP
         a client API,
         {{{../../faq.html#installDriverFile}install a custom file system driver}}
         which overrides
-        {{{./apidocs/de/truezip/driver/zip/ZipDriver.html#getMethod()}<<<ZipDriver.getMethod()>>>}}.
+        {{{./apidocs/net/truevfs/driver/zip/ZipDriver.html#getMethod()}<<<ZipDriver.getMethod()>>>}}.
 
         To use this feature for writing a BZIP2 compressed ZIP entry with
         the ZIP API, call
-        {{{./apidocs/de/truezip/driver/zip/io/ZipEntry.html#setMethod(int)}<<<ZipEntry.setMethod(int)>>>}}
+        {{{./apidocs/net/truevfs/driver/zip/io/ZipEntry.html#setMethod(int)}<<<ZipEntry.setMethod(int)>>>}}
 
     [Selectable Character Sets]
         The character set for reading and writing ZIP comments and ZIP entry
@@ -114,19 +114,19 @@ About TrueVFS Driver ZIP
         To use this feature with a client API,
         {{{../../faq.html#installDriverFile}install a custom file system driver}}
         which overrides
-        {{{./apidocs/de/truezip/driver/zip/ZipDriver.html#getCharset()}<<<ZipDriver.getCharset()>>>}}.
+        {{{./apidocs/net/truevfs/driver/zip/ZipDriver.html#getCharset()}<<<ZipDriver.getCharset()>>>}}.
 
         To use this feature with the ZIP API, call
-        {{{./apidocs/de/truezip/driver/zip/io/ZipOutputStream.html#ZipOutputStream(java.io.OutputStream,java.nio.charset.Charset)}<<<ZipOutputStream(OutputStream, Charset)>>>}}
+        {{{./apidocs/net/truevfs/driver/zip/io/ZipOutputStream.html#ZipOutputStream(java.io.OutputStream,java.nio.charset.Charset)}<<<ZipOutputStream(OutputStream, Charset)>>>}}
         or
-        {{{./apidocs/de/truezip/driver/zip/io/ZipFile.html#ZipFile(java.io.File,java.nio.charset.Charset)}<<<ZipFile(File, Charset)>>>}}.
+        {{{./apidocs/net/truevfs/driver/zip/io/ZipFile.html#ZipFile(java.io.File,java.nio.charset.Charset)}<<<ZipFile(File, Charset)>>>}}.
 
     [External File Attributes]
         External file attributes can get used to set executable bits for third
         party tools, etc.
         This requires direct use of the ZIP classes.
         See
-        {{{./apidocs/de/truezip/driver/zip/io/ZipEntry.html#setExternalAttributes(long)}<<<ZipEntry.setExternalAttributes(long)>>>}}.
+        {{{./apidocs/net/truevfs/driver/zip/io/ZipEntry.html#setExternalAttributes(long)}<<<ZipEntry.setExternalAttributes(long)>>>}}.
 
     [ZIP64 Extensions]
         ZIP64 extensions are automatically and transparently activated when
