@@ -101,7 +101,8 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     @Override
     public InputSocket<?> input(
-            final BitField<FsAccessOption> options, final FsEntryName name) {
+            final BitField<FsAccessOption> options,
+            final FsEntryName name) {
         /** This class requires ON-DEMAND LOOKUP of its delegate lazySocket! */
         class Input extends DelegatingInputSocket<Entry> {
             @Override
@@ -123,8 +124,9 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("NP_PARAMETER_MUST_BE_NONNULL_BUT_MARKED_AS_NULLABLE") // false positive!
     public OutputSocket<?> output(
-            final BitField<FsAccessOption> options, final FsEntryName name, @CheckForNull
-    final Entry template) {
+            final BitField<FsAccessOption> options,
+            final FsEntryName name,
+            final @CheckForNull Entry template) {
         /** This class requires ON-DEMAND LOOKUP of its delegate lazySocket! */
         class Output extends DelegatingOutputSocket<Entry> {
             @Override
@@ -273,239 +275,227 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
             caches.put(name, this);
         }
 
-        InputSocket<?> input(BitField<FsAccessOption> options) {
-            return cache.configure(new Input(options)).input();
-        }
+        InputSocket<?> input(final BitField<FsAccessOption> options) {
+            /**
+             * This class requires LAZY INITIALIZATION of its channel, but NO
+             * automatic decoupling on exceptions!
+             */
+            @NotThreadSafe
+            final class Input extends ClutchInputSocket<Entry> {
+                private final BitField<FsAccessOption> o = options.clear(CACHE); // consume
 
-        /**
-         * This class requires LAZY INITIALIZATION of its channel, but NO
-         * automatic decoupling on exceptions!
-         */
-        @NotThreadSafe
-        final class Input extends ClutchInputSocket<Entry> {
-            final BitField<FsAccessOption> options;
-
-            Input(final BitField<FsAccessOption> options) {
-                this.options = options.clear(CACHE); // consume
-            }
-
-            @Override
-            protected InputSocket<? extends Entry> lazySocket() {
-                return controller.input(options, name);
-            }
-
-            @Override
-            public Entry localTarget() throws IOException {
-                // Bypass the super class implementation to keep the
-                // lazySocket even upon an exception!
-                return boundSocket().localTarget();
-            }
-
-            @Override
-            public InputStream stream() throws IOException {
-                assert isWriteLockedByCurrentThread();
-                class Stream extends DecoratingInputStream {
-                    @CreatesObligation
-                    Stream() throws IOException {
-                        // Bypass the super class implementation to keep the
-                        // channel even upon an exception!
-                        //super(Input.super.stream());
-                        super(boundSocket().stream());
-                        assert getModel().isTouched();
-                    }
-
-                    @Override
-                    @DischargesObligation
-                    public void close() throws IOException {
-                        assert isWriteLockedByCurrentThread();
-                        in.close();
-                        register();
-                    }
+                @Override
+                protected InputSocket<? extends Entry> lazySocket() {
+                    return controller.input(o, name);
                 }
-                return new Stream();
-            }
 
-            @Override
-            public SeekableByteChannel channel(){
-                throw new AssertionError();
-            }
-        } // Input
+                @Override
+                public Entry localTarget() throws IOException {
+                    // Bypass the super class implementation to keep the
+                    // lazySocket even upon an exception!
+                    return boundSocket().localTarget();
+                }
 
-        OutputSocket<?> output( BitField<FsAccessOption> options,
-                                @CheckForNull Entry template) {
-            return new Output(options, template);
+                @Override
+                public InputStream stream() throws IOException {
+                    assert isWriteLockedByCurrentThread();
+
+                    final class Stream extends DecoratingInputStream {
+                        @CreatesObligation
+                        Stream() throws IOException {
+                            // Bypass the super class implementation to keep the
+                            // channel even upon an exception!
+                            //super(Input.super.stream());
+                            super(boundSocket().stream());
+                            assert getModel().isTouched();
+                        }
+
+                        @Override
+                        @DischargesObligation
+                        public void close() throws IOException {
+                            assert isWriteLockedByCurrentThread();
+                            in.close();
+                            register();
+                        }
+                    }
+                    return new Stream();
+                }
+
+                @Override
+                public SeekableByteChannel channel(){
+                    throw new AssertionError();
+                }
+            }
+            return cache.configure(new Input()).input();
         }
 
-        /**
-         * This class requires LAZY INITIALIZATION of its channel, but NO
-         * automatic decoupling on exceptions!
-         */
-        @NotThreadSafe
-        final class Output extends ClutchOutputSocket<Entry> {
-            final BitField<FsAccessOption> options;
-            final @CheckForNull Entry template;
+        OutputSocket<?> output( final BitField<FsAccessOption> options,
+                                final @CheckForNull Entry template) {
+            /**
+             * This class requires LAZY INITIALIZATION of its channel, but NO
+             * automatic decoupling on exceptions!
+             */
+            @NotThreadSafe
+            final class Output extends ClutchOutputSocket<Entry> {
+                final BitField<FsAccessOption> o = options.clear(CACHE); // consume
 
-            Output( final BitField<FsAccessOption> options,
-                    final @CheckForNull Entry template) {
-                this.options = options.clear(CACHE); // consume
-                this.template = template;
-            }
-
-            @Override
-            protected OutputSocket<? extends Entry> lazySocket() {
-                return cache.configure( controller.output(
-                                            options.clear(EXCLUSIVE), name,
-                                            template))
+                @Override
+                protected OutputSocket<? extends Entry> lazySocket() {
+                    return cache
+                            .configure(controller.output(
+                                o.clear(EXCLUSIVE), name, template))
                             .output();
-            }
-
-            @Override
-            public Entry localTarget() throws IOException {
-                // Bypass the super class implementation to keep the
-                // lazySocket even upon an exception!
-                return boundSocket().localTarget();
-            }
-
-            @Override
-            public OutputStream stream() throws IOException {
-                assert isWriteLockedByCurrentThread();
-                preOutput();
-                return new Stream();
-            }
-
-            final class Stream extends DecoratingOutputStream {
-                @CreatesObligation
-                Stream() throws IOException {
-                    // Bypass the super class implementation to keep the
-                    // lazySocket even upon an exception!
-                    //super(Output.super.stream());
-                    super(boundSocket().stream());
-                    register();
                 }
 
                 @Override
-                @DischargesObligation
-                public void close() throws IOException {
-                    assert isWriteLockedByCurrentThread();
-                    out.close();
-                    postOutput();
-                }
-            } // Stream
-
-            @Override
-            public SeekableByteChannel channel() throws IOException {
-                assert isWriteLockedByCurrentThread();
-                preOutput();
-                return new Channel();
-            }
-
-            final class Channel extends DecoratingSeekableChannel {
-                @CreatesObligation
-                Channel() throws IOException {
+                public Entry localTarget() throws IOException {
                     // Bypass the super class implementation to keep the
                     // lazySocket even upon an exception!
-                    //super(Output.super.channel());
-                    super(boundSocket().channel());
-                    register();
+                    return boundSocket().localTarget();
                 }
 
                 @Override
-                @DischargesObligation
-                public void close() throws IOException {
+                public OutputStream stream() throws IOException {
                     assert isWriteLockedByCurrentThread();
-                    channel.close();
-                    postOutput();
+                    preOutput();
+
+                    final class Stream extends DecoratingOutputStream {
+                        @CreatesObligation
+                        Stream() throws IOException {
+                            // Bypass the super class implementation to keep the
+                            // lazySocket even upon an exception!
+                            //super(Output.super.stream());
+                            super(boundSocket().stream());
+                            register();
+                        }
+
+                        @Override
+                        @DischargesObligation
+                        public void close() throws IOException {
+                            assert isWriteLockedByCurrentThread();
+                            out.close();
+                            postOutput();
+                        }
+                    }
+                    return new Stream();
                 }
-            } // Channel
 
-            void preOutput() throws IOException {
-                mknod(options, template);
-            }
+                @Override
+                public SeekableByteChannel channel() throws IOException {
+                    assert isWriteLockedByCurrentThread();
+                    preOutput();
 
-            void postOutput() throws IOException {
-                mknod(  options.clear(EXCLUSIVE),
-                        null != template ? template : cache);
-                register();
-            }
+                    final class Channel extends DecoratingSeekableChannel {
+                        @CreatesObligation
+                        Channel() throws IOException {
+                            // Bypass the super class implementation to keep the
+                            // lazySocket even upon an exception!
+                            //super(Output.super.channel());
+                            super(boundSocket().channel());
+                            register();
+                        }
 
-            void mknod( final BitField<FsAccessOption> options,
-                        final @CheckForNull Entry template)
-            throws IOException {
-                BitField<FsAccessOption> mknodOpts = options;
-                while (true) {
-                    try {
-                        controller.mknod(mknodOpts, name, FILE, template);
-                        break;
-                    } catch (final NeedsSyncException mknodEx) {
-                        // In this context, this exception means that the entry
-                        // has already been written to the output archive for
-                        // the target archive file.
+                        @Override
+                        @DischargesObligation
+                        public void close() throws IOException {
+                            assert isWriteLockedByCurrentThread();
+                            channel.close();
+                            postOutput();
+                        }
+                    }
+                    return new Channel();
+                }
 
-                        // Pass on the exception if there is no means to
-                        // resolve the issue locally, that is if we were asked
-                        // to create the entry exclusively or this is a
-                        // non-recursive file system operation.
-                        if (mknodOpts.get(EXCLUSIVE))
-                            throw mknodEx;
-                        final BitField<FsSyncOption> syncOpts = SyncController.modify(SYNC);
-                        if (SYNC == syncOpts)
-                            throw mknodEx;
+                void preOutput() throws IOException {
+                    mknod(o, template);
+                }
 
-                        // Try to resolve the issue locally.
-                        // Even if we were asked to create the entry
-                        // EXCLUSIVEly, first we must try to get the cache in
-                        // sync() with the virtual file system again and retry
-                        // the mknod().
+                void postOutput() throws IOException {
+                    mknod(  o.clear(EXCLUSIVE),
+                            null != template ? template : cache);
+                    register();
+                }
+
+                void mknod( final BitField<FsAccessOption> options,
+                            final @CheckForNull Entry template)
+                throws IOException {
+                    BitField<FsAccessOption> mknodOpts = options;
+                    while (true) {
                         try {
-                            controller.sync(syncOpts);
-                            //continue; // sync() succeeded, now repeat mknod()
-                        } catch (final FsSyncException syncEx) {
-                            syncEx.addSuppressed(mknodEx);
+                            controller.mknod(mknodOpts, name, FILE, template);
+                            break;
+                        } catch (final NeedsSyncException mknodEx) {
+                            // In this context, this exception means that the entry
+                            // has already been written to the output archive for
+                            // the target archive file.
 
-                            // sync() failed, maybe just because the current
-                            // thread has already acquired some open I/O
-                            // resources for the same target archive file, e.g.
-                            // an input stream for a copy operation and this
-                            // is an artifact of an attempt to acquire the
-                            // output stream for a child file system.
-                            if (!(syncEx.getCause() instanceof FsResourceOpenException)) {
-                                // Too bad, sync() failed because of a more
-                                // serious issue than just some open resources.
-                                // Let's rethrow the sync exception.
-                                throw syncEx;
-                            }
+                            // Pass on the exception if there is no means to
+                            // resolve the issue locally, that is if we were asked
+                            // to create the entry exclusively or this is a
+                            // non-recursive file system operation.
+                            if (mknodOpts.get(EXCLUSIVE))
+                                throw mknodEx;
+                            final BitField<FsSyncOption> syncOpts = SyncController.modify(SYNC);
+                            if (SYNC == syncOpts)
+                                throw mknodEx;
 
-                            // OK, we couldn't sync() because the current
-                            // thread has acquired open I/O resources for the
-                            // same target archive file.
-                            // Normally, we would be expected to rethrow the
-                            // mknod exception to trigger another sync(), but
-                            // this would fail for the same reason und create
-                            // an endless loop, so we can't do this.
-                            //throw mknodEx;
+                            // Try to resolve the issue locally.
+                            // Even if we were asked to create the entry
+                            // EXCLUSIVEly, first we must try to get the cache in
+                            // sync() with the virtual file system again and retry
+                            // the mknod().
+                            try {
+                                controller.sync(syncOpts);
+                                //continue; // sync() succeeded, now repeat mknod()
+                            } catch (final FsSyncException syncEx) {
+                                syncEx.addSuppressed(mknodEx);
 
-                            // Dito for mapping the exception.
-                            //throw FsNeedsLockRetryException.get(getModel());
+                                // sync() failed, maybe just because the current
+                                // thread has already acquired some open I/O
+                                // resources for the same target archive file, e.g.
+                                // an input stream for a copy operation and this
+                                // is an artifact of an attempt to acquire the
+                                // output stream for a child file system.
+                                if (!(syncEx.getCause() instanceof FsResourceOpenException)) {
+                                    // Too bad, sync() failed because of a more
+                                    // serious issue than just some open resources.
+                                    // Let's rethrow the sync exception.
+                                    throw syncEx;
+                                }
 
-                            // Check if we can retry the mknod with GROW set.
-                            mknodOpts = mknodOpts.set(GROW);
-                            if (mknodOpts == options) {
-                                // Finally, the mknod failed because the entry
-                                // has already been output to the target archive
-                                // file - so what?!
-                                // This should mark only a volatile issue because
-                                // the next sync() will sort it out once all the
-                                // I/O resources have been closed.
-                                // Let's log the sync exception - mind that it has
-                                // suppressed the mknod exception - and continue
-                                // anyway...
-                                logger.log(Level.FINE, "ignoring", syncEx);
-                                break;
+                                // OK, we couldn't sync() because the current
+                                // thread has acquired open I/O resources for the
+                                // same target archive file.
+                                // Normally, we would be expected to rethrow the
+                                // mknod exception to trigger another sync(), but
+                                // this would fail for the same reason und create
+                                // an endless loop, so we can't do this.
+                                //throw mknodEx;
+
+                                // Dito for mapping the exception.
+                                //throw FsNeedsLockRetryException.get(getModel());
+
+                                // Check if we can retry the mknod with GROW set.
+                                mknodOpts = mknodOpts.set(GROW);
+                                if (mknodOpts == options) {
+                                    // Finally, the mknod failed because the entry
+                                    // has already been output to the target archive
+                                    // file - so what?!
+                                    // This should mark only a volatile issue because
+                                    // the next sync() will sort it out once all the
+                                    // I/O resources have been closed.
+                                    // Let's log the sync exception - mind that it has
+                                    // suppressed the mknod exception - and continue
+                                    // anyway...
+                                    logger.log(Level.FINE, "ignoring", syncEx);
+                                    break;
+                                }
                             }
                         }
                     }
                 }
             }
-        } // Output
+            return new Output();
+        }
     } // EntryCache
 }
