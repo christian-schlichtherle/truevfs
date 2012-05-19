@@ -5,22 +5,10 @@
 package de.schlichtherle.truevfs.kernel.se;
 
 import de.schlichtherle.truevfs.kernel.CacheEntry;
+import static de.schlichtherle.truevfs.kernel.CacheEntry.Strategy.WRITE_BACK;
 import de.schlichtherle.truevfs.kernel.ClutchInputSocket;
 import de.schlichtherle.truevfs.kernel.ClutchOutputSocket;
 import de.schlichtherle.truevfs.kernel.NeedsSyncException;
-import static de.schlichtherle.truevfs.kernel.CacheEntry.Strategy.WRITE_BACK;
-import static net.truevfs.kernel.FsAccessOption.*;
-import static net.truevfs.kernel.FsSyncOption.ABORT_CHANGES;
-import static net.truevfs.kernel.FsSyncOption.CLEAR_CACHE;
-import static net.truevfs.kernel.FsSyncOptions.SYNC;
-import net.truevfs.kernel.*;
-import net.truevfs.kernel.cio.Entry.Type;
-import static net.truevfs.kernel.cio.Entry.Type.FILE;
-import net.truevfs.kernel.cio.*;
-import net.truevfs.kernel.io.DecoratingInputStream;
-import net.truevfs.kernel.io.DecoratingOutputStream;
-import net.truevfs.kernel.io.DecoratingSeekableChannel;
-import net.truevfs.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
@@ -36,6 +24,18 @@ import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
+import static net.truevfs.kernel.FsAccessOption.*;
+import static net.truevfs.kernel.FsSyncOption.ABORT_CHANGES;
+import static net.truevfs.kernel.FsSyncOption.CLEAR_CACHE;
+import static net.truevfs.kernel.FsSyncOptions.SYNC;
+import net.truevfs.kernel.*;
+import net.truevfs.kernel.cio.Entry.Type;
+import static net.truevfs.kernel.cio.Entry.Type.FILE;
+import net.truevfs.kernel.cio.*;
+import net.truevfs.kernel.io.DecoratingInputStream;
+import net.truevfs.kernel.io.DecoratingOutputStream;
+import net.truevfs.kernel.io.DecoratingSeekableChannel;
+import net.truevfs.kernel.util.BitField;
 
 /**
  * A selective cache for file system entries.
@@ -428,10 +428,10 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                 register();
             }
 
-            void mknod( final BitField<FsAccessOption> _mknodOpts,
+            void mknod( final BitField<FsAccessOption> options,
                         final @CheckForNull Entry template)
             throws IOException {
-                BitField<FsAccessOption> mknodOpts = _mknodOpts;
+                BitField<FsAccessOption> mknodOpts = options;
                 while (true) {
                     try {
                         controller.mknod(mknodOpts, name, FILE, template);
@@ -489,7 +489,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
                             // Check if we can retry the mknod with GROW set.
                             mknodOpts = mknodOpts.set(GROW);
-                            if (mknodOpts == _mknodOpts) {
+                            if (mknodOpts == options) {
                                 // Finally, the mknod failed because the entry
                                 // has already been output to the target archive
                                 // file - so what?!
