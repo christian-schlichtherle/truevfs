@@ -1,0 +1,26 @@
+    -----------------------
+    About TrueVFS Driver
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About TrueVFS Driver
+
+    This module contains sub-modules with pluggable file system drivers.
+    The following sub-modules are available:
+
+    * {{{./truezip-driver-file/index.html}TrueVFS Driver FILE}}
+
+    * {{{./truezip-driver-http/index.html}TrueVFS Driver HTTP(S)}}
+
+    * {{{./truezip-driver-tar/index.html}TrueVFS Driver TAR}}
+
+    * {{{./truezip-driver-zip/index.html}TrueVFS Driver ZIP}}
+
+    * {{{./truezip-driver-tzp/index.html}TrueVFS Driver ZIP.RAES (TZP)}}
+
+    []
+
+    Add the JAR artifact of these sub-modules to the run time class path to
+    make their file system drivers available for service location in the client
+    API modules.

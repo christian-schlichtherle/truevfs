@@ -43,7 +43,7 @@ $title
 * $heading
 
     Thanks to the module
-    {{{../truezip-file/index.html}TrueZIP File*}},
+    {{{../truezip-file/index.html}TrueVFS File*}},
     here's your relief:
     The
     {{{../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}}

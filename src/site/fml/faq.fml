@@ -13,7 +13,7 @@
         title="Frequently Asked Questions"
         toplink="false">
     <part id="file">
-        <title>TrueZIP File* API</title>
+        <title>TrueVFS File* API</title>
         <faq id="cannotReadArchive">
             <question>
                 When trying to read an archive file, I get an exception saying
@@ -23,7 +23,7 @@
             <answer>
                 <p>
                     When configured correctly, the File* API will treat an
-                    archive file like a virtual directory (that's what TrueZIP
+                    archive file like a virtual directory (that's what TrueVFS
                     is all about).
                     Like with plain directories, applications cannot read or
                     write virtual directories using an input or output stream.
@@ -50,7 +50,7 @@
             <answer>
                 <p>
                     When configured correctly, the File* API will treat an
-                    archive file like a virtual directory (that's what TrueZIP
+                    archive file like a virtual directory (that's what TrueVFS
                     is all about).
                     Like with plain directories, applications cannot read or
                     write virtual directories using an input or output stream.
@@ -164,7 +164,7 @@ src.cp_rp(dst);
                     You can easily filter the set of canonical extensions
                     installed by the file system driver modules on the run time
                     class path.
-                    For example, the TrueZIP Driver ZIP module will install a
+                    For example, the TrueVFS Driver ZIP module will install a
                     large set of canonical file extensions for ZIP files.
                     If all you want is to detect <code>*.zip</code> files
                     however, you can do so easily using the following statement:
@@ -197,7 +197,7 @@ TConfig.get().setArchiveDetector(
                     This example presumes that you are going to map the file
                     extension <code>.zip</code> to the <code>ZipDriver</code>.
                     This is actually the default if you add the JAR artifact of
-                    the module TrueZIP&nbsp;Driver&nbsp;ZIP to the run time
+                    the module TrueVFS&nbsp;Driver&nbsp;ZIP to the run time
                     class path.
                 </p>
                 <p>
@@ -220,7 +220,7 @@ TConfig.get().setArchiveDetector(
             </question>
             <answer>
                 <p>
-                    Most likely the TrueZIP File* module is not set up
+                    Most likely the TrueVFS File* module is not set up
                     correctly in order to detect the file extension of the
                     archive type you want to access.
                     To make sure it does, make the following call early in your
@@ -278,7 +278,7 @@ TConfig.get().setArchiveDetector(
 <source>
 // Note that the actual path may refer to anything, even a nested archive file.
 TFile inner = new TFile("outer.zip/inner.zip");
-TFile file = inner.toNonArchiveFile(); // convert - since TrueZIP 7.5
+TFile file = inner.toNonArchiveFile(); // convert - since TrueVFS 7.5
 ... // there may be some I/O here
 TVFS.umount(inner); // unmount potential archive file
 // Now you can safely do any I/O to $file.
@@ -292,7 +292,7 @@ long length = file.length();
                 <p>
                     Last but not least, using the object <code>file</code>
                     for any I/O bypasses any state associated with the path
-                    <code>outer.zip/inner.zip</code> in the TrueZIP Kernel.
+                    <code>outer.zip/inner.zip</code> in the TrueVFS Kernel.
                     This could result in an inconsistent state of the federated
                     file system space and may even incur <em>loss of data</em>!
                     In order to avoid this, it's a good idea <em>not</em> to
@@ -309,7 +309,7 @@ long length = file.length();
             </question>
             <answer>
                 <p>
-                    The TrueZIP Kernel module applies neat caching and
+                    The TrueVFS Kernel module applies neat caching and
                     buffering strategies for archive entries.
                     So whenever your application creates or updates archive
                     entries, the changes need to get committed to the archive
@@ -343,7 +343,7 @@ long length = file.length();
             </question>
             <answer>
                 <p>
-                    The TrueZIP File* API can only access the platform file
+                    The TrueVFS File* API can only access the platform file
                     system because the <code>TFile</code> class extends the
                     <code>File</code> class.
                     To access an archive file via HTTP(S) or any other procotol
@@ -352,10 +352,10 @@ long length = file.length();
                 <ul>
                 <li>If your application uses a JSE&#160;7 compliant JVM,
                     you can simply use the API of the
-                    <a href="truezip-path/index.html">TrueZIP Path</a>
+                    <a href="truezip-path/index.html">TrueVFS Path</a>
                     module.</li>
                 <li>Otherwise, you can use the API of the
-                    <a href="truezip-kernel/index.html">TrueZIP Kernel</a>
+                    <a href="truezip-kernel/index.html">TrueVFS Kernel</a>
                     module.
                 </li>
                 </ul>
@@ -388,16 +388,16 @@ long length = file.length();
         </faq>
     </part>
     <part id="path">
-        <title>TrueZIP Path API</title>
+        <title>TrueVFS Path API</title>
         <faq id="interoperability">
             <question>
-                Can I use the APIs of the modules TrueZIP Path and
-                TrueZIP File* concurrently?
+                Can I use the APIs of the modules TrueVFS Path and
+                TrueVFS File* concurrently?
             </question>
             <answer>
                 <p>
                     Absolutely yes, because both module APIs are just facades
-                    for the TrueZIP Kernel.
+                    for the TrueVFS Kernel.
                     The NIO.2 API defines some methods for the interoperability
                     of <code>File</code> and <code>Path</code> objects:
                 </p>
@@ -422,7 +422,7 @@ long length = file.length();
                     </li>
                 </ul>
                 <p>
-                    To solve these issues, in TrueZIP this is implemented as
+                    To solve these issues, in TrueVFS this is implemented as
                     follows:
                 </p>
                 <ul>
@@ -432,8 +432,8 @@ long length = file.length();
                         This works for any (virtual) file system.
                     </li>
                     <li>
-                        To avoid a compile time dependency in the TrueZIP File*
-                        module on the TrueZIP Path module,
+                        To avoid a compile time dependency in the TrueVFS File*
+                        module on the TrueVFS Path module,
                         <code>TFile.toPath()</code> throws an
                         <code>UnsupportedOperationException</code>.
                         To create a <code>TPath</code> from a
@@ -447,7 +447,7 @@ long length = file.length();
         </faq>
         <faq id="whichCopy">
             <question>
-                The NIO.2 API and the TrueZIP File* API both provide a copy
+                The NIO.2 API and the TrueVFS File* API both provide a copy
                 method. Which one should I use?
             </question>
             <answer>
@@ -461,9 +461,9 @@ long length = file.length();
                     directory trees, so you'ld have to write this yourselve.
                 </p>
                 <p>
-                    With TrueZIP however, you can easily &quot;back out&quot;
+                    With TrueVFS however, you can easily &quot;back out&quot;
                     from a <code>TPath</code> object to a <code>TFile</code>
-                    object to use the advanced copy methods of the TrueZIP
+                    object to use the advanced copy methods of the TrueVFS
                     File* API.
                     So instead of calling...
                 </p>
@@ -496,7 +496,7 @@ TFile.cp(src.toFile(), dst.toFile());
             <answer>
                 <p>
                     In exactly the same way as with the module
-                    TrueZIP&nbsp;File*,
+                    TrueVFS&nbsp;File*,
                     see <a href="#installDriverFile">here</a>.
                 </p>
             </answer>
@@ -534,7 +534,7 @@ TFile.cp(src.toFile(), dst.toFile());
                 </p>
 <source>
 TPath inner = new TPath("outer.zip/inner.zip");
-TPath path = inner.toNonArchivePath(); // convert - since TrueZIP 7.5
+TPath path = inner.toNonArchivePath(); // convert - since TrueVFS 7.5
 ... // there may be some I/O here
 inner.getFileSystem().close(); // unmount potential archive file
 // Now you can safely do any I/O to $path.
@@ -548,7 +548,7 @@ long size = Files.size(path);
                 <p>
                     Last but not least, using the object <code>path</code>
                     for any I/O bypasses any state associated with the path
-                    <code>outer.zip/inner.zip</code> in the TrueZIP Kernel.
+                    <code>outer.zip/inner.zip</code> in the TrueVFS Kernel.
                     This could result in an inconsistent state of the federated
                     file system space and may even incur <em>loss of data</em>!
                     In order to avoid this, it's a good idea <em>not</em> to
@@ -564,20 +564,20 @@ long size = Files.size(path);
             <question>Where are the latest news and announcements?</question>
             <answer>
                 <p>
-                    Starting from version 7.0, the TrueZIP project has it's
+                    Starting from version 7.0, the TrueVFS project has it's
                     own blog for announcements, release notes, feature show
                     cases and more named
-                    <a href="http://truezip.schlichtherle.de">The TrueZIP Blog</a>.
+                    <a href="http://truezip.schlichtherle.de">The TrueVFS Blog</a>.
                 </p>
             </answer>
         </faq>
         <faq id="no-maven">
-            <question>Do I have to use Maven to use TrueZIP?</question>
+            <question>Do I have to use Maven to use TrueVFS?</question>
             <answer>
                 <p>
                     Absolutely not!
                     To learn about your options, please read the article
-                    <a href="kick-start/no-maven.html">Using TrueZIP Without Maven</a>.
+                    <a href="kick-start/no-maven.html">Using TrueVFS Without Maven</a>.
                 </p>
             </answer>
         </faq>
@@ -585,7 +585,7 @@ long size = Files.size(path);
             <question>Where is the Javadoc?</question>
             <answer>
                 <p>
-                    You can find the Javadoc for the entire TrueZIP API
+                    You can find the Javadoc for the entire TrueVFS API
                     including all modules in the navigation bar by clicking
                     <i>Project Reports</i> -> <i>Project Reports</i> ->
                     <i>JavaDocs</i>, or you could simply click
@@ -595,11 +595,11 @@ long size = Files.size(path);
         </faq>
         <faq id="binaryCompatibility">
             <question>
-                How does TrueZIP deal with binary compatibility?
+                How does TrueVFS deal with binary compatibility?
             </question>
             <answer>
                 <p>
-                    TrueZIP uses the same version numbering scheme like Maven,
+                    TrueVFS uses the same version numbering scheme like Maven,
                     i.e.
                     <code>&lt;major&gt;.&lt;minor&gt;.&lt;incremental&gt;-&lt;qualifier&gt;</code>.
                     Within the same major version number, binary compatibility
@@ -632,15 +632,15 @@ long size = Files.size(path);
         </faq>
         <faq id="nestedArchives">
             <question>
-                How does TrueZIP deal with the compression of nested archive
+                How does TrueVFS deal with the compression of nested archive
                 files like e.g. <code>app.war/WEB-INF/lib/lib.jar</code>?
             </question>
             <answer>
                 <p>
-                    With the advent of release 7.1, TrueZIP implements a new
+                    With the advent of release 7.1, TrueVFS implements a new
                     strategy to avoid compressing already compressed archive
                     files in an enclosing archive file again.
-                    In contrast, the old stragegy of TrueZIP 7.0 and earlier
+                    In contrast, the old stragegy of TrueVFS 7.0 and earlier
                     was to compress everything - even if it was already
                     compressed.
                 </p>
@@ -674,7 +674,7 @@ long size = Files.size(path);
         </faq>
         <faq id="absoluteEntryName">
             <question>
-                How does TrueZIP deal with entries with absolute entry names in
+                How does TrueVFS deal with entries with absolute entry names in
                 archive files?
             </question>
             <answer>
@@ -686,10 +686,10 @@ long size = Files.size(path);
                     contain entries with absolute entry names.
                 </p>
                 <p>
-                    However, you can use TrueZIP to read, modify or delete
+                    However, you can use TrueVFS to read, modify or delete
                     archive files which contain entries with absolute entry
                     names:
-                    If you use TrueZIP to modify an archive file which
+                    If you use TrueVFS to modify an archive file which
                     contains entries with absolute entry names, these entry 
                     names are preserved.
                     Likewise, an archive file can get deleted like any empty
@@ -700,7 +700,7 @@ long size = Files.size(path);
         </faq>
         <faq id="normalizeEntryName">
             <question>
-                How does TrueZIP deal with entries with dot <code>"."</code>
+                How does TrueVFS deal with entries with dot <code>"."</code>
                 or dot-dot <code>".."</code> segments in archive files?
             </question>
             <answer>
@@ -720,7 +720,7 @@ long size = Files.size(path);
         </faq>
         <faq id="windowsSeparator">
             <question>
-                How does TrueZIP deal with entries which use <code>"\"</code>
+                How does TrueVFS deal with entries which use <code>"\"</code>
                 as the separator character in archive files?
             </question>
             <answer>
@@ -737,11 +737,11 @@ long size = Files.size(path);
         </faq>
         <faq id="duplicateEntries">
             <question>
-                How does TrueZIP deal with duplicate entries in archive files?
+                How does TrueVFS deal with duplicate entries in archive files?
             </question>
             <answer>
                 <p>
-                    When mounting an archive file system, TrueZIP 7.1 and later
+                    When mounting an archive file system, TrueVFS 7.1 and later
                     use <i>covariant file system entries</i> in order to enable
                     an application to access archive entries of different types
                     (FILE, DIRECTORY, SYMLINK or SPECIAL) which share the same
@@ -766,7 +766,7 @@ long size = Files.size(path);
                     Note that this feature solely exists to enable applications
                     to read the contents of all archive files, even if they
                     have a strange directory layout.
-                    Note again that a TrueZIP application cannot create a
+                    Note again that a TrueVFS application cannot create a
                     covariant archive entry because this is considered to be a
                     bad practice.
                 </p>
@@ -797,7 +797,7 @@ long size = Files.size(path);
                     <a href="http://java.net/jira/browse/TRUEZIP">JIRA</a>.
                     You can then use JIRA to monitor and discuss its progress,
                     vote for it, add file attachments to it etc.
-                    JIRA is now also used to schedule new TrueZIP versions and
+                    JIRA is now also used to schedule new TrueVFS versions and
                     prepare their Release Notes.
                 </p>
             </answer>

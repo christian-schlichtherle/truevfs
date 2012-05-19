@@ -2,9 +2,9 @@
 #macro(configuring $extension $file $modules_need $artifactId)
 * Configuring Archive Detection
 
-    You may wonder how TrueZIP gets configured to treat a file name with a
+    You may wonder how TrueVFS gets configured to treat a file name with a
     $extension extension as a $file file instead of a plain old file.
-    For now, let it suffice to say that TrueZIP follows the
+    For now, let it suffice to say that TrueVFS follows the
     convention-over-configuration principle as much as possible,
     so there are reasonable defaults for everything in order to relieve you
     from typical configuration tasks.
@@ -16,7 +16,7 @@
 
     For more information about configuring the client APIs, please refer to the
     article
-    {{{../truezip-file/configuration.html}Configuring TrueZIP File*}}.
+    {{{../truezip-file/configuration.html}Configuring TrueVFS File*}}.
 
 ** False Positive Archive Files
 
@@ -25,7 +25,7 @@
     not even a file, e.g. a directory. This is called a
     <false positive archive file> or <false positive> for short.
 
-    TrueZIP safely detects any false positives and treats them according to
+    TrueVFS safely detects any false positives and treats them according to
     their true state, that is, like a plain file or directory.
     This finding will be remembered until the next call to <<<TVFS.umount()>>>,
     so the performance impact is minimal.
@@ -41,7 +41,7 @@
     access - this dependends on the driver implementation.
 
     If your application is only short-running, then there is actually nothing
-    to do because the TrueZIP Kernel automatically registers and de-registers
+    to do because the TrueVFS Kernel automatically registers and de-registers
     a JVM shutdown hook which will commit all changes when its run.
     Note that shutdown hooks are run even if the application terminates due to
     a <<<Throwable>>>.

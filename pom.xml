@@ -18,23 +18,23 @@
         <version>5</version>
     </parent>
 
-    <groupId>de.schlichtherle.truezip</groupId>
-    <artifactId>truezip</artifactId>
-    <version>8-SNAPSHOT</version>
+    <groupId>de.schlichtherle.truevfs</groupId>
+    <artifactId>truevfs</artifactId>
+    <version>1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>TrueZIP</name>
+    <name>TrueVFS</name>
     <description>
-TrueZIP is a Java based virtual file system (VFS) which enables
+TrueVFS is a Java based virtual file system (VFS) which enables
 client applications to perform CRUD (Create, Read, Update, Delete)
 operations on archive files as if they were virtual directories,
 even with nested archive files in multithreaded environments.
 
-As a library, TrueZIP provides simple, uniform, transparent,
+As a library, TrueVFS provides simple, uniform, transparent,
 thread-safe, read/write access to archive files as if they were
 virtual directories in a file system path.
 
-As a framework, TrueZIP provides the interfaces and classes to
+As a framework, TrueVFS provides the interfaces and classes to
 write file system drivers which plug-in to its federated file
 system space.
     </description>
@@ -116,113 +116,113 @@ system space.
             <!-- Header text -->
             &lt;b&gt;${project.name} ${project.version}&lt;/b&gt;
         </header>
-        <excludePackageNames>de.schlichtherle.truezip</excludePackageNames>
+        <excludePackageNames>de.schlichtherle.truevfs</excludePackageNames>
 
         <!-- clirr-maven-plugin -->
         <comparisonVersion>8.0</comparisonVersion>
     </properties>
 
     <modules>
-        <module>truezip-archetype</module>
-        <module>truezip-driver</module>
-        <module>truezip-extension</module>
-        <module>truezip-file</module>
-        <module>truezip-kernel</module>
-        <module>truezip-key</module>
-        <module>truezip-path</module>
-        <module>truezip-samples</module>
+        <module>truevfs-archetype</module>
+        <module>truevfs-driver</module>
+        <module>truevfs-extension</module>
+        <module>truevfs-file</module>
+        <module>truevfs-kernel</module>
+        <module>truevfs-key</module>
+        <module>truevfs-path</module>
+        <module>truevfs-samples</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-driver-file</artifactId>
+                <artifactId>truevfs-driver-file</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-driver-http</artifactId>
+                <artifactId>truevfs-driver-http</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-driver-tar</artifactId>
+                <artifactId>truevfs-driver-tar</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-driver-tzp</artifactId>
+                <artifactId>truevfs-driver-tzp</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-driver-zip</artifactId>
+                <artifactId>truevfs-driver-zip</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-driver-zip</artifactId>
+                <artifactId>truevfs-driver-zip</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-extension-jmx-jul</artifactId>
+                <artifactId>truevfs-extension-jmx-jul</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-file</artifactId>
+                <artifactId>truevfs-file</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-file</artifactId>
+                <artifactId>truevfs-file</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-kernel</artifactId>
+                <artifactId>truevfs-kernel</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-kernel</artifactId>
+                <artifactId>truevfs-kernel</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-key</artifactId>
+                <artifactId>truevfs-key</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-key</artifactId>
+                <artifactId>truevfs-key</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-path</artifactId>
+                <artifactId>truevfs-path</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-path</artifactId>
+                <artifactId>truevfs-path</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truezip-samples</artifactId>
+                <artifactId>truevfs-samples</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -269,7 +269,7 @@ system space.
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
                         <systemPropertyVariables>
-                            <de.schlichtherle.truezip.kernel.ControlFlowException.traceable>true</de.schlichtherle.truezip.kernel.ControlFlowException.traceable>
+                            <de.schlichtherle.truevfs.kernel.ControlFlowException.traceable>true</de.schlichtherle.truevfs.kernel.ControlFlowException.traceable>
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
                         </systemPropertyVariables>
                     </configuration>
@@ -298,9 +298,9 @@ system space.
                                  it would also conceal any multithreading bugs
                                  in the classes under test, so it's generally
                                  discouraged. -->
-                            <de.truezip.kernel.isolateFsManager>false</de.truezip.kernel.isolateFsManager>
-                            <de.truezip.driver.zip.io.forceZip64Ext>false</de.truezip.driver.zip.io.forceZip64Ext>
-                            <de.schlichtherle.truezip.kernel.ControlFlowException.traceable>true</de.schlichtherle.truezip.kernel.ControlFlowException.traceable>
+                            <net.truevfs.kernel.isolateFsManager>false</net.truevfs.kernel.isolateFsManager>
+                            <net.truevfs.driver.zip.io.forceZip64Ext>false</net.truevfs.driver.zip.io.forceZip64Ext>
+                            <de.schlichtherle.truevfs.kernel.ControlFlowException.traceable>true</de.schlichtherle.truevfs.kernel.ControlFlowException.traceable>
                             <java.io.tmpdir>${java.io.tmpdir.it}</java.io.tmpdir>
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
                         </systemPropertyVariables>
@@ -372,9 +372,9 @@ system space.
 
     <distributionManagement>
         <site>
-            <id>truezip-website</id>
-            <name>TrueZIP Website</name>
-            <url>file:/C:/Users/christian/Documents/Schlichtherle_IT_Services/Projekte/truezip~web</url>
+            <id>truevfs-website</id>
+            <name>TrueVFS Website</name>
+            <url>file:/C:/Users/christian/Documents/Schlichtherle_IT_Services/Projekte/truevfs~web</url>
         </site>
     </distributionManagement>
 

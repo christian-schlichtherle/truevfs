@@ -6,11 +6,11 @@
 
 Use Cases
 
-    This section shows some typical use cases for TrueZIP.
+    This section shows some typical use cases for TrueVFS.
     Each use case is an independent story which should be comprehendible
-    without prior knowledge of TrueZIP.
-    Note that these stories have been written with the TrueZIP File* API in
-    mind, but using the TrueZIP Path API would be equally appropriate:
+    without prior knowledge of TrueVFS.
+    Note that these stories have been written with the TrueVFS File* API in
+    mind, but using the TrueVFS Path API would be equally appropriate:
 
     * {{{./sbt.html}Software Build Tool}}
 

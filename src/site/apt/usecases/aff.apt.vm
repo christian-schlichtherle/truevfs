@@ -20,7 +20,7 @@ Application File Format
 * Accessing Application File Formats
 
     Thanks to the
-    {{{../truezip-file/index.html}TrueZIP File*}}
+    {{{../truezip-file/index.html}TrueVFS File*}}
     module, here's your relief:
     The
     {{{../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}},
@@ -45,7 +45,7 @@ TConfig.get().setArchiveDetector(
     file extensions <<<foo>>> and <<<bar>>>, whereby case is ignored,
     and assume the JAR file format to read or write these files.
 
-    Note that TrueZIP automatically recognizes false positive archive files,
+    Note that TrueVFS automatically recognizes false positive archive files,
     so it cannot get confused by files with arbitrary content which accidently
     use the extensions of your custom application file format.
 

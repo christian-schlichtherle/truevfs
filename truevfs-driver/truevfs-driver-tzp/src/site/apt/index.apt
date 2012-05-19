@@ -1,0 +1,112 @@
+    -----------------------
+    About TrueVFS Driver ZIP.RAES (TZP)
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About TrueVFS Driver ZIP.RAES (TZP)
+
+    This module contains the file system driver service class
+    {{{./apidocs/de/truezip/driver/zip/raes/ZipRaesDriverService.html}ZipRaesDriverService}}
+    which provides the following map of file system drivers:
+
+*--*--*
+||URI Schemes / Archive File Extension||File System Driver Class|
+*--+--+
+|<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{./apidocs/de/truezip/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}|
+*--+--+
+
+    Add the JAR artifact of this module to the run time class path to
+    make its file system drivers available for service location in the
+    client API modules.
+    The URI schemes will then get recognized as default archive file extensions
+    by the class
+    {{{../../apidocs/de/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+
+* Key Features
+
+    This module employs a custom archive file format, namely ZIP.RAES
+    alias TZP (short) alias RAES encrypted ZIP file (long).
+
+    [Wrapper File Format]
+        A ZIP.RAES file is a JAR file which is wrapped in an envelope named
+        Random Access Encryption Specification (RAES).
+        RAES encrypts and authenticates its entire pay load.
+        This means that information leakage is kept to a minimum because all
+        entry data and entry meta data is protected.
+
+        Compare this to the
+        {{{http://www.winzip.com/win/en/aes_info.htm}WinZip AES specification}},
+        where only the entry data is encrypted and authenticated, while the
+        entry meta data is neither encrypted nor authenticated.
+
+    [Extensible Specification]
+        The RAES file format specification is extensible in order to support a
+        variety of encryption and authentication schemes if required.
+        However, since its inception in 2006 exactly only one scheme has ever
+        been required: RAES Type 0, which is detailed below.
+
+    [Internationalized Encoding]
+        RAES Type 0 uses PKCS #12 V1.0 as its Password Based Key Derivation
+        Function (PBKDF).
+        Hence passwords are encoded as 16 bit Unicode characters (similar, but
+        not identical to UTF-16BE).
+        Since the payload is a JAR file, UTF-8 is used to encode the ZIP file
+        comment and entry names.
+
+        Again, compare this to the WinZip AES specification, which recommends
+        to stick with US-ASCII characters for passwords.
+        However, this results in a lower entropy when compared to a localized
+        character set.
+
+    [Strong Encryption]
+        RAES Type 0 uses AES with a selectable key strength of 128, 192 and 256
+        bits.
+        For the typical entropy of a password, 128 bits should be more than
+        enough, but 192 and 256 bits can be used when you need it.
+
+    [Strong Authentication]
+        RAES Type 0 uses SHA-256 as its HMac, so it's not vulnerable to the
+        recently discovered attacks on SHA-1.
+
+        RAES Type 0 supports two authentication steps:
+        The first step is mandatory and authenticates the cipher key (which is
+        a function of the password) and the length of the payload data only.
+        The second step is optional and authenticates the entire payload data.
+        For strong authentication, the second step should always be executed.
+        However, an application can skip the second step if it can use another
+        scheme for authentication of the payload data.
+
+        E.g. for ZIP.RAES files, the file system driver can decrypt and check
+        the CRC-32 value of an individual JAR entry for authentication instead
+        of the entire JAR file.
+        This can significantly improve the access performance for large
+        ZIP.RAES files at the expense of authentication strength due to the
+        frequent collisions of CRC-32 values.
+        This strategy is configurable by selecting either the
+        {{{./apidocs/de/truezip/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
+        or the
+        {{{./apidocs/de/truezip/driver/zip/raes/ParanoidZipRaesDriver.html}<<<ParanoidZipRaesDriver>>>}}.
+
+    [Fast Access]
+        RAES Type 0 uses CTR mode.
+        This allows for fast read access to the plain text from a randomly
+        selected block of cipher text.
+
+        It also uses Encrypt-then-MAC order.
+        This allows to skip the decryption if the authentication of the cipher
+        text failed.
+
+    [Robust]
+        The authentication steps which have been explained before fully
+        integrate with the strategy to discover and deal with false positive
+        archive files which is employed by the TrueVFS Kernel.
+
+    [Reliable]
+        TrueVFS supports ZIP.RAES since 2006.
+        Since the very first version, each release has to pass the same
+        comprehensive set of integration tests like any other archive file
+        format.
+        Since this time, not a single bug has been discovered.
+
+    []

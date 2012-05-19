@@ -40,7 +40,7 @@ try {
 #configuring("<<<zip>>>",
   "ZIP",
   "module
-   {{{../truezip-driver/truezip-driver-zip/index.html}TrueZIP Driver ZIP}}
+   {{{../truezip-driver/truezip-driver-zip/index.html}TrueVFS Driver ZIP}}
    needs",
   "<<<truezip-driver-zip>>>")
 #cleaningUp()

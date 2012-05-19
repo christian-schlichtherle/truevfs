@@ -6,18 +6,18 @@
 
 Key Features
 
-    The following list introduces key features of the overal TrueZIP
+    The following list introduces key features of the overal TrueVFS
     architecture.
     For a list of features for individual modules please visit their respective
     home page, e.g.
-    {{{./truezip-driver/truezip-driver-zip/index.html}TrueZIP Driver ZIP}}.
+    {{{./truezip-driver/truezip-driver-zip/index.html}TrueVFS Driver ZIP}}.
     You can find the modules in the navigation bar.
 
     [Easy To Use]
         The client API modules
-        {{{./truezip-file/index.html}TrueZIP&#160;File*}}
+        {{{./truezip-file/index.html}TrueVFS&#160;File*}}
         and
-        {{{./truezip-path/index.html}TrueZIP&#160;Path}}
+        {{{./truezip-path/index.html}TrueVFS&#160;Path}}
         provide convenient and transparent read/write access to archive files
         as if they were virtual directories.
         For example, the classes
@@ -30,7 +30,7 @@ Key Features
         {{{./usecases/eaff.html}encrypted application file format}}.
 
     [Fast Bulk I/O]
-        The client API module {{{./truezip-file/index.html}TrueZIP&#160;File*}}
+        The client API module {{{./truezip-file/index.html}TrueVFS&#160;File*}}
         provides convenient and powerful methods for fast bulk I/O operations
         like file or directory tree copying, moving, deleting, traversing etc.
         For example, by using the multi-threaded method
@@ -38,7 +38,7 @@ Key Features
         you'll never need to use a naive read-stop-write-stop-loop again.
 
     [File System Federation]
-        The {{{./truezip-kernel/index.html}TrueZIP&#160;Kernel}} module
+        The {{{./truezip-kernel/index.html}TrueVFS&#160;Kernel}} module
         supports read/write access to stacked file systems.
         This enables you to read and write entries in nested archive files,
         e.g. you could write the manifest entry of a JAR file within a WAR file
@@ -46,36 +46,36 @@ Key Features
         <<<new {{{./apidocs/de/truezip/file/TFileWriter.html}TFileWriter}}("app.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF")>>>
 
     [Modular Architecture]
-        TrueZIP employs a {{{./concepts.html}three-tier architecture}} with an
+        TrueVFS employs a {{{./concepts.html}three-tier architecture}} with an
         access tier, a kernel tier and a driver tier.
         The access tier and the driver tier consist of several modules to
         give you the freedom to select what suits your needs best.
 
     [Pluggable File System Drivers]
-        TrueZIP can support virtually any file system type via its pluggable 
+        TrueVFS can support virtually any file system type via its pluggable 
         {{{./apidocs/de/truezip/kernel/FsDriver.html}file system driver}}
         architecture in the driver tier.
-        TrueZIP ships with file system drivers for the file system schemes
+        TrueVFS ships with file system drivers for the file system schemes
         FILE, HTTP(S), ZIP, TAR and their relatives like JAR, TGZ, TBZ2 etc.
         To make a file system driver available to your application, simply add
         the JAR artifact of the driver module to the application's run time
         class path.
 
     [Robust]
-        The TrueZIP&#160;Kernel properly recognizes false positive archive
+        The TrueVFS&#160;Kernel properly recognizes false positive archive
         files, so it does not get confused by an arbitrary file or directory
         which inadvertenly uses a detectable archive file extension, e.g.
         <<<.zip>>>.
 
     [Thread-Safe]
-        The TrueZIP&#160;Kernel applies fine grained locking, caching and
+        The TrueVFS&#160;Kernel applies fine grained locking, caching and
         accounting of resources where required so that multiple threads can
         safely and concurrently read and write entries within the same archive
         file.
 
     [Scalable]
         Given enough heap space to hold the archive file system meta data,
-        TrueZIP can access thousands of archive files with thousands of entries
+        TrueVFS can access thousands of archive files with thousands of entries
         in many different threads concurrently.
         The kernel and driver tier modules precompute the initial capacity of
         <<<LinkedHashMap>>> objects as much as possible in order to reduce heap
@@ -83,11 +83,11 @@ Key Features
         tables when adding large numbers of entries.
 
     [Reliable]
-        TrueZIP uses code assertions, unit tests, function tests, integration
+        TrueVFS uses code assertions, unit tests, function tests, integration
         tests and static code analysis tools like FindBugs and JDepend in order
         to meet the project's high reliability standards.
         The project aims for zero bug tolerance so that you can persist your
-        application data using TrueZIP with ease of mind.
+        application data using TrueVFS with ease of mind.
         This claim goes without warranties, of course!
 
     []

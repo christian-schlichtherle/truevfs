@@ -8,9 +8,9 @@ Glossary
 
     \[This section reads a bit esoteric - mea culpa.
     You can safely skip it unless you want to write a file system driver or
-    maintain the TrueZIP source code.\]
+    maintain the TrueVFS source code.\]
 
-    TrueZIP federates virtual file systems into a common file system space.
+    TrueVFS federates virtual file systems into a common file system space.
     To understand what this means, let's check the following definitions:
 
     [File System]
@@ -51,9 +51,9 @@ Glossary
     <<</mnt/cdrom>>>.
 
     As an example for a file system which is both virtual and federated,
-    consider any archive file which is accessed via TrueZIP's API:
+    consider any archive file which is accessed via TrueVFS's API:
     It's virtual because it's adapted to typical file system services
-    by TrueZIP and it's federated because it's a file member within
+    by TrueVFS and it's federated because it's a file member within
     another file system - which is a native file system of the
     operating system in most cases.
 
@@ -61,9 +61,9 @@ Glossary
     <virtual federated file system>, <federated file system> and
     <archive file system> are often used synonymously.
     This simplification should do no harm because as a Java application,
-    TrueZIP provides only federated file systems which are virtual file
+    TrueVFS provides only federated file systems which are virtual file
     systems at the same time, too.
-    The term <archive file system> is a legacy of TrueZIP's history which
+    The term <archive file system> is a legacy of TrueVFS's history which
     started as a small library for accessing archive files like directories.
     Of course, this is still true and in virtually all use cases a federated
     file system is persisted in an archive file.
