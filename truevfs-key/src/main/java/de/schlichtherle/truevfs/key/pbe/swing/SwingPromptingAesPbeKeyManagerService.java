@@ -4,12 +4,12 @@
  */
 package de.schlichtherle.truevfs.key.pbe.swing;
 
-import net.truevfs.key.KeyManager;
-import net.truevfs.key.param.AesPbeParameters;
-import net.truevfs.key.spi.KeyManagerService;
 import java.awt.GraphicsEnvironment;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.key.KeyManager;
+import net.truevfs.key.param.AesPbeParameters;
+import net.truevfs.key.spi.KeyManagerService;
 
 /**
  * A service provider for a Swing prompting key manager for

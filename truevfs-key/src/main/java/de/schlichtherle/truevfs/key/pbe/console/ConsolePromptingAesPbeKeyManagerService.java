@@ -4,11 +4,11 @@
  */
 package de.schlichtherle.truevfs.key.pbe.console;
 
+import java.util.Map;
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.key.KeyManager;
 import net.truevfs.key.param.AesPbeParameters;
 import net.truevfs.key.spi.KeyManagerService;
-import java.util.Map;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * A service provider for a console prompting key manager for
