@@ -6,17 +6,6 @@ package de.schlichtherle.truevfs.kernel.se;
 
 import de.schlichtherle.truevfs.kernel.NeedsLockRetryException;
 import de.schlichtherle.truevfs.kernel.NeedsSyncException;
-import static net.truevfs.kernel.FsSyncOption.WAIT_CLOSE_IO;
-import static net.truevfs.kernel.FsSyncOptions.RESET;
-import static net.truevfs.kernel.FsSyncOptions.SYNC;
-import net.truevfs.kernel.*;
-import net.truevfs.kernel.cio.Entry.Access;
-import net.truevfs.kernel.cio.Entry.Type;
-import net.truevfs.kernel.cio.*;
-import net.truevfs.kernel.io.DecoratingInputStream;
-import net.truevfs.kernel.io.DecoratingOutputStream;
-import net.truevfs.kernel.io.DecoratingSeekableChannel;
-import net.truevfs.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
 import java.io.IOException;
@@ -28,6 +17,17 @@ import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
+import static net.truevfs.kernel.FsSyncOption.WAIT_CLOSE_IO;
+import static net.truevfs.kernel.FsSyncOptions.RESET;
+import static net.truevfs.kernel.FsSyncOptions.SYNC;
+import net.truevfs.kernel.*;
+import net.truevfs.kernel.cio.Entry.Access;
+import net.truevfs.kernel.cio.Entry.Type;
+import net.truevfs.kernel.cio.*;
+import net.truevfs.kernel.io.DecoratingInputStream;
+import net.truevfs.kernel.io.DecoratingOutputStream;
+import net.truevfs.kernel.io.DecoratingSeekableChannel;
+import net.truevfs.kernel.util.BitField;
 
 /**
  * Performs a {@link FsController#sync(BitField) sync} operation if required.
@@ -49,22 +49,6 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
 
     SyncController(FsController<? extends LockModel> controller) {
         super(controller);
-    }
-
-    /**
-     * Syncs this controller.
-     * 
-     * @param opEx the triggering exception from the file system operation.
-     */
-    final void sync(final NeedsSyncException opEx)
-    throws FsSyncWarningException, FsSyncException {
-        checkWriteLockedByCurrentThread();
-        try {
-            sync(SYNC);
-        } catch (final FsSyncException syncEx) {
-            syncEx.addSuppressed(opEx);
-            throw syncEx;
-        }
     }
 
     @Override
@@ -276,6 +260,22 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
     }
 
     /**
+     * Syncs this controller.
+     * 
+     * @param opEx the triggering exception from the file system operation.
+     */
+    final void sync(final NeedsSyncException opEx)
+    throws FsSyncWarningException, FsSyncException {
+        checkWriteLockedByCurrentThread();
+        try {
+            sync(SYNC);
+        } catch (final FsSyncException syncEx) {
+            syncEx.addSuppressed(opEx);
+            throw syncEx;
+        }
+    }
+
+    /**
      * Modify the sync options so that no dead lock can appear due to waiting
      * for I/O resources in a recursive file system operation.
      * 
@@ -283,13 +283,9 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
      * @return the potentially modified sync options.
      */
     static BitField<FsSyncOption> modify(final BitField<FsSyncOption> options) {
-        final boolean isRecursive = 1 < LockingStrategy.getLockCount();
-        final BitField<FsSyncOption> result = isRecursive
+        return 1 < LockingStrategy.getLockCount()
                 ? options.and(NOT_WAIT_CLOSE_IO)
                 : options;
-        assert result == options == result.equals(options) : "Broken contract in BitField.and()!";
-        assert result == options || isRecursive;
-        return result;
     }
 
     void close(final Closeable closeable) throws IOException {
