@@ -4,11 +4,11 @@
  */
 package net.truevfs.driver.zip;
 
+import java.util.Map;
 import net.truevfs.key.AbstractKeyManagerProvider;
 import net.truevfs.key.KeyManager;
 import net.truevfs.key.MockView;
 import net.truevfs.key.param.AesPbeParameters;
-import java.util.Map;
 
 /**
  * @author Christian Schlichtherle
@@ -21,14 +21,14 @@ public final class TestKeyManagerProvider extends AbstractKeyManagerProvider {
     public TestKeyManagerProvider() {
         this.managers = newMap(new Object[][]{{
             AesPbeParameters.class,
-            new TestKeyManager<AesPbeParameters>(this.view = newView())
+            new TestKeyManager<>(this.view = newView())
         }});
     }
 
     private static MockView<AesPbeParameters> newView() {
         final AesPbeParameters key = new AesPbeParameters();
         key.setPassword("top secret".toCharArray());
-        final MockView<AesPbeParameters> view = new MockView<AesPbeParameters>();
+        final MockView<AesPbeParameters> view = new MockView<>();
         view.setKey(key);
         return view;
     }
