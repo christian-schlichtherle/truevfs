@@ -6,6 +6,18 @@ package de.schlichtherle.truevfs.kernel.se;
 
 import de.schlichtherle.truevfs.kernel.FalsePositiveArchiveException;
 import de.schlichtherle.truevfs.kernel.NeedsSyncException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystemException;
+import java.nio.file.NoSuchFileException;
+import java.util.Map;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.NotThreadSafe;
 import static net.truevfs.kernel.FsAccessOption.APPEND;
 import static net.truevfs.kernel.FsAccessOption.CREATE_PARENTS;
 import static net.truevfs.kernel.FsAccessOptions.NONE;
@@ -20,18 +32,6 @@ import net.truevfs.kernel.cio.*;
 import net.truevfs.kernel.io.InputException;
 import net.truevfs.kernel.io.Streams;
 import net.truevfs.kernel.util.BitField;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.FileSystemException;
-import java.nio.file.NoSuchFileException;
-import java.util.Map;
-import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An abstract base class for any archive file system controller which
