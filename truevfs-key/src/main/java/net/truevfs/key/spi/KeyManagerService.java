@@ -4,9 +4,9 @@
  */
 package net.truevfs.key.spi;
 
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.key.AbstractKeyManagerProvider;
 import net.truevfs.key.sl.KeyManagerLocator;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * An abstract locatable service for key managers.
