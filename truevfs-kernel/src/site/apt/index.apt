@@ -10,7 +10,7 @@ About TrueVFS Kernel
     manages their state and commits unsynchronized changes if required or
     requested.
     The TrueVFS Kernel uses
-    {{{./apidocs/de/truezip/kernel/FsDriver.html}file system drivers}} to access
+    {{{./apidocs/net/truevfs/kernel/FsDriver.html}file system drivers}} to access
     these resources.
     It provides federating, multithreading, multiplexing, caching and
     accounting so that archive file system drivers do not need to take care of
@@ -22,7 +22,7 @@ About TrueVFS Kernel
     incompatible changes to its API may appear anytime in order to improve it.
     An application developer should never use the API of this module directly,
     but instead use the API of the client facade modules
-    {{{../truezip-file/index.html}TrueVFS&#160;File*}} or
-    {{{../truezip-path/index.html}TrueVFS&#160;Path}}.
+    {{{../truevfs-file/index.html}TrueVFS&#160;File*}} or
+    {{{../truevfs-path/index.html}TrueVFS&#160;Path}}.
     The API of these modules provides all of the functionality of the
     TrueVFS&#160;Kernel and more with ease and comfort.

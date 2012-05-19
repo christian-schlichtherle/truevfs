@@ -26,12 +26,12 @@
     <publishDate position="bottom"/>
     <skin>
         <groupId>${project.groupId}</groupId>
-        <artifactId>truezip-skin</artifactId>
+        <artifactId>truevfs-skin</artifactId>
         <version>7</version>
      </skin>
     <body>
         <head>
-            <link rel="alternate" type="application/rss+xml" title="The TrueZIP Blog - Announcements Feed" href="http://truezip.schlichtherle.de/category/announcements/feed/"/>
+            <link rel="alternate" type="application/rss+xml" title="The TrueZIP Blog - Announcements Feed" href="http://truevfs.schlichtherle.de/category/announcements/feed/"/>
         </head>
         <breadcrumbs>
             <item name="TrueVFS" href="index.html"/>
@@ -65,8 +65,8 @@
         <menu name="External Resources">
             <item name="Road Map" href="http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:roadmap-panel"/>
             <item name="Change Log" href="http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel"/>
-            <item name="Developer Site" href="http://java.net/projects/truezip"/>
-            <item name="The TrueZIP Blog" href="http://truezip.schlichtherle.de"/>
+            <item name="Developer Site" href="http://java.net/projects/truevfs"/>
+            <item name="The TrueZIP Blog" href="http://truevfs.schlichtherle.de"/>
         </menu>
         <menu name="Reports" ref="reports" inherit="bottom"/>
         <menu name="Sub-Modules" ref="modules" inherit="bottom"/>

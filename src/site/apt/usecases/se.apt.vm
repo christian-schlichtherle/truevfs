@@ -19,7 +19,7 @@ TFile[] entries = new TFile("archive.zip").listFiles();
 
     Indexing the contents of any entry within an archive file works exactly the
     same way as it would work for plain files in the file system by using the
-    {{{../apidocs/de/truezip/file/TFileReader.html}<<<TFileReader>>>}}
+    {{{../apidocs/net/truevfs/file/TFileReader.html}<<<TFileReader>>>}}
     class
 
 +--+
@@ -40,7 +40,7 @@ try {
 #configuring("<<<zip>>>",
   "ZIP",
   "module
-   {{{../truezip-driver/truezip-driver-zip/index.html}TrueVFS Driver ZIP}}
+   {{{../truevfs-driver/truevfs-driver-zip/index.html}TrueVFS Driver ZIP}}
    needs",
-  "<<<truezip-driver-zip>>>")
+  "<<<truevfs-driver-zip>>>")
 #cleaningUp()

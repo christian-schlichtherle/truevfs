@@ -9,7 +9,7 @@ About TrueVFS Extension
     This module contains sub-modules with pluggable extensions.
     The following sub-modules are available:
 
-    * {{{./truezip-extension-jmx-jul/index.html}TrueVFS Extension JMX/JUL}}
+    * {{{./truevfs-extension-jmx-jul/index.html}TrueVFS Extension JMX/JUL}}
 
     []
 

@@ -7,19 +7,19 @@
 About TrueVFS Path
 
     This module provides the
-    {{{./apidocs/de/truezip/path/TPath.html}<<<TPath>>>}}
+    {{{./apidocs/net/truevfs/path/TPath.html}<<<TPath>>>}}
     class
     for simple, uniform, transparent, thread-safe, read/write access to archive
     files as if they were virtual directories in a file system path.
     It also provides the
-    {{{./apidocs/de/truezip/path/TFileSystemProvider.html}<<<TFileSystemProvider>>>}}
+    {{{./apidocs/net/truevfs/path/TFileSystemProvider.html}<<<TFileSystemProvider>>>}}
     class to implement a file system provider for the NIO.2 API (JSR 203) in
     JSE&#160;7.
 
     This is the primary API for JSE&#160;7 compliant TrueVFS applications:
-    Like the API of the module {{{../truezip-file/index.html}TrueVFS File*}},
+    Like the API of the module {{{../truevfs-file/index.html}TrueVFS File*}},
     this API is just a facade for the module
-    {{{../truezip-kernel/index.html}TrueVFS Kernel}}.
+    {{{../truevfs-kernel/index.html}TrueVFS Kernel}}.
     In contrast to the TrueVFS File* API however, this API can access
     any (virtual) file system, not just the platform file system and
     any archive files within the platform file system.
@@ -32,7 +32,7 @@ About TrueVFS Path
 
     For example, an application could access an entry within an archive
     file which is located at a web site using a
-    {{{./apidocs/de/truezip/path/TPath.html}<<<TPath>>>}}
+    {{{./apidocs/net/truevfs/path/TPath.html}<<<TPath>>>}}
     like this:
 
 +--+
@@ -44,18 +44,18 @@ try (InputStream in = Files.newInputStream(path)) {
 +--+
 
     This example presumes that the JARs of the driver modules
-    {{{../truezip-driver/truezip-driver-http/index.html}TrueVFS Driver HTTP(S)}}
+    {{{../truevfs-driver/truevfs-driver-http/index.html}TrueVFS Driver HTTP(S)}}
     and
-    {{{../truezip-driver/truezip-driver-tar/index.html}TrueVFS Driver TAR}}
+    {{{../truevfs-driver/truevfs-driver-tar/index.html}TrueVFS Driver TAR}}
     are present on the run time class path.
 
     For more examples, please use the Maven archetype for TrueVFS Path module
     applications as described in the
     {{{../kick-start/index.html}Kick-Starting TrueVFS}} section.
     You might also want to
-    {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-sources.jar}download}}
+    {{{http://repo1.maven.org/maven2/de/schlichtherle/truevfs/truevfs-samples/${project.version}/truevfs-samples-${project.version}-sources.jar}download}}
     the source code of the module
-    {{{../truezip-samples/index.html}TrueVFS Samples}}.
+    {{{../truevfs-samples/index.html}TrueVFS Samples}}.
 
     For the API documentation, please refer to the Javadoc of the package
-    {{{./apidocs/de/truezip/path/package-summary.html}<<<de.truezip.path>>>}}
+    {{{./apidocs/net/truevfs/path/package-summary.html}<<<net.truevfs.path>>>}}

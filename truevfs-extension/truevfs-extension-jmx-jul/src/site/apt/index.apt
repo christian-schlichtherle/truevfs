@@ -37,19 +37,19 @@ Prerequisites
     However, it will only work as designed if all of the following apply:
 
     [[1]] The application is <not> providing a custom
-    {{{../../apidocs/de/truezip/kernel/spi/IOPoolService.html}<<<IOPoolService>>>}}
+    {{{../../apidocs/net/truevfs/kernel/spi/IOPoolService.html}<<<IOPoolService>>>}}
     or the
-    {{{../../apidocs/de/truezip/kernel/spi/IOPoolService.html#getPriority()}priority}}
+    {{{../../apidocs/net/truevfs/kernel/spi/IOPoolService.html#getPriority()}priority}}
     of its custom I/O pool service is less than one on JSE 6 or less than 151
     on JSE 7 - see
-    {{{../../apidocs/de/truezip/extension/jmxjul/comp/CompositeIOPoolService.html}<<<CompositeIOPoolService>>>}}.
+    {{{../../apidocs/net/truevfs/extension/jmxjul/comp/CompositeIOPoolService.html}<<<CompositeIOPoolService>>>}}.
 
     [[1]] The application is <not> providing a custom
-    {{{../../apidocs/de/truezip/kernel/spi/FsManagerService.html}<<<FsManagerService>>>}}
+    {{{../../apidocs/net/truevfs/kernel/spi/FsManagerService.html}<<<FsManagerService>>>}}
     or the
-    {{{../../apidocs/de/truezip/kernel/spi/FsManagerService.html#getPriority()}priority}}
+    {{{../../apidocs/net/truevfs/kernel/spi/FsManagerService.html#getPriority()}priority}}
     of its custom file system manager service is less than 100 - see
-    {{{../../apidocs/de/truezip/extension/jmxjul/comp/CompositeManagerService.html}<<<CompositeManagerService>>>}}.
+    {{{../../apidocs/net/truevfs/extension/jmxjul/comp/CompositeManagerService.html}<<<CompositeManagerService>>>}}.
 
     []
 
@@ -143,9 +143,9 @@ Sample
         <!-- Extension module for monitoring and management with JMX and
              java.util.logging. -->
         <dependency>
-            <groupId>de.schlichtherle.truezip</groupId>
-            <artifactId>truezip-extension-jmx-jul</artifactId>
-            <version>${truezip.version}</version>
+            <groupId>de.schlichtherle.truevfs</groupId>
+            <artifactId>truevfs-extension-jmx-jul</artifactId>
+            <version>${truevfs.version}</version>
             <scope>runtime</scope>
         </dependency>
     </dependencies>
@@ -294,7 +294,7 @@ handlers= java.util.logging.FileHandler, java.util.logging.ConsoleHandler
 
 # default file output is in user's home directory.
 #java.util.logging.FileHandler.pattern = %h/java%u.log
-java.util.logging.FileHandler.pattern = target/truezip%u-%g.log
+java.util.logging.FileHandler.pattern = target/truevfs%u-%g.log
 java.util.logging.FileHandler.limit = 100000
 java.util.logging.FileHandler.count = 10
 java.util.logging.FileHandler.formatter = java.util.logging.SimpleFormatter
@@ -318,7 +318,7 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.SimpleFormatter
 # found on the class path. Use this to debug your class path configuration.
 # The finer the level, the more information you will get.
 # It's recommended to avoid the FINEST level because of its excessive output.
-de.truezip.level = FINER
+net.truevfs.level = FINER
 +--+
 
     You can activate this configuration by storing this file in the current

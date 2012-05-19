@@ -13,37 +13,37 @@ Using TrueVFS File*
 * Basic Operations
 
     In order to create a new archive file, an application can simply call
-    {{{../apidocs/de/truezip/file/TFile.html#mkdir()}<<<TFile.mkdir()>>>}}.
+    {{{../apidocs/net/truevfs/file/TFile.html#mkdir()}<<<TFile.mkdir()>>>}}.
 
     In order to delete it, an application can call
-    {{{../apidocs/de/truezip/file/TFile.html#delete()}<<<TFile.delete()>>>}}.
+    {{{../apidocs/net/truevfs/file/TFile.html#delete()}<<<TFile.delete()>>>}}.
     Like a plain old directory, this is only possible if the archive file is
     empty.
     Alternatively, an application could call
-    {{{../apidocs/de/truezip/file/TFile.html#deleteAll()}<<<TFile.deleteAll()>>>}}
+    {{{../apidocs/net/truevfs/file/TFile.html#deleteAll()}<<<TFile.deleteAll()>>>}}
     in order to delete the (virtual) directory in one go, regardless of its
     contents.
 
     To read an archive <entry>, an application can simply create a
-    {{{../apidocs/de/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}}
+    {{{../apidocs/net/truevfs/file/TFileInputStream.html}<<<TFileInputStream>>>}}
     or a
-    {{{../apidocs/de/truezip/file/TFileReader.html}<<<TFileReader>>>}}
+    {{{../apidocs/net/truevfs/file/TFileReader.html}<<<TFileReader>>>}}
     object.
     Note that an application cannot use these classes to read a valid archive
     <file> itself.
 
     Likewise, to write an archive <entry>, an application can simply create a
-    {{{../apidocs/de/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
+    {{{../apidocs/net/truevfs/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
     or a
-    {{{../apidocs/de/truezip/file/TFileWriter.html}<<<TFileWriter>>>}}
+    {{{../apidocs/net/truevfs/file/TFileWriter.html}<<<TFileWriter>>>}}
     object.
     Note that an application cannot use these classes to write a valid archive
     <file> itself.
 
     If an application just needs to copy data however, using one of the
-    {{{../apidocs/de/truezip/file/TFile.html#bulkIOMethods}copy methods}}
+    {{{../apidocs/net/truevfs/file/TFile.html#bulkIOMethods}copy methods}}
     in the class
-    {{{../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}}
+    {{{../apidocs/net/truevfs/file/TFile.html}<<<TFile>>>}}
     is highly recommended instead of using
     <<<TFile(In|Out)putStream>>> or <<<TFile(Reader|Writer)>>> directly.
     These methods use pooled buffers and pooled threads and do not need to
@@ -60,7 +60,7 @@ Using TrueVFS File*
     In general, when using streams, an application should always close them in a
     <<<finally>>>-block or use a try-with-resources statement like this:
 
-%{snippet|id=cat1|file=${project.build.testSourceDirectory}/de/truezip/file/sample/Usage.java}
+%{snippet|id=cat1|file=${project.build.testSourceDirectory}/net/truevfs/file/sample/Usage.java}
 
     This ensures that the stream is closed even if an exception occurs.
 
@@ -69,7 +69,7 @@ Using TrueVFS File*
     Applications need to deal with this appropriately, for example by
     enclosing the entire block within another <<<try-catch>>>-block:
 
-%{snippet|id=cat2|file=${project.build.testSourceDirectory}/de/truezip/file/sample/Usage.java}
+%{snippet|id=cat2|file=${project.build.testSourceDirectory}/net/truevfs/file/sample/Usage.java}
 
     This idiom is not at all specific to TrueVFS:
     Streams often utilize OS resources such as file descriptors or network
@@ -86,16 +86,16 @@ Using TrueVFS File*
     any open entry streams or not.
     If the entry streams are <not> forced to close, the archive file cannot
     get unmounted and an
-    {{{../apidocs/de/truezip/kernel/FsSyncException.html}<<<FsSyncException>>>}}
+    {{{../apidocs/net/truevfs/kernel/FsSyncException.html}<<<FsSyncException>>>}}
     is thrown.
     If the entry streams are forced to close however, the archive file is
     unmounted and an
-    {{{../apidocs/de/truezip/kernel/FsSyncWarningException.html}<<<FsSyncWarningException>>>}}
+    {{{../apidocs/net/truevfs/kernel/FsSyncWarningException.html}<<<FsSyncWarningException>>>}}
     is thrown to indicate that any subsequent I/O operations on these entry
     streams other than <<<(In|Out)putStream.close()>>> will fail with an
-    {{{../apidocs/de/truezip/kernel/io/InputClosedException.html}<<<InputClosedException>>>}}
+    {{{../apidocs/net/truevfs/kernel/io/InputClosedException.html}<<<InputClosedException>>>}}
     or
-    {{{../apidocs/de/truezip/kernel/io/OutputClosedException.html}<<<OutputClosedException>>>}}.
+    {{{../apidocs/net/truevfs/kernel/io/OutputClosedException.html}<<<OutputClosedException>>>}}.
 
     In order to prevent these exceptions, TrueVFS automatically closes entry
     streams when they are garbage collected.
@@ -122,9 +122,9 @@ Using TrueVFS File*
     Archive file synchronization is performed semi-automatic:
 
     * <Manual synchronization> happens when the application calls
-        {{{../apidocs/de/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}},
+        {{{../apidocs/net/truevfs/file/TVFS.html#umount()}<<<TVFS.umount()>>>}},
         which calls
-        {{{../apidocs/de/truezip/file/TVFS.html#sync(de.truezip.kernel.util.BitField)}<<<TVFS.sync(BitField<FsSyncOption>)>>>}},
+        {{{../apidocs/net/truevfs/file/TVFS.html#sync(net.truevfs.kernel.util.BitField)}<<<TVFS.sync(BitField<FsSyncOption>)>>>}},
         or any of their many variants and incarnations.
 
     * <Automatic synchronization> happens when the JVM terminates (in a JVM
@@ -141,7 +141,7 @@ Using TrueVFS File*
     or
     <<<TVFS.sync(BitField<FsSyncOption>)>>>
     may throw an
-    {{{../apidocs/de/truezip/kernel/FsSyncException.html}<<<FsSyncException>>>}}.
+    {{{../apidocs/net/truevfs/kernel/FsSyncException.html}<<<FsSyncException>>>}}.
     An application may catch these exceptions and act on them individually
     (see {{{Exception_Handling}below}}).
 
@@ -176,7 +176,7 @@ Using TrueVFS File*
     This archive file is then said to be <mounted>.
     The TrueVFS Kernel manages the associated state until the archive file gets
     <unmounted> again, e.g. by a call to
-    {{{../apidocs/de/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}.
+    {{{../apidocs/net/truevfs/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}.
 
     Due to this strategy, the TrueVFS Kernel assumes exclusive access to any
     mounted archive files.
@@ -184,10 +184,10 @@ Using TrueVFS File*
     In this context, third parties are:
 
     [[1]] Instances of the class
-          {{{../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}}
+          {{{../apidocs/net/truevfs/file/TFile.html}<<<TFile>>>}}
           which do not detect the same set of archive files in a path name due
           to the use of a differently configured
-          {{{../apidocs/de/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+          {{{../apidocs/net/truevfs/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
 
     [[1]] Instances of the class <<<File>>> which are not instances of the
           class <<<TFile>>>.
@@ -209,9 +209,9 @@ Using TrueVFS File*
 
     If these restrictions cannot be respected for some reason, an application
     may call <<<TVFS.umount()>>>,
-    {{{../apidocs/de/truezip/file/TVFS.html#umount(de.truezip.file.TFile)}<<<TVFS.umount(TFile)>>>}}
+    {{{../apidocs/net/truevfs/file/TVFS.html#umount(net.truevfs.file.TFile)}<<<TVFS.umount(TFile)>>>}}
     or any of their many variants and incarnations (e.g.
-    {{{../apidocs/de/truezip/file/TVFS.html#sync(de.truezip.kernel.FsSyncOption)}<<<TVFS.sync(BitField<FsSyncOption>)>>>}}).
+    {{{../apidocs/net/truevfs/file/TVFS.html#sync(net.truevfs.kernel.FsSyncOption)}<<<TVFS.sync(BitField<FsSyncOption>)>>>}}).
     in order to commit all changes and finally unmount the archive files.
     A third party can then safely access them.
     Likewise, the    application must make sure not to access an archive file or
@@ -219,14 +219,14 @@ Using TrueVFS File*
 
 ** Exception Handling
 
-    {{{../apidocs/de/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}
+    {{{../apidocs/net/truevfs/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}
     and
-    {{{../apidocs/de/truezip/file/TVFS.html#sync(de.truezip.kernel.option.SyncOption[])}<<<TVFS.sync(SyncOption...)>>>}}
+    {{{../apidocs/net/truevfs/file/TVFS.html#sync(net.truevfs.kernel.option.SyncOption[])}<<<TVFS.sync(SyncOption...)>>>}}
     process <all> archive files which are currently mounted.
     However, an <<<IOException>>> may occur for each archive file.
     Hence, the TrueVFS Kernel assembles all I/O exceptions which occur
     during the processing into a single I/O exception by using a
-    {{{../apidocs/de/truezip/kernel/util/PriorityExceptionBuilder.html}<<<PriorityExceptionBuilder>>>}}.
+    {{{../apidocs/net/truevfs/kernel/util/PriorityExceptionBuilder.html}<<<PriorityExceptionBuilder>>>}}.
     The priority exception builder suppresses all but the first input exception
     with the highest priority by using <exception suppressing>, which is a new
     feature in JSE&#160;7 (see <<<Throwable.addSuppressed(Throwable)>>>).
@@ -234,20 +234,20 @@ Using TrueVFS File*
     Catching and dealing with such an I/O exception is easy - just apply the
     standard idioms for exception handling:
 
-%{snippet|id=umount1|file=${project.build.testSourceDirectory}/de/truezip/file/sample/Usage.java}
+%{snippet|id=umount1|file=${project.build.testSourceDirectory}/net/truevfs/file/sample/Usage.java}
 
     The priority of a file system sync exception is obtained by calling
-    {{{../apidocs/de/truezip/kernel/FsSyncException.html#getPriority()}<<<FsSyncException.getPriority()>>>}}:
+    {{{../apidocs/net/truevfs/kernel/FsSyncException.html#getPriority()}<<<FsSyncException.getPriority()>>>}}:
 
     [[1]] The class
-        {{{../apidocs/de/truezip/kernel/FsSyncException.html}<<<FsSyncException>>>}}
+        {{{../apidocs/net/truevfs/kernel/FsSyncException.html}<<<FsSyncException>>>}}
         is the root of the file system sync exception class hierarchy.
         An exception of this type gets thrown if an archive file could not get
         updated and some or all of its data got lost.
         Its priority is <<<0>>>.
 
     [[2]] The class
-        {{{../apidocs/de/truezip/kernel/FsSyncWarningException.html}<<<FsSyncWarningException>>>}}
+        {{{../apidocs/net/truevfs/kernel/FsSyncWarningException.html}<<<FsSyncWarningException>>>}}
         is used to indicate warning conditions.
         An exception of this type gets thrown if an archive file has been
         synchronized without loss of data, but some warning conditions apply.
@@ -258,7 +258,7 @@ Using TrueVFS File*
     This strategy enables applications to selectively catch and filter file
     system sync exceptions according to the following standard idiom:
 
-%{snippet|id=umount2|file=${project.build.testSourceDirectory}/de/truezip/file/sample/Usage.java}
+%{snippet|id=umount2|file=${project.build.testSourceDirectory}/net/truevfs/file/sample/Usage.java}
 
 ** Performance Considerations
 
@@ -276,18 +276,18 @@ Using TrueVFS File*
     runtime increases to <<<O(s*s)>>>!
     Here's an example:
 
-%{snippet|id=performance1|file=${project.build.testSourceDirectory}/de/truezip/file/sample/Usage.java}
+%{snippet|id=performance1|file=${project.build.testSourceDirectory}/net/truevfs/file/sample/Usage.java}
 
     The bad run-time performance is because <<<File.umount()>>> is called
     within the loop.
     Moving it out of the loop fixes the issue:
 
-%{snippet|id=performance2|file=${project.build.testSourceDirectory}/de/truezip/file/sample/Usage.java}
+%{snippet|id=performance2|file=${project.build.testSourceDirectory}/net/truevfs/file/sample/Usage.java}
 
     In essence: If at all, an application should never call
-    {{{../apidocs/de/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}
+    {{{../apidocs/net/truevfs/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}
     or
-    {{{../apidocs/de/truezip/file/TVFS.html#sync(de.truezip.kernel.util.BitField)}<<<TVFS.sync(BitField)>>>}}
+    {{{../apidocs/net/truevfs/file/TVFS.html#sync(net.truevfs.kernel.util.BitField)}<<<TVFS.sync(BitField)>>>}}
     in a loop which modifies an archive file.
 
     The situation gets more complicated with implicit remounting:
@@ -297,10 +297,10 @@ Using TrueVFS File*
     other utilities).
     Here's an example:
 
-%{snippet|id=performance3|file=${project.build.testSourceDirectory}/de/truezip/file/sample/Usage.java}
+%{snippet|id=performance3|file=${project.build.testSourceDirectory}/net/truevfs/file/sample/Usage.java}
 
     Each call to
-    {{{../apidocs/de/truezip/file/TFile.html#createNewFile()}<<<TFile.createNewFile()>>>}}
+    {{{../apidocs/net/truevfs/file/TFile.html#createNewFile()}<<<TFile.createNewFile()>>>}}
     is a modification operation.
     Hence, on the second call to this method, TrueVFS needs to do an automatic
     synchronization which writes all entries in the archive file created so far
@@ -310,10 +310,10 @@ Using TrueVFS File*
     Consider the following example to create an archive file with empty
     entries which all share the same last modification time:
 
-%{snippet|id=performance4|file=${project.build.testSourceDirectory}/de/truezip/file/sample/Usage.java}
+%{snippet|id=performance4|file=${project.build.testSourceDirectory}/net/truevfs/file/sample/Usage.java}
 
     When
-    {{{../apidocs/de/truezip/file/TFile.html#setLastModified(long)}<<<TFile.setLastModified(long)>>>}}
+    {{{../apidocs/net/truevfs/file/TFile.html#setLastModified(long)}<<<TFile.setLastModified(long)>>>}}
     gets called, the entry has already been
     written and so an implicit remount is triggered, which writes all entries
     in the archive file created so far to disk again.
@@ -328,7 +328,7 @@ Using TrueVFS File*
 
     To avoid accidental synchronization when copying data, please consider
     using the advanced
-    {{{../apidocs/de/truezip/file/TFile.html#CopyMethods}copy methods}}
+    {{{../apidocs/net/truevfs/file/TFile.html#CopyMethods}copy methods}}
     instead.
     These methods are easy to use and provide best performance.
 
@@ -338,15 +338,15 @@ Using TrueVFS File*
     control:
 
     [[1]] When the JVM terminates, calling
-        {{{../apidocs/de/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}
+        {{{../apidocs/net/truevfs/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}
         or
-        {{{../apidocs/de/truezip/file/TVFS.html#sync(de.truezip.kernel.util.BitField)}<<<TVFS.sync(BitField)>>>}}
+        {{{../apidocs/net/truevfs/file/TVFS.html#sync(net.truevfs.kernel.util.BitField)}<<<TVFS.sync(BitField)>>>}}
         is recommended in order to handle exceptions explicitly.
 
     [[2]] Otherwise, in order to achieve best performance,
-        {{{../apidocs/de/truezip/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}
+        {{{../apidocs/net/truevfs/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}
         or
-        {{{../apidocs/de/truezip/file/TVFS.html#sync(de.truezip.kernel.util.BitField)}<<<TVFS.sync(BitField)>>>}}
+        {{{../apidocs/net/truevfs/file/TVFS.html#sync(net.truevfs.kernel.util.BitField)}<<<TVFS.sync(BitField)>>>}}
         should not get called unless either third party access or explicit
         exception handling is required.
 
@@ -400,7 +400,7 @@ Using TrueVFS File*
         only observe the result.
 
     [[3]] Otherwise, all
-        {{{../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}}
+        {{{../apidocs/net/truevfs/file/TFile.html}<<<TFile>>>}}
         instances which recognize the same set of archive file types and are
         defined by the same class loader can't monitor or influence the changes
         as they are in progress - they can only observe the result.
@@ -408,7 +408,7 @@ Using TrueVFS File*
     []
 
     These conditions apply regardless of whether the
-    {{{../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}}
+    {{{../apidocs/net/truevfs/file/TFile.html}<<<TFile>>>}}
     instances are used by different threads or not.
     In other words, TrueVFS is thread safe as much as you could expect from a
     platform file system.
@@ -425,19 +425,19 @@ Using TrueVFS File*
     For an application, the root directory behaves like any other directory and
     is addressed by naming the archive file in a path:
     For example, an application may list its contents by calling
-    {{{../apidocs/de/truezip/file/TFile.html#list()}<<<TFile.list()>>>}}
+    {{{../apidocs/net/truevfs/file/TFile.html#list()}<<<TFile.list()>>>}}
     or
-    {{{../apidocs/de/truezip/file/TFile.html#listFiles()}<<<TFile.listFiles()>>>}}
+    {{{../apidocs/net/truevfs/file/TFile.html#listFiles()}<<<TFile.listFiles()>>>}}
 
     An archive may contain directories for which no entry is present in the
     file although they contain at least one member in their directory tree for
     which an entry is actually present in the file.
     Similarly, if
-    {{{../apidocs/de/truezip/file/TFile.html#isLenient()}<<<TFile.isLenient()>>>}}
+    {{{../apidocs/net/truevfs/file/TFile.html#isLenient()}<<<TFile.isLenient()>>>}}
     returns <<<true>>> (which is the default), an archive entry may be created
     in an archive file although its parent directory hasn't been explicitly
     created by calling
-    {{{../apidocs/de/truezip/file/TFile.html#mkdir()}<<<TFile.mkdir()>>>}}
+    {{{../apidocs/net/truevfs/file/TFile.html#mkdir()}<<<TFile.mkdir()>>>}}
     before.
 
     Such a directory is called a <ghost directory>:
@@ -448,10 +448,10 @@ Using TrueVFS File*
 
     To the application, a ghost directory behaves like a regular directory with
     the exception that its last modification time returned by
-    {{{../apidocs/de/truezip/file/TFile.html#lastModified()}<<<TFile.lastModified()>>>}}
+    {{{../apidocs/net/truevfs/file/TFile.html#lastModified()}<<<TFile.lastModified()>>>}}
     is <<<0L>>>.
     If the application sets the last modification time explicitly using
-    {{{../apidocs/de/truezip/file/TFile.html#setLastModified(long)}<<<TFile.setLastModified(long)>>>}},
+    {{{../apidocs/net/truevfs/file/TFile.html#setLastModified(long)}<<<TFile.setLastModified(long)>>>}},
     then the ghost directory reincarnates as a regular directory and will be
     output to the archive file.
 
@@ -494,15 +494,15 @@ Using TrueVFS File*
     name it's up to the individual methods how they behave in this case.
     This could happen with archive files created by external tools only.
     Both
-    {{{../apidocs/de/truezip/file/TFile.html#isDirectory()}<<<TFile.isDirectory()>>>}}
+    {{{../apidocs/net/truevfs/file/TFile.html#isDirectory()}<<<TFile.isDirectory()>>>}}
     and
-    {{{../apidocs/de/truezip/file/TFile.html#isFile()}<<<TFile.isFile()>>>}}
+    {{{../apidocs/net/truevfs/file/TFile.html#isFile()}<<<TFile.isFile()>>>}}
     will return <<<true>>> in this case and in fact they are the only methods
     an application can rely upon to act properly in this situation:
     Many other methods use a combination of
-    {{{../apidocs/de/truezip/file/TFile.html#isDirectory()}<<<TFile.isDirectory()>>>}}
+    {{{../apidocs/net/truevfs/file/TFile.html#isDirectory()}<<<TFile.isDirectory()>>>}}
     and
-    {{{../apidocs/de/truezip/file/TFile.html#isFile()}<<<TFile.isFile()>>>}}
+    {{{../apidocs/net/truevfs/file/TFile.html#isFile()}<<<TFile.isFile()>>>}}
     calls and will show an undefined behavior.
 
     The good news is that both the file and the directory coexist in the

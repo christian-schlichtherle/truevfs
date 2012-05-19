@@ -30,7 +30,7 @@ new TFile("file").cp_rp(new TFile("archive.tar.gz/file"));
     The <<<TFile>>> class provides many alternative constructors and methods to
     ease the tasks of constructing complete path names and copy files or
     directories - please consult the
-    {{{../apidocs/de/truezip/file/TFile.html}Javadoc}}
+    {{{../apidocs/net/truevfs/file/TFile.html}Javadoc}}
     for more information.
     
     The type of the prospective archive file is detected by its
@@ -54,9 +54,9 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
 #configuring("<<<tar.gz>>> or <<<zip>>>",
   "TAR.GZ or ZIP",
   "modules
-   {{{../truezip-driver/truezip-driver-tar/index.html}TrueVFS Driver TAR}}
+   {{{../truevfs-driver/truevfs-driver-tar/index.html}TrueVFS Driver TAR}}
    and
-   {{{../truezip-driver/truezip-driver-zip/index.html}TrueVFS Driver ZIP}}
+   {{{../truevfs-driver/truevfs-driver-zip/index.html}TrueVFS Driver ZIP}}
    need",
-  "<<<truezip-driver-tar>>> and <<<truezip-driver-zip>>>")
+  "<<<truevfs-driver-tar>>> and <<<truevfs-driver-zip>>>")
 #cleaningUp()

@@ -28,15 +28,15 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
 *--*--*
 || Module || Description
 *--+--+
-| {{{./truezip-driver/truezip-driver-file/index.html}TrueVFS Driver FILE}} | Provides read/write access to the platform file system. Automatically uses NIO.2 if JSE&#160;7 is available.
+| {{{./truevfs-driver/truevfs-driver-file/index.html}TrueVFS Driver FILE}} | Provides read/write access to the platform file system. Automatically uses NIO.2 if JSE&#160;7 is available.
 *--+--+
-| {{{./truezip-driver/truezip-driver-http/index.html}TrueVFS Driver HTTP(S)}} | Provides read-only access to HTTP(S) URLs.
+| {{{./truevfs-driver/truevfs-driver-http/index.html}TrueVFS Driver HTTP(S)}} | Provides read-only access to HTTP(S) URLs.
 *--+--+
-| {{{./truezip-driver/truezip-driver-tar/index.html}TrueVFS Driver TAR}} | Provides read/write access to TAR, TAR.GZ and TAR.BZ2 files.
+| {{{./truevfs-driver/truevfs-driver-tar/index.html}TrueVFS Driver TAR}} | Provides read/write access to TAR, TAR.GZ and TAR.BZ2 files.
 *--+--+
-| {{{./truezip-driver/truezip-driver-zip/index.html}TrueVFS Driver ZIP}} | Provides read/write access to ZIP, JAR, EAR, WAR etc. Supports appending to existing ZIP files, recovery of lost ZIP entries, WinZip AES encryption, BZIP2 compression, selectable character sets, external file attributes and ZIP64 extensions.
+| {{{./truevfs-driver/truevfs-driver-zip/index.html}TrueVFS Driver ZIP}} | Provides read/write access to ZIP, JAR, EAR, WAR etc. Supports appending to existing ZIP files, recovery of lost ZIP entries, WinZip AES encryption, BZIP2 compression, selectable character sets, external file attributes and ZIP64 extensions.
 *--+--+
-| {{{./truezip-driver/truezip-driver-tzp/index.html}TrueVFS Driver ZIP.RAES (TZP)}} | Provides read/write access to JAR files which are entirely wrapped in an envelope with AES-256/CTR encryption, SHA-256 authentication and PKCS #12 V1 PBKDF.
+| {{{./truevfs-driver/truevfs-driver-tzp/index.html}TrueVFS Driver ZIP.RAES (TZP)}} | Provides read/write access to JAR files which are entirely wrapped in an envelope with AES-256/CTR encryption, SHA-256 authentication and PKCS #12 V1 PBKDF.
 *--+--+
 
     Add the JAR artifact of these modules to the run time class path to
@@ -54,9 +54,9 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
 *--*--*--*
 || Module || Requires || Description
 *--+--+--+
-| {{{./truezip-file/index.html}TrueVFS File*}} | JSE&#160;6 | Provides classes which can get used in exactly the same way as the <<<java.io.File*>>> classes, so it's easy to learn or migrate an existing application. In addition, easy to use, yet powerful methods for standard tasks like file or directory tree copying, moving, deleting, traversing etc are provided, too.
+| {{{./truevfs-file/index.html}TrueVFS File*}} | JSE&#160;6 | Provides classes which can get used in exactly the same way as the <<<java.io.File*>>> classes, so it's easy to learn or migrate an existing application. In addition, easy to use, yet powerful methods for standard tasks like file or directory tree copying, moving, deleting, traversing etc are provided, too.
 *--+--+--+
-| {{{./truezip-path/index.html}TrueVFS Path}} | JSE&#160;7 | Provides classes which implement a <<<java.nio.file.spi.FileSystemProvider>>> for the NIO.2 API (JSR&#160;203) to enable an application to access archive files within any (virtual) file system, e.g. via HTTP(S). Applications can even read or write archive entries in random order using a <<<SeekableByteChannel>>>.
+| {{{./truevfs-path/index.html}TrueVFS Path}} | JSE&#160;7 | Provides classes which implement a <<<java.nio.file.spi.FileSystemProvider>>> for the NIO.2 API (JSR&#160;203) to enable an application to access archive files within any (virtual) file system, e.g. via HTTP(S). Applications can even read or write archive entries in random order using a <<<SeekableByteChannel>>>.
 *--+--+--+
 
     Writing an application for either API is really easy:
@@ -78,10 +78,10 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
 
     * If you are going to write a federated file system driver
       (i.e. archive driver), please consult the Javadoc for
-      {{{./apidocs/de/truezip/kernel/FsArchiveDriver.html}<<<de.truezip.kernel.FsArchiveDriver>>>}}.
+      {{{./apidocs/net/truevfs/kernel/FsArchiveDriver.html}<<<net.truevfs.kernel.FsArchiveDriver>>>}}.
 
     * If you are going to write a non-federated file system driver,
       please consult the Javadoc for
-      {{{./apidocs/de/truezip/kernel/FsDriver.html}<<<de.truezip.kernel.FsDriver>>>}}.
+      {{{./apidocs/net/truevfs/kernel/FsDriver.html}<<<net.truevfs.kernel.FsDriver>>>}}.
 
     []

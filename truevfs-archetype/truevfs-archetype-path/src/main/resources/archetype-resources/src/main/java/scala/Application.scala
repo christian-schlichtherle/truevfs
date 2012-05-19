@@ -3,9 +3,9 @@
 #set( $symbol_escape = '\' )
 package ${package}.scala
 
-import de.schlichtherle.truezip.key.pbe.swing.feedback.HurlingWindowFeedback
-import de.schlichtherle.truezip.key.pbe.swing.feedback.InvalidKeyFeedback
-import de.truezip.file.TApplication
+import de.schlichtherle.truevfs.key.pbe.swing.feedback.HurlingWindowFeedback
+import de.schlichtherle.truevfs.key.pbe.swing.feedback.InvalidKeyFeedback
+import net.truevfs.file.TApplication
 
 /**
  * An abstract class which configures the TrueVFS Path module.

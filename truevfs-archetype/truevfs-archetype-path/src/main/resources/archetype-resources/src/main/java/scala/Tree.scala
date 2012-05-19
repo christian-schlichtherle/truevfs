@@ -3,7 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package}.scala
 
-import de.truezip.path.TPath
+import net.truevfs.path.TPath
 import java.nio.file.Files._
 import java.nio.file.Path
 import java.util.TreeSet
@@ -15,7 +15,7 @@ import scala.collection.JavaConversions._
  * Instead of a directory, you can name any configured archive file type as an
  * argument, too.
  * <p>
- * For example, if the JAR for the module {@code truezip-driver-zip} is present
+ * For example, if the JAR for the module {@code truevfs-driver-zip} is present
  * on the run time class path and the path name argument is {@code archive.zip}
  * and this file actually exists as a ZIP file, then the tree graph of the
  * directory structure of this ZIP file gets printed.

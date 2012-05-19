@@ -3,7 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package};
 
-import de.truezip.file.TFile;
+import net.truevfs.file.TFile;
 import java.io.IOException;
 
 /**

@@ -15,16 +15,16 @@ Configuring TrueVFS File*
     you just need to make sure that the JAR artifacts of the respective file
     system driver modules are present on the class path.
     At run time, the module
-    {{{../truezip-kernel/index.html}TrueVFS Kernel}}
+    {{{../truevfs-kernel/index.html}TrueVFS Kernel}}
     will then enumerate the available file system drivers in order to register
     their canonical archive file extensions and make this mapping available for
     the initial setup of the client API modules
     {{{./index.html}TrueVFS File*}}
     and
-    {{{../truezip-path/index.html}TrueVFS Path}}.
+    {{{../truevfs-path/index.html}TrueVFS Path}}.
     To see the list of canonical archive file extensions, please consult the
     documentation of the respective file system driver module, e.g.
-    {{{../truezip-driver/truezip-driver-zip/index.html}TrueVFS Driver ZIP}}.
+    {{{../truevfs-driver/truevfs-driver-zip/index.html}TrueVFS Driver ZIP}}.
 
     If you use Maven, you just need to add the driver modules as dependencies
     to your POM like this:
@@ -35,8 +35,8 @@ Configuring TrueVFS File*
   <dependencies>
     ...
     <dependency>
-      <groupId>de.schlichtherle.truezip</groupId>
-      <artifactId>truezip-driver-zip</artifactId>
+      <groupId>de.schlichtherle.truevfs</groupId>
+      <artifactId>truevfs-driver-zip</artifactId>
       <version>$project.version</version>
       <scope>runtime</scope>
     </dependency>
@@ -50,38 +50,38 @@ Configuring TrueVFS File*
 * The class <<<TArchiveDetector>>>
 
     The task of the class
-    {{{./apidocs/de/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}
+    {{{./apidocs/net/truevfs/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}
     is to scan path names for archive file extensions and map it to the
     respective
-    {{{./apidocs/de/truezip/kernel/FsArchiveDriver.html}<<<FsArchiveDriver>>>}}
+    {{{./apidocs/net/truevfs/kernel/FsArchiveDriver.html}<<<FsArchiveDriver>>>}}
     class.
     For example, it could detect the file extension <<<jar>>> in the path name
     <<<directory/lib.jar>>> and map it to the class
-    {{{./apidocs/de/truezip/driver/zip/JarDriver.html}<<<JarDriver>>>}}.
+    {{{./apidocs/net/truevfs/driver/zip/JarDriver.html}<<<JarDriver>>>}}.
 
     <<<TArchiveDetector>>> provides many options for archive detection:
 
     * The predefined object 
-    {{{./apidocs/de/truezip/file/TArchiveDetector.html#NULL}<<<TArchiveDetector.NULL>>>}}
+    {{{./apidocs/net/truevfs/file/TArchiveDetector.html#NULL}<<<TArchiveDetector.NULL>>>}}
     detects no archive file extensions at all.
 
     * The predefined object 
-    {{{./apidocs/de/truezip/file/TArchiveDetector.html#ALL}<<<TArchiveDetector.ALL>>>}}
+    {{{./apidocs/net/truevfs/file/TArchiveDetector.html#ALL}<<<TArchiveDetector.ALL>>>}}
     detects all archive file extensions which have been registered
-    in the module {{{./truezip-kernel/index.html}TrueVFS Kernel}}
+    in the module {{{./truevfs-kernel/index.html}TrueVFS Kernel}}
     by enumerating the file system drivers on the class path.
     Please consult the documentation of the individual driver modules for the
     list of registered archive file extensions.
 
     * The constructor 
-    {{{./apidocs/de/truezip/file/TArchiveDetector.html#TArchiveDetector(java.lang.String)}<<<TArchiveDetector(String extensions)>>>}}
+    {{{./apidocs/net/truevfs/file/TArchiveDetector.html#TArchiveDetector(java.lang.String)}<<<TArchiveDetector(String extensions)>>>}}
     lets you filter the list of archive file extensions known by
     <<<TArchiveDetector.ALL>>>.
     This enables you to limit the set of all archive file extensions registered
     by all file system driver modules on the run time class path.
 
     * The constructor
-    {{{./apidocs/de/truezip/file/TArchiveDetector.html#TArchiveDetector(java.lang.String, de.truezip.kernel.FsDriver)}<<<TArchiveDetector(String extensions, FsDriver driver)>>>}}
+    {{{./apidocs/net/truevfs/file/TArchiveDetector.html#TArchiveDetector(java.lang.String, net.truevfs.kernel.FsDriver)}<<<TArchiveDetector(String extensions, FsDriver driver)>>>}}
     lets you define a custom list of archive file extension for any archive
     driver.
     This enables you to define a custom {{{./usecases/aff.html}application file format}}.
@@ -89,7 +89,7 @@ Configuring TrueVFS File*
     []
 
     Please consult the
-    {{{./apidocs/de/truezip/file/TArchiveDetector.html}Javadoc}}
+    {{{./apidocs/net/truevfs/file/TArchiveDetector.html}Javadoc}}
     for even more constructor options.
 
     The following example would map the file extensions <<<foo>>> and <<<bar>>>
@@ -104,7 +104,7 @@ TArchiveDetector ad = new TArchiveDetector(
 * The class <<<TFile>>>
 
     Whenever an object of the class
-    {{{./apidocs/de/truezip/file/TFile.html}<<<TFile>>>}}
+    {{{./apidocs/net/truevfs/file/TFile.html}<<<TFile>>>}}
     is constructed, a <<<TArchiveDetector>>> is used to scan its path name for
     prospective archive files.
     Because the <<<TFile>>> class is immutable, once an object is created you
@@ -112,7 +112,7 @@ TArchiveDetector ad = new TArchiveDetector(
 
     The <<<TFile>>> class provides multiple overloaded constructors and
     constructing methods, e.g.
-    {{{./apidocs/de/truezip/file/TFile.html#listFiles()}<<<TFile.listFiles()>>>}}.
+    {{{./apidocs/net/truevfs/file/TFile.html#listFiles()}<<<TFile.listFiles()>>>}}.
     Almost all of these come in pairs:
     One variant with and one variant without an additional
     <<<TArchiveDetector>>> parameter.
@@ -121,7 +121,7 @@ TArchiveDetector ad = new TArchiveDetector(
     constructor or constructing method, then the class property called
     <default archive detector> is used.
     This class property is initially set to
-    {{{./apidocs/de/truezip/file/TArchiveDetector.html#ALL}<<<TArchiveDetector.ALL>>>}},
+    {{{./apidocs/net/truevfs/file/TArchiveDetector.html#ALL}<<<TArchiveDetector.ALL>>>}},
     which is why the following simple code for the standard use case of
     extracting a ZIP file to a directory works as expected if the JAR of the
     module TrueVFS Driver ZIP is present on the class path:
@@ -134,9 +134,9 @@ src.cp_rp(dst); // copy "archive.zip" as a virtual directory!
 +--+
 
     To get or set the default archive detector, call
-    {{{./apidocs/de/truezip/file/TConfig.html#getArchiveDetector}<<<TConfig.get().getArchiveDetector()>>>}}
+    {{{./apidocs/net/truevfs/file/TConfig.html#getArchiveDetector}<<<TConfig.get().getArchiveDetector()>>>}}
     or
-    {{{./apidocs/de/truezip/file/TConfig.html#setArchiveDetector(de.truezip.file.TArchiveDetector)}<<<TConfig.get().setArchiveDetector(detector)>>>}}
+    {{{./apidocs/net/truevfs/file/TConfig.html#setArchiveDetector(net.truevfs.file.TArchiveDetector)}<<<TConfig.get().setArchiveDetector(detector)>>>}}
     respectively - see {{{The class TConfig}below}}.
 
     Mind that a change of the default archive detector affects only
@@ -154,7 +154,7 @@ src.cp_rp(dst); // copy "archive.zip" as a plain old file!
 +--+
 
     Here,
-    {{{./apidocs/de/truezip/file/TArchiveDetector.html#NULL}<<<TArchiveDetector.NULL>>>}}
+    {{{./apidocs/net/truevfs/file/TArchiveDetector.html#NULL}<<<TArchiveDetector.NULL>>>}}
     is used to disable archive detection and copy <<<archive.zip>>> as a plain
     old file.
 
@@ -192,7 +192,7 @@ src.cp_rp(dst); // copy "archive.zip" as a plain old file!
     Furthermore, changing options should be thread safe.
 
     The solution to these requirements is the class
-    {{{./apidocs/de/truezip/file/TConfig.html}<<<TConfig>>>}}.
+    {{{./apidocs/net/truevfs/file/TConfig.html}<<<TConfig>>>}}.
     Each instance of this class is a container for configuration options with
     either <global> or <inheritable thread local> scope.
     This may sound scary, but it's really simple to use, so let's look at the
@@ -216,7 +216,7 @@ try {
 +--+
 
     Note the call to
-    {{{./apidocs/de/truezip/file/TConfig.html#close()}<<<TConfig.close()>>>}}
+    {{{./apidocs/net/truevfs/file/TConfig.html#close()}<<<TConfig.close()>>>}}
     in the finally-block:
     With JSE7, you could use the try-with-resources statement instead to
     shorten the code to this:
@@ -235,18 +235,18 @@ try (TConfig config = TConfig.push()) {
 
     To understand why these examples are thread-safe, you first need to know
     that a call to
-    {{{./apidocs/de/truezip/file/TConfig.html#get()}<<<TConfig.get()>>>}}
+    {{{./apidocs/net/truevfs/file/TConfig.html#get()}<<<TConfig.get()>>>}}
     returns the <current configuration>, which may be global or inheritable
     thread local.
     So
-    {{{./apidocs/de/truezip/file/TConfig.html#getArchiveDetector()}<<<TConfig.get().getArchiveDetector()>>>}}
+    {{{./apidocs/net/truevfs/file/TConfig.html#getArchiveDetector()}<<<TConfig.get().getArchiveDetector()>>>}}
     returns the archive detector of the current configuration.
     Similarly,
-    {{{./apidocs/de/truezip/file/TConfig.html#setArchiveDetector(de.truezip.file.TArchiveDetector)}<<<TConfig.get().setArchiveDetector(TArchiveDetector detector)>>>}}
+    {{{./apidocs/net/truevfs/file/TConfig.html#setArchiveDetector(net.truevfs.file.TArchiveDetector)}<<<TConfig.get().setArchiveDetector(TArchiveDetector detector)>>>}}
     updates the archive detector of the current configuration.
 
     Second, the call to
-    {{{./apidocs/de/truezip/file/TConfig.html#push()}<<<TConfig.push()>>>}}
+    {{{./apidocs/net/truevfs/file/TConfig.html#push()}<<<TConfig.push()>>>}}
     copies the current configuration, pushes the copy onto an inheritable
     thread local stack, thereby installing it as the new current configuration,
     and finally returns it.
@@ -273,7 +273,7 @@ try (TConfig config = TConfig.push()) {
 * The class <<<TApplication>>>
 
     The class
-    {{{./apidocs/de/truezip/file/TApplication.html}<<<TApplication>>>}}
+    {{{./apidocs/net/truevfs/file/TApplication.html}<<<TApplication>>>}}
     is a simple template class which aids you in implementing the typical
     lifecycle of a TrueVFS application.
     Consider the following example:
@@ -305,7 +305,7 @@ class MyApplication extends TApplication<IOException> {
     Here, the current configuration is not only used to change the archive
     detector, but also to set FsOutputOption.GROW.
     By overriding
-    {{{./apidocs/de/truezip/file/TApplication.html#setup()}<<<TApplication.setup()>>>}},
+    {{{./apidocs/net/truevfs/file/TApplication.html#setup()}<<<TApplication.setup()>>>}},
     it can be safely assumed that there is no enclosing
     <<<TConfig.push|close()>>> and hence <<<config>>> is indeed the global
     configuration.

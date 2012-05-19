@@ -7,9 +7,9 @@
 Getting started without Maven
 
     If you do not want to use Maven then you can easily
-    {{{http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22de.schlichtherle.truezip%22%20AND%20v%3A%22${project.version}%22}<<download individual TrueVFS artifacts>>}}
+    {{{http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22de.schlichtherle.truevfs%22%20AND%20v%3A%22${project.version}%22}<<download individual TrueVFS artifacts>>}}
     from Maven Central.
-    You can also directly {{{http://repo1.maven.org/maven2/de/schlichtherle/truezip/truezip-samples/${project.version}/truezip-samples-${project.version}-jar-with-dependencies.jar}<<download the all-in-one JAR>>}}.
+    You can also directly {{{http://repo1.maven.org/maven2/de/schlichtherle/truevfs/truevfs-samples/${project.version}/truevfs-samples-${project.version}-jar-with-dependencies.jar}<<download the all-in-one JAR>>}}.
 
     The all-in-one JAR saves you from grabbing the module JARs individually.
     However, as the name implies, it includes all sample code which bloats the
@@ -43,30 +43,30 @@ Getting started without Maven
     types required to access.
     {{{../usecases/aff.html}Here}} is a sample available for this task.
     For further information, please refer to the Javadoc for the class
-    {{{../apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+    {{{../apidocs/de/schlichtherle/truevfs/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
 
 * Initial Setup
 
     Following are the canonical archive file extensions which will be detected
     by an application using the TrueVFS File* API according to the initial set
-    up of the all-in-one JAR <<<truezip-samples-${project.version}-jar-with-dependencies.jar>>>:
+    up of the all-in-one JAR <<<truevfs-samples-${project.version}-jar-with-dependencies.jar>>>:
 
 *--*--*
 ||Canonical File Extensions||File System Driver Class|
 *--+--+
-|<<<ear>>>, <<<jar>>>, <<<war>>>|{{{../apidocs/de/truezip/driver/zip/JarDriver.html}<<<JarDriver>>>}}|
+|<<<ear>>>, <<<jar>>>, <<<war>>>|{{{../apidocs/net/truevfs/driver/zip/JarDriver.html}<<<JarDriver>>>}}|
 *--+--+
-|<<<exe>>>|{{{../apidocs/de/truezip/driver/zip/ReadOnlySfxDriver.html}<<<ReadOnlySfxDriver>>>}}|
+|<<<exe>>>|{{{../apidocs/net/truevfs/driver/zip/ReadOnlySfxDriver.html}<<<ReadOnlySfxDriver>>>}}|
 *--+--+
-|<<<odt>>>, <<<ott>>>, <<<odg>>>, <<<otg>>>, <<<odp>>>, <<<otp>>>, <<<ods>>>, <<<ots>>>, <<<odc>>>, <<<otc>>>, <<<odi>>>, <<<oti>>>, <<<odf>>>, <<<otf>>>, <<<odm>>>, <<<oth>>>, <<<odb>>>|{{{./apidocs/de/truezip/driver/zip/OdfDriver.html}<<<OdfDriver>>>}}|
+|<<<odt>>>, <<<ott>>>, <<<odg>>>, <<<otg>>>, <<<odp>>>, <<<otp>>>, <<<ods>>>, <<<ots>>>, <<<odc>>>, <<<otc>>>, <<<odi>>>, <<<oti>>>, <<<odf>>>, <<<otf>>>, <<<odm>>>, <<<oth>>>, <<<odb>>>|{{{./apidocs/net/truevfs/driver/zip/OdfDriver.html}<<<OdfDriver>>>}}|
 *--+--+
-|<<<tar>>>|{{{../apidocs/de/truezip/driver/tar/TarDriver.html}<<<TarDriver>>>}}|
+|<<<tar>>>|{{{../apidocs/net/truevfs/driver/tar/TarDriver.html}<<<TarDriver>>>}}|
 *--+--+
-|<<<tar.bz2>>>, <<<tb2>>>, <<<tbz>>>|{{{../apidocs/de/truezip/driver/tar/TarBZip2Driver.html}<<<TarBZip2Driver>>>}}|
+|<<<tar.bz2>>>, <<<tb2>>>, <<<tbz>>>|{{{../apidocs/net/truevfs/driver/tar/TarBZip2Driver.html}<<<TarBZip2Driver>>>}}|
 *--+--+
-|<<<tar.gz>>>, <<<tgz>>>|{{{../apidocs/de/truezip/driver/tar/TarGZipDriver.html}<<<TarGZipDriver>>>}}|
+|<<<tar.gz>>>, <<<tgz>>>|{{{../apidocs/net/truevfs/driver/tar/TarGZipDriver.html}<<<TarGZipDriver>>>}}|
 *--+--+
-|<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{../apidocs/de/truezip/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}|
+|<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{../apidocs/net/truevfs/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}|
 *--+--+
-|<<<zip>>>|{{{../apidocs/de/truezip/driver/zip/ZipDriver.html}<<<ZipDriver>>>}}|
+|<<<zip>>>|{{{../apidocs/net/truevfs/driver/zip/ZipDriver.html}<<<ZipDriver>>>}}|
 *--+--+

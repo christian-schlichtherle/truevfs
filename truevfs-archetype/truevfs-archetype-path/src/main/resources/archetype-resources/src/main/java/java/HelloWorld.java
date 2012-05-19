@@ -3,7 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package}.java;
 
-import de.truezip.path.TPath;
+import net.truevfs.path.TPath;
 import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;

@@ -18,20 +18,20 @@ Key Management
 
     At runtime, all RAES encrypted ZIP files are managed by an instance of a
     sub-class of the abstract archive driver implementation class
-    {{{../../apidocs/de/truezip/driver/zip/raes/ZipRaesDriver.html}<<<ZipRaesDriver>>>}}.
+    {{{../../apidocs/net/truevfs/driver/zip/raes/ZipRaesDriver.html}<<<ZipRaesDriver>>>}}.
     For custom encrypted application file formats, this should be an instance
     of the class
-    {{{../../apidocs/de/truezip/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
+    {{{../../apidocs/net/truevfs/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
 
     Whenever this archive driver class reads or writes a RAES encrypted ZIP
     file, it uses an instance of the interface
-    {{{../../apidocs/de/truezip/key/KeyManagerProvider.html}<<<KeyManagerProvider>>>}}
+    {{{../../apidocs/net/truevfs/key/KeyManagerProvider.html}<<<KeyManagerProvider>>>}}
     in order to obtain an instance of the interface
-    {{{../../apidocs/de/truezip/key/KeyManager.html}<<<KeyManager>>>}}
+    {{{../../apidocs/net/truevfs/key/KeyManager.html}<<<KeyManager>>>}}
     for the interface
-    {{{../../apidocs/de/truezip/key/param/AesPbeParameters.html}<<<AesPbeParameters>>>}}
+    {{{../../apidocs/net/truevfs/key/param/AesPbeParameters.html}<<<AesPbeParameters>>>}}
     and finally obtain an instance of the interface
-    {{{../../apidocs/de/truezip/key/KeyProvider.html}<<<KeyProvider>>>}}
+    {{{../../apidocs/net/truevfs/key/KeyProvider.html}<<<KeyProvider>>>}}
     for the prospective archive file.
 
     Because dependency injection is used all over the place in order to resolve
@@ -40,27 +40,27 @@ Key Management
     architecture provides several ways to set passwords programmatically.
     In order to set a common password for all RAES encrypted ZIP files
     you need a custom
-    {{{../../apidocs/de/truezip/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}
+    {{{../../apidocs/net/truevfs/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}
     which you can either inject into any
-    {{{../../apidocs/de/truezip/file/TFile.html}<<<TFile>>>}}
+    {{{../../apidocs/net/truevfs/file/TFile.html}<<<TFile>>>}}
     constructor or install as the default archive detector by calling
 
-%{snippet|id=install|file=${project.build.testSourceDirectory}/de/truezip/driver/zip/raes/sample/KeyManagement.java}
+%{snippet|id=install|file=${project.build.testSourceDirectory}/net/truevfs/driver/zip/raes/sample/KeyManagement.java}
 
 * Setting Passwords For All ZIP.RAES Files By Implementing A Custom Driver
 
     This option bypasses the key manager by subclassing
-    {{{../../apidocs/de/truezip/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
+    {{{../../apidocs/net/truevfs/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
     and overriding the relevant methods for dealing with RAES parameters.
 
-%{snippet|id=newArchiveDetector1|file=${project.build.testSourceDirectory}/de/truezip/driver/zip/raes/sample/KeyManagement.java}
+%{snippet|id=newArchiveDetector1|file=${project.build.testSourceDirectory}/net/truevfs/driver/zip/raes/sample/KeyManagement.java}
 
 * Setting Passwords For All ZIP.RAES Files By Implementing A Custom View
 
     Another option is to use a prompting key manager by instantiating the class
-    {{{../../apidocs/de/truezip/key/PromptingKeyManagerProvider.html}<<<PromptingKeyManagerProvider>>>}}
+    {{{../../apidocs/net/truevfs/key/PromptingKeyManagerProvider.html}<<<PromptingKeyManagerProvider>>>}}
     which applies the Model-View-Controller pattern to manage its key providers.
     Here I simply substitute the default view class with a custom
     implementation.
 
-%{snippet|id=newArchiveDetector2|file=${project.build.testSourceDirectory}/de/truezip/driver/zip/raes/sample/KeyManagement.java}
+%{snippet|id=newArchiveDetector2|file=${project.build.testSourceDirectory}/net/truevfs/driver/zip/raes/sample/KeyManagement.java}

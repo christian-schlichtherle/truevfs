@@ -7,8 +7,8 @@
 Nzip - a Comprehensive Command Line Utility
 
     The Nzip command line utility implemented by the class
-    {{{./apidocs/de/truezip/sample/Nzip.html}<<<de.truezip.samples.Nzip>>>}}
-    showcases the power of the {{{../truezip-file/index.html}TrueVFS File*}} API.
+    {{{./apidocs/net/truevfs/sample/Nzip.html}<<<net.truevfs.samples.Nzip>>>}}
+    showcases the power of the {{{../truevfs-file/index.html}TrueVFS File*}} API.
 
     This is a comprehensive command line utility which allows you to work with
     entries in any archive file supported by an archive driver
@@ -28,7 +28,7 @@ Nzip - a Comprehensive Command Line Utility
     like this:
 
 +--+
-$ java -jar truezip-${project.version}-jar-with-dependencies.jar %ARGS%
+$ java -jar truevfs-${project.version}-jar-with-dependencies.jar %ARGS%
 +--+
 
     Where <<<%ARGS%>>> is a variable for arbitrary command line arguments - see
@@ -49,7 +49,7 @@ $ nzip.cmd %ARGS%
 
 rem set PROPS=-Djava.awt.headless=true
 rem set PROPS=-Djava.util.logging.config.file=logging.properties
-set JAR=%USERPROFILE%\.m2\repository\de\schlichtherle\truezip\truezip-samples\\${project.version}\truezip-samples-${project.version}-jar-with-dependencies.jar
+set JAR=%USERPROFILE%\.m2\repository\de\schlichtherle\truevfs\truevfs-samples\\${project.version}\truevfs-samples-${project.version}-jar-with-dependencies.jar
 
 java %PROPS% -jar "%JAR%" %*
 +--+
@@ -67,13 +67,13 @@ java %PROPS% -jar "%JAR%" %*
 *--*--*
 ||Command||Description|
 *--+--+
-|<<<nzip.cmd ll truezip-${project.version}-jar-with-dependencies.jar>>>|Prints a detailed listing of the contents of the root directory of the JAR file from which the tool is actually running.|
+|<<<nzip.cmd ll truevfs-${project.version}-jar-with-dependencies.jar>>>|Prints a detailed listing of the contents of the root directory of the JAR file from which the tool is actually running.|
 *--+--+
-|<<<nzip.cmd llr truezip-${project.version}-jar-with-dependencies.jar>>>|Prints a recursive long listing of the contents of the root directory of the JAR file from which the tool is actually running.|
+|<<<nzip.cmd llr truevfs-${project.version}-jar-with-dependencies.jar>>>|Prints a recursive long listing of the contents of the root directory of the JAR file from which the tool is actually running.|
 *--+--+
-|<<<nzip.cmd cp truezip-${project.version}-jar-with-dependencies.jar/de/truezip/sample/Nzip.class archive.zip>>>|Copies the file entry <<<de/truezip/sample/Nzip.class>>> from the distribution JAR into the ZIP file <<<archive.zip>>>.|
+|<<<nzip.cmd cp truevfs-${project.version}-jar-with-dependencies.jar/net/truevfs/sample/Nzip.class archive.zip>>>|Copies the file entry <<<net/truevfs/sample/Nzip.class>>> from the distribution JAR into the ZIP file <<<archive.zip>>>.|
 *--+--+
-|<<<nzip.cmd rm archive.zip/de/truezip/sample/Nzip.class>>>|Removes the file entry <<<Nzip.class>>> from <<<archive.zip/de/truezip/samples>>>.|
+|<<<nzip.cmd rm archive.zip/net/truevfs/sample/Nzip.class>>>|Removes the file entry <<<Nzip.class>>> from <<<archive.zip/net/truevfs/samples>>>.|
 *--+--+
 |<<<nzip.cmd rmr archive.zip/de>>>|Recursively removes the directory entry <<<de>>> from <<<archive.zip>>>.|
 *--+--+

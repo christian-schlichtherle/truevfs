@@ -10,40 +10,40 @@ Key Features
     architecture.
     For a list of features for individual modules please visit their respective
     home page, e.g.
-    {{{./truezip-driver/truezip-driver-zip/index.html}TrueVFS Driver ZIP}}.
+    {{{./truevfs-driver/truevfs-driver-zip/index.html}TrueVFS Driver ZIP}}.
     You can find the modules in the navigation bar.
 
     [Easy To Use]
         The client API modules
-        {{{./truezip-file/index.html}TrueVFS&#160;File*}}
+        {{{./truevfs-file/index.html}TrueVFS&#160;File*}}
         and
-        {{{./truezip-path/index.html}TrueVFS&#160;Path}}
+        {{{./truevfs-path/index.html}TrueVFS&#160;Path}}
         provide convenient and transparent read/write access to archive files
         as if they were virtual directories.
         For example, the classes
-        {{{./apidocs/de/truezip/file/TFile.html}<<<TFile>>>}},
-        {{{./apidocs/de/truezip/file/TFileInputStream.html}<<<TFileInputStream>>>}},
-        {{{./apidocs/de/truezip/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
+        {{{./apidocs/net/truevfs/file/TFile.html}<<<TFile>>>}},
+        {{{./apidocs/net/truevfs/file/TFileInputStream.html}<<<TFileInputStream>>>}},
+        {{{./apidocs/net/truevfs/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
         et al can instantly access ZIP files, TAR files and their relatives or
         even your own
         {{{./usecases/aff.html}application file format}} or
         {{{./usecases/eaff.html}encrypted application file format}}.
 
     [Fast Bulk I/O]
-        The client API module {{{./truezip-file/index.html}TrueVFS&#160;File*}}
+        The client API module {{{./truevfs-file/index.html}TrueVFS&#160;File*}}
         provides convenient and powerful methods for fast bulk I/O operations
         like file or directory tree copying, moving, deleting, traversing etc.
         For example, by using the multi-threaded method
-        {{{./apidocs/de/truezip/file/TFile.html#cat(java.io.InputStream,java.io.OutputStream)}<<<TFile.cat(InputStream, OutputStream)>>>}},
+        {{{./apidocs/net/truevfs/file/TFile.html#cat(java.io.InputStream,java.io.OutputStream)}<<<TFile.cat(InputStream, OutputStream)>>>}},
         you'll never need to use a naive read-stop-write-stop-loop again.
 
     [File System Federation]
-        The {{{./truezip-kernel/index.html}TrueVFS&#160;Kernel}} module
+        The {{{./truevfs-kernel/index.html}TrueVFS&#160;Kernel}} module
         supports read/write access to stacked file systems.
         This enables you to read and write entries in nested archive files,
         e.g. you could write the manifest entry of a JAR file within a WAR file
         in the current directory simply by using a
-        <<<new {{{./apidocs/de/truezip/file/TFileWriter.html}TFileWriter}}("app.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF")>>>
+        <<<new {{{./apidocs/net/truevfs/file/TFileWriter.html}TFileWriter}}("app.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF")>>>
 
     [Modular Architecture]
         TrueVFS employs a {{{./concepts.html}three-tier architecture}} with an
@@ -53,7 +53,7 @@ Key Features
 
     [Pluggable File System Drivers]
         TrueVFS can support virtually any file system type via its pluggable 
-        {{{./apidocs/de/truezip/kernel/FsDriver.html}file system driver}}
+        {{{./apidocs/net/truevfs/kernel/FsDriver.html}file system driver}}
         architecture in the driver tier.
         TrueVFS ships with file system drivers for the file system schemes
         FILE, HTTP(S), ZIP, TAR and their relatives like JAR, TGZ, TBZ2 etc.

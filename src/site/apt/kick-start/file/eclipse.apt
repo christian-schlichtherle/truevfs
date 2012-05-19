@@ -19,24 +19,24 @@ Getting started with Eclipse
 
     A typical issue for beginners is understanding the dependency of TrueVFS 7
     on
-    {{{../../truezip-driver/index.html}file system driver modules}}
+    {{{../../truevfs-driver/index.html}file system driver modules}}
     at run time:
     The modules
-    {{{../../truezip-file/index.html}TrueVFS File*}}
+    {{{../../truevfs-file/index.html}TrueVFS File*}}
     and
-    {{{../../truezip-path/index.html}TrueVFS Path}}
+    {{{../../truevfs-path/index.html}TrueVFS Path}}
     use a
-    {{{../../apidocs/de/truezip/kernel/sl/FsDriverLocator.html#SINGLETON}file system driver service locator singleton}}
+    {{{../../apidocs/net/truevfs/kernel/sl/FsDriverLocator.html#SINGLETON}file system driver service locator singleton}}
     which scans the class path for
-    {{{../../apidocs/de/truezip/kernel/spi/FsDriverService.html}file system driver services}}.
+    {{{../../apidocs/net/truevfs/kernel/spi/FsDriverService.html}file system driver services}}.
     These file system driver services are contained in
-    {{{../../truezip-driver/index.html}file system driver modules}}.
+    {{{../../truevfs-driver/index.html}file system driver modules}}.
     By adding the JAR artifacts of the file system driver modules to the run
     time class path of your application, you trigger the module TrueVFS File*
     to add their file system drivers to the
-    {{{../../apidocs/de/truezip/file/TFile.html#getDefaultArchiveDetector()}initial set up}}
+    {{{../../apidocs/net/truevfs/file/TFile.html#getDefaultArchiveDetector()}initial set up}}
     of its
-    {{{../../apidocs/de/truezip/file/TArchiveDetector.html#ALL}archive detection}}.
+    {{{../../apidocs/net/truevfs/file/TArchiveDetector.html#ALL}archive detection}}.
 
     Although it's straightforward, setting up the class path can be a daunting
     task for TrueVFS beginners, so a Maven archetype is provided as a template
@@ -97,8 +97,8 @@ Getting started with Eclipse
 [eclipse/05_New_Maven_Project.png] New Maven Project
 
     Make sure to have <All Catalogs> or <Nexus Indexer> selected in the
-    <Catalog> drop down combo box, enter <truezip> into the <Filter> field,
-    select the latest entry with the Artifact Id <truezip-archetype-file> and
+    <Catalog> drop down combo box, enter <truevfs> into the <Filter> field,
+    select the latest entry with the Artifact Id <truevfs-archetype-file> and
     click <Next> to open the following dialog:
 
 [eclipse/06_New_Maven_Project.png] New Maven Project
@@ -131,7 +131,7 @@ Getting started with Eclipse
     This abstract base class runs the setup-work-sync life cycle of a typical
     TrueVFS application.
     It overrides the method
-    {{{../../apidocs/de/truezip/file/TApplication.html#setup()}<<<TApplication.setup()>>>}}
+    {{{../../apidocs/net/truevfs/file/TApplication.html#setup()}<<<TApplication.setup()>>>}}
     in order to customize the initial setup.
 
     [<<<src/main/java/com/company/project/Cat.java>>>]
@@ -140,7 +140,7 @@ Getting started with Eclipse
     If you name any archive file entries in the arguments, they get
     copied, too.
 
-    For example, if the JAR for the module <<<truezip-driver-zip>>> is
+    For example, if the JAR for the module <<<truevfs-driver-zip>>> is
     present on the run time class path, you could use the argument
     <<<archive.zip/readme.txt>>> to print the contents of the entry
     <<<readme.txt>>> in the archive file <<<archive.zip>>>.
@@ -153,7 +153,7 @@ Getting started with Eclipse
     If you name any archive files in the destination path name, they get
     automatically created.
 
-    For example, if the JAR for the module <<<truezip-driver-zip>>> is
+    For example, if the JAR for the module <<<truevfs-driver-zip>>> is
     present on the run time class path and the destination path name is
     <<<archive.zip>>>, a ZIP file with this name gets created unless it
     already exists.
@@ -162,11 +162,11 @@ Getting started with Eclipse
     This utility is only available with the archetype for the TrueVFS File*
     module.
     It llets you pick a file using a
-    {{{../../apidocs/de/truezip/file/swing/TFileChooser.html}<<<TFileChooser>>>}}
+    {{{../../apidocs/net/truevfs/file/swing/TFileChooser.html}<<<TFileChooser>>>}}
     and prints it's path.
     Of course, <<<TFileChooser>>> can browse archive files, too.
 
-    For example, if the JAR for the module <<<truezip-driver-zip>>> is present
+    For example, if the JAR for the module <<<truevfs-driver-zip>>> is present
     on the run time class path and a ZIP file <<<archive.zip>>> exists, then
     you can double click it to browse its entries.
     
@@ -176,7 +176,7 @@ Getting started with Eclipse
     Instead of a directory, you can name any configured archive file type as an
     argument, too.
 
-    For example, if the JAR for the module <<<truezip-driver-zip>>> is present
+    For example, if the JAR for the module <<<truevfs-driver-zip>>> is present
     on the run time class path and the path name argument is <<<archive.zip>>>
     and this file actually exists as a ZIP file, then the tree graph of the
     directory structure of this ZIP file gets printed.
@@ -203,7 +203,7 @@ Getting started with Eclipse
     <<<target/project-0.1-SNAPSHOT.jar>>> get listed, too!
     This is because the configuration file <<<pom.xml>>> is set up to recognize
     JAR files as virtual directories by adding the module TrueVFS Driver ZIP
-    with the artifactId <<<truezip-driver-zip>>> to the run time class path.
+    with the artifactId <<<truevfs-driver-zip>>> to the run time class path.
     You can change this by editing the configuration file <<<pom.xml>>> or 
     the method <<<Application.html.setup()>>>.
 

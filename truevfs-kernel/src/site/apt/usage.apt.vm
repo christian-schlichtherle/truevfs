@@ -9,23 +9,23 @@ TrueVFS Kernel Usage
 * Abstract
 
     This article showcases the TrueVFS&#160;Kernel API in contrast to the
-    {{{../truezip-file/index.html}TrueVFS File*}} API.
+    {{{../truevfs-file/index.html}TrueVFS File*}} API.
 
 * Design
 
     In contrast to the modules
-    {{{../truezip-path/index.html}TrueVFS Path}}
+    {{{../truevfs-path/index.html}TrueVFS Path}}
     or
-    {{{../truezip-file/index.html}TrueVFS File*}},
+    {{{../truevfs-file/index.html}TrueVFS File*}},
     the API of this module is more complex to use, yet very extensible because
     it relies on Dependency Injection for the resolution of
-    {{{./apidocs/de/truezip/kernel/FsDriver.html}file system drivers}}
+    {{{./apidocs/net/truevfs/kernel/FsDriver.html}file system drivers}}
     and
-    {{{./apidocs/de/truezip/kernel/cio/IOPool.html}I/O entry pools}}.
+    {{{./apidocs/net/truevfs/kernel/cio/IOPool.html}I/O entry pools}}.
     It also provides service locators for
-    {{{./apidocs/de/truezip/kernel/sl/FsDriverLocator.html}file system driver providers}}
+    {{{./apidocs/net/truevfs/kernel/sl/FsDriverLocator.html}file system driver providers}}
     and
-    {{{./apidocs/de/truezip/kernel/sl/IOPoolLocator.html}I/O entry pool providers}}
+    {{{./apidocs/net/truevfs/kernel/sl/IOPoolLocator.html}I/O entry pool providers}}
     in order to enable applications to resolve these dependencies easily at
     runtime.
 
@@ -76,11 +76,11 @@ $ cat fileA fileB
     Here's how to copy the contents of the path name parameter <<<resource>>>
     to the standard output using the API of the module TrueVFS File*:
 
-%{snippet|id=cat|file=${project.basedir}/../truezip-file/src/test/java/de/truezip/file/sample/PathCat.java}
+%{snippet|id=cat|file=${project.basedir}/../truevfs-file/src/test/java/net/truevfs/file/sample/PathCat.java}
 
     Suppose that the modules TrueVFS Driver ZIP
-    (Maven artifactId <<<truezip-driver-zip>>>) and TrueVFS Driver File
-    (<<<truezip-driver-file>>>) are present on the class path at run-time.
+    (Maven artifactId <<<truevfs-driver-zip>>>) and TrueVFS Driver File
+    (<<<truevfs-driver-file>>>) are present on the class path at run-time.
     Furthermore, if the current directory is the root directory and the file
     <<<file>>> exists and the file <<<archive.zip>>> is a valid ZIP file,
     then the following path names could be addressed with the code above:
@@ -99,7 +99,7 @@ $ cat fileA fileB
     If an application needs to address URIs, too, then the following code
     could be used instead:
 
-%{snippet|id=cat|file=${project.basedir}/../truezip-file/src/test/java/de/truezip/file/sample/UriCat.java}
+%{snippet|id=cat|file=${project.basedir}/../truevfs-file/src/test/java/net/truevfs/file/sample/UriCat.java}
 
     Using the same configuration like before, the following URIs could now be
     addressed with the code above:
@@ -126,25 +126,25 @@ $ cat fileA fileB
     Now for comparison, let's implement the same functionality using the API
     of the module TrueVFS Kernel.
 
-%{snippet|id=cat|file=${project.build.testSourceDirectory}/de/truezip/kernel/sample/Cat.java}
+%{snippet|id=cat|file=${project.build.testSourceDirectory}/net/truevfs/kernel/sample/Cat.java}
 
     Using the same configuration like before, this code could access the same
     URIs than before.
     However, this could access <any> URI scheme for which a file system driver
     is present on the class path at run-time, too.
-    E.g. if the module TrueVFS Driver HTTP(S) (<<<truezip-driver-http>>>) is
+    E.g. if the module TrueVFS Driver HTTP(S) (<<<truevfs-driver-http>>>) is
     present on the class path at run-time, even http(s)-based URIs could get
     accessed.
 
     Just for fun, try the code above with the following URI:
 
 ---
-zip:zip:zip:zip:zip:zip:zip:http://truezip.java.net/truezip-samples/test/1.zip!/0.zip!/this.zip!/is.zip!/nuts.zip!/or.zip!/not.zip!/x
+zip:zip:zip:zip:zip:zip:zip:http://truevfs.java.net/truevfs-samples/test/1.zip!/0.zip!/this.zip!/is.zip!/nuts.zip!/or.zip!/not.zip!/x
 ---
 
     And for even more fun, try the code above with the following URI and
     provide the top secret password <<<test1234>>> when prompted:
 
 ---
-zip:zip:zip:zip:tzp:zip:zip:http://truezip.java.net/truezip-samples/test/1.zip!/0.zip!/test1234.tzp!/is.zip!/nuts.zip!/or.zip!/not.zip!/x
+zip:zip:zip:zip:tzp:zip:zip:http://truevfs.java.net/truevfs-samples/test/1.zip!/0.zip!/test1234.tzp!/is.zip!/nuts.zip!/or.zip!/not.zip!/x
 ---
