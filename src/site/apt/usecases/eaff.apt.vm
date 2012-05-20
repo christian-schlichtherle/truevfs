@@ -25,7 +25,7 @@ Encrypted Application File Format
 * Accessing Encrypted and Authenticated Application File Formats
 
     Thanks to the
-    {{{../truevfs-file/index.html}TrueVFS File*}}
+    {{{../truevfs-access/truevfs-access-file/index.html}TrueVFS Access File*}}
     module, here's your relief:
     The
     {{{../apidocs/net/truevfs/file/TFile.html}<<<TFile>>>}},

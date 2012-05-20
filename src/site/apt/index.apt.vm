@@ -28,7 +28,7 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
 *--*--*
 || Module || Description
 *--+--+
-| {{{./truevfs-driver/truevfs-driver-file/index.html}TrueVFS Driver FILE}} | Provides read/write access to the platform file system. Automatically uses NIO.2 if JSE&#160;7 is available.
+| {{{./truevfs-driver/truevfs-driver-file/index.html}TrueVFS Driver FILE}} | Provides read/write access to the platform file system.
 *--+--+
 | {{{./truevfs-driver/truevfs-driver-http/index.html}TrueVFS Driver HTTP(S)}} | Provides read-only access to HTTP(S) URLs.
 *--+--+
@@ -48,16 +48,17 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
     As a library, TrueVFS provides simple, uniform, transparent,
     thread-safe, read/write access to archive files as if they were
     virtual directories in a file system path.
-    Starting with TrueVFS&#160;7.2, there are two client API modules available
-    which can get used concurrently to access the same (virtual) file systems:
+    TrueVFS provides two client API modules to access its (federated virtual)
+    file system space.
+    Both can be used simultaneously to access the same file systems:
 
-*--*--*--*
-|| Module || Requires || Description
-*--+--+--+
-| {{{./truevfs-file/index.html}TrueVFS File*}} | JSE&#160;6 | Provides classes which can get used in exactly the same way as the <<<java.io.File*>>> classes, so it's easy to learn or migrate an existing application. In addition, easy to use, yet powerful methods for standard tasks like file or directory tree copying, moving, deleting, traversing etc are provided, too.
-*--+--+--+
-| {{{./truevfs-path/index.html}TrueVFS Path}} | JSE&#160;7 | Provides classes which implement a <<<java.nio.file.spi.FileSystemProvider>>> for the NIO.2 API (JSR&#160;203) to enable an application to access archive files within any (virtual) file system, e.g. via HTTP(S). Applications can even read or write archive entries in random order using a <<<SeekableByteChannel>>>.
-*--+--+--+
+*--*--*
+|| Module || Description
+*--+--+
+| {{{./truevfs-access/truevfs-access-file/index.html}TrueVFS Access File*}}| Provides classes which can get used in exactly the same way as the <<<java.io.File*>>> classes, so it's easy to learn or migrate an existing application. In addition, easy to use, yet powerful methods for standard tasks like file or directory tree copying, moving, deleting, traversing etc are provided, too.
+*--+--+
+| {{{./truevfs-access/truevfs-access-path/index.html}TrueVFS Access Path}} | Provides classes which implement a <<<java.nio.file.spi.FileSystemProvider>>> for the NIO.2 API (JSR&#160;203) to enable an application to access archive files within any (virtual) file system, e.g. via HTTP(S). Applications can even read or write archive entries in random order using a <<<SeekableByteChannel>>>.
+*--+--+
 
     Writing an application for either API is really easy:
     Please have a look at the page {{{./kick-start/index.html}Getting Started}}

@@ -16,7 +16,7 @@
 
     For more information about configuring the client APIs, please refer to the
     article
-    {{{../truevfs-file/configuration.html}Configuring TrueVFS File*}}.
+    {{{../truevfs-access/truevfs-access-file/configuration.html}Configuring TrueVFS Access File*}}.
 
 ** False Positive Archive Files
 

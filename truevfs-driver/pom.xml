@@ -32,13 +32,13 @@
                  integration tests. -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-file</artifactId>
+                <artifactId>truevfs-access-file</artifactId>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-path</artifactId>
+                <artifactId>truevfs-access-path</artifactId>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>

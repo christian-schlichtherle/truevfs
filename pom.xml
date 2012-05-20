@@ -123,13 +123,12 @@ system space.
     </properties>
 
     <modules>
+        <module>truevfs-access</module>
         <module>truevfs-archetype</module>
         <module>truevfs-driver</module>
         <module>truevfs-extension</module>
-        <module>truevfs-file</module>
         <module>truevfs-kernel</module>
         <module>truevfs-key</module>
-        <module>truevfs-path</module>
         <module>truevfs-samples</module>
     </modules>
 
@@ -174,12 +173,12 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-file</artifactId>
+                <artifactId>truevfs-access-file</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-file</artifactId>
+                <artifactId>truevfs-access-file</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
@@ -210,12 +209,12 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-path</artifactId>
+                <artifactId>truevfs-access-path</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-path</artifactId>
+                <artifactId>truevfs-access-path</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>

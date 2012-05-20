@@ -40,11 +40,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-file</artifactId>
+            <artifactId>truevfs-access-file</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-file</artifactId>
+            <artifactId>truevfs-access-file</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>
@@ -54,11 +54,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-path</artifactId>
+            <artifactId>truevfs-access-path</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-path</artifactId>
+            <artifactId>truevfs-access-path</artifactId>
             <type>test-jar</type>
         </dependency>
     </dependencies>

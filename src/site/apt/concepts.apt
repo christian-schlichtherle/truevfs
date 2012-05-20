@@ -19,9 +19,9 @@ Concepts
           No file system state is managed by this tier, which enables a TrueVFS
           application to work with any client API concurrently.
           This tier consists of the modules
-          {{{./truevfs-file/index.html}TrueVFS&#160;File*}}
+          {{{./truevfs-access/truevfs-access-file/index.html}TrueVFS&#160;File*}}
           and
-          {{{./truevfs-path/index.html}TrueVFS&#160;Path}}
+          {{{./truevfs-access/truevfs-access-path/index.html}TrueVFS&#160;Path}}
           (since TrueVFS 7.2).
           In addition to the canonical term <access module>, each of these may
           also get referred to by the term <client API module> for better
@@ -66,7 +66,7 @@ Concepts
     {{{./apidocs/net/truevfs/file/TConfig.html#setArchiveDetector(net.truevfs.file.TArchiveDetector)}explicitly override}}
     it.
     Check the {{{./faq.html#file}FAQ}} for the
-    {{{./truevfs-file/index.html}TrueVFS File*}}
+    {{{./truevfs-access/truevfs-access-file/index.html}TrueVFS Access File*}}
     API for a discussion of some options to adapt the archive detection to your
     needs.
 
@@ -95,7 +95,7 @@ Concepts
     For example, the file system manager service locator singleton and the file
     system driver service locator singleton are used by the APIs of the TrueVFS
     File* and
-    {{{./truevfs-path/index.html}TrueVFS Path}}
+    {{{./truevfs-access-path/index.html}TrueVFS Access Path}}
     modules in order to implement the Convention Over Configuration design
     paradigm.
     Likewise, the temporary I/O entry pool service locator singleton is used by

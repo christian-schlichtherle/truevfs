@@ -8,7 +8,7 @@ import de.schlichtherle.truevfs.key.pbe.swing.feedback.InvalidKeyFeedback;
 import net.truevfs.file.TApplication;
 
 /**
- * An abstract class which configures the TrueVFS Path module.
+ * An abstract class which configures the TrueVFS Access Path module.
  * 
  * @author Christian Schlichtherle
  */

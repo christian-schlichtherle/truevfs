@@ -24,18 +24,18 @@ Getting Started
 
     []
 
-    These guides were written with the archetype for the TrueVFS File*
+    These guides were written with the archetype for the TrueVFS Access File*
     API in mind.
-    However, they work the same way with the archetype for the TrueVFS Path
+    However, they work the same way with the archetype for the TrueVFS Access Path
     API - just pick the Maven archetype coordinates for your preferred client
     API from the following table:
 
 *--+--+--+--+--+
 || Client API || Requires || Archetype Group Id || Archetype Artifact Id || Archetype Version
 *--+--+--+--+--+
-| {{{../truevfs-file/index.html}TrueVFS File*}} | JSE&#160;6 | <<<de.schlichtherle.truevfs>>> | <<<truevfs-archetype-file>>> | <<<${project.version}>>>
+| {{{../truevfs-access/truevfs-access-file/index.html}TrueVFS Access File*}} | JSE&#160;6 | <<<de.schlichtherle.truevfs>>> | <<<truevfs-archetype-file>>> | <<<${project.version}>>>
 *--+--+--+--+--+
-| {{{../truevfs-path/index.html}TrueVFS Path}} | JSE&#160;7 | <<<de.schlichtherle.truevfs>>> | <<<truevfs-archetype-path>>> | <<<${project.version}>>>
+| {{{../truevfs-access/truevfs-access-path/index.html}TrueVFS Access Path}} | JSE&#160;7 | <<<de.schlichtherle.truevfs>>> | <<<truevfs-archetype-path>>> | <<<${project.version}>>>
 *--+--+--+--+--+
 
 * Manual Download
@@ -52,6 +52,6 @@ Getting Started
 
 * Tutorial (new)
 
-    A short {{{./tutorial.html}tutorial}} is available for the TrueVFS File* API.
+    A short {{{./tutorial.html}tutorial}} is available for the TrueVFS Access File* API.
     It does not require you to use Maven, but it assumes you have
     already setup an application skeleton.
