@@ -2,8 +2,8 @@
 #macro(configuring $extension $file $modules_need $artifactId)
 * Configuring Archive Detection
 
-    You may wonder how TrueVFS gets configured to treat a file name with a
-    $extension extension as a $file file instead of a plain old file.
+    You may be wondering how TrueVFS gets configured to treat a file name with
+    a $extension extension as a $file file instead of a plain old file.
     For now, let it suffice to say that TrueVFS follows the
     convention-over-configuration principle as much as possible,
     so there are reasonable defaults for everything in order to relieve you
