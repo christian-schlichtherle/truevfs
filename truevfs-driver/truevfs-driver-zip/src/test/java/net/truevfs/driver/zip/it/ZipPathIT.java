@@ -1,17 +1,19 @@
+package net.truevfs.driver.zip.it;
+
 /*
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.driver.zip.access;
 
-import net.truevfs.driver.zip.CheckedZipDriver;
-import net.truevfs.access.TFileITSuite;
+
+import net.truevfs.driver.zip.ZipDriver;
 import net.truevfs.kernel.cio.IOPool;
+import net.truevfs.access.TPathITSuite;
 
 /**
  * @author  Christian Schlichtherle
  */
-public final class CheckedZipFileIT extends TFileITSuite<CheckedZipDriver> {
+public final class ZipPathIT extends TPathITSuite<ZipDriver> {
 
     @Override
     protected String getExtensionList() {
@@ -19,8 +21,8 @@ public final class CheckedZipFileIT extends TFileITSuite<CheckedZipDriver> {
     }
 
     @Override
-    protected CheckedZipDriver newArchiveDriver() {
-        return new CheckedZipDriver() {
+    protected ZipDriver newArchiveDriver() {
+        return new ZipDriver() {
             @Override
             public IOPool<?> getIOPool() {
                 return getTestConfig().getIOPoolProvider().getIOPool();

@@ -1,25 +1,28 @@
+package net.truevfs.driver.zip.it;
+
 /*
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.driver.tar.access;
 
-import net.truevfs.driver.tar.TarGZipDriver;
+
+import net.truevfs.driver.zip.CheckedZipDriver;
 import net.truevfs.kernel.cio.IOPool;
+import net.truevfs.access.TPathITSuite;
 
 /**
  * @author  Christian Schlichtherle
  */
-public final class TarGZipPathIT extends TarPathITSuite<TarGZipDriver> {
+public final class CheckedZipPathIT extends TPathITSuite<CheckedZipDriver> {
 
     @Override
     protected String getExtensionList() {
-        return "tar.gz";
+        return "zip";
     }
 
     @Override
-    protected TarGZipDriver newArchiveDriver() {
-        return new TarGZipDriver() {
+    protected CheckedZipDriver newArchiveDriver() {
+        return new CheckedZipDriver() {
             @Override
             public IOPool<?> getIOPool() {
                 return getTestConfig().getIOPoolProvider().getIOPool();
