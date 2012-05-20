@@ -4,19 +4,17 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.access.TArchiveDetector;
-import net.truevfs.access.TConfig;
 import de.schlichtherle.truevfs.kernel.se.ArchiveManagerService;
-import net.truevfs.kernel.FsArchiveDriver;
-import net.truevfs.kernel.FsArchiveDriverTestBase;
-import net.truevfs.kernel.FsMountPoint;
-import net.truevfs.kernel.FsScheme;
-import net.truevfs.kernel.util.ExtensionSet;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
+import net.truevfs.kernel.FsArchiveDriver;
+import net.truevfs.kernel.FsArchiveDriverTestBase;
+import net.truevfs.kernel.FsMountPoint;
+import net.truevfs.kernel.FsScheme;
+import net.truevfs.kernel.util.ExtensionSet;
 
 /**
  * @param  <D> the type of the archive driver.
