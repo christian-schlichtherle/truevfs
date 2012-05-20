@@ -5,11 +5,11 @@
 package net.truevfs.extension.jmxjul;
 
 import de.schlichtherle.truevfs.kernel.se.ArchiveManagerService;
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.extension.jmxjul.jmx.JmxDirector;
 import net.truevfs.extension.jmxjul.jul.JulDirector;
 import net.truevfs.kernel.FsManager;
 import net.truevfs.kernel.spi.FsManagerService;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * @author Christian Schlichtherle
