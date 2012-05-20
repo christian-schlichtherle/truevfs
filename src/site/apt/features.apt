@@ -14,36 +14,34 @@ Key Features
     You can find the modules in the navigation bar.
 
     [Easy To Use]
-        The client API modules
-        {{{./truevfs-access/truevfs-access-file/index.html}TrueVFS&#160;File*}}
-        and
-        {{{./truevfs-access/truevfs-access-path/index.html}TrueVFS&#160;Path}}
-        provide convenient and transparent read/write access to archive files
+        The client API module
+        {{{./truevfs-access/index.html}TrueVFS&#160;Access}}
+        provides convenient and transparent read/write access to archive files
         as if they were virtual directories.
         For example, the classes
-        {{{./apidocs/net/truevfs/file/TFile.html}<<<TFile>>>}},
-        {{{./apidocs/net/truevfs/file/TFileInputStream.html}<<<TFileInputStream>>>}},
-        {{{./apidocs/net/truevfs/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
+        {{{./apidocs/net/truevfs/access/TFile.html}<<<TFile>>>}},
+        {{{./apidocs/net/truevfs/access/TFileInputStream.html}<<<TFileInputStream>>>}},
+        {{{./apidocs/net/truevfs/access/TFileOutputStream.html}<<<TFileOutputStream>>>}}
         et al can instantly access ZIP files, TAR files and their relatives or
         even your own
         {{{./usecases/aff.html}application file format}} or
         {{{./usecases/eaff.html}encrypted application file format}}.
 
     [Fast Bulk I/O]
-        The client API module {{{./truevfs-access/truevfs-access-file/index.html}TrueVFS&#160;File*}}
+        The client API module {{{./truevfs-access/index.html}TrueVFS&#160;Access}}
         provides convenient and powerful methods for fast bulk I/O operations
         like file or directory tree copying, moving, deleting, traversing etc.
         For example, by using the multi-threaded method
-        {{{./apidocs/net/truevfs/file/TFile.html#cat(java.io.InputStream,java.io.OutputStream)}<<<TFile.cat(InputStream, OutputStream)>>>}},
+        {{{./apidocs/net/truevfs/access/TFile.html#cat(java.io.InputStream,java.io.OutputStream)}<<<TFile.cat(InputStream, OutputStream)>>>}},
         you'll never need to use a naive read-stop-write-stop-loop again.
 
     [File System Federation]
-        The {{{./truevfs-kernel/index.html}TrueVFS&#160;Kernel}} module
+        The module {{{./truevfs-kernel/index.html}TrueVFS&#160;Kernel}}
         supports read/write access to stacked file systems.
         This enables you to read and write entries in nested archive files,
         e.g. you could write the manifest entry of a JAR file within a WAR file
         in the current directory simply by using a
-        <<<new {{{./apidocs/net/truevfs/file/TFileWriter.html}TFileWriter}}("app.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF")>>>
+        <<<new {{{./apidocs/net/truevfs/access/TFileWriter.html}TFileWriter}}("app.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF")>>>
 
     [Modular Architecture]
         TrueVFS employs a {{{./concepts.html}three-tier architecture}} with an

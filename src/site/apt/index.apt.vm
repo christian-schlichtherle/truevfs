@@ -6,7 +6,7 @@
 
 About
 
-    TrueVFS is a Java based virtual file system (VFS) which enables client
+    TrueVFS is a virtual file system (VFS) for Java&#160;7 which enables client
     applications to perform CRUD (Create, Read, Update, Delete) operations on
     archive files as if they were virtual directories, even with nested archive
     files in multithreaded environments - see {{{./features.html}Key Features}}.
@@ -48,19 +48,12 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
     As a library, TrueVFS provides simple, uniform, transparent,
     thread-safe, read/write access to archive files as if they were
     virtual directories in a file system path.
-    TrueVFS provides two client API modules to access its (federated virtual)
+    TrueVFS provides the module
+    {{{./truevfs-access/index.html}TrueVFS&#160;Access}}
+    with the client facade API for convenient access to its (federated virtual)
     file system space.
-    Both can be used simultaneously to access the same file systems:
 
-*--*--*
-|| Module || Description
-*--+--+
-| {{{./truevfs-access/truevfs-access-file/index.html}TrueVFS Access File*}}| Provides classes which can get used in exactly the same way as the <<<java.io.File*>>> classes, so it's easy to learn or migrate an existing application. In addition, easy to use, yet powerful methods for standard tasks like file or directory tree copying, moving, deleting, traversing etc are provided, too.
-*--+--+
-| {{{./truevfs-access/truevfs-access-path/index.html}TrueVFS Access Path}} | Provides classes which implement a <<<java.nio.file.spi.FileSystemProvider>>> for the NIO.2 API (JSR&#160;203) to enable an application to access archive files within any (virtual) file system, e.g. via HTTP(S). Applications can even read or write archive entries in random order using a <<<SeekableByteChannel>>>.
-*--+--+
-
-    Writing an application for either API is really easy:
+    Writing an application for this API is really easy:
     Please have a look at the page {{{./kick-start/index.html}Getting Started}}
     to learn how to generate a TrueVFS client application from a Maven
     archetype in about ten minutes.
@@ -70,9 +63,11 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
     As a framework, TrueVFS provides the interfaces and classes to
     write file system drivers which plug-in to its federated file
     system space.
-    The module TrueVFS&#160;Kernel provides federating, multithreading,
-    multiplexing, caching and accounting so that archive file system drivers
-    do not need to take care of these aspects of a virtual file system.
+    The module
+    {{{./truezip-kernel/index.html}TrueVFS&#160;Kernel}}
+    provides federating, multithreading, multiplexing, caching and accounting
+    so that archive file system drivers do not need to take care of these
+    aspects of a virtual file system.
 
     Unfortunately, there is no tutorial for how to write a file system driver,
     but there's comprehensive Javadoc and sample code:

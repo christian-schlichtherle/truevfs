@@ -60,7 +60,7 @@ Prerequisites
 Sample
 
     To demonstrate this module, let's use the <<<Tree>>> class in the module
-    TrueVFS Archetype File*.
+    TrueVFS Archetype.
     This class simply prints an ASCII directory tree of a directory and then
     terminates.
     When run unchanged with no arguments in the project directory of the

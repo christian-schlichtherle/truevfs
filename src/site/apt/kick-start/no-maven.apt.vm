@@ -14,9 +14,10 @@ Getting started without Maven
     The all-in-one JAR saves you from grabbing the module JARs individually.
     However, as the name implies, it includes all sample code which bloats the
     code size of the application.
-    More importantly, this will also initially set up the TrueVFS Access File* API to
-    detect all canonical file extensions of all supported archive file types
-    in TrueVFS ${project.version} - see the table at the end of this page.
+    More importantly, this will also initially set up the TrueVFS&#160;Access
+    API to detect all canonical file extensions of all supported archive file
+    types in TrueVFS&#160;${project.version} - see the table at the end of this
+    page.
     This may produce some unwanted side effects on an unintended access to an
     archive file:
 
@@ -39,8 +40,8 @@ Getting started without Maven
     []
 
     To avoid these unwanted side effects, you should <always> configure the
-    TrueVFS Access File* API to detect exactly only the file suffixes of the archive
-    types required to access.
+    TrueVFS&#160;Access API to detect exactly only the file suffixes of the
+    archive types required to access.
     {{{../usecases/aff.html}Here}} is a sample available for this task.
     For further information, please refer to the Javadoc for the class
     {{{../apidocs/de/schlichtherle/truevfs/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
@@ -48,7 +49,7 @@ Getting started without Maven
 * Initial Setup
 
     Following are the canonical archive file extensions which will be detected
-    by an application using the TrueVFS Access File* API according to the initial set
+    by an application using the TrueVFS Access API according to the initial set
     up of the all-in-one JAR <<<truevfs-samples-${project.version}-jar-with-dependencies.jar>>>:
 
 *--*--*

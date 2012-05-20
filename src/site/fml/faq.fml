@@ -13,7 +13,7 @@
         title="Frequently Asked Questions"
         toplink="false">
     <part id="file">
-        <title>TrueVFS Access File* API</title>
+        <title>TrueVFS Access / File* API</title>
         <faq id="cannotReadArchive">
             <question>
                 When trying to read an archive file, I get an exception saying
@@ -174,7 +174,7 @@ TConfig.get().setArchiveDetector(new TArchiveDetector("zip"));
 </source>
                 <p>
                     Check the
-                    <a href="kick-start/index.html">Maven archetypes</a> for
+                    <a href="kick-start/index.html">Maven archetype</a> for
                     more options and to help you get started with this quickly.
                 </p>
             </answer>
@@ -203,12 +203,12 @@ TConfig.get().setArchiveDetector(
                 <p>
                     Furthermore, this example presumes that you want no other
                     archive file extensions to get detected, hence the use of
-                    <a href="apidocs/net/truevfs/file/TArchiveDetector.html#NULL"><code>TArchiveDetector.NULL</code></a>
+                    <a href="apidocs/net/truevfs/access/TArchiveDetector.html#NULL"><code>TArchiveDetector.NULL</code></a>
                     as the decorated archive detector.
                     The class <code>TArchiveDetector</code> has many different
                     constructors.
                     Check the
-                    <a href="apidocs/net/truevfs/file/TArchiveDetector.html">Javadoc</a>
+                    <a href="apidocs/net/truevfs/access/TArchiveDetector.html">Javadoc</a>
                     to make sure you get what you need.
                 </p>
             </answer>
@@ -239,7 +239,7 @@ TConfig.get().setArchiveDetector(
 </source>
                 <p>
                     Check the
-                    <a href="kick-start/index.html">Maven archetypes</a> for
+                    <a href="kick-start/index.html">Maven archetype</a> for
                     more options and to help you get started with this quickly.
                 </p>
             </answer>
@@ -332,7 +332,7 @@ long length = file.length();
                 <source>TVFS.umount();</source>
                 <p>
                     Please have a look at the method's
-                    <a href="apidocs/net/truevfs/file/TVFS.html#umount()">Javadoc</a>
+                    <a href="apidocs/net/truevfs/access/TVFS.html#umount()">Javadoc</a>
                     for more options.
                 </p>
             </answer>
@@ -343,22 +343,14 @@ long length = file.length();
             </question>
             <answer>
                 <p>
-                    The TrueVFS Access File* API can only access the platform file
-                    system because the <code>TFile</code> class extends the
-                    <code>File</code> class.
+                    The TrueVFS Access / File* API can only access the platform
+                    file system because the <code>TFile</code> class extends
+                    the <code>File</code> class.
                     To access an archive file via HTTP(S) or any other procotol
-                    scheme, you have two options:
+                    scheme, you need to use the TrueVFS Access / Path API
+                    (class <a href="apidocs/net/truevfs/access/TPath.html"><code>TPath</code></a> et al)
+                    in the same package.
                 </p>
-                <ul>
-                <li>If your application uses a JSE&#160;7 compliant JVM,
-                    you can simply use the API of the
-                    <a href="truevfs-access/truevfs-access-path/index.html">TrueVFS Access Path</a>
-                    module.</li>
-                <li>Otherwise, you can use the API of the
-                    <a href="truevfs-kernel/index.html">TrueVFS Kernel</a>
-                    module.
-                </li>
-                </ul>
             </answer>
         </faq>
         <faq id="accessAbsoluteEntryName">
@@ -388,7 +380,7 @@ long length = file.length();
         </faq>
     </part>
     <part id="path">
-        <title>TrueVFS Access Path API</title>
+        <title>TrueVFS Access / Path API</title>
         <faq id="interoperability">
             <question>
                 Can I use the APIs of the modules TrueVFS Access Path and
@@ -758,9 +750,9 @@ long size = Files.size(path);
                     normalized entry name.
                     Then, an application can read the contents of the file
                     entry by using e.g.
-                    <a href="apidocs/net/truevfs/file/TFileInputStream.html"><code>TFileInputStream</code></a>
+                    <a href="apidocs/net/truevfs/access/TFileInputStream.html"><code>TFileInputStream</code></a>
                     and list the members of the directory entry by using
-                    <a href="apidocs/net/truevfs/file/TFile.html#listFiles()"><code>TFile.listFiles()</code></a>.
+                    <a href="apidocs/net/truevfs/access/TFile.html#listFiles()"><code>TFile.listFiles()</code></a>.
                 </p>
                 <p>
                     Note that this feature solely exists to enable applications
