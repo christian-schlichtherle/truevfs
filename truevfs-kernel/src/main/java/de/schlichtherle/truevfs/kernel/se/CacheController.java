@@ -477,7 +477,7 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                                 // Check if we can retry the mknod with GROW set.
                                 final BitField<FsAccessOption> oldMknodOpts = mknodOpts;
                                 mknodOpts = oldMknodOpts.set(GROW);
-                                if (oldMknodOpts == mknodOpts) {
+                                if (mknodOpts == oldMknodOpts) {
                                     // Finally, the mknod failed because the entry
                                     // has already been output to the target archive
                                     // file - so what?!
