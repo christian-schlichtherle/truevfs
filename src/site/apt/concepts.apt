@@ -23,8 +23,8 @@ Concepts
           and
           {{{./truevfs-path/index.html}TrueVFS&#160;Path}}
           (since TrueVFS 7.2).
-          In addition to the canonical term <i>access module<i>, each of these
-          may also get referred to by the term <i>client API module</i> for
+          In addition to the canonical term <access module>, each of these
+          may also get referred to by the term <client API module> for
           better comprehensibility.
 
     [[1]] The <Kernel Tier> manages all virtual file system state.
