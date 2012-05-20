@@ -495,9 +495,10 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                         // resolve the issue locally, that is if we were asked
                         // to create the entry exclusively or this is a
                         // non-recursive file system operation.
-                        final BitField<FsSyncOption> syncOpts;
-                        if (mknodOpts.get(EXCLUSIVE)
-                                || SYNC == (syncOpts = FsSyncController.modify(SYNC)))
+                        if (mknodOpts.get(EXCLUSIVE))
+                            throw mknodEx;
+                        final BitField<FsSyncOption> syncOpts = FsSyncController.modify(SYNC);
+                        if (SYNC == syncOpts)
                             throw mknodEx;
 
                         // Try to resolve the issue locally.
@@ -507,7 +508,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                         // the mknod().
                         try {
                             delegate.sync(syncOpts);
-                            continue; // sync() succeeded, now repeat mknod()
+                            //continue; // sync() succeeded, now repeat mknod()
                         } catch (final FsSyncException syncEx) {
                             if (JSE7.AVAILABLE) syncEx.addSuppressed(mknodEx);
 
@@ -539,20 +540,19 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                             // Check if we can retry the mknod with GROW set.
                             final BitField<FsOutputOption> oldMknodOpts = mknodOpts;
                             mknodOpts = oldMknodOpts.set(GROW);
-                            if (oldMknodOpts != mknodOpts)
-                                continue;
-
-                            // Finally, the mknod failed because the entry
-                            // has already been output to the target archive
-                            // file - so what?!
-                            // This should mark only a volatile issue because
-                            // the next sync() will sort it out once all the
-                            // I/O resources have been closed.
-                            // Let's log the sync exception - mind that it has
-                            // suppressed the mknod exception - and continue
-                            // anyway...
-                            logger.log(Level.FINE, "ignoring", syncEx);
-                            break;
+                            if (oldMknodOpts == mknodOpts) {
+                                // Finally, the mknod failed because the entry
+                                // has already been output to the target archive
+                                // file - so what?!
+                                // This should mark only a volatile issue because
+                                // the next sync() will sort it out once all the
+                                // I/O resources have been closed.
+                                // Let's log the sync exception - mind that it has
+                                // suppressed the mknod exception - and continue
+                                // anyway...
+                                logger.log(Level.FINE, "ignoring", syncEx);
+                                break;
+                            }
                         }
                     }
                 }
