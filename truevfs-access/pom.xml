@@ -43,6 +43,11 @@ and choosing entries in archive files.
             <artifactId>truevfs-kernel</artifactId>
             <type>test-jar</type>
         </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <build>

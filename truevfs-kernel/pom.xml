@@ -27,8 +27,19 @@
         the file system drivers do not need to take care of this.
     </description>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
