@@ -416,10 +416,9 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                     register();
                 }
 
-                void mknod( final BitField<FsAccessOption> options,
+                void mknod( BitField<FsAccessOption> mknodOpts,
                             final @CheckForNull Entry template)
                 throws IOException {
-                    BitField<FsAccessOption> mknodOpts = options;
                     while (true) {
                         try {
                             controller.mknod(mknodOpts, name, FILE, template);
@@ -476,8 +475,9 @@ extends DecoratingLockModelController<FsController<? extends LockModel>> {
                                 //throw FsNeedsLockRetryException.get(getModel());
 
                                 // Check if we can retry the mknod with GROW set.
-                                mknodOpts = mknodOpts.set(GROW);
-                                if (mknodOpts == options) {
+                                final BitField<FsAccessOption> oldMknodOpts = mknodOpts;
+                                mknodOpts = oldMknodOpts.set(GROW);
+                                if (oldMknodOpts == mknodOpts) {
                                     // Finally, the mknod failed because the entry
                                     // has already been output to the target archive
                                     // file - so what?!
