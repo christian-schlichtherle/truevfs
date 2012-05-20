@@ -4,18 +4,6 @@
  */
 package net.truevfs.driver.zip.io;
 
-import static net.truevfs.driver.zip.io.Constants.*;
-import static net.truevfs.driver.zip.io.ExtraField.WINZIP_AES_ID;
-import static net.truevfs.driver.zip.io.WinZipAesEntryExtraField.VV_AE_1;
-import static net.truevfs.driver.zip.io.WinZipAesEntryExtraField.VV_AE_2;
-import static net.truevfs.driver.zip.io.WinZipAesUtils.overhead;
-import static net.truevfs.driver.zip.io.ZipEntry.*;
-import static net.truevfs.driver.zip.io.ZipParametersUtils.parameters;
-import net.truevfs.kernel.io.DecoratingOutputStream;
-import net.truevfs.kernel.io.LittleEndianOutputStream;
-import net.truevfs.kernel.io.Sink;
-import static net.truevfs.kernel.util.HashMaps.initialCapacity;
-import net.truevfs.key.param.AesKeyStrength;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,6 +19,18 @@ import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
+import static net.truevfs.driver.zip.io.Constants.*;
+import static net.truevfs.driver.zip.io.ExtraField.WINZIP_AES_ID;
+import static net.truevfs.driver.zip.io.WinZipAesEntryExtraField.VV_AE_1;
+import static net.truevfs.driver.zip.io.WinZipAesEntryExtraField.VV_AE_2;
+import static net.truevfs.driver.zip.io.WinZipAesUtils.overhead;
+import static net.truevfs.driver.zip.io.ZipEntry.*;
+import static net.truevfs.driver.zip.io.ZipParametersUtils.parameters;
+import net.truevfs.kernel.io.DecoratingOutputStream;
+import net.truevfs.kernel.io.LittleEndianOutputStream;
+import net.truevfs.kernel.io.Sink;
+import static net.truevfs.kernel.util.HashMaps.initialCapacity;
+import net.truevfs.key.param.AesKeyStrength;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**
