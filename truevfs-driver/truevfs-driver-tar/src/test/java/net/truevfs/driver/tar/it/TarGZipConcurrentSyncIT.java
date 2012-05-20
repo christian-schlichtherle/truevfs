@@ -2,25 +2,26 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.driver.zip.access;
+package net.truevfs.driver.tar.it;
 
-import net.truevfs.driver.zip.JarDriver;
-import net.truevfs.access.TFileITSuite;
+import net.truevfs.driver.tar.TarGZipDriver;
+import net.truevfs.access.ConcurrentSyncITSuite;
 import net.truevfs.kernel.cio.IOPool;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
-public final class JarFileIT extends TFileITSuite<JarDriver> {
+public final class TarGZipConcurrentSyncIT
+extends ConcurrentSyncITSuite<TarGZipDriver> {
 
     @Override
     protected String getExtensionList() {
-        return "jar";
+        return "tar.gz";
     }
 
     @Override
-    protected JarDriver newArchiveDriver() {
-        return new JarDriver() {
+    protected TarGZipDriver newArchiveDriver() {
+        return new TarGZipDriver() {
             @Override
             public IOPool<?> getIOPool() {
                 return getTestConfig().getIOPoolProvider().getIOPool();

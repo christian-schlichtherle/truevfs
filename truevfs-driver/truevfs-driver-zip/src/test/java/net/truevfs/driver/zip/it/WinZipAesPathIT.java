@@ -1,25 +1,28 @@
+package net.truevfs.driver.zip.it;
+
 /*
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.driver.zip.access;
+
 
 import net.truevfs.driver.zip.TestWinZipAesDriver;
 import net.truevfs.access.TConfig;
-import net.truevfs.access.TFile;
-import net.truevfs.access.TFileITSuite;
 import static net.truevfs.kernel.FsAccessOption.ENCRYPT;
-import net.truevfs.key.MockView.Action;
+import net.truevfs.key.MockView;
 import static net.truevfs.key.MockView.Action.CANCEL;
 import static net.truevfs.key.MockView.Action.ENTER;
+import net.truevfs.access.TPath;
+import net.truevfs.access.TPathITSuite;
 import java.io.IOException;
+import static java.nio.file.Files.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle
  */
-public final class WinZipAesFileIT extends TFileITSuite<TestWinZipAesDriver> {
+public final class WinZipAesPathIT extends TPathITSuite<TestWinZipAesDriver> {
 
     @Override
     protected String getExtensionList() {
@@ -38,7 +41,7 @@ public final class WinZipAesFileIT extends TFileITSuite<TestWinZipAesDriver> {
         config.setAccessPreferences(config.getAccessPreferences().set(ENCRYPT));
     }
 
-    private void setAction(Action action) {
+    private void setAction(MockView.Action action) {
         getArchiveDriver().getView().setAction(action);
     }
 
@@ -46,56 +49,56 @@ public final class WinZipAesFileIT extends TFileITSuite<TestWinZipAesDriver> {
     public void testCancelling() throws IOException {
         setAction(CANCEL);
 
-        final TFile archive = getArchive();
-        assertFalse(archive.toNonArchiveFile().exists());
+        final TPath archive = getArchive();
+        assertFalse(exists(archive.toNonArchivePath()));
 
-        final TFile entry1 = new TFile(archive, "entry1");
-        assertTrue(entry1.mkdirs());
-        entry1.rm();
-        assertTrue(entry1.createNewFile());
-        entry1.rm();
+        final TPath entry1 = archive.resolve("entry1");
+        createDirectories(entry1);
+        delete(entry1);
+        createFile(entry1);
+        delete(entry1);
 
-        final TFile entry2 = new TFile(archive, "entry2");
-        assertTrue(entry2.mkdirs());
-        entry2.rm();
-        assertTrue(entry2.createNewFile());
-        entry2.rm();
+        final TPath entry2 = archive.resolve("entry2");
+        createDirectories(entry2);
+        delete(entry2);
+        createFile(entry2);
+        delete(entry2);
     }
 
     @Test
     public void testFileStatus() throws IOException {
-        final TFile archive = getArchive();
-        final TFile inner = new TFile(archive, "inner" + getExtension());
+        final TPath archive = getArchive();
+        final TPath inner = archive.resolve("inner" + getExtension());
 
-        assertTrue(archive.mkdir());
-        assertTrue(inner.mkdir());
+        createDirectory(archive);
+        createDirectory(inner);
 
         umount();
         setAction(CANCEL);
-        assertTrue(archive.exists());
-        assertTrue(archive.isDirectory());
-        assertFalse(archive.isFile());
+        assertTrue(exists(archive));
+        assertTrue(isDirectory(archive));
+        assertFalse(isRegularFile(archive));
 
         umount();
         setAction(ENTER);
-        assertTrue(archive.exists());
-        assertTrue(archive.isDirectory());
-        assertFalse(archive.isFile());
+        assertTrue(exists(archive));
+        assertTrue(isDirectory(archive));
+        assertFalse(isRegularFile(archive));
 
         setAction(CANCEL);
-        assertTrue(inner.exists());
-        assertFalse(inner.isDirectory());
-        assertFalse(inner.isFile());
+        assertTrue(exists(inner));
+        assertFalse(isDirectory(inner));
+        assertFalse(isRegularFile(inner));
 
         umount();
         try {
-            archive.rm_r();
+            archive.toFile().rm_r();
             fail();
         } catch (IOException expected) {
         }
 
         umount();
         setAction(ENTER);
-        archive.rm_r();
+        archive.toFile().rm_r();
     }
 }
