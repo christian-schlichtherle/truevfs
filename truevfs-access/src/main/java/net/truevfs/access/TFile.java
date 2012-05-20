@@ -4,6 +4,18 @@
  */
 package net.truevfs.access;
 
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.WillClose;
+import javax.annotation.WillNotClose;
+import javax.annotation.concurrent.Immutable;
+import javax.swing.filechooser.FileSystemView;
 import static net.truevfs.kernel.FsAccessOption.EXCLUSIVE;
 import static net.truevfs.kernel.FsAccessOption.GROW;
 import static net.truevfs.kernel.FsEntryName.ROOT;
@@ -21,18 +33,6 @@ import net.truevfs.kernel.util.BitField;
 import net.truevfs.kernel.util.PathSplitter;
 import net.truevfs.kernel.util.Paths;
 import net.truevfs.kernel.util.UriBuilder;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.*;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import javax.annotation.WillClose;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.Immutable;
-import javax.swing.filechooser.FileSystemView;
 
 /**
  * A replacement for the class {@link File} which provides transparent
@@ -1651,63 +1651,13 @@ public final class TFile extends File {
     }
 
     /**
-     * The reasons for always throwing an {@link UnsupportedOperationException}
-     * are:
-     * <p>
-     * <ol>
-     * <li>Circular dependency issues:
-     *     This method introduces a circular dependency between the
-     *     packages {@code java.io} and {@code java.nio.file}.
-     *     Circular dependencies are the root of all evil in API design:
-     *     They limit reusability and extensibility because you cannot reuse
-     *     or exchange a package individually - it's either both or none at
-     *     all.</li>
-     * <li>Extensibility issues:
-     *     Whatever {@link java.nio.file.Path} object would be returned here,
-     *     you could not exchange its implementation.
-     *     This is because the NIO.2 API lacks a feature to create a
-     *     {@code Path} object by looking up an appropriate file
-     *     system provider from a plain path string:
-     * <ul>
-     * <li>The super class implementation of this method always uses the
-     *     {@link java.nio.file.FileSystems#getDefault() default file system provider}.</li>
-     * <li>{@link java.nio.file.Paths#get(String, String[])} always uses the
-     *     default file system provider, too.</li>
-     * </ul>
-     *     Using {@link URI}s is no alternative, too, because the various URI
-     *     schemes provided by the method {@link #toURI()} cannot be made
-     *     compatible with the singular URI scheme provided by the method
-     *     {@link java.nio.file.spi.FileSystemProvider#scheme()} of any
-     *     NIO.2 {@link java.nio.file.spi.FileSystemProvider} implementation.
-     * </li>
-     * <li>Behavior: A typical {@code Path} implementation is <em>greedy</em>,
-     *     i.e. when creating another {@code Path} object from an instance of
-     *     the implementation class (e.g. by calling
-     *     {@link java.nio.file.Path#resolve(String)}), then the returned
-     *     object is typically another instance of this implementation class
-     *     rather than some other {@code Path} implementation class which may
-     *     be required to do I/O on the resulting path.
-     * </ol>
-     * <p>
-     * As an alternative, you can always create a {@code Path}
-     * object from a {@link File} object {@code file} as follows:
-     * <p>
-     * <ul>
-     * <li>Associated with the default file system provider:
-     *     {@link java.nio.file.Paths#get(String, String[]) Paths.get(file.getPath())}.</li>
-     * <li>Associated with a TrueVFS file system provider:
-     *     {@code new net.truevfs.path.TPath(file)}.
-     *     This requires the TrueVFS Access Path module to be present on the compile
-     *     time class path.</li>
-     * </ul>
+     * Returns {@code new TPath(this)}.
      * 
-     * @deprecated Throws {@link UnsupportedOperationException}.
-     * @throws UnsupportedOperationException always.
+     * @return {@code new TPath(this)}.
      */
-    @Deprecated
     @Override
-    public java.nio.file.Path toPath() {
-        throw new UnsupportedOperationException("Use a Path constructor or method instead!");
+    public TPath toPath() {
+        return new TPath(this);
     }
 
     private static BitField<FsAccessOption> getAccessPreferences() {
