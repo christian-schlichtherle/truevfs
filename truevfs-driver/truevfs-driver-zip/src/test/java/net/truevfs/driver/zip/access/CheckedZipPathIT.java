@@ -1,26 +1,28 @@
+package net.truevfs.driver.zip.access;
+
 /*
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
 
 
-import net.truevfs.driver.zip.OdfDriver;
+import net.truevfs.driver.zip.CheckedZipDriver;
 import net.truevfs.kernel.cio.IOPool;
 import net.truevfs.access.TPathITSuite;
 
 /**
  * @author  Christian Schlichtherle
  */
-public final class OdfPathIT extends TPathITSuite<OdfDriver> {
+public final class CheckedZipPathIT extends TPathITSuite<CheckedZipDriver> {
 
     @Override
     protected String getExtensionList() {
-        return "odf";
+        return "zip";
     }
 
     @Override
-    protected OdfDriver newArchiveDriver() {
-        return new OdfDriver() {
+    protected CheckedZipDriver newArchiveDriver() {
+        return new CheckedZipDriver() {
             @Override
             public IOPool<?> getIOPool() {
                 return getTestConfig().getIOPoolProvider().getIOPool();
