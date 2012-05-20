@@ -19,5 +19,5 @@
     <packaging>maven-archetype</packaging>
 
     <name>TrueVFS Archetype File*</name>
-    <description>TrueVFS File* module application - requires JSE 6.</description>
+    <description>TrueVFS Access File* module application - requires JSE 6.</description>
 </project>

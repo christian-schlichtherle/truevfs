@@ -21,9 +21,9 @@ import java.net.URI;
  * for copying the contents of the first parameter URI to the second parameter
  * URI.
  * 
- * @deprecated Since TrueVFS 7.2, the new TrueVFS Path API provides the same
+ * @deprecated Since TrueVFS 7.2, the new TrueVFS Access Path API provides the same
  *             functionality with much more ease and comfort.
- *             Use the Maven archetype for the module TrueVFS Path instead.
+ *             Use the Maven archetype for the module TrueVFS Access Path instead.
  *             Its group ID is {@code de.schlichtherle.truevfs}.
  *             Its artifact ID is {@code truevfs-archetype-path}.
  * @see        <a href="http://curl.haxx.se/">cURL and libcurl - Home Page</a>
@@ -66,7 +66,7 @@ public final class Copy {
             // the caller cannot specify an archive file in a path name.
             // To overcome this limitation, you should use a TFile instead.
             // Unfortunately, this would introduce a cyclic dependency on the
-            // module TrueVFS File*, so it's not an option for this sample.
+            // module TrueVFS Access File*, so it's not an option for this sample.
             URI srcUri = URI.create(src);
             srcUri = srcUri.isAbsolute() ? srcUri : new File(src).toURI();
             FsPath srcPath = FsPath.create(srcUri, FsUriModifier.CANONICALIZE);

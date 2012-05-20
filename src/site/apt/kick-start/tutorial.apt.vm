@@ -20,9 +20,9 @@ Tutorial
       {{{http://docs.oracle.com/javase/tutorial/essential/io/}The Java Tutorials Lesson: Basic I/O}}
       first.
 
-    * You want to use the TrueVFS File* API to access some archive files.
+    * You want to use the TrueVFS Access File* API to access some archive files.
       Of course, the same operations are available for the
-      {{{../truevfs-path/index.html}TrueVFS Path}} API, too.
+      {{{../truevfs-access/truevfs-access-path/index.html}TrueVFS Access Path}} API, too.
       Note that you can actually use both client APIs concurrently because they
       are just facades for the TrueVFS Kernel.
 
@@ -36,7 +36,7 @@ Tutorial
 
 * The package <<<net.truevfs.file>>>
 
-    The entry point to the TrueVFS File* API is the package
+    The entry point to the TrueVFS Access File* API is the package
     {{{../apidocs/net/truevfs/file/package-summary.html}<<<net.truevfs.file>>>}}.
     It contains the classes
     {{{../apidocs/net/truevfs/file/TFile.html}<<<TFile>>>}},

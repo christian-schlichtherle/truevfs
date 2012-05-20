@@ -8,7 +8,7 @@ import de.schlichtherle.truevfs.key.pbe.swing.feedback.InvalidKeyFeedback;
 import net.truevfs.file.TApplication;
 
 /**
- * An abstract class which configures the TrueVFS File* module.
+ * An abstract class which configures the TrueVFS Access File* module.
  * 
  * @author  Christian Schlichtherle
  */
@@ -19,7 +19,7 @@ abstract class Application<E extends Exception> extends TApplication<E> {
      * <p>
      * This method is {@link #run run} only once at the start of the life
      * cycle.
-     * Its task is to configure the default behavior of the TrueVFS File* API
+     * Its task is to configure the default behavior of the TrueVFS Access File* API
      * in order to answer the following questions:
      * <ul>
      * <li>What are the file extensions which shall get recognized as archive

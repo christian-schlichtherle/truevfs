@@ -9,14 +9,14 @@ TrueVFS Kernel Usage
 * Abstract
 
     This article showcases the TrueVFS&#160;Kernel API in contrast to the
-    {{{../truevfs-file/index.html}TrueVFS File*}} API.
+    {{{../truevfs-access/truevfs-access-file/index.html}TrueVFS Access File*}} API.
 
 * Design
 
     In contrast to the modules
-    {{{../truevfs-path/index.html}TrueVFS Path}}
+    {{{../truevfs-access/truevfs-access-path/index.html}TrueVFS Access Path}}
     or
-    {{{../truevfs-file/index.html}TrueVFS File*}},
+    {{{../truevfs-access/truevfs-access-file/index.html}TrueVFS Access File*}},
     the API of this module is more complex to use, yet very extensible because
     it relies on Dependency Injection for the resolution of
     {{{./apidocs/net/truevfs/kernel/FsDriver.html}file system drivers}}
@@ -29,10 +29,10 @@ TrueVFS Kernel Usage
     in order to enable applications to resolve these dependencies easily at
     runtime.
 
-* TrueVFS Kernel versus TrueVFS File*
+* TrueVFS Kernel versus TrueVFS Access File*
 
     The API of the TrueVFS Kernel module is considerably different to the API
-    of the TrueVFS File* module:
+    of the TrueVFS Access File* module:
     While the File* API primarily aims to "make simple things easy",
     the Kernel API primarily aims to "make complex things possible".
 
@@ -74,9 +74,9 @@ $ cat fileA fileB
     output.
 
     Here's how to copy the contents of the path name parameter <<<resource>>>
-    to the standard output using the API of the module TrueVFS File*:
+    to the standard output using the API of the module TrueVFS Access File*:
 
-%{snippet|id=cat|file=${project.basedir}/../truevfs-file/src/test/java/net/truevfs/file/sample/PathCat.java}
+%{snippet|id=cat|file=${project.basedir}/../truevfs-access/truevfs-access-file/src/test/java/net/truevfs/file/sample/PathCat.java}
 
     Suppose that the modules TrueVFS Driver ZIP
     (Maven artifactId <<<truevfs-driver-zip>>>) and TrueVFS Driver File
@@ -99,7 +99,7 @@ $ cat fileA fileB
     If an application needs to address URIs, too, then the following code
     could be used instead:
 
-%{snippet|id=cat|file=${project.basedir}/../truevfs-file/src/test/java/net/truevfs/file/sample/UriCat.java}
+%{snippet|id=cat|file=${project.basedir}/../truevfs-access/truevfs-access-file/src/test/java/net/truevfs/file/sample/UriCat.java}
 
     Using the same configuration like before, the following URIs could now be
     addressed with the code above:

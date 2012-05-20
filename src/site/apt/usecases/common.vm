@@ -43,7 +43,7 @@ $title
 * $heading
 
     Thanks to the module
-    {{{../truevfs-file/index.html}TrueVFS File*}},
+    {{{../truevfs-access/truevfs-access-file/index.html}TrueVFS Access File*}},
     here's your relief:
     The
     {{{../apidocs/net/truevfs/file/TFile.html}<<<TFile>>>}}

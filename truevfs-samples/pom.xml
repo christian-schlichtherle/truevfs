@@ -34,16 +34,16 @@
 
     <dependencies>
         <!-- A TrueVFS application typically has a compile time dependency on
-             one or more of the modules TrueVFS File* or TrueVFS Path.
-             Note that TrueVFS Path already has a dependency on TrueVFS File.
+             one or more of the modules TrueVFS Access File* or TrueVFS Access Path.
+             Note that TrueVFS Access Path already has a dependency on TrueVFS Access File.
              -->
         <!--dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-file</artifactId>
+            <artifactId>truevfs-access-file</artifactId>
         </dependency-->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-path</artifactId>
+            <artifactId>truevfs-access-path</artifactId>
         </dependency>
 
         <!-- Extension module for monitoring and management with JMX and
@@ -83,7 +83,7 @@
 
         <!-- This driver provides access to the following URI schemes:
              file: platform file system.
-             This dependency is already added by the modules TrueVFS File*.
+             This dependency is already added by the modules TrueVFS Access File*.
              -->
         <!--dependency>
             <groupId>${project.groupId}</groupId>
@@ -93,8 +93,8 @@
 
         <!-- This driver provides access to the following URI schemes:
              http|https: Hyper Text Transport Protocol.
-             You cannot access these schemes via the TrueVFS File* API,
-             you need to use the TrueVFS Path API instead.
+             You cannot access these schemes via the TrueVFS Access File* API,
+             you need to use the TrueVFS Access Path API instead.
              -->
         <dependency>
             <groupId>${project.groupId}</groupId>

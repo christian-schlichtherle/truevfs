@@ -22,9 +22,9 @@ import java.net.URISyntaxException;
  * This version can address any URI scheme which is supported by a file system
  * driver which is available on the run-time class path.
  *
- * @deprecated Since TrueVFS 7.2, the new TrueVFS Path API provides the same
+ * @deprecated Since TrueVFS 7.2, the new TrueVFS Access Path API provides the same
  *             functionality with much more ease and comfort.
- *             Use the Maven archetype for the module TrueVFS Path instead.
+ *             Use the Maven archetype for the module TrueVFS Access Path instead.
  *             Its group ID is {@code de.schlichtherle.truevfs}.
  *             Its artifact ID is {@code truevfs-archetype-path}.
  * @see        <a href="http://www.gnu.org/software/wget/">GNU Cat - Home Page</a>
@@ -69,7 +69,7 @@ public final class Cat {
             // the caller cannot specify an archive file in a path name.
             // To overcome this limitation, you should use a TFile instead.
             // Unfortunately, this would introduce a cyclic dependency on the
-            // module TrueVFS File*, so it's not an option for this sample.
+            // module TrueVFS Access File*, so it's not an option for this sample.
             URI uri = new URI(resource);
             uri = uri.isAbsolute() ? uri : new File(resource).toURI();
             FsPath path = FsPath.create(uri, FsUriModifier.CANONICALIZE);

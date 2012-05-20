@@ -22,9 +22,9 @@ Getting started with NetBeans
     {{{../../truevfs-driver/index.html}file system driver modules}}
     at run time:
     The modules
-    {{{../../truevfs-file/index.html}TrueVFS File*}}
+    {{{../../truevfs-access/truevfs-access-file/index.html}TrueVFS Access File*}}
     and
-    {{{../../truevfs-path/index.html}TrueVFS Path}}
+    {{{../../truevfs-access/truevfs-access-path/index.html}TrueVFS Access Path}}
     use a
     {{{../../apidocs/net/truevfs/kernel/sl/FsDriverLocator.html#SINGLETON}file system driver service locator singleton}}
     which scans the class path for
@@ -32,7 +32,7 @@ Getting started with NetBeans
     These file system driver services are contained in
     {{{../../truevfs-driver/index.html}file system driver modules}}.
     By adding the JAR artifacts of the file system driver modules to the run
-    time class path of your application, you trigger the module TrueVFS File*
+    time class path of your application, you trigger the module TrueVFS Access File*
     to add their file system drivers to the
     {{{../../apidocs/net/truevfs/file/TFile.html#getDefaultArchiveDetector()}initial set up}}
     of its
@@ -40,7 +40,7 @@ Getting started with NetBeans
 
     Although it's straightforward, setting up the class path can be a daunting
     task for TrueVFS beginners, so a Maven archetype is provided as a template
-    for TrueVFS File* applications.
+    for TrueVFS Access File* applications.
     This archetype shows how to setup the run time dependencies and, as an
     alternative, how to avoid using the service locator by using dependency
     injection instead.
@@ -88,7 +88,7 @@ Getting started with NetBeans
 
     Enter the appropriate values for your <Project Name>, <Group Id>, <Version>
     and <Package> and then click <Finish> to see the magical population
-    of the Projects window with your shiny new TrueVFS File* application
+    of the Projects window with your shiny new TrueVFS Access File* application
     happen:
 
 [netbeans/05_Projects.png] Package Explorer
@@ -105,7 +105,7 @@ Getting started with NetBeans
     dependencies of your application, i.e. the JARs required to compile and run
     it.
     Each file system driver module on the run time class path adds to the
-    initial set up of detected archive types by the TrueVFS File* and TrueVFS
+    initial set up of detected archive types by the TrueVFS Access File* and TrueVFS
     Path API as explained above, so please edit it
     {{{Edit_Your_Application}later}} to meet your application requirements.
     For now, please leave this file alone.
@@ -142,7 +142,7 @@ Getting started with NetBeans
     already exists.
 
     [<<<src/main/java/com/company/project/Pickr.java>>>]
-    This utility is only available with the archetype for the TrueVFS File*
+    This utility is only available with the archetype for the TrueVFS Access File*
     module.
     It llets you pick a file using a
     {{{../../apidocs/net/truevfs/file/swing/TFileChooser.html}<<<TFileChooser>>>}}
@@ -194,7 +194,7 @@ Getting started with NetBeans
     Now you're ready and set to edit your application to meet your requirements.
 
     Mind that the class <<<Application>>> is just a template to show the
-    setup-work-sync life cycle of a typical TrueVFS File* application:
+    setup-work-sync life cycle of a typical TrueVFS Access File* application:
     You don't need to use this class at all as long as your application
     implements this life cycle somehow.
 

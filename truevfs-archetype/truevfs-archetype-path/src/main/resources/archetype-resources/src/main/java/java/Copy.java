@@ -57,7 +57,7 @@ public class Copy extends Application<IOException> {
         Files.copy(src, dst, COPY_ATTRIBUTES, REPLACE_EXISTING);
         
         // Okay, if this example should demonstrate a recursive copy, I'ld back
-        // out to the TrueVFS File* API as follows because a recursive copy
+        // out to the TrueVFS Access File* API as follows because a recursive copy
         // with the NIO.2 API is way too complex for this most prominent use
         // case.
         //TFile.cp_rp(src.toFile(), dst.toFile(), TArchiveDetector.NULL);

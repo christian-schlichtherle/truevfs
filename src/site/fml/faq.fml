@@ -13,7 +13,7 @@
         title="Frequently Asked Questions"
         toplink="false">
     <part id="file">
-        <title>TrueVFS File* API</title>
+        <title>TrueVFS Access File* API</title>
         <faq id="cannotReadArchive">
             <question>
                 When trying to read an archive file, I get an exception saying
@@ -220,7 +220,7 @@ TConfig.get().setArchiveDetector(
             </question>
             <answer>
                 <p>
-                    Most likely the TrueVFS File* module is not set up
+                    Most likely the TrueVFS Access File* module is not set up
                     correctly in order to detect the file extension of the
                     archive type you want to access.
                     To make sure it does, make the following call early in your
@@ -343,7 +343,7 @@ long length = file.length();
             </question>
             <answer>
                 <p>
-                    The TrueVFS File* API can only access the platform file
+                    The TrueVFS Access File* API can only access the platform file
                     system because the <code>TFile</code> class extends the
                     <code>File</code> class.
                     To access an archive file via HTTP(S) or any other procotol
@@ -352,7 +352,7 @@ long length = file.length();
                 <ul>
                 <li>If your application uses a JSE&#160;7 compliant JVM,
                     you can simply use the API of the
-                    <a href="truevfs-path/index.html">TrueVFS Path</a>
+                    <a href="truevfs-access/truevfs-access-path/index.html">TrueVFS Access Path</a>
                     module.</li>
                 <li>Otherwise, you can use the API of the
                     <a href="truevfs-kernel/index.html">TrueVFS Kernel</a>
@@ -388,11 +388,11 @@ long length = file.length();
         </faq>
     </part>
     <part id="path">
-        <title>TrueVFS Path API</title>
+        <title>TrueVFS Access Path API</title>
         <faq id="interoperability">
             <question>
-                Can I use the APIs of the modules TrueVFS Path and
-                TrueVFS File* concurrently?
+                Can I use the APIs of the modules TrueVFS Access Path and
+                TrueVFS Access File* concurrently?
             </question>
             <answer>
                 <p>
@@ -432,8 +432,8 @@ long length = file.length();
                         This works for any (virtual) file system.
                     </li>
                     <li>
-                        To avoid a compile time dependency in the TrueVFS File*
-                        module on the TrueVFS Path module,
+                        To avoid a compile time dependency in the TrueVFS Access File*
+                        module on the TrueVFS Access Path module,
                         <code>TFile.toPath()</code> throws an
                         <code>UnsupportedOperationException</code>.
                         To create a <code>TPath</code> from a
@@ -447,7 +447,7 @@ long length = file.length();
         </faq>
         <faq id="whichCopy">
             <question>
-                The NIO.2 API and the TrueVFS File* API both provide a copy
+                The NIO.2 API and the TrueVFS Access File* API both provide a copy
                 method. Which one should I use?
             </question>
             <answer>

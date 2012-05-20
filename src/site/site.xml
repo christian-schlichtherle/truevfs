@@ -25,8 +25,8 @@
     </custom>
     <publishDate position="bottom"/>
     <skin>
-        <groupId>${project.groupId}</groupId>
-        <artifactId>truevfs-skin</artifactId>
+        <groupId>de.schlichtherle.truezip</groupId>
+        <artifactId>truezip-skin</artifactId>
         <version>7</version>
      </skin>
     <body>
