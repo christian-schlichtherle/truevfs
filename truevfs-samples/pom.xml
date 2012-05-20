@@ -33,17 +33,12 @@
     </description>
 
     <dependencies>
-        <!-- A TrueVFS application typically has a compile time dependency on
-             one or more of the modules TrueVFS Access File* or TrueVFS Access Path.
-             Note that TrueVFS Access Path already has a dependency on TrueVFS Access File.
+        <!-- A TrueVFS application has a compile time dependency on the module
+             TrueVFS Access.
              -->
-        <!--dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-access-file</artifactId>
-        </dependency-->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-access-path</artifactId>
+            <artifactId>truevfs-access</artifactId>
         </dependency>
 
         <!-- Extension module for monitoring and management with JMX and

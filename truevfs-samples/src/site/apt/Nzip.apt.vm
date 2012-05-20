@@ -8,7 +8,7 @@ Nzip - a Comprehensive Command Line Utility
 
     The Nzip command line utility implemented by the class
     {{{./apidocs/net/truevfs/sample/Nzip.html}<<<net.truevfs.samples.Nzip>>>}}
-    showcases the power of the {{{../truevfs-access/truevfs-access-file/index.html}TrueVFS Access File*}} API.
+    showcases the power of the {{{../truevfs-access/index.html}TrueVFS Access File*}} API.
 
     This is a comprehensive command line utility which allows you to work with
     entries in any archive file supported by an archive driver

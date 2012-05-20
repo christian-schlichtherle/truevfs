@@ -29,20 +29,11 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-access-file</artifactId>
+            <artifactId>truevfs-access</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-access-file</artifactId>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-access-path</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-access-path</artifactId>
+            <artifactId>truevfs-access</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>

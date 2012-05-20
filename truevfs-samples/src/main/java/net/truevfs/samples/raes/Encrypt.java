@@ -5,9 +5,9 @@
 package net.truevfs.samples.raes;
 
 import net.truevfs.kernel.FsSyncException;
-import net.truevfs.path.TPath;
-import net.truevfs.samples.file.Application;
-import net.truevfs.samples.file.IllegalUsageException;
+import net.truevfs.access.TPath;
+import net.truevfs.samples.access.Application;
+import net.truevfs.samples.access.IllegalUsageException;
 import java.io.IOException;
 import java.util.ResourceBundle;
 

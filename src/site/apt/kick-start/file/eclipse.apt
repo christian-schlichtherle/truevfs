@@ -21,18 +21,14 @@ Getting started with Eclipse
     on
     {{{../../truevfs-driver/index.html}file system driver modules}}
     at run time:
-    The modules
-    {{{../../truevfs-access/truevfs-access-file/index.html}TrueVFS Access File*}}
-    and
-    {{{../../truevfs-access/truevfs-access-path/index.html}TrueVFS Access Path}}
-    use a
+    The module {{{../../truevfs-access/index.html}TrueVFS Access}} uses a
     {{{../../apidocs/net/truevfs/kernel/sl/FsDriverLocator.html#SINGLETON}file system driver service locator singleton}}
     which scans the class path for
     {{{../../apidocs/net/truevfs/kernel/spi/FsDriverService.html}file system driver services}}.
     These file system driver services are contained in
     {{{../../truevfs-driver/index.html}file system driver modules}}.
     By adding the JAR artifacts of the file system driver modules to the run
-    time class path of your application, you trigger the module TrueVFS Access File*
+    time class path of your application, you trigger the module TrueVFS Access
     to add their file system drivers to the
     {{{../../apidocs/net/truevfs/file/TFile.html#getDefaultArchiveDetector()}initial set up}}
     of its
@@ -40,7 +36,7 @@ Getting started with Eclipse
 
     Although it's straightforward, setting up the class path can be a daunting
     task for TrueVFS beginners, so a Maven archetype is provided as a template
-    for TrueVFS Access File* applications.
+    for TrueVFS applications.
     This archetype shows how to setup the run time dependencies and, as an
     alternative, how to avoid using the service locator by using dependency
     injection instead.
@@ -51,9 +47,7 @@ Getting started with Eclipse
 
     * {{{http://www.eclipse.org/downloads/}Eclipse&#160;Helios}} or later.
 
-    * JSE&#160;6 for applications using the TrueVFS&#160;File* API.
-
-    * JSE&#160;7 for applications using the TrueVFS&#160;Path API.
+    * JSE&#160;7 for applications using the TrueVFS&#160;Access API.
 
     []
 

@@ -136,6 +136,18 @@ system space.
         <dependencies>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-access</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-access</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-file</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -173,18 +185,6 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-access-file</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-access-file</artifactId>
-                <type>test-jar</type>
-                <version>${project.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-kernel</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -203,18 +203,6 @@ system space.
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-key</artifactId>
-                <type>test-jar</type>
-                <version>${project.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-access-path</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-access-path</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>

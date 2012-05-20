@@ -16,17 +16,24 @@
     </parent>
 
     <artifactId>truevfs-access</artifactId>
-    <packaging>pom</packaging>
 
     <name>TrueVFS Access</name>
-    <description>Parent POM for client API modules.</description>
+    <description>
+This module provides convenient access to the (virtual federated) file system
+space for TrueVFS client applications.
+It features simple, uniform, transparent, thread-safe, read/write access to
+archive files as if they were virtual directories in a file system path.
 
-    <modules>
-        <module>truevfs-access-file</module>
-        <module>truevfs-access-path</module>
-    </modules>
+This module also provides Swing GUI classes for viewing file trees
+and choosing entries in archive files.
+    </description>
 
     <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-driver-file</artifactId>
+            <scope>runtime</scope>
+        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-kernel</artifactId>

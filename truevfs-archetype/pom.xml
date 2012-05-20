@@ -19,8 +19,7 @@
     <description>Parent POM for Maven archetypes.</description>
 
     <modules>
-        <module>truevfs-archetype-file</module>
-        <module>truevfs-archetype-path</module>
+        <module>truevfs-archetype-access</module>
     </modules>
 
     <dependencies>

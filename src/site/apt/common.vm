@@ -16,7 +16,7 @@
 
     For more information about configuring the client APIs, please refer to the
     article
-    {{{../truevfs-access/truevfs-access-file/configuration.html}Configuring TrueVFS Access File*}}.
+    {{{../truevfs-access/configuration.html}Configuring TrueVFS Access}}.
 
 ** False Positive Archive Files
 
@@ -66,6 +66,6 @@ TVFS.umount();
     total number of archive entries.
 
     For more information, please refer to the Javadoc for
-    {{{../apidocs/net/truevfs/file/TVFS.html#umount()}<<<TVFS.umount()>>>}}.
+    {{{../apidocs/net/truevfs/access/TVFS.html#umount()}<<<TVFS.umount()>>>}}.
 
 #end ## cleaningUp
