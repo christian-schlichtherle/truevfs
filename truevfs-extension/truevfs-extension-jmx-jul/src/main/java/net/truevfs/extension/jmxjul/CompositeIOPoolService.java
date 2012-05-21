@@ -4,12 +4,12 @@
  */
 package net.truevfs.extension.jmxjul;
 
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.driver.file.TempFilePoolService;
 import net.truevfs.extension.jmxjul.jmx.JmxDirector;
 import net.truevfs.extension.jmxjul.jul.JulDirector;
 import net.truevfs.kernel.cio.IOPool;
 import net.truevfs.kernel.spi.IOPoolService;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * @author Christian Schlichtherle
@@ -23,10 +23,10 @@ public final class CompositeIOPoolService extends IOPoolService {
     private final IOPool<?> pool =
             JmxDirector.SINGLETON.instrument(
                 JulDirector.SINGLETON.instrument(
-                    (IOPool) service.getIOPool()));
+                    (IOPool) service.getIoPool()));
 
     @Override
-    public IOPool<?> getIOPool() {
+    public IOPool<?> getIoPool() {
         return pool;
     }
 

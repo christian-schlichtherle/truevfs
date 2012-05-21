@@ -311,7 +311,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
          * @return A new cache.
          */
         @CreatesObligation
-        public CacheEntry newCache(IOPool<?> pool) {
+        public CacheEntry newCacheEntry(IOPool<?> pool) {
             return new CacheEntry(this, pool);
         }
 

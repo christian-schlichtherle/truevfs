@@ -1,21 +1,19 @@
-package net.truevfs.driver.zip.it;
-
 /*
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
+package net.truevfs.driver.zip.it;
 
-
-import net.truevfs.driver.zip.TestWinZipAesDriver;
+import java.io.IOException;
+import static java.nio.file.Files.*;
 import net.truevfs.access.TConfig;
+import net.truevfs.access.TPath;
+import net.truevfs.access.TPathITSuite;
+import net.truevfs.driver.zip.TestWinZipAesDriver;
 import static net.truevfs.kernel.FsAccessOption.ENCRYPT;
 import net.truevfs.key.MockView;
 import static net.truevfs.key.MockView.Action.CANCEL;
 import static net.truevfs.key.MockView.Action.ENTER;
-import net.truevfs.access.TPath;
-import net.truevfs.access.TPathITSuite;
-import java.io.IOException;
-import static java.nio.file.Files.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -31,7 +29,7 @@ public final class WinZipAesPathIT extends TPathITSuite<TestWinZipAesDriver> {
 
     @Override
     protected TestWinZipAesDriver newArchiveDriver() {
-        return new TestWinZipAesDriver(getTestConfig().getIOPoolProvider());
+        return new TestWinZipAesDriver(getTestConfig().getIoPoolProvider());
     }
 
     @Override

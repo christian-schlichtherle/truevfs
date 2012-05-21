@@ -4,14 +4,14 @@
  */
 package net.truevfs.driver.zip.raes.it;
 
+import java.io.IOException;
+import static java.nio.file.Files.*;
+import net.truevfs.access.TPath;
+import net.truevfs.access.TPathITSuite;
 import net.truevfs.driver.zip.raes.TestZipRaesDriver;
 import net.truevfs.key.MockView.Action;
 import static net.truevfs.key.MockView.Action.CANCEL;
 import static net.truevfs.key.MockView.Action.ENTER;
-import net.truevfs.access.TPath;
-import net.truevfs.access.TPathITSuite;
-import java.io.IOException;
-import static java.nio.file.Files.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -27,7 +27,7 @@ public final class ZipRaesPathIT extends TPathITSuite<TestZipRaesDriver> {
 
     @Override
     protected TestZipRaesDriver newArchiveDriver() {
-        return new TestZipRaesDriver(getTestConfig().getIOPoolProvider());
+        return new TestZipRaesDriver(getTestConfig().getIoPoolProvider());
     }
 
     private void setAction(Action action) {

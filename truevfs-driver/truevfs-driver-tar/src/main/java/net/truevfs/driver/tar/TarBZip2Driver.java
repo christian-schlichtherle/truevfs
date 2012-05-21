@@ -4,6 +4,8 @@
  */
 package net.truevfs.driver.tar;
 
+import java.io.*;
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.FsAccessOption;
 import static net.truevfs.kernel.FsAccessOption.STORE;
 import net.truevfs.kernel.FsController;
@@ -14,8 +16,6 @@ import net.truevfs.kernel.cio.MultiplexingOutputService;
 import net.truevfs.kernel.cio.OutputService;
 import net.truevfs.kernel.io.*;
 import net.truevfs.kernel.util.BitField;
-import java.io.*;
-import javax.annotation.concurrent.Immutable;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 /**
@@ -109,7 +109,7 @@ public class TarBZip2Driver extends TarDriver {
             }
         } // Sink
 
-        return new MultiplexingOutputService<>(getIOPool(),
+        return new MultiplexingOutputService<>(getIoPool(),
                 new TarOutputService(model, new Sink(), this));
     }
 

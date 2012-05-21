@@ -4,8 +4,8 @@
  */
 package net.truevfs.driver.zip.raes.it;
 
-import net.truevfs.driver.zip.raes.TestZipRaesDriver;
 import net.truevfs.access.ConcurrentSyncITSuite;
+import net.truevfs.driver.zip.raes.TestZipRaesDriver;
 
 /**
  * @author Christian Schlichtherle
@@ -19,6 +19,6 @@ public final class ZipRaesConcurrentSyncIT extends ConcurrentSyncITSuite<TestZip
 
     @Override
     protected TestZipRaesDriver newArchiveDriver() {
-        return new TestZipRaesDriver(getTestConfig().getIOPoolProvider());
+        return new TestZipRaesDriver(getTestConfig().getIoPoolProvider());
     }
 }

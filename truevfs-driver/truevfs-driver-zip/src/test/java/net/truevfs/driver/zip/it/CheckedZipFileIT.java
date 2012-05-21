@@ -4,8 +4,8 @@
  */
 package net.truevfs.driver.zip.it;
 
-import net.truevfs.driver.zip.CheckedZipDriver;
 import net.truevfs.access.TFileITSuite;
+import net.truevfs.driver.zip.CheckedZipDriver;
 import net.truevfs.kernel.cio.IOPool;
 
 /**
@@ -22,8 +22,8 @@ public final class CheckedZipFileIT extends TFileITSuite<CheckedZipDriver> {
     protected CheckedZipDriver newArchiveDriver() {
         return new CheckedZipDriver() {
             @Override
-            public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().getIOPool();
+            public IOPool<?> getIoPool() {
+                return getTestConfig().getIoPoolProvider().getIoPool();
             }
         };
     }

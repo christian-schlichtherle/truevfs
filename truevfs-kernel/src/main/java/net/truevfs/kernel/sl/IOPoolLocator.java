@@ -48,8 +48,8 @@ public final class IOPoolLocator implements IOPoolProvider {
     private IOPoolLocator() { }
 
     @Override
-    public IOPool<?> getIOPool() {
-        return Boot.SERVICE.getIOPool();
+    public IOPool<?> getIoPool() {
+        return Boot.SERVICE.getIoPool();
     }
 
     /** A static data utility class used for lazy initialization. */

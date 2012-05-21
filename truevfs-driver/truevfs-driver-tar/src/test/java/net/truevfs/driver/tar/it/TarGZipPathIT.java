@@ -21,8 +21,8 @@ public final class TarGZipPathIT extends TarPathITSuite<TarGZipDriver> {
     protected TarGZipDriver newArchiveDriver() {
         return new TarGZipDriver() {
             @Override
-            public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().getIOPool();
+            public IOPool<?> getIoPool() {
+                return getTestConfig().getIoPoolProvider().getIoPool();
             }
         };
     }

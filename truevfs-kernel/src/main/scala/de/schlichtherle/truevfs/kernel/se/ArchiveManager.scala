@@ -159,7 +159,7 @@ private object ArchiveManager {
   with CacheController
   with SyncController
   with LockController {
-    override val pool = driver.getIOPool
+    override val pool = driver.getIoPool
     require(null ne pool)
   }
 

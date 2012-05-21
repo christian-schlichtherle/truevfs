@@ -23,8 +23,8 @@ public final class TestWinZipAesDriver extends ZipDriver {
     }
 
     @Override
-    public IOPool<?> getIOPool() {
-        return ioPoolProvider.getIOPool();
+    public IOPool<?> getIoPool() {
+        return ioPoolProvider.getIoPool();
     }
 
     @Override

@@ -4,6 +4,14 @@
  */
 package net.truevfs.driver.tar;
 
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import java.io.*;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.NoSuchFileException;
+import java.util.*;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillNotClose;
+import javax.annotation.concurrent.NotThreadSafe;
 import static net.truevfs.driver.tar.TarDriver.DEFAULT_BLKSIZE;
 import static net.truevfs.driver.tar.TarDriver.DEFAULT_RCDSIZE;
 import net.truevfs.kernel.FsArchiveDriver;
@@ -18,14 +26,6 @@ import net.truevfs.kernel.util.ExceptionBuilder;
 import static net.truevfs.kernel.util.HashMaps.OVERHEAD_SIZE;
 import static net.truevfs.kernel.util.HashMaps.initialCapacity;
 import net.truevfs.kernel.util.SuppressedExceptionBuilder;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.*;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.util.*;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.NotThreadSafe;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import static org.apache.commons.compress.archivers.tar.TarConstants.*;
@@ -84,7 +84,7 @@ implements InputService<TarDriverEntry> {
     private void unpack(final @WillNotClose TarArchiveInputStream tin)
     throws IOException {
         final TarDriver driver = this.driver;
-        final IOPool<?> pool = driver.getIOPool();
+        final IOPool<?> pool = driver.getIoPool();
         for (   TarArchiveEntry tinEntry;
                 null != (tinEntry = tin.getNextTarEntry()); ) {
             final String name = name(tinEntry);

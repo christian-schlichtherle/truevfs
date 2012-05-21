@@ -21,8 +21,8 @@ public final class TarPathIT extends TarPathITSuite<TarDriver> {
     protected TarDriver newArchiveDriver() {
         return new TarDriver() {
             @Override
-            public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().getIOPool();
+            public IOPool<?> getIoPool() {
+                return getTestConfig().getIoPoolProvider().getIoPool();
             }
         };
     }

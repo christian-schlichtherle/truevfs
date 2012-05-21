@@ -39,7 +39,7 @@ public final class ByteArrayIOPoolService extends IOPoolService {
     }
 
     @Override
-    public IOPool<?> getIOPool() {
+    public IOPool<?> getIoPool() {
         return pool;
     }
 }

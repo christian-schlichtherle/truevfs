@@ -17,8 +17,8 @@ extends FsArchiveDriverTestSuite<ZipDriverEntry, CheckedZipDriver> {
     protected CheckedZipDriver newArchiveDriver() {
         return new CheckedZipDriver() {
             @Override
-            public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().getIOPool();
+            public IOPool<?> getIoPool() {
+                return getTestConfig().getIoPoolProvider().getIoPool();
             }
         };
     }

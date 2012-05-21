@@ -61,11 +61,11 @@ implements Container<MockArchiveDriverEntry> {
     }
 
     public IOPoolProvider getIOPoolProvider() {
-        return config.getIOPoolProvider();
+        return config.getIoPoolProvider();
     }
 
     public final IOPool<?> getIOPool() {
-        return getIOPoolProvider().getIOPool();
+        return getIOPoolProvider().getIoPool();
     }
 
     @Override

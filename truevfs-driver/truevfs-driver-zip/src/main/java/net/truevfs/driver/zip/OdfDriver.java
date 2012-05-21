@@ -4,13 +4,16 @@
  */
 package net.truevfs.driver.zip;
 
-import net.truevfs.kernel.FsModel;
-import net.truevfs.kernel.cio.*;
-import net.truevfs.kernel.io.Sink;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.FsModel;
+import net.truevfs.kernel.cio.IOPool;
+import net.truevfs.kernel.cio.InputService;
+import net.truevfs.kernel.cio.MultiplexingOutputService;
+import net.truevfs.kernel.cio.OutputService;
+import net.truevfs.kernel.io.Sink;
 
 /**
  * An archive driver for application archive files according to the Open
@@ -47,7 +50,7 @@ public class OdfDriver extends JarDriver {
         final OptionOutputSocket oos = (OptionOutputSocket) sink;
         final ZipInputService zis = (ZipInputService) input;
         final ZipOutputService zos = new ZipOutputService(model, oos, zis, this);
-        final IOPool<?> pool = getIOPool();
+        final IOPool<?> pool = getIoPool();
         return null != zis && zis.isAppendee()
                 ? new MultiplexingOutputService<>(pool, zos)
                 : new OdfOutputService(pool, zos);
