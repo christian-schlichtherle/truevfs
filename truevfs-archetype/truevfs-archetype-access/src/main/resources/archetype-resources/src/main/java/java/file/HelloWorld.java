@@ -3,6 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package}.java.file;
 
+import ${package}.java.Application;
 import net.truevfs.access.TFile;
 import net.truevfs.access.TFileWriter;
 import java.io.IOException;

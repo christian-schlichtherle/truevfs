@@ -1,8 +1,9 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-package ${package}.scala
+package ${package}.scala.path
 
+import ${package}.scala.Application
 import net.truevfs.access.TPath
 import java.nio.file.Files._
 import java.nio.file.Path

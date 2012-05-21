@@ -156,6 +156,7 @@
                         <id>scala-compile-first</id>
                         <phase>process-resources</phase>
                         <goals>
+                            <goal>add-source</goal>
                             <goal>compile</goal>
                         </goals>
                     </execution>
@@ -167,16 +168,6 @@
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <!--jvmArgs>
-                        <jvmArg>-Xss2m</jvmArg>
-                    </jvmArgs-->
-                    <args>
-                        <!--arg>-g</arg-->
-                        <arg>-unchecked</arg>
-                        <arg>-deprecation</arg>
-                    </args>
-                </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>

@@ -3,6 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package}.java.file;
 
+import ${package}.java.Application;
 import net.truevfs.access.swing.TFileChooser;
 import javax.swing.SwingUtilities;
 
