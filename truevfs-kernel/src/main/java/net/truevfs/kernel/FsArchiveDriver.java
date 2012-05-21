@@ -4,19 +4,6 @@
  */
 package net.truevfs.kernel;
 
-import static net.truevfs.kernel.FsEntryName.SEPARATOR;
-import static net.truevfs.kernel.FsEntryName.SEPARATOR_CHAR;
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.Entry.Type;
-import static net.truevfs.kernel.cio.Entry.Type.DIRECTORY;
-import net.truevfs.kernel.cio.IOPool;
-import net.truevfs.kernel.cio.InputService;
-import net.truevfs.kernel.cio.OutputService;
-import net.truevfs.kernel.io.Sink;
-import net.truevfs.kernel.io.Source;
-import net.truevfs.kernel.sl.IOPoolLocator;
-import net.truevfs.kernel.util.BitField;
-import static net.truevfs.kernel.util.Paths.cutTrailingSeparators;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -26,6 +13,16 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
+import static net.truevfs.kernel.FsEntryName.SEPARATOR;
+import static net.truevfs.kernel.FsEntryName.SEPARATOR_CHAR;
+import net.truevfs.kernel.cio.Entry.Type;
+import static net.truevfs.kernel.cio.Entry.Type.DIRECTORY;
+import net.truevfs.kernel.cio.*;
+import net.truevfs.kernel.io.Sink;
+import net.truevfs.kernel.io.Source;
+import net.truevfs.kernel.sl.IOPoolLocator;
+import net.truevfs.kernel.util.BitField;
+import static net.truevfs.kernel.util.Paths.cutTrailingSeparators;
 
 /**
  * An abstract factory for components required for accessing archive files.
@@ -101,7 +98,7 @@ extends FsDriver {
      *
      * @return The pool to use for allocating temporary I/O buffers.
      */
-    public IOPool<?> getIOPool() {
+    public IOPool<? extends IOBuffer<?>> getIOPool() {
         return IOPoolLocator.SINGLETON.getIOPool();
     }
 
