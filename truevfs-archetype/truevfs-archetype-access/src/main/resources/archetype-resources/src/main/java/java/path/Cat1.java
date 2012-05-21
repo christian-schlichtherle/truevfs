@@ -3,6 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package}.java.path;
 
+import ${package}.java.Application;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;

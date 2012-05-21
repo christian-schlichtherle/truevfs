@@ -1,7 +1,7 @@
 #set( $symbol_pound = '#' )
 #set( $symbol_dollar = '$' )
 #set( $symbol_escape = '\' )
-package ${package}.java.file;
+package ${package}.java;
 
 import de.schlichtherle.truevfs.key.pbe.swing.feedback.HurlingWindowFeedback;
 import de.schlichtherle.truevfs.key.pbe.swing.feedback.InvalidKeyFeedback;
@@ -12,7 +12,7 @@ import net.truevfs.access.TApplication;
  * 
  * @author  Christian Schlichtherle
  */
-abstract class Application<E extends Exception> extends TApplication<E> {
+public abstract class Application<E extends Exception> extends TApplication<E> {
 
     /**
      * Runs the setup phase.
@@ -42,15 +42,4 @@ abstract class Application<E extends Exception> extends TApplication<E> {
         String impl = HurlingWindowFeedback.class.getName();
         System.setProperty(spec, System.getProperty(spec, impl));
     }
-
-    /*@Override
-    protected void sync() throws FsSyncException {
-        try {
-            Thread.sleep(Long.MAX_VALUE);
-        } catch (InterruptedException ex) {
-            Logger  .getLogger(Application.class.getName())
-                    .log(Level.SEVERE, null, ex);
-        }
-        super.sync();
-    }*/
 }
