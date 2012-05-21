@@ -4,8 +4,8 @@
  */
 package net.truevfs.kernel.cio;
 
-import net.truevfs.kernel.util.Pool;
 import java.io.IOException;
+import net.truevfs.kernel.util.Pool;
 
 /**
  * A pool for allocating I/O buffers, which can get used as a volatile storage
