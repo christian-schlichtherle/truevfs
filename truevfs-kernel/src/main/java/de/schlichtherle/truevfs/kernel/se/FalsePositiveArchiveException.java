@@ -2,29 +2,33 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truevfs.kernel;
+package de.schlichtherle.truevfs.kernel.se;
 
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.FsDecoratingController;
 
 /**
- * Indicates that a file system is a false positive file system and that this
- * exception may get cached until the federated (archive) file system gets
- * {@linkplain FsController#sync(net.truevfs.kernel.util.BitField) synced}
- * again.
+ * Indicates that a file system is a false positive file system.
  * <p>
  * This exception type is reserved for non-local control flow in
  * {@linkplain FsDecoratingController file system controller chains} in order
  * to reroute file system operations to the parent file system of a false
  * positive federated (archive) file system.
- * 
+ *
+ * @see    FalsePositiveController
  * @author Christian Schlichtherle
  */
 @Immutable
 @SuppressWarnings("serial") // serializing a control flow exception is nonsense!
-public final class PersistentFalsePositiveArchiveException extends FalsePositiveArchiveException {
+class FalsePositiveArchiveException extends ControlFlowException {
 
-    public PersistentFalsePositiveArchiveException(IOException cause) {
+    FalsePositiveArchiveException(IOException cause) {
         super(cause);
+    }
+
+    @Override
+    public IOException getCause() {
+        return (IOException) super.getCause();
     }
 }

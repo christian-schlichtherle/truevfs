@@ -2,11 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truevfs.kernel;
+package de.schlichtherle.truevfs.kernel.se;
 
-import de.schlichtherle.truevfs.kernel.CacheEntry.Strategy;
-import static de.schlichtherle.truevfs.kernel.CacheEntry.Strategy.WRITE_BACK;
-import static de.schlichtherle.truevfs.kernel.CacheEntry.Strategy.WRITE_THROUGH;
+import de.schlichtherle.truevfs.kernel.se.CacheEntry.Strategy;
+import static de.schlichtherle.truevfs.kernel.se.CacheEntry.Strategy.WRITE_BACK;
+import static de.schlichtherle.truevfs.kernel.se.CacheEntry.Strategy.WRITE_THROUGH;
 import static net.truevfs.kernel.cio.Entry.Access.READ;
 import static net.truevfs.kernel.cio.Entry.Access.WRITE;
 import static net.truevfs.kernel.cio.Entry.Size.DATA;

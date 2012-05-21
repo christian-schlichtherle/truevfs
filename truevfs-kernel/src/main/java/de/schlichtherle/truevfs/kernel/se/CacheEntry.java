@@ -2,16 +2,8 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truevfs.kernel;
+package de.schlichtherle.truevfs.kernel.se;
 
-import static net.truevfs.kernel.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.cio.*;
-import net.truevfs.kernel.io.DecoratingInputStream;
-import net.truevfs.kernel.io.DecoratingOutputStream;
-import net.truevfs.kernel.io.DecoratingReadOnlyChannel;
-import net.truevfs.kernel.io.DecoratingSeekableChannel;
-import net.truevfs.kernel.util.Pool;
-import net.truevfs.kernel.util.Releasable;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -22,6 +14,14 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
+import static net.truevfs.kernel.cio.Entry.UNKNOWN;
+import net.truevfs.kernel.cio.*;
+import net.truevfs.kernel.io.DecoratingInputStream;
+import net.truevfs.kernel.io.DecoratingOutputStream;
+import net.truevfs.kernel.io.DecoratingReadOnlyChannel;
+import net.truevfs.kernel.io.DecoratingSeekableChannel;
+import net.truevfs.kernel.util.Pool;
+import net.truevfs.kernel.util.Releasable;
 
 /**
  * Provides temporary caching services for input and output sockets with the
@@ -48,7 +48,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 @CleanupObligation
-public class CacheEntry
+final class CacheEntry
 implements Entry, Flushable, Releasable<IOException>, Closeable {
 
     private final Strategy strategy;
@@ -148,7 +148,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
      * @return An input socket for reading the cached entry data.
      */
     public InputSocket<? extends Entry> input() {
-        class Input extends AbstractInputSocket<Entry> {
+        final class Input extends AbstractInputSocket<Entry> {
             @CheckForNull Buffer buffer;
 
             InputSocket<? extends Entry> socket() throws IOException {
@@ -185,7 +185,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
      * @return An output socket for writing the cached entry data.
      */
     public OutputSocket<? extends Entry> output() {
-        class Output extends AbstractOutputSocket<Entry> {
+        final class Output extends AbstractOutputSocket<Entry> {
             @CheckForNull Buffer buffer;
 
             OutputSocket<? extends Entry> socket() throws IOException {
@@ -456,7 +456,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
 
         @Override
         public InputSocket<Buffer> input() {
-            class Input extends AbstractInputSocket<Buffer> {
+            final class Input extends AbstractInputSocket<Buffer> {
                 final InputSocket<?> socket = data.input();
 
                 InputSocket<?> getBoundSocket() {
@@ -470,7 +470,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
 
                 @Override
                 public InputStream stream() throws IOException {
-                    class Stream extends DecoratingInputStream {
+                    final class Stream extends DecoratingInputStream {
                         boolean closed;
 
                         Stream() throws IOException {
@@ -493,7 +493,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
 
                 @Override
                 public SeekableByteChannel channel() throws IOException {
-                    class Channel extends DecoratingReadOnlyChannel {
+                    final class Channel extends DecoratingReadOnlyChannel {
                         boolean closed;
 
                         Channel() throws IOException {
@@ -517,10 +517,9 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
             return new Input();
         }
 
-
         @Override
         public OutputSocket<Buffer> output() {
-            class Output extends AbstractOutputSocket<Buffer> {
+            final class Output extends AbstractOutputSocket<Buffer> {
                 final OutputSocket<?> socket = data.output();
 
                 OutputSocket<?> getBoundSocket() {
@@ -534,7 +533,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
 
                 @Override
                 public OutputStream stream() throws IOException {
-                    class Stream extends DecoratingOutputStream {
+                    final class Stream extends DecoratingOutputStream {
                         boolean closed;
 
                         Stream() throws IOException {
@@ -557,7 +556,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
 
                 @Override
                 public SeekableByteChannel channel() throws IOException {
-                    class Channel extends DecoratingSeekableChannel {
+                    final class Channel extends DecoratingSeekableChannel {
                         boolean closed;
 
                         Channel() throws IOException {

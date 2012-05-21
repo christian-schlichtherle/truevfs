@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truevfs.kernel;
+package de.schlichtherle.truevfs.kernel.se;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
@@ -16,12 +16,12 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing an exception for a temporary event is nonsense!
-public final class NeedsWriteLockException extends ControlFlowException {
+final class NeedsWriteLockException extends ControlFlowException {
 
     private static final @Nullable NeedsWriteLockException
             SINGLETON = TRACEABLE ? null : new NeedsWriteLockException();
 
-    public static NeedsWriteLockException get() {
+    static NeedsWriteLockException get() {
         return TRACEABLE ? new NeedsWriteLockException() : SINGLETON;
     }
 
