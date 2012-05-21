@@ -4,20 +4,6 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.access.TArchiveDetector;
-import net.truevfs.access.TConfig;
-import net.truevfs.kernel.FsAccessOption;
-import static net.truevfs.kernel.FsAccessOption.EXCLUSIVE;
-import net.truevfs.kernel.FsEntry;
-import static net.truevfs.kernel.FsEntryName.SEPARATOR;
-import net.truevfs.kernel.FsMountPoint;
-import net.truevfs.kernel.FsPath;
-import static net.truevfs.kernel.cio.Entry.Type.DIRECTORY;
-import static net.truevfs.kernel.cio.Entry.Type.FILE;
-import net.truevfs.kernel.cio.IoSockets;
-import net.truevfs.kernel.cio.InputSocket;
-import net.truevfs.kernel.cio.OutputSocket;
-import net.truevfs.kernel.util.BitField;
 import java.io.*;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
@@ -34,6 +20,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
+import net.truevfs.kernel.FsAccessOption;
+import static net.truevfs.kernel.FsAccessOption.EXCLUSIVE;
+import net.truevfs.kernel.FsEntry;
+import static net.truevfs.kernel.FsEntryName.SEPARATOR;
+import net.truevfs.kernel.FsMountPoint;
+import net.truevfs.kernel.FsPath;
+import static net.truevfs.kernel.cio.Entry.Type.DIRECTORY;
+import static net.truevfs.kernel.cio.Entry.Type.FILE;
+import net.truevfs.kernel.cio.InputSocket;
+import net.truevfs.kernel.cio.IoSockets;
+import net.truevfs.kernel.cio.OutputSocket;
+import net.truevfs.kernel.util.BitField;
 
 /**
  * A {@link FileSystemProvider} implementation

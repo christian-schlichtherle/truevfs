@@ -21,7 +21,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 public abstract class AbstractOutputSocket<E extends Entry>
-extends AbstractIOSocket<E, Entry>
+extends AbstractIoSocket<E, Entry>
 implements OutputSocket<E> {
 
     private @CheckForNull InputSocket<?> peer;

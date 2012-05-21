@@ -4,33 +4,33 @@
  */
 package net.truevfs.kernel.spi;
 
-import net.truevfs.kernel.cio.ByteArrayIOBuffer;
-import net.truevfs.kernel.cio.ByteArrayIOPool;
+import net.truevfs.kernel.cio.ByteArrayIoBuffer;
+import net.truevfs.kernel.cio.ByteArrayIoPool;
 import net.truevfs.kernel.cio.IoPool;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * An immutable locatable container of a {@link ByteArrayIOPool byte array I/O buffer pool}.
+ * An immutable locatable container of a {@link ByteArrayIoPool byte array I/O buffer pool}.
  * 
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class ByteArrayIOPoolService extends IoPoolService {
+public final class ByteArrayIoPoolService extends IoPoolService {
 
     // Don't make this static. Having multiple instances is good for debugging
     // the allocation and release of resources in a more isolated context.
-    private final ByteArrayIOPool pool;
+    private final ByteArrayIoPool pool;
 
     /**
      * Constructs a new instance which provides a
-     * {@link ByteArrayIOPool byte array I/O pool} where each allocated
-     * {@link ByteArrayIOBuffer byte array I/O entry} has an initial capacity
+     * {@link ByteArrayIoPool byte array I/O pool} where each allocated
+     * {@link ByteArrayIoBuffer byte array I/O entry} has an initial capacity
      * of the given number of bytes.
      * 
      * @param initialCapacity the initial capacity in bytes.
      */
-    public ByteArrayIOPoolService(final int initialCapacity) {
-        pool = new ByteArrayIOPool(initialCapacity);
+    public ByteArrayIoPoolService(final int initialCapacity) {
+        pool = new ByteArrayIoPool(initialCapacity);
     }
 
     @Override

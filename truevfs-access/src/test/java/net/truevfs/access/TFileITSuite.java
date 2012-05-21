@@ -4,9 +4,6 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.access.TFileInputStream;
-import net.truevfs.access.TFile;
-import net.truevfs.access.TFileOutputStream;
 import net.truevfs.access.TConfig;
 import net.truevfs.access.TVFS;
 import static net.truevfs.kernel.FsAccessOption.GROW;

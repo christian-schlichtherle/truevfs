@@ -4,7 +4,10 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.access.TArchiveDetector;
+import java.net.URI;
+import java.net.URISyntaxException;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.NotThreadSafe;
 import net.truevfs.kernel.FsEntryName;
 import static net.truevfs.kernel.FsEntryName.*;
 import net.truevfs.kernel.FsMountPoint;
@@ -12,14 +15,10 @@ import net.truevfs.kernel.FsPath;
 import net.truevfs.kernel.FsScheme;
 import static net.truevfs.kernel.FsUriModifier.CANONICALIZE;
 import static net.truevfs.kernel.FsUriModifier.NULL;
-import net.truevfs.kernel.util.Paths;
 import net.truevfs.kernel.util.PathSplitter;
+import net.truevfs.kernel.util.Paths;
 import net.truevfs.kernel.util.QuotedUriSyntaxException;
 import net.truevfs.kernel.util.UriBuilder;
-import java.net.URI;
-import java.net.URISyntaxException;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Scans hierarchical {@link URI}s for prospective archive files with the help

@@ -4,7 +4,6 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.access.TFile;
 import static net.truevfs.access.TVFS.mountPoint;
 import net.truevfs.kernel.FsMountPoint;
 import java.net.URI;

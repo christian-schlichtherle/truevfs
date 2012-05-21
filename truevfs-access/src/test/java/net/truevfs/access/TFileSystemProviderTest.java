@@ -4,9 +4,6 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.access.TPath;
-import net.truevfs.access.TFileSystemProvider;
-import net.truevfs.access.TFileSystem;
 import net.truevfs.access.MockArchiveDriverTestBase;
 import net.truevfs.kernel.FsMountPoint;
 import static net.truevfs.kernel.FsUriModifier.CANONICALIZE;

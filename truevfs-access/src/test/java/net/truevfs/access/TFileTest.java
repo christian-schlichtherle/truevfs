@@ -4,7 +4,6 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.access.TFile;
 import net.truevfs.access.TConfig;
 import static net.truevfs.access.TArchiveDetector.NULL;
 import static net.truevfs.kernel.FsEntryName.ROOT;

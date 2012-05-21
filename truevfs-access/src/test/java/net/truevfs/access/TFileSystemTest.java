@@ -4,7 +4,6 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.access.TFileSystem;
 import net.truevfs.access.MockArchiveDriverTestBase;
 import net.truevfs.kernel.FsMountPoint;
 import java.io.IOException;

@@ -15,7 +15,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author  Christian Schlichtherle
  */
 @ThreadSafe
-public final class ByteArrayIOPool implements IoPool<ByteArrayIOBuffer> {
+public final class ByteArrayIoPool implements IoPool<ByteArrayIoBuffer> {
 
     private static final String BUFFER_NAME = "buffer-";
 
@@ -29,21 +29,21 @@ public final class ByteArrayIOPool implements IoPool<ByteArrayIOBuffer> {
      * @param initialCapacity the initial capacity of the array to use for
      *        writing to an allocated I/O entry.
      */
-    public ByteArrayIOPool(final int initialCapacity) {
+    public ByteArrayIoPool(final int initialCapacity) {
         if (0 > initialCapacity)
             throw new IllegalArgumentException("Negative initial capacity: " + initialCapacity);
         this.initialCapacity = initialCapacity;
     }
 
     @Override
-    public IoBuffer<ByteArrayIOBuffer> allocate() {
+    public IoBuffer<ByteArrayIoBuffer> allocate() {
         ByteBuffer entry = new ByteBuffer(total.getAndIncrement());
         active.getAndIncrement();
         return entry;
     }
 
     @Override
-    public void release(IoBuffer<ByteArrayIOBuffer> entry) throws IOException {
+    public void release(IoBuffer<ByteArrayIoBuffer> entry) throws IOException {
         entry.release();
     }
 
@@ -60,12 +60,12 @@ public final class ByteArrayIOPool implements IoPool<ByteArrayIOBuffer> {
 
     @NotThreadSafe
     private final class ByteBuffer
-    extends ByteArrayIOBuffer
-    implements net.truevfs.kernel.cio.IoBuffer<ByteArrayIOBuffer> {
+    extends ByteArrayIoBuffer
+    implements net.truevfs.kernel.cio.IoBuffer<ByteArrayIoBuffer> {
         private boolean released;
 
         ByteBuffer(int i) {
-            super(BUFFER_NAME + i, ByteArrayIOPool.this.initialCapacity);
+            super(BUFFER_NAME + i, ByteArrayIoPool.this.initialCapacity);
         }
 
         @Override

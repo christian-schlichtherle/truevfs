@@ -4,8 +4,19 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.access.TConfig;
-import net.truevfs.access.TVFS;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.DirectoryStream.Filter;
+import java.nio.file.*;
+import java.nio.file.attribute.*;
+import java.util.*;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.NotThreadSafe;
+import javax.annotation.concurrent.ThreadSafe;
 import static net.truevfs.kernel.FsAccessOption.CACHE;
 import static net.truevfs.kernel.FsAccessOption.EXCLUSIVE;
 import static net.truevfs.kernel.FsEntryName.SEPARATOR;
@@ -21,19 +32,6 @@ import net.truevfs.kernel.cio.InputSocket;
 import net.truevfs.kernel.cio.OutputSocket;
 import net.truevfs.kernel.util.BitField;
 import net.truevfs.kernel.util.FilteringIterator;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.DirectoryStream.Filter;
-import java.nio.file.*;
-import java.nio.file.attribute.*;
-import java.util.*;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A {@link FileSystem} implementation based on the TrueVFS Kernel module.

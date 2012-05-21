@@ -32,11 +32,11 @@ public final class CacheEntryTest {
     private static final String MOCK_ENTRY_DATA_READ = "read";
     private static final String MOCK_ENTRY_DATA_WRITE = "write";
 
-    private ByteArrayIOPool pool;
+    private ByteArrayIoPool pool;
 
     @Before
     public void setUp() throws IOException {
-        pool = new ByteArrayIOPool(5);
+        pool = new ByteArrayIoPool(5);
     }
 
     @Test
@@ -46,10 +46,10 @@ public final class CacheEntryTest {
             WRITE_BACK,
         }) {
             final CacheEntry cache = strategy.newCacheEntry(pool);
-            ByteArrayIOBuffer front;
-            ByteArrayIOBuffer back;
+            ByteArrayIoBuffer front;
+            ByteArrayIoBuffer back;
 
-            back = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
+            back = new ByteArrayIoBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             back.setData(MOCK_ENTRY_DATA_READ.getBytes());
             cache   .configure(new BrokenInputSocket(back))
                     .configure(new BrokenOutputSocket(back));
@@ -59,7 +59,7 @@ public final class CacheEntryTest {
             assertThat(back.getCount(WRITE), is(0));
             assertThat(cache.getSize(DATA), is((long) UNKNOWN));
 
-            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
+            front = new ByteArrayIoBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             assertThat(front.getData(), nullValue());
             try {
                 IoSockets.copy(cache.input(), front.output());
@@ -82,7 +82,7 @@ public final class CacheEntryTest {
             assertThat(back.getCount(WRITE), is(0));
             assertThat(cache.getSize(DATA), is((long) UNKNOWN));
 
-            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
+            front = new ByteArrayIoBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             assertThat(pool.size(), is(0));
             assertThat(front.getData(), nullValue());
             IoSockets.copy(cache.input(), front.output());
@@ -93,7 +93,7 @@ public final class CacheEntryTest {
             assertThat(back.getCount(WRITE), is(0));
             assertThat(cache.getSize(DATA), is((long) MOCK_ENTRY_DATA_READ.length()));
 
-            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
+            front = new ByteArrayIoBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             front.setData(MOCK_ENTRY_DATA_WRITE.getBytes());
             cache   .configure(new BrokenInputSocket(back))
                     .configure(new BrokenOutputSocket(back));
@@ -142,7 +142,7 @@ public final class CacheEntryTest {
             assertThat(back.getCount(WRITE), is(1));
             assertThat(cache.getSize(DATA), is((long) MOCK_ENTRY_DATA_WRITE.length()));
 
-            back = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
+            back = new ByteArrayIoBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             back.setData(MOCK_ENTRY_DATA_READ.getBytes());
             cache   .configure(new BrokenInputSocket(back))
                     .configure(new BrokenOutputSocket(back));
@@ -154,7 +154,7 @@ public final class CacheEntryTest {
             assertThat(back.getCount(WRITE), is(0));
             assertThat(cache.getSize(DATA), is((long) MOCK_ENTRY_DATA_WRITE.length()));
 
-            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
+            front = new ByteArrayIoBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             IoSockets.copy(cache.input(), front.output());
             assertThat(cache.getSize(DATA), is(not((long) UNKNOWN)));
             assertThat(pool.size(), is(1));
@@ -173,7 +173,7 @@ public final class CacheEntryTest {
             assertThat(back.getCount(WRITE), is(0));
             assertThat(cache.getSize(DATA), is((long) UNKNOWN));
 
-            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
+            front = new ByteArrayIoBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             try {
                 IoSockets.copy(cache.input(), front.output());
                 fail();
@@ -206,7 +206,7 @@ public final class CacheEntryTest {
             assertThat(back.getCount(WRITE), is(0));
             assertThat(cache.getSize(DATA), is((long) MOCK_ENTRY_DATA_READ.length()));
 
-            front = new ByteArrayIOBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
+            front = new ByteArrayIoBuffer(MOCK_ENTRY_NAME, INITIAL_CAPACITY);
             front.setData(MOCK_ENTRY_DATA_WRITE.getBytes());
             cache   .configure(new BrokenInputSocket(back))
                     .configure(new BrokenOutputSocket(back));

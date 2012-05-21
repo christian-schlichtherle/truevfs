@@ -183,7 +183,7 @@ public class MockController extends FsAbstractController<FsModel> {
             protected OutputSocket<? extends Entry> socket()
             throws IOException {
                 checkAllExceptions(this);
-                final IoEntry<?> n = new ByteArrayIOBuffer(
+                final IoEntry<?> n = new ByteArrayIoBuffer(
                         name.toString(), config.getDataSize());
                 IoEntry<?> o = map.get(name);
                 if (null == o)

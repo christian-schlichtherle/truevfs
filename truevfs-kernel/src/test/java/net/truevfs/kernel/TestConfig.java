@@ -9,7 +9,7 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.cio.IoPoolProvider;
-import net.truevfs.kernel.spi.ByteArrayIOPoolService;
+import net.truevfs.kernel.spi.ByteArrayIoPoolService;
 import net.truevfs.kernel.util.InheritableThreadLocalStack;
 import net.truevfs.kernel.util.Resource;
 
@@ -149,7 +149,7 @@ public final class TestConfig extends Resource<RuntimeException> {
         final IoPoolProvider iop = ioPoolProvider;
         return null != iop
                 ? iop
-                : (ioPoolProvider = new ByteArrayIOPoolService(getDataSize()));
+                : (ioPoolProvider = new ByteArrayIoPoolService(getDataSize()));
     }
 
     public void setIOPoolProvider(final @CheckForNull IoPoolProvider iop) {
