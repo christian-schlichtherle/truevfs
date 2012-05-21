@@ -98,8 +98,8 @@ extends FsDriver {
      *
      * @return The pool to use for allocating temporary I/O buffers.
      */
-    public IOPool<? extends IOBuffer<?>> getIOPool() {
-        return IOPoolLocator.SINGLETON.getIOPool();
+    public IOPool<? extends IOBuffer<?>> getIoPool() {
+        return IOPoolLocator.SINGLETON.getIoPool();
     }
 
     /**

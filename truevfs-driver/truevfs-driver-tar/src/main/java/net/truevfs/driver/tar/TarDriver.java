@@ -4,6 +4,11 @@
  */
 package net.truevfs.driver.tar;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillNotClose;
+import javax.annotation.concurrent.Immutable;
 import static net.truevfs.kernel.FsAccessOption.CACHE;
 import static net.truevfs.kernel.FsAccessOption.COMPRESS;
 import net.truevfs.kernel.*;
@@ -21,11 +26,6 @@ import net.truevfs.kernel.cio.OutputService;
 import net.truevfs.kernel.io.Sink;
 import net.truevfs.kernel.io.Source;
 import net.truevfs.kernel.util.BitField;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.Immutable;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**
@@ -95,7 +95,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
             final Sink sink,
             final @CheckForNull @WillNotClose InputService<TarDriverEntry> input)
     throws IOException {
-        return new MultiplexingOutputService<>(getIOPool(),
+        return new MultiplexingOutputService<>(getIoPool(),
                 new TarOutputService(model, sink, this));
     }
 

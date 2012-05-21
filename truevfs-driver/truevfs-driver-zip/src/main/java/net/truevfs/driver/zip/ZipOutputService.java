@@ -4,19 +4,6 @@
  */
 package net.truevfs.driver.zip;
 
-import net.truevfs.driver.zip.io.RawZipOutputStream;
-import net.truevfs.driver.zip.io.ZipCryptoParameters;
-import static net.truevfs.driver.zip.io.ZipEntry.STORED;
-import net.truevfs.kernel.FsModel;
-import net.truevfs.kernel.cio.Entry.Access;
-import net.truevfs.kernel.cio.Entry.Size;
-import static net.truevfs.kernel.cio.Entry.Size.DATA;
-import static net.truevfs.kernel.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.cio.*;
-import net.truevfs.kernel.io.*;
-import net.truevfs.kernel.util.ExceptionBuilder;
-import net.truevfs.kernel.util.JointIterator;
-import net.truevfs.kernel.util.SuppressedExceptionBuilder;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -31,6 +18,18 @@ import java.util.zip.CheckedOutputStream;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.driver.zip.io.RawZipOutputStream;
+import net.truevfs.driver.zip.io.ZipCryptoParameters;
+import static net.truevfs.driver.zip.io.ZipEntry.STORED;
+import net.truevfs.kernel.FsModel;
+import net.truevfs.kernel.cio.Entry.Access;
+import net.truevfs.kernel.cio.Entry.Size;
+import static net.truevfs.kernel.cio.Entry.Size.DATA;
+import static net.truevfs.kernel.cio.Entry.UNKNOWN;
+import net.truevfs.kernel.cio.*;
+import net.truevfs.kernel.io.*;
+import net.truevfs.kernel.util.JointIterator;
+import net.truevfs.kernel.util.SuppressedExceptionBuilder;
 
 /**
  * An output service for writing ZIP files.
@@ -100,7 +99,7 @@ implements OutputService<ZipDriverEntry> {
     }
 
     private IOPool<?> getIOPool() {
-        return driver.getIOPool();
+        return driver.getIoPool();
     }
 
     @Override

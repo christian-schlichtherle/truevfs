@@ -201,7 +201,7 @@ with LockModelController {
 
   /** A cache for the contents of an individual archive entry. */
   private final class EntryCache(val name: FsEntryName) {
-    val cache = CacheEntry.Strategy.WRITE_BACK.newCache(pool)
+    val cache = CacheEntry.Strategy.WRITE_BACK.newCacheEntry(pool)
 
     def flush() { cache.flush() }
 

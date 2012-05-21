@@ -4,8 +4,8 @@
  */
 package net.truevfs.driver.tar.it;
 
-import net.truevfs.driver.tar.TarDriver;
 import net.truevfs.access.ConcurrentSyncITSuite;
+import net.truevfs.driver.tar.TarDriver;
 import net.truevfs.kernel.cio.IOPool;
 
 /**
@@ -23,8 +23,8 @@ extends ConcurrentSyncITSuite<TarDriver> {
     protected TarDriver newArchiveDriver() {
         return new TarDriver() {
             @Override
-            public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().getIOPool();
+            public IOPool<?> getIoPool() {
+                return getTestConfig().getIoPoolProvider().getIoPool();
             }
         };
     }

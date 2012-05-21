@@ -45,7 +45,7 @@ public final class CacheEntryTest {
             WRITE_THROUGH,
             WRITE_BACK,
         }) {
-            final CacheEntry cache = strategy.newCache(pool);
+            final CacheEntry cache = strategy.newCacheEntry(pool);
             ByteArrayIOBuffer front;
             ByteArrayIOBuffer back;
 

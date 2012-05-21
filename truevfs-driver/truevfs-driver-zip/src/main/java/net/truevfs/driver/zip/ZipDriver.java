@@ -4,6 +4,17 @@
  */
 package net.truevfs.driver.zip;
 
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.zip.Deflater;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillNotClose;
+import javax.annotation.concurrent.Immutable;
 import static net.truevfs.driver.zip.io.ZipEntry.*;
 import net.truevfs.driver.zip.io.*;
 import static net.truevfs.kernel.FsAccessOption.*;
@@ -23,17 +34,6 @@ import net.truevfs.kernel.util.HashMaps;
 import net.truevfs.key.KeyManagerProvider;
 import net.truevfs.key.KeyProvider;
 import net.truevfs.key.sl.KeyManagerLocator;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.zip.Deflater;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * An archive driver for ZIP files.
@@ -322,7 +322,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * The implementation in the class {@link ZipDriver} decorates the
      * given controller with a package private controller which keeps track of
      * the AES PBE parameters.
-     * This should getIOPool overridden in order to return just {@code controller} if
+     * This should getIoPool overridden in order to return just {@code controller} if
      * and only if you are overriding
      * {@link #zipCryptoParameters(FsModel, Charset)}, too, and do not want to
      * use the locatable key manager to resolve passwords, e.g. for WinZip AES
@@ -385,7 +385,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     throws IOException {
         final OptionOutputSocket oos = (OptionOutputSocket) sink;
         final ZipInputService zis = (ZipInputService) input;
-        return new MultiplexingOutputService<>(getIOPool(),
+        return new MultiplexingOutputService<>(getIoPool(),
                 new ZipOutputService(model, oos, zis, this));
     }
 
@@ -403,7 +403,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * for an upcast in {@link #newOutput}.
      * Thus, when overriding this method, {@link #newOutput} should get
      * overridden, too.
-     * Otherwise, a class cast exception will getIOPool thrown in
+     * Otherwise, a class cast exception will getIoPool thrown in
      * {@link #newOutput}.
      */
     @Override

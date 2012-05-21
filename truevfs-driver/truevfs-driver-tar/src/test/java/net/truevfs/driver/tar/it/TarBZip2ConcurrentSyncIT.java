@@ -23,8 +23,8 @@ extends ConcurrentSyncITSuite<TarBZip2Driver> {
     protected TarBZip2Driver newArchiveDriver() {
         return new TarBZip2Driver() {
             @Override
-            public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().getIOPool();
+            public IOPool<?> getIoPool() {
+                return getTestConfig().getIoPoolProvider().getIoPool();
             }
         };
     }

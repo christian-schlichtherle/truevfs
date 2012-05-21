@@ -55,8 +55,8 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     }
 
     @Override
-    public IOPool<?> getIOPool() {
-        return config.getIOPoolProvider().getIOPool();
+    public IOPool<?> getIoPool() {
+        return config.getIoPoolProvider().getIoPool();
     }
 
     @Override
@@ -82,7 +82,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
         MockArchive o = containers.get(mp);
         if (null == o)
             o = containers.putIfAbsent(mp, n);
-        return new MultiplexingOutputService<>(getIOPool(),
+        return new MultiplexingOutputService<>(getIoPool(),
                 (null != o ? o : n).newOutputService());
     }
 

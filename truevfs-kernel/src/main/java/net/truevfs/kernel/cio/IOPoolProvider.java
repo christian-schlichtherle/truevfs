@@ -19,5 +19,5 @@ public interface IOPoolProvider {
      *
      * @return The pool to use for allocating temporary I/O buffers.
      */
-    IOPool<?> getIOPool();
+    IOPool<? extends IOBuffer<?>> getIoPool();
 }

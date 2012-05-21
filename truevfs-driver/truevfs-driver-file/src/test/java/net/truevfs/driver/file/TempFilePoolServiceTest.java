@@ -4,8 +4,6 @@
  */
 package net.truevfs.driver.file;
 
-import net.truevfs.driver.file.TempFilePool;
-import net.truevfs.driver.file.TempFilePoolService;
 import net.truevfs.kernel.spi.IOPoolService;
 import static org.junit.Assert.assertSame;
 import org.junit.Before;
@@ -25,6 +23,6 @@ public final class TempFilePoolServiceTest {
 
     @Test
     public void testGet() {
-        assertSame(instance.getIOPool(), TempFilePool.INSTANCE);
+        assertSame(instance.getIoPool(), TempFilePool.INSTANCE);
     }
 }

@@ -4,6 +4,12 @@
  */
 package net.truevfs.driver.zip.raes;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillNotClose;
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.driver.zip.*;
 import net.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import net.truevfs.driver.zip.raes.crypto.RaesParameters;
@@ -23,12 +29,6 @@ import net.truevfs.kernel.io.AbstractSource;
 import net.truevfs.kernel.io.Sink;
 import net.truevfs.kernel.io.Source;
 import net.truevfs.kernel.util.BitField;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.channels.SeekableByteChannel;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * An abstract archive driver for RAES encrypted ZIP files which optionally
@@ -159,7 +159,7 @@ public abstract class ZipRaesDriver extends JarDriver {
         } // Sink
 
         final ZipInputService zis = (ZipInputService) input;
-        return new MultiplexingOutputService<>(getIOPool(),
+        return new MultiplexingOutputService<>(getIoPool(),
                 new ZipOutputService(model, new Sink(), zis, this));
     }
 

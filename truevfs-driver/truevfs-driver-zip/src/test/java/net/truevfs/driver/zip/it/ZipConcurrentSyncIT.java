@@ -4,8 +4,8 @@
  */
 package net.truevfs.driver.zip.it;
 
-import net.truevfs.driver.zip.ZipDriver;
 import net.truevfs.access.ConcurrentSyncITSuite;
+import net.truevfs.driver.zip.ZipDriver;
 import net.truevfs.kernel.cio.IOPool;
 
 /**
@@ -22,8 +22,8 @@ public final class ZipConcurrentSyncIT extends ConcurrentSyncITSuite<ZipDriver> 
     protected ZipDriver newArchiveDriver() {
         return new ZipDriver() {
             @Override
-            public IOPool<?> getIOPool() {
-                return getTestConfig().getIOPoolProvider().getIOPool();
+            public IOPool<?> getIoPool() {
+                return getTestConfig().getIoPoolProvider().getIoPool();
             }
         };
     }

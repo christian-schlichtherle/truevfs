@@ -4,11 +4,11 @@
  */
 package net.truevfs.driver.zip.it;
 
-import net.truevfs.driver.zip.TestWinZipAesDriver;
+import java.io.IOException;
 import net.truevfs.access.ConcurrentSyncITSuite;
 import net.truevfs.access.TConfig;
+import net.truevfs.driver.zip.TestWinZipAesDriver;
 import static net.truevfs.kernel.FsAccessOption.ENCRYPT;
-import java.io.IOException;
 
 /**
  * @author Christian Schlichtherle
@@ -22,7 +22,7 @@ public final class WinZipAesConcurrentSyncIT extends ConcurrentSyncITSuite<TestW
 
     @Override
     protected TestWinZipAesDriver newArchiveDriver() {
-        return new TestWinZipAesDriver(getTestConfig().getIOPoolProvider());
+        return new TestWinZipAesDriver(getTestConfig().getIoPoolProvider());
     }
 
     @Override

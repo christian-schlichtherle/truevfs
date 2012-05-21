@@ -4,16 +4,16 @@
  */
 package net.truevfs.driver.http;
 
+import java.io.IOException;
+import java.util.Objects;
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.FsController;
 import net.truevfs.kernel.FsDriver;
 import net.truevfs.kernel.FsManager;
 import net.truevfs.kernel.FsModel;
 import net.truevfs.kernel.cio.IOPool;
 import net.truevfs.kernel.cio.IOPoolProvider;
-import java.io.IOException;
-import java.util.Objects;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -40,7 +40,7 @@ public class HttpDriver extends FsDriver {
     }
 
     final IOPool<?> getPool() {
-        return provider.getIOPool();
+        return provider.getIoPool();
     }
 
     /**

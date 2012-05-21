@@ -4,6 +4,12 @@
  */
 package net.truevfs.driver.tar;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.zip.Deflater;
+import java.util.zip.GZIPInputStream;
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.FsAccessOption;
 import static net.truevfs.kernel.FsAccessOption.STORE;
 import net.truevfs.kernel.FsController;
@@ -14,12 +20,6 @@ import net.truevfs.kernel.cio.MultiplexingOutputService;
 import net.truevfs.kernel.cio.OutputService;
 import net.truevfs.kernel.io.*;
 import net.truevfs.kernel.util.BitField;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.zip.Deflater;
-import java.util.zip.GZIPInputStream;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * An archive driver for GZIP compressed TAR files (TAR.GZIP).
@@ -109,7 +109,7 @@ public class TarGZipDriver extends TarDriver {
             }
         } // Sink
 
-        return new MultiplexingOutputService<>(getIOPool(),
+        return new MultiplexingOutputService<>(getIoPool(),
                 new TarOutputService(model, new Sink(), this));
     }
 

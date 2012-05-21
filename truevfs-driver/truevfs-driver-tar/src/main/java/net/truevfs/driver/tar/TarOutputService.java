@@ -4,6 +4,15 @@
  */
 package net.truevfs.driver.tar;
 
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.*;
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.NotThreadSafe;
 import static net.truevfs.driver.tar.TarDriver.DEFAULT_BLKSIZE;
 import static net.truevfs.driver.tar.TarDriver.DEFAULT_RCDSIZE;
 import net.truevfs.kernel.FsModel;
@@ -14,15 +23,6 @@ import net.truevfs.kernel.io.*;
 import static net.truevfs.kernel.util.HashMaps.OVERHEAD_SIZE;
 import static net.truevfs.kernel.util.HashMaps.initialCapacity;
 import net.truevfs.kernel.util.SuppressedExceptionBuilder;
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.*;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.NotThreadSafe;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**
@@ -79,7 +79,7 @@ implements OutputService<TarDriverEntry> {
     }
 
     private IOPool<?> getIOPool() {
-        return driver.getIOPool();
+        return driver.getIoPool();
     }
 
     @Override
