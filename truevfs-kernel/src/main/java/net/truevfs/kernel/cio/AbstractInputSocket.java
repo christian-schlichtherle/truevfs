@@ -4,12 +4,12 @@
  */
 package net.truevfs.kernel.cio;
 
-import net.truevfs.kernel.io.ChannelInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.kernel.io.ChannelInputStream;
 
 /**
  * An abstract factory for input resources for reading bytes from its
