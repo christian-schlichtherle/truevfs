@@ -2,12 +2,12 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truevfs.kernel;
+package de.schlichtherle.truevfs.kernel.se;
 
-import net.truevfs.kernel.FsManager;
-import net.truevfs.kernel.FsSyncOptions;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
+import net.truevfs.kernel.FsManager;
+import net.truevfs.kernel.FsSyncOptions;
 
 /**
  * A shutdown hook singleton which {@linkplain FsManager#sync syncs} a
@@ -20,7 +20,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class SyncShutdownHook {
+final class SyncShutdownHook {
 
     private static final Runtime runtime = Runtime.getRuntime();
     private static final Hook hook = new Hook();

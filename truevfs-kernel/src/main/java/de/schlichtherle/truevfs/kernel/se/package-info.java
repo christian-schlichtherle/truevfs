@@ -3,7 +3,7 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Provides utilities for implementing the Kernel API.
+ * Implements the Kernel API.
  * 
  * @author Christian Schlichtherle
  */

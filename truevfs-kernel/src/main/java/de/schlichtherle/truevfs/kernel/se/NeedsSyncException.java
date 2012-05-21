@@ -2,12 +2,12 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truevfs.kernel;
+package de.schlichtherle.truevfs.kernel.se;
 
-import net.truevfs.kernel.FsController;
-import net.truevfs.kernel.util.BitField;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.FsController;
+import net.truevfs.kernel.util.BitField;
 
 /**
  * Indicates that a file system controller needs to get
@@ -19,12 +19,12 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 @SuppressWarnings("serial") // serializing a control flow exception is nonsense!
-public final class NeedsSyncException extends ControlFlowException {
+final class NeedsSyncException extends ControlFlowException {
 
     private static final @Nullable NeedsSyncException
             SINGLETON = TRACEABLE ? null : new NeedsSyncException();
 
-    public static NeedsSyncException get() {
+    static NeedsSyncException get() {
         return TRACEABLE ? new NeedsSyncException() : SINGLETON;
     }
 

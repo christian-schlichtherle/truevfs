@@ -2,9 +2,8 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truevfs.kernel;
+package de.schlichtherle.truevfs.kernel.se;
 
-import net.truevfs.kernel.cio.*;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
 import java.io.IOException;
@@ -17,6 +16,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
+import net.truevfs.kernel.cio.*;
 
 /**
  * Decorates another input service to allow concurrent access which is
@@ -28,7 +28,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class LockInputService<E extends Entry>
+class LockInputService<E extends Entry>
 extends DecoratingInputService<E, InputService<E>> {
 
     /** The lock on which this object synchronizes. */
@@ -39,7 +39,7 @@ extends DecoratingInputService<E, InputService<E>> {
      *
      * @param input the service to decorate.
      */
-    public LockInputService(@WillCloseWhenClosed InputService<E> input) {
+    LockInputService(@WillCloseWhenClosed InputService<E> input) {
         super(input);
     }
 

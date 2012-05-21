@@ -2,11 +2,8 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truevfs.kernel;
+package de.schlichtherle.truevfs.kernel.se;
 
-import net.truevfs.kernel.util.ExceptionBuilder;
-import net.truevfs.kernel.util.HashMaps;
-import net.truevfs.kernel.util.SuppressedExceptionBuilder;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +18,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.ThreadSafe;
+import net.truevfs.kernel.util.ExceptionBuilder;
+import static net.truevfs.kernel.util.HashMaps.initialCapacity;
+import net.truevfs.kernel.util.SuppressedExceptionBuilder;
 
 /**
  * Controls {@link Closeable} resources
@@ -38,14 +38,14 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class ResourceManager {
+final class ResourceManager {
 
     /**
      * The initial capacity for the hash map accounts for the number of
      * available processors, a 90% blocking factor for typical I/O and a 2/3
      * map resize threshold.
      */
-    private static final int INITIAL_CAPACITY = HashMaps.initialCapacity(
+    private static final int INITIAL_CAPACITY = initialCapacity(
             Runtime.getRuntime().availableProcessors() * 10);
 
     /** The pool of all accounted closeable resources. */
@@ -67,7 +67,7 @@ public final class ResourceManager {
      *             {@link ReentrantLock} because chances are that it gets
      *             locked recursively.
      */
-    public ResourceManager(final Lock lock) {
+    ResourceManager(final Lock lock) {
         this.condition = (this.lock = lock).newCondition();
     }
 

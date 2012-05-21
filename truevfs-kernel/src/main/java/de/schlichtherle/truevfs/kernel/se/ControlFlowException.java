@@ -2,13 +2,13 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truevfs.kernel;
+package de.schlichtherle.truevfs.kernel.se;
 
+import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.FsCompositeDriver;
 import net.truevfs.kernel.FsController;
 import net.truevfs.kernel.FsManager;
 import net.truevfs.kernel.FsMountPoint;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Indicates a condition which requires non-local control flow within a
@@ -69,7 +69,7 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 @SuppressWarnings("serial") // serializing a control flow exception is nonsense!
-public abstract class ControlFlowException extends RuntimeException {
+abstract class ControlFlowException extends RuntimeException {
 
     /**
      * Controls whether or not instances of this class have a regular stack
@@ -84,11 +84,11 @@ public abstract class ControlFlowException extends RuntimeException {
     static final boolean TRACEABLE = Boolean
             .getBoolean(ControlFlowException.class.getName() + ".traceable");
 
-    public ControlFlowException() {
+    ControlFlowException() {
         super(null, null, TRACEABLE, TRACEABLE);
     }
 
-    public ControlFlowException(final Throwable cause) {
+    ControlFlowException(final Throwable cause) {
         super(null, cause, TRACEABLE, TRACEABLE);
     }
 }
