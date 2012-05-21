@@ -61,7 +61,7 @@ extends FsController[LockModel]
 with LockModelController {
   import CacheController._
 
-  protected def pool: IOPool[_]
+  protected def pool: AnyIoPool
 
   private[this] val caches = new java.util.HashMap[FsEntryName, EntryCache]
 
