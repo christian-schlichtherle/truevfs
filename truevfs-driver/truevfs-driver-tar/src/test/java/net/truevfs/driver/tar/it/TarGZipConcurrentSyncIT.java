@@ -6,7 +6,7 @@ package net.truevfs.driver.tar.it;
 
 import net.truevfs.access.ConcurrentSyncITSuite;
 import net.truevfs.driver.tar.TarGZipDriver;
-import net.truevfs.kernel.cio.IOPool;
+import net.truevfs.kernel.cio.IoPool;
 
 /**
  * @author Christian Schlichtherle
@@ -23,7 +23,7 @@ extends ConcurrentSyncITSuite<TarGZipDriver> {
     protected TarGZipDriver newArchiveDriver() {
         return new TarGZipDriver() {
             @Override
-            public IOPool<?> getIoPool() {
+            public IoPool<?> getIoPool() {
                 return getTestConfig().getIoPoolProvider().getIoPool();
             }
         };

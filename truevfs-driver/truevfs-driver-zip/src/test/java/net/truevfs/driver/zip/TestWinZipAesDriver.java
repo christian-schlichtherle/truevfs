@@ -4,8 +4,8 @@
  */
 package net.truevfs.driver.zip;
 
-import net.truevfs.kernel.cio.IOPool;
-import net.truevfs.kernel.cio.IOPoolProvider;
+import net.truevfs.kernel.cio.IoPool;
+import net.truevfs.kernel.cio.IoPoolProvider;
 import net.truevfs.key.MockView;
 import net.truevfs.key.param.AesPbeParameters;
 
@@ -14,16 +14,16 @@ import net.truevfs.key.param.AesPbeParameters;
  */
 public final class TestWinZipAesDriver extends ZipDriver {
 
-    private final IOPoolProvider ioPoolProvider;
+    private final IoPoolProvider ioPoolProvider;
     private final TestKeyManagerProvider service;
 
-    public TestWinZipAesDriver(final IOPoolProvider ioPoolProvider) {
+    public TestWinZipAesDriver(final IoPoolProvider ioPoolProvider) {
         this.ioPoolProvider = ioPoolProvider;
         this.service = new TestKeyManagerProvider();
     }
 
     @Override
-    public IOPool<?> getIoPool() {
+    public IoPool<?> getIoPool() {
         return ioPoolProvider.getIoPool();
     }
 

@@ -45,7 +45,7 @@ implements OutputService<ZipDriverEntry> {
 
     private final FsModel model;
     private final ZipDriver driver;
-    private @CheckForNull IOBuffer<?> postamble;
+    private @CheckForNull IoBuffer<?> postamble;
     private @CheckForNull ZipDriverEntry bufferedEntry;
     private ZipCryptoParameters param;
 
@@ -98,7 +98,7 @@ implements OutputService<ZipDriverEntry> {
         return model;
     }
 
-    private IOPool<?> getIOPool() {
+    private IoPool<?> getIOPool() {
         return driver.getIoPool();
     }
 
@@ -247,7 +247,7 @@ implements OutputService<ZipDriverEntry> {
     @Override
     public void close() throws IOException {
         super.finish();
-        final IOBuffer<?> postamble = this.postamble;
+        final IoBuffer<?> postamble = this.postamble;
         if (null != postamble) {
             this.postamble = null;
             final InputSocket<?> input = postamble.input();
@@ -312,14 +312,14 @@ implements OutputService<ZipDriverEntry> {
 
     /**
      * This entry output stream writes the ZIP archive entry to an
-     * {@linkplain IOBuffer I/O buffer}.
+     * {@linkplain IoBuffer I/O buffer}.
      * When the stream gets closed, the I/O buffer is then copied to this
      * output service and finally deleted.
      */
     @CleanupObligation
     private final class BufferedEntryOutputStream
     extends DecoratingOutputStream {
-        final IOBuffer<?> buffer;
+        final IoBuffer<?> buffer;
         final ZipDriverEntry local;
         boolean closed;
 
@@ -328,7 +328,7 @@ implements OutputService<ZipDriverEntry> {
         throws IOException {
             assert STORED == local.getMethod();
             this.local = local;
-            final IOBuffer<?> buffer = this.buffer = getIOPool().allocate();
+            final IoBuffer<?> buffer = this.buffer = getIOPool().allocate();
             try {
                 this.out = new CheckedOutputStream(
                         buffer.output().stream(),
@@ -358,7 +358,7 @@ implements OutputService<ZipDriverEntry> {
 
         void updateProperties() {
             final ZipDriverEntry local = this.local;
-            final IOBuffer<?> buffer = this.buffer;
+            final IoBuffer<?> buffer = this.buffer;
             local.setCrc(((CheckedOutputStream) out).getChecksum().getValue());
             final long length = buffer.getSize(DATA);
             local.setSize(length);
@@ -367,7 +367,7 @@ implements OutputService<ZipDriverEntry> {
         }
 
         void storeBuffer() throws IOException {
-            final IOBuffer<?> buffer = this.buffer;
+            final IoBuffer<?> buffer = this.buffer;
             try (final InputStream in = buffer.input().stream()) {
                 final ZipOutputService zos = ZipOutputService.this;
                 zos.putNextEntry(local, true);

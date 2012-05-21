@@ -4,9 +4,9 @@
  */
 package net.truevfs.kernel.sl;
 
-import net.truevfs.kernel.cio.IOPool;
-import net.truevfs.kernel.cio.IOPoolProvider;
-import net.truevfs.kernel.spi.IOPoolService;
+import net.truevfs.kernel.cio.IoPool;
+import net.truevfs.kernel.cio.IoPoolProvider;
+import net.truevfs.kernel.spi.IoPoolService;
 import net.truevfs.kernel.util.ServiceLocator;
 import java.text.MessageFormat;
 import java.util.Iterator;
@@ -23,49 +23,49 @@ import javax.annotation.concurrent.Immutable;
  * whatever yields a result first.
  * <p>
  * First, the value of the {@link System#getProperty system property}
- * with the class name {@code "net.truevfs.kernel.spi.IOPoolService"}
+ * with the class name {@code "net.truevfs.kernel.spi.IoPoolService"}
  * as the key is queried.
  * If this yields a value, the class with that name is then loaded and
  * instantiated by calling its public no-argument constructor.
  * <p>
  * Otherwise, the class path is searched for any resource file with the name
- * {@code "META-INF/services/net.truevfs.kernel.spi.IOPoolService"}.
+ * {@code "META-INF/services/net.truevfs.kernel.spi.IoPoolService"}.
  * If this yields a result, the class with the name in this file is then loaded
  * and instantiated by calling its public no-argument constructor.
  * <p>
  * Otherwise, a {@link ServiceConfigurationError} gets thrown.
  *
- * @see    IOPoolService
+ * @see    IoPoolService
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class IOPoolLocator implements IOPoolProvider {
+public final class IoPoolLocator implements IoPoolProvider {
 
     /** The singleton instance of this class. */
-    public static final IOPoolLocator SINGLETON = new IOPoolLocator();
+    public static final IoPoolLocator SINGLETON = new IoPoolLocator();
 
     /** Can't touch this - hammer time! */
-    private IOPoolLocator() { }
+    private IoPoolLocator() { }
 
     @Override
-    public IOPool<?> getIoPool() {
+    public IoPool<?> getIoPool() {
         return Boot.SERVICE.getIoPool();
     }
 
     /** A static data utility class used for lazy initialization. */
     private static final class Boot {
-        static final IOPoolService SERVICE;
+        static final IoPoolService SERVICE;
         static {
             final Logger logger = Logger.getLogger(
-                    IOPoolLocator.class.getName(),
-                    IOPoolLocator.class.getName());
+                    IoPoolLocator.class.getName(),
+                    IoPoolLocator.class.getName());
             final ServiceLocator locator = new ServiceLocator(
-                    IOPoolLocator.class.getClassLoader());
-            IOPoolService service = locator.getService(IOPoolService.class, null);
+                    IoPoolLocator.class.getClassLoader());
+            IoPoolService service = locator.getService(IoPoolService.class, null);
             if (null == service) {
-                IOPoolService newService = null;
-                for (   final Iterator<IOPoolService>
-                            i = locator.getServices(IOPoolService.class);
+                IoPoolService newService = null;
+                for (   final Iterator<IoPoolService>
+                            i = locator.getServices(IoPoolService.class);
                         i.hasNext();) {
                     newService = i.next();
                     logger.log(CONFIG, "located", newService);
@@ -86,9 +86,9 @@ public final class IOPoolLocator implements IOPoolProvider {
                 throw new ServiceConfigurationError(
                         MessageFormat.format(
                             ResourceBundle
-                                .getBundle(IOPoolLocator.class.getName())
+                                .getBundle(IoPoolLocator.class.getName())
                                 .getString("null"),
-                            IOPoolService.class));
+                            IoPoolService.class));
             logger.log(CONFIG, "provided", service);
             SERVICE = service;
         }

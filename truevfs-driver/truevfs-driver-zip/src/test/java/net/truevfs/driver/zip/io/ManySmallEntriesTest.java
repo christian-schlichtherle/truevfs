@@ -7,7 +7,7 @@ package net.truevfs.driver.zip.io;
 import static net.truevfs.driver.zip.io.ZipEntry.STORED;
 import net.truevfs.kernel.cio.ByteArrayIOBuffer;
 import net.truevfs.kernel.cio.Entry.Size;
-import net.truevfs.kernel.cio.IOEntry;
+import net.truevfs.kernel.cio.IoEntry;
 import static net.truevfs.kernel.util.HashMaps.initialCapacity;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +37,7 @@ public final class ManySmallEntriesTest {
 
     @Test
     public void testManySmallEntries() throws IOException {
-        final IOEntry<?> buffer = new ByteArrayIOBuffer("zip", ZIP_SIZE);
+        final IoEntry<?> buffer = new ByteArrayIOBuffer("zip", ZIP_SIZE);
         final byte[] data = DATA_STRING.getBytes(DATA_CHARSET);
         final HashSet<String> set = new HashSet<>(initialCapacity(NUM_ENTRIES));
 

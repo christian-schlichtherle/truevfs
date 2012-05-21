@@ -4,11 +4,11 @@
  */
 package net.truevfs.extension.jmxjul.jmx;
 
-import net.truevfs.kernel.cio.IOBuffer;
+import net.truevfs.kernel.cio.IoBuffer;
 import javax.annotation.Nullable;
 
 /**
- * The MXBean interface for an {@link IOBuffer I/O pool entry}.
+ * The MXBean interface for an {@link IoBuffer I/O pool entry}.
  *
  * @author  Christian Schlichtherle
  */

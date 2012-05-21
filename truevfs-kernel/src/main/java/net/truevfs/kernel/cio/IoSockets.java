@@ -15,10 +15,10 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class IOSockets {
+public final class IoSockets {
 
     /** Can't touch this - hammer time! */
-    private IOSockets() { }
+    private IoSockets() { }
 
     /**
      * Copies an input stream {@link InputSocket#stream created}

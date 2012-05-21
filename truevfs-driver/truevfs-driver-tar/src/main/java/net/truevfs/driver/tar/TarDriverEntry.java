@@ -11,7 +11,7 @@ import static net.truevfs.kernel.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.cio.Entry.Size.STORAGE;
 import static net.truevfs.kernel.cio.Entry.Type.DIRECTORY;
 import static net.truevfs.kernel.cio.Entry.Type.FILE;
-import net.truevfs.kernel.cio.IOBuffer;
+import net.truevfs.kernel.cio.IoBuffer;
 import net.truevfs.kernel.util.Releasable;
 import java.io.IOException;
 import java.util.Date;
@@ -43,7 +43,7 @@ implements FsArchiveEntry, Releasable<IOException> {
     private static final int TOEXEC  = 0001; // Execute/search by other
 
     private byte init; // bit flags for init state
-    private @CheckForNull IOBuffer<?> temp;
+    private @CheckForNull IoBuffer<?> temp;
 
     public TarDriverEntry(final String name) {
         super(name, true);
@@ -79,11 +79,11 @@ implements FsArchiveEntry, Releasable<IOException> {
             this.init &= ~mask;
     }
 
-    @Nullable IOBuffer<?> getTemp() {
+    @Nullable IoBuffer<?> getTemp() {
         return temp;
     }
 
-    void setTemp(@CheckForNull IOBuffer<?> temp) {
+    void setTemp(@CheckForNull IoBuffer<?> temp) {
         this.temp = temp;
     }
 

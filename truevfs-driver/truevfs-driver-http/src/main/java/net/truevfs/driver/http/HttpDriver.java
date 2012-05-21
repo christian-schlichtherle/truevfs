@@ -12,8 +12,8 @@ import net.truevfs.kernel.FsController;
 import net.truevfs.kernel.FsDriver;
 import net.truevfs.kernel.FsManager;
 import net.truevfs.kernel.FsModel;
-import net.truevfs.kernel.cio.IOPool;
-import net.truevfs.kernel.cio.IOPoolProvider;
+import net.truevfs.kernel.cio.IoPool;
+import net.truevfs.kernel.cio.IoPoolProvider;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -30,16 +30,16 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 @Immutable
 public class HttpDriver extends FsDriver {
 
-    private final IOPoolProvider provider;
+    private final IoPoolProvider provider;
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private volatile @CheckForNull HttpClient client;
 
-    public HttpDriver(final IOPoolProvider provider) {
+    public HttpDriver(final IoPoolProvider provider) {
         this.provider = Objects.requireNonNull(provider);
     }
 
-    final IOPool<?> getPool() {
+    final IoPool<?> getPool() {
         return provider.getIoPool();
     }
 

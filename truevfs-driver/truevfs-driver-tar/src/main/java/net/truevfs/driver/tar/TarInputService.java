@@ -84,7 +84,7 @@ implements InputService<TarDriverEntry> {
     private void unpack(final @WillNotClose TarArchiveInputStream tin)
     throws IOException {
         final TarDriver driver = this.driver;
-        final IOPool<?> pool = driver.getIoPool();
+        final IoPool<?> pool = driver.getIoPool();
         for (   TarArchiveEntry tinEntry;
                 null != (tinEntry = tin.getNextTarEntry()); ) {
             final String name = name(tinEntry);
@@ -93,7 +93,7 @@ implements InputService<TarDriverEntry> {
                 entry.release();
             entry = driver.newEntry(name, tinEntry);
             if (!tinEntry.isDirectory()) {
-                final IOBuffer<?> temp = pool.allocate();
+                final IoBuffer<?> temp = pool.allocate();
                 entry.setTemp(temp);
                 try {
                     try (final OutputStream out = temp.output().stream()) {
@@ -227,7 +227,7 @@ implements InputService<TarDriverEntry> {
                 return input().channel();
             }
 
-            InputSocket<? extends IOBuffer<?>> input() throws IOException {
+            InputSocket<? extends IoBuffer<?>> input() throws IOException {
                 return localTarget().getTemp().input();
             }
         } // Input

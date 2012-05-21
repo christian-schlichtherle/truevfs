@@ -42,7 +42,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 public class MultiplexingOutputService<E extends MutableEntry>
 extends DecoratingOutputService<E, OutputService<E>> {
 
-    private final IOPool<?> pool;
+    private final IoPool<?> pool;
 
     /**
      * The map of temporary archive entries which have not yet been written
@@ -61,7 +61,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
      * @param pool the pool for buffering entry data.
      */
     public MultiplexingOutputService(
-            final IOPool<?> pool,
+            final IoPool<?> pool,
             final @WillCloseWhenClosed OutputService<E> output) {
         super(output);
         this.pool = Objects.requireNonNull(pool);
@@ -211,7 +211,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
     /**
      * This entry output stream writes the archive entry to an
-     * {@linkplain IOBuffer I/O buffer}.
+     * {@linkplain IoBuffer I/O buffer}.
      * When the stream gets closed, the I/O buffer is then copied to this
      * output service and finally deleted unless this output service is still busy.
      */
@@ -220,7 +220,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
     extends DecoratingOutputStream {
         final InputSocket<?> input;
         final OutputSocket<? extends E> output;
-        final IOBuffer<?> buffer;
+        final IoBuffer<?> buffer;
         boolean closed;
 
         @CreatesObligation
@@ -230,7 +230,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
             // HC SUNT DRACONES!
             final E local = (this.output = output).localTarget();
             final Entry _peer = output.peerTarget();
-            final IOBuffer<?> buffer = this.buffer = pool.allocate();
+            final IoBuffer<?> buffer = this.buffer = pool.allocate();
             final Entry peer = null != _peer ? _peer : buffer;
             final class InputProxy extends DecoratingInputSocket<Entry> {
                 InputProxy() {
@@ -307,7 +307,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         boolean storeBuffer() throws InputException, IOException {
             if (!closed || isBusy())
                 return false;
-            IOSockets.copy(input, output);
+            IoSockets.copy(input, output);
             buffer.release();
             return true;
         }

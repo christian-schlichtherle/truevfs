@@ -6,7 +6,7 @@ package net.truevfs.kernel.sample;
 
 import net.truevfs.kernel.*;
 import static net.truevfs.kernel.FsAccessOption.*;
-import net.truevfs.kernel.cio.IOSockets;
+import net.truevfs.kernel.cio.IoSockets;
 import net.truevfs.kernel.cio.InputSocket;
 import net.truevfs.kernel.cio.OutputSocket;
 import net.truevfs.kernel.sl.FsDriverLocator;
@@ -82,7 +82,7 @@ public final class Copy {
                     .output(BitField.of(CREATE_PARENTS, EXCLUSIVE),
                             dstPath.getEntryName(),
                             srcSocket.localTarget());
-            IOSockets.copy(srcSocket, dstSocket);
+            IoSockets.copy(srcSocket, dstSocket);
         } finally {
             // Commit all unsynchronized changes to the contents of federated
             // file systems, if any were accessed, and clean up temporary files

@@ -5,7 +5,7 @@
 package net.truevfs.extension.jmxjul.jul;
 
 import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.IOBuffer;
+import net.truevfs.kernel.cio.IoBuffer;
 import net.truevfs.kernel.cio.InputSocket;
 import net.truevfs.kernel.io.DecoratingInputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -44,7 +44,7 @@ final class JulInputStream extends DecoratingInputStream {
         } catch (final IOException ignore) {
             target = null;
         }
-        final Level level = target instanceof IOBuffer
+        final Level level = target instanceof IoBuffer
                 ? Level.FINER
                 : Level.FINEST;
         logger.log(level, message + target, new NeverThrowable());

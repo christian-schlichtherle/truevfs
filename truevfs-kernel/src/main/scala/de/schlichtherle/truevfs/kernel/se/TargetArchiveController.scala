@@ -340,7 +340,7 @@ with TouchListener {
                 if (UNKNOWN != ae.getTime(WRITE)) // never output a ghost directory!
                   os.output(ae).stream().close()
             } else if (null ne is.entry(aen)) {
-              IOSockets.copy(is.input(aen), os.output(ae))
+              IoSockets.copy(is.input(aen), os.output(ae))
             } else {
               // The file system entry is a newly created
               // non-directory entry which hasn't received any

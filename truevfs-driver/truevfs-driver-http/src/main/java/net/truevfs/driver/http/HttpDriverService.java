@@ -7,7 +7,7 @@ package net.truevfs.driver.http;
 import net.truevfs.kernel.FsDriver;
 import net.truevfs.kernel.FsScheme;
 import net.truevfs.kernel.spi.FsDriverService;
-import net.truevfs.kernel.sl.IOPoolLocator;
+import net.truevfs.kernel.sl.IoPoolLocator;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 
@@ -38,7 +38,7 @@ public final class HttpDriverService extends FsDriverService {
 
     private final Map<FsScheme, FsDriver>
             drivers = newMap(new Object[][] {
-                { "http|https", new HttpDriver(IOPoolLocator.SINGLETON) },
+                { "http|https", new HttpDriver(IoPoolLocator.SINGLETON) },
             });
 
     @Override

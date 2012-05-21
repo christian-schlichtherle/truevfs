@@ -4,19 +4,19 @@
  */
 package net.truevfs.kernel.spi;
 
-import net.truevfs.kernel.cio.IOPoolProvider;
-import net.truevfs.kernel.sl.IOPoolLocator;
+import net.truevfs.kernel.cio.IoPoolProvider;
+import net.truevfs.kernel.sl.IoPoolLocator;
 
 /**
  * An abstract locatable service for an I/O buffer pool.
  * Implementations of this abstract class are subject to service location
- * by the class {@link IOPoolLocator}.
+ * by the class {@link IoPoolLocator}.
  * <p>
  * Implementations must be thread-safe.
  *
  * @author Christian Schlichtherle
  */
-public abstract class IOPoolService implements IOPoolProvider {
+public abstract class IoPoolService implements IoPoolProvider {
 
     /**
      * Returns a priority to help the I/O pool service locator.

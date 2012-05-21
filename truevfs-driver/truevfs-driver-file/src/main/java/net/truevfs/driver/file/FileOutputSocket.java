@@ -10,7 +10,7 @@ import net.truevfs.kernel.cio.AbstractOutputSocket;
 import net.truevfs.kernel.cio.Entry;
 import static net.truevfs.kernel.cio.Entry.Access.*;
 import static net.truevfs.kernel.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.cio.IOSockets;
+import net.truevfs.kernel.cio.IoSockets;
 import net.truevfs.kernel.util.BitField;
 import static net.truevfs.kernel.util.HashMaps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -101,7 +101,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
 
     void append(final FileEntry temp) throws IOException {
         if (temp != entry && options.get(APPEND) && exists(entry.getPath()))
-            IOSockets.copy(entry.input(), temp.output());
+            IoSockets.copy(entry.input(), temp.output());
     }
 
     Set<OpenOption> optionSet() {
@@ -135,7 +135,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
                     /*Files.copy(tempFile, entryFile,
                             StandardCopyOption.REPLACE_EXISTING);*/
                     // Fast.
-                    IOSockets.copy(temp.input(), entry.output());
+                    IoSockets.copy(temp.input(), entry.output());
                     updateProperties(entryFile);
                 }
                 release(temp, null);

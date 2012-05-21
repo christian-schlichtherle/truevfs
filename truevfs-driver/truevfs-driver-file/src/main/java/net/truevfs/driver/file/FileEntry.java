@@ -11,7 +11,7 @@ import net.truevfs.kernel.FsEntryName;
 import static net.truevfs.kernel.FsEntryName.SEPARATOR_CHAR;
 import net.truevfs.kernel.cio.Entry;
 import static net.truevfs.kernel.cio.Entry.PosixEntity.*;
-import net.truevfs.kernel.cio.IOBuffer;
+import net.truevfs.kernel.cio.IoBuffer;
 import net.truevfs.kernel.cio.InputSocket;
 import net.truevfs.kernel.cio.OutputSocket;
 import net.truevfs.kernel.util.BitField;
@@ -36,7 +36,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-class FileEntry extends FsEntry implements IOBuffer<FileEntry> {
+class FileEntry extends FsEntry implements IoBuffer<FileEntry> {
 
     private static final Path CURRENT_DIRECTORY = Paths.get(".");
 

@@ -4,8 +4,8 @@
  */
 package net.truevfs.driver.file;
 
-import net.truevfs.kernel.cio.IOBuffer;
-import net.truevfs.kernel.cio.IOPool;
+import net.truevfs.kernel.cio.IoBuffer;
+import net.truevfs.kernel.cio.IoPool;
 import java.io.IOException;
 import static java.nio.file.Files.createTempFile;
 import static java.nio.file.Files.deleteIfExists;
@@ -22,7 +22,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class TempFilePool implements IOPool<FileEntry> {
+final class TempFilePool implements IoPool<FileEntry> {
 
     private static final Path TEMP_DIR
             = Paths.get(System.getProperty("java.io.tmpdir"));
@@ -52,7 +52,7 @@ final class TempFilePool implements IOPool<FileEntry> {
     }
 
     @Override
-    public void release(IOBuffer<FileEntry> resource) throws IOException {
+    public void release(IoBuffer<FileEntry> resource) throws IOException {
         resource.release();
     }
 
@@ -60,7 +60,7 @@ final class TempFilePool implements IOPool<FileEntry> {
     @NotThreadSafe
     private static final class FileBuffer
     extends FileEntry
-    implements IOBuffer<FileEntry> {
+    implements IoBuffer<FileEntry> {
 
         FileBuffer(Path file, final TempFilePool pool) {
             super(file);
@@ -93,5 +93,5 @@ final class TempFilePool implements IOPool<FileEntry> {
                 super.finalize();
             }
         }
-    } // IOBuffer
+    } // IoBuffer
 }

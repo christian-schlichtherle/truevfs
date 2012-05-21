@@ -14,7 +14,7 @@ import net.truevfs.kernel.FsMountPoint;
 import net.truevfs.kernel.FsPath;
 import static net.truevfs.kernel.cio.Entry.Type.DIRECTORY;
 import static net.truevfs.kernel.cio.Entry.Type.FILE;
-import net.truevfs.kernel.cio.IOSockets;
+import net.truevfs.kernel.cio.IoSockets;
 import net.truevfs.kernel.cio.InputSocket;
 import net.truevfs.kernel.cio.OutputSocket;
 import net.truevfs.kernel.util.BitField;
@@ -350,7 +350,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
         final InputSocket<?> input = src.input(src.getAccessPreferences());
         final OutputSocket<?> output = dst.output(o,
                 preserve ? input.localTarget() : null);
-        IOSockets.copy(input, output);
+        IoSockets.copy(input, output);
     }
 
     @Override

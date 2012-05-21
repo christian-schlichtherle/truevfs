@@ -9,7 +9,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.FsModel;
-import net.truevfs.kernel.cio.IOPool;
+import net.truevfs.kernel.cio.IoPool;
 import net.truevfs.kernel.cio.InputService;
 import net.truevfs.kernel.cio.MultiplexingOutputService;
 import net.truevfs.kernel.cio.OutputService;
@@ -50,7 +50,7 @@ public class OdfDriver extends JarDriver {
         final OptionOutputSocket oos = (OptionOutputSocket) sink;
         final ZipInputService zis = (ZipInputService) input;
         final ZipOutputService zos = new ZipOutputService(model, oos, zis, this);
-        final IOPool<?> pool = getIoPool();
+        final IoPool<?> pool = getIoPool();
         return null != zis && zis.isAppendee()
                 ? new MultiplexingOutputService<>(pool, zos)
                 : new OdfOutputService(pool, zos);

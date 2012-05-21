@@ -24,8 +24,8 @@ import net.truevfs.driver.zip.CheckedReadOnlySfxDriver;
 import net.truevfs.driver.zip.CheckedZipDriver;
 import static net.truevfs.kernel.FsAccessOption.*;
 import net.truevfs.kernel.FsSyncException;
-import net.truevfs.kernel.cio.IOPoolProvider;
-import net.truevfs.kernel.sl.IOPoolLocator;
+import net.truevfs.kernel.cio.IoPoolProvider;
+import net.truevfs.kernel.sl.IoPoolLocator;
 
 /**
  * A comprehensive command line utility which allows you to work
@@ -54,7 +54,7 @@ public class Nzip extends Application {
 
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(Nzip.class.getName());
-    private static final IOPoolProvider POOL_PROVIDER = IOPoolLocator.SINGLETON;
+    private static final IoPoolProvider POOL_PROVIDER = IoPoolLocator.SINGLETON;
 
     private final NumberFormat numberFormat = NumberFormat.getNumberInstance();
     private final DateFormat dateFormat = DateFormat.getDateTimeInstance();

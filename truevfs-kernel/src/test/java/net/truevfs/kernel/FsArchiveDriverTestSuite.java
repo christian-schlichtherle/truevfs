@@ -114,8 +114,8 @@ extends FsArchiveDriverTestBase<D> {
 
     @Test
     public void testIOPoolShouldBeConstant() {
-        final IOPool<?> p1 = getArchiveDriver().getIoPool();
-        final IOPool<?> p2 = getArchiveDriver().getIoPool();
+        final IoPool<?> p1 = getArchiveDriver().getIoPool();
+        final IoPool<?> p2 = getArchiveDriver().getIoPool();
         if (p1 != p2)
             logger.log(Level.WARNING, "{0} returns different I/O buffer pools upon multiple invocations of getPool()!", getArchiveDriver().getClass());
     }

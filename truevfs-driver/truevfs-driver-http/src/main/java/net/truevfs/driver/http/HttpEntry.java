@@ -34,7 +34,7 @@ import org.apache.http.client.methods.HttpUriRequest;
  * @author Christian Schlichtherle
  */
 @Immutable
-public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
+public class HttpEntry extends FsEntry implements IoEntry<HttpEntry> {
 
     private final HttpController controller;
     private final String name;
@@ -48,7 +48,7 @@ public class HttpEntry extends FsEntry implements IOEntry<HttpEntry> {
         this.uri = controller.resolve(name).toUri();
     }
 
-    final IOPool<?> getPool() {
+    final IoPool<?> getPool() {
         return controller.getPool();
     }
 

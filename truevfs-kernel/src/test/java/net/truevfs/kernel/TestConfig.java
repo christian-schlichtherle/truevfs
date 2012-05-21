@@ -8,7 +8,7 @@ import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
-import net.truevfs.kernel.cio.IOPoolProvider;
+import net.truevfs.kernel.cio.IoPoolProvider;
 import net.truevfs.kernel.spi.ByteArrayIOPoolService;
 import net.truevfs.kernel.util.InheritableThreadLocalStack;
 import net.truevfs.kernel.util.Resource;
@@ -67,7 +67,7 @@ public final class TestConfig extends Resource<RuntimeException> {
     private final ThrowManager throwControl;
     private int numEmtries = DEFAULT_NUM_ENTRIES;
     private int dataSize = DEFAULT_DATA_LENGTH;
-    private IOPoolProvider ioPoolProvider;
+    private IoPoolProvider ioPoolProvider;
 
     /**
      * Returns the current configuration.
@@ -145,14 +145,14 @@ public final class TestConfig extends Resource<RuntimeException> {
         dataSize = size;
     }
 
-    public IOPoolProvider getIoPoolProvider() {
-        final IOPoolProvider iop = ioPoolProvider;
+    public IoPoolProvider getIoPoolProvider() {
+        final IoPoolProvider iop = ioPoolProvider;
         return null != iop
                 ? iop
                 : (ioPoolProvider = new ByteArrayIOPoolService(getDataSize()));
     }
 
-    public void setIOPoolProvider(final @CheckForNull IOPoolProvider iop) {
+    public void setIOPoolProvider(final @CheckForNull IoPoolProvider iop) {
         ioPoolProvider = iop;
     }
 

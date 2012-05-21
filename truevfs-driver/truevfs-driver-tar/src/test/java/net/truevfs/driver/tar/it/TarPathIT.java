@@ -5,7 +5,7 @@
 package net.truevfs.driver.tar.it;
 
 import net.truevfs.driver.tar.TarDriver;
-import net.truevfs.kernel.cio.IOPool;
+import net.truevfs.kernel.cio.IoPool;
 
 /**
  * @author Christian Schlichtherle
@@ -21,7 +21,7 @@ public final class TarPathIT extends TarPathITSuite<TarDriver> {
     protected TarDriver newArchiveDriver() {
         return new TarDriver() {
             @Override
-            public IOPool<?> getIoPool() {
+            public IoPool<?> getIoPool() {
                 return getTestConfig().getIoPoolProvider().getIoPool();
             }
         };

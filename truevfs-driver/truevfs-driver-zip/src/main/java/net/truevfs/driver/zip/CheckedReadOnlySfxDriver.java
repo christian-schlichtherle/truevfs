@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.zip;
 
-import net.truevfs.kernel.cio.IOPoolProvider;
+import net.truevfs.kernel.cio.IoPoolProvider;
 import javax.annotation.concurrent.Immutable;
 
 /**

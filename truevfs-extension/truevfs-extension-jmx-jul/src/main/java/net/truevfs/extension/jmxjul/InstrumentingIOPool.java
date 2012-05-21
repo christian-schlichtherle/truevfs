@@ -14,33 +14,33 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public class InstrumentingIOPool<B extends IOBuffer<B>> implements IOPool<B> {
+public class InstrumentingIOPool<B extends IoBuffer<B>> implements IoPool<B> {
 
-    protected final IOPool<B> pool;
+    protected final IoPool<B> pool;
     protected final InstrumentingDirector<?> director;
 
-    public InstrumentingIOPool( final IOPool<B> pool,
+    public InstrumentingIOPool( final IoPool<B> pool,
                                 final InstrumentingDirector<?> director) {
         this.pool = Objects.requireNonNull(pool);
         this.director = Objects.requireNonNull(director);
     }
 
     @Override
-    public IOBuffer<B> allocate() throws IOException {
+    public IoBuffer<B> allocate() throws IOException {
         return new InstrumentingBuffer(pool.allocate());
     }
 
     @Override
-    public void release(IOBuffer<B> resource) throws IOException {
+    public void release(IoBuffer<B> resource) throws IOException {
         resource.release();
     }
 
     @SuppressWarnings("PublicInnerClass")
     public class InstrumentingBuffer
-    extends DecoratingEntry<IOBuffer<B>>
-    implements IOBuffer<B> {
+    extends DecoratingEntry<IoBuffer<B>>
+    implements IoBuffer<B> {
 
-        protected InstrumentingBuffer(IOBuffer<B> buffer) {
+        protected InstrumentingBuffer(IoBuffer<B> buffer) {
             super(buffer);
         }
 

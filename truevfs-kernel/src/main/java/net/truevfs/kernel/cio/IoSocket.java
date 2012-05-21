@@ -46,7 +46,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public interface IOSocket<LT extends Entry, PT extends Entry> {
+public interface IoSocket<LT extends Entry, PT extends Entry> {
 
     /**
      * Resolves the <i>local target</i> for I/O operations.

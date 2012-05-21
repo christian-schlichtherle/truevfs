@@ -10,7 +10,7 @@ package net.truevfs.kernel.cio;
  * @param  <E> the type of this I/O entry.
  * @author Christian Schlichtherle
  */
-public interface IOEntry<E extends IOEntry<E>> extends Entry {
+public interface IoEntry<E extends IoEntry<E>> extends Entry {
 
     /**
      * Returns an input socket for reading this entry.

@@ -23,8 +23,8 @@ package object se {
   type AnyController = FsController[_ <: FsModel]
   type AnyInputSocket = InputSocket[_ <: Entry]
   type AnyOutputSocket = OutputSocket[_ <: Entry]
-  type AnyIoPool = IOPool[_ <: IOBuffer[_]]
-  type AnyIoBuffer = IOBuffer[_ <: IOBuffer[_]]
+  type AnyIoPool = IoPool[_ <: IoBuffer[_]]
+  type AnyIoBuffer = IoBuffer[_ <: IoBuffer[_]]
 
   // Used for looping through BitField, Container etc.
   private[se] implicit def asScalaIterable[E](i: jl.Iterable[E]): Iterable[E] = {

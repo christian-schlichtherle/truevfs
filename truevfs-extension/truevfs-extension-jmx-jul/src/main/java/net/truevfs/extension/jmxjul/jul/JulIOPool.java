@@ -5,8 +5,8 @@
 package net.truevfs.extension.jmxjul.jul;
 
 import net.truevfs.extension.jmxjul.InstrumentingIOPool;
-import net.truevfs.kernel.cio.IOBuffer;
-import net.truevfs.kernel.cio.IOPool;
+import net.truevfs.kernel.cio.IoBuffer;
+import net.truevfs.kernel.cio.IoPool;
 import java.io.IOException;
 import static java.util.logging.Level.FINE;
 import java.util.logging.Logger;
@@ -16,23 +16,23 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class JulIOPool<B extends IOBuffer<B>>
+final class JulIOPool<B extends IoBuffer<B>>
 extends InstrumentingIOPool<B> {
 
     private static final Logger
             logger = Logger.getLogger(JulIOPool.class.getName());
 
-    JulIOPool(IOPool<B> model, JulDirector director) {
+    JulIOPool(IoPool<B> model, JulDirector director) {
         super(model, director);
     }
 
     @Override
-    public IOBuffer<B> allocate() throws IOException {
+    public IoBuffer<B> allocate() throws IOException {
         return new JulBuffer(pool.allocate());
     }
 
     private final class JulBuffer extends InstrumentingBuffer {
-        JulBuffer(IOBuffer<B> model) {
+        JulBuffer(IoBuffer<B> model) {
             super(model);
             logger.log(FINE, "Allocated " + entry, new NeverThrowable());
         }
