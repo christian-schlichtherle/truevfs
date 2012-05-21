@@ -24,7 +24,7 @@ import javax.annotation.CheckForNull;
  * @author Christian Schlichtherle
  */
 public interface InputSocket<E extends Entry>
-extends IOSocket<E, Entry>, Source {
+extends IoSocket<E, Entry>, Source {
 
     /**
      * {@inheritDoc}

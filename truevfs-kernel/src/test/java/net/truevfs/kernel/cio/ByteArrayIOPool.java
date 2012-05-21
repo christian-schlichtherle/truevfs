@@ -15,7 +15,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author  Christian Schlichtherle
  */
 @ThreadSafe
-public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
+public final class ByteArrayIOPool implements IoPool<ByteArrayIOBuffer> {
 
     private static final String BUFFER_NAME = "buffer-";
 
@@ -36,14 +36,14 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
     }
 
     @Override
-    public IOBuffer<ByteArrayIOBuffer> allocate() {
+    public IoBuffer<ByteArrayIOBuffer> allocate() {
         ByteBuffer entry = new ByteBuffer(total.getAndIncrement());
         active.getAndIncrement();
         return entry;
     }
 
     @Override
-    public void release(IOBuffer<ByteArrayIOBuffer> entry) throws IOException {
+    public void release(IoBuffer<ByteArrayIOBuffer> entry) throws IOException {
         entry.release();
     }
 
@@ -61,7 +61,7 @@ public final class ByteArrayIOPool implements IOPool<ByteArrayIOBuffer> {
     @NotThreadSafe
     private final class ByteBuffer
     extends ByteArrayIOBuffer
-    implements net.truevfs.kernel.cio.IOBuffer<ByteArrayIOBuffer> {
+    implements net.truevfs.kernel.cio.IoBuffer<ByteArrayIOBuffer> {
         private boolean released;
 
         ByteBuffer(int i) {

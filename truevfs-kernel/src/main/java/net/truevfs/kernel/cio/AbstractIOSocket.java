@@ -19,7 +19,7 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public abstract class AbstractIOSocket<LT extends Entry, PT extends Entry>
-implements IOSocket<LT, PT> {
+implements IoSocket<LT, PT> {
 
     /**
      * Two I/O socket are considered equal if and only if

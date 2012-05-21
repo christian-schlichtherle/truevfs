@@ -32,7 +32,7 @@ public class MockController extends FsAbstractController<FsModel> {
 
     private final @Nullable FsController<?> parent;
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final ConcurrentMap<FsEntryName, IOEntry<?>>
+    private final ConcurrentMap<FsEntryName, IoEntry<?>>
             map = new ConcurrentHashMap<>();
     private final TestConfig config;
     private volatile @CheckForNull ThrowManager control;
@@ -143,7 +143,7 @@ public class MockController extends FsAbstractController<FsModel> {
             protected InputSocket<? extends Entry> socket()
             throws IOException {
                 checkAllExceptions(this);
-                final IOEntry<?> buffer = map.get(name);
+                final IoEntry<?> buffer = map.get(name);
                 if (null == buffer)
                     throw new NoSuchFileException(name.toString());
                 return buffer.input();
@@ -183,9 +183,9 @@ public class MockController extends FsAbstractController<FsModel> {
             protected OutputSocket<? extends Entry> socket()
             throws IOException {
                 checkAllExceptions(this);
-                final IOEntry<?> n = new ByteArrayIOBuffer(
+                final IoEntry<?> n = new ByteArrayIOBuffer(
                         name.toString(), config.getDataSize());
-                IOEntry<?> o = map.get(name);
+                IoEntry<?> o = map.get(name);
                 if (null == o)
                     o = map.putIfAbsent(name, n);
                 return (null != o ? o : n).output();

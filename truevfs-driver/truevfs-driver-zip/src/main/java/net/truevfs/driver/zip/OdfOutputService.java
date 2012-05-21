@@ -7,7 +7,7 @@ package net.truevfs.driver.zip;
 import static net.truevfs.driver.zip.io.ZipEntry.STORED;
 import net.truevfs.kernel.cio.DecoratingOutputSocket;
 import static net.truevfs.kernel.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.cio.IOPool;
+import net.truevfs.kernel.cio.IoPool;
 import net.truevfs.kernel.cio.MultiplexingOutputService;
 import net.truevfs.kernel.cio.OutputSocket;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -39,7 +39,7 @@ public class OdfOutputService extends MultiplexingOutputService<ZipDriverEntry> 
      * @param pool the pool for buffering entry data.
      */
     public OdfOutputService(
-            IOPool<?> pool,
+            IoPool<?> pool,
             @WillCloseWhenClosed ZipOutputService output) {
         super(pool, output);
     }

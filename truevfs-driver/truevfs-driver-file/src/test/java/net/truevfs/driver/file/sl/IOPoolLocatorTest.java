@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.file.sl;
 
-import net.truevfs.kernel.sl.IOPoolLocator;
+import net.truevfs.kernel.sl.IoPoolLocator;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 
@@ -14,6 +14,6 @@ import org.junit.Test;
 public final class IOPoolLocatorTest {
     @Test
     public void testIsLocatable() {
-        assertNotNull(IOPoolLocator.SINGLETON.getIoPool());
+        assertNotNull(IoPoolLocator.SINGLETON.getIoPool());
     }
 }

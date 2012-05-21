@@ -33,7 +33,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class ByteArrayIOBuffer implements IOBuffer<ByteArrayIOBuffer> {
+public class ByteArrayIOBuffer implements IoBuffer<ByteArrayIOBuffer> {
 
     private final String name;
     private int initialCapacity;

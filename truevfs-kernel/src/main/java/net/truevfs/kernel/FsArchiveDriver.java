@@ -20,7 +20,7 @@ import static net.truevfs.kernel.cio.Entry.Type.DIRECTORY;
 import net.truevfs.kernel.cio.*;
 import net.truevfs.kernel.io.Sink;
 import net.truevfs.kernel.io.Source;
-import net.truevfs.kernel.sl.IOPoolLocator;
+import net.truevfs.kernel.sl.IoPoolLocator;
 import net.truevfs.kernel.util.BitField;
 import static net.truevfs.kernel.util.Paths.cutTrailingSeparators;
 
@@ -94,12 +94,12 @@ extends FsDriver {
      * object.
      * <p>
      * The implementation in the class {@link FsArchiveDriver} calls the
-     * equally named method on the {@link IOPoolLocator#SINGLETON}.
+     * equally named method on the {@link IoPoolLocator#SINGLETON}.
      *
      * @return The pool to use for allocating temporary I/O buffers.
      */
-    public IOPool<? extends IOBuffer<?>> getIoPool() {
-        return IOPoolLocator.SINGLETON.getIoPool();
+    public IoPool<? extends IoBuffer<?>> getIoPool() {
+        return IoPoolLocator.SINGLETON.getIoPool();
     }
 
     /**

@@ -24,7 +24,7 @@ public final class JulDirector extends InstrumentingDirector<JulDirector> {
     private JulDirector() { }
 
     @Override
-    public <B extends IOBuffer<B>> IOPool<B> instrument(IOPool<B> pool) {
+    public <B extends IoBuffer<B>> IoPool<B> instrument(IoPool<B> pool) {
         return new JulIOPool<>(pool, this);
     }
 

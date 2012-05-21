@@ -52,7 +52,7 @@ final class CacheEntry
 implements Entry, Flushable, Releasable<IOException>, Closeable {
 
     private final Strategy strategy;
-    private final IOPool<?> pool;
+    private final IoPool<?> pool;
     private @Nullable InputSocket<?> input;
     private @Nullable OutputSocket<?> output;
     private @CheckForNull InputBufferPool inputBufferPool;
@@ -73,7 +73,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
      */
     private CacheEntry(
             final Strategy strategy,
-            final IOPool<?> pool) {
+            final IoPool<?> pool) {
         assert null != strategy;
         this.strategy = strategy;
         this.pool = Objects.requireNonNull(pool);
@@ -311,7 +311,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
          * @return A new cache.
          */
         @CreatesObligation
-        public CacheEntry newCacheEntry(IOPool<?> pool) {
+        public CacheEntry newCacheEntry(IoPool<?> pool) {
             return new CacheEntry(this, pool);
         }
 
@@ -410,8 +410,8 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
     } // WriteBackOutputBufferPool
 
     /** An I/O buffer with the cached contents. */
-    private final class Buffer implements IOBuffer<Buffer> {
-        final IOBuffer<?> data;
+    private final class Buffer implements IoBuffer<Buffer> {
+        final IoBuffer<?> data;
 
         int readers, writers; // max one writer!
 
@@ -440,11 +440,11 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
         }
 
         void load(InputSocket<?> input) throws IOException {
-            IOSockets.copy(input, data.output());
+            IoSockets.copy(input, data.output());
         }
 
         void save(OutputSocket<?> output) throws IOException {
-            IOSockets.copy(data.input(), output);
+            IoSockets.copy(data.input(), output);
         }
 
         @Override
@@ -579,5 +579,5 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
             }
             return new Output();
         }
-    } // IOBuffer
+    } // IoBuffer
 }

@@ -5,7 +5,7 @@
 package net.truevfs.driver.zip;
 
 import net.truevfs.kernel.FsArchiveDriverTestSuite;
-import net.truevfs.kernel.cio.IOPool;
+import net.truevfs.kernel.cio.IoPool;
 
 /**
  * @author Christian Schlichtherle
@@ -17,7 +17,7 @@ extends FsArchiveDriverTestSuite<ZipDriverEntry, CheckedOdfDriver> {
     protected CheckedOdfDriver newArchiveDriver() {
         return new CheckedOdfDriver() {
             @Override
-            public IOPool<?> getIoPool() {
+            public IoPool<?> getIoPool() {
                 return getTestConfig().getIoPoolProvider().getIoPool();
             }
         };

@@ -7,8 +7,8 @@ package net.truevfs.kernel.mock;
 import net.truevfs.kernel.FsArchiveEntries;
 import net.truevfs.kernel.FsArchiveEntry;
 import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.IOBuffer;
-import net.truevfs.kernel.cio.IOPool;
+import net.truevfs.kernel.cio.IoBuffer;
+import net.truevfs.kernel.cio.IoPool;
 import java.io.IOException;
 import java.util.EnumMap;
 import javax.annotation.CheckForNull;
@@ -26,7 +26,7 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
             times = new EnumMap<>(Access.class);
     private final Boolean[][] permissions
             = new Boolean[Access.values().length][PosixEntity.values().length];
-    private @CheckForNull IOBuffer<?> buffer;
+    private @CheckForNull IoBuffer<?> buffer;
 
     public MockArchiveDriverEntry(final String name, final Type type) {
         assert null != name;
@@ -57,8 +57,8 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
         }
     }
 
-    IOBuffer<?> getBuffer(final IOPool<?> ioPool) throws IOException {
-        final IOBuffer<?> buffer = this.buffer;
+    IoBuffer<?> getBuffer(final IoPool<?> ioPool) throws IOException {
+        final IoBuffer<?> buffer = this.buffer;
         return null != buffer ? buffer : (this.buffer = ioPool.allocate());
     }
 

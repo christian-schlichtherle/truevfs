@@ -8,7 +8,7 @@ import net.truevfs.kernel.FsAccessOption;
 import static net.truevfs.kernel.FsAccessOption.CREATE_PARENTS;
 import net.truevfs.kernel.FsPath;
 import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.IOSockets;
+import net.truevfs.kernel.cio.IoSockets;
 import net.truevfs.kernel.cio.InputSocket;
 import net.truevfs.kernel.cio.OutputSocket;
 import net.truevfs.kernel.util.BitField;
@@ -216,7 +216,7 @@ final class TBIO {
         final InputSocket<?> input = input(preferences, src);
         final OutputSocket<?> output = output(preferences, dst,
                 preserve ? input.localTarget() : null);
-        IOSockets.copy(input, output);
+        IoSockets.copy(input, output);
     }
 
     /**

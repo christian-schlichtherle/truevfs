@@ -13,6 +13,6 @@ import net.truevfs.kernel.util.Releasable;
  * @param  <B> the type of this I/O buffer.
  * @author Christian Schlichtherle
  */
-public interface IOBuffer<B extends IOBuffer<B>>
-extends Releasable<IOException>, IOEntry<B> {
+public interface IoBuffer<B extends IoBuffer<B>>
+extends Releasable<IOException>, IoEntry<B> {
 }

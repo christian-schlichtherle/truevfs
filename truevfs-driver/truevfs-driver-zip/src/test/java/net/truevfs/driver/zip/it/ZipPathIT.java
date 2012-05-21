@@ -6,7 +6,7 @@ package net.truevfs.driver.zip.it;
 
 import net.truevfs.access.TPathITSuite;
 import net.truevfs.driver.zip.ZipDriver;
-import net.truevfs.kernel.cio.IOPool;
+import net.truevfs.kernel.cio.IoPool;
 
 /**
  * @author  Christian Schlichtherle
@@ -22,7 +22,7 @@ public final class ZipPathIT extends TPathITSuite<ZipDriver> {
     protected ZipDriver newArchiveDriver() {
         return new ZipDriver() {
             @Override
-            public IOPool<?> getIoPool() {
+            public IoPool<?> getIoPool() {
                 return getTestConfig().getIoPoolProvider().getIoPool();
             }
         };

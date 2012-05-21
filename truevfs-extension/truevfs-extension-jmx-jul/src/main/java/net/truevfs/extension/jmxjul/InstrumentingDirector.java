@@ -22,7 +22,7 @@ public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> 
         return new InstrumentingManager(manager, this);
     }
 
-    public abstract <B extends IOBuffer<B>> IOPool<B> instrument(IOPool<B> pool);
+    public abstract <B extends IoBuffer<B>> IoPool<B> instrument(IoPool<B> pool);
 
     protected FsCompositeDriver instrument(
             FsCompositeDriver driver,
@@ -44,7 +44,7 @@ public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> 
             FsController<? extends FsModel> controller,
             InstrumentingCompositeDriver context);
 
-    protected <B extends IOBuffer<B>> InputSocket<B> instrument(
+    protected <B extends IoBuffer<B>> InputSocket<B> instrument(
             InputSocket<B> input,
             InstrumentingIOPool<B>.InstrumentingBuffer context) {
         return instrument(input);
@@ -61,7 +61,7 @@ public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> 
         return input; //new InstrumentingInputSocket<E>(input, this);
     }
 
-    protected <B extends IOBuffer<B>> OutputSocket<B> instrument(
+    protected <B extends IoBuffer<B>> OutputSocket<B> instrument(
             OutputSocket<B> output,
             InstrumentingIOPool<B>.InstrumentingBuffer context) {
         return instrument(output);

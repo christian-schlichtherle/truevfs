@@ -6,7 +6,7 @@ package net.truevfs.driver.http;
 
 import net.truevfs.kernel.FsAccessOption;
 import net.truevfs.kernel.cio.AbstractInputSocket;
-import net.truevfs.kernel.cio.IOBuffer;
+import net.truevfs.kernel.cio.IoBuffer;
 import net.truevfs.kernel.io.AbstractSource;
 import net.truevfs.kernel.io.DecoratingReadOnlyChannel;
 import net.truevfs.kernel.io.Streams;
@@ -54,7 +54,7 @@ public class HttpInputSocket extends AbstractInputSocket<HttpEntry> {
             }
         } // Source
 
-        final IOBuffer<?> temp = entry.getPool().allocate();
+        final IoBuffer<?> temp = entry.getPool().allocate();
         try {
             Streams.copy(new Source(), temp.output());
         } catch (final Throwable ex) {
@@ -71,7 +71,7 @@ public class HttpInputSocket extends AbstractInputSocket<HttpEntry> {
 
             @CreatesObligation
             TempReadOnlyChannel() throws IOException {
-                super(temp.input().channel()); // bind(*) is considered redundant for IOPool.IOBuffer
+                super(temp.input().channel()); // bind(*) is considered redundant for IOPool.IoBuffer
             }
 
             @Override

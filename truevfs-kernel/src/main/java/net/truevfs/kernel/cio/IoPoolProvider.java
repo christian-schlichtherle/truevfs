@@ -9,7 +9,7 @@ package net.truevfs.kernel.cio;
  *
  * @author Christian Schlichtherle
  */
-public interface IOPoolProvider {
+public interface IoPoolProvider {
 
     /**
      * Returns the pool to use for allocating temporary I/O buffers.
@@ -19,5 +19,5 @@ public interface IOPoolProvider {
      *
      * @return The pool to use for allocating temporary I/O buffers.
      */
-    IOPool<? extends IOBuffer<?>> getIoPool();
+    IoPool<? extends IoBuffer<?>> getIoPool();
 }

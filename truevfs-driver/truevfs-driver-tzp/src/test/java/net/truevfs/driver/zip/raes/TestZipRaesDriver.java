@@ -5,8 +5,8 @@
 package net.truevfs.driver.zip.raes;
 
 import net.truevfs.driver.zip.TestKeyManagerProvider;
-import net.truevfs.kernel.cio.IOPool;
-import net.truevfs.kernel.cio.IOPoolProvider;
+import net.truevfs.kernel.cio.IoPool;
+import net.truevfs.kernel.cio.IoPoolProvider;
 import net.truevfs.key.MockView;
 import net.truevfs.key.param.AesPbeParameters;
 
@@ -15,16 +15,16 @@ import net.truevfs.key.param.AesPbeParameters;
  */
 public class TestZipRaesDriver extends SafeZipRaesDriver {
 
-    private final IOPoolProvider ioPoolProvider;
+    private final IoPoolProvider ioPoolProvider;
     private final TestKeyManagerProvider service;
 
-    public TestZipRaesDriver(final IOPoolProvider ioPoolProvider) {
+    public TestZipRaesDriver(final IoPoolProvider ioPoolProvider) {
         this.ioPoolProvider = ioPoolProvider;
         this.service = new TestKeyManagerProvider();
     }
 
     @Override
-    public IOPool<?> getIoPool() {
+    public IoPool<?> getIoPool() {
         return ioPoolProvider.getIoPool();
     }
     

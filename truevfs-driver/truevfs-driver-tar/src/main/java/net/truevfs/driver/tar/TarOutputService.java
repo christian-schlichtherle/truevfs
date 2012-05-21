@@ -78,7 +78,7 @@ implements OutputService<TarDriverEntry> {
         }
     }
 
-    private IOPool<?> getIOPool() {
+    private IoPool<?> getIOPool() {
         return driver.getIoPool();
     }
 
@@ -212,7 +212,7 @@ implements OutputService<TarDriverEntry> {
     @CleanupObligation
     private final class BufferedEntryOutputStream
     extends DecoratingOutputStream {
-        final IOBuffer<?> buffer;
+        final IoBuffer<?> buffer;
         final TarDriverEntry local;
         boolean closed;
 
@@ -220,7 +220,7 @@ implements OutputService<TarDriverEntry> {
         BufferedEntryOutputStream(final TarDriverEntry local)
         throws IOException {
             this.local = local;
-            final IOBuffer<?> buffer = this.buffer = getIOPool().allocate();
+            final IoBuffer<?> buffer = this.buffer = getIOPool().allocate();
             try {
                 this.out = buffer.output().stream();
             } catch (final Throwable ex) {
@@ -248,7 +248,7 @@ implements OutputService<TarDriverEntry> {
         }
 
         void storeBuffer() throws IOException {
-            final IOBuffer<?> buffer = this.buffer;
+            final IoBuffer<?> buffer = this.buffer;
             try (final InputStream in = buffer.input().stream()) {
                 final TarArchiveOutputStream taos = TarOutputService.this.tos;
                 taos.putArchiveEntry(local);

@@ -10,7 +10,7 @@ import net.truevfs.kernel.cio.Entry.Access;
 import static net.truevfs.kernel.cio.Entry.Access.READ;
 import net.truevfs.kernel.cio.Entry.Type;
 import static net.truevfs.kernel.cio.Entry.Type.FILE;
-import net.truevfs.kernel.cio.IOPool;
+import net.truevfs.kernel.cio.IoPool;
 import net.truevfs.kernel.cio.InputSocket;
 import net.truevfs.kernel.cio.OutputSocket;
 import net.truevfs.kernel.util.BitField;
@@ -39,7 +39,7 @@ public class HttpController extends FsAbstractController<FsModel>  {
         this.driver = driver;
     }
 
-    final IOPool<?> getPool() {
+    final IoPool<?> getPool() {
         return driver.getPool();
     }
 

@@ -6,7 +6,7 @@ package net.truevfs.kernel.spi;
 
 import net.truevfs.kernel.cio.ByteArrayIOBuffer;
 import net.truevfs.kernel.cio.ByteArrayIOPool;
-import net.truevfs.kernel.cio.IOPool;
+import net.truevfs.kernel.cio.IoPool;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -15,7 +15,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class ByteArrayIOPoolService extends IOPoolService {
+public final class ByteArrayIOPoolService extends IoPoolService {
 
     // Don't make this static. Having multiple instances is good for debugging
     // the allocation and release of resources in a more isolated context.
@@ -39,7 +39,7 @@ public final class ByteArrayIOPoolService extends IOPoolService {
     }
 
     @Override
-    public IOPool<?> getIoPool() {
+    public IoPool<?> getIoPool() {
         return pool;
     }
 }
