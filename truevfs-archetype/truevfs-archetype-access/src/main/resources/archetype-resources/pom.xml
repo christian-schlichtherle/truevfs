@@ -128,11 +128,12 @@
             <!--scope>runtime</scope-->
         </dependency>
 
-        <dependency>
+        <!-- Already added by the TrueZIP Kernel. -->
+        <!--dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>${scala.version}</version>
-        </dependency>
+        </dependency-->
 
         <!-- This is only required for the Scala compiler.
              If you are not using Scala in your project, then you can remove
