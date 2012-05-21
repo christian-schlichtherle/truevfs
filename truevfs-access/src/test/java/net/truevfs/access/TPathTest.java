@@ -4,7 +4,6 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.access.TPath;
 import net.truevfs.access.MockArchiveDriverTestBase;
 import net.truevfs.access.TArchiveDetector;
 import net.truevfs.access.TConfig;

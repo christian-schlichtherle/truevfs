@@ -8,7 +8,6 @@ import net.truevfs.access.MockArchiveDriverTestBase;
 import net.truevfs.access.TConfig;
 import net.truevfs.kernel.FsMountPoint;
 import net.truevfs.kernel.FsPath;
-import net.truevfs.access.TPathScanner;
 import static net.truevfs.access.TPathScanner.parent;
 import static java.io.File.separatorChar;
 import java.net.URI;

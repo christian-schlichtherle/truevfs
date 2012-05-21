@@ -4,7 +4,6 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.access.TPath;
 import net.truevfs.access.ConfiguredClientTestBase;
 import net.truevfs.access.TConfig;
 import net.truevfs.access.TFileITSuite;

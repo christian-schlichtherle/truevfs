@@ -4,12 +4,12 @@
  */
 package net.truevfs.access;
 
-import static net.truevfs.kernel.FsAccessOption.APPEND;
-import net.truevfs.kernel.cio.OutputSocket;
-import net.truevfs.kernel.io.DecoratingOutputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;
+import static net.truevfs.kernel.FsAccessOption.APPEND;
+import net.truevfs.kernel.cio.OutputSocket;
+import net.truevfs.kernel.io.DecoratingOutputStream;
 
 /**
  * A replacement for the class {@link FileOutputStream} for writing plain old

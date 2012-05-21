@@ -18,7 +18,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class AbstractIOSocket<LT extends Entry, PT extends Entry>
+public abstract class AbstractIoSocket<LT extends Entry, PT extends Entry>
 implements IoSocket<LT, PT> {
 
     /**

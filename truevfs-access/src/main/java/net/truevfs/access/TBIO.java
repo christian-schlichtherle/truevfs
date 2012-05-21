@@ -4,20 +4,20 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.kernel.FsAccessOption;
-import static net.truevfs.kernel.FsAccessOption.CREATE_PARENTS;
-import net.truevfs.kernel.FsPath;
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.IoSockets;
-import net.truevfs.kernel.cio.InputSocket;
-import net.truevfs.kernel.cio.OutputSocket;
-import net.truevfs.kernel.util.BitField;
-import net.truevfs.kernel.util.Paths;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.FsAccessOption;
+import static net.truevfs.kernel.FsAccessOption.CREATE_PARENTS;
+import net.truevfs.kernel.FsPath;
+import net.truevfs.kernel.cio.Entry;
+import net.truevfs.kernel.cio.InputSocket;
+import net.truevfs.kernel.cio.IoSockets;
+import net.truevfs.kernel.cio.OutputSocket;
+import net.truevfs.kernel.util.BitField;
+import net.truevfs.kernel.util.Paths;
 
 /**
  * Provides fast bulk I/O operations for {@link File}s and {@link TFile}s.

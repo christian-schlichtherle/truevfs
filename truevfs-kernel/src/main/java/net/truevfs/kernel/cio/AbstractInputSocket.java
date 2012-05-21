@@ -21,7 +21,7 @@ import net.truevfs.kernel.io.ChannelInputStream;
  */
 @NotThreadSafe
 public abstract class AbstractInputSocket<E extends Entry>
-extends AbstractIOSocket<E, Entry>
+extends AbstractIoSocket<E, Entry>
 implements InputSocket<E> {
 
     private @CheckForNull OutputSocket<?> peer;

@@ -27,13 +27,13 @@ import javax.annotation.concurrent.NotThreadSafe;
  * The reference gets updated upon each call to {@code close()} on any
  * {@link OutputStream} or {@link SeekableByteChannel}.
  * It can also get explicitly set by calling the constructor
- * {@link #ByteArrayIOBuffer(String, byte[])} or the method
+ * {@link #ByteArrayIoBuffer(String, byte[])} or the method
  * {@link #setData(byte[])}.
  * 
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class ByteArrayIOBuffer implements IoBuffer<ByteArrayIOBuffer> {
+public class ByteArrayIoBuffer implements IoBuffer<ByteArrayIoBuffer> {
 
     private final String name;
     private int initialCapacity;
@@ -51,7 +51,7 @@ public class ByteArrayIOBuffer implements IoBuffer<ByteArrayIOBuffer> {
      * @param initialCapacity the initial capacity of the next backing array
      *        to allocate when starting output to this I/O buffer.
      */
-    public ByteArrayIOBuffer(String name, int initialCapacity) {
+    public ByteArrayIoBuffer(String name, int initialCapacity) {
         this(name, null, initialCapacity);
     }
 
@@ -65,11 +65,11 @@ public class ByteArrayIOBuffer implements IoBuffer<ByteArrayIOBuffer> {
      * @param name the name of this I/O buffer.
      * @param data the backing array.
      */
-    public ByteArrayIOBuffer(String name, byte[] data) {
+    public ByteArrayIoBuffer(String name, byte[] data) {
         this(name, data, data.length);
     }
 
-    private ByteArrayIOBuffer(  final String name,
+    private ByteArrayIoBuffer(  final String name,
                                 final @CheckForNull byte[] data,
                                 final int initialCapacity) {
         this.name = Objects.requireNonNull(name);
@@ -163,12 +163,12 @@ public class ByteArrayIOBuffer implements IoBuffer<ByteArrayIOBuffer> {
     }
 
     @Override
-    public final InputSocket<ByteArrayIOBuffer> input() {
+    public final InputSocket<ByteArrayIoBuffer> input() {
         return new Input();
     }
 
     @Override
-    public final OutputSocket<ByteArrayIOBuffer> output() {
+    public final OutputSocket<ByteArrayIoBuffer> output() {
         return new Output();
     }
 
@@ -187,10 +187,10 @@ public class ByteArrayIOBuffer implements IoBuffer<ByteArrayIOBuffer> {
     public void release() throws IOException {
     }
 
-    private final class Input extends AbstractInputSocket<ByteArrayIOBuffer> {
+    private final class Input extends AbstractInputSocket<ByteArrayIoBuffer> {
         @Override
-        public ByteArrayIOBuffer localTarget() throws IOException {
-            return ByteArrayIOBuffer.this;
+        public ByteArrayIoBuffer localTarget() throws IOException {
+            return ByteArrayIoBuffer.this;
         }
 
         void count() throws FileNotFoundException {
@@ -212,10 +212,10 @@ public class ByteArrayIOBuffer implements IoBuffer<ByteArrayIOBuffer> {
         }
     } // Input
 
-    private final class Output extends AbstractOutputSocket<ByteArrayIOBuffer> {
+    private final class Output extends AbstractOutputSocket<ByteArrayIoBuffer> {
         @Override
-        public ByteArrayIOBuffer localTarget() throws IOException {
-            return ByteArrayIOBuffer.this;
+        public ByteArrayIoBuffer localTarget() throws IOException {
+            return ByteArrayIoBuffer.this;
         }
 
         void count() {

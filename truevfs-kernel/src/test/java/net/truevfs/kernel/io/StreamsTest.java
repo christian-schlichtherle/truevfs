@@ -6,7 +6,7 @@ package net.truevfs.kernel.io;
 
 import net.truevfs.kernel.TestConfig;
 import net.truevfs.kernel.ThrowManager;
-import net.truevfs.kernel.cio.ByteArrayIOBuffer;
+import net.truevfs.kernel.cio.ByteArrayIoBuffer;
 import static net.truevfs.kernel.util.Throwables.contains;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +32,7 @@ public class StreamsTest {
             BUFFER_SIZE = 2 * Streams.FIFO_SIZE * Streams.BUFFER_SIZE;
     private static final Random rnd = new Random();
 
-    private ByteArrayIOBuffer buffer;
+    private ByteArrayIoBuffer buffer;
 
     @Before
     public void setUp() {
@@ -45,18 +45,18 @@ public class StreamsTest {
         TestConfig.pop();
     }
 
-    private static ByteArrayIOBuffer newByteArrayIOBuffer() {
+    private static ByteArrayIoBuffer newByteArrayIOBuffer() {
         final byte[] data = new byte[BUFFER_SIZE];
         rnd.nextBytes(data);
-        return new ByteArrayIOBuffer("test", data);
+        return new ByteArrayIoBuffer("test", data);
     }
 
-    private static TestInputStream newTestInputStream(ByteArrayIOBuffer buffer)
+    private static TestInputStream newTestInputStream(ByteArrayIoBuffer buffer)
     throws IOException {
         return new TestInputStream(buffer.input().stream());
     }
 
-    private static TestOutputStream newTestOutputStream(ByteArrayIOBuffer buffer)
+    private static TestOutputStream newTestOutputStream(ByteArrayIoBuffer buffer)
     throws IOException {
         return new TestOutputStream(buffer.output().stream());
     }
@@ -135,7 +135,7 @@ public class StreamsTest {
         assertCopy(buffer);
     }
 
-    private void assertCopy(final ByteArrayIOBuffer buffer)
+    private void assertCopy(final ByteArrayIoBuffer buffer)
     throws IOException {
         final byte[] data = buffer.getData();
         final TestInputStream in = newTestInputStream(buffer);
@@ -178,7 +178,7 @@ public class StreamsTest {
     private static abstract class CatTest {
         final byte[] data = new byte[BUFFER_SIZE];
         { rnd.nextBytes(data); }
-        final ByteArrayIOBuffer buffer = new ByteArrayIOBuffer("test", data);
+        final ByteArrayIoBuffer buffer = new ByteArrayIoBuffer("test", data);
 
         void run() throws IOException {
             try (   final TestInputStream in = newTestInputStream(buffer);

@@ -4,8 +4,6 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.access.TFile;
-import net.truevfs.access.TFileOutputStream;
 import net.truevfs.access.TVFS;
 import net.truevfs.kernel.FsArchiveDriver;
 import static net.truevfs.kernel.FsSyncOptions.SYNC;
