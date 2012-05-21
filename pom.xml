@@ -50,33 +50,33 @@ system space.
     <mailingLists>
         <mailingList>
             <name>Announce Mailing List</name>
-            <subscribe>mailto:sympa@truevfs.java.net?subject=subscribe%20announce</subscribe>
-            <unsubscribe>mailto:sympa@truevfs.java.net?subject=unsubscribe%20announce</unsubscribe>
-            <archive>http://java.net/projects/truevfs/lists/announce/archive</archive>
+            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20announce</subscribe>
+            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20announce</unsubscribe>
+            <archive>http://java.net/projects/truezip/lists/announce/archive</archive>
         </mailingList>
         <mailingList>
             <name>Users Mailing List</name>
-            <subscribe>mailto:sympa@truevfs.java.net?subject=subscribe%20users</subscribe>
-            <unsubscribe>mailto:sympa@truevfs.java.net?subject=unsubscribe%20users</unsubscribe>
-            <post>users@truevfs.java.net</post>
-            <archive>http://java.net/projects/truevfs/lists/users/archive</archive>
+            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20users</subscribe>
+            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20users</unsubscribe>
+            <post>users@truezip.java.net</post>
+            <archive>http://java.net/projects/truezip/lists/users/archive</archive>
         </mailingList>
         <mailingList>
             <name>Developers Mailing List</name>
-            <subscribe>mailto:sympa@truevfs.java.net?subject=subscribe%20dev</subscribe>
-            <unsubscribe>mailto:sympa@truevfs.java.net?subject=unsubscribe%20dev</unsubscribe>
-            <post>dev@truevfs.java.net</post>
-            <archive>http://java.net/projects/truevfs/lists/dev/archive</archive>
+            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20dev</subscribe>
+            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20dev</unsubscribe>
+            <post>dev@truezip.java.net</post>
+            <archive>http://java.net/projects/truezip/lists/dev/archive</archive>
         </mailingList>
     </mailingLists>
     <issueManagement>
         <system>JIRA</system>
-        <url>http://java.net/jira/browse/TRUEZIP</url>
+        <url>http://java.net/jira/browse/TRUEVFS</url>
     </issueManagement>
     <scm>
-        <connection>scm:hg:https://hg.java.net/hg/truevfs~v7</connection>
-        <developerConnection>scm:hg:ssh://hg.java.net/truevfs~v7</developerConnection>
-        <url>http://java.net/projects/truevfs/sources/v7/show</url>
+        <connection>scm:hg:https://hg.java.net/hg/truevfs~v1</connection>
+        <developerConnection>scm:hg:ssh://hg.java.net/truevfs~v1</developerConnection>
+        <url>http://java.net/projects/truevfs/sources/v1/show</url>
     </scm>
 
     <properties>
