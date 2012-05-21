@@ -4,8 +4,8 @@
  */
 package net.truevfs.kernel.cio;
 
-import net.truevfs.kernel.util.Releasable;
 import java.io.IOException;
+import net.truevfs.kernel.util.Releasable;
 
 /**
  * A releasable I/O entry.
