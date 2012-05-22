@@ -86,7 +86,7 @@ extends FsController[LockModel] with LockModelController {
   }
 
   private def waitIdle(options: SyncOptions) {
-    // HC SUNT DRACONES!
+    // HC SVNT DRACONES!
     val manager = this.manager
     val local = manager.localResources
     if (0 != local && !options.get(FORCE_CLOSE_IO))

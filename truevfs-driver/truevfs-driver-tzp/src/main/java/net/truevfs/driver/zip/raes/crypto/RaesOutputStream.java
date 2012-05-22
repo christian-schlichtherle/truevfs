@@ -74,7 +74,7 @@ public abstract class RaesOutputStream extends DecoratingOutputStream {
     throws RaesParametersException, IOException {
         RaesParameters p = param;
         while (null != p) {
-            // HC SUNT DRACONES!
+            // HC SVNT DRACONES!
             if (p instanceof Type0RaesParameters) {
                 return new Type0RaesOutputStream((Type0RaesParameters) p,
                         sink);
