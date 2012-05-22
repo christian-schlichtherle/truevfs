@@ -243,7 +243,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     throws IOException {
         while (true) {
             try {
-                // HC SUNT DRACONES!
+                // HC SVNT DRACONES!
                 delegate.unlink(name, options);
                 if (name.isRoot()) {
                     // Make the file system controller chain eligible for GC.

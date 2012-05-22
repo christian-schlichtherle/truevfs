@@ -104,7 +104,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     waitIdle(   final BitField<FsSyncOption> options,
                 final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
-        // HC SUNT DRACONES!
+        // HC SVNT DRACONES!
         final FsResourceManager a = accountant;
         if (null == a)
             return;

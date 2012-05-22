@@ -489,7 +489,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
         final IOOperation<Void> operation = new Unlink();
         if (name.isRoot()) {
-            // HC SUNT DRACONES!
+            // HC SVNT DRACONES!
             final State tryChild = new TryChild();
             try {
                 tryChild.call(operation, ROOT);
@@ -507,7 +507,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     sync(   final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws IOException {
-        // HC SUNT DRACONES!
+        // HC SVNT DRACONES!
         try {
             delegate.sync(options, handler);
         } catch (final FsFalsePositiveException ex) {
