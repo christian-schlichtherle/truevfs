@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truevfs.kernel.se
 
+import ArchiveFileSystem._
 import net.truevfs.kernel._
 import net.truevfs.kernel.FsAccessOption._
 import net.truevfs.kernel.FsAccessOptions._
@@ -32,9 +33,8 @@ private class ArchiveFileSystem[E <: FsArchiveEntry](
   driver: FsArchiveDriver[E],
   master: EntryTable[E])
 extends Iterable[FsCovariantEntry[E]] {
-  import ArchiveFileSystem._
 
-  private val splitter = new PathSplitter
+  private val splitter = new Splitter
 
   /** Whether or not this file system has been modified. */
   private var touched: Boolean = _
@@ -492,13 +492,54 @@ private object ArchiveFileSystem {
 
   private def typeName(tµpe: Type) = tµpe.toString.toLowerCase(Locale.ENGLISH)
 
-  private final class PathSplitter
-  extends net.truevfs.kernel.util.PathSplitter(SEPARATOR_CHAR, false) {
+  /**
+   * The master archive entry table.
+   * 
+   * @param <E> The type of the archive entries.
+   */
+  final class EntryTable[E <: FsArchiveEntry](_initialSize: Int)
+  extends Iterable[FsCovariantEntry[E]] {
+
+    /**
+     * The map of covariant file system entries.
+     * <p>
+     * Note that the archive entries in the covariant file system entries
+     * in this map are shared with the {@link Container} object
+     * provided to the constructor of this class.
+     */
+    private[this] val map = new collection.mutable.LinkedHashMap[String, FsCovariantEntry[E]] {
+      // See https://issues.scala-lang.org/browse/SI-5804 .
+      table = new Array(initialCapacity(_initialSize))
+      threshold = (table.size * 3L / 4).toInt
+    }
+
+    override def size = map.size
+
+    override def iterator = map.values.iterator
+
+    def add(name: String, ae: E) = {
+      val ce = map.get(name) match {
+        case Some(ce) => ce
+        case _ =>
+          val ce = new FsCovariantEntry[E](name)
+          map.put(name, ce)
+          ce
+      }
+      ce.putEntry(ae.getType, ae)
+      ce
+    }
+
+    def get(name: String) = map.get(name)
+
+    def remove(name: String) = map.remove(name)
+  } // EntryTable
+
+  private final class Splitter extends PathSplitter(SEPARATOR_CHAR, false) {
     override def getParentPath = {
       val path = super.getParentPath
       if (null ne path) path else ROOT_PATH
     }
-  }
+  } // Splitter
 
   /** Used to notify implementations of an event in this file system. */
   trait TouchListener {
@@ -512,7 +553,7 @@ private object ArchiveFileSystem {
      * @throws IOException at the discretion of the implementation.
      */
     def preTouch(options: AccessOptions)
-  }
+  } // TouchListener
 
   /**
    * A case class which represents a path segment for use by {@link Mknod}.
@@ -524,45 +565,3 @@ private object ArchiveFileSystem {
     name: Option[String],
     entry: FsCovariantEntry[E])
 } // ArchiveFileSystem
-
-/**
- * The master archive entry table.
- * 
- * @param <E> The type of the archive entries.
- */
-private final class EntryTable[E <: FsArchiveEntry](_initialSize: Int)
-extends Iterable[FsCovariantEntry[E]] {
-
-  /**
-   * The map of covariant file system entries.
-   * <p>
-   * Note that the archive entries in the covariant file system entries
-   * in this map are shared with the {@link Container} object
-   * provided to the constructor of this class.
-   */
-  private[this] val map = new collection.mutable.LinkedHashMap[String, FsCovariantEntry[E]] {
-    // See https://issues.scala-lang.org/browse/SI-5804 .
-    table = new Array(initialCapacity(_initialSize))
-    threshold = (table.size * 3L / 4).toInt
-  }
-
-  override def size = map.size
-
-  override def iterator = map.values.iterator
-
-  def add(name: String, ae: E) = {
-    val ce = map.get(name) match {
-      case Some(ce) => ce
-      case _ =>
-        val ce = new FsCovariantEntry[E](name)
-        map.put(name, ce)
-        ce
-    }
-    ce.putEntry(ae.getType, ae)
-    ce
-  }
-
-  def get(name: String) = map.get(name)
-  
-  def remove(name: String) = map.remove(name)
-} // EntryTable
