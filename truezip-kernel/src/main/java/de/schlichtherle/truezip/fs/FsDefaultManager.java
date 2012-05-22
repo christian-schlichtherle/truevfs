@@ -62,7 +62,7 @@ public final class FsDefaultManager extends FsManager {
         if (null == c) {
             final FsController<?> p = getController0(mountPoint.getParent(), driver);
             final ScheduledModel m = new ScheduledModel(mountPoint, p.getModel());
-            // HC SUNT DRACONES!
+            // HC SVNT DRACONES!
             m.setController(c =
                     new FsFalsePositiveController(
                         new FsFinalizeController<FsModel>(

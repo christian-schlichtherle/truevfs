@@ -150,7 +150,7 @@ extends FsDriver {
         final FsLockModel lockModel = isLockModel
                 ? (FsLockModel) model
                 : new FsLockModel(model);
-        // HC SUNT DRACONES!
+        // HC SVNT DRACONES!
         return  new FsLockController(
                     new FsSyncController(
                         new FsCacheController(

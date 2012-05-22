@@ -85,7 +85,7 @@ final class FsSyncShutdownHook {
         @Override
         @SuppressWarnings(value = "CallToThreadDumpStack")
         public void run() {
-            // HC SUNT DRACONES!
+            // HC SVNT DRACONES!
             final FsManager manager = this.manager;
             if (manager != null) {
                 this.manager = null; // MUST reset to void calls to cancel()!

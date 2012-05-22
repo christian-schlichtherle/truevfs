@@ -180,7 +180,7 @@ extends FsFileSystemArchiveController<E> {
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
     private void mount0(final boolean autoCreate) throws IOException {
-        // HC SUNT DRACONES!
+        // HC SVNT DRACONES!
         
         // Check parent file system entry.
         final FsEntry pe; // parent entry
@@ -386,7 +386,7 @@ extends FsFileSystemArchiveController<E> {
     void checkSync(   final FsEntryName name,
                         final @CheckForNull Access intention)
     throws FsNeedsSyncException {
-        // HC SUNT DRACONES!
+        // HC SVNT DRACONES!
 
         // If no file system exists, then pass the test.
         final FsArchiveFileSystem<E> fs = getFileSystem();
@@ -591,7 +591,7 @@ extends FsFileSystemArchiveController<E> {
     close(  final BitField<FsSyncOption> options,
             final ExceptionHandler<? super FsSyncException, X> handler)
     throws FsControllerException, X {
-        // HC SUNT DRACONES!
+        // HC SVNT DRACONES!
         final InputArchive<E> ia = inputArchive;
         if (null != ia) {
             try {
