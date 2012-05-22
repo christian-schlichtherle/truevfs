@@ -359,7 +359,7 @@ implements Iterable<E> {
             final ZipEntry entry,
             final boolean process)
     throws ZipException {
-        // HC SUNT DRACONES!
+        // HC SVNT DRACONES!
         OutputMethod processor = new RawOutputMethod(process);
         if (!process) {
             assert UNKNOWN != entry.getCrc();
@@ -853,7 +853,7 @@ implements Iterable<E> {
 
         @Override
         public void init(final ZipEntry entry) throws ZipException {
-            // HC SUNT DRACONES!
+            // HC SVNT DRACONES!
             final WinZipAesEntryParameters entryParam
                     = new WinZipAesEntryParameters(this.generalParam, entry);
             final AesKeyStrength keyStrength = entryParam.getKeyStrength();

@@ -138,7 +138,7 @@ extends FsDecoratingController[FsModel, AnyController](c) {
       }
     }
     if (name.isRoot) {
-      // HC SUNT DRACONES!
+      // HC SVNT DRACONES!
       try {
         TryChild(ROOT, operation)
       } catch {
@@ -152,7 +152,7 @@ extends FsDecoratingController[FsModel, AnyController](c) {
   }
 
   override def sync(options: SyncOptions) {
-    // HC SUNT DRACONES!
+    // HC SVNT DRACONES!
     try {
       controller.sync(options)
     } catch {

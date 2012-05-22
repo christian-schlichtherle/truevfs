@@ -540,7 +540,7 @@ implements Closeable, Iterable<E> {
 
             // Process entry contents.
             if (entry.getGeneralPurposeBitFlag(GPBF_DATA_DESCRIPTOR)) {
-                // HC SUNT DRACONES!
+                // HC SVNT DRACONES!
                 // This is the tough one.
                 // We need to process the entry as if we were unzipping
                 // it because the CRC-32, the compressed size and the

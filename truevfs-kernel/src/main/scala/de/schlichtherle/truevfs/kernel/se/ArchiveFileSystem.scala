@@ -143,7 +143,7 @@ extends Iterable[FsCovariantEntry[E]] {
       case Some(ce) => ce
       case _ => throw new NoSuchFileException(name.toString)
     }
-    // HC SUNT DRACONES!
+    // HC SVNT DRACONES!
     touch(options)
     val ae = ce.getEntry
     var ok = true
@@ -161,7 +161,7 @@ extends Iterable[FsCovariantEntry[E]] {
       case Some(ce) => ce
       case _ => throw new NoSuchFileException(name.toString)
     }
-    // HC SUNT DRACONES!
+    // HC SVNT DRACONES!
     touch(options)
     val ae = ce.getEntry()
     var ok = true

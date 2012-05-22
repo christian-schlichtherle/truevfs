@@ -482,7 +482,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
                         public void close() throws IOException {
                             if (closed)
                                 return;
-                            // HC SUNT DRACONES!
+                            // HC SVNT DRACONES!
                             in.close();
                             getInputBufferPool().release(Buffer.this);
                             closed = true;
@@ -505,7 +505,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
                         public void close() throws IOException {
                             if (closed)
                                 return;
-                            // HC SUNT DRACONES!
+                            // HC SVNT DRACONES!
                             channel.close();
                             getInputBufferPool().release(Buffer.this);
                             closed = true;
@@ -545,7 +545,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
                         public void close() throws IOException {
                             if (closed)
                                 return;
-                            // HC SUNT DRACONES!
+                            // HC SVNT DRACONES!
                             out.close();
                             getOutputBufferPool().release(Buffer.this);
                             closed = true;
@@ -568,7 +568,7 @@ implements Entry, Flushable, Releasable<IOException>, Closeable {
                         public void close() throws IOException {
                             if (closed)
                                 return;
-                            // HC SUNT DRACONES!
+                            // HC SVNT DRACONES!
                             channel.close();
                             getOutputBufferPool().release(Buffer.this);
                             closed = true;

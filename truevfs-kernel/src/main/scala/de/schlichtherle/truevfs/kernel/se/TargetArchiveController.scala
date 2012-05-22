@@ -121,7 +121,7 @@ with TouchListener {
   }
 
   private def mount0(options: AccessOptions, autoCreate: Boolean) {
-    // HC SUNT DRACONES!
+    // HC SVNT DRACONES!
 
     // Check parent file system entry.
     val pe = {
@@ -377,7 +377,7 @@ with TouchListener {
    * @param handler the strategy for assembling sync exceptions.
    */
   private def close(options: SyncOptions, handler: FsSyncExceptionBuilder) {
-    // HC SUNT DRACONES!
+    // HC SVNT DRACONES!
     _inputArchive.foreach { ia =>
       try {
         ia.close()
@@ -410,7 +410,7 @@ with TouchListener {
   }
 
   override def checkSync(options: AccessOptions, name: FsEntryName, intention: Option[Access]) {
-    // HC SUNT DRACONES!
+    // HC SVNT DRACONES!
 
     // If no file system exists, then pass the test.
     val fs = fileSystem match {

@@ -102,7 +102,7 @@ extends FsManager {
   def newController(driver: AnyArchiveDriver, model: FsModel, parent: AnyController) = {
     assert(!model.isInstanceOf[LockModel])
     val lmodel = new LockModel(model)
-    // HC SUNT DRACONES!
+    // HC SVNT DRACONES!
     // The FalsePositiveArchiveController decorates the FrontController
     // so that the decorated controller (chain) does not need to resolve
     // operations on false positive archive files.
@@ -139,7 +139,7 @@ private object ArchiveManager {
   extends FsDecoratingController[FsModel, AnyController](c)
   with FinalizeController
 
-  // HC SUNT DRACONES!
+  // HC SVNT DRACONES!
   // The LockController extends the SyncController so that
   // the extended controller (chain) doesn't need to be thread safe.
   // The SyncController extends the CacheController because the

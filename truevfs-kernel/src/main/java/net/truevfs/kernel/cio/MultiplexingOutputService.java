@@ -227,7 +227,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         @SuppressWarnings("LeakingThisInConstructor")
         BufferedEntryOutputStream(final OutputSocket<? extends E> output)
         throws IOException {
-            // HC SUNT DRACONES!
+            // HC SVNT DRACONES!
             final E local = (this.output = output).localTarget();
             final Entry _peer = output.peerTarget();
             final IoBuffer<?> buffer = this.buffer = pool.allocate();

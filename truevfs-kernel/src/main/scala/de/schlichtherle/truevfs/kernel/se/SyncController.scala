@@ -82,7 +82,7 @@ extends FsController[LockModel] with LockModelController {
 
   abstract override def unlink(options: AccessOptions, name: FsEntryName) =
     apply({
-        // HC SUNT DRACONES!
+        // HC SVNT DRACONES!
         super.unlink(options, name)
         if (name.isRoot) {
           // Make the file system controller chain eligible for GC.
