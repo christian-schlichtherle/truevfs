@@ -25,8 +25,8 @@ class ScalableContainerSpec extends WordSpec with ShouldMatchers {
       "have appropriate properties" in {
         container should have size (0)
         container.iterator.hasNext should be (false)
-        container.entry(path) should be (null)
-        container.entry(parentPath) should be (null)
+        container(path) should be (null)
+        container(parentPath) should be (null)
         container.remove(path) should be (false)
         container.remove(parentPath) should be (false)
       }
@@ -36,30 +36,27 @@ class ScalableContainerSpec extends WordSpec with ShouldMatchers {
       val parentPath = "foo"
       val entry = DummyEntry(path)
       val container = create
-      container.add(path, entry)
+      container(path) = entry
       "have appropriate properties" in {
         container should have size (1)
         val iterator = container.iterator
         iterator.hasNext should be (true)
         iterator.next should be theSameInstanceAs (entry)
         iterator.hasNext should be (false)
-        container.entry(null) should be (null)
-        container.entry(path) should be theSameInstanceAs (entry)
+        container(path) should be theSameInstanceAs (entry)
+        container(parentPath) should be (null)
+        container(null) should be (null)
         container.remove(path) should be (true)
+        container.remove(parentPath) should be (false)
       }
     }
   }
 
   "A scalable container" should always {
-    "report illegal arguments with a RuntimeException" when {
-      "adding an entry" in {
+    "throw a runtime exception" when {
+      "adding a null entry" in {
         intercept[RuntimeException] {
           create.add(null, null)
-        }
-      }
-      "removing an entry" in {
-        intercept[RuntimeException] {
-          create.remove(null)
         }
       }
     }

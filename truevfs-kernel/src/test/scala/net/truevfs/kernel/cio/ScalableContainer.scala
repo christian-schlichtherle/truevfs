@@ -36,7 +36,17 @@ trait ScalableContainer[E >: Null <: Entry] { this: Container[E] =>
     (s getParentPath, s getMemberName)
   }
 
-  def add(path: String, entry: E): Boolean = add0(path, Option(entry)).entry isEmpty
+  def apply(path: String) = entry(path)
+
+  def update(path: String, entry: E) {
+    if (null ne entry) add(path, entry)
+    else remove(path)
+  }
+
+  def add(path: String, entry: E): Boolean = {
+    require(null ne entry)
+    add0(path, new Some(entry)).entry isEmpty
+  }
 
   private def add0(path: String, entry: Option[E]): Node[E] = {
     if (path == rootName) {
