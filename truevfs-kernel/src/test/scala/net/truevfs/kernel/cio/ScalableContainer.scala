@@ -7,9 +7,9 @@ package net.truevfs.kernel.cio
 import ScalableContainer._
 
 /**
- * A mixin for containers which manage their entries in a tree.
- * This saves heap space with deeply nested entry hierarchies where most entry
- * name segments are duplicates.
+ * A mixin for containers which persist their entries in a tree.
+ * This saves heap space with deeply nested entry hierarchies where many
+ * entry name segments are duplicates.
  * <p>
  * This mixin is <em>not</em> thread-safe!
  * 
@@ -77,11 +77,15 @@ trait ScalableContainer[E >: Null <: Entry] { this: Container[E] =>
     } else {
       val (parentPath, memberName) = split(path)
       node(parentPath) flatMap { parentNode =>
-        val memberNode = parentNode(memberName)
-        if (0 != memberNode.map(_ size).getOrElse(0))
-          throw new IllegalStateException("Node not empty!")
-        parentNode(memberName) = None
-        memberNode flatMap (_ entry)
+        parentNode(memberName) flatMap { memberNode =>
+          // HC SVNT DRACONES!
+          if (0 != memberNode.size)
+            throw new IllegalStateException("Node not empty!")
+          parentNode(memberName) = None
+          val oldEntry = memberNode.entry
+          memberNode.entry = None // update _size conditionally
+          oldEntry
+        }
       }
     }
   } isDefined
