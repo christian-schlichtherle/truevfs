@@ -20,15 +20,12 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
   "A scalable container" when {
     "empty" should {
       val path = "foo"
-      val parentPath: String = null
       val container = create
       "have appropriate properties" in {
         container should have size (0)
         container.iterator.hasNext should be (false)
         container(path) should be (None)
-        container(parentPath) should be (None)
         container.remove(path) should be (false)
-        container.remove(parentPath) should be (false)
       }
     }
 
@@ -46,7 +43,6 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
         iterator.hasNext should be (false)
         container(path).get should be theSameInstanceAs (entry)
         container(parentPath) should be (None)
-        container(null) should be (None)
         container.remove(path) should be (true)
         container.remove(parentPath) should be (false)
       }
@@ -55,13 +51,27 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
 
   "A scalable container" should {
     "throw a runtime exception" when {
+      "adding a null path" in {
+        evaluating {
+          create.add(null, DummyEntry(""))
+        } should produce [RuntimeException]
+      }
+
       "adding a null entry" in {
         forAll { path: String =>
-          evaluating {
-            create.add(path, null)
-          } should produce [RuntimeException]
-          (): Unit
+          whenever (null ne path) {
+            evaluating {
+              create.add(path, null)
+            } should produce [RuntimeException]
+            (): Unit
+          }
         }
+      }
+
+      "removing a null path" in {
+        evaluating {
+          create.remove(null)
+        } should produce [RuntimeException]
       }
     }
 
@@ -84,7 +94,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
         (Remove(""), IndexedSeq())
       )
       val container = create
-      forAll(actions) { (action: Action, result: IndexedSeq[String]) =>
+      forAll(actions) { (action, result) =>
         action match {
           case Add(path) => container(path) = Some(DummyEntry(path))
           case Remove(path) => container(path) = None
