@@ -4,9 +4,6 @@
  */
 package net.truevfs.kernel.cio;
 
-import static net.truevfs.kernel.cio.Entry.Access.READ;
-import static net.truevfs.kernel.cio.Entry.Access.WRITE;
-import net.truevfs.kernel.io.ByteBufferChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -17,6 +14,10 @@ import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
+import static net.truevfs.kernel.cio.Entry.Access.READ;
+import static net.truevfs.kernel.cio.Entry.Access.WRITE;
+import static net.truevfs.kernel.cio.Entry.*;
+import net.truevfs.kernel.io.ByteBufferChannel;
 
 /**
  * An I/O buffer which is backed by a byte array.
