@@ -72,14 +72,16 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
       val actions = Table(
         ("action", "result"),
         (Action(), IndexedSeq()),
-        (Add("foo"), IndexedSeq("foo")),
-        (Add("bar"), IndexedSeq("bar", "foo")),
-        (Remove("bar"), IndexedSeq("foo")),
-        (Add("foo/bar"), IndexedSeq("foo", "foo/bar")),
-        (Add("bar/foo"), IndexedSeq("bar/foo", "foo", "foo/bar")),
-        (Remove("foo/bar"), IndexedSeq("bar/foo", "foo")),
-        (Remove("bar/foo"), IndexedSeq("foo")),
-        (Remove("foo"), IndexedSeq())
+        (Add(""), IndexedSeq("")),
+        (Add("foo"), IndexedSeq("", "foo")),
+        (Add("bar"), IndexedSeq("", "bar", "foo")),
+        (Remove("bar"), IndexedSeq("", "foo")),
+        (Add("foo/bar"), IndexedSeq("", "foo", "foo/bar")),
+        (Add("bar/foo"), IndexedSeq("", "bar/foo", "foo", "foo/bar")),
+        (Remove("foo/bar"), IndexedSeq("", "bar/foo", "foo")),
+        (Remove("bar/foo"), IndexedSeq("", "foo")),
+        (Remove("foo"), IndexedSeq("")),
+        (Remove(""), IndexedSeq())
       )
       val container = create
       forAll(actions) { (action: Action, result: IndexedSeq[String]) =>
