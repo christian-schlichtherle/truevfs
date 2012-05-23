@@ -15,7 +15,7 @@ class ScalableContainerSpec
 extends WordSpec with ShouldMatchers with PropertyChecks {
   import ScalableContainerSpec._
 
-  private def create = new Container[DummyEntry] with ScalableContainer[DummyEntry]
+  private def create = new DummyEntryContainer
 
   "A scalable container" when {
     "empty" should {
@@ -65,14 +65,21 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
       }
     }
 
-    "persist entries correctly" in {
-      sealed class Action(path: String)
-      final case class Add(path: String) extends Action(path)
-      final case class Remove(path: String) extends Action(path)
+    "correctly persist entries" in {
+      sealed case class Action
+      final case class Add(path: String) extends Action
+      final case class Remove(path: String) extends Action
       val actions = Table(
         ("action", "result"),
+        (Action(), IndexedSeq()),
         (Add("foo"), IndexedSeq("foo")),
-        (Add("bar"), IndexedSeq("bar", "foo"))
+        (Add("bar"), IndexedSeq("bar", "foo")),
+        (Remove("bar"), IndexedSeq("foo")),
+        (Add("foo/bar"), IndexedSeq("foo", "foo/bar")),
+        (Add("bar/foo"), IndexedSeq("bar/foo", "foo", "foo/bar")),
+        (Remove("foo/bar"), IndexedSeq("bar/foo", "foo")),
+        (Remove("bar/foo"), IndexedSeq("foo")),
+        (Remove("foo"), IndexedSeq())
       )
       val container = create
       forAll(actions) { (action: Action, result: IndexedSeq[String]) =>
@@ -85,7 +92,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
         for (path <- result)
           container(path).getName should be (path)
         import collection.JavaConversions._
-        container.iterator.toSeq.map(_ getName) should equal (result)
+        container.iterator.toSeq map (_ getName) should equal (result)
       }
     }
   }
@@ -94,4 +101,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
 object ScalableContainerSpec {
   private final case class DummyEntry(name: String)
   extends ByteArrayIoBuffer(name, 0)
+
+  private final class DummyEntryContainer
+  extends Container[DummyEntry] with ScalableContainer[DummyEntry]
 } // ScalableContainerSpec
