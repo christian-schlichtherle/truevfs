@@ -8,19 +8,19 @@ import org.junit.runner.RunWith
 import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.prop.PropertyChecks
 
 @RunWith(classOf[JUnitRunner])
-class ScalableContainerSpec extends WordSpec with ShouldMatchers {
+class ScalableContainerSpec
+extends WordSpec with ShouldMatchers with PropertyChecks {
   import ScalableContainerSpec._
 
   private def create = new Container[DummyEntry] with ScalableContainer[DummyEntry]
 
-  private[this] val always = afterWord("always")
-
   "A scalable container" when {
     "empty" should {
       val path = "foo"
-      val parentPath = null:String
+      val parentPath: String = null
       val container = create
       "have appropriate properties" in {
         container should have size (0)
@@ -31,6 +31,7 @@ class ScalableContainerSpec extends WordSpec with ShouldMatchers {
         container.remove(parentPath) should be (false)
       }
     }
+
     "not empty" should {
       val path = "foo/bar"
       val parentPath = "foo"
@@ -52,16 +53,40 @@ class ScalableContainerSpec extends WordSpec with ShouldMatchers {
     }
   }
 
-  "A scalable container" should always {
+  "A scalable container" should {
     "throw a runtime exception" when {
       "adding a null entry" in {
-        intercept[RuntimeException] {
-          create.add(null, null)
+        forAll { path: String =>
+          evaluating {
+            create.add(path, null)
+          } should produce [RuntimeException]
+          (): Unit
         }
       }
     }
-    "persist entries" in {
-      pending
+
+    "persist entries correctly" in {
+      sealed class Action(path: String)
+      final case class Add(path: String) extends Action(path)
+      final case class Remove(path: String) extends Action(path)
+      val actions = Table(
+        ("action", "result"),
+        (Add("foo"), IndexedSeq("foo")),
+        (Add("bar"), IndexedSeq("bar", "foo"))
+      )
+      val container = create
+      forAll(actions) { (action: Action, result: IndexedSeq[String]) =>
+        action match {
+          case Add(path) => container(path) = DummyEntry(path)
+          case Remove(path) => container(path) = null
+          case _ =>
+        }
+        container should have size (result size)
+        for (path <- result)
+          container(path).getName should be (path)
+        import collection.JavaConversions._
+        container.iterator.toSeq.map(_ getName) should equal (result)
+      }
     }
   }
 } // ScalableContainerSpec
