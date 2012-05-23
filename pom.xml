@@ -235,6 +235,18 @@ system space.
                 <artifactId>scala-library</artifactId>
                 <version>${scala.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest_${scala.version}</artifactId>
+                <version>1.7.2</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.scalacheck</groupId>
+                <artifactId>scalacheck_${scala.version}</artifactId>
+                <version>1.9</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -262,6 +274,15 @@ system space.
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
+                        <includes>
+                            <include>**/*Test.class</include>
+                            <!--include>**/*Suite.class</include-->
+                            <include>**/*Spec.class</include>
+                        </includes>
+                        <!--excludes>
+                            <exclude>**/*ITSuite.class</exclude>
+                            <exclude>**/*TestSuite.class</exclude>
+                        </excludes-->
                         <systemPropertyVariables>
                             <de.schlichtherle.truevfs.kernel.ControlFlowException.traceable>true</de.schlichtherle.truevfs.kernel.ControlFlowException.traceable>
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
