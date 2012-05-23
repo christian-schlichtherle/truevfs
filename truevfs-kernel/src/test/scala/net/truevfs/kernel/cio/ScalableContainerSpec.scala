@@ -25,8 +25,8 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
       "have appropriate properties" in {
         container should have size (0)
         container.iterator.hasNext should be (false)
-        container(path) should be (null)
-        container(parentPath) should be (null)
+        container(path) should be (None)
+        container(parentPath) should be (None)
         container.remove(path) should be (false)
         container.remove(parentPath) should be (false)
       }
@@ -37,16 +37,16 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
       val parentPath = "foo"
       val entry = DummyEntry(path)
       val container = create
-      container(path) = entry
+      container(path) = Some(entry)
       "have appropriate properties" in {
         container should have size (1)
         val iterator = container.iterator
         iterator.hasNext should be (true)
         iterator.next should be theSameInstanceAs (entry)
         iterator.hasNext should be (false)
-        container(path) should be theSameInstanceAs (entry)
-        container(parentPath) should be (null)
-        container(null) should be (null)
+        container(path).get should be theSameInstanceAs (entry)
+        container(parentPath) should be (None)
+        container(null) should be (None)
         container.remove(path) should be (true)
         container.remove(parentPath) should be (false)
       }
@@ -86,13 +86,13 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
       val container = create
       forAll(actions) { (action: Action, result: IndexedSeq[String]) =>
         action match {
-          case Add(path) => container(path) = DummyEntry(path)
-          case Remove(path) => container(path) = null
+          case Add(path) => container(path) = Some(DummyEntry(path))
+          case Remove(path) => container(path) = None
           case _ =>
         }
         container should have size (result size)
         for (path <- result)
-          container(path).getName should be (path)
+          container(path).get.getName should be (path)
         import collection.JavaConversions._
         container.iterator.toSeq map (_ getName) should equal (result)
       }

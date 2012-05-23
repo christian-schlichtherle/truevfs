@@ -36,16 +36,27 @@ trait ScalableContainer[E >: Null <: Entry] { this: Container[E] =>
     (s getParentPath, s getMemberName)
   }
 
-  def apply(path: String) = entry(path)
+  def apply(path: String) = node(path) flatMap (_ entry)
 
-  def update(path: String, entry: E) {
-    if (null ne entry) add(path, entry)
-    else remove(path)
+  private def node(path: String): Option[Node[E]] = {
+    if (path == rootName) {
+      new Some(root)
+    } else {
+      val (parentPath, memberName) = split(path)
+      node(parentPath) flatMap (_(memberName))
+    }
+  }
+
+  def update(path: String, entry: Option[E]) {
+    entry match {
+      case Some(entry) => add(path, entry)
+      case _ => remove(path)
+    }
   }
 
   def add(path: String, entry: E): Boolean = {
     require(null ne entry)
-    add0(path, new Some(entry)).entry isEmpty
+    add0(path, Some(entry)).entry isEmpty
   }
 
   private def add0(path: String, entry: Option[E]): Node[E] = {
@@ -61,7 +72,7 @@ trait ScalableContainer[E >: Null <: Entry] { this: Container[E] =>
           memberNode
         case _ =>
           val memberNode = new Node(entry)
-          parentNode(memberName) = new Some(memberNode)
+          parentNode(memberName) = Some(memberNode)
           memberNode
       }
     }
@@ -90,21 +101,12 @@ trait ScalableContainer[E >: Null <: Entry] { this: Container[E] =>
     }
   } isDefined
 
-  private def node(path: String): Option[Node[E]] = {
-    if (path == rootName) {
-      new Some(root)
-    } else {
-      val (parentPath, memberName) = split(path)
-      node(parentPath) flatMap (_(memberName))
-    }
-  }
-
   override def size = _size
 
   override def iterator =
     collection.JavaConversions.asIterator(root allEntries)
 
-  override def entry(path: String) = node(path) flatMap (_ entry) orNull
+  override def entry(path: String) = apply(path) orNull
 } // ScalableContainer
 
 private object ScalableContainer {
