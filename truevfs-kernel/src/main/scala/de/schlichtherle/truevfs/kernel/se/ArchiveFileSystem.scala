@@ -43,11 +43,11 @@ extends Iterable[FsCovariantEntry[E]] {
 
   private def this(driver: FsArchiveDriver[E]) {
     this(driver, new EntryTable(OVERHEAD_SIZE))
-    val root = newEntry(ROOT_PATH, DIRECTORY, None)
+    val root = newEntry(RootPath, DIRECTORY, None)
     val time = System.currentTimeMillis()
     for (access <- ALL_ACCESS)
       root.setTime(access, time)
-    master.add(ROOT_PATH, root)
+    master.add(RootPath, root)
     touched = true;
   }
 
@@ -69,7 +69,7 @@ extends Iterable[FsCovariantEntry[E]] {
     }
     // Setup root file system entry, potentially replacing its previous
     // mapping from the source archive.
-    master.add(ROOT_PATH, newEntry(ROOT_PATH, DIRECTORY, rootTemplate))
+    master.add(RootPath, newEntry(RootPath, DIRECTORY, rootTemplate))
     // Now perform a file system check to create missing parent directories
     // and populate directories with their members - this must be done
     // separately!
@@ -433,7 +433,7 @@ extends Iterable[FsCovariantEntry[E]] {
 } // ArchiveFileSystem
 
 private object ArchiveFileSystem {
-  private val ROOT_PATH = ROOT.getPath
+  private val RootPath = ROOT.getPath
 
   /**
    * Returns a new empty archive file system and ensures its integrity.
@@ -537,7 +537,7 @@ private object ArchiveFileSystem {
   private final class Splitter extends PathSplitter(SEPARATOR_CHAR, false) {
     override def getParentPath = {
       val path = super.getParentPath
-      if (null ne path) path else ROOT_PATH
+      if (null ne path) path else RootPath
     }
   } // Splitter
 
