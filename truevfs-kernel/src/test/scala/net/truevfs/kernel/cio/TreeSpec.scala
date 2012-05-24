@@ -11,21 +11,21 @@ import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 
 @RunWith(classOf[JUnitRunner])
-class TreeContainerSpec
+class TreeSpec
 extends WordSpec with ShouldMatchers with PropertyChecks {
-  import TreeContainerSpec._
+  import TreeSpec._
 
-  private def create = new TestContainer
+  private def create() = new TestTree
 
-  "A tree container" when {
+  "A tree" when {
     "empty" should {
       val path = "foo"
-      val container = create
+      val tree = create()
       "have appropriate properties" in {
-        container should have size (0)
-        container.iterator.hasNext should be (false)
-        container(path) should be (None)
-        container.entry(path) should be (null)
+        tree should have size (0)
+        tree.iterator.hasNext should be (false)
+        tree(path) should be (None)
+        tree.remove(path) should be (false)
       }
     }
 
@@ -33,25 +33,28 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
       val path = "foo/bar"
       val parentPath = "foo"
       val entry = TestEntry(path)
-      val container = create
-      container(path) = Some(entry)
+      val tree = create()
+      tree(path) = Some(entry)
       "have appropriate properties" in {
-        container should have size (1)
-        val iterator = container.iterator
+        tree should have size (1)
+        val iterator = tree.iterator
         iterator.hasNext should be (true)
         iterator.next should be theSameInstanceAs (entry)
         iterator.hasNext should be (false)
-        container(path).get should be theSameInstanceAs (entry)
-        container.entry(path) should be theSameInstanceAs (entry)
-        container(parentPath) should be (None)
-        container.entry(parentPath) should be (null)
+        tree(path).get should be theSameInstanceAs (entry)
+        tree.remove(path) should be (true)
+        tree(parentPath) should be (None)
+        tree.remove(parentPath) should be (false)
       }
     }
   }
 
-  "A tree container" should {
+  "A tree" should {
     "throw a runtime exception" when {
       "adding a null path" in {
+        evaluating {
+          create().add(null, TestEntry(""))
+        } should produce [RuntimeException]
         evaluating {
           create(null) = Some(TestEntry(""))
         } should produce [RuntimeException]
@@ -59,8 +62,22 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
 
       "removing a null path" in {
         evaluating {
+          create().remove(null)
+        } should produce [RuntimeException]
+        evaluating {
           create(null) = None
         } should produce [RuntimeException]
+      }
+
+      "adding a null entry" in {
+        forAll { path: String =>
+          whenever (null ne path) {
+            evaluating {
+              create().add(path, null)
+            } should produce [RuntimeException]
+            (): Unit
+          }
+        }
       }
     }
 
@@ -82,26 +99,24 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
         (Remove("foo"), IndexedSeq("")),
         (Remove(""), IndexedSeq())
       )
-      val container = create
+      val tree = create()
       forAll(actions) { (action, result) =>
         action match {
-          case Add(path)    => container(path) = Some(TestEntry(path))
-          case Remove(path) => container(path) = None
+          case Add(path)    => tree(path) = Some(TestEntry(path))
+          case Remove(path) => tree(path) = None
           case _            =>
         }
-        container should have size (result size)
+        tree should have size (result size)
         for (path <- result)
-          container(path).get.getName should be (path)
+          tree(path).get.name should be (path)
         import collection.JavaConversions._
-        container.iterator.toSeq map (_ getName) should equal (result)
+        tree.iterator.toSeq map (_ name) should equal (result)
       }
     }
   }
-} // TreeContainerSpec
+} // TreeSpec
 
-object TreeContainerSpec {
+object TreeSpec {
   private final case class TestEntry(name: String)
-  extends ByteArrayIoBuffer(name, 0)
-
-  private type TestContainer = TreeContainer[TestEntry]
-} // TreeContainerSpec
+  private type TestTree = Tree[TestEntry]
+} // TreeSpec
