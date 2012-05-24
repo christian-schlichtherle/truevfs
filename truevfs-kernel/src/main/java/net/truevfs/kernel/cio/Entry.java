@@ -4,10 +4,10 @@
  */
 package net.truevfs.kernel.cio;
 
+import javax.annotation.CheckForNull;
 import static net.truevfs.kernel.cio.Entry.Access.*;
 import static net.truevfs.kernel.cio.Entry.Type.*;
 import net.truevfs.kernel.util.BitField;
-import javax.annotation.CheckForNull;
 
 /**
  * Represents an entry in a container.
