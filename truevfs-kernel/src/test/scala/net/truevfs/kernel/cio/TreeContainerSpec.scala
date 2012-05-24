@@ -11,13 +11,13 @@ import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 
 @RunWith(classOf[JUnitRunner])
-class ScalableContainerSpec
+class TreeContainerSpec
 extends WordSpec with ShouldMatchers with PropertyChecks {
-  import ScalableContainerSpec._
+  import TreeContainerSpec._
 
-  private def create = new DummyEntryContainer
+  private def create = new TestContainer
 
-  "A scalable container" when {
+  "A tree container" when {
     "empty" should {
       val path = "foo"
       val container = create
@@ -32,7 +32,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
     "not empty" should {
       val path = "foo/bar"
       val parentPath = "foo"
-      val entry = DummyEntry(path)
+      val entry = TestEntry(path)
       val container = create
       container(path) = Some(entry)
       "have appropriate properties" in {
@@ -49,11 +49,11 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
     }
   }
 
-  "A scalable container" should {
+  "A tree container" should {
     "throw a runtime exception" when {
       "adding a null path" in {
         evaluating {
-          create.add(null, DummyEntry(""))
+          create.add(null, TestEntry(""))
         } should produce [RuntimeException]
       }
 
@@ -96,9 +96,9 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
       val container = create
       forAll(actions) { (action, result) =>
         action match {
-          case Add(path) => container(path) = Some(DummyEntry(path))
+          case Add(path)    => container(path) = Some(TestEntry(path))
           case Remove(path) => container(path) = None
-          case _ =>
+          case _            =>
         }
         container should have size (result size)
         for (path <- result)
@@ -108,12 +108,11 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
       }
     }
   }
-} // ScalableContainerSpec
+} // TreeContainerSpec
 
-object ScalableContainerSpec {
-  private final case class DummyEntry(name: String)
+object TreeContainerSpec {
+  private final case class TestEntry(name: String)
   extends ByteArrayIoBuffer(name, 0)
 
-  private final class DummyEntryContainer
-  extends Container[DummyEntry] with ScalableContainer[DummyEntry]
-} // ScalableContainerSpec
+  private type TestContainer = TreeContainer[TestEntry]
+} // TreeContainerSpec

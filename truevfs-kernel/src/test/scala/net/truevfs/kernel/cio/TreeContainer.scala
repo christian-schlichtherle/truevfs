@@ -4,10 +4,10 @@
  */
 package net.truevfs.kernel.cio
 
-import ScalableContainer._
+import TreeContainer._
 
 /**
- * A mixin for containers which persist their entries in a tree.
+ * A container which persists its entries in a tree.
  * This class is designed to save some heap space with deeply nested directory
  * structures where many entry name segments are duplicates.
  * <p>
@@ -16,11 +16,11 @@ import ScalableContainer._
  * @param  <E> the type of the entries in this container.
  * @author Christian Schlichtherle
  */
-trait ScalableContainer[E >: Null <: Entry] { this: Container[E] =>
+class TreeContainer[E >: Null <: Entry]
+(splitter: Splitter = new Splitter('/'))
+extends Container[E] {
 
   private implicit def container = this
-
-  protected val splitter = new Splitter('/')
 
   private[this] val rootNode: Node[E] = new Node(None)
 
@@ -97,13 +97,13 @@ trait ScalableContainer[E >: Null <: Entry] { this: Container[E] =>
     collection.JavaConversions.asIterator(rootNode recursiveIterator)
 
   override def entry(path: String) = apply(path) orNull
-} // ScalableContainer
+} // TreeContainer
 
-object ScalableContainer {
+object TreeContainer {
 
   private final class Node[E >: Null <: Entry]
   (private[this] var _entry: Option[E])
-  (implicit container: ScalableContainer[E])
+  (implicit container: TreeContainer[E])
   extends collection.Iterable[Node[E]] {
 
     private[this] var _members = collection.SortedMap[String, Node[E]]()
@@ -113,7 +113,7 @@ object ScalableContainer {
 
     def entry = _entry
 
-    def entry_=(entry: Option[E])(implicit container: ScalableContainer[E]) {
+    def entry_=(entry: Option[E])(implicit container: TreeContainer[E]) {
       // HC SVNT DRACONES!
       if (_entry isDefined) {
         if (entry isEmpty)
@@ -139,14 +139,16 @@ object ScalableContainer {
     def recursiveIterator: Iterator[E] =
       _entry.iterator ++ _members.valuesIterator.flatMap(_ recursiveIterator)
   } // Node
-} // ScalableContainer
+} // TreeContainer
 
-/*class ScalableEntry[E <: Entry] private(
-  node: ScalableContainer.Node[E],
-  parent: Option[ScalableContainer.Node[E]])
+/*class AnonymousEntry extends Entry {
+  final override def getName = null
+}*/
+
+/*class TreeEntry[E <: AnonymousEntry] private(
+  node: TreeContainer.Node[E],
+  parent: Option[TreeContainer.Node[E]])
 extends DecoratingEntry(node.entry.get) {
-
-  assert(null eq node.entry.get.getName, "There will be no heap space savings for entries with a non-null name!")
 
   override getName = {
     
