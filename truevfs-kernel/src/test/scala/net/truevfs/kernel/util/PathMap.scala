@@ -43,21 +43,25 @@ with collection.mutable.MapLike[String, V, PathMap[V]] {
   }
 
   private def add(path: String, value: Option[V]): Node[V] = {
-    if (path isEmpty) {
-      value foreach (_ => rootNode value = value)
-      rootNode
-    } else {
-      val (parentPath, memberName) = splitter(path)
-      add(parentPath, None).add(memberName, value)
+    splitter(path) match {
+      case (Some(parentPath), memberName) =>
+        add(parentPath, None).add(memberName, value)
+      case (None, "") =>
+        value foreach (_ => rootNode value = value)
+        rootNode
+      case (None, memberName) =>
+        rootNode.add(memberName, value)
     }
   }
 
   override def -=(path: String) = {
-    if (path isEmpty) {
-      rootNode value = None
-    } else {
-      val (parentPath, memberName) = splitter(path)
-      node(parentPath) foreach (_.remove(memberName))
+    splitter(path) match {
+      case (Some(parentPath), memberName) =>
+        node(parentPath) foreach (_.remove(memberName))
+      case (None, "") =>
+        rootNode value = None
+      case (None, memberName) =>
+        rootNode.remove(memberName)
     }
     this
   }
@@ -65,11 +69,13 @@ with collection.mutable.MapLike[String, V, PathMap[V]] {
   override def get(path: String) = node(path) flatMap (_ value)
 
   private def node(path: String): Option[Node[V]] = {
-    if (path isEmpty) {
-      new Some(rootNode)
-    } else {
-      val (parentPath, memberName) = splitter(path)
-      node(parentPath) flatMap (_.get(memberName))
+    splitter(path) match {
+      case (Some(parentPath), memberName) =>
+        node(parentPath) flatMap (_.get(memberName))
+      case (None, "") =>
+        Some(rootNode)
+      case (None, memberName) =>
+        rootNode.get(memberName)
     }
   }
 
@@ -138,7 +144,9 @@ private object PathMap {
 
   private final class Splitter(separator: Char)
   extends PathSplitter(separator, false) {
-    def apply(path: String) = { split(path); (getParentPath, getMemberName) }
-    override def getParentPath = Option(super.getParentPath) getOrElse ""
+    def apply(path: String) = {
+      split(path)
+      (Option(super.getParentPath), getMemberName)
+    }
   } // Splitter
 } // PathMap
