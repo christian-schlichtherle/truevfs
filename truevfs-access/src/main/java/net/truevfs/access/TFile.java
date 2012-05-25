@@ -1284,6 +1284,10 @@ public final class TFile extends File {
      * @return An instance of the {@link File File} class or any of its
      *         sub-classes, but never an instance of this class and never
      *         {@code null}.
+     * @deprecated Using the resulting {@link File} object for file system
+     *             access would compete with the TrueZIP Kernel for I/O and may
+     *             easily corrupt the state of the (virtual) file system space,
+     *             including loss of data!
      */
     public File getFile() {
         return file;
