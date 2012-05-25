@@ -45,24 +45,24 @@ with collection.mutable.MapLike[String, V, PathMap[V]] {
 
   private def add(path: String, value: Option[V]): Node[V] = {
     path match {
-      case Path(Some(parentPath), memberName) =>
-        add(parentPath, None).add(memberName, value)
+      case Path(Some(parentPath), memberSegment) =>
+        add(parentPath, None).add(memberSegment, value)
       case Path(None, null) =>
         value foreach (_ => rootNode value = value)
         rootNode
-      case Path(None, memberName) =>
-        rootNode.add(memberName, value)
+      case Path(None, memberSegment) =>
+        rootNode.add(memberSegment, value)
     }
   }
 
   override def -=(path: String) = {
     path match {
-      case Path(Some(parentPath), memberName) =>
-        node(parentPath) foreach (_.remove(memberName))
+      case Path(Some(parentPath), memberSegment) =>
+        node(parentPath) foreach (_.remove(memberSegment))
       case Path(None, null) =>
         rootNode value = None
-      case Path(None, memberName) =>
-        rootNode.remove(memberName)
+      case Path(None, memberSegment) =>
+        rootNode.remove(memberSegment)
     }
     this
   }
@@ -71,12 +71,12 @@ with collection.mutable.MapLike[String, V, PathMap[V]] {
 
   private def node(path: String): Option[Node[V]] = {
     path match {
-      case Path(Some(parentPath), memberName) =>
-        node(parentPath) flatMap (_.get(memberName))
+      case Path(Some(parentPath), memberSegment) =>
+        node(parentPath) flatMap (_.get(memberSegment))
       case Path(None, null) =>
         Some(rootNode)
-      case Path(None, memberName) =>
-        rootNode.get(memberName)
+      case Path(None, memberSegment) =>
+        rootNode.get(memberSegment)
     }
   }
 
@@ -108,38 +108,46 @@ object PathMap {
 
     def get(memberName: String) = _members get memberName
 
-    def add(memberName: String, value: Option[V])(implicit map: PathMap[V]) = {
-      _members get memberName match {
+    def add(memberSegment: String, value: Option[V])(implicit map: PathMap[V]) = {
+      _members get memberSegment match {
         case Some(node) =>
           value foreach (_ => node value = value)
           node
         case None =>
           val node = new Node(value)
-          _members += new String(memberName) -> node // don't share strings with clients!
+          _members += memberSegment -> node
           node
       }
     }
 
-    def remove(memberName: String)(implicit map: PathMap[V]) {
-      _members get memberName foreach { node =>
+    def remove(memberSegment: String)(implicit map: PathMap[V]) {
+      _members get memberSegment foreach { node =>
         node value = None
-        if (node._members isEmpty) _members -= memberName
+        if (node._members isEmpty) _members -= memberSegment
       }
     }
 
     def recursiveEntriesIterator(path: Option[String])(implicit Path: Converter[String])
     : Iterator[(String, V)] = {
       entry(path).iterator ++ _members.iterator.flatMap {
-        case (memberName, memberNode) =>          
-          memberNode recursiveEntriesIterator Some(Path(path, memberName))
+        case (memberSegment, memberNode) =>          
+          memberNode recursiveEntriesIterator Some(Path(path, memberSegment))
       }
     }
 
     private def entry(path: Option[String]) = _value map (path.orNull -> _)
   } // Node
 
-  trait Converter[V] {
-    def apply(parent: Option[V], member: V): V
+  trait Converter[V <: AnyRef] extends ((Option[V], V) => V) {
+    /** The injection method. */
+    def apply(parentPath: Option[V], memberSegment: V): V
+
+    /**
+     * The extraction method.
+     * Note that the second element of the tuple should not share any memory
+     * with the given path - otherwise you will not achieve any heap space
+     * savings!
+     */
     def unapply(path: V): Some[(Option[V], V)]
   } // Converter
 
@@ -154,7 +162,7 @@ object PathMap {
 
     def unapply(path: String) = {
       split(path)
-      Some(Option(super.getParentPath), getMemberName)
+      Some(Option(super.getParentPath), new String(getMemberName)) // don't share strings with the PathMap!
     }
   } // PathConverter
 } // PathMap
