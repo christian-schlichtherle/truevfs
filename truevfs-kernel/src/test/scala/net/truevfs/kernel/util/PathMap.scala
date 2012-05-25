@@ -4,6 +4,8 @@
  */
 package net.truevfs.kernel.util
 
+import PathMap._
+
 /**
  * A mutable map for path names to any reference values.
  * This class is designed to save some heap space if the path names address
@@ -20,14 +22,13 @@ package net.truevfs.kernel.util
  * @param  <V> the type of the values in this map.
  * @author Christian Schlichtherle
  */
-final class PathMap[V](implicit private[this] val separator: Char = '/')
+final class PathMap[V]
+(implicit private[this] val Path: PathMap.Converter = new PathConverter('/'))
 extends collection.mutable.Map[String, V]
 with collection.mutable.MapLike[String, V, PathMap[V]] {
-  import PathMap._
 
   private[this] implicit def container = this
 
-  private[this] val splitter = new Splitter(separator)
   private[this] val rootNode = new Node[V](None)
 
   private var _size: Int = _
@@ -43,24 +44,24 @@ with collection.mutable.MapLike[String, V, PathMap[V]] {
   }
 
   private def add(path: String, value: Option[V]): Node[V] = {
-    splitter(path) match {
-      case (Some(parentPath), memberName) =>
+    path match {
+      case Path(Some(parentPath), memberName) =>
         add(parentPath, None).add(memberName, value)
-      case (None, null) =>
+      case Path(None, null) =>
         value foreach (_ => rootNode value = value)
         rootNode
-      case (None, memberName) =>
+      case Path(None, memberName) =>
         rootNode.add(memberName, value)
     }
   }
 
   override def -=(path: String) = {
-    splitter(path) match {
-      case (Some(parentPath), memberName) =>
+    path match {
+      case Path(Some(parentPath), memberName) =>
         node(parentPath) foreach (_.remove(memberName))
-      case (None, null) =>
+      case Path(None, null) =>
         rootNode value = None
-      case (None, memberName) =>
+      case Path(None, memberName) =>
         rootNode.remove(memberName)
     }
     this
@@ -69,20 +70,20 @@ with collection.mutable.MapLike[String, V, PathMap[V]] {
   override def get(path: String) = node(path) flatMap (_ value)
 
   private def node(path: String): Option[Node[V]] = {
-    splitter(path) match {
-      case (Some(parentPath), memberName) =>
+    path match {
+      case Path(Some(parentPath), memberName) =>
         node(parentPath) flatMap (_.get(memberName))
-      case (None, null) =>
+      case Path(None, null) =>
         Some(rootNode)
-      case (None, memberName) =>
+      case Path(None, memberName) =>
         rootNode.get(memberName)
     }
   }
 
-  override def iterator = rootNode recursiveEntriesIterator null
+  override def iterator = rootNode recursiveEntriesIterator None
 } // PathMap
 
-private object PathMap {
+object PathMap {
 
   private final class Node[V](private[this] var _value: Option[V])
   (implicit map: PathMap[V]) {
@@ -126,27 +127,34 @@ private object PathMap {
       }
     }
 
-    def recursiveEntriesIterator(path: String)(implicit separator: Char)
+    def recursiveEntriesIterator(path: Option[String])(implicit Path: Converter)
     : Iterator[(String, V)] = {
-      val nullPath = null eq path
       entry(path).iterator ++ _members.iterator.flatMap {
-        case (memberName, memberNode) =>
-        val memberPath = {
-          if (nullPath) memberName
-          else path + separator + memberName
-        }
-        memberNode recursiveEntriesIterator memberPath
+        case (memberName, memberNode) =>          
+          memberNode recursiveEntriesIterator Some(Path(path, memberName))
       }
     }
 
-    private def entry(path: String) = _value map (path -> _)
+    private def entry(path: Option[String]) = _value map (path.orNull -> _)
   } // Node
 
-  private final class Splitter(separator: Char)
+  type Converter = {
+    def apply(parentPath: Option[String], memberName: String): String
+    def unapply(path: String): Some[(Option[String], String)]
+  } // Converter
+
+  final case class PathConverter(separator: Char)
   extends PathSplitter(separator, false) {
-    def apply(path: String) = {
+    def apply(parentPath: Option[String], memberName: String) = {
+      parentPath match {
+        case Some(parentPath) => parentPath + separator + memberName
+        case None => memberName
+      }
+    }
+
+    def unapply(path: String) = {
       split(path)
-      (Option(super.getParentPath), getMemberName)
+      Some(Option(super.getParentPath), getMemberName)
     }
   } // Splitter
 } // PathMap
