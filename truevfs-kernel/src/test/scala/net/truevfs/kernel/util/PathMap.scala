@@ -22,7 +22,7 @@ import PathMap._
  * @param  <V> the type of the values in this map.
  * @author Christian Schlichtherle
  */
-final class PathMap[V]
+final class PathMap[V <: AnyRef]
 (implicit private[this] val Path: PathMap.Converter[String] = new PathConverter('/'))
 extends collection.mutable.Map[String, V]
 with collection.mutable.MapLike[String, V, PathMap[V]] {
@@ -47,9 +47,6 @@ with collection.mutable.MapLike[String, V, PathMap[V]] {
     path match {
       case Path(Some(parentPath), memberSegment) =>
         add(parentPath, None).add(memberSegment, value)
-      case Path(None, null) =>
-        value foreach (_ => rootNode value = value)
-        rootNode
       case Path(None, memberSegment) =>
         rootNode.add(memberSegment, value)
     }
@@ -59,8 +56,6 @@ with collection.mutable.MapLike[String, V, PathMap[V]] {
     path match {
       case Path(Some(parentPath), memberSegment) =>
         node(parentPath) foreach (_.remove(memberSegment))
-      case Path(None, null) =>
-        rootNode value = None
       case Path(None, memberSegment) =>
         rootNode.remove(memberSegment)
     }
@@ -73,8 +68,6 @@ with collection.mutable.MapLike[String, V, PathMap[V]] {
     path match {
       case Path(Some(parentPath), memberSegment) =>
         node(parentPath) flatMap (_.get(memberSegment))
-      case Path(None, null) =>
-        Some(rootNode)
       case Path(None, memberSegment) =>
         rootNode.get(memberSegment)
     }
@@ -85,10 +78,10 @@ with collection.mutable.MapLike[String, V, PathMap[V]] {
 
 object PathMap {
 
-  private final class Node[V](private[this] var _value: Option[V])
+  private final class Node[V <: AnyRef](private[this] var _value: Option[V])
   (implicit map: PathMap[V]) {
 
-    private var _members = new collection.immutable.TreeMap[String, Node[V]]
+    private[this] var _members = new collection.immutable.TreeMap[String, Node[V]]
 
     if (_value isDefined) map._size += 1
 
@@ -123,9 +116,11 @@ object PathMap {
     def remove(memberSegment: String)(implicit map: PathMap[V]) {
       _members get memberSegment foreach { node =>
         node value = None
-        if (node._members isEmpty) _members -= memberSegment
+        if (0 == node.size) _members -= memberSegment
       }
     }
+
+    def size = _members size
 
     def recursiveEntriesIterator(path: Option[String])(implicit Path: Converter[String])
     : Iterator[(String, V)] = {
@@ -135,7 +130,7 @@ object PathMap {
       }
     }
 
-    private def entry(path: Option[String]) = _value map (path.orNull -> _)
+    private def entry(path: Option[String]) = value map (path.get -> _)
   } // Node
 
   trait Converter[V <: AnyRef] extends ((Option[V], V) => V) {
@@ -148,7 +143,7 @@ object PathMap {
      * with the given path - otherwise you will not achieve any heap space
      * savings!
      */
-    def unapply(path: V): Some[(Option[V], V)]
+    def unapply(path: V): Option[(Option[V], V)]
   } // Converter
 
   final case class PathConverter(separator: Char)
