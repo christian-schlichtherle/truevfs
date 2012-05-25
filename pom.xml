@@ -122,6 +122,8 @@ system space.
         <comparisonVersion>8.0</comparisonVersion>
 
         <scala.version>2.9.2</scala.version>
+        <scalacheck.version>1.9</scalacheck.version>
+        <scalatest.version>1.7.2</scalatest.version>
     </properties>
 
     <modules>
@@ -236,15 +238,15 @@ system space.
                 <version>${scala.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.scalatest</groupId>
-                <artifactId>scalatest_${scala.version}</artifactId>
-                <version>1.7.2</version>
+                <groupId>org.scalacheck</groupId>
+                <artifactId>scalacheck_${scala.version}</artifactId>
+                <version>${scalacheck.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.scalacheck</groupId>
-                <artifactId>scalacheck_${scala.version}</artifactId>
-                <version>1.9</version>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest_${scala.version}</artifactId>
+                <version>${scalatest.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>
