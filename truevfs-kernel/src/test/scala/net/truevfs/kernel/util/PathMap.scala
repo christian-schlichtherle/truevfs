@@ -23,7 +23,7 @@ import PathMap._
  * @author Christian Schlichtherle
  */
 final class PathMap[V]
-(implicit private[this] val Path: PathMap.Converter = new PathConverter('/'))
+(implicit private[this] val Path: PathMap.Converter[String] = new PathConverter('/'))
 extends collection.mutable.Map[String, V]
 with collection.mutable.MapLike[String, V, PathMap[V]] {
 
@@ -127,7 +127,7 @@ object PathMap {
       }
     }
 
-    def recursiveEntriesIterator(path: Option[String])(implicit Path: Converter)
+    def recursiveEntriesIterator(path: Option[String])(implicit Path: Converter[String])
     : Iterator[(String, V)] = {
       entry(path).iterator ++ _members.iterator.flatMap {
         case (memberName, memberNode) =>          
@@ -138,16 +138,16 @@ object PathMap {
     private def entry(path: Option[String]) = _value map (path.orNull -> _)
   } // Node
 
-  type Converter = {
-    def apply(parentPath: Option[String], memberName: String): String
-    def unapply(path: String): Some[(Option[String], String)]
+  trait Converter[V] {
+    def apply(parent: Option[V], member: V): V
+    def unapply(path: V): Some[(Option[V], V)]
   } // Converter
 
   final case class PathConverter(separator: Char)
-  extends PathSplitter(separator, false) {
+  extends PathSplitter(separator, false) with Converter[String] {
     def apply(parentPath: Option[String], memberName: String) = {
       parentPath match {
-        case Some(parentPath) => parentPath + separator + memberName
+        case Some(parent) => parent + separator + memberName
         case None => memberName
       }
     }
@@ -156,5 +156,5 @@ object PathMap {
       split(path)
       Some(Option(super.getParentPath), getMemberName)
     }
-  } // Splitter
+  } // PathConverter
 } // PathMap
