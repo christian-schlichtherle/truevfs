@@ -46,7 +46,7 @@ with collection.mutable.MapLike[String, V, PathMap[V]] {
     splitter(path) match {
       case (Some(parentPath), memberName) =>
         add(parentPath, None).add(memberName, value)
-      case (None, "") =>
+      case (None, null) =>
         value foreach (_ => rootNode value = value)
         rootNode
       case (None, memberName) =>
@@ -58,7 +58,7 @@ with collection.mutable.MapLike[String, V, PathMap[V]] {
     splitter(path) match {
       case (Some(parentPath), memberName) =>
         node(parentPath) foreach (_.remove(memberName))
-      case (None, "") =>
+      case (None, null) =>
         rootNode value = None
       case (None, memberName) =>
         rootNode.remove(memberName)
@@ -72,14 +72,14 @@ with collection.mutable.MapLike[String, V, PathMap[V]] {
     splitter(path) match {
       case (Some(parentPath), memberName) =>
         node(parentPath) flatMap (_.get(memberName))
-      case (None, "") =>
+      case (None, null) =>
         Some(rootNode)
       case (None, memberName) =>
         rootNode.get(memberName)
     }
   }
 
-  override def iterator = rootNode recursiveEntriesIterator ""
+  override def iterator = rootNode recursiveEntriesIterator null
 } // PathMap
 
 private object PathMap {
@@ -128,11 +128,11 @@ private object PathMap {
 
     def recursiveEntriesIterator(path: String)(implicit separator: Char)
     : Iterator[(String, V)] = {
-      val emptyPath = path.isEmpty
+      val nullPath = null eq path
       entry(path).iterator ++ _members.iterator.flatMap {
         case (memberName, memberNode) =>
         val memberPath = {
-          if (emptyPath) memberName
+          if (nullPath) memberName
           else path + separator + memberName
         }
         memberNode recursiveEntriesIterator memberPath
