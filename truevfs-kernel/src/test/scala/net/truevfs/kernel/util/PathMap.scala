@@ -23,7 +23,7 @@ import PathMap._
  * @author Christian Schlichtherle
  */
 final class PathMap[K >: Null <: AnyRef, V]
-(private val converter: Converter[K] = new PathMap.PathConverter('/'))
+(private val converter: Converter[K] = new PathMap.Splitter('/'))
 (implicit private val ordering: Ordering[K])
 extends collection.mutable.Map[K, V]
 with collection.mutable.MapLike[K, V, PathMap[K, V]] {
@@ -168,7 +168,7 @@ object PathMap {
 
   trait Converter[K] extends ((Option[K], K) => K) {
     /** The injection method. */
-    def apply(parent: Option[K], segment: K): K
+    override def apply(parent: Option[K], segment: K): K
 
     /**
      * The extraction method.
@@ -176,21 +176,26 @@ object PathMap {
      * with the given path - otherwise you will not achieve any heap space
      * savings!
      */
-    def unapply(path: K): Option[(Option[K], K)]
+    def unapply(path: K): Some[(Option[K], K)]
   } // Converter
 
-  final case class PathConverter(separator: Char)
-  extends PathSplitter(separator, false) with Converter[String] {
-    override def apply(parentPath: Option[String], memberName: String) = {
-      parentPath match {
-        case Some(parentPath) => parentPath + separator + memberName
-        case None => memberName
+  final case class Splitter(separator: Char) extends Converter[String] {
+    override def apply(parent: Option[String], segment: String) = {
+      parent match {
+        case Some(parent) => parent + segment
+        case None => segment
       }
     }
 
     override def unapply(path: String) = {
-      split(path)
-      Some(Option(super.getParentPath) -> new String(getMemberName)) // don't share strings with the PathMap!
+      val i = path.lastIndexOf(separator)
+      if (0 <= i) {
+        // Don't share sub-strings with the PathMap!
+        Some(Some(path substring (0, i)) -> new String(path substring i))
+      } else {
+        // There's no point in copying here!
+        Some(None, path)
+      } 
     }
   } // PathConverter
 } // PathMap
