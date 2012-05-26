@@ -29,7 +29,7 @@ import scala.annotation._
  * @see    <a href="http://truezip.java.net/faq.html">Frequently Asked Questions</a>
  * @author Christian Schlichtherle
  */
-private class ArchiveFileSystem[E <: FsArchiveEntry](
+private class ArchiveFileSystem[E <: FsArchiveEntry] private(
   driver: FsArchiveDriver[E],
   master: EntryTable[E])
 extends Iterable[FsCovariantEntry[E]] {
@@ -41,7 +41,7 @@ extends Iterable[FsCovariantEntry[E]] {
 
   private var _touchListener: Option[TouchListener] = None
 
-  private def this(driver: FsArchiveDriver[E]) {
+  def this(driver: FsArchiveDriver[E]) {
     this(driver, new EntryTable(OVERHEAD_SIZE))
     val root = newEntry(RootPath, DIRECTORY, None)
     val time = System.currentTimeMillis()
