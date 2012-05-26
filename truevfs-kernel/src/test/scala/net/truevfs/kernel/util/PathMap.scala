@@ -22,72 +22,101 @@ import PathMap._
  * @param  <V> the type of the values in this map.
  * @author Christian Schlichtherle
  */
-final class PathMap[V <: AnyRef]
-(implicit private[this] val Path: PathMap.Converter[String] = new PathConverter('/'))
-extends collection.mutable.Map[String, V]
-with collection.mutable.MapLike[String, V, PathMap[V]] {
+final class PathMap[K >: Null <: AnyRef, V]
+(private val converter: Converter[K] = new PathMap.PathConverter('/'))
+(implicit private val ordering: Ordering[K])
+extends collection.mutable.Map[K, V]
+with collection.mutable.MapLike[K, V, PathMap[K, V]] {
 
-  private[this] implicit def container = this
-
-  private[this] val rootNode = new Node[V](None)
-
+  private[this] var _root: Node[K, V] = _
   private var _size: Int = _
+
+  reset()
+
+  implicit private def self = this
+
+  private def reset() { _root = new Node(None); _size = 0}
 
   override def size = _size
 
-  override def empty = new PathMap[V]
+  override def clear() = reset()
 
-  override def +=(entry: (String, V)) = {
-    val (path, value) = entry
-    add(path, Some(value))
+  override def empty = new PathMap[K, V](converter)
+
+  override def iterator = _root.recursiveEntriesIterator(None)(converter)
+
+  override def get(path: K) = node(Option(path)) flatMap (_ value)
+
+  private def node(path: Option[K]): Option[Node[K, V]] = {
+    path match {
+      case Some(path) =>
+        path match {
+          case converter(parent, segment) =>
+            node(parent) flatMap (_.get(segment))
+        }
+      case None =>
+        Some(_root)
+    }
+  }
+
+  def list(path: Option[K]) = {
+    node(path) map (_.members map {
+      case (segment, value) => converter(path, segment) -> value
+    })
+  }
+
+  override def +=(entry: (K, V)) = {
+    add(Option(entry._1), Some(entry._2))
     this
   }
 
-  private def add(path: String, value: Option[V]): Node[V] = {
+  private def add(path: Option[K], value: Option[V]): Node[K, V] = {
     path match {
-      case Path(Some(parentPath), memberSegment) =>
-        add(parentPath, None).add(memberSegment, value)
-      case Path(None, memberSegment) =>
-        rootNode.add(memberSegment, value)
+      case Some(path) =>
+        path match {
+          case converter(parent, segment) =>
+            add(parent, None) add (segment, value)
+        }
+      case None =>
+        if (value isDefined) _root value = value
+        _root
     }
   }
 
-  override def -=(path: String) = {
-    path match {
-      case Path(Some(parentPath), memberSegment) =>
-        node(parentPath) foreach (_.remove(memberSegment))
-      case Path(None, memberSegment) =>
-        rootNode.remove(memberSegment)
-    }
+  override def -=(path: K) = {
+    remove(Option(path))
     this
   }
 
-  override def get(path: String) = node(path) flatMap (_ value)
-
-  private def node(path: String): Option[Node[V]] = {
+  private def remove(path: Option[K]) {
     path match {
-      case Path(Some(parentPath), memberSegment) =>
-        node(parentPath) flatMap (_.get(memberSegment))
-      case Path(None, memberSegment) =>
-        rootNode.get(memberSegment)
+      case Some(path) =>
+        path match {
+          case converter(parent, segment) =>
+            node(parent) foreach { node =>
+              node remove segment
+              if (node isEmpty) remove(parent)
+            }
+        }
+      case None =>
+        _root value = None
     }
   }
-
-  override def iterator = rootNode recursiveEntriesIterator None
 } // PathMap
 
 object PathMap {
 
-  private final class Node[V <: AnyRef](private[this] var _value: Option[V])
-  (implicit map: PathMap[V]) {
+  private final class Node[K >: Null <: AnyRef, V]
+  (private[this] var _value: Option[V])
+  (implicit map: PathMap[K, V]) {
 
-    private[this] var _members = new collection.immutable.TreeMap[String, Node[V]]
+    private[this] var _members =
+      new collection.immutable.TreeMap[K, Node[K, V]]()(map.ordering)
 
     if (_value isDefined) map._size += 1
 
     def value = _value
-
-    def value_=(value: Option[V])(implicit map: PathMap[V]) {
+    def value_=(value: Option[V])(implicit map: PathMap[K, V]) {
       // HC SVNT DRACONES!
       if (_value isDefined) {
         if (value isEmpty)
@@ -99,43 +128,47 @@ object PathMap {
       _value = value
     }
 
-    def get(memberName: String) = _members get memberName
+    def isEmpty = _value.isEmpty && 0 == _members.size
 
-    def add(memberSegment: String, value: Option[V])(implicit map: PathMap[V]) = {
-      _members get memberSegment match {
+    final def get(segment: K) = _members get segment
+
+    final def add(segment: K, value: Option[V])(implicit map: PathMap[K, V]) = {
+      _members get segment match {
         case Some(node) =>
-          value foreach (_ => node value = value)
+          if (value isDefined) node value = value
           node
         case None =>
-          val node = new Node(value)
-          _members += memberSegment -> node
+          val node = new Node[K, V](value)
+          _members += segment -> node
           node
       }
     }
 
-    def remove(memberSegment: String)(implicit map: PathMap[V]) {
-      _members get memberSegment foreach { node =>
+    final def remove(segment: K)(implicit map: PathMap[K, V]) {
+      _members get segment map { node =>
         node value = None
-        if (0 == node.size) _members -= memberSegment
+        if (node isEmpty) _members -= segment
       }
     }
 
-    def size = _members size
-
-    def recursiveEntriesIterator(path: Option[String])(implicit Path: Converter[String])
-    : Iterator[(String, V)] = {
+    final def recursiveEntriesIterator(path: Option[K])
+    (implicit converter: Converter[K]): Iterator[(K, V)] = {
       entry(path).iterator ++ _members.iterator.flatMap {
-        case (memberSegment, memberNode) =>          
-          memberNode recursiveEntriesIterator Some(Path(path, memberSegment))
+        case (segment, node) =>          
+          node recursiveEntriesIterator Some(converter(path, segment))
       }
     }
 
-    private def entry(path: Option[String]) = value map (path.get -> _)
+    private def entry(path: Option[K]) = _value map (path.orNull -> _)
+
+    def members = _members flatMap {
+      case (segment, node) => node.value map (segment -> _)
+    }
   } // Node
 
-  trait Converter[V <: AnyRef] extends ((Option[V], V) => V) {
+  trait Converter[K] extends ((Option[K], K) => K) {
     /** The injection method. */
-    def apply(parentPath: Option[V], memberSegment: V): V
+    def apply(parent: Option[K], segment: K): K
 
     /**
      * The extraction method.
@@ -143,21 +176,21 @@ object PathMap {
      * with the given path - otherwise you will not achieve any heap space
      * savings!
      */
-    def unapply(path: V): Option[(Option[V], V)]
+    def unapply(path: K): Option[(Option[K], K)]
   } // Converter
 
   final case class PathConverter(separator: Char)
   extends PathSplitter(separator, false) with Converter[String] {
-    def apply(parentPath: Option[String], memberName: String) = {
+    override def apply(parentPath: Option[String], memberName: String) = {
       parentPath match {
-        case Some(parent) => parent + separator + memberName
+        case Some(parentPath) => parentPath + separator + memberName
         case None => memberName
       }
     }
 
-    def unapply(path: String) = {
+    override def unapply(path: String) = {
       split(path)
-      Some(Option(super.getParentPath), new String(getMemberName)) // don't share strings with the PathMap!
+      Some(Option(super.getParentPath) -> new String(getMemberName)) // don't share strings with the PathMap!
     }
   } // PathConverter
 } // PathMap

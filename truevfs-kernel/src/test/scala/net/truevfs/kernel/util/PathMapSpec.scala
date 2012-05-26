@@ -71,30 +71,28 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
     }
   }
 
-  "A path map" should {
-    "throw a runtime exception" when {
-      "adding a null path" in {
-        evaluating {
-          create() += (null: String) -> Value("")
-        } should produce [RuntimeException]
-      }
+  private def check(path: String, value: Value) {
+    val map = create()
+    map += path -> value
+    map(path) should be theSameInstanceAs (value)
+    map should have size (1)
+    val iterator = map.iterator
+    iterator.hasNext should be (true)
+    iterator.next should be (path -> value)
+    iterator.hasNext should be (false)
+    map.remove(path) should be (Some(value))
+    map.get(path) should be (None)
+  }
 
-      "removing a null path" in {
-        evaluating {
-          create() -= null
-        } should produce [RuntimeException]
-      }
+  "A path map" should {
+    "accept the null path" in {
+      check(null, Value(null))
     }
 
     "accept null values" in {
       forAll { path: String =>
         whenever (isPath(path)) {
-          val map = create()
-          map += path -> null
-          map(path) should be (null)
-          map.valuesIterator.next should be (null)
-          map -= path
-          map.get(path) should be (None)
+          check(path, null)
         }
       }
     }
@@ -103,31 +101,37 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
       sealed case class Action
       final case class Add(path: String) extends Action
       final case class Remove(path: String) extends Action
+      final case class List(path: Option[String]) extends Action
       val actions = Table(
-        ("action", "result"),
-        (Action(), IndexedSeq()),
-        (Add(""), IndexedSeq("")),
-        (Add("foo"), IndexedSeq("", "foo")),
-        (Add("bar"), IndexedSeq("", "bar", "foo")),
-        (Remove("bar"), IndexedSeq("", "foo")),
-        (Add("foo/bar"), IndexedSeq("", "foo", "foo/bar")),
-        (Add("bar/foo"), IndexedSeq("", "bar/foo", "foo", "foo/bar")),
-        (Remove("foo/bar"), IndexedSeq("", "bar/foo", "foo")),
-        (Remove("bar/foo"), IndexedSeq("", "foo")),
-        (Remove("foo"), IndexedSeq("")),
-        (Remove(""), IndexedSeq())
+        ("action", "expected"),
+        (Action(), Seq()),
+        (Add(""), Seq("")),
+        (Add("foo"), Seq("", "foo")),
+        (Add("bar"), Seq("", "bar", "foo")),
+        (Remove("bar"), Seq("", "foo")),
+        (Add("foo/bar"), Seq("", "foo", "foo/bar")),
+        (Add("bar/foo"), Seq("", "bar/foo", "foo", "foo/bar")),
+        (List(None), Seq("", "foo")),
+        (List(Some("")), Seq()),
+        (List(Some("foo")), Seq("foo/bar")),
+        (List(Some("bar")), Seq("bar/foo")),
+        (Remove("foo/bar"), Seq("", "bar/foo", "foo")),
+        (Remove("bar/foo"), Seq("", "foo")),
+        (Remove("foo"), Seq("")),
+        (Remove(""), Seq())
       )
       val map = create()
-      forAll(actions) { (action, result) =>
-        action match {
-          case Add(path)    => map += path -> Value(path)
-          case Remove(path) => map -= path
-          case _            =>
+      forAll(actions) { (action, expected) =>
+        val result: collection.Map[String, Value] = action match {
+          case List(path)   => map.list(path) getOrElse (Map())
+          case Add(path)    => map += path -> Value(path); map
+          case Remove(path) => map -= path; map
+          case Action()     => map
         }
-        map should have size (result size)
-        for (path <- result)
-          map(path).path should be (path)
-        map.valuesIterator.toSeq map (_ path) should equal (result)
+        result should have size (expected size)
+        for (path <- expected)
+          result(path).path should be (path)
+        result.values map (_ path) should equal (expected)
       }
     }
   }
@@ -145,5 +149,5 @@ object PathMapSpec {
 
   private final case class Value(path: String)
 
-  private type TestMap = PathMap[Value]
+  private type TestMap = PathMap[String, Value]
 } // PathMapSpec
