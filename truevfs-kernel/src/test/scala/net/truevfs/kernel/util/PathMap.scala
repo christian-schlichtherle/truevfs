@@ -39,9 +39,9 @@ with collection.mutable.MapLike[K, V, PathMap[K, V]] {
 
   override def size = _size
 
-  protected def newDirectory[V]: collection.Map[K, V] = collection.SortedMap.empty
-
   override def clear() = reset()
+
+  protected def newDirectory[V]: collection.Map[K, V] = collection.SortedMap.empty
 
   override def empty = new PathMap[K, V]
 
