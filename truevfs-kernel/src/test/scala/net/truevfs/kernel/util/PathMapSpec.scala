@@ -15,12 +15,12 @@ class PathMapSpec
 extends WordSpec with ShouldMatchers with PropertyChecks {
   import PathMapSpec._
 
-  private def create() = PathMap[Value]('/')
+  private def newMap = PathMap[Value]('/')
 
   "A path map" when {
     "empty" should {
       "have appropriate properties" in {
-        val map = create()
+        val map = newMap
         forAll { path: String =>
           whenever (isPath(path)) {
             map.remove(path) should be (None)
@@ -33,7 +33,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
 
     "not empty" should {
       "have appropriate properties" in {
-        val map = create()
+        val map = newMap
         forAll { parentPath: String =>
           whenever (isParentPath(parentPath)) {
             val parentValue = Value(parentPath)
@@ -72,7 +72,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
   }
 
   private def check(path: String, value: Value) {
-    val map = create()
+    val map = newMap
     map += path -> value
     map(path) should be theSameInstanceAs (value)
     map should have size (1)
@@ -120,7 +120,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
         (Remove("foo"), Seq("")),
         (Remove(""), Seq())
       )
-      val map = create()
+      val map = newMap
       forAll(actions) { (action, expected) =>
         val result: collection.Map[String, Value] = action match {
           case List(path)   => map.list(path) getOrElse (Map())
