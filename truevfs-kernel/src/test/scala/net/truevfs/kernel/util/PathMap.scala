@@ -24,7 +24,7 @@ import PathMap._
  * @author Christian Schlichtherle
  */
 final class PathMap[K >: Null <: AnyRef, V] private
-(implicit composer: Composer[K], private val ordering: Ordering[K])
+(implicit composer: Composer[K], ordering: Ordering[K])
 extends collection.mutable.Map[K, V]
 with collection.mutable.MapLike[K, V, PathMap[K, V]] {
 
@@ -38,6 +38,8 @@ with collection.mutable.MapLike[K, V, PathMap[K, V]] {
   private def reset() { _root = new Node(None); _size = 0}
 
   override def size = _size
+
+  protected def newDirectory[V]: collection.Map[K, V] = collection.SortedMap.empty
 
   override def clear() = reset()
 
@@ -116,8 +118,7 @@ object PathMap {
   (private[this] var _value: Option[V])
   (implicit map: PathMap[K, V]) {
 
-    private[this] var _members =
-      new collection.immutable.TreeMap[K, Node[K, V]]()(map.ordering)
+    private[this] var _members = map.newDirectory[Node[K, V]]
 
     if (_value isDefined) map._size += 1
 
