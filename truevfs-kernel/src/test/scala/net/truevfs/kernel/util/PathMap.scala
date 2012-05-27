@@ -24,7 +24,7 @@ import PathMap._
  * @author Christian Schlichtherle
  */
 final class PathMap[K >: Null <: AnyRef, V] private
-(implicit composer: Composer[K], ordering: Ordering[K])
+(implicit transformation: Transformation[K], ordering: Ordering[K])
 extends collection.mutable.Map[K, V]
 with collection.mutable.MapLike[K, V, PathMap[K, V]] {
 
@@ -53,7 +53,7 @@ with collection.mutable.MapLike[K, V, PathMap[K, V]] {
     path match {
       case Some(path) =>
         path match {
-          case composer(parent, segment) =>
+          case transformation(parent, segment) =>
             node(parent) flatMap (_.get(segment))
         }
       case None =>
@@ -63,7 +63,7 @@ with collection.mutable.MapLike[K, V, PathMap[K, V]] {
 
   def list(path: Option[K]) = {
     node(path) map (_.members map {
-      case (segment, value) => composer(path, segment) -> value
+      case (segment, value) => transformation(path, segment) -> value
     })
   }
 
@@ -76,7 +76,7 @@ with collection.mutable.MapLike[K, V, PathMap[K, V]] {
     path match {
       case Some(path) =>
         path match {
-          case composer(parent, segment) =>
+          case transformation(parent, segment) =>
             add(parent, None) add (segment, value)
         }
       case None =>
@@ -94,7 +94,7 @@ with collection.mutable.MapLike[K, V, PathMap[K, V]] {
     path match {
       case Some(path) =>
         path match {
-          case composer(parent, segment) =>
+          case transformation(parent, segment) =>
             node(parent) foreach { node =>
               node remove segment
               if (node isEmpty) remove(parent)
@@ -108,11 +108,11 @@ with collection.mutable.MapLike[K, V, PathMap[K, V]] {
 
 object PathMap {
 
-  def apply[K >: Null <: AnyRef : Ordering, V](composer: Composer[K]) =
-    new PathMap[K, V]()(composer, implicitly[Ordering[K]])
+  def apply[K >: Null <: AnyRef : Ordering, V](transformation: Transformation[K]) =
+    new PathMap[K, V]()(transformation, implicitly[Ordering[K]])
 
   def apply[V](separator: Char): PathMap[String, V] =
-    apply(new StringComposer(separator))
+    apply(new StringTransformation(separator))
 
   private final class Node[K >: Null <: AnyRef, V]
   (private[this] var _value: Option[V])
@@ -159,10 +159,10 @@ object PathMap {
     }
 
     final def recursiveEntriesIterator(path: Option[K])
-    (implicit converter: Composer[K]): Iterator[(K, V)] = {
+    (implicit transformation: Transformation[K]): Iterator[(K, V)] = {
       entry(path).iterator ++ _members.iterator.flatMap {
         case (segment, node) =>          
-          node recursiveEntriesIterator Some(converter(path, segment))
+          node recursiveEntriesIterator Some(transformation(path, segment))
       }
     }
 
@@ -173,20 +173,21 @@ object PathMap {
     }
   } // Node
 
-  trait Composer[K] extends ((Option[K], K) => K) {
+  trait Transformation[K] extends ((Option[K], K) => K) {
     /** The composition method for injection. */
     override def apply(parent: Option[K], segment: K): K
 
     /**
      * The decomposition method for extraction.
-     * Note that the second element of the tuple should not share any memory
-     * with the given path - otherwise you will not achieve any heap space
-     * savings!
+     * Note that the second element of the returned tuple should not share any
+     * memory with the given path - otherwise you might not achieve any heap
+     * space savings!
      */
     def unapply(path: K): Some[(Option[K], K)]
-  } // Composer
+  } // Transformation
 
-  final case class StringComposer(separator: Char) extends Composer[String] {
+  final case class StringTransformation(separator: Char)
+  extends Transformation[String] {
     override def apply(parent: Option[String], segment: String) = {
       parent match {
         case Some(parent) => parent + segment
