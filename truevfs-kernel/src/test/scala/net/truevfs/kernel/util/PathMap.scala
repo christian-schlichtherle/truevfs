@@ -22,7 +22,7 @@ import PathMap._
  * @param  <V> the type of the values in this map.
  * @author Christian Schlichtherle
  */
-final class PathMap[K >: Null <: AnyRef, V]
+final class PathMap[K >: Null <: AnyRef, V] private
 (implicit converter: Converter[K], private val ordering: Ordering[K])
 extends collection.mutable.Map[K, V]
 with collection.mutable.MapLike[K, V, PathMap[K, V]] {
@@ -105,8 +105,8 @@ with collection.mutable.MapLike[K, V, PathMap[K, V]] {
 
 object PathMap {
 
-  def apply[K >: Null <: AnyRef, V](converter: Converter[K])
-  (implicit ordering: Ordering[K]) = new PathMap[K, V]()(converter, ordering)
+  def apply[K >: Null <: AnyRef : Ordering, V](converter: Converter[K]) =
+    new PathMap[K, V]()(converter, implicitly[Ordering[K]])
 
   def apply[V](separator: Char): PathMap[String, V] =
     apply(new Splitter(separator))
