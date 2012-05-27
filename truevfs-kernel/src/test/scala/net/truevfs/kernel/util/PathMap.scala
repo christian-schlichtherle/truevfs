@@ -23,8 +23,7 @@ import PathMap._
  * @author Christian Schlichtherle
  */
 final class PathMap[K >: Null <: AnyRef, V]
-(private val converter: Converter[K] = new PathMap.Splitter('/'))
-(implicit private val ordering: Ordering[K])
+(implicit converter: Converter[K], private val ordering: Ordering[K])
 extends collection.mutable.Map[K, V]
 with collection.mutable.MapLike[K, V, PathMap[K, V]] {
 
@@ -41,9 +40,9 @@ with collection.mutable.MapLike[K, V, PathMap[K, V]] {
 
   override def clear() = reset()
 
-  override def empty = new PathMap[K, V](converter)
+  override def empty = new PathMap[K, V]
 
-  override def iterator = _root.recursiveEntriesIterator(None)(converter)
+  override def iterator = _root recursiveEntriesIterator (None)
 
   override def get(path: K) = node(Option(path)) flatMap (_ value)
 
@@ -105,6 +104,12 @@ with collection.mutable.MapLike[K, V, PathMap[K, V]] {
 } // PathMap
 
 object PathMap {
+
+  def apply[K >: Null <: AnyRef, V](converter: Converter[K])
+  (implicit ordering: Ordering[K]) = new PathMap[K, V]()(converter, ordering)
+
+  def apply[V](separator: Char): PathMap[String, V] =
+    apply(new Splitter(separator))
 
   private final class Node[K >: Null <: AnyRef, V]
   (private[this] var _value: Option[V])
