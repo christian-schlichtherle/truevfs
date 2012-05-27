@@ -15,7 +15,7 @@ class PathMapSpec
 extends WordSpec with ShouldMatchers with PropertyChecks {
   import PathMapSpec._
 
-  private def create() = new TestMap
+  private def create() = PathMap[Value]('/')
 
   "A path map" when {
     "empty" should {
@@ -148,6 +148,4 @@ object PathMapSpec {
   private def isPath(path: String) = null != path
 
   private final case class Value(path: String)
-
-  private type TestMap = PathMap[String, Value]
 } // PathMapSpec
