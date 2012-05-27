@@ -7,23 +7,24 @@ package net.truevfs.kernel.util
 import PathMap._
 
 /**
- * A mutable map for path names to any reference values.
- * This class is designed to save some heap space if the path names address
- * deeply nested directory structures where many path name segments can get
- * shared between entries.
- * Note that you need to make sure that the path names are eligible for garbage
- * collection in order to achieve these heap space savings!
+ * A mutable, ordered map with decomposable keys.
+ * The standard use case is for mapping path name strings which can get
+ * decomposed into segments by splitting them with a separator character such
+ * as {@code '/'}.
+ * Using this map will then help to save some heap space if the path names
+ * address deeply nested directory structures where many segments can get
+ * shared between mapped values <em>and</em> no external references to the path
+ * names are held!
+ * <p>
+ * This class supports both {@code null} keys and values.
  * <p>
  * This class is <em>not</em> thread-safe!
- * <p>
- * Implementation note: This class <em>must not</em> share any strings with its
- * clients in order to achieve the heap space savings!
  * 
  * @param  <V> the type of the values in this map.
  * @author Christian Schlichtherle
  */
 final class PathMap[K >: Null <: AnyRef, V] private
-(implicit converter: Converter[K], private val ordering: Ordering[K])
+(implicit composer: Composer[K], private val ordering: Ordering[K])
 extends collection.mutable.Map[K, V]
 with collection.mutable.MapLike[K, V, PathMap[K, V]] {
 
@@ -50,7 +51,7 @@ with collection.mutable.MapLike[K, V, PathMap[K, V]] {
     path match {
       case Some(path) =>
         path match {
-          case converter(parent, segment) =>
+          case composer(parent, segment) =>
             node(parent) flatMap (_.get(segment))
         }
       case None =>
@@ -60,7 +61,7 @@ with collection.mutable.MapLike[K, V, PathMap[K, V]] {
 
   def list(path: Option[K]) = {
     node(path) map (_.members map {
-      case (segment, value) => converter(path, segment) -> value
+      case (segment, value) => composer(path, segment) -> value
     })
   }
 
@@ -73,7 +74,7 @@ with collection.mutable.MapLike[K, V, PathMap[K, V]] {
     path match {
       case Some(path) =>
         path match {
-          case converter(parent, segment) =>
+          case composer(parent, segment) =>
             add(parent, None) add (segment, value)
         }
       case None =>
@@ -91,7 +92,7 @@ with collection.mutable.MapLike[K, V, PathMap[K, V]] {
     path match {
       case Some(path) =>
         path match {
-          case converter(parent, segment) =>
+          case composer(parent, segment) =>
             node(parent) foreach { node =>
               node remove segment
               if (node isEmpty) remove(parent)
@@ -105,11 +106,11 @@ with collection.mutable.MapLike[K, V, PathMap[K, V]] {
 
 object PathMap {
 
-  def apply[K >: Null <: AnyRef : Ordering, V](converter: Converter[K]) =
-    new PathMap[K, V]()(converter, implicitly[Ordering[K]])
+  def apply[K >: Null <: AnyRef : Ordering, V](composer: Composer[K]) =
+    new PathMap[K, V]()(composer, implicitly[Ordering[K]])
 
   def apply[V](separator: Char): PathMap[String, V] =
-    apply(new Splitter(separator))
+    apply(new StringComposer(separator))
 
   private final class Node[K >: Null <: AnyRef, V]
   (private[this] var _value: Option[V])
@@ -157,7 +158,7 @@ object PathMap {
     }
 
     final def recursiveEntriesIterator(path: Option[K])
-    (implicit converter: Converter[K]): Iterator[(K, V)] = {
+    (implicit converter: Composer[K]): Iterator[(K, V)] = {
       entry(path).iterator ++ _members.iterator.flatMap {
         case (segment, node) =>          
           node recursiveEntriesIterator Some(converter(path, segment))
@@ -171,20 +172,20 @@ object PathMap {
     }
   } // Node
 
-  trait Converter[K] extends ((Option[K], K) => K) {
-    /** The injection method. */
+  trait Composer[K] extends ((Option[K], K) => K) {
+    /** The composition method for injection. */
     override def apply(parent: Option[K], segment: K): K
 
     /**
-     * The extraction method.
+     * The decomposition method for extraction.
      * Note that the second element of the tuple should not share any memory
      * with the given path - otherwise you will not achieve any heap space
      * savings!
      */
     def unapply(path: K): Some[(Option[K], K)]
-  } // Converter
+  } // Composer
 
-  final case class Splitter(separator: Char) extends Converter[String] {
+  final case class StringComposer(separator: Char) extends Composer[String] {
     override def apply(parent: Option[String], segment: String) = {
       parent match {
         case Some(parent) => parent + segment
