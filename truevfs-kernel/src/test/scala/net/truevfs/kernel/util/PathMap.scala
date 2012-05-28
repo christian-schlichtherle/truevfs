@@ -5,9 +5,10 @@
 package net.truevfs.kernel.util
 
 import PathMap._
+import collection._
 
 /**
- * A mutable, ordered map with decomposable keys.
+ * A mutable map with decomposable keys.
  * The standard use case is for mapping path name strings which can get
  * decomposed into segments by splitting them with a separator character such
  * as {@code '/'}.
@@ -18,15 +19,20 @@ import PathMap._
  * <p>
  * This class supports both {@code null} keys and values.
  * <p>
+ * By default, this class uses {@link scala.collection.immutable.SortedMap}s
+ * with an implicit ordering passed to its constructor for storing its values.
+ * However, this is not a strict requirement.
+ * You can change this default property by overriding {@link #newDirectory},
+ * e.g. in order to return a new {@link scala.collection.mutable.LinkedHashMap}
+ * <p>
  * This class is <em>not</em> thread-safe!
  * 
  * @param  <V> the type of the values in this map.
  * @author Christian Schlichtherle
  */
-final class PathMap[K >: Null <: AnyRef, V] private
-(implicit composition: Composition[K], ordering: Ordering[K])
-extends collection.mutable.Map[K, V]
-with collection.mutable.MapLike[K, V, PathMap[K, V]] {
+class PathMap[K >: Null <: AnyRef, V] protected
+(implicit val composition: Composition[K], ordering: Ordering[K])
+extends mutable.Map[K, V] with mutable.MapLike[K, V, PathMap[K, V]] {
 
   private[this] var _root: Node[K, V] = _
   private var _size: Int = _
@@ -41,7 +47,7 @@ with collection.mutable.MapLike[K, V, PathMap[K, V]] {
 
   override def clear() = reset()
 
-  protected def newDirectory[V]: collection.Map[K, V] = collection.SortedMap.empty
+  protected def newDirectory[V]: Map[K, V] = immutable.SortedMap.empty
 
   override def empty = new PathMap[K, V]
 
@@ -61,7 +67,9 @@ with collection.mutable.MapLike[K, V, PathMap[K, V]] {
     }
   }
 
-  def list(path: Option[K]) = {
+  def list(path: K): Option[Map[K, V]] = list(Option(path))
+
+  private def list(path: Option[K]) = {
     node(path) map (_.members map {
       case (segment, value) => composition(path, segment) -> value
     })

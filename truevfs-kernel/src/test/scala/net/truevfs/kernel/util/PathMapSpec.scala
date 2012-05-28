@@ -101,7 +101,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
       sealed case class Action
       final case class Add(path: String) extends Action
       final case class Remove(path: String) extends Action
-      final case class List(path: Option[String]) extends Action
+      final case class List(path: String) extends Action
       val actions = Table(
         ("action", "expected"),
         (Action(), Seq()),
@@ -111,10 +111,10 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
         (Remove("bar"), Seq("", "foo")),
         (Add("foo/bar"), Seq("", "foo", "foo/bar")),
         (Add("bar/foo"), Seq("", "bar/foo", "foo", "foo/bar")),
-        (List(None), Seq("", "foo")),
-        (List(Some("")), Seq()),
-        (List(Some("foo")), Seq("foo/bar")),
-        (List(Some("bar")), Seq("bar/foo")),
+        (List(null), Seq("", "foo")),
+        (List(""), Seq()),
+        (List("foo"), Seq("foo/bar")),
+        (List("bar"), Seq("bar/foo")),
         (Remove("foo/bar"), Seq("", "bar/foo", "foo")),
         (Remove("bar/foo"), Seq("", "foo")),
         (Remove("foo"), Seq("")),
