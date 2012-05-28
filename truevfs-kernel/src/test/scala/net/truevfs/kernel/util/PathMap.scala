@@ -47,7 +47,8 @@ extends mutable.Map[K, V] with mutable.MapLike[K, V, PathMap[K, V]] {
 
   override def clear() = reset()
 
-  protected def newDirectory[V]: Map[K, V] = immutable.SortedMap.empty
+  protected def newDirectoryMap[V]: mutable.Map[K, V] =
+    new mutable.ImmutableMapAdaptor(immutable.SortedMap.empty)
 
   override def empty = new PathMap[K, V]
 
@@ -69,11 +70,7 @@ extends mutable.Map[K, V] with mutable.MapLike[K, V, PathMap[K, V]] {
 
   def list(path: K): Option[Map[K, V]] = list(Option(path))
 
-  private def list(path: Option[K]) = {
-    node(path) map (_.members map {
-      case (segment, value) => composition(path, segment) -> value
-    })
-  }
+  private def list(path: Option[K]) = node(path) map (_ members path)
 
   override def +=(entry: (K, V)) = {
     add(Option(entry._1), Some(entry._2))
@@ -126,7 +123,7 @@ object PathMap {
   (private[this] var _value: Option[V])
   (implicit map: PathMap[K, V]) {
 
-    private[this] var _members = map.newDirectory[Node[K, V]]
+    private[this] val _members = map.newDirectoryMap[Node[K, V]]
 
     if (_value isDefined) map._size += 1
 
@@ -176,8 +173,12 @@ object PathMap {
 
     private def entry(path: Option[K]) = _value map (path.orNull -> _)
 
-    def members = _members flatMap {
-      case (segment, node) => node.value map (segment -> _)
+    def members(path: Option[K])(implicit map: PathMap[K, V]) = {
+      val composition = map composition
+      val result = map.newDirectoryMap[V]
+      for ((segment, node) <- _members)
+        node.value foreach (result += composition(path, segment) -> _)
+      result
     }
   } // Node
 
