@@ -123,7 +123,11 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
       val map = newMap
       forAll(actions) { (action, expected) =>
         val result: collection.Map[String, Value] = action match {
-          case List(path)   => map.list(path) getOrElse (Map())
+          case List(path) =>
+            val result = collection.mutable.LinkedHashMap[String, Value]()
+            for ((path, value) <- map.list(path) getOrElse (Iterable()))
+              result += path -> value
+            result
           case Add(path)    => map += path -> Value(path); map
           case Remove(path) => map -= path; map
           case Action()     => map
