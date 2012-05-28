@@ -47,7 +47,7 @@ extends mutable.Map[K, V] with mutable.MapLike[K, V, PathMap[K, V]] {
 
   override def clear() = reset()
 
-  protected def newDirectoryMap[V]: mutable.Map[K, V] =
+  protected def newDirectory[V]: mutable.Map[K, V] =
     new mutable.ImmutableMapAdaptor(immutable.SortedMap.empty)
 
   override def empty = new PathMap[K, V]
@@ -123,7 +123,7 @@ object PathMap {
   (private[this] var _value: Option[V])
   (implicit map: PathMap[K, V]) {
 
-    private[this] val _members = map.newDirectoryMap[Node[K, V]]
+    private[this] val _members = map.newDirectory[Node[K, V]]
 
     if (_value isDefined) map._size += 1
 
@@ -175,7 +175,7 @@ object PathMap {
 
     def members(path: Option[K])(implicit map: PathMap[K, V]) = {
       val composition = map composition
-      val result = map.newDirectoryMap[V]
+      val result = map.newDirectory[V]
       for ((segment, node) <- _members)
         node.value foreach (result += composition(path, segment) -> _)
       result
