@@ -25,13 +25,13 @@ public final class FsResourceOpenException extends IOException {
     final int total, local;
 
     FsResourceOpenException(int total, int local) {
-        super("Total (thread local) number of open I/O resources: %d (%d)");
+        super("Thread-local vs. total number of open I/O resources (streams, channels etc): %d / %d");
         this.total = total;
         this.local = local;
     }
 
     @Override
     public String getMessage() {
-        return String.format(super.getMessage(), total, local);
+        return String.format(super.getMessage(), local, total);
     }
 }
