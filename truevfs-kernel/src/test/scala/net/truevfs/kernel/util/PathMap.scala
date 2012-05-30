@@ -41,7 +41,7 @@ extends mutable.Map[K, V] with mutable.MapLike[K, V, PathMap[K, V]] {
 
   implicit private def self = this
 
-  private def reset() { _root = new Node(None); _size = 0}
+  private def reset() { _root = new Root; _size = 0}
 
   override def size = _size
 
@@ -54,7 +54,9 @@ extends mutable.Map[K, V] with mutable.MapLike[K, V, PathMap[K, V]] {
 
   override def iterator = _root recursiveEntriesIterator (None)
 
-  override def get(path: K) = node(Option(path)) flatMap (_ value)
+  override def get(path: K) = node(path) flatMap (_ value)
+
+  def node(path: K): Option[Node[K, V]] = node(Option(path))
 
   private def node(path: Option[K]): Option[Node[K, V]] = {
     path match {
@@ -70,12 +72,14 @@ extends mutable.Map[K, V] with mutable.MapLike[K, V, PathMap[K, V]] {
 
   def list(path: K): Option[Iterable[(K, V)]] = list(Option(path))
 
-  private def list(path: Option[K]) = node(path) map (_ members path)
+  private def list(path: Option[K]) = node(path) map (_ list path)
 
   override def +=(entry: (K, V)) = {
-    add(Option(entry._1), Some(entry._2))
+    add(entry._1, entry._2)
     this
   }
+
+  def add(path: K, value: V): Node[K, V] = add(Option(path), Some(value))
 
   private def add(path: Option[K], value: Option[V]): Node[K, V] = {
     path match {
@@ -119,16 +123,27 @@ object PathMap {
   def apply[V](separator: Char): PathMap[String, V] =
     apply(new StringComposition(separator))
 
-  private final class Node[K >: Null <: AnyRef, V]
-  (private[this] var _value: Option[V])
+  class Node[K >: Null <: AnyRef, V] private[PathMap] (
+    private[this] val parent: Option[(Node[K, V], K)],
+    private[this] var _value: Option[V])
   (implicit map: PathMap[K, V]) {
 
     private[this] val _members = map.newDirectory[Node[K, V]]
 
     if (_value isDefined) map._size += 1
 
+    def address: (PathMap[K, V], Option[K]) = {
+      val (node, segment) = parent.get
+      val (map, path) = node.address
+      map -> Some(map.composition(path, segment))
+    }
+
+    def path = address._2
+
     def value = _value
-    def value_=(value: Option[V])(implicit map: PathMap[K, V]) {
+
+    private[PathMap] def value_=(value: Option[V])
+    (implicit map: PathMap[K, V]) {
       // HC SVNT DRACONES!
       if (_value isDefined) {
         if (value isEmpty)
@@ -140,30 +155,31 @@ object PathMap {
       _value = value
     }
 
-    def isEmpty = _value.isEmpty && 0 == _members.size
+    private[PathMap] def isEmpty = _value.isEmpty && 0 == _members.size
 
-    final def get(segment: K) = _members get segment
+    private[PathMap] final def get(segment: K) = _members get segment
 
-    final def add(segment: K, value: Option[V])(implicit map: PathMap[K, V]) = {
+    private[PathMap] final def add(segment: K, value: Option[V])
+    (implicit map: PathMap[K, V]) = {
       _members get segment match {
         case Some(node) =>
           if (value isDefined) node value = value
           node
         case None =>
-          val node = new Node[K, V](value)
+          val node = new Node[K, V](Some(this, segment), value)
           _members += segment -> node
           node
       }
     }
 
-    final def remove(segment: K)(implicit map: PathMap[K, V]) {
+    private[PathMap] final def remove(segment: K)(implicit map: PathMap[K, V]) {
       _members get segment map { node =>
         node value = None
         if (node isEmpty) _members -= segment
       }
     }
 
-    final def recursiveEntriesIterator(path: Option[K])
+    private[PathMap] final def recursiveEntriesIterator(path: Option[K])
     (implicit composition: Composition[K]): Iterator[(K, V)] = {
       entry(path).iterator ++ _members.iterator.flatMap {
         case (segment, node) =>          
@@ -173,12 +189,24 @@ object PathMap {
 
     private def entry(path: Option[K]) = _value map (path.orNull -> _)
 
-    def members(path: Option[K])(implicit composition: Composition[K]) = {
+    private[PathMap] def list(path: Option[K])
+    (implicit composition: Composition[K]) = {
       _members.toIterable flatMap {
         case (segment, node) => node.value map (composition(path, segment) -> _)
       }
     }
+
+    def members = {
+      _members.toIterable withFilter {
+        case (segment, node) => node.value isDefined
+      }
+    }
   } // Node
+
+  private final class Root[K >: Null <: AnyRef, V](implicit map: PathMap[K, V])
+  extends Node[K, V](None, None) {
+    override def address = map -> None
+  } // Root
 
   trait Composition[K] extends ((Option[K], K) => K) {
     /** The composition method for injection. */
