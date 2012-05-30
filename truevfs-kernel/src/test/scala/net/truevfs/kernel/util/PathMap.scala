@@ -4,8 +4,8 @@
  */
 package net.truevfs.kernel.util
 
-import PathMap._
 import collection._
+import PathMap._
 
 /**
  * A mutable map with decomposable keys.
