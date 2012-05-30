@@ -11,85 +11,85 @@ import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
 
 @RunWith(classOf[JUnitRunner])
-class PathMapSpec
+class FileSystemSpec
 extends WordSpec with ShouldMatchers with PropertyChecks {
-  import PathMapSpec._
+  import FileSystemSpec._
 
-  private def newMap = PathMap[Value]('/')
+  private def newFileSystem = FileSystem[Entry]('/')
 
-  "A path map" when {
+  "A file system" when {
     "empty" should {
       "have appropriate properties" in {
-        val map = newMap
+        val fs = newFileSystem
         forAll { path: String =>
           whenever (isPath(path)) {
-            map.remove(path) should be (None)
+            fs.remove(path) should be (None)
           }
         }
-        map should have size (0)
-        map.iterator.hasNext should be (false)
+        fs should have size (0)
+        fs.iterator.hasNext should be (false)
       }
     }
 
     "not empty" should {
       "have appropriate properties" in {
-        val map = newMap
+        val fs = newFileSystem
         forAll { parentPath: String =>
           whenever (isParentPath(parentPath)) {
-            val parentValue = Value(parentPath)
-            map += parentPath -> parentValue
-            map(parentPath) should be theSameInstanceAs(parentValue)
-            map.size should be >= (1)
-            val iterator = map.iterator
+            val parentEntry = Entry(parentPath)
+            fs += parentPath -> parentEntry 
+            fs(parentPath) should be theSameInstanceAs(parentEntry )
+            fs.size should be >= (1)
+            val iterator = fs.iterator
             iterator.hasNext should be (true)
-            iterator.next should be ((parentPath, parentValue))
+            iterator.next should be ((parentPath, parentEntry ))
             iterator.hasNext should be (false)
             forAll { memberName: String =>
               whenever (isMemberName(memberName)) {
                 val path = parentPath + '/' + memberName
-                val value = Value(path)
-                map += path -> value
-                map(path) should be theSameInstanceAs(value)
-                map.size should be >= (2)
-                val iterator = map.iterator
+                val entry = Entry(path)
+                fs += path -> entry
+                fs(path) should be theSameInstanceAs(entry)
+                fs.size should be >= (2)
+                val iterator = fs.iterator
                 iterator.hasNext should be (true)
-                iterator.next should be ((parentPath, parentValue))
+                iterator.next should be ((parentPath, parentEntry ))
                 iterator.hasNext should be (true)
-                iterator.next should be ((path, value))
+                iterator.next should be ((path, entry))
                 iterator.hasNext should be (false)
-                map.remove(path) should be (Some(value))
-                map.get(path) should be (None)
-                map.remove(path) should be (None)
+                fs.remove(path) should be (Some(entry))
+                fs.get(path) should be (None)
+                fs.remove(path) should be (None)
               }
             }
-            map.remove(parentPath) should be (Some(parentValue))
-            map.get(parentPath) should be (None)
-            map.remove(parentPath) should be (None)
+            fs.remove(parentPath) should be (Some(parentEntry ))
+            fs.get(parentPath) should be (None)
+            fs.remove(parentPath) should be (None)
           }
         }
       }
     }
   }
 
-  private def check(path: String, value: Value) {
-    val map = newMap
-    map += path -> value
-    map(path) should be theSameInstanceAs (value)
-    map should have size (1)
-    val iterator = map.iterator
+  private def check(path: String, entry: Entry) {
+    val fs = newFileSystem
+    fs += path -> entry
+    fs(path) should be theSameInstanceAs (entry)
+    fs should have size (1)
+    val iterator = fs.iterator
     iterator.hasNext should be (true)
-    iterator.next should be (path -> value)
+    iterator.next should be (path -> entry)
     iterator.hasNext should be (false)
-    map.remove(path) should be (Some(value))
-    map.get(path) should be (None)
+    fs.remove(path) should be (Some(entry))
+    fs.get(path) should be (None)
   }
 
-  "A path map" should {
+  "A file system" should {
     "accept the null path" in {
-      check(null, Value(null))
+      check(null, Entry(null))
     }
 
-    "accept null values" in {
+    "accept null entries" in {
       forAll { path: String =>
         whenever (isPath(path)) {
           check(path, null)
@@ -97,7 +97,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
       }
     }
 
-    "correctly persist values" in {
+    "correctly persist entries" in {
       sealed case class Action
       final case class Add(path: String) extends Action
       final case class Remove(path: String) extends Action
@@ -120,17 +120,17 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
         (Remove("foo"), Seq("")),
         (Remove(""), Seq())
       )
-      val map = newMap
+      val fs = newFileSystem
       forAll(actions) { (action, expected) =>
-        val result: collection.Map[String, Value] = action match {
+        val result: collection.Map[String, Entry] = action match {
           case List(path) =>
-            val result = collection.mutable.LinkedHashMap[String, Value]()
-            for ((path, value) <- map.list(path) getOrElse (Iterable()))
-              result += path -> value
+            val result = collection.mutable.LinkedHashMap[String, Entry]()
+            for ((path, entry) <- fs.list(path) getOrElse (Iterable()))
+              result += path -> entry
             result
-          case Add(path)    => map += path -> Value(path); map
-          case Remove(path) => map -= path; map
-          case Action()     => map
+          case Add(path)    => fs += path -> Entry(path); fs
+          case Remove(path) => fs -= path; fs
+          case Action()     => fs
         }
         result should have size (expected size)
         for (path <- expected)
@@ -139,9 +139,9 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
       }
     }
   }
-} // PathMapSpec
+} // FileSystemSpec
 
-object PathMapSpec {
+object FileSystemSpec {
 
   private def isParentPath(parentPath: String) =
     null != parentPath && !parentPath.isEmpty && !parentPath.endsWith("/")
@@ -151,5 +151,5 @@ object PathMapSpec {
 
   private def isPath(path: String) = null != path
 
-  private final case class Value(path: String)
-} // PathMapSpec
+  private final case class Entry(path: String)
+} // FileSystemSpec
