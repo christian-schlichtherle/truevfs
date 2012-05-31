@@ -136,9 +136,9 @@ object FileSystem {
   ) = apply[String, V](new StringComposition(separator), directoryFactory)
 
   /** A file system node. */
-  sealed abstract class Node[K >: Null, V] extends Iterable[(K, Node[K, V])] {
-    def address: (FileSystem[K, V], Option[K])
-    final def path = address _2
+  sealed abstract class Node[K >: Null, +V] extends Iterable[(K, Node[K, V])] {
+    def path: Option[K]
+    final def isRoot = path isEmpty
     def entry: Option[V]
     final def isGhost = entry isEmpty
     final def isLeaf = isEmpty
@@ -156,7 +156,13 @@ object FileSystem {
 
     if (_entry isDefined) fs._size += 1
 
-    override def address: (FileSystem[K, V], Option[K]) = {
+    override def iterator = _members iterator
+    override def foreach[U](f: ((K, Node[K, V])) => U): Unit = _members foreach f
+    override def size = _members size
+
+    override def path = address _2
+
+    def address: (FileSystem[K, V], Option[K]) = {
       val (node, segment) = parent get
       val (fs, path) = node.address
       fs -> Some(fs composition (path, segment))
@@ -196,8 +202,6 @@ object FileSystem {
         if (node isLeaf) _members -= segment
       }
     }
-
-    override def iterator = _members iterator
 
     def isDead = isGhost && isLeaf
   } // INode
