@@ -52,9 +52,19 @@ final class FileSystem[K >: Null, V](
 
   override def iterator = iterator(None, _root)
 
-  private def iterator(path: Option[K], node: INode[K, V]): Iterator[(K, V)] = {
-    node.entry.map(path.orNull -> _).iterator ++ node.members.flatMap {
+  private def iterator(path: Option[K], node: Node[K, V]): Iterator[(K, V)] = {
+    node.entry.map(path.orNull -> _).iterator ++ node.iterator.flatMap {
       case (segment, node) => iterator(Some(composition(path, segment)), node)
+    }
+  }
+
+  def list(path: K): Option[Iterator[(K, V)]] = list(Option(path))
+
+  private def list(path: Option[K]) = {
+    node(path) map {
+      _.iterator.flatMap {
+        case (segment, node) => node.entry map (composition(path, segment) -> _)
+      }
     }
   }
 
@@ -73,10 +83,6 @@ final class FileSystem[K >: Null, V](
         Some(_root)
     }
   }
-
-  def list(path: K): Option[Iterator[(K, V)]] = list(Option(path))
-
-  private def list(path: Option[K]) = node(path) map (_ list path)
 
   override def +=(kv: (K, V)) = { link(kv._1, kv._2); this }
 
@@ -130,14 +136,14 @@ object FileSystem {
   ) = apply[String, V](new StringComposition(separator), directoryFactory)
 
   /** A file system node. */
-  sealed abstract class Node[K >: Null, V] {
+  sealed abstract class Node[K >: Null, V] extends Iterable[(K, Node[K, V])] {
     def address: (FileSystem[K, V], Option[K])
-    def path = address _2
+    final def path = address _2
     def entry: Option[V]
-    def isGhost = entry isEmpty
-    def members: Iterator[(K, Node[K,V])]
-    def isLeaf = members isEmpty
-    final override def toString = "Node(path=" + path + ", isLeaf=" + isLeaf + ", entry=" + entry + ")"
+    final def isGhost = entry isEmpty
+    final def isLeaf = isEmpty
+    final override def stringPrefix = "Node"
+    final override def toString = stringPrefix + "(path=" + path + ", isLeaf=" + isLeaf + ", entry=" + entry + ")"
   } // Node
 
   private class INode[K >: Null, V] protected (
@@ -170,8 +176,6 @@ object FileSystem {
       _entry = entry
     }
 
-    override def isGhost = _entry isEmpty
-
     def get(segment: K) = _members get segment
 
     def link(segment: K, entry: Option[V])(implicit fs: FileSystem[K, V]) = {
@@ -193,15 +197,7 @@ object FileSystem {
       }
     }
 
-    def list(path: Option[K])(implicit composition: Composition[K]) = {
-      _members.iterator flatMap {
-        case (segment, node) => node.entry map (composition(path, segment) -> _)
-      }
-    }
-
-    override def members = _members iterator
-
-    override def isLeaf = _members isEmpty
+    override def iterator = _members iterator
 
     def isDead = isGhost && isLeaf
   } // INode
