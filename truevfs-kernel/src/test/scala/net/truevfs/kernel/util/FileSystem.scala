@@ -35,7 +35,7 @@ final class FileSystem[K >: Null, V](
   val directoryFactory: DirectoryFactory[K]
 ) extends mutable.Map[K, V] with mutable.MapLike[K, V, FileSystem[K, V]] {
 
-  private[this] var _root: Node[K, V] = _
+  private[this] var _root: Inode[K, V] = _
   private var _size: Int = _
 
   reset()
@@ -56,7 +56,7 @@ final class FileSystem[K >: Null, V](
 
   def node(path: K): Option[Node[K, V]] = node(Option(path))
 
-  private def node(path: Option[K]): Option[Node[K, V]] = {
+  private def node(path: Option[K]): Option[Inode[K, V]] = {
     path match {
       case Some(path) =>
         path match {
@@ -68,7 +68,7 @@ final class FileSystem[K >: Null, V](
     }
   }
 
-  def list(path: K): Option[Iterable[(K, V)]] = list(Option(path))
+  def list(path: K): Option[Iterator[(K, V)]] = list(Option(path))
 
   private def list(path: Option[K]) = node(path) map (_ list path)
 
@@ -76,7 +76,7 @@ final class FileSystem[K >: Null, V](
 
   def link(path: K, entry: V): Node[K, V] = link(Option(path), Some(entry))
 
-  private def link(path: Option[K], entry: Option[V]): Node[K, V] = {
+  private def link(path: Option[K], entry: Option[V]): Inode[K, V] = {
     path match {
       case Some(path) =>
         path match {
@@ -100,7 +100,7 @@ final class FileSystem[K >: Null, V](
           case composition(parent, segment) =>
             node(parent) foreach { node =>
               node unlink segment
-              if (node isEmpty) unlink(parent)
+              if (node isDead) unlink(parent)
             }
         }
       case None =>
@@ -123,27 +123,38 @@ object FileSystem {
     directoryFactory: DirectoryFactory[String] = new SortedDirectoryFactory
   ) = apply[String, V](new StringComposition(separator), directoryFactory)
 
-  sealed class Node[K >: Null, V] protected (
-    private[this] val parent: Option[(Node[K, V], K)],
-    private[this] var _entry: Option[V]
-  ) (implicit fs: FileSystem[K, V]) {
+  /** A file system node. */
+  sealed abstract class Node[K >: Null, V] {
+    def address: (FileSystem[K, V], Option[K])
+    def path = address _2
+    def entry: Option[V]
+    def isGhost = entry isEmpty
+    def members: Iterator[(K, Node[K,V])]
+    def isLeaf = members isEmpty
+    final override def toString = "Node(path=" + path + ", entry=" + entry + ")"
+  } // Node
 
-    private[this] val _members = fs.directoryFactory.create[Node[K, V]]
+  private class Inode[K >: Null, V] protected (
+    private[this] val parent: Option[(Inode[K, V], K)],
+    private[this] var _entry: Option[V]
+  ) (implicit fs: FileSystem[K, V])
+  extends Node[K, V] {
+
+    private[this] val _members = fs.directoryFactory.create[Inode[K, V]]
 
     if (_entry isDefined) fs._size += 1
 
-    def address: (FileSystem[K, V], Option[K]) = {
+    override def address: (FileSystem[K, V], Option[K]) = {
       val (node, segment) = parent get
       val (fs, path) = node.address
       fs -> Some(fs composition (path, segment))
     }
 
-    final def path = address _2
+    def item(path: Option[K]) = _entry map (path.orNull -> _)
 
-    final def entry = _entry
+    override def entry = _entry
 
-    private[FileSystem] final def entry_=(entry: Option[V])
-    (implicit fs: FileSystem[K, V]) {
+    def entry_=(entry: Option[V])(implicit fs: FileSystem[K, V]) {
       // HC SVNT DRACONES!
       if (_entry isDefined) {
         if (entry isEmpty)
@@ -155,60 +166,53 @@ object FileSystem {
       _entry = entry
     }
 
-    private[FileSystem] final def isEmpty = _entry.isEmpty && 0 == _members.size
+    override def isGhost = _entry isEmpty
 
-    private[FileSystem] final def get(segment: K) = _members get segment
+    def get(segment: K) = _members get segment
 
-    private[FileSystem] final def link(segment: K, entry: Option[V])
-    (implicit fs: FileSystem[K, V]) = {
+    def link(segment: K, entry: Option[V])(implicit fs: FileSystem[K, V]) = {
       _members get segment match {
         case Some(node) =>
           if (entry isDefined) node entry = entry
           node
         case None =>
-          val node = new Node[K, V](Some(this, segment), entry)
+          val node = new Inode[K, V](Some(this, segment), entry)
           _members += segment -> node
           node
       }
     }
 
-    private[FileSystem] final def unlink(segment: K)
-    (implicit fs: FileSystem[K, V]) {
-      _members get segment map { node =>
+    def unlink(segment: K)(implicit fs: FileSystem[K, V]) {
+      _members get segment foreach { node =>
         node entry = None
-        if (node isEmpty) _members -= segment
+        if (node isLeaf) _members -= segment
       }
     }
 
-    private[FileSystem] final def recursiveEntriesIterator(path: Option[K])
+    def recursiveEntriesIterator(path: Option[K])
     (implicit composition: Composition[K]): Iterator[(K, V)] = {
-      entry(path).iterator ++ _members.iterator.flatMap {
+      item(path).iterator ++ _members.iterator.flatMap {
         case (segment, node) =>          
           node recursiveEntriesIterator Some(composition(path, segment))
       }
     }
 
-    private def entry(path: Option[K]) = _entry map (path.orNull -> _)
-
-    private[FileSystem] def list(path: Option[K])
-    (implicit composition: Composition[K]) = {
-      _members.toIterable flatMap {
+    def list(path: Option[K])(implicit composition: Composition[K]) = {
+      _members.iterator flatMap {
         case (segment, node) => node.entry map (composition(path, segment) -> _)
       }
     }
 
-    final def members = {
-      _members.toIterable withFilter {
-        case (segment, node) => node.entry isDefined
-      }
-    }
+    override def members = _members iterator
 
-    final override def toString = "Node(path=" + path + ", entry=" + entry + ")"
-  } // Node
+    override def isLeaf = _members isEmpty
+
+    def isDead = isGhost && isLeaf
+  } // Inode
 
   private final class Root[K >: Null, V]
   (implicit fs: FileSystem[K, V])
-  extends Node[K, V](None, None) {
+  extends Inode[K, V](None, None) {
     override def address = fs -> None
   } // Root
 
