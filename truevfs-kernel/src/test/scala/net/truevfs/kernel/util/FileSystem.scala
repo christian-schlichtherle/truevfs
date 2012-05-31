@@ -61,11 +61,9 @@ final class FileSystem[K >: Null, V](
   def list(path: K): Option[Iterator[(K, V)]] = list(Option(path))
 
   private def list(path: Option[K]) = {
-    node(path) map {
-      _.iterator.flatMap {
-        case (segment, node) => node.entry map (composition(path, segment) -> _)
-      }
-    }
+    node(path) map (_.iterator flatMap {
+      case (segment, node) => node.entry map (composition(path, segment) -> _)
+    })
   }
 
   override def get(path: K) = node(path) flatMap (_ entry)
