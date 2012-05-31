@@ -35,7 +35,7 @@ final class FileSystem[K >: Null, V](
   val directoryFactory: DirectoryFactory[K]
 ) extends mutable.Map[K, V] with mutable.MapLike[K, V, FileSystem[K, V]] {
 
-  private[this] var _root: Inode[K, V] = _
+  private[this] var _root: INode[K, V] = _
   private var _size: Int = _
 
   reset()
@@ -50,13 +50,19 @@ final class FileSystem[K >: Null, V](
 
   override def empty = new FileSystem[K, V]
 
-  override def iterator = _root recursiveEntriesIterator (None)
+  override def iterator = iterator(None, _root)
+
+  private def iterator(path: Option[K], node: INode[K, V]): Iterator[(K, V)] = {
+    node.entry.map(path.orNull -> _).iterator ++ node.members.flatMap {
+      case (segment, node) => iterator(Some(composition(path, segment)), node)
+    }
+  }
 
   override def get(path: K) = node(path) flatMap (_ entry)
 
   def node(path: K): Option[Node[K, V]] = node(Option(path))
 
-  private def node(path: Option[K]): Option[Inode[K, V]] = {
+  private def node(path: Option[K]): Option[INode[K, V]] = {
     path match {
       case Some(path) =>
         path match {
@@ -76,7 +82,7 @@ final class FileSystem[K >: Null, V](
 
   def link(path: K, entry: V): Node[K, V] = link(Option(path), Some(entry))
 
-  private def link(path: Option[K], entry: Option[V]): Inode[K, V] = {
+  private def link(path: Option[K], entry: Option[V]): INode[K, V] = {
     path match {
       case Some(path) =>
         path match {
@@ -131,16 +137,16 @@ object FileSystem {
     def isGhost = entry isEmpty
     def members: Iterator[(K, Node[K,V])]
     def isLeaf = members isEmpty
-    final override def toString = "Node(path=" + path + ", entry=" + entry + ")"
+    final override def toString = "Node(path=" + path + ", isLeaf=" + isLeaf + ", entry=" + entry + ")"
   } // Node
 
-  private class Inode[K >: Null, V] protected (
-    private[this] val parent: Option[(Inode[K, V], K)],
+  private class INode[K >: Null, V] protected (
+    private[this] val parent: Option[(INode[K, V], K)],
     private[this] var _entry: Option[V]
   ) (implicit fs: FileSystem[K, V])
   extends Node[K, V] {
 
-    private[this] val _members = fs.directoryFactory.create[Inode[K, V]]
+    private[this] val _members = fs.directoryFactory.create[INode[K, V]]
 
     if (_entry isDefined) fs._size += 1
 
@@ -149,8 +155,6 @@ object FileSystem {
       val (fs, path) = node.address
       fs -> Some(fs composition (path, segment))
     }
-
-    def item(path: Option[K]) = _entry map (path.orNull -> _)
 
     override def entry = _entry
 
@@ -176,7 +180,7 @@ object FileSystem {
           if (entry isDefined) node entry = entry
           node
         case None =>
-          val node = new Inode[K, V](Some(this, segment), entry)
+          val node = new INode[K, V](Some(this, segment), entry)
           _members += segment -> node
           node
       }
@@ -186,14 +190,6 @@ object FileSystem {
       _members get segment foreach { node =>
         node entry = None
         if (node isLeaf) _members -= segment
-      }
-    }
-
-    def recursiveEntriesIterator(path: Option[K])
-    (implicit composition: Composition[K]): Iterator[(K, V)] = {
-      item(path).iterator ++ _members.iterator.flatMap {
-        case (segment, node) =>          
-          node recursiveEntriesIterator Some(composition(path, segment))
       }
     }
 
@@ -208,11 +204,10 @@ object FileSystem {
     override def isLeaf = _members isEmpty
 
     def isDead = isGhost && isLeaf
-  } // Inode
+  } // INode
 
-  private final class Root[K >: Null, V]
-  (implicit fs: FileSystem[K, V])
-  extends Inode[K, V](None, None) {
+  private final class Root[K >: Null, V](implicit fs: FileSystem[K, V])
+  extends INode[K, V](None, None) {
     override def address = fs -> None
   } // Root
 
