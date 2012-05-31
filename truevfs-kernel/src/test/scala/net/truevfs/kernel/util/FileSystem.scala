@@ -14,7 +14,7 @@ import FileSystem._
  * can get decomposed into segments by splitting them with a separator
  * character such as {@code '/'}.
  * However, this class works with any generic decomposable key type for which
- * a {@link FileSystem.Composition} and an {@link Ordering} exist.
+ * a {@link Composition} and a {@link DirectoryFactory} exist.
  * <p>
  * Using this class helps to save some heap space if the paths address deeply
  * nested directory trees where many path segments can get shared between
@@ -23,12 +23,6 @@ import FileSystem._
  * <p>
  * This class supports both {@code null} paths and entries.
  * <p>
- * By default, this class uses {@link scala.collection.immutable.SortedMap}s
- * with an implicit ordering passed to its constructor for storing its values.
- * However, this is not a strict requirement.
- * You can change this default property by overriding {@link #newDirectory},
- * e.g. in order to return a new {@link scala.collection.mutable.LinkedHashMap}
- * <p>
  * This class is <em>not</em> thread-safe!
  * 
  * @param  <K> the type of the paths (keys) in this (virtual) file system (map).
@@ -36,25 +30,23 @@ import FileSystem._
  *         (map).
  * @author Christian Schlichtherle
  */
-class FileSystem[K >: Null <: AnyRef, V] protected
-(implicit val composition: Composition[K], ordering: Ordering[K])
-extends mutable.Map[K, V] with mutable.MapLike[K, V, FileSystem[K, V]] {
+final class FileSystem[K >: Null, V](
+  implicit val composition: Composition[K],
+  val directoryFactory: DirectoryFactory[K]
+) extends mutable.Map[K, V] with mutable.MapLike[K, V, FileSystem[K, V]] {
 
   private[this] var _root: Node[K, V] = _
   private var _size: Int = _
 
   reset()
 
-  private implicit def self = this
+  implicit private def self = this
 
   private def reset() { _root = new Root; _size = 0}
 
   override def size = _size
 
   override def clear() = reset()
-
-  protected def newDirectory[V]: mutable.Map[K, V] =
-    new mutable.ImmutableMapAdaptor(immutable.SortedMap.empty)
 
   override def empty = new FileSystem[K, V]
 
@@ -89,7 +81,7 @@ extends mutable.Map[K, V] with mutable.MapLike[K, V, FileSystem[K, V]] {
       case Some(path) =>
         path match {
           case composition(parent, segment) =>
-            link(parent, None) add (segment, entry)
+            link(parent, None) link (segment, entry)
         }
       case None =>
         if (entry isDefined) _root entry = entry
@@ -107,7 +99,7 @@ extends mutable.Map[K, V] with mutable.MapLike[K, V, FileSystem[K, V]] {
         path match {
           case composition(parent, segment) =>
             node(parent) foreach { node =>
-              node remove segment
+              node unlink segment
               if (node isEmpty) unlink(parent)
             }
         }
@@ -115,54 +107,60 @@ extends mutable.Map[K, V] with mutable.MapLike[K, V, FileSystem[K, V]] {
         _root entry = None
     }
   }
+
+  override def stringPrefix = "FileSystem"
 } // FileSystem
 
 object FileSystem {
 
-  def apply[K >: Null <: AnyRef : Ordering, V](composition: Composition[K]) =
-    new FileSystem[K, V]()(composition, implicitly[Ordering[K]])
+  def apply[K >: Null, V](
+    composition: Composition[K],
+    directoryFactory: DirectoryFactory[K]
+  ) = new FileSystem[K, V]()(composition, directoryFactory)
 
-  def apply[V](separator: Char): FileSystem[String, V] =
-    apply(new StringComposition(separator))
+  def apply[V](
+    separator: Char,
+    directoryFactory: DirectoryFactory[String] = new SortedDirectoryFactory
+  ) = apply[String, V](new StringComposition(separator), directoryFactory)
 
-  class Node[K >: Null <: AnyRef, V] private[FileSystem] (
+  sealed class Node[K >: Null, V] protected (
     private[this] val parent: Option[(Node[K, V], K)],
-    private[this] var _entry: Option[V])
-  (implicit map: FileSystem[K, V]) {
+    private[this] var _entry: Option[V]
+  ) (implicit fs: FileSystem[K, V]) {
 
-    private[this] val _members = map.newDirectory[Node[K, V]]
+    private[this] val _members = fs.directoryFactory.create[Node[K, V]]
 
-    if (_entry isDefined) map._size += 1
+    if (_entry isDefined) fs._size += 1
 
     def address: (FileSystem[K, V], Option[K]) = {
       val (node, segment) = parent get
-      val (map, path) = node.address
-      map -> Some(map composition (path, segment))
+      val (fs, path) = node.address
+      fs -> Some(fs composition (path, segment))
     }
 
-    def path = address _2
+    final def path = address _2
 
-    def entry = _entry
+    final def entry = _entry
 
-    private[FileSystem] def entry_=(entry: Option[V])
-    (implicit map: FileSystem[K, V]) {
+    private[FileSystem] final def entry_=(entry: Option[V])
+    (implicit fs: FileSystem[K, V]) {
       // HC SVNT DRACONES!
       if (_entry isDefined) {
         if (entry isEmpty)
-          map._size -= 1
+          fs._size -= 1
       } else {
         if (entry isDefined)
-          map._size += 1
+          fs._size += 1
       }
       _entry = entry
     }
 
-    private[FileSystem] def isEmpty = _entry.isEmpty && 0 == _members.size
+    private[FileSystem] final def isEmpty = _entry.isEmpty && 0 == _members.size
 
     private[FileSystem] final def get(segment: K) = _members get segment
 
-    private[FileSystem] final def add(segment: K, entry: Option[V])
-    (implicit map: FileSystem[K, V]) = {
+    private[FileSystem] final def link(segment: K, entry: Option[V])
+    (implicit fs: FileSystem[K, V]) = {
       _members get segment match {
         case Some(node) =>
           if (entry isDefined) node entry = entry
@@ -174,7 +172,8 @@ object FileSystem {
       }
     }
 
-    private[FileSystem] final def remove(segment: K)(implicit map: FileSystem[K, V]) {
+    private[FileSystem] final def unlink(segment: K)
+    (implicit fs: FileSystem[K, V]) {
       _members get segment map { node =>
         node entry = None
         if (node isEmpty) _members -= segment
@@ -198,16 +197,19 @@ object FileSystem {
       }
     }
 
-    def members = {
+    final def members = {
       _members.toIterable withFilter {
         case (segment, node) => node.entry isDefined
       }
     }
+
+    final override def toString = "Node(path=" + path + ", entry=" + entry + ")"
   } // Node
 
-  private final class Root[K >: Null <: AnyRef, V](implicit map: FileSystem[K, V])
+  private final class Root[K >: Null, V]
+  (implicit fs: FileSystem[K, V])
   extends Node[K, V](None, None) {
-    override def address = map -> None
+    override def address = fs -> None
   } // Root
 
   trait Composition[K] extends ((Option[K], K) => K) {
@@ -223,7 +225,7 @@ object FileSystem {
     def unapply(path: K): Some[(Option[K], K)]
   } // Composition
 
-  final case class StringComposition(separator: Char)
+  final class StringComposition(separator: Char)
   extends Composition[String] {
     override def apply(parent: Option[String], segment: String) = {
       parent match {
@@ -243,4 +245,20 @@ object FileSystem {
       } 
     }
   } // StringComposition
+
+  trait DirectoryFactory[K] {
+    def create[V]: mutable.Map[K, V]
+  } // DirectoryFactory
+
+  final class HashedDirectoryFactory[K] extends DirectoryFactory[K] {
+    def create[V] = new mutable.HashMap
+  } // HashDirectoryFactory
+
+  final class SortedDirectoryFactory[K : Ordering] extends DirectoryFactory[K] {
+    def create[V] = new mutable.ImmutableMapAdaptor(immutable.SortedMap.empty)
+  } // SortedDirectoryFactory
+
+  final class LinkedDirectoryFactory[K] extends DirectoryFactory[K] {
+    def create[V] = new mutable.LinkedHashMap
+  }
 } // FileSystem
