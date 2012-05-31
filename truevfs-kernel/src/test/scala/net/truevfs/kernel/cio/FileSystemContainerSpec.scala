@@ -5,12 +5,12 @@
 
 package net.truevfs.kernel.cio
 
-import Entry._
 import org.junit.runner.RunWith
 import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.prop.PropertyChecks
+import Entry._
 
 @RunWith(classOf[JUnitRunner])
 class FileSystemContainerSpec
