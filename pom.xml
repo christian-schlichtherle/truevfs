@@ -17,7 +17,7 @@
 
     <groupId>de.schlichtherle.truezip</groupId>
     <artifactId>truezip</artifactId>
-    <version>7.5.5-SNAPSHOT</version>
+    <version>7.5.5</version>
     <packaging>pom</packaging>
 
     <name>TrueZIP</name>
@@ -74,7 +74,8 @@ system space.
         <connection>scm:hg:https://hg.java.net/hg/truezip~v7</connection>
         <developerConnection>scm:hg:ssh://hg.java.net/truezip~v7</developerConnection>
         <url>http://java.net/projects/truezip/sources/v7/show</url>
-    </scm>
+      <tag>truezip-7.5.5</tag>
+  </scm>
 
     <properties>
         <!-- While using an older Maven version may work, this hasn't been
