@@ -44,7 +44,7 @@ implements FsController<M> {
      * @return The mount point of this (federated virtual) file system as
      *         defined by the {@linkplain #getModel() model}.
      */
-    protected final FsMountPoint getMountPoint() {
+    public final FsMountPoint getMountPoint() {
         return model.getMountPoint();
     }
 
@@ -55,7 +55,7 @@ implements FsController<M> {
      * @return the {@code touched} property of the
      *         {@linkplain #getModel() file system model}.
      */
-    protected final boolean isTouched() {
+    public final boolean isTouched() {
         return model.isTouched();
     }
 
