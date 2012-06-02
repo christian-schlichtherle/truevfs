@@ -85,7 +85,7 @@ extends FsManager {
     override def setTouched(touched: Boolean) {
       if (_touched != touched) {
         if (touched)
-          SyncShutdownHook.register(ArchiveManager.this)
+          SyncShutdownHook register ArchiveManager.this
         schedule(touched)
         _touched = touched
       }
@@ -94,8 +94,8 @@ extends FsManager {
     def schedule(mandatory: Boolean) {
       val mountPoint = getMountPoint
       val link: Link[AnyController] =
-        (if (mandatory) STRONG else optionalScheduleType).newLink(_controller)
-      ArchiveManager.this.synchronized(controllers.put(mountPoint, link))
+        (if (mandatory) STRONG else optionalScheduleType) newLink _controller
+      ArchiveManager.this synchronized controllers.put(mountPoint, link)
     }
   }
 
@@ -107,15 +107,15 @@ extends FsManager {
     // operations on false positive archive files.
     new FalsePositiveArchiveController(
       new FrontController(
-        driver.decorate(
-          new BackController(driver, new LockModel(model), parent))))
+        driver decorate 
+          new BackController(driver, new LockModel(model), parent)))
   }
 
   override def size = synchronized(controllers.size)
 
   override def iterator = synchronized {
     import collection.JavaConversions._
-    sortedControllers.iterator
+    sortedControllers iterator
   }
 
   private def sortedControllers = {
@@ -130,8 +130,8 @@ extends FsManager {
 }
 
 private object ArchiveManager {
-  Logger  .getLogger( classOf[ArchiveManager].getName,
-                      classOf[ArchiveManager].getName)
+  Logger  .getLogger( classOf[ArchiveManager] getName,
+                      classOf[ArchiveManager] getName)
           .config("banner")
 
   private final class FrontController(c: AnyController)
@@ -166,7 +166,7 @@ private object ArchiveManager {
    */
   private object ReverseControllerOrdering extends Ordering[AnyController] {
     override def compare(a: AnyController, b: AnyController) =
-      b.getModel.getMountPoint.toHierarchicalUri.compareTo(
-        a.getModel.getMountPoint.toHierarchicalUri)
+      b.getModel.getMountPoint.toHierarchicalUri compareTo
+        a.getModel.getMountPoint.toHierarchicalUri
   }
 }
