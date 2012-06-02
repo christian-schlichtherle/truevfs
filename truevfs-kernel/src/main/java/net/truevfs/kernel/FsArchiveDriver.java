@@ -205,7 +205,7 @@ extends FsDriver {
     public InputService<E> newInput(
             FsModel model,
             BitField<FsAccessOption> options,
-            FsController<?> controller,
+            FsController<? extends FsModel> controller,
             FsEntryName name)
     throws IOException {
         return newInput(model, source(options, controller, name));
@@ -258,7 +258,7 @@ extends FsDriver {
     public OutputService<E> newOutput(
             FsModel model,
             BitField<FsAccessOption> options,
-            FsController<?> controller,
+            FsController<? extends FsModel> controller,
             FsEntryName name,
             @CheckForNull @WillNotClose InputService<E> input)
     throws IOException {
@@ -308,7 +308,7 @@ extends FsDriver {
      */
     protected Source source(
             BitField<FsAccessOption> options,
-            FsController<?> controller,
+            FsController<? extends FsModel> controller,
             FsEntryName name) {
         return controller.input(options, name);
     }
@@ -332,7 +332,7 @@ extends FsDriver {
      */
     protected Sink sink(
             BitField<FsAccessOption> options,
-            FsController<?> controller,
+            FsController<? extends FsModel> controller,
             FsEntryName name) {
         return controller.output(options, name, null);
     }
