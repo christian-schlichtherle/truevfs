@@ -54,9 +54,9 @@ final class TBIO {
     static void
     mv(final File src, final File dst, final TArchiveDetector detector)
     throws IOException {
+        checkContains(src, dst);
         if (dst.exists())
             throw new IOException(dst + " (destination exists already)");
-        checkContains(src, dst);
         mv0(src, dst, detector);
     }
 
