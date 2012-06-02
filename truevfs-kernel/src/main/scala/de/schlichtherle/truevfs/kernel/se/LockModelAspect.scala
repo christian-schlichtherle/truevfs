@@ -12,7 +12,36 @@ import net.truevfs.kernel._
  * @see    LockModel
  * @author Christian Schlichtherle
  */
-private trait LockModelAspect extends ModelAspect[LockModel] {
+private trait LockModelAspect {
+
+  def model: LockModel
+
+  /**
+   * Returns the mount point of this (federated virtual) file system as
+   * defined by the {@linkplain #getModel() model}.
+   * 
+   * @return The mount point of this (federated virtual) file system as
+   *         defined by the {@linkplain #getModel() model}.
+   */
+  final def mountPoint = model getMountPoint
+
+  /**
+   * Returns the {@code touched} property of the
+   * {@linkplain #getModel() file system model}.
+   * 
+   * @return the {@code touched} property of the
+   *         {@linkplain #getModel() file system model}.
+   */
+  final def touched = model isTouched
+
+  /**
+   * Sets the {@code touched} property of the
+   * {@linkplain #getModel() file system model}.
+   * 
+   * @param touched the {@code touched} property of the
+   *         {@linkplain #getModel() file system model}.
+   */
+  final def touched_=(touched: Boolean) = model setTouched touched
 
   final val readLock = model readLock
   final def readLockedByCurrentThread = model isReadLockedByCurrentThread
