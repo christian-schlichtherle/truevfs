@@ -4,12 +4,12 @@
  */
 package net.truevfs.kernel;
 
-import net.truevfs.kernel.cio.Entry.Access;
-import net.truevfs.kernel.util.BitField;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
+import net.truevfs.kernel.cio.Entry.Access;
+import net.truevfs.kernel.util.BitField;
 
 /**
  * An abstract file system controller which implements the {@link #getModel()}
