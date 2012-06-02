@@ -28,19 +28,18 @@ import java.nio.channels._
  */
 private abstract class FileSystemArchiveController[E <: FsArchiveEntry]
 (m: LockModel)
-extends BasicArchiveController[E](m)
-with MountState[E] {
+extends BasicArchiveController[E](m) with MountState[E] {
 
   /** The mount state of the archive file system. */
   private[this] var mountState: MountState[E] = new ResetFileSystem
 
   final def autoMount(options: AccessOptions, autoCreate: Boolean) =
-    mountState.autoMount(options, autoCreate)
+    mountState autoMount (options, autoCreate)
 
-  final def fileSystem = mountState.fileSystem
+  final def fileSystem = mountState fileSystem
 
   final def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]]) {
-    mountState.fileSystem = fileSystem
+    mountState fileSystem = fileSystem
   }
 
   /**
@@ -69,7 +68,7 @@ with MountState[E] {
     override def autoMount(options: AccessOptions, autoCreate: Boolean) = {
       checkWriteLockedByCurrentThread
       mount(options, autoCreate)
-      mountState.fileSystem.get
+      mountState.fileSystem get
     }
 
     override def fileSystem = None
