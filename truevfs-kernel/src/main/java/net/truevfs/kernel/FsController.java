@@ -4,16 +4,16 @@
  */
 package net.truevfs.kernel;
 
+import java.io.IOException;
+import java.util.Map;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import net.truevfs.kernel.cio.Entry;
 import net.truevfs.kernel.cio.Entry.Access;
 import net.truevfs.kernel.cio.Entry.Type;
 import net.truevfs.kernel.cio.InputSocket;
 import net.truevfs.kernel.cio.OutputSocket;
 import net.truevfs.kernel.util.BitField;
-import java.io.IOException;
-import java.util.Map;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 
 /**
  * Provides read/write access to a file system.
