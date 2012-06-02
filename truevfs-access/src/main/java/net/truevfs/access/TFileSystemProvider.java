@@ -326,9 +326,8 @@ public final class TFileSystemProvider extends FileSystemProvider {
         if (null == srcEntry)
             throw new NoSuchFileException(src.toString());
         if (!srcEntry.isType(FILE))
-            throw new FileSystemException(
-                    src.toString(), null, "Expected type FILE, but is "
-                    + srcEntry.getTypes() + "!");
+            throw new FileSystemException(src.toString(), null,
+                    "Expected type FILE, but is " + srcEntry.getTypes() + "!");
         if (null != dstEntry) {
             if (o.get(EXCLUSIVE))
                 throw new FileAlreadyExistsException(dst.toString());
