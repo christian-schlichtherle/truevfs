@@ -4,9 +4,9 @@
  */
 package net.truevfs.extension.jmxjul.jmx;
 
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.extension.jmxjul.InstrumentingModel;
 import net.truevfs.kernel.FsModel;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * @author Christian Schlichtherle
@@ -19,9 +19,9 @@ final class JmxModel extends InstrumentingModel {
     }
 
     @Override
-    public void setTouched(final boolean newTouched) {
+    protected void setTouched(final boolean newTouched) {
         try {
-            model.setTouched(newTouched);
+            super.setTouched(newTouched);
         } finally {
             if (newTouched) JmxModelView.  register(model);
             else            JmxModelView.unregister(model);
