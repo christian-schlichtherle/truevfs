@@ -87,7 +87,7 @@ public class FsModel {
      *         implementation, e.g. if the file system type does not support
      *         {@link FsController#sync syncing}.
      */
-    protected void setTouched(boolean touched) {
+    public void setTouched(boolean touched) {
         throw new UnsupportedOperationException();
     }
 
