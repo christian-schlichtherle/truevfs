@@ -4,6 +4,11 @@
  */
 package net.truevfs.access;
 
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
+import java.util.Objects;
+import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.FsAccessOption;
 import static net.truevfs.kernel.FsAccessOption.*;
 import net.truevfs.kernel.FsAccessOptions;
@@ -13,11 +18,6 @@ import net.truevfs.kernel.sl.FsManagerLocator;
 import net.truevfs.kernel.util.BitField;
 import net.truevfs.kernel.util.InheritableThreadLocalStack;
 import net.truevfs.kernel.util.Resource;
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
-import java.util.Objects;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A container for configuration options with global or inheritable thread
@@ -322,13 +322,9 @@ public final class TConfig extends Resource<RuntimeException> {
     /**
      * Returns the file system manager.
      * 
-     * @return     The file system manager.
-     * @deprecated This public class property is solely intended to be used by
-     *             the module TrueVFS&nbsp;Path and should never get used by
-     *             client applications.
+     * @return The file system manager.
      */
-    @Deprecated
-    public FsManager getFsManager() {
+    FsManager getFsManager() {
         return this.manager;
     }
 

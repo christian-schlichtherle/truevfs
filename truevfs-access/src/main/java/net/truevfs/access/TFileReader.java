@@ -7,8 +7,8 @@ package net.truevfs.access;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
@@ -33,11 +33,11 @@ public final class TFileReader extends InputStreamReader {
      * characters.
      * 
      * @param  file a file to read.
-     * @throws FileNotFoundException on any I/O error.
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("DM_DEFAULT_ENCODING")
-    public TFileReader(File file) throws FileNotFoundException {
+    public TFileReader(File file) throws IOException {
 	super(new TFileInputStream(file));
     }
 
@@ -46,11 +46,10 @@ public final class TFileReader extends InputStreamReader {
      * 
      * @param  file a file to read.
      * @param  charset a character set for decoding bytes to characters.
-     * @throws FileNotFoundException on any I/O error.
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
-    public TFileReader(File file, Charset charset)
-    throws FileNotFoundException {
+    public TFileReader(File file, Charset charset) throws IOException {
 	super(new TFileInputStream(file), charset);
     }
 
@@ -59,11 +58,10 @@ public final class TFileReader extends InputStreamReader {
      * 
      * @param  file a file to read.
      * @param  decoder a decoder for decoding bytes to characters.
-     * @throws FileNotFoundException on any I/O error.
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
-    public TFileReader(File file, CharsetDecoder decoder)
-    throws FileNotFoundException {
+    public TFileReader(File file, CharsetDecoder decoder) throws IOException {
 	super(new TFileInputStream(file), decoder);
     }
 

@@ -4,10 +4,16 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.access.ConfiguredClientTestBase;
-import net.truevfs.access.TConfig;
-import net.truevfs.access.TFileITSuite;
-import net.truevfs.access.TVFS;
+import static java.io.File.separatorChar;
+import java.io.*;
+import java.nio.ByteBuffer;
+import static java.nio.file.Files.*;
+import java.nio.file.*;
+import java.nio.file.attribute.FileTime;
+import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import static net.truevfs.kernel.FsAccessOption.GROW;
 import net.truevfs.kernel.FsArchiveDriver;
 import net.truevfs.kernel.FsResourceOpenException;
@@ -24,16 +30,6 @@ import static net.truevfs.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
 import net.truevfs.kernel.util.ConcurrencyUtils.TaskFactory;
 import net.truevfs.kernel.util.ConcurrencyUtils.TaskJoiner;
 import static net.truevfs.kernel.util.ConcurrencyUtils.runConcurrent;
-import static java.io.File.separatorChar;
-import java.io.*;
-import java.nio.ByteBuffer;
-import static java.nio.file.Files.*;
-import java.nio.file.*;
-import java.nio.file.attribute.FileTime;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -451,7 +447,7 @@ extends ConfiguredClientTestBase<D> {
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
-    //@Test
+    @Test
     public final void testBusyFileInputStream()
     throws IOException, InterruptedException {
         final TPath file1 = archive.resolve("file1");
@@ -516,7 +512,7 @@ extends ConfiguredClientTestBase<D> {
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
-    //@Test
+    @Test
     public final void testBusyFileOutputStream()
     throws IOException, InterruptedException {
         TPath file1 = archive.resolve("file1");
@@ -545,7 +541,7 @@ extends ConfiguredClientTestBase<D> {
             fail();
         } catch (final FsSyncException ex) {
             if (!(ex.getCause() instanceof FsResourceOpenException))
-                    throw ex;
+                throw ex;
         }
 
         // out is still open!
@@ -968,7 +964,7 @@ extends ConfiguredClientTestBase<D> {
         delete(b);
     }
 
-    //@Test
+    @Test
     public final void testIllegalDeleteOfEntryWithOpenStream()
     throws IOException {
         final TPath entry1 = archive.resolve("entry1");

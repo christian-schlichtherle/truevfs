@@ -8,7 +8,6 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;
 import static net.truevfs.kernel.FsAccessOption.APPEND;
-import net.truevfs.kernel.cio.OutputSocket;
 import net.truevfs.kernel.io.DecoratingOutputStream;
 
 /**
@@ -74,11 +73,10 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      *
      * @param  path the path of the plain old file or entry in an archive file
      *         to write.
-     * @throws FileNotFoundException on any I/O error.
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
-    public TFileOutputStream(String path)
-    throws FileNotFoundException {
+    public TFileOutputStream(String path) throws IOException {
         super(newOutputStream(new TFile(path), false));
     }
 
@@ -92,11 +90,10 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      *         to write.
      * @param  append if the data shall get appended to the file rather than
      *         replacing it.
-     * @throws FileNotFoundException on any I/O error.
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
-    public TFileOutputStream(String path, boolean append)
-    throws FileNotFoundException {
+    public TFileOutputStream(String path, boolean append) throws IOException {
         super(newOutputStream(new TFile(path), append));
     }
 
@@ -105,11 +102,10 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      * in an archive file.
      *
      * @param  file the plain old file or entry in an archive file to write.
-     * @throws FileNotFoundException on any I/O error.
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
-    public TFileOutputStream(File file)
-    throws FileNotFoundException {
+    public TFileOutputStream(File file) throws IOException {
         super(newOutputStream(file, false));
     }
 
@@ -120,27 +116,17 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      * @param  file the plain old file or entry in an archive file to write.
      * @param  append if the data shall get appended to the file rather than
      *         replacing it.
-     * @throws FileNotFoundException on any I/O error.
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
-    public TFileOutputStream(File file, boolean append)
-    throws FileNotFoundException {
+    public TFileOutputStream(File file, boolean append) throws IOException {
         super(newOutputStream(file, append));
     }
 
     @CreatesObligation
     private static OutputStream newOutputStream(final File dst,
                                                 final boolean append)
-    throws FileNotFoundException {
-        final OutputSocket<?> output = TBIO.output(TConfig.get().getAccessPreferences().set(APPEND, append), dst,
-                null);
-        try {
-            return output.stream();
-        } catch (FileNotFoundException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            throw (FileNotFoundException) new FileNotFoundException(
-                    dst.toString()).initCause(ex);
-        }
+    throws IOException {
+        return TBIO.output(TConfig.get().getAccessPreferences().set(APPEND, append), dst, null).stream();
     }
 }
