@@ -34,7 +34,7 @@ public abstract class FsDecoratingModel<M extends FsModel> extends FsModel {
     }
 
     @Override
-    public void setTouched(boolean touched) {
+    protected void setTouched(boolean touched) {
         model.setTouched(touched);
     }
 
