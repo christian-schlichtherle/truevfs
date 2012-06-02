@@ -364,7 +364,7 @@ public final class TFile extends File {
     private static final File CURRENT_DIRECTORY = new File(".");
 
     /**
-     * The delegate is used to implement the behaviour of the file system
+     * The decorated file is used to implement the behaviour of the file system
      * operations in case this instance represents neither an archive file
      * nor an entry in an archive file.
      * If this instance is constructed from another {@code File}
@@ -374,7 +374,7 @@ public final class TFile extends File {
      * to enable the broken implementation in
      * {@link javax.swing.JFileChooser} to browse archive files.
      */
-    private transient File delegate;
+    private transient File file;
 
     private transient TArchiveDetector detector;
     private transient @CheckForNull TFile innerArchive;
@@ -423,14 +423,14 @@ public final class TFile extends File {
 
         if (file instanceof TFile) {
             final TFile tfile = (TFile) file;
-            this.delegate = tfile.delegate;
+            this.file = tfile.file;
             this.detector = tfile.detector;
             this.enclArchive = tfile.enclArchive;
             this.enclEntryName = tfile.enclEntryName;
             this.innerArchive = tfile.isArchive() ? this : tfile.innerArchive;
             this.controller = tfile.controller;
         } else {
-            this.delegate = file;
+            this.file = file;
             this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
             scan(null);
         }
@@ -467,7 +467,7 @@ public final class TFile extends File {
                     final @CheckForNull TArchiveDetector detector) {
         super(path);
 
-        this.delegate = new File(path);
+        this.file = new File(path);
         this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
         scan(null);
 
@@ -507,7 +507,7 @@ public final class TFile extends File {
                     final @CheckForNull TArchiveDetector detector) {
         super(parent, member);
 
-        this.delegate = new File(parent, member);
+        this.file = new File(parent, member);
         this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
         scan(null);
 
@@ -563,7 +563,7 @@ public final class TFile extends File {
                     final @CheckForNull TArchiveDetector detector) {
         super(parent, member);
 
-        this.delegate = new File(parent, member);
+        this.file = new File(parent, member);
         if (parent instanceof TFile) {
             final TFile p = (TFile) parent;
             this.detector = null != detector ? detector : p.detector;
@@ -653,7 +653,7 @@ public final class TFile extends File {
 
     private void parse( final FsPath path,
                         final TArchiveDetector detector) {
-        this.delegate = new File(super.getPath());
+        this.file = new File(super.getPath());
         this.detector = detector;
 
         final FsMountPoint mp = path.getMountPoint();
@@ -692,7 +692,7 @@ public final class TFile extends File {
                     final TArchiveDetector detector) {
         super(mountPoint.toHierarchicalUri());
 
-        this.delegate = new File(super.getPath());
+        this.file = new File(super.getPath());
         this.detector = detector;
 
         final FsPath mpp = mountPoint.getPath();
@@ -719,14 +719,14 @@ public final class TFile extends File {
     }
 
     @SuppressWarnings("LeakingThisInConstructor")
-    private TFile(  final File delegate,
+    private TFile(  final File file,
                     final @CheckForNull TFile innerArchive,
                     final TArchiveDetector detector) {
-        super(delegate.getPath());
+        super(file.getPath());
 
-        this.delegate = delegate;
+        this.file = file;
 
-        final String path = delegate.getPath();
+        final String path = file.getPath();
         if (null != innerArchive) {
             final int iapl = innerArchive.getPath().length();
             if (path.length() == iapl) {
@@ -761,13 +761,13 @@ public final class TFile extends File {
      * Initialize this file object by scanning its path for archive
      * files, using the given {@code ancestor} file (i.e. a direct or
      * indirect parent file) if any.
-     * {@code delegate} and {@code detector} must already be initialized!
+     * {@code file} and {@code detector} must already be initialized!
      * Must not be called to re-initialize this object!
      */
     private void scan(final @CheckForNull TFile ancestor) {
         final String path = super.getPath();
         assert ancestor == null || path.startsWith(ancestor.getPath());
-        assert delegate.getPath().equals(path);
+        assert file.getPath().equals(path);
         assert null != detector;
 
         final StringBuilder enclEntryNameBuf = new StringBuilder(path.length());
@@ -903,14 +903,14 @@ public final class TFile extends File {
      */
     private boolean invariants() {
         // Thread-safe caching
-        final File delegate = this.delegate;
+        final File file = this.file;
         final TFile innerArchive = this.innerArchive;
         final TFile enclArchive = this.enclArchive;
         final FsEntryName enclEntryName = this.enclEntryName;
 
-        assert null != delegate;
-        assert !(delegate instanceof TFile);
-        assert delegate.getPath().equals(super.getPath());
+        assert null != file;
+        assert !(file instanceof TFile);
+        assert file.getPath().equals(super.getPath());
         assert null != detector;
         assert (null != innerArchive) == (getInnerEntryName() != null);
         assert (null != enclArchive) == (enclEntryName != null);
@@ -919,7 +919,7 @@ public final class TFile extends File {
                 ^ (innerArchive == enclArchive && null == controller);
         assert null == enclArchive
                 || Paths.contains(  enclArchive.getPath(),
-                                    delegate.getParentFile().getPath(),
+                                    file.getParentFile().getPath(),
                                     separatorChar)
                     && !enclEntryName.toString().isEmpty();
         return true;
@@ -1122,12 +1122,12 @@ public final class TFile extends File {
 
     @Override
     public @Nullable String getParent() {
-        return delegate.getParent();
+        return file.getParent();
     }
 
     @Override
     public @Nullable TFile getParentFile() {
-        final File parent = delegate.getParentFile();
+        final File parent = file.getParentFile();
         if (parent == null)
             return null;
 
@@ -1153,7 +1153,7 @@ public final class TFile extends File {
 
     @Override
     public String getAbsolutePath() {
-        return delegate.getAbsolutePath();
+        return file.getAbsolutePath();
     }
 
     /**
@@ -1223,7 +1223,7 @@ public final class TFile extends File {
 
     @Override
     public String getCanonicalPath() throws IOException {
-        return delegate.getCanonicalPath();
+        return file.getCanonicalPath();
     }
 
     /**
@@ -1257,12 +1257,12 @@ public final class TFile extends File {
 
     @Override
     public String getPath() {
-        return delegate.getPath();
+        return file.getPath();
     }
 
     @Override
     public String getName() {
-        return delegate.getName();
+        return file.getName();
     }
 
     /**
@@ -1447,7 +1447,7 @@ public final class TFile extends File {
      *             including loss of data!
      */
     public File getFile() {
-        return delegate;
+        return file;
     }
 
     /**
@@ -1464,8 +1464,8 @@ public final class TFile extends File {
         final FsController<?> controller = this.controller;
         if (this != innerArchive || null != controller)
             return controller;
-        final File delegate = this.delegate;
-        final String path = Paths.normalize(delegate.getPath(), separatorChar);
+        final File file = this.file;
+        final String path = Paths.normalize(file.getPath(), separatorChar);
         final FsScheme scheme = detector.getScheme(path);
         // See http://java.net/jira/browse/TRUEZIP-154 .
         if (null == scheme)
@@ -1479,7 +1479,7 @@ public final class TFile extends File {
             final FsEntryName enclEntryName = this.enclEntryName;
             assert (null != enclArchive) == (null != enclEntryName);
             mountPoint = new FsMountPoint(scheme, null == enclArchive
-                    ? new FsPath(   delegate)
+                    ? new FsPath(   file)
                     : new FsPath(   enclArchive .getController()
                                                 .getModel()
                                                 .getMountPoint(),
@@ -1521,12 +1521,12 @@ public final class TFile extends File {
 
     @Override
     public boolean isAbsolute() {
-        return delegate.isAbsolute();
+        return file.isAbsolute();
     }
 
     @Override
     public boolean isHidden() {
-        return delegate.isHidden();
+        return file.isHidden();
     }
 
     /**
@@ -1621,7 +1621,7 @@ public final class TFile extends File {
      */
     @Override
     public int hashCode() {
-        return delegate.hashCode();
+        return file.hashCode();
     }
 
     /**
@@ -1654,7 +1654,7 @@ public final class TFile extends File {
     @Override
     @SuppressWarnings({"EqualsWhichDoesntCheckParameterClass"})
     public boolean equals(Object that) {
-        return delegate.equals(that);
+        return file.equals(that);
     }
 
     /**
@@ -1685,19 +1685,19 @@ public final class TFile extends File {
      */
     @Override
     public int compareTo(File that) {
-        return delegate.compareTo(that);
+        return file.compareTo(that);
     }
 
     @Override
     public String toString() {
-        return delegate.toString();
+        return file.toString();
     }
 
     @Deprecated
     @Override
     @SuppressWarnings("deprecation")
     public URL toURL() throws MalformedURLException {
-        return null != innerArchive ? toURI().toURL() : delegate.toURL();
+        return null != innerArchive ? toURI().toURL() : file.toURL();
     }
 
     /**
@@ -1749,7 +1749,7 @@ public final class TFile extends File {
                                 new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
                                 enclEntryName)).toUri();
                 } else {
-                    return new FsMountPoint(scheme, new FsPath(delegate)).toUri();
+                    return new FsMountPoint(scheme, new FsPath(file)).toUri();
                 }
             } else if (null != enclArchive) {
                 assert null != enclEntryName;
@@ -1757,7 +1757,7 @@ public final class TFile extends File {
                         new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
                         enclEntryName).toUri();
             } else {
-                return delegate.toURI();
+                return file.toURI();
             }
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
@@ -1786,7 +1786,7 @@ public final class TFile extends File {
                             ROOT);
                 } else {
                     return new FsPath(
-                            new FsMountPoint(scheme, new FsPath(delegate)),
+                            new FsMountPoint(scheme, new FsPath(file)),
                             ROOT);
                 }
             } else if (null != enclArchive) {
@@ -1795,7 +1795,7 @@ public final class TFile extends File {
                         new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
                         enclEntryName);
             } else {
-                return new FsPath(delegate);
+                return new FsPath(file);
             }
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
@@ -1808,7 +1808,7 @@ public final class TFile extends File {
         final FsController<?> controller = this.controller;
         if (null != controller)
             return controller.getModel().getMountPoint().getScheme();
-        return detector.getScheme(delegate.getPath());
+        return detector.getScheme(file.getPath());
     }
 
     /**
@@ -1890,7 +1890,7 @@ public final class TFile extends File {
                 return false;
             }
         }
-        return delegate.exists();
+        return file.exists();
     }
 
     /**
@@ -1917,7 +1917,7 @@ public final class TFile extends File {
                 return false;
             }
         }
-        return delegate.isFile();
+        return file.isFile();
     }
 
     /**
@@ -1946,7 +1946,7 @@ public final class TFile extends File {
                 return false;
             }
         }
-        return delegate.isDirectory();
+        return file.isDirectory();
     }
 
     /**
@@ -1997,7 +1997,7 @@ public final class TFile extends File {
                 return false;
             }
         }
-        return delegate.canRead();
+        return file.canRead();
     }
 
     @Override
@@ -2010,7 +2010,7 @@ public final class TFile extends File {
                 return false;
             }
         }
-        return delegate.canWrite();
+        return file.canWrite();
     }
 
     @Override
@@ -2023,7 +2023,7 @@ public final class TFile extends File {
                 return false;
             }
         }
-        return delegate.canExecute();
+        return file.canExecute();
     }
 
     /**
@@ -2045,7 +2045,7 @@ public final class TFile extends File {
                 return false;
             }
         }
-        return delegate.setReadOnly();
+        return file.setReadOnly();
     }
 
     /**
@@ -2076,7 +2076,7 @@ public final class TFile extends File {
             final long size = entry.getSize(Size.DATA);
             return UNKNOWN != size ? size : 0;
         }
-        return delegate.length();
+        return file.length();
     }
 
     /**
@@ -2104,7 +2104,7 @@ public final class TFile extends File {
             final long time = entry.getTime(Access.WRITE);
             return UNKNOWN != time ? time : 0;
         }
-        return delegate.lastModified();
+        return file.lastModified();
     }
 
     /**
@@ -2138,7 +2138,7 @@ public final class TFile extends File {
                 return false;
             }
         }
-        return delegate.setLastModified(time);
+        return file.setLastModified(time);
     }
 
     /**
@@ -2171,7 +2171,7 @@ public final class TFile extends File {
             final Set<String> members = entry.getMembers();
             return null == members ? null : members.toArray(new String[members.size()]);
         }
-        return delegate.list();
+        return file.list();
     }
 
     /**
@@ -2210,7 +2210,7 @@ public final class TFile extends File {
                     accepted.add(member);
             return accepted.toArray(new String[accepted.size()]);
         }
-        return delegate.list(filter);
+        return file.list(filter);
     }
 
     /**
@@ -2283,7 +2283,7 @@ public final class TFile extends File {
             }
             return filter(members(entry), filter, detector);
         } else {
-            return filter(list(delegate.list(filter)), (FilenameFilter) null, detector);
+            return filter(list(file.list(filter)), (FilenameFilter) null, detector);
         }
     }
 
@@ -2356,7 +2356,7 @@ public final class TFile extends File {
             }
             return filter(members(entry), filter, detector);
         } else {
-            return filter(list(delegate.list()), filter, detector);
+            return filter(list(file.list()), filter, detector);
         }
     }
 
@@ -2408,13 +2408,13 @@ public final class TFile extends File {
                     null);
             return true;
         }
-        return delegate.createNewFile();
+        return file.createNewFile();
     }
 
     @Override
     public boolean mkdirs() {
         if (null == innerArchive)
-            return delegate.mkdirs();
+            return file.mkdirs();
 
         final TFile parent = getParentFile();
         if (null != parent && !parent.exists())
@@ -2457,7 +2457,7 @@ public final class TFile extends File {
                 return false;
             }
         }
-        return delegate.mkdir();
+        return file.mkdir();
     }
 
     /**
@@ -2491,7 +2491,7 @@ public final class TFile extends File {
                     throw ex;
             }
         } else {
-            final File dir = delegate;
+            final File dir = file;
             if (!(recursive ? dir.mkdirs() : dir.mkdir()) && !dir.isDirectory())
                 throw new IOException(dir + " (cannot create directory)");
         }
@@ -2550,7 +2550,7 @@ public final class TFile extends File {
                         TConfig.get().getOutputPreferences());
                 return;
             }
-            node = file.delegate;
+            node = file.file;
         }
         if (!node.delete())
             throw new IOException(node + " (cannot delete)");
@@ -2604,7 +2604,7 @@ public final class TFile extends File {
             // introduces a memory leak in dynamic class loader environments.
             throw new UnsupportedOperationException();
         }
-        delegate.deleteOnExit();
+        file.deleteOnExit();
     }
 
     /**
@@ -2683,7 +2683,7 @@ public final class TFile extends File {
             if (src instanceof TFile) {
                 final TFile srcFile = (TFile) src;
                 srcArchived = null != srcFile.innerArchive;
-                srcDelegate = srcFile.delegate;
+                srcDelegate = srcFile.file;
             } else {
                 srcArchived = false;
                 srcDelegate = src;
@@ -2693,7 +2693,7 @@ public final class TFile extends File {
             if (dst instanceof TFile) {
                 final TFile dstFile = (TFile) dst;
                 dstArchived = null != dstFile.innerArchive;
-                dstDelegate = dstFile.delegate;
+                dstDelegate = dstFile.file;
             } else {
                 dstArchived = false;
                 dstDelegate = dst;
