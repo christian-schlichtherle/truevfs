@@ -101,7 +101,6 @@ extends FsManager {
 
   def newController(driver: AnyArchiveDriver, model: FsModel, parent: AnyController) = {
     assert(!model.isInstanceOf[LockModel])
-    val lmodel = new LockModel(model)
     // HC SVNT DRACONES!
     // The FalsePositiveArchiveController decorates the FrontController
     // so that the decorated controller (chain) does not need to resolve
@@ -109,7 +108,7 @@ extends FsManager {
     new FalsePositiveArchiveController(
       new FrontController(
         driver.decorate(
-          new BackController(driver, lmodel, parent))))
+          new BackController(driver, new LockModel(model), parent))))
   }
 
   override def size = synchronized(controllers.size)
@@ -150,10 +149,8 @@ private object ArchiveManager {
   // The ResourceController extends the TargetArchiveController so that
   // trying to sync the file system while any stream or channel to the
   // latter is open gets detected and properly dealt with.
-  private final class BackController[E <: FsArchiveEntry](
-    driver: FsArchiveDriver[E],
-    model: LockModel,
-    parent: AnyController)
+  private final class BackController[E <: FsArchiveEntry]
+  (driver: FsArchiveDriver[E], model: LockModel, parent: AnyController)
   extends TargetArchiveController(driver, model, parent)
   with ResourceController
   with CacheController

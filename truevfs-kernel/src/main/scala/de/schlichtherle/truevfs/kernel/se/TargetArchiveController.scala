@@ -42,12 +42,11 @@ private class TargetArchiveController[E <: FsArchiveEntry](
   driver: FsArchiveDriver[E],
   model: LockModel,
   parent: AnyController)
-extends FileSystemArchiveController[E](model)
-with TouchListener {
+extends FileSystemArchiveController[E](model) with TouchListener {
   import TargetArchiveController._
 
   /** The entry name of the target archive file in the parent file system. */
-  private[this] val name = getMountPoint.getPath.getEntryName
+  private[this] val name = mountPoint.getPath.getEntryName
 
   /**
    * The (possibly cached) {@link InputArchive} which is used to mount the
@@ -91,7 +90,7 @@ with TouchListener {
 
   private def inputArchive_=(ia: Option[InputArchive[E]]) {
     assert(ia.isEmpty || _inputArchive.isEmpty)
-    ia.foreach { _ => setTouched(true) }
+    ia.foreach { _ => touched = true }
     _inputArchive = ia
   }
 
@@ -104,7 +103,7 @@ with TouchListener {
 
   private def outputArchive_=(oa: Option[OutputArchive[E]]) {
     assert(oa.isEmpty || _outputArchive.isEmpty)
-    oa.foreach { _ => setTouched(true) }
+    oa.foreach { _ => touched = true }
     _outputArchive = oa
   }
 
@@ -171,7 +170,7 @@ with TouchListener {
         }
         val fs = ArchiveFileSystem(driver, is, Option(pe), ro);
         inputArchive = Some(new InputArchive(is))
-        assert(isTouched)
+        assert(touched)
         fs
       }
     }
@@ -203,7 +202,7 @@ with TouchListener {
    * @return The output archive.
    */
   private def outputArchive(options: AccessOptions): OutputArchive[E] = {
-    outputArchive.foreach { oa => assert(isTouched); return oa }
+    outputArchive.foreach { oa => assert(touched); return oa }
     val is = inputArchive match {
       case Some(ia) => ia.driverProduct
       case _ => null
@@ -221,7 +220,7 @@ with TouchListener {
     }
     val oa = new OutputArchive(os)
     outputArchive = Some(oa)
-    assert(isTouched)
+    assert(touched)
     oa
   }
 
@@ -287,7 +286,7 @@ with TouchListener {
   }
 
   override def sync(options: SyncOptions) {
-    assert(isWriteLockedByCurrentThread)
+    assert(writeLockedByCurrentThread)
     try {
       val builder = new FsSyncExceptionBuilder
       if (!options.get(ABORT_CHANGES))
@@ -354,9 +353,9 @@ with TouchListener {
           } catch {
             case ex: IOException =>
               if (warning.isDefined || !ex.isInstanceOf[InputException])
-                throw handler fail new FsSyncException(getModel, ex)
+                throw handler fail new FsSyncException(mountPoint, ex)
               warning = Some(ex)
-              handler warn new FsSyncWarningException(getModel, ex)
+              handler warn new FsSyncWarningException(mountPoint, ex)
           }
         }
       }
@@ -386,7 +385,7 @@ with TouchListener {
           assert(ex.isInstanceOf[NeedsLockRetryException], ex)
           throw ex
         case ex: IOException =>
-          handler warn new FsSyncWarningException(getModel, ex)
+          handler warn new FsSyncWarningException(mountPoint, ex)
       }
       inputArchive = None
     }
@@ -398,7 +397,7 @@ with TouchListener {
           assert(ex.isInstanceOf[NeedsLockRetryException], ex)
           throw ex
         case ex: IOException =>
-          handler warn new FsSyncException(getModel, ex)
+          handler warn new FsSyncException(mountPoint, ex)
       }
       outputArchive = None
     }
@@ -406,7 +405,7 @@ with TouchListener {
     // TODO: Remove a condition and clear a flag in the model
     // instead.
     if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
-      setTouched(false)
+      touched = false
   }
 
   override def checkSync(options: AccessOptions, name: FsEntryName, intention: Option[Access]) {

@@ -38,11 +38,8 @@ import java.nio.channels._
  * @see    NeedsLockRetryException
  * @author Christian Schlichtherle
  */
-private trait LockController
-extends FsController[LockModel] with LockModelController {
-
-  override val readLock = getModel.readLock
-  override val writeLock = getModel.writeLock
+private trait LockController extends FsController[LockModel] {
+  this: LockModelAspect =>
 
   abstract override def stat(options: AccessOptions, name: FsEntryName) =
     timedReadOrWriteLocked(super.stat(options, name))
@@ -110,7 +107,7 @@ extends FsController[LockModel] with LockModelController {
     timedWriteLocked(super.sync(options))
 
   private def fastWriteLocked[V](operation: => V) = {
-      assert(!isReadLockedByCurrentThread, "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!")
+      assert(!readLockedByCurrentThread, "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!")
       FAST_LOCK.apply(writeLock, operation)
   }
 
@@ -126,7 +123,7 @@ extends FsController[LockModel] with LockModelController {
     TIMED_LOCK.apply(readLock, operation)
 
   private def timedWriteLocked[V](operation: => V) = {
-    assert(!isReadLockedByCurrentThread, "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!")
+    assert(!readLockedByCurrentThread, "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!")
     TIMED_LOCK.apply(writeLock, operation)
   }
 
