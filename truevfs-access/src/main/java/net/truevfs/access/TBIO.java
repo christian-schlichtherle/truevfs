@@ -6,6 +6,10 @@ package net.truevfs.access;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystemException;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.NotDirectoryException;
 import java.util.Arrays;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
@@ -53,9 +57,9 @@ final class TBIO {
     static void
     mv(final File src, final File dst, final TArchiveDetector detector)
     throws IOException {
-        if (dst.exists())
-            throw new IOException(dst + " (destination exists already)");
         checkContains(src, dst);
+        if (dst.exists())
+            throw new FileAlreadyExistsException(src.getPath(), dst.getPath(), null);
         mv0(src, dst, detector);
     }
 
@@ -73,10 +77,10 @@ final class TBIO {
                     && 0 >= srcLastModified;
             if (!srcIsGhost || !dstIsArchived || !TConfig.get().isLenient())
                 if (!dst.mkdir() && !dst.isDirectory())
-                    throw new IOException(dst + " (not a directory)");
+                    throw new NotDirectoryException(dst.getPath());
             final String[] members = src.list();
             if (null == members)
-                throw new IOException(dst + " (cannot list directory)");
+                throw new FileSystemException(dst.getPath(), null, "Cannot list directory!");
             if (!srcIsArchived && dstIsArchived) {
                 // Create sorted entries if writing a new archive file.
                 // This is courtesy only, so natural order is sufficient.
@@ -88,18 +92,18 @@ final class TBIO {
                         detector);
             if (!srcIsGhost)
                 if (!dst.setLastModified(srcLastModified))
-                    throw new IOException(dst + " (cannot set last modification time)");
+                    throw new FileSystemException(dst.getPath(), null, "Cannot set last modification time!");
         } else if (src.isFile()) {
             if (dst.exists() && !dst.isFile())
-                throw new IOException(dst + " (not a file)");
+                throw new FileSystemException(dst.getPath(), null, "Not a file!");
             cp0(true, src, dst);
         } else if (src.exists()) {
-            throw new IOException(src + " (cannot move special file)");
+            throw new FileSystemException(src.getPath(), null, "Cannot move special file!");
         } else {
-            throw new IOException(src + " (missing file)");
+            throw new NoSuchFileException(src.getPath());
         }
         if (!src.delete())
-            throw new IOException(src + " (cannot delete)");
+            throw new FileSystemException(src.getPath(), null, "Cannot delete!");
     }
 
     /**
@@ -154,10 +158,10 @@ final class TBIO {
             final boolean srcIsGhost = srcArchived && 0 >= srcLastModified;
             if (!srcIsGhost || !dstArchived || !TConfig.get().isLenient())
                 if (!dst.mkdir() && !dst.isDirectory())
-                    throw new IOException(dst + " (not a directory)");
+                    throw new NotDirectoryException(dst.getPath());
             final String[] members = src.list();
             if (null == members)
-                throw new IOException(dst + " (cannot list directory)");
+                throw new FileSystemException(dst.getPath(), null, "Cannot list directory!");
             if (!srcArchived && dstArchived) {
                 // Create sorted entries if copying an ordinary directory to a
                 // new archive.
@@ -171,15 +175,15 @@ final class TBIO {
                         srcDetector, dstDetector);
             if (preserve && !srcIsGhost)
                 if (!dst.setLastModified(srcLastModified))
-                    throw new IOException(dst + " (cannot set last modification time)");
+                    throw new FileSystemException(dst.getPath(), null, "Cannot set last modification time!");
         } else if (src.isFile()) {
             if (dst.exists() && !dst.isFile())
-                throw new IOException(dst + " (not a file)");
+                throw new FileSystemException(dst.getPath(), null, "Not a file!");
             cp0(preserve, src, dst);
         } else if (src.exists()) {
-            throw new IOException(src + " (cannot copy special file)");
+            throw new FileSystemException(src.getPath(), null, "Cannot copy special file!");
         } else {
-            throw new IOException(src + " (missing file)");
+            throw new NoSuchFileException(src.getPath());
         }
     }
 
@@ -230,7 +234,7 @@ final class TBIO {
         if (node.isDirectory()) {
             final String[] members = node.list();
             if (null == members)
-                throw new IOException(node + " (cannot list directory)");
+                throw new FileSystemException(node.getPath(), null, "Cannot list directory!");
             for (final String member : members)
                 rm_r(new TFile(node, member, detector), detector);
         }
@@ -253,7 +257,7 @@ final class TBIO {
         if (Paths.contains( a.getAbsolutePath(),
                             b.getAbsolutePath(),
                             File.separatorChar))
-            throw new IOException(b + " (contained in " + a + ")");
+            throw new FileSystemException(a.getPath(), b.getPath(), "First path contains second path!");
     }
 
     /**
@@ -271,12 +275,11 @@ final class TBIO {
             final TFile tsrc = (TFile) src;
             final TFile archive = tsrc.getInnerArchive();
             if (null != archive)
-                return archive  .getController()
-                                .input(options, tsrc.getInnerFsEntryName());
+                return archive.getController()
+                        .input(options, tsrc.getInnerFsEntryName());
         }
         final FsPath path = new FsPath(src);
-        return  TConfig
-                .get()
+        return  TConfig.get()
                 .getFsManager()
                 .controller(getDetector(src), path.getMountPoint())
                 .input(options, path.getEntryName());
@@ -300,13 +303,11 @@ final class TBIO {
             final TFile tdst = (TFile) dst;
             final TFile archive = tdst.getInnerArchive();
             if (null != archive)
-                return archive
-                        .getController()
+                return archive.getController()
                         .output(options, tdst.getInnerFsEntryName(), template);
         }
         final FsPath path = new FsPath(dst);
-        return TConfig
-                .get()
+        return TConfig.get()
                 .getFsManager()
                 .controller(getDetector(dst), path.getMountPoint())
                 .output(options.clear(CREATE_PARENTS), path.getEntryName(), template);

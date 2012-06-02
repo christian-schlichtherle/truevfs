@@ -7,7 +7,6 @@ package net.truevfs.access;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.cio.InputSocket;
 import net.truevfs.kernel.io.DecoratingInputStream;
 
 /**
@@ -72,11 +71,10 @@ public final class TFileInputStream extends DecoratingInputStream {
      *
      * @param  path the path of the plain old file or entry in an archive file
      *         to read.
-     * @throws FileNotFoundException on any I/O error.
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
-    public TFileInputStream(String path)
-    throws FileNotFoundException {
+    public TFileInputStream(String path) throws IOException {
         super(newInputStream(new TFile(path)));
     }
 
@@ -85,25 +83,16 @@ public final class TFileInputStream extends DecoratingInputStream {
      * in an archive file.
      *
      * @param  file the plain old file or entry in an archive file to read.
-     * @throws FileNotFoundException on any I/O error.
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
-    public TFileInputStream(File file)
-    throws FileNotFoundException {
+    public TFileInputStream(File file) throws IOException {
         super(newInputStream(file));
     }
 
     @CreatesObligation
     private static InputStream newInputStream(final File src)
-    throws FileNotFoundException {
-        final InputSocket<?> input = TBIO.input(TConfig.get().getAccessPreferences(), src);
-        try {
-            return input.stream();
-        } catch (FileNotFoundException ex) {
-            throw ex;
-        } catch (IOException ex) {
-            throw (FileNotFoundException) new FileNotFoundException(
-                    src.toString()).initCause(ex);
-        }
+    throws IOException {
+        return TBIO.input(TConfig.get().getAccessPreferences(), src).stream();
     }
 }

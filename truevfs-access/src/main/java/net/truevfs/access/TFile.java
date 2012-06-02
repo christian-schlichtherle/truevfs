@@ -9,6 +9,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.file.FileSystemException;
 import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -367,7 +368,7 @@ public final class TFile extends File {
     private static final BitField<Access> EXECUTE_ACCESS = BitField.of(EXECUTE);
 
     /**
-     * The delegate file is used to implement the behaviour of the file system
+     * The decorated file is used to implement the behaviour of the file system
      * operations in case this instance represents neither an archive file
      * nor an entry in an archive file.
      * If this instance is constructed from another {@code File}
@@ -2259,7 +2260,7 @@ public final class TFile extends File {
         } else {
             final File dir = file;
             if (!(recursive ? dir.mkdirs() : dir.mkdir()) && !dir.isDirectory())
-                throw new IOException(dir + " (cannot create directory)");
+                throw new FileSystemException(dir.getPath(), null, "Cannot create directory!");
         }
         return this;
     }
@@ -2318,7 +2319,7 @@ public final class TFile extends File {
             node = file.file;
         }
         if (!node.delete())
-            throw new IOException(node + " (cannot delete)");
+            throw new FileSystemException(node.getPath(), null, "Cannot delete!");
     }
 
     /**
@@ -2467,7 +2468,7 @@ public final class TFile extends File {
                 if (srcDelegate.renameTo(dstDelegate))
                     return;
                 else
-                    throw new IOException(src + " (cannot move to " + dst + ")");
+                    throw new FileSystemException(src.getPath(), dst.getPath(), "Cannot move!");
         }
         TBIO.mv(src, dst, detector);
     }
@@ -3326,7 +3327,7 @@ public final class TFile extends File {
                 // Move the compacted archive file over to the grown archive
                 // file like a regular file.
                 if (!move(compact.toNonArchiveFile(), grown.toNonArchiveFile()))
-                    throw new IOException(compact + " (cannot move to " + grown + ")");
+                    throw new FileSystemException(compact.getPath(), grown.getPath(), "Cannot move!");
             } catch (final IOException ex) {
                 compact.rm();
                 throw ex;

@@ -302,7 +302,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
                                 final CopyOption... options)
     throws IOException {
         if (isSameFile0(src, dst))
-            throw new IOException(dst + " (source and destination are the same file)");
+            throw new FileSystemException(src.toString(), dst.toString(), "Source and destination are the same file!");
         boolean preserve = false;
         BitField<FsAccessOption> o = dst.getAccessPreferences().set(EXCLUSIVE);
         for (final CopyOption option : options) {
@@ -326,9 +326,9 @@ public final class TFileSystemProvider extends FileSystemProvider {
         if (null == srcEntry)
             throw new NoSuchFileException(src.toString());
         if (!srcEntry.isType(FILE))
-            throw new FileNotFoundException(
-                    src.toString() + " (expected FILE - is "
-                    + srcEntry.getTypes() + ")");
+            throw new FileSystemException(
+                    src.toString(), null, "Expected type FILE, but is "
+                    + srcEntry.getTypes() + "!");
         if (null != dstEntry) {
             if (o.get(EXCLUSIVE))
                 throw new FileAlreadyExistsException(dst.toString());
@@ -370,9 +370,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
 
     private static boolean isSameFile0(final Path a, final Path b)
     throws IOException {
-        final String as = a.toRealPath().toString();
-        final String bs = b.toRealPath().toString();
-        return as.equals(bs);
+        return a.equals(b) || a.toRealPath().equals(b.toRealPath());
     }
 
     @Override

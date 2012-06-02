@@ -4,21 +4,6 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.access.TConfig;
-import net.truevfs.access.TVFS;
-import static net.truevfs.kernel.FsAccessOption.GROW;
-import static net.truevfs.kernel.FsSyncOption.CLEAR_CACHE;
-import static net.truevfs.kernel.FsSyncOption.WAIT_CLOSE_IO;
-import static net.truevfs.kernel.FsSyncOptions.SYNC;
-import net.truevfs.kernel.*;
-import net.truevfs.kernel.io.InputClosedException;
-import net.truevfs.kernel.io.InputException;
-import net.truevfs.kernel.io.OutputClosedException;
-import net.truevfs.kernel.util.BitField;
-import static net.truevfs.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
-import net.truevfs.kernel.util.ConcurrencyUtils.TaskFactory;
-import net.truevfs.kernel.util.ConcurrencyUtils.TaskJoiner;
-import static net.truevfs.kernel.util.ConcurrencyUtils.runConcurrent;
 import static java.io.File.separatorChar;
 import java.io.*;
 import java.lang.ref.Reference;
@@ -32,6 +17,19 @@ import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static net.truevfs.kernel.FsAccessOption.GROW;
+import static net.truevfs.kernel.FsSyncOption.CLEAR_CACHE;
+import static net.truevfs.kernel.FsSyncOption.WAIT_CLOSE_IO;
+import static net.truevfs.kernel.FsSyncOptions.SYNC;
+import net.truevfs.kernel.*;
+import net.truevfs.kernel.io.InputClosedException;
+import net.truevfs.kernel.io.InputException;
+import net.truevfs.kernel.io.OutputClosedException;
+import net.truevfs.kernel.util.BitField;
+import static net.truevfs.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
+import net.truevfs.kernel.util.ConcurrencyUtils.TaskFactory;
+import net.truevfs.kernel.util.ConcurrencyUtils.TaskJoiner;
+import static net.truevfs.kernel.util.ConcurrencyUtils.runConcurrent;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -228,7 +226,7 @@ extends ConfiguredClientTestBase<D> {
             new TFileInputStream(archive).close();
             if ('\\' == separatorChar)
                 fail();
-        } catch (FileNotFoundException ex) {
+        } catch (IOException ex) {
             if ('\\' != separatorChar && !archive.isArchive() && !archive.isEntry())
                 throw ex;
         }
@@ -236,7 +234,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             new TFileOutputStream(archive).close();
             fail();
-        } catch (FileNotFoundException expected) {
+        } catch (IOException expected) {
         }
 
         assertRm(file);
@@ -254,7 +252,7 @@ extends ConfiguredClientTestBase<D> {
             new TFileInputStream(archive).close();
             if ('\\' == separatorChar)
                 fail();
-        } catch (FileNotFoundException ex) {
+        } catch (IOException ex) {
             if ('\\' != separatorChar && !archive.isArchive())
                 throw ex;
         }
@@ -262,7 +260,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             new TFileOutputStream(archive).close();
             fail();
-        } catch (FileNotFoundException expected) {
+        } catch (IOException expected) {
         }
 
         assertRm(file);
@@ -385,14 +383,14 @@ extends ConfiguredClientTestBase<D> {
             new TFileInputStream(dir).close();
             if ('\\' == separatorChar)
                 fail();
-        } catch (FileNotFoundException ex) {
+        } catch (IOException ex) {
             if ('\\' != separatorChar && !dir.isArchive() && !dir.isEntry())
                 throw ex;
         }
         try {
             new TFileOutputStream(dir).close();
             fail();
-        } catch (FileNotFoundException expected) {
+        } catch (IOException expected) {
         }
         File tmp = TFile.createTempFile(TEMP_FILE_PREFIX, null);
         try {
@@ -419,7 +417,7 @@ extends ConfiguredClientTestBase<D> {
             try {
                 assertFileOutputStream(file);
                 fail("Creating ghost directories should not be allowed when File.isLenient() is false!");
-            } catch (FileNotFoundException expected) {
+            } catch (IOException expected) {
             }
             assertTrue(archive.mkdir());
             assertFileOutputStream(file);
@@ -493,9 +491,8 @@ extends ConfiguredClientTestBase<D> {
             try {
                 new TFileInputStream(file2).close();
                 fail();
-            } catch (final FileNotFoundException ex) {
-                if (!(ex.getCause() instanceof FsSyncException)
-                        || !(ex.getCause().getCause() instanceof FsResourceOpenException))
+            } catch (final FsSyncException ex) {
+                if (!(ex.getCause() instanceof FsResourceOpenException))
                     throw ex;
             }
             file2.input(in1);
@@ -582,19 +579,17 @@ extends ConfiguredClientTestBase<D> {
         try {
             new TFileOutputStream(file1).close();
             fail();
-        } catch (final FileNotFoundException ex) {
-            if (!(ex.getCause() instanceof FsSyncException)
-                    || !(ex.getCause().getCause() instanceof FsResourceOpenException))
-                    throw ex;
+        } catch (final FsSyncException ex) {
+            if (!(ex.getCause() instanceof FsResourceOpenException))
+                throw ex;
         }
 
         // out is still open!
         try {
             new TFileOutputStream(file2).close();
-        } catch (final FileNotFoundException ex) {
-            if (!(ex.getCause() instanceof FsSyncException)
-                    || !(ex.getCause().getCause() instanceof FsResourceOpenException))
-                    throw ex;
+        } catch (final FsSyncException ex) {
+            if (!(ex.getCause() instanceof FsResourceOpenException))
+                throw ex;
             logger.log(Level.INFO,
                     getArchiveDriver().getClass()
                         + " does not support concurrent writing of different entries in the same archive file.",
