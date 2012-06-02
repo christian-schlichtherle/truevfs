@@ -20,11 +20,12 @@ import java.nio.channels._
  * @see    ResourceManager
  * @author Christian Schlichtherle
  */
-private trait ResourceController
-extends FsController[LockModel] with LockModelController {
+private trait ResourceController extends FsController[LockModel] {
+  this: LockModelAspect =>
+
   import ResourceController._
 
-  private[this] val manager = new ResourceManager(super.writeLock)
+  private[this] val manager = new ResourceManager(writeLock)
 
   abstract override def input(options: AccessOptions, name: FsEntryName) = {
     final class Input extends DecoratingInputSocket[Entry](super.input(options, name)) {
@@ -61,7 +62,7 @@ extends FsController[LockModel] with LockModelController {
   }
 
   abstract override def sync(options: SyncOptions) {
-    assert(isWriteLockedByCurrentThread)
+    assert(writeLockedByCurrentThread)
     val builder = new FsSyncExceptionBuilder
     waitIdle(options, builder)
     closeAll(builder)
@@ -80,8 +81,8 @@ extends FsController[LockModel] with LockModelController {
     } catch {
       case ex: FsResourceOpenException =>
         if (!options.get(FORCE_CLOSE_IO))
-            throw builder.fail(new FsSyncException(getModel, ex))
-        builder.warn(new FsSyncWarningException(getModel, ex))
+            throw builder.fail(new FsSyncException(mountPoint, ex))
+        builder.warn(new FsSyncWarningException(mountPoint, ex))
     }
   }
 
@@ -118,7 +119,7 @@ extends FsController[LockModel] with LockModelController {
       manager.closeAllResources()
     } catch {
       case ex: IOException =>
-        builder.warn(new FsSyncWarningException(getModel, ex))
+        builder.warn(new FsSyncWarningException(mountPoint, ex))
     }
   }
 }

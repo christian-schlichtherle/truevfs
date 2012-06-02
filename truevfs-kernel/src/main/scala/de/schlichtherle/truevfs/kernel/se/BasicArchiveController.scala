@@ -41,7 +41,7 @@ import java.util.logging._
  * @author Christian Schlichtherle
  */
 private abstract class BasicArchiveController[E <: FsArchiveEntry](m: LockModel)
-extends FsAbstractController[LockModel](m) {
+extends AbstractController[LockModel](m) with LockModelAspect {
   import BasicArchiveController._
 
   require(null ne m.getParent)
@@ -218,7 +218,7 @@ extends FsAbstractController[LockModel](m) {
       val size = fs.size - 1 // mind the ROOT entry
       if (0 != size)
           logger.log(Level.WARNING, "unlink.absolute",
-                     Array[AnyRef](getMountPoint, size.asInstanceOf[AnyRef]));
+                     Array[AnyRef](mountPoint, size.asInstanceOf[AnyRef]));
     }
   }
 

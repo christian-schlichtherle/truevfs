@@ -26,8 +26,8 @@ import java.nio.channels._
  * @see    NeedsSyncException
  * @author Christian Schlichtherle
  */
-private trait SyncController
-extends FsController[LockModel] with LockModelController {
+private trait SyncController extends FsController[LockModel] {
+  this: LockModelAspect =>
 
   abstract override def stat(options: AccessOptions, name: FsEntryName) =
     apply(super.stat(options, name))

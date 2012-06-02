@@ -56,9 +56,9 @@ import scala.util.control.Breaks
  * 
  * @author Christian Schlichtherle
  */
-private trait CacheController
-extends FsController[LockModel]
-with LockModelController {
+private trait CacheController extends FsController[LockModel] {
+  this: LockModelAspect =>
+
   import CacheController._
 
   protected def pool: AnyIoPool
@@ -69,7 +69,7 @@ with LockModelController {
     /** This class requires ON-DEMAND LOOKUP of its delegate socket! */
     final class Input extends DelegatingInputSocket[Entry] {
       override def socket(): AnyInputSocket = {
-        assert(isWriteLockedByCurrentThread)
+        assert(writeLockedByCurrentThread)
         var cache = caches.get(name)
         if (null eq cache) {
             if (!options.get(CACHE))
@@ -87,7 +87,7 @@ with LockModelController {
     /** This class requires ON-DEMAND LOOKUP of its delegate socket! */
     final class Output extends DelegatingOutputSocket[Entry] {
       override def socket(): AnyOutputSocket = {
-        assert(isWriteLockedByCurrentThread)
+        assert(writeLockedByCurrentThread)
         var cache = caches.get(name)
         if (null eq cache) {
             if (!options.get(CACHE))
@@ -102,7 +102,7 @@ with LockModelController {
   }: AnyOutputSocket
 
   abstract override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Entry) {
-    assert(isWriteLockedByCurrentThread)
+    assert(writeLockedByCurrentThread)
     super.mknod(options, name, tµpe, template)
     val cache = caches.remove(name)
     if (null ne cache)
@@ -110,7 +110,7 @@ with LockModelController {
   }
 
   abstract override def unlink(options: AccessOptions, name: FsEntryName) {
-    assert(isWriteLockedByCurrentThread)
+    assert(writeLockedByCurrentThread)
     super.unlink(options, name)
     val cache = caches.remove(name)
     if (null ne cache)
@@ -118,7 +118,7 @@ with LockModelController {
   }
 
   abstract override def sync(options: SyncOptions) {
-    assert(isWriteLockedByCurrentThread)
+    assert(writeLockedByCurrentThread)
     var preSyncEx: NeedsSyncException = null
     do {
       preSyncEx = null;
@@ -177,7 +177,7 @@ with LockModelController {
             cache.flush()
           } catch {
             case ex: IOException =>
-              throw builder fail new FsSyncException(getModel, ex)
+              throw builder fail new FsSyncException(mountPoint, ex)
           }
         }
       } catch {
@@ -191,7 +191,7 @@ with LockModelController {
             cache.release()
           } catch {
             case ex: IOException =>
-              builder warn new FsSyncWarningException(getModel, ex)
+              builder warn new FsSyncWarningException(mountPoint, ex)
           }
         }
       }
@@ -224,7 +224,7 @@ with LockModelController {
         override def localTarget() = boundSocket.localTarget()
 
         override def stream() = {
-          assert(isWriteLockedByCurrentThread)
+          assert(writeLockedByCurrentThread)
 
           // Bypass the super class implementation to keep the
           // socket even upon an exception!
@@ -232,7 +232,7 @@ with LockModelController {
             assert(getModel.isTouched)
 
             override def close() {
-              assert(isWriteLockedByCurrentThread)
+              assert(writeLockedByCurrentThread)
               in.close()
               register()
             }
@@ -263,7 +263,7 @@ with LockModelController {
         override def localTarget() = boundSocket.localTarget()
 
         override def stream() = {
-          assert(isWriteLockedByCurrentThread)
+          assert(writeLockedByCurrentThread)
           preOutput()
 
           // Bypass the super class implementation to keep the
@@ -272,7 +272,7 @@ with LockModelController {
             register()
 
             override def close() {
-              assert(isWriteLockedByCurrentThread)
+              assert(writeLockedByCurrentThread)
               out.close()
               postOutput()
             }
@@ -281,7 +281,7 @@ with LockModelController {
         }
 
         override def channel() = {
-          assert(isWriteLockedByCurrentThread)
+          assert(writeLockedByCurrentThread)
           preOutput()
 
           // Bypass the super class implementation to keep the
@@ -290,7 +290,7 @@ with LockModelController {
             register()
 
             override def close() {
-              assert(isWriteLockedByCurrentThread)
+              assert(writeLockedByCurrentThread)
               channel.close()
               postOutput()
             }

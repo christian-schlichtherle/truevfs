@@ -19,8 +19,8 @@ import javax.annotation.concurrent.ThreadSafe;
 public class FsSyncWarningException extends FsSyncException {
     private static final long serialVersionUID = 2302357394858347366L;
 
-    public FsSyncWarningException(FsModel model, IOException cause) {
-        super(model, cause);
+    public FsSyncWarningException(FsMountPoint mountPoint, IOException cause) {
+        super(mountPoint, cause);
     }
 
     /** @return {@code -10}. */

@@ -26,10 +26,9 @@ import java.nio.channels._
  * @param  <E> the type of the archive entries.
  * @author Christian Schlichtherle
  */
-private abstract class FileSystemArchiveController[E <: FsArchiveEntry](
-  m: LockModel)
+private abstract class FileSystemArchiveController[E <: FsArchiveEntry]
+(m: LockModel)
 extends BasicArchiveController[E](m)
-with LockModelController
 with MountState[E] {
 
   /** The mount state of the archive file system. */

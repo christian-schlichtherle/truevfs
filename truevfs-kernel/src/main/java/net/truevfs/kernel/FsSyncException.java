@@ -20,8 +20,8 @@ import javax.annotation.concurrent.ThreadSafe;
 public class FsSyncException extends IOException {
     private static final long serialVersionUID = 4893219420357369739L;
 
-    public FsSyncException(FsModel model, IOException cause) {
-        super(model.getMountPoint().toString(), cause);
+    public FsSyncException(FsMountPoint mountPoint, IOException cause) {
+        super(mountPoint.toString(), cause);
     }
 
     @Override
