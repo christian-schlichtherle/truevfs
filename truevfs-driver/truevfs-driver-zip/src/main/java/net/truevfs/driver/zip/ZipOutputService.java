@@ -163,8 +163,7 @@ implements OutputService<ZipDriverEntry> {
                 }
                 return new EntryOutputStream(local, rdc);
             }
-        } // Output
-
+        }
         return new Output();
     }
 
