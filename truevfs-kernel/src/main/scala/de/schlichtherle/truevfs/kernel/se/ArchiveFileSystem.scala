@@ -470,14 +470,12 @@ private object ArchiveFileSystem {
    * @param  driver the archive driver to use.
    * @param  archive The archive entry container to read the entries for
    *         the population of the archive file system.
-   * @param  rootTemplate The nullable template to use for the root entry of
+   * @param  rootTemplate The optional template to use for the root entry of
    *         the returned archive file system.
    * @param  readOnly If and only if {@code true}, any subsequent
    *         modifying operation on the file system will result in a
    *         {@link FsReadOnlyFileSystemException}.
    * @return A new archive file system.
-   * @throws NullPointerException If {@code factory} or {@code archive} are
-   *         {@code null}.
    */
   def apply[E <: FsArchiveEntry](driver: FsArchiveDriver[E], archive: Container[E], rootTemplate: Option[Entry], readOnly: Boolean) = {
     if (readOnly) new ReadOnlyArchiveFileSystem(driver, archive, rootTemplate)

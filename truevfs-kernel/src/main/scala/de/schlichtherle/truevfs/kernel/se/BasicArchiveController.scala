@@ -40,14 +40,15 @@ import java.util.logging._
  * @param  <E> the type of the archive entries.
  * @author Christian Schlichtherle
  */
-private abstract class BasicArchiveController[E <: FsArchiveEntry](m: LockModel)
-extends AbstractController[LockModel](m) with LockModelAspect {
+private abstract class BasicArchiveController[E <: FsArchiveEntry]
+(final override val model: LockModel)
+extends Controller[LockModel] with LockModelFeatures {
   import BasicArchiveController._
 
-  require(null ne m.getParent)
+  require(null ne model.getParent)
 
-  override def stat(options: AccessOptions, name: FsEntryName): FsEntry =
-    autoMount(options).stat(options, name).orNull
+  override def stat(options: AccessOptions, name: FsEntryName): Option[FsEntry] =
+    autoMount(options).stat(options, name)
 
   override def checkAccess(options: AccessOptions, name: FsEntryName, types: BitField[Access]) =
     autoMount(options).checkAccess(options, name, types)
@@ -55,7 +56,7 @@ extends AbstractController[LockModel](m) with LockModelAspect {
   override def setReadOnly(name: FsEntryName) =
     autoMount(NONE).setReadOnly(name)
 
-  override def setTime(options: AccessOptions, name: FsEntryName, times: java.util.Map[Access, java.lang.Long]) = {
+  override def setTime(options: AccessOptions, name: FsEntryName, times: Map[Access, Long]) = {
     checkSync(options, name, None)
     autoMount(options).setTime(options, name, times)
   }
@@ -93,7 +94,7 @@ extends AbstractController[LockModel](m) with LockModelAspect {
 
   def input(name: String): InputSocket[E]
 
-  override def output(options: AccessOptions, name: FsEntryName, template: Entry) = {
+  override def output(options: AccessOptions, name: FsEntryName, template: Option[Entry]) = {
     require(null ne options)
     require(null ne name)
 
@@ -167,7 +168,7 @@ extends AbstractController[LockModel](m) with LockModelAspect {
         // Start creating or overwriting the archive entry.
         // This will fail if the entry already exists as a directory.
         autoMount(options, !name.isRoot && options.get(CREATE_PARENTS))
-        .mknod(options, name, FILE, Option(template))
+        .mknod(options, name, FILE, template)
       }
 
       def append(): Option[InputStream] = {
@@ -188,7 +189,7 @@ extends AbstractController[LockModel](m) with LockModelAspect {
 
   def output(options: AccessOptions, entry: E): OutputSocket[E]
 
-  override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Entry): Unit = {
+  override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Option[Entry]) {
     if (name.isRoot) { // TODO: Is this case differentiation still required?
       try {
         autoMount(options) // detect false positives!
@@ -204,12 +205,12 @@ extends AbstractController[LockModel](m) with LockModelAspect {
     } else {
       checkSync(options, name, None)
       autoMount(options, options.get(CREATE_PARENTS))
-      .mknod(options, name, tµpe, Option(template))
+      .mknod(options, name, tµpe, template)
       .commit()
     }
   }
 
-  override def unlink(options: AccessOptions, name: FsEntryName) = {
+  override def unlink(options: AccessOptions, name: FsEntryName) {
     checkSync(options, name, None)
     val fs = autoMount(options)
     fs.unlink(options, name)

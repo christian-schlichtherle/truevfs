@@ -30,14 +30,14 @@ extends FsManager {
    * keyed by the mount point of their respective file system model.
    */
   private[this] val controllers =
-    new WeakHashMap[FsMountPoint, Link[AnyController]]
+    new WeakHashMap[FsMountPoint, Link[FsController[_ <: FsModel]]]
 
   def this() = this(WEAK)
 
   override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint) =
     synchronized(controller0(driver, mountPoint))
 
-  private def controller0(driver: FsCompositeDriver, mountPoint: FsMountPoint): AnyController = {
+  private def controller0(driver: FsCompositeDriver, mountPoint: FsMountPoint): FsController[_ <: FsModel] = {
     if (null eq mountPoint.getParent) {
       val m = new FsModel(mountPoint, null)
       return driver.newController(this, m, null)
@@ -64,12 +64,12 @@ extends FsManager {
    */
   private final class ScheduledModel(mountPoint: FsMountPoint, parent: FsModel)
   extends FsModel(mountPoint, parent) {
-    private[this] var _controller: AnyController = _
+    private[this] var _controller: FsController[_ <: FsModel] = _
     private[this] var _touched: Boolean = _
 
     def controller = _controller
 
-    def controller_=(controller: AnyController) {
+    def controller_=(controller: FsController[_ <: FsModel]) {
       assert(null ne controller)
       assert(!_touched)
       _controller = controller
@@ -93,13 +93,13 @@ extends FsManager {
 
     def schedule(mandatory: Boolean) {
       val mountPoint = getMountPoint
-      val link: Link[AnyController] =
+      val link: Link[FsController[_ <: FsModel]] =
         (if (mandatory) STRONG else optionalScheduleType) newLink _controller
       ArchiveManager.this synchronized controllers.put(mountPoint, link)
     }
   }
 
-  def newController(driver: AnyArchiveDriver, model: FsModel, parent: AnyController) = {
+  def newController(driver: AnyArchiveDriver, model: FsModel, parent: FsController[_ <: FsModel]) = {
     assert(!model.isInstanceOf[LockModel])
     // HC SVNT DRACONES!
     // The FalsePositiveArchiveController decorates the FrontController
@@ -108,7 +108,8 @@ extends FsManager {
     new FalsePositiveArchiveController(
       new FrontController(
         driver decorate 
-          new BackController(driver, new LockModel(model), parent)))
+          asFsController(
+            new BackController(driver, new LockModel(model), parent), parent)))
   }
 
   override def size = synchronized(controllers.size)
@@ -134,8 +135,8 @@ private object ArchiveManager {
                       classOf[ArchiveManager] getName)
           .config("banner")
 
-  private final class FrontController(c: AnyController)
-  extends FsDecoratingController[FsModel, AnyController](c)
+  private final class FrontController(c: FsController[_ <: FsModel])
+  extends FsDecoratingController[FsModel, FsController[_ <: FsModel]](c)
   with FinalizeController
 
   // HC SVNT DRACONES!
@@ -150,7 +151,7 @@ private object ArchiveManager {
   // trying to sync the file system while any stream or channel to the
   // latter is open gets detected and properly dealt with.
   private final class BackController[E <: FsArchiveEntry]
-  (driver: FsArchiveDriver[E], model: LockModel, parent: AnyController)
+  (driver: FsArchiveDriver[E], model: LockModel, parent: FsController[_ <: FsModel])
   extends TargetArchiveController(driver, model, parent)
   with ResourceController
   with CacheController
@@ -164,8 +165,8 @@ private object ArchiveManager {
    * Orders file system controllers so that all file systems appear before
    * any of their parent file systems.
    */
-  private object ReverseControllerOrdering extends Ordering[AnyController] {
-    override def compare(a: AnyController, b: AnyController) =
+  private object ReverseControllerOrdering extends Ordering[FsController[_ <: FsModel]] {
+    override def compare(a: FsController[_ <: FsModel], b: FsController[_ <: FsModel]) =
       b.getModel.getMountPoint.toHierarchicalUri compareTo
         a.getModel.getMountPoint.toHierarchicalUri
   }
