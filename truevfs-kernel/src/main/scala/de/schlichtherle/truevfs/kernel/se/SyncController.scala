@@ -109,7 +109,7 @@ private trait SyncController extends Controller[LockModel] {
         if (modified ne options) {
           ex.getCause match {
             case _: FsResourceOpenException =>
-              throw NeedsLockRetryException.get
+              throw NeedsLockRetryException()
             case _ =>
           }
         }

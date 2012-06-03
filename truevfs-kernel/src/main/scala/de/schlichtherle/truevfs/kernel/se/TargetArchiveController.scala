@@ -81,7 +81,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
 
   private def inputArchive = {
     _inputArchive match {
-      case Some(ia) if ia.closed => throw NeedsSyncException.get
+      case Some(ia) if ia.closed => throw NeedsSyncException()
       case x => x
     }
   }
@@ -94,7 +94,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
 
   private def outputArchive = {
     _outputArchive match {
-      case Some(oa) if oa.closed => throw NeedsSyncException.get
+      case Some(oa) if oa.closed => throw NeedsSyncException()
       case x => x
     }
   }
@@ -232,7 +232,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
           super.localTarget
         } catch {
           case _: InputClosedException =>
-            throw NeedsSyncException.get
+            throw NeedsSyncException()
         }
       }
 
@@ -241,7 +241,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
           super.stream()
         } catch {
           case _: InputClosedException =>
-            throw NeedsSyncException.get
+            throw NeedsSyncException()
         }
       }
 
@@ -250,7 +250,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
           super.channel()
         } catch {
           case _: InputClosedException =>
-            throw NeedsSyncException.get
+            throw NeedsSyncException()
         }
       }
     }
@@ -268,7 +268,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
           super.stream()
         } catch {
           case _: OutputClosedException =>
-            throw NeedsSyncException.get
+            throw NeedsSyncException()
         }
       }
 
@@ -277,7 +277,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
           super.channel()
         } catch {
           case _: OutputClosedException =>
-            throw NeedsSyncException.get
+            throw NeedsSyncException()
         }
       }
     }
@@ -449,7 +449,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
       case Some(oa) =>
         val aen = fse.getEntry.getName
         if (null ne oa.entry(aen))
-          throw NeedsSyncException.get
+          throw NeedsSyncException()
       case _ =>
     }
 
@@ -464,9 +464,9 @@ extends FileSystemArchiveController[E](model) with TouchListener {
       case Some(ia) =>
         val aen = fse.getEntry.getName
         if (null eq ia.entry(aen))
-          throw NeedsSyncException.get
+          throw NeedsSyncException()
       case _ =>
-        throw NeedsSyncException.get
+        throw NeedsSyncException()
     }
   }
 }
