@@ -76,12 +76,12 @@ private trait ResourceController extends Controller[LockModel] {
     }
     val wait = options get WAIT_CLOSE_IO;
     if (!wait) {
-      // Spend some effort on closing streams which have already been
-      // garbage collected in order to compensates for a disadvantage of
-      // the NeedsLockRetryException:
-      // An FsArchiveDriver may try to close() a file system entry but
-      // fail to do so because of a NeedsLockRetryException which is
-      // impossible to resolve in a driver.
+      // Spend some effort on closing streams which have already been garbage
+      // collected in order to compensates for a disadvantage of the
+      // NeedsLockRetryException:
+      // An FsArchiveDriver may try to close() a file system entry but fail to
+      // do so because of a NeedsLockRetryException which is impossible to
+      // resolve in a driver.
       // The TarDriver family is known to be affected by this.
       System.runFinalization()
     }
@@ -95,7 +95,7 @@ private trait ResourceController extends Controller[LockModel] {
 
   /** Closes and disconnects all entry streams of the output and input archive.
     * 
-    * @param  builder the exception handling strategy.
+    * @param builder the exception handling strategy.
     */
   private def closeAll(builder: FsSyncExceptionBuilder) {
     try {
@@ -120,7 +120,7 @@ private trait ResourceController extends Controller[LockModel] {
 
     abstract override def close() {
       super.close()
-      manager.stop(this)
+      manager stop this
     }
   }
 }
