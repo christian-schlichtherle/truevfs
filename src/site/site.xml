@@ -7,7 +7,7 @@
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://maven.apache.org/DECORATION/1.1.0 http://maven.apache.org/xsd/decoration-1.1.0.xsd">
     <bannerRight>
-        <name>Archive files are virtual directories!</name>
+        <name>Archive Files Are Not Enough!</name>
     </bannerRight>
     <googleAnalyticsAccountId>UA-25500668-1</googleAnalyticsAccountId>
     <custom>
