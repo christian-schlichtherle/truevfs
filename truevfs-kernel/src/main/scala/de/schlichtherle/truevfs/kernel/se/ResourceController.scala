@@ -14,12 +14,11 @@ import net.truevfs.kernel.util._
 import java.io._
 import java.nio.channels._
 
-/**
- * Accounts input and output resources returned by its decorated controller.
- * 
- * @see    ResourceManager
- * @author Christian Schlichtherle
- */
+/** Accounts input and output resources returned by its decorated controller.
+  * 
+  * @see    ResourceManager
+  * @author Christian Schlichtherle
+  */
 private trait ResourceController extends Controller[LockModel] {
   this: LockModelFeatures =>
 
@@ -42,24 +41,6 @@ private trait ResourceController extends Controller[LockModel] {
     }
     new Output
   }: AnyOutputSocket
-
-  private class ResourceInputStream(in: InputStream)
-  extends DecoratingInputStream(in) with ResourceCloseable
-
-  private class ResourceOutputStream(out: OutputStream)
-  extends DecoratingOutputStream(out) with ResourceCloseable
-
-  private class ResourceSeekableChannel(channel: SeekableByteChannel)
-  extends DecoratingSeekableChannel(channel) with ResourceCloseable
-
-  private trait ResourceCloseable extends Closeable {
-    manager.start(this)
-
-    abstract override def close() {
-      super.close()
-      manager.stop(this)
-    }
-  }
 
   abstract override def sync(options: SyncOptions) {
     assert(writeLockedByCurrentThread)
@@ -88,11 +69,12 @@ private trait ResourceController extends Controller[LockModel] {
 
   private def waitIdle(options: SyncOptions) {
     // HC SVNT DRACONES!
-    val manager = this.manager
-    val local = manager.localResources
-    if (0 != local && !options.get(FORCE_CLOSE_IO))
-        throw new FsResourceOpenException(manager.totalResources, local)
-    val wait = options.get(WAIT_CLOSE_IO)
+    {
+      val (local, total) = manager resources()
+      if (0 != local && !(options get FORCE_CLOSE_IO))
+          throw new FsResourceOpenException(local, total)
+    }
+    val wait = options get WAIT_CLOSE_IO;
     if (!wait) {
       // Spend some effort on closing streams which have already been
       // garbage collected in order to compensates for a disadvantage of
@@ -101,19 +83,20 @@ private trait ResourceController extends Controller[LockModel] {
       // fail to do so because of a NeedsLockRetryException which is
       // impossible to resolve in a driver.
       // The TarDriver family is known to be affected by this.
-      System.runFinalization();
+      System.runFinalization()
     }
-    val total = manager.waitOtherThreads(if (wait) 0 else WAIT_TIMEOUT_MILLIS)
-    if (0 != total)
-        throw new FsResourceOpenException(total, local);
+    manager waitOtherThreads (if (wait) 0 else waitTimeoutMillis);
+    {
+      val (local, total) = manager resources()
+      if (0 != total)
+          throw new FsResourceOpenException(local, total)
+    }
   }
 
-  /**
-   * Closes and disconnects all entry streams of the output and input
-   * archive.
-   * 
-   * @param  builder the exception handling strategy.
-   */
+  /** Closes and disconnects all entry streams of the output and input archive.
+    * 
+    * @param  builder the exception handling strategy.
+    */
   private def closeAll(builder: FsSyncExceptionBuilder) {
     try {
       manager.closeAllResources()
@@ -122,8 +105,26 @@ private trait ResourceController extends Controller[LockModel] {
         builder.warn(new FsSyncWarningException(mountPoint, ex))
     }
   }
+
+  private class ResourceInputStream(in: InputStream)
+  extends DecoratingInputStream(in) with ResourceCloseable
+
+  private class ResourceOutputStream(out: OutputStream)
+  extends DecoratingOutputStream(out) with ResourceCloseable
+
+  private class ResourceSeekableChannel(channel: SeekableByteChannel)
+  extends DecoratingSeekableChannel(channel) with ResourceCloseable
+
+  private trait ResourceCloseable extends Closeable {
+    manager.start(this)
+
+    abstract override def close() {
+      super.close()
+      manager.stop(this)
+    }
+  }
 }
 
 private object ResourceController {
-  private val WAIT_TIMEOUT_MILLIS = LockingStrategy.ACQUIRE_TIMEOUT_MILLIS
+  private val waitTimeoutMillis = LockingStrategy.ACQUIRE_TIMEOUT_MILLIS
 }
