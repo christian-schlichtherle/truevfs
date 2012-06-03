@@ -124,12 +124,9 @@ private final class ResourceManager(lock: Lock) {
   def resources() = {
     val currentThread = Thread.currentThread
     var local, total = 0
-    for (account <- accounts values) {
-      if (account.manager eq this) {
-        total += 1
-        if (account.owner eq currentThread)
-          local += 1
-      }
+    for (account <- accounts.values if account.manager eq this) {
+      if (account.owner eq currentThread) local += 1
+      total += 1
     }
     (local, total)
   }
