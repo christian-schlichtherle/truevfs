@@ -475,15 +475,15 @@ private object TargetArchiveController {
   private val MOUNT_OPTIONS = BitField.of(CACHE)
   private val WRITE_ACCESS = BitField.of(WRITE)
 
-  private final class InputArchive[E <: FsArchiveEntry](
-    val driverProduct: InputService[E])
+  private final class InputArchive[E <: FsArchiveEntry]
+  (val driverProduct: InputService[E])
   extends LockInputService(new DisconnectingInputService(driverProduct)) {
     def clutch = container.asInstanceOf[DisconnectingInputService[E]]
     def closed = clutch.isClosed
   } // InputArchive
 
-  private final class OutputArchive[E <: FsArchiveEntry](
-    driverProduct: OutputService[E])
+  private final class OutputArchive[E <: FsArchiveEntry]
+  (driverProduct: OutputService[E])
   extends LockOutputService(new DisconnectingOutputService(driverProduct)) {
     def clutch = container.asInstanceOf[DisconnectingOutputService[E]]
     def closed = clutch.isClosed
