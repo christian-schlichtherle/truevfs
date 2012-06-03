@@ -131,7 +131,7 @@ private object LockingStrategy {
   object FAST_LOCK extends LockingStrategy {
     override def acquire(lock: Lock) {
       if (!lock.tryLock)
-        throw NeedsLockRetryException.get
+        throw NeedsLockRetryException()
     }
   }
 
@@ -142,11 +142,11 @@ private object LockingStrategy {
     override def acquire(lock: Lock) {
       try {
         if (!lock.tryLock(ACQUIRE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS))
-          throw NeedsLockRetryException.get
+          throw NeedsLockRetryException()
       } catch {
         case _: InterruptedException =>
           Thread.currentThread.interrupt() // restore
-          throw NeedsLockRetryException.get
+          throw NeedsLockRetryException()
       }
     }
   }

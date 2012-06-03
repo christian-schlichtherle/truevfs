@@ -65,6 +65,6 @@ private trait LockModelFeatures {
    * @see    #writeLockedByCurrentThread
    */
   final def checkWriteLockedByCurrentThread() {
-    if (!writeLockedByCurrentThread) throw NeedsWriteLockException get
+    if (!writeLockedByCurrentThread) throw NeedsWriteLockException()
   }
 }

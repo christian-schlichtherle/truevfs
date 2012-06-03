@@ -2,13 +2,10 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truevfs.kernel.se;
+package de.schlichtherle.truevfs.kernel.se
 
-import javax.annotation.concurrent.ThreadSafe;
-import net.truevfs.kernel.FsCompositeDriver;
-import net.truevfs.kernel.FsController;
-import net.truevfs.kernel.FsManager;
-import net.truevfs.kernel.FsMountPoint;
+import net.truevfs.kernel._
+import ControlFlowException._
 
 /**
  * Indicates a condition which requires non-local control flow within a
@@ -67,28 +64,21 @@ import net.truevfs.kernel.FsMountPoint;
  * 
  * @author Christian Schlichtherle
  */
-@ThreadSafe
-@SuppressWarnings("serial") // serializing a control flow exception is nonsense!
-abstract class ControlFlowException extends RuntimeException {
+private abstract class ControlFlowException(cause: Throwable = null)
+extends RuntimeException(null, cause, traceable, traceable)
 
-    /**
-     * Controls whether or not instances of this class have a regular stack
-     * trace or an empty stack trace.
-     * If and only if the system property with the name
-     * {@code de.schlichtherle.truevfs.kernel.ControlFlowException.traceable}
-     * is set to {@code true} (whereby case is ignored), then instances of this
-     * class will have a regular stack trace, otherwise their stack trace will
-     * be empty.
-     * This should be set to {@code true} for debugging purposes only.
-     */
-    static final boolean TRACEABLE = Boolean
-            .getBoolean(ControlFlowException.class.getName() + ".traceable");
+private object ControlFlowException {
 
-    ControlFlowException() {
-        super(null, null, TRACEABLE, TRACEABLE);
-    }
-
-    ControlFlowException(final Throwable cause) {
-        super(null, cause, TRACEABLE, TRACEABLE);
-    }
+  /**
+   * Controls whether or not instances of this class have a regular stack
+   * trace or an empty stack trace.
+   * If and only if the system property with the name
+   * {@code de.schlichtherle.truevfs.kernel.ControlFlowException.traceable}
+   * is set to {@code true} (whereby case is ignored), then instances of this
+   * class will have a regular stack trace, otherwise their stack trace will
+   * be empty.
+   * This should be set to {@code true} for debugging purposes only.
+   */
+  val traceable = sys.BooleanProp
+  .valueIsTrue(classOf[ControlFlowException].getName + ".traceable")
 }
