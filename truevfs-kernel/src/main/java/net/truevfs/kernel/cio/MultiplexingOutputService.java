@@ -4,6 +4,15 @@
  */
 package net.truevfs.kernel.cio;
 
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.*;
+import javax.annotation.CheckForNull;
+import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.concurrent.NotThreadSafe;
 import static net.truevfs.kernel.cio.Entry.ALL_ACCESS;
 import net.truevfs.kernel.cio.Entry.Access;
 import static net.truevfs.kernel.cio.Entry.Size.DATA;
@@ -14,15 +23,6 @@ import net.truevfs.kernel.util.ExceptionBuilder;
 import net.truevfs.kernel.util.JointIterator;
 import net.truevfs.kernel.util.PriorityExceptionBuilder;
 import net.truevfs.kernel.util.SuppressedExceptionBuilder;
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.*;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Decorates another output service to support a virtually unlimited number of
@@ -112,9 +112,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         Objects.requireNonNull(local);
 
         final class Output extends DecoratingOutputSocket<E> {
-            Output() {
-                super(container.output(local));
-            }
+            Output() { super(container.output(local)); }
 
             @Override
             public E localTarget() {
@@ -127,8 +125,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
                 return isBusy() ? new BufferedEntryOutputStream(output)
                                 : new EntryOutputStream(output);
             }
-        } // Output
-
+        }
         return new Output();
     }
 

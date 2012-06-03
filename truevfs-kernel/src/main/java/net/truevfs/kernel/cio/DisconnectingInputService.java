@@ -48,31 +48,31 @@ extends DecoratingInputService<E, InputService<E>> {
         return closed;
     }
 
-    final void assertOpenService() {
+    final void assertOpen() {
         if (isClosed())
             throw new IllegalStateException(new InputClosedException());
     }
 
-    final void checkOpenService() throws IOException {
+    final void checkOpen() throws IOException {
         if (isClosed())
             throw new InputClosedException();
     }
 
     @Override
     public int size() {
-        assertOpenService();
+        assertOpen();
         return container.size();
     }
 
     @Override
     public Iterator<E> iterator() {
-        assertOpenService();
+        assertOpen();
         return container.iterator();
     }
 
     @Override
     public E entry(String name) {
-        assertOpenService();
+        assertOpen();
         return container.entry(name);
     }
 
@@ -105,7 +105,7 @@ extends DecoratingInputService<E, InputService<E>> {
 
         @Override
         protected InputSocket<? extends E> socket() throws IOException {
-            checkOpenService();
+            checkOpen();
             return socket;
         }
 
@@ -132,25 +132,25 @@ extends DecoratingInputService<E, InputService<E>> {
 
         @Override
         public int read() throws IOException {
-            checkOpenService();
+            checkOpen();
             return in.read();
         }
 
         @Override
         public int read(byte[] b, int off, int len) throws IOException {
-            checkOpenService();
+            checkOpen();
             return in.read(b, off, len);
         }
 
         @Override
         public long skip(long n) throws IOException {
-            checkOpenService();
+            checkOpen();
             return in.skip(n);
         }
 
         @Override
         public int available() throws IOException {
-            checkOpenService();
+            checkOpen();
             return in.available();
         }
 
@@ -162,7 +162,7 @@ extends DecoratingInputService<E, InputService<E>> {
 
         @Override
         public void reset() throws IOException {
-            checkOpenService();
+            checkOpen();
             in.reset();
         }
 
@@ -189,26 +189,26 @@ extends DecoratingInputService<E, InputService<E>> {
 
         @Override
         public int read(ByteBuffer dst) throws IOException {
-            checkOpenService();
+            checkOpen();
             return channel.read(dst);
         }
 
         @Override
         public long position() throws IOException {
-            checkOpenService();
+            checkOpen();
             return channel.position();
         }
 
         @Override
         public SeekableByteChannel position(long newPosition) throws IOException {
-            checkOpenService();
+            checkOpen();
             channel.position(newPosition);
             return this;
         }
 
         @Override
         public long size() throws IOException {
-            checkOpenService();
+            checkOpen();
             return channel.size();
         }
 

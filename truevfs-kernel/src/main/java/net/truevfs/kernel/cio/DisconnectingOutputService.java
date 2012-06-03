@@ -48,31 +48,31 @@ extends DecoratingOutputService<E, OutputService<E>> {
         return closed;
     }
 
-    final void assertOpenService() {
+    final void assertOpen() {
         if (isClosed())
             throw new IllegalStateException(new OutputClosedException());
     }
 
-    final void checkOpenService() throws IOException {
+    final void checkOpen() throws IOException {
         if (isClosed())
             throw new OutputClosedException();
     }
 
     @Override
     public int size() {
-        assertOpenService();
+        assertOpen();
         return container.size();
     }
 
     @Override
     public Iterator<E> iterator() {
-        assertOpenService();
+        assertOpen();
         return container.iterator();
     }
 
     @Override
     public E entry(String name) {
-        assertOpenService();
+        assertOpen();
         return container.entry(name);
     }
 
@@ -105,7 +105,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
         @Override
         protected OutputSocket<? extends E> socket() throws IOException {
-            checkOpenService();
+            checkOpen();
             return socket;
         }
 
@@ -132,19 +132,19 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
         @Override
         public void write(int b) throws IOException {
-            checkOpenService();
+            checkOpen();
             out.write(b);
         }
 
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
-            checkOpenService();
+            checkOpen();
             out.write(b, off, len);
         }
 
         @Override
         public void flush() throws IOException {
-            checkOpenService();
+            checkOpen();
             out.flush();
         }
 
@@ -171,38 +171,38 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
         @Override
         public int read(ByteBuffer dst) throws IOException {
-            checkOpenService();
+            checkOpen();
             return channel.read(dst);
         }
 
         @Override
         public int write(ByteBuffer src) throws IOException {
-            checkOpenService();
+            checkOpen();
             return channel.write(src);
         }
 
         @Override
         public long position() throws IOException {
-            checkOpenService();
+            checkOpen();
             return channel.position();
         }
 
         @Override
         public SeekableByteChannel position(long newPosition) throws IOException {
-            checkOpenService();
+            checkOpen();
             channel.position(newPosition);
             return this;
         }
 
         @Override
         public long size() throws IOException {
-            checkOpenService();
+            checkOpen();
             return channel.size();
         }
 
         @Override
         public SeekableByteChannel truncate(long size) throws IOException {
-            checkOpenService();
+            checkOpen();
             channel.truncate(size);
             return this;
         }
