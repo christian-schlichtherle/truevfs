@@ -38,8 +38,8 @@ import java.nio.channels._
  * @see    NeedsLockRetryException
  * @author Christian Schlichtherle
  */
-private trait LockController extends FsController[LockModel] {
-  this: LockModelAspect =>
+private trait LockController extends Controller[LockModel] {
+  this: LockModelFeatures =>
 
   abstract override def stat(options: AccessOptions, name: FsEntryName) =
     timedReadOrWriteLocked(super.stat(options, name))
@@ -50,7 +50,7 @@ private trait LockController extends FsController[LockModel] {
   abstract override def setReadOnly(name: FsEntryName) =
     timedWriteLocked(super.setReadOnly(name))
 
-  abstract override def setTime(options: AccessOptions, name: FsEntryName, times: java.util.Map[Access, java.lang.Long]) =
+  abstract override def setTime(options: AccessOptions, name: FsEntryName, times: Map[Access, Long]) =
     timedWriteLocked(super.setTime(options, name, times))
 
   abstract override def setTime(options: AccessOptions, name: FsEntryName, types: BitField[Access], value: Long) =
@@ -69,7 +69,7 @@ private trait LockController extends FsController[LockModel] {
     new Input
   }: AnyInputSocket
 
-  abstract override def output(options: AccessOptions, name: FsEntryName, template: Entry) = {
+  abstract override def output(options: AccessOptions, name: FsEntryName, template: Option[Entry]) = {
     final class Output extends DecoratingOutputSocket[Entry](super.output(options, name, template)) {
       override def localTarget() = fastWriteLocked(boundSocket.localTarget())
 
@@ -97,7 +97,7 @@ private trait LockController extends FsController[LockModel] {
     override def close = deadWriteLocked(channel.close)
   }
 
-  abstract override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Entry) =
+  abstract override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Option[Entry]) =
     timedWriteLocked(super.mknod(options, name, tµpe, template))
 
   abstract override def unlink(options: AccessOptions, name: FsEntryName) =

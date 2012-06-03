@@ -18,8 +18,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock
 private final class LockModel(model: FsModel)
 extends FsDecoratingModel[FsModel](model) {
 
-  /** The lock on which the file system controllers shall synchronize. */
-  private val lock = new ReentrantReadWriteLock();
+  /** The lock on which the file system controller(s) shall synchronize. */
+  private val lock = new ReentrantReadWriteLock
 
   def readLock = lock.readLock
 
@@ -32,7 +32,7 @@ extends FsDecoratingModel[FsModel](model) {
    * @return {@code true} if and only if the read lock is held by the
    *         current thread.
    */
-  def isReadLockedByCurrentThread = 0 != lock.getReadHoldCount
+  def readLockedByCurrentThread = 0 != lock.getReadHoldCount
 
   def writeLock = lock.writeLock
 
@@ -46,18 +46,5 @@ extends FsDecoratingModel[FsModel](model) {
    *         current thread.
    * @see    #checkWriteLockedByCurrentThread()
    */
-  def isWriteLockedByCurrentThread = lock.isWriteLockedByCurrentThread
-
-  /**
-   * Asserts that the write lock is held by the current thread.
-   * Use this method for lock control.
-   * 
-   * @throws NeedsWriteLockException if the <i>write lock</i> is not
-   *         held by the current thread.
-   * @see    #isWriteLockedByCurrentThread()
-   */
-  def checkWriteLockedByCurrentThread {
-    if (!isWriteLockedByCurrentThread)
-      throw NeedsWriteLockException.get
-  }
+  def writeLockedByCurrentThread = lock.isWriteLockedByCurrentThread
 }

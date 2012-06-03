@@ -56,8 +56,8 @@ import java.io._
  * @see    FalsePositiveArchiveException
  * @author Christian Schlichtherle
  */
-private final class FalsePositiveArchiveController(c: AnyController)
-extends FsDecoratingController[FsModel, AnyController](c) {
+private final class FalsePositiveArchiveController(c: FsController[_ <: FsModel])
+extends FsDecoratingController[FsModel, FsController[_ <: FsModel]](c) {
 
   @volatile private[this] var state: State = TryChild
 
@@ -181,7 +181,7 @@ extends FsDecoratingController[FsModel, AnyController](c) {
 
   private def parent(name: FsEntryName) = path.resolve(name).getEntryName
 
-  private type Operation[V] = (AnyController, FsEntryName) => V
+  private type Operation[V] = (FsController[_ <: FsModel], FsEntryName) => V
 
   private sealed trait State {
     def apply[V](name: FsEntryName, operation: Operation[V]): V

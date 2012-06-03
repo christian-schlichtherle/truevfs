@@ -7,13 +7,14 @@ package de.schlichtherle.truevfs.kernel.se
 import net.truevfs.kernel._
 
 /**
- * A mixin which defines some methods on its associated {@link LockModel}.
+ * A mixin which provides some features of its associated {@link LockModel}.
  *
  * @see    LockModel
  * @author Christian Schlichtherle
  */
-private trait LockModelAspect {
+private trait LockModelFeatures {
 
+  /** The lock model with the features to provide in this trait. */
   def model: LockModel
 
   /**
@@ -43,10 +44,27 @@ private trait LockModelAspect {
    */
   final def touched_=(touched: Boolean) = model setTouched touched
 
+  /** The read lock of the lock model. */
   final val readLock = model readLock
-  final def readLockedByCurrentThread = model isReadLockedByCurrentThread
 
+  /** Wether or not the current thread has acquired the read lock. */
+  final def readLockedByCurrentThread = model readLockedByCurrentThread
+
+  /** The write lock of the lock model. */
   final val writeLock = model writeLock
-  final def writeLockedByCurrentThread = model isWriteLockedByCurrentThread
-  final def checkWriteLockedByCurrentThread = model checkWriteLockedByCurrentThread
+
+  /** Wether or not the current thread has acquired the write lock. */
+  final def writeLockedByCurrentThread = model writeLockedByCurrentThread
+
+  /**
+   * Checks that the write lock is held by the current thread.
+   * Use this method for lock control.
+   * 
+   * @throws NeedsWriteLockException if the <i>write lock</i> is not
+   *         held by the current thread.
+   * @see    #writeLockedByCurrentThread
+   */
+  final def checkWriteLockedByCurrentThread() {
+    if (!writeLockedByCurrentThread) throw NeedsWriteLockException get
+  }
 }

@@ -20,8 +20,8 @@ import java.nio.channels._
  * @see    ResourceManager
  * @author Christian Schlichtherle
  */
-private trait ResourceController extends FsController[LockModel] {
-  this: LockModelAspect =>
+private trait ResourceController extends Controller[LockModel] {
+  this: LockModelFeatures =>
 
   import ResourceController._
 
@@ -35,7 +35,7 @@ private trait ResourceController extends FsController[LockModel] {
     new Input
   }: AnyInputSocket
 
-  abstract override def output(options: AccessOptions, name: FsEntryName, template: Entry) = {
+  abstract override def output(options: AccessOptions, name: FsEntryName, template: Option[Entry]) = {
     final class Output extends DecoratingOutputSocket[Entry](super.output(options, name, template)) {
       override def stream() = new ResourceOutputStream(boundSocket.stream())
       override def channel() = new ResourceSeekableChannel(boundSocket.channel())

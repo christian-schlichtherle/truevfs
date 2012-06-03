@@ -56,8 +56,8 @@ import scala.util.control.Breaks
  * 
  * @author Christian Schlichtherle
  */
-private trait CacheController extends FsController[LockModel] {
-  this: LockModelAspect =>
+private trait CacheController extends Controller[LockModel] {
+  this: LockModelFeatures =>
 
   import CacheController._
 
@@ -83,7 +83,7 @@ private trait CacheController extends FsController[LockModel] {
     new Input
   }: AnyInputSocket
 
-  abstract override def output(options: AccessOptions, name: FsEntryName, template: Entry) = {
+  abstract override def output(options: AccessOptions, name: FsEntryName, template: Option[Entry]) = {
     /** This class requires ON-DEMAND LOOKUP of its delegate socket! */
     final class Output extends DelegatingOutputSocket[Entry] {
       override def socket(): AnyOutputSocket = {
@@ -101,7 +101,7 @@ private trait CacheController extends FsController[LockModel] {
     new Output
   }: AnyOutputSocket
 
-  abstract override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Entry) {
+  abstract override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Option[Entry]) {
     assert(writeLockedByCurrentThread)
     super.mknod(options, name, tµpe, template)
     val cache = caches.remove(name)
@@ -229,7 +229,7 @@ private trait CacheController extends FsController[LockModel] {
           // Bypass the super class implementation to keep the
           // socket even upon an exception!
           final class Stream extends DecoratingInputStream(boundSocket.stream()) {
-            assert(getModel.isTouched)
+            assert(model.isTouched)
 
             override def close() {
               assert(writeLockedByCurrentThread)
@@ -245,7 +245,7 @@ private trait CacheController extends FsController[LockModel] {
       cache.configure(new Input()).input
     }: AnyInputSocket
 
-    def output(options: AccessOptions, template: Entry) = {
+    def output(options: AccessOptions, template: Option[Entry]) = {
       /**
        * This class requires LAZY INITIALIZATION of its channel, but NO
        * automatic decoupling on exceptions!
@@ -301,11 +301,11 @@ private trait CacheController extends FsController[LockModel] {
         def preOutput() { mknod(o, template) }
 
         def postOutput() {
-          mknod(o.clear(EXCLUSIVE), Option(template).getOrElse(cache)) 
+          mknod(o.clear(EXCLUSIVE), template.orElse(Option(cache))) 
           register()
         }
 
-        def mknod(options: AccessOptions, template: Entry) {
+        def mknod(options: AccessOptions, template: Option[Entry]) {
           var mknodOpts = options
           val breaks = new Breaks
           import breaks.{break, breakable}

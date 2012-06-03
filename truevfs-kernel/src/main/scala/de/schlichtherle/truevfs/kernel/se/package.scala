@@ -17,14 +17,13 @@ import java.{util => ju}
  * @author Christian Schlichtherle
  */
 package object se {
-  type AccessOptions = BitField[FsAccessOption]
-  type SyncOptions = BitField[FsSyncOption]
-  type AnyArchiveDriver = FsArchiveDriver[_ <: FsArchiveEntry]
-  type AnyController = FsController[_ <: FsModel]
-  type AnyInputSocket = InputSocket[_ <: Entry]
-  type AnyOutputSocket = OutputSocket[_ <: Entry]
-  type AnyIoPool = IoPool[_ <: IoBuffer[_]]
-  type AnyIoBuffer = IoBuffer[_ <: IoBuffer[_]]
+  private[se] type AccessOptions = BitField[FsAccessOption]
+  private[se] type SyncOptions = BitField[FsSyncOption]
+  private[se] type AnyArchiveDriver = FsArchiveDriver[_ <: FsArchiveEntry]
+  private[se] type AnyInputSocket = InputSocket[_ <: Entry]
+  private[se] type AnyOutputSocket = OutputSocket[_ <: Entry]
+  private[se] type AnyIoPool = IoPool[_ <: IoBuffer[_]]
+  private[se] type AnyIoBuffer = IoBuffer[_ <: IoBuffer[_]]
 
   // Used for looping through BitField, Container etc.
   private[se] implicit def asScalaIterable[E](i: jl.Iterable[E]): Iterable[E] = {
@@ -37,4 +36,16 @@ package object se {
       output += e.getKey -> Long.unbox(e.getValue)
     output
   }
+
+  private[se] implicit def asJavaMapFromAccessToLong(input: Map[Access, Long]): ju.Map[Access, jl.Long] = {
+    var output = new ju.HashMap[Access, jl.Long]()
+    for (e <- input.entrySet)
+      output.put(e.getKey, Long.box(e.getValue))
+    output
+  }
+
+  private[se] def asFsController[M <: FsModel](
+    controller: Controller[M],
+    parent: FsController[_ <: FsModel]) =
+    new ControllerAdapter(controller, parent)
 }

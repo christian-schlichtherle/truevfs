@@ -26,8 +26,8 @@ import java.nio.channels._
  * @see    NeedsSyncException
  * @author Christian Schlichtherle
  */
-private trait SyncController extends FsController[LockModel] {
-  this: LockModelAspect =>
+private trait SyncController extends Controller[LockModel] {
+  this: LockModelFeatures =>
 
   abstract override def stat(options: AccessOptions, name: FsEntryName) =
     apply(super.stat(options, name))
@@ -38,7 +38,7 @@ private trait SyncController extends FsController[LockModel] {
   abstract override def setReadOnly(name: FsEntryName) =
     apply(super.setReadOnly(name))
 
-  abstract override def setTime(options: AccessOptions, name: FsEntryName, times: java.util.Map[Access, java.lang.Long]) =
+  abstract override def setTime(options: AccessOptions, name: FsEntryName, times: Map[Access, Long]) =
     apply(super.setTime(options, name, times))
 
   abstract override def setTime(options: AccessOptions, name: FsEntryName, types: BitField[Access], value: Long) =
@@ -53,7 +53,7 @@ private trait SyncController extends FsController[LockModel] {
     new Input
   }: AnyInputSocket
 
-  abstract override def output(options: AccessOptions, name: FsEntryName, template: Entry) = {
+  abstract override def output(options: AccessOptions, name: FsEntryName, template: Option[Entry]) = {
     final class Output extends DecoratingOutputSocket[Entry](super.output(options, name, template)) {
       override def localTarget = apply(boundSocket.localTarget)
       override def stream() = apply(new SyncOutputStream(boundSocket.stream))
@@ -77,7 +77,7 @@ private trait SyncController extends FsController[LockModel] {
     override def close = apply(channel.close)
   }
 
-  abstract override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Entry) =
+  abstract override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Option[Entry]) =
     apply(super.mknod(options, name, tµpe, template))
 
   abstract override def unlink(options: AccessOptions, name: FsEntryName) =
