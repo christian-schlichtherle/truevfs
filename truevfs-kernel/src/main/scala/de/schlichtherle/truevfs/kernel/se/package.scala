@@ -26,21 +26,21 @@ package object se {
   private[se] type AnyIoBuffer = IoBuffer[_ <: IoBuffer[_]]
 
   // Used for looping through BitField, Container etc.
-  private[se] implicit def asScalaIterable[E](i: jl.Iterable[E]): Iterable[E] = {
+  implicit private[se] def asScalaIterable[E](i: jl.Iterable[E]): Iterable[E] = {
     collection.JavaConversions.asIterable(i)
   }
 
-  private[se] implicit def asScalaMapFromAccessToLong(input: ju.Map[Access, jl.Long]): Map[Access, Long] = {
+  implicit private[se] def asScalaMapFromAccessToLong(input: ju.Map[Access, jl.Long]): Map[Access, Long] = {
     var output = Map[Access, Long]()
     for (e <- input.entrySet)
       output += e.getKey -> Long.unbox(e.getValue)
     output
   }
 
-  private[se] implicit def asJavaMapFromAccessToLong(input: Map[Access, Long]): ju.Map[Access, jl.Long] = {
+  implicit private[se] def asJavaMapFromAccessToLong(input: Map[Access, Long]): ju.Map[Access, jl.Long] = {
     var output = new ju.HashMap[Access, jl.Long]()
-    for (e <- input.entrySet)
-      output.put(e.getKey, Long.box(e.getValue))
+    for ((key, value) <- input)
+      output.put(key, Long.box(value))
     output
   }
 
