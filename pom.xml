@@ -286,7 +286,7 @@ system space.
                             <exclude>**/*TestSuite.class</exclude>
                         </excludes-->
                         <systemPropertyVariables>
-                            <de.schlichtherle.truevfs.kernel.ControlFlowException.traceable>true</de.schlichtherle.truevfs.kernel.ControlFlowException.traceable>
+                            <de.schlichtherle.truevfs.kernel.ControlFlowException.se.traceable>true</de.schlichtherle.truevfs.kernel.ControlFlowException.se.traceable>
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
                         </systemPropertyVariables>
                     </configuration>
