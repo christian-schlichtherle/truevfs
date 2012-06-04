@@ -5,16 +5,13 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.io.DecoratingInputStream;
-import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
 import de.schlichtherle.truezip.io.InputClosedException;
-import de.schlichtherle.truezip.rof.DecoratingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
 import javax.annotation.WillCloseWhenClosed;
@@ -33,7 +30,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @see    DisconnectingOutputShop
  * @author Christian Schlichtherle
  */
-// TODO: Consider renaming this to ClutchInputArchive in TrueZIP 8.
 @NotThreadSafe
 public class DisconnectingInputShop<E extends Entry>
 extends DecoratingInputShop<E, InputShop<E>> {
@@ -60,13 +56,11 @@ extends DecoratingInputShop<E, InputShop<E>> {
     }
 
     final void assertOpen() {
-        if (isClosed())
-            throw new IllegalStateException(new InputClosedException());
+        if (isClosed()) throw new IllegalStateException(new InputClosedException());
     }
 
     final void checkOpen() throws IOException {
-        if (isClosed())
-            throw new InputClosedException();
+        if (isClosed()) throw new InputClosedException();
     }
 
     @Override
@@ -171,153 +165,62 @@ extends DecoratingInputShop<E, InputShop<E>> {
     } // Input
 
     private final class DisconnectingReadOnlyFile
-    extends DecoratingReadOnlyFile {
+    extends de.schlichtherle.truezip.rof.DisconnectingReadOnlyFile {
+
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         DisconnectingReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
             super(rof);
         }
 
         @Override
-        public long length() throws IOException {
-            checkOpen();
-            return delegate.length();
+        public boolean isOpen() {
+            return !isClosed();
         }
 
         @Override
-        public long getFilePointer() throws IOException {
-            checkOpen();
-            return delegate.getFilePointer();
-        }
-
-        @Override
-        public void seek(long pos) throws IOException {
-            checkOpen();
-            delegate.seek(pos);
-        }
-
-        @Override
-        public int read() throws IOException {
-            checkOpen();
-            return delegate.read();
-        }
-
-        @Override
-        public int read(byte[] b, int off, int len) throws IOException {
-            checkOpen();
-            return delegate.read(b, off, len);
-        }
-
-        @Override
+        @DischargesObligation
         public void close() throws IOException {
-            if (!closed)
-                delegate.close();
+            if (isOpen()) delegate.close();
         }
     } // DisconnectingReadOnlyFile
 
     private final class DisconnectingSeekableByteChannel
-    extends DecoratingSeekableByteChannel {
+    extends de.schlichtherle.truezip.io.DisconnectingSeekableByteChannel {
+
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         DisconnectingSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
         }
 
         @Override
-        public int read(ByteBuffer dst) throws IOException {
-            checkOpen();
-            return delegate.read(dst);
-        }
-
-        @Override
-        public int write(ByteBuffer src) throws IOException {
-            checkOpen();
-            return delegate.write(src);
-        }
-
-        @Override
-        public long position() throws IOException {
-            checkOpen();
-            return delegate.position();
-        }
-
-        @Override
-        public SeekableByteChannel position(long newPosition) throws IOException {
-            checkOpen();
-            delegate.position(newPosition);
-            return this;
-        }
-
-        @Override
-        public long size() throws IOException {
-            checkOpen();
-            return delegate.size();
-        }
-
-        @Override
-        public SeekableByteChannel truncate(long size) throws IOException {
-            checkOpen();
-            delegate.truncate(size);
-            return this;
-        }
-
-        @Override
         public boolean isOpen() {
-            return !closed && delegate.isOpen();
+            return !isClosed() && delegate.isOpen();
         }
 
         @Override
+        @DischargesObligation
         public void close() throws IOException {
-            if (!closed)
-                delegate.close();
+            if (isOpen()) delegate.close();
         }
     } // DisconnectingSeekableByteChannel
 
     private final class DisconnectingInputStream
-    extends DecoratingInputStream {
+    extends de.schlichtherle.truezip.io.DisconnectingInputStream {
+
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
         DisconnectingInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
         }
 
         @Override
-        public int read() throws IOException {
-            checkOpen();
-            return delegate.read();
+        public boolean isOpen() {
+            return !isClosed();
         }
 
         @Override
-        public int read(byte[] b, int off, int len) throws IOException {
-            checkOpen();
-            return delegate.read(b, off, len);
-        }
-
-        @Override
-        public long skip(long n) throws IOException {
-            checkOpen();
-            return delegate.skip(n);
-        }
-
-        @Override
-        public int available() throws IOException {
-            checkOpen();
-            return delegate.available();
-        }
-
-        @Override
-        public void mark(int readlimit) {
-            if (!closed)
-                delegate.mark(readlimit);
-        }
-
-        @Override
-        public void reset() throws IOException {
-            checkOpen();
-            delegate.reset();
-        }
-
-        @Override
+        @DischargesObligation
         public void close() throws IOException {
-            if (!closed)
-                delegate.close();
+            if (isOpen()) delegate.close();
         }
     } // DisconnectingInputStream
 }

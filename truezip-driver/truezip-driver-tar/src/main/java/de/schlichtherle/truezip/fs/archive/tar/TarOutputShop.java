@@ -13,9 +13,9 @@ import de.schlichtherle.truezip.io.*;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputShop;
 import de.schlichtherle.truezip.socket.OutputSocket;
-import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.util.HashMaps;
 import static de.schlichtherle.truezip.util.HashMaps.initialCapacity;
+import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -168,7 +168,7 @@ implements OutputShop<TarDriverEntry> {
      * These preconditions are checked by {@link #getOutputSocket(TarDriverEntry)}.
      */
     @CleanupObligation
-    private final class EntryOutputStream extends DecoratingOutputStream {
+    private final class EntryOutputStream extends DisconnectingOutputStream {
         boolean closed;
 
         @CreatesObligation
@@ -182,10 +182,14 @@ implements OutputShop<TarDriverEntry> {
         }
 
         @Override
+        public boolean isOpen() {
+            return !closed;
+        }
+
+        @Override
         @DischargesObligation
         public void close() throws IOException {
-            if (closed)
-                return;
+            if (closed) return;
             closeArchiveEntry();
             closed = true;
             busy = false;
