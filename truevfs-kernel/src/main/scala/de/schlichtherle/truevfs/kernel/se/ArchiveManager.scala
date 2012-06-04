@@ -35,7 +35,7 @@ extends FsManager {
   def this() = this(WEAK)
 
   override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint) =
-    synchronized(controller0(driver, mountPoint))
+    synchronized { controller0(driver, mountPoint) }
 
   private def controller0(driver: FsCompositeDriver, mountPoint: FsMountPoint): FsController[_ <: FsModel] = {
     if (null eq mountPoint.getParent) {
@@ -95,7 +95,7 @@ extends FsManager {
       val mountPoint = getMountPoint
       val link: Link[FsController[_ <: FsModel]] =
         (if (mandatory) STRONG else optionalScheduleType) newLink _controller
-      ArchiveManager.this synchronized controllers.put(mountPoint, link)
+      ArchiveManager.this synchronized { controllers put (mountPoint, link) }
     }
   }
 
@@ -112,11 +112,11 @@ extends FsManager {
             new BackController(driver, new LockModel(model), parent), parent)))
   }
 
-  override def size = synchronized(controllers.size)
+  override def size = synchronized { controllers size }
 
   override def iterator = synchronized {
-    import collection.JavaConversions._
-    sortedControllers iterator
+    import collection.JavaConverters._
+    sortedControllers.iterator.asJava
   }
 
   private def sortedControllers = {

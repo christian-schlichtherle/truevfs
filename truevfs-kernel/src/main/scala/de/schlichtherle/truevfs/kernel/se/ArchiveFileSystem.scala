@@ -147,7 +147,6 @@ extends Iterable[FsCovariantEntry[E]] {
     touch(options)
     val ae = ce.getEntry
     var ok = true
-    import collection.JavaConversions._
     for ((access, value) <- times)
         ok &= 0 <= value && ae.setTime(access, value)
     ok
