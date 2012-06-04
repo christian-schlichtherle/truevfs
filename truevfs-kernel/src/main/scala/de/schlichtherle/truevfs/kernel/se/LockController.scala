@@ -82,21 +82,6 @@ private trait LockController extends Controller[LockModel] {
     new Output
   }: AnyOutputSocket
 
-  private class LockInputStream(in: InputStream)
-  extends DecoratingInputStream(in) {
-    override def close = deadWriteLocked(in.close)
-  }
-
-  private class LockOutputStream(out: OutputStream)
-  extends DecoratingOutputStream(out) {
-    override def close = deadWriteLocked(out.close)
-  }
-
-  private class LockSeekableChannel(channel: SeekableByteChannel)
-  extends DecoratingSeekableChannel(channel) {
-    override def close = deadWriteLocked(channel.close)
-  }
-
   abstract override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Option[Entry]) =
     timedWriteLocked(super.mknod(options, name, tµpe, template))
 
@@ -129,4 +114,19 @@ private trait LockController extends Controller[LockModel] {
 
   private def deadWriteLocked[V](operation: => V) =
     DEAD_LOCK.apply(writeLock, operation)
+
+  private class LockInputStream(in: InputStream)
+  extends DecoratingInputStream(in) {
+    override def close = deadWriteLocked(in.close)
+  }
+
+  private class LockOutputStream(out: OutputStream)
+  extends DecoratingOutputStream(out) {
+    override def close = deadWriteLocked(out.close)
+  }
+
+  private class LockSeekableChannel(channel: SeekableByteChannel)
+  extends DecoratingSeekableChannel(channel) {
+    override def close = deadWriteLocked(channel.close)
+  }
 }
