@@ -184,7 +184,6 @@ public final class IntervalReadOnlyChannel extends DecoratingReadOnlyChannel {
     @Override
     @DischargesObligation
     public void close() throws IOException {
-        if (exclusive)
-            channel.close();
+        if (exclusive) channel.close();
     }
 }
