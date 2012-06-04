@@ -19,8 +19,8 @@ import javax.annotation.WillCloseWhenClosed;
  * in the JSE, but optimized for performance and <em>without</em>
  * multithreading support.
  *
- * @see     DecoratingOutputStream
- * @author  Christian Schlichtherle
+ * @see    DecoratingOutputStream
+ * @author Christian Schlichtherle
  */
 @CleanupObligation
 public abstract class DecoratingInputStream extends InputStream {
