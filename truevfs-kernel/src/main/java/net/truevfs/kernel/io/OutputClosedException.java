@@ -12,7 +12,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * @see     InputClosedException
  * @author  Christian Schlichtherle
  */
-// TODO: Remove this class and just use its super class.
 @ThreadSafe
 public class OutputClosedException extends ClosedException {
     private static final long serialVersionUID = 4563928734723923649L;
