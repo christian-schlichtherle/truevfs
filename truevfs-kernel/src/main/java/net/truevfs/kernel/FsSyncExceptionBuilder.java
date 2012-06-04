@@ -4,9 +4,9 @@
  */
 package net.truevfs.kernel;
 
-import net.truevfs.kernel.util.PriorityExceptionBuilder;
 import java.util.Comparator;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.kernel.util.PriorityExceptionBuilder;
 
 /**
  * Assembles an {@link FsSyncException} from one or more sync exceptions by
