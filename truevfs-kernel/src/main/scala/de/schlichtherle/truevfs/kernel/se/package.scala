@@ -27,13 +27,13 @@ package object se {
 
   // Used for looping through BitField, Container etc.
   implicit private[se] def asScalaIterable[E](i: jl.Iterable[E]): Iterable[E] = {
-    collection.JavaConversions.asIterable(i)
+    collection.JavaConversions.iterableAsScalaIterable(i)
   }
 
   implicit private[se] def asScalaMapFromAccessToLong(input: ju.Map[Access, jl.Long]): Map[Access, Long] = {
     var output = Map[Access, Long]()
-    for (e <- input.entrySet)
-      output += e.getKey -> Long.unbox(e.getValue)
+    for (entry <- input.entrySet)
+      output += entry.getKey -> Long.unbox(entry.getValue)
     output
   }
 
