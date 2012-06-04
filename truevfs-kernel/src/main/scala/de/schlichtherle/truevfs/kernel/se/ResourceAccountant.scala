@@ -26,8 +26,8 @@ import scala.util.control.Breaks
   * @see    FsResourceController
   * @author Christian Schlichtherle
   */
-private final class ResourceManager(lock: Lock) {
-  import ResourceManager._
+private final class ResourceAccountant(lock: Lock) {
+  import ResourceAccountant._
 
   private[this] val condition = lock.newCondition
 
@@ -35,8 +35,8 @@ private final class ResourceManager(lock: Lock) {
     * 
     * @param resource the closeable resource to start accounting for.
     */
-  def start(resource: Closeable) {
-    accounts += resource -> new Account
+  def startAccountingFor(resource: Closeable) {
+    accounts += resource -> Account(this)
   }
 
   /** Stops accounting for the given closeable resource.
@@ -45,7 +45,7 @@ private final class ResourceManager(lock: Lock) {
     * 
     * @param resource the closeable resource to stop accounting for.
     */
-  def stop(resource: Closeable) {
+  def stopAccountingFor(resource: Closeable) {
     accounts.remove(resource) foreach { _ =>
       lock.lock()
       try {
@@ -88,7 +88,7 @@ private final class ResourceManager(lock: Lock) {
         val mybreaks = new Breaks
         import mybreaks.{break, breakable}
         breakable {
-          while ({ val (local, total) = resources(); local < total }) {
+          while (resources() isBusy) {
             if (0 < timeout) {
               if (0 >= toWait)
                 break
@@ -99,11 +99,10 @@ private final class ResourceManager(lock: Lock) {
           }
         }
       } catch {
-        case cancel: InterruptedException =>
+        case _: InterruptedException =>
           // Fix rare racing condition between Thread.interrupt() and
           // Condition.signalAll() events.
-          val (_, total) = resources()
-          if (0 == total)
+          if (0 == resources().total)
             Thread.currentThread.interrupt()
       }
     } finally {
@@ -124,11 +123,11 @@ private final class ResourceManager(lock: Lock) {
   def resources() = {
     val currentThread = Thread.currentThread
     var local, total = 0
-    for (account <- accounts.values if account.manager eq this) {
+    for (account <- accounts.values if account.accountant eq this) {
       if (account.owner eq currentThread) local += 1
       total += 1
     }
-    (local, total)
+    Resources(local, total)
   }
 
   /** For each accounted closeable resource, stops accounting for it and closes
@@ -141,14 +140,16 @@ private final class ResourceManager(lock: Lock) {
     lock.lock()
     try {
       val builder = new SuppressedExceptionBuilder[IOException]
-      for ((closeable, account) <- accounts if account.manager eq this) {
+      for ((closeable, account) <- accounts if account.accountant eq this) {
+        accounts -= closeable
         try {
-          // This should trigger an attempt to remove the closeable
-          // from the map, but it can cause no
-          // ConcurrentModificationException because we are using a
-          // ConcurrentHashMap.
-          closeable close() // could throw an IOException or a RuntimeException, e.g. a NeedsLockRetryException!
-          assert(!(accounts contains closeable), "closeable.close() did not call stop(this) on this resource manager!")
+          // This should trigger an attempt to remove the closeable from the
+          // map, but it can cause no ConcurrentModificationException because
+          // the entry is already removed and a ConcurrentHashMap doesn't do
+          // that anyway.
+          // Note that this method may throw an IOException or a
+          // RuntimeException, e.g. a NeedsLockRetryException!
+          closeable close()
         } catch {
           case ex: ControlFlowException =>
             assert(ex.isInstanceOf[NeedsLockRetryException], ex)
@@ -163,14 +164,9 @@ private final class ResourceManager(lock: Lock) {
       lock.unlock()
     }
   }
-
-  private final class Account {
-    val owner = Thread.currentThread
-    def manager = ResourceManager.this
-  } // Account
 }
 
-private object ResourceManager {
+private object ResourceAccountant {
 
   /** The map of all accounted closeable resources.
     * The initial capacity for the hash map accounts for the number of
@@ -180,7 +176,15 @@ private object ResourceManager {
   private val accounts = {
     val initialCapacity =
       HashMaps.initialCapacity(Runtime.getRuntime.availableProcessors() * 10);
-    new ConcurrentHashMap[Closeable, ResourceManager#Account](
+    new ConcurrentHashMap[Closeable, Account](
       initialCapacity, 0.75f, initialCapacity).asScala
   }
+
+  private final case class Account(accountant: ResourceAccountant) {
+    val owner = Thread.currentThread
+  } // Account
+
+  final case class Resources(local: Int, total: Int) {
+    def isBusy = local < total
+  } // Resources
 }
