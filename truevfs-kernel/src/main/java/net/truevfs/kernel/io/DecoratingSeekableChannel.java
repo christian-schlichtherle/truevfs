@@ -53,8 +53,7 @@ implements SeekableByteChannel {
      *         {@code false}.
      */
     protected final void checkOpen() throws ClosedChannelException {
-        if (!isOpen())
-            throw new ClosedChannelException();
+        if (!isOpen()) throw new ClosedChannelException();
     }
 
     @Override
