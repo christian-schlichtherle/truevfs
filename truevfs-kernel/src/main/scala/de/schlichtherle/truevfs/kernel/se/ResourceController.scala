@@ -62,7 +62,7 @@ private trait ResourceController extends Controller[LockModel] {
       waitIdle(options)
     } catch {
       case ex: FsResourceOpenException =>
-        if (!options.get(FORCE_CLOSE_IO))
+        if (!(options get FORCE_CLOSE_IO))
             throw builder.fail(new FsSyncException(mountPoint, ex))
         builder.warn(new FsSyncWarningException(mountPoint, ex))
     }
