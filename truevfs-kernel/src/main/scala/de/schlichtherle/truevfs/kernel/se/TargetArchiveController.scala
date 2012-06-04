@@ -81,7 +81,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
 
   private def inputArchive = {
     _inputArchive match {
-      case Some(ia) if ia.closed => throw NeedsSyncException()
+      case Some(ia) if ia.isClosed => throw NeedsSyncException()
       case x => x
     }
   }
@@ -94,7 +94,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
 
   private def outputArchive = {
     _outputArchive match {
-      case Some(oa) if oa.closed => throw NeedsSyncException()
+      case Some(oa) if oa.isClosed => throw NeedsSyncException()
       case x => x
     }
   }
@@ -313,7 +313,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
     // be an artifact of a bug.
     val is = _inputArchive match {
       case Some(ia) =>
-        if (ia.closed) return
+        if (ia.isClosed) return
         ia.clutch
       case _ =>
         new DummyInputService[E]
@@ -321,7 +321,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
 
     val os = _outputArchive match {
       case Some(oa) =>
-        if (oa.closed) return
+        if (oa.isClosed) return
         oa.clutch
       case _ =>
         return
@@ -479,14 +479,14 @@ private object TargetArchiveController {
   (val driverProduct: InputService[E])
   extends LockInputService(new DisconnectingInputService(driverProduct)) {
     def clutch = container.asInstanceOf[DisconnectingInputService[E]]
-    def closed = clutch.isClosed
+    def isClosed = !clutch.isOpen
   } // InputArchive
 
   private final class OutputArchive[E <: FsArchiveEntry]
   (driverProduct: OutputService[E])
   extends LockOutputService(new DisconnectingOutputService(driverProduct)) {
     def clutch = container.asInstanceOf[DisconnectingOutputService[E]]
-    def closed = clutch.isClosed
+    def isClosed = !clutch.isOpen
   } // OutputArchive
 
   /**

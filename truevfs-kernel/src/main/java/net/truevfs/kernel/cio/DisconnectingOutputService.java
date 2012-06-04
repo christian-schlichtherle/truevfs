@@ -4,17 +4,13 @@
  */
 package net.truevfs.kernel.cio;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.truevfs.kernel.io.DecoratingOutputStream;
-import net.truevfs.kernel.io.DecoratingSeekableChannel;
 import net.truevfs.kernel.io.OutputClosedException;
 
 /**
@@ -30,32 +26,25 @@ import net.truevfs.kernel.io.OutputClosedException;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public final class DisconnectingOutputService<E extends Entry>
+public class DisconnectingOutputService<E extends Entry>
 extends DecoratingOutputService<E, OutputService<E>> {
 
     private boolean closed;
 
-    /**
-     * Constructs a disconnecting output service.
-     * 
-     * @param output the service to decorate.
-     */
     public DisconnectingOutputService(@WillCloseWhenClosed OutputService<E> output) {
         super(output);
     }
 
-    public boolean isClosed() {
-        return closed;
+    public boolean isOpen() {
+        return !closed;
     }
 
     final void assertOpen() {
-        if (isClosed())
-            throw new IllegalStateException(new OutputClosedException());
+        if (!isOpen()) throw new IllegalStateException(new OutputClosedException());
     }
 
-    final void checkOpen() throws IOException {
-        if (isClosed())
-            throw new OutputClosedException();
+    final void checkOpen() throws OutputClosedException {
+        if (!isOpen()) throw new OutputClosedException();
     }
 
     @Override
@@ -123,95 +112,40 @@ extends DecoratingOutputService<E, OutputService<E>> {
     } // Output
 
     private final class DisconnectingOutputStream
-    extends DecoratingOutputStream {
+    extends net.truevfs.kernel.io.DisconnectingOutputStream {
 
-        @CreatesObligation
         DisconnectingOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
         }
 
         @Override
-        public void write(int b) throws IOException {
-            checkOpen();
-            out.write(b);
-        }
-
-        @Override
-        public void write(byte[] b, int off, int len) throws IOException {
-            checkOpen();
-            out.write(b, off, len);
-        }
-
-        @Override
-        public void flush() throws IOException {
-            checkOpen();
-            out.flush();
+        public boolean isOpen() {
+            return DisconnectingOutputService.this.isOpen();
         }
 
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            if (!closed)
-                out.close();
+            if (isOpen()) out.close();
         }
     } // DisconnectingOutputStream
 
     private final class DisconnectingSeekableChannel
-    extends DecoratingSeekableChannel {
+    extends net.truevfs.kernel.io.DisconnectingSeekableChannel {
 
-        @CreatesObligation
         DisconnectingSeekableChannel(@WillCloseWhenClosed SeekableByteChannel channel) {
             super(channel);
         }
 
         @Override
         public boolean isOpen() {
-            return !closed && channel.isOpen();
-        }
-
-        @Override
-        public int read(ByteBuffer dst) throws IOException {
-            checkOpen();
-            return channel.read(dst);
-        }
-
-        @Override
-        public int write(ByteBuffer src) throws IOException {
-            checkOpen();
-            return channel.write(src);
-        }
-
-        @Override
-        public long position() throws IOException {
-            checkOpen();
-            return channel.position();
-        }
-
-        @Override
-        public SeekableByteChannel position(long newPosition) throws IOException {
-            checkOpen();
-            channel.position(newPosition);
-            return this;
-        }
-
-        @Override
-        public long size() throws IOException {
-            checkOpen();
-            return channel.size();
-        }
-
-        @Override
-        public SeekableByteChannel truncate(long size) throws IOException {
-            checkOpen();
-            channel.truncate(size);
-            return this;
+            return DisconnectingOutputService.this.isOpen() && channel.isOpen();
         }
 
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            if (!closed)
-                channel.close();
+            if (isOpen()) channel.close();
         }
     } // DisconnectingSeekableChannel
 }

@@ -181,7 +181,7 @@ implements OutputService<TarDriverEntry> {
      * These preconditions are checked by {@link #output(TarDriverEntry)}.
      */
     @CleanupObligation
-    private final class EntryOutputStream extends DecoratingOutputStream {
+    private final class EntryOutputStream extends DisconnectingOutputStream {
         boolean closed;
 
         @CreatesObligation
@@ -194,10 +194,14 @@ implements OutputService<TarDriverEntry> {
         }
 
         @Override
+        public boolean isOpen() {
+            return !closed;
+        }
+
+        @Override
         @DischargesObligation
         public void close() throws IOException {
-            if (closed)
-                return;
+            if (closed) return;
             tos.closeArchiveEntry();
             closed = true;
             busy = false;
