@@ -13,6 +13,7 @@ import net.truevfs.kernel.io._
 import net.truevfs.kernel.util._
 import java.io._
 import java.nio.channels._
+import ResourceAccountant.Resources
 
 /** Accounts input and output resources returned by its decorated controller.
   * 
@@ -24,7 +25,7 @@ private trait ResourceController extends Controller[LockModel] {
 
   import ResourceController._
 
-  private[this] val manager = new ResourceManager(writeLock)
+  private[this] val accountant = new ResourceAccountant(writeLock)
 
   abstract override def input(options: AccessOptions, name: FsEntryName) = {
     final class Input extends DecoratingInputSocket[Entry](super.input(options, name)) {
@@ -70,7 +71,7 @@ private trait ResourceController extends Controller[LockModel] {
   private def waitIdle(options: SyncOptions) {
     // HC SVNT DRACONES!
     {
-      val (local, total) = manager resources()
+      val Resources(local, total) = accountant resources()
       if (0 != local && !(options get FORCE_CLOSE_IO))
           throw new FsResourceOpenException(local, total)
     }
@@ -85,9 +86,9 @@ private trait ResourceController extends Controller[LockModel] {
       // The TarDriver family is known to be affected by this.
       System.runFinalization()
     }
-    manager waitOtherThreads (if (wait) 0 else waitTimeoutMillis);
+    accountant waitOtherThreads (if (wait) 0 else waitTimeoutMillis);
     {
-      val (local, total) = manager resources()
+      val Resources(local, total) = accountant resources()
       if (0 != total)
           throw new FsResourceOpenException(local, total)
     }
@@ -99,7 +100,7 @@ private trait ResourceController extends Controller[LockModel] {
     */
   private def closeAll(builder: FsSyncExceptionBuilder) {
     try {
-      manager.closeAllResources()
+      accountant closeAllResources()
     } catch {
       case ex: IOException =>
         builder.warn(new FsSyncWarningException(mountPoint, ex))
@@ -116,11 +117,11 @@ private trait ResourceController extends Controller[LockModel] {
   extends DecoratingSeekableChannel(channel) with ResourceCloseable
 
   private trait ResourceCloseable extends Closeable {
-    manager.start(this)
+    accountant startAccountingFor this
 
     abstract override def close() {
       super.close()
-      manager stop this
+      accountant stopAccountingFor this
     }
   }
 }
