@@ -2,12 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truevfs.kernel.se;
+package net.truevfs.kernel.cio;
 
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
-import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
@@ -16,31 +15,24 @@ import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
-import net.truevfs.kernel.cio.*;
 
 /**
- * Decorates another input service to allow concurrent access which is
+ * Decorates another output service to allow concurrent access which is
  * synchronized by a private {@link Lock} object.
  *
- * @param  <E> the type of the entries in the decorated input service.
- * @see    LockOutputService
- * @see    LockManagement
+ * @param  <E> the type of the entries in the decorated output service.
+ * @see    LockInputService
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-class LockInputService<E extends Entry>
-extends DecoratingInputService<E, InputService<E>> {
+public class LockOutputService<E extends Entry>
+extends DecoratingOutputService<E, OutputService<E>> {
 
     /** The lock on which this object synchronizes. */
     private final Lock lock = new ReentrantLock();
 
-    /**
-     * Constructs a new lock input service.
-     *
-     * @param input the service to decorate.
-     */
-    LockInputService(@WillCloseWhenClosed InputService<E> input) {
-        super(input);
+    public LockOutputService(@WillCloseWhenClosed OutputService<E> output) {
+        super(output);
     }
 
     @Override
@@ -83,34 +75,28 @@ extends DecoratingInputService<E, InputService<E>> {
     }
 
     @Override
-    public InputSocket<E> input(final String name) {
-        final class Input extends DecoratingInputSocket<E> {
-            Input() {
-                super(container.input(name));
+    public OutputSocket<E> output(final E entry) {
+        final class Output extends DecoratingOutputSocket<E> {
+            Output() {
+                super(container.output(entry));
             }
 
             @Override
-            @GuardedBy("lock")
             public E localTarget() throws IOException {
-                lock.lock();
-                try {
-                    return boundSocket().localTarget();
-                } finally {
-                    lock.unlock();
-                }
+                return entry;
             }
 
             @Override
             @GuardedBy("lock")
-            public InputStream stream() throws IOException {
-                final InputStream in;
+            public OutputStream stream() throws IOException {
+                final OutputStream in;
                 lock.lock();
                 try {
                     in = boundSocket().stream();
                 } finally {
                     lock.unlock();
                 }
-                return new LockInputStream(in);
+                return new LockOutputStream(in);
             }
 
             @Override
@@ -125,43 +111,22 @@ extends DecoratingInputService<E, InputService<E>> {
                 }
                 return new LockSeekableChannel(channel);
             }
-        } // Input
+        } // Output
 
-        return new Input();
+        return new Output();
     }
 
-    void close(final Closeable closeable) throws IOException {
-        lock.lock();
-        try {
-            closeable.close();
-        } finally {
-            lock.unlock();
+    private final class LockOutputStream
+    extends net.truevfs.kernel.io.LockOutputStream {
+        LockOutputStream(@WillCloseWhenClosed OutputStream out) {
+            super(lock, out);
         }
-    }
-
-    private final class LockInputStream
-    extends net.truevfs.kernel.io.LockInputStream {
-        LockInputStream(@WillCloseWhenClosed InputStream in) {
-            super(lock, in);
-        }
-
-        @Override
-        @DischargesObligation
-        public void close() throws IOException {
-            close(in);
-        }
-    } // LockInputStream
+    } // LockOutputStream
 
     private final class LockSeekableChannel
     extends net.truevfs.kernel.io.LockSeekableChannel {
         LockSeekableChannel(@WillCloseWhenClosed SeekableByteChannel channel) {
             super(lock, channel);
-        }
-
-        @Override
-        @DischargesObligation
-        public void close() throws IOException {
-            close(channel);
         }
     } // LockSeekableChannel
 }
