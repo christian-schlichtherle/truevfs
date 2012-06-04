@@ -9,6 +9,7 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
@@ -18,8 +19,8 @@ import javax.annotation.WillCloseWhenClosed;
  * This is optimized for performance and <em>without</em> multithreading
  * support.
  *
- * @since   TrueZIP 7.2
- * @author  Christian Schlichtherle
+ * @since  TrueZIP 7.2
+ * @author Christian Schlichtherle
  */
 @CleanupObligation
 public abstract class DecoratingSeekableByteChannel
@@ -37,6 +38,23 @@ implements SeekableByteChannel {
     protected DecoratingSeekableByteChannel(
             final @Nullable @WillCloseWhenClosed SeekableByteChannel delegate) {
         this.delegate = delegate;
+    }
+
+    @Override
+    public boolean isOpen() {
+        return delegate.isOpen();
+    }
+
+    /**
+     * Throws a {@link ClosedChannelException} iff {@link #isOpen()} returns
+     * {@code false}.
+     * 
+     * @throws ClosedChannelException iff {@link #isOpen()} returns
+     *         {@code false}.
+     * @since  TrueZIP 7.5.6
+     */
+    protected final void checkOpen() throws ClosedChannelException {
+        if (!isOpen()) throw new ClosedChannelException();
     }
 
     @Override
@@ -72,11 +90,6 @@ implements SeekableByteChannel {
     }
 
     @Override
-    public boolean isOpen() {
-        return delegate.isOpen();
-    }
-
-    @Override
     @DischargesObligation
     public void close() throws IOException {
         delegate.close();
@@ -88,8 +101,6 @@ implements SeekableByteChannel {
      */
     @Override
     public String toString() {
-        return String.format("%s[delegate=%s]",
-                getClass().getName(),
-                delegate);
+        return String.format("%s[delegate=%s]", getClass().getName(), delegate);
     }
 }
