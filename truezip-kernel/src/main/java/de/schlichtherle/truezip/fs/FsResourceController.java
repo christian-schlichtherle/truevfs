@@ -5,6 +5,7 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.fs.FsResourceAccountant.Resources;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
@@ -31,7 +32,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 /**
  * Accounts input and output resources returned by its decorated controller.
  * 
- * @see    FsResourceManager
+ * @see    FsResourceAccountant
  * @since  TrueZIP 7.3
  * @author Christian Schlichtherle
  */
@@ -43,21 +44,11 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             ? SocketFactory.NIO2
             : SocketFactory.OIO;
 
-    private @CheckForNull FsResourceManager accountant;
+    private final FsResourceAccountant accountant =
+            new FsResourceAccountant(writeLock());
 
-    /**
-     * Constructs a new file system resource controller.
-     *
-     * @param controller the decorated file system controller.
-     */
     public FsResourceController(FsController<? extends FsLockModel> controller) {
         super(controller);
-    }
-
-    private FsResourceManager getAccountant() {
-        assert isWriteLockedByCurrentThread();
-        final FsResourceManager a = accountant;
-        return null != a ? a : (accountant = new FsResourceManager(writeLock()));
     }
 
     @Override
@@ -88,7 +79,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
      * Waits for all entry input and output resources to close or forces
      * them to close, dependending on the {@code options}.
      * Mind that this method deliberately handles entry input and output
-     * streams equally because {@link FsResourceManager#waitForeignResources}
+     * streams equally because {@link FsResourceAccountant#waitOtherThreads}
      * WILL NOT WORK if any two resource accountants share the same lock!
      *
      * @param  options a bit field of synchronization options.
@@ -105,16 +96,15 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 final ExceptionHandler<? super FsSyncException, X> handler)
     throws X {
         // HC SVNT DRACONES!
-        final FsResourceManager a = accountant;
-        if (null == a)
-            return;
         final boolean force = options.get(FORCE_CLOSE_INPUT)
                 || options.get(FORCE_CLOSE_OUTPUT);
-        final int local = a.localResources();
-        final IOException cause;
-        if (0 != local && !force) {
-            cause = new FsResourceOpenException(a.totalResources(), local);
-            throw handler.fail(new FsSyncException(getModel(), cause));
+        {
+            final Resources r = accountant.resources();
+            if (0 != r.local && !force) {
+                final IOException cause =
+                        new FsResourceOpenException(r.total, r.local);
+                throw handler.fail(new FsSyncException(getModel(), cause));
+            }
         }
         final boolean wait = options.get(WAIT_CLOSE_INPUT)
                 || options.get(WAIT_CLOSE_OUTPUT);
@@ -128,14 +118,17 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             // The TarDriver family is known to be affected by this.
             System.runFinalization();
         }
-        final int total = a.waitForeignResources(
-                wait ? 0 : WAIT_TIMEOUT_MILLIS);
-        if (0 == total)
-            return;
-        cause = new FsResourceOpenException(total, local);
-        if (!force)
-            throw handler.fail(new FsSyncException(getModel(), cause));
-        handler.warn(new FsSyncWarningException(getModel(), cause));
+        accountant.waitOtherThreads(wait ? 0 : WAIT_TIMEOUT_MILLIS);
+        {
+            final Resources r = accountant.resources();
+            if (0 == r.total)
+                return;
+            final IOException cause =
+                    new FsResourceOpenException(r.total, r.local);
+            if (!force)
+                throw handler.fail(new FsSyncException(getModel(), cause));
+            handler.warn(new FsSyncWarningException(getModel(), cause));
+        }
     }
 
     /**
@@ -167,7 +160,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             }
         } // IOExceptionHandler
 
-        final FsResourceManager acc = accountant;
+        final FsResourceAccountant acc = accountant;
         if (null != acc)
             acc.closeAllResources(new IOExceptionHandler());
     }
@@ -296,13 +289,13 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         @SuppressWarnings("LeakingThisInConstructor")
         ResourceReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
             super(rof);
-            getAccountant().startAccountingFor(this);
+            accountant.startAccountingFor(this);
         }
 
         @Override
         public void close() throws IOException {
             delegate.close();
-            getAccountant().stopAccountingFor(this);
+            accountant.stopAccountingFor(this);
         }
     } // ResourceReadOnlyFile
 
@@ -312,13 +305,13 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         @SuppressWarnings("LeakingThisInConstructor")
         ResourceSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
-            getAccountant().startAccountingFor(this);
+            accountant.startAccountingFor(this);
         }
 
         @Override
         public void close() throws IOException {
             delegate.close();
-            getAccountant().stopAccountingFor(this);
+            accountant.stopAccountingFor(this);
         }
     } // ResourceSeekableByteChannel
 
@@ -328,13 +321,13 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         @SuppressWarnings("LeakingThisInConstructor")
         ResourceInputStream(@WillCloseWhenClosed InputStream in) {
             super(in);
-            getAccountant().startAccountingFor(this);
+            accountant.startAccountingFor(this);
         }
 
         @Override
         public void close() throws IOException {
             delegate.close();
-            getAccountant().stopAccountingFor(this);
+            accountant.stopAccountingFor(this);
         }
     } // ResourceInputStream
 
@@ -344,13 +337,13 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         @SuppressWarnings("LeakingThisInConstructor")
         ResourceOutputStream(@WillCloseWhenClosed OutputStream out) {
             super(out);
-            getAccountant().startAccountingFor(this);
+            accountant.startAccountingFor(this);
         }
 
         @Override
         public void close() throws IOException {
             delegate.close();
-            getAccountant().stopAccountingFor(this);
+            accountant.stopAccountingFor(this);
         }
     } // ResourceOutputStream
 }

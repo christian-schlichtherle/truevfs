@@ -29,7 +29,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * threads.
  * <p>
  * For synchronization, each accountant uses a lock which has to be provided
- * to its {@link #FsResourceManager constructor}.
+ * to its {@link #FsResourceAccountant constructor}.
  * In order to start accounting for a closeable resource,
  * call {@link #startAccountingFor(Closeable)}.
  * In order to stop accounting for a closeable resource,
@@ -40,7 +40,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class FsResourceManager {
+final class FsResourceAccountant {
 
     /**
      * The initial capacity for the hash map accounts for the number of
@@ -67,7 +67,7 @@ final class FsResourceManager {
      * Constructs a new resource accountant with the given lock.
      * You MUST MAKE SURE not to use two instances of this class which share
      * the same lock!
-     * Otherwise {@link #waitForeignResources} will not work as designed!
+     * Otherwise {@link #waitOtherThreads} will not work as designed!
      * 
      * @param lock the lock to use for accounting resources.
      *             Though not required by the use in this class, this
@@ -75,7 +75,7 @@ final class FsResourceManager {
      *             {@link ReentrantLock} because chances are that it gets
      *             locked recursively.
      */
-    FsResourceManager(final Lock lock) {
+    FsResourceAccountant(final Lock lock) {
         this.condition = (this.lock = lock).newCondition();
     }
 
@@ -85,8 +85,7 @@ final class FsResourceManager {
      * @param resource the closeable resource to start accounting for.
      */
     void startAccountingFor(final @WillCloseWhenClosed Closeable resource) {
-        if (null == accounts.get(resource))
-            accounts.putIfAbsent(resource, new Account());
+        accounts.put(resource, new Account());
     }
 
     /**
@@ -131,18 +130,13 @@ final class FsResourceManager {
      *         resources which have been accounted for by <em>other</em>
      *         threads once the lock has been acquired.
      *         If this is non-positive, then there is no timeout for waiting.
-     * @return The number of closeable resources which have been accounted for
-     *         by <em>all</em> threads.
      */
-    int waitForeignResources(final long timeout) {
+    void waitOtherThreads(final long timeout) {
         lock.lock();
         try {
             try {
                 long toWait = TimeUnit.MILLISECONDS.toNanos(timeout);
-                // Note that even local resources may get stopped accounting
-                // for by a different thread, e.g. the finalizer thread, so
-                // this MUST get checked on each iteration!
-                while (localResources() < totalResources()) {
+                while (resources().isBusy()) {
                     if (0 < timeout) {
                         if (0 >= toWait)
                             break;
@@ -154,57 +148,35 @@ final class FsResourceManager {
             } catch (InterruptedException cancel) {
                 // Fix rare racing condition between Thread.interrupt() and
                 // Condition.signalAll() events.
-                final int tr = totalResources();
-                if (0 == tr)
+                if (0 == resources().total)
                     Thread.currentThread().interrupt();
-                return tr;
             }
-            return totalResources();
         } finally {
             lock.unlock();
         }
     }
 
     /**
-     * Returns the number of closeable resources which have been accounted for
-     * by the <em>current</em> thread.
+     * Returns the number of closeable resources which have been accounted for.
+     * The first element contains the number of closeable resources which have
+     * been created by the current thread (<i>local</i>).
+     * The second element contains the number of closeable resources which have
+     * been created by all threads (<i>total</i>).
      * Mind that this value may reduce concurrently, even while the lock is
-     * held, so it should <em>not</em> get cached!
-     * <p>
-     * This method <em>must not</em> get called if the {@link #lock} is not
-     * acquired!
+     * held, so it should <i>not</i> get cached!
      * 
-     * @return The number of closeable resources which have been accounted for
-     *         by the <em>current</em> thread.
+     * @return The number of closeable resources which have been accounted for.
      */
-    int localResources() {
-        int n = 0;
+    Resources resources() {
         final Thread currentThread = Thread.currentThread();
-        for (final Account account : accounts.values())
-            if (account.getAccountant() == this
-                    && account.owner == currentThread)
-                n++;
-        return n;
-    }
-
-    /**
-     * Returns the number of closeable resources which have been accounted for
-     * by <em>all</em> threads.
-     * Mind that this value may reduce concurrently, even while the lock is
-     * held, so it should <em>not</em> get cached!
-     * <p>
-     * This method <em>must not</em> get called if the {@link #lock} is not
-     * acquired!
-     * 
-     * @return The number of closeable resources which have been accounted for
-     *         by <em>all</em> threads.
-     */
-    int totalResources() {
-        int n = 0;
-        for (final Account account : accounts.values())
-            if (account.getAccountant() == this)
-                n++;
-        return n;
+        int local = 0, total = 0;
+        for (final Account account : accounts.values()) {
+            if (account.getAccountant() == this) {
+                if (account.owner == currentThread) local++;
+                total++;
+            }
+        }
+        return new Resources(local, total);
     }
 
     /**
@@ -230,25 +202,23 @@ final class FsResourceManager {
                 final Account account = entry.getValue();
                 if (account.getAccountant() != this)
                     continue;
+                i.remove();
                 final Closeable closeable = entry.getKey();
                 try {
                     // This should trigger an attempt to remove the closeable
                     // from the map, but it can cause no
-                    // ConcurrentModificationException because we are using a
-                    // ConcurrentHashMap.
-                    closeable.close(); // could throw an IOException or a RuntimeException, e.g. a NeedsLockRetryException!
+                    // ConcurrentModificationException because the entry is
+                    // already removed and a ConcurrentHashMap doesn't do that
+                    // anyway.
+                    // Note that this method may throw an IOException or a
+                    // RuntimeException, e.g. a NeedsLockRetryException!
+                    closeable.close();
                 } catch (final FsControllerException ex) {
                     assert ex instanceof FsNeedsLockRetryException : ex;
                     throw ex;
                 } catch (final IOException ex) {
                     handler.warn(ex); // may throw an exception!
                 }
-                assert !accounts.containsKey(closeable)
-                        : "closeable.close() did not call stop(this) on this resource manager!";
-                // This is actually redundant.
-                // In either case, it must NOT get done before a successful
-                // close()!
-                i.remove();
             }
         } finally {
             condition.signalAll();
@@ -259,8 +229,19 @@ final class FsResourceManager {
     private final class Account {
         final Thread owner = Thread.currentThread();
 
-        FsResourceManager getAccountant() {
-            return FsResourceManager.this;
+        FsResourceAccountant getAccountant() {
+            return FsResourceAccountant.this;
         }
     } // Account
+
+    static final class Resources {
+        final int local, total;
+
+        private Resources(final int local, final int total) {
+            this.local = local;
+            this.total = total;
+        }
+
+        boolean isBusy() { return local < total; }
+    } // Resources
 }
