@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/truevfs.iml" filepath="$PROJECT_DIR$/truevfs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/truevfs-access/truevfs-access.iml" filepath="$PROJECT_DIR$/truevfs-access/truevfs-access.iml" />
+      <module fileurl="file://$PROJECT_DIR$/truevfs-archetype/truevfs-archetype.iml" filepath="$PROJECT_DIR$/truevfs-archetype/truevfs-archetype.iml" />
+      <module fileurl="file://$PROJECT_DIR$/truevfs-archetype/truevfs-archetype-access/truevfs-archetype-access.iml" filepath="$PROJECT_DIR$/truevfs-archetype/truevfs-archetype-access/truevfs-archetype-access.iml" />
+      <module fileurl="file://$PROJECT_DIR$/truevfs-driver/truevfs-driver.iml" filepath="$PROJECT_DIR$/truevfs-driver/truevfs-driver.iml" />
+      <module fileurl="file://$PROJECT_DIR$/truevfs-driver/truevfs-driver-file/truevfs-driver-file.iml" filepath="$PROJECT_DIR$/truevfs-driver/truevfs-driver-file/truevfs-driver-file.iml" />
+      <module fileurl="file://$PROJECT_DIR$/truevfs-driver/truevfs-driver-http/truevfs-driver-http.iml" filepath="$PROJECT_DIR$/truevfs-driver/truevfs-driver-http/truevfs-driver-http.iml" />
+      <module fileurl="file://$PROJECT_DIR$/truevfs-driver/truevfs-driver-tar/truevfs-driver-tar.iml" filepath="$PROJECT_DIR$/truevfs-driver/truevfs-driver-tar/truevfs-driver-tar.iml" />
+      <module fileurl="file://$PROJECT_DIR$/truevfs-driver/truevfs-driver-tzp/truevfs-driver-tzp.iml" filepath="$PROJECT_DIR$/truevfs-driver/truevfs-driver-tzp/truevfs-driver-tzp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/truevfs-driver/truevfs-driver-zip/truevfs-driver-zip.iml" filepath="$PROJECT_DIR$/truevfs-driver/truevfs-driver-zip/truevfs-driver-zip.iml" />
+      <module fileurl="file://$PROJECT_DIR$/truevfs-extension/truevfs-extension.iml" filepath="$PROJECT_DIR$/truevfs-extension/truevfs-extension.iml" />
+      <module fileurl="file://$PROJECT_DIR$/truevfs-extension/truevfs-extension-jmx-jul/truevfs-extension-jmx-jul.iml" filepath="$PROJECT_DIR$/truevfs-extension/truevfs-extension-jmx-jul/truevfs-extension-jmx-jul.iml" />
+      <module fileurl="file://$PROJECT_DIR$/truevfs-kernel/truevfs-kernel.iml" filepath="$PROJECT_DIR$/truevfs-kernel/truevfs-kernel.iml" />
+      <module fileurl="file://$PROJECT_DIR$/truevfs-key/truevfs-key.iml" filepath="$PROJECT_DIR$/truevfs-key/truevfs-key.iml" />
+      <module fileurl="file://$PROJECT_DIR$/truevfs-samples/truevfs-samples.iml" filepath="$PROJECT_DIR$/truevfs-samples/truevfs-samples.iml" />
+    </modules>
+  </component>
+</project>
+
