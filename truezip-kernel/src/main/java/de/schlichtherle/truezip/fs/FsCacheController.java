@@ -342,6 +342,13 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             }
 
             @Override
+            public Entry getLocalTarget() throws IOException {
+                // Bypass the super class implementation to keep the
+                // socket even upon an exception!
+                return getBoundSocket().getLocalTarget();
+            }
+
+            @Override
             public SeekableByteChannel newSeekableByteChannel(){
                 throw new UnsupportedOperationException();
             }
@@ -361,7 +368,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                 Stream() throws IOException {
                     // Bypass the super class implementation to keep the
-                    // channel even upon an exception!
+                    // socket even upon an exception!
                     //super(Input.super.newInputStream());
                     super(getBoundSocket().newInputStream());
                     assert isTouched();
@@ -397,7 +404,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                 Channel() throws IOException {
                     // Note that the super class implementation MUST get
-                    // bypassed because the delegate MUST get kept even upon an
+                    // bypassed because the socket MUST get kept even upon an
                     // exception!
                     //super(Nio2Output.super.newSeekableByteChannel());
                     super(getBoundSocket().newSeekableByteChannel());
@@ -439,7 +446,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             @Override
             public Entry getLocalTarget() throws IOException {
                 // Note that the super class implementation MUST get
-                // bypassed because the delegate MUST get kept even upon an
+                // bypassed because the socket MUST get kept even upon an
                 // exception!
                 return getBoundSocket().getLocalTarget();
             }
@@ -455,7 +462,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
                 Stream() throws IOException {
                     // Note that the super class implementation MUST get
-                    // bypassed because the delegate MUST get kept even upon an
+                    // bypassed because the socket MUST get kept even upon an
                     // exception!
                     //super(Output.super.newOutputStream());
                     super(getBoundSocket().newOutputStream());
