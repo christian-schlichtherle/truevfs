@@ -28,7 +28,9 @@ Glossary
 
     [Federated File System]
         A file system with a root directory which is a member within another
-        (parent) file system which may be federated, too.
+        (parent) file system.
+        This definition is recursive, so the parent file system may be
+        federated, too.
 
     [File System Space]
         The union of all file systems.
