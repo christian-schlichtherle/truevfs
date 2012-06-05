@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truevfs.kernel.se
 
-import de.schlichtherle.truevfs.kernel._
 import java.util.concurrent.locks._
 import javax.annotation.concurrent._
 import net.truevfs.kernel._
@@ -24,12 +23,12 @@ extends FsDecoratingModel[FsModel](model) {
   def readLock = lock.readLock
 
   /**
-   * Returns {@code true} if and only if the read lock is held by the
+   * Returns `true` if and only if the read lock is held by the
    * current thread.
    * This method should only get used for assert statements, not for lock
    * control!
    * 
-   * @return {@code true} if and only if the read lock is held by the
+   * @return `true` if and only if the read lock is held by the
    *         current thread.
    */
   def readLockedByCurrentThread = 0 != lock.getReadHoldCount
@@ -37,12 +36,12 @@ extends FsDecoratingModel[FsModel](model) {
   def writeLock = lock.writeLock
 
   /**
-   * Returns {@code true} if and only if the write lock is held by the
+   * Returns `true` if and only if the write lock is held by the
    * current thread.
    * This method should only get used for assert statements, not for lock
    * control!
    * 
-   * @return {@code true} if and only if the write lock is held by the
+   * @return `true` if and only if the write lock is held by the
    *         current thread.
    * @see    #checkWriteLockedByCurrentThread()
    */
