@@ -4,35 +4,33 @@
  */
 package de.schlichtherle.truevfs.kernel.se
 
+import javax.annotation.concurrent._
 import net.truevfs.kernel._
 
-/**
- * A mixin which provides some features of its associated {@link LockModel}.
- *
- * @see    LockModel
- * @author Christian Schlichtherle
- */
+/** A mixin which provides some features of its associated
+  * [[de.schlichtherle.truevfs.kernel.se.LockModel]].
+  *
+  * @see    LockModel
+  * @author Christian Schlichtherle
+  */
+@ThreadSafe
 private trait LockModelFeatures {
 
   /** The lock model with the features to provide in this trait. */
   def model: LockModel
 
-  /**
-   * Returns the mount point of this (federated virtual) file system as
-   * defined by the {@linkplain #getModel() model}.
-   * 
-   * @return The mount point of this (federated virtual) file system as
-   *         defined by the {@linkplain #getModel() model}.
-   */
+  /** Returns the mount point of this (federated virtual) file system as
+    * defined by the `model`.
+    * 
+    * @return The mount point of this (federated virtual) file system as
+    *         defined by the `model`.
+    */
   final def mountPoint = model getMountPoint
 
-  /**
-   * Returns the {@code touched} property of the
-   * {@linkplain #getModel() file system model}.
-   * 
-   * @return the {@code touched} property of the
-   *         {@linkplain #getModel() file system model}.
-   */
+  /** Returns the `touched` property of the `model`.
+    * 
+    * @return The `touched` property of the `model`.
+    */
   final def touched = model isTouched
 
   /**

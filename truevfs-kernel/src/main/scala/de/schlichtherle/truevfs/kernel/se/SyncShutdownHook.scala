@@ -5,17 +5,16 @@
 package de.schlichtherle.truevfs.kernel.se
 
 import net.truevfs.kernel._
+import javax.annotation.concurrent._
 
-/**
- * A shutdown hook singleton which {@linkplain FsManager#sync syncs} a
- * {@linkplain SyncShutdownHook#register registered} file system manager when
- * it's run.
- * This is to protect an application from loss of data if the manager isn't
- * explicitly asked to {@code sync()} before the JVM terminates.
- * 
- * @see    FsManager#sync
- * @author Christian Schlichtherle
- */
+/** A shutdown hook singleton which `sync`s a `register`ed file system manager
+  * when it's run.
+  * This is to protect an application from loss of data if the manager isn't
+  * explicitly asked to `sync` before the JVM terminates.
+  * 
+  * @author Christian Schlichtherle
+  */
+@ThreadSafe
 private object SyncShutdownHook extends Thread {
   setPriority(Thread.MAX_PRIORITY)
 

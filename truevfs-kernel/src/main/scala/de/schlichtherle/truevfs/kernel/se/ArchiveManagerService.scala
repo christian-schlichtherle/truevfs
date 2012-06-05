@@ -4,14 +4,15 @@
  */
 package de.schlichtherle.truevfs.kernel.se
 
+import javax.annotation.concurrent._
 import net.truevfs.kernel.FsManager
 import net.truevfs.kernel.spi.FsManagerService
 
-/**
- * A service for the file system manager implementation in this package.
- * 
- * @author Christian Schlichtherle
- */
+/** A service for the file system manager implementation in this package.
+  * 
+  * @author Christian Schlichtherle
+  */
+@Immutable
 final class ArchiveManagerService extends FsManagerService {
   override lazy val getManager: FsManager = new ArchiveManager
   override def getPriority = -100

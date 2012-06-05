@@ -5,6 +5,10 @@
 package de.schlichtherle.truevfs.kernel.se
 
 import de.schlichtherle.truevfs.kernel._
+import java.io._
+import java.nio.channels._
+import java.util.logging._
+import javax.annotation.concurrent._
 import net.truevfs.kernel._
 import net.truevfs.kernel.FsAccessOption._
 import net.truevfs.kernel.FsSyncOption._
@@ -14,48 +18,39 @@ import net.truevfs.kernel.cio.Entry._;
 import net.truevfs.kernel.cio.Entry.Type._;
 import net.truevfs.kernel.io._
 import net.truevfs.kernel.util._
-import java.io._
-import java.nio.channels._
-import java.util.logging._
 import scala.util.control.Breaks
 
-/**
- * A selective cache for file system entries.
- * Decorating a file system controller with this class has the following
- * effects:
- * <ul>
- * <li>Caching and buffering for an entry needs to get activated by using the
- *     method
- *     {@link #input input socket} with the input option
- *     {@link FsAccessOption#CACHE} or the method
- *     {@link #output output socket} with the output option
- *     {@link FsAccessOption#CACHE}.
- * <li>Unless a write operation succeeds, upon each read operation the entry
- *     data gets copied from the backing store for buffering purposes only.
- * <li>Upon a successful write operation, the entry data gets cached for
- *     subsequent read operations until the file system gets
- *     {@link #sync synced} again.
- * <li>Entry data written to the cache is not written to the backing store
- *     until the file system gets {@link #sync synced} - this is a
- *     <i>write back</i> strategy.
- * <li>As a side effect, caching decouples the underlying storage from its
- *     clients, allowing it to create, read, update or delete the entry data
- *     while some clients are still busy on reading or writing the copied
- *     entry data.
- * </ul>
- * <p>
- * <strong>TO THE FUTURE ME:</strong>
- * FOR TRUEZIP 7.5, IT TOOK ME TWO MONTHS OF CONSECUTIVE CODING, TESTING,
- * DEBUGGING, ANALYSIS AND SWEATING TO GET THIS DAMN BEAST WORKING STRAIGHT!
- * DON'T EVEN THINK YOU COULD CHANGE A SINGLE CHARACTER IN THIS CODE AND EASILY
- * GET AWAY WITH IT!
- * <strong>YOU HAVE BEEN WARNED!</strong>
- * <p>
- * Well, if you really feel like changing something, run the integration test
- * suite at least ten times to make sure your changes really work - I mean it!
- * 
- * @author Christian Schlichtherle
- */
+/** A selective cache for file system entries.
+  * Decorating a file system controller with this class has the following
+  * effects:
+  * 
+  * - Caching and buffering for an entry needs to get activated by using the
+  *   methods `input` or `output` with the access option
+  *   [[net.truevfs.kernel.FsAccessOption.CACHE]].
+  * - Unless a write operation succeeds, upon each read operation the entry
+  *   data gets copied from the backing store for buffering purposes only.
+  * - Upon a successful write operation, the entry data gets cached for
+  *   subsequent read operations until the file system gets `sync`ed again.
+  * - Entry data written to the cache is not written to the backing store
+  *   until the file system gets `sync`ed - this is a ''write back'' strategy.
+  * - As a side effect, caching decouples the underlying storage from its
+  *   clients, allowing it to create, read, update or delete the entry data
+  *   while some clients are still busy on reading or writing the copied
+  *   entry data.
+  * 
+  * '''TO THE FUTURE ME:'''
+  * FOR TRUEZIP 7.5, IT TOOK ME TWO MONTHS OF CONSECUTIVE CODING, TESTING,
+  * DEBUGGING, ANALYSIS AND SWEATING TO GET THIS DAMN BEAST WORKING STRAIGHT!
+  * DON'T EVEN THINK YOU COULD CHANGE A SINGLE CHARACTER IN THIS CODE AND
+  * EASILY GET AWAY WITH IT!
+  * '''YOU HAVE BEEN WARNED!'''
+  * 
+  * Well, if you really feel like changing something, run the integration test
+  * suite at least ten times to make sure your changes really work - I mean it!
+  * 
+  * @author Christian Schlichtherle
+  */
+@NotThreadSafe
 private trait CacheController extends Controller[LockModel] {
   this: LockModelFeatures =>
 
@@ -67,15 +62,14 @@ private trait CacheController extends Controller[LockModel] {
 
   abstract override def input(options: AccessOptions, name: FsEntryName) = {
     /** This class requires ON-DEMAND LOOKUP of its delegate socket! */
-    final class Input extends DelegatingInputSocket[Entry] {
+    class Input extends DelegatingInputSocket[Entry] {
       override def socket(): AnyInputSocket = {
         assert(writeLockedByCurrentThread)
-        var cache = caches.get(name)
+        var cache = caches get name
         if (null eq cache) {
-            if (!options.get(CACHE))
+            if (!(options get CACHE))
               return CacheController.super.input(options, name)
-          //checkWriteLockedByCurrentThread();
-          cache = new EntryCache(name);
+          cache = new EntryCache(name)
         }
         cache.input(options)
       }
@@ -85,15 +79,14 @@ private trait CacheController extends Controller[LockModel] {
 
   abstract override def output(options: AccessOptions, name: FsEntryName, template: Option[Entry]) = {
     /** This class requires ON-DEMAND LOOKUP of its delegate socket! */
-    final class Output extends DelegatingOutputSocket[Entry] {
+    class Output extends DelegatingOutputSocket[Entry] {
       override def socket(): AnyOutputSocket = {
         assert(writeLockedByCurrentThread)
-        var cache = caches.get(name)
+        var cache = caches get name
         if (null eq cache) {
-            if (!options.get(CACHE))
+            if (!(options get CACHE))
               return CacheController.super.output(options, name, template)
-          //checkWriteLockedByCurrentThread();
-          cache = new EntryCache(name);
+          cache = new EntryCache(name)
         }
         cache.output(options, template)
       }
@@ -104,17 +97,17 @@ private trait CacheController extends Controller[LockModel] {
   abstract override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Option[Entry]) {
     assert(writeLockedByCurrentThread)
     super.mknod(options, name, tµpe, template)
-    val cache = caches.remove(name)
+    val cache = caches remove name
     if (null ne cache)
-      cache.release()
+      cache release()
   }
 
   abstract override def unlink(options: AccessOptions, name: FsEntryName) {
     assert(writeLockedByCurrentThread)
     super.unlink(options, name)
-    val cache = caches.remove(name)
+    val cache = caches remove name
     if (null ne cache)
-      cache.release()
+      cache release()
   }
 
   abstract override def sync(options: SyncOptions) {
@@ -164,17 +157,17 @@ private trait CacheController extends Controller[LockModel] {
   private def preSync(options: SyncOptions) {
     if (0 >= caches.size())
       return
-    val flush = !options.get(ABORT_CHANGES)
-    var release = !flush || options.get(CLEAR_CACHE)
+    val flush = !(options get ABORT_CHANGES)
+    var release = !flush || (options get CLEAR_CACHE)
     assert(flush || release)
     val builder = new FsSyncExceptionBuilder
     val i = caches.values.iterator
-    while (i.hasNext) {
-      val cache = i.next()
+    while (i hasNext) {
+      val cache = i next()
       try {
         if (flush) {
           try {
-            cache.flush()
+            cache flush()
           } catch {
             case ex: IOException =>
               throw builder fail new FsSyncException(mountPoint, ex)
@@ -186,9 +179,9 @@ private trait CacheController extends Controller[LockModel] {
           throw ex
       } finally {
         if (release) {
-          i.remove()
+          i remove()
           try {
-            cache.release()
+            cache release()
           } catch {
             case ex: IOException =>
               builder warn new FsSyncWarningException(mountPoint, ex)
@@ -196,28 +189,27 @@ private trait CacheController extends Controller[LockModel] {
         }
       }
     }
-    builder.check()
+    builder check()
   }
 
   /** A cache for the contents of an individual archive entry. */
   private final class EntryCache(val name: FsEntryName) {
     val cache = CacheEntry.Strategy.WRITE_BACK.newCacheEntry(pool)
 
-    def flush() { cache.flush() }
+    def flush() { cache flush() }
 
-    def release() { cache.release() }
+    def release() { cache release() }
 
-    def register() { caches.put(name, this) }
+    def register() { caches put (name, this) }
 
     def input(options: AccessOptions) = {
-      /**
-       * This class requires LAZY INITIALIZATION of its channel, but NO
-       * automatic decoupling on exceptions!
-       */
+      /** This class requires LAZY INITIALIZATION of its channel, but NO
+        * automatic decoupling on exceptions!
+        */
       final class Input extends ClutchInputSocket[Entry] {
-        private[this] val o = options.clear(CACHE) // consume
+        private[this] val _options = options clear CACHE // consume
 
-        override def lazySocket = CacheController.super.input(o, name)
+        override def lazySocket = CacheController.super.input(_options, name)
 
         // Bypass the super class implementation to keep the
         // socket even upon an exception!
@@ -229,11 +221,11 @@ private trait CacheController extends Controller[LockModel] {
           // Bypass the super class implementation to keep the
           // socket even upon an exception!
           final class Stream extends DecoratingInputStream(boundSocket.stream()) {
-            assert(model.isTouched)
+            assert(touched)
 
             override def close() {
               assert(writeLockedByCurrentThread)
-              in.close()
+              in close()
               register()
             }
           }
@@ -242,20 +234,19 @@ private trait CacheController extends Controller[LockModel] {
 
         override def channel() = throw new AssertionError
       }
-      cache.configure(new Input()).input
+      cache.configure(new Input) input
     }: AnyInputSocket
 
     def output(options: AccessOptions, template: Option[Entry]) = {
-      /**
-       * This class requires LAZY INITIALIZATION of its channel, but NO
-       * automatic decoupling on exceptions!
-       */
+      /** This class requires LAZY INITIALIZATION of its channel, but NO
+        * automatic decoupling on exceptions!
+        */
       final class Output extends ClutchOutputSocket[Entry] {
-        private[this] val o = options.clear(CACHE) // consume
+        private[this] val _options = options clear CACHE // consume
 
         override def lazySocket = cache
           .configure(CacheController.super.output(
-              o.clear(EXCLUSIVE), name, template))
+              _options clear EXCLUSIVE, name, template))
           .output
 
         // Bypass the super class implementation to keep the
@@ -273,7 +264,7 @@ private trait CacheController extends Controller[LockModel] {
 
             override def close() {
               assert(writeLockedByCurrentThread)
-              out.close()
+              out close()
               postOutput()
             }
           }
@@ -291,17 +282,17 @@ private trait CacheController extends Controller[LockModel] {
 
             override def close() {
               assert(writeLockedByCurrentThread)
-              channel.close()
+              channel close()
               postOutput()
             }
           }
           new Channel
         }
 
-        def preOutput() { mknod(o, template) }
+        def preOutput() { mknod(_options, template) }
 
         def postOutput() {
-          mknod(o.clear(EXCLUSIVE), template.orElse(Option(cache))) 
+          mknod(_options clear EXCLUSIVE, template.orElse(Option(cache))) 
           register()
         }
 
@@ -324,11 +315,11 @@ private trait CacheController extends Controller[LockModel] {
                   // resolve the issue locally, that is if we were asked
                   // to create the entry exclusively or this is a
                   // non-recursive file system operation.
-                  if (mknodOpts.get(EXCLUSIVE))
-                    throw mknodEx;
-                  val syncOpts = SyncController.modify(SYNC)
+                  if (mknodOpts get EXCLUSIVE)
+                    throw mknodEx
+                  val syncOpts = SyncController modify SYNC
                   if (SYNC eq syncOpts)
-                    throw mknodEx;
+                    throw mknodEx
 
                   // Try to resolve the issue locally.
                   // Even if we were asked to create the entry
@@ -336,11 +327,11 @@ private trait CacheController extends Controller[LockModel] {
                   // sync() with the virtual file system again and retry
                   // the mknod().
                   try {
-                    CacheController.super.sync(syncOpts);
+                    CacheController.super.sync(syncOpts)
                     //continue; // sync() succeeded, now repeat mknod()
                   } catch {
                     case syncEx: FsSyncException =>
-                      syncEx.addSuppressed(mknodEx);
+                      syncEx addSuppressed mknodEx
 
                       // sync() failed, maybe just because the current
                       // thread has already acquired some open I/O
@@ -350,11 +341,10 @@ private trait CacheController extends Controller[LockModel] {
                       // output stream for a child file system.
                       syncEx.getCause match {
                         case _: FsResourceOpenException =>
-                        case _ =>
-                          // Too bad, sync() failed because of a more
-                          // serious issue than just some open resources.
-                          // Let's rethrow the sync exception.
-                          throw syncEx;
+                        // Too bad, sync() failed because of a more
+                        // serious issue than just some open resources.
+                        // Let's rethrow the sync exception.
+                        case _ => throw syncEx
                       }
 
                       // OK, we couldn't sync() because the current
@@ -371,7 +361,7 @@ private trait CacheController extends Controller[LockModel] {
 
                       // Check if we can retry the mknod with GROW set.
                       val oldMknodOpts = mknodOpts
-                      mknodOpts = oldMknodOpts.set(GROW)
+                      mknodOpts = oldMknodOpts set GROW
                       if (mknodOpts eq oldMknodOpts) {
                           // Finally, the mknod failed because the entry
                           // has already been output to the target archive
@@ -382,7 +372,7 @@ private trait CacheController extends Controller[LockModel] {
                           // Let's log the sync exception - mind that it has
                           // suppressed the mknod exception - and continue
                           // anyway...
-                          logger.log(Level.FINE, "ignoring", syncEx);
+                          logger log (Level.FINE, "ignoring", syncEx)
                           break
                       }
                   }
@@ -390,7 +380,7 @@ private trait CacheController extends Controller[LockModel] {
             }
           }
         }
-      }
+      } // Output
       new Output
     }: AnyOutputSocket
   } // EntryCache

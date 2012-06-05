@@ -4,20 +4,20 @@
  */
 package de.schlichtherle.truevfs.kernel.se
 
-import de.schlichtherle.truevfs.kernel._
+import java.util.logging._
+import javax.annotation.concurrent._
 import net.truevfs.kernel._
 import net.truevfs.kernel.util._
 import net.truevfs.kernel.util.Link._
 import net.truevfs.kernel.util.Link.Type._
 import net.truevfs.kernel.util.Links._
-import java.util.logging._
 import scala.collection.mutable.WeakHashMap
 
-/**
- * The default implementation of a file system manager.
- *
- * @author Christian Schlichtherle
- */
+/** The default implementation of a file system manager.
+  *
+  * @author Christian Schlichtherle
+  */
+@ThreadSafe
 private final class ArchiveManager(optionalScheduleType: Type)
 extends FsManager {
   import ArchiveManager._

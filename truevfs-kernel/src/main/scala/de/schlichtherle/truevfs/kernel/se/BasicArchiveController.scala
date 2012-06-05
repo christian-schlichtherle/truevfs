@@ -5,6 +5,11 @@
 package de.schlichtherle.truevfs.kernel.se
 
 import de.schlichtherle.truevfs.kernel._
+import java.io._
+import java.nio.channels._
+import java.nio.file._
+import java.util.logging._
+import javax.annotation.concurrent._
 import net.truevfs.kernel._
 import net.truevfs.kernel.FsAccessOption._
 import net.truevfs.kernel.FsAccessOptions._
@@ -14,32 +19,28 @@ import net.truevfs.kernel.cio.Entry.Access._;
 import net.truevfs.kernel.cio.Entry.Type._;
 import net.truevfs.kernel.io._
 import net.truevfs.kernel.util._
-import java.io._
-import java.nio.channels._
-import java.nio.file._
-import java.util.logging._
 
-/**
- * An abstract base class for any archive file system controller which
- * provide all the essential services required for accessing a prospective
- * archive file.
- * This base class encapsulates all the code which is not depending on a
- * particular archive update strategy and the corresponding state of this
- * file system controller.
- * <p>
- * Each instance of this class manages an archive file - the <i>target file</i>
- * - in order to allow random access to it as if it were a regular directory in
- * its parent file system.
- * <p>
- * Note that in general all of the methods in this class are reentrant on
- * exceptions.
- * This is important because client applications may repeatedly call them.
- * Of course, depending on the calling context, some or all of the archive
- * file's data may be lost in this case.
- * 
- * @param  <E> the type of the archive entries.
- * @author Christian Schlichtherle
- */
+/** An abstract base class for any archive file system controller which
+  * provide all the essential services required for accessing a prospective
+  * archive file.
+  * This base class encapsulates all the code which is not depending on a
+  * particular archive update strategy and the corresponding state of this
+  * file system controller.
+  * <p>
+  * Each instance of this class manages an archive file - the
+  * ''target archive file'' - in order to allow random access to it as if it
+  * were a regular directory in its parent file system.
+  * <p>
+  * Note that in general all of the methods in this class are reentrant on
+  * exceptions.
+  * This is important because client applications may repeatedly call them.
+  * Of course, depending on the calling context, some or all of the archive
+  * file's data may be lost in this case.
+  * 
+  * @tparam E the type of the archive entries.
+  * @author Christian Schlichtherle
+  */
+@NotThreadSafe
 private abstract class BasicArchiveController[E <: FsArchiveEntry]
 (final override val model: LockModel)
 extends Controller[LockModel] with LockModelFeatures {

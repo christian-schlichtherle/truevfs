@@ -5,6 +5,10 @@
 package de.schlichtherle.truevfs.kernel.se
 
 import de.schlichtherle.truevfs.kernel._
+import java.io._
+import java.nio.channels._
+import java.nio.file._
+import javax.annotation.concurrent._
 import net.truevfs.kernel._
 import net.truevfs.kernel.FsAccessOption._
 import net.truevfs.kernel.FsAccessOptions._
@@ -16,28 +20,22 @@ import net.truevfs.kernel.cio.Entry.Size._;
 import net.truevfs.kernel.cio.Entry.Type._;
 import net.truevfs.kernel.io._
 import net.truevfs.kernel.util._
-import java.io._
-import java.nio.channels._
-import java.nio.file._
 import ArchiveFileSystem._
 
-/**
- * Manages I/O to the entry which represents the target archive file in its
- * parent file system, detects archive entry collisions and implements a sync
- * of the target archive file.
- * <p>
- * This controller is an emitter for {@link ControlFlowException}s:
- * for example when
- * {@linkplain FalsePositiveArchiveException detecting a false positive archive file}, or
- * {@linkplain NeedsWriteLockException requiring a write lock} or
- * {@linkplain NeedsSyncException requiring a sync}.
- *
- * @param  <E> the type of the archive entries.
- * @see    FalsePositiveArchiveException
- * @see    NeedsWriteLockException
- * @see    NeedsSyncException
- * @author Christian Schlichtherle
- */
+/** Manages I/O to the entry which represents the target archive file in its
+  * parent file system, detects archive entry collisions and implements a sync
+  * of the target archive file.
+  * 
+  * This controller is an emitter of
+  * [[de.schlichtherle.truevfs.kernel.se.ControlFlowException]]s, for example
+  * when
+  * [[de.schlichtherle.truevfs.kernel.se.FalsePositiveArchiveException detecting a false positive archive file], or
+  * [[de.schlichtherle.truevfs.kernel.se.NeedsSyncException requiring a sync].
+  *
+  * @tparam E the type of the archive entries.
+  * @author Christian Schlichtherle
+  */
+@NotThreadSafe
 private class TargetArchiveController[E <: FsArchiveEntry](
   driver: FsArchiveDriver[E],
   model: LockModel,
@@ -101,13 +99,11 @@ extends FileSystemArchiveController[E](model) with TouchListener {
 
   private def outputArchive_=(oa: Option[OutputArchive[E]]) {
     assert(oa.isEmpty || _outputArchive.isEmpty)
-    oa.foreach { _ => touched = true }
+    oa foreach { _ => touched = true }
     _outputArchive = oa
   }
 
-  override def preTouch(options: AccessOptions) {
-    outputArchive(options)
-  }
+  override def preTouch(options: AccessOptions) { outputArchive(options) }
 
   override def mount(options: AccessOptions, autoCreate: Boolean) {
     try {

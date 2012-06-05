@@ -9,23 +9,24 @@ import net.truevfs.kernel._
 import net.truevfs.kernel.FsSyncOption._
 import net.truevfs.kernel.FsSyncOptions._
 import net.truevfs.kernel.cio._
-import net.truevfs.kernel.cio.Entry._;
+import net.truevfs.kernel.cio.Entry._
 import net.truevfs.kernel.io._
 import net.truevfs.kernel.util._
 import java.io._
 import java.nio.channels._
+import javax.annotation.concurrent._
 
-/**
- * Performs a {@link FsController#sync(BitField) sync} operation if required.
- * <p>
- * This controller is a barrier for {@link NeedsSyncException}s:
- * Whenever the decorated controller chain throws a {@code NeedsSyncException},
- * the file system gets {@link #sync(NeedsSyncException) synced} before the
- * operation gets retried.
- * 
- * @see    NeedsSyncException
- * @author Christian Schlichtherle
- */
+/** Performs a `sync` operation if required.
+  * 
+  * This controller is a barrier for
+  * [[de.schlichtherle.truevfs.kernel.se.NeedsSyncException]]s:
+  * Whenever the decorated controller chain throws a `NeedsSyncException`,
+  * the file system gets `sync`ed before the operation gets retried.
+  * 
+  * @see    NeedsSyncException
+  * @author Christian Schlichtherle
+  */
+@ThreadSafe
 private trait SyncController extends Controller[LockModel] {
   this: LockModelFeatures =>
 

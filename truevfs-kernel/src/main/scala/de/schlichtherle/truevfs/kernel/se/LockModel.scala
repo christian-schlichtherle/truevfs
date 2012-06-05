@@ -5,16 +5,16 @@
 package de.schlichtherle.truevfs.kernel.se
 
 import de.schlichtherle.truevfs.kernel._
+import java.util.concurrent.locks._
+import javax.annotation.concurrent._
 import net.truevfs.kernel._
-import java.util.concurrent.locks.ReentrantReadWriteLock
 
-/**
- * A file system model which supports multiple concurrent reader threads.
- *
- * @see    LockController
- * @see    NeedsWriteLockException
- * @author Christian Schlichtherle
- */
+/** A file system model which supports multiple concurrent reader threads.
+  *
+  * @see    LockController
+  * @author Christian Schlichtherle
+  */
+@ThreadSafe
 private final class LockModel(model: FsModel)
 extends FsDecoratingModel[FsModel](model) {
 

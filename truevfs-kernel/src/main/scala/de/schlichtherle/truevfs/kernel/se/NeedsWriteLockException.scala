@@ -4,13 +4,15 @@
  */
 package de.schlichtherle.truevfs.kernel.se
 
-/**
- * Indicates that the file system needs to get write locked before the
- * operation can get retried.
- *
- * @see    LockController
- * @author Christian Schlichtherle
- */
+import javax.annotation.concurrent._
+
+/** Indicates that the file system needs to get write locked before the
+  * operation can get retried.
+  *
+  * @see    LockController
+  * @author Christian Schlichtherle
+  */
+@Immutable
 private final class NeedsWriteLockException private()
 extends ControlFlowException
 

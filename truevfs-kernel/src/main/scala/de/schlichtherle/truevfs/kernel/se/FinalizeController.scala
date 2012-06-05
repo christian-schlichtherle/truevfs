@@ -5,21 +5,22 @@
 package de.schlichtherle.truevfs.kernel.se
 
 import de.schlichtherle.truevfs.kernel._
+import java.io._
+import java.nio.channels._
+import java.util.logging._
+import java.util.logging.Level._
+import javax.annotation.concurrent._
 import net.truevfs.kernel._
 import net.truevfs.kernel.cio._
 import net.truevfs.kernel.cio.Entry._;
 import net.truevfs.kernel.io._
 import net.truevfs.kernel.util._
-import java.io._
-import java.nio.channels._
-import java.util.logging._
-import java.util.logging.Level._
 
-/**
- * Finalizes unclosed resources returned by its decorated controller.
- * 
- * @author Christian Schlichtherle
- */
+/** Finalizes unclosed resources returned by its decorated controller.
+  * 
+  * @author Christian Schlichtherle
+  */
+@ThreadSafe
 private trait FinalizeController extends FsController[FsModel] {
   import FinalizeController._
 

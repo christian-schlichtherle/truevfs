@@ -11,11 +11,10 @@ import net.truevfs.kernel.util._
 import java.{lang => jl}
 import java.{util => ju}
 
-/**
- * Implements the Kernel API.
- * 
- * @author Christian Schlichtherle
- */
+/** Implements the Kernel API.
+  * 
+  * @author Christian Schlichtherle
+  */
 package object se {
   private[se] type AccessOptions = BitField[FsAccessOption]
   private[se] type SyncOptions = BitField[FsSyncOption]

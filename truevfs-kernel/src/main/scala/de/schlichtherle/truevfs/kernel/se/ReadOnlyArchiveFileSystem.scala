@@ -4,20 +4,22 @@
  */
 package de.schlichtherle.truevfs.kernel.se
 
+import javax.annotation.concurrent._
 import net.truevfs.kernel._
 import net.truevfs.kernel.cio._
 import net.truevfs.kernel.cio.Entry._;
 import net.truevfs.kernel.cio.Entry.Access._;
 import net.truevfs.kernel.util._
 
-/**
- * A read-only virtual file system for archive entries.
- * <p>
- * All modifying methods throw a {@link FsReadOnlyFileSystemException}.
- *
- * @param  <E> The type of the archive entries.
- * @author Christian Schlichtherle
- */
+/** A read-only virtual file system for archive entries.
+  * 
+  * All modifying methods throw a
+  * [[de.schlichtherle.truevfs.kernel.se.FsReadOnlyFileSystemException]].
+  *
+  * @param  <E> The type of the archive entries.
+  * @author Christian Schlichtherle
+  */
+@NotThreadSafe
 private final class ReadOnlyArchiveFileSystem[E <: FsArchiveEntry](
   driver: FsArchiveDriver[E],
   archive: Container[E],

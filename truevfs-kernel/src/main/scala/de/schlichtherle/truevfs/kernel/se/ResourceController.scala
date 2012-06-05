@@ -13,6 +13,7 @@ import net.truevfs.kernel.io._
 import net.truevfs.kernel.util._
 import java.io._
 import java.nio.channels._
+import javax.annotation.concurrent._
 import ResourceAccountant.Resources
 
 /** Accounts input and output resources returned by its decorated controller.
@@ -20,6 +21,7 @@ import ResourceAccountant.Resources
   * @see    ResourceManager
   * @author Christian Schlichtherle
   */
+@NotThreadSafe
 private trait ResourceController extends Controller[LockModel] {
   this: LockModelFeatures =>
 
@@ -127,5 +129,5 @@ private trait ResourceController extends Controller[LockModel] {
 }
 
 private object ResourceController {
-  private val waitTimeoutMillis = LockingStrategy.ACQUIRE_TIMEOUT_MILLIS
+  private val waitTimeoutMillis = LockingStrategy acquireTimeoutMillis
 }

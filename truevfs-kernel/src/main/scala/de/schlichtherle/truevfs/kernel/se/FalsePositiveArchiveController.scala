@@ -5,57 +5,60 @@
 package de.schlichtherle.truevfs.kernel.se
 
 import de.schlichtherle.truevfs.kernel._
+import java.io._
+import javax.annotation.concurrent._
 import net.truevfs.kernel.FsEntryName._;
 import net.truevfs.kernel._
 import net.truevfs.kernel.cio._
 import net.truevfs.kernel.cio.Entry._;
 import net.truevfs.kernel.io._
 import net.truevfs.kernel.util._
-import java.io._
 
-/**
- * Implements a chain of responsibility for resolving
- * {@link FalsePositiveArchiveException}s which may get thrown by its decorated file
- * system controller.
- * <p>
- * This controller is a barrier for {@link FalsePositiveArchiveException}s:
- * Whenever the decorated controller chain throws a
- * {@code FalsePositiveArchiveException}, the file system operation is routed to the
- * controller of the parent file system in order to continue the operation.
- * If this fails with an {@link IOException}, then the {@code IOException}
- * which is associated as the original cause of the initial
- * {@code FalsePositiveArchiveException} gets rethrown.
- * <p>
- * This algorithm effectively achieves the following objectives:
- * <ol>
- * <li>False positive archive files get resolved correctly by accessing them as
- *     entities of the parent file system.
- * <li>If the file system driver for the parent file system throws another
- *     exception, then it gets discarded and the exception initially thrown by
- *     the file system driver for the false positive archive file takes its
- *     place in order to provide the caller with a good indication of what went
- *     wrong in the first place.
- * <li>Non-{@code IOException}s are excempt from this masquerade in order to
- *     support resolving them by a more competent caller.
- *     This is required to make {@link ControlFlowException}s work as designed.
- * </ol>
- * <p>
- * As an example consider accessing a RAES encrypted ZIP file:
- * With the default driver configuration of the module TrueVFS ZIP.RAES,
- * whenever a ZIP.RAES file gets mounted, the user is prompted for a password.
- * If the user cancels the password prompting dialog, then an appropriate
- * exception gets thrown.
- * The target archive controller would then catch this exception and flag the
- * archive file as a false positive by wrapping this exception in a
- * {@code FalsePositiveArchiveException}.
- * This class would then catch this false positive exception and try to resolve
- * the issue by using the parent file system controller.
- * Failing that, the initial exception would get rethrown in order to signal
- * to the caller that the user had cancelled password prompting.
- *
- * @see    FalsePositiveArchiveException
- * @author Christian Schlichtherle
- */
+/** Implements a chain of responsibility for resolving
+  * [[de.schlichtherle.truevfs.kernel.se.FalsePositiveArchiveException]]s which
+  * may get thrown by its decorated file system controller.
+  * 
+  * This controller is a barrier for
+  * [[de.schlichtherle.truevfs.kernel.se.FalsePositiveArchiveException]]s:
+  * Whenever the decorated controller chain throws a
+  * `FalsePositiveArchiveException`, the file system operation is routed to the
+  * controller of the parent file system in order to continue the operation.
+  * If this fails with an [[java.io.IOException]], then the `IOException` which
+  * is associated as the original cause of the initial
+  * `FalsePositiveArchiveException` gets rethrown.
+  * 
+  * This algorithm effectively achieves the following objectives:
+  * 
+  * 1. False positive archive files get resolved correctly by accessing them as
+  *    entities of the parent file system.
+  * 2. If the file system driver for the parent file system throws another
+  *    exception, then it gets discarded and the exception initially thrown by
+  *    the file system driver for the false positive archive file takes its
+  *    place in order to provide the caller with a good indication of what went
+  *    wrong in the first place.
+  * 3. Non-`IOException`s are excempt from this masquerade in order to
+  *    support resolving them by a more competent caller.
+  *    This is required to make
+  *    [[de.schlichtherle.truevfs.kernel.se.ControlFlowException]]s work as
+  *    designed.
+  * 
+  * As an example consider accessing a RAES encrypted ZIP file:
+  * With the default driver configuration of the module TrueVFS ZIP.RAES,
+  * whenever a ZIP.RAES file gets mounted, the user is prompted for a password.
+  * If the user cancels the password prompting dialog, then an appropriate
+  * exception gets thrown.
+  * The target archive controller would then catch this exception and flag the
+  * archive file as a false positive by wrapping this exception in a
+  * `FalsePositiveArchiveException`.
+  * This class would then catch this false positive exception and try to
+  * resolve the issue by using the parent file system controller.
+  * Failing that, the initial exception would get rethrown in order to signal
+  * to the caller that the user had cancelled password prompting.
+  *
+  * @see    FalsePositiveArchiveException
+  * @author Christian Schlichtherle
+  */
+@ThreadSafe
 private final class FalsePositiveArchiveController(c: FsController[_ <: FsModel])
 extends FsDecoratingController[FsModel, FsController[_ <: FsModel]](c) {
 
