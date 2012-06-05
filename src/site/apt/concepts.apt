@@ -1,10 +1,10 @@
     -----------------------
-    Concepts
+    Basic Concepts
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-Concepts
+Basic Concepts
 
     TrueZIP is a Java based plug-in framework for virtual file systems (VFS)
     which provides transparent access to archive files as if they were just
@@ -28,14 +28,18 @@ Concepts
           comprehensibility.
 
     [[1]] The <Kernel Tier> manages all virtual file system state.
-          It also provides multithreading, multiplexing, caching and buffering
-          so that the driver tier does not need to take care of this.
-          This tier solely consists of the module TrueZIP Kernel.
+          It also provides multiplexing, caching and buffering for
+          multithreaded environments so that the driver tier does not need to
+          take care of this.
+          This tier solely consists of the module
+          {{{./truetip-kernel/index.html}TrueZIP&#160;Kernel}}.
 
     [[1]] The <Driver Tier> implements the I/O operations for their respective
           (federated) file system type.
-          This tier consists of all file system driver modules like TrueZIP
-          Driver FILE, TrueZIP Driver ZIP etc.
+          This tier consists of all file system driver modules, e.g.
+          {{{./truezip-driver/truezip-driver-file/index.html}TrueZIP&#160;Driver&#160;FILE}},
+          {{{./truezip-driver/truezip-driver-zip/index.html}TrueZIP&#160;Driver&#160;ZIP}}
+          et al.
 
     []
 
@@ -43,18 +47,18 @@ Concepts
 
     The TrueZIP project employs several high level design paradigms which have
     proven to be beneficial.
-    However, after all these are guidelines - not rules.
-    So they should get applied with some care.
+    However, these are only guidelines - not rules - so they should get applied
+    with some care.
 
 ** Convention Over Configuration
 
     The decomposition of this framework into separate modules enables users to
     easily configure the initial setup of the application's archive detection
-    by simply adding or removing the JARs of the required file system driver
-    modules to or from the run time class path.
+    by simply putting the JARs of the required file system driver modules on
+    the run time class path.
     This will cause the application to automatically detect the canonical file
-    suffixes for the archive files supported by the respective file system
-    driver modules - no XML or property file editing is required.
+    extension for the archive files supported by the respective file system
+    driver modules - no configuration file editing is required.
 
     The application can simply accept this
     {{{./apidocs/de/schlichtherle/truezip/file/TArchiveDetector.html#ALL}initial setup}}
@@ -80,7 +84,7 @@ Concepts
     the
     {{{./apidocs/de/schlichtherle/truezip/fs/sl/FsDriverLocator.html}file system drivers}}
     and the
-    {{{./apidocs/de/schlichtherle/truezip/socket/sl/IOPoolLocator.html}temporary I/O entry pool}}.
+    {{{./apidocs/de/schlichtherle/truezip/socket/sl/IOPoolLocator.html}temporary I/O buffer pool}}.
 
     File system drivers may add additional service locators singletons.
     For example, the
@@ -96,9 +100,9 @@ Concepts
     module, it does not actually use them.
     To the contrary, the TrueZIP Kernel module fully relies on the Dependency
     Injection design paradigm.
-    This enables the TrueZIP modules and TrueZIP application to inject a custom
-    implementation instance or simply a service locator singleton as a
-    dependency of a TrueZIP Kernel object.
+    This enables TrueVFS modules and TrueVFS applications to inject custom
+    implementations or simply the service locator singletons as a dependency
+    into the TrueVFS Kernel.
 
     For example, the file system manager service locator singleton and the file
     system driver service locator singleton are used by the APIs of the TrueZIP
