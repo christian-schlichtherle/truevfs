@@ -13,31 +13,29 @@ import net.truevfs.kernel.io._
 import net.truevfs.kernel.util._
 import java.io._
 import java.nio.channels._
+import javax.annotation.concurrent._
 
-/**
- * Provides read/write locking for multi-threaded access by its clients.
- * <p>
- * This controller is a barrier for {@link NeedsWriteLockException}s:
- * Whenever the decorated controller chain throws a
- * {@code NeedsWriteLockException},
- * the read lock gets released before the write lock gets acquired and the
- * operation gets retried.
- * <p>
- * This controller is also an emitter and a barrier for
- * {@link NeedsLockRetryException}s:
- * If a lock can't get immediately acquired, then a
- * {@code NeedsLockRetryException} gets thrown.
- * This will unwind the stack of federated file systems until the 
- * {@code LockController} for the first visited file system is found.
- * This controller will then pause the current thread for a small random amount
- * of milliseconds before retrying the operation.
- * 
- * @see    LockModel
- * @see    LockManagement
- * @see    NeedsWriteLockException
- * @see    NeedsLockRetryException
- * @author Christian Schlichtherle
- */
+/** Provides read/write locking for multi-threaded access by its clients.
+  * 
+  * This controller is a barrier for
+  * [[de.schlichtherle.truevfs.kernel.se.NeedsWriteLockException]]s:
+  * Whenever the decorated controller chain throws a `NeedsWriteLockException`,
+  * the read lock gets released before the write lock gets acquired and the
+  * operation gets retried.
+  * 
+  * This controller is also an emitter of and a barrier for
+  * [[de.schlichtherle.truevfs.kernel.se.NeedsLockRetryException]]s:
+  * If a lock can't get immediately acquired, then a `NeedsLockRetryException`
+  * gets thrown.
+  * This will unwind the stack of federated file systems until the
+  * `LockController` for the first visited file system is found.
+  * This controller will then pause the current thread for a small random
+  * amount of milliseconds before retrying the operation.
+  * 
+  * @see    LockingStrategy
+  * @author Christian Schlichtherle
+  */
+@Immutable
 private trait LockController extends Controller[LockModel] {
   this: LockModelFeatures =>
 
@@ -48,85 +46,69 @@ private trait LockController extends Controller[LockModel] {
     timedReadOrWriteLocked(super.checkAccess(options, name, types))
 
   abstract override def setReadOnly(name: FsEntryName) =
-    timedWriteLocked(super.setReadOnly(name))
+    timedLocked(writeLock)(super.setReadOnly(name))
 
   abstract override def setTime(options: AccessOptions, name: FsEntryName, times: Map[Access, Long]) =
-    timedWriteLocked(super.setTime(options, name, times))
+    timedLocked(writeLock)(super.setTime(options, name, times))
 
   abstract override def setTime(options: AccessOptions, name: FsEntryName, types: BitField[Access], value: Long) =
-    timedWriteLocked(super.setTime(options, name, types, value))
+    timedLocked(writeLock)(super.setTime(options, name, types, value))
 
   abstract override def input(options: AccessOptions, name: FsEntryName) = {
     final class Input extends  DecoratingInputSocket[Entry](super.input(options, name)) {
-      override def localTarget() = fastWriteLocked(boundSocket.localTarget())
+      override def localTarget() = fastLocked(writeLock)(boundSocket.localTarget())
 
       override def stream() =
-        timedWriteLocked(new LockInputStream(boundSocket.stream()))
+        timedLocked(writeLock)(new LockInputStream(boundSocket.stream()))
 
       override def channel() =
-        timedWriteLocked(new LockSeekableChannel(boundSocket.channel()))
+        timedLocked(writeLock)(new LockSeekableChannel(boundSocket.channel()))
     }
     new Input
   }: AnyInputSocket
 
   abstract override def output(options: AccessOptions, name: FsEntryName, template: Option[Entry]) = {
     final class Output extends DecoratingOutputSocket[Entry](super.output(options, name, template)) {
-      override def localTarget() = fastWriteLocked(boundSocket.localTarget())
+      override def localTarget() = fastLocked(writeLock)(boundSocket.localTarget())
 
       override def stream() =
-        timedWriteLocked(new LockOutputStream(boundSocket.stream()))
+        timedLocked(writeLock)(new LockOutputStream(boundSocket.stream()))
 
       override def channel() =
-        timedWriteLocked(new LockSeekableChannel(boundSocket.channel()))
+        timedLocked(writeLock)(new LockSeekableChannel(boundSocket.channel()))
     }
     new Output
   }: AnyOutputSocket
 
   abstract override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Option[Entry]) =
-    timedWriteLocked(super.mknod(options, name, tµpe, template))
+    timedLocked(writeLock)(super.mknod(options, name, tµpe, template))
 
   abstract override def unlink(options: AccessOptions, name: FsEntryName) =
-    timedWriteLocked(super.unlink(options, name))
+    timedLocked(writeLock)(super.unlink(options, name))
 
   abstract override def sync(options: SyncOptions) =
-    timedWriteLocked(super.sync(options))
-
-  private def fastWriteLocked[V](operation: => V) = {
-      assert(!readLockedByCurrentThread, "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!")
-      FAST_LOCK.apply(writeLock, operation)
-  }
+    timedLocked(writeLock)(super.sync(options))
 
   private def timedReadOrWriteLocked[V](operation: => V) = {
     try {
-      timedReadLocked(operation);
+      timedLocked(readLock)(operation)
     } catch {
-      case _: NeedsWriteLockException => timedWriteLocked(operation)
+      case _: NeedsWriteLockException => timedLocked(writeLock)(operation)
     }
   }
 
-  private def timedReadLocked[V](operation: => V) =
-    TIMED_LOCK.apply(readLock, operation)
-
-  private def timedWriteLocked[V](operation: => V) = {
-    assert(!readLockedByCurrentThread, "Trying to upgrade a read lock to a write lock would only result in a dead lock - see Javadoc for ReentrantReadWriteLock!")
-    TIMED_LOCK.apply(writeLock, operation)
-  }
-
-  private def deadWriteLocked[V](operation: => V) =
-    DEAD_LOCK.apply(writeLock, operation)
-
   private class LockInputStream(in: InputStream)
   extends DecoratingInputStream(in) {
-    override def close = deadWriteLocked(in.close)
+    override def close = deadLocked(writeLock)(in.close)
   }
 
   private class LockOutputStream(out: OutputStream)
   extends DecoratingOutputStream(out) {
-    override def close = deadWriteLocked(out.close)
+    override def close = deadLocked(writeLock)(out.close)
   }
 
   private class LockSeekableChannel(channel: SeekableByteChannel)
   extends DecoratingSeekableChannel(channel) {
-    override def close = deadWriteLocked(channel.close)
+    override def close = deadLocked(writeLock)(channel.close)
   }
 }

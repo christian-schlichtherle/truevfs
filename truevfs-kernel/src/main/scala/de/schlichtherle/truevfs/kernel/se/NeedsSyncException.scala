@@ -4,16 +4,16 @@
  */
 package de.schlichtherle.truevfs.kernel.se
 
+import javax.annotation.concurrent._
 import net.truevfs.kernel.util._
 
-/**
- * Indicates that a file system controller needs to get
- * {@linkplain Controller#sync(BitField) synced} before the operation can
- * get retried.
- *
- * @see    FsSyncController
- * @author Christian Schlichtherle
- */
+/** Indicates that a file system controller needs to get `sync`ed before the
+  * operation can get retried.
+  *
+  * @see    FsSyncController
+  * @author Christian Schlichtherle
+  */
+@Immutable
 private final class NeedsSyncException private()
 extends ControlFlowException
 

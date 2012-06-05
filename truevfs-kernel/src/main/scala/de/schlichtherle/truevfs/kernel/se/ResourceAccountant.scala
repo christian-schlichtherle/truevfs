@@ -8,13 +8,14 @@ import collection.JavaConverters._
 import java.io._
 import java.util.concurrent._
 import java.util.concurrent.locks._
+import javax.annotation.concurrent._
 import net.truevfs.kernel.util._
-import scala.util.control.Breaks
+import scala.util.control._
 
-/** Controls [[java.io.Closeable]] resources.
+/** Accounts for [[java.io.Closeable]] resources.
   * 
-  * For synchronization, each manager uses a lock which has to be provided to
-  * its constructor.
+  * For synchronization, each accountant uses a lock which has to be provided
+  * to its constructor.
   * In order to start accounting for a closeable resource, call `start`.
   * In order to stop  accounting for a closeable resource, call `stop`.
   * 
@@ -26,6 +27,7 @@ import scala.util.control.Breaks
   * @see    FsResourceController
   * @author Christian Schlichtherle
   */
+@ThreadSafe
 private final class ResourceAccountant(lock: Lock) {
   import ResourceAccountant._
 

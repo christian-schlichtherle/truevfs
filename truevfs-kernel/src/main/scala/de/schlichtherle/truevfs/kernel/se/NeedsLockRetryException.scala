@@ -2,16 +2,17 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package de.schlichtherle.truevfs.kernel.se
 
-/**
- * Indicates that all file system locks need to get released before the
- * operation can get retried.
- *
- * @see    SyncController
- * @author Christian Schlichtherle
- */
+import javax.annotation.concurrent._
+
+/** Indicates that all file system locks need to get released before the
+  * operation can get retried.
+  *
+  * @see    SyncController
+  * @author Christian Schlichtherle
+  */
+@Immutable
 private final class NeedsLockRetryException private()
 extends ControlFlowException
 

@@ -4,28 +4,28 @@
  */
 package de.schlichtherle.truevfs.kernel.se
 
+import java.io._
+import java.nio.channels._
+import javax.annotation.concurrent._
 import net.truevfs.kernel._
 import net.truevfs.kernel.cio._
 import net.truevfs.kernel.cio.Entry._;
 import net.truevfs.kernel.io._
 import net.truevfs.kernel.util._
-import java.io._
-import java.nio.channels._
 
-/**
- * This abstract archive controller controls the mount state transition.
- * It is up to the sub class to implement the actual mounting/unmounting
- * strategy.
- * <p>
- * Note that all {@link FsController} API methods may throw a
- * {@link ControlFlowException}, for example when
- * {@linkplain FalsePositiveException detecting a false positive archive file}, or
- * {@linkplain NeedsWriteLockException requiring a write lock} or
- * {@linkplain NeedsSyncException requiring a sync}.
- *
- * @param  <E> the type of the archive entries.
- * @author Christian Schlichtherle
- */
+/** This abstract archive controller controls the mount state transition.
+  * It is up to the sub-class to implement the actual mounting/unmounting
+  * strategy.
+  *
+  * This controller is an emitter of
+  * [[de.schlichtherle.truevfs.kernel.se.ControlFlowException]]s, for example
+  * when
+  * [[de.schlichtherle.truevfs.kernel.se.NeedsWriteLockException requiring a write lock].
+  * 
+  * @tparam E the type of the archive entries.
+  * @author Christian Schlichtherle
+  */
+@NotThreadSafe
 private abstract class FileSystemArchiveController[E <: FsArchiveEntry]
 (m: LockModel)
 extends BasicArchiveController[E](m) with MountState[E] {

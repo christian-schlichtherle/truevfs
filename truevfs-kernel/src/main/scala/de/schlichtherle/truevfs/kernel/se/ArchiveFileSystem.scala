@@ -4,7 +4,9 @@
  */
 package de.schlichtherle.truevfs.kernel.se
 
-import ArchiveFileSystem._
+import java.nio.file._
+import java.util.Locale
+import javax.annotation.concurrent._
 import net.truevfs.kernel._
 import net.truevfs.kernel.FsAccessOption._
 import net.truevfs.kernel.FsAccessOptions._
@@ -16,19 +18,18 @@ import net.truevfs.kernel.cio.Entry.Type._
 import net.truevfs.kernel.util._
 import net.truevfs.kernel.util.HashMaps._
 import net.truevfs.kernel.util.Paths._
-import java.nio.file._
-import java.util.Locale
 import scala.annotation._
+import ArchiveFileSystem._
 
-/**
- * A read/write virtual file system for archive entries.
- * Have a look at the online <a href="http://truezip.java.net/faq.html">FAQ</a>
- * to get the concept of how this works.
- * 
- * @param  <E> the type of the archive entries.
- * @see    <a href="http://truezip.java.net/faq.html">Frequently Asked Questions</a>
- * @author Christian Schlichtherle
- */
+/** A read/write virtual file system for archive entries.
+  * Have a look at the online [[http://truezip.java.net/faq.html FAQ]]
+  * to get the concept of how this works.
+  * 
+  * @tparam E the type of the archive entries.
+  * @see    <a href="http://truezip.java.net/faq.html">Frequently Asked Questions</a>
+  * @author Christian Schlichtherle
+  */
+@NotThreadSafe
 private class ArchiveFileSystem[E <: FsArchiveEntry] private(
   driver: FsArchiveDriver[E],
   master: EntryTable[E])
