@@ -50,13 +50,9 @@ private trait ResourceController extends Controller[LockModel] {
     val builder = new FsSyncExceptionBuilder
     waitIdle(options, builder)
     closeAll(builder)
-    try {
-        super.sync(options)
-    } catch {
-      case ex: FsSyncException =>
-        builder.warn(ex)
-    }
-    builder.check();
+    try { super.sync(options) }
+    catch { case ex: FsSyncException => builder warn ex }
+    builder check();
   }
 
   private def waitIdle(options: SyncOptions, builder: FsSyncExceptionBuilder) {
@@ -65,19 +61,19 @@ private trait ResourceController extends Controller[LockModel] {
     } catch {
       case ex: FsResourceOpenException =>
         if (!(options get FORCE_CLOSE_IO))
-            throw builder.fail(new FsSyncException(mountPoint, ex))
-        builder.warn(new FsSyncWarningException(mountPoint, ex))
+            throw builder fail new FsSyncException(mountPoint, ex)
+        builder warn new FsSyncWarningException(mountPoint, ex)
     }
   }
 
   private def waitIdle(options: SyncOptions) {
     // HC SVNT DRACONES!
     {
-      val Resources(local, total) = accountant resources()
+      val Resources(local, total) = accountant.resources
       if (0 != local && !(options get FORCE_CLOSE_IO))
           throw new FsResourceOpenException(local, total)
     }
-    val wait = options get WAIT_CLOSE_IO;
+    val wait = options get WAIT_CLOSE_IO
     if (!wait) {
       // Spend some effort on closing streams which have already been garbage
       // collected in order to compensates for a disadvantage of the
@@ -90,9 +86,8 @@ private trait ResourceController extends Controller[LockModel] {
     }
     accountant waitOtherThreads (if (wait) 0 else waitTimeoutMillis);
     {
-      val Resources(local, total) = accountant resources()
-      if (0 != total)
-          throw new FsResourceOpenException(local, total)
+      val Resources(local, total) = accountant.resources
+      if (0 != total) throw new FsResourceOpenException(local, total)
     }
   }
 
@@ -105,7 +100,7 @@ private trait ResourceController extends Controller[LockModel] {
       accountant closeAllResources()
     } catch {
       case ex: IOException =>
-        builder.warn(new FsSyncWarningException(mountPoint, ex))
+        builder warn new FsSyncWarningException(mountPoint, ex)
     }
   }
 
