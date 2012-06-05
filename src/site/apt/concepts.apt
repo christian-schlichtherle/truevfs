@@ -1,10 +1,10 @@
     -----------------------
-    Concepts
+    Basic Concepts
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-Concepts
+Basic Concepts
 
     TrueVFS is a Java based plug-in framework for virtual file systems (VFS)
     which provides transparent access to archive files as if they were just
@@ -18,24 +18,25 @@ Concepts
           convenient-to-use client APIs for TrueVFS applications.
           No file system state is managed by this tier, which enables a TrueVFS
           application to work with any client API concurrently.
-          This tier consists of the modules
-          {{{./truevfs-access/index.html}TrueVFS&#160;Access*}}
-          and
-          {{{./truevfs-access/index.html}TrueVFS&#160;Access}}
-          (since TrueVFS 7.2).
-          In addition to the canonical term <access module>, each of these may
-          also get referred to by the term <client API module> for better
+          This tier solely consists of the module
+          {{{./truevfs-access/index.html}TrueVFS&#160;Access}}.
+          In addition to the canonical term <access module>, this may also get
+          referred to by the term <client API module> for better
           comprehensibility.
 
     [[1]] The <Kernel Tier> manages all virtual file system state.
-          It also provides multithreading, multiplexing, caching and buffering
-          so that the driver tier does not need to take care of this.
-          This tier solely consists of the module TrueVFS Kernel.
+          It also provides multiplexing, caching and buffering for
+          multithreaded environments so that the driver tier does not need to
+          take care of this.
+          This tier solely consists of the module
+          {{{./truevfs-kernel/index.html}TrueVFS&#160;Kernel}}.
 
     [[1]] The <Driver Tier> implements the I/O operations for their respective
           (federated) file system type.
-          This tier consists of all file system driver modules like TrueVFS
-          Driver FILE, TrueVFS Driver ZIP etc.
+          This tier consists of all file system driver modules, e.g.
+          {{{./truevfs-driver/truevfs-driver-file/index.html}TrueVFS&#160;Driver&#160;FILE}},
+          {{{./truevfs-driver/truevfs-driver-zip/index.html}TrueVFS&#160;Driver&#160;ZIP}}
+          et al.
 
     []
 
@@ -43,18 +44,18 @@ Concepts
 
     The TrueVFS project employs several high level design paradigms which have
     proven to be beneficial.
-    However, after all these are guidelines - not rules.
-    So they should get applied with some care.
+    However, these are only guidelines - not rules - so they should get applied
+    with some care.
 
 ** Convention Over Configuration
 
     The decomposition of this framework into separate modules enables users to
     easily configure the initial setup of the application's archive detection
-    by simply adding or removing the JARs of the required file system driver
-    modules to or from the run time class path.
+    by simply putting the JARs of the required file system driver modules on
+    the run time class path.
     This will cause the application to automatically detect the canonical file
     extension for the archive files supported by the respective file system
-    driver modules - no XML or property file editing is required.
+    driver modules - no configuration file editing is required.
 
     The application can simply accept this
     {{{./apidocs/net/truevfs/access/TArchiveDetector.html#ALL}initial setup}}
@@ -80,7 +81,7 @@ Concepts
     the
     {{{./apidocs/net/truevfs/kernel/sl/FsDriverLocator.html}file system drivers}}
     and the
-    {{{./apidocs/net/truevfs/kernel/sl/IOPoolLocator.html}temporary I/O entry pool}}.
+    {{{./apidocs/net/truevfs/kernel/sl/IoPoolLocator.html}temporary I/O buffer pool}}.
 
 ** Dependency Injection
 
@@ -88,9 +89,9 @@ Concepts
     module, it does not actually use them.
     To the contrary, the TrueVFS Kernel module fully relies on the Dependency
     Injection design paradigm.
-    This enables the TrueVFS modules and TrueVFS application to inject a custom
-    implementation instance or simply a service locator singleton as a
-    dependency of a TrueVFS Kernel object.
+    This enables TrueVFS modules and TrueVFS applications to inject custom
+    implementations or simply the service locator singletons as a dependency
+    into the TrueVFS Kernel.
 
     For example, the file system manager service locator singleton and the file
     system driver service locator singleton are used by the module
@@ -112,10 +113,10 @@ Concepts
     which is a key requirement for most TrueVFS Kernel classes.
 
     For example, the classes
-    {{{./apidocs/net/truevfs/kernel/addr/FsPath.html}<<<FsPath>>>}},
-    {{{./apidocs/net/truevfs/kernel/addr/FsMountPoint.html}<<<FsMountPoint>>>}}
+    {{{./apidocs/net/truevfs/kernel/FsPath.html}<<<FsPath>>>}},
+    {{{./apidocs/net/truevfs/kernel/FsMountPoint.html}<<<FsMountPoint>>>}}
     and
-    {{{./apidocs/net/truevfs/kernel/addr/FsEntryName.html}<<<FsEntryName>>>}}
+    {{{./apidocs/net/truevfs/kernel/FsEntryName.html}<<<FsEntryName>>>}}
     are immutable so that their instances can get safely shared among many
     objects and threads.
 
