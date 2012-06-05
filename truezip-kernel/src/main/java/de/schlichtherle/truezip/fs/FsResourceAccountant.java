@@ -20,7 +20,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -43,22 +42,18 @@ import javax.annotation.concurrent.ThreadSafe;
 final class FsResourceAccountant {
 
     /**
+     * The map of all accounted closeable resources.
      * The initial capacity for the hash map accounts for the number of
      * available processors, a 90% blocking factor for typical I/O and a 2/3
      * map resize threshold.
      */
-    private static final int INITIAL_CAPACITY = HashMaps.initialCapacity(
-            Runtime.getRuntime().availableProcessors() * 10);
-
-    /**
-     * The pool of all accounted closeable resources.
-     * The weak hash map allows the garbage collector to pick up a closeable
-     * resource if there are no more references to it.
-     */
-    @GuardedBy("lock")
-    private static final ConcurrentMap<Closeable, Account> accounts
-            = new ConcurrentHashMap<Closeable, Account>(
-                INITIAL_CAPACITY, 0.75f, INITIAL_CAPACITY);
+    private static final ConcurrentMap<Closeable, Account> accounts;
+    static {
+        final int initialCapacity =
+                HashMaps.initialCapacity(Runtime.getRuntime().availableProcessors() * 10);
+        accounts = new ConcurrentHashMap<Closeable, Account>(
+                initialCapacity, 0.75f, initialCapacity);
+    }
 
     private final Lock lock;
     private final Condition condition;
@@ -138,8 +133,7 @@ final class FsResourceAccountant {
                 long toWait = TimeUnit.MILLISECONDS.toNanos(timeout);
                 while (resources().isBusy()) {
                     if (0 < timeout) {
-                        if (0 >= toWait)
-                            break;
+                        if (0 >= toWait) break;
                         toWait = condition.awaitNanos(toWait);
                     } else {
                         condition.await();

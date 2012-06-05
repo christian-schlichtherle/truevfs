@@ -160,9 +160,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             }
         } // IOExceptionHandler
 
-        final FsResourceAccountant acc = accountant;
-        if (null != acc)
-            acc.closeAllResources(new IOExceptionHandler());
+        accountant.closeAllResources(new IOExceptionHandler());
     }
 
     @Immutable
