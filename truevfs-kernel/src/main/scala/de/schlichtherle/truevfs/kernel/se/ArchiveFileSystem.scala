@@ -49,7 +49,7 @@ extends Iterable[FsCovariantEntry[E]] {
     for (access <- ALL_ACCESS)
       root.setTime(access, time)
     master.add(RootPath, root)
-    touched = true;
+    touched = true
   }
 
   def this(driver: FsArchiveDriver[E], archive: Container[E], rootTemplate: Option[Entry]) {
@@ -77,19 +77,17 @@ extends Iterable[FsCovariantEntry[E]] {
     for (path <- paths) fix(path)
   }
 
-  /**
-   * Called from a constructor in order to fix the parent directories of the
-   * file system entry identified by {@code name}, ensuring that all parent
-   * directories of the file system entry exist and that they contain the
-   * respective member entry.
-   * If a parent directory does not exist, it is created using an unkown time
-   * as the last modification time - this is defined to be a
-   * <i>ghost directory<i>.
-   * If a parent directory does exist, the respective member entry is added
-   * (possibly yet again) and the process is continued.
-   *
-   * @param name the entry name.
-   */
+  /** Called from a constructor in order to fix the parent directories of the
+    * file system entry identified by `name`, ensuring that all parent
+    * directories of the file system entry exist and that they contain the
+    * respective member entry.
+    * If a parent directory does not exist, it is created using an unkown time
+    * as the last modification time - this is defined to be a
+    * ''ghost directory''.
+    * If a parent directory does exist, the respective member entry is added
+    *
+    * @param name the entry name.
+    */
   @tailrec
   private def fix(name: String) {
     // When recursing into this method, it may be called with the root
@@ -111,21 +109,20 @@ extends Iterable[FsCovariantEntry[E]] {
 
   def iterator = master.iterator
 
-  /**
-   * Returns a covariant file system entry or {@code null} if no file system
-   * entry exists for the given name.
-   * Modifying the returned object graph is either not supported (i.e. throws
-   * an {@link UnsupportedOperationException}) or does not show any effect on
-   * this file system.
-   * 
-   * @param  name the name of the file system entry to look up.
-   * @return A covariant file system entry or {@code null} if no file system
-   *         entry exists for the given name.
-   */
+  /** Returns a covariant file system entry or `None` if no file system
+    * entry exists for the given name.
+    * Modifying the returned object graph is either not supported (i.e. throws
+    * an [[java.lang.UnsupportedOperationException]] or does not show any effect
+    * on this file system.
+    *
+    * @param  name the name of the file system entry to look up.
+    * @return A covariant file system entry or `None` if no file system
+    *         entry exists for the given name.
+    */
   def stat(options: AccessOptions, name: FsEntryName) = {
     master.get(name.getPath) match {
       case Some(ce) => Some(ce.clone(driver))
-      case x => x
+      case None => None
     }
   }
 
@@ -136,7 +133,7 @@ extends Iterable[FsCovariantEntry[E]] {
 
   def setReadOnly(name: FsEntryName) {
     throw new FileSystemException(name.toString, null,
-        "Cannot set read-only state!");
+        "Cannot set read-only state!")
   }
 
   def setTime(options: AccessOptions, name: FsEntryName, times: Map[Access, Long]) = {
@@ -163,39 +160,41 @@ extends Iterable[FsCovariantEntry[E]] {
     }
     // HC SVNT DRACONES!
     touch(options)
-    val ae = ce.getEntry()
+    val ae = ce.getEntry
     var ok = true
     for (tµpe <- types)
         ok &= ae.setTime(tµpe, value)
     ok
   }
 
-  /**
-   * Begins a <i>transaction</i> to create or replace and finally link a
-   * chain of one or more archive entries for the given {@code path} into
-   * this archive file system.
-   * <p>
-   * To commit the transaction, you need to call
-   * {@link ArchiveFileSystemOperation#commit} on the returned object, which
-   * will mark this archive file system as touched and set the last
-   * modification time of the created and linked archive file system entries
-   * to the system's current time at the moment of the call to this method.
-   *
-   * @param  name the archive file system entry name.
-   * @param  type the type of the archive file system entry to create.
-   * @param  options if {@code CREATE_PARENTS} is set, any missing parent
-   *         directories will be created and linked into this file
-   *         system with its last modification time set to the system's
-   *         current time.
-   * @param  template if not {@code null}, then the archive file system entry
-   *         at the end of the chain shall inherit as much properties from
-   *         this entry as possible - with the exception of its name and type.
-   * @throws IOException on any I/O error.
-   * @return A new archive file system operation on a chain of one or more
-   *         archive file system entries for the given path name which will
-   *         be linked into this archive file system upon a call to its
-   *         {@link ArchiveFileSystemOperation#commit} method.
-   */
+  /** Begins a ''transaction'' to create or replace and finally link a
+    * chain of one or more archive entries for the given `name` into
+    * this archive file system.
+    *
+    * To commit the transaction, you need to call
+    * `commit` on the returned
+    * [[de.schlichtherle.truevfs.kernel.se.ArchiveFileSystem.Mknod]] object,
+    * which will mark this archive file system as touched and set the last
+    * modification time of the created and linked archive file system entries
+    * to the system's current time at the moment of the call to this method.
+    *
+    * @param  name the archive file system entry name.
+    * @param  tµpe the type of the archive file system entry to create.
+    * @param  options if `CREATE_PARENTS` is set, any missing parent
+    *         directories will be created and linked into this file
+    *         system with its last modification time set to the system's
+    *         current time.
+    * @param  template if not `None`, then the archive file system entry
+    *         at the end of the chain shall inherit as much properties from
+    *         this entry as possible - with the exception of its name and type.
+    * @throws IOException on any I/O error.
+    * @return A new archive file system operation on a chain of one or more
+    *         archive file system entries for the given path name which will
+    *         be linked into this archive file system upon a call to the
+    *         `commit` method of the returned
+    *         [[de.schlichtherle.truevfs.kernel.se.ArchiveFileSystem.Mknod]]
+    *         object.
+    */
   def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Option[Entry]) = {
     require(null ne tµpe)
     if (FILE.ne(tµpe) && DIRECTORY.ne(tµpe)) // TODO: Add support for other types.
@@ -219,22 +218,21 @@ extends Iterable[FsCovariantEntry[E]] {
     new Mknod(options, path, tµpe, t)
   }
 
-  /**
-   * Represents an {@linkplain #mknod} transaction.
-   * The transaction get committed by calling {@link #commit}.
-   * The state of the archive file system will not change until this method
-   * gets called.
-   * The head of the chain of covariant file system entries to commit can get
-   * obtained by calling {@link #head}.
-   * <p>
-   * TODO: The current implementation yields a potential issue: The state of
-   * the file system may get altered between the construction of this
-   * transaction and the call to its {@link #commit} method.
-   * However, the change may render this operation illegal and so the file
-   * system may get corrupted upon a call to {@link #commit}.
-   * To avoid this, the caller must not allow concurrent changes to this
-   * archive file system.
-   */
+  /** Represents an `mknod` transaction.
+    * The transaction get committed by calling `commit`.
+    * The state of the archive file system will not change until this method
+    * gets called.
+    * The head of the chain of covariant file system entries to commit can get
+    * obtained by calling `head`.
+    *
+    * TODO: The current implementation yields a potential issue: The state of
+    * the file system may get altered between the construction of this
+    * transaction and the call to its `commit` method.
+    * However, the change may render this operation illegal and so the file
+    * system may get corrupted upon a call to `commit`.
+    * To avoid this, the caller must not allow concurrent changes to this
+    * archive file system.
+    */
   final class Mknod(options: AccessOptions, path: String, tµpe: Type, template: Option[Entry]) {
     private var time: Long = UNKNOWN
     private val segments = newSegments(path, tµpe, template)
@@ -270,7 +268,7 @@ extends Iterable[FsCovariantEntry[E]] {
     }
 
     def commit() {
-      touch(options);
+      touch(options)
       val size = commit(segments)
       assert(2 <= size)
       val mae = segments.head.entry.getEntry
@@ -305,17 +303,16 @@ extends Iterable[FsCovariantEntry[E]] {
     def head = segments.head.entry
   } // Mknod
 
-  /**
-   * Tests the named file system entry and then - unless its the file system
-   * root - notifies the listener and deletes the entry.
-   * For the file system root, only the tests are performed but the listener
-   * does not get notified and the entry does not get deleted.
-   * For the tests to succeed, the named file system entry must exist and
-   * directory entries (including the file system root) must be empty.
-   *
-   * @param  name the archive file system entry name.
-   * @throws IOException on any I/O error.
-   */
+  /** Tests the named file system entry and then - unless its the file system
+    * root - notifies the listener and deletes the entry.
+    * For the file system root, only the tests are performed but the listener
+    * does not get notified and the entry does not get deleted.
+    * For the tests to succeed, the named file system entry must exist and
+    * directory entries (including the file system root) must be empty.
+    *
+    * @param  name the archive file system entry name.
+    * @throws IOException on any I/O error.
+    */
   def unlink(options: AccessOptions, name: FsEntryName) {
     // Test.
     val path = name.getPath
@@ -361,53 +358,53 @@ extends Iterable[FsCovariantEntry[E]] {
         pae.setTime(WRITE, System.currentTimeMillis)
   }
 
-  /**
-   * Returns a new archive entry.
-   * This is just a factory method and the returned file system entry is not
-   * (yet) linked into this (virtual) archive file system.
-   *
-   * @param  name the entry name.
-   * @param  options a bit field of access options.
-   * @param  type the entry type.
-   * @param  template if not {@code null}, then the new entry shall inherit
-   *         as much properties from this entry as possible - with the
-   *         exception of its name and type.
-   * @return A new entry for the given name.
-   */
+  /** Returns a new archive entry.
+    *
+    * Note that this is just a factory method and the returned file system entry
+    * is not (yet) linked into this (virtual) archive file system.
+    *
+    * @param  name the entry name.
+    * @param  tµpe the entry type.
+    * @param  template if not `None`, then the new entry shall inherit
+    *         as much properties from this entry as possible - with the
+    *         exception of its name and type.
+    * @return A new entry for the given name.
+    */
   private def newEntry(name: String, tµpe: Type, template: Option[Entry]) = {
     assert(!isRoot(name) || DIRECTORY.eq(tµpe))
     driver.newEntry(NONE, name, tµpe, template.orNull)
   }
 
-  /**
-   * Like {@link #entry entry(name, type, options, template)},
-   * but checks that the given entry name can get encoded by the driver's
-   * character set.
-   *
-   * @param  name the entry name.
-   * @param  options a bit field of access options.
-   * @param  type the entry type.
-   * @param  template if not {@code null}, then the new entry shall inherit
-   *         as much properties from this entry as possible - with the
-   *         exception of its name and type.
-   * @return A new entry for the given name.
-   * @throws CharConversionException If the entry name contains characters
-   *         which cannot get encoded.
-   * @see    #mknod
-   */
+  /** Returns a new archive entry.
+    * This version checks that the given entry name can get encoded by the
+    * driver's character set.
+    *
+    * Note that this is just a factory method and the returned file system entry
+    * is not (yet) linked into this (virtual) archive file system.
+    *
+    * @param  name the entry name.
+    * @param  options a bit field of access options.
+    * @param  tµpe the entry type.
+    * @param  template if not `None`, then the new entry shall inherit
+    *         as much properties from this entry as possible - with the
+    *         exception of its name and type.
+    * @return A new entry for the given name.
+    * @throws CharConversionException If the entry name contains characters
+    *         which cannot get encoded.
+    * @see    #mknod
+    */
   private def newEntry(options: AccessOptions, name: String, tµpe: Type, template: Option[Entry]) = {
     assert(!isRoot(name))
     driver.checkEncodable(name)
     driver.newEntry(options, name, tµpe, template.orNull)
   }
 
-  /**
-   * Marks this (virtual) archive file system as touched and notifies the
-   * listener if and only if the touch status is changing.
-   *
-   * @throws IOException If the listener's preTouch implementation vetoed
-   *         the operation for any reason.
-   */
+  /** Marks this (virtual) archive file system as touched and notifies the
+    * listener if and only if the touch status is changing.
+    *
+    * @throws IOException If the listener's preTouch implementation vetoed
+    *         the operation for any reason.
+    */
   private def touch(options: AccessOptions) {
     if (!touched) {
       _touchListener.foreach(_.preTouch(options))
@@ -418,13 +415,12 @@ extends Iterable[FsCovariantEntry[E]] {
   /** Gets the archive file system touch listener. */
   final def touchListener = _touchListener
 
-  /**
-   * Sets the archive file system touch listener.
-   *
-   * @param  listener the listener for archive file system events.
-   * @throws IllegalStateException if {@code listener} is not null and the
-   *         touch listener has already been set.
-   */
+  /** Sets the archive file system touch listener.
+    *
+    * @param  listener the listener for archive file system events.
+    * @throws IllegalStateException if `listener` is not null and the
+    *         touch listener has already been set.
+    */
   final def touchListener_=(listener: Option[TouchListener]) {
     if (listener.isDefined && _touchListener.isDefined)
       throw new IllegalStateException("The touch listener has already been set!")
@@ -435,48 +431,45 @@ extends Iterable[FsCovariantEntry[E]] {
 private object ArchiveFileSystem {
   private val RootPath = ROOT.getPath
 
-  /**
-   * Returns a new empty archive file system and ensures its integrity.
-   * Only the root directory is created with its last modification time set
-   * to the system's current time.
-   * The file system is modifiable and marked as touched!
-   *
-   * @param  <E> The type of the archive entries.
-   * @param  driver the archive driver to use.
-   * @return A new archive file system.
-   * @throws NullPointerException If {@code factory} is {@code null}.
-   */
+  /** Returns a new empty archive file system and ensures its integrity.
+    * Only the root directory is created with its last modification time set
+    * to the system's current time.
+    * The file system is modifiable and marked as touched!
+    *
+    * @tparam E The type of the archive entries.
+    * @param  driver the archive driver to use.
+    * @return A new archive file system.
+    */
   def apply[E <: FsArchiveEntry](driver: FsArchiveDriver[E]) =
     new ArchiveFileSystem(driver)
 
-  /**
-   * Returns a new archive file system which populates its entries from
-   * the given {@code archive} and ensures its integrity.
-   * <p>
-   * First, the entries from the archive are loaded into the file system.
-   * <p>
-   * Second, a root directory with the given last modification time is
-   * created and linked into the filesystem (so it's never loaded from the
-   * archive).
-   * <p>
-   * Finally, the file system integrity is checked and fixed: Any missing
-   * parent directories are created using the system's current time as their
-   * last modification time - existing directories will never be replaced.
-   * <p>
-   * Note that the entries in the file system are shared with the given
-   * archive entry {@code container}.
-   *
-   * @param  <E> The type of the archive entries.
-   * @param  driver the archive driver to use.
-   * @param  archive The archive entry container to read the entries for
-   *         the population of the archive file system.
-   * @param  rootTemplate The optional template to use for the root entry of
-   *         the returned archive file system.
-   * @param  readOnly If and only if {@code true}, any subsequent
-   *         modifying operation on the file system will result in a
-   *         {@link FsReadOnlyFileSystemException}.
-   * @return A new archive file system.
-   */
+  /** Returns a new archive file system which populates its entries from
+    * the given `archive` and ensures its integrity.
+    *
+    * First, the entries from the archive are loaded into the file system.
+    *
+    * Second, a root directory with the given last modification time is
+    * created and linked into the filesystem (so it's never loaded from the
+    * archive).
+    *
+    * Finally, the file system integrity is checked and fixed: Any missing
+    * parent directories are created using the system's current time as their
+    * last modification time - existing directories will never be replaced.
+    *
+    * Note that the entries in the file system are shared with the given
+    * `archive`.
+    *
+    * @tparam E The type of the archive entries.
+    * @param  driver the archive driver to use.
+    * @param  archive The archive entry container to read the entries for
+    *         the population of the archive file system.
+    * @param  rootTemplate The optional template to use for the root entry of
+    *         the returned archive file system.
+    * @param  readOnly If and only if `true`, any subsequent
+    *         modifying operation on the file system will result in a
+    *         [[net.truevfs.kernel.FsReadOnlyFileSystemException]].
+    *@return A new archive file system.
+    */
   def apply[E <: FsArchiveEntry](driver: FsArchiveDriver[E], archive: Container[E], rootTemplate: Option[Entry], readOnly: Boolean) = {
     if (readOnly) new ReadOnlyArchiveFileSystem(driver, archive, rootTemplate)
     else new ArchiveFileSystem(driver, archive, rootTemplate)
@@ -490,21 +483,19 @@ private object ArchiveFileSystem {
 
   private def typeName(tµpe: Type) = tµpe.toString.toLowerCase(Locale.ENGLISH)
 
-  /**
-   * The master archive entry table.
-   * 
-   * @param <E> The type of the archive entries.
-   */
+  /** The master archive entry table.
+    *
+    * @tparam E The type of the archive entries.
+    */
   final class EntryTable[E <: FsArchiveEntry](_initialSize: Int)
   extends Iterable[FsCovariantEntry[E]] {
 
-    /**
-     * The map of covariant file system entries.
-     * <p>
-     * Note that the archive entries in the covariant file system entries
-     * in this map are shared with the {@link Container} object
-     * provided to the constructor of this class.
-     */
+    /** The map of covariant file system entries.
+      *
+      * Note that the archive entries in the covariant file system entries
+      * in this map are shared with the constructor parameter  `archive` of
+      * the archive file system object.
+      */
     private[this] val map = new collection.mutable.LinkedHashMap[String, FsCovariantEntry[E]] {
       // See https://issues.scala-lang.org/browse/SI-5804 .
       table = new Array(initialCapacity(_initialSize))
@@ -541,24 +532,22 @@ private object ArchiveFileSystem {
 
   /** Used to notify implementations of an event in this file system. */
   trait TouchListener {
-
-    /**
-     * Called immediately before the source archive file system is going to
-     * get modified (touched) for the first time.
-     * If this method throws an {@code IOException}), then the modification
-     * is effectively vetoed.
-     *
-     * @throws IOException at the discretion of the implementation.
-     */
+    /** Called immediately before the source archive file system is going to
+      * get modified (touched) for the first time.
+      * If this method throws an [[java.io.IOException]], then the modification
+      * is effectively vetoed.
+      *
+      * @throws IOException at the discretion of the implementation.
+      */
     def preTouch(options: AccessOptions)
   } // TouchListener
 
-  /**
-   * A case class which represents a path segment for use by {@link Mknod}.
-   * 
-   * @param name the nullable member name for the covariant file system entry.
-   * @param entry the covariant file system entry for the nullable member name.
-   */
+  /** A case class which represents a path segment for use by
+    * [[de.schlichtherle.truevfs.kernel.se.ArchiveFileSystem.Mknod]].
+    *
+    * @param name the nullable member name for the covariant file system entry.
+    * @param entry the covariant file system entry for the nullable member name.
+    */
   private final case class Segment[E <: FsArchiveEntry](
     name: Option[String],
     entry: FsCovariantEntry[E])
