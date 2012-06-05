@@ -8,6 +8,7 @@ import collection.JavaConverters._
 import java.io._
 import java.util.concurrent._
 import java.util.concurrent.locks._
+import javax.annotation._
 import javax.annotation.concurrent._
 import net.truevfs.kernel.util._
 import scala.util.control._
@@ -37,7 +38,7 @@ private final class ResourceAccountant(lock: Lock) {
     * 
     * @param resource the closeable resource to start accounting for.
     */
-  def startAccountingFor(resource: Closeable) {
+  def startAccountingFor(@WillCloseWhenClosed resource: Closeable) {
     accounts += resource -> Account(this)
   }
 
@@ -47,13 +48,13 @@ private final class ResourceAccountant(lock: Lock) {
     * 
     * @param resource the closeable resource to stop accounting for.
     */
-  def stopAccountingFor(resource: Closeable) {
+  def stopAccountingFor(@WillNotClose resource: Closeable) {
     accounts.remove(resource) foreach { _ =>
-      lock.lock()
+      lock lock()
       try {
-        condition.signalAll()
+        condition signalAll()
       } finally {
-        lock.unlock()
+        lock unlock()
       }
     }
   }
@@ -83,20 +84,19 @@ private final class ResourceAccountant(lock: Lock) {
     *        If this is non-positive, then there is no timeout for waiting.
     */
   def waitOtherThreads(timeout: Long) {
-    lock.lock()
+    lock lock()
     try {
       try {
-        var toWait = TimeUnit.MILLISECONDS.toNanos(timeout)
+        var toWait = TimeUnit.MILLISECONDS toNanos timeout
         val mybreaks = new Breaks
         import mybreaks.{break, breakable}
         breakable {
-          while (resources() isBusy) {
+          while (resources.isBusy) {
             if (0 < timeout) {
-              if (0 >= toWait)
-                break
-              toWait = condition.awaitNanos(toWait)
+              if (0 >= toWait) break
+              toWait = condition awaitNanos toWait
             } else {
-              condition.await()
+              condition await()
             }
           }
         }
@@ -104,11 +104,11 @@ private final class ResourceAccountant(lock: Lock) {
         case _: InterruptedException =>
           // Fix rare racing condition between Thread.interrupt() and
           // Condition.signalAll() events.
-          if (0 == resources().total)
+          if (0 == resources.total)
             Thread.currentThread.interrupt()
       }
     } finally {
-      lock.unlock()
+      lock unlock()
     }
   }
 
@@ -122,7 +122,7 @@ private final class ResourceAccountant(lock: Lock) {
     * 
     * @return The number of closeable resources which have been accounted for.
     */
-  def resources() = {
+  def resources = {
     val currentThread = Thread.currentThread
     var local, total = 0
     for (account <- accounts.values if account.accountant eq this) {
@@ -139,7 +139,7 @@ private final class ResourceAccountant(lock: Lock) {
     * to the constructor - use with care!
     */
   def closeAllResources() {
-    lock.lock()
+    lock lock()
     try {
       val builder = new SuppressedExceptionBuilder[IOException]
       for ((closeable, account) <- accounts if account.accountant eq this) {
@@ -160,10 +160,10 @@ private final class ResourceAccountant(lock: Lock) {
             builder warn ex // could throw an IOException!
         }
       }
-      builder.check()
+      builder check()
     } finally {
-      condition.signalAll()
-      lock.unlock()
+      condition signalAll()
+      lock unlock()
     }
   }
 }
