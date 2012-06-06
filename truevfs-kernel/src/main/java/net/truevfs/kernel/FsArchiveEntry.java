@@ -14,7 +14,7 @@ import net.truevfs.kernel.cio.MutableEntry;
  * <p>
  * Implementations do <em>not</em> need to be thread-safe.
  * 
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public interface FsArchiveEntry extends MutableEntry {
 
