@@ -56,7 +56,7 @@ public interface Entry {
      */
     String getName();
 
-    /** Defines the type of entry. */
+    /** Defines the type of an entry. */
     @SuppressWarnings("PublicInnerClass")
     enum Type {
 
