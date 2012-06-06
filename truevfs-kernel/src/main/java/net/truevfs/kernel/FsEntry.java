@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
  * An abstract file system entry is an entry which can implement multiple types
  * and list directory members.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public abstract class FsEntry implements Entry {
 
