@@ -4,16 +4,16 @@
  */
 package net.truevfs.driver.zip.io;
 
+import java.util.Formatter;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.NotThreadSafe;
 import static net.truevfs.driver.zip.io.Constants.EMPTY;
 import static net.truevfs.driver.zip.io.Constants.FORCE_ZIP64_EXT;
 import static net.truevfs.driver.zip.io.ExtraField.WINZIP_AES_ID;
 import static net.truevfs.driver.zip.io.ExtraField.ZIP64_HEADER_ID;
 import static net.truevfs.driver.zip.io.LittleEndian.readLong;
 import static net.truevfs.driver.zip.io.LittleEndian.writeLong;
-import java.util.Formatter;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Replacement for {@link java.util.zip.ZipEntry java.util.zip.ZipEntry}.
