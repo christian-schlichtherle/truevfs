@@ -181,14 +181,14 @@ public final class IOCache implements Flushable, Closeable {
     }
 
     private InputBufferPool getInputBufferPool() {
-        InputBufferPool ibp = inputBufferPool;
+        final InputBufferPool ibp = inputBufferPool;
         return null != ibp
                 ? ibp
                 : (inputBufferPool = strategy.newInputBufferPool(this));
     }
 
     private OutputBufferPool getOutputBufferPool() {
-        OutputBufferPool obp = this.outputBufferPool;
+        final OutputBufferPool obp = outputBufferPool;
         return null != obp
                 ? obp
                 : (outputBufferPool = strategy.newOutputBufferPool(this));
