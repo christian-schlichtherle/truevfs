@@ -194,7 +194,7 @@ private trait CacheController extends Controller[LockModel] {
 
   /** A cache for the contents of an individual archive entry. */
   private final class EntryCache(val name: FsEntryName) {
-    val cache = CacheEntry.Strategy.WRITE_BACK.newCacheEntry(pool)
+    val cache = CacheEntry.Strategy.WriteBack.newCacheEntry(pool)
 
     def flush() { cache flush() }
 
