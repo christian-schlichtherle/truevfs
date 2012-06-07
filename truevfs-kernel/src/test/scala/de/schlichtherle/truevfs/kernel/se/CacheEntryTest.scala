@@ -14,7 +14,7 @@ import org.scalatest.junit._
 import org.scalatest.matchers._
 import org.scalatest.prop._
 import org.scalatest._
-import CacheEntry._
+import CacheEntry.Strategy._
 
 /**
  * @author Christian Schlichtherle
@@ -34,7 +34,7 @@ class CacheEntryTest extends WordSpec with ShouldMatchers with PropertyChecks {
       /*
       val pool = new ByteArrayIoPool(5)
       forAll(Table("strategy", WriteThrough, WriteBack)) { strategy =>
-        val cache: CacheEntry = new CacheEntry(strategy, pool)
+        val cache: CacheEntry = strategy.newCacheEntry(pool)
         var front: ByteArrayIoBuffer = null
         var back: ByteArrayIoBuffer = null
 
