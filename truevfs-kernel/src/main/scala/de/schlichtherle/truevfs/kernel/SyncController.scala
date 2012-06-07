@@ -107,8 +107,7 @@ private trait SyncController extends Controller[LockModel] {
       case ex: FsSyncException =>
         if (modified ne options) {
           ex.getCause match {
-            case _: FsResourceOpenException =>
-              throw NeedsLockRetryException()
+            case _: FsResourceOpenException => throw NeedsLockRetryException()
             case _ =>
           }
         }
@@ -138,7 +137,7 @@ private trait SyncController extends Controller[LockModel] {
             safeSync(SYNC)
           } catch {
             case syncEx: FsSyncException =>
-              syncEx.addSuppressed(opEx)
+              syncEx addSuppressed opEx
               throw syncEx
           }
       }
