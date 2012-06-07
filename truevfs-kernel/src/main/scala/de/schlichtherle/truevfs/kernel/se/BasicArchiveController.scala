@@ -43,7 +43,7 @@ import net.truevfs.kernel.util._
 @NotThreadSafe
 private abstract class BasicArchiveController[E <: FsArchiveEntry]
 (final override val model: LockModel)
-extends Controller[LockModel] with LockModelFeatures {
+extends Controller[LockModel] with LockModelAspect {
   import BasicArchiveController._
 
   require(null ne model.getParent)

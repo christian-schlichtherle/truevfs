@@ -15,35 +15,6 @@ import net.truevfs.kernel._
   */
 @ThreadSafe
 private final class LockModel(model: FsModel)
-extends FsDecoratingModel[FsModel](model) {
-
-  /** The lock on which the file system controller(s) shall synchronize. */
-  private val lock = new ReentrantReadWriteLock
-
-  def readLock = lock.readLock
-
-  /**
-   * Returns `true` if and only if the read lock is held by the
-   * current thread.
-   * This method should only get used for assert statements, not for lock
-   * control!
-   * 
-   * @return `true` if and only if the read lock is held by the
-   *         current thread.
-   */
-  def readLockedByCurrentThread = 0 != lock.getReadHoldCount
-
-  def writeLock = lock.writeLock
-
-  /**
-   * Returns `true` if and only if the write lock is held by the
-   * current thread.
-   * This method should only get used for assert statements, not for lock
-   * control!
-   * 
-   * @return `true` if and only if the write lock is held by the
-   *         current thread.
-   * @see    #checkWriteLockedByCurrentThread()
-   */
-  def writeLockedByCurrentThread = lock.isWriteLockedByCurrentThread
+extends FsDecoratingModel[FsModel](model) with LockModelLike {
+  val lock = new ReentrantReadWriteLock
 }

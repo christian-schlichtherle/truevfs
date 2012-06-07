@@ -37,7 +37,7 @@ import javax.annotation.concurrent._
   */
 @Immutable
 private trait LockController extends Controller[LockModel] {
-  this: LockModelFeatures =>
+  this: LockModelAspect =>
 
   abstract override def stat(options: AccessOptions, name: FsEntryName) =
     timedReadOrWriteLocked(super.stat(options, name))

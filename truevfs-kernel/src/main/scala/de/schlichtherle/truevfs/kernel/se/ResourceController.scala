@@ -23,7 +23,7 @@ import ResourceAccountant.Resources
   */
 @NotThreadSafe
 private trait ResourceController extends Controller[LockModel] {
-  this: LockModelFeatures =>
+  this: LockModelAspect =>
 
   import ResourceController._
 
