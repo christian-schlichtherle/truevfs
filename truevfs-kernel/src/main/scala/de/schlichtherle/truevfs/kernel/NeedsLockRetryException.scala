@@ -13,7 +13,7 @@ import javax.annotation.concurrent._
   * @author Christian Schlichtherle
   */
 @Immutable
-private final class NeedsLockRetryException private()
+private final class NeedsLockRetryException private ()
 extends ControlFlowException
 
 private object NeedsLockRetryException {

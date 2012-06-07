@@ -14,7 +14,7 @@ import net.truevfs.kernel.util._
   * @author Christian Schlichtherle
   */
 @Immutable
-private final class NeedsSyncException private()
+private final class NeedsSyncException private ()
 extends ControlFlowException
 
 private object NeedsSyncException {
