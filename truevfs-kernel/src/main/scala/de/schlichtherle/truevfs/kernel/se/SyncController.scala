@@ -28,7 +28,7 @@ import javax.annotation.concurrent._
   */
 @ThreadSafe
 private trait SyncController extends Controller[LockModel] {
-  this: LockModelFeatures =>
+  this: LockModelAspect =>
 
   abstract override def stat(options: AccessOptions, name: FsEntryName) =
     apply(super.stat(options, name))

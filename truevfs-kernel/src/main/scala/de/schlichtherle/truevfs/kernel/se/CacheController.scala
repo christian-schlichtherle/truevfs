@@ -52,7 +52,7 @@ import scala.util.control.Breaks
   */
 @NotThreadSafe
 private trait CacheController extends Controller[LockModel] {
-  this: LockModelFeatures =>
+  this: LockModelAspect =>
 
   import CacheController._
 
