@@ -4,12 +4,12 @@
  */
 package net.truevfs.kernel.cio;
 
-import net.truevfs.kernel.io.ChannelOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.kernel.io.ChannelOutputStream;
 
 /**
  * An abstract factory for output resources for writing bytes to its
@@ -17,6 +17,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  *
  * @param  <E> the type of the {@link #localTarget() local target}
  *         for I/O operations.
+ * @see    AbstractInputSocket
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
@@ -33,8 +34,7 @@ implements OutputSocket<E> {
 
     @Override
     public final OutputSocket<E> bind(final OutputSocket<? extends Entry> to) {
-        if (this == to)
-            throw new IllegalArgumentException();
+        if (this == to) throw new IllegalArgumentException();
         this.peer = to.getPeerSocket();
         return this;
     }
