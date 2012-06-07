@@ -311,7 +311,7 @@ private final class CacheEntry private (
     private final class CacheSeekableChannel(channel: SeekableByteChannel)
     extends DecoratingSeekableChannel(channel) with CacheOutputResource
 
-    def input: AnyInputSocket = {
+    def input: InputSocket[Buffer] = {
       final class Input extends AbstractInputSocket[Buffer] {
         private[this] val socket = data.input
 
@@ -323,7 +323,7 @@ private final class CacheEntry private (
       new Input
     }
 
-    def output: AnyOutputSocket = {
+    def output: OutputSocket[Buffer] = {
       final class Output extends AbstractOutputSocket[Buffer] {
         private[this] val socket = data.output
 
