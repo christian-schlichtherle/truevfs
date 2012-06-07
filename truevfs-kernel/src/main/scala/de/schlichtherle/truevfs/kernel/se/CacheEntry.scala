@@ -41,6 +41,7 @@ private final class CacheEntry private (
   private[this] val strategy: Strategy,
   private[this] val pool: AnyIoPool
 ) extends Entry with Releasable[IOException] with Flushable with Closeable {
+
   private[this] var _input: Option[AnyInputSocket] = None
   private[this] var _output: Option[AnyOutputSocket] = None
   private[this] var _inputBufferPool: Option[InputBufferPool] = None
@@ -107,21 +108,9 @@ private final class CacheEntry private (
     * @return An input socket for reading the cached entry data.
     */
   def input: AnyInputSocket = {
-    final class Input extends DelegatingInputSocket[Entry] {
-      private[this] var _buffer: Option[Buffer] = None
-
-      def socket() = {
-        val buffer = getInputBufferPool.allocate()
-        _buffer = new Some(buffer)
-        buffer.input
-      }
-
-      override def localTarget() = {
-        _buffer match {
-          case Some(buffer) => buffer
-          case _ => new CacheEntry.ProxyEntry(_input.get/*.bind(this)*/.localTarget()) // do NOT bind!
-        }
-      }
+    final class Input extends DelegatingInputSocket[Entry] with BufferAllocator {
+      def socket() = buffer(getInputBufferPool).input
+      override def localTarget() = localTarget(_input.get)
     }
     new Input
   }
@@ -131,23 +120,28 @@ private final class CacheEntry private (
     * @return An output socket for writing the cached entry data.
     */
   def output: AnyOutputSocket = {
-    final class Output extends DelegatingOutputSocket[Entry] {
-      private[this] var _buffer: Option[Buffer] = None
-
-      def socket() = {
-        val buffer = getOutputBufferPool.allocate()
-        _buffer = new Some(buffer)
-        buffer.output
-      }
-
-      override def localTarget() = {
-        _buffer match {
-          case Some(buffer) => buffer
-          case _ => new CacheEntry.ProxyEntry(_output.get/*.bind(this)*/.localTarget()) // do NOT bind!
-        }
-      }
+    final class Output extends DelegatingOutputSocket[Entry] with BufferAllocator {
+      def socket() = buffer(getOutputBufferPool).output
+      override def localTarget() = localTarget(_output.get)
     }
     new Output
+  }
+
+  private trait BufferAllocator {
+    private[this] var _buffer: Option[Buffer] = None
+
+    def buffer(pool: Pool[Buffer, _]) = {
+      val buffer = pool.allocate()
+      _buffer = new Some(buffer)
+      buffer
+    }
+
+    def localTarget(socket: IoSocket[_ <: Entry, _]) = {
+      _buffer match {
+        case Some(buffer) => buffer
+        case _ => new CacheEntry.ProxyEntry(socket/*.bind(this)*/.localTarget()) // do NOT bind!
+      }
+    }
   }
 
   /** Writes the cached entry data to the backing store unless already done.
