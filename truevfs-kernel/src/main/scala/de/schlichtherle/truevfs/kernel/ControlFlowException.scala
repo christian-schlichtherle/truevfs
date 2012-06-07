@@ -62,8 +62,8 @@ import ControlFlowException._
   * @author Christian Schlichtherle
   */
 @Immutable
-private abstract class ControlFlowException(cause: Throwable = null)
-extends RuntimeException(null, cause, traceable, traceable)
+private abstract class ControlFlowException
+extends RuntimeException(null, null, traceable, traceable)
 
 private object ControlFlowException {
 
