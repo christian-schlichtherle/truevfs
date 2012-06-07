@@ -48,7 +48,7 @@ private object FinalizeController {
 
   private val OK = new IOException(null: Throwable)
 
-  private trait FinalizeCloseable extends Closeable {
+  private trait FinalizeResource extends Closeable {
     @volatile var result: Option[IOException] = None // accessed by finalizer thread!
 
     abstract override def close() {
@@ -60,7 +60,7 @@ private object FinalizeController {
       result = Some(OK)
     }
 
-    override def finalize() {
+    abstract override def finalize() {
       try {
         result match {
           case Some(OK) => logger.log(FINEST, "closeCleared");
@@ -81,14 +81,14 @@ private object FinalizeController {
         super.finalize()
       }
     }
-  } // FinalizeCloseable
+  } // FinalizeResource
 
   private final class FinalizeInputStream(in: InputStream)
-  extends DecoratingInputStream(in) with FinalizeCloseable
+  extends DecoratingInputStream(in) with FinalizeResource
 
   private final class FinalizeOutputStream(out: OutputStream)
-  extends DecoratingOutputStream(out) with FinalizeCloseable
+  extends DecoratingOutputStream(out) with FinalizeResource
 
   private final class FinalizeSeekableChannel(channel: SeekableByteChannel)
-  extends DecoratingSeekableChannel(channel) with FinalizeCloseable
+  extends DecoratingSeekableChannel(channel) with FinalizeResource
 }
