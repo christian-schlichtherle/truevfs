@@ -4,7 +4,7 @@
  */
 package net.truevfs.access;
 
-import de.schlichtherle.truevfs.kernel.se.ArchiveManagerService;
+import de.schlichtherle.truevfs.kernel.ArchiveManagerService;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
