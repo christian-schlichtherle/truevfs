@@ -15,11 +15,17 @@ import javax.annotation.concurrent.ThreadSafe;
  *         for I/O operations.
  * @param  <PT> the type of the {@link #peerTarget() peer target}
  *         for I/O operations.
+ * @param  <This> the type of this socket.
+ * @param  <Peer> the type of the peer socket.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class AbstractIoSocket<LT extends Entry, PT extends Entry>
-implements IoSocket<LT, PT> {
+public abstract class AbstractIoSocket<
+        LT extends Entry,
+        PT extends Entry,
+        This extends IoSocket<LT, PT, This, Peer>,
+        Peer extends IoSocket<? extends Entry, Entry, ?, ?>>
+implements IoSocket<LT, PT, This, Peer> {
 
     /**
      * Two I/O socket are considered equal if and only if

@@ -22,20 +22,20 @@ import net.truevfs.kernel.io.ChannelOutputStream;
  */
 @NotThreadSafe
 public abstract class AbstractOutputSocket<E extends Entry>
-extends AbstractIoSocket<E, Entry>
+extends AbstractIoSocket<E, Entry, OutputSocket<E>, InputSocket<? extends Entry>>
 implements OutputSocket<E> {
 
-    private @CheckForNull InputSocket<?> peer;
+    private @CheckForNull InputSocket<? extends Entry> peer;
 
     @Override
-    public final InputSocket<? extends Entry> getPeerSocket() {
+    public final InputSocket<? extends Entry> getPeer() {
         return peer;
     }
 
     @Override
-    public final OutputSocket<E> bind(final OutputSocket<? extends Entry> to) {
+    public final OutputSocket<E> bind(final IoSocket<?, ?, ?, ? extends InputSocket<? extends Entry>> to) {
         if (this == to) throw new IllegalArgumentException();
-        this.peer = to.getPeerSocket();
+        this.peer = to.getPeer();
         return this;
     }
 
