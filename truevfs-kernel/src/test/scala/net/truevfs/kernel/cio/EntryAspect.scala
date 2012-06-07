@@ -10,7 +10,7 @@ import net.truevfs.kernel.cio.Entry._
 import net.truevfs.kernel.cio._
 import net.truevfs.kernel._
 
-trait EntryFeatures {
+trait EntryLike {
   type IndexedProperty[-A, B] <: A => B
 
   def name: String
@@ -38,7 +38,7 @@ trait MutableIndexedProperty[-A, B] extends (A => B) {
   def update(index: A, value: B)
 }
 
-trait MutableEntryFeatures extends EntryFeatures {
+trait MutableEntryLike extends EntryLike {
   type IndexedProperty[-A, B] <: MutableIndexedProperty[A, B]
 
   final def dataSize_=(value: Long) = size(DATA) = value
@@ -56,7 +56,7 @@ trait GenEntryAspect[E <: Entry] {
 }
 
 class EntryAspect(val entry: Entry)
-extends GenEntryAspect[Entry] with EntryFeatures {
+extends GenEntryAspect[Entry] with EntryLike {
   type IndexedProperty[-A, B] = A => B
 
   final def size = entry.getSize(_)
@@ -72,7 +72,7 @@ object EntryAspect {
 }
 
 class MutableEntryAspect(val entry: MutableEntry)
-extends GenEntryAspect[MutableEntry] with MutableEntryFeatures {
+extends GenEntryAspect[MutableEntry] with MutableEntryLike {
   type IndexedProperty[-A, B] = MutableIndexedProperty[A, B]
 
   final def size = new MutableIndexedProperty[Size, Long] {
