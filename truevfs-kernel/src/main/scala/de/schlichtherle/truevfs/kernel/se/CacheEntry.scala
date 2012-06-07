@@ -4,7 +4,9 @@
  */
 package de.schlichtherle.truevfs.kernel.se
 
+import edu.umd.cs.findbugs.annotations._
 import java.io._
+import javax.annotation.concurrent._
 import net.truevfs.kernel.cio.Entry._
 import net.truevfs.kernel.cio._
 import net.truevfs.kernel.io._
@@ -37,6 +39,8 @@ import CacheEntry._
   * @param pool the pool for allocating and releasing temporary I/O entries.
   * @author Christian Schlichtherle
   */
+@NotThreadSafe
+@CleanupObligation
 private final class CacheEntry private (
   private[this] val strategy: Strategy,
   private[this] val pool: AnyIoPool
@@ -44,8 +48,9 @@ private final class CacheEntry private (
 
   private[this] var _input: Option[AnyInputSocket] = None
   private[this] var _output: Option[AnyOutputSocket] = None
-  private[this] var _inputBufferPool: Option[InputBufferPool] = None
-  private[this] var _outputBufferPool: Option[OutputBufferPool] = None
+  private[this] val inputBufferPool = new InputBufferPool
+  private[this] lazy val outputBufferPool =
+    strategy.newOutputBufferPool(this).asInstanceOf[OutputBufferPool]
   private[this] var _buffer: Option[Buffer] = None
 
   /** Configures the input socket for reading the entry data from the backing
@@ -109,7 +114,7 @@ private final class CacheEntry private (
     */
   def input: AnyInputSocket = {
     final class Input extends DelegatingInputSocket[Entry] with BufferAllocator {
-      def socket() = buffer(getInputBufferPool).input
+      def socket() = buffer(inputBufferPool).input
       override def localTarget() = localTarget(_input.get)
     }
     new Input
@@ -121,7 +126,7 @@ private final class CacheEntry private (
     */
   def output: AnyOutputSocket = {
     final class Output extends DelegatingOutputSocket[Entry] with BufferAllocator {
-      def socket() = buffer(getOutputBufferPool).output
+      def socket() = buffer(outputBufferPool).output
       override def localTarget() = localTarget(_output.get)
     }
     new Output
@@ -153,7 +158,7 @@ private final class CacheEntry private (
     * effect.
     */
   def flush() {
-    _buffer foreach { getOutputBufferPool.release(_) }
+    _buffer foreach { outputBufferPool.release(_) }
   }
 
   /** Clears the entry data from this cache without flushing it.
@@ -167,26 +172,6 @@ private final class CacheEntry private (
     release()
   }
 
-  private def getInputBufferPool: InputBufferPool = {
-    _inputBufferPool match {
-      case Some(pool) => pool
-      case _ =>
-        val ibp = strategy.newInputBufferPool(this).asInstanceOf[InputBufferPool]
-        _inputBufferPool = new Some(ibp)
-        ibp
-    }
-  }
-
-  private def getOutputBufferPool: OutputBufferPool = {
-    _outputBufferPool match {
-      case Some(pool) => pool
-      case _ =>
-        val obp = strategy.newOutputBufferPool(this).asInstanceOf[OutputBufferPool]
-        _outputBufferPool = new Some(obp)
-        obp
-    }
-  }
-
   private def setBuffer(newBuffer: Option[Buffer]) {
     val oldBuffer = _buffer
     if (oldBuffer.orNull ne newBuffer.orNull) {
@@ -198,7 +183,8 @@ private final class CacheEntry private (
     }
   }
 
-  private[CacheEntry] final class InputBufferPool extends Pool[Buffer, IOException] {
+  private[CacheEntry] final class InputBufferPool
+  extends Pool[Buffer, IOException] {
     def allocate() = {
       if (_buffer.isEmpty) {
         val buffer = new Buffer
@@ -231,7 +217,8 @@ private final class CacheEntry private (
     }
   } // InputBufferPool
 
-  private[CacheEntry] abstract class OutputBufferPool extends Pool[Buffer, IOException] {
+  private[CacheEntry] abstract class OutputBufferPool
+  extends Pool[Buffer, IOException] {
     def allocate() = {
       val buffer = new Buffer
       assert(0 == buffer.readers)
@@ -305,7 +292,7 @@ private final class CacheEntry private (
               if (!closed) {
                 // HC SUNT DRACONES!
                 in.close()
-                getInputBufferPool.release(Buffer.this)
+                inputBufferPool.release(Buffer.this)
                 closed = true
               }
             }
@@ -321,7 +308,7 @@ private final class CacheEntry private (
               if (!closed) {
                 // HC SUNT DRACONES!
                 channel.close()
-                getInputBufferPool.release(Buffer.this)
+                inputBufferPool.release(Buffer.this)
                 closed = true
               }
             }
@@ -348,7 +335,7 @@ private final class CacheEntry private (
               if (!closed) {
                 // HC SUNT DRACONES!
                 out.close()
-                getOutputBufferPool.release(Buffer.this)
+                outputBufferPool.release(Buffer.this)
                 closed = true
               }
             }
@@ -364,7 +351,7 @@ private final class CacheEntry private (
               if (!closed) {
                 // HC SUNT DRACONES!
                 channel.close()
-                getOutputBufferPool.release(Buffer.this)
+                outputBufferPool.release(Buffer.this)
                 closed = true
               }
             }
@@ -380,13 +367,9 @@ private final class CacheEntry private (
 private object CacheEntry {
   /** Defines different cache entry strategies. */
   sealed trait Strategy {
-    private[se] final def newCacheEntry(pool: AnyIoPool) =
-      new CacheEntry(this, pool)
+    final def newCacheEntry(pool: AnyIoPool) = new CacheEntry(this, pool)
 
-    private[CacheEntry] final def newInputBufferPool(cache: CacheEntry): CacheEntry#InputBufferPool =
-      new cache.InputBufferPool
-
-    private[CacheEntry] def newOutputBufferPool(cache: CacheEntry): CacheEntry#OutputBufferPool
+    private[CacheEntry] def newOutputBufferPool[C <: CacheEntry](cache: C): C#OutputBufferPool
   }
 
   /** Provided different cache entry strategies. */
@@ -395,7 +378,7 @@ private object CacheEntry {
       * output stream created by `CacheEntry.output` gets closed.
       */
     object WriteThrough extends Strategy {
-      private[CacheEntry] def newOutputBufferPool(cache: CacheEntry): CacheEntry#OutputBufferPool =
+      private[CacheEntry] def newOutputBufferPool[C <: CacheEntry](cache: C): C#OutputBufferPool =
         new cache.WriteThroughOutputBufferPool
     }
 
@@ -403,7 +386,7 @@ private object CacheEntry {
       * explicitly `CacheEntry.flushed`.
       */
     object WriteBack extends Strategy {
-      private[CacheEntry] def newOutputBufferPool(cache: CacheEntry): CacheEntry#OutputBufferPool =
+      private[CacheEntry] def newOutputBufferPool[C <: CacheEntry](cache: C): C#OutputBufferPool =
         new cache.WriteBackOutputBufferPool
     }
   }
