@@ -291,11 +291,11 @@ system space.
                             </goals>
                         </execution>
                     </executions>
-                    <!--configuration>
+                    <configuration>
                         <args>
-                            <arg>-verbose</arg>
+                            <arg>-deprecation</arg>
                         </args>
-                    </configuration-->
+                    </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
