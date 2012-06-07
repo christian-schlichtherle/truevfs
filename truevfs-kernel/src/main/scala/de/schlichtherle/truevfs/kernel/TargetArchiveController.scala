@@ -86,7 +86,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
 
   private def inputArchive_=(ia: Option[InputArchive[E]]) {
     assert(ia.isEmpty || _inputArchive.isEmpty)
-    ia.foreach { _ => touched = true }
+    ia foreach { _ => touched = true }
     _inputArchive = ia
   }
 
@@ -222,33 +222,9 @@ extends FileSystemArchiveController[E](model) with TouchListener {
   override def input(name: String) = {
     final class Input extends ClutchInputSocket[E] {
       override def lazySocket = inputArchive.get.input(name)
-
-      override def localTarget() = {
-        try {
-          super.localTarget
-        } catch {
-          case _: InputClosedException =>
-            throw NeedsSyncException()
-        }
-      }
-
-      override def stream() = {
-        try {
-          super.stream()
-        } catch {
-          case _: InputClosedException =>
-            throw NeedsSyncException()
-        }
-      }
-
-      override def channel() = {
-        try {
-          super.channel()
-        } catch {
-          case _: InputClosedException =>
-            throw NeedsSyncException()
-        }
-      }
+      override def localTarget() = syncOn[InputClosedException] { super.localTarget() }
+      override def stream() = syncOn[InputClosedException] { super.stream() }
+      override def channel() = syncOn[InputClosedException] { super.channel() }
     }
     new Input
   }
@@ -256,28 +232,26 @@ extends FileSystemArchiveController[E](model) with TouchListener {
   override def output(options: AccessOptions, entry: E) = {
     final class Output extends ClutchOutputSocket[E] {
       override def lazySocket = outputArchive(options).output(entry)
-
       override def localTarget = entry
+      override def stream() = syncOn[OutputClosedException] { super.stream() }
+      override def channel() = syncOn[OutputClosedException] { super.channel() }
+    }
+    new Output
+  }
 
-      override def stream() = {
+  private def syncOn[X <: ClosedException] = {
+    new {
+      def apply[A](expression: => A)(implicit mf: ClassManifest[X]) = {
         try {
-          super.stream()
+          expression
         } catch {
-          case _: OutputClosedException =>
-            throw NeedsSyncException()
-        }
-      }
-
-      override def channel() = {
-        try {
-          super.channel()
-        } catch {
-          case _: OutputClosedException =>
-            throw NeedsSyncException()
+          case ex =>
+            if (mf.erasure isAssignableFrom ex.getClass)
+              throw NeedsSyncException()
+            throw ex
         }
       }
     }
-    new Output
   }
 
   override def sync(options: SyncOptions) {
@@ -476,26 +450,24 @@ private object TargetArchiveController {
   extends LockInputService(new DisconnectingInputService(driverProduct)) {
     def clutch = container.asInstanceOf[DisconnectingInputService[E]]
     def isClosed = !clutch.isOpen
-  } // InputArchive
+  }
 
   private final class OutputArchive[E <: FsArchiveEntry]
   (driverProduct: OutputService[E])
   extends LockOutputService(new DisconnectingOutputService(driverProduct)) {
     def clutch = container.asInstanceOf[DisconnectingOutputService[E]]
     def isClosed = !clutch.isOpen
-  } // OutputArchive
+  }
 
-  /**
-   * A dummy input archive to substitute for {@code null} when copying.
-   * 
-   * @param <E> The type of the entries.
-   */
-  private final class DummyInputService[E <: Entry]
-  extends InputService[E] {
+  /** A dummy input archive to substitute for `None` when copying.
+    * 
+    * @tparam E the type of the entries.
+    */
+  private final class DummyInputService[E <: Entry] extends InputService[E] {
     override def size = 0
     override def iterator = java.util.Collections.emptyList[E].iterator
     override def entry(name: String) = null.asInstanceOf[E]
     override def input(name: String) = throw new AssertionError
     override def close() = throw new AssertionError
-  } // DummyInputService
+  }
 }
