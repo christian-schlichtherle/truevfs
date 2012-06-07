@@ -38,6 +38,8 @@ extends DelegatingInputSocket[E] {
   protected final override def socket: InputSocket[_ <: E] = {
     _socket match {
       case Some(socket) => socket
+      // In case lazySocket returns null, this will produce an NPE, which is
+      // better than a retry which may probably only result in an endless loop.
       case None => _socket = Some(lazySocket); socket
     }
   }
