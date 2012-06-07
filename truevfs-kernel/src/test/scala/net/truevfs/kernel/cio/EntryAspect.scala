@@ -10,7 +10,7 @@ import net.truevfs.kernel.cio.Entry._
 import net.truevfs.kernel.cio._
 import net.truevfs.kernel._
 
-trait EntryLike {
+trait EntryFeatures {
   type IndexedProperty[-A, B] <: A => B
 
   def name: String
@@ -27,16 +27,18 @@ trait EntryLike {
 
   def permission(tµpe: Access): IndexedProperty[Entity, Option[Boolean]]
   final def createPermission = permission(CREATE)
+  //final def overwritePermission = permission(CREATE)
   final def readPermission = permission(READ)
   final def writePermission = permission(WRITE)
   final def executePermission = permission(EXECUTE)
+  final def deletePermission = permission(DELETE)
 }
 
 trait MutableIndexedProperty[-A, B] extends (A => B) {
   def update(index: A, value: B)
 }
 
-trait MutableEntryLike extends EntryLike {
+trait MutableEntryFeatures extends EntryFeatures {
   type IndexedProperty[-A, B] <: MutableIndexedProperty[A, B]
 
   final def dataSize_=(value: Long) = size(DATA) = value
@@ -48,12 +50,13 @@ trait MutableEntryLike extends EntryLike {
   final def executeTime_=(value: Long) = time(EXECUTE) = value
 }
 
-trait EntryAspect[E <: Entry] extends EntryLike {
+trait GenEntryAspect[E <: Entry] {
   def entry: E
   final def name = entry.getName
 }
 
-class EntryOps[E <: Entry](val entry: E) extends EntryAspect[E] { 
+class EntryAspect(val entry: Entry)
+extends GenEntryAspect[Entry] with EntryFeatures {
   type IndexedProperty[-A, B] = A => B
 
   final def size = entry.getSize(_)
@@ -64,11 +67,12 @@ class EntryOps[E <: Entry](val entry: E) extends EntryAspect[E] {
   }
 }
 
-object EntryOps {
-  implicit def apply[E <: Entry](entry: E) = new EntryOps(entry)
+object EntryAspect {
+  implicit def apply[E <: Entry](entry: E) = new EntryAspect(entry)
 }
 
-class MutableEntryOps[E <: MutableEntry](val entry: E) extends EntryAspect[E] {
+class MutableEntryAspect(val entry: MutableEntry)
+extends GenEntryAspect[MutableEntry] with MutableEntryFeatures {
   type IndexedProperty[-A, B] = MutableIndexedProperty[A, B]
 
   final def size = new MutableIndexedProperty[Size, Long] {
@@ -95,15 +99,15 @@ class MutableEntryOps[E <: MutableEntry](val entry: E) extends EntryAspect[E] {
   }
 }
 
-object MutableEntryOps {
-  implicit def apply[E <: MutableEntry](entry: E) = new MutableEntryOps(entry)
+object MutableEntryAspect {
+  implicit def apply[E <: MutableEntry](entry: E) = new MutableEntryAspect(entry)
 }
 
-class ArchiveEntryOps[E <: FsArchiveEntry](entry: E)
-extends MutableEntryOps[E](entry) {
+class ArchiveEntryAspect(entry: FsArchiveEntry)
+extends MutableEntryAspect(entry) {
   def tµpe: Type = entry.getType
 }
 
-object ArchiveEntryOps {
-  implicit def apply[E <: FsArchiveEntry](entry: E) = new ArchiveEntryOps(entry)
+object ArchiveEntryAspect {
+  implicit def apply[E <: FsArchiveEntry](entry: E) = new ArchiveEntryAspect(entry)
 }

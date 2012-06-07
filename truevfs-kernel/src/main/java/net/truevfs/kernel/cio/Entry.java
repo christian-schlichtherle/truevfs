@@ -128,10 +128,21 @@ public interface Entry {
     /** Defines the type of access information for an entry. */
     @SuppressWarnings("PublicInnerClass")
     enum Access {
+
+        /** Create or overwrite the entry. */
         CREATE,
+
+        /** Read the entry. */
         READ,
+
+        /** Write the entry. */
         WRITE,
+
+        /** Execute the entry. */
         EXECUTE,
+
+        /** Delete the entry. */
+        DELETE,
     }
 
     /** A bit field of no enums in {@link Access}. */
