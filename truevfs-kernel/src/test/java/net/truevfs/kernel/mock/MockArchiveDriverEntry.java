@@ -6,10 +6,16 @@ package net.truevfs.kernel.mock;
 
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import net.truevfs.kernel.FsArchiveEntries;
 import net.truevfs.kernel.FsArchiveEntry;
 import net.truevfs.kernel.cio.Entry;
+import net.truevfs.kernel.cio.Entry.Access;
+import net.truevfs.kernel.cio.Entry.Entity;
+import net.truevfs.kernel.cio.Entry.PosixEntity;
+import net.truevfs.kernel.cio.Entry.Size;
+import net.truevfs.kernel.cio.Entry.Type;
 import net.truevfs.kernel.cio.IoBuffer;
 import net.truevfs.kernel.cio.IoPool;
 
@@ -29,17 +35,15 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
     private @CheckForNull IoBuffer<?> buffer;
 
     public MockArchiveDriverEntry(final String name, final Type type) {
-        assert null != name;
-        assert null != type;
-        this.name = name;
-        this.type = type;
+        this(name, type, null);
     }
 
     public MockArchiveDriverEntry(
             final String name,
             final Type type,
             final @CheckForNull Entry template) {
-        this(name, type);
+        this.name = Objects.requireNonNull(name);
+        this.type = Objects.requireNonNull(type);
         if (null != template) {
             for (final Size size : ALL_SIZES) {
                 final long value = template.getSize(size);
