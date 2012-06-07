@@ -10,9 +10,9 @@ import net.truevfs.kernel.util.Releasable;
 /**
  * A releasable I/O entry.
  *
- * @param  <B> the type of this I/O buffer.
+ * @param  <This> the type of this I/O buffer.
  * @author Christian Schlichtherle
  */
-public interface IoBuffer<B extends IoBuffer<B>>
-extends Releasable<IOException>, IoEntry<B> {
+public interface IoBuffer<This extends IoBuffer<This>>
+extends Releasable<IOException>, IoEntry<This> {
 }

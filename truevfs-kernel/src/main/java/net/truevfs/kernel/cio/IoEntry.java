@@ -7,10 +7,10 @@ package net.truevfs.kernel.cio;
 /**
  * An entry which provides I/O services.
  *
- * @param  <E> the type of this I/O entry.
+ * @param  <This> the type of this I/O entry.
  * @author Christian Schlichtherle
  */
-public interface IoEntry<E extends IoEntry<E>> extends Entry {
+public interface IoEntry<This extends IoEntry<This>> extends Entry {
 
     /**
      * Returns an input socket for reading this entry.
@@ -19,7 +19,7 @@ public interface IoEntry<E extends IoEntry<E>> extends Entry {
      *
      * @return An input socket for reading this entry.
      */
-    InputSocket<E> input();
+    InputSocket<This> input();
 
     /**
      * Returns an output socket for writing this entry.
@@ -28,5 +28,5 @@ public interface IoEntry<E extends IoEntry<E>> extends Entry {
      *
      * @return An output socket for writing this entry.
      */
-    OutputSocket<E> output();
+    OutputSocket<This> output();
 }
