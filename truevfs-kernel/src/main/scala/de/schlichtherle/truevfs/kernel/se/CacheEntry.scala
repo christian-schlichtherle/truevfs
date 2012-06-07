@@ -6,6 +6,7 @@ package de.schlichtherle.truevfs.kernel.se
 
 import edu.umd.cs.findbugs.annotations._
 import java.io._
+import java.nio.channels._
 import javax.annotation.concurrent._
 import net.truevfs.kernel.cio.Entry._
 import net.truevfs.kernel.cio._
@@ -49,7 +50,7 @@ private final class CacheEntry private (
   private[this] var _input: Option[AnyInputSocket] = None
   private[this] var _output: Option[AnyOutputSocket] = None
   private[this] val inputBufferPool = new InputBufferPool
-  private[this] lazy val outputBufferPool =
+  private[this] val outputBufferPool =
     strategy.newOutputBufferPool(this).asInstanceOf[OutputBufferPool]
   private[this] var _buffer: Option[Buffer] = None
 
@@ -183,8 +184,7 @@ private final class CacheEntry private (
     }
   }
 
-  private[CacheEntry] final class InputBufferPool
-  extends Pool[Buffer, IOException] {
+  private final class InputBufferPool extends Pool[Buffer, IOException] {
     def allocate() = {
       if (_buffer.isEmpty) {
         val buffer = new Buffer
@@ -276,88 +276,61 @@ private final class CacheEntry private (
       data.release()
     }
 
-    def input = {
+    private trait CacheResource extends Closeable {
+      private[this] var closed: Boolean = _
+
+      protected final def close(pool: Pool[Buffer, _]) {
+        if (!closed) {
+          // HC SUNT DRACONES!
+          super.close()
+          pool.release(Buffer.this)
+          closed = true
+        }
+      }
+
+      abstract override def close()
+    }
+
+    private trait CacheInputResource extends CacheResource {
+      abstract override def close() = close(inputBufferPool)
+    }
+
+    private trait CacheOutputResource extends CacheResource {
+      abstract override def close() = close(outputBufferPool)
+    }
+    
+    private final class CacheInputStream(in: InputStream)
+    extends DecoratingInputStream(in) with CacheInputResource
+
+    private final class CacheReadOnlyChannel(channel: SeekableByteChannel)
+    extends DecoratingReadOnlyChannel(channel) with CacheInputResource
+
+    private final class CacheOutputStream(out: OutputStream)
+    extends DecoratingOutputStream(out) with CacheOutputResource
+
+    private final class CacheSeekableChannel(channel: SeekableByteChannel)
+    extends DecoratingSeekableChannel(channel) with CacheOutputResource
+
+    def input: AnyInputSocket = {
       final class Input extends AbstractInputSocket[Buffer] {
         private[this] val socket = data.input
 
         def boundSocket = socket.bind(this)
-
         def localTarget() = Buffer.this
-
-        override def stream() = {
-          final class Stream extends DecoratingInputStream(boundSocket.stream()) {
-            private[this] var closed: Boolean = _
-
-            override def close() {
-              if (!closed) {
-                // HC SUNT DRACONES!
-                in.close()
-                inputBufferPool.release(Buffer.this)
-                closed = true
-              }
-            }
-          }
-          new Stream
-        }
-
-        override def channel() = {
-          final class Channel extends DecoratingReadOnlyChannel(boundSocket.channel()) {
-            private[this] var closed: Boolean = _
-
-            override def close() {
-              if (!closed) {
-                // HC SUNT DRACONES!
-                channel.close()
-                inputBufferPool.release(Buffer.this)
-                closed = true
-              }
-            }
-          }
-          new Channel
-        }
+        override def stream() = new CacheInputStream(boundSocket.stream())
+        override def channel() = new CacheReadOnlyChannel(boundSocket.channel())
       }
       new Input
     }
 
-    def output = {
+    def output: AnyOutputSocket = {
       final class Output extends AbstractOutputSocket[Buffer] {
         private[this] val socket = data.output
 
         def boundSocket = socket.bind(this)
-
         def localTarget() = Buffer.this
-
-        override def stream() = {
-          final class Stream extends DecoratingOutputStream(boundSocket.stream()) {
-            private[this] var closed: Boolean = _
-
-            override def close() {
-              if (!closed) {
-                // HC SUNT DRACONES!
-                out.close()
-                outputBufferPool.release(Buffer.this)
-                closed = true
-              }
-            }
-          }
-          new Stream
-        }
-
-        override def channel() = {
-          final class Channel extends DecoratingSeekableChannel(boundSocket.channel()) {
-            private[this] var closed: Boolean = _
-
-            override def close() {
-              if (!closed) {
-                // HC SUNT DRACONES!
-                channel.close()
-                outputBufferPool.release(Buffer.this)
-                closed = true
-              }
-            }
-          }
-          new Channel
-        }
+        override def stream() = new CacheOutputStream(boundSocket.stream())
+        override def channel() = new CacheSeekableChannel(boundSocket.channel())
       }
       new Output
     }
@@ -369,7 +342,7 @@ private object CacheEntry {
   sealed trait Strategy {
     final def newCacheEntry(pool: AnyIoPool) = new CacheEntry(this, pool)
 
-    private[CacheEntry] def newOutputBufferPool[C <: CacheEntry](cache: C): C#OutputBufferPool
+    private[CacheEntry] def newOutputBufferPool(cache: CacheEntry): CacheEntry#OutputBufferPool
   }
 
   /** Provided different cache entry strategies. */
@@ -378,7 +351,7 @@ private object CacheEntry {
       * output stream created by `CacheEntry.output` gets closed.
       */
     object WriteThrough extends Strategy {
-      private[CacheEntry] def newOutputBufferPool[C <: CacheEntry](cache: C): C#OutputBufferPool =
+      private[CacheEntry] def newOutputBufferPool(cache: CacheEntry): CacheEntry#OutputBufferPool =
         new cache.WriteThroughOutputBufferPool
     }
 
@@ -386,7 +359,7 @@ private object CacheEntry {
       * explicitly `CacheEntry.flushed`.
       */
     object WriteBack extends Strategy {
-      private[CacheEntry] def newOutputBufferPool[C <: CacheEntry](cache: C): C#OutputBufferPool =
+      private[CacheEntry] def newOutputBufferPool(cache: CacheEntry): CacheEntry#OutputBufferPool =
         new cache.WriteBackOutputBufferPool
     }
   }
