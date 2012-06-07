@@ -98,13 +98,14 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
     }
 
     "correctly persist entries" in {
-      sealed case class Action
+      sealed trait Action
+      final case class NoOp() extends Action
       final case class Add(path: String) extends Action
       final case class Remove(path: String) extends Action
       final case class List(path: String) extends Action
       val actions = Table(
         ("action", "expected"),
-        (Action(), Seq()),
+        (NoOp(), Seq()),
         (Add(""), Seq("")),
         (Add("foo"), Seq("", "foo")),
         (Add("bar"), Seq("", "bar", "foo")),
@@ -131,7 +132,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
             result
           case Add(path)    => fs += path -> Entry(path); fs
           case Remove(path) => fs -= path; fs
-          case Action()     => fs
+          case NoOp()       => fs
         }
         result should have size (expected size)
         for (path <- expected)

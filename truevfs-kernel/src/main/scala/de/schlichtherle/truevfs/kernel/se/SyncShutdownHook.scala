@@ -8,7 +8,7 @@ import net.truevfs.kernel._
 import javax.annotation.concurrent._
 
 /** A shutdown hook singleton which `sync`s a `register`ed file system manager
-  * when it's run.
+  * when it's `run`.
   * This is to protect an application from loss of data if the manager isn't
   * explicitly asked to `sync` before the JVM terminates.
   * 
@@ -21,14 +21,11 @@ private object SyncShutdownHook extends Thread {
   @volatile
   private var _manager: Option[FsManager] = None
 
-  /**
-   * Registers the given file system {@code manager} for
-   * {@linkplain FsManager#sync synchronization} when the shutdown hook is
-   * {@linkplain #run run}.
+  /** Registers the given file system `manager` for `sync`hronization when the
+    * shutdown hook is `run`.
    * 
-   * @param manager the file system manager to
-   *        {@linkplain FsManager#sync synchronize} when the shutdown hook
-   *        is {@linkplain #run run}.
+   * @param manager the file system manager to `sync` when the shutdown hook is
+   *        `run`.
    * @see   #cancel
    */
   def register(manager: FsManager) {
@@ -42,11 +39,10 @@ private object SyncShutdownHook extends Thread {
     }
   }
 
-  /**
-   * De-registers any previously registered file system manager.
-   * 
-   * @see #register
-   */
+  /** De-registers any previously registered file system manager.
+    * 
+    * @see #register
+    */
   def cancel() {
     if (_manager isDefined) {
       synchronized {
@@ -59,18 +55,15 @@ private object SyncShutdownHook extends Thread {
     }
   }
 
-  /**
-   * {@linkplain FsManager#sync Synchronizes} any
-   * {@linkplain #register registered} file system manager.
-   * <p>
-   * If any exception occurs within the shutdown hook, its stacktrace gets
-   * printed to standard error because logging doesn't work in a shutdown
-   * hook.
-   * 
-   * @deprecated Do <em>not</em> call this method explicitly!
-   * @see #register
-   */
-  @deprecated
+  /** `sync`s any `register`ed file system manager.
+    * 
+    * If any exception occurs within the shutdown hook, its stacktrace gets
+    * printed to standard error because logging doesn't work in a shutdown
+    * hook.
+    * 
+    * @deprecated Do '''not''' call this method directly!
+    * @see #register
+    */
   override def run() {
     // HC SVNT DRACONES!
     _manager foreach { manager =>
