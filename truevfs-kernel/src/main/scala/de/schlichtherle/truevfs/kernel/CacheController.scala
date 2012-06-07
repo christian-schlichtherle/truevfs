@@ -225,7 +225,7 @@ private trait CacheController extends Controller[LockModel] {
 
             override def close() {
               assert(writeLockedByCurrentThread)
-              in close()
+              in.close()
               register()
             }
           }
@@ -264,7 +264,7 @@ private trait CacheController extends Controller[LockModel] {
 
             override def close() {
               assert(writeLockedByCurrentThread)
-              out close()
+              out.close()
               postOutput()
             }
           }
@@ -282,7 +282,7 @@ private trait CacheController extends Controller[LockModel] {
 
             override def close() {
               assert(writeLockedByCurrentThread)
-              channel close()
+              channel.close()
               postOutput()
             }
           }
