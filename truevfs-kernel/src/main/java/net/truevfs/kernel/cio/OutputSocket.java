@@ -4,11 +4,10 @@
  */
 package net.truevfs.kernel.cio;
 
-import net.truevfs.kernel.io.Sink;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
-import javax.annotation.CheckForNull;
+import net.truevfs.kernel.io.Sink;
 
 /**
  * A factory for output resources for writing bytes to its
@@ -24,45 +23,7 @@ import javax.annotation.CheckForNull;
  * @author Christian Schlichtherle
  */
 public interface OutputSocket<E extends Entry>
-extends IoSocket<E, Entry>, Sink {
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The peer target is {@code null} if and only if this socket is not
-     * {@linkplain #getPeerSocket connected} to another socket.
-     */
-    @Override
-    @CheckForNull Entry peerTarget() throws IOException;
-
-    /**
-     * Returns the nullable peer socket to which this socket is connected for
-     * copying.
-     * 
-     * @return The nullable peer socket to which this socket is connected for
-     *         copying.
-     */
-    @CheckForNull InputSocket<? extends Entry> getPeerSocket();
-
-    /**
-     * Inherits the {@linkplain #getPeerSocket peer socket} from the given
-     * output socket.
-     *
-     * @param  to the output socket from which to inherit the peer socket.
-     * @return {@code this}
-     * @throws IllegalArgumentException if {@code this} == {@code to}.
-     */
-    OutputSocket<E> bind(OutputSocket<? extends Entry> to);
-
-    /**
-     * Connects this output socket to the given {@code peer} input socket.
-     * This method shall change the peer output socket of the given peer input
-     * socket to this output socket, too.
-     *
-     * @param  peer the nullable peer input socket to connect to.
-     * @return {@code this}
-     */
-    OutputSocket<E> connect(@CheckForNull InputSocket<? extends Entry> peer);
+extends IoSocket<E, Entry, OutputSocket<E>, InputSocket<? extends Entry>>, Sink {
 
     /**
      * {@inheritDoc}

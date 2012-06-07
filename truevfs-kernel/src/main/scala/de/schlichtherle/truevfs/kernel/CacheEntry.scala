@@ -142,7 +142,7 @@ private final class CacheEntry private (
       buffer
     }
 
-    def localTarget(socket: IoSocket[_ <: Entry, _]) = {
+    def localTarget(socket: IoSocket[_ <: Entry, _, _, _]) = {
       _buffer match {
         case Some(buffer) => buffer
         case _ => new CacheEntry.ProxyEntry(socket/*.bind(this)*/.localTarget()) // do NOT bind!

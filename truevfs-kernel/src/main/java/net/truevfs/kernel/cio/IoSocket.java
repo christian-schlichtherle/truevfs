@@ -43,10 +43,16 @@ import javax.annotation.concurrent.ThreadSafe;
  *         for I/O operations.
  * @param  <PT> the type of the {@link #peerTarget() peer target}
  *         for I/O operations.
+ * @param  <This> the type of this socket.
+ * @param  <Peer> the type of the peer socket.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public interface IoSocket<LT extends Entry, PT extends Entry> {
+public interface IoSocket<
+        LT extends Entry,
+        PT extends Entry,
+        This extends IoSocket<LT, PT, This, Peer>,
+        Peer extends IoSocket<? extends Entry, Entry, ?, ?>> {
 
     /**
      * Resolves the <i>local target</i> for I/O operations.
@@ -69,9 +75,41 @@ public interface IoSocket<LT extends Entry, PT extends Entry> {
     /**
      * Resolves the nullable <i>peer target</i> for I/O operations.
      * The same considerations as for {@link #localTarget} apply here, too.
+     * <p>
+     * The peer target is {@code null} if and only if this socket is not
+     * {@linkplain #getPeer connected} to another socket.
      *
      * @return The nullable peer target for I/O operations.
      * @throws IOException on any I/O error. 
      */
     @CheckForNull PT peerTarget() throws IOException;
+
+    /**
+     * Returns the nullable peer socket to which this socket is connected for
+     * copying.
+     * 
+     * @return The nullable peer socket to which this socket is connected for
+     *         copying.
+     */
+    @CheckForNull Peer getPeer();
+
+    /**
+     * Connects this socket to the given {@code peer} socket.
+     * This method shall change the peer socket of the given peer socket to
+     * this socket, too.
+     *
+     * @param  peer the nullable peer output socket to connect to.
+     * @return {@code this}
+     */
+    This connect(@CheckForNull Peer peer);
+
+    /**
+     * Inherits the {@linkplain #getPeer peer socket} from the given
+     * socket.
+     *
+     * @param  to the socket from which to inherit the peer socket.
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code this} == {@code to}.
+     */
+    This bind(IoSocket<?, ?, ?, ? extends Peer> to);
 }

@@ -16,8 +16,8 @@ import scala.annotation.tailrec
   * @author Christian Schlichtherle
   */
 @NotThreadSafe
-trait ClutchSocketLike[E <: Entry, +S <: IoSocket[_ <: E, Entry]] {
-  this: IoSocket[E, Entry] =>
+trait ClutchSocketLike[E <: Entry, +S <: IoSocket[_ <: E, Entry, _, _]] {
+  this: IoSocket[E, Entry, _, _] =>
 
   private[this] var _socket: Option[S] = None
 
