@@ -65,31 +65,29 @@ private trait SyncController extends Controller[LockModel] {
 
   private class SyncInputStream(in: InputStream)
   extends DecoratingInputStream(in) {
-    override def close = apply(in.close)
+    override def close = apply(in.close())
   }
 
   private class SyncOutputStream(out: OutputStream)
   extends DecoratingOutputStream(out) {
-    override def close = apply(out.close)
+    override def close = apply(out.close())
   }
 
   private class SyncSeekableChannel(channel: SeekableByteChannel)
   extends DecoratingSeekableChannel(channel) {
-    override def close = apply(channel.close)
+    override def close = apply(channel.close())
   }
 
   abstract override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Option[Entry]) =
     apply(super.mknod(options, name, tµpe, template))
 
   abstract override def unlink(options: AccessOptions, name: FsEntryName) =
-    apply({
-        // HC SVNT DRACONES!
-        super.unlink(options, name)
-        if (name.isRoot) {
-          // Make the file system controller chain eligible for GC.
-          super.sync(RESET);
-        }
-      })
+    apply {
+      // HC SVNT DRACONES!
+      super.unlink(options, name)
+      // Eventually make the file system controller chain eligible for GC.
+      if (name.isRoot) super.sync(RESET)
+    }
 
   abstract override def sync(options: SyncOptions) = safeSync(options)
 
