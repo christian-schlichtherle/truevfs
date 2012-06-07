@@ -17,6 +17,7 @@ import net.truevfs.kernel.io.ChannelInputStream;
  *
  * @param  <E> the type of the {@link #localTarget() local target}
  *         for I/O operations.
+ * @see    AbstractOutputSocket
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
@@ -33,8 +34,7 @@ implements InputSocket<E> {
 
     @Override
     public final InputSocket<E> bind(final InputSocket<? extends Entry> to) {
-        if (this == to)
-            throw new IllegalArgumentException();
+        if (this == to) throw new IllegalArgumentException();
         this.peer = to.getPeerSocket();
         return this;
     }
