@@ -10,15 +10,14 @@ import java.io.OutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.FsAccessOption;
 import static net.truevfs.kernel.FsAccessOption.STORE;
-import net.truevfs.kernel.FsController;
-import net.truevfs.kernel.FsEntryName;
-import net.truevfs.kernel.FsModel;
+import net.truevfs.kernel.*;
 import net.truevfs.kernel.cio.InputService;
 import net.truevfs.kernel.cio.MultiplexingOutputService;
 import net.truevfs.kernel.cio.OutputService;
-import net.truevfs.kernel.io.*;
+import net.truevfs.kernel.io.AbstractSink;
+import net.truevfs.kernel.io.AbstractSource;
+import net.truevfs.kernel.io.Streams;
 import net.truevfs.kernel.util.BitField;
 
 /**
@@ -64,7 +63,7 @@ public class TarGZipDriver extends TarDriver {
     @Override
     protected InputService<TarDriverEntry> newInput(
             final FsModel model,
-            final Source source)
+            final FsInputSocketSource source)
     throws IOException {
         final class Source extends AbstractSource {
             @Override
@@ -89,7 +88,7 @@ public class TarGZipDriver extends TarDriver {
     @Override
     protected OutputService<TarDriverEntry> newOutput(
             final FsModel model,
-            final Sink sink,
+            final FsOutputSocketSink sink,
             final InputService<TarDriverEntry> input)
     throws IOException {
         final class Sink extends AbstractSink {
@@ -118,9 +117,15 @@ public class TarGZipDriver extends TarDriver {
      * forwarding the call to {@code controller}.
      */
     @Override
-    protected Sink sink(
-            BitField<FsAccessOption> options, FsController<?> controller, FsEntryName name) {
-        return controller.output(options.set(STORE), name, null);
+    protected FsOutputSocketSink sink(
+            BitField<FsAccessOption> options,
+            final FsController<?> controller,
+            final FsEntryName name) {
+        // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
+        // opportunity to apply its own preferences to sort out such a conflict.
+        options = options.set(STORE);
+        return new FsOutputSocketSink(options,
+                controller.output(options, name, null));
     }
 
     /** Extends its super class to set the deflater level. */

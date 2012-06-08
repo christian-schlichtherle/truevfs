@@ -5,8 +5,13 @@
 package net.truevfs.kernel.cio;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.io.InputException;
+import net.truevfs.kernel.io.Sink;
+import net.truevfs.kernel.io.Source;
 import net.truevfs.kernel.io.Streams;
 
 /**
@@ -40,8 +45,45 @@ public final class IoSockets {
     public static void copy(InputSocket<?> input, OutputSocket<?> output)
     throws InputException, IOException {
         // Call connect on output for early NPE check!
-        Streams.copy(input, output.connect(input));
+        Streams.copy(   new InputSocketAdapter(input),
+                        new OutputSocketAdapter(output.connect(input)));
         // Disconnect for subsequent use, if any.
         input.connect(null); // or output.connect(null)
     }
+
+    private static class InputSocketAdapter implements Source {
+        final InputSocket<? extends Entry> input;
+
+        InputSocketAdapter(final InputSocket<? extends Entry> input) {
+            this.input = input;//Objects.requireNonNull(input);
+        }
+
+        @Override
+        public InputStream stream() throws IOException {
+            return input.stream();
+        }
+
+        @Override
+        public SeekableByteChannel channel() throws IOException {
+            return input.channel();
+        }
+    } // InputSocketAdapter
+
+    private static class OutputSocketAdapter implements Sink {
+        final OutputSocket<? extends Entry> output;
+
+        OutputSocketAdapter(final OutputSocket<? extends Entry> output) {
+            this.output = output;//Objects.requireNonNull(output);
+        }
+
+        @Override
+        public OutputStream stream() throws IOException {
+            return output.stream();
+        }
+
+        @Override
+        public SeekableByteChannel channel() throws IOException {
+            return output.channel();
+        }
+    } // OutputSocketAdapter
 }

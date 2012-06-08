@@ -46,26 +46,24 @@ private object FinalizeController {
     classOf[FinalizeController].getName,
     classOf[FinalizeController].getName);
 
-  private val OK = new IOException(null: Throwable)
-
   private trait FinalizeResource extends Closeable {
-    @volatile var result: Option[IOException] = None // accessed by finalizer thread!
+    @volatile var ioException: Option[IOException] = _ // accessed by finalizer thread!
 
     abstract override def close() {
       try {
         super.close()
+        ioException = None
       } catch {
-        case ex: IOException => result = Some(ex); throw ex
+        case ex: IOException => ioException = Some(ex); throw ex
       }
-      result = Some(OK)
     }
 
     abstract override def finalize() {
       try {
-        result match {
-          case Some(OK) => logger.log(FINEST, "closeCleared");
+        ioException match {
           case Some(ex) => logger.log(FINER, "closeFailed", ex);
-          case None =>
+          case None => logger.log(FINEST, "closeCleared");
+          case _ =>
             try {
               super.close();
               logger.log(FINE, "finalizeCleared");

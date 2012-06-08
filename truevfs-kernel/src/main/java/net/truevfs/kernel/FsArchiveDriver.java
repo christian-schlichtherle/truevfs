@@ -225,7 +225,7 @@ extends FsDriver {
     @CreatesObligation
     protected abstract InputService<E> newInput(
             FsModel model,
-            Source source)
+            FsInputSocketSource source)
     throws IOException;
 
     /**
@@ -286,7 +286,7 @@ extends FsDriver {
     @CreatesObligation
     protected abstract OutputService<E> newOutput(
             FsModel model,
-            Sink sink,
+            FsOutputSocketSink sink,
             @CheckForNull @WillNotClose InputService<E> input)
     throws IOException;
 
@@ -306,11 +306,11 @@ extends FsDriver {
      * @return A source for reading an artifact of this driver.
      * @see    #newInput(FsModel, BitField, FsController, FsEntryName) 
      */
-    protected Source source(
+    protected FsInputSocketSource source(
             BitField<FsAccessOption> options,
             FsController<? extends FsModel> controller,
             FsEntryName name) {
-        return controller.input(options, name);
+        return new FsInputSocketSource(options, controller.input(options, name));
     }
 
     /**
@@ -330,11 +330,12 @@ extends FsDriver {
      * @return A sink for writing an artifact of this driver.
      * @see    #newOutput(FsModel, BitField, FsController, FsEntryName, InputService) 
      */
-    protected Sink sink(
+    protected FsOutputSocketSink sink(
             BitField<FsAccessOption> options,
             FsController<? extends FsModel> controller,
             FsEntryName name) {
-        return controller.output(options, name, null);
+        return new FsOutputSocketSink(options,
+                controller.output(options, name, null));
     }
 
     /**

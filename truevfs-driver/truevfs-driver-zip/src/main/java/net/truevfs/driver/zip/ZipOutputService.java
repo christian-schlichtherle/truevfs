@@ -21,7 +21,9 @@ import javax.annotation.concurrent.NotThreadSafe;
 import net.truevfs.driver.zip.io.RawZipOutputStream;
 import net.truevfs.driver.zip.io.ZipCryptoParameters;
 import static net.truevfs.driver.zip.io.ZipEntry.STORED;
+import static net.truevfs.kernel.FsAccessOption.GROW;
 import net.truevfs.kernel.FsModel;
+import net.truevfs.kernel.FsOutputSocketSink;
 import net.truevfs.kernel.cio.Entry.Access;
 import net.truevfs.kernel.cio.Entry.Size;
 import static net.truevfs.kernel.cio.Entry.Size.DATA;
@@ -52,18 +54,18 @@ implements OutputService<ZipDriverEntry> {
     @CreatesObligation
     public ZipOutputService(
             final FsModel model,
-            final Sink sink,
+            final FsOutputSocketSink sink,
             final @CheckForNull @WillNotClose ZipInputService source,
             final ZipDriver driver)
     throws IOException {
         super(  sink,
-                null != source && source.isAppendee() ? source : null,
+                null != source && sink.getOptions().get(GROW) ? source : null,
                 driver);
         this.driver = driver;
         try {
             this.model = Objects.requireNonNull(model);
             if (null != source) {
-                if (!source.isAppendee()) {
+                if (!sink.getOptions().get(GROW)) {
                     // Retain comment and preamble of input ZIP archive.
                     super.setComment(source.getComment());
                     if (0 < source.getPreambleLength()) {

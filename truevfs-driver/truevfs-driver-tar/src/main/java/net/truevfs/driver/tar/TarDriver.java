@@ -23,8 +23,6 @@ import net.truevfs.kernel.cio.Entry.Type;
 import net.truevfs.kernel.cio.InputService;
 import net.truevfs.kernel.cio.MultiplexingOutputService;
 import net.truevfs.kernel.cio.OutputService;
-import net.truevfs.kernel.io.Sink;
-import net.truevfs.kernel.io.Source;
 import net.truevfs.kernel.util.BitField;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
@@ -84,7 +82,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     @Override
     protected InputService<TarDriverEntry> newInput(
             final FsModel model,
-            final Source source)
+            final FsInputSocketSource source)
     throws IOException {
         return new TarInputService(model, source, this);
     }
@@ -92,7 +90,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     @Override
     protected OutputService<TarDriverEntry> newOutput(
             final FsModel model,
-            final Sink sink,
+            final FsOutputSocketSink sink,
             final @CheckForNull @WillNotClose InputService<TarDriverEntry> input)
     throws IOException {
         return new MultiplexingOutputService<>(getIoPool(),
@@ -104,11 +102,15 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      * forwarding the call to {@code controller}.
      */
     @Override
-    protected Source source(
+    protected FsInputSocketSource source(
             BitField<FsAccessOption> options,
-            FsController<?> controller,
-            FsEntryName name) {
-        return controller.input(options.clear(CACHE), name);
+            final FsController<?> controller,
+            final FsEntryName name) {
+        // The target archive file will be only used to extract the TAR entries
+        // to a temporary file, so we don't need to put it into the selective
+        // entry cache.
+        options = options.clear(CACHE);
+        return new FsInputSocketSource(options, controller.input(options, name));
     }
 
     /**
@@ -116,11 +118,15 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      * forwarding the call to {@code controller}.
      */
     @Override
-    protected Sink sink(
+    protected FsOutputSocketSink sink(
             BitField<FsAccessOption> options,
-            FsController<?> controller,
-            FsEntryName name) {
-        return controller.output(options.set(COMPRESS), name, null);
+            final FsController<?> controller,
+            final FsEntryName name) {
+        // Leave FsAccessOption.STORE untouched - the driver shall be given
+        // opportunity to apply its own preferences to sort out such a conflict.
+        options = options.set(COMPRESS);
+        return new FsOutputSocketSink(options,
+                controller.output(options, name, null));
     }
 
     @Override

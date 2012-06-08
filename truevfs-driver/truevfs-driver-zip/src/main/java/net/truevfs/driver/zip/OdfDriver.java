@@ -8,12 +8,13 @@ import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
+import static net.truevfs.kernel.FsAccessOption.GROW;
 import net.truevfs.kernel.FsModel;
-import net.truevfs.kernel.cio.IoPool;
+import net.truevfs.kernel.FsOutputSocketSink;
 import net.truevfs.kernel.cio.InputService;
+import net.truevfs.kernel.cio.IoPool;
 import net.truevfs.kernel.cio.MultiplexingOutputService;
 import net.truevfs.kernel.cio.OutputService;
-import net.truevfs.kernel.io.Sink;
 
 /**
  * An archive driver for application archive files according to the Open
@@ -44,14 +45,13 @@ public class OdfDriver extends JarDriver {
     @Override
     protected OutputService<ZipDriverEntry> newOutput(
             final FsModel model,
-            final Sink sink,
+            final FsOutputSocketSink sink,
             final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {
-        final OptionOutputSocket oos = (OptionOutputSocket) sink;
         final ZipInputService zis = (ZipInputService) input;
-        final ZipOutputService zos = new ZipOutputService(model, oos, zis, this);
+        final ZipOutputService zos = new ZipOutputService(model, sink, zis, this);
         final IoPool<?> pool = getIoPool();
-        return null != zis && zis.isAppendee()
+        return null != zis && sink.getOptions().get(GROW)
                 ? new MultiplexingOutputService<>(pool, zos)
                 : new OdfOutputService(pool, zos);
     }
