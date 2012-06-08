@@ -19,7 +19,7 @@ import org.scalatest.prop._
 import org.scalatest._
 
 @RunWith(classOf[JUnitRunner])
-class ArchiveEntryAspectTest extends WordSpec with ShouldMatchers with PropertyChecks {
+class ArchiveEntryAspectSpec extends WordSpec with ShouldMatchers with PropertyChecks {
 
   private def forAllNameAndType(test: (FsArchiveEntry, ArchiveEntryAspect[_]) => Unit) {
     forAll { name: String =>

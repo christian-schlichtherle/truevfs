@@ -20,7 +20,7 @@ import CacheEntry.Strategy._
  * @author Christian Schlichtherle
  */
 @RunWith(classOf[JUnitRunner])
-class CacheEntryTest extends WordSpec with ShouldMatchers with PropertyChecks {
+class CacheEntrySpec extends WordSpec with ShouldMatchers with PropertyChecks {
   import CacheEntryTest._
 
   private val initialCapacity = 32
