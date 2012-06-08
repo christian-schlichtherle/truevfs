@@ -28,7 +28,7 @@ extends Closeable, Container<E> {
     /**
      * {@inheritDoc}
      * <p>
-     * The iterator returned by this method must be unmodifiable.
+     * Note that the iterator returned by this method must be unmodifiable.
      */
     @Override
     Iterator<E> iterator();
