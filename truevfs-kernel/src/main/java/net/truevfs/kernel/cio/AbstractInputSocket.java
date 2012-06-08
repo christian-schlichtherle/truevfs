@@ -7,7 +7,6 @@ package net.truevfs.kernel.cio;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.truevfs.kernel.io.ChannelInputStream;
 
@@ -24,43 +23,6 @@ import net.truevfs.kernel.io.ChannelInputStream;
 public abstract class AbstractInputSocket<E extends Entry>
 extends AbstractIoSocket<E, Entry, InputSocket<E>, OutputSocket<? extends Entry>>
 implements InputSocket<E> {
-
-    private @CheckForNull OutputSocket<? extends Entry> peer;
-
-    @Override
-    public final OutputSocket<? extends Entry> getPeer() {
-        return peer;
-    }
-
-    @Override
-    public final InputSocket<E> bind(final IoSocket<?, ?, ?, ? extends OutputSocket<? extends Entry>> to) {
-        if (this == to) throw new IllegalArgumentException();
-        this.peer = to.getPeer();
-        return this;
-    }
-
-    @Override
-    public final InputSocket<E> connect(
-            final @CheckForNull OutputSocket<? extends Entry> np) {
-        final OutputSocket<?> op = peer;
-        if (op != np) {
-            if (null != op) {
-                peer = null;
-                op.connect(null);
-            }
-            if (null != np) {
-                peer = np;
-                np.connect(this);
-            }
-        }
-        return this;
-    }
-
-    // See https://java.net/jira/browse/TRUEZIP-203
-    @Override
-    public final @CheckForNull Entry peerTarget() throws IOException {
-        return null == peer ? null : peer.localTarget();
-    }
 
     /**
      * {@inheritDoc}
