@@ -4,18 +4,19 @@
  */
 package net.truevfs.driver.http;
 
-import net.truevfs.kernel.FsAccessOption;
-import net.truevfs.kernel.cio.AbstractInputSocket;
-import net.truevfs.kernel.cio.IoBuffer;
-import net.truevfs.kernel.io.AbstractSource;
-import net.truevfs.kernel.io.DecoratingReadOnlyChannel;
-import net.truevfs.kernel.io.Streams;
-import net.truevfs.kernel.util.BitField;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.kernel.FsAccessOption;
+import net.truevfs.kernel.cio.AbstractInputSocket;
+import net.truevfs.kernel.cio.IoBuffer;
+import net.truevfs.kernel.cio.IoSockets;
+import net.truevfs.kernel.io.AbstractSource;
+import net.truevfs.kernel.io.DecoratingReadOnlyChannel;
+import net.truevfs.kernel.io.Streams;
+import net.truevfs.kernel.util.BitField;
 
 /**
  * An input socket for HTTP(S) entries.
@@ -47,16 +48,9 @@ public class HttpInputSocket extends AbstractInputSocket<HttpEntry> {
 
     @Override
     public SeekableByteChannel channel() throws IOException {
-        final class Source extends AbstractSource {
-            @Override
-            public InputStream stream() throws IOException {
-                return entry.newInputStream();
-            }
-        } // Source
-
         final IoBuffer<?> temp = entry.getPool().allocate();
         try {
-            Streams.copy(new Source(), temp.output());
+            IoSockets.copy(entry.input(), temp.output());
         } catch (final Throwable ex) {
             try {
                 temp.release();
@@ -65,25 +59,23 @@ public class HttpInputSocket extends AbstractInputSocket<HttpEntry> {
             }
             throw ex;
         }
-
         final class TempReadOnlyChannel extends DecoratingReadOnlyChannel {
             boolean closed;
 
             @CreatesObligation
             TempReadOnlyChannel() throws IOException {
-                super(temp.input().channel()); // bind(*) is considered redundant for IOPool.IoBuffer
+                super(temp.input().channel()); // bind(*) is considered redundant for IoPool.IoBuffer
             }
 
             @Override
             public void close() throws IOException {
-                if (closed)
-                    return;
-                channel.close();
-                closed = true;
-                temp.release();
+                if (!closed) {
+                    channel.close();
+                    closed = true;
+                    temp.release();
+                }
             }
-        } // TempReadOnlyChannel
-
+        }
         return new TempReadOnlyChannel();
     }
 }
