@@ -10,24 +10,20 @@ import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.driver.zip.*;
+import net.truevfs.driver.zip.JarDriver;
+import net.truevfs.driver.zip.ZipDriverEntry;
+import net.truevfs.driver.zip.ZipInputService;
+import net.truevfs.driver.zip.ZipOutputService;
 import net.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import net.truevfs.driver.zip.raes.crypto.RaesParameters;
 import net.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
-import net.truevfs.kernel.FsAccessOption;
 import static net.truevfs.kernel.FsAccessOption.*;
-import net.truevfs.kernel.FsController;
-import net.truevfs.kernel.FsEntryName;
-import net.truevfs.kernel.FsModel;
+import net.truevfs.kernel.*;
 import net.truevfs.kernel.cio.Entry;
 import net.truevfs.kernel.cio.Entry.Type;
 import net.truevfs.kernel.cio.InputService;
 import net.truevfs.kernel.cio.MultiplexingOutputService;
 import net.truevfs.kernel.cio.OutputService;
-import net.truevfs.kernel.io.AbstractSink;
-import net.truevfs.kernel.io.AbstractSource;
-import net.truevfs.kernel.io.Sink;
-import net.truevfs.kernel.io.Source;
 import net.truevfs.kernel.util.BitField;
 
 /**
@@ -120,9 +116,11 @@ public abstract class ZipRaesDriver extends JarDriver {
     @Override
     protected ZipInputService newZipInput(
             final FsModel model,
-            final Source source)
+            final FsInputSocketSource source)
     throws IOException {
-        final class Source extends AbstractSource {
+        final class Source extends FsInputSocketSource {
+            Source() { super(source); }
+
             @Override
             public SeekableByteChannel channel() throws IOException {
                 final RaesReadOnlyChannel channel = RaesReadOnlyChannel
@@ -140,27 +138,41 @@ public abstract class ZipRaesDriver extends JarDriver {
                     throw ex;
                 }
             }
-        } // Source
-
+        }
         return new ZipInputService(model, new Source(), this);
     }
 
     @Override
     protected OutputService<ZipDriverEntry> newOutput(
             final FsModel model,
-            final Sink sink,
+            final FsOutputSocketSink sink,
             final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {
-        final class Sink extends AbstractSink {
-            @Override
-            public OutputStream stream() throws IOException {
-                return RaesOutputStream.create(raesParameters(model), sink);
-            }
-        } // Sink
-
         final ZipInputService zis = (ZipInputService) input;
         return new MultiplexingOutputService<>(getIoPool(),
-                new ZipOutputService(model, new Sink(), zis, this));
+                new ZipOutputService(model, new RaesSocketSink(model, sink), zis, this));
+    }
+
+    @SuppressWarnings("PackageVisibleInnerClass")
+    final class RaesSocketSink extends FsOutputSocketSink {
+        private final FsModel model;
+        private final FsOutputSocketSink sink;
+
+        RaesSocketSink(final FsModel model, final FsOutputSocketSink sink) {
+            super(sink);
+            this.model = model;
+            this.sink = sink;
+        }
+
+        @Override
+        public OutputStream stream() throws IOException {
+            return RaesOutputStream.create(raesParameters(model), sink);
+        }
+
+        @Override
+        public SeekableByteChannel channel() throws IOException {
+            throw new UnsupportedOperationException();
+        }
     }
 
     /**
@@ -168,16 +180,17 @@ public abstract class ZipRaesDriver extends JarDriver {
      * forwarding the call to {@code controller}.
      */
     @Override
-    protected final OptionOutputSocket sink(
+    protected final FsOutputSocketSink sink(
             BitField<FsAccessOption> options,
             final FsController<?> controller,
             final FsEntryName name) {
-        options = options.clear(GROW);
-        // Leave FsAccessOption.COMPRESS untouched - the controller shall have the
+        // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
         // opportunity to apply its own preferences to sort out such a conflict.
-        return new OptionOutputSocket(
-                controller.output(options.set(STORE), name, null),
-                options); // use modified options!
+        options = options.set(STORE);
+        // The RAES file format cannot support GROWing.
+        options = options.clear(GROW);
+        return new FsOutputSocketSink(options,
+                controller.output(options, name, null));
     }
 
     /**
@@ -197,11 +210,11 @@ public abstract class ZipRaesDriver extends JarDriver {
     @Override
     public ZipDriverEntry newEntry(
             final BitField<FsAccessOption> options,
-            final String path,
+            final String name,
             final Type type,
             final @CheckForNull Entry template) {
         final ZipDriverEntry entry
-                = super.newEntry(options.set(COMPRESS), path, type, template);
+                = super.newEntry(options.set(COMPRESS), name, type, template);
         // Fix for http://java.net/jira/browse/TRUEZIP-176 :
         // Entry level encryption is enabled if mknod.getKeyManager(ENCRYPTED) is true
         // OR template is an instance of ZipEntry

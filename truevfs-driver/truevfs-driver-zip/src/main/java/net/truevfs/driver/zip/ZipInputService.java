@@ -4,20 +4,21 @@
  */
 package net.truevfs.driver.zip;
 
-import net.truevfs.driver.zip.io.RawZipFile;
-import net.truevfs.driver.zip.io.ZipCryptoParameters;
-import net.truevfs.kernel.FsModel;
-import net.truevfs.kernel.cio.AbstractInputSocket;
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.InputService;
-import net.truevfs.kernel.cio.InputSocket;
-import net.truevfs.kernel.io.Source;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.NoSuchFileException;
 import java.util.Objects;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.driver.zip.io.RawZipFile;
+import net.truevfs.driver.zip.io.ZipCryptoParameters;
+import net.truevfs.kernel.FsInputSocketSource;
+import net.truevfs.kernel.FsModel;
+import net.truevfs.kernel.cio.AbstractInputSocket;
+import net.truevfs.kernel.cio.Entry;
+import net.truevfs.kernel.cio.InputService;
+import net.truevfs.kernel.cio.InputSocket;
+import net.truevfs.kernel.io.Source;
 
 /**
  * An input service for reading ZIP files.
@@ -32,13 +33,12 @@ implements InputService<ZipDriverEntry> {
 
     private final ZipDriver driver;
     private final FsModel model;
-    private boolean appendee;
     private ZipCryptoParameters param;
 
     @CreatesObligation
     public ZipInputService(
             final FsModel model,
-            final Source source,
+            final FsInputSocketSource source,
             final ZipDriver driver)
     throws IOException {
         super(source, driver);
@@ -69,30 +69,6 @@ implements InputService<ZipDriverEntry> {
         if (null == param)
             this.param = param = driver.zipCryptoParameters(this);
         return param;
-    }
-
-    /**
-     * Returns {@code true} if and only if the target archive file gets entries
-     * appended to it.
-     * Note that the implementation in the class {@link ZipInputService} does not
-     * use this property.
-     * 
-     * @return {@code true} if and only if the target archive file gets entries
-     *         appended to it.
-     */
-    boolean isAppendee() {
-        return appendee;
-    }
-
-    /**
-     * Indicates whether or not the target archive file gets entries appended
-     * to it.
-     * 
-     * @param appendee {@code true} if and only if the target archive file gets
-     *        entries appended to it.
-     */
-    void setAppendee(boolean appendee) {
-        this.appendee = appendee;
     }
 
     @Override

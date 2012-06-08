@@ -27,7 +27,6 @@ import static net.truevfs.kernel.cio.Entry.Type.DIRECTORY;
 import net.truevfs.kernel.cio.InputService;
 import net.truevfs.kernel.cio.MultiplexingOutputService;
 import net.truevfs.kernel.cio.OutputService;
-import net.truevfs.kernel.io.Sink;
 import net.truevfs.kernel.io.Source;
 import net.truevfs.kernel.util.BitField;
 import net.truevfs.kernel.util.HashMaps;
@@ -337,7 +336,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     @Override
     protected final ZipInputService newInput(
             final FsModel model,
-            final Source source)
+            final FsInputSocketSource source)
     throws IOException {
         final ZipInputService zis = newZipInput(Objects.requireNonNull(model), source);
         try {
@@ -355,38 +354,22 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     @CreatesObligation
     protected ZipInputService newZipInput(
             FsModel model,
-            Source source)
+            FsInputSocketSource source)
     throws IOException {
         assert null != model;
         return new ZipInputService(model, source, this);
     }
 
     @Override
-    public OutputService<ZipDriverEntry> newOutput(
-            final FsModel model,
-            final BitField<FsAccessOption> options,
-            final FsController<?> controller,
-            final FsEntryName name,
-            final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
-    throws IOException {
-        final OptionOutputSocket oos = sink(options, controller, name);
-        final ZipInputService zis = (ZipInputService) input;
-        if (null != zis)
-            zis.setAppendee(oos.getOptions().get(GROW));
-        return newOutput(model, oos, zis);
-    }
-
-    @Override
     @CreatesObligation
     protected OutputService<ZipDriverEntry> newOutput(
             FsModel model,
-            Sink sink,
+            FsOutputSocketSink sink,
             final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {
-        final OptionOutputSocket oos = (OptionOutputSocket) sink;
         final ZipInputService zis = (ZipInputService) input;
         return new MultiplexingOutputService<>(getIoPool(),
-                new ZipOutputService(model, oos, zis, this));
+                new ZipOutputService(model, sink, zis, this));
     }
 
     /**
@@ -407,7 +390,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * {@link #newOutput}.
      */
     @Override
-    protected OptionOutputSocket sink(
+    protected FsOutputSocketSink sink(
             BitField<FsAccessOption> options,
             final FsController<?> controller,
             final FsEntryName name) {
@@ -416,9 +399,8 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
         options = options.set(STORE);
         if (options.get(GROW))
             options = options.set(APPEND).clear(CACHE);
-        return new OptionOutputSocket(
-                controller.output(options, name, null),
-                options);
+        return new FsOutputSocketSink(options,
+                controller.output(options, name, null));
     }
 
     @Override

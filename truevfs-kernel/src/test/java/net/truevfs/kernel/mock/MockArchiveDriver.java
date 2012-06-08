@@ -62,7 +62,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     @Override
     protected InputService<MockArchiveDriverEntry> newInput(
             final FsModel model,
-            final Source input)
+            final FsInputSocketSource input)
     throws IOException {
         final FsMountPoint mp = model.getMountPoint();
         final MockArchive c = containers.get(mp);
@@ -74,7 +74,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     @Override
     protected OutputService<MockArchiveDriverEntry> newOutput(
             final FsModel model,
-            final Sink output,
+            final FsOutputSocketSink sink,
             final @CheckForNull @WillNotClose InputService<MockArchiveDriverEntry> input)
     throws IOException {
         final FsMountPoint mp = model.getMountPoint();
