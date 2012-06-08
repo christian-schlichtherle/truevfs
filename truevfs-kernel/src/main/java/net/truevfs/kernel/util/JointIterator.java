@@ -47,8 +47,7 @@ public final class JointIterator<E> implements Iterator<E> {
 
     @Override
     public boolean hasNext() {
-        return i1.hasNext()
-           || (i1 != i2 && (i1 = i2).hasNext());
+        return i1.hasNext() || (i1 != i2 && (i1 = i2).hasNext());
     }
 
     @Override
@@ -56,8 +55,7 @@ public final class JointIterator<E> implements Iterator<E> {
         try {
             return i1.next();
         } catch (NoSuchElementException ex) {
-            if (i1 == i2)
-                throw ex;
+            if (i1 == i2) throw ex;
             return (i1 = i2).next();
         }
     }
