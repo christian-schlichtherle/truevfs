@@ -32,27 +32,28 @@ import javax.annotation.concurrent.ThreadSafe;
  * target.
  * Again, this operation may fail with an {@code IOException}.
  * <p>
- * I/O sockets are designed to {@linkplain IOSockets#copy copy} the contents of
+ * I/O sockets are designed to {@linkplain IoSockets#copy copy} the contents of
  * their I/O targets fast and easily by using multithreading.
  * In addition, a socket may negotiate with its peer target in order to
  * agree upon the necessary processing when copying the entry data.
  * For example, this could get used by an implementation in order to avoid
  * redundant decompression and recompression when copying compressed entry data.
  *
- * @param  <LT> the type of the {@link #localTarget() local target}
+ * @param  <LT> the type of the {@linkplain #localTarget() local target}
  *         for I/O operations.
- * @param  <PT> the type of the {@link #peerTarget() peer target}
+ * @param  <PT> the type of the {@linkplain #peerTarget() peer target}
  *         for I/O operations.
- * @param  <This> the type of this socket.
- * @param  <Peer> the type of the peer socket.
+ * @param  <Local> the representational type of
+ *         {@linkplain #connect(IoSocket) this socket}.
+ * @param  <Peer> the type of the {@linkplain #getPeer() peer socket}.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
 public interface IoSocket<
         LT extends Entry,
         PT extends Entry,
-        This extends IoSocket<LT, PT, This, Peer>,
-        Peer extends IoSocket<? extends Entry, Entry, ?, ?>> {
+        Local extends IoSocket<LT, PT, Local, Peer>,
+        Peer extends IoSocket<? extends PT, ?, ?, ?/* super Local*/>> {
 
     /**
      * Resolves the <i>local target</i> for I/O operations.
@@ -77,7 +78,7 @@ public interface IoSocket<
      * The same considerations as for {@link #localTarget} apply here, too.
      * <p>
      * The peer target is {@code null} if and only if this socket is not
-     * {@linkplain #getPeer connected} to another socket.
+     * connected to a {@linkplain #getPeer peer socket}.
      *
      * @return The nullable peer target for I/O operations.
      * @throws IOException on any I/O error. 
@@ -90,26 +91,26 @@ public interface IoSocket<
      * 
      * @return The nullable peer socket to which this socket is connected for
      *         copying.
+     * @see    #connect(IoSocket)
      */
     @CheckForNull Peer getPeer();
 
     /**
-     * Connects this socket to the given {@code peer} socket.
+     * Connects this socket to the given nullable {@code peer} socket.
      * This method shall change the peer socket of the given peer socket to
      * this socket, too.
      *
      * @param  peer the nullable peer output socket to connect to.
      * @return {@code this}
      */
-    This connect(@CheckForNull Peer peer);
+    Local connect(@CheckForNull Peer peer);
 
     /**
-     * Inherits the {@linkplain #getPeer peer socket} from the given
-     * socket.
+     * Inherits the {@linkplain #getPeer peer socket} from the given socket.
      *
      * @param  to the socket from which to inherit the peer socket.
      * @return {@code this}
      * @throws IllegalArgumentException if {@code this} == {@code to}.
      */
-    This bind(IoSocket<?, ?, ?, ? extends Peer> to);
+    Local bind(IoSocket<?, ?, ?, ? extends Peer> to);
 }
