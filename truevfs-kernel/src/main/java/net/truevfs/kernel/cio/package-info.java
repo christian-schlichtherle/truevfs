@@ -3,7 +3,9 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Provides generic services for reading and writing entries in containers,
+ * Provides generic services for reading and writing
+ * {@linkplain net.truevfs.kernel.cio.Entry entries} in
+ * {@linkplain net.truevfs.kernel.cio.Container containers},
  * e.g.&#160;file systems, archive files or I/O buffer pools.
  * 
  * @author Christian Schlichtherle
