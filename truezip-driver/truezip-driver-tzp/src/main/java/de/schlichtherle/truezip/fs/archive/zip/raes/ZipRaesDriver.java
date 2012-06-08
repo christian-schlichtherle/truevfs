@@ -230,13 +230,14 @@ public abstract class ZipRaesDriver extends JarDriver {
             final FsEntryName name,
             BitField<FsOutputOption> options,
             final @CheckForNull Entry template) {
-        options = options.clear(GROW);
         // Leave FsOutputOption.COMPRESS untouched - the driver shall be given
         // opportunity to apply its own preferences to sort out such a conflict.
-        BitField<FsOutputOption> options2 = options.set(STORE);
+        options = options.set(STORE);
+        // The RAES file format cannot support GROWing.
+        options = options.clear(GROW);
         return new OptionOutputSocket(
-                controller.getOutputSocket(name, options2, template),
-                options); // use modified options!
+                controller.getOutputSocket(name, options, template),
+                options);
     }
 
     @Override
