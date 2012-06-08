@@ -4,13 +4,13 @@
  */
 package net.truevfs.kernel.cio;
 
-import net.truevfs.kernel.io.InputException;
-import net.truevfs.kernel.io.Streams;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.io.InputException;
+import net.truevfs.kernel.io.Streams;
 
 /**
- * Provides utility methods for {@link IOSocket}s.
+ * Provides utility methods for {@link IoSocket}s.
  *
  * @author Christian Schlichtherle
  */
