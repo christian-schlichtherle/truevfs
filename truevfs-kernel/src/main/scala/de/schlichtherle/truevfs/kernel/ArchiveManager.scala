@@ -97,7 +97,7 @@ extends FsManager {
         (if (mandatory) STRONG else optionalScheduleType) newLink _controller
       ArchiveManager.this synchronized { controllers put (mountPoint, link) }
     }
-  }
+  } // ScheduledModel
 
   def newController(driver: AnyArchiveDriver, model: FsModel, parent: FsController[_ <: FsModel]) = {
     assert(!model.isInstanceOf[LockModel])
