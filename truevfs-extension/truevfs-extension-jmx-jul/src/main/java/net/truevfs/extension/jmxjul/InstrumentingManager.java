@@ -4,9 +4,9 @@
  */
 package net.truevfs.extension.jmxjul;
 
-import net.truevfs.kernel.*;
 import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.*;
 
 /**
  * @author Christian Schlichtherle
@@ -16,8 +16,9 @@ public class InstrumentingManager extends FsDecoratingManager<FsManager> {
 
     protected final InstrumentingDirector<?> director;
 
-    public InstrumentingManager(final FsManager manager,
-                                final InstrumentingDirector<?> director) {
+    public InstrumentingManager(
+            final InstrumentingDirector<?> director,
+            final FsManager manager) {
         super(manager);
         this.director = Objects.requireNonNull(director);
     }

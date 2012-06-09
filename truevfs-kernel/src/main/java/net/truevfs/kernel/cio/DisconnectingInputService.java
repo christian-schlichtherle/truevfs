@@ -99,15 +99,15 @@ extends DecoratingInputService<E, InputService<E>> {
         }
 
         @Override
-        public InputStream stream() throws IOException {
-            return new DisconnectingInputStream(
-                    boundSocket().stream());
+        public InputStream stream(OutputSocket<? extends Entry> peer)
+        throws IOException {
+            return new DisconnectingInputStream(socket().stream(peer));
         }
 
         @Override
-        public SeekableByteChannel channel() throws IOException {
-            return new DisconnectingSeekableChannel(
-                    boundSocket().channel());
+        public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
+        throws IOException {
+            return new DisconnectingSeekableChannel(socket().channel(peer));
         }
     } // Input
 

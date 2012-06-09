@@ -7,18 +7,19 @@ package net.truevfs.kernel.cio;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
-import javax.annotation.concurrent.NotThreadSafe;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Delegates all methods to another output socket.
  *
  * @see    DelegatingInputSocket
- * @param  <E> the type of the {@link #localTarget() local target}.
+ * @param  <T> the type of the {@linkplain #target() target} entry for I/O
+ *         operations.
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
-public abstract class DelegatingOutputSocket<E extends Entry>
-extends AbstractOutputSocket<E> {
+@Immutable
+public abstract class DelegatingOutputSocket<T extends Entry>
+extends AbstractOutputSocket<T> {
 
     /**
      * Returns the delegate socket.
@@ -26,32 +27,23 @@ extends AbstractOutputSocket<E> {
      * @return The delegate socket.
      * @throws IOException on any I/O error. 
      */
-    protected abstract OutputSocket<? extends E> socket()
+    protected abstract OutputSocket<? extends T> socket()
     throws IOException;
 
-    /**
-     * Binds the delegate socket to this socket and returns it.
-     *
-     * @return The bound delegate socket.
-     * @throws IOException on any I/O error. 
-     */
-    protected final OutputSocket<? extends E> boundSocket()
+    @Override
+    public T target() throws IOException {
+        return socket().target();
+    }
+
+    @Override
+    public OutputStream stream(InputSocket<? extends Entry> peer)
     throws IOException {
-        return socket().bind(this);
+        return socket().stream(peer);
     }
 
     @Override
-    public E localTarget() throws IOException {
-        return boundSocket().localTarget();
-    }
-
-    @Override
-    public SeekableByteChannel channel() throws IOException {
-        return boundSocket().channel();
-    }
-
-    @Override
-    public OutputStream stream() throws IOException {
-        return boundSocket().stream();
+    public SeekableByteChannel channel(InputSocket<? extends Entry> peer)
+    throws IOException {
+        return socket().channel(peer);
     }
 }

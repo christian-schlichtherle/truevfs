@@ -4,11 +4,11 @@
  */
 package net.truevfs.kernel.cio;
 
+import java.io.IOException;
+import java.util.Iterator;
 import static net.truevfs.kernel.cio.Entry.Type.FILE;
 import net.truevfs.kernel.mock.MockArchive;
 import net.truevfs.kernel.mock.MockArchiveDriverEntry;
-import java.io.IOException;
-import java.util.Iterator;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
@@ -31,7 +31,7 @@ public class MultiplexingOutputServiceTest {
             final OutputSocket<MockArchiveDriverEntry> socket = service
                     .output(new MockArchiveDriverEntry(name, FILE));
             assertThat(service.entry(name), nullValue());
-            socket.stream();
+            socket.stream(null);
             assertThat(service.entry(name), notNullValue());
             assertThat(service.isBusy(), is(true));
         }

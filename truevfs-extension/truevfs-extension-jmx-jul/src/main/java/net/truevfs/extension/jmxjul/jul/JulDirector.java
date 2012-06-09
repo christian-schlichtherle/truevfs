@@ -25,7 +25,7 @@ public final class JulDirector extends InstrumentingDirector<JulDirector> {
 
     @Override
     public <B extends IoBuffer<B>> IoPool<B> instrument(IoPool<B> pool) {
-        return new JulIOPool<>(pool, this);
+        return new JulIOPool<>(this, pool);
     }
 
     @Override
@@ -35,16 +35,16 @@ public final class JulDirector extends InstrumentingDirector<JulDirector> {
 
     @Override
     protected FsController<? extends FsModel> instrument(FsController<? extends FsModel> controller, InstrumentingCompositeDriver context) {
-        return new InstrumentingController<>(controller, this);
+        return new InstrumentingController<>(this, controller);
     }
 
     @Override
     protected <E extends Entry> InputSocket<E> instrument(InputSocket<E> input) {
-        return new JulInputSocket<>(input, this);
+        return new JulInputSocket<>(this, input);
     }
 
     @Override
     protected <E extends Entry> OutputSocket<E> instrument(OutputSocket<E> output) {
-        return new JulOutputSocket<>(output, this);
+        return new JulOutputSocket<>(this, output);
     }
 }

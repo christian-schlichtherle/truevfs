@@ -4,15 +4,6 @@
  */
 package net.truevfs.driver.file;
 
-import net.truevfs.kernel.FsAccessOption;
-import static net.truevfs.kernel.FsAccessOption.*;
-import net.truevfs.kernel.cio.AbstractOutputSocket;
-import net.truevfs.kernel.cio.Entry;
-import static net.truevfs.kernel.cio.Entry.Access.*;
-import static net.truevfs.kernel.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.cio.IoSockets;
-import net.truevfs.kernel.util.BitField;
-import static net.truevfs.kernel.util.HashMaps.initialCapacity;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,6 +20,16 @@ import java.util.Set;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.kernel.FsAccessOption;
+import static net.truevfs.kernel.FsAccessOption.*;
+import net.truevfs.kernel.cio.AbstractOutputSocket;
+import net.truevfs.kernel.cio.Entry;
+import static net.truevfs.kernel.cio.Entry.Access.*;
+import static net.truevfs.kernel.cio.Entry.UNKNOWN;
+import net.truevfs.kernel.cio.InputSocket;
+import net.truevfs.kernel.cio.IoSockets;
+import net.truevfs.kernel.util.BitField;
+import static net.truevfs.kernel.util.HashMaps.initialCapacity;
 
 /**
  * An output socket for a file entry.
@@ -66,7 +67,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
     }
 
     @Override
-    public FileEntry localTarget() {
+    public FileEntry target() {
         return entry;
     }
 
@@ -174,8 +175,8 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    public SeekableByteChannel channel() throws IOException {
+    public SeekableByteChannel channel(final InputSocket<? extends Entry> peer)
+    throws IOException {
         final FileEntry temp = begin();
 
         final class Channel extends IOExceptionSeekableChannel {
@@ -205,8 +206,8 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    public OutputStream stream() throws IOException {
+    public OutputStream stream(final InputSocket<? extends Entry> peer)
+    throws IOException {
         final FileEntry temp = begin();
 
         final class Stream extends IOExceptionOutputStream {

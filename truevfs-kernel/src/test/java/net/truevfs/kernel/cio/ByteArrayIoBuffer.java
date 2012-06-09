@@ -14,9 +14,12 @@ import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.kernel.cio.Entry.Access;
 import static net.truevfs.kernel.cio.Entry.Access.READ;
 import static net.truevfs.kernel.cio.Entry.Access.WRITE;
-import static net.truevfs.kernel.cio.Entry.*;
+import net.truevfs.kernel.cio.Entry.Entity;
+import net.truevfs.kernel.cio.Entry.Size;
+import static net.truevfs.kernel.cio.Entry.UNKNOWN;
 import net.truevfs.kernel.io.ByteBufferChannel;
 
 /**
@@ -190,7 +193,7 @@ public class ByteArrayIoBuffer implements IoBuffer<ByteArrayIoBuffer> {
 
     private final class Input extends AbstractInputSocket<ByteArrayIoBuffer> {
         @Override
-        public ByteArrayIoBuffer localTarget() throws IOException {
+        public ByteArrayIoBuffer target() throws IOException {
             return ByteArrayIoBuffer.this;
         }
 
@@ -201,13 +204,15 @@ public class ByteArrayIoBuffer implements IoBuffer<ByteArrayIoBuffer> {
         }
 
         @Override
-        public InputStream stream() throws IOException {
+        public InputStream stream(OutputSocket<? extends Entry> _)
+        throws IOException {
             count();
             return new DataInputStream();
         }
 
         @Override
-        public SeekableByteChannel channel() throws IOException {
+        public SeekableByteChannel channel(OutputSocket<? extends Entry> _)
+        throws IOException {
             count();
             return new DataInputChannel();
         }
@@ -215,7 +220,7 @@ public class ByteArrayIoBuffer implements IoBuffer<ByteArrayIoBuffer> {
 
     private final class Output extends AbstractOutputSocket<ByteArrayIoBuffer> {
         @Override
-        public ByteArrayIoBuffer localTarget() throws IOException {
+        public ByteArrayIoBuffer target() throws IOException {
             return ByteArrayIoBuffer.this;
         }
 
@@ -224,13 +229,15 @@ public class ByteArrayIoBuffer implements IoBuffer<ByteArrayIoBuffer> {
         }
 
         @Override
-        public SeekableByteChannel channel() throws IOException {
+        public SeekableByteChannel channel(InputSocket<? extends Entry> _)
+        throws IOException {
             count();
             return new DataOutputChannel();
         }
 
         @Override
-        public OutputStream stream() throws IOException {
+        public OutputStream stream(InputSocket<? extends Entry> _)
+        throws IOException {
             count();
             return new DataOutputStream();
         }

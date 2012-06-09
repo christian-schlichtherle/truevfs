@@ -220,36 +220,45 @@ extends FileSystemArchiveController[E](model) with TouchListener {
   }
 
   override def input(name: String) = {
-    final class Input extends ClutchInputSocket[E] {
+    final class Input extends LazyInputSocket[E] {
       override def lazySocket = inputArchive.get.input(name)
-      override def localTarget() = syncOn[InputClosedException] { super.localTarget() }
-      override def stream() = syncOn[InputClosedException] { super.stream() }
-      override def channel() = syncOn[InputClosedException] { super.channel() }
+
+      override def target() = syncOn[InputClosedException] { super.target() }
+
+      override def stream(peer: AnyOutputSocket) =
+        syncOn[InputClosedException] { super.stream(peer) }
+
+      override def channel(peer: AnyOutputSocket) =
+        syncOn[InputClosedException] { super.channel(peer) }
     }
     new Input
   }
 
   override def output(options: AccessOptions, entry: E) = {
-    final class Output extends ClutchOutputSocket[E] {
+    final class Output extends LazyOutputSocket[E] {
+
       override def lazySocket = outputArchive(options).output(entry)
-      override def localTarget = entry
-      override def stream() = syncOn[OutputClosedException] { super.stream() }
-      override def channel() = syncOn[OutputClosedException] { super.channel() }
+
+      override def target = entry
+
+      override def stream(peer: AnyInputSocket) =
+        syncOn[OutputClosedException] { super.stream(peer) }
+
+      override def channel(peer: AnyInputSocket) =
+        syncOn[OutputClosedException] { super.channel(peer) }
     }
     new Output
   }
 
-  private def syncOn[X <: ClosedException] = {
-    new {
-      def apply[A](expression: => A)(implicit mf: ClassManifest[X]) = {
-        try {
-          expression
-        } catch {
-          case ex =>
-            if (mf.erasure isAssignableFrom ex.getClass)
-              throw NeedsSyncException()
-            throw ex
-        }
+  private def syncOn[X <: ClosedException] = new {
+    def apply[A](expression: => A)(implicit mf: ClassManifest[X]) = {
+      try {
+        expression
+      } catch {
+        case ex =>
+          if (mf.erasure isAssignableFrom ex.getClass)
+            throw NeedsSyncException()
+          throw ex
       }
     }
   }
@@ -306,7 +315,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
             if (DIRECTORY eq ae.getType) {
               if (!fse.isRoot) // never output the root directory!
                 if (UNKNOWN != ae.getTime(WRITE)) // never output a ghost directory!
-                  os.output(ae).stream().close()
+                  os.output(ae).stream(null).close()
             } else if (null ne is.entry(aen)) {
               IoSockets.copy(is.input(aen), os.output(ae))
             } else {
@@ -317,7 +326,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
               for (size <- ALL_SIZES)
                 ae.setSize(size, UNKNOWN)
               ae.setSize(DATA, 0)
-              os.output(ae).stream().close()
+              os.output(ae).stream(null).close()
             }
           } catch {
             case ex: IOException =>

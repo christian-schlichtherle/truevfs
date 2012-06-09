@@ -4,17 +4,17 @@
  */
 package net.truevfs.kernel.sample;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import net.truevfs.kernel.*;
 import net.truevfs.kernel.cio.InputSocket;
 import net.truevfs.kernel.io.Streams;
 import net.truevfs.kernel.sl.FsDriverLocator;
 import net.truevfs.kernel.sl.FsManagerLocator;
 import net.truevfs.kernel.util.BitField;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * A poor man's blend of the cat(1) and wget(1) command line utility
@@ -76,7 +76,7 @@ public final class Cat {
             InputSocket<?> socket = manager
                     .controller(     driver, path.getMountPoint())
                     .input(    BitField.noneOf(FsAccessOption.class), path.getEntryName());
-            try (InputStream in = socket.stream()) {
+            try (InputStream in = socket.stream(null)) {
                 Streams.cat(in, System.out); // copy the data
             }
         } finally {

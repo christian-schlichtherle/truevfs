@@ -89,7 +89,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
         @Override
         public E next() {
-            return i.next().getLocalTarget();
+            return i.next().getTarget();
         }
 
         @Override
@@ -104,7 +104,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         if (null != entry)
             return entry;
         final BufferedEntryOutputStream out = buffers.get(name);
-        return null == out ? null : out.getLocalTarget();
+        return null == out ? null : out.getTarget();
     }
 
     @Override
@@ -115,15 +115,15 @@ extends DecoratingOutputService<E, OutputService<E>> {
             Output() { super(container.output(local)); }
 
             @Override
-            public E localTarget() {
+            public E target() {
                 return local;
             }
 
             @Override
-            public OutputStream stream() throws IOException {
-                final OutputSocket<? extends E> output = boundSocket();
-                return isBusy() ? new BufferedEntryOutputStream(output)
-                                : new EntryOutputStream(output);
+            public OutputStream stream(InputSocket<? extends Entry> peer)
+            throws IOException {
+                return isBusy() ? new BufferedEntryOutputStream(socket(), peer)
+                                : new EntryOutputStream(socket().stream(peer));
             }
         }
         return new Output();
@@ -188,9 +188,8 @@ extends DecoratingOutputService<E, OutputService<E>> {
         boolean closed;
 
         @CreatesObligation
-        EntryOutputStream(final OutputSocket<? extends E> output)
-        throws IOException {
-            super(output.stream());
+        EntryOutputStream(final OutputStream out) {
+            super(out);
             busy = true;
         }
 
@@ -222,26 +221,30 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
         @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
-        BufferedEntryOutputStream(final OutputSocket<? extends E> output)
+        BufferedEntryOutputStream(
+                final OutputSocket<? extends E> output,
+                final @CheckForNull InputSocket<? extends Entry> input)
         throws IOException {
             // HC SVNT DRACONES!
-            final E local = (this.output = output).localTarget();
-            final Entry _peer = output.peerTarget();
+            final E local = (this.output = output).target();
+            final Entry _peer = null != input ? input.target() : null;
             final IoBuffer<?> buffer = this.buffer = pool.allocate();
             final Entry peer = null != _peer ? _peer : buffer;
+
             final class InputProxy extends DecoratingInputSocket<Entry> {
                 InputProxy() {
                     super(buffer.input());
                 }
 
                 @Override
-                public Entry localTarget() {
+                public Entry target() {
                     return peer;
                 }
             } // InputProxy
+
             try {
                 this.input = new InputProxy();
-                this.out = buffer.output().stream();
+                this.out = buffer.output().stream(null);
             } catch (final Throwable ex) {
                 try {
                     buffer.release();
@@ -253,9 +256,9 @@ extends DecoratingOutputService<E, OutputService<E>> {
             buffers.put(local.getName(), this);
         }
 
-        E getLocalTarget() {
+        E getTarget() {
             try {
-                return output.localTarget();
+                return output.target();
             } catch (final IOException ex) {
                 throw new AssertionError(ex);
             }
@@ -270,9 +273,9 @@ extends DecoratingOutputService<E, OutputService<E>> {
                 try {
                     out.close();
                     closed = true;
-                    final E local = output.localTarget();
+                    final E local = output.target();
                     if (this == buffers.get(local.getName()))
-                        updateProperties(local, input.localTarget());
+                        updateProperties(local, input.target());
                     else
                         discardBuffer();
                 } catch (final IOException ex) {

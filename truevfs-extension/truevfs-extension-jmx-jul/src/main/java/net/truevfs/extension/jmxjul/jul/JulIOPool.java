@@ -4,13 +4,13 @@
  */
 package net.truevfs.extension.jmxjul.jul;
 
-import net.truevfs.extension.jmxjul.InstrumentingIOPool;
-import net.truevfs.kernel.cio.IoBuffer;
-import net.truevfs.kernel.cio.IoPool;
 import java.io.IOException;
 import static java.util.logging.Level.FINE;
 import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.extension.jmxjul.InstrumentingIOPool;
+import net.truevfs.kernel.cio.IoBuffer;
+import net.truevfs.kernel.cio.IoPool;
 
 /**
  * @author Christian Schlichtherle
@@ -22,8 +22,8 @@ extends InstrumentingIOPool<B> {
     private static final Logger
             logger = Logger.getLogger(JulIOPool.class.getName());
 
-    JulIOPool(IoPool<B> model, JulDirector director) {
-        super(model, director);
+    JulIOPool(JulDirector director, IoPool<B> model) {
+        super(director, model);
     }
 
     @Override

@@ -4,17 +4,18 @@
  */
 package net.truevfs.kernel.sample;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import static net.truevfs.kernel.FsAccessOption.CREATE_PARENTS;
+import static net.truevfs.kernel.FsAccessOption.EXCLUSIVE;
 import net.truevfs.kernel.*;
-import static net.truevfs.kernel.FsAccessOption.*;
-import net.truevfs.kernel.cio.IoSockets;
 import net.truevfs.kernel.cio.InputSocket;
+import net.truevfs.kernel.cio.IoSockets;
 import net.truevfs.kernel.cio.OutputSocket;
 import net.truevfs.kernel.sl.FsDriverLocator;
 import net.truevfs.kernel.sl.FsManagerLocator;
 import net.truevfs.kernel.util.BitField;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
 
 /**
  * A poor man's blend of the cp(1) or curl(1) command line utilities
@@ -81,7 +82,7 @@ public final class Copy {
                     .controller(driver, dstPath.getMountPoint())
                     .output(BitField.of(CREATE_PARENTS, EXCLUSIVE),
                             dstPath.getEntryName(),
-                            srcSocket.localTarget());
+                            srcSocket.target());
             IoSockets.copy(srcSocket, dstSocket);
         } finally {
             // Commit all unsynchronized changes to the contents of federated

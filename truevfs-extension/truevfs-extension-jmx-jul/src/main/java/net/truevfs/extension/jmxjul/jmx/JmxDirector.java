@@ -4,14 +4,14 @@
  */
 package net.truevfs.extension.jmxjul.jmx;
 
+import java.lang.management.ManagementFactory;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.management.*;
 import net.truevfs.extension.jmxjul.*;
 import net.truevfs.kernel.FsController;
 import net.truevfs.kernel.FsManager;
 import net.truevfs.kernel.FsModel;
 import net.truevfs.kernel.cio.*;
-import java.lang.management.ManagementFactory;
-import javax.annotation.concurrent.ThreadSafe;
-import javax.management.*;
 
 /**
  * @author Christian Schlichtherle
@@ -102,7 +102,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
 
     @Override
     public FsManager instrument(FsManager manager) {
-        return new JmxManager(manager, this);
+        return new JmxManager(this, manager);
     }
 
     @Override
@@ -114,35 +114,35 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     protected FsModel instrument(
             FsModel model,
             InstrumentingCompositeDriver context) {
-        return new JmxModel(model, this);
+        return new JmxModel(this, model);
     }
 
     @Override
     protected FsController<? extends FsModel> instrument(
             FsController<? extends FsModel> controller,
             InstrumentingManager context) {
-        return new JmxApplicationController(controller, this);
+        return new JmxApplicationController(this, controller);
     }
 
     @Override
     protected FsController<? extends FsModel> instrument(
             FsController<? extends FsModel> controller,
             InstrumentingCompositeDriver context) {
-        return new JmxKernelController(controller, this);
+        return new JmxKernelController(this, controller);
     }
 
     @Override
     protected <B extends IoBuffer<B>> InputSocket<B> instrument(
             InputSocket<B> input,
             InstrumentingIOPool<B>.InstrumentingBuffer context) {
-        return new JmxInputSocket<B>(input, this, temp);
+        return new JmxInputSocket<B>(this, input, temp);
     }
 
     @Override
     protected <E extends Entry> InputSocket<E> instrument(
             InputSocket<E> input,
             InstrumentingController<JmxDirector> context) {
-        return new JmxInputSocket<E>(input, this,
+        return new JmxInputSocket<E>(this, input,
                 JmxController.class.cast(context).getIOStatistics());
     }
 
@@ -150,14 +150,14 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     protected <B extends IoBuffer<B>> OutputSocket<B> instrument(
             OutputSocket<B> output,
             InstrumentingIOPool<B>.InstrumentingBuffer context) {
-        return new JmxOutputSocket<B>(output, this, temp);
+        return new JmxOutputSocket<B>(this, output, temp);
     }
 
     @Override
     protected <E extends Entry> OutputSocket<E> instrument(
             OutputSocket<E> output,
             InstrumentingController<JmxDirector> context) {
-        return new JmxOutputSocket<E>(output, this,
+        return new JmxOutputSocket<E>(this, output,
                 JmxController.class.cast(context).getIOStatistics());
     }
 }

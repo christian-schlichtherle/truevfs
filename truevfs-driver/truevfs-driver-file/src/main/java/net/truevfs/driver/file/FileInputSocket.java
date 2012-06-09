@@ -4,13 +4,15 @@
  */
 package net.truevfs.driver.file;
 
-import net.truevfs.kernel.cio.AbstractInputSocket;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import static java.nio.file.Files.newByteChannel;
 import static java.nio.file.Files.newInputStream;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.kernel.cio.AbstractInputSocket;
+import net.truevfs.kernel.cio.Entry;
+import net.truevfs.kernel.cio.OutputSocket;
 
 /**
  * An input socket for a file entry.
@@ -29,17 +31,19 @@ final class FileInputSocket extends AbstractInputSocket<FileEntry> {
     }
 
     @Override
-    public FileEntry localTarget() {
+    public FileEntry target() {
         return entry;
     }
 
     @Override
-    public InputStream stream() throws IOException {
+    public InputStream stream(OutputSocket<? extends Entry> peer)
+    throws IOException {
         return newInputStream(entry.getPath());
     }
 
     @Override
-    public SeekableByteChannel channel() throws IOException {
+    public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
+    throws IOException {
         return newByteChannel(entry.getPath());
     }
 }

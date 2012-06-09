@@ -93,15 +93,15 @@ implements InputService<TarDriverEntry> {
                 entry.release();
             entry = driver.newEntry(name, tinEntry);
             if (!tinEntry.isDirectory()) {
-                final IoBuffer<?> temp = pool.allocate();
-                entry.setTemp(temp);
+                final IoBuffer<?> buffer = pool.allocate();
+                entry.setBuffer(buffer);
                 try {
-                    try (final OutputStream out = temp.output().stream()) {
+                    try (final OutputStream out = buffer.output().stream(null)) {
                         Streams.cat(tin, out);
                     }
                 } catch (final Throwable ex) {
                     try {
-                        temp.release();
+                        buffer.release();
                     } catch (final Throwable ex2) {
                         ex.addSuppressed(ex2);
                     }
@@ -208,7 +208,7 @@ implements InputService<TarDriverEntry> {
 
         final class Input extends AbstractInputSocket<TarDriverEntry> {
             @Override
-            public TarDriverEntry localTarget() throws IOException {
+            public TarDriverEntry target() throws IOException {
                 final TarDriverEntry entry = entry(name);
                 if (null == entry)
                     throw new NoSuchFileException(name, null, "Entry not found!");
@@ -218,17 +218,19 @@ implements InputService<TarDriverEntry> {
             }
 
             @Override
-            public InputStream stream() throws IOException {
-                return input().stream();
+            public InputStream stream(OutputSocket<? extends Entry> peer)
+            throws IOException {
+                return socket().stream(peer);
             }
 
             @Override
-            public SeekableByteChannel channel() throws IOException {
-                return input().channel();
+            public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
+            throws IOException {
+                return socket().channel(peer);
             }
 
-            InputSocket<? extends IoBuffer<?>> input() throws IOException {
-                return localTarget().getTemp().input();
+            private InputSocket<? extends IoBuffer<?>> socket() throws IOException {
+                return target().getBuffer().input();
             }
         } // Input
 

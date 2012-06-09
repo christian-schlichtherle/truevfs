@@ -10,14 +10,14 @@ import net.truevfs.kernel.cio._
 /** An output socket which obtains its delegate socket lazily and `reset`s
   * it upon any [[java.lang.Throwable]].
   *
-  * @see    ClutchInputSocket
-  * @tparam E the type of the `localTarget`.
+  * @see    LazyInputSocket
+  * @tparam E the type of the `target`.
   * @author Christian Schlichtherle
   */
 @NotThreadSafe
-private abstract class ClutchOutputSocket[E <: Entry]
-extends DelegatingOutputSocket[E] with ClutchSocketLike[E, OutputSocket[_ <: E]] {
-  override def localTarget() = apply(_.localTarget())
-  override def stream() = apply(_.stream())
-  override def channel() = apply(_.channel())
+private abstract class LazyOutputSocket[E <: Entry]
+extends AbstractOutputSocket[E] with LazySocketLike[E, OutputSocket[_ <: E]] {
+  override def target() = apply(_.target())
+  override def stream(peer: AnyInputSocket) = apply(_.stream(peer))
+  override def channel(peer: AnyInputSocket) = apply(_.channel(peer))
 }

@@ -4,10 +4,6 @@
  */
 package net.truevfs.kernel.io;
 
-import net.truevfs.kernel.TestConfig;
-import net.truevfs.kernel.ThrowManager;
-import net.truevfs.kernel.cio.ByteArrayIoBuffer;
-import static net.truevfs.kernel.util.Throwables.contains;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -18,6 +14,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import net.truevfs.kernel.TestConfig;
+import net.truevfs.kernel.ThrowManager;
+import net.truevfs.kernel.cio.ByteArrayIoBuffer;
+import static net.truevfs.kernel.util.Throwables.contains;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -53,12 +53,12 @@ public class StreamsTest {
 
     private static TestInputStream newTestInputStream(ByteArrayIoBuffer buffer)
     throws IOException {
-        return new TestInputStream(buffer.input().stream());
+        return new TestInputStream(buffer.input().stream(null));
     }
 
     private static TestOutputStream newTestOutputStream(ByteArrayIoBuffer buffer)
     throws IOException {
-        return new TestOutputStream(buffer.output().stream());
+        return new TestOutputStream(buffer.output().stream(null));
     }
 
     @Test

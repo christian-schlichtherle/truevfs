@@ -4,13 +4,6 @@
  */
 package net.truevfs.driver.http;
 
-import net.truevfs.kernel.*;
-import static net.truevfs.kernel.cio.Entry.Access.READ;
-import static net.truevfs.kernel.cio.Entry.Access.WRITE;
-import static net.truevfs.kernel.cio.Entry.Size.DATA;
-import static net.truevfs.kernel.cio.Entry.Type.FILE;
-import net.truevfs.kernel.cio.*;
-import net.truevfs.kernel.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,6 +14,13 @@ import java.util.Set;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.*;
+import static net.truevfs.kernel.cio.Entry.Access.READ;
+import static net.truevfs.kernel.cio.Entry.Access.WRITE;
+import static net.truevfs.kernel.cio.Entry.Size.DATA;
+import static net.truevfs.kernel.cio.Entry.Type.FILE;
+import net.truevfs.kernel.cio.*;
+import net.truevfs.kernel.util.BitField;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.cio.InputSocket;
 
 /**
  * @author  Christian Schlichtherle
@@ -25,8 +26,11 @@ final class JulOutputStream extends DecoratingOutputStream {
     private final OutputSocket<?> socket;
 
     @CreatesObligation
-    JulOutputStream(final OutputSocket<?> socket) throws IOException {
-        super(socket.stream());
+    JulOutputStream(
+            final OutputSocket<? extends Entry> socket,
+            final InputSocket<? extends Entry> peer)
+    throws IOException {
+        super(socket.stream(peer));
         this.socket = socket;
         log("Stream writing ");
     }
@@ -40,7 +44,7 @@ final class JulOutputStream extends DecoratingOutputStream {
     private void log(String message) {
         Entry target;
         try {
-            target = socket.localTarget();
+            target = socket.target();
         } catch (final IOException ignore) {
             target = null;
         }

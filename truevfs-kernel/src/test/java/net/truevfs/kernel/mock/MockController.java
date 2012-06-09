@@ -4,14 +4,6 @@
  */
 package net.truevfs.kernel.mock;
 
-import net.truevfs.kernel.*;
-import net.truevfs.kernel.cio.Entry.Access;
-import net.truevfs.kernel.cio.Entry.Type;
-import net.truevfs.kernel.cio.*;
-import net.truevfs.kernel.io.ThrowingInputStream;
-import net.truevfs.kernel.io.ThrowingOutputStream;
-import net.truevfs.kernel.io.ThrowingSeekableChannel;
-import net.truevfs.kernel.util.BitField;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,6 +15,14 @@ import java.util.concurrent.ConcurrentMap;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
+import net.truevfs.kernel.*;
+import net.truevfs.kernel.cio.Entry.Access;
+import net.truevfs.kernel.cio.Entry.Type;
+import net.truevfs.kernel.cio.*;
+import net.truevfs.kernel.io.ThrowingInputStream;
+import net.truevfs.kernel.io.ThrowingOutputStream;
+import net.truevfs.kernel.io.ThrowingSeekableChannel;
+import net.truevfs.kernel.util.BitField;
 
 /**
  * @author Christian Schlichtherle
@@ -150,18 +150,16 @@ public class MockController extends FsAbstractController<FsModel> {
             }
 
             @Override
-            public SeekableByteChannel channel()
+            public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
             throws IOException {
-                return new ThrowingSeekableChannel(
-                        boundSocket().channel(),
+                return new ThrowingSeekableChannel(socket().channel(peer),
                         config.getThrowControl());
             }
 
             @Override
-            public InputStream stream()
+            public InputStream stream(OutputSocket<? extends Entry> peer)
             throws IOException {
-                return new ThrowingInputStream(
-                        boundSocket().stream(),
+                return new ThrowingInputStream(socket().stream(peer),
                         config.getThrowControl());
             }
         } // Input
@@ -192,18 +190,16 @@ public class MockController extends FsAbstractController<FsModel> {
             }
 
             @Override
-            public SeekableByteChannel channel()
+            public SeekableByteChannel channel(InputSocket<? extends Entry> peer)
             throws IOException {
-                return new ThrowingSeekableChannel(
-                        boundSocket().channel(),
+                return new ThrowingSeekableChannel(socket().channel(peer),
                         config.getThrowControl());
             }
 
             @Override
-            public OutputStream stream()
+            public OutputStream stream(InputSocket<? extends Entry> peer)
             throws IOException {
-                return new ThrowingOutputStream(
-                        boundSocket().stream(),
+                return new ThrowingOutputStream(socket().stream(peer),
                         config.getThrowControl());
             }
         } // Output

@@ -4,15 +4,6 @@
  */
 package net.truevfs.kernel.mock;
 
-import net.truevfs.kernel.TestConfig;
-import net.truevfs.kernel.ThrowManager;
-import static net.truevfs.kernel.cio.Entry.ALL_ACCESS;
-import static net.truevfs.kernel.cio.Entry.ALL_SIZES;
-import net.truevfs.kernel.cio.Entry.Access;
-import net.truevfs.kernel.cio.Entry.Size;
-import net.truevfs.kernel.cio.*;
-import net.truevfs.kernel.io.DecoratingOutputStream;
-import net.truevfs.kernel.util.HashMaps;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +13,15 @@ import java.nio.file.NoSuchFileException;
 import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.kernel.TestConfig;
+import net.truevfs.kernel.ThrowManager;
+import static net.truevfs.kernel.cio.Entry.ALL_ACCESS;
+import static net.truevfs.kernel.cio.Entry.ALL_SIZES;
+import net.truevfs.kernel.cio.Entry.Access;
+import net.truevfs.kernel.cio.Entry.Size;
+import net.truevfs.kernel.cio.*;
+import net.truevfs.kernel.io.DecoratingOutputStream;
+import net.truevfs.kernel.util.HashMaps;
 
 /**
  * @author Christian Schlichtherle
@@ -117,7 +117,7 @@ implements Container<MockArchiveDriverEntry> {
 
             final class Input extends AbstractInputSocket<MockArchiveDriverEntry> {
                 @Override
-                public MockArchiveDriverEntry localTarget()
+                public MockArchiveDriverEntry target()
                 throws IOException {
                     final MockArchiveDriverEntry entry = entries.get(name);
                     if (null == entry)
@@ -126,21 +126,20 @@ implements Container<MockArchiveDriverEntry> {
                 }
 
                 @Override
-                public InputStream stream() throws IOException {
-                    return getBufferInputSocket().stream();
+                public InputStream stream(OutputSocket<? extends Entry> peer)
+                throws IOException {
+                    return getBufferInputSocket().stream(peer);
                 }
 
                 @Override
-                public SeekableByteChannel channel()
+                public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
                 throws IOException {
-                    return getBufferInputSocket().channel();
+                    return getBufferInputSocket().channel(peer);
                 }
 
-                InputSocket<? extends IoEntry<?>>
+                InputSocket<? extends IoBuffer<?>>
                 getBufferInputSocket() throws IOException {
-                    return localTarget()
-                            .getBuffer(getIOPool())
-                            .input();
+                    return target().getBuffer(getIOPool()).input();
                 }
             } // Input
 
@@ -169,19 +168,19 @@ implements Container<MockArchiveDriverEntry> {
 
             final class Output extends AbstractOutputSocket<MockArchiveDriverEntry> {
                 @Override
-                public MockArchiveDriverEntry localTarget() {
+                public MockArchiveDriverEntry target() {
                     return entry;
                 }
 
                 @Override
-                public OutputStream stream() throws IOException {
+                public OutputStream stream(final InputSocket<? extends Entry> peer)
+                throws IOException {
                     final class Stream extends DecoratingOutputStream {
                         boolean closed;
 
                         Stream() throws IOException {
-                            if (busy)
-                                throw new IOException("Busy!");
-                            this.out = getBufferOutputSocket().stream();
+                            if (busy) throw new IOException("Busy!");
+                            this.out = getBufferOutputSocket().stream(peer);
                             busy = true;
                         }
 
@@ -204,16 +203,14 @@ implements Container<MockArchiveDriverEntry> {
                     return getBufferOutputSocket().channel();
                 }*/
 
-                OutputSocket<? extends IoEntry<?>>
+                OutputSocket<? extends IoBuffer<?>>
                 getBufferOutputSocket() throws IOException {
                     entries.put(entry.getName(), entry);
-                    return localTarget()
-                            .getBuffer(getIOPool())
-                            .output();
+                    return target().getBuffer(getIOPool()).output();
                 }
 
                 void copyProperties() {
-                    final MockArchiveDriverEntry target = localTarget();
+                    final MockArchiveDriverEntry target = target();
                     final IoBuffer<?> buffer;
                     try {
                         buffer = target.getBuffer(getIOPool());

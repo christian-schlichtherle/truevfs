@@ -7,30 +7,29 @@ package net.truevfs.kernel.cio;
 import java.io.IOException;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An abstract decorator for an output socket.
  * 
  * @see    DecoratingInputSocket
- * @param  <E> the type of the {@link #localTarget() local target}.
+ * @param  <T> the type of the {@linkplain #target() target} entry for I/O
+ *         operations.
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
-public abstract class DecoratingOutputSocket<E extends Entry>
-extends DelegatingOutputSocket<E> {
+public abstract class DecoratingOutputSocket<T extends Entry>
+extends DelegatingOutputSocket<T> {
 
     /** The nullable decorated output socket. */
-    protected @Nullable OutputSocket<? extends E> socket;
+    protected @Nullable OutputSocket<? extends T> socket;
 
     protected DecoratingOutputSocket() { }
 
-    protected DecoratingOutputSocket(final OutputSocket<? extends E> socket) {
+    protected DecoratingOutputSocket(final OutputSocket<? extends T> socket) {
         this.socket = Objects.requireNonNull(socket);
     }
 
     @Override
-    protected OutputSocket<? extends E> socket() throws IOException {
+    protected OutputSocket<? extends T> socket() throws IOException {
         return socket;
     }
 

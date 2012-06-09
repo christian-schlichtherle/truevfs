@@ -4,6 +4,18 @@
  */
 package net.truevfs.kernel;
 
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import java.io.*;
+import java.net.URI;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.charset.Charset;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.CheckForNull;
 import static net.truevfs.kernel.FsAccessOptions.NONE;
 import static net.truevfs.kernel.cio.Entry.Access.*;
 import static net.truevfs.kernel.cio.Entry.Size.DATA;
@@ -18,18 +30,6 @@ import net.truevfs.kernel.io.PowerBuffer;
 import net.truevfs.kernel.mock.MockController;
 import net.truevfs.kernel.util.BitField;
 import static net.truevfs.kernel.util.Throwables.contains;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.*;
-import java.net.URI;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.CheckForNull;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -211,21 +211,20 @@ extends FsArchiveDriverTestBase<D> {
         final String name = name(i);
         final E entry = newEntry(name);
         final OutputSocket<? extends E> output = service.output(entry);
-        assertSame(entry, output.localTarget());
+        assertSame(entry, output.target());
 
         assertNull(service.entry(name));
         assertEquals(i, service.size());
 
         boolean failure = true;
-        final OutputStream out = output.stream();
+        final OutputStream out = output.stream(null);
         try {
             assertSame(entry, service.entry(name));
             assertEquals(i + 1, service.size());
             out.write(getData());
             failure = false;
         } finally {
-            if (failure)
-                out.close();
+            if (failure) out.close();
         }
         return out;
     }
@@ -271,7 +270,7 @@ extends FsArchiveDriverTestBase<D> {
             final PowerBuffer buf = PowerBuffer.allocate(getDataLength());
             SeekableByteChannel channel;
             try {
-                channel = input.channel();
+                channel = input.channel(null);
             } catch (final UnsupportedOperationException ex) {
                 channel = null;
                 logger.log(Level.FINE,
@@ -294,16 +293,14 @@ extends FsArchiveDriverTestBase<D> {
         {
             final byte[] buf = new byte[getDataLength()];
             boolean failure = true;
-            final DataInputStream
-                    in = new DataInputStream(input.stream());
+            final DataInputStream in = new DataInputStream(input.stream(null));
             try {
                 in.readFully(buf);
                 assertTrue(Arrays.equals(getData(), buf));
                 assertEquals(-1, in.read());
                 failure = false;
             } finally {
-                if (failure)
-                    in.close();
+                if (failure) in.close();
             }
             return in;
         }
@@ -453,17 +450,15 @@ extends FsArchiveDriverTestBase<D> {
                 }
 
                 @Override
-                public InputStream stream()
+                public InputStream stream(OutputSocket<? extends Entry> peer)
                 throws IOException {
-                    return new TestInputStream(
-                            boundSocket().stream());
+                    return new TestInputStream(socket().stream(peer));
                 }
 
                 @Override
-                public SeekableByteChannel channel()
+                public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
                 throws IOException {
-                    return new TestSeekableChannel(
-                            boundSocket().channel());
+                    return new TestSeekableChannel(socket().channel(peer));
                 }
             } // Input
 
@@ -484,23 +479,21 @@ extends FsArchiveDriverTestBase<D> {
                 }
 
                 @Override
-                public SeekableByteChannel channel()
+                public SeekableByteChannel channel(InputSocket<? extends Entry> peer)
                 throws IOException {
-                    return new TestSeekableChannel(
-                            boundSocket().channel());
+                    return new TestSeekableChannel(socket().channel(peer));
                 }
 
                 @Override
-                public OutputStream stream()
+                public OutputStream stream(InputSocket<? extends Entry> peer)
                 throws IOException {
-                    return new TestOutputStream(
-                            boundSocket().stream());
+                    return new TestOutputStream(socket().stream(peer));
                 }
             } // Output
 
             return new Output();
         }
-    } // TestController
+    } // ParentController
 
     @SuppressWarnings("MarkerInterface")
     private interface TestCloseable extends Closeable {

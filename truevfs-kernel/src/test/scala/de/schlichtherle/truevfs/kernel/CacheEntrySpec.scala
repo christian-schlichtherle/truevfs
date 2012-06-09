@@ -257,20 +257,20 @@ class CacheEntrySpec extends WordSpec with ShouldMatchers with PropertyChecks {
 }
 
 private object CacheEntryTest {
-  class BrokenInputSocket(override val localTarget: Entry)
+  class BrokenInputSocket(override val target: Entry)
   extends AbstractInputSocket[Entry] {
-    require(null ne localTarget)
+    require(null ne target)
 
-    override def stream = new InputStream {
+    override def stream(peer: AnyOutputSocket) = new InputStream {
       override def read = throw new IOException
     }
   }
 
-  class BrokenOutputSocket(override val localTarget: Entry)
+  class BrokenOutputSocket(override val target: Entry)
   extends AbstractOutputSocket[Entry] {
-    require(null ne localTarget)
+    require(null ne target)
 
-    override def stream = new OutputStream {
+    override def stream(peer: AnyInputSocket) = new OutputStream {
       override def write(b: Int) { throw new IOException }
     }
   }

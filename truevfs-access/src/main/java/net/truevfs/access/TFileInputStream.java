@@ -93,6 +93,6 @@ public final class TFileInputStream extends DecoratingInputStream {
     @CreatesObligation
     private static InputStream newInputStream(final File src)
     throws IOException {
-        return TBIO.input(TConfig.get().getAccessPreferences(), src).stream();
+        return TBIO.input(TConfig.get().getAccessPreferences(), src).stream(null);
     }
 }

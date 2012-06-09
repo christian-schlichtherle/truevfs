@@ -10,12 +10,8 @@ import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.truevfs.kernel.FsAccessOption;
-import net.truevfs.kernel.cio.AbstractInputSocket;
-import net.truevfs.kernel.cio.IoBuffer;
-import net.truevfs.kernel.cio.IoSockets;
-import net.truevfs.kernel.io.AbstractSource;
+import net.truevfs.kernel.cio.*;
 import net.truevfs.kernel.io.DecoratingReadOnlyChannel;
-import net.truevfs.kernel.io.Streams;
 import net.truevfs.kernel.util.BitField;
 
 /**
@@ -37,17 +33,19 @@ public class HttpInputSocket extends AbstractInputSocket<HttpEntry> {
     }
 
     @Override
-    public HttpEntry localTarget() {
+    public HttpEntry target() {
         return entry;
     }
 
     @Override
-    public InputStream stream() throws IOException {
+    public InputStream stream(final OutputSocket<? extends Entry> peer)
+    throws IOException {
         return entry.newInputStream();
     }
 
     @Override
-    public SeekableByteChannel channel() throws IOException {
+    public SeekableByteChannel channel(final OutputSocket<? extends Entry> peer)
+    throws IOException {
         final IoBuffer<?> temp = entry.getPool().allocate();
         try {
             IoSockets.copy(entry.input(), temp.output());
@@ -64,7 +62,7 @@ public class HttpInputSocket extends AbstractInputSocket<HttpEntry> {
 
             @CreatesObligation
             TempReadOnlyChannel() throws IOException {
-                super(temp.input().channel()); // bind(*) is considered redundant for IoPool.IoBuffer
+                super(temp.input().channel(peer)); // or .channel(null)
             }
 
             @Override

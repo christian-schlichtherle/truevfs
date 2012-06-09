@@ -46,19 +46,31 @@ private trait SyncController extends Controller[LockModel] {
     apply(super.setTime(options, name, types, value))
 
   abstract override def input(options: AccessOptions, name: FsEntryName) = {
-    final class Input extends DecoratingInputSocket[Entry](super.input(options, name)) {
-      override def localTarget() = apply(boundSocket.localTarget())
-      override def stream() = apply(new SyncInputStream(boundSocket.stream()))
-      override def channel() = apply(new SyncSeekableChannel(boundSocket.channel()))
+    final class Input extends AbstractInputSocket[Entry] {
+      private[this] val socket = SyncController.super.input(options, name)
+
+      override def target() = apply(socket.target())
+
+      override def stream(peer: AnyOutputSocket) =
+        apply(new SyncInputStream(socket stream peer))
+
+      override def channel(peer: AnyOutputSocket) =
+        apply(new SyncSeekableChannel(socket channel peer))
     }
     new Input
   }: AnyInputSocket
 
   abstract override def output(options: AccessOptions, name: FsEntryName, template: Option[Entry]) = {
-    final class Output extends DecoratingOutputSocket[Entry](super.output(options, name, template)) {
-      override def localTarget = apply(boundSocket.localTarget)
-      override def stream() = apply(new SyncOutputStream(boundSocket.stream))
-      override def channel() = apply(new SyncSeekableChannel(boundSocket.channel))
+    final class Output extends AbstractOutputSocket[Entry] {
+      private[this] val socket = SyncController.super.output(options, name, template)
+
+      override def target = apply(socket.target)
+
+      override def stream(peer: AnyInputSocket) =
+        apply(new SyncOutputStream(socket stream peer))
+
+      override def channel(peer: AnyInputSocket) =
+        apply(new SyncSeekableChannel(socket channel peer))
     }
     new Output
   }: AnyOutputSocket

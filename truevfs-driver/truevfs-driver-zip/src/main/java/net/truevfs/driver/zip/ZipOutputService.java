@@ -78,7 +78,7 @@ implements OutputService<ZipDriverEntry> {
                 if (0 < source.getPostambleLength()) {
                     this.postamble = getIOPool().allocate();
                     Streams.copy(   source.getPostambleInputStream(),
-                                    this.postamble.output().stream());
+                                    this.postamble.output().stream(null));
                 }
             }
         } catch (final Throwable ex) {
@@ -142,19 +142,20 @@ implements OutputService<ZipDriverEntry> {
 
         final class Output extends AbstractOutputSocket<ZipDriverEntry> {
             @Override
-            public ZipDriverEntry localTarget() {
+            public ZipDriverEntry target() {
                 return local;
             }
 
             @Override
-            public OutputStream stream() throws IOException {
+            public OutputStream stream(InputSocket<? extends Entry> peer)
+            throws IOException {
                 if (isBusy())
                     throw new OutputBusyException(local.getName());
                 if (local.isDirectory()) {
                     updateProperties(local, DirectoryTemplate.INSTANCE);
                     return new EntryOutputStream(local, false);
                 }
-                final boolean rdc = updateProperties(local, peerTarget());
+                final boolean rdc = updateProperties(local, target(peer));
                 if (STORED == local.getMethod()) {
                     if (UNKNOWN == local.getCrc()
                             || UNKNOWN == local.getSize()
@@ -254,14 +255,14 @@ implements OutputService<ZipDriverEntry> {
             final InputSocket<?> input = postamble.input();
             Throwable ex = null;
             try {
-                try (final InputStream in = input.stream()) {
+                try (final InputStream in = input.stream(null)) {
                     // If the output ZIP file differs in length from the
                     // input ZIP file then pad the output to the next four
                     // byte boundary before appending the postamble.
                     // This might be required for self extracting files on
                     // some platforms, e.g. Windows x86.
                     final long ol = length();
-                    final long ipl = input.localTarget().getSize(DATA);
+                    final long ipl = input.target().getSize(DATA);
                     if ((ol + ipl) % 4 != 0)
                         write(new byte[4 - (int) (ol % 4)]);
                     Streams.cat(in, this);
@@ -336,7 +337,7 @@ implements OutputService<ZipDriverEntry> {
             final IoBuffer<?> buffer = this.buffer = getIOPool().allocate();
             try {
                 this.out = new CheckedOutputStream(
-                        buffer.output().stream(),
+                        buffer.output().stream(null),
                         new CRC32());
             } catch (final Throwable ex) {
                 try {
@@ -373,7 +374,7 @@ implements OutputService<ZipDriverEntry> {
 
         void storeBuffer() throws IOException {
             final IoBuffer<?> buffer = this.buffer;
-            try (final InputStream in = buffer.input().stream()) {
+            try (final InputStream in = buffer.input().stream(null)) {
                 final ZipOutputService zos = ZipOutputService.this;
                 zos.putNextEntry(local, true);
                 final SuppressedExceptionBuilder<IOException>

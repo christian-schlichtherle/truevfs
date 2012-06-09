@@ -4,17 +4,13 @@
  */
 package net.truevfs.extension.jmxjul;
 
+import java.util.Objects;
+import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.*;
 import net.truevfs.kernel.cio.Entry;
 import net.truevfs.kernel.cio.InputSocket;
 import net.truevfs.kernel.cio.OutputSocket;
-import net.truevfs.kernel.FsController;
-import net.truevfs.kernel.FsDecoratingController;
-import net.truevfs.kernel.FsModel;
-import net.truevfs.kernel.FsEntryName;
-import net.truevfs.kernel.FsAccessOption;
 import net.truevfs.kernel.util.BitField;
-import java.util.Objects;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * @param  <D> the type of the instrumenting director.
@@ -27,8 +23,8 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     protected final D director;
 
     public InstrumentingController(
-            final FsController<? extends FsModel> controller,
-            final D director) {
+            final D director,
+            final FsController<? extends FsModel> controller) {
         super(controller);
         this.director = Objects.requireNonNull(director);
     }
