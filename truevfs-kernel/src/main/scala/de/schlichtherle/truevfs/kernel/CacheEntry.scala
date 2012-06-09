@@ -116,7 +116,7 @@ private final class CacheEntry private (
   def input: AnyInputSocket = {
     final class Input extends DelegatingInputSocket[Entry] with BufferAllocator {
       def socket() = buffer(inputBufferPool).input
-      override def localTarget() = localTarget(_input.get)
+      override def target() = target(_input.get)
     }
     new Input
   }
@@ -128,7 +128,7 @@ private final class CacheEntry private (
   def output: AnyOutputSocket = {
     final class Output extends DelegatingOutputSocket[Entry] with BufferAllocator {
       def socket() = buffer(outputBufferPool).output
-      override def localTarget() = localTarget(_output.get)
+      override def target() = target(_output.get)
     }
     new Output
   }
@@ -142,10 +142,10 @@ private final class CacheEntry private (
       buffer
     }
 
-    def localTarget(socket: IoSocket[_ <: Entry, _, _, _]) = {
+    def target(socket: IoSocket[_ <: Entry]) = {
       _buffer match {
         case Some(buffer) => buffer
-        case _ => new CacheEntry.ProxyEntry(socket/*.bind(this)*/.localTarget()) // do NOT bind!
+        case None => new ProxyEntry(socket.target())
       }
     }
   }
@@ -315,10 +315,13 @@ private final class CacheEntry private (
       final class Input extends AbstractInputSocket[Buffer] {
         private[this] val socket = data.input
 
-        def boundSocket = socket.bind(this)
-        def localTarget() = Buffer.this
-        override def stream() = new CacheInputStream(boundSocket.stream())
-        override def channel() = new CacheReadOnlyChannel(boundSocket.channel())
+        def target() = Buffer.this
+
+        override def stream(peer: AnyOutputSocket) =
+          new CacheInputStream(socket.stream(peer))
+
+        override def channel(peer: AnyOutputSocket) =
+          new CacheReadOnlyChannel(socket.channel(peer))
       }
       new Input
     }
@@ -327,10 +330,13 @@ private final class CacheEntry private (
       final class Output extends AbstractOutputSocket[Buffer] {
         private[this] val socket = data.output
 
-        def boundSocket = socket.bind(this)
-        def localTarget() = Buffer.this
-        override def stream() = new CacheOutputStream(boundSocket.stream())
-        override def channel() = new CacheSeekableChannel(boundSocket.channel())
+        def target() = Buffer.this
+
+        override def stream(peer: AnyInputSocket) =
+          new CacheOutputStream(socket stream peer)
+
+        override def channel(peer: AnyInputSocket) =
+          new CacheSeekableChannel(socket channel peer)
       }
       new Output
     }

@@ -4,6 +4,10 @@
  */
 package net.truevfs.driver.tar;
 
+import java.io.IOException;
+import java.util.Date;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import net.truevfs.kernel.FsArchiveEntries;
 import net.truevfs.kernel.FsArchiveEntry;
 import static net.truevfs.kernel.cio.Entry.Access.WRITE;
@@ -13,10 +17,6 @@ import static net.truevfs.kernel.cio.Entry.Type.DIRECTORY;
 import static net.truevfs.kernel.cio.Entry.Type.FILE;
 import net.truevfs.kernel.cio.IoBuffer;
 import net.truevfs.kernel.util.Releasable;
-import java.io.IOException;
-import java.util.Date;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**
@@ -43,7 +43,7 @@ implements FsArchiveEntry, Releasable<IOException> {
     private static final int TOEXEC  = 0001; // Execute/search by other
 
     private byte init; // bit flags for init state
-    private @CheckForNull IoBuffer<?> temp;
+    private @CheckForNull IoBuffer<?> buffer;
 
     public TarDriverEntry(final String name) {
         super(name, true);
@@ -79,19 +79,19 @@ implements FsArchiveEntry, Releasable<IOException> {
             this.init &= ~mask;
     }
 
-    @Nullable IoBuffer<?> getTemp() {
-        return temp;
+    @Nullable IoBuffer<?> getBuffer() {
+        return buffer;
     }
 
-    void setTemp(@CheckForNull IoBuffer<?> temp) {
-        this.temp = temp;
+    void setBuffer(@CheckForNull IoBuffer<?> buffer) {
+        this.buffer = buffer;
     }
 
     @Override
     public void release() throws IOException {
-        if (null != temp) {
-            temp.release();
-            temp = null;
+        if (null != buffer) {
+            buffer.release();
+            buffer = null;
         }
     }
 

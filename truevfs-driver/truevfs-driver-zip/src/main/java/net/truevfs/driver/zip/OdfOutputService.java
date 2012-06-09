@@ -4,18 +4,15 @@
  */
 package net.truevfs.driver.zip;
 
-import static net.truevfs.driver.zip.io.ZipEntry.STORED;
-import net.truevfs.kernel.cio.DecoratingOutputSocket;
-import static net.truevfs.kernel.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.cio.IoPool;
-import net.truevfs.kernel.cio.MultiplexingOutputService;
-import net.truevfs.kernel.cio.OutputSocket;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Objects;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
+import static net.truevfs.driver.zip.io.ZipEntry.STORED;
+import static net.truevfs.kernel.cio.Entry.UNKNOWN;
+import net.truevfs.kernel.cio.*;
 
 /**
  * Created by {@link OdfDriver} to meet the special requirements of
@@ -49,23 +46,22 @@ public class OdfOutputService extends MultiplexingOutputService<ZipDriverEntry> 
         Objects.requireNonNull(entry);
 
         final class Output extends DecoratingOutputSocket<ZipDriverEntry> {
-            Output() {
-                super(OdfOutputService.super.output(entry));
-            }
+            Output() { super(OdfOutputService.super.output(entry)); }
 
             @Override
-            public ZipDriverEntry localTarget() throws IOException {
+            public ZipDriverEntry target() throws IOException {
                 return entry;
             }
 
             @Override
-            public OutputStream stream() throws IOException {
+            public OutputStream stream(InputSocket<? extends Entry> peer)
+            throws IOException {
                 if (MIMETYPE.equals(entry.getName())) {
                     mimetype = true;
                     if (UNKNOWN == entry.getMethod())
                         entry.setMethod(STORED);
                 }
-                return super.stream();
+                return socket().stream(peer);
             }
         } // Output
 

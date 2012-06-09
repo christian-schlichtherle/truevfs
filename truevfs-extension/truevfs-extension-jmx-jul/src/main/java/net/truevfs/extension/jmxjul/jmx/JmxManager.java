@@ -4,13 +4,13 @@
  */
 package net.truevfs.extension.jmxjul.jmx;
 
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.extension.jmxjul.InstrumentingManager;
 import net.truevfs.kernel.FsManager;
 import net.truevfs.kernel.FsSyncException;
 import net.truevfs.kernel.FsSyncOption;
 import net.truevfs.kernel.FsSyncWarningException;
 import net.truevfs.kernel.util.BitField;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * @author Christian Schlichtherle
@@ -19,8 +19,8 @@ import javax.annotation.concurrent.Immutable;
 final class JmxManager extends InstrumentingManager {
 
     @SuppressWarnings("LeakingThisInConstructor")
-    JmxManager(FsManager model, JmxDirector director) {
-        super(model, director);
+    JmxManager(JmxDirector director, FsManager model) {
+        super(director, model);
         assert null != director;
         director.setApplicationIOStatistics(new JmxIOStatistics());
         director.setKernelIOStatistics(new JmxIOStatistics());

@@ -14,8 +14,8 @@ import net.truevfs.kernel.FsModel;
 @Immutable
 final class JmxModel extends InstrumentingModel {
 
-    JmxModel(FsModel model, JmxDirector director) {
-        super(model, director);
+    JmxModel(JmxDirector director, FsModel model) {
+        super(director, model);
     }
 
     @Override

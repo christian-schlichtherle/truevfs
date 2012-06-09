@@ -85,44 +85,42 @@ extends FsDecoratingController[FsModel, FsController[_ <: FsModel]](c) {
 
   override def input(options: AccessOptions, name: FsEntryName) = {
     final class Input extends AbstractInputSocket[Entry] {
-      var last: FsController[_] = _
-      var socket: AnyInputSocket = _
+      var _last: FsController[_] = _
+      var _socket: AnyInputSocket = _
 
-      def getBoundSocket(c: FsController[_], n: FsEntryName) = {
-        if (last ne c) { last = c; socket = c.input(options, n) }
-        socket.bind(this)
+      def socket(c: FsController[_], n: FsEntryName) = {
+        if (_last ne c) { _last = c; _socket = c.input(options, n) }
+        _socket
       }
 
-      override def localTarget() =
-        apply(name, (c, n) => getBoundSocket(c, n).localTarget())
+      override def target() = apply(name, (c, n) => socket(c, n).target())
 
-      override def stream() =
-        apply(name, (c, n) => getBoundSocket(c, n).stream())
+      override def stream(peer: AnyOutputSocket) =
+        apply(name, (c, n) => socket(c, n).stream(peer))
 
-      override def channel() =
-        apply(name, (c, n) => getBoundSocket(c, n).channel())
+      override def channel(peer: AnyOutputSocket) =
+        apply(name, (c, n) => socket(c, n).channel(peer))
     }
     new Input
   }: AnyInputSocket
 
   override def output(options: AccessOptions, name: FsEntryName, template: Entry) = {
     final class Output extends AbstractOutputSocket[Entry] {
-      var last: FsController[_] = _
-      var socket: AnyOutputSocket = _
+      var _last: FsController[_] = _
+      var _socket: AnyOutputSocket = _
 
-      def getBoundSocket(c: FsController[_], n: FsEntryName) = {
-        if (last ne c) { last = c; socket = c.output(options, n, template) }
-        socket.bind(this)
+      def socket(c: FsController[_], n: FsEntryName) = {
+        if (_last ne c) { _last = c; _socket = c.output(options, n, template) }
+        _socket
       }
 
-      override def localTarget() =
-        apply(name, (c, n) => getBoundSocket(c, n).localTarget())
+      override def target() = apply(name, (c, n) => socket(c, n).target())
 
-      override def stream() =
-        apply(name, (c, n) => getBoundSocket(c, n).stream())
+      override def stream(peer: AnyInputSocket) =
+        apply(name, (c, n) => socket(c, n).stream(peer))
 
-      override def channel() =
-        apply(name, (c, n) => getBoundSocket(c, n).channel())
+      override def channel(peer: AnyInputSocket) =
+        apply(name, (c, n) => socket(c, n).channel(peer))
     }
     new Output
   }: AnyOutputSocket

@@ -127,6 +127,6 @@ public final class TFileOutputStream extends DecoratingOutputStream {
     private static OutputStream newOutputStream(final File dst,
                                                 final boolean append)
     throws IOException {
-        return TBIO.output(TConfig.get().getAccessPreferences().set(APPEND, append), dst, null).stream();
+        return TBIO.output(TConfig.get().getAccessPreferences().set(APPEND, append), dst, null).stream(null);
     }
 }

@@ -4,12 +4,13 @@
  */
 package net.truevfs.extension.jmxjul.jul;
 
-import net.truevfs.extension.jmxjul.InstrumentingOutputSocket;
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.OutputSocket;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.extension.jmxjul.InstrumentingOutputSocket;
+import net.truevfs.kernel.cio.Entry;
+import net.truevfs.kernel.cio.InputSocket;
+import net.truevfs.kernel.cio.OutputSocket;
 
 /**
  * @author  Christian Schlichtherle
@@ -18,12 +19,13 @@ import javax.annotation.concurrent.Immutable;
 final class JulOutputSocket<E extends Entry>
 extends InstrumentingOutputSocket<E> {
 
-    JulOutputSocket(OutputSocket<? extends E> model, JulDirector director) {
-        super(model, director);
+    JulOutputSocket(JulDirector director, OutputSocket<? extends E> model) {
+        super(director, model);
     }
 
     @Override
-    public OutputStream stream() throws IOException {
-        return new JulOutputStream(boundSocket());
+    public OutputStream stream(InputSocket<? extends Entry> peer)
+    throws IOException {
+        return new JulOutputStream(socket(), peer);
     }
 }

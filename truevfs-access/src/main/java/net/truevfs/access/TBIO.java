@@ -219,7 +219,7 @@ final class TBIO {
         BitField<FsAccessOption> preferences = config.getAccessPreferences();
         final InputSocket<?> input = input(preferences, src);
         final OutputSocket<?> output = output(preferences, dst,
-                preserve ? input.localTarget() : null);
+                preserve ? input.target() : null);
         IoSockets.copy(input, output);
     }
 

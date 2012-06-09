@@ -30,17 +30,27 @@ private trait ResourceController extends Controller[LockModel] {
   private[this] val accountant = new ResourceAccountant(writeLock)
 
   abstract override def input(options: AccessOptions, name: FsEntryName) = {
-    final class Input extends DecoratingInputSocket[Entry](super.input(options, name)) {
-      override def stream() = new ResourceInputStream(boundSocket.stream())
-      override def channel() = new ResourceSeekableChannel(boundSocket.channel())
+    final class Input extends DelegatingInputSocket[Entry] {
+      val socket = ResourceController.super.input(options, name)
+
+      override def stream(peer: AnyOutputSocket) =
+        new ResourceInputStream(socket.stream(peer))
+
+      override def channel(peer: AnyOutputSocket) =
+        new ResourceSeekableChannel(socket.channel(peer))
     }
     new Input
   }: AnyInputSocket
 
   abstract override def output(options: AccessOptions, name: FsEntryName, template: Option[Entry]) = {
-    final class Output extends DecoratingOutputSocket[Entry](super.output(options, name, template)) {
-      override def stream() = new ResourceOutputStream(boundSocket.stream())
-      override def channel() = new ResourceSeekableChannel(boundSocket.channel())
+    final class Output extends DelegatingOutputSocket[Entry] {
+      val socket = ResourceController.super.output(options, name, template)
+
+      override def stream(peer: AnyInputSocket) =
+        new ResourceOutputStream(socket.stream(peer))
+
+      override def channel(peer: AnyInputSocket) =
+        new ResourceSeekableChannel(socket.channel(peer))
     }
     new Output
   }: AnyOutputSocket

@@ -99,15 +99,15 @@ extends DecoratingOutputService<E, OutputService<E>> {
         }
 
         @Override
-        public OutputStream stream() throws IOException {
-            return new DisconnectingOutputStream(
-                    boundSocket().stream());
+        public OutputStream stream(InputSocket<? extends Entry> peer)
+        throws IOException {
+            return new DisconnectingOutputStream(socket().stream(peer));
         }
 
         @Override
-        public SeekableByteChannel channel() throws IOException {
-            return new DisconnectingSeekableChannel(
-                    boundSocket().channel());
+        public SeekableByteChannel channel(InputSocket<? extends Entry> peer)
+        throws IOException {
+            return new DisconnectingSeekableChannel(socket().channel(peer));
         }
     } // Output
 

@@ -4,11 +4,11 @@
  */
 package net.truevfs.extension.jmxjul;
 
+import java.util.Objects;
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.cio.DecoratingOutputSocket;
 import net.truevfs.kernel.cio.Entry;
 import net.truevfs.kernel.cio.OutputSocket;
-import java.util.Objects;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * @param  <E> the type of the {@linkplain #localTarget() local target}.
@@ -21,8 +21,8 @@ extends DecoratingOutputSocket<E> {
     protected final InstrumentingDirector<?> director;
 
     protected InstrumentingOutputSocket(
-            final OutputSocket<? extends E> socket,
-            final InstrumentingDirector<?> director) {
+            final InstrumentingDirector<?> director,
+            final OutputSocket<? extends E> socket) {
         super(socket);
         this.director = Objects.requireNonNull(director);
     }

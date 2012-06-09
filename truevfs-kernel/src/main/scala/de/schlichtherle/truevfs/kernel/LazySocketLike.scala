@@ -11,24 +11,21 @@ import scala.annotation.tailrec
 /** A mixin for an I/O socket which obtains its delegate socket lazily and
   * `reset`s it upon any [[java.lang.Throwable]].
   *
-  * @tparam E the type of the `localTarget`.
+  * @tparam E the type of the `target`.
   * @tparam S the type of the socket returned by `lazySocket`.
   * @author Christian Schlichtherle
   */
 @NotThreadSafe
-trait ClutchSocketLike[E <: Entry, +S <: IoSocket[_ <: E, Entry, _, _]] {
-  this: IoSocket[E, Entry, _, _] =>
+trait LazySocketLike[E <: Entry, +S <: IoSocket[_ <: E]] { this: IoSocket[E] =>
 
   private[this] var _socket: Option[S] = None
 
   protected final def apply[A](f: S => A) = {
-    try { f(boundSocket) }
+    try { f(socket) }
     catch { case ex => reset(); throw ex }
   }
 
   protected final def reset() { _socket = None }
-
-  protected def boundSocket(): S
 
   @tailrec
   protected final def socket: S = {

@@ -17,6 +17,13 @@ import net.truevfs.kernel.util.BitField;
  * 
  * @author Christian Schlichtherle
  */
+/* class FsInputSocketSource
+ * (val options: BitField[FsAccessOption], val socket: InputSocket[_ <: Entry]) {
+ *   def this(sink: FsInputSocketSource) = this(sink.options, sink.socket)
+ *   def stream() = socket stream null
+ *   def channel() = socket channel null
+ * }
+ */
 public class FsInputSocketSource implements Source {
     private final BitField<FsAccessOption> options;
     private final InputSocket<? extends Entry> socket;
@@ -43,11 +50,11 @@ public class FsInputSocketSource implements Source {
 
     @Override
     public InputStream stream() throws IOException {
-        return getSocket().stream();
+        return getSocket().stream(null);
     }
 
     @Override
     public SeekableByteChannel channel() throws IOException {
-        return getSocket().channel();
+        return getSocket().channel(null);
     }
 }

@@ -103,19 +103,20 @@ implements OutputService<TarDriverEntry> {
 
         final class Output extends AbstractOutputSocket<TarDriverEntry> {
             @Override
-            public TarDriverEntry localTarget() {
+            public TarDriverEntry target() {
                 return local;
             }
 
             @Override
-            public OutputStream stream() throws IOException {
+            public OutputStream stream(final InputSocket<? extends Entry> peer)
+            throws IOException {
                 if (isBusy())
                     throw new OutputBusyException(local.getName());
                 if (local.isDirectory()) {
                     updateProperties(local, DirectoryTemplate.INSTANCE);
                     return new EntryOutputStream(local);
                 }
-                updateProperties(local, peerTarget());
+                updateProperties(local, target(peer));
                 if (UNKNOWN == local.getSize())
                     return new BufferedEntryOutputStream(local);
                 return new EntryOutputStream(local);
@@ -226,7 +227,7 @@ implements OutputService<TarDriverEntry> {
             this.local = local;
             final IoBuffer<?> buffer = this.buffer = getIOPool().allocate();
             try {
-                this.out = buffer.output().stream();
+                this.out = buffer.output().stream(null);
             } catch (final Throwable ex) {
                 try {
                     buffer.release();
@@ -253,7 +254,7 @@ implements OutputService<TarDriverEntry> {
 
         void storeBuffer() throws IOException {
             final IoBuffer<?> buffer = this.buffer;
-            try (final InputStream in = buffer.input().stream()) {
+            try (final InputStream in = buffer.input().stream(null)) {
                 final TarArchiveOutputStream taos = TarOutputService.this.tos;
                 taos.putArchiveEntry(local);
                 final SuppressedExceptionBuilder<IOException>

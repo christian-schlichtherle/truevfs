@@ -4,13 +4,13 @@
  */
 package net.truevfs.extension.jmxjul;
 
+import java.util.Objects;
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.FsCompositeDriver;
 import net.truevfs.kernel.FsController;
 import net.truevfs.kernel.FsManager;
 import net.truevfs.kernel.FsModel;
-import java.util.Objects;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * @author Christian Schlichtherle
@@ -18,13 +18,14 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class InstrumentingCompositeDriver implements FsCompositeDriver {
 
-    protected final FsCompositeDriver driver;
     protected final InstrumentingDirector<?> director;
+    protected final FsCompositeDriver driver;
 
-    public InstrumentingCompositeDriver(final FsCompositeDriver driver,
-                                        final InstrumentingDirector<?> director) {
-        this.driver = Objects.requireNonNull(driver);
+    public InstrumentingCompositeDriver(
+            final InstrumentingDirector<?> director,
+            final FsCompositeDriver driver) {
         this.director = Objects.requireNonNull(director);
+        this.driver = Objects.requireNonNull(driver);
     }
 
     @Override

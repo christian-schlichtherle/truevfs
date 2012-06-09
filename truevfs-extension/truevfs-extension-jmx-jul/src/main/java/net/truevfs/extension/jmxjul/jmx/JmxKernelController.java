@@ -11,8 +11,8 @@ import net.truevfs.kernel.FsController;
  */
 final class JmxKernelController extends JmxController {
 
-    JmxKernelController(FsController<?> controller, JmxDirector director) {
-        super(controller, director);
+    JmxKernelController(JmxDirector director, FsController<?> controller) {
+        super(director, controller);
     }
 
     @Override

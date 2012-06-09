@@ -222,14 +222,14 @@ public final class TFileSystem extends FileSystem {
                     o = path.inputOptions(options).set(CACHE);
             return controller
                     .input(o, name)
-                    .channel();
+                    .channel(null);
         } else {
             final BitField<FsAccessOption>
                     o = path.outputOptions(options).set(CACHE);
             try {
                 return controller
                         .output(o, name, null)
-                        .channel();
+                        .channel(null);
             } catch (final IOException ex) {
                 // TODO: Filter FileAlreadyExistsException.
                 if (o.get(EXCLUSIVE) && null != controller.stat(o, name))
@@ -243,18 +243,15 @@ public final class TFileSystem extends FileSystem {
     InputStream newInputStream(TPath path, OpenOption... options)
     throws IOException {
         return getController()
-                .input(
-                    path.inputOptions(options), path.getEntryName())
-                .stream();
+                .input(path.inputOptions(options), path.getEntryName())
+                .stream(null);
     }
 
     OutputStream newOutputStream(TPath path, OpenOption... options)
     throws IOException {
         return getController()
-                .output(
-                    path.outputOptions(options), path.getEntryName(),
-                    null)
-                .stream();
+                .output(path.outputOptions(options), path.getEntryName(), null)
+                .stream(null);
     }
 
     DirectoryStream<Path> newDirectoryStream(

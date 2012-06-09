@@ -4,11 +4,11 @@
  */
 package net.truevfs.extension.jmxjul.jmx;
 
-import net.truevfs.kernel.cio.IoBuffer;
-import net.truevfs.kernel.cio.IoPool;
-import net.truevfs.extension.jmxjul.InstrumentingIOPool;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.extension.jmxjul.InstrumentingIOPool;
+import net.truevfs.kernel.cio.IoBuffer;
+import net.truevfs.kernel.cio.IoPool;
 
 /**
  * @author Christian Schlichtherle
@@ -18,7 +18,7 @@ final class JmxIOPool<B extends IoBuffer<B>>
 extends InstrumentingIOPool<B> {
 
     JmxIOPool(IoPool<B> model, JmxDirector director) {
-        super(model, director);
+        super(director, model);
     }
 
     @Override

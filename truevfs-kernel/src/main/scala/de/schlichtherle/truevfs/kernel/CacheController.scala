@@ -206,21 +206,15 @@ private trait CacheController extends Controller[LockModel] {
       /** This class requires LAZY INITIALIZATION of its channel, but NO
         * automatic decoupling on exceptions!
         */
-      final class Input extends ClutchInputSocket[Entry] {
+      final class Input extends DelegatingInputSocket[Entry] {
         private[this] val _options = options clear CACHE // consume
 
-        override def lazySocket = CacheController.super.input(_options, name)
+        override lazy val socket = CacheController.super.input(_options, name)
 
-        // Bypass the super class implementation to keep the
-        // socket even upon an exception!
-        override def localTarget() = boundSocket.localTarget()
-
-        override def stream() = {
+        override def stream(peer: AnyOutputSocket) = {
           assert(writeLockedByCurrentThread)
 
-          // Bypass the super class implementation to keep the
-          // socket even upon an exception!
-          final class Stream extends DecoratingInputStream(boundSocket.stream()) {
+          final class Stream extends DecoratingInputStream(socket.stream(peer)) {
             assert(touched)
 
             override def close() {
@@ -232,7 +226,7 @@ private trait CacheController extends Controller[LockModel] {
           new Stream
         }
 
-        override def channel() = throw new AssertionError
+        override def channel(peer: AnyOutputSocket) = throw new AssertionError
       }
       cache.configure(new Input) input
     }: AnyInputSocket
@@ -241,25 +235,19 @@ private trait CacheController extends Controller[LockModel] {
       /** This class requires LAZY INITIALIZATION of its channel, but NO
         * automatic decoupling on exceptions!
         */
-      final class Output extends ClutchOutputSocket[Entry] {
+      final class Output extends DelegatingOutputSocket[Entry] {
         private[this] val _options = options clear CACHE // consume
 
-        override def lazySocket = cache
+        override lazy val socket = cache
           .configure(CacheController.super.output(
               _options clear EXCLUSIVE, name, template))
           .output
 
-        // Bypass the super class implementation to keep the
-        // socket even upon an exception!
-        override def localTarget() = boundSocket.localTarget()
-
-        override def stream() = {
+        override def stream(peer: AnyInputSocket) = {
           assert(writeLockedByCurrentThread)
           preOutput()
 
-          // Bypass the super class implementation to keep the
-          // socket even upon an exception!
-          final class Stream extends DecoratingOutputStream(boundSocket.stream()) {
+          final class Stream extends DecoratingOutputStream(socket.stream(peer)) {
             register()
 
             override def close() {
@@ -271,13 +259,11 @@ private trait CacheController extends Controller[LockModel] {
           new Stream
         }
 
-        override def channel() = {
+        override def channel(peer: AnyInputSocket) = {
           assert(writeLockedByCurrentThread)
           preOutput()
 
-          // Bypass the super class implementation to keep the
-          // socket even upon an exception!
-          final class Channel extends DecoratingSeekableChannel(boundSocket.channel()) {
+          final class Channel extends DecoratingSeekableChannel(socket.channel(peer)) {
             register()
 
             override def close() {

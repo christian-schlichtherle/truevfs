@@ -4,10 +4,10 @@
  */
 package net.truevfs.extension.jmxjul;
 
-import net.truevfs.kernel.cio.*;
 import java.io.IOException;
 import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.cio.*;
 
 /**
  * @param  <B> the type parameter for the I/O buffers managed by this pool.
@@ -16,13 +16,14 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class InstrumentingIOPool<B extends IoBuffer<B>> implements IoPool<B> {
 
-    protected final IoPool<B> pool;
     protected final InstrumentingDirector<?> director;
+    protected final IoPool<B> pool;
 
-    public InstrumentingIOPool( final IoPool<B> pool,
-                                final InstrumentingDirector<?> director) {
-        this.pool = Objects.requireNonNull(pool);
+    public InstrumentingIOPool(
+            final InstrumentingDirector<?> director,
+            final IoPool<B> pool) {
         this.director = Objects.requireNonNull(director);
+        this.pool = Objects.requireNonNull(pool);
     }
 
     @Override

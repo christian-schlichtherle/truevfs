@@ -7,22 +7,38 @@ package net.truevfs.kernel.cio;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
-import javax.annotation.concurrent.NotThreadSafe;
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.io.ChannelOutputStream;
 
 /**
  * An abstract factory for output resources for writing bytes to its
  * <i>local target</i>.
  *
- * @param  <E> the type of the {@link #localTarget() local target}
- *         for I/O operations.
+ * @param  <T> the type of the {@linkplain #target() target} entry for I/O
+ *         operations.
  * @see    AbstractInputSocket
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
-public abstract class AbstractOutputSocket<E extends Entry>
-extends AbstractIoSocket<E, Entry, OutputSocket<E>, InputSocket<? extends Entry>>
-implements OutputSocket<E> {
+@Immutable
+public abstract class AbstractOutputSocket<T extends Entry>
+extends AbstractIoSocket<T> implements OutputSocket<T> {
+
+    /**
+     * Returns the target of the given nullable peer socket or null.
+     * This method is provided for convenience.
+     * 
+     * @param  <E> the type of the peer socket's local target.
+     * @param  peer the nullable peer socket.
+     * @return {@code null} if the given reference is null or the target of the
+     *         given peer socket otherwise.
+     * @throws IOException if resolving the peer's local target fails.
+     */
+    protected final @CheckForNull <E extends Entry> E target(
+            @CheckForNull InputSocket<E> peer)
+    throws IOException {
+        return null != peer ? peer.target() : null;
+    }
 
     /**
      * {@inheritDoc}
@@ -35,8 +51,9 @@ implements OutputSocket<E> {
      * implementation.
      */
     @Override
-    public OutputStream stream() throws IOException {
-        return new ChannelOutputStream(channel());
+    public OutputStream stream(InputSocket<? extends Entry> peer)
+    throws IOException {
+        return new ChannelOutputStream(channel(peer));
     }
 
     /**
@@ -47,7 +64,8 @@ implements OutputSocket<E> {
      *         this type.
      */
     @Override
-    public SeekableByteChannel channel() throws IOException {
+    public SeekableByteChannel channel(InputSocket<? extends Entry> peer)
+    throws IOException {
         throw new UnsupportedOperationException();
     }
 }

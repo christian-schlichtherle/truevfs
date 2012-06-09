@@ -4,12 +4,14 @@
  */
 package net.truevfs.extension.jmxjul.jul;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.channels.SeekableByteChannel;
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.extension.jmxjul.InstrumentingInputSocket;
 import net.truevfs.kernel.cio.Entry;
 import net.truevfs.kernel.cio.InputSocket;
-import java.io.IOException;
-import java.io.InputStream;
-import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.cio.OutputSocket;
 
 /**
  * @author Christian Schlichtherle
@@ -18,17 +20,19 @@ import javax.annotation.concurrent.Immutable;
 final class JulInputSocket<E extends Entry>
 extends InstrumentingInputSocket<E> {
 
-    JulInputSocket(InputSocket<? extends E> model, JulDirector director) {
-        super(model, director);
+    JulInputSocket(JulDirector director, InputSocket<? extends E> model) {
+        super(director, model);
     }
 
     @Override
-    public InputStream stream() throws IOException {
-        return new JulInputStream(boundSocket());
+    public InputStream stream(OutputSocket<? extends Entry> peer)
+    throws IOException {
+        return new JulInputStream(socket(), peer);
     }
 
     @Override
-    public java.nio.channels.SeekableByteChannel channel() throws IOException {
-        return new JulInputChannel(boundSocket());
+    public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
+    throws IOException {
+        return new JulInputChannel(socket(), peer);
     }
 }

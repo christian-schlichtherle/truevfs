@@ -25,17 +25,27 @@ private trait FinalizeController extends FsController[FsModel] {
   import FinalizeController._
 
   abstract override def input(options: AccessOptions, name: FsEntryName) = {
-    final class Input extends DecoratingInputSocket[Entry](super.input(options, name)) {
-      override def stream() = new FinalizeInputStream(boundSocket.stream())
-      override def channel() = new FinalizeSeekableChannel(boundSocket.channel())
+    final class Input extends DelegatingInputSocket[Entry] {
+      val socket = FinalizeController.super.input(options, name)
+
+      override def stream(peer: AnyOutputSocket) =
+        new FinalizeInputStream(socket.stream(peer))
+
+      override def channel(peer: AnyOutputSocket) =
+        new FinalizeSeekableChannel(socket.channel(peer))
     }
     new Input
   }: AnyInputSocket
 
   abstract override def output(options: AccessOptions, name: FsEntryName, template: Entry) = {
-    final class Output extends DecoratingOutputSocket[Entry](super.output(options, name, template)) {
-      override def stream() = new FinalizeOutputStream(boundSocket.stream())
-      override def channel() = new FinalizeSeekableChannel(boundSocket.channel())
+    final class Output extends DelegatingOutputSocket[Entry] {
+      val socket = FinalizeController.super.output(options, name, template)
+
+      override def stream(peer: AnyInputSocket) =
+        new FinalizeOutputStream(socket.stream(peer))
+
+      override def channel(peer: AnyInputSocket) =
+        new FinalizeSeekableChannel(socket.channel(peer))
     }
     new Output
   }: AnyOutputSocket

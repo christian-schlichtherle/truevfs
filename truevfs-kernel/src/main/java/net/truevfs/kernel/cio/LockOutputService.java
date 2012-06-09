@@ -82,17 +82,18 @@ extends DecoratingOutputService<E, OutputService<E>> {
             }
 
             @Override
-            public E localTarget() throws IOException {
+            public E target() throws IOException {
                 return entry;
             }
 
             @Override
             @GuardedBy("lock")
-            public OutputStream stream() throws IOException {
+            public OutputStream stream(InputSocket<? extends Entry> peer)
+            throws IOException {
                 final OutputStream in;
                 lock.lock();
                 try {
-                    in = boundSocket().stream();
+                    in = socket().stream(peer);
                 } finally {
                     lock.unlock();
                 }
@@ -101,11 +102,12 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
             @Override
             @GuardedBy("lock")
-            public SeekableByteChannel channel() throws IOException {
+            public SeekableByteChannel channel(InputSocket<? extends Entry> peer)
+            throws IOException {
                 final SeekableByteChannel channel;
                 lock.lock();
                 try {
-                    channel = boundSocket().channel();
+                    channel = socket().channel(peer);
                 } finally {
                     lock.unlock();
                 }

@@ -4,12 +4,12 @@
  */
 package net.truevfs.extension.jmxjul;
 
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.FsCompositeDriver;
 import net.truevfs.kernel.FsController;
 import net.truevfs.kernel.FsManager;
 import net.truevfs.kernel.FsModel;
 import net.truevfs.kernel.cio.*;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * @param  <D> the type of this instrumenting director.
@@ -19,7 +19,7 @@ import javax.annotation.concurrent.Immutable;
 public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> {
 
     public FsManager instrument(FsManager manager) {
-        return new InstrumentingManager(manager, this);
+        return new InstrumentingManager(this, manager);
     }
 
     public abstract <B extends IoBuffer<B>> IoPool<B> instrument(IoPool<B> pool);
@@ -27,7 +27,7 @@ public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> 
     protected FsCompositeDriver instrument(
             FsCompositeDriver driver,
             InstrumentingManager context) {
-        return new InstrumentingCompositeDriver(driver, this);
+        return new InstrumentingCompositeDriver(this, driver);
     }
 
     protected FsModel instrument(

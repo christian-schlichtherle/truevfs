@@ -4,7 +4,10 @@
  */
 package net.truevfs.access;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.DirectoryStream.Filter;
@@ -346,7 +349,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
         }
         final InputSocket<?> input = src.input(src.getAccessPreferences());
         final OutputSocket<?> output = dst.output(o,
-                preserve ? input.localTarget() : null);
+                preserve ? input.target() : null);
         IoSockets.copy(input, output);
     }
 

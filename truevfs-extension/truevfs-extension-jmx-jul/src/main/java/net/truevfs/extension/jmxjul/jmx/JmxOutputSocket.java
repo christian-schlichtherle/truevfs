@@ -4,13 +4,14 @@
  */
 package net.truevfs.extension.jmxjul.jmx;
 
-import net.truevfs.extension.jmxjul.InstrumentingOutputSocket;
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.OutputSocket;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.extension.jmxjul.InstrumentingOutputSocket;
+import net.truevfs.kernel.cio.Entry;
+import net.truevfs.kernel.cio.InputSocket;
+import net.truevfs.kernel.cio.OutputSocket;
 
 /**
  * @author  Christian Schlichtherle
@@ -21,19 +22,21 @@ extends InstrumentingOutputSocket<E> {
 
     final JmxIOStatistics stats;
 
-    JmxOutputSocket(OutputSocket<? extends E> model, JmxDirector director, JmxIOStatistics stats) {
-        super(model, director);
+    JmxOutputSocket(JmxDirector director, OutputSocket<? extends E> model, JmxIOStatistics stats) {
+        super(director, model);
         assert null != stats;
         this.stats = stats;
     }
 
     @Override
-    public SeekableByteChannel channel() throws IOException {
-        return new JmxSeekableChannel(boundSocket().channel(), stats);
+    public SeekableByteChannel channel(InputSocket<? extends Entry> peer)
+    throws IOException {
+        return new JmxSeekableChannel(socket().channel(peer), stats);
     }
 
     @Override
-    public OutputStream stream() throws IOException {
-        return new JmxOutputStream(boundSocket().stream(), stats);
+    public OutputStream stream(InputSocket<? extends Entry> peer)
+    throws IOException {
+        return new JmxOutputStream(socket().stream(peer), stats);
     }
 }

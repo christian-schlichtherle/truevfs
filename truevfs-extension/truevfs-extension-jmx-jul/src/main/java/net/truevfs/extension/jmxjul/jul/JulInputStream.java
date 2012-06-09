@@ -4,15 +4,16 @@
  */
 package net.truevfs.extension.jmxjul.jul;
 
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.IoBuffer;
-import net.truevfs.kernel.cio.InputSocket;
-import net.truevfs.kernel.io.DecoratingInputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.cio.Entry;
+import net.truevfs.kernel.cio.InputSocket;
+import net.truevfs.kernel.cio.IoBuffer;
+import net.truevfs.kernel.cio.OutputSocket;
+import net.truevfs.kernel.io.DecoratingInputStream;
 
 /**
  * @author Christian Schlichtherle
@@ -25,8 +26,11 @@ final class JulInputStream extends DecoratingInputStream {
     private final InputSocket<?> socket;
 
     @CreatesObligation
-    JulInputStream(final InputSocket<?> socket) throws IOException {
-        super(socket.stream());
+    JulInputStream(
+            final InputSocket<? extends Entry> socket,
+            final OutputSocket<? extends Entry> peer)
+    throws IOException {
+        super(socket.stream(peer));
         this.socket = socket;
         log("Stream reading ");
     }
@@ -40,7 +44,7 @@ final class JulInputStream extends DecoratingInputStream {
     private void log(String message) {
         Entry target;
         try {
-            target = socket.localTarget();
+            target = socket.target();
         } catch (final IOException ignore) {
             target = null;
         }

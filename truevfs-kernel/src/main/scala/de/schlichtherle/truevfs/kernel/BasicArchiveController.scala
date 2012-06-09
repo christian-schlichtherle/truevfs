@@ -71,25 +71,35 @@ extends Controller[LockModel] with LockModelAspect {
     require(null ne options)
     require(null ne name)
 
-    final class Input extends DelegatingInputSocket[E] {
-      override def socket() = {
-        val ae = localTarget()
+    final class Input extends AbstractInputSocket[E] {
+      def target() = {
+        checkSync(options, name, Some(READ))
+        autoMount(options) stat (options, name) match {
+          case Some(ce) => ce.getEntry
+          case _ => throw new NoSuchFileException(name.toString)
+        }
+      }
+
+      override def stream(peer: AnyOutputSocket) = {
+        target(peer) // may sync() if in same target archive file!
+        socket() stream peer
+      }
+
+      override def channel(peer: AnyOutputSocket) = {
+        target(peer) // may sync() if in same target archive file!
+        socket() channel peer
+      }
+
+      def socket() = {
+        val ae = target()
         val tµpe = ae.getType()
         if (FILE ne tµpe)
           throw new FileSystemException(name.toString, null,
                                         "Expected a FILE entry, but is a " + tµpe + " entry!");
         input(ae.getName)
       }
+    } // Input
 
-      override def localTarget() = {
-        peerTarget() // may sync() if in same target archive file!
-        checkSync(options, name, Some(READ))
-        autoMount(options).stat(options, name) match {
-          case Some(ce) => ce.getEntry
-          case _ => throw new NoSuchFileException(name.toString)
-        }
-      }
-    }
     new Input
   }: AnyInputSocket
 
@@ -100,9 +110,9 @@ extends Controller[LockModel] with LockModelAspect {
     require(null ne name)
 
     final class Output extends AbstractOutputSocket[FsArchiveEntry] {
-      override def localTarget() = {
+      def target() = {
         val ae = mknod().head.getEntry
-        if (options.get(APPEND)) {
+        if (options get APPEND) {
           // A proxy entry must get returned here in order to inhibit
           // a peer target to recognize the type of this entry and
           // switch to Raw Data Copy (RDC) mode.
@@ -113,28 +123,27 @@ extends Controller[LockModel] with LockModelAspect {
         }
       }
 
-      override def stream() = {
+      override def stream(peer: AnyInputSocket) = {
         val tx = mknod()
         val ae = tx.head.getEntry
         val in = append()
         var ex: Option[Throwable] = None
         try {
           val os = output(options, ae)
-          in match {
-            case None => os.bind(this)
-            case _ => // do NOT bind when appending!
-          }
-          val out = os.stream()
+          val out = os stream (in match {
+            case Some(_) => null // do NOT bind when appending!
+            case None    => peer
+          })
           try {
             tx.commit()
-            in.foreach(Streams.cat(_, out))
+            in foreach (Streams.cat(_, out))
           } catch {
             case ex2: Throwable =>
               try {
                 out.close()
               } catch {
                 case ex3: Throwable =>
-                  ex2.addSuppressed(ex3)
+                  ex2 addSuppressed ex3
               }
               throw ex2
           }
@@ -144,19 +153,19 @@ extends Controller[LockModel] with LockModelAspect {
             ex = Some(ex2)
             throw ex2
         } finally {
-          in.foreach { in =>
+          in foreach { in =>
             try {
               in.close()
             } catch {
               case ex2: IOException =>
                 val ex3 = new InputException(ex2)
                 ex match {
-                  case Some(ex) => ex.addSuppressed(ex3)
+                  case Some(ex) => ex addSuppressed ex3
                   case _ => throw ex3
                 }
               case ex2: Throwable =>
                 ex match {
-                  case Some(ex) => ex.addSuppressed(ex2)
+                  case Some(ex) => ex addSuppressed ex2
                   case _ => throw ex2
                 }
             }
@@ -168,14 +177,14 @@ extends Controller[LockModel] with LockModelAspect {
         checkSync(options, name, Some(WRITE))
         // Start creating or overwriting the archive entry.
         // This will fail if the entry already exists as a directory.
-        autoMount(options, !name.isRoot && options.get(CREATE_PARENTS))
+        autoMount(options, !name.isRoot && (options get CREATE_PARENTS))
         .mknod(options, name, FILE, template)
       }
 
       def append(): Option[InputStream] = {
-        if (options.get(APPEND)) {
+        if (options get APPEND) {
           try {
-            return Some(input(options, name).stream())
+            return Some(input(options, name) stream null)
           } catch {
             // When appending, there is no need for the entry to be
             // readable or even exist, so this can get safely ignored.
@@ -184,7 +193,8 @@ extends Controller[LockModel] with LockModelAspect {
         }
         None
       }
-    }
+    } // Output
+
     new Output
   }: AnyOutputSocket
 

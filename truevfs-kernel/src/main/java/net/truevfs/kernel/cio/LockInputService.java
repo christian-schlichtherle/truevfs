@@ -83,10 +83,10 @@ extends DecoratingInputService<E, InputService<E>> {
 
             @Override
             @GuardedBy("lock")
-            public E localTarget() throws IOException {
+            public E target() throws IOException {
                 lock.lock();
                 try {
-                    return boundSocket().localTarget();
+                    return socket().target();
                 } finally {
                     lock.unlock();
                 }
@@ -94,11 +94,12 @@ extends DecoratingInputService<E, InputService<E>> {
 
             @Override
             @GuardedBy("lock")
-            public InputStream stream() throws IOException {
+            public InputStream stream(OutputSocket<? extends Entry> peer)
+            throws IOException {
                 final InputStream in;
                 lock.lock();
                 try {
-                    in = boundSocket().stream();
+                    in = socket().stream(peer);
                 } finally {
                     lock.unlock();
                 }
@@ -107,11 +108,12 @@ extends DecoratingInputService<E, InputService<E>> {
 
             @Override
             @GuardedBy("lock")
-            public SeekableByteChannel channel() throws IOException {
+            public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
+            throws IOException {
                 final SeekableByteChannel channel;
                 lock.lock();
                 try {
-                    channel = boundSocket().channel();
+                    channel = socket().channel(peer);
                 } finally {
                     lock.unlock();
                 }

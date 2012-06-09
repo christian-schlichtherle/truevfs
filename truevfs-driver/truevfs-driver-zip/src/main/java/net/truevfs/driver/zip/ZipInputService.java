@@ -14,11 +14,7 @@ import net.truevfs.driver.zip.io.RawZipFile;
 import net.truevfs.driver.zip.io.ZipCryptoParameters;
 import net.truevfs.kernel.FsInputSocketSource;
 import net.truevfs.kernel.FsModel;
-import net.truevfs.kernel.cio.AbstractInputSocket;
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.InputService;
-import net.truevfs.kernel.cio.InputSocket;
-import net.truevfs.kernel.io.Source;
+import net.truevfs.kernel.cio.*;
 
 /**
  * An input service for reading ZIP files.
@@ -77,7 +73,7 @@ implements InputService<ZipDriverEntry> {
 
         final class Input extends AbstractInputSocket<ZipDriverEntry> {
             @Override
-            public ZipDriverEntry localTarget() throws IOException {
+            public ZipDriverEntry target() throws IOException {
                 final ZipDriverEntry entry = entry(name);
                 if (null == entry)
                     throw new NoSuchFileException(name, null, "Entry not found!");
@@ -87,9 +83,10 @@ implements InputService<ZipDriverEntry> {
             }
 
             @Override
-            public InputStream stream() throws IOException {
-                final ZipDriverEntry local = localTarget();
-                final Entry peer = peerTarget();
+            public InputStream stream(OutputSocket<? extends Entry> output)
+            throws IOException {
+                final ZipDriverEntry local = target();
+                final Entry peer = target(output);
                 final ZipDriverEntry zpeer = peer instanceof ZipDriverEntry
                         ? (ZipDriverEntry) peer
                         : null;

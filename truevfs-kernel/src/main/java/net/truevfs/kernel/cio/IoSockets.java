@@ -44,46 +44,51 @@ public final class IoSockets {
      */
     public static void copy(InputSocket<?> input, OutputSocket<?> output)
     throws InputException, IOException {
-        // Call connect on output for early NPE check!
-        Streams.copy(   new InputSocketAdapter(input),
-                        new OutputSocketAdapter(output.connect(input)));
-        // Disconnect for subsequent use, if any.
-        input.connect(null); // or output.connect(null)
+        Streams.copy(   new InputAdapter(input, output),
+                        new OutputAdapter(output, input));
     }
 
-    private static class InputSocketAdapter implements Source {
+    private static class InputAdapter implements Source {
         final InputSocket<? extends Entry> input;
+        final OutputSocket<? extends Entry> output;
 
-        InputSocketAdapter(final InputSocket<? extends Entry> input) {
-            this.input = input;//Objects.requireNonNull(input);
+        InputAdapter(
+                final InputSocket<? extends Entry> input,
+                final OutputSocket<? extends Entry> output) {
+            this.input = input;
+            this.output = output;
         }
 
         @Override
         public InputStream stream() throws IOException {
-            return input.stream();
+            return input.stream(output);
         }
 
         @Override
         public SeekableByteChannel channel() throws IOException {
-            return input.channel();
+            return input.channel(output);
         }
-    } // InputSocketAdapter
+    } // InputAdapter
 
-    private static class OutputSocketAdapter implements Sink {
+    private static class OutputAdapter implements Sink {
         final OutputSocket<? extends Entry> output;
+        final InputSocket<? extends Entry> input;
 
-        OutputSocketAdapter(final OutputSocket<? extends Entry> output) {
-            this.output = output;//Objects.requireNonNull(output);
+        OutputAdapter(
+                final OutputSocket<? extends Entry> output,
+                final InputSocket<? extends Entry> input) {
+            this.output = output;
+            this.input = input;
         }
 
         @Override
         public OutputStream stream() throws IOException {
-            return output.stream();
+            return output.stream(input);
         }
 
         @Override
         public SeekableByteChannel channel() throws IOException {
-            return output.channel();
+            return output.channel(input);
         }
-    } // OutputSocketAdapter
+    } // OutputAdapter
 }

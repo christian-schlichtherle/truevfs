@@ -55,27 +55,31 @@ private trait LockController extends Controller[LockModel] {
     timedLocked(writeLock)(super.setTime(options, name, types, value))
 
   abstract override def input(options: AccessOptions, name: FsEntryName) = {
-    final class Input extends  DecoratingInputSocket[Entry](super.input(options, name)) {
-      override def localTarget() = fastLocked(writeLock)(boundSocket.localTarget())
+    final class Input extends AbstractInputSocket[Entry] {
+      private[this] val socket = LockController.super.input(options, name)
 
-      override def stream() =
-        timedLocked(writeLock)(new LockInputStream(boundSocket.stream()))
+      override def target() = fastLocked(writeLock)(socket.target())
 
-      override def channel() =
-        timedLocked(writeLock)(new LockSeekableChannel(boundSocket.channel()))
+      override def stream(peer: AnyOutputSocket) =
+        timedLocked(writeLock)(new LockInputStream(socket.stream(peer)))
+
+      override def channel(peer: AnyOutputSocket) =
+        timedLocked(writeLock)(new LockSeekableChannel(socket.channel(peer)))
     }
     new Input
   }: AnyInputSocket
 
   abstract override def output(options: AccessOptions, name: FsEntryName, template: Option[Entry]) = {
-    final class Output extends DecoratingOutputSocket[Entry](super.output(options, name, template)) {
-      override def localTarget() = fastLocked(writeLock)(boundSocket.localTarget())
+    final class Output extends AbstractOutputSocket[Entry] {
+      private[this] val socket = LockController.super.output(options, name, template)
 
-      override def stream() =
-        timedLocked(writeLock)(new LockOutputStream(boundSocket.stream()))
+      override def target() = fastLocked(writeLock)(socket.target())
 
-      override def channel() =
-        timedLocked(writeLock)(new LockSeekableChannel(boundSocket.channel()))
+      override def stream(peer: AnyInputSocket) =
+        timedLocked(writeLock)(new LockOutputStream(socket.stream(peer)))
+
+      override def channel(peer: AnyInputSocket) =
+        timedLocked(writeLock)(new LockSeekableChannel(socket.channel(peer)))
     }
     new Output
   }: AnyOutputSocket

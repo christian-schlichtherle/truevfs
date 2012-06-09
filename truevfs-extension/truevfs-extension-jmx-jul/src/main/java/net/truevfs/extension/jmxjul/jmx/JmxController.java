@@ -14,8 +14,8 @@ import net.truevfs.kernel.FsModel;
 abstract class JmxController
 extends InstrumentingController<JmxDirector> {
 
-    JmxController(FsController<? extends FsModel> controller, JmxDirector director) {
-        super(controller, director);
+    JmxController(JmxDirector director, FsController<? extends FsModel> controller) {
+        super(director, controller);
     }
 
     abstract JmxIOStatistics getIOStatistics();
