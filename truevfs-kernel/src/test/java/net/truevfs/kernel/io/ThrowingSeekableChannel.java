@@ -4,8 +4,6 @@
  */
 package net.truevfs.kernel.io;
 
-import net.truevfs.kernel.TestConfig;
-import net.truevfs.kernel.ThrowManager;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -13,6 +11,8 @@ import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.kernel.TestConfig;
+import net.truevfs.kernel.ThrowManager;
 
 /**
  * A decorating seekable byte channel which supports throwing exceptions

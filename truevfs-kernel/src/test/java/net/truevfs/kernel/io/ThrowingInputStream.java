@@ -4,15 +4,14 @@
  */
 package net.truevfs.kernel.io;
 
-import net.truevfs.kernel.TestConfig;
-import net.truevfs.kernel.ThrowManager;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.kernel.TestConfig;
+import net.truevfs.kernel.ThrowManager;
 
 /**
  * A decorating input stream which supports throwing exceptions according to
