@@ -103,9 +103,9 @@ extends FileSystemArchiveController[E](model) with TouchListener {
     _outputArchive = oa
   }
 
-  override def preTouch(options: AccessOptions) { outputArchive(options) }
+  def preTouch(options: AccessOptions) { outputArchive(options) }
 
-  override def mount(options: AccessOptions, autoCreate: Boolean) {
+  def mount(options: AccessOptions, autoCreate: Boolean) {
     try {
       mount0(options, autoCreate)
     } finally {
@@ -196,15 +196,16 @@ extends FileSystemArchiveController[E](model) with TouchListener {
    * @return The output archive.
    */
   private def outputArchive(options: AccessOptions): OutputArchive[E] = {
-    outputArchive.foreach { oa => assert(touched); return oa }
+    outputArchive foreach { oa => assert(touched); return oa }
     val is = inputArchive match {
       case Some(ia) => ia.driverProduct
       case _ => null
     }
     val os = {
       try {
-        driver.newOutput(model, options.and(ACCESS_PREFERENCES_MASK).set(CACHE),
-                         _parent, name, is)
+        driver newOutput (model,
+                          options.and(ACCESS_PREFERENCES_MASK).set(CACHE),
+                          _parent, name, is)
       } catch {
         case ex: FalsePositiveArchiveException =>
           throw new AssertionError(ex)
@@ -219,33 +220,32 @@ extends FileSystemArchiveController[E](model) with TouchListener {
     oa
   }
 
-  override def input(name: String) = {
-    final class Input extends LazyInputSocket[E] {
-      override def lazySocket = inputArchive.get.input(name)
+  def input(name: String) = {
+    final class Input extends AbstractInputSocket[E] {
+      lazy val socket = inputArchive.get.input(name)
 
-      override def target() = syncOn[InputClosedException] { super.target() }
+      def target() = syncOn[InputClosedException] { socket.target() }
 
       override def stream(peer: AnyOutputSocket) =
-        syncOn[InputClosedException] { super.stream(peer) }
+        syncOn[InputClosedException] { socket.stream(peer) }
 
       override def channel(peer: AnyOutputSocket) =
-        syncOn[InputClosedException] { super.channel(peer) }
+        syncOn[InputClosedException] { socket.channel(peer) }
     }
     new Input
   }
 
-  override def output(options: AccessOptions, entry: E) = {
-    final class Output extends LazyOutputSocket[E] {
+  def output(options: AccessOptions, entry: E) = {
+    final class Output extends AbstractOutputSocket[E] {
+      lazy val socket = outputArchive(options).output(entry)
 
-      override def lazySocket = outputArchive(options).output(entry)
-
-      override def target = entry
+      def target = entry
 
       override def stream(peer: AnyInputSocket) =
-        syncOn[OutputClosedException] { super.stream(peer) }
+        syncOn[OutputClosedException] { socket.stream(peer) }
 
       override def channel(peer: AnyInputSocket) =
-        syncOn[OutputClosedException] { super.channel(peer) }
+        syncOn[OutputClosedException] { socket.channel(peer) }
     }
     new Output
   }
@@ -263,7 +263,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
     }
   }
 
-  override def sync(options: SyncOptions) {
+  def sync(options: SyncOptions) {
     assert(writeLockedByCurrentThread)
     try {
       val builder = new FsSyncExceptionBuilder
@@ -386,7 +386,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
       touched = false
   }
 
-  override def checkSync(options: AccessOptions, name: FsEntryName, intention: Option[Access]) {
+  def checkSync(options: AccessOptions, name: FsEntryName, intention: Option[Access]) {
     // HC SVNT DRACONES!
 
     // If no file system exists, then pass the test.
