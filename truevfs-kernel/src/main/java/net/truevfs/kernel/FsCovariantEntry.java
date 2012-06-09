@@ -4,11 +4,11 @@
  */
 package net.truevfs.kernel;
 
-import static net.truevfs.kernel.cio.Entry.Type.DIRECTORY;
-import net.truevfs.kernel.util.BitField;
 import java.util.*;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
+import static net.truevfs.kernel.cio.Entry.Type.DIRECTORY;
+import net.truevfs.kernel.util.BitField;
 
 /**
  * A covariant file system entry maintains a map of
