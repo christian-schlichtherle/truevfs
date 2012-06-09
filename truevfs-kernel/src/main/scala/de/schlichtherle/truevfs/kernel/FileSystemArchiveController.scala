@@ -65,15 +65,15 @@ extends BasicArchiveController[E](m) with MountState[E] {
   def mount(options: AccessOptions, autoCreate: Boolean)
 
   private final class ResetFileSystem extends MountState[E] {
-    override def autoMount(options: AccessOptions, autoCreate: Boolean) = {
+    def autoMount(options: AccessOptions, autoCreate: Boolean) = {
       checkWriteLockedByCurrentThread
       mount(options, autoCreate)
       mountState.fileSystem get
     }
 
-    override def fileSystem = None
+    def fileSystem = None
 
-    override def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]]) {
+    def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]]) {
       // Passing in None may happen by sync(*).
       fileSystem.foreach { fs => mountState = new MountedFileSystem(fs) }
     }
@@ -81,12 +81,11 @@ extends BasicArchiveController[E](m) with MountState[E] {
 
   private final class MountedFileSystem(fs: ArchiveFileSystem[E])
   extends MountState[E] {
-    override def autoMount(options: AccessOptions, autoCreate: Boolean) =
-      fs
+    def autoMount(options: AccessOptions, autoCreate: Boolean) = fs
 
-    override def fileSystem = Some(fs)
+    def fileSystem = Some(fs)
 
-    override def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]]) {
+    def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]]) {
       fileSystem match {
         case Some(fs) => throw new IllegalStateException("File system already mounted!")
         case _ => mountState = new ResetFileSystem
