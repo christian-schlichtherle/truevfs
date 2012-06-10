@@ -48,26 +48,26 @@ extends Controller[LockModel] with LockModelAspect {
 
   require(null ne model.getParent)
 
-  override def stat(options: AccessOptions, name: FsEntryName): Option[FsEntry] =
+  def stat(options: AccessOptions, name: FsEntryName): Option[FsEntry] =
     autoMount(options).stat(options, name)
 
-  override def checkAccess(options: AccessOptions, name: FsEntryName, types: BitField[Access]) =
+  def checkAccess(options: AccessOptions, name: FsEntryName, types: BitField[Access]) =
     autoMount(options).checkAccess(options, name, types)
 
-  override def setReadOnly(name: FsEntryName) =
+  def setReadOnly(name: FsEntryName) =
     autoMount(NONE).setReadOnly(name)
 
-  override def setTime(options: AccessOptions, name: FsEntryName, times: Map[Access, Long]) = {
+  def setTime(options: AccessOptions, name: FsEntryName, times: Map[Access, Long]) = {
     checkSync(options, name, None)
     autoMount(options).setTime(options, name, times)
   }
 
-  override def setTime(options: AccessOptions, name: FsEntryName, types: BitField[Access], value: Long) = {
+  def setTime(options: AccessOptions, name: FsEntryName, types: BitField[Access], value: Long) = {
     checkSync(options, name, None)
     autoMount(options).setTime(options, name, types, value)
   }
 
-  override def input(options: AccessOptions, name: FsEntryName) = {
+  def input(options: AccessOptions, name: FsEntryName) = {
     require(null ne options)
     require(null ne name)
 
@@ -75,28 +75,23 @@ extends Controller[LockModel] with LockModelAspect {
       def target() = {
         checkSync(options, name, Some(READ))
         autoMount(options) stat (options, name) match {
-          case Some(ce) => ce.getEntry
+          case Some(ce) =>
+            val ae = ce.getEntry(FILE)
+            if (null eq ae)
+              throw new FileSystemException(name.toString, null,
+                                            "Expected a FILE entry, but is a " + ce.getTypes + " entry!");
+            ae
           case _ => throw new NoSuchFileException(name.toString)
         }
       }
 
-      override def stream(peer: AnyOutputSocket) = {
-        target(peer) // may sync() if in same target archive file!
-        socket() stream peer
-      }
+      override def stream(peer: AnyOutputSocket) = socket(peer) stream peer
 
-      override def channel(peer: AnyOutputSocket) = {
-        target(peer) // may sync() if in same target archive file!
-        socket() channel peer
-      }
+      override def channel(peer: AnyOutputSocket) = socket(peer) channel peer
 
-      def socket() = {
-        val ae = target()
-        val tµpe = ae.getType()
-        if (FILE ne tµpe)
-          throw new FileSystemException(name.toString, null,
-                                        "Expected a FILE entry, but is a " + tµpe + " entry!");
-        input(ae.getName)
+      def socket(peer: AnyOutputSocket) = {
+        target(peer) // may sync() if in same target archive file!
+        input(target().getName)
       }
     } // Input
 
@@ -105,7 +100,7 @@ extends Controller[LockModel] with LockModelAspect {
 
   def input(name: String): InputSocket[E]
 
-  override def output(options: AccessOptions, name: FsEntryName, template: Option[Entry]) = {
+  def output(options: AccessOptions, name: FsEntryName, template: Option[Entry]) = {
     require(null ne options)
     require(null ne name)
 
@@ -200,7 +195,7 @@ extends Controller[LockModel] with LockModelAspect {
 
   def output(options: AccessOptions, entry: E): OutputSocket[E]
 
-  override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Option[Entry]) {
+  def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Option[Entry]) {
     if (name.isRoot) { // TODO: Is this case differentiation still required?
       try {
         autoMount(options) // detect false positives!
@@ -221,7 +216,7 @@ extends Controller[LockModel] with LockModelAspect {
     }
   }
 
-  override def unlink(options: AccessOptions, name: FsEntryName) {
+  def unlink(options: AccessOptions, name: FsEntryName) {
     checkSync(options, name, None)
     val fs = autoMount(options)
     fs.unlink(options, name)
@@ -273,16 +268,13 @@ private object BasicArchiveController {
 
   private final class ProxyEntry(entry: FsArchiveEntry)
   extends DecoratingEntry[FsArchiveEntry](entry) with FsArchiveEntry {
-    override def getType: Type = entry.getType
+    def getType: Type = entry.getType
 
-    override def setSize(tµpe: Size, value: Long) = entry.setSize(tµpe, value)
+    def setSize(tµpe: Size, value: Long) = entry.setSize(tµpe, value)
 
-    override def setTime(tµpe: Access, value: Long) = entry.setTime(tµpe, value)
+    def setTime(tµpe: Access, value: Long) = entry.setTime(tµpe, value)
 
-    override def isPermitted(tµpe: Access, entity: Entity) =
-      entry.isPermitted(tµpe, entity)
-
-    override def setPermitted(tµpe: Access, entity: Entity, value: java.lang.Boolean) =
+    def setPermitted(tµpe: Access, entity: Entity, value: java.lang.Boolean) =
       entry.setPermitted(tµpe, entity, value)
   }
 }
