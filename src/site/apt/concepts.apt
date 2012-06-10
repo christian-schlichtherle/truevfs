@@ -136,7 +136,7 @@ Basic Concepts
     of non-federated and federated file system types and implement their
     specific behavior.
 
-** Open For Extension, Closed For Change
+** Open For Extension, Closed For Modification
 
     Abstract classes are favored over interfaces wherever the future addition
     of more methods is anticipated in order to enable binary backwards
