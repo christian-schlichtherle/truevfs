@@ -291,7 +291,7 @@ extends FsFileSystemArchiveController<E> {
             @Override
             public E getLocalTarget() throws IOException {
                 try {
-                    return super.getLocalTarget();
+                    return getBoundSocket().getLocalTarget();
                 } catch (InputClosedException ex) {
                     throw map(ex);
                 }
@@ -300,7 +300,7 @@ extends FsFileSystemArchiveController<E> {
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
                 try {
-                    return super.newReadOnlyFile();
+                    return getBoundSocket().newReadOnlyFile();
                 } catch (InputClosedException ex) {
                     throw map(ex);
                 }
@@ -309,7 +309,7 @@ extends FsFileSystemArchiveController<E> {
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
                 try {
-                    return super.newSeekableByteChannel();
+                    return getBoundSocket().newSeekableByteChannel();
                 } catch (InputClosedException ex) {
                     throw map(ex);
                 }
@@ -318,13 +318,13 @@ extends FsFileSystemArchiveController<E> {
             @Override
             public InputStream newInputStream() throws IOException {
                 try {
-                    return super.newInputStream();
+                    return getBoundSocket().newInputStream();
                 } catch (InputClosedException ex) {
                     throw map(ex);
                 }
             }
 
-            IOException map(IOException ex) {
+            IOException map(InputClosedException ex) {
                 // DON'T try to sync() locally - this could make the state of
                 // clients inconsistent if they have cached other artifacts of
                 // this controller, e.g. the archive file system.
@@ -347,7 +347,7 @@ extends FsFileSystemArchiveController<E> {
             @Override
             public E getLocalTarget() throws IOException {
                 try {
-                    return super.getLocalTarget();
+                    return getBoundSocket().getLocalTarget();
                 } catch (OutputClosedException ex) {
                     throw map(ex);
                 }
@@ -356,7 +356,7 @@ extends FsFileSystemArchiveController<E> {
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
                 try {
-                    return super.newSeekableByteChannel();
+                    return getBoundSocket().newSeekableByteChannel();
                 } catch (OutputClosedException ex) {
                     throw map(ex);
                 }
@@ -365,13 +365,13 @@ extends FsFileSystemArchiveController<E> {
             @Override
             public OutputStream newOutputStream() throws IOException {
                 try {
-                    return super.newOutputStream();
+                    return getBoundSocket().newOutputStream();
                 } catch (OutputClosedException ex) {
                     throw map(ex);
                 }
             }
 
-            IOException map(IOException ex) {
+            IOException map(OutputClosedException ex) {
                 // DON'T try to sync() locally - this could make the state of
                 // clients inconsistent if they have cached other artifacts of
                 // this controller, e.g. the archive file system.
