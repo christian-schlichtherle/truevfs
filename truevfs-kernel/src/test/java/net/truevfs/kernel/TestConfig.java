@@ -54,7 +54,7 @@ public final class TestConfig extends Resource<RuntimeException> {
     public static final int DEFAULT_DATA_LENGTH = 1024;
 
     private static final InheritableThreadLocalStack<TestConfig>
-            configs = new InheritableThreadLocalStack<TestConfig>();
+            configs = new InheritableThreadLocalStack<>();
 
     private static final TestConfig GLOBAL = new TestConfig();
 
@@ -146,10 +146,8 @@ public final class TestConfig extends Resource<RuntimeException> {
     }
 
     public IoPoolProvider getIoPoolProvider() {
-        final IoPoolProvider iop = ioPoolProvider;
-        return null != iop
-                ? iop
-                : (ioPoolProvider = new ByteArrayIoPoolService(getDataSize()));
+        final IoPoolProvider p = ioPoolProvider;
+        return null != p ? p : (ioPoolProvider = new ByteArrayIoPoolService(getDataSize()));
     }
 
     public void setIOPoolProvider(final @CheckForNull IoPoolProvider iop) {

@@ -4,12 +4,12 @@
  */
 package net.truevfs.kernel;
 
-import net.truevfs.kernel.mock.MockDriverService;
+import java.net.URI;
+import java.util.Iterator;
+import net.truevfs.kernel.driver.mock.MockDriverService;
 import net.truevfs.kernel.util.BitField;
 import net.truevfs.kernel.util.Link.Type;
 import static net.truevfs.kernel.util.Link.Type.WEAK;
-import java.net.URI;
-import java.util.Iterator;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;

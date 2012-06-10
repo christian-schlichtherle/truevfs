@@ -2,15 +2,8 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.kernel.mock;
+package net.truevfs.kernel.driver.mock;
 
-import net.truevfs.kernel.*;
-import net.truevfs.kernel.cio.Entry.Type;
-import net.truevfs.kernel.cio.*;
-import net.truevfs.kernel.io.Sink;
-import net.truevfs.kernel.io.Source;
-import net.truevfs.kernel.util.BitField;
-import net.truevfs.kernel.util.HashMaps;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.NoSuchFileException;
@@ -19,6 +12,11 @@ import java.util.concurrent.ConcurrentMap;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.ThreadSafe;
+import net.truevfs.kernel.*;
+import net.truevfs.kernel.cio.Entry.Type;
+import net.truevfs.kernel.cio.*;
+import net.truevfs.kernel.util.BitField;
+import net.truevfs.kernel.util.HashMaps;
 
 /**
  * @author Christian Schlichtherle

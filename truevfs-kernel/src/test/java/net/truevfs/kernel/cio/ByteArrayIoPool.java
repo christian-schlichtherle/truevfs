@@ -59,9 +59,7 @@ public final class ByteArrayIoPool implements IoPool<ByteArrayIoBuffer> {
     }
 
     @NotThreadSafe
-    private final class ByteBuffer
-    extends ByteArrayIoBuffer
-    implements net.truevfs.kernel.cio.IoBuffer<ByteArrayIoBuffer> {
+    private final class ByteBuffer extends ByteArrayIoBuffer {
         private boolean released;
 
         ByteBuffer(int i) {

@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.kernel.mock;
+package net.truevfs.kernel.driver.mock;
 
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
@@ -60,12 +60,12 @@ implements Container<MockArchiveDriverEntry> {
         getThrowControl().check(this, Error.class);
     }
 
-    public IoPoolProvider getIOPoolProvider() {
+    public IoPoolProvider getIoPoolProvider() {
         return config.getIoPoolProvider();
     }
 
-    public final IoPool<?> getIOPool() {
-        return getIOPoolProvider().getIoPool();
+    public final IoPool<?> getIoPool() {
+        return getIoPoolProvider().getIoPool();
     }
 
     @Override
@@ -89,16 +89,14 @@ implements Container<MockArchiveDriverEntry> {
     public InputService<MockArchiveDriverEntry> newInputService() {
         checkUndeclaredExceptions();
         return new ThrowingInputService<>(
-                new DisconnectingInputService<>(
-                    new MockInputService(entries, config)),
+                new MockInputService(entries, config),
                 config);
     }
 
     public OutputService<MockArchiveDriverEntry> newOutputService() {
         checkUndeclaredExceptions();
         return new ThrowingOutputService<>(
-                new DisconnectingOutputService<>(
-                    new MockOutputService(entries, config)),
+                new MockOutputService(entries, config),
                 config);
     }
 
@@ -106,8 +104,9 @@ implements Container<MockArchiveDriverEntry> {
     extends MockArchive
     implements InputService<MockArchiveDriverEntry> {
 
-        MockInputService(  Map<String, MockArchiveDriverEntry> entries,
-                        TestConfig config) {
+        MockInputService(
+                Map<String, MockArchiveDriverEntry> entries,
+                TestConfig config) {
             super(entries, config);
         }
 
@@ -139,7 +138,7 @@ implements Container<MockArchiveDriverEntry> {
 
                 InputSocket<? extends IoBuffer<?>>
                 getBufferInputSocket() throws IOException {
-                    return target().getBuffer(getIOPool()).input();
+                    return target().getBuffer(getIoPool()).input();
                 }
             } // Input
 
@@ -156,8 +155,9 @@ implements Container<MockArchiveDriverEntry> {
     implements OutputService<MockArchiveDriverEntry> {
         boolean busy;
 
-        MockOutputService( Map<String, MockArchiveDriverEntry> entries,
-                        TestConfig config) {
+        MockOutputService(
+                Map<String, MockArchiveDriverEntry> entries,
+                TestConfig config) {
             super(entries, config);
         }
 
@@ -206,14 +206,14 @@ implements Container<MockArchiveDriverEntry> {
                 OutputSocket<? extends IoBuffer<?>>
                 getBufferOutputSocket() throws IOException {
                     entries.put(entry.getName(), entry);
-                    return target().getBuffer(getIOPool()).output();
+                    return target().getBuffer(getIoPool()).output();
                 }
 
                 void copyProperties() {
                     final MockArchiveDriverEntry target = target();
                     final IoBuffer<?> buffer;
                     try {
-                        buffer = target.getBuffer(getIOPool());
+                        buffer = target.getBuffer(getIoPool());
                     } catch (final IOException ex) {
                         throw new AssertionError(ex);
                     }

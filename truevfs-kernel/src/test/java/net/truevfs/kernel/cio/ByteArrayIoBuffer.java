@@ -253,8 +253,7 @@ public class ByteArrayIoBuffer implements IoBuffer<ByteArrayIoBuffer> {
 
         @Override
         public void close() throws IOException {
-            if (closed)
-                return;
+            if (closed) return;
             super.close();
             times.put(READ, System.currentTimeMillis());
             closed = true;
@@ -271,8 +270,7 @@ public class ByteArrayIoBuffer implements IoBuffer<ByteArrayIoBuffer> {
 
         @Override
         public void close() throws IOException {
-            if (closed)
-                return;
+            if (closed) return;
             super.close();
             times.put(WRITE, System.currentTimeMillis());
             final ByteBuffer buffer = getByteBuffer();
@@ -290,8 +288,7 @@ public class ByteArrayIoBuffer implements IoBuffer<ByteArrayIoBuffer> {
 
         @Override
         public void close() throws IOException {
-            if (closed)
-                return;
+            if (closed) return;
             super.close();
             times.put(READ, System.currentTimeMillis());
             closed = true;
@@ -307,8 +304,7 @@ public class ByteArrayIoBuffer implements IoBuffer<ByteArrayIoBuffer> {
 
         @Override
         public void close() throws IOException {
-            if (closed)
-                return;
+            if (closed) return;
             super.close();
             times.put(WRITE, System.currentTimeMillis());
             data = toByteArray();
