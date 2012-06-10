@@ -11,7 +11,7 @@ import net.truevfs.kernel.cio._
 import net.truevfs.kernel.cio.Entry._
 import net.truevfs.kernel.util._
 
-final class ControllerAdapter[M <: FsModel](
+private final class ControllerAdapter[M <: FsModel](
   c: Controller[M],
   override val getParent: FsController[_ <: FsModel]
 ) extends FsAbstractController[M](c.model) {
