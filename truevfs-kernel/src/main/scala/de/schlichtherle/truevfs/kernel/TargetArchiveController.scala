@@ -251,9 +251,9 @@ extends FileSystemArchiveController[E](model) with TouchListener {
   }
 
   private def syncOn[X <: ClosedException] = new {
-    def apply[A](expression: => A)(implicit mf: ClassManifest[X]) = {
+    def apply[A](operation: => A)(implicit mf: ClassManifest[X]) = {
       try {
-        expression
+        operation
       } catch {
         case ex =>
           if (mf.erasure isAssignableFrom ex.getClass)
