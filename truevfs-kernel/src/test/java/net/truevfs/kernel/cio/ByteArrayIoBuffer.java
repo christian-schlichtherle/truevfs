@@ -21,6 +21,9 @@ import net.truevfs.kernel.cio.Entry.Entity;
 import net.truevfs.kernel.cio.Entry.Size;
 import static net.truevfs.kernel.cio.Entry.UNKNOWN;
 import net.truevfs.kernel.io.ByteBufferChannel;
+import net.truevfs.kernel.io.DisconnectingInputStream;
+import net.truevfs.kernel.io.DisconnectingOutputStream;
+import net.truevfs.kernel.io.DisconnectingSeekableChannel;
 
 /**
  * An I/O buffer which is backed by a byte array.
@@ -243,71 +246,79 @@ public class ByteArrayIoBuffer implements IoBuffer<ByteArrayIoBuffer> {
         }
     } // Output
 
-    private final class DataInputChannel extends ByteBufferChannel {
+    private final class DataInputChannel extends DisconnectingSeekableChannel {
         boolean closed;
 
         @CreatesObligation
         DataInputChannel() {
-            super(ByteBuffer.wrap(data).asReadOnlyBuffer());
+            super(new ByteBufferChannel(ByteBuffer.wrap(data).asReadOnlyBuffer()));
         }
+
+        @Override
+        public boolean isOpen() { return !closed; }
 
         @Override
         public void close() throws IOException {
             if (closed) return;
-            super.close();
+            channel.close();
             times.put(READ, System.currentTimeMillis());
             closed = true;
         }
     } // DataInputChannel
 
-    private final class DataOutputChannel extends ByteBufferChannel {
+    private final class DataOutputChannel extends DisconnectingSeekableChannel {
         boolean closed;
 
         @CreatesObligation
         DataOutputChannel() {
-            super((ByteBuffer) ByteBuffer.allocate(initialCapacity).limit(0));
+            super(new ByteBufferChannel((ByteBuffer) ByteBuffer.allocate(initialCapacity).limit(0)));
         }
+
+        @Override
+        public boolean isOpen() { return !closed; }
 
         @Override
         public void close() throws IOException {
             if (closed) return;
-            super.close();
+            channel.close();
             times.put(WRITE, System.currentTimeMillis());
-            final ByteBuffer buffer = getByteBuffer();
+            final ByteBuffer buffer = ((ByteBufferChannel) channel).getByteBuffer();
             data = Arrays.copyOf(buffer.array(), buffer.limit());
             closed = true;
         }
     } // DataOutputChannel
 
-    private final class DataInputStream extends ByteArrayInputStream {
+    private final class DataInputStream extends DisconnectingInputStream {
         boolean closed;
 
-        DataInputStream() {
-            super(data);
-        }
+        DataInputStream() { super(new ByteArrayInputStream(data)); }
+
+        @Override
+        public boolean isOpen() { return !closed; }
 
         @Override
         public void close() throws IOException {
             if (closed) return;
-            super.close();
+            in.close();
             times.put(READ, System.currentTimeMillis());
             closed = true;
         }
     } // DataInputStream
 
-    private final class DataOutputStream extends ByteArrayOutputStream {
+    private final class DataOutputStream extends DisconnectingOutputStream {
         boolean closed;
 
-        DataOutputStream() {
-            super(initialCapacity);
-        }
+        DataOutputStream() { super(new ByteArrayOutputStream(initialCapacity)); }
+
+        @Override
+        public boolean isOpen() { return !closed; }
 
         @Override
         public void close() throws IOException {
             if (closed) return;
-            super.close();
+            out.close();
             times.put(WRITE, System.currentTimeMillis());
-            data = toByteArray();
+            data = ((ByteArrayOutputStream) out).toByteArray();
             closed = true;
         }
     } // DataOutputStream
