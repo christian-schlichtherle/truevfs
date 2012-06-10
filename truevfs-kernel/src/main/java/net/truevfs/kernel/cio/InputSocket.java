@@ -13,12 +13,8 @@ import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * A factory for input resources for reading bytes from its
- * <i>local target</i>.
- * <p>
- * Note that the entity relationship between input sockets and output sockets
- * is n:1, i.e. any input socket can have at most one peer output socket, but
- * it may be the peer of many other output sockets.
+ * A <em>stateless</em> factory for input streams and seekable byte channels
+ * which operate on a {@linkplain #target() target entry}.
  *
  * @param  <T> the type of the {@linkplain #target() target} entry for I/O
  *         operations.
