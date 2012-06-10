@@ -10,7 +10,7 @@ import net.truevfs.kernel.cio.Entry.Size._
 import net.truevfs.kernel.cio.Entry.Type._
 import net.truevfs.kernel.cio.Entry._
 import net.truevfs.kernel.cio._
-import net.truevfs.kernel.mock._
+import net.truevfs.kernel.driver.mock._
 import net.truevfs.kernel._
 import org.junit.runner._
 import org.scalatest.junit._

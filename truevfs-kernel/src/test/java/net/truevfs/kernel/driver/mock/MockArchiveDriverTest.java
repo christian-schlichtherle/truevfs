@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.kernel.mock;
+package net.truevfs.kernel.driver.mock;
 
 import net.truevfs.kernel.FsArchiveDriverTestSuite;
 

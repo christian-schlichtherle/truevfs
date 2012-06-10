@@ -4,16 +4,15 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.access.TArchiveDetector;
-import net.truevfs.kernel.FsArchiveDriver;
-import net.truevfs.kernel.FsDriver;
-import net.truevfs.kernel.FsScheme;
-import net.truevfs.kernel.mock.MockArchiveDriver;
-import net.truevfs.kernel.util.ExtensionSet;
 import java.io.File;
 import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nullable;
+import net.truevfs.kernel.FsArchiveDriver;
+import net.truevfs.kernel.FsDriver;
+import net.truevfs.kernel.FsScheme;
+import net.truevfs.kernel.driver.mock.MockArchiveDriver;
+import net.truevfs.kernel.util.ExtensionSet;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 import org.junit.Before;

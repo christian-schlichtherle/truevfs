@@ -2,13 +2,13 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.kernel.mock;
+package net.truevfs.kernel.driver.mock;
 
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.FsController;
 import net.truevfs.kernel.FsDriver;
 import net.truevfs.kernel.FsManager;
 import net.truevfs.kernel.FsModel;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * @author  Christian Schlichtherle

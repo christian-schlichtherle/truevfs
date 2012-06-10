@@ -7,8 +7,8 @@ package net.truevfs.kernel.cio;
 import java.io.IOException;
 import java.util.Iterator;
 import static net.truevfs.kernel.cio.Entry.Type.FILE;
-import net.truevfs.kernel.mock.MockArchive;
-import net.truevfs.kernel.mock.MockArchiveDriverEntry;
+import net.truevfs.kernel.driver.mock.MockArchive;
+import net.truevfs.kernel.driver.mock.MockArchiveDriverEntry;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
@@ -20,7 +20,7 @@ public class MultiplexingOutputServiceTest {
 
     private final MockArchive archive = MockArchive.create(null);
     private final MultiplexingOutputService<MockArchiveDriverEntry>
-            service = new MultiplexingOutputService<>(archive.getIOPool(),
+            service = new MultiplexingOutputService<>(archive.getIoPool(),
                 archive.newOutputService());
 
     @Test

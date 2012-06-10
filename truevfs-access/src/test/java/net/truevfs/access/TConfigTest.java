@@ -4,13 +4,11 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.access.TArchiveDetector;
-import net.truevfs.access.TConfig;
+import java.util.NoSuchElementException;
 import static net.truevfs.kernel.FsAccessOption.*;
 import net.truevfs.kernel.FsDriver;
-import net.truevfs.kernel.mock.MockArchiveDriver;
+import net.truevfs.kernel.driver.mock.MockArchiveDriver;
 import net.truevfs.kernel.util.BitField;
-import java.util.NoSuchElementException;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.*;
@@ -21,7 +19,7 @@ import org.junit.Test;
  * Its global scope makes it available to any other test running in parallel,
  * if any.
  * 
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class TConfigTest {
 

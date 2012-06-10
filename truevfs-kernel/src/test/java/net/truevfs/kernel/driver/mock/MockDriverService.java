@@ -2,12 +2,12 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.kernel.mock;
+package net.truevfs.kernel.driver.mock;
 
+import java.util.Map;
 import net.truevfs.kernel.FsDriver;
 import net.truevfs.kernel.FsScheme;
 import net.truevfs.kernel.spi.FsDriverService;
-import java.util.Map;
 
 /**
  * A service for the dummy driver.

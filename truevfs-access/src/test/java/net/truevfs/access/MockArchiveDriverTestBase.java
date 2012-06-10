@@ -4,10 +4,10 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.kernel.mock.MockArchiveDriver;
+import net.truevfs.kernel.driver.mock.MockArchiveDriver;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public abstract class MockArchiveDriverTestBase
 extends ConfiguredClientTestBase<MockArchiveDriver> {
