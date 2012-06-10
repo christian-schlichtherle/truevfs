@@ -58,12 +58,12 @@ extends Controller[LockModel] with LockModelAspect {
     autoMount(NONE).setReadOnly(name)
 
   def setTime(options: AccessOptions, name: FsEntryName, times: Map[Access, Long]) = {
-    checkSync(options, name, None)
+    checkSync(options, name, CREATE) // alias for UPDATE
     autoMount(options).setTime(options, name, times)
   }
 
   def setTime(options: AccessOptions, name: FsEntryName, types: BitField[Access], value: Long) = {
-    checkSync(options, name, None)
+    checkSync(options, name, CREATE) // alias for UPDATE
     autoMount(options).setTime(options, name, types, value)
   }
 
@@ -73,7 +73,7 @@ extends Controller[LockModel] with LockModelAspect {
 
     final class Input extends AbstractInputSocket[E] {
       def target() = {
-        checkSync(options, name, Some(READ))
+        checkSync(options, name, READ)
         autoMount(options) stat (options, name) match {
           case Some(ce) =>
             val ae = ce.getEntry(FILE)
@@ -169,7 +169,7 @@ extends Controller[LockModel] with LockModelAspect {
       }
 
       def mknod() = {
-        checkSync(options, name, Some(WRITE))
+        checkSync(options, name, WRITE)
         // Start creating or overwriting the archive entry.
         // This will fail if the entry already exists as a directory.
         autoMount(options, !name.isRoot && (options get CREATE_PARENTS))
@@ -209,7 +209,7 @@ extends Controller[LockModel] with LockModelAspect {
       throw new FileAlreadyExistsException(name.toString, null,
                                            "Cannot replace a directory entry!");
     } else {
-      checkSync(options, name, None)
+      checkSync(options, name, CREATE)
       autoMount(options, options.get(CREATE_PARENTS))
       .mknod(options, name, tµpe, template)
       .commit()
@@ -217,7 +217,7 @@ extends Controller[LockModel] with LockModelAspect {
   }
 
   def unlink(options: AccessOptions, name: FsEntryName) {
-    checkSync(options, name, None)
+    checkSync(options, name, DELETE)
     val fs = autoMount(options)
     fs.unlink(options, name)
     if (name.isRoot) {
@@ -238,13 +238,10 @@ extends Controller[LockModel] with LockModelAspect {
    * @param  options the options for accessing the file system entry.
    * @param  name the name of the file system entry.
    * @param  intention the intended I/O operation on the archive entry.
-   *         If {@code None}, then only an update to the archive entry meta
-   *         data (i.e. a pure virtual file system operation with no I/O)
-   *         is intended.
    * @throws NeedsSyncException If a sync operation is required before the
    *         intended access could succeed.
    */
-  def checkSync(options: AccessOptions, name: FsEntryName, intention: Option[Access])
+  def checkSync(options: AccessOptions, name: FsEntryName, intention: Access)
 
   /**
    * Returns the (virtual) archive file system mounted from the target

@@ -386,28 +386,27 @@ extends FileSystemArchiveController[E](model) with TouchListener {
       touched = false
   }
 
-  def checkSync(options: AccessOptions, name: FsEntryName, intention: Option[Access]) {
+  def checkSync(options: AccessOptions, name: FsEntryName, intention: Access) {
     // HC SVNT DRACONES!
 
-    // If no file system exists, then pass the test.
+    // If no file system exists then pass the test.
     val fs = fileSystem match {
       case Some(fs) => fs
-      case _ => return
+      case _        => return
     }
 
     // If GROWing and the driver supports the respective access method,
     // then pass the test.
     if (options.get(GROW)) {
       intention match {
-        case None =>
-          if (driver.getRedundantMetaDataSupport)
-            return
-        case Some(WRITE) =>
+        case READ  =>
+        case WRITE =>
           if (driver.getRedundantContentSupport) {
             outputArchive // side-effect!
             return
           }
-        case _ =>
+        case _     =>
+          if (driver.getRedundantMetaDataSupport) return
       }
     }
 
@@ -420,30 +419,22 @@ extends FileSystemArchiveController[E](model) with TouchListener {
 
     // If the entry name addresses the file system root, then pass the test
     // because the root entry cannot get input or output anyway.
-    if (name.isRoot)
-      return
+    if (name.isRoot) return
 
     // Check if the entry is already written to the output archive.
     outputArchive match {
       case Some(oa) =>
         val aen = fse.getEntry.getName
-        if (null ne oa.entry(aen))
-          throw NeedsSyncException()
+        if (null ne oa.entry(aen)) throw NeedsSyncException()
       case _ =>
     }
 
-    intention match {
-      case Some(READ) =>
-      // If our intention is not reading the entry then pass the test.
-      case _ => return
-    }
-
-    // Check if the entry is present in the input archive.
-    inputArchive match {
+    // If our intention is reading the entry then check if it's present in the
+    // input archive.
+    if (intention eq READ) inputArchive match {
       case Some(ia) =>
         val aen = fse.getEntry.getName
-        if (null eq ia.entry(aen))
-          throw NeedsSyncException()
+        if (null eq ia.entry(aen)) throw NeedsSyncException()
       case _ =>
         throw NeedsSyncException()
     }
