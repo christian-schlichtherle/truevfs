@@ -175,133 +175,109 @@ extends FsLockModelController {
 
     @Override
     public final InputSocket<?> getInputSocket(
-            FsEntryName name,
-            BitField<FsInputOption> options) {
-        return new Input(name);
+            final FsEntryName name,
+            final BitField<FsInputOption> options) {
+        if (null == name) throw new NullPointerException();
+
+        final class Input extends DelegatingInputSocket<FsArchiveEntry> {
+            @Override
+            public FsArchiveEntry getLocalTarget() throws IOException {
+                checkSync(name, READ);
+                final FsCovariantEntry<E> ce = autoMount().getEntry(name);
+                if (null == ce)
+                    throw new FsEntryNotFoundException(getModel(),
+                            name, "no such entry");
+                final FsArchiveEntry ae = ce.getEntry(FILE);
+                if (null == ae)
+                    throw new FsEntryNotFoundException(getModel(),
+                            name, "expected FILE entry, but is a " + ce.getTypes() + " entry");
+                return ae;
+            }
+
+            @Override
+            protected InputSocket<? extends FsArchiveEntry> getDelegate()
+            throws IOException {
+                getPeerTarget(); // may sync() if in same target archive file!
+                return getInputSocket(getLocalTarget().getName());
+            }
+        } // Input
+
+        return new Input();
     }
-
-    private final class Input extends DelegatingInputSocket<FsArchiveEntry> {
-        final FsEntryName name;
-        @CheckForNull FsArchiveEntry localTarget;
-
-        Input(final FsEntryName name) {
-            if (null == (this.name = name))
-                throw new NullPointerException();
-        }
-
-        @Override
-        public FsArchiveEntry getLocalTarget() throws IOException {
-            if (null != localTarget)
-                return localTarget;
-            getPeerTarget(); // may sync() if in same target archive file!
-            checkSync(name, READ);
-            final FsCovariantEntry<E> fse = autoMount().getEntry(name);
-            if (null == fse)
-                throw new FsEntryNotFoundException(getModel(),
-                        name, "no such entry");
-            return localTarget = fse.getEntry();
-        }
-
-        @Override
-        protected InputSocket<? extends FsArchiveEntry> getDelegate()
-        throws IOException {
-            localTarget = null;
-            final FsArchiveEntry ae = getLocalTarget();
-            if (FILE != ae.getType())
-                throw new FsEntryNotFoundException(getModel(),
-                        name, "entry type is not a file");
-            return getInputSocket(ae.getName());
-        }
-    } // Input
 
     abstract InputSocket<? extends E> getInputSocket(String name);
 
     @Override
     public final OutputSocket<?> getOutputSocket(
-            FsEntryName name,
-            BitField<FsOutputOption> options,
-            Entry template) {
-        return new Output(name, options, template);
-    }
+            final FsEntryName name,
+            final BitField<FsOutputOption> options,
+            final Entry template) {
+        if (null == name) throw new NullPointerException();
+        if (null == options) throw new NullPointerException();
 
-    private final class Output extends OutputSocket<FsArchiveEntry> {
-        final FsEntryName name;
-        final BitField<FsOutputOption> options;
-        final @CheckForNull Entry template;
-        @CheckForNull FsArchiveFileSystemOperation<E> mknod;
-
-        Output( final FsEntryName name,
-                final BitField<FsOutputOption> options,
-                final @CheckForNull Entry template) {
-            if (null == (this.name = name))
-                throw new NullPointerException();
-            if (null == (this.options = options))
-                throw new NullPointerException();
-            this.template = template;
-        }
-
-        FsArchiveFileSystemOperation<E> mknod() throws IOException {
-            if (null != mknod)
-                return mknod;
-            checkSync(name, WRITE);
-            // Start creating or overwriting the archive entry.
-            // This will fail if the entry already exists as a directory.
-            return mknod = autoMount(!name.isRoot() && options.get(CREATE_PARENTS))
-                    .mknod(name, FILE, options, template);
-        }
-
-        @Override
-        public FsArchiveEntry getLocalTarget() throws IOException {
-            final E ae = mknod().getTarget().getEntry();
-            if (options.get(APPEND)) {
-                // A proxy entry must get returned here in order to inhibit
-                // a peer target to recognize the type of this entry and
-                // change the contents of the transferred data accordingly.
-                // This would not work when APPENDing.
-                return new ProxyEntry(ae);
-            }
-            return ae;
-        }
-
-        @Override
-        public OutputStream newOutputStream() throws IOException {
-            mknod = null;
-            final FsArchiveFileSystemOperation<E> mknod = mknod();
-            final E ae = mknod.getTarget().getEntry();
-            InputStream in = null;
-            if (options.get(APPEND)) {
-                try {
-                    in = new Input(name).newInputStream();
-                } catch (IOException ex) {
-                    // When appending, there is no need for the entry to exist,
-                    // so we can safely ignore this - fall through!
+        final class Output extends OutputSocket<FsArchiveEntry> {
+            @Override
+            public FsArchiveEntry getLocalTarget() throws IOException {
+                final E ae = mknod().getTarget().getEntry();
+                if (options.get(APPEND)) {
+                    // A proxy entry must get returned here in order to inhibit
+                    // a peer target to recognize the type of this entry and
+                    // change the contents of the transferred data accordingly.
+                    // This would not work when APPENDing.
+                    return new ProxyEntry(ae);
                 }
+                return ae;
             }
-            try {
-                final OutputSocket<? extends E> os = getOutputSocket(ae);
-                if (null == in) // do NOT bind when appending!
-                    os.bind(this);
-                final OutputStream out = os.newOutputStream();
-                try {
-                    mknod.commit();
-                    if (in != null)
-                        Streams.cat(in, out);
-                } catch (IOException ex) {
-                    out.close(); // may throw another exception!
-                    throw ex;
-                }
-                return out;
-            } finally {
-                if (null != in) {
+
+            @Override
+            public OutputStream newOutputStream() throws IOException {
+                final FsArchiveFileSystemOperation<E> mknod = mknod();
+                final E ae = mknod.getTarget().getEntry();
+                InputStream in = null;
+                if (options.get(APPEND)) {
                     try {
-                        in.close();
+                        in = getInputSocket(name, FsInputOptions.NONE).newInputStream();
                     } catch (IOException ex) {
-                        throw new InputException(ex);
+                        // When appending, there is no need for the entry to exist,
+                        // so we can safely ignore this - fall through!
+                    }
+                }
+                try {
+                    final OutputSocket<? extends E> os = getOutputSocket(ae);
+                    if (null == in) // do NOT bind when appending!
+                        os.bind(this);
+                    final OutputStream out = os.newOutputStream();
+                    try {
+                        mknod.commit();
+                        if (in != null)
+                            Streams.cat(in, out);
+                    } catch (IOException ex) {
+                        out.close(); // may throw another exception!
+                        throw ex;
+                    }
+                    return out;
+                } finally {
+                    if (null != in) {
+                        try {
+                            in.close();
+                        } catch (IOException ex) {
+                            throw new InputException(ex);
+                        }
                     }
                 }
             }
-        }
-    } // Output
+
+            FsArchiveFileSystemOperation<E> mknod() throws IOException {
+                checkSync(name, WRITE);
+                // Start creating or overwriting the archive entry.
+                // This will fail if the entry already exists as a directory.
+                return autoMount(!name.isRoot() && options.get(CREATE_PARENTS))
+                        .mknod(name, FILE, options, template);
+            }
+        } // Output
+
+        return new Output();
+    }
 
     private static final class ProxyEntry
     extends DecoratingEntry<FsArchiveEntry>
