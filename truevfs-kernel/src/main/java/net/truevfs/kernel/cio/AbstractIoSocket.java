@@ -49,12 +49,12 @@ implements IoSocket<T> {
      */
     @Override
     public String toString() {
-        Object lt;
+        Object target;
         try {
-            lt = target();
+            target = target();
         } catch (final IOException ex) {
-            lt = ex;
+            target = ex;
         }
-        return String.format("%s[target=%s]", getClass().getName(), lt);
+        return String.format("%s[target=%s]", getClass().getName(), target);
     }
 }

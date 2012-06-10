@@ -12,8 +12,7 @@ import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.io.ChannelInputStream;
 
 /**
- * An abstract factory for input resources for reading bytes from its
- * <i>local target</i>.
+ * Abstract base class for input sockets.
  *
  * @param  <T> the type of the {@linkplain #target() target} entry for I/O
  *         operations.

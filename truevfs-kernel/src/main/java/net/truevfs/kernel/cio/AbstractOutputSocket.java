@@ -12,8 +12,7 @@ import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.io.ChannelOutputStream;
 
 /**
- * An abstract factory for output resources for writing bytes to its
- * <i>local target</i>.
+ * Abstract base class for output sockets.
  *
  * @param  <T> the type of the {@linkplain #target() target} entry for I/O
  *         operations.
