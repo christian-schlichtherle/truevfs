@@ -13,7 +13,7 @@ import javax.annotation.concurrent._
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-trait LockModelLike {
+private trait LockModelLike {
 
   /** The lock on which the file system controller(s) shall synchronize. */
   def lock: ReentrantReadWriteLock
