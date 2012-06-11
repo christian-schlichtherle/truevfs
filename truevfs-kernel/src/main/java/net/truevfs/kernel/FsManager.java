@@ -4,10 +4,11 @@
  */
 package net.truevfs.kernel;
 
-import static net.truevfs.kernel.FsSyncOption.ABORT_CHANGES;
-import net.truevfs.kernel.util.BitField;
 import java.util.Iterator;
 import javax.annotation.concurrent.ThreadSafe;
+import static net.truevfs.kernel.FsSyncOption.ABORT_CHANGES;
+import net.truevfs.kernel.util.BitField;
+import net.truevfs.kernel.util.UniqueObject;
 
 /**
  * An abstract container which manages the life cycle of controllers for
@@ -21,7 +22,7 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public abstract class FsManager
-implements Iterable<FsController<? extends FsModel>> {
+extends UniqueObject implements Iterable<FsController<? extends FsModel>> {
 
     /**
      * Returns a thread-safe file system controller for the given mount point.
@@ -108,27 +109,6 @@ implements Iterable<FsController<? extends FsModel>> {
             }
         }
         builder.check();
-    }
-
-    /**
-     * Two file system managers are considered equal if and only if they are
-     * identical. This can't get overriden.
-     * 
-     * @param that the object to compare.
-     */
-    @SuppressWarnings(value = "EqualsWhichDoesntCheckParameterClass")
-    @Override
-    public final boolean equals(Object that) {
-        return this == that;
-    }
-
-    /**
-     * Returns a hash code which is consistent with {@link #equals}.
-     * This can't get overriden.
-     */
-    @Override
-    public final int hashCode() {
-        return super.hashCode();
     }
 
     /**

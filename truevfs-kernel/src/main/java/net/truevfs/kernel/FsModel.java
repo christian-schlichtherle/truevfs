@@ -6,6 +6,7 @@ package net.truevfs.kernel;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
+import net.truevfs.kernel.util.UniqueObject;
 
 /**
  * Defines the common properties of a file system.
@@ -16,7 +17,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class FsModel {
+public class FsModel extends UniqueObject {
 
     private final FsMountPoint mountPoint;
     private @CheckForNull final FsModel parent;
@@ -89,26 +90,6 @@ public class FsModel {
      */
     public void setTouched(boolean touched) {
         throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Two file system models are considered equal if and only if they are
-     * identical.
-     * 
-     * @param that the object to compare.
-     */
-    @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public final boolean equals(@CheckForNull Object that) {
-        return this == that;
-    }
-
-    /**
-     * Returns a hash code which is consistent with {@link #equals}.
-     */
-    @Override
-    public final int hashCode() {
-        return super.hashCode();
     }
 
     /**
