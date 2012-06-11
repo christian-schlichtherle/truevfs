@@ -92,15 +92,10 @@ extends FsDriver {
      * <p>
      * This is an immutable property - multiple calls must return the same
      * object.
-     * <p>
-     * The implementation in the class {@link FsArchiveDriver} calls the
-     * equally named method on the {@link IoPoolLocator#SINGLETON}.
      *
      * @return The pool to use for allocating temporary I/O buffers.
      */
-    public IoPool<? extends IoBuffer<?>> getIoPool() {
-        return IoPoolLocator.SINGLETON.getIoPool();
-    }
+    public abstract IoPool<? extends IoBuffer<?>> getIoPool();
 
     /**
      * Returns {@code true} if and only if the archive files produced by this

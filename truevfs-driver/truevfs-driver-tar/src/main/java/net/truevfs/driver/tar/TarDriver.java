@@ -12,7 +12,7 @@ import javax.annotation.concurrent.Immutable;
 import static net.truevfs.kernel.FsAccessOption.CACHE;
 import static net.truevfs.kernel.FsAccessOption.COMPRESS;
 import net.truevfs.kernel.*;
-import net.truevfs.kernel.cio.Entry;
+import net.truevfs.kernel.cio.*;
 import static net.truevfs.kernel.cio.Entry.ALL_POSIX_ACCESS;
 import static net.truevfs.kernel.cio.Entry.ALL_POSIX_ENTITIES;
 import net.truevfs.kernel.cio.Entry.Access;
@@ -20,9 +20,7 @@ import static net.truevfs.kernel.cio.Entry.Access.WRITE;
 import net.truevfs.kernel.cio.Entry.PosixEntity;
 import static net.truevfs.kernel.cio.Entry.Size.DATA;
 import net.truevfs.kernel.cio.Entry.Type;
-import net.truevfs.kernel.cio.InputService;
-import net.truevfs.kernel.cio.MultiplexingOutputService;
-import net.truevfs.kernel.cio.OutputService;
+import net.truevfs.kernel.sl.IoPoolLocator;
 import net.truevfs.kernel.util.BitField;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
@@ -64,6 +62,17 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
 
     final String getEncoding() {
         return getCharset().name();
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link FsArchiveDriver} calls the
+     * equally named method on the {@link IoPoolLocator#SINGLETON}.
+     */
+    @Override
+    public IoPool<? extends IoBuffer<?>> getIoPool() {
+        return IoPoolLocator.SINGLETON.getIoPool();
     }
 
     /**
