@@ -132,10 +132,10 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
                 try {
                     move(tempFile, entryFile, REPLACE_EXISTING);
                 } catch (final IOException ex) {
-                    // Slow.
+                    // Slow:
                     /*Files.copy(tempFile, entryFile,
                             StandardCopyOption.REPLACE_EXISTING);*/
-                    // Fast.
+                    // Fast:
                     IoSockets.copy(temp.input(), entry.output());
                     updateProperties(entryFile);
                 }
@@ -188,8 +188,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
 
             @Override
             public void close() throws IOException {
-                if (closed)
-                    return;
+                if (closed) return;
                 super.close();
                 closed = true;
                 close(temp, null == exception);
