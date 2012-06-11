@@ -4,6 +4,7 @@
  */
 package net.truevfs.kernel;
 
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.util.UniqueObject;
@@ -24,15 +25,11 @@ public class FsModel extends UniqueObject {
 
     public FsModel( final FsMountPoint mountPoint,
                     final @CheckForNull FsModel parent) {
-        if (!equals(mountPoint.getParent(),
+        if (!Objects.equals(mountPoint.getParent(),
                     (null == parent ? null : parent.getMountPoint())))
             throw new IllegalArgumentException("Parent/Member mismatch!");
         this.mountPoint = mountPoint;
         this.parent = parent;
-    }
-
-    private static boolean equals(@CheckForNull Object o1, @CheckForNull Object o2) {
-        return o1 == o2 || null != o1 && o1.equals(o2);
     }
 
     /**
