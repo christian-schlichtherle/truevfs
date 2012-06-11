@@ -5,8 +5,8 @@
 package net.truevfs.kernel.cio;
 
 import java.io.IOException;
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.util.UniqueObject;
 
 /**
  * Abstract base class for I/O sockets.
@@ -17,31 +17,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 public abstract class AbstractIoSocket<T extends Entry>
-implements IoSocket<T> {
-
-    /**
-     * Two I/O socket are considered equal if and only if
-     * they are identical.
-     * 
-     * @param  that the object to compare.
-     * @return {@code this == that}. 
-     */
-    @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public final boolean equals(@CheckForNull Object that) {
-        return this == that;
-    }
-
-    /**
-     * Returns a hash code which is consistent with {@link #equals}.
-     * 
-     * @return A hash code which is consistent with {@link #equals}.
-     * @see Object#hashCode
-     */
-    @Override
-    public final int hashCode() {
-        return super.hashCode();
-    }
+extends UniqueObject implements IoSocket<T> {
 
     /**
      * Returns a string representation of this object for debugging and logging

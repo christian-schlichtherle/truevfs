@@ -7,9 +7,9 @@ package net.truevfs.kernel;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
-import javax.annotation.CheckForNull;
 import net.truevfs.kernel.cio.Entry.Access;
 import net.truevfs.kernel.util.BitField;
+import net.truevfs.kernel.util.UniqueObject;
 
 /**
  * An abstract file system controller which implements the {@link #getModel()}
@@ -19,7 +19,7 @@ import net.truevfs.kernel.util.BitField;
  * @author Christian Schlichtherle
  */
 public abstract class FsAbstractController<M extends FsModel>
-implements FsController<M> {
+extends UniqueObject implements FsController<M> {
 
     private final M model;
 
@@ -82,30 +82,6 @@ implements FsController<M> {
             ok &= 0 <= value && setTime(options, name, BitField.of(e.getKey()), value);
         }
         return ok;
-    }
-
-    /**
-     * Two file system controllers are considered equal if and only if
-     * they are identical.
-     * 
-     * @param  that the object to compare.
-     * @return {@code this == that}. 
-     */
-    @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public final boolean equals(@CheckForNull Object that) {
-        return this == that;
-    }
-
-    /**
-     * Returns a hash code which is consistent with {@link #equals}.
-     * 
-     * @return A hash code which is consistent with {@link #equals}.
-     * @see Object#hashCode
-     */
-    @Override
-    public final int hashCode() {
-        return super.hashCode();
     }
 
     /**

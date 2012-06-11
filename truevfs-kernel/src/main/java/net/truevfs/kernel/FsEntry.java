@@ -4,11 +4,12 @@
  */
 package net.truevfs.kernel;
 
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.util.BitField;
 import java.util.Formatter;
 import java.util.Set;
 import javax.annotation.Nullable;
+import net.truevfs.kernel.cio.Entry;
+import net.truevfs.kernel.util.BitField;
+import net.truevfs.kernel.util.UniqueObject;
 
 /**
  * An abstract file system entry is an entry which can implement multiple types
@@ -16,7 +17,7 @@ import javax.annotation.Nullable;
  *
  * @author Christian Schlichtherle
  */
-public abstract class FsEntry implements Entry {
+public abstract class FsEntry extends UniqueObject implements Entry {
 
     /**
      * Returns a string representation of the
@@ -68,26 +69,6 @@ public abstract class FsEntry implements Entry {
      *         directory entry.
      */
     public abstract @Nullable Set<String> getMembers();
-
-    /**
-     * Two file system entries are considered equal if and only if they are
-     * identical.
-     * This can't get overriden.
-     */
-    @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public final boolean equals(Object that) {
-        return this == that;
-    }
-
-    /**
-     * Returns a hash code which is consistent with {@link #equals}.
-     * This can't get overriden.
-     */
-    @Override
-    public final int hashCode() {
-        return super.hashCode();
-    }
 
     /**
      * Returns a string representation of this object for debugging and logging
