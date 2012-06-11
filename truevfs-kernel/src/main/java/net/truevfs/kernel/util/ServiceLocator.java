@@ -163,7 +163,7 @@ public final class ServiceLocator {
         try {
             return l1 == l2
                     ? l1.getResources(name)
-                    : new JointEnumeration<>(l1.getResources(name),
+                    : new JointEnumeration<>(   l1.getResources(name),
                                                 l2.getResources(name));
         } catch (final IOException ex) {
             throw new ServiceConfigurationError(ex.toString(), ex);
