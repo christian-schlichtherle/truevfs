@@ -4,10 +4,6 @@
  */
 package net.truevfs.kernel.sl;
 
-import net.truevfs.kernel.FsManager;
-import net.truevfs.kernel.FsManagerProvider;
-import net.truevfs.kernel.spi.FsManagerService;
-import net.truevfs.kernel.util.ServiceLocator;
 import java.text.MessageFormat;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -16,6 +12,10 @@ import static java.util.logging.Level.CONFIG;
 import static java.util.logging.Level.WARNING;
 import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.FsManager;
+import net.truevfs.kernel.FsManagerProvider;
+import net.truevfs.kernel.spi.FsManagerService;
+import net.truevfs.kernel.util.ServiceLocator;
 
 /**
  * Locates a file system manager service of a class with a name which is
