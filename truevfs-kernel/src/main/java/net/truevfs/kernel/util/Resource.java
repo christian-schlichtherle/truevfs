@@ -22,6 +22,15 @@ public abstract class Resource<X extends Exception> implements AutoCloseable {
     private boolean closed;
 
     /**
+     * Returns {@code true} iff this resource hasn't been
+     *         {@linkplain #close() closed} yet.
+     * 
+     * @return {@code true} iff this resource hasn't been
+     *         {@linkplain #close() closed} yet.
+     */
+    public boolean isOpen() { return !closed; }
+
+    /**
      * Closes this resource.
      * If this is the first call to this method, then {@link #onClose()} gets
      * called.
@@ -34,10 +43,9 @@ public abstract class Resource<X extends Exception> implements AutoCloseable {
     @Override
     @DischargesObligation
     public void close() throws X {
-        if (!closed) {
-            onClose();
-            closed = true;
-        }
+        if (closed) return;
+        onClose();
+        closed = true;
     }
 
     protected abstract void onClose() throws X;

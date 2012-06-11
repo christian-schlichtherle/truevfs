@@ -154,12 +154,6 @@ public final class TestConfig extends Resource<RuntimeException> {
         ioPoolProvider = iop;
     }
 
-    // This one is just for you, NetBeans.
-    @Override
-    public void close() {
-        super.close();
-    }
-
     @Override
     protected void onClose() {
         configs.popIf(this);
