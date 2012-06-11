@@ -459,6 +459,12 @@ public final class TConfig extends Resource<RuntimeException> {
     }
 
     @Override
+    @DischargesObligation
+    public void close() {
+        super.close();
+    }
+
+    @Override
     protected void onClose() {
         configs.popIf(this);
     }

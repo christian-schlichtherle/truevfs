@@ -6,6 +6,7 @@ package net.truevfs.kernel;
 
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.cio.IoPoolProvider;
@@ -152,6 +153,12 @@ public final class TestConfig extends Resource<RuntimeException> {
 
     public void setIOPoolProvider(final @CheckForNull IoPoolProvider iop) {
         ioPoolProvider = iop;
+    }
+
+    @Override
+    @DischargesObligation
+    public void close() {
+        super.close();
     }
 
     @Override
