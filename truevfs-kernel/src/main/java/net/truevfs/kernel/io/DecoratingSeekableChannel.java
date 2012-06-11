@@ -100,7 +100,7 @@ implements SeekableByteChannel {
      */
     @Override
     public String toString() {
-        return String.format("%s[sbc=%s]",
+        return String.format("%s[channel=%s]",
                 getClass().getName(),
                 channel);
     }
