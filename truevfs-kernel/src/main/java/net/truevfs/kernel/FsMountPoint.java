@@ -4,16 +4,16 @@
  */
 package net.truevfs.kernel;
 
-import static net.truevfs.kernel.FsUriModifier.NULL;
-import static net.truevfs.kernel.FsUriModifier.PostFix.MOUNT_POINT;
-import net.truevfs.kernel.util.QuotedUriSyntaxException;
-import net.truevfs.kernel.util.UriBuilder;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
+import static net.truevfs.kernel.FsUriModifier.NULL;
+import static net.truevfs.kernel.FsUriModifier.PostFix.MOUNT_POINT;
+import net.truevfs.kernel.util.QuotedUriSyntaxException;
+import net.truevfs.kernel.util.UriBuilder;
 
 /**
  * Addresses a file system mount point.
@@ -413,6 +413,15 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     }
 
     /**
+     * Implements a natural ordering which is consistent with
+     * {@link #equals(Object)}.
+     */
+    @Override
+    public int compareTo(FsMountPoint that) {
+        return this.uri.compareTo(that.uri);
+    }
+
+    /**
      * Returns {@code true} iff the given object is a mount point and its URI
      * {@link URI#equals(Object) equals} the URI of this mount point.
      * Note that this ignores the scheme and path.
@@ -422,15 +431,6 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
         return this == that
                 || that instanceof FsMountPoint
                     && this.uri.equals(((FsMountPoint) that).uri);
-    }
-
-    /**
-     * Implements a natural ordering which is consistent with
-     * {@link #equals(Object)}.
-     */
-    @Override
-    public int compareTo(FsMountPoint that) {
-        return this.uri.compareTo(that.uri);
     }
 
     /**
