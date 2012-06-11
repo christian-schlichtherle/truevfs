@@ -4,17 +4,17 @@
  */
 package net.truevfs.kernel;
 
-import static net.truevfs.kernel.FsUriModifier.CANONICALIZE;
-import static net.truevfs.kernel.FsUriModifier.NULL;
-import static net.truevfs.kernel.FsUriModifier.PostFix.PATH;
-import net.truevfs.kernel.util.QuotedUriSyntaxException;
-import net.truevfs.kernel.util.UriBuilder;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
+import static net.truevfs.kernel.FsUriModifier.CANONICALIZE;
+import static net.truevfs.kernel.FsUriModifier.NULL;
+import static net.truevfs.kernel.FsUriModifier.PostFix.PATH;
+import net.truevfs.kernel.util.QuotedUriSyntaxException;
+import net.truevfs.kernel.util.UriBuilder;
 
 /**
  * Addresses a file system entry.
@@ -420,6 +420,15 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     }
 
     /**
+     * Implements a natural ordering which is consistent with
+     * {@link #equals(Object)}.
+     */
+    @Override
+    public int compareTo(FsPath that) {
+        return this.uri.compareTo(that.uri);
+    }
+
+    /**
      * Returns {@code true} iff the given object is a path name and its URI
      * {@link URI#equals(Object) equals} the URI of this path name.
      * Note that this ignores the mount point and entry name.
@@ -429,15 +438,6 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
         return this == that
                 || that instanceof FsPath
                     && this.uri.equals(((FsPath) that).uri);
-    }
-
-    /**
-     * Implements a natural ordering which is consistent with
-     * {@link #equals(Object)}.
-     */
-    @Override
-    public int compareTo(FsPath that) {
-        return this.uri.compareTo(that.uri);
     }
 
     /**

@@ -4,15 +4,15 @@
  */
 package net.truevfs.kernel;
 
-import static net.truevfs.kernel.FsUriModifier.NULL;
-import static net.truevfs.kernel.FsUriModifier.PostFix.ENTRY_NAME;
-import net.truevfs.kernel.util.QuotedUriSyntaxException;
-import net.truevfs.kernel.util.UriBuilder;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import static net.truevfs.kernel.FsUriModifier.NULL;
+import static net.truevfs.kernel.FsUriModifier.PostFix.ENTRY_NAME;
+import net.truevfs.kernel.util.QuotedUriSyntaxException;
+import net.truevfs.kernel.util.UriBuilder;
 
 /**
  * Addresses a file system entry relative to its {@link FsMountPoint mount point}.
@@ -396,6 +396,17 @@ implements Serializable, Comparable<FsEntryName> {
     }
 
     /**
+     * Implements a natural ordering which is consistent with
+     * {@link #equals(Object)}.
+     * 
+     * @param that the entry name to compare.
+     */
+    @Override
+    public int compareTo(FsEntryName that) {
+        return this.uri.compareTo(that.uri);
+    }
+
+    /**
      * Returns {@code true} iff the given object is a entry name
      * and its URI {@link URI#equals(Object) equals} the URI of this entry name.
      * 
@@ -406,17 +417,6 @@ implements Serializable, Comparable<FsEntryName> {
         return this == that
                 || that instanceof FsEntryName
                     && this.uri.equals(((FsEntryName) that).uri);
-    }
-
-    /**
-     * Implements a natural ordering which is consistent with
-     * {@link #equals(Object)}.
-     * 
-     * @param that the entry name to compare.
-     */
-    @Override
-    public int compareTo(FsEntryName that) {
-        return this.uri.compareTo(that.uri);
     }
 
     /**
