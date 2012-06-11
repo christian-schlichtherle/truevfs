@@ -458,13 +458,6 @@ public final class TConfig extends Resource<RuntimeException> {
         this.accessPreferences = preferences;
     }
 
-    // This one is just for you, NetBeans.
-    @Override
-    @DischargesObligation
-    public void close() {
-        super.close();
-    }
-
     @Override
     protected void onClose() {
         configs.popIf(this);
