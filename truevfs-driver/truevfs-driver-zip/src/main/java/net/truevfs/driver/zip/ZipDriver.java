@@ -19,15 +19,13 @@ import static net.truevfs.driver.zip.io.ZipEntry.*;
 import net.truevfs.driver.zip.io.*;
 import static net.truevfs.kernel.FsAccessOption.*;
 import net.truevfs.kernel.*;
-import net.truevfs.kernel.cio.Entry;
+import net.truevfs.kernel.cio.*;
 import static net.truevfs.kernel.cio.Entry.Access.WRITE;
 import static net.truevfs.kernel.cio.Entry.Size.DATA;
 import net.truevfs.kernel.cio.Entry.Type;
 import static net.truevfs.kernel.cio.Entry.Type.DIRECTORY;
-import net.truevfs.kernel.cio.InputService;
-import net.truevfs.kernel.cio.MultiplexingOutputService;
-import net.truevfs.kernel.cio.OutputService;
 import net.truevfs.kernel.io.Source;
+import net.truevfs.kernel.sl.IoPoolLocator;
 import net.truevfs.kernel.util.BitField;
 import net.truevfs.kernel.util.HashMaps;
 import net.truevfs.key.KeyManagerProvider;
@@ -81,6 +79,17 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     @Override
     public Charset getCharset() {
         return ZIP_CHARSET;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link FsArchiveDriver} calls the
+     * equally named method on the {@link IoPoolLocator#SINGLETON}.
+     */
+    @Override
+    public IoPool<? extends IoBuffer<?>> getIoPool() {
+        return IoPoolLocator.SINGLETON.getIoPool();
     }
 
     /**
