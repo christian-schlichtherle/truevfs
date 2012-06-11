@@ -4,17 +4,17 @@
  */
 package net.truevfs.kernel.sl;
 
+import java.util.*;
+import static java.util.logging.Level.CONFIG;
+import static java.util.logging.Level.WARNING;
+import java.util.logging.Logger;
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.FsDriver;
 import net.truevfs.kernel.FsDriverProvider;
 import net.truevfs.kernel.FsScheme;
 import net.truevfs.kernel.spi.FsDriverService;
 import static net.truevfs.kernel.util.HashMaps.initialCapacity;
 import net.truevfs.kernel.util.ServiceLocator;
-import java.util.*;
-import static java.util.logging.Level.CONFIG;
-import static java.util.logging.Level.WARNING;
-import java.util.logging.Logger;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * Locates all file system drivers on the class path.
