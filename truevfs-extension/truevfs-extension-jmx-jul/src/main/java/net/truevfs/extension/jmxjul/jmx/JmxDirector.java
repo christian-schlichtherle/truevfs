@@ -29,46 +29,46 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     /** Can't touch this - hammer time! */
     private JmxDirector() { }
 
-    private volatile JmxIOStatistics application;
+    private volatile JmxIoStatistics application;
 
-    JmxIOStatistics getApplicationIOStatistics() {
-        final JmxIOStatistics stats = application;
+    JmxIoStatistics getApplicationIOStatistics() {
+        final JmxIoStatistics stats = application;
         assert null != stats;
         return stats;
     }
 
-    void setApplicationIOStatistics(final JmxIOStatistics stats) {
+    void setApplicationIOStatistics(final JmxIoStatistics stats) {
         assert null != stats;
         this.application = stats;
-        JmxIOStatisticsView.register(stats, APPLICATION_IO_STATISTICS);
+        JmxIoStatisticsView.register(stats, APPLICATION_IO_STATISTICS);
     }
 
-    private volatile JmxIOStatistics kernel;
+    private volatile JmxIoStatistics kernel;
 
-    JmxIOStatistics getKernelIOStatistics() {
-        final JmxIOStatistics stats = kernel;
+    JmxIoStatistics getKernelIOStatistics() {
+        final JmxIoStatistics stats = kernel;
         assert null != stats;
         return stats;
     }
 
-    void setKernelIOStatistics(final JmxIOStatistics stats) {
+    void setKernelIOStatistics(final JmxIoStatistics stats) {
         assert null != stats;
         this.kernel = stats;
-        JmxIOStatisticsView.register(stats, KERNEL_IO_STATISTICS);
+        JmxIoStatisticsView.register(stats, KERNEL_IO_STATISTICS);
     }
 
-    private volatile JmxIOStatistics temp;
+    private volatile JmxIoStatistics temp;
 
-    JmxIOStatistics getTempIOStatistics() {
-        final JmxIOStatistics stats = temp;
+    JmxIoStatistics getTempIOStatistics() {
+        final JmxIoStatistics stats = temp;
         assert null != stats;
         return stats;
     }
 
-    void setTempIOStatistics(final JmxIOStatistics stats) {
+    void setTempIOStatistics(final JmxIoStatistics stats) {
         assert null != stats;
         this.temp = stats;
-        JmxIOStatisticsView.register(stats, TEMP_IO_STATISTICS);
+        JmxIoStatisticsView.register(stats, TEMP_IO_STATISTICS);
     }
 
     void clearStatistics() {
@@ -84,9 +84,9 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
                 throw new AssertionError();
             }
             for (final ObjectName found : mbs.queryNames(pattern, null)) {
-                final JmxIOStatisticsMXBean proxy = JMX.newMXBeanProxy(
-                        mbs, found, JmxIOStatisticsMXBean.class);
-                if (((JmxIOStatistics) params[1]).getTimeCreatedMillis()
+                final JmxIoStatisticsMXBean proxy = JMX.newMXBeanProxy(
+                        mbs, found, JmxIoStatisticsMXBean.class);
+                if (((JmxIoStatistics) params[1]).getTimeCreatedMillis()
                         == proxy.getTimeCreatedMillis())
                     continue;
                 try {
@@ -107,7 +107,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
 
     @Override
     public <B extends IoBuffer<B>> IoPool<B> instrument(IoPool<B> pool) {
-        return new JmxIOPool<B>(pool, this);
+        return new JmxIoPool<B>(pool, this);
     }
 
     @Override
@@ -134,7 +134,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     @Override
     protected <B extends IoBuffer<B>> InputSocket<B> instrument(
             InputSocket<B> input,
-            InstrumentingIOPool<B>.InstrumentingBuffer context) {
+            InstrumentingIoPool<B>.InstrumentingBuffer context) {
         return new JmxInputSocket<B>(this, input, temp);
     }
 
@@ -149,7 +149,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     @Override
     protected <B extends IoBuffer<B>> OutputSocket<B> instrument(
             OutputSocket<B> output,
-            InstrumentingIOPool<B>.InstrumentingBuffer context) {
+            InstrumentingIoPool<B>.InstrumentingBuffer context) {
         return new JmxOutputSocket<B>(this, output, temp);
     }
 

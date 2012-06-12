@@ -16,10 +16,10 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 final class JmxInputStream extends DecoratingInputStream {
-    private final JmxIOStatistics stats;
+    private final JmxIoStatistics stats;
 
     @CreatesObligation
-    JmxInputStream(@WillCloseWhenClosed InputStream in, JmxIOStatistics stats) {
+    JmxInputStream(@WillCloseWhenClosed InputStream in, JmxIoStatistics stats) {
         super(in);
         assert null != stats;
         this.stats = stats;

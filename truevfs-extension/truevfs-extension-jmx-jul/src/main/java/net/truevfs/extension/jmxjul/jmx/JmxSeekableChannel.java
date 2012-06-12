@@ -17,10 +17,10 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 final class JmxSeekableChannel extends DecoratingSeekableChannel {
-    private final JmxIOStatistics stats;
+    private final JmxIoStatistics stats;
 
     @CreatesObligation
-    JmxSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc, JmxIOStatistics stats) {
+    JmxSeekableChannel(@WillCloseWhenClosed SeekableByteChannel sbc, JmxIoStatistics stats) {
         super(sbc);
         assert null != stats;
         this.stats = stats;

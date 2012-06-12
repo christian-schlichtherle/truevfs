@@ -6,7 +6,7 @@ package net.truevfs.extension.jmxjul.jmx;
 
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.extension.jmxjul.InstrumentingIOPool;
+import net.truevfs.extension.jmxjul.InstrumentingIoPool;
 import net.truevfs.kernel.cio.IoBuffer;
 import net.truevfs.kernel.cio.IoPool;
 
@@ -14,10 +14,10 @@ import net.truevfs.kernel.cio.IoPool;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class JmxIOPool<B extends IoBuffer<B>>
-extends InstrumentingIOPool<B> {
+final class JmxIoPool<B extends IoBuffer<B>>
+extends InstrumentingIoPool<B> {
 
-    JmxIOPool(IoPool<B> model, JmxDirector director) {
+    JmxIoPool(IoPool<B> model, JmxDirector director) {
         super(director, model);
     }
 
@@ -31,7 +31,7 @@ extends InstrumentingIOPool<B> {
         @SuppressWarnings("LeakingThisInConstructor")
         JmxBuffer(IoBuffer<B> model) {
             super(model);
-            JmxIOBufferView.register(this);
+            JmxIoBufferView.register(this);
         }
 
         @Override
@@ -39,7 +39,7 @@ extends InstrumentingIOPool<B> {
             try {
                 entry.release();
             } finally {
-                JmxIOBufferView.unregister(this);
+                JmxIoBufferView.unregister(this);
             }
         }
     } // JmxBuffer

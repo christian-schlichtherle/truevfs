@@ -22,9 +22,9 @@ final class JmxManager extends InstrumentingManager {
     JmxManager(JmxDirector director, FsManager model) {
         super(director, model);
         assert null != director;
-        director.setApplicationIOStatistics(new JmxIOStatistics());
-        director.setKernelIOStatistics(new JmxIOStatistics());
-        director.setTempIOStatistics(new JmxIOStatistics());
+        director.setApplicationIOStatistics(new JmxIoStatistics());
+        director.setKernelIOStatistics(new JmxIoStatistics());
+        director.setTempIOStatistics(new JmxIoStatistics());
         JmxManagerView.register(this);
     }
 
@@ -42,9 +42,9 @@ final class JmxManager extends InstrumentingManager {
             manager.sync(options);
         } finally {
             JmxDirector d = ((JmxDirector) director);
-            d.setApplicationIOStatistics(new JmxIOStatistics());
-            d.setKernelIOStatistics(new JmxIOStatistics());
-            d.setTempIOStatistics(new JmxIOStatistics());
+            d.setApplicationIOStatistics(new JmxIoStatistics());
+            d.setKernelIOStatistics(new JmxIoStatistics());
+            d.setTempIOStatistics(new JmxIoStatistics());
         }
     }
 }
