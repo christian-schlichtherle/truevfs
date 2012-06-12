@@ -19,25 +19,25 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author  Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxIOStatisticsView
+public class JmxIoStatisticsView
 extends StandardMBean
-implements JmxIOStatisticsMXBean {
+implements JmxIoStatisticsMXBean {
 
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
 
-    private final JmxIOStatistics model;
+    private final JmxIoStatistics model;
     private final String type;
 
-    static synchronized JmxIOStatisticsMXBean register(final JmxIOStatistics model, final String type) {
-        final JmxIOStatisticsView view = new JmxIOStatisticsView(model, type);
+    static synchronized JmxIoStatisticsMXBean register(final JmxIoStatistics model, final String type) {
+        final JmxIoStatisticsView view = new JmxIoStatisticsView(model, type);
         final ObjectName name = getObjectName(model, type);
         try {
             try {
                 mbs.registerMBean(view, name);
                 return view;
             } catch (InstanceAlreadyExistsException ignored) {
-                return JMX.newMXBeanProxy(mbs, name, JmxIOStatisticsMXBean.class);
+                return JMX.newMXBeanProxy(mbs, name, JmxIoStatisticsMXBean.class);
             }
         } catch (RuntimeException ex) {
             throw ex;
@@ -46,7 +46,7 @@ implements JmxIOStatisticsMXBean {
         }
     }
 
-    static void unregister(final JmxIOStatistics model, final String type) {
+    static void unregister(final JmxIoStatistics model, final String type) {
         final ObjectName name = getObjectName(model, type);
         try {
             try {
@@ -60,7 +60,7 @@ implements JmxIOStatisticsMXBean {
         }
     }
 
-    private static synchronized ObjectName getObjectName(final JmxIOStatistics model, final String type) {
+    private static synchronized ObjectName getObjectName(final JmxIoStatistics model, final String type) {
         Objects.requireNonNull(type);
         final long time = model.getTimeCreatedMillis();
         @SuppressWarnings("UseOfObsoleteCollectionType")
@@ -76,8 +76,8 @@ implements JmxIOStatisticsMXBean {
         }
     }
 
-    private JmxIOStatisticsView(final JmxIOStatistics model, final String name) {
-        super(JmxIOStatisticsMXBean.class, true);
+    private JmxIoStatisticsView(final JmxIoStatistics model, final String name) {
+        super(JmxIoStatisticsMXBean.class, true);
         assert null != model;
         assert null != name;
         this.model = model;

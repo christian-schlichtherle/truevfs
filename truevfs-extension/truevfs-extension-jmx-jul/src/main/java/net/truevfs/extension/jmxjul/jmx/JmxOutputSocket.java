@@ -20,9 +20,9 @@ import net.truevfs.kernel.cio.OutputSocket;
 final class JmxOutputSocket<E extends Entry>
 extends InstrumentingOutputSocket<E> {
 
-    final JmxIOStatistics stats;
+    final JmxIoStatistics stats;
 
-    JmxOutputSocket(JmxDirector director, OutputSocket<? extends E> model, JmxIOStatistics stats) {
+    JmxOutputSocket(JmxDirector director, OutputSocket<? extends E> model, JmxIoStatistics stats) {
         super(director, model);
         assert null != stats;
         this.stats = stats;

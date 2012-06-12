@@ -16,7 +16,7 @@ final class JmxApplicationController extends JmxController {
     }
 
     @Override
-    JmxIOStatistics getIOStatistics() {
+    JmxIoStatistics getIOStatistics() {
         return director.getApplicationIOStatistics();
     }
 }

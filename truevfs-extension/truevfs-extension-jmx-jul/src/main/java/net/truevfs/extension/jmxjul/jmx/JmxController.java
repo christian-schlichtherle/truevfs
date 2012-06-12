@@ -18,5 +18,5 @@ extends InstrumentingController<JmxDirector> {
         super(director, controller);
     }
 
-    abstract JmxIOStatistics getIOStatistics();
+    abstract JmxIoStatistics getIOStatistics();
 }
