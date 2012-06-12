@@ -19,14 +19,14 @@
     <description>
         This configuration profile is designed for applications which want to
         access all TrueZIP features without a negative impact on performance.
-        It depends on the minimum configuration profile and adds the file
+        It depends on the base configuration profile and adds the file
         system driver modules for HTTP(S), TAR and ZIP.RAES.
     </description>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-profile-min</artifactId>
+            <artifactId>truevfs-profile-base</artifactId>
             <type>pom</type>
         </dependency>
         <dependency>

@@ -2,10 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.driver.zip;
+package net.truevfs.driver.sfx;
 
-import net.truevfs.kernel.cio.IoPoolProvider;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.driver.zip.ZipDriverEntry;
+import net.truevfs.driver.zip.ZipInputService;
 
 /**
  * An archive driver for SFX/EXE files which checks the CRC32 value for all

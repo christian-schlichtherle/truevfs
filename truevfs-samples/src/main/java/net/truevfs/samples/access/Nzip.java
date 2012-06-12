@@ -16,16 +16,14 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.truevfs.access.*;
+import net.truevfs.driver.sfx.CheckedReadOnlySfxDriver;
 import net.truevfs.driver.tar.TarBZip2Driver;
 import net.truevfs.driver.tar.TarDriver;
 import net.truevfs.driver.tar.TarGZipDriver;
 import net.truevfs.driver.zip.CheckedJarDriver;
-import net.truevfs.driver.zip.CheckedReadOnlySfxDriver;
 import net.truevfs.driver.zip.CheckedZipDriver;
 import static net.truevfs.kernel.FsAccessOption.*;
 import net.truevfs.kernel.FsSyncException;
-import net.truevfs.kernel.cio.IoPoolProvider;
-import net.truevfs.kernel.sl.IoPoolLocator;
 
 /**
  * A comprehensive command line utility which allows you to work

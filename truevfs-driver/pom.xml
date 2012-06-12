@@ -21,6 +21,7 @@
     <modules>
         <module>truevfs-driver-file</module>
         <module>truevfs-driver-http</module>
+        <module>truevfs-driver-sfx</module>
         <module>truevfs-driver-tar</module>
         <module>truevfs-driver-zip</module>
         <module>truevfs-driver-tzp</module>

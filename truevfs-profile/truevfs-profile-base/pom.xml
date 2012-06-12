@@ -12,10 +12,10 @@
         <version>1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truevfs-profile-min</artifactId>
+    <artifactId>truevfs-profile-base</artifactId>
     <packaging>pom</packaging>
 
-    <name>TrueVFS Profile Minimum</name>
+    <name>TrueVFS Profile Base</name>
     <description>
         This configuration profile is designed to support the most prominent
         use case with minimum dependencies.

@@ -12,16 +12,16 @@
         <version>1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truevfs-profile-max</artifactId>
+    <artifactId>truevfs-profile-full</artifactId>
     <packaging>pom</packaging>
 
-    <name>TrueVFS Profile Maximum</name>
+    <name>TrueVFS Profile Full</name>
     <description>
         This configuration profile is designed for testing purposes only and
         should not be used in production environments because of its negative
         performance impact.
         It depends on the default configuration profile and adds the modules
-        TrueZIP Extension JMX/JUL and TrueZIP Samples.
+        TrueZIP Driver SFX, TrueZIP Extension JMX/JUL and TrueZIP Samples.
         Note that the JAR artifact of this profile is executable: The main
         class is net.truevfs.samples.access.Nzip.
     </description>
@@ -31,6 +31,10 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-profile-default</artifactId>
             <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-driver-sfx</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

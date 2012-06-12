@@ -2,17 +2,19 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.driver.zip;
+package net.truevfs.driver.sfx;
 
-import net.truevfs.kernel.*;
-import net.truevfs.kernel.cio.InputService;
-import net.truevfs.kernel.cio.OutputService;
-import net.truevfs.kernel.util.BitField;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.driver.zip.ZipDriver;
+import net.truevfs.driver.zip.ZipDriverEntry;
+import net.truevfs.kernel.*;
+import net.truevfs.kernel.cio.InputService;
+import net.truevfs.kernel.cio.OutputService;
+import net.truevfs.kernel.util.BitField;
 
 /**
  * An archive driver which reads Self Executable (SFX/EXE) ZIP files,
