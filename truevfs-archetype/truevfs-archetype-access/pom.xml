@@ -20,4 +20,13 @@
 
     <name>TrueVFS Archetype Access</name>
     <description>Showcases the client API of the module TrueZIP Access - requires JSE 7.</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-profile-default</artifactId>
+            <type>pom</type>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
 </project>

@@ -41,25 +41,13 @@
             <artifactId>truevfs-access</artifactId>
         </dependency>
 
-        <!-- Extension module for monitoring and management with JMX and
-             java.util.logging.
-             This module is designed for testing purposes only.
-             It should not be used in production environments because of its
-             negative performance impact.
-             -->
-        <!--dependency>
-            <groupId>de.schlichtherle.truevfs</groupId>
-            <artifactId>truevfs-extension-jmx-jul</artifactId>
-            <version>${truevfs.version}</version>
-            <scope>runtime</scope>
-        </dependency-->
-
         <!-- This should normally be only a runtime dependency in order to
              prompt the user for passwords when accessing WinZip AES encrypted
              ZIP entries or RAES encrypted ZIP files.
              However, declaring it as a compile time dependency allows the
              application to set the class for visual and audible feedback when
-             entering wrong passwords. -->
+             entering wrong passwords.
+             -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-key</artifactId>
@@ -113,7 +101,7 @@
              archive file extensions:
              tzp|zip.rae|zip.raes: RAES encrypted ZIP file format.
              -->
-            <dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-driver-tzp</artifactId>
             <!--scope>runtime</scope-->
@@ -132,31 +120,4 @@
             <!--scope>runtime</scope-->
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <archive>
-                                <manifest>
-                                    <mainClass>de.truevfs.samples.file.Nzip</mainClass>
-                                </manifest>
-                            </archive>
-                            <descriptors>
-                                <descriptor>src/assembly/jar-with-dependencies.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
 </project>

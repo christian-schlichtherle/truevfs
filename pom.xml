@@ -133,6 +133,7 @@ system space.
         <module>truevfs-extension</module>
         <module>truevfs-kernel</module>
         <module>truevfs-key</module>
+        <module>truevfs-profile</module>
         <module>truevfs-samples</module>
     </modules>
 
@@ -210,6 +211,24 @@ system space.
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-profile-default</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-profile-max</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-profile-min</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
