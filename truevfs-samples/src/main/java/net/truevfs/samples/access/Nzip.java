@@ -54,7 +54,6 @@ public class Nzip extends Application {
 
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(Nzip.class.getName());
-    private static final IoPoolProvider POOL_PROVIDER = IoPoolLocator.SINGLETON;
 
     private final NumberFormat numberFormat = NumberFormat.getNumberInstance();
     private final DateFormat dateFormat = DateFormat.getDateTimeInstance();
