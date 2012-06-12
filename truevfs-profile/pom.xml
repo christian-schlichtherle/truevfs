@@ -12,23 +12,15 @@
         <version>1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truevfs-archetype</artifactId>
+    <artifactId>truevfs-profile</artifactId>
     <packaging>pom</packaging>
 
-    <name>TrueVFS Archetype</name>
-    <description>Parent POM for Maven archetypes.</description>
+    <name>TrueVFS Profile</name>
+    <description>Parent POM for configuration profiles.</description>
 
     <modules>
-        <module>truevfs-archetype-access</module>
+        <module>truevfs-profile-default</module>
+        <module>truevfs-profile-max</module>
+        <module>truevfs-profile-min</module>
     </modules>
-
-    <build>
-        <extensions>
-            <extension>
-                <groupId>org.apache.maven.archetype</groupId>
-                <artifactId>archetype-packaging</artifactId>
-                <version>2.2</version>
-            </extension>
-        </extensions>
-    </build>
 </project>
