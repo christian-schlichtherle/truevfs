@@ -1,0 +1,28 @@
+    -----------------------
+    About TrueVFS Driver SFX
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About TrueVFS Driver SFX
+
+    This module contains the file system driver service class
+    {{{./apidocs/net/truevfs/driver/sfx/SfxDriverService.html}SfxDriverService}}
+    which provides the following map of file system drivers:
+
+*--*--*
+||URI Schemes / Archive File Extensions||File System Driver Class|
+*--+--+
+|<<<exe>>>|{{{./apidocs/net/truevfs/driver/zip/ReadOnlySfxDriver.html}<<<ReadOnlySfxDriver>>>}}|
+*--+--+
+
+    Add the JAR artifact of this module to the run time class path to
+    make its file system drivers available for service location in the
+    client API modules.
+    The URI schemes will then get recognized as default archive file extensions
+    by the class
+    {{{../../apidocs/net/truevfs/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+
+* Key Features
+
+    This driver provides read-only access to SelF eXtracting ZIP files (SFX).

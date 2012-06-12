@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.driver.zip;
+package net.truevfs.driver.sfx;
 
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
@@ -23,16 +23,8 @@ import net.truevfs.kernel.spi.FsDriverService;
 </thead>
 <tbody>
 <tr>
-<td>{@code ear}, {@code jar}, {@code war}</td>
-<td>{@link net.truevfs.driver.zip.JarDriver}</td>
-</tr>
-<tr>
-<td>{@code odt}, {@code ott}, {@code odg}, {@code otg}, {@code odp}, {@code otp}, {@code ods}, {@code ots}, {@code odc}, {@code otc}, {@code odi}, {@code oti}, {@code odf}, {@code otf}, {@code odm}, {@code oth}, {@code odb}</td>
-<td>{@link net.truevfs.driver.zip.OdfDriver}</td>
-</tr>
-<tr>
-<td>{@code zip}</td>
-<td>{@link net.truevfs.driver.zip.ZipDriver}</td>
+<td>{@code exe}</td>
+<td>{@link net.truevfs.driver.zip.ReadOnlySfxDriver}</td>
 </tr>
 </tbody>
 </table>
@@ -44,13 +36,11 @@ import net.truevfs.kernel.spi.FsDriverService;
  * @author  Christian Schlichtherle
  */
 @Immutable
-public final class ZipDriverService extends FsDriverService {
+public final class SfxDriverService extends FsDriverService {
 
     private final Map<FsScheme, FsDriver>
             drivers = newMap(new Object[][] {
-                { "zip", new ZipDriver() },
-                { "ear|jar|war", new JarDriver() },
-                { "odt|ott|odg|otg|odp|otp|ods|ots|odc|otc|odi|oti|odf|otf|odm|oth|odb", new OdfDriver() },
+                { "exe", new ReadOnlySfxDriver() },
             });
 
     @Override

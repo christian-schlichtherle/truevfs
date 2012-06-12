@@ -19,8 +19,8 @@
     <description>Parent POM for configuration profiles.</description>
 
     <modules>
+        <module>truevfs-profile-base</module>
         <module>truevfs-profile-default</module>
-        <module>truevfs-profile-max</module>
-        <module>truevfs-profile-min</module>
+        <module>truevfs-profile-full</module>
     </modules>
 </project>

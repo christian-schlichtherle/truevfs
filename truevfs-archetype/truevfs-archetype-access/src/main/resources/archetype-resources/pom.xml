@@ -29,7 +29,7 @@
             <groupId>de.schlichtherle.truevfs</groupId>
             <artifactId>truevfs-profile-default</artifactId>
             <version>${truevfs.version}</version>
-            <type>pom</type> <!-- or "<classifier>assembly</classifier>" for the all-in-one-jar -->
+            <type>pom</type>
         </dependency>
 
         <!-- This should normally be only a runtime dependency in order to
