@@ -6,9 +6,9 @@ package net.truevfs.samples.access;
 
 import de.schlichtherle.truevfs.key.pbe.swing.feedback.HurlingWindowFeedback;
 import de.schlichtherle.truevfs.key.pbe.swing.feedback.InvalidKeyFeedback;
-import net.truevfs.access.TApplication;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import net.truevfs.access.TApplication;
 
 /**
  * Abstract base class for command line utilities.
