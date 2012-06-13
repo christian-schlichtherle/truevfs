@@ -19,9 +19,8 @@
 
     <name>TrueVFS Kernel</name>
     <description>
-        This module implements virtual file systems from arbitrary resources,
-        manages their state and commits unsynchronized changes if required or
-        requested.
+        Implements virtual file systems from arbitrary resources, manages their
+        state and commits unsynchronized changes if required or requested.
         The TrueVFS Kernel uses file system drivers to access these resources.
         It provides multithreading, multiplexing, caching and buffering so that
         the file system drivers do not need to take care of this.

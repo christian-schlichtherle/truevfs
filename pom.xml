@@ -15,7 +15,7 @@
     <parent>
         <groupId>de.schlichtherle</groupId>
         <artifactId>oss-parent</artifactId>
-        <version>9</version>
+        <version>10</version>
     </parent>
 
     <groupId>de.schlichtherle.truevfs</groupId>
@@ -241,9 +241,20 @@ system space.
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>annotations</artifactId>
+                <version>2.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.10</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
-                <version>1.4</version>
+                <version>1.4.1</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
@@ -275,21 +286,6 @@ system space.
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>annotations</artifactId>
-            <version>2.0.0</version>
-            <optional>true</optional>
-        </dependency>
-    </dependencies>
 
     <build>
         <pluginManagement>
@@ -341,6 +337,15 @@ system space.
                 </plugin>
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>integration-test</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                     <configuration>
                         <!-- Consider 90% blocking factor for I/O. -->
                         <threadCount>10</threadCount>
@@ -444,6 +449,35 @@ system space.
     </distributionManagement>
 
     <profiles>
+        <profile>
+            <id>main-sources-depend-on-findbugs-annotations</id>
+            <activation>
+                <file>
+                    <exists>src/main</exists>
+                </file>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.google.code.findbugs</groupId>
+                    <artifactId>annotations</artifactId>
+                    <optional>true</optional>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>test-sources-depend-on-junit</id>
+            <activation>
+                <file>
+                    <exists>src/test</exists>
+                </file>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
         <profile>
             <id>integration-test</id>
             <build>
