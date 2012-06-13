@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truevfs.key.pbe.swing;
 
-import de.schlichtherle.truevfs.key.pbe.swing.ReadKeyPanel;
 import net.truevfs.key.param.AesPbeParameters;
 import static org.junit.Assert.*;
 import org.junit.Test;
