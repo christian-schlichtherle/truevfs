@@ -13,17 +13,14 @@
     </parent>
 
     <artifactId>truevfs-profile-full</artifactId>
-    <packaging>pom</packaging>
 
     <name>TrueVFS Profile Full</name>
     <description>
-        This configuration profile is designed for testing purposes only and
-        should not be used in production environments because of its negative
-        performance impact.
-        It depends on the default configuration profile and adds the modules
+        Designed for testing purposes only and should not be used in production
+        environments because of its negative performance impact.
+        Depends on the default configuration profile and adds the modules
         TrueZIP Driver SFX, TrueZIP Extension JMX/JUL and TrueZIP Samples.
-        Note that the JAR artifact of this profile is executable: The main
-        class is net.truevfs.samples.access.Nzip.
+        The main class of this executable JAR is net.truevfs.samples.access.Nzip.
     </description>
 
     <dependencies>
@@ -35,10 +32,12 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-driver-sfx</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-extension-jmx-jul</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -49,26 +48,7 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <archive>
-                                <manifest>
-                                    <mainClass>net.truevfs.samples.access.Nzip</mainClass>
-                                </manifest>
-                            </archive>
-                            <descriptors>
-                                <descriptor>src/assembly/assembly.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                </executions>
+                <artifactId>maven-shade-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

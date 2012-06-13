@@ -13,14 +13,13 @@
     </parent>
 
     <artifactId>truevfs-profile-default</artifactId>
-    <packaging>pom</packaging>
 
     <name>TrueVFS Profile Default</name>
     <description>
-        This configuration profile is designed for applications which want to
-        access all TrueZIP features without a negative impact on performance.
-        It depends on the base configuration profile and adds the file
-        system driver modules for HTTP(S), TAR and ZIP.RAES.
+        Designed for applications which want to access all TrueZIP features
+        without a negative impact on performance.
+        Depends on the base configuration profile and adds the file system
+        driver modules for HTTP(S), TAR and ZIP.RAES.
     </description>
 
     <dependencies>
@@ -49,21 +48,7 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>src/assembly/assembly.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                </executions>
+                <artifactId>maven-shade-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

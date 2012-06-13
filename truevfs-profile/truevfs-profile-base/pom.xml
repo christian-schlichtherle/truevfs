@@ -13,13 +13,11 @@
     </parent>
 
     <artifactId>truevfs-profile-base</artifactId>
-    <packaging>pom</packaging>
 
     <name>TrueVFS Profile Base</name>
     <description>
-        This configuration profile is designed to support the most prominent
-        use case with minimum dependencies.
-        It only provides the file system module TrueZIP Driver ZIP.
+        Designed to support the most prominent use case with minimum dependencies.
+        Only provides the file system module TrueZIP Driver ZIP.
     </description>
 
     <dependencies>
@@ -37,21 +35,7 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>src/assembly/assembly.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                </executions>
+                <artifactId>maven-shade-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
