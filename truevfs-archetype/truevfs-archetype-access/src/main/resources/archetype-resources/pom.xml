@@ -22,9 +22,8 @@
     </properties>
 
     <dependencies>
-        <!-- A TrueVFS application has a compile time dependency on the module
-             TrueVFS Access.
-             -->
+        <!-- Depending on the TrueZIP Profile Default is a good starting point.
+             Typical applications will need nothing else. -->
         <dependency>
             <groupId>de.schlichtherle.truevfs</groupId>
             <artifactId>truevfs-profile-default</artifactId>

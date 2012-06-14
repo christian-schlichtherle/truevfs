@@ -2,12 +2,16 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.driver.zip;
+package net.truevfs.driver.odf;
 
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.driver.zip.JarDriver;
+import net.truevfs.driver.zip.ZipDriverEntry;
+import net.truevfs.driver.zip.ZipInputService;
+import net.truevfs.driver.zip.ZipOutputService;
 import static net.truevfs.kernel.FsAccessOption.GROW;
 import net.truevfs.kernel.FsModel;
 import net.truevfs.kernel.FsOutputSocketSink;

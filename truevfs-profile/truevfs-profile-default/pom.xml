@@ -19,7 +19,7 @@
         Designed for applications which want to access all TrueZIP features
         without a negative impact on performance.
         Depends on the base configuration profile and adds the file system
-        driver modules for HTTP(S), TAR and ZIP.RAES.
+        driver modules for HTTP(S), ODF, TAR and ZIP.RAES.
     </description>
 
     <dependencies>
@@ -35,12 +35,17 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-driver-odf</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-driver-tar</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-driver-tzp</artifactId>
+            <artifactId>truevfs-driver-zip-raes</artifactId>
             <scope>runtime</scope>
         </dependency>
     </dependencies>

@@ -58,12 +58,12 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-driver-tzp</artifactId>
+            <artifactId>truevfs-driver-zip</artifactId>
             <!--scope>runtime</scope-->
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-driver-zip</artifactId>
+            <artifactId>truevfs-driver-zip-raes</artifactId>
             <!--scope>runtime</scope-->
         </dependency>
     </dependencies>

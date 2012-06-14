@@ -1,0 +1,35 @@
+    -----------------------
+    About TrueVFS Driver ODF
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About TrueVFS Driver ODF
+
+    This module contains the file system driver service class
+    {{{./apidocs/net/truevfs/driver/zip/ZipDriverService.html}ZipDriverService}}
+    which provides the following map of file system drivers:
+
+*--*--*
+||URI Schemes / Archive File Extensions||File System Driver Class|
+*--+--+
+|<<<odt>>>, <<<ott>>>, <<<odg>>>, <<<otg>>>, <<<odp>>>, <<<otp>>>, <<<ods>>>, <<<ots>>>, <<<odc>>>, <<<otc>>>, <<<odi>>>, <<<oti>>>, <<<odf>>>, <<<otf>>>, <<<odm>>>, <<<oth>>>, <<<odb>>>|{{{./apidocs/net/truevfs/driver/zip/OdfDriver.html}<<<OdfDriver>>>}}|
+*--+--+
+
+    Add the JAR artifact of this module to the run time class path to
+    make its file system drivers available for service location in the
+    client API modules.
+    The URI schemes will then get recognized as default archive file extensions
+    by the class
+    {{{../../apidocs/net/truevfs/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+
+* Key Features
+
+    This driver provides read/write access to the Open Document Format (ODF).
+    ODF files are ZIP files with a distinct directory layout, similar to JAR
+    files.
+    ODF files need to start with an entry named <mimetype>.
+    To make sure this is the case, the drivers in this module will buffer any
+    other entry to a temp file until the <mimetype> entry has been written.
+    So for best performance, make sure to write the <mimetype> entry first when
+    creating an ODF file.

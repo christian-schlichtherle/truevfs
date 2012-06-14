@@ -3,10 +3,9 @@
   - Copyright (C) 2005-2012 Schlichtherle IT Services.
   - All rights reserved. Use is subject to license terms.
   -->
-<project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project    xmlns="http://maven.apache.org/POM/4.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -15,12 +14,11 @@
         <version>1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truevfs-driver-tzp</artifactId>
+    <artifactId>truevfs-driver-odf</artifactId>
 
-    <name>TrueVFS Driver ZIP.RAES (TZP)</name>
+    <name>TrueVFS Driver ODF</name>
     <description>
-        The file system driver family for RAES encrypted ZIP alias
-        ZIP.RAES alias TZP files.
+        The file system driver family for Open Document Format (ODF) files.
 
         Add the JAR artifact of this module to the run time class path to
         make its file system drivers available for service location in the
@@ -46,11 +44,6 @@
             <artifactId>truevfs-driver-zip</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-key</artifactId>
-            <type>test-jar</type>
         </dependency>
     </dependencies>
 </project>
