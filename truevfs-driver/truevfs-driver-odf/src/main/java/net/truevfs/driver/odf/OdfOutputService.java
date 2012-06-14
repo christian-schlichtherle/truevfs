@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.driver.zip;
+package net.truevfs.driver.odf;
 
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
@@ -10,6 +10,8 @@ import java.io.OutputStream;
 import java.util.Objects;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.driver.zip.ZipDriverEntry;
+import net.truevfs.driver.zip.ZipOutputService;
 import static net.truevfs.driver.zip.io.ZipEntry.STORED;
 import static net.truevfs.kernel.cio.Entry.UNKNOWN;
 import net.truevfs.kernel.cio.*;

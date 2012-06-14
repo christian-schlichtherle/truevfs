@@ -2,10 +2,10 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.driver.zip.it;
+package net.truevfs.driver.odf.it;
 
 import net.truevfs.access.TPathITSuite;
-import net.truevfs.driver.zip.OdfDriver;
+import net.truevfs.driver.odf.OdfDriver;
 import net.truevfs.kernel.cio.IoPool;
 
 /**

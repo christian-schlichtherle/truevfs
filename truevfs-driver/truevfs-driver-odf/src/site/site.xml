@@ -10,7 +10,6 @@
     <body>
         <menu name="Documentation">
             <item name="About" href="index.html"/>
-            <item name="Key Management" href="key-management.html"/>
         </menu>
     </body>
 </project>
