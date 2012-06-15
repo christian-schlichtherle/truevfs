@@ -46,12 +46,17 @@
              Kernel. -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-kernel</artifactId>
+            <artifactId>truevfs-kernel-spec</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-kernel</artifactId>
+            <artifactId>truevfs-kernel-spec</artifactId>
             <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-kernel-impl</artifactId>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 </project>

@@ -25,12 +25,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-kernel</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-kernel</artifactId>
-            <type>test-jar</type>
+            <artifactId>truevfs-kernel-spec</artifactId>
         </dependency>
     </dependencies>
 </project>
