@@ -11,28 +11,19 @@
 
     <parent>
         <groupId>de.schlichtherle.truevfs</groupId>
-        <artifactId>truevfs</artifactId>
+        <artifactId>truevfs-kernel</artifactId>
         <version>1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truevfs-key</artifactId>
+    <artifactId>truevfs-kernel-spec</artifactId>
 
-    <name>TrueVFS Key</name>
+    <name>TrueVFS Kernel Specification</name>
     <description>
-Defines the secret key management API and provides a reference
-implementation of its SPI which is locatable on the class path.
+        Specifies services for virtual file systems from arbitrary resources.
+        The TrueVFS Kernel uses file system drivers to access these resources.
+        It provides multithreading, multiplexing, caching and buffering so that
+        the file system drivers do not need to take care of this.
     </description>
-
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-kernel-spec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans</groupId>
-            <artifactId>jemmy</artifactId>
-        </dependency>
-    </dependencies>
 
     <build>
         <plugins>
