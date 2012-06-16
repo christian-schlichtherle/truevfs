@@ -7,10 +7,10 @@ package net.truevfs.kernel.io;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Indicates that an input resource (input stream etc.) has been closed.
+ * Indicates that an input resource (stream, channel etc.) has been closed.
  *
- * @see     OutputClosedException
- * @author  Christian Schlichtherle
+ * @see    OutputClosedException
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public class InputClosedException extends ClosedException {
