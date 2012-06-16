@@ -9,6 +9,11 @@ import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Indicates that an I/O operation was trying to modify a read-only file system.
+ * <p>
+ * The primary difference between this exception class and
+ * {@link java.nio.file.ReadOnlyFileSystemException} is that this class is a
+ * subclass of {@code FileSystemException} while the latter is a subclass of
+ * {@link java.lang.UnsupportedOperationException}.
  */
 @ThreadSafe
 public class FsReadOnlyFileSystemException extends FileSystemException {
