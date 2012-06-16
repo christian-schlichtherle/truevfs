@@ -4,6 +4,12 @@
  */
 package net.truevfs.samples.raes;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import net.truevfs.driver.zip.raes.KeyManagerRaesParameters;
 import net.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import net.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
@@ -11,12 +17,6 @@ import net.truevfs.kernel.io.AbstractSink;
 import net.truevfs.kernel.io.AbstractSource;
 import net.truevfs.kernel.io.Streams;
 import net.truevfs.key.sl.KeyManagerLocator;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 /**
  * Saves and restores the contents of arbitrary files to and from the RAES
