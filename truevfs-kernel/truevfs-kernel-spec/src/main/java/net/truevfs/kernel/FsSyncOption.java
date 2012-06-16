@@ -4,11 +4,11 @@
  */
 package net.truevfs.kernel;
 
+import java.io.IOException;
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.io.InputClosedException;
 import net.truevfs.kernel.io.OutputClosedException;
 import net.truevfs.kernel.util.BitField;
-import java.io.IOException;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * Defines options for (federated) file system synchronization.
@@ -30,7 +30,7 @@ public enum FsSyncOption {
      * If the current thread gets interrupted while waiting, it will stop
      * waiting and proceed normally as if this option wasn't set.
      * <p>
-     * Beware: If an input resource has not been closed because the client
+     * Beware: If an I/O resource has not been closed because the client
      * application does not always properly close its streams, even on an
      * {@link IOException} (which is a typical bug in many Java applications),
      * then the respective file system controller will not return from the
@@ -53,7 +53,7 @@ public enum FsSyncOption {
      * <em>not</em> updated, but instead
      * an {@link FsSyncException} with a {@link FsResourceOpenException} as
      * its cause is thrown to indicate
-     * that the application must close all input resources first.
+     * that the application must close all I/O resources first.
      */
     FORCE_CLOSE_IO,
 
