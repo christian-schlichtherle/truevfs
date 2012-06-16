@@ -8,9 +8,9 @@ import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Indicates that a resource has been closed.
+ * Indicates that a resource (stream, channel, etc.) has been closed.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public class ClosedException extends IOException {
