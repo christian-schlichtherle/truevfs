@@ -36,7 +36,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-extension-jmx-jul</artifactId>
+            <artifactId>truevfs-inst-jmx-jul</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
