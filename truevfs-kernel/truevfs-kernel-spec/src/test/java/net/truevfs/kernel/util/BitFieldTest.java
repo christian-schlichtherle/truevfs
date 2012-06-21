@@ -4,7 +4,6 @@
  */
 package net.truevfs.kernel.util;
 
-import static net.truevfs.kernel.util.BitFieldTest.Dummy.*;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -14,6 +13,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static net.truevfs.kernel.util.BitFieldTest.Dummy.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
