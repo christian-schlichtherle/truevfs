@@ -4,17 +4,6 @@
  */
 package net.truevfs.driver.file;
 
-import net.truevfs.kernel.FsAccessOption;
-import net.truevfs.kernel.FsAccessOptions;
-import net.truevfs.kernel.FsEntry;
-import net.truevfs.kernel.FsEntryName;
-import static net.truevfs.kernel.FsEntryName.SEPARATOR_CHAR;
-import net.truevfs.kernel.cio.Entry;
-import static net.truevfs.kernel.cio.Entry.PosixEntity.*;
-import net.truevfs.kernel.cio.IoBuffer;
-import net.truevfs.kernel.cio.InputSocket;
-import net.truevfs.kernel.cio.OutputSocket;
-import net.truevfs.kernel.util.BitField;
 import static java.io.File.separatorChar;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -29,6 +18,17 @@ import java.util.Set;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.spec.FsAccessOption;
+import net.truevfs.kernel.spec.FsAccessOptions;
+import net.truevfs.kernel.spec.FsEntry;
+import net.truevfs.kernel.spec.FsEntryName;
+import static net.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
+import net.truevfs.kernel.spec.cio.Entry;
+import static net.truevfs.kernel.spec.cio.Entry.PosixEntity.*;
+import net.truevfs.kernel.spec.cio.InputSocket;
+import net.truevfs.kernel.spec.cio.IoBuffer;
+import net.truevfs.kernel.spec.cio.OutputSocket;
+import net.truevfs.kernel.spec.util.BitField;
 
 /**
  * Adapts a {@link Path} instance to a {@link FsEntry}.

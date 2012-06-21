@@ -5,8 +5,8 @@
 package net.truevfs.kernel.impl
 
 import javax.annotation.concurrent._
-import net.truevfs.kernel._
-import net.truevfs.kernel.spi._
+import net.truevfs.kernel.spec._
+import net.truevfs.kernel.spec.spi._
 
 /** A service for the file system manager implementation in this package.
   * 

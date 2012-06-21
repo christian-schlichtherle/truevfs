@@ -4,19 +4,19 @@
  */
 package net.truevfs.driver.zip;
 
-import static net.truevfs.kernel.FsEntryName.ROOT;
-import net.truevfs.kernel.*;
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.Entry.Access;
-import static net.truevfs.kernel.cio.Entry.Type.SPECIAL;
-import net.truevfs.kernel.util.BitField;
-import net.truevfs.key.KeyManager;
-import net.truevfs.key.KeyManagerProvider;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import static net.truevfs.kernel.spec.FsEntryName.ROOT;
+import net.truevfs.kernel.spec.*;
+import net.truevfs.kernel.spec.cio.Entry;
+import net.truevfs.kernel.spec.cio.Entry.Access;
+import static net.truevfs.kernel.spec.cio.Entry.Type.SPECIAL;
+import net.truevfs.kernel.spec.util.BitField;
+import net.truevfs.key.KeyManager;
+import net.truevfs.key.KeyManagerProvider;
 
 /**
  * This file system controller decorates another file system controller in

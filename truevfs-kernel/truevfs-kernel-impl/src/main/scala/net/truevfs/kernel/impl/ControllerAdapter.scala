@@ -6,10 +6,10 @@ package net.truevfs.kernel.impl
 
 import java.{lang => jl}
 import java.{util => ju}
-import net.truevfs.kernel._
-import net.truevfs.kernel.cio._
-import net.truevfs.kernel.cio.Entry._
-import net.truevfs.kernel.util._
+import net.truevfs.kernel.spec._
+import net.truevfs.kernel.spec.cio._
+import net.truevfs.kernel.spec.cio.Entry._
+import net.truevfs.kernel.spec.util._
 
 private final class ControllerAdapter[M <: FsModel](
   c: Controller[M],

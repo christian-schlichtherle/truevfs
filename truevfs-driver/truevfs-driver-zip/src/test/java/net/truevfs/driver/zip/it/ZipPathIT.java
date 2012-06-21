@@ -6,7 +6,7 @@ package net.truevfs.driver.zip.it;
 
 import net.truevfs.access.TPathITSuite;
 import net.truevfs.driver.zip.ZipDriver;
-import net.truevfs.kernel.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoPool;
 
 /**
  * @author  Christian Schlichtherle

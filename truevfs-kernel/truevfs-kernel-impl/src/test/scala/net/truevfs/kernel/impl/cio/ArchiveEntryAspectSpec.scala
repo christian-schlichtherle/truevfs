@@ -4,14 +4,14 @@
  */
 package net.truevfs.kernel.impl.cio
 
-import net.truevfs.kernel.cio.Entry.Access._
-import net.truevfs.kernel.cio.Entry.PosixEntity._
-import net.truevfs.kernel.cio.Entry.Size._
-import net.truevfs.kernel.cio.Entry.Type._
-import net.truevfs.kernel.cio.Entry._
-import net.truevfs.kernel.cio._
 import net.truevfs.kernel.driver.mock._
-import net.truevfs.kernel._
+import net.truevfs.kernel.spec.cio.Entry.Access._
+import net.truevfs.kernel.spec.cio.Entry.PosixEntity._
+import net.truevfs.kernel.spec.cio.Entry.Size._
+import net.truevfs.kernel.spec.cio.Entry.Type._
+import net.truevfs.kernel.spec.cio.Entry._
+import net.truevfs.kernel.spec.cio._
+import net.truevfs.kernel.spec._
 import org.junit.runner._
 import org.scalatest.junit._
 import org.scalatest.matchers._

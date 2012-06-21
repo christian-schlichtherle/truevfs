@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
-import static net.truevfs.kernel.util.HashMaps.initialCapacity;
-import net.truevfs.kernel.util.ServiceLocator;
+import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
+import net.truevfs.kernel.spec.util.ServiceLocator;
 
 /**
  * An abstract provider for an immutable map of secret key classes to nullable

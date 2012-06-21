@@ -6,7 +6,7 @@ package net.truevfs.driver.odf.it;
 
 import net.truevfs.access.TFileITSuite;
 import net.truevfs.driver.odf.OdfDriver;
-import net.truevfs.kernel.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoPool;
 
 /**
  * @author  Christian Schlichtherle

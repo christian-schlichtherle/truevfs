@@ -5,11 +5,11 @@
 package net.truevfs.kernel.impl
 
 import javax.annotation.concurrent._
-import net.truevfs.kernel._
-import net.truevfs.kernel.cio._
-import net.truevfs.kernel.cio.Entry._;
-import net.truevfs.kernel.cio.Entry.Access._;
-import net.truevfs.kernel.util._
+import net.truevfs.kernel.spec._
+import net.truevfs.kernel.spec.cio._
+import net.truevfs.kernel.spec.cio.Entry._;
+import net.truevfs.kernel.spec.cio.Entry.Access._;
+import net.truevfs.kernel.spec.util._
 
 /** A read-only virtual file system for archive entries.
   * 

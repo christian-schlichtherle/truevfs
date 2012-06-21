@@ -4,8 +4,8 @@
  */
 package net.truevfs.key.sl;
 
-import static net.truevfs.kernel.util.HashMaps.initialCapacity;
-import net.truevfs.kernel.util.ServiceLocator;
+import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
+import net.truevfs.kernel.spec.util.ServiceLocator;
 import net.truevfs.key.AbstractKeyManagerProvider;
 import net.truevfs.key.KeyManager;
 import net.truevfs.key.spi.KeyManagerService;

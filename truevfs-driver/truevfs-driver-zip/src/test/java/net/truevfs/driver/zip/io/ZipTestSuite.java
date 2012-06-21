@@ -5,10 +5,10 @@
 package net.truevfs.driver.zip.io;
 
 import static net.truevfs.driver.zip.io.Constants.FORCE_ZIP64_EXT;
-import static net.truevfs.kernel.util.ConcurrencyUtils.NUM_IO_THREADS;
-import net.truevfs.kernel.util.ConcurrencyUtils.TaskFactory;
-import static net.truevfs.kernel.util.ConcurrencyUtils.runConcurrent;
-import static net.truevfs.kernel.util.HashMaps.initialCapacity;
+import static net.truevfs.kernel.spec.util.ConcurrencyUtils.NUM_IO_THREADS;
+import net.truevfs.kernel.spec.util.ConcurrencyUtils.TaskFactory;
+import static net.truevfs.kernel.spec.util.ConcurrencyUtils.runConcurrent;
+import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;

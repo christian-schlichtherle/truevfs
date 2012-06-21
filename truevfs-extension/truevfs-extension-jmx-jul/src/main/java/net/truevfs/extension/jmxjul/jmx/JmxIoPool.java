@@ -7,8 +7,8 @@ package net.truevfs.extension.jmxjul.jmx;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.extension.jmxjul.InstrumentingIoPool;
-import net.truevfs.kernel.cio.IoBuffer;
-import net.truevfs.kernel.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoBuffer;
+import net.truevfs.kernel.spec.cio.IoPool;
 
 /**
  * @author Christian Schlichtherle

@@ -10,7 +10,7 @@ import net.truevfs.access.TConfig;
 import net.truevfs.access.TPath;
 import net.truevfs.access.TPathITSuite;
 import net.truevfs.driver.zip.TestWinZipAesDriver;
-import static net.truevfs.kernel.FsAccessOption.ENCRYPT;
+import static net.truevfs.kernel.spec.FsAccessOption.ENCRYPT;
 import net.truevfs.key.MockView;
 import static net.truevfs.key.MockView.Action.CANCEL;
 import static net.truevfs.key.MockView.Action.ENTER;

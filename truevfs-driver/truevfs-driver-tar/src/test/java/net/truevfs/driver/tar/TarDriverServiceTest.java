@@ -4,8 +4,8 @@
  */
 package net.truevfs.driver.tar;
 
-import net.truevfs.kernel.FsDriverProvider;
-import net.truevfs.kernel.spi.FsDriverServiceTestSuite;
+import net.truevfs.kernel.spec.FsDriverProvider;
+import net.truevfs.kernel.spec.spi.FsDriverServiceTestSuite;
 
 /**
  * @author Christian Schlichtherle

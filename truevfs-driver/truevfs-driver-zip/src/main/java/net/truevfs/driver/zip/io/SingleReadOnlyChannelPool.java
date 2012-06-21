@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.zip.io;
 
-import net.truevfs.kernel.util.Pool;
+import net.truevfs.kernel.spec.util.Pool;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
 

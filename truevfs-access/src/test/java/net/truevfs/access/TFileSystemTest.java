@@ -5,7 +5,7 @@
 package net.truevfs.access;
 
 import net.truevfs.access.MockArchiveDriverTestBase;
-import net.truevfs.kernel.FsMountPoint;
+import net.truevfs.kernel.spec.FsMountPoint;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystems;

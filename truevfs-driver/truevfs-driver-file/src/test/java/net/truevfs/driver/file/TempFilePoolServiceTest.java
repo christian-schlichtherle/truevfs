@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.file;
 
-import net.truevfs.kernel.spi.IoPoolService;
+import net.truevfs.kernel.spec.spi.IoPoolService;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 import org.junit.Before;

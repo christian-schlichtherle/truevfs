@@ -7,8 +7,8 @@ package net.truevfs.access.sample;
 import net.truevfs.access.TFile;
 import net.truevfs.access.TFileInputStream;
 import net.truevfs.access.TVFS;
-import net.truevfs.kernel.FsSyncException;
-import net.truevfs.kernel.FsSyncWarningException;
+import net.truevfs.kernel.spec.FsSyncException;
+import net.truevfs.kernel.spec.FsSyncWarningException;
 import java.io.IOException;
 import java.io.InputStream;
 

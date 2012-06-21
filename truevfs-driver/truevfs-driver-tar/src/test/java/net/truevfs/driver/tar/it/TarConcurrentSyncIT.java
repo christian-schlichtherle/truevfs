@@ -6,7 +6,7 @@ package net.truevfs.driver.tar.it;
 
 import net.truevfs.access.ConcurrentSyncITSuite;
 import net.truevfs.driver.tar.TarDriver;
-import net.truevfs.kernel.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoPool;
 
 /**
  * @author Christian Schlichtherle

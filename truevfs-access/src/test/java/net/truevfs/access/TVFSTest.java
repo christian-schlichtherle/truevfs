@@ -5,7 +5,7 @@
 package net.truevfs.access;
 
 import static net.truevfs.access.TVFS.mountPoint;
-import net.truevfs.kernel.FsMountPoint;
+import net.truevfs.kernel.spec.FsMountPoint;
 import java.net.URI;
 import java.net.URISyntaxException;
 import static org.hamcrest.CoreMatchers.is;

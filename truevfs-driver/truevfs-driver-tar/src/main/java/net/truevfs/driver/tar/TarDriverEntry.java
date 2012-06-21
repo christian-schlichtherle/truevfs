@@ -8,15 +8,15 @@ import java.io.IOException;
 import java.util.Date;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import net.truevfs.kernel.FsArchiveEntries;
-import net.truevfs.kernel.FsArchiveEntry;
-import static net.truevfs.kernel.cio.Entry.Access.WRITE;
-import static net.truevfs.kernel.cio.Entry.Size.DATA;
-import static net.truevfs.kernel.cio.Entry.Size.STORAGE;
-import static net.truevfs.kernel.cio.Entry.Type.DIRECTORY;
-import static net.truevfs.kernel.cio.Entry.Type.FILE;
-import net.truevfs.kernel.cio.IoBuffer;
-import net.truevfs.kernel.util.Releasable;
+import net.truevfs.kernel.spec.FsArchiveEntries;
+import net.truevfs.kernel.spec.FsArchiveEntry;
+import static net.truevfs.kernel.spec.cio.Entry.Access.WRITE;
+import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
+import static net.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
+import static net.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
+import static net.truevfs.kernel.spec.cio.Entry.Type.FILE;
+import net.truevfs.kernel.spec.cio.IoBuffer;
+import net.truevfs.kernel.spec.util.Releasable;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**

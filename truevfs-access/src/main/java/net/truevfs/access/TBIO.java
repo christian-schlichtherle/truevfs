@@ -13,15 +13,15 @@ import java.nio.file.NotDirectoryException;
 import java.util.Arrays;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.FsAccessOption;
-import static net.truevfs.kernel.FsAccessOption.CREATE_PARENTS;
-import net.truevfs.kernel.FsPath;
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.InputSocket;
-import net.truevfs.kernel.cio.IoSockets;
-import net.truevfs.kernel.cio.OutputSocket;
-import net.truevfs.kernel.util.BitField;
-import net.truevfs.kernel.util.Paths;
+import net.truevfs.kernel.spec.FsAccessOption;
+import static net.truevfs.kernel.spec.FsAccessOption.CREATE_PARENTS;
+import net.truevfs.kernel.spec.FsPath;
+import net.truevfs.kernel.spec.cio.Entry;
+import net.truevfs.kernel.spec.cio.InputSocket;
+import net.truevfs.kernel.spec.cio.IoSockets;
+import net.truevfs.kernel.spec.cio.OutputSocket;
+import net.truevfs.kernel.spec.util.BitField;
+import net.truevfs.kernel.spec.util.Paths;
 
 /**
  * Provides fast bulk I/O operations for {@link File}s and {@link TFile}s.

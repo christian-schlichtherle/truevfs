@@ -4,9 +4,9 @@
  */
 package net.truevfs.driver.zip.io;
 
-import net.truevfs.kernel.io.AbstractSource;
-import net.truevfs.kernel.io.LockInputStream;
-import net.truevfs.kernel.io.OneTimeSource;
+import net.truevfs.kernel.spec.io.AbstractSource;
+import net.truevfs.kernel.spec.io.LockInputStream;
+import net.truevfs.kernel.spec.io.OneTimeSource;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;

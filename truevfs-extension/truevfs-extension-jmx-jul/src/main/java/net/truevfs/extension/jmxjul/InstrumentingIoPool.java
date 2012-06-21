@@ -7,7 +7,7 @@ package net.truevfs.extension.jmxjul;
 import java.io.IOException;
 import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.cio.*;
+import net.truevfs.kernel.spec.cio.*;
 
 /**
  * @param  <B> the type parameter for the I/O buffers managed by this pool.

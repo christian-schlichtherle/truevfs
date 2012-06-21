@@ -17,21 +17,21 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
-import static net.truevfs.kernel.FsAccessOption.CACHE;
-import static net.truevfs.kernel.FsAccessOption.EXCLUSIVE;
-import static net.truevfs.kernel.FsEntryName.SEPARATOR;
-import static net.truevfs.kernel.FsSyncOptions.UMOUNT;
-import net.truevfs.kernel.*;
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.Entry.Access;
-import static net.truevfs.kernel.cio.Entry.Access.*;
-import static net.truevfs.kernel.cio.Entry.Size.DATA;
-import static net.truevfs.kernel.cio.Entry.Type.*;
-import static net.truevfs.kernel.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.cio.InputSocket;
-import net.truevfs.kernel.cio.OutputSocket;
-import net.truevfs.kernel.util.BitField;
-import net.truevfs.kernel.util.FilteringIterator;
+import static net.truevfs.kernel.spec.FsAccessOption.CACHE;
+import static net.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
+import static net.truevfs.kernel.spec.FsEntryName.SEPARATOR;
+import static net.truevfs.kernel.spec.FsSyncOptions.UMOUNT;
+import net.truevfs.kernel.spec.*;
+import net.truevfs.kernel.spec.cio.Entry;
+import net.truevfs.kernel.spec.cio.Entry.Access;
+import static net.truevfs.kernel.spec.cio.Entry.Access.*;
+import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
+import static net.truevfs.kernel.spec.cio.Entry.Type.*;
+import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
+import net.truevfs.kernel.spec.cio.InputSocket;
+import net.truevfs.kernel.spec.cio.OutputSocket;
+import net.truevfs.kernel.spec.util.BitField;
+import net.truevfs.kernel.spec.util.FilteringIterator;
 
 /**
  * A {@link FileSystem} implementation based on the TrueVFS Kernel module.

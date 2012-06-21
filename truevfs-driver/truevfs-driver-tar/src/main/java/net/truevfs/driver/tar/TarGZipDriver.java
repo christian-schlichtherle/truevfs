@@ -10,15 +10,15 @@ import java.io.OutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import javax.annotation.concurrent.Immutable;
-import static net.truevfs.kernel.FsAccessOption.STORE;
-import net.truevfs.kernel.*;
-import net.truevfs.kernel.cio.InputService;
-import net.truevfs.kernel.cio.MultiplexingOutputService;
-import net.truevfs.kernel.cio.OutputService;
-import net.truevfs.kernel.io.AbstractSink;
-import net.truevfs.kernel.io.AbstractSource;
-import net.truevfs.kernel.io.Streams;
-import net.truevfs.kernel.util.BitField;
+import static net.truevfs.kernel.spec.FsAccessOption.STORE;
+import net.truevfs.kernel.spec.*;
+import net.truevfs.kernel.spec.cio.InputService;
+import net.truevfs.kernel.spec.cio.MultiplexingOutputService;
+import net.truevfs.kernel.spec.cio.OutputService;
+import net.truevfs.kernel.spec.io.AbstractSink;
+import net.truevfs.kernel.spec.io.AbstractSource;
+import net.truevfs.kernel.spec.io.Streams;
+import net.truevfs.kernel.spec.util.BitField;
 
 /**
  * An archive driver for GZIP compressed TAR files (TAR.GZIP).

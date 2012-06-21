@@ -4,7 +4,7 @@
  */
 package net.truevfs.key.util;
 
-import net.truevfs.kernel.util.Threads;
+import net.truevfs.kernel.spec.util.Threads;
 import javax.annotation.concurrent.Immutable;
 
 /**

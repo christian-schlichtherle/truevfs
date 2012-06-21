@@ -8,11 +8,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.truevfs.kernel.FsAccessOption;
-import net.truevfs.kernel.cio.AbstractOutputSocket;
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.InputSocket;
-import net.truevfs.kernel.util.BitField;
+import net.truevfs.kernel.spec.FsAccessOption;
+import net.truevfs.kernel.spec.cio.AbstractOutputSocket;
+import net.truevfs.kernel.spec.cio.Entry;
+import net.truevfs.kernel.spec.cio.InputSocket;
+import net.truevfs.kernel.spec.util.BitField;
 
 /**
  * An output socket for HTTP(S) entries.

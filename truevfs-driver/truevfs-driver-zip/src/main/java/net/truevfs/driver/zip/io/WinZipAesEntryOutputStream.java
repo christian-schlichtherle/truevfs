@@ -5,8 +5,8 @@
 package net.truevfs.driver.zip.io;
 
 import net.truevfs.driver.zip.crypto.CipherOutputStream;
-import net.truevfs.kernel.io.DecoratingOutputStream;
-import net.truevfs.kernel.io.LittleEndianOutputStream;
+import net.truevfs.kernel.spec.io.DecoratingOutputStream;
+import net.truevfs.kernel.spec.io.LittleEndianOutputStream;
 import net.truevfs.key.param.KeyStrength;
 import java.io.IOException;
 import java.security.SecureRandom;

@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.zip.io;
 
-import net.truevfs.kernel.io.OneTimeSink;
+import net.truevfs.kernel.spec.io.OneTimeSink;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;

@@ -15,14 +15,14 @@ import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 import static net.truevfs.driver.tar.TarDriver.DEFAULT_BLKSIZE;
 import static net.truevfs.driver.tar.TarDriver.DEFAULT_RCDSIZE;
-import net.truevfs.kernel.FsModel;
-import static net.truevfs.kernel.cio.Entry.Size.DATA;
-import static net.truevfs.kernel.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.cio.*;
-import net.truevfs.kernel.io.*;
-import static net.truevfs.kernel.util.HashMaps.OVERHEAD_SIZE;
-import static net.truevfs.kernel.util.HashMaps.initialCapacity;
-import net.truevfs.kernel.util.SuppressedExceptionBuilder;
+import net.truevfs.kernel.spec.FsModel;
+import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
+import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
+import net.truevfs.kernel.spec.cio.*;
+import net.truevfs.kernel.spec.io.*;
+import static net.truevfs.kernel.spec.util.HashMaps.OVERHEAD_SIZE;
+import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
+import net.truevfs.kernel.spec.util.SuppressedExceptionBuilder;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**

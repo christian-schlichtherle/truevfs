@@ -4,9 +4,9 @@
  */
 package net.truevfs.kernel.impl.cio
 
-import net.truevfs.kernel.cio.Entry._
-import net.truevfs.kernel.cio.Entry.Access._
-import net.truevfs.kernel.cio.Entry.Size._
+import net.truevfs.kernel.spec.cio.Entry._
+import net.truevfs.kernel.spec.cio.Entry.Access._
+import net.truevfs.kernel.spec.cio.Entry.Size._
 
 /**
   * @author Christian Schlichtherle

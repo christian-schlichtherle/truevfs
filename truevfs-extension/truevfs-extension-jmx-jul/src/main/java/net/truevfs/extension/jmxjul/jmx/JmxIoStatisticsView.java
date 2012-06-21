@@ -4,7 +4,7 @@
  */
 package net.truevfs.extension.jmxjul.jmx;
 
-import net.truevfs.kernel.FsManager;
+import net.truevfs.kernel.spec.FsManager;
 import java.lang.management.ManagementFactory;
 import java.text.DateFormat;
 import java.util.Date;

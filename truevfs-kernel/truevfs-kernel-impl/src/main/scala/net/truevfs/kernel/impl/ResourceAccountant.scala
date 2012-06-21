@@ -10,7 +10,7 @@ import java.util.concurrent._
 import java.util.concurrent.locks._
 import javax.annotation._
 import javax.annotation.concurrent._
-import net.truevfs.kernel.util._
+import net.truevfs.kernel.spec.util._
 import scala.util.control._
 
 /** Accounts for [[java.io.Closeable]] resources.

@@ -9,8 +9,8 @@ import static java.util.logging.Level.FINE;
 import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.extension.jmxjul.InstrumentingIoPool;
-import net.truevfs.kernel.cio.IoBuffer;
-import net.truevfs.kernel.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoBuffer;
+import net.truevfs.kernel.spec.cio.IoPool;
 
 /**
  * @author Christian Schlichtherle

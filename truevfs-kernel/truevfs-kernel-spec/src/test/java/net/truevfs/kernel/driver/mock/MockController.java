@@ -15,14 +15,14 @@ import java.util.concurrent.ConcurrentMap;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
-import net.truevfs.kernel.*;
-import net.truevfs.kernel.cio.Entry.Access;
-import net.truevfs.kernel.cio.Entry.Type;
-import net.truevfs.kernel.cio.*;
-import net.truevfs.kernel.io.ThrowingInputStream;
-import net.truevfs.kernel.io.ThrowingOutputStream;
-import net.truevfs.kernel.io.ThrowingSeekableChannel;
-import net.truevfs.kernel.util.BitField;
+import net.truevfs.kernel.spec.*;
+import net.truevfs.kernel.spec.cio.Entry.Access;
+import net.truevfs.kernel.spec.cio.Entry.Type;
+import net.truevfs.kernel.spec.cio.*;
+import net.truevfs.kernel.spec.io.ThrowingInputStream;
+import net.truevfs.kernel.spec.io.ThrowingOutputStream;
+import net.truevfs.kernel.spec.io.ThrowingSeekableChannel;
+import net.truevfs.kernel.spec.util.BitField;
 
 /**
  * @author Christian Schlichtherle

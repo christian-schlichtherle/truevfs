@@ -9,10 +9,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.truevfs.kernel.FsAccessOption;
-import net.truevfs.kernel.cio.*;
-import net.truevfs.kernel.io.DecoratingReadOnlyChannel;
-import net.truevfs.kernel.util.BitField;
+import net.truevfs.kernel.spec.FsAccessOption;
+import net.truevfs.kernel.spec.cio.*;
+import net.truevfs.kernel.spec.io.DecoratingReadOnlyChannel;
+import net.truevfs.kernel.spec.util.BitField;
 
 /**
  * An input socket for HTTP(S) entries.

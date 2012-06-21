@@ -7,9 +7,9 @@ package net.truevfs.extension.jmxjul;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.extension.jmxjul.jmx.JmxDirector;
 import net.truevfs.extension.jmxjul.jul.JulDirector;
-import net.truevfs.kernel.FsManager;
 import net.truevfs.kernel.impl.ArchiveManagerService;
-import net.truevfs.kernel.spi.FsManagerService;
+import net.truevfs.kernel.spec.FsManager;
+import net.truevfs.kernel.spec.spi.FsManagerService;
 
 /**
  * @author Christian Schlichtherle

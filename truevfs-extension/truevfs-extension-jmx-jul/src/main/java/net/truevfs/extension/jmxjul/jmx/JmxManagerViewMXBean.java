@@ -4,8 +4,8 @@
  */
 package net.truevfs.extension.jmxjul.jmx;
 
-import net.truevfs.kernel.FsManager;
-import net.truevfs.kernel.FsSyncException;
+import net.truevfs.kernel.spec.FsManager;
+import net.truevfs.kernel.spec.FsSyncException;
 
 /**
  * The MXBean interface for a {@link FsManager file system manager}.

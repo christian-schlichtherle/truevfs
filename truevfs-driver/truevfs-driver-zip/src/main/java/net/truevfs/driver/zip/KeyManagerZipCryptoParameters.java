@@ -5,7 +5,7 @@
 package net.truevfs.driver.zip;
 
 import net.truevfs.driver.zip.io.*;
-import net.truevfs.kernel.FsModel;
+import net.truevfs.kernel.spec.FsModel;
 import net.truevfs.key.KeyManager;
 import net.truevfs.key.KeyManagerProvider;
 import net.truevfs.key.KeyProvider;

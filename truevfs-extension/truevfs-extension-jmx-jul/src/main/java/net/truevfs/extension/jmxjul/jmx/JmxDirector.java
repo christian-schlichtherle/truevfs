@@ -8,10 +8,10 @@ import java.lang.management.ManagementFactory;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.*;
 import net.truevfs.extension.jmxjul.*;
-import net.truevfs.kernel.FsController;
-import net.truevfs.kernel.FsManager;
-import net.truevfs.kernel.FsModel;
-import net.truevfs.kernel.cio.*;
+import net.truevfs.kernel.spec.FsController;
+import net.truevfs.kernel.spec.FsManager;
+import net.truevfs.kernel.spec.FsModel;
+import net.truevfs.kernel.spec.cio.*;
 
 /**
  * @author Christian Schlichtherle

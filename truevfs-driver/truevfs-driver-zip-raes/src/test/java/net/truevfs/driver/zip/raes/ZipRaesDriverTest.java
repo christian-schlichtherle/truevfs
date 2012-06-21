@@ -5,7 +5,7 @@
 package net.truevfs.driver.zip.raes;
 
 import net.truevfs.driver.zip.ZipDriverEntry;
-import net.truevfs.kernel.FsArchiveDriverTestSuite;
+import net.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 
 /**
  * @author  Christian Schlichtherle

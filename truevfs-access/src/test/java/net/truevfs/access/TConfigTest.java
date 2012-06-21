@@ -5,10 +5,10 @@
 package net.truevfs.access;
 
 import java.util.NoSuchElementException;
-import static net.truevfs.kernel.FsAccessOption.*;
-import net.truevfs.kernel.FsDriver;
+import static net.truevfs.kernel.spec.FsAccessOption.*;
+import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.driver.mock.MockArchiveDriver;
-import net.truevfs.kernel.util.BitField;
+import net.truevfs.kernel.spec.util.BitField;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.*;

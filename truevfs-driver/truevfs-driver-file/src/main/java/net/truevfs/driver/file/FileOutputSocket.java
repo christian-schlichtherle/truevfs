@@ -20,16 +20,16 @@ import java.util.Set;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.truevfs.kernel.FsAccessOption;
-import static net.truevfs.kernel.FsAccessOption.*;
-import net.truevfs.kernel.cio.AbstractOutputSocket;
-import net.truevfs.kernel.cio.Entry;
-import static net.truevfs.kernel.cio.Entry.Access.*;
-import static net.truevfs.kernel.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.cio.InputSocket;
-import net.truevfs.kernel.cio.IoSockets;
-import net.truevfs.kernel.util.BitField;
-import static net.truevfs.kernel.util.HashMaps.initialCapacity;
+import net.truevfs.kernel.spec.FsAccessOption;
+import static net.truevfs.kernel.spec.FsAccessOption.*;
+import net.truevfs.kernel.spec.cio.AbstractOutputSocket;
+import net.truevfs.kernel.spec.cio.Entry;
+import static net.truevfs.kernel.spec.cio.Entry.Access.*;
+import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
+import net.truevfs.kernel.spec.cio.InputSocket;
+import net.truevfs.kernel.spec.cio.IoSockets;
+import net.truevfs.kernel.spec.util.BitField;
+import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 
 /**
  * An output socket for a file entry.

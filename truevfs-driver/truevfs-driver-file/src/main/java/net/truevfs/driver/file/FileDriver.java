@@ -4,10 +4,10 @@
  */
 package net.truevfs.driver.file;
 
-import net.truevfs.kernel.FsController;
-import net.truevfs.kernel.FsDriver;
-import net.truevfs.kernel.FsManager;
-import net.truevfs.kernel.FsModel;
+import net.truevfs.kernel.spec.FsController;
+import net.truevfs.kernel.spec.FsDriver;
+import net.truevfs.kernel.spec.FsManager;
+import net.truevfs.kernel.spec.FsModel;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 

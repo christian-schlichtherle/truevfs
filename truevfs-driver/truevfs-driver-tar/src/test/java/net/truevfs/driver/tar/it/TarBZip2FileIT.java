@@ -5,7 +5,7 @@
 package net.truevfs.driver.tar.it;
 
 import net.truevfs.driver.tar.TarBZip2Driver;
-import net.truevfs.kernel.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoPool;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**

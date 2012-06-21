@@ -6,8 +6,8 @@ package net.truevfs.extension.jmxjul;
 
 import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.FsDecoratingModel;
-import net.truevfs.kernel.FsModel;
+import net.truevfs.kernel.spec.FsDecoratingModel;
+import net.truevfs.kernel.spec.FsModel;
 
 /**
  * @author Christian Schlichtherle

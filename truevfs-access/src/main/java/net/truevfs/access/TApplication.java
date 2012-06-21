@@ -4,8 +4,8 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.kernel.FsSyncException;
-import net.truevfs.kernel.FsSyncWarningException;
+import net.truevfs.kernel.spec.FsSyncException;
+import net.truevfs.kernel.spec.FsSyncWarningException;
 
 /**
  * A template class which aids in establishing the typical

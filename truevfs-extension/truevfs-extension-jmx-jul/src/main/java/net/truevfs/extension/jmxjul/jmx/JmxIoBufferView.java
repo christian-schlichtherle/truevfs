@@ -7,11 +7,11 @@ package net.truevfs.extension.jmxjul.jmx;
 import java.lang.management.ManagementFactory;
 import java.util.Date;
 import javax.management.*;
-import static net.truevfs.kernel.cio.Entry.Access.*;
-import static net.truevfs.kernel.cio.Entry.Size.DATA;
-import static net.truevfs.kernel.cio.Entry.Size.STORAGE;
-import static net.truevfs.kernel.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.cio.IoBuffer;
+import static net.truevfs.kernel.spec.cio.Entry.Access.*;
+import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
+import static net.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
+import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
+import net.truevfs.kernel.spec.cio.IoBuffer;
 
 /**
  * The MXBean implementation for an {@link IoBuffer I/O pool entry}.

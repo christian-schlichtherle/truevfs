@@ -5,10 +5,10 @@
 package net.truevfs.kernel.driver.mock;
 
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.FsController;
-import net.truevfs.kernel.FsDriver;
-import net.truevfs.kernel.FsManager;
-import net.truevfs.kernel.FsModel;
+import net.truevfs.kernel.spec.FsController;
+import net.truevfs.kernel.spec.FsDriver;
+import net.truevfs.kernel.spec.FsManager;
+import net.truevfs.kernel.spec.FsModel;
 
 /**
  * @author  Christian Schlichtherle

@@ -5,11 +5,11 @@
 package net.truevfs.extension.jmxjul;
 
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.FsCompositeDriver;
-import net.truevfs.kernel.FsController;
-import net.truevfs.kernel.FsManager;
-import net.truevfs.kernel.FsModel;
-import net.truevfs.kernel.cio.*;
+import net.truevfs.kernel.spec.FsCompositeDriver;
+import net.truevfs.kernel.spec.FsController;
+import net.truevfs.kernel.spec.FsManager;
+import net.truevfs.kernel.spec.FsModel;
+import net.truevfs.kernel.spec.cio.*;
 
 /**
  * @param  <D> the type of this instrumenting director.

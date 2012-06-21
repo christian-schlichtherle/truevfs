@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.impl
 
-import net.truevfs.kernel.sl._
+import net.truevfs.kernel.spec.sl._
 import org.junit._
 import org.junit.runner._
 import org.scalatest.junit._

@@ -22,8 +22,8 @@ import net.truevfs.driver.tar.TarDriver;
 import net.truevfs.driver.tar.TarGZipDriver;
 import net.truevfs.driver.zip.CheckedJarDriver;
 import net.truevfs.driver.zip.CheckedZipDriver;
-import static net.truevfs.kernel.FsAccessOption.*;
-import net.truevfs.kernel.FsSyncException;
+import static net.truevfs.kernel.spec.FsAccessOption.*;
+import net.truevfs.kernel.spec.FsSyncException;
 
 /**
  * A comprehensive command line utility which allows you to work

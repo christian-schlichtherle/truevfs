@@ -5,8 +5,8 @@
 package net.truevfs.driver.odf;
 
 import net.truevfs.driver.zip.ZipDriverEntry;
-import net.truevfs.kernel.FsArchiveDriverTestSuite;
-import net.truevfs.kernel.cio.IoPool;
+import net.truevfs.kernel.spec.FsArchiveDriverTestSuite;
+import net.truevfs.kernel.spec.cio.IoPool;
 
 /**
  * @author Christian Schlichtherle

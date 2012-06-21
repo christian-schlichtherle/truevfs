@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.file;
 
-import net.truevfs.kernel.sl.IoPoolLocator;
+import net.truevfs.kernel.spec.sl.IoPoolLocator;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 

@@ -17,14 +17,14 @@ import net.truevfs.driver.zip.ZipOutputService;
 import net.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import net.truevfs.driver.zip.raes.crypto.RaesParameters;
 import net.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
-import static net.truevfs.kernel.FsAccessOption.*;
-import net.truevfs.kernel.*;
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.Entry.Type;
-import net.truevfs.kernel.cio.InputService;
-import net.truevfs.kernel.cio.MultiplexingOutputService;
-import net.truevfs.kernel.cio.OutputService;
-import net.truevfs.kernel.util.BitField;
+import static net.truevfs.kernel.spec.FsAccessOption.*;
+import net.truevfs.kernel.spec.*;
+import net.truevfs.kernel.spec.cio.Entry;
+import net.truevfs.kernel.spec.cio.Entry.Type;
+import net.truevfs.kernel.spec.cio.InputService;
+import net.truevfs.kernel.spec.cio.MultiplexingOutputService;
+import net.truevfs.kernel.spec.cio.OutputService;
+import net.truevfs.kernel.spec.util.BitField;
 
 /**
  * An abstract archive driver for RAES encrypted ZIP files which optionally

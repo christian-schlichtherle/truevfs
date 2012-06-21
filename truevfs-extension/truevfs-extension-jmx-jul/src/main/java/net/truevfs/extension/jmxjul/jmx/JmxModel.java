@@ -6,7 +6,7 @@ package net.truevfs.extension.jmxjul.jmx;
 
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.extension.jmxjul.InstrumentingModel;
-import net.truevfs.kernel.FsModel;
+import net.truevfs.kernel.spec.FsModel;
 
 /**
  * @author Christian Schlichtherle

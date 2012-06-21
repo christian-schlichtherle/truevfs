@@ -10,7 +10,7 @@ import java.io.OutputStream;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
-import net.truevfs.kernel.io.DecoratingOutputStream;
+import net.truevfs.kernel.spec.io.DecoratingOutputStream;
 
 /**
  * A decorating output stream which saves the last {@link IOException}

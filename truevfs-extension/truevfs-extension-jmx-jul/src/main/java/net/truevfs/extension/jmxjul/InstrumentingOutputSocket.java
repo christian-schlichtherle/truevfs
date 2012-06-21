@@ -6,9 +6,9 @@ package net.truevfs.extension.jmxjul;
 
 import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.cio.DecoratingOutputSocket;
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.OutputSocket;
+import net.truevfs.kernel.spec.cio.DecoratingOutputSocket;
+import net.truevfs.kernel.spec.cio.Entry;
+import net.truevfs.kernel.spec.cio.OutputSocket;
 
 /**
  * @param  <E> the type of the {@linkplain #localTarget() local target}.

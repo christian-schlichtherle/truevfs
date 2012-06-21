@@ -6,10 +6,10 @@ package net.truevfs.access;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import static net.truevfs.kernel.FsSyncOptions.UMOUNT;
-import net.truevfs.kernel.*;
-import static net.truevfs.kernel.FsUriModifier.CANONICALIZE;
-import net.truevfs.kernel.util.BitField;
+import static net.truevfs.kernel.spec.FsSyncOptions.UMOUNT;
+import net.truevfs.kernel.spec.*;
+import static net.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
+import net.truevfs.kernel.spec.util.BitField;
 
 /**
  * Static utility methods for virtual file system operations with global scope.

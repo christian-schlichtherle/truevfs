@@ -23,18 +23,18 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
-import net.truevfs.kernel.FsAccessOption;
-import static net.truevfs.kernel.FsAccessOption.EXCLUSIVE;
-import net.truevfs.kernel.FsEntry;
-import static net.truevfs.kernel.FsEntryName.SEPARATOR;
-import net.truevfs.kernel.FsMountPoint;
-import net.truevfs.kernel.FsPath;
-import static net.truevfs.kernel.cio.Entry.Type.DIRECTORY;
-import static net.truevfs.kernel.cio.Entry.Type.FILE;
-import net.truevfs.kernel.cio.InputSocket;
-import net.truevfs.kernel.cio.IoSockets;
-import net.truevfs.kernel.cio.OutputSocket;
-import net.truevfs.kernel.util.BitField;
+import net.truevfs.kernel.spec.FsAccessOption;
+import static net.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
+import net.truevfs.kernel.spec.FsEntry;
+import static net.truevfs.kernel.spec.FsEntryName.SEPARATOR;
+import net.truevfs.kernel.spec.FsMountPoint;
+import net.truevfs.kernel.spec.FsPath;
+import static net.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
+import static net.truevfs.kernel.spec.cio.Entry.Type.FILE;
+import net.truevfs.kernel.spec.cio.InputSocket;
+import net.truevfs.kernel.spec.cio.IoSockets;
+import net.truevfs.kernel.spec.cio.OutputSocket;
+import net.truevfs.kernel.spec.util.BitField;
 
 /**
  * A {@link FileSystemProvider} implementation

@@ -7,8 +7,8 @@ package net.truevfs.access;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;
-import static net.truevfs.kernel.FsAccessOption.APPEND;
-import net.truevfs.kernel.io.DecoratingOutputStream;
+import static net.truevfs.kernel.spec.FsAccessOption.APPEND;
+import net.truevfs.kernel.spec.io.DecoratingOutputStream;
 
 /**
  * A replacement for the class {@link FileOutputStream} for writing plain old

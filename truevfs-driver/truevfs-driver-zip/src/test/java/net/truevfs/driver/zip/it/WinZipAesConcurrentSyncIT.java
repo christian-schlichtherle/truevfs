@@ -8,7 +8,7 @@ import java.io.IOException;
 import net.truevfs.access.ConcurrentSyncITSuite;
 import net.truevfs.access.TConfig;
 import net.truevfs.driver.zip.TestWinZipAesDriver;
-import static net.truevfs.kernel.FsAccessOption.ENCRYPT;
+import static net.truevfs.kernel.spec.FsAccessOption.ENCRYPT;
 
 /**
  * @author Christian Schlichtherle

@@ -5,9 +5,9 @@
 package net.truevfs.kernel.driver.mock;
 
 import java.util.Map;
-import net.truevfs.kernel.FsDriver;
-import net.truevfs.kernel.FsScheme;
-import net.truevfs.kernel.spi.FsDriverService;
+import net.truevfs.kernel.spec.FsDriver;
+import net.truevfs.kernel.spec.FsScheme;
+import net.truevfs.kernel.spec.spi.FsDriverService;
 
 /**
  * A service for the dummy driver.

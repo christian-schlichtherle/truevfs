@@ -6,12 +6,12 @@ package net.truevfs.driver.zip;
 
 import net.truevfs.driver.zip.io.DateTimeConverter;
 import net.truevfs.driver.zip.io.ZipEntry;
-import net.truevfs.kernel.FsArchiveEntries;
-import net.truevfs.kernel.FsArchiveEntry;
-import static net.truevfs.kernel.cio.Entry.Access.WRITE;
-import static net.truevfs.kernel.cio.Entry.Size.DATA;
-import static net.truevfs.kernel.cio.Entry.Type.DIRECTORY;
-import static net.truevfs.kernel.cio.Entry.Type.FILE;
+import net.truevfs.kernel.spec.FsArchiveEntries;
+import net.truevfs.kernel.spec.FsArchiveEntry;
+import static net.truevfs.kernel.spec.cio.Entry.Access.WRITE;
+import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
+import static net.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
+import static net.truevfs.kernel.spec.cio.Entry.Type.FILE;
 
 /**
  * ZIP archive entries apply the date/time conversion rules as defined by
