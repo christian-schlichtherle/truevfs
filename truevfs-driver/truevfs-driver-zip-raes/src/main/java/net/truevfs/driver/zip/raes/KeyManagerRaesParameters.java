@@ -4,6 +4,10 @@
  */
 package net.truevfs.driver.zip.raes;
 
+import java.net.URI;
+import java.util.Objects;
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.driver.zip.raes.crypto.RaesKeyException;
 import net.truevfs.driver.zip.raes.crypto.RaesParameters;
 import net.truevfs.driver.zip.raes.crypto.RaesParametersProvider;
@@ -14,10 +18,6 @@ import net.truevfs.key.KeyProvider;
 import net.truevfs.key.UnknownKeyException;
 import net.truevfs.key.param.AesKeyStrength;
 import net.truevfs.key.param.AesPbeParameters;
-import java.net.URI;
-import java.util.Objects;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * An adapter which provides {@link RaesParameters} by using a
