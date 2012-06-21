@@ -130,7 +130,7 @@ system space.
         <module>truevfs-access</module>
         <module>truevfs-archetype</module>
         <module>truevfs-driver</module>
-        <module>truevfs-extension</module>
+        <module>truevfs-inst</module>
         <module>truevfs-kernel</module>
         <module>truevfs-key</module>
         <module>truevfs-profile</module>
@@ -195,7 +195,12 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-extension-jmx-jul</artifactId>
+                <artifactId>truevfs-inst-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-inst-jmx-jul</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
