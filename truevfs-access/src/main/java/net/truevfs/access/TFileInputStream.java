@@ -7,7 +7,7 @@ package net.truevfs.access;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.io.DecoratingInputStream;
+import net.truevfs.kernel.spec.io.DecoratingInputStream;
 
 /**
  * A replacement for the class {@link FileInputStream} for reading plain old

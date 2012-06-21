@@ -13,8 +13,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 import net.truevfs.driver.zip.ZipDriverEntry;
 import net.truevfs.driver.zip.ZipOutputService;
 import static net.truevfs.driver.zip.io.ZipEntry.STORED;
-import static net.truevfs.kernel.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.cio.*;
+import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
+import net.truevfs.kernel.spec.cio.*;
 
 /**
  * Created by {@link OdfDriver} to meet the special requirements of

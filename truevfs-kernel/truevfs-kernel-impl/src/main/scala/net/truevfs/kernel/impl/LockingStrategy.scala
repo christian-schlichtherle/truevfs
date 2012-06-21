@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.impl
 
-import net.truevfs.kernel._
+import net.truevfs.kernel.spec._
 import java.util._
 import java.util.concurrent._
 import java.util.concurrent.locks._

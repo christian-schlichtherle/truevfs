@@ -4,12 +4,12 @@
  */
 package net.truevfs.extension.jmxjul.jmx;
 
-import net.truevfs.kernel.FsController;
-import net.truevfs.kernel.FsManager;
-import net.truevfs.kernel.FsSyncException;
-import net.truevfs.kernel.FsSyncOption;
-import static net.truevfs.kernel.FsSyncOption.CLEAR_CACHE;
-import net.truevfs.kernel.util.BitField;
+import net.truevfs.kernel.spec.FsController;
+import net.truevfs.kernel.spec.FsManager;
+import net.truevfs.kernel.spec.FsSyncException;
+import net.truevfs.kernel.spec.FsSyncOption;
+import static net.truevfs.kernel.spec.FsSyncOption.CLEAR_CACHE;
+import net.truevfs.kernel.spec.util.BitField;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;

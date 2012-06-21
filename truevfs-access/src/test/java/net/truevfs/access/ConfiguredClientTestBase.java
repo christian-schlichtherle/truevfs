@@ -9,12 +9,12 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
-import net.truevfs.kernel.FsArchiveDriver;
-import net.truevfs.kernel.FsArchiveDriverTestBase;
-import net.truevfs.kernel.FsMountPoint;
-import net.truevfs.kernel.FsScheme;
 import net.truevfs.kernel.impl.ArchiveManagerService;
-import net.truevfs.kernel.util.ExtensionSet;
+import net.truevfs.kernel.spec.FsArchiveDriver;
+import net.truevfs.kernel.spec.FsArchiveDriverTestBase;
+import net.truevfs.kernel.spec.FsMountPoint;
+import net.truevfs.kernel.spec.FsScheme;
+import net.truevfs.kernel.spec.util.ExtensionSet;
 
 /**
  * @param  <D> the type of the archive driver.

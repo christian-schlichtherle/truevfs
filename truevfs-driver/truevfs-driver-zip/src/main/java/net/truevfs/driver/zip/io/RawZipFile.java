@@ -4,6 +4,12 @@
  */
 package net.truevfs.driver.zip.io;
 
+import net.truevfs.kernel.spec.io.Source;
+import net.truevfs.kernel.spec.io.IntervalReadOnlyChannel;
+import net.truevfs.kernel.spec.io.ChannelInputStream;
+import net.truevfs.kernel.spec.io.DecoratingReadOnlyChannel;
+import net.truevfs.kernel.spec.io.BufferedReadOnlyChannel;
+import net.truevfs.kernel.spec.io.PowerBuffer;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -29,8 +35,7 @@ import static net.truevfs.driver.zip.io.WinZipAesEntryExtraField.VV_AE_2;
 import static net.truevfs.driver.zip.io.WinZipAesUtils.overhead;
 import static net.truevfs.driver.zip.io.ZipEntry.*;
 import static net.truevfs.driver.zip.io.ZipParametersUtils.parameters;
-import net.truevfs.kernel.io.*;
-import static net.truevfs.kernel.util.HashMaps.initialCapacity;
+import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 /**

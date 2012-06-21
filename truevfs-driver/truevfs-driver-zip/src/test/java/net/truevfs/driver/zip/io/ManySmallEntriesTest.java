@@ -11,10 +11,10 @@ import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashSet;
 import static net.truevfs.driver.zip.io.ZipEntry.STORED;
-import net.truevfs.kernel.cio.ByteArrayIoBuffer;
-import net.truevfs.kernel.cio.Entry.Size;
-import net.truevfs.kernel.cio.IoEntry;
-import static net.truevfs.kernel.util.HashMaps.initialCapacity;
+import net.truevfs.kernel.spec.cio.ByteArrayIoBuffer;
+import net.truevfs.kernel.spec.cio.Entry.Size;
+import net.truevfs.kernel.spec.cio.IoBuffer;
+import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -37,7 +37,7 @@ public final class ManySmallEntriesTest {
 
     @Test
     public void testManySmallEntries() throws IOException {
-        final IoEntry<?> buffer = new ByteArrayIoBuffer("zip", ZIP_SIZE);
+        final IoBuffer<?> buffer = new ByteArrayIoBuffer("zip", ZIP_SIZE);
         final byte[] data = DATA_STRING.getBytes(DATA_CHARSET);
         final HashSet<String> set = new HashSet<>(initialCapacity(NUM_ENTRIES));
 

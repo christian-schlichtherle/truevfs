@@ -7,10 +7,10 @@ package net.truevfs.extension.jmxjul;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.FsCompositeDriver;
-import net.truevfs.kernel.FsController;
-import net.truevfs.kernel.FsManager;
-import net.truevfs.kernel.FsModel;
+import net.truevfs.kernel.spec.FsCompositeDriver;
+import net.truevfs.kernel.spec.FsController;
+import net.truevfs.kernel.spec.FsManager;
+import net.truevfs.kernel.spec.FsModel;
 
 /**
  * @author Christian Schlichtherle

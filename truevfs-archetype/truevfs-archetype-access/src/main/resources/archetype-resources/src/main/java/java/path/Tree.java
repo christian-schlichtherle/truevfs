@@ -4,7 +4,7 @@
 package ${package}.java.path;
 
 import ${package}.java.Application;
-import net.truevfs.kernel.FsSyncException;
+import net.truevfs.kernel.spec.FsSyncException;
 import net.truevfs.access.TPath;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;

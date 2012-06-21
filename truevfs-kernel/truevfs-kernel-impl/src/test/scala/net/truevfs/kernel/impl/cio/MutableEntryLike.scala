@@ -4,8 +4,8 @@
  */
 package net.truevfs.kernel.impl.cio
 
-import net.truevfs.kernel.cio.Entry.Access._
-import net.truevfs.kernel.cio.Entry.Size._
+import net.truevfs.kernel.spec.cio.Entry.Access._
+import net.truevfs.kernel.spec.cio.Entry.Size._
 import net.truevfs.kernel.impl.util._
 
 /**

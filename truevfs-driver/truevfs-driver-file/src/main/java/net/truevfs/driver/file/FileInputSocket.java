@@ -10,9 +10,9 @@ import java.nio.channels.SeekableByteChannel;
 import static java.nio.file.Files.newByteChannel;
 import static java.nio.file.Files.newInputStream;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.truevfs.kernel.cio.AbstractInputSocket;
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.OutputSocket;
+import net.truevfs.kernel.spec.cio.AbstractInputSocket;
+import net.truevfs.kernel.spec.cio.Entry;
+import net.truevfs.kernel.spec.cio.OutputSocket;
 
 /**
  * An input socket for a file entry.

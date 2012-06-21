@@ -11,10 +11,10 @@ import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.driver.zip.ZipDriver;
 import net.truevfs.driver.zip.ZipDriverEntry;
-import net.truevfs.kernel.*;
-import net.truevfs.kernel.cio.InputService;
-import net.truevfs.kernel.cio.OutputService;
-import net.truevfs.kernel.util.BitField;
+import net.truevfs.kernel.spec.*;
+import net.truevfs.kernel.spec.cio.InputService;
+import net.truevfs.kernel.spec.cio.OutputService;
+import net.truevfs.kernel.spec.util.BitField;
 
 /**
  * An archive driver which reads Self Executable (SFX/EXE) ZIP files,

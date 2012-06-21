@@ -4,16 +4,16 @@
  */
 package net.truevfs.extension.jmxjul.jul;
 
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.IoBuffer;
-import net.truevfs.kernel.cio.OutputSocket;
-import net.truevfs.kernel.io.DecoratingOutputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.cio.InputSocket;
+import net.truevfs.kernel.spec.cio.Entry;
+import net.truevfs.kernel.spec.cio.InputSocket;
+import net.truevfs.kernel.spec.cio.IoBuffer;
+import net.truevfs.kernel.spec.cio.OutputSocket;
+import net.truevfs.kernel.spec.io.DecoratingOutputStream;
 
 /**
  * @author  Christian Schlichtherle

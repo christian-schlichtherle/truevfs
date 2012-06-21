@@ -5,7 +5,7 @@
 package net.truevfs.kernel.impl
 
 import javax.annotation.concurrent._
-import net.truevfs.kernel._
+import net.truevfs.kernel.spec._
 
 /** A generic mixin which provides some features of its associated `model`.
   *

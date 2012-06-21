@@ -4,10 +4,10 @@
  */
 package net.truevfs.driver.http;
 
-import net.truevfs.kernel.FsDriver;
-import net.truevfs.kernel.FsScheme;
-import net.truevfs.kernel.spi.FsDriverService;
-import net.truevfs.kernel.sl.IoPoolLocator;
+import net.truevfs.kernel.spec.FsDriver;
+import net.truevfs.kernel.spec.FsScheme;
+import net.truevfs.kernel.spec.spi.FsDriverService;
+import net.truevfs.kernel.spec.sl.IoPoolLocator;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 

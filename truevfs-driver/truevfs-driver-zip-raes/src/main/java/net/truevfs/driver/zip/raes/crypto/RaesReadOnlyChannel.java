@@ -6,9 +6,9 @@ package net.truevfs.driver.zip.raes.crypto;
 
 import static net.truevfs.driver.zip.raes.crypto.Constants.HEADER_MIN_LEN;
 import static net.truevfs.driver.zip.raes.crypto.Constants.SIGNATURE;
-import net.truevfs.kernel.io.DecoratingReadOnlyChannel;
-import net.truevfs.kernel.io.PowerBuffer;
-import net.truevfs.kernel.io.Source;
+import net.truevfs.kernel.spec.io.DecoratingReadOnlyChannel;
+import net.truevfs.kernel.spec.io.PowerBuffer;
+import net.truevfs.kernel.spec.io.Source;
 import net.truevfs.key.param.AesKeyStrength;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.EOFException;

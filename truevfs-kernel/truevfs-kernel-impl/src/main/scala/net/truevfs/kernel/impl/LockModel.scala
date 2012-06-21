@@ -6,7 +6,7 @@ package net.truevfs.kernel.impl
 
 import java.util.concurrent.locks._
 import javax.annotation.concurrent._
-import net.truevfs.kernel._
+import net.truevfs.kernel.spec._
 
 /** A file system model which supports multiple concurrent reader threads.
   *

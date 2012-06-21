@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.impl.cio
 
-import net.truevfs.kernel.cio.Entry
+import net.truevfs.kernel.spec.cio.Entry
 
 /**
   * @author Christian Schlichtherle

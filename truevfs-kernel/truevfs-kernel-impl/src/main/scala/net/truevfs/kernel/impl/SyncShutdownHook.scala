@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.impl
 
-import net.truevfs.kernel._
+import net.truevfs.kernel.spec._
 import javax.annotation.concurrent._
 
 /** A shutdown hook singleton which `sync`s a `register`ed file system manager

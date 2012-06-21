@@ -8,16 +8,16 @@ import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
-import net.truevfs.kernel.FsArchiveEntries;
-import net.truevfs.kernel.FsArchiveEntry;
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.Entry.Access;
-import net.truevfs.kernel.cio.Entry.Entity;
-import net.truevfs.kernel.cio.Entry.PosixEntity;
-import net.truevfs.kernel.cio.Entry.Size;
-import net.truevfs.kernel.cio.Entry.Type;
-import net.truevfs.kernel.cio.IoBuffer;
-import net.truevfs.kernel.cio.IoPool;
+import net.truevfs.kernel.spec.FsArchiveEntries;
+import net.truevfs.kernel.spec.FsArchiveEntry;
+import net.truevfs.kernel.spec.cio.Entry;
+import net.truevfs.kernel.spec.cio.Entry.Access;
+import net.truevfs.kernel.spec.cio.Entry.Entity;
+import net.truevfs.kernel.spec.cio.Entry.PosixEntity;
+import net.truevfs.kernel.spec.cio.Entry.Size;
+import net.truevfs.kernel.spec.cio.Entry.Type;
+import net.truevfs.kernel.spec.cio.IoBuffer;
+import net.truevfs.kernel.spec.cio.IoPool;
 
 /**
  * @author Christian Schlichtherle

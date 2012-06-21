@@ -4,14 +4,14 @@
  */
 package net.truevfs.extension.jmxjul.jul;
 
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.extension.jmxjul.InstrumentingCompositeDriver;
 import net.truevfs.extension.jmxjul.InstrumentingController;
 import net.truevfs.extension.jmxjul.InstrumentingDirector;
 import net.truevfs.extension.jmxjul.InstrumentingManager;
-import net.truevfs.kernel.FsController;
-import net.truevfs.kernel.FsModel;
-import net.truevfs.kernel.cio.*;
-import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.spec.FsController;
+import net.truevfs.kernel.spec.FsModel;
+import net.truevfs.kernel.spec.cio.*;
 
 /**
  * @author Christian Schlichtherle

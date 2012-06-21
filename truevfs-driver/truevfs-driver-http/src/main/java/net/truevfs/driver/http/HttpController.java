@@ -7,16 +7,16 @@ package net.truevfs.driver.http;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.*;
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.Entry.Access;
-import static net.truevfs.kernel.cio.Entry.Access.READ;
-import net.truevfs.kernel.cio.Entry.Type;
-import static net.truevfs.kernel.cio.Entry.Type.FILE;
-import net.truevfs.kernel.cio.InputSocket;
-import net.truevfs.kernel.cio.IoPool;
-import net.truevfs.kernel.cio.OutputSocket;
-import net.truevfs.kernel.util.BitField;
+import net.truevfs.kernel.spec.*;
+import net.truevfs.kernel.spec.cio.Entry;
+import net.truevfs.kernel.spec.cio.Entry.Access;
+import static net.truevfs.kernel.spec.cio.Entry.Access.READ;
+import net.truevfs.kernel.spec.cio.Entry.Type;
+import static net.truevfs.kernel.spec.cio.Entry.Type.FILE;
+import net.truevfs.kernel.spec.cio.InputSocket;
+import net.truevfs.kernel.spec.cio.IoPool;
+import net.truevfs.kernel.spec.cio.OutputSocket;
+import net.truevfs.kernel.spec.util.BitField;
 import org.apache.http.HttpResponse;
 
 /**

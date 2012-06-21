@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.tar.it;
 
-import net.truevfs.kernel.FsArchiveDriver;
+import net.truevfs.kernel.spec.FsArchiveDriver;
 import net.truevfs.access.TPathITSuite;
 
 /**

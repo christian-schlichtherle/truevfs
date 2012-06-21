@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.zip.io;
 
-import net.truevfs.kernel.util.HashMaps;
+import net.truevfs.kernel.spec.util.HashMaps;
 import java.nio.charset.Charset;
 import java.util.zip.Deflater;
 import javax.annotation.concurrent.ThreadSafe;

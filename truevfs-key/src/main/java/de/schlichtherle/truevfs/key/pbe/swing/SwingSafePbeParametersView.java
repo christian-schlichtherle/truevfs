@@ -9,7 +9,7 @@ import de.schlichtherle.truevfs.key.pbe.swing.feedback.BasicUnknownKeyFeedback;
 import de.schlichtherle.truevfs.key.pbe.swing.feedback.InvalidKeyFeedback;
 import de.schlichtherle.truevfs.key.pbe.swing.feedback.UnknownKeyFeedback;
 import de.schlichtherle.truevfs.key.swing.Windows;
-import net.truevfs.kernel.util.ServiceLocator;
+import net.truevfs.kernel.spec.util.ServiceLocator;
 import net.truevfs.key.KeyPromptingInterruptedException;
 import net.truevfs.key.PromptingKeyProvider.Controller;
 import net.truevfs.key.UnknownKeyException;

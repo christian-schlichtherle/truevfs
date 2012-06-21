@@ -13,8 +13,8 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
-import net.truevfs.kernel.cio.IoBuffer;
-import net.truevfs.kernel.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoBuffer;
+import net.truevfs.kernel.spec.cio.IoPool;
 
 /**
  * This I/O pool creates and deletes temporary files as {@link FileEntry}s.

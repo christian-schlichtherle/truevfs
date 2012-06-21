@@ -4,8 +4,8 @@
  */
 package net.truevfs.driver.zip.raes.crypto;
 
-import net.truevfs.kernel.io.DecoratingOutputStream;
-import net.truevfs.kernel.io.Sink;
+import net.truevfs.kernel.spec.io.DecoratingOutputStream;
+import net.truevfs.kernel.spec.io.Sink;
 import net.truevfs.key.param.KeyStrength;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;

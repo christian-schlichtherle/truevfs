@@ -4,17 +4,16 @@
  */
 package net.truevfs.kernel.impl
 
-import net.truevfs.kernel.impl._
 import java.io._
 import java.nio.channels._
 import java.util.logging._
 import java.util.logging.Level._
 import javax.annotation.concurrent._
-import net.truevfs.kernel._
-import net.truevfs.kernel.cio._
-import net.truevfs.kernel.cio.Entry._;
-import net.truevfs.kernel.io._
-import net.truevfs.kernel.util._
+import net.truevfs.kernel.spec._
+import net.truevfs.kernel.spec.cio._
+import net.truevfs.kernel.spec.cio.Entry._;
+import net.truevfs.kernel.spec.io._
+import net.truevfs.kernel.spec.util._
 
 /** Finalizes unclosed resources returned by its decorated controller.
   * 

@@ -26,10 +26,10 @@ import static net.truevfs.driver.zip.io.WinZipAesEntryExtraField.VV_AE_2;
 import static net.truevfs.driver.zip.io.WinZipAesUtils.overhead;
 import static net.truevfs.driver.zip.io.ZipEntry.*;
 import static net.truevfs.driver.zip.io.ZipParametersUtils.parameters;
-import net.truevfs.kernel.io.DecoratingOutputStream;
-import net.truevfs.kernel.io.LittleEndianOutputStream;
-import net.truevfs.kernel.io.Sink;
-import static net.truevfs.kernel.util.HashMaps.initialCapacity;
+import net.truevfs.kernel.spec.io.DecoratingOutputStream;
+import net.truevfs.kernel.spec.io.LittleEndianOutputStream;
+import net.truevfs.kernel.spec.io.Sink;
+import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 import net.truevfs.key.param.AesKeyStrength;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 

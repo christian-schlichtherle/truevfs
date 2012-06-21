@@ -5,9 +5,9 @@
 package net.truevfs.driver.file;
 
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.cio.IoBuffer;
-import net.truevfs.kernel.cio.IoPool;
-import net.truevfs.kernel.spi.IoPoolService;
+import net.truevfs.kernel.spec.cio.IoBuffer;
+import net.truevfs.kernel.spec.cio.IoPool;
+import net.truevfs.kernel.spec.spi.IoPoolService;
 
 /**
  * Provides {@link TempFilePool#INSTANCE}.

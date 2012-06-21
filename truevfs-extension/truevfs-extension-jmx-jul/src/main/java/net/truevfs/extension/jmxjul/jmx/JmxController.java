@@ -5,8 +5,8 @@
 package net.truevfs.extension.jmxjul.jmx;
 
 import net.truevfs.extension.jmxjul.InstrumentingController;
-import net.truevfs.kernel.FsController;
-import net.truevfs.kernel.FsModel;
+import net.truevfs.kernel.spec.FsController;
+import net.truevfs.kernel.spec.FsModel;
 
 /**
  * @author  Christian Schlichtherle

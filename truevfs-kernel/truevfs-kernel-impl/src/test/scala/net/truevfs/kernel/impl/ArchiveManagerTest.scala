@@ -4,8 +4,8 @@
  */
 package net.truevfs.kernel.impl
 
-import net.truevfs.kernel._
-import net.truevfs.kernel.util.Link._
+import net.truevfs.kernel.spec._
+import net.truevfs.kernel.spec.util.Link._
 
 /**
   * @author Christian Schlichtherle

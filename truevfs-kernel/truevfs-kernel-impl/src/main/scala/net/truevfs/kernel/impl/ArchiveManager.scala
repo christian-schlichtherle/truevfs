@@ -6,11 +6,11 @@ package net.truevfs.kernel.impl
 
 import java.util.logging._
 import javax.annotation.concurrent._
-import net.truevfs.kernel._
-import net.truevfs.kernel.util._
-import net.truevfs.kernel.util.Link._
-import net.truevfs.kernel.util.Link.Type._
-import net.truevfs.kernel.util.Links._
+import net.truevfs.kernel.spec._
+import net.truevfs.kernel.spec.util._
+import net.truevfs.kernel.spec.util.Link._
+import net.truevfs.kernel.spec.util.Link.Type._
+import net.truevfs.kernel.spec.util.Links._
 import scala.collection.mutable.WeakHashMap
 
 /** The default implementation of a file system manager.

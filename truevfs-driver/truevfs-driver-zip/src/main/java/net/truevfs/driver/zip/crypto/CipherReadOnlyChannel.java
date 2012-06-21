@@ -4,8 +4,8 @@
  */
 package net.truevfs.driver.zip.crypto;
 
-import net.truevfs.kernel.io.DecoratingReadOnlyChannel;
-import net.truevfs.kernel.io.Streams;
+import net.truevfs.kernel.spec.io.DecoratingReadOnlyChannel;
+import net.truevfs.kernel.spec.io.Streams;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import static java.lang.Math.min;

@@ -5,10 +5,10 @@
 package net.truevfs.kernel.impl
 
 import java.io._
-import net.truevfs.kernel.cio.Entry.Access._
-import net.truevfs.kernel.cio.Entry.Size._
-import net.truevfs.kernel.cio.Entry._
-import net.truevfs.kernel.cio._
+import net.truevfs.kernel.spec.cio.Entry._
+import net.truevfs.kernel.spec.cio.Entry.Access._
+import net.truevfs.kernel.spec.cio.Entry.Size._
+import net.truevfs.kernel.spec.cio._
 import net.truevfs.kernel.impl.cio.EntryAspect._
 import org.junit.runner._
 import org.scalatest.junit._

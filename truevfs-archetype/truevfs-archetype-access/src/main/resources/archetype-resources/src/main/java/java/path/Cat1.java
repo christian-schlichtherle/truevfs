@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import net.truevfs.access.TPath;
-import net.truevfs.kernel.io.Streams;
+import net.truevfs.kernel.spec.io.Streams;
 
 /**
  * This command line utility concatenates the contents of the parameter paths

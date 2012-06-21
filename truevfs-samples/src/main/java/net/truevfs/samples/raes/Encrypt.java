@@ -4,7 +4,7 @@
  */
 package net.truevfs.samples.raes;
 
-import net.truevfs.kernel.FsSyncException;
+import net.truevfs.kernel.spec.FsSyncException;
 import net.truevfs.access.TPath;
 import net.truevfs.samples.access.Application;
 import net.truevfs.samples.access.IllegalUsageException;

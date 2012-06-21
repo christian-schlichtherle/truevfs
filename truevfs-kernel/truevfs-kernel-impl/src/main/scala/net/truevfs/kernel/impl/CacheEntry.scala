@@ -8,10 +8,10 @@ import edu.umd.cs.findbugs.annotations._
 import java.io._
 import java.nio.channels._
 import javax.annotation.concurrent._
-import net.truevfs.kernel.cio.Entry._
-import net.truevfs.kernel.cio._
-import net.truevfs.kernel.io._
-import net.truevfs.kernel.util._
+import net.truevfs.kernel.spec.cio.Entry._
+import net.truevfs.kernel.spec.cio._
+import net.truevfs.kernel.spec.io._
+import net.truevfs.kernel.spec.util._
 import CacheEntry._
 
 /** Provides caching services for input and output sockets with the following

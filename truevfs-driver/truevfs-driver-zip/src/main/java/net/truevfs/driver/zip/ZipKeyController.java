@@ -5,8 +5,8 @@
 package net.truevfs.driver.zip;
 
 import net.truevfs.driver.zip.io.ZipKeyException;
-import net.truevfs.kernel.FsController;
-import net.truevfs.kernel.FsModel;
+import net.truevfs.kernel.spec.FsController;
+import net.truevfs.kernel.spec.FsModel;
 import net.truevfs.key.param.AesPbeParameters;
 import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;

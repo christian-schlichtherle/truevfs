@@ -5,8 +5,8 @@
 package net.truevfs.driver.zip.raes;
 
 import net.truevfs.driver.zip.TestKeyManagerProvider;
-import net.truevfs.kernel.cio.IoPool;
-import net.truevfs.kernel.cio.IoPoolProvider;
+import net.truevfs.kernel.spec.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoPoolProvider;
 import net.truevfs.key.MockView;
 import net.truevfs.key.param.AesPbeParameters;
 

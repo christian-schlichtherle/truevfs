@@ -12,9 +12,9 @@ import java.util.Objects;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.truevfs.driver.zip.io.RawZipFile;
 import net.truevfs.driver.zip.io.ZipCryptoParameters;
-import net.truevfs.kernel.FsInputSocketSource;
-import net.truevfs.kernel.FsModel;
-import net.truevfs.kernel.cio.*;
+import net.truevfs.kernel.spec.FsInputSocketSource;
+import net.truevfs.kernel.spec.FsModel;
+import net.truevfs.kernel.spec.cio.*;
 
 /**
  * An input service for reading ZIP files.

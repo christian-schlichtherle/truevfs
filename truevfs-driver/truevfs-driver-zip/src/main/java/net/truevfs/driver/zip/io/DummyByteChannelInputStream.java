@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.zip.io;
 
-import net.truevfs.kernel.io.ChannelInputStream;
+import net.truevfs.kernel.spec.io.ChannelInputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;

@@ -6,7 +6,7 @@ package net.truevfs.kernel.impl
 
 import java.io._
 import javax.annotation.concurrent._
-import net.truevfs.kernel.util._
+import net.truevfs.kernel.spec.util._
 
 /** Indicates that a file system is a false positive file system and that this
   * exception may get cached until the federated (archive) file system gets

@@ -4,10 +4,14 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.kernel.*;
-import net.truevfs.kernel.sl.FsDriverLocator;
-import net.truevfs.kernel.util.ExtensionSet;
-import static net.truevfs.kernel.util.HashMaps.initialCapacity;
+import net.truevfs.kernel.spec.FsDriver;
+import net.truevfs.kernel.spec.FsDriverProvider;
+import net.truevfs.kernel.spec.FsScheme;
+import net.truevfs.kernel.spec.FsAbstractCompositeDriver;
+import net.truevfs.kernel.spec.FsAbstractDriverProvider;
+import net.truevfs.kernel.spec.sl.FsDriverLocator;
+import net.truevfs.kernel.spec.util.ExtensionSet;
+import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Collection;

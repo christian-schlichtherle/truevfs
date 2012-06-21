@@ -12,13 +12,13 @@ import net.truevfs.driver.zip.JarDriver;
 import net.truevfs.driver.zip.ZipDriverEntry;
 import net.truevfs.driver.zip.ZipInputService;
 import net.truevfs.driver.zip.ZipOutputService;
-import static net.truevfs.kernel.FsAccessOption.GROW;
-import net.truevfs.kernel.FsModel;
-import net.truevfs.kernel.FsOutputSocketSink;
-import net.truevfs.kernel.cio.InputService;
-import net.truevfs.kernel.cio.IoPool;
-import net.truevfs.kernel.cio.MultiplexingOutputService;
-import net.truevfs.kernel.cio.OutputService;
+import static net.truevfs.kernel.spec.FsAccessOption.GROW;
+import net.truevfs.kernel.spec.FsModel;
+import net.truevfs.kernel.spec.FsOutputSocketSink;
+import net.truevfs.kernel.spec.cio.InputService;
+import net.truevfs.kernel.spec.cio.IoPool;
+import net.truevfs.kernel.spec.cio.MultiplexingOutputService;
+import net.truevfs.kernel.spec.cio.OutputService;
 
 /**
  * An archive driver for application archive files according to the Open

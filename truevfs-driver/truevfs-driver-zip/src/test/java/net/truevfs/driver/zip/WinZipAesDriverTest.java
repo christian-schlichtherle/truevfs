@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.zip;
 
-import net.truevfs.kernel.FsArchiveDriverTestSuite;
+import net.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 
 /**
  * @author Christian Schlichtherle

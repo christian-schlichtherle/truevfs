@@ -4,9 +4,14 @@
  */
 package net.truevfs.extension.jmxjul;
 
+import net.truevfs.kernel.spec.FsMountPoint;
+import net.truevfs.kernel.spec.FsModel;
+import net.truevfs.kernel.spec.FsController;
+import net.truevfs.kernel.spec.FsDecoratingManager;
+import net.truevfs.kernel.spec.FsManager;
+import net.truevfs.kernel.spec.FsCompositeDriver;
 import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.*;
 
 /**
  * @author Christian Schlichtherle

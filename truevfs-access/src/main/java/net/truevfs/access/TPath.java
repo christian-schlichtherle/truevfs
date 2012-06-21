@@ -25,17 +25,17 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import static net.truevfs.access.TPathScanner.*;
-import static net.truevfs.kernel.FsAccessOption.*;
-import static net.truevfs.kernel.FsEntryName.*;
-import net.truevfs.kernel.*;
-import net.truevfs.kernel.cio.Entry;
-import net.truevfs.kernel.cio.InputSocket;
-import net.truevfs.kernel.cio.OutputSocket;
-import net.truevfs.kernel.util.BitField;
-import static net.truevfs.kernel.util.HashMaps.initialCapacity;
-import net.truevfs.kernel.util.Paths;
-import net.truevfs.kernel.util.QuotedUriSyntaxException;
-import net.truevfs.kernel.util.UriBuilder;
+import static net.truevfs.kernel.spec.FsAccessOption.*;
+import static net.truevfs.kernel.spec.FsEntryName.*;
+import net.truevfs.kernel.spec.*;
+import net.truevfs.kernel.spec.cio.Entry;
+import net.truevfs.kernel.spec.cio.InputSocket;
+import net.truevfs.kernel.spec.cio.OutputSocket;
+import net.truevfs.kernel.spec.util.BitField;
+import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
+import net.truevfs.kernel.spec.util.Paths;
+import net.truevfs.kernel.spec.util.QuotedUriSyntaxException;
+import net.truevfs.kernel.spec.util.UriBuilder;
 
 /**
  * A {@link Path} implementation based on the TrueVFS Kernel module.

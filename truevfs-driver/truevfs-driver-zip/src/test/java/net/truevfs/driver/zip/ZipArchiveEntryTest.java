@@ -4,8 +4,8 @@
  */
 package net.truevfs.driver.zip;
 
-import net.truevfs.kernel.FsArchiveEntry;
 import net.truevfs.driver.zip.io.ZipEntry;
+import net.truevfs.kernel.spec.FsArchiveEntry;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 

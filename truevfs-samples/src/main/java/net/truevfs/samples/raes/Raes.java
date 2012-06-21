@@ -13,9 +13,9 @@ import java.nio.file.Path;
 import net.truevfs.driver.zip.raes.KeyManagerRaesParameters;
 import net.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import net.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
-import net.truevfs.kernel.io.AbstractSink;
-import net.truevfs.kernel.io.AbstractSource;
-import net.truevfs.kernel.io.Streams;
+import net.truevfs.kernel.spec.io.AbstractSink;
+import net.truevfs.kernel.spec.io.AbstractSource;
+import net.truevfs.kernel.spec.io.Streams;
 import net.truevfs.key.sl.KeyManagerLocator;
 
 /**

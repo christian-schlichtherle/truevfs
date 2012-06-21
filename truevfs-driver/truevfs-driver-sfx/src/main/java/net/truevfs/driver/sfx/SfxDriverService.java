@@ -6,9 +6,9 @@ package net.truevfs.driver.sfx;
 
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.FsDriver;
-import net.truevfs.kernel.FsScheme;
-import net.truevfs.kernel.spi.FsDriverService;
+import net.truevfs.kernel.spec.FsDriver;
+import net.truevfs.kernel.spec.FsScheme;
+import net.truevfs.kernel.spec.spi.FsDriverService;
 
 /**
  * An immutable container of a map of drivers for the ZIP file format.

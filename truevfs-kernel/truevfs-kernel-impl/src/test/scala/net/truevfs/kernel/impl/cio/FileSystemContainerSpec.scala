@@ -4,8 +4,8 @@
  */
 package net.truevfs.kernel.impl.cio
 
-import net.truevfs.kernel.cio._
-import net.truevfs.kernel.cio.Entry._
+import net.truevfs.kernel.spec.cio._
+import net.truevfs.kernel.spec.cio.Entry._
 import org.junit.runner.RunWith
 import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner

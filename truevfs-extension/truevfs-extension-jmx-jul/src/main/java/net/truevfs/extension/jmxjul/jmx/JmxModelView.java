@@ -4,20 +4,20 @@
  */
 package net.truevfs.extension.jmxjul.jmx;
 
-import static net.truevfs.kernel.FsAccessOptions.NONE;
-import net.truevfs.kernel.*;
-import static net.truevfs.kernel.FsSyncOption.CLEAR_CACHE;
-import static net.truevfs.kernel.cio.Entry.Access.*;
-import static net.truevfs.kernel.cio.Entry.Size.DATA;
-import static net.truevfs.kernel.cio.Entry.Size.STORAGE;
-import static net.truevfs.kernel.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.sl.FsDriverLocator;
-import net.truevfs.kernel.sl.FsManagerLocator;
-import net.truevfs.kernel.util.BitField;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Date;
 import javax.management.*;
+import static net.truevfs.kernel.spec.FsAccessOptions.NONE;
+import net.truevfs.kernel.spec.*;
+import static net.truevfs.kernel.spec.FsSyncOption.CLEAR_CACHE;
+import static net.truevfs.kernel.spec.cio.Entry.Access.*;
+import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
+import static net.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
+import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
+import net.truevfs.kernel.spec.sl.FsDriverLocator;
+import net.truevfs.kernel.spec.sl.FsManagerLocator;
+import net.truevfs.kernel.spec.util.BitField;
 
 /**
  * The MXBean implementation for a {@link FsModel file system model}.

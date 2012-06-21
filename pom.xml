@@ -340,7 +340,7 @@ system space.
                             <exclude>**/*TestSuite.class</exclude>
                         </excludes-->
                         <systemPropertyVariables>
-                            <de.schlichtherle.truevfs.kernel.ControlFlowException.traceable>true</de.schlichtherle.truevfs.kernel.ControlFlowException.traceable>
+                            <net.truevfs.kernel.impl.ControlFlowException.traceable>true</net.truevfs.kernel.impl.ControlFlowException.traceable>
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
                         </systemPropertyVariables>
                     </configuration>
@@ -378,9 +378,9 @@ system space.
                                  it would also conceal any multithreading bugs
                                  in the classes under test, so it's generally
                                  discouraged. -->
-                            <net.truevfs.kernel.isolateFsManager>false</net.truevfs.kernel.isolateFsManager>
+                            <net.truevfs.kernel.spec.isolateFsManager>false</net.truevfs.kernel.spec.isolateFsManager>
+                            <net.truevfs.kernel.impl.ControlFlowException.traceable>true</net.truevfs.kernel.impl.ControlFlowException.traceable>
                             <net.truevfs.driver.zip.io.forceZip64Ext>false</net.truevfs.driver.zip.io.forceZip64Ext>
-                            <de.schlichtherle.truevfs.kernel.ControlFlowException.traceable>true</de.schlichtherle.truevfs.kernel.ControlFlowException.traceable>
                             <java.io.tmpdir>${java.io.tmpdir.it}</java.io.tmpdir>
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
                         </systemPropertyVariables>

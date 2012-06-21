@@ -4,22 +4,21 @@
  */
 package net.truevfs.kernel.impl
 
-import net.truevfs.kernel.impl._
 import java.io._
 import java.nio.channels._
 import java.nio.file._
 import javax.annotation.concurrent._
-import net.truevfs.kernel._
-import net.truevfs.kernel.FsAccessOption._
-import net.truevfs.kernel.FsAccessOptions._
-import net.truevfs.kernel.FsSyncOption._
-import net.truevfs.kernel.cio._
-import net.truevfs.kernel.cio.Entry._;
-import net.truevfs.kernel.cio.Entry.Access._;
-import net.truevfs.kernel.cio.Entry.Size._;
-import net.truevfs.kernel.cio.Entry.Type._;
-import net.truevfs.kernel.io._
-import net.truevfs.kernel.util._
+import net.truevfs.kernel.spec._
+import net.truevfs.kernel.spec.FsAccessOption._
+import net.truevfs.kernel.spec.FsAccessOptions._
+import net.truevfs.kernel.spec.FsSyncOption._
+import net.truevfs.kernel.spec.cio._
+import net.truevfs.kernel.spec.cio.Entry._;
+import net.truevfs.kernel.spec.cio.Entry.Access._;
+import net.truevfs.kernel.spec.cio.Entry.Size._;
+import net.truevfs.kernel.spec.cio.Entry.Type._;
+import net.truevfs.kernel.spec.io._
+import net.truevfs.kernel.spec.util._
 import ArchiveFileSystem._
 
 /** Manages I/O to the entry which represents the target archive file in its

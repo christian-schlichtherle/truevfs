@@ -21,17 +21,17 @@ import javax.annotation.concurrent.NotThreadSafe;
 import net.truevfs.driver.zip.io.RawZipOutputStream;
 import net.truevfs.driver.zip.io.ZipCryptoParameters;
 import static net.truevfs.driver.zip.io.ZipEntry.STORED;
-import static net.truevfs.kernel.FsAccessOption.GROW;
-import net.truevfs.kernel.FsModel;
-import net.truevfs.kernel.FsOutputSocketSink;
-import net.truevfs.kernel.cio.Entry.Access;
-import net.truevfs.kernel.cio.Entry.Size;
-import static net.truevfs.kernel.cio.Entry.Size.DATA;
-import static net.truevfs.kernel.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.cio.*;
-import net.truevfs.kernel.io.*;
-import net.truevfs.kernel.util.JointIterator;
-import net.truevfs.kernel.util.SuppressedExceptionBuilder;
+import static net.truevfs.kernel.spec.FsAccessOption.GROW;
+import net.truevfs.kernel.spec.FsModel;
+import net.truevfs.kernel.spec.FsOutputSocketSink;
+import net.truevfs.kernel.spec.cio.Entry.Access;
+import net.truevfs.kernel.spec.cio.Entry.Size;
+import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
+import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
+import net.truevfs.kernel.spec.cio.*;
+import net.truevfs.kernel.spec.io.*;
+import net.truevfs.kernel.spec.util.JointIterator;
+import net.truevfs.kernel.spec.util.SuppressedExceptionBuilder;
 
 /**
  * An output service for writing ZIP files.

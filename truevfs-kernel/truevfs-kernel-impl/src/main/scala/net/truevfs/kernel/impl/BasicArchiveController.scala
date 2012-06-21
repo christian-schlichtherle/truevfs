@@ -4,21 +4,20 @@
  */
 package net.truevfs.kernel.impl
 
-import net.truevfs.kernel.impl._
 import java.io._
 import java.nio.channels._
 import java.nio.file._
 import java.util.logging._
 import javax.annotation.concurrent._
-import net.truevfs.kernel._
-import net.truevfs.kernel.FsAccessOption._
-import net.truevfs.kernel.FsAccessOptions._
-import net.truevfs.kernel.cio._
-import net.truevfs.kernel.cio.Entry._;
-import net.truevfs.kernel.cio.Entry.Access._;
-import net.truevfs.kernel.cio.Entry.Type._;
-import net.truevfs.kernel.io._
-import net.truevfs.kernel.util._
+import net.truevfs.kernel.spec._
+import net.truevfs.kernel.spec.FsAccessOption._
+import net.truevfs.kernel.spec.FsAccessOptions._
+import net.truevfs.kernel.spec.cio._
+import net.truevfs.kernel.spec.cio.Entry._;
+import net.truevfs.kernel.spec.cio.Entry.Access._;
+import net.truevfs.kernel.spec.cio.Entry.Type._;
+import net.truevfs.kernel.spec.io._
+import net.truevfs.kernel.spec.util._
 
 /** An abstract base class for any archive file system controller which
   * provide all the essential services required for accessing a prospective

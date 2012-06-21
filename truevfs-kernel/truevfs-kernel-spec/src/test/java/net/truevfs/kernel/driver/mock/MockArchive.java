@@ -13,15 +13,15 @@ import java.nio.file.NoSuchFileException;
 import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.truevfs.kernel.TestConfig;
-import net.truevfs.kernel.ThrowManager;
-import static net.truevfs.kernel.cio.Entry.ALL_ACCESS;
-import static net.truevfs.kernel.cio.Entry.ALL_SIZES;
-import net.truevfs.kernel.cio.Entry.Access;
-import net.truevfs.kernel.cio.Entry.Size;
-import net.truevfs.kernel.cio.*;
-import net.truevfs.kernel.io.DecoratingOutputStream;
-import net.truevfs.kernel.util.HashMaps;
+import net.truevfs.kernel.spec.TestConfig;
+import net.truevfs.kernel.spec.ThrowManager;
+import static net.truevfs.kernel.spec.cio.Entry.ALL_ACCESS;
+import static net.truevfs.kernel.spec.cio.Entry.ALL_SIZES;
+import net.truevfs.kernel.spec.cio.Entry.Access;
+import net.truevfs.kernel.spec.cio.Entry.Size;
+import net.truevfs.kernel.spec.cio.*;
+import net.truevfs.kernel.spec.io.DecoratingOutputStream;
+import net.truevfs.kernel.spec.util.HashMaps;
 
 /**
  * @author Christian Schlichtherle

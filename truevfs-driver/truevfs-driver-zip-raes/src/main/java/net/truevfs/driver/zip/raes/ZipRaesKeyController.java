@@ -6,8 +6,8 @@ package net.truevfs.driver.zip.raes;
 
 import net.truevfs.driver.zip.KeyController;
 import net.truevfs.driver.zip.raes.crypto.RaesKeyException;
-import net.truevfs.kernel.FsController;
-import net.truevfs.kernel.FsModel;
+import net.truevfs.kernel.spec.FsController;
+import net.truevfs.kernel.spec.FsModel;
 import net.truevfs.key.param.AesPbeParameters;
 import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;

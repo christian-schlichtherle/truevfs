@@ -4,8 +4,8 @@
  */
 package net.truevfs.extension.jmxjul.jmx;
 
-import net.truevfs.kernel.FsModel;
-import net.truevfs.kernel.FsSyncException;
+import net.truevfs.kernel.spec.FsModel;
+import net.truevfs.kernel.spec.FsSyncException;
 import javax.annotation.Nullable;
 
 /**

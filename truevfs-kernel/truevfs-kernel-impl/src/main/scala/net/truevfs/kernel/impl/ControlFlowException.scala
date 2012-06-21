@@ -5,7 +5,7 @@
 package net.truevfs.kernel.impl
 
 import javax.annotation.concurrent._
-import net.truevfs.kernel._
+import net.truevfs.kernel.spec._
 import ControlFlowException._
 
 /** Indicates a condition which requires non-local control flow within a

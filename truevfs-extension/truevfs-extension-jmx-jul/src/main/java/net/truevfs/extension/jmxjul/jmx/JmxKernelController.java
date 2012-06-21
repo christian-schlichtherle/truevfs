@@ -4,7 +4,7 @@
  */
 package net.truevfs.extension.jmxjul.jmx;
 
-import net.truevfs.kernel.FsController;
+import net.truevfs.kernel.spec.FsController;
 
 /**
  * @author  Christian Schlichtherle

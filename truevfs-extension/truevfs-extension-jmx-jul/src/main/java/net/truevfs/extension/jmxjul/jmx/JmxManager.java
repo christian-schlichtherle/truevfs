@@ -6,11 +6,11 @@ package net.truevfs.extension.jmxjul.jmx;
 
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.extension.jmxjul.InstrumentingManager;
-import net.truevfs.kernel.FsManager;
-import net.truevfs.kernel.FsSyncException;
-import net.truevfs.kernel.FsSyncOption;
-import net.truevfs.kernel.FsSyncWarningException;
-import net.truevfs.kernel.util.BitField;
+import net.truevfs.kernel.spec.FsManager;
+import net.truevfs.kernel.spec.FsSyncException;
+import net.truevfs.kernel.spec.FsSyncOption;
+import net.truevfs.kernel.spec.FsSyncWarningException;
+import net.truevfs.kernel.spec.util.BitField;
 
 /**
  * @author Christian Schlichtherle

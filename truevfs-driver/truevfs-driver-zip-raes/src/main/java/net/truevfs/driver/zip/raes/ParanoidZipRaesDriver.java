@@ -11,10 +11,10 @@ import javax.annotation.concurrent.Immutable;
 import net.truevfs.driver.zip.ZipDriverEntry;
 import net.truevfs.driver.zip.ZipInputService;
 import net.truevfs.driver.zip.ZipOutputService;
-import net.truevfs.kernel.FsModel;
-import net.truevfs.kernel.FsOutputSocketSink;
-import net.truevfs.kernel.cio.InputService;
-import net.truevfs.kernel.cio.OutputService;
+import net.truevfs.kernel.spec.FsModel;
+import net.truevfs.kernel.spec.FsOutputSocketSink;
+import net.truevfs.kernel.spec.cio.InputService;
+import net.truevfs.kernel.spec.cio.OutputService;
 
 /**
  * A paranoid archive driver for RAES encrypted ZIP files.

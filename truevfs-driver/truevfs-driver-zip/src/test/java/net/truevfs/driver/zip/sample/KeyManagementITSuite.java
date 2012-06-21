@@ -9,7 +9,7 @@ import net.truevfs.access.TFileInputStream;
 import net.truevfs.access.TFile;
 import net.truevfs.access.TArchiveDetector;
 import net.truevfs.access.TFileOutputStream;
-import net.truevfs.kernel.FsSyncException;
+import net.truevfs.kernel.spec.FsSyncException;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Random;

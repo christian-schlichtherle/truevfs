@@ -6,8 +6,8 @@ package net.truevfs.access;
 
 import net.truevfs.access.TConfig;
 import static net.truevfs.access.TArchiveDetector.NULL;
-import static net.truevfs.kernel.FsEntryName.ROOT;
-import net.truevfs.kernel.FsPath;
+import static net.truevfs.kernel.spec.FsEntryName.ROOT;
+import net.truevfs.kernel.spec.FsPath;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;

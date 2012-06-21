@@ -5,7 +5,7 @@ package ${package}.java.file;
 
 import ${package}.java.Application;
 import net.truevfs.access.TFile;
-import net.truevfs.kernel.FsSyncException;
+import net.truevfs.kernel.spec.FsSyncException;
 import java.io.File;
 import java.util.Arrays;
 
