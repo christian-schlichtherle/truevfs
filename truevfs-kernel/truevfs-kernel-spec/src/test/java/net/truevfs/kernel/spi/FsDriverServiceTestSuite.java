@@ -15,7 +15,6 @@ import org.junit.Test;
  * @author Christian Schlichtherle
  */
 public abstract class FsDriverServiceTestSuite extends FsDriverProviderTestSuite {
-
     @Test
     public void testIsLocatable() {
         for (final String extension : new ExtensionSet(getExtensions()))

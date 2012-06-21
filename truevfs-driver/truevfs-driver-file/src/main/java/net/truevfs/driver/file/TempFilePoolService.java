@@ -5,6 +5,7 @@
 package net.truevfs.driver.file;
 
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.cio.IoBuffer;
 import net.truevfs.kernel.cio.IoPool;
 import net.truevfs.kernel.spi.IoPoolService;
 
@@ -17,7 +18,7 @@ import net.truevfs.kernel.spi.IoPoolService;
 public final class TempFilePoolService extends IoPoolService {
 
     @Override
-    public IoPool<?> getIoPool() {
+    public IoPool<? extends IoBuffer<?>> getIoPool() {
         return TempFilePool.INSTANCE;
     }
 

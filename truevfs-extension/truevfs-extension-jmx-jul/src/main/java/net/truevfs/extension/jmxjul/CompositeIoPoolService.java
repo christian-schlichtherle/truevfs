@@ -8,6 +8,7 @@ import javax.annotation.concurrent.Immutable;
 import net.truevfs.driver.file.TempFilePoolService;
 import net.truevfs.extension.jmxjul.jmx.JmxDirector;
 import net.truevfs.extension.jmxjul.jul.JulDirector;
+import net.truevfs.kernel.cio.IoBuffer;
 import net.truevfs.kernel.cio.IoPool;
 import net.truevfs.kernel.spi.IoPoolService;
 
@@ -26,7 +27,7 @@ public final class CompositeIoPoolService extends IoPoolService {
                     (IoPool) service.getIoPool()));
 
     @Override
-    public IoPool<?> getIoPool() {
+    public IoPool<? extends IoBuffer<?>> getIoPool() {
         return pool;
     }
 

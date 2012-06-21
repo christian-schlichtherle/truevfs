@@ -12,6 +12,7 @@ import static java.util.logging.Level.CONFIG;
 import static java.util.logging.Level.WARNING;
 import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.cio.IoBuffer;
 import net.truevfs.kernel.cio.IoPool;
 import net.truevfs.kernel.cio.IoPoolProvider;
 import net.truevfs.kernel.spi.IoPoolService;
@@ -48,7 +49,7 @@ public final class IoPoolLocator implements IoPoolProvider {
     private IoPoolLocator() { }
 
     @Override
-    public IoPool<?> getIoPool() {
+    public IoPool<? extends IoBuffer<?>> getIoPool() {
         return Boot.SERVICE.getIoPool();
     }
 

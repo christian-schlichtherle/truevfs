@@ -4,7 +4,6 @@
  */
 package net.truevfs.access;
 
-import de.schlichtherle.truevfs.kernel.ArchiveManagerService;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -14,6 +13,7 @@ import net.truevfs.kernel.FsArchiveDriver;
 import net.truevfs.kernel.FsArchiveDriverTestBase;
 import net.truevfs.kernel.FsMountPoint;
 import net.truevfs.kernel.FsScheme;
+import net.truevfs.kernel.impl.ArchiveManagerService;
 import net.truevfs.kernel.util.ExtensionSet;
 
 /**
