@@ -19,8 +19,7 @@
 
     <name>TrueVFS Instrumentation Core</name>
     <description>
-        This module provides core functionality for instrumenting TrueVFS at
-        runtime.
+        Provides core functionality for instrumenting TrueVFS at runtime.
     </description>
 
     <dependencies>
