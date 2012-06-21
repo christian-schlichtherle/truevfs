@@ -4,8 +4,6 @@
  */
 package net.truevfs.driver.file;
 
-import net.truevfs.kernel.cio.IoBuffer;
-import net.truevfs.kernel.cio.IoPool;
 import java.io.IOException;
 import static java.nio.file.Files.createTempFile;
 import static java.nio.file.Files.deleteIfExists;
@@ -15,6 +13,8 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
+import net.truevfs.kernel.cio.IoBuffer;
+import net.truevfs.kernel.cio.IoPool;
 
 /**
  * This I/O pool creates and deletes temporary files as {@link FileEntry}s.
@@ -93,5 +93,5 @@ final class TempFilePool implements IoPool<FileEntry> {
                 super.finalize();
             }
         }
-    } // IoBuffer
+    } // FileBuffer
 }
