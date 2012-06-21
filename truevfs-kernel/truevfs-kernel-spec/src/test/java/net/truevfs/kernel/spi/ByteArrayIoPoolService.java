@@ -8,6 +8,7 @@ import net.truevfs.kernel.cio.ByteArrayIoBuffer;
 import net.truevfs.kernel.cio.ByteArrayIoPool;
 import net.truevfs.kernel.cio.IoPool;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.cio.IoBuffer;
 
 /**
  * An immutable locatable container of a {@link ByteArrayIoPool byte array I/O buffer pool}.
@@ -39,7 +40,7 @@ public final class ByteArrayIoPoolService extends IoPoolService {
     }
 
     @Override
-    public IoPool<?> getIoPool() {
+    public IoPool<? extends IoBuffer<?>> getIoPool() {
         return pool;
     }
 }
