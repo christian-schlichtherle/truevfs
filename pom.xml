@@ -460,7 +460,7 @@ system space.
 
     <profiles>
         <profile>
-            <id>main-sources-depend-on-findbugs-annotations</id>
+            <id>main-source-requirements</id>
             <activation>
                 <file>
                     <exists>src/main</exists>
@@ -475,7 +475,29 @@ system space.
             </dependencies>
         </profile>
         <profile>
-            <id>test-sources-depend-on-junit</id>
+            <id>scala-source-requirements</id>
+            <activation>
+                <file>
+                    <exists>src/main/scala</exists>
+                </file>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.scala-lang</groupId>
+                    <artifactId>scala-library</artifactId>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>net.alchim31.maven</groupId>
+                        <artifactId>scala-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>test-source-requirements</id>
             <activation>
                 <file>
                     <exists>src/test</exists>
@@ -485,6 +507,24 @@ system space.
                 <dependency>
                     <groupId>junit</groupId>
                     <artifactId>junit</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>scala-test-source-requirements</id>
+            <activation>
+                <file>
+                    <exists>src/test/scala</exists>
+                </file>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.scalatest</groupId>
+                    <artifactId>scalatest_${scala.version}</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.scalacheck</groupId>
+                    <artifactId>scalacheck_${scala.version}</artifactId>
                 </dependency>
             </dependencies>
         </profile>
