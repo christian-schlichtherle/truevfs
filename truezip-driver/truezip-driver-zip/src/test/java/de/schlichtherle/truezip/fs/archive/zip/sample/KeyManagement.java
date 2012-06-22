@@ -10,8 +10,8 @@ import de.schlichtherle.truezip.file.TConfig;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsDriverProvider;
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.archive.zip.JarDriver;
 import de.schlichtherle.truezip.fs.archive.zip.PromptingKeyManagerService;
+import de.schlichtherle.truezip.fs.archive.zip.ZipDriver;
 import de.schlichtherle.truezip.fs.archive.zip.ZipDriverEntry;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.PromptingKeyProvider;
@@ -71,13 +71,13 @@ public final class KeyManagement {
             String suffixes,
             byte[] password) {
         return new TArchiveDetector(delegate,
-                suffixes, new CustomJarDriver1(password));
+                suffixes, new CustomZipDriver1(password));
     }
     
-    private static final class CustomJarDriver1 extends JarDriver {
+    private static final class CustomZipDriver1 extends ZipDriver {
         final ZipCryptoParameters param;
         
-        CustomJarDriver1(byte[] password) {
+        CustomZipDriver1(byte[] password) {
             super(IOPoolLocator.SINGLETON);
             param = new CustomWinZipAesParameters(password);
         }
@@ -125,7 +125,7 @@ public final class KeyManagement {
             // This is the default implementation - try to see the difference.
             //return input.isEncrypted() || output.isEncrypted();
         }
-    } // CustomJarDriver1
+    } // CustomZipDriver1
     
     private static final class CustomWinZipAesParameters
     implements WinZipAesParameters {
@@ -190,13 +190,13 @@ public final class KeyManagement {
             String suffixes,
             char[] password) {
         return new TArchiveDetector(delegate,
-                    suffixes, new CustomJarDriver2(password));
+                    suffixes, new CustomZipDriver2(password));
     }
     
-    private static final class CustomJarDriver2 extends JarDriver {
+    private static final class CustomZipDriver2 extends ZipDriver {
         final KeyManagerProvider provider;
         
-        CustomJarDriver2(char[] password) {
+        CustomZipDriver2(char[] password) {
             super(IOPoolLocator.SINGLETON);
             this.provider = new PromptingKeyManagerService(
                     new CustomView(password));
@@ -206,7 +206,7 @@ public final class KeyManagement {
         protected KeyManagerProvider getKeyManagerProvider() {
             return provider;
         }
-    } // CustomJarDriver2
+    } // CustomZipDriver2
     
     private static final class CustomView
     implements PromptingKeyProvider.View<AesPbeParameters> {
