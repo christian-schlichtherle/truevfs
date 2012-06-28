@@ -5,7 +5,7 @@
 package de.schlichtherle.truevfs.key.swing;
 
 import java.awt.Component;
-import java.awt.EventQueue;
+import static java.awt.EventQueue.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import javax.swing.JFrame;
@@ -48,7 +48,7 @@ public class JemmyUtils {
         // copied.
         // Therefore, the JUnit annotation is currently commented out.
         try {
-            EventQueue.invokeAndWait(new Runnable() {
+            invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     JemmyProperties.push();
@@ -67,7 +67,7 @@ public class JemmyUtils {
         // copied.
         // Therefore, the JUnit annotation is currently commented out.
         try {
-            EventQueue.invokeAndWait(new Runnable() {
+            invokeAndWait(new Runnable() {
                 @Override
                 public void run() {
                     JemmyProperties.pop();
@@ -93,6 +93,7 @@ public class JemmyUtils {
      *
      * @param  component the component to display in the new frame.
      * @return An operator for the new frame which shows the given component.
+     * @throws InterruptedException if the current thread is interrupted while 
      */
     public static JFrameOperator showFrameWith(final Component component)
     throws InterruptedException {
@@ -116,20 +117,17 @@ public class JemmyUtils {
     }
 
     public static void runOnEdt(final Runnable task) {
-        if (EventQueue.isDispatchThread()) {
-            task.run();
-        } else {
-            EventQueue.invokeLater(task);
-        }
+        if (isDispatchThread()) task.run();
+        else invokeLater(task);
     }
 
     public static void runOnEdtNow(final Runnable task)
     throws InterruptedException {
-        if (EventQueue.isDispatchThread()) {
+        if (isDispatchThread()) {
             task.run();
         } else {
             try {
-                EventQueue.invokeAndWait(task);
+                invokeAndWait(task);
             } catch (InvocationTargetException ex) {
                 throw new UndeclaredThrowableException(ex);
             }
@@ -197,7 +195,7 @@ public class JemmyUtils {
     implements TextDriver {
         final TextDriver driver = new SwingTextKeyboardDriver();
 
-        public AtomicTextDriver() {
+        AtomicTextDriver() {
             super(new String[] { JTextComponentOperator.class.getName() });
         }
 
