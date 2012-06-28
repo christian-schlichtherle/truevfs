@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truevfs.key.pbe.swing;
 
-import de.schlichtherle.truevfs.key.pbe.swing.AuthenticationPanel;
 import de.schlichtherle.truevfs.key.swing.JemmyUtils;
 import java.io.File;
 import javax.swing.JLabel;
