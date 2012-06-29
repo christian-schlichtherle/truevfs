@@ -4,15 +4,6 @@
  */
 package de.schlichtherle.truevfs.key.swing;
 
-import de.schlichtherle.truevfs.key.swing.EnhancedPanel;
-import de.schlichtherle.truevfs.key.swing.EnhancedPanel;
-import de.schlichtherle.truevfs.key.swing.EnhancedPanel;
-import de.schlichtherle.truevfs.key.swing.PanelEvent;
-import de.schlichtherle.truevfs.key.swing.PanelEvent;
-import de.schlichtherle.truevfs.key.swing.PanelEvent;
-import de.schlichtherle.truevfs.key.swing.PanelListener;
-import de.schlichtherle.truevfs.key.swing.PanelListener;
-import de.schlichtherle.truevfs.key.swing.PanelListener;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.util.EventListener;
