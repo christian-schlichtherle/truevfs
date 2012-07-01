@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.kernel.spec.io;
+package net.truevfs.kernel.spec.cio;
 
 import java.io.FileNotFoundException;
 import javax.annotation.CheckForNull;
@@ -18,14 +18,14 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class FileBusyException extends FileNotFoundException {
+public class BusyException extends FileNotFoundException {
     private static final long serialVersionUID = 2056108562576389242L;
 
-    public FileBusyException(@CheckForNull String message) {
+    public BusyException(@CheckForNull String message) {
         super(message);
     }
 
-    public FileBusyException(@CheckForNull Throwable cause) {
+    public BusyException(@CheckForNull Throwable cause) {
         super(null == cause ? null : cause.toString());
         super.initCause(cause);
     }
