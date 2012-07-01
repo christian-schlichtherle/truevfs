@@ -9,7 +9,7 @@ import net.truevfs.kernel.spec.cio.IoPool;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class TarBZip2PathIT extends TarPathITSuite<TarBZip2Driver> {
 
