@@ -4,9 +4,9 @@
  */
 package net.truevfs.kernel.spec.spi;
 
-import net.truevfs.kernel.spec.sl.FsDriverLocator;
 import net.truevfs.kernel.spec.FsDriverProviderTestSuite;
 import net.truevfs.kernel.spec.FsScheme;
+import net.truevfs.kernel.spec.sl.FsDriverLocator;
 import net.truevfs.kernel.spec.util.ExtensionSet;
 import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
