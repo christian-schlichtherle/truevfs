@@ -4,8 +4,8 @@
  */
 package net.truevfs.driver.tar.it;
 
-import net.truevfs.kernel.spec.FsArchiveDriver;
 import net.truevfs.access.TPathITSuite;
+import net.truevfs.kernel.spec.FsArchiveDriver;
 
 /**
  * @param   <D> The type of the archive driver.
@@ -18,6 +18,7 @@ extends TPathITSuite<D> {
      * Skipped because appending to TAR files is not supported.
      */
     @Override
+    @SuppressWarnings("NoopMethodInAbstractClass")
     public final void testGrowing() {
     }
 }
