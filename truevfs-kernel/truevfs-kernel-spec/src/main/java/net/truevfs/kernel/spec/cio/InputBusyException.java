@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.kernel.spec.io;
+package net.truevfs.kernel.spec.cio;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
@@ -18,7 +18,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class InputBusyException extends FileBusyException {
+public class InputBusyException extends BusyException {
     private static final long serialVersionUID = 1983745618753823654L;
 
     public InputBusyException(@CheckForNull String message) {
