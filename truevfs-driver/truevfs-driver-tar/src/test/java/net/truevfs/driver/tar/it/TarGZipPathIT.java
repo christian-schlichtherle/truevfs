@@ -8,7 +8,7 @@ import net.truevfs.driver.tar.TarGZipDriver;
 import net.truevfs.kernel.spec.cio.IoPool;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class TarGZipPathIT extends TarPathITSuite<TarGZipDriver> {
 
