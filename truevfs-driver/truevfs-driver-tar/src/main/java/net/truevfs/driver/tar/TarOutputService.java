@@ -110,8 +110,7 @@ implements OutputService<TarDriverEntry> {
             @Override
             public OutputStream stream(final InputSocket<? extends Entry> peer)
             throws IOException {
-                if (isBusy())
-                    throw new OutputBusyException(local.getName());
+                if (isBusy()) throw new OutputBusyException(local.getName());
                 if (local.isDirectory()) {
                     updateProperties(local, DirectoryTemplate.INSTANCE);
                     return new EntryOutputStream(local);
