@@ -19,8 +19,8 @@ import javax.annotation.concurrent.Immutable;
 final class JmxManager extends InstrumentingManager {
 
     @SuppressWarnings("LeakingThisInConstructor")
-    JmxManager(FsManager model, JmxDirector director) {
-        super(model, director);
+    JmxManager(FsManager manager, JmxDirector director) {
+        super(manager, director);
         assert null != director;
         director.setApplicationIOStatistics(new JmxIOStatistics());
         director.setKernelIOStatistics(new JmxIOStatistics());
