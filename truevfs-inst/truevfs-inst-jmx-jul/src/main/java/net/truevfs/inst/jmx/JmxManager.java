@@ -19,8 +19,8 @@ import net.truevfs.kernel.spec.util.BitField;
 final class JmxManager extends InstrumentingManager {
 
     @SuppressWarnings("LeakingThisInConstructor")
-    JmxManager(JmxDirector director, FsManager model) {
-        super(director, model);
+    JmxManager(JmxDirector director, FsManager manager) {
+        super(director, manager);
         assert null != director;
         director.setApplicationIOStatistics(new JmxIoStatistics());
         director.setKernelIOStatistics(new JmxIoStatistics());
