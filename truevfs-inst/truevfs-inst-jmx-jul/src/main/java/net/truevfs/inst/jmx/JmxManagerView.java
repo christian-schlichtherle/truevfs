@@ -18,7 +18,7 @@ import net.truevfs.kernel.spec.util.BitField;
 /**
  * The MXBean implementation for a {@link FsManager file system manager}.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 final class JmxManagerView
 extends StandardMBean
@@ -100,16 +100,22 @@ implements JmxManagerViewMXBean {
     @Override
     protected String getDescription(MBeanAttributeInfo info) {
         String description = null;
-        if (info.getName().equals("FederatedFileSystems")) {
+        switch (info.getName()) {
+        case "FederatedFileSystems":
             description = "The federated file systems managed by this instance.";
-        } else if (info.getName().equals("FileSystemsTotal")) {
+            break;
+        case "FileSystemsTotal":
             description = "The total number of managed federated file systems.";
-        } else if (info.getName().equals("FileSystemsTouched")) {
+            break;
+        case "FileSystemsTouched":
             description = "The number of managed federated file systems which have been touched and need unmounting.";
-        } else if (info.getName().equals("TopLevelFileSystemsTotal")) {
+            break;
+        case "TopLevelFileSystemsTotal":
             description = "The total number of managed top level federated file systems.";
-        } else if (info.getName().equals("TopLevelFileSystemsTouched")) {
+            break;
+        case "TopLevelFileSystemsTouched":
             description = "The number of managed top level federated file systems which have been touched and need unmounting.";
+            break;
         }
         return description;
     }
@@ -139,10 +145,13 @@ implements JmxManagerViewMXBean {
     @Override
     protected String getDescription(MBeanOperationInfo info) {
         String description = null;
-        if (info.getName().equals("clearStatistics")) {
+        switch (info.getName()) {
+        case "sync":
+            description = "Synchronizes all managed federated file systems. If any file system is busy with I/O, an FsSyncException is thrown.";
+            break;
+        case "clearStatistics":
             description = "Clears all but the last I/O statistics.";
-        } else if (info.getName().equals("umount")) {
-            description = "Unmounts all managed federated file systems. If any file system is busy with I/O, an FsSyncException is thrown.";
+            break;
         }
         return description;
     }
@@ -150,7 +159,7 @@ implements JmxManagerViewMXBean {
     @Override
     public JmxModelViewMXBean[] getFederatedFileSystems() {
         int size = model.size();
-        List<JmxModelViewMXBean> list = new ArrayList<JmxModelViewMXBean>(size);
+        List<JmxModelViewMXBean> list = new ArrayList<>(size);
         for (FsController<?> controller : model)
             list.add(JmxModelView.register(controller.getModel()));
         return list.toArray(new JmxModelViewMXBean[size]);
@@ -191,7 +200,7 @@ implements JmxManagerViewMXBean {
     }
 
     @Override
-    public void umount() throws FsSyncException {
+    public void sync() throws FsSyncException {
         model.sync(SYNC_OPTIONS);
     }
 
