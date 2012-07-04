@@ -10,7 +10,7 @@ import net.truevfs.kernel.spec.FsSyncException;
 /**
  * The MXBean interface for a {@link FsManager file system manager}.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public interface JmxManagerViewMXBean {
 
@@ -49,12 +49,15 @@ public interface JmxManagerViewMXBean {
     int getTopLevelFileSystemsTouched();
 
     /**
-     * Unmounts all managed federated file systems.
+     * Synchronizes all managed federated file systems.
      * 
      * @throws FsSyncException If any managed federated file system is busy
      *         with I/O.
      */
-    void umount() throws FsSyncException;
+    void sync() throws FsSyncException;
     
+    /**
+     * Clears all but the last I/O statistics.
+     */
     void clearStatistics();
 }
