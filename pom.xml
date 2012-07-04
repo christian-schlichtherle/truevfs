@@ -323,6 +323,7 @@ system space.
                             <link>http://commons.apache.org/compress/apidocs/</link>
                             <link>http://findbugs.sourceforge.net/api/</link>
                         </links>
+                        <show>private</show>
                     </configuration>
                 </plugin>
                 <plugin>
