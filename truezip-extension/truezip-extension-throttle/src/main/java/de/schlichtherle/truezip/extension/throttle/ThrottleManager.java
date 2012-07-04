@@ -115,12 +115,12 @@ final class ThrottleManager extends FsDecoratingManager<FsManager> {
 
     /**
      * If the number of mounted archive files exceeds {@link #getMaxMounts()},
-     * then this method unmounts the least recently used (LRU) archive files
+     * then this method syncs the least recently used (LRU) archive files
      * which exceed this value.
      * 
      * @throws FsSyncException 
      */
-    void umountLru() throws FsSyncException {
+    void syncLru() throws FsSyncException {
         iterating: for (final Iterator<ThrottleController> i = lru.iterator(); i.hasNext(); ) {
             final ThrottleController c = i.next();
             final FsMountPoint mp = c.getMountPoint();
@@ -136,8 +136,8 @@ final class ThrottleManager extends FsDecoratingManager<FsManager> {
                 }
             }
             i.remove(); // even if subsequent umount fails
-            logger.log(Level.FINE, "umountLru", mp);
-            fm.sync(FsSyncOptions.UMOUNT);
+            logger.log(Level.FINE, "syncLru", mp);
+            fm.sync(FsSyncOptions.SYNC);
         }
     }
 
