@@ -8,15 +8,15 @@ import de.schlichtherle.truezip.fs.*;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 public class InstrumentingManager
 extends FsDecoratingManager<FsManager> {
 
-    protected final InstrumentingDirector director;
+    protected final InstrumentingDirector<?> director;
 
-    public InstrumentingManager(final FsManager manager, final InstrumentingDirector director) {
+    public InstrumentingManager(final FsManager manager, final InstrumentingDirector<?> director) {
         super(manager);
         if (null == director)
             throw new NullPointerException();
