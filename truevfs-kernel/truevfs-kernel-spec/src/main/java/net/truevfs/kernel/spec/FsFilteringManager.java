@@ -4,11 +4,11 @@
  */
 package net.truevfs.kernel.spec;
 
-import static net.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
-import net.truevfs.kernel.spec.util.FilteringIterator;
 import java.net.URI;
 import java.util.Iterator;
 import javax.annotation.concurrent.ThreadSafe;
+import static net.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
+import net.truevfs.kernel.spec.util.FilteringIterator;
 
 /**
  * Filters the list of federated file systems managed by the decorated file
