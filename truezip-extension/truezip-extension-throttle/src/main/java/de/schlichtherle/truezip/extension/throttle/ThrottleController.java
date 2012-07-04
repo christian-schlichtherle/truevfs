@@ -26,7 +26,7 @@ import javax.swing.Icon;
 /**
  * Calls back the given {@link ThrottleManager} before each file system
  * operation in order to register itself as the most recently used archive file
- * system and unmount the least recently used archive file systems which exceed
+ * system and syncs the least recently used archive file systems which exceed
  * {@link ThrottleManager#getMaxMounts()} before proceeding with the file
  * system operation.
  * 
@@ -47,67 +47,67 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         this.manager = manager;
     }
 
-    void accessMruAndUmountLru() throws FsSyncException {
-        manager.accessMru(this).umountLru();
+    void accessMruAndSyncLru() throws FsSyncException {
+        manager.accessMru(this).syncLru();
     }
 
     @Override
     public Icon getOpenIcon() throws IOException {
-        accessMruAndUmountLru();
+        accessMruAndSyncLru();
         return delegate.getOpenIcon();
     }
 
     @Override
     public Icon getClosedIcon() throws IOException {
-        accessMruAndUmountLru();
+        accessMruAndSyncLru();
         return delegate.getClosedIcon();
     }
 
     @Override
     public boolean isReadOnly() throws IOException {
-        accessMruAndUmountLru();
+        accessMruAndSyncLru();
         return delegate.isReadOnly();
     }
 
     @Override
     public FsEntry getEntry(FsEntryName name) throws IOException {
-        accessMruAndUmountLru();
+        accessMruAndSyncLru();
         return delegate.getEntry(name);
     }
 
     @Override
     public boolean isReadable(FsEntryName name) throws IOException {
-        accessMruAndUmountLru();
+        accessMruAndSyncLru();
         return delegate.isReadable(name);
     }
 
     @Override
     public boolean isWritable(FsEntryName name) throws IOException {
-        accessMruAndUmountLru();
+        accessMruAndSyncLru();
         return delegate.isWritable(name);
     }
 
     @Override
     public boolean isExecutable(FsEntryName name) throws IOException {
-        accessMruAndUmountLru();
+        accessMruAndSyncLru();
         return delegate.isExecutable(name);
     }
 
     @Override
     public void setReadOnly(FsEntryName name) throws IOException {
-        accessMruAndUmountLru();
+        accessMruAndSyncLru();
         delegate.setReadOnly(name);
     }
 
     @Override
     public boolean setTime(FsEntryName name, Map<Access, Long> times, BitField<FsOutputOption> options) throws IOException {
-        accessMruAndUmountLru();
+        accessMruAndSyncLru();
         return delegate.setTime(name, times, options);
     }
 
     @Override
     public boolean setTime(FsEntryName name, BitField<Access> types, long value, BitField<FsOutputOption> options) throws IOException {
-        accessMruAndUmountLru();
+        accessMruAndSyncLru();
         return delegate.setTime(name, types, value, options);
     }
 
@@ -121,25 +121,25 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
             @Override
             public Entry getLocalTarget() throws IOException {
-                accessMruAndUmountLru();
+                accessMruAndSyncLru();
                 return getBoundSocket().getLocalTarget();
             }
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                accessMruAndUmountLru();
+                accessMruAndSyncLru();
                 return getBoundSocket().newReadOnlyFile();
             }
 
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
-                accessMruAndUmountLru();
+                accessMruAndSyncLru();
                 return getBoundSocket().newSeekableByteChannel();
             }
 
             @Override
             public InputStream newInputStream() throws IOException {
-                accessMruAndUmountLru();
+                accessMruAndSyncLru();
                 return getBoundSocket().newInputStream();
             }
         } // Input
@@ -157,19 +157,19 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
             @Override
             public Entry getLocalTarget() throws IOException {
-                accessMruAndUmountLru();
+                accessMruAndSyncLru();
                 return getBoundSocket().getLocalTarget();
             }
 
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
-                accessMruAndUmountLru();
+                accessMruAndSyncLru();
                 return getBoundSocket().newSeekableByteChannel();
             }
 
             @Override
             public OutputStream newOutputStream() throws IOException {
-                accessMruAndUmountLru();
+                accessMruAndSyncLru();
                 return getBoundSocket().newOutputStream();
             }
         } // Output
@@ -178,13 +178,13 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     @Override
     public void mknod(FsEntryName name, Type type, BitField<FsOutputOption> options, Entry template) throws IOException {
-        accessMruAndUmountLru();
+        accessMruAndSyncLru();
         delegate.mknod(name, type, options, template);
     }
 
     @Override
     public void unlink(FsEntryName name, BitField<FsOutputOption> options) throws IOException {
-        accessMruAndUmountLru();
+        accessMruAndSyncLru();
         delegate.unlink(name, options);
     }
 }
