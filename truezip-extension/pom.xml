@@ -20,6 +20,7 @@
 
     <modules>
         <module>truezip-extension-jmx-jul</module>
+        <module>truezip-extension-throttle</module>
     </modules>
 
     <dependencies>
