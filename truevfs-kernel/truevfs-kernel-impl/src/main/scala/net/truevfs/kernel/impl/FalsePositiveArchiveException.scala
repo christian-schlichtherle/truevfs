@@ -6,6 +6,7 @@ package net.truevfs.kernel.impl
 
 import java.io._
 import javax.annotation.concurrent._
+import net.truevfs.kernel.spec.util._
 
 /** Indicates that a file system is a false positive file system.
   * 

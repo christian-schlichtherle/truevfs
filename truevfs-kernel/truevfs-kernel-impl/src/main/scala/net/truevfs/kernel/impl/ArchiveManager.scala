@@ -4,6 +4,8 @@
  */
 package net.truevfs.kernel.impl
 
+import java.util.concurrent.locks._
+import java.util.concurrent.locks.ReentrantReadWriteLock._
 import java.util.logging._
 import javax.annotation.concurrent._
 import net.truevfs.kernel.spec._
@@ -18,8 +20,13 @@ import scala.collection.mutable.WeakHashMap
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private final class ArchiveManager(optionalScheduleType: Type)
-extends FsManager {
+private final class ArchiveManager(
+  optionalScheduleType: Type,
+  lock: ReentrantReadWriteLock = new ReentrantReadWriteLock
+) extends FsManager {
+
+  def this() = this(WEAK)
+
   import ArchiveManager._
 
   ArchiveManager // init companion object
@@ -32,10 +39,17 @@ extends FsManager {
   private[this] val controllers =
     new WeakHashMap[FsMountPoint, Link[FsController[_ <: FsModel]]]
 
-  def this() = this(WEAK)
+  private[this] val readLock = lock.readLock
+  private[this] val writeLock = lock.writeLock
 
-  override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint) =
-    synchronized { controller0(driver, mountPoint) }
+  override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint) = {
+    writeLock.lock()
+    try {
+      controller0(driver, mountPoint)
+    } finally {
+      writeLock.unlock()
+    }
+  }
 
   private def controller0(driver: FsCompositeDriver, mountPoint: FsMountPoint): FsController[_ <: FsModel] = {
     if (null eq mountPoint.getParent) {
@@ -95,7 +109,12 @@ extends FsManager {
       val mountPoint = getMountPoint
       val link: Link[FsController[_ <: FsModel]] =
         (if (mandatory) STRONG else optionalScheduleType) newLink _controller
-      ArchiveManager.this synchronized { controllers put (mountPoint, link) }
+      writeLock.lock()
+      try {
+        controllers put (mountPoint, link)
+      } finally {
+        writeLock.unlock()
+      }
     }
   } // ScheduledModel
 
@@ -112,16 +131,28 @@ extends FsManager {
             new BackController(driver, new LockModel(model), parent), parent)))
   }
 
-  override def size = synchronized { controllers size }
+  override def size = {
+    readLock.lock()
+    try {
+      controllers size
+    } finally {
+      readLock.unlock()
+    }
+  }
 
-  override def iterator = synchronized {
+  override def iterator = {
     import collection.JavaConverters._
     sortedControllers.iterator.asJava
   }
 
   private def sortedControllers = {
-    controllers.values.map(target(_)).filter(null ne _).toIndexedSeq
-    .sorted(ReverseControllerOrdering)
+    readLock.lock()
+    try {
+      controllers.values.map(target(_)).filter(null ne _).toIndexedSeq
+      .sorted(ReverseControllerOrdering)
+    } finally {
+      readLock.unlock()
+    }
   }
 
   override def sync(options: SyncOptions) {

@@ -5,6 +5,7 @@
 package net.truevfs.kernel.impl
 
 import javax.annotation.concurrent._
+import net.truevfs.kernel.spec.util._
 
 /** Indicates that all file system locks need to get released before the
   * operation can get retried.
@@ -21,5 +22,5 @@ private object NeedsLockRetryException {
 
   private[this] val instance = new NeedsLockRetryException
 
-  def apply() = if (traceable) new NeedsLockRetryException else instance
+  def apply() = if (isTraceable) new NeedsLockRetryException else instance
 }
