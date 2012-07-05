@@ -194,7 +194,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
 
         @Override
         public boolean isOpen() {
-            return !isClosed() && delegate.isOpen();
+            return !isClosed();
         }
 
         @Override
