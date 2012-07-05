@@ -167,7 +167,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
         @Override
         public boolean isOpen() {
-            return !isClosed() && delegate.isOpen();
+            return !isClosed();
         }
 
         @Override
