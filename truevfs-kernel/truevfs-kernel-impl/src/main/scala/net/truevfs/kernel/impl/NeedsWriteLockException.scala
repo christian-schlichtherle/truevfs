@@ -5,6 +5,7 @@
 package net.truevfs.kernel.impl
 
 import javax.annotation.concurrent._
+import net.truevfs.kernel.spec.util._
 
 /** Indicates that the file system needs to get write locked before the
   * operation can get retried.
@@ -21,5 +22,5 @@ private object NeedsWriteLockException {
 
   private[this] val instance = new NeedsWriteLockException
 
-  def apply() = if (traceable) new NeedsWriteLockException else instance
+  def apply() = if (isTraceable) new NeedsWriteLockException else instance
 }
