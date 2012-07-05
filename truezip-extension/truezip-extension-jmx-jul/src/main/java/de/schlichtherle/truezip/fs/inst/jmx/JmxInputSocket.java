@@ -13,7 +13,7 @@ import java.io.InputStream;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 class JmxInputSocket<E extends Entry>
