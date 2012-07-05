@@ -13,7 +13,7 @@ import javax.annotation.concurrent.Immutable;
  * the file system driver map returned by {@link #get()} to lookup the
  * appropriate driver for the scheme of any given mount point.
  * 
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 public abstract class FsAbstractCompositeDriver
