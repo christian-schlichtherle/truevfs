@@ -23,7 +23,7 @@ import javax.annotation.concurrent.Immutable;
 public final class JulDirector extends InstrumentingDirector<JulDirector> {
     public static final JulDirector SINGLETON = new JulDirector();
 
-    private static final SocketFactory FACTORY = JSE7.AVAILABLE
+    private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
             ? SocketFactory.NIO
             : SocketFactory.OIO;
 
@@ -46,12 +46,12 @@ public final class JulDirector extends InstrumentingDirector<JulDirector> {
 
     @Override
     protected <E extends Entry> InputSocket<E> instrument(InputSocket<E> input) {
-        return FACTORY.newInputSocket(input, this);
+        return SOCKET_FACTORY.newInputSocket(input, this);
     }
 
     @Override
     protected <E extends Entry> OutputSocket<E> instrument(OutputSocket<E> output) {
-        return FACTORY.newOutputSocket(output, this);
+        return SOCKET_FACTORY.newOutputSocket(output, this);
     }
 
     private enum SocketFactory {
