@@ -139,7 +139,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
         @Override
         public boolean isOpen() {
-            return DisconnectingOutputService.this.isOpen() && channel.isOpen();
+            return DisconnectingOutputService.this.isOpen();
         }
 
         @Override

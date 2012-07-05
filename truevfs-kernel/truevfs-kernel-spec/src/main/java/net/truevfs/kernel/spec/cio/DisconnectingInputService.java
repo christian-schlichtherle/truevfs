@@ -139,7 +139,7 @@ extends DecoratingInputService<E, InputService<E>> {
 
         @Override
         public boolean isOpen() {
-            return DisconnectingInputService.this.isOpen() && channel.isOpen();
+            return DisconnectingInputService.this.isOpen();
         }
 
         @Override
