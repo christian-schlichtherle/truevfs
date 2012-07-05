@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.extension.throttle;
+package de.schlichtherle.truezip.ext.throttle;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
@@ -27,7 +27,7 @@ import javax.swing.Icon;
  * Calls back the given {@link ThrottleManager} before each file system
  * operation in order to register itself as the most recently used archive file
  * system and syncs the least recently used archive file systems which exceed
- * {@link ThrottleManager#getMaxMounts()} before proceeding with the file
+ * {@link ThrottleManager#getMaximumOfMostRecentlyUsedArchiveFiles()} before proceeding with the file
  * system operation.
  * 
  * @author Christian Schlichtherle

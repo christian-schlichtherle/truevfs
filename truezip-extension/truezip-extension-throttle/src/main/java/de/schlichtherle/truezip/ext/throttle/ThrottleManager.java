@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.extension.throttle;
+package de.schlichtherle.truezip.ext.throttle;
 
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.util.BitField;
@@ -19,23 +19,12 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class ThrottleManager extends FsDecoratingManager<FsManager> {
+final class ThrottleManager
+extends FsDecoratingManager<FsManager> implements ThrottleManagerMXBean {
 
     private static final Logger
             logger = Logger.getLogger(  ThrottleManager.class.getName(),
                                         ThrottleManager.class.getName());
-
-    /**
-     * The minimum value for the maximum number of mounted archive file systems,
-     * which is {@value}.
-     */
-    public static final int MIN_MAX_MOUNTS = 2;
-
-    /**
-     * The default value for the maximum number of mounted archive file systems,
-     * which is {@value}.
-     */
-    public static final int DEFAULT_MAX_MOUNTS = MIN_MAX_MOUNTS;
 
     private volatile int maxMounts;
 
@@ -47,9 +36,9 @@ final class ThrottleManager extends FsDecoratingManager<FsManager> {
 
     ThrottleManager(FsManager manager) {
         super(manager);
-        setMaxMounts(Integer.parseInt(System.getProperty(
+        setMaximumOfMostRecentlyUsedArchiveFiles(Integer.parseInt(System.getProperty(
                 ThrottleManager.class.getName() + ".maxMounts",
-                Integer.toString(DEFAULT_MAX_MOUNTS))));
+                Integer.toString(DEFAULT_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES))));
         // Requires initialized maxMounts!
         mru = Collections.synchronizedMap(new MruControllerMap());
     }
@@ -65,36 +54,29 @@ final class ThrottleManager extends FsDecoratingManager<FsManager> {
                 : controller;
     }
 
-    /**
-     * Returns the maximum number of archive files which may be mounted at any
-     * time.
-     * The mimimum value is one.
-     * 
-     * @return The maximum number of archive files which may be mounted at any
-     *         time.
-     */
-    public int getMaxMounts() {
+    @Override
+    public int getNumberOfManagedArchiveFiles() {
+        return delegate.getSize();
+    }
+
+    @Override
+    public int getMaximumOfMostRecentlyUsedArchiveFiles() {
         return maxMounts;
     }
 
-    /**
-     * Sets the maximum number of archive files which may be mounted at any
-     * time.
-     * 
-     * @param  maxMounts the maximum number of mounted archive files.
-     * @throws IllegalArgumentException if {@code maxMounts} is less than
-     *         {@link #MIN_MAX_MOUNTS}.
-     */
-    public void setMaxMounts(final int maxMounts) {
-        if (maxMounts < MIN_MAX_MOUNTS) throw new IllegalArgumentException();
-        this.maxMounts = maxMounts;
+    @Override
+    public void setMaximumOfMostRecentlyUsedArchiveFiles(final int max) {
+        if (max < MINIMUM_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES) throw new IllegalArgumentException();
+        this.maxMounts = max;
     }
 
-    public int getMruSize() {
+    @Override
+    public int getNumberOfMostRecentlyUsedArchiveFiles() {
         return mru.size();
     }
 
-    public int getLruSize() {
+    @Override
+    public int getNumberOfLeastRecentlyUsedArchiveFiles() {
         return lru.size();
     }
 
@@ -114,7 +96,7 @@ final class ThrottleManager extends FsDecoratingManager<FsManager> {
     }
 
     /**
-     * If the number of mounted archive files exceeds {@link #getMaxMounts()},
+     * If the number of mounted archive files exceeds {@link #getMaximumOfMostRecentlyUsedArchiveFiles()},
      * then this method syncs the least recently used (LRU) archive files
      * which exceed this value.
      * 
@@ -142,15 +124,29 @@ final class ThrottleManager extends FsDecoratingManager<FsManager> {
     }
 
     @Override
+    public void sync() throws FsSyncException {
+        sync(SYNC_OPTIONS);
+    }
+
+    @Override
     public <X extends IOException> void sync(
             final BitField<FsSyncOption> options,
             final ExceptionHandler<? super IOException, X> handler)
     throws X {
-        logger.log(Level.FINER, "clearMruSize", getMruSize());
-        mru.clear();
-        logger.log(Level.FINER, "clearLruSize", getLruSize());
+        logger.log(Level.FINER, "clearLruSize", getNumberOfLeastRecentlyUsedArchiveFiles());
         lru.clear();
-        delegate.sync(options, handler);
+        logger.log(Level.FINER, "clearMruSize", getNumberOfMostRecentlyUsedArchiveFiles());
+        mru.clear();
+        try {
+            delegate.sync(options, handler);
+        } catch (final IOException ex) {
+            // Rebuild the MRU cache and pass on the exception.
+            for (final FsController<?> c : delegate) {
+                final FsMountPoint mp = c.getModel().getMountPoint();
+                mru.put(mp, new ThrottleController(this, c));
+            }
+            throw (X) ex;
+        }
     }
 
     @SuppressWarnings("serial")
@@ -158,13 +154,13 @@ final class ThrottleManager extends FsDecoratingManager<FsManager> {
     extends LinkedHashMap<FsMountPoint, ThrottleController> {
 
         MruControllerMap() {
-            super(HashMaps.initialCapacity(getMaxMounts() + 1), 0.75f, true);
+            super(HashMaps.initialCapacity(getMaximumOfMostRecentlyUsedArchiveFiles() + 1), 0.75f, true);
         }
 
         @Override
         public boolean removeEldestEntry(
                 final Map.Entry<FsMountPoint, ThrottleController> entry) {
-            final boolean evict = size() > getMaxMounts();
+            final boolean evict = size() > getMaximumOfMostRecentlyUsedArchiveFiles();
             if (evict) {
                 final ThrottleController c = entry.getValue();
                 final boolean added = lru.add(c);
