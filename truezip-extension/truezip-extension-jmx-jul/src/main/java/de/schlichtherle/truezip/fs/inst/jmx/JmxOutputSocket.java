@@ -12,7 +12,7 @@ import java.io.OutputStream;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 class JmxOutputSocket<E extends Entry>
