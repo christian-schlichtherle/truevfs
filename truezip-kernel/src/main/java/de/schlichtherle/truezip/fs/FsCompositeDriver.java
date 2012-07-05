@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
  * order to lookup the appropriate file system driver which is then used to
  * create the requested thread-safe file system controller.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public interface FsCompositeDriver {
 
