@@ -23,9 +23,9 @@ public final class FsSyncOptions {
     /**
      * A bit field with no synchronization options set.
      * 
-     * @since TrueZIP 7.5
+     * @since TrueZIP 7.5 (public since TrueZIP 7.6)
      */
-    static final BitField<FsSyncOption>
+    public static final BitField<FsSyncOption>
             NONE = BitField.noneOf(FsSyncOption.class);
 
     /**
