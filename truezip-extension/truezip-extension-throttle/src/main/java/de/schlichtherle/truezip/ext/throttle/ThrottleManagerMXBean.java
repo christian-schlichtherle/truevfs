@@ -5,8 +5,6 @@
 package de.schlichtherle.truezip.ext.throttle;
 
 import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncOption;
-import de.schlichtherle.truezip.util.BitField;
 
 /**
  * @author Christian Schlichtherle
@@ -54,11 +52,6 @@ public interface ThrottleManagerMXBean {
                     Integer.toString(MINIMUM_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES))));
 
     /**
-     * The options which will be used by {@link #sync()}.
-     */
-    BitField<FsSyncOption> SYNC_OPTIONS = BitField.of(FsSyncOption.CLEAR_CACHE);
-
-    /**
      * Returns the number of managed archive files.
      * 
      * @return The number of managed archive files.
@@ -82,11 +75,11 @@ public interface ThrottleManagerMXBean {
      * Changing this property will show effect upon the next access to an
      * archive file.
      *
-     * @param  maxUsed the maximum number of mounted archive files.
+     * @param  maxMounts the maximum number of mounted archive files.
      * @throws IllegalArgumentException if {@code maxMounts} is less than
      *         {@link #MINIMUM_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES}.
      */
-    void setMaximumOfMostRecentlyUsedArchiveFiles(int maxUsed);
+    void setMaximumOfMostRecentlyUsedArchiveFiles(int maxMounts);
 
     /**
      * Returns the number of most recently used archive files.

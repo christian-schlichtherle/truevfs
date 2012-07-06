@@ -7,9 +7,7 @@ package de.schlichtherle.truezip.fs.inst.jmx;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsSyncException;
-import de.schlichtherle.truezip.fs.FsSyncOption;
-import static de.schlichtherle.truezip.fs.FsSyncOption.CLEAR_CACHE;
-import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.fs.FsSyncOptions;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +24,6 @@ implements JmxManagerViewMXBean {
 
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
-    private static final BitField<FsSyncOption>
-            SYNC_OPTIONS = BitField.of(CLEAR_CACHE);
 
     private final FsManager model;
 
@@ -192,7 +188,7 @@ implements JmxManagerViewMXBean {
 
     @Override
     public void umount() throws FsSyncException {
-        model.sync(SYNC_OPTIONS);
+        model.sync(FsSyncOptions.NONE);
     }
 
     @Override
