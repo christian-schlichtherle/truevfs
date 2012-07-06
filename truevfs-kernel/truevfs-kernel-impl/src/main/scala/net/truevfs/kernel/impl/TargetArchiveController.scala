@@ -379,10 +379,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
       outputArchive = None
     }
     fileSystem = None
-    // TODO: Remove a condition and clear a flag in the model
-    // instead.
-    if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
-      touched = false
+    if (options.get(ABORT_CHANGES)) touched = false
   }
 
   def checkSync(options: AccessOptions, name: FsEntryName, intention: Access) {
