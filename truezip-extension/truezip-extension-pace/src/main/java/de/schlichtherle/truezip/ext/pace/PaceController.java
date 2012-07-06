@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.ext.throttle;
+package de.schlichtherle.truezip.ext.pace;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
@@ -24,22 +24,22 @@ import javax.annotation.concurrent.NotThreadSafe;
 import javax.swing.Icon;
 
 /**
- * Calls back the given {@link ThrottleManager} before each file system
+ * Calls back the given {@link PaceManager} before each file system
  * operation in order to register itself as the most recently used archive file
  * system and syncs the least recently used archive file systems which exceed
- * {@link ThrottleManager#getMaximumOfMostRecentlyUsedArchiveFiles()} before proceeding with the file
+ * {@link PaceManager#getMaximumOfMostRecentlyUsedArchiveFiles()} before proceeding with the file
  * system operation.
  * 
  * @author Christian Schlichtherle
  */
 @Immutable
-final class ThrottleController
+final class PaceController
 extends FsDecoratingController<FsModel, FsController<?>> {
 
-    private final ThrottleManager manager;
+    private final PaceManager manager;
 
-    ThrottleController(
-            final ThrottleManager manager,
+    PaceController(
+            final PaceManager manager,
             final FsController<?> controller) {
         super(controller);
         assert null != manager;

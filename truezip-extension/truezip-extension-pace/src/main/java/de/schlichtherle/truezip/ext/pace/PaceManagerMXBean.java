@@ -2,14 +2,14 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.ext.throttle;
+package de.schlichtherle.truezip.ext.pace;
 
 import de.schlichtherle.truezip.fs.FsSyncException;
 
 /**
  * @author Christian Schlichtherle
  */
-public interface ThrottleManagerMXBean {
+public interface PaceManagerMXBean {
 
     /**
      * The name of the property for the maximum number of archive files which
@@ -22,10 +22,10 @@ public interface ThrottleManagerMXBean {
      * The key string for the system property which defines the value of the
      * constant {@link #DEFAULT_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES}.
      * Equivalent to the expression
-     * {@code ThrottleManagerMXBean.class.getName() + "." + MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES}.
+     * {@code PaceManagerMXBean.class.getName() + "." + MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES}.
      */
     String MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES_PROPERTY_NAME
-            = ThrottleManagerMXBean.class.getName() + "." + MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES;
+            = PaceManagerMXBean.class.getName() + "." + MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES;
 
     /**
      * The minimum value for the maximum number of mounted archive files, which
