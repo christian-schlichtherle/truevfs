@@ -92,6 +92,12 @@ public enum FsSyncOption {
      * entry contents.
      * Then if this option is set when the file system gets synchronized,
      * the entry contents get cleared.
+     * <p>
+     * Note that this option may induce dead locks or even busy loops
+     * when accessing nested archive files in different threads.
+     * 
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-268">#TRUEZIP-268</a>
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-268">#TRUEZIP-269</a>
      */
     CLEAR_CACHE,
 }
