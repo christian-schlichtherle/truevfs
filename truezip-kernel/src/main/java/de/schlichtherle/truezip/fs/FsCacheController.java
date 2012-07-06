@@ -11,7 +11,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
 import static de.schlichtherle.truezip.fs.FsSyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.fs.FsSyncOption.CLEAR_CACHE;
-import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
+import static de.schlichtherle.truezip.fs.FsSyncOptions.AUTOSYNC;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
@@ -217,9 +217,8 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 logger.log(Level.FINE, "recovering", invalidState);
                 preSyncEx = invalidState; // trigger another iteration
             }
-            // TODO: Consume FsSyncOption.CLEAR_CACHE and clear a flag in
-            // the model instead.
-            delegate.sync(options/*.clear(CLEAR_CACHE)*/, handler);
+            delegate.sync(options.clear(CLEAR_CACHE), handler);
+            if (options.get(CLEAR_CACHE) && caches.isEmpty()) setTouched(false);
         } while (null != preSyncEx);
     }
 

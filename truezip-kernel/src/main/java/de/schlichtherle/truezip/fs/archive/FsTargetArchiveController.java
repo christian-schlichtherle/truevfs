@@ -19,7 +19,6 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.CACHE;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.OUTPUT_PREFERENCES_MASK;
 import static de.schlichtherle.truezip.fs.FsSyncOption.ABORT_CHANGES;
-import static de.schlichtherle.truezip.fs.FsSyncOption.CLEAR_CACHE;
 import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem.newEmptyFileSystem;
 import static de.schlichtherle.truezip.fs.archive.FsArchiveFileSystem.newPopulatedFileSystem;
@@ -618,12 +617,8 @@ extends FsFileSystemArchiveController<E> {
             setOutputArchive(null);
         }
         setFileSystem(null);
-        // TODO: Remove a condition and clear a flag in the model
-        // instead.
-        if (options.get(ABORT_CHANGES) || options.get(CLEAR_CACHE))
-            setTouched(false);
-        if (null != ex)
-            throw handler.fail(ex);
+        if (options.get(ABORT_CHANGES)) setTouched(false);
+        if (null != ex) throw handler.fail(ex);
     }
 
     /**
