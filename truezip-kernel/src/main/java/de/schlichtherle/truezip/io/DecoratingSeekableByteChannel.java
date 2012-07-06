@@ -51,7 +51,7 @@ implements SeekableByteChannel {
      * 
      * @throws ClosedChannelException iff {@link #isOpen()} returns
      *         {@code false}.
-     * @since  TrueZIP 7.5.6
+     * @since  TrueZIP 7.6
      */
     protected final void checkOpen() throws ClosedChannelException {
         if (!isOpen()) throw new ClosedChannelException();
