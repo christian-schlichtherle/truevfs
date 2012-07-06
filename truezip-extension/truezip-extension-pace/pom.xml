@@ -3,7 +3,9 @@
   - Copyright (C) 2005-2012 Schlichtherle IT Services.
   - All rights reserved. Use is subject to license terms.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project    xmlns="http://maven.apache.org/POM/4.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -12,9 +14,9 @@
         <version>7.6-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truezip-extension-throttle</artifactId>
+    <artifactId>truezip-extension-pace</artifactId>
 
-    <name>TrueZIP Extension Throttle</name>
+    <name>TrueZIP Extension Pacemaker</name>
     <description>
         This module constrains the number of mounted archive files in order to
         save some heap space.
@@ -22,6 +24,11 @@
         Add the JAR artifact of this module to the run time class path to
         make its file system manager and I/O pool service available for
         service location in the client API modules.
+        
+        Note that TrueZIP Extension plugins are mutually exclusive:
+        If you put more than one on the runtime class path, then one will get
+        picked randomly at runtime.
+        You can stack them at compile time, however.
     </description>
 
     <properties>

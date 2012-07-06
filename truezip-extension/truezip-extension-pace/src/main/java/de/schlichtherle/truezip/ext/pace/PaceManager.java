@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.ext.throttle;
+package de.schlichtherle.truezip.ext.pace;
 
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.util.BitField;
@@ -19,25 +19,25 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class ThrottleManager
-extends FsDecoratingManager<FsManager> implements ThrottleManagerMXBean {
+final class PaceManager
+extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
 
     private static final Logger
-            logger = Logger.getLogger(  ThrottleManager.class.getName(),
-                                        ThrottleManager.class.getName());
+            logger = Logger.getLogger(  PaceManager.class.getName(),
+                                        PaceManager.class.getName());
 
     private volatile int maxMounts;
 
-    private final Queue<ThrottleController> lru
-            = new ConcurrentLinkedQueue<ThrottleController>();
+    private final Queue<PaceController> lru
+            = new ConcurrentLinkedQueue<PaceController>();
 
     @SuppressWarnings("serial")
-    private final Map<FsMountPoint, ThrottleController> mru;
+    private final Map<FsMountPoint, PaceController> mru;
 
-    ThrottleManager(FsManager manager) {
+    PaceManager(FsManager manager) {
         super(manager);
         setMaximumOfMostRecentlyUsedArchiveFiles(Integer.parseInt(System.getProperty(
-                ThrottleManager.class.getName() + ".maxMounts",
+                PaceManager.class.getName() + ".maxMounts",
                 Integer.toString(DEFAULT_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES))));
         // Requires initialized maxMounts!
         mru = Collections.synchronizedMap(new MruControllerMap());
@@ -50,7 +50,7 @@ extends FsDecoratingManager<FsManager> implements ThrottleManagerMXBean {
         final FsController<?> controller
                 = delegate.getController(mountPoint, driver);
         return null != controller.getParent()
-                ? new ThrottleController(this, controller)
+                ? new PaceController(this, controller)
                 : controller;
     }
 
@@ -89,7 +89,7 @@ extends FsDecoratingManager<FsManager> implements ThrottleManagerMXBean {
      *         archive file system.
      * @return {@code this}
      */
-    ThrottleManager accessMru(final ThrottleController controller) {
+    PaceManager accessMru(final PaceController controller) {
         final FsMountPoint mp = controller.getMountPoint();
         logger.log(Level.FINEST, "accessMru", mp);
         mru.put(mp, controller);
@@ -104,8 +104,8 @@ extends FsDecoratingManager<FsManager> implements ThrottleManagerMXBean {
      * @throws FsSyncException 
      */
     void syncLru() throws FsSyncException {
-        iterating: for (final Iterator<ThrottleController> i = lru.iterator(); i.hasNext(); ) {
-            final ThrottleController c = i.next();
+        iterating: for (final Iterator<PaceController> i = lru.iterator(); i.hasNext(); ) {
+            final PaceController c = i.next();
             final FsMountPoint mp = c.getMountPoint();
             final FsManager fm = new FsFilteringManager(delegate, mp);
             // Make sure not to umount a parent of a MRU controller because
@@ -145,7 +145,7 @@ extends FsDecoratingManager<FsManager> implements ThrottleManagerMXBean {
             // Rebuild the MRU cache and pass on the exception.
             for (final FsController<?> c : delegate) {
                 final FsMountPoint mp = c.getModel().getMountPoint();
-                mru.put(mp, new ThrottleController(this, c));
+                mru.put(mp, new PaceController(this, c));
             }
             throw (X) ex;
         }
@@ -153,7 +153,7 @@ extends FsDecoratingManager<FsManager> implements ThrottleManagerMXBean {
 
     @SuppressWarnings("serial")
     private final class MruControllerMap
-    extends LinkedHashMap<FsMountPoint, ThrottleController> {
+    extends LinkedHashMap<FsMountPoint, PaceController> {
 
         MruControllerMap() {
             super(HashMaps.initialCapacity(getMaximumOfMostRecentlyUsedArchiveFiles() + 1), 0.75f, true);
@@ -161,10 +161,10 @@ extends FsDecoratingManager<FsManager> implements ThrottleManagerMXBean {
 
         @Override
         public boolean removeEldestEntry(
-                final Map.Entry<FsMountPoint, ThrottleController> entry) {
+                final Map.Entry<FsMountPoint, PaceController> entry) {
             final boolean evict = size() > getMaximumOfMostRecentlyUsedArchiveFiles();
             if (evict) {
-                final ThrottleController c = entry.getValue();
+                final PaceController c = entry.getValue();
                 final boolean added = lru.add(c);
                 assert added;
             }

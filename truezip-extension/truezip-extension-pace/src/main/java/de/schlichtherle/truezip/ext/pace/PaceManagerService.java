@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.ext.throttle;
+package de.schlichtherle.truezip.ext.pace;
 
 import de.schlichtherle.truezip.fs.FsDefaultManager;
 import de.schlichtherle.truezip.fs.FsManager;
@@ -18,7 +18,7 @@ import javax.management.ObjectName;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class ThrottleManagerService extends FsManagerService {
+public final class PaceManagerService extends FsManagerService {
 
     @Override
     public FsManager get() {
@@ -40,13 +40,13 @@ public final class ThrottleManagerService extends FsManagerService {
         static final FsManager MANAGER;
         static {
             final Logger logger = Logger.getLogger(
-                    ThrottleManagerService.class.getName());
+                    PaceManagerService.class.getName());
             final MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-            final ThrottleManager manager = new ThrottleManager(new FsDefaultManager());
+            final PaceManager manager = new PaceManager(new FsDefaultManager());
             try {
                 mbs.registerMBean(manager,
-                        new ObjectName(ThrottleManager.class.getPackage().getName(),
-                            "type", ThrottleManager.class.getSimpleName()));
+                        new ObjectName(PaceManager.class.getPackage().getName(),
+                            "type", PaceManager.class.getSimpleName()));
             } catch (final Exception ex) {
                 logger.log(Level.WARNING, null, ex);
             }
