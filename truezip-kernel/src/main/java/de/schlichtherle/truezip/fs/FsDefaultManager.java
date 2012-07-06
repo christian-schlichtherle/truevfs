@@ -13,7 +13,9 @@ import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 import static de.schlichtherle.truezip.util.Links.getTarget;
 import java.io.IOException;
 import java.util.*;
-import javax.annotation.concurrent.GuardedBy;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -28,11 +30,13 @@ public final class FsDefaultManager extends FsManager {
      * The map of all schedulers for composite file system controllers,
      * keyed by the mount point of their respective file system model.
      */
-    @GuardedBy("this")
-    private final Map<FsMountPoint, Link<FsFalsePositiveController>> schedulers
+    private final Map<FsMountPoint, Link<FsFalsePositiveController>> controllers
             = new WeakHashMap<FsMountPoint, Link<FsFalsePositiveController>>();
 
     private final Type optionalScheduleType;
+
+    private final ReadLock readLock;
+    private final WriteLock writeLock;
 
     public FsDefaultManager() {
         this(WEAK);
@@ -42,13 +46,21 @@ public final class FsDefaultManager extends FsManager {
     FsDefaultManager(final Type optionalScheduleType) {
         assert null != optionalScheduleType;
         this.optionalScheduleType = optionalScheduleType;
+        final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+        this.readLock = lock.readLock();
+        this.writeLock = lock.writeLock();
     }
 
     @Override
-    public synchronized FsController<?> getController(
+    public FsController<?> getController(
             FsMountPoint mountPoint,
             FsCompositeDriver driver) {
-        return getController0(mountPoint, driver);
+        writeLock.lock();
+        try {
+            return getController0(mountPoint, driver);
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     private FsController<?> getController0(
@@ -58,7 +70,7 @@ public final class FsDefaultManager extends FsManager {
             final FsModel m = new FsDefaultModel(mountPoint, null);
             return driver.newController(m, null);
         }
-        FsFalsePositiveController c = getTarget(schedulers.get(mountPoint));
+        FsFalsePositiveController c = getTarget(controllers.get(mountPoint));
         if (null == c) {
             final FsController<?> p = getController0(mountPoint.getParent(), driver);
             final ScheduledModel m = new ScheduledModel(mountPoint, p.getModel());
@@ -72,24 +84,34 @@ public final class FsDefaultManager extends FsManager {
     }
 
     @Override
-    public synchronized int getSize() {
-        return schedulers.size();
+    public int getSize() {
+        readLock.lock();
+        try {
+            return controllers.size();
+        } finally {
+            readLock.unlock();
+        }
     }
 
     @Override
     public Iterator<FsController<?>> iterator() {
-        return getControllers().iterator();
+        return sortedControllers().iterator();
     }
 
-    private synchronized Set<FsController<?>> getControllers() {
-        final Set<FsController<?>> snapshot
-                = new TreeSet<FsController<?>>(ReverseControllerComparator.INSTANCE);
-        for (final Link<FsFalsePositiveController> link : schedulers.values()) {
-            final FsController<?> controller = getTarget(link);
-            if (null != controller)
-                snapshot.add(controller);
+    private Set<FsController<?>> sortedControllers() {
+        readLock.lock();
+        try {
+            final Set<FsController<?>> snapshot
+                    = new TreeSet<FsController<?>>(ReverseControllerComparator.INSTANCE);
+            for (final Link<FsFalsePositiveController> link : controllers.values()) {
+                final FsController<?> controller = getTarget(link);
+                if (null != controller)
+                    snapshot.add(controller);
+            }
+            return snapshot;
+        } finally {
+            readLock.unlock();
         }
-        return snapshot;
     }
 
     @Override
@@ -147,8 +169,11 @@ public final class FsDefaultManager extends FsManager {
             final FsMountPoint mountPoint = getMountPoint();
             final Link<FsFalsePositiveController> link =
                     (mandatory ? STRONG : optionalScheduleType).newLink(controller);
-            synchronized (FsDefaultManager.this) {
-                schedulers.put(mountPoint, link);
+            writeLock.lock();
+            try {
+                controllers.put(mountPoint, link);
+            } finally {
+                writeLock.unlock();
             }
         }
     } // ScheduledModel
