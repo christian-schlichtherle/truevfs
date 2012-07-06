@@ -4,13 +4,14 @@
  */
 package net.truevfs.kernel.spec;
 
+import javax.annotation.concurrent.Immutable;
 import static net.truevfs.kernel.spec.FsSyncOption.*;
 import net.truevfs.kernel.spec.util.BitField;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * Provides common bit fields of synchronization options.
  * 
+ * @see    FsController#sync(BitField)
  * @see    FsSyncOption
  * @author Christian Schlichtherle
  */
@@ -50,15 +51,14 @@ public final class FsSyncOptions {
      * These options should be used if a multithreaded application wants to
      * synchronize all mounted archive files without affecting any I/O to
      * these archive files by any other thread.
-     * However, a call with the {@link #UMOUNT} options is still required in
-     * order to really clean up <em>all</em> resources, including the
-     * selective entry cache.
+     * <p>
+     * Note that this bit field deliberately doesn't include CLEAR_CACHE!
+     * This is because CLEAR_CACHE may induce dead locks or even busy loops
+     * when accessing nested archive files in different threads.
+     * 
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-268">#TRUEZIP-268</a>
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-268">#TRUEZIP-269</a>
      */
-    // Note that setting CLEAR_CACHE may cause endless loops when working with
-    // nested archive files and there are copy operations where an input stream
-    // has been successfully acquired and then acquiring the output stream
-    // would require an automatic sync() of the same target archive file from
-    // which the input stream is reading.
     public static final BitField<FsSyncOption>
             SYNC = BitField.of(WAIT_CLOSE_IO);
 
