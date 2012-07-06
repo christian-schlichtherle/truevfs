@@ -22,6 +22,11 @@
         Add the JAR artifact of this module to the run time class path to
         make its file system manager and I/O pool service available for
         service location in the client API modules.
+        
+        Note that TrueZIP Extension plugins are mutually exclusive:
+        If you put more than one on the runtime class path, then one will get
+        picked randomly at runtime.
+        You can stack them at compile time, however.
     </description>
 
     <properties>
