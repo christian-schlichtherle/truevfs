@@ -11,7 +11,7 @@ import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
 import static de.schlichtherle.truezip.fs.FsSyncOption.ABORT_CHANGES;
 import static de.schlichtherle.truezip.fs.FsSyncOption.CLEAR_CACHE;
-import static de.schlichtherle.truezip.fs.FsSyncOptions.AUTOSYNC;
+import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.DecoratingSeekableByteChannel;
