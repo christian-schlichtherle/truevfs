@@ -150,7 +150,7 @@ implements JmxModelViewMXBean {
     protected String getDescription(MBeanOperationInfo info) {
         String description = null;
         if (info.getName().equals("umount")) {
-            description = "Unmounts this managed federated file system and all enclosed managed federated file systems. If any managed federated file system is busy with I/O, an FsSyncException is thrown.";
+            description = "Synchronizes this managed archive file system and all enclosed archive file systems. If any file system is busy with I/O, an FsSyncException is thrown.";
         }
         return description;
     }

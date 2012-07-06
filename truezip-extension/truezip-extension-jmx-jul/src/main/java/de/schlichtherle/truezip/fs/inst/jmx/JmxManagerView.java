@@ -138,7 +138,7 @@ implements JmxManagerViewMXBean {
         if (info.getName().equals("clearStatistics")) {
             description = "Clears all but the last I/O statistics.";
         } else if (info.getName().equals("umount")) {
-            description = "Unmounts all managed federated file systems. If any file system is busy with I/O, an FsSyncException is thrown.";
+            description = "Synchronizes all managed archive file systems. If any file system is busy with I/O, an FsSyncException is thrown.";
         }
         return description;
     }
