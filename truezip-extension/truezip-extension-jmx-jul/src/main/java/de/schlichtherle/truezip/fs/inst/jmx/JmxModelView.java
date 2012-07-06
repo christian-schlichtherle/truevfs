@@ -9,10 +9,8 @@ import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.Size.STORAGE;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import de.schlichtherle.truezip.fs.*;
-import static de.schlichtherle.truezip.fs.FsSyncOption.CLEAR_CACHE;
 import de.schlichtherle.truezip.fs.sl.FsDriverLocator;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
-import de.schlichtherle.truezip.util.BitField;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Date;
@@ -29,8 +27,6 @@ implements JmxModelViewMXBean {
 
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
-    private static final BitField<FsSyncOption>
-            SYNC_OPTIONS = BitField.of(CLEAR_CACHE);
     private static final FsCompositeDriver
             DRIVER = new FsDefaultDriver(FsDriverLocator.SINGLETON);
 
@@ -270,6 +266,6 @@ implements JmxModelViewMXBean {
     public void umount() throws FsSyncException {
         new FsFilteringManager( FsManagerLocator.SINGLETON.get(),
                                 model.getMountPoint())
-                .sync(SYNC_OPTIONS);
+                .sync(FsSyncOptions.NONE);
     }
 }

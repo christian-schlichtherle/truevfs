@@ -65,9 +65,10 @@ extends FsDecoratingManager<FsManager> implements ThrottleManagerMXBean {
     }
 
     @Override
-    public void setMaximumOfMostRecentlyUsedArchiveFiles(final int max) {
-        if (max < MINIMUM_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES) throw new IllegalArgumentException();
-        this.maxMounts = max;
+    public void setMaximumOfMostRecentlyUsedArchiveFiles(final int maxMounts) {
+        if (maxMounts < MINIMUM_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES)
+            throw new IllegalArgumentException();
+        this.maxMounts = maxMounts;
     }
 
     @Override
@@ -125,10 +126,11 @@ extends FsDecoratingManager<FsManager> implements ThrottleManagerMXBean {
 
     @Override
     public void sync() throws FsSyncException {
-        sync(SYNC_OPTIONS);
+        sync(FsSyncOptions.NONE);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <X extends IOException> void sync(
             final BitField<FsSyncOption> options,
             final ExceptionHandler<? super IOException, X> handler)
