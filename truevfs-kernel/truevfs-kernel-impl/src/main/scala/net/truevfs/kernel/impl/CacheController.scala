@@ -147,9 +147,8 @@ private trait CacheController extends Controller[LockModel] {
           logger.log(Level.FINE, "recovering", invalidState);
           preSyncEx = invalidState; // trigger another iteration
       }
-      // TODO: Consume FsSyncOption.CLEAR_CACHE and release a flag in
-      // the model instead.
-      super.sync(options/*.clear(CLEAR_CACHE)*/)
+      super.sync(options.clear(CLEAR_CACHE))
+      if (options.get(CLEAR_CACHE) && caches.isEmpty) touched = false
     } while (null ne preSyncEx)
   }
 
