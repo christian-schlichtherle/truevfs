@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 /**
  * The MXBean interface for a {@link FsModel file system model}.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public interface JmxModelViewMXBean {
     String getMountPoint();
