@@ -156,8 +156,11 @@ extends FsDecoratingController[FsModel, FsController[_ <: FsModel]](c) {
     try {
       controller.sync(options)
     } catch {
-      case ex =>
-        assert(!(ex.isInstanceOf[FsSyncException] || ex.isInstanceOf[ControlFlowException]) || state.eq(TryChild))
+      case ex: FsSyncException =>
+        assert(state.eq(TryChild))
+        throw ex
+      case ex: ControlFlowException =>
+        assert(state.eq(TryChild))
         throw ex
     }
     state = TryChild
