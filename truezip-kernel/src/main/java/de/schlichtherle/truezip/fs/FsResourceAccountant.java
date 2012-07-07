@@ -20,6 +20,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.WillNotClose;
+import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -228,6 +229,7 @@ final class FsResourceAccountant {
         }
     } // Account
 
+    @Immutable
     static final class Resources {
         final int local, total;
 
