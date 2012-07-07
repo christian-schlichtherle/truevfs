@@ -155,34 +155,27 @@ private trait CacheController extends Controller[LockModel] {
   private def preSync(options: SyncOptions) {
     if (0 >= caches.size()) return
     val flush = !(options get ABORT_CHANGES)
-    var release = !flush || (options get CLEAR_CACHE)
-    assert(flush || release)
+    val clear = !flush || (options get CLEAR_CACHE)
+    assert(flush || clear)
     val builder = new FsSyncExceptionBuilder
     val i = caches.values.iterator
     while (i.hasNext) {
       val cache = i next ()
-      try {
-        if (flush) {
-          try {
-            cache flush ()
-          } catch {
-            case ex: IOException =>
-              release = false
-              throw builder fail new FsSyncException(mountPoint, ex)
-            case ex: Throwable =>
-              release = false
-              throw ex
-          }
+      if (flush) {
+        try {
+          cache flush ()
+        } catch {
+          case ex: IOException =>
+            throw builder fail new FsSyncException(mountPoint, ex)
         }
-      } finally {
-        if (release) {
-          i remove ()
-          try {
-            cache release ()
-          } catch {
-            case ex: IOException =>
-              builder warn new FsSyncWarningException(mountPoint, ex)
-          }
+      }
+      if (clear) {
+        i remove ()
+        try {
+          cache release ()
+        } catch {
+          case ex: IOException =>
+            builder warn new FsSyncWarningException(mountPoint, ex)
         }
       }
     }
