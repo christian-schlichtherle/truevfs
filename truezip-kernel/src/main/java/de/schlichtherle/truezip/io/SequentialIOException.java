@@ -183,16 +183,14 @@ public class SequentialIOException extends IOException implements Cloneable {
             @CheckForNull SequentialIOException predecessor) {
         setPredecessor(predecessor);
         predecessor = getPredecessor();
-        if (predecessor != null)
-            index = maxIndex = predecessor.maxIndex + 1;
+        if (predecessor != null) index = maxIndex = predecessor.maxIndex + 1;
         return this;
     }
 
     private void setPredecessor(
             final @CheckForNull SequentialIOException predecessor) {
         if (this.predecessor != this) {
-            if (this.predecessor == predecessor)
-                return;
+            if (this.predecessor == predecessor) return;
             throw new IllegalStateException("Can't overwrite predecessor!");
         }
         if (predecessor == this)
@@ -252,13 +250,10 @@ public class SequentialIOException extends IOException implements Cloneable {
     private SequentialIOException sort(
             final Comparator<SequentialIOException> cmp) {
         final SequentialIOException predecessor = getPredecessor();
-        if (null == predecessor)
-            return this;
+        if (null == predecessor) return this;
         final SequentialIOException tail = predecessor.sort(cmp);
-        if (tail == predecessor && cmp.compare(this, tail) >= 0)
-            return this;
-        else
-            return tail.insert(clone(), cmp);
+        if (tail == predecessor && cmp.compare(this, tail) >= 0) return this;
+        else return tail.insert(clone(), cmp);
     }
 
     private SequentialIOException insert(
@@ -373,7 +368,6 @@ public class SequentialIOException extends IOException implements Cloneable {
      */
     public void printStackTrace(final PrintWriter s, int maxExceptions) {
         maxExceptions--;
-
         final SequentialIOException predecessor = getPredecessor();
         if (null != predecessor) {
             if (0 < maxExceptions) {
@@ -383,7 +377,6 @@ public class SequentialIOException extends IOException implements Cloneable {
                 s.println("\nOmitting " + predecessor.getNumExceptions() + " more exception(s) at the start of this list!");
             }
         }
-
         super.printStackTrace(s);
     }
 
