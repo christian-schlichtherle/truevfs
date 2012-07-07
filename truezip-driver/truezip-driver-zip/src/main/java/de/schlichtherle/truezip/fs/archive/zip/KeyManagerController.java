@@ -70,8 +70,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         try {
             return delegate.getEntry(name);
         } catch (final IOException ex) {
-            if (!name.isRoot() || null == findKeyException(ex))
-                throw ex;
+            if (!name.isRoot() || null == findKeyException(ex)) throw ex;
             Entry entry = getParent().getEntry(
                     getModel()
                         .getMountPoint()
@@ -80,8 +79,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                         .getEntryName());
             // We're not holding any locks, so it's possible that someone else
             // has concurrently modified the parent file system.
-            if (null == entry)
-                return null;
+            if (null == entry) return null;
             // The entry is inaccessible for some reason.
             // This may be because the cipher key is not available.
             // Now mask the entry as a special file.
