@@ -149,7 +149,7 @@ private trait CacheController extends Controller[LockModel] {
       }
       super.sync(options.clear(CLEAR_CACHE))
     } while (null ne preSyncEx)
-    if (caches.isEmpty) touched = false
+    if (options.get(CLEAR_CACHE) && caches.isEmpty) touched = false
   }
 
   private def preSync(options: SyncOptions) {
