@@ -275,9 +275,7 @@ public interface FsController<M extends FsModel> {
      * @param  name the name of the file system entry.
      * @throws IOException on any I/O error.
      */
-    void unlink(
-            BitField<FsAccessOption> options,
-            FsEntryName name)
+    void unlink(BitField<FsAccessOption> options, FsEntryName name)
     throws IOException;
 
     /**
@@ -300,6 +298,6 @@ public interface FsController<M extends FsModel> {
      *         stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
-    void sync(final BitField<FsSyncOption> options)
+    void sync(BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException;
 }
