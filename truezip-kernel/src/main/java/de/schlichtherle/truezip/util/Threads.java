@@ -35,7 +35,6 @@ public class Threads {
                 interrupted = true;
             }
         } while (0 < (millis -= System.currentTimeMillis() - start));
-        if (interrupted)
-            Thread.currentThread().interrupt(); // restore
+        if (interrupted) Thread.currentThread().interrupt(); // restore
     }
 }
