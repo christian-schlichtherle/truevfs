@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.DirectoryStream.Filter;
@@ -59,7 +61,8 @@ public final class TFileSystemProvider extends FileSystemProvider {
     private final String scheme;
     private final FsPath root;
 
-    private Map<FsMountPoint, TFileSystem> fileSystems = new WeakHashMap<>();
+    private Map<FsMountPoint, WeakReference<TFileSystem>>
+            fileSystems = new WeakHashMap<>();
 
     /**
      * Obtains a file system provider for the given {@link TPath} URI.
@@ -231,12 +234,18 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * @param  path a path.
      * @return A file system.
      */
-    synchronized TFileSystem getFileSystem(final TPath path) {
+    TFileSystem getFileSystem(final TPath path) {
         final FsMountPoint mp = path.getMountPoint();
-        TFileSystem fs = fileSystems.get(mp);
-        if (null == fs)
-            fileSystems.put(mp, fs = new TFileSystem(path));
-        return fs;
+        synchronized (this) {
+            TFileSystem fs = deref(fileSystems.get(mp));
+            if (null == fs)
+                fileSystems.put(mp, new WeakReference<>(fs = new TFileSystem(path)));
+            return fs;
+        }
+    }
+
+    private static <T> T deref(Reference<T> ref) {
+        return null != ref ? ref.get() : null;
     }
 
     /**
