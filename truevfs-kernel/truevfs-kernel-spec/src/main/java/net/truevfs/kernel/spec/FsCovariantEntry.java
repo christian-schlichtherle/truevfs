@@ -192,8 +192,7 @@ implements Cloneable {
      */
     @Override
     public long getSize(Size type) {
-        if (DIRECTORY == key)
-            return UNKNOWN; // TODO: Evaluate 0
+        if (DIRECTORY == key) return UNKNOWN; // TODO: Evaluate 0
         return map.get(key).getSize(type);
     }
 
@@ -221,8 +220,7 @@ implements Cloneable {
      */
     @Override
     public @Nullable Set<String> getMembers() {
-        if (!map.containsKey(DIRECTORY))
-            return members = null;
+        if (!isType(DIRECTORY)) return members = null;
         final Set<String> m = members;
         return null != m ? m : (members = new LinkedHashSet<>());
     }
