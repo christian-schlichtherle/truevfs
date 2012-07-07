@@ -115,7 +115,7 @@ private trait SyncController extends Controller[LockModel] {
     try {
       super.sync(modified)
     } catch {
-      case ex: FsSyncWarningException => throw ex
+      case ex: FsSyncWarningException => throw ex // may be FORCE_CLOSE_IO was set, too?
       case ex: FsSyncException =>
         if (modified ne options) {
           ex.getCause match {
