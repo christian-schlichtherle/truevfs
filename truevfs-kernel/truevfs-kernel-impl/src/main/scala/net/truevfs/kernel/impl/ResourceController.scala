@@ -106,12 +106,15 @@ private trait ResourceController extends Controller[LockModel] {
     * @param builder the exception handling strategy.
     */
   private def closeAll(builder: FsSyncExceptionBuilder) {
-    try {
-      accountant closeAllResources()
-    } catch {
-      case ex: IOException =>
-        builder warn new FsSyncWarningException(mountPoint, ex)
-    }
+    final class IOExceptionHandler
+    extends ExceptionHandler[IOException, RuntimeException] {
+      def fail(ex: IOException) = throw new AssertionError(ex)
+      def warn(ex: IOException) {
+        assert(!ex.isInstanceOf[ControlFlowException])
+        builder.warn(new FsSyncWarningException(mountPoint, ex))
+      }
+    } // IOExceptionHandler
+    accountant closeAllResources (new IOExceptionHandler)
   }
 
   private class ResourceInputStream(in: InputStream)

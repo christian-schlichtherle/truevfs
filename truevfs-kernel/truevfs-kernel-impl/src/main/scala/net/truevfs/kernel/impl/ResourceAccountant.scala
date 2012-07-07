@@ -138,10 +138,10 @@ private final class ResourceAccountant(lock: Lock) {
     * closeable resources again unless the caller also locks the lock provided
     * to the constructor - use with care!
     */
-  def closeAllResources() {
+  def closeAllResources[X <: Exception](handler: ExceptionHandler[_ >: IOException, X]) {
+    assert(null != handler)
     lock lock()
     try {
-      val builder = new SuppressedExceptionBuilder[IOException]
       for ((closeable, account) <- accounts if account.accountant eq this) {
         accounts -= closeable
         try {
@@ -149,21 +149,18 @@ private final class ResourceAccountant(lock: Lock) {
           // map, but it can cause no ConcurrentModificationException because
           // the entry is already removed and a ConcurrentHashMap doesn't do
           // that anyway.
-          // Note that this method may throw an IOException or a
-          // RuntimeException, e.g. a NeedsLockRetryException!
-          closeable close()
+          closeable close ()
         } catch {
           case ex: ControlFlowException =>
             assert(ex.isInstanceOf[NeedsLockRetryException], ex)
             throw ex
           case ex: IOException =>
-            builder warn ex // could throw an IOException!
+            handler warn ex // may throw an exception!
         }
       }
-      builder check()
     } finally {
-      condition signalAll()
-      lock unlock()
+      condition signalAll ()
+      lock unlock ()
     }
   }
 }
