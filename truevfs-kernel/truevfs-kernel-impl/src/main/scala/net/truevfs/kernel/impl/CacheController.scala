@@ -149,7 +149,7 @@ private trait CacheController extends Controller[LockModel] {
       }
       super.sync(options.clear(CLEAR_CACHE))
     } while (null ne preSyncEx)
-    if (options.get(CLEAR_CACHE) && caches.isEmpty) touched = false
+    if (caches.isEmpty) touched = false
   }
 
   private def preSync(options: SyncOptions) {
@@ -167,13 +167,13 @@ private trait CacheController extends Controller[LockModel] {
             cache flush ()
           } catch {
             case ex: IOException =>
+              release = false
               throw builder fail new FsSyncException(mountPoint, ex)
+            case ex: Throwable =>
+              release = false
+              throw ex
           }
         }
-      } catch {
-        case ex: Throwable =>
-          release = false
-          throw ex
       } finally {
         if (release) {
           i remove ()
