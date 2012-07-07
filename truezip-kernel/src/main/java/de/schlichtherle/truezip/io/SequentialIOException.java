@@ -189,7 +189,7 @@ public class SequentialIOException extends IOException implements Cloneable {
 
     private void setPredecessor(
             final @CheckForNull SequentialIOException predecessor) {
-        if (this.predecessor != this) {
+        if (this != this.predecessor) {
             if (this.predecessor == predecessor) return;
             throw new IllegalStateException("Can't overwrite predecessor!");
         }
