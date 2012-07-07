@@ -48,32 +48,6 @@ extends FsLockModelDecoratingController<FsTargetArchiveController<?>> {
     }
 
     @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        final FsTargetArchiveController<?> delegate = this.delegate;
-        final FsOperationContext context = delegate.getContext();
-        delegate.setContext(NULL);
-        try {
-            return delegate.getOpenIcon();
-        } finally {
-            delegate.setContext(context);
-        }
-    }
-
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
-        final FsTargetArchiveController<?> delegate = this.delegate;
-        final FsOperationContext context = delegate.getContext();
-        delegate.setContext(NULL);
-        try {
-            return delegate.getClosedIcon();
-        } finally {
-            delegate.setContext(context);
-        }
-    }
-
-    @Override
     public boolean isReadOnly() throws IOException {
         final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
@@ -225,15 +199,13 @@ extends FsLockModelDecoratingController<FsTargetArchiveController<?>> {
     }
 
     @Override
-    public <X extends IOException>
-    void sync(  final BitField<FsSyncOption> options,
-                final ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
+    public void sync(final BitField<FsSyncOption> options)
+    throws FsSyncException, FsControllerException {
         final FsTargetArchiveController<?> delegate = this.delegate;
         final FsOperationContext context = delegate.getContext();
         delegate.setContext(NULL);
         try {
-            delegate.sync(options, handler);
+            delegate.sync(options);
         } finally {
             delegate.setContext(context);
         }

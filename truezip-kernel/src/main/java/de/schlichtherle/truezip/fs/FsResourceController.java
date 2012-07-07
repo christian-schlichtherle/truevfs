@@ -65,45 +65,41 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     }
 
     @Override
-    public <X extends IOException> void
-    sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
+    public void sync(final BitField<FsSyncOption> options)
+    throws FsSyncException, FsControllerException {
         assert isWriteLockedByCurrentThread();
-        waitIdle(options, handler);
-        closeAll(handler);
-        delegate.sync(options, handler);
+        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
+        waitIdle(options, builder);
+        closeAll(builder);
+        try {
+            delegate.sync(options);
+        } catch (final FsSyncException ex) {
+            builder.warn(ex);
+        }
+        builder.check();
     }
 
-    /**
-     * Waits for all entry input and output resources to close or forces
-     * them to close, dependending on the {@code options}.
-     * Mind that this method deliberately handles entry input and output
-     * streams equally because {@link FsResourceAccountant#waitOtherThreads}
-     * WILL NOT WORK if any two resource accountants share the same lock!
-     *
-     * @param  options a bit field of synchronization options.
-     * @param  handler the exception handling strategy for consuming input
-     *         {@code FsSyncException}s and/or assembling output
-     *         {@code IOException}s.
-     * @param  <X> The type of the {@code IOException} to throw at the
-     *         discretion of the exception {@code handler}.
-     * @throws IOException at the discretion of the exception {@code handler}
-     *         upon the occurence of an {@link FsSyncException}.
-     */
-    private <X extends IOException> void
-    waitIdle(   final BitField<FsSyncOption> options,
-                final ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+    private void waitIdle(
+            final BitField<FsSyncOption> options,
+            final FsSyncExceptionBuilder builder) throws FsSyncException {
+        try {
+            waitIdle(options);
+        } catch (final FsResourceOpenException ex) {
+            if (!options.get(FORCE_CLOSE_INPUT) && !options.get(FORCE_CLOSE_OUTPUT))
+                throw builder.fail(new FsSyncException(getModel(), ex));
+            builder.warn(new FsSyncWarningException(getModel(), ex));
+        }
+    }
+
+    private void waitIdle(final BitField<FsSyncOption> options)
+    throws FsResourceOpenException {
         // HC SVNT DRACONES!
         final boolean force = options.get(FORCE_CLOSE_INPUT)
                 || options.get(FORCE_CLOSE_OUTPUT);
         {
             final Resources r = accountant.resources();
             if (0 != r.local && !force) {
-                final IOException cause =
-                        new FsResourceOpenException(r.total, r.local);
-                throw handler.fail(new FsSyncException(getModel(), cause));
+                throw new FsResourceOpenException(r.total, r.local);
             }
         }
         final boolean wait = options.get(WAIT_CLOSE_INPUT)
@@ -121,13 +117,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         accountant.waitOtherThreads(wait ? 0 : WAIT_TIMEOUT_MILLIS);
         {
             final Resources r = accountant.resources();
-            if (0 == r.total)
-                return;
-            final IOException cause =
-                    new FsResourceOpenException(r.total, r.local);
-            if (!force)
-                throw handler.fail(new FsSyncException(getModel(), cause));
-            handler.warn(new FsSyncWarningException(getModel(), cause));
+            if (0 != r.total) throw new FsResourceOpenException(r.total, r.local);
         }
     }
 
@@ -135,31 +125,23 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
      * Closes and disconnects all entry streams of the output and input
      * archive.
      *
-     * @param  handler the exception handling strategy for consuming input
-     *         {@code FsSyncException}s and/or assembling output
-     *         {@code IOException}s.
-     * @param  <X> The type of the {@code IOException} to throw at the
-     *         discretion of the exception {@code handler}.
-     * @throws IOException at the discretion of the exception {@code handler}
-     *         upon the occurence of an {@link FsSyncException}.
+     * @param builder the exception handling strategy.
      */
-    private <X extends IOException> void
-    closeAll(final ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
+    private void closeAll(final FsSyncExceptionBuilder builder)
+    throws FsControllerException {
         final class IOExceptionHandler
-        implements ExceptionHandler<IOException, X> {
+        implements ExceptionHandler<IOException, RuntimeException> {
             @Override
-            public X fail(IOException shouldNotHappen) {
-                throw new AssertionError(shouldNotHappen);
+            public RuntimeException fail(final IOException ex) {
+                throw new AssertionError(ex);
             }
 
             @Override
-            public void warn(IOException cause) throws X {
-                assert !(cause instanceof FsControllerException);
-                handler.warn(new FsSyncWarningException(getModel(), cause));
+            public void warn(final IOException ex) {
+                assert !(ex instanceof FsControllerException);
+                builder.warn(new FsSyncWarningException(getModel(), ex));
             }
         } // IOExceptionHandler
-
         accountant.closeAllResources(new IOExceptionHandler());
     }
 

@@ -182,12 +182,10 @@ final class FsResourceAccountant {
      * for closeable resources again unless the caller also locks the lock
      * provided to the constructor - use with care!
      */
-    <X extends IOException>
-    void closeAllResources(
-            final ExceptionHandler<? super IOException, X> handler)
-    throws IOException {
+    <X extends Exception> void
+    closeAllResources(final ExceptionHandler<? super IOException, X> handler)
+    throws X, FsControllerException {
         assert null != handler;
-
         lock.lock();
         try {
             for (   final Iterator<Entry<Closeable, Account>>
@@ -195,8 +193,7 @@ final class FsResourceAccountant {
                     i.hasNext(); ) {
                 final Entry<Closeable, Account> entry = i.next();
                 final Account account = entry.getValue();
-                if (account.getAccountant() != this)
-                    continue;
+                if (account.getAccountant() != this) continue;
                 i.remove();
                 final Closeable closeable = entry.getKey();
                 try {
@@ -205,8 +202,6 @@ final class FsResourceAccountant {
                     // ConcurrentModificationException because the entry is
                     // already removed and a ConcurrentHashMap doesn't do that
                     // anyway.
-                    // Note that this method may throw an IOException or a
-                    // RuntimeException, e.g. a NeedsLockRetryException!
                     closeable.close();
                 } catch (final FsControllerException ex) {
                     assert ex instanceof FsNeedsLockRetryException : ex;

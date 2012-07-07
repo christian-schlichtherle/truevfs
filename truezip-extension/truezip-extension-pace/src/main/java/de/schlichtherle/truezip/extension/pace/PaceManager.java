@@ -127,16 +127,13 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <X extends IOException> void sync(
-            final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super IOException, X> handler)
-    throws X {
+    public void sync(final BitField<FsSyncOption> options)
+    throws FsSyncWarningException, FsSyncException {
         logger.log(Level.FINER, "clearLruSize", getNumberOfLeastRecentlyUsedArchiveFiles());
         lru.clear();
         logger.log(Level.FINER, "clearMruSize", getNumberOfMostRecentlyUsedArchiveFiles());
         mru.clear();
-        delegate.sync(options, handler);
+        delegate.sync(options);
     }
 
     @SuppressWarnings("serial")

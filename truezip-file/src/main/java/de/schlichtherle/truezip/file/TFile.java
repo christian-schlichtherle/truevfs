@@ -17,6 +17,7 @@ import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.UMOUNT;
 import static de.schlichtherle.truezip.fs.FsUriModifier.CANONICALIZE;
+import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Streams;
@@ -1803,8 +1804,7 @@ public final class TFile extends File {
     }
 
     private @Nullable FsScheme getScheme() {
-        if (this != innerArchive)
-            return null;
+        if (this != innerArchive) return null;
         final FsController<?> controller = this.controller;
         if (null != controller)
             return controller.getModel().getMountPoint().getScheme();
@@ -1950,7 +1950,7 @@ public final class TFile extends File {
     }
 
     /**
-     * If this file is a true archive file, its archive driver is asked to
+     * If this file refers to an archive file, its archive driver is asked to
      * return an icon to be displayed for this file.
      * Otherwise, null is returned.
      * 
@@ -1959,17 +1959,14 @@ public final class TFile extends File {
      */
     @Deprecated
     public @CheckForNull Icon getOpenIcon() {
-        if (this == innerArchive) {
-            try {
-                return getController().getOpenIcon();
-            } catch (IOException ex) {
-            }
-        }
-        return null;
+        return isArchive()
+                ? ((FsArchiveDriver<?>) getDriver(getScheme()))
+                    .getOpenIcon(getController().getModel())
+                : null;
     }
 
     /**
-     * If this file is a true archive file, its archive driver is asked to
+     * If this file refers to an archive file, its archive driver is asked to
      * return an icon to be displayed for this file.
      * Otherwise, null is returned.
      * 
@@ -1978,13 +1975,14 @@ public final class TFile extends File {
      */
     @Deprecated
     public @CheckForNull Icon getClosedIcon() {
-        if (this == innerArchive) {
-            try {
-                return getController().getClosedIcon();
-            } catch (IOException ex) {
-            }
-        }
-        return null;
+        return isArchive()
+                ? ((FsArchiveDriver<?>) getDriver(getScheme()))
+                    .getClosedIcon(getController().getModel())
+                : null;
+    }
+
+    private @Nullable FsDriver getDriver(FsScheme scheme) {
+        return detector.get().get(scheme);
     }
 
     @Override

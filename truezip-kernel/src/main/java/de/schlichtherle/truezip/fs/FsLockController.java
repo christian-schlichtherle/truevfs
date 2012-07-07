@@ -17,7 +17,6 @@ import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.util.Threads;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -37,7 +36,6 @@ import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
-import javax.swing.Icon;
 
 /**
  * Provides read/write locking for multi-threaded access by its clients.
@@ -85,42 +83,15 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     }
 
     @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        return readOrWriteLocked(new GetOpenIcon());
-    }
-
-    private final class GetOpenIcon implements Operation<Icon> {
-        @Override
-        public Icon call() throws IOException {
-            return delegate.getOpenIcon();
-        }
-    } // GetOpenIcon
-    
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
-        return readOrWriteLocked(new GetClosedIcon());
-    }
-
-    private final class GetClosedIcon implements Operation<Icon> {
-        @Override
-        public Icon call() throws IOException {
-            return delegate.getClosedIcon();
-        }
-    } // GetClosedIcon
-
-    @Override
     public boolean isReadOnly() throws IOException {
+        final class IsReadOnly implements Operation<Boolean> {
+            @Override
+            public Boolean call() throws IOException {
+                return delegate.isReadOnly();
+            }
+        } // IsReadOnly
         return readOrWriteLocked(new IsReadOnly());
     }
-
-    private final class IsReadOnly implements Operation<Boolean> {
-        @Override
-        public Boolean call() throws IOException {
-            return delegate.isReadOnly();
-        }
-    } // IsReadOnly
     
     @Override
     public FsEntry getEntry(final FsEntryName name) throws IOException {
@@ -130,7 +101,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 return delegate.getEntry(name);
             }
         } // GetEntry
-
         return readOrWriteLocked(new GetEntry());
     }
 
@@ -142,7 +112,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 return delegate.isReadable(name);
             }
         } // IsReadable
-
         return readOrWriteLocked(new IsReadable());
     }
     
@@ -154,7 +123,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 return delegate.isWritable(name);
             }
         } // IsWritable
-
         return readOrWriteLocked(new IsWritable());
     }
 
@@ -166,7 +134,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 return delegate.isExecutable(name);
             }
         } // IsExecutable
-
         return readOrWriteLocked(new IsExecutable());
     }
 
@@ -179,7 +146,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 return null;
             }
         } // SetReadOnly
-
         writeLocked(new SetReadOnly());
     }
 
@@ -194,8 +160,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             public Boolean call() throws IOException {
                 return delegate.setTime(name, times, options);
             }
-        } // class SetTime
-
+        } // SetTime
         return writeLocked(new SetTime());
     }
 
@@ -211,8 +176,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             public Boolean call() throws IOException {
                 return delegate.setTime(name, types, value, options);
             }
-        } // class SetTime
-
+        } // SetTime
         return writeLocked(new SetTime());
     }
 
@@ -244,7 +208,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 return null;
             }
         } // Mknod
-
         writeLocked(new Mknod());
     }
 
@@ -260,29 +223,33 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 return null;
             }
         } // Unlink
-
         writeLocked(new Unlink());
     }
 
     @Override
-    public <X extends IOException> void
-    sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
+    public void sync(final BitField<FsSyncOption> options)
+    throws FsSyncException, FsControllerException {
         final class Sync implements Operation<Void> {
             @Override
             public Void call() throws IOException {
-                delegate.sync(options, handler);
+                delegate.sync(options);
                 return null;
             }
         } // Sync
-
-        writeLocked(new Sync());
+        try {
+            writeLocked(new Sync());
+        } catch (final FsSyncException ex) {
+            throw ex;
+        } catch (final FsControllerException ex) {
+            throw ex;
+        } catch (IOException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     private interface Operation<T> {
         @Nullable T call() throws IOException;
-    } // IOOperation
+    } // Operation
 
     <T> T readOrWriteLocked(Operation<T> operation)
     throws IOException {
@@ -441,14 +408,13 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            class NewSeekableByteChannel implements Operation<SeekableByteChannel> {
+            final class NewSeekableByteChannel implements Operation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
                     return new LockSeekableByteChannel(
                             getBoundSocket().newSeekableByteChannel());
                 }
             } // NewSeekableByteChannel
-
             return writeLocked(new NewSeekableByteChannel());
         }
     } // Nio2Input
@@ -463,39 +429,36 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            class GetLocalTarget implements Operation<Entry> {
+            final class GetLocalTarget implements Operation<Entry> {
                 @Override
                 public Entry call() throws IOException {
                     return getBoundSocket().getLocalTarget();
                 }
             } // GetLocalTarget
-
             return writeLocked(new GetLocalTarget());
         }
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            class NewReadOnlyFile implements Operation<ReadOnlyFile> {
+            final class NewReadOnlyFile implements Operation<ReadOnlyFile> {
                 @Override
                 public ReadOnlyFile call() throws IOException {
                     return new LockReadOnlyFile(
                             getBoundSocket().newReadOnlyFile());
                 }
             } // NewReadOnlyFile
-
             return writeLocked(new NewReadOnlyFile());
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            class NewInputStream implements Operation<InputStream> {
+            final class NewInputStream implements Operation<InputStream> {
                 @Override
                 public InputStream call() throws IOException {
                     return new LockInputStream(
                             getBoundSocket().newInputStream());
                 }
             } // NewInputStream
-
             return writeLocked(new NewInputStream());
         }
     } // Input
@@ -510,14 +473,13 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            class NewSeekableByteChannel implements Operation<SeekableByteChannel> {
+            final class NewSeekableByteChannel implements Operation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call() throws IOException {
                     return new LockSeekableByteChannel(
                             getBoundSocket().newSeekableByteChannel());
                 }
             } // NewSeekableByteChannel
-
             return writeLocked(new NewSeekableByteChannel());
         }
     } // Nio2Output
@@ -533,26 +495,24 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public Entry getLocalTarget() throws IOException {
-            class GetLocalTarget implements Operation<Entry> {
+            final class GetLocalTarget implements Operation<Entry> {
                 @Override
                 public Entry call() throws IOException {
                     return getBoundSocket().getLocalTarget();
                 }
             } // GetLocalTarget
-
             return writeLocked(new GetLocalTarget());
         }
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            class NewOutputStream implements Operation<OutputStream> {
+            final class NewOutputStream implements Operation<OutputStream> {
                 @Override
                 public OutputStream call() throws IOException {
                     return new LockOutputStream(
                             getBoundSocket().newOutputStream());
                 }
             } // NewOutputStream
-
             return writeLocked(new NewOutputStream());
         }
     } // Output
@@ -621,7 +581,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 return null;
             }
         } // Close
-
         writeLocked(new Close());
     }
 

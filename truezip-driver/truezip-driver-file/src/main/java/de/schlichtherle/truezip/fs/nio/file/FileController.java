@@ -14,7 +14,6 @@ import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
@@ -29,7 +28,6 @@ import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
-import javax.swing.Icon;
 
 /**
  * A file system controller with a prospective directory in the platform file
@@ -59,18 +57,6 @@ final class FileController extends FsModelController<FsModel>  {
 
     @Override
     public FsController<?> getParent() {
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
         return null;
     }
 
@@ -205,9 +191,7 @@ final class FileController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public <X extends IOException>
-    void sync(  BitField<FsSyncOption> options,
-                ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+    public void sync(final BitField<FsSyncOption> options)
+    throws FsSyncException, FsControllerException {
     }
 }

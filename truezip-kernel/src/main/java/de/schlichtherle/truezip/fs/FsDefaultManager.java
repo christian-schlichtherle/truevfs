@@ -5,13 +5,11 @@
 package de.schlichtherle.truezip.fs;
 
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.Link;
 import de.schlichtherle.truezip.util.Link.Type;
 import static de.schlichtherle.truezip.util.Link.Type.STRONG;
 import static de.schlichtherle.truezip.util.Link.Type.WEAK;
 import static de.schlichtherle.truezip.util.Links.getTarget;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
@@ -115,12 +113,9 @@ public final class FsDefaultManager extends FsManager {
     }
 
     @Override
-    public <X extends IOException> void sync(
-            final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super IOException, X> handler)
-    throws X {
+    public void sync(BitField<FsSyncOption> options) throws FsSyncException {
         FsSyncShutdownHook.cancel();
-        super.sync(options, handler);
+        super.sync(options);
     }
 
     /**

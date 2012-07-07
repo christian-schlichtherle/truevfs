@@ -14,7 +14,6 @@ import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.SafeKeyManager;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.net.URI;
 import javax.annotation.CheckForNull;
@@ -123,11 +122,9 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public <X extends IOException> void
-    sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
-        delegate.sync(options, handler);
+    public void sync(final BitField<FsSyncOption> options)
+    throws FsSyncException, FsControllerException {
+        delegate.sync(options);
         final KeyManager<?> manager = getKeyManager();
         final URI resource = driver.mountPointUri(getModel());
         final KeyProvider<?> provider;

@@ -10,11 +10,9 @@ import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
-import javax.swing.Icon;
 
 /**
  * An abstract decorator for a file system controller.
@@ -45,18 +43,6 @@ extends FsModelController<M> {
     @Override
     public FsController<?> getParent() {
         return delegate.getParent();
-    }
-
-    @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        return delegate.getOpenIcon();
-    }
-
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
-        return delegate.getClosedIcon();
     }
 
     @Override
@@ -141,11 +127,9 @@ extends FsModelController<M> {
     }
 
     @Override
-    public <X extends IOException> void
-    sync(   BitField<FsSyncOption> options,
-            ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
-        delegate.sync(options, handler);
+    public void sync(BitField<FsSyncOption> options)
+    throws FsSyncException, FsControllerException {
+        delegate.sync(options);
     }
 
     @Override
