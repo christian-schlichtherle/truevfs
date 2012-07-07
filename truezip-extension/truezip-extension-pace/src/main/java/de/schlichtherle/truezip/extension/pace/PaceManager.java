@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.ext.pace;
+package de.schlichtherle.truezip.extension.pace;
 
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.util.BitField;
@@ -19,27 +19,24 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class PaceManager
+public final class PaceManager
 extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
 
     private static final Logger
             logger = Logger.getLogger(  PaceManager.class.getName(),
                                         PaceManager.class.getName());
 
-    private volatile int maxMounts;
+    private volatile int
+            maxMounts = DEFAULT_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES;
 
-    private final Queue<PaceController> lru
+    private final Collection<PaceController> lru
             = new ConcurrentLinkedQueue<PaceController>();
 
     @SuppressWarnings("serial")
     private final Map<FsMountPoint, PaceController> mru;
 
-    PaceManager(FsManager manager) {
+    public PaceManager(final FsManager manager) {
         super(manager);
-        setMaximumOfMostRecentlyUsedArchiveFiles(Integer.parseInt(System.getProperty(
-                PaceManager.class.getName() + ".maxMounts",
-                Integer.toString(DEFAULT_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES))));
-        // Requires initialized maxMounts!
         mru = Collections.synchronizedMap(new MruControllerMap());
     }
 
@@ -139,16 +136,7 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
         lru.clear();
         logger.log(Level.FINER, "clearMruSize", getNumberOfMostRecentlyUsedArchiveFiles());
         mru.clear();
-        try {
-            delegate.sync(options, handler);
-        } catch (final IOException ex) {
-            // Rebuild the MRU cache and pass on the exception.
-            for (final FsController<?> c : delegate) {
-                final FsMountPoint mp = c.getModel().getMountPoint();
-                mru.put(mp, new PaceController(this, c));
-            }
-            throw (X) ex;
-        }
+        delegate.sync(options, handler);
     }
 
     @SuppressWarnings("serial")
@@ -156,13 +144,15 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
     extends LinkedHashMap<FsMountPoint, PaceController> {
 
         MruControllerMap() {
-            super(HashMaps.initialCapacity(getMaximumOfMostRecentlyUsedArchiveFiles() + 1), 0.75f, true);
+            super(HashMaps.initialCapacity(
+                    getMaximumOfMostRecentlyUsedArchiveFiles() + 1), 0.75f, true);
         }
 
         @Override
         public boolean removeEldestEntry(
                 final Map.Entry<FsMountPoint, PaceController> entry) {
-            final boolean evict = size() > getMaximumOfMostRecentlyUsedArchiveFiles();
+            final boolean evict
+                    = size() > getMaximumOfMostRecentlyUsedArchiveFiles();
             if (evict) {
                 final PaceController c = entry.getValue();
                 final boolean added = lru.add(c);
