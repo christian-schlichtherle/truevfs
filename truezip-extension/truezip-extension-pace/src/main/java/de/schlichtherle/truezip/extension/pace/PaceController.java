@@ -21,7 +21,6 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
-import javax.swing.Icon;
 
 /**
  * Calls back the given {@link PaceManager} before each file system
@@ -49,18 +48,6 @@ extends FsDecoratingController<FsModel, FsController<?>> {
 
     void accessMruAndSyncLru() throws FsSyncException {
         manager.accessMru(this).syncLru();
-    }
-
-    @Override
-    public Icon getOpenIcon() throws IOException {
-        accessMruAndSyncLru();
-        return delegate.getOpenIcon();
-    }
-
-    @Override
-    public Icon getClosedIcon() throws IOException {
-        accessMruAndSyncLru();
-        return delegate.getClosedIcon();
     }
 
     @Override

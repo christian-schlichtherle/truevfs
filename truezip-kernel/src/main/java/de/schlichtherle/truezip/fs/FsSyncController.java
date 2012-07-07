@@ -21,7 +21,6 @@ import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
@@ -34,7 +33,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.ThreadSafe;
-import javax.swing.Icon;
 
 /**
  * Performs a {@link FsController#sync(BitField) sync} operation on the
@@ -66,43 +64,13 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     }
 
     void sync(final FsNeedsSyncException trigger)
-    throws IOException {
+    throws FsSyncException, FsControllerException {
         checkWriteLockedByCurrentThread();
-        final FsSyncWarningException fuse
-                = new FsSyncWarningException(getModel(), trigger);
-        final FsSyncExceptionBuilder ied = new FsSyncExceptionBuilder();
         try {
-            ied.warn(fuse);     // charge fuse
-            sync(SYNC, ied);    // charge load
-            ied.check();        // pull trigger
-            throw new AssertionError("Expected an instance of the " + FsSyncException.class);
-        } catch (final FsSyncWarningException damage) {
-            if (damage != fuse) // check for dud
-                throw damage;
-        }
-    }
-
-    @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        while (true) {
-            try {
-                return delegate.getOpenIcon();
-            } catch (FsNeedsSyncException ex) {
-                sync(ex);
-            }
-        }
-    }
-
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
-        while (true) {
-            try {
-                return delegate.getClosedIcon();
-            } catch (FsNeedsSyncException ex) {
-                sync(ex);
-            }
+            sync(SYNC);
+        } catch (final FsSyncException ex) {
+            if (JSE7.AVAILABLE) ex.addSuppressed(trigger);
+            throw ex;
         }
     }
 
@@ -257,10 +225,8 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     }
 
     @Override
-    public <X extends IOException> void
-    sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
+    public void sync(final BitField<FsSyncOption> options)
+    throws FsSyncException, FsControllerException {
         final BitField<FsSyncOption> modified = modify(options);
         try {
             delegate.sync(modified);

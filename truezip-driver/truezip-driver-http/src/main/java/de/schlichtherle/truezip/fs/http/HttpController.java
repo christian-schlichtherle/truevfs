@@ -13,11 +13,9 @@ import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
-import javax.swing.Icon;
 import org.apache.http.HttpResponse;
 
 /**
@@ -60,18 +58,6 @@ public class HttpController extends FsModelController<FsModel>  {
 
     @Override
     public FsController<?> getParent() {
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
         return null;
     }
 
@@ -141,9 +127,7 @@ public class HttpController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public <X extends IOException>
-    void sync(  BitField<FsSyncOption> options,
-                ExceptionHandler<? super FsSyncException, X> handler)
-    throws X {
+    public void sync(final BitField<FsSyncOption> options)
+    throws FsSyncException, FsControllerException {
     }
 }

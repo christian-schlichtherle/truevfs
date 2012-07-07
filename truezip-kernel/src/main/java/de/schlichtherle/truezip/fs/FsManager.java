@@ -4,9 +4,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import static de.schlichtherle.truezip.fs.FsSyncOption.*;
+import static de.schlichtherle.truezip.fs.FsSyncOption.ABORT_CHANGES;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.util.Iterator;
 import javax.annotation.concurrent.ThreadSafe;
@@ -65,43 +64,6 @@ implements Iterable<FsController<?>> {
     public abstract Iterator<FsController<?>> iterator();
 
     /**
-     * @deprecated Use {@link FsSyncOptions#UMOUNT} instead.
-     */
-    @Deprecated
-    public static final BitField<FsSyncOption> UMOUNT = FsSyncOptions.UMOUNT;
-
-    /**
-     * Commits all unsynchronized changes to the contents of all federated file
-     * systems managed by this instance to their respective parent file system,
-     * releases the associated resources (e.g. target archive files) for
-     * access by third parties (e.g. other processes), cleans up any temporary
-     * allocated resources (e.g. temporary files) and purges any cached data.
-     * Note that temporary resources may get allocated even if the federated
-     * file systems were accessed read-only.
-     * As a side effect, this will reset the state of the respective file
-     * system controllers.
-     * <p>
-     * This method calls {@link #sync sync(options, builder)}, where builder is
-     * an instance of {@link FsSyncExceptionBuilder}.
-     * If the call succeeds, the builder's {@link FsSyncExceptionBuilder#check}
-     * method is called to check out any {@link FsSyncWarningException}, too.
-     *
-     * @param  options a bit field of synchronization options.
-     * @throws FsSyncException if committing the changes fails for any reason.
-     * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if
-     *         {@link FsSyncOption#FORCE_CLOSE_INPUT} is cleared and
-     *         {@link FsSyncOption#FORCE_CLOSE_OUTPUT} is set or if the
-     *         synchronization option {@link FsSyncOption#ABORT_CHANGES} is set.
-     */
-    public final void
-    sync(final BitField<FsSyncOption> options) throws FsSyncException {
-        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
-        sync(options, builder);
-        builder.check();
-    }
-
-    /**
      * Commits all unsynchronized changes to the contents of all federated file
      * systems managed by this instance to their respective parent file system,
      * releases the associated resources (e.g. target archive files) for
@@ -112,35 +74,30 @@ implements Iterable<FsController<?>> {
      * As a side effect, this will reset the state of the respective file
      * system controllers.
      *
-     * @param  options a bit field of synchronization options.
-     * @param  handler the exception handling strategy for consuming input
-     *         {@code IOException}s and mapping them to output
-     *         {@code IOException}s.
-     * @param  <X> The type of the {@code IOException} to throw at the
-     *         discretion of the exception {@code handler}.
-     * @throws X at the discretion of the exception {@code handler}
-     *         upon the occurence of any {@code IOException}.
+     * @param  options the options for synchronizing the file system.
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
+     *         apply.
+     *         This implies that the respective parent file system has been
+     *         synchronized with constraints, e.g. if an unclosed archive entry
+     *         stream gets forcibly closed.
+     * @throws FsSyncException if any error conditions apply.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if
-     *         {@link FsSyncOption#FORCE_CLOSE_INPUT} is cleared and
-     *         {@link FsSyncOption#FORCE_CLOSE_OUTPUT} is set or if the
-     *         synchronization option {@link FsSyncOption#ABORT_CHANGES} is set.
+     *         options is illegal, e.g. if {@link FsSyncOption#ABORT_CHANGES}
+     *         is set.
      */
-    public <X extends IOException> void
-    sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super IOException, X> handler)
-    throws X {
-        if (options.get(FORCE_CLOSE_OUTPUT) && !options.get(FORCE_CLOSE_INPUT)
-                || options.get(ABORT_CHANGES))
+    public void sync(final BitField<FsSyncOption> options)
+    throws FsSyncWarningException, FsSyncException {
+        if (options.get(ABORT_CHANGES))
             throw new IllegalArgumentException();
-
+        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         for (final FsController<?> controller : this) {
             try {
-                controller.sync(options, handler);
+                controller.sync(options);
             } catch (final IOException ex) {
-                handler.warn(ex);
+                builder.warn(ex);
             }
         }
+        builder.check();
     }
 
     /**

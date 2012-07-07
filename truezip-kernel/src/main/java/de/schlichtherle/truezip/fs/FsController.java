@@ -10,13 +10,10 @@ import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import javax.swing.Icon;
-import javax.swing.JTree;
 
 /**
  * An abstract class which provides read/write access to a file system.
@@ -116,32 +113,6 @@ public abstract class FsController<M extends FsModel> {
      * @return The nullable controller for the parent file system.
      */
     public abstract @Nullable FsController<?> getParent();
-
-    /**
-     * Returns a nullable icon representing the "open" state when displaying
-     * the (federated) file system represented by this controller in a GUI,
-     * e.g. a {@link JTree}.
-     * 
-     * @return The nullable icon.
-     * @throws IOException on any I/O failure.
-     * @deprecated GUI features will get removed from this class in TrueZIP 8.
-     */
-    @Deprecated
-    public abstract @Nullable Icon getOpenIcon()
-    throws IOException;
-
-    /**
-     * Returns a nullable icon representing the "closed" state when displaying
-     * the (federated) file system represented by this controller in a GUI,
-     * e.g. a {@link JTree}.
-     * 
-     * @return The nullable icon.
-     * @throws IOException on any I/O failure.
-     * @deprecated GUI features will get removed from this class in TrueZIP 8.
-     */
-    @Deprecated
-    public abstract @Nullable Icon getClosedIcon()
-    throws IOException;
 
     /**
      * Returns {@code true} if and only if the file system is read-only.
@@ -361,51 +332,18 @@ public abstract class FsController<M extends FsModel> {
      * If this is not a federated file system, i.e. if its not a member of a
      * parent file system, then nothing happens.
      * Otherwise, the state of this file system controller is reset.
-     * <p>
-     * This method calls {@link #sync sync(options, builder)}, where builder is
-     * an instance of {@link FsSyncExceptionBuilder}.
-     * If the call succeeds, the builder's {@link FsSyncExceptionBuilder#check}
-     * method is called to check out any {@link FsSyncWarningException}, too.
      *
-     * @param  options the synchronization options.
-     * @throws FsSyncException if committing the changes fails because of any
-     *         I/O related failure.
-     * @throws IOException on any other (not necessarily I/O related) failure.
+     * @param  options the options for synchronizing the file system.
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
+     *         apply.
+     *         This implies that the respective parent file system has been
+     *         synchronized with constraints, e.g. if an unclosed archive entry
+     *         stream gets forcibly closed.
+     * @throws FsSyncException if any error conditions apply.
+     * @throws FsControllerException for non-local control flow.
      */
-    public final void
-    sync(final BitField<FsSyncOption> options)
-    throws IOException {
-        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
-        sync(options, builder);
-        builder.check();
-    }
-
-    /**
-     * Commits all unsynchronized changes to the contents of this file system
-     * to its parent file system,
-     * releases the associated resources (e.g. target archive files) for
-     * access by third parties (e.g. other processes), cleans up any temporary
-     * allocated resources (e.g. temporary files) and purges any cached data.
-     * Note that temporary resources may get allocated even if the federated
-     * file systems were accessed read-only.
-     * If this is not a federated file system, i.e. if its not a member of a
-     * parent file system, then nothing happens.
-     * Otherwise, the state of this file system controller is reset.
-     *
-     * @param  options a bit field of synchronization options.
-     * @param  handler the exception handling strategy for consuming input
-     *         {@code FsSyncException}s and mapping them to output
-     *         {@code IOException}s.
-     * @param  <X> The type of the {@code IOException} to throw at the
-     *         discretion of the exception {@code handler}.
-     * @throws X at the discretion of the exception {@code handler}
-     *         upon the occurence of any {@link FsSyncException}.
-     * @throws IOException on any other (not necessarily I/O related) failure.
-     */
-    public abstract <X extends IOException> void
-    sync(   BitField<FsSyncOption> options,
-            ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException;
+    public abstract void sync(BitField<FsSyncOption> options)
+    throws FsSyncWarningException, FsSyncException, FsControllerException;
 
     /**
      * Two file system controllers are considered equal if and only if they

@@ -17,7 +17,6 @@ import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.test.ThrowControl;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +28,6 @@ import java.util.concurrent.ConcurrentMap;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
-import javax.swing.Icon;
 
 /**
  * @author  Christian Schlichtherle
@@ -92,20 +90,6 @@ public class MockController extends FsController<FsModel> {
     public FsController<?> getParent() {
         checkUndeclaredExceptions(this);
         return parent;
-    }
-
-    @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        checkAllExceptions(this);
-        return null;
-    }
-
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
-        checkAllExceptions(this);
-        return null;
     }
 
     @Override
@@ -288,12 +272,17 @@ public class MockController extends FsController<FsModel> {
     }
 
     @Override
-    public <X extends IOException> void
-    sync(   BitField<FsSyncOption> options,
-            ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
-        checkAllExceptions(this);
+    public void sync(final BitField<FsSyncOption> options)
+    throws FsSyncException, FsControllerException {
+        try {
+            checkAllExceptions(this);
+        } catch (final FsSyncException ex) {
+            throw ex;
+        } catch (final FsControllerException ex) {
+            throw ex;
+        } catch (final IOException ex) {
+            throw new AssertionError(ex);
+        }
         assert null != options;
-        assert null != handler;
     }
 }

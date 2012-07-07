@@ -12,7 +12,6 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -23,7 +22,6 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
-import javax.swing.Icon;
 
 /**
  * Implements a chain of responsibility in order to resolve
@@ -96,7 +94,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         assert null != super.getParent();
     }
 
-    @Nullable <T> T call(   final IOOperation<T> operation,
+    @Nullable <T> T call(   final Operation<T> operation,
                             final FsEntryName name)
     throws IOException {
         final State state = this.state;
@@ -127,41 +125,11 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    @Deprecated
-    public Icon getOpenIcon() throws IOException {
-        return call(new GetOpenIcon(), ROOT);
-    }
-
-    final static class GetOpenIcon implements IOOperation<Icon> {
-        @Override
-        public Icon call(   final FsController<?> controller,
-                            final FsEntryName name)
-        throws IOException {
-            return controller.getOpenIcon();
-        }
-    } // GetOpenIcon
-
-    @Override
-    @Deprecated
-    public Icon getClosedIcon() throws IOException {
-        return call(new GetClosedIcon(), ROOT);
-    }
-
-    private static final class GetClosedIcon implements IOOperation<Icon> {
-        @Override
-        public Icon call(   final FsController<?> controller,
-                            final FsEntryName name)
-        throws IOException {
-            return controller.getClosedIcon();
-        }
-    } // GetClosedIcon
-
-    @Override
     public boolean isReadOnly() throws IOException {
         return call(new IsReadOnly(), ROOT);
     }
 
-    private static final class IsReadOnly implements IOOperation<Boolean> {
+    private static final class IsReadOnly implements Operation<Boolean> {
         @Override
         public Boolean call(final FsController<?> controller,
                             final FsEntryName name)
@@ -175,7 +143,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return call(new GetEntry(), name);
     }
 
-    private static final class GetEntry implements IOOperation<FsEntry> {
+    private static final class GetEntry implements Operation<FsEntry> {
         @Override
         public FsEntry call(final FsController<?> controller,
                             final FsEntryName name)
@@ -189,7 +157,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return call(new IsReadable(), name);
     }
 
-    private static final class IsReadable implements IOOperation<Boolean> {
+    private static final class IsReadable implements Operation<Boolean> {
         @Override
         public Boolean call(final FsController<?> controller,
                             final FsEntryName name)
@@ -203,7 +171,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return call(new IsWritable(), name);
     }
 
-    private static final class IsWritable implements IOOperation<Boolean> {
+    private static final class IsWritable implements Operation<Boolean> {
         @Override
         public Boolean call(final FsController<?> controller,
                             final FsEntryName name)
@@ -217,7 +185,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         return call(new IsExecutable(), name);
     }
 
-    private static final class IsExecutable implements IOOperation<Boolean> {
+    private static final class IsExecutable implements Operation<Boolean> {
         @Override
         public Boolean call(final FsController<?> controller,
                             final FsEntryName name)
@@ -231,7 +199,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         call(new SetReadOnly(), name);
     }
 
-    private static final class SetReadOnly implements IOOperation<Void> {
+    private static final class SetReadOnly implements Operation<Void> {
         @Override
         public Void call(   final FsController<?> controller,
                             final FsEntryName name)
@@ -247,7 +215,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final Map<Access, Long> times,
             final BitField<FsOutputOption> options)
     throws IOException {
-        final class SetTime implements IOOperation<Boolean> {
+        final class SetTime implements Operation<Boolean> {
             @Override
             public Boolean call(final FsController<?> controller,
                                 final FsEntryName name)
@@ -266,7 +234,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final long value,
             final BitField<FsOutputOption> options)
     throws IOException {
-        final class SetTime implements IOOperation<Boolean> {
+        final class SetTime implements Operation<Boolean> {
             @Override
             public Boolean call(final FsController<?> controller,
                                 final FsEntryName name)
@@ -302,7 +270,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             }
 
             final class GetLocalTarget
-            implements IOOperation<Entry> {
+            implements Operation<Entry> {
                 @Override
                 public Entry call(
                         final FsController<?> controller,
@@ -319,7 +287,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             }
 
             final class NewReadOnlyFile
-            implements IOOperation<ReadOnlyFile> {
+            implements Operation<ReadOnlyFile> {
                 @Override
                 public ReadOnlyFile call(
                         final FsController<?> controller,
@@ -337,7 +305,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             }
 
             final class NewSeekableByteChannel
-            implements IOOperation<SeekableByteChannel> {
+            implements Operation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call(
                         final FsController<?> controller,
@@ -354,7 +322,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             }
 
             final class NewInputStream
-            implements IOOperation<InputStream> {
+            implements Operation<InputStream> {
                 @Override
                 public InputStream call(
                         final FsController<?> controller,
@@ -395,7 +363,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             }
 
             final class GetLocalTarget
-            implements IOOperation<Entry> {
+            implements Operation<Entry> {
                 @Override
                 public Entry call(
                         final FsController<?> controller,
@@ -413,7 +381,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             }
 
             final class NewSeekableByteChannel
-            implements IOOperation<SeekableByteChannel> {
+            implements Operation<SeekableByteChannel> {
                 @Override
                 public SeekableByteChannel call(
                         final FsController<?> controller,
@@ -430,7 +398,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             }
 
             final class NewOutputStream
-            implements IOOperation<OutputStream> {
+            implements Operation<OutputStream> {
                 @Override
                 public OutputStream call(
                         final FsController<?> controller,
@@ -453,7 +421,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final BitField<FsOutputOption> options,
             final @CheckForNull Entry template)
     throws IOException {
-        final class Mknod implements IOOperation<Void> {
+        final class Mknod implements Operation<Void> {
             @Override
             public Void call(final FsController<?> controller,
                              final FsEntryName name)
@@ -471,7 +439,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             final FsEntryName name,
             final BitField<FsOutputOption> options)
     throws IOException {
-        final class Unlink implements IOOperation<Void> {
+        final class Unlink implements Operation<Void> {
             @Override
             public Void call(final FsController<?> controller,
                              final FsEntryName name)
@@ -487,7 +455,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
             }
         } // Unlink
 
-        final IOOperation<Void> operation = new Unlink();
+        final Operation<Void> operation = new Unlink();
         if (name.isRoot()) {
             // HC SVNT DRACONES!
             final State tryChild = new TryChild();
@@ -503,34 +471,35 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     @Override
-    public <X extends IOException> void
-    sync(   final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
+    public void sync(final BitField<FsSyncOption> options)
+    throws FsSyncException, FsControllerException {
         // HC SVNT DRACONES!
         try {
-            delegate.sync(options, handler);
-        } catch (final FsFalsePositiveException ex) {
+            delegate.sync(options);
+        } catch (final FsSyncException ex) {
             assert state instanceof TryChild;
-            throw new FsSyncException(getModel(), ex.getCause());
+            throw ex;
+        } catch (final FsControllerException ex) {
+            assert state instanceof TryChild;
+            throw ex;
         }
         state = new TryChild();
     }
 
-    private interface IOOperation<V> {
+    private interface Operation<V> {
         @Nullable V call(FsController<?> controller, FsEntryName name)
         throws IOException;
     } // IOOperation
 
     private interface State {
-        @Nullable <T> T call(IOOperation<T> operation, FsEntryName name)
+        @Nullable <T> T call(Operation<T> operation, FsEntryName name)
         throws IOException;
     } // State
 
     @Immutable
     private final class TryChild implements State {
         @Override
-        public <V> V call(  final IOOperation<V> operation,
+        public <V> V call(  final Operation<V> operation,
                             final FsEntryName name)
         throws IOException {
             return operation.call(delegate, name);
@@ -546,7 +515,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
         }
 
         @Override
-        public <V> V call(  final IOOperation<V> operation,
+        public <V> V call(  final Operation<V> operation,
                             final FsEntryName name)
         throws IOException {
             try {

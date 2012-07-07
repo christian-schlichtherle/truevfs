@@ -19,7 +19,6 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import static de.schlichtherle.truezip.socket.IOCache.Strategy.WRITE_BACK;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
@@ -174,15 +173,14 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     }
 
     @Override
-    public <X extends IOException> void sync(
-            final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws IOException {
+    public void sync(final BitField<FsSyncOption> options)
+    throws FsSyncException, FsControllerException {
+        assert isWriteLockedByCurrentThread();
         FsNeedsSyncException preSyncEx;
         do {
             preSyncEx = null;
             try {
-                preSync(options, handler);
+                preSync(options);
             } catch (final FsNeedsSyncException invalidState) {
                 // The target archive controller is in an invalid state because
                 // it reports to need a sync() while the current thread is
@@ -217,49 +215,43 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 logger.log(Level.FINE, "recovering", invalidState);
                 preSyncEx = invalidState; // trigger another iteration
             }
-            delegate.sync(options.clear(CLEAR_CACHE), handler);
+            delegate.sync(options.clear(CLEAR_CACHE));
         } while (null != preSyncEx);
-        if (options.get(CLEAR_CACHE) && caches.isEmpty()) setTouched(false);
+        if (caches.isEmpty()) setTouched(false);
     }
 
-    private <X extends IOException> void
-    preSync(final BitField<FsSyncOption> options,
-            final ExceptionHandler<? super FsSyncException, X> handler)
-    throws FsControllerException, X {
-        assert isWriteLockedByCurrentThread();
-        if (0 >= caches.size())
-            return;
+    private void preSync(final BitField<FsSyncOption> options)
+    throws FsSyncWarningException, FsSyncException, FsControllerException {
+        if (0 >= caches.size()) return;
         final boolean flush = !options.get(ABORT_CHANGES);
-        boolean clear = !flush || options.get(CLEAR_CACHE);
+        final boolean clear = !flush || options.get(CLEAR_CACHE);
         assert flush || clear;
+        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         for (   final Iterator<EntryCache> i = caches.values().iterator();
                 i.hasNext(); ) {
             final EntryCache cache = i.next();
-            try {
-                if (flush) {
-                    try {
-                        cache.flush();
-                    } catch (final FsControllerException ex) {
-                        clear = false;
-                        throw ex;
-                    } catch (final IOException ex) {
-                        throw handler.fail(new FsSyncException(getModel(), ex));
-                    }
+            if (flush) {
+                try {
+                    cache.flush();
+                } catch (final FsControllerException ex) {
+                    throw ex;
+                } catch (final IOException ex) {
+                    throw builder.fail(new FsSyncException(getModel(), ex));
                 }
-            } finally {
-                if (clear) {
-                    i.remove();
-                    try {
-                        cache.clear();
-                    } catch (final FsControllerException ex) {
-                        assert false;
-                        throw ex;
-                    } catch (final IOException ex) {
-                        handler.warn(new FsSyncWarningException(getModel(), ex));
-                    }
+            }
+            if (clear) {
+                i.remove();
+                try {
+                    cache.clear();
+                } catch (final FsControllerException ex) {
+                    assert false;
+                    throw ex;
+                } catch (final IOException ex) {
+                    builder.warn(new FsSyncWarningException(getModel(), ex));
                 }
             }
         }
+        builder.check();
     }
 
     @Immutable
