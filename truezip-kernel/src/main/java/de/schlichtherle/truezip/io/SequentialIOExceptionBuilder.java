@@ -50,8 +50,8 @@ extends AbstractExceptionBuilder<C, X> {
         try {
             if (!x.isAssignableFrom(c))
                 x   .getConstructor(String.class)
-                    .newInstance("test")
-                    .initCause(null); // fail-fast test!
+                    .newInstance("fail-fast test")
+                    .initCause(null);
         } catch (final RuntimeException ex) {
             // E.g. null == c || null == x || ex instanceof SecurityException
             throw ex;
