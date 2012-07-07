@@ -219,7 +219,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             }
             delegate.sync(options.clear(CLEAR_CACHE), handler);
         } while (null != preSyncEx);
-        if (caches.isEmpty()) setTouched(false);
+        if (options.get(CLEAR_CACHE) && caches.isEmpty()) setTouched(false);
     }
 
     private <X extends IOException> void
