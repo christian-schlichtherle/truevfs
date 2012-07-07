@@ -2,10 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package de.schlichtherle.truezip.ext.pace;
+package de.schlichtherle.truezip.extension.pace;
 
 import de.schlichtherle.truezip.fs.FsDefaultManager;
-import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.spi.FsManagerService;
 import java.lang.management.ManagementFactory;
 import java.util.logging.Level;
@@ -21,7 +20,7 @@ import javax.management.ObjectName;
 public final class PaceManagerService extends FsManagerService {
 
     @Override
-    public FsManager get() {
+    public PaceManager get() {
         return Boot.MANAGER;
     }
 
@@ -37,7 +36,7 @@ public final class PaceManagerService extends FsManagerService {
 
     /** A static data utility class used for lazy initialization. */
     private static final class Boot {
-        static final FsManager MANAGER;
+        static final PaceManager MANAGER;
         static {
             final Logger logger = Logger.getLogger(
                     PaceManagerService.class.getName());
