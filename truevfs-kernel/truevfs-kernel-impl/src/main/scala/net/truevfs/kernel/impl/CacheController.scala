@@ -153,19 +153,18 @@ private trait CacheController extends Controller[LockModel] {
   }
 
   private def preSync(options: SyncOptions) {
-    if (0 >= caches.size())
-      return
+    if (0 >= caches.size()) return
     val flush = !(options get ABORT_CHANGES)
     var release = !flush || (options get CLEAR_CACHE)
     assert(flush || release)
     val builder = new FsSyncExceptionBuilder
     val i = caches.values.iterator
-    while (i hasNext) {
-      val cache = i next()
+    while (i.hasNext) {
+      val cache = i next ()
       try {
         if (flush) {
           try {
-            cache flush()
+            cache flush ()
           } catch {
             case ex: IOException =>
               throw builder fail new FsSyncException(mountPoint, ex)
@@ -177,9 +176,9 @@ private trait CacheController extends Controller[LockModel] {
           throw ex
       } finally {
         if (release) {
-          i remove()
+          i remove ()
           try {
-            cache release()
+            cache release ()
           } catch {
             case ex: IOException =>
               builder warn new FsSyncWarningException(mountPoint, ex)
@@ -187,7 +186,7 @@ private trait CacheController extends Controller[LockModel] {
         }
       }
     }
-    builder check()
+    builder check ()
   }
 
   /** A cache for the contents of an individual archive entry. */
