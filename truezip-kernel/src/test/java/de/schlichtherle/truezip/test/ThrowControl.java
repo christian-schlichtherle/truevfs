@@ -62,11 +62,8 @@ public final class ThrowControl {
     throws X {
         final Throwable toThrow = throwables.remove(thiz);
         if (null != toThrow)
-            if (throwz.isInstance(toThrow))
-                throw throwz.cast(wrap(toThrow));
-            else
-                throwables.put(thiz, toThrow); // restore
-
+            if (throwz.isInstance(toThrow)) throw throwz.cast(wrap(toThrow));
+            else throwables.put(thiz, toThrow); // restore
         // No match, now recursively check interfaces first and then super
         // classes.
         // This may result in redundant checks for interfaces.
