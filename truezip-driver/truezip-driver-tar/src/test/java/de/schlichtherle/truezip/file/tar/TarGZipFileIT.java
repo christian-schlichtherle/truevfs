@@ -5,6 +5,7 @@
 package de.schlichtherle.truezip.file.tar;
 
 import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
+import de.schlichtherle.truezip.fs.archive.tar.TestTarGZipDriver;
 
 /**
  * @author Christian Schlichtherle
@@ -18,6 +19,6 @@ public final class TarGZipFileIT extends TarFileITSuite<TarGZipDriver> {
 
     @Override
     protected TarGZipDriver newArchiveDriver() {
-        return new TarGZipDriver(getTestConfig().getIOPoolProvider());
+        return new TestTarGZipDriver();
     }
 }

@@ -14,7 +14,7 @@ extends FsCharsetArchiveDriverTestSuite<TarDriverEntry, TarGZipDriver> {
 
     @Override
     protected TarGZipDriver newArchiveDriver() {
-        return new TarGZipDriver(getTestConfig().getIOPoolProvider());
+        return new TestTarGZipDriver();
     }
 
     @Override
