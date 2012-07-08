@@ -42,25 +42,36 @@ private final class ArchiveManager(
   private[this] val readLock = lock.readLock
   private[this] val writeLock = lock.writeLock
 
-  override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint) = {
-    writeLock.lock()
+  override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint): FsController[_ <: FsModel] = {
     try {
-      controller0(driver, mountPoint)
-    } finally {
-      writeLock.unlock()
+      readLock lock ()
+      try {
+        return controller0(driver, mountPoint)
+      } finally {
+        readLock unlock ()
+      }
+    } catch {
+      case ex: NeedsWriteLockException =>
+        writeLock lock ()
+        try {
+          return controller0(driver, mountPoint)
+        } finally {
+          writeLock unlock ()
+        }
     }
   }
 
   private def controller0(driver: FsCompositeDriver, mountPoint: FsMountPoint): FsController[_ <: FsModel] = {
     if (null eq mountPoint.getParent) {
       val m = new FsModel(mountPoint, null)
-      return driver.newController(this, m, null)
+      return driver newController (this, m, null)
     }
-    target(controllers.get(mountPoint).orNull) match {
+    target(controllers get mountPoint orNull) match {
       case null =>
+        if (!writeLock.isHeldByCurrentThread) throw NeedsWriteLockException()
         val p = controller0(driver, mountPoint.getParent)
         val m = new ScheduledModel(mountPoint, p.getModel)
-        val c = driver.newController(this, m, p)
+        val c = driver newController (this, m, p)
         m.controller = c
         c
       case c => c
@@ -100,21 +111,22 @@ private final class ArchiveManager(
       if (_touched != touched) {
         if (touched)
           SyncShutdownHook register ArchiveManager.this
-        schedule(touched)
+        writeLock lock ()
+        try {
+          schedule(touched)
+        } finally {
+          writeLock unlock ()
+        }
         _touched = touched
       }
     }
 
     def schedule(mandatory: Boolean) {
+      assert(writeLock.isHeldByCurrentThread)
       val mountPoint = getMountPoint
       val link: Link[FsController[_ <: FsModel]] =
         (if (mandatory) STRONG else optionalScheduleType) newLink _controller
-      writeLock.lock()
-      try {
-        controllers put (mountPoint, link)
-      } finally {
-        writeLock.unlock()
-      }
+      controllers put (mountPoint, link)
     }
   } // ScheduledModel
 
@@ -132,11 +144,11 @@ private final class ArchiveManager(
   }
 
   override def size = {
-    readLock.lock()
+    readLock lock ()
     try {
       controllers size
     } finally {
-      readLock.unlock()
+      readLock unlock ()
     }
   }
 
@@ -146,12 +158,12 @@ private final class ArchiveManager(
   }
 
   private def sortedControllers = {
-    readLock.lock()
+    readLock lock ()
     try {
       controllers.values.map(target(_)).filter(null ne _).toIndexedSeq
       .sorted(ReverseControllerOrdering)
     } finally {
-      readLock.unlock()
+      readLock unlock ()
     }
   }
 
