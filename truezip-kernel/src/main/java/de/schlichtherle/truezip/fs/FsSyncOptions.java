@@ -68,7 +68,7 @@ public final class FsSyncOptions {
      * 
      * @since TrueZIP 7.5
      * @see <a href="http://java.net/jira/browse/TRUEZIP-268">#TRUEZIP-268</a>
-     * @see <a href="http://java.net/jira/browse/TRUEZIP-268">#TRUEZIP-269</a>
+     * @see <a href="http://java.net/jira/browse/TRUEZIP-269">#TRUEZIP-269</a>
      */
     public static final BitField<FsSyncOption>
             SYNC = BitField.of( WAIT_CLOSE_INPUT,
