@@ -39,7 +39,7 @@ public class Throwables {
                         .getConstructor(String.class)
                         .newInstance(ex.toString())
                         .initCause(ex);
-        } catch (final NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex2) {
+        } catch (final NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex2) {
             ex.addSuppressed(ex2);
             return ex;
         }
