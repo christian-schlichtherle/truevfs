@@ -9,12 +9,12 @@ import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriverTestSuite;
 /**
  * @author Christian Schlichtherle
  */
-public final class TarBZip2DriverTest
-extends FsCharsetArchiveDriverTestSuite<TarDriverEntry, TarBZip2Driver> {
+public final class TarXZDriverTest
+extends FsCharsetArchiveDriverTestSuite<TarDriverEntry, TarXZDriver> {
 
     @Override
-    protected TarBZip2Driver newArchiveDriver() {
-        return new TestTarBZip2Driver();
+    protected TarXZDriver newArchiveDriver() {
+        return new TestTarXZDriver();
     }
 
     @Override

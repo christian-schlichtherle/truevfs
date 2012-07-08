@@ -6,6 +6,7 @@ package de.schlichtherle.truezip.file.tar;
 
 import de.schlichtherle.truezip.file.ConcurrentSyncTestSuite;
 import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
+import de.schlichtherle.truezip.fs.archive.tar.TestTarGZipDriver;
 
 /**
  * @author Christian Schlichtherle
@@ -20,6 +21,6 @@ extends ConcurrentSyncTestSuite<TarGZipDriver> {
 
     @Override
     protected TarGZipDriver newArchiveDriver() {
-        return new TarGZipDriver(getTestConfig().getIOPoolProvider());
+        return new TestTarGZipDriver();
     }
 }

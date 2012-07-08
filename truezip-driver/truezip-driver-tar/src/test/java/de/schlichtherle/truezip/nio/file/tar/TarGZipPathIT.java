@@ -5,9 +5,10 @@
 package de.schlichtherle.truezip.nio.file.tar;
 
 import de.schlichtherle.truezip.fs.archive.tar.TarGZipDriver;
+import de.schlichtherle.truezip.fs.archive.tar.TestTarGZipDriver;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class TarGZipPathIT extends TarPathITSuite<TarGZipDriver> {
 
@@ -18,6 +19,6 @@ public final class TarGZipPathIT extends TarPathITSuite<TarGZipDriver> {
 
     @Override
     protected TarGZipDriver newArchiveDriver() {
-        return new TarGZipDriver(getTestConfig().getIOPoolProvider());
+        return new TestTarGZipDriver();
     }
 }

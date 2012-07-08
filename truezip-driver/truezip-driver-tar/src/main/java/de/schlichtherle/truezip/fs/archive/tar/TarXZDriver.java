@@ -20,20 +20,21 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
+import org.tukaani.xz.LZMA2Options;
+import org.tukaani.xz.XZInputStream;
+import org.tukaani.xz.XZOutputStream;
 
 /**
- * An archive driver for BZIP2 compressed TAR files (TAR.BZIP2).
+ * An archive driver for XZ compressed TAR files (TAR.XZ).
  * <p>
  * Subclasses must be thread-safe and should be immutable!
  * 
  * @author Christian Schlichtherle
  */
 @Immutable
-public class TarBZip2Driver extends TarDriver {
+public class TarXZDriver extends TarDriver {
 
-    public TarBZip2Driver(IOPoolProvider provider) {
+    public TarXZDriver(IOPoolProvider provider) {
         super(provider);
     }
 
@@ -46,7 +47,7 @@ public class TarBZip2Driver extends TarDriver {
     /**
      * Returns the size of the I/O buffer.
      * <p>
-     * The implementation in the class {@link TarBZip2Driver} returns
+     * The implementation in the class {@link TarXZDriver} returns
      * {@link #BUFFER_SIZE}.
      *
      * @return The size of the I/O buffer.
@@ -56,15 +57,15 @@ public class TarBZip2Driver extends TarDriver {
     }
 
     /**
-     * Returns the compression level to use when writing a BZIP2 output stream.
+     * Returns the compression level to use when writing an XZ output stream.
      * <p>
-     * The implementation in the class {@link TarBZip2Driver} returns
-     * {@link org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream#MAX_BLOCKSIZE}.
+     * The implementation in the class {@link TarXZDriver} returns
+     * {@link LZMA2Options#PRESET_DEFAULT}.
      * 
-     * @return The compression level to use when writing a BZIP2 output stream.
+     * @return The compression level to use when writing a XZ output stream.
      */
-    public int getLevel() {
-        return FixedBZip2CompressorOutputStream.MAX_BLOCKSIZE;
+    public int getPreset() {
+        return LZMA2Options.PRESET_DEFAULT;
     }
 
     /**
@@ -80,11 +81,10 @@ public class TarBZip2Driver extends TarDriver {
     }
 
     @Override
-    protected TarInputShop newTarInputShop(
-            final FsModel model, final InputStream in)
+    protected TarInputShop newTarInputShop(FsModel model, InputStream in)
     throws IOException {
         return super.newTarInputShop(model,
-                new BZip2CompressorInputStream(
+                new XZInputStream(
                     new BufferedInputStream(in, getBufferSize())));
     }
 
@@ -95,34 +95,37 @@ public class TarBZip2Driver extends TarDriver {
             final TarInputShop source)
     throws IOException {
         return super.newTarOutputShop(model,
-                new FixedBZip2CompressorOutputStream(
+                new FixedXZOutputStream(
                     new FixedBufferedOutputStream(out, getBufferSize()),
-                    getLevel()),
+                    new LZMA2Options(getPreset())),
                 source);
     }
 
-    private static final class FixedBZip2CompressorOutputStream
-    extends BZip2CompressorOutputStream {
+    private static final class FixedXZOutputStream extends XZOutputStream {
         final FixedBufferedOutputStream out;
 
-        FixedBZip2CompressorOutputStream(
+        private FixedXZOutputStream(
                 final FixedBufferedOutputStream out,
-                final int level)
+                final LZMA2Options options)
         throws IOException {
-            super(out, level);
+            super(out, options);
             this.out = out;
         }
 
         @Override
         public void close() throws IOException {
-            // Workaround for super class implementation which fails to close
-            // the decorated stream on a subsequent call if the initial attempt
-            // failed with an IOException.
-            // See http://java.net/jira/browse/TRUEZIP-234
+            // Workaround for super class implementation which remembers and
+            // rethrows any IOException thrown by the decorated output stream.
+            // Unfortunately, this doesn't work with TrueZIP's
+            // FsControllerException, which is an IOException.
+            // TODO: Remove all this in TrueVFS. TrueVFS uses a
+            // ControlFlowException instead, which is a RuntimeException and
+            // should not interfere with the super class implementation in this
+            // way.
             out.ignoreClose = true;
             super.close();
             out.ignoreClose = false;
             out.close();
         }
-    } //FixedBZip2CompressorOutputStream
+    } // FixedXZOutputStream
 }

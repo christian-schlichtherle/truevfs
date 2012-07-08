@@ -13,11 +13,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public class TarDriverServiceTest {
 
-    public static final String DRIVER_LIST = "tar|tar.bz2|tar.gz|tbz|tb2|tgz";
+    public static final String DRIVER_LIST = "tar|tar.bz2|tbz|tb2|tar.gz|tgz|tar.xz|txz";
 
     private FsDriverService instance;
 

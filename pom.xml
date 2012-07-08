@@ -229,6 +229,12 @@ system space.
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
                 <version>1.4.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.tukaani</groupId>
+                        <artifactId>xz</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
@@ -240,6 +246,11 @@ system space.
                 <artifactId>jemmy</artifactId>
                 <version>2.2.7.5</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.tukaani</groupId>
+                <artifactId>xz</artifactId>
+                <version>1.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -290,8 +301,6 @@ system space.
                         <threadCount>10</threadCount>
                         <!-- The server VM is expected to be less tolerant
                              against multithreading bugs when running the tests.
-                             The server VM requires 650 MB to run the
-                             integration tests for TAR.BZ2 archive files.
                              Setting -XX:+DisableExplicitGC would trigger an
                              endless loop because some tests check if the
                              garbage collection and the finalization kicked
@@ -300,7 +309,7 @@ system space.
                              See http://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html .
                              See http://www.oracle.com/technetwork/java/tuning-139912.html#section4.2.5 .
                              -->
-                        <argLine>-server -Xms650m -Xmx650m</argLine>
+                        <argLine>-server</argLine>
                         <systemPropertyVariables>
                             <!-- While running the tests with isolated
                                  file system managers yields better performance
