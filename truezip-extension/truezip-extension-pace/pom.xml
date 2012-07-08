@@ -16,7 +16,7 @@
 
     <artifactId>truezip-extension-pace</artifactId>
 
-    <name>TrueZIP Extension Pacemaker</name>
+    <name>TrueZIP Extension PaceManager</name>
     <description>
         This module constrains the number of mounted archive files in order to
         save some heap space.
