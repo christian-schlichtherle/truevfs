@@ -4,12 +4,12 @@
  */
 package net.truevfs.kernel.spec;
 
-import static net.truevfs.kernel.spec.util.Throwables.wrap;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.concurrent.NotThreadSafe;
+import static net.truevfs.kernel.spec.util.Throwables.wrap;
 
 /**
  * @author Christian Schlichtherle
@@ -61,11 +61,8 @@ public final class ThrowManager {
     throws X {
         final Throwable toThrow = throwables.remove(thiz);
         if (null != toThrow)
-            if (throwz.isInstance(toThrow))
-                throw throwz.cast(wrap(toThrow));
-            else
-                throwables.put(thiz, toThrow); // restore
-
+            if (throwz.isInstance(toThrow)) throw throwz.cast(wrap(toThrow));
+            else throwables.put(thiz, toThrow); // restore
         // No match, now recursively check interfaces first and then super
         // classes.
         // This may result in redundant checks for interfaces.
