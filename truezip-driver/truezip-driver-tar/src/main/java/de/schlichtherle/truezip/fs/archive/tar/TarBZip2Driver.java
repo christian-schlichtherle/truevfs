@@ -18,6 +18,7 @@ import java.io.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**
  * An archive driver for BZIP2 compressed TAR files (TAR.BZIP2).
@@ -60,7 +61,7 @@ public class TarBZip2Driver extends TarDriver {
      * @return The compression level to use when writing a BZIP2 output stream.
      */
     public int getLevel() {
-        return BZip2CompressorOutputStream.MAX_BLOCKSIZE;
+        return FixedBZip2CompressorOutputStream.MAX_BLOCKSIZE;
     }
 
     /**
@@ -91,17 +92,17 @@ public class TarBZip2Driver extends TarDriver {
             final TarInputShop source)
     throws IOException {
         return super.newTarOutputShop(model,
-                new BZip2CompressorOutputStream(
+                new FixedBZip2CompressorOutputStream(
                     new BufferedOutputStream(out, getBufferSize()),
                     getLevel()),
                 source);
     }
 
-    private static final class BZip2CompressorOutputStream
-    extends org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream {
+    private static final class FixedBZip2CompressorOutputStream
+    extends BZip2CompressorOutputStream {
         final OutputStream out;
 
-        BZip2CompressorOutputStream(final OutputStream out, final int level)
+        FixedBZip2CompressorOutputStream(final OutputStream out, final int level)
         throws IOException {
             super(out, level);
             this.out = out;
@@ -116,5 +117,5 @@ public class TarBZip2Driver extends TarDriver {
             super.close();
             out.close();
         }
-    } // BZip2CompressorOutputStream
+    } //FixedBZip2CompressorOutputStream
 }
