@@ -12,20 +12,22 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-@SuppressWarnings("serial") // serializing control flow exceptions is nonsense
+@SuppressWarnings("serial") // serializing control flow exceptions is nonsense!
 public class ControlFlowException extends RuntimeException {
 
-    private static final String PROPERTY_NAME
+    private static final String TRACEABLE_PROPERTY_KEY
             = ControlFlowException.class.getName() + ".traceable";
 
-    public ControlFlowException() {
-        super(null, null, false, isTraceable());
+    public ControlFlowException() { this(null); }
+
+    public ControlFlowException(final Throwable cause) {
+        super(null != cause ? cause.toString() : null, cause, false, isTraceable());
     }
 
     /**
      * Returns {@code true} if and only if a control flow exception should have
      * a full stack trace instead of an empty stack trace.
-     * If and only if the system property with the name
+     * If and only if the system property with the key string
      * {@code net.truevfs.kernel.spec.util.ControlFlowException.traceable}
      * is set to {@code true} (whereby case is ignored), then instances of this
      * class will have a regular stack trace, otherwise their stack trace will
@@ -36,6 +38,6 @@ public class ControlFlowException extends RuntimeException {
      *         a full stack trace instead of an empty stack trace.
      */
     public static boolean isTraceable() {
-        return Boolean.getBoolean(PROPERTY_NAME);
+        return Boolean.getBoolean(TRACEABLE_PROPERTY_KEY);
     }
 }
