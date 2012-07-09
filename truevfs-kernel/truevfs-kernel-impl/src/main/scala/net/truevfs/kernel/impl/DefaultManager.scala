@@ -23,7 +23,7 @@ import scala.collection.mutable.WeakHashMap
 private final class DefaultManager(
   optionalScheduleType: Type,
   lock: ReentrantReadWriteLock = new ReentrantReadWriteLock
-) extends FsManager {
+) extends FsAbstractManager {
 
   def this() = this(WEAK)
 
