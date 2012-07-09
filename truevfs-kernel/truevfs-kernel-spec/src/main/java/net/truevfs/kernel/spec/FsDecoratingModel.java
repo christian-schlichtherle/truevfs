@@ -13,7 +13,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class FsDecoratingModel<M extends FsModel> extends FsModel {
+public abstract class FsDecoratingModel<M extends FsModel>
+extends FsAbstractModel {
 
     /** The decorated file system model. */
     protected final M model;

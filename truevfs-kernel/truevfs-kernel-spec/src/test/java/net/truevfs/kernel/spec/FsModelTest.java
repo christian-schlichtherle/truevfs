@@ -17,7 +17,7 @@ public class FsModelTest {
 
     protected FsModel newModel( FsMountPoint mountPoint,
                                 @CheckForNull FsModel parent) {
-        return new FsModel(mountPoint, parent);
+        return new FsDefaultModel(mountPoint, parent);
     }
 
     private FsModel newModel(final FsMountPoint mountPoint) {
