@@ -4,11 +4,10 @@
  */
 package net.truevfs.driver.tar;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.zip.Deflater;
-import java.util.zip.GZIPInputStream;
 import javax.annotation.concurrent.Immutable;
 import static net.truevfs.kernel.spec.FsAccessOption.STORE;
 import net.truevfs.kernel.spec.*;
@@ -19,21 +18,24 @@ import net.truevfs.kernel.spec.io.AbstractSink;
 import net.truevfs.kernel.spec.io.AbstractSource;
 import net.truevfs.kernel.spec.io.Streams;
 import net.truevfs.kernel.spec.util.BitField;
+import org.tukaani.xz.LZMA2Options;
+import org.tukaani.xz.XZInputStream;
+import org.tukaani.xz.XZOutputStream;
 
 /**
- * An archive driver for GZIP compressed TAR files (TAR.GZIP).
+ * An archive driver for XZ compressed TAR files (TAR.XZ).
  * <p>
  * Subclasses must be thread-safe and should be immutable!
  * 
  * @author Christian Schlichtherle
  */
 @Immutable
-public class TarGZipDriver extends TarDriver {
+public class TarXZDriver extends TarDriver {
 
     /**
      * Returns the size of the I/O buffer.
      * <p>
-     * The implementation in the class {@link TarGZipDriver} returns
+     * The implementation in the class {@link TarXZDriver} returns
      * {@link Streams#BUFFER_SIZE}.
      *
      * @return The size of the I/O buffer.
@@ -43,15 +45,15 @@ public class TarGZipDriver extends TarDriver {
     }
 
     /**
-     * Returns the compression level to use when writing a GZIP sink stream.
+     * Returns the compression level to use when writing an XZ output stream.
      * <p>
-     * The implementation in the class {@link TarBZip2Driver} returns
-     * {@link Deflater#BEST_COMPRESSION}.
+     * The implementation in the class {@link TarXZDriver} returns
+     * {@link LZMA2Options#PRESET_DEFAULT}.
      * 
-     * @return The compression level to use when writing a GZIP sink stream.
+     * @return The compression level to use when writing a XZ output stream.
      */
-    public int getLevel() {
-        return Deflater.BEST_COMPRESSION;
+    public int getPreset() {
+        return LZMA2Options.PRESET_DEFAULT;
     }
 
     @Override
@@ -64,8 +66,9 @@ public class TarGZipDriver extends TarDriver {
             public InputStream stream() throws IOException {
                 final InputStream in = source.stream();
                 try {
-                    return new GZIPInputStream(in, getBufferSize());
-                } catch(final Throwable ex) {
+                    return new XZInputStream(
+                            new BufferedInputStream(in, getBufferSize()));
+                } catch (final Throwable ex) {
                     try {
                         in.close();
                     } catch (final Throwable ex2) {
@@ -75,7 +78,6 @@ public class TarGZipDriver extends TarDriver {
                 }
             }
         } // Source
-
         return new TarInputService(model, new Source(), this);
     }
 
@@ -90,8 +92,10 @@ public class TarGZipDriver extends TarDriver {
             public OutputStream stream() throws IOException {
                 final OutputStream out = sink.stream();
                 try {
-                    return new GZIPOutputStream(out, getBufferSize(), getLevel());
-                } catch(final Throwable ex) {
+                    return new FixedXZOutputStream(
+                            new FixedBufferedOutputStream(out, getBufferSize()),
+                            new LZMA2Options(getPreset()));
+                } catch (final Throwable ex) {
                     try {
                         out.close();
                     } catch (final Throwable ex2) {
@@ -101,7 +105,6 @@ public class TarGZipDriver extends TarDriver {
                 }
             }
         } // Sink
-
         return new MultiplexingOutputService<>(getIoPool(),
                 new TarOutputService(model, new Sink(), this));
     }
@@ -122,13 +125,31 @@ public class TarGZipDriver extends TarDriver {
                 controller.output(options, name, null));
     }
 
-    /** Extends its super class to set the deflater level. */
-    private static final class GZIPOutputStream
-    extends java.util.zip.GZIPOutputStream {
-        GZIPOutputStream(OutputStream out, int size, int level)
+    private static final class FixedXZOutputStream extends XZOutputStream {
+        final FixedBufferedOutputStream out;
+
+        private FixedXZOutputStream(
+                final FixedBufferedOutputStream out,
+                final LZMA2Options options)
         throws IOException {
-            super(out, size);
-            def.setLevel(level);
+            super(out, options);
+            this.out = out;
         }
-    } // GZIPOutputStream
+
+        @Override
+        public void close() throws IOException {
+            // Workaround for super class implementation which remembers and
+            // rethrows any IOException thrown by the decorated output stream.
+            // Unfortunately, this doesn't work with TrueZIP's
+            // FsControllerException, which is an IOException.
+            // TODO: Remove all this in TrueVFS. TrueVFS uses a
+            // ControlFlowException instead, which is a RuntimeException and
+            // should not interfere with the super class implementation in this
+            // way.
+            out.ignoreClose = true;
+            super.close();
+            out.ignoreClose = false;
+            out.close();
+        }
+    } // FixedXZOutputStream
 }

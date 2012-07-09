@@ -5,8 +5,7 @@
 package net.truevfs.driver.tar.it;
 
 import net.truevfs.driver.tar.TarBZip2Driver;
-import net.truevfs.kernel.spec.cio.IoPool;
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
+import net.truevfs.driver.tar.TestTarBZip2Driver;
 
 /**
  * @author Christian Schlichtherle
@@ -20,18 +19,6 @@ public final class TarBZip2FileIT extends TarFileITSuite<TarBZip2Driver> {
 
     @Override
     protected TarBZip2Driver newArchiveDriver() {
-        class TestDriver extends TarBZip2Driver {
-            @Override
-            public IoPool<?> getIoPool() {
-                return getTestConfig().getIoPoolProvider().getIoPool();
-            }
-
-            @Override
-            public int getLevel() {
-                return BZip2CompressorOutputStream.MIN_BLOCKSIZE;
-            }
-        } // TestDriver
-        
-        return new TestDriver();
+        return new TestTarBZip2Driver();
     }
 }

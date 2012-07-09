@@ -5,7 +5,6 @@
 package net.truevfs.driver.tar;
 
 import net.truevfs.kernel.spec.FsArchiveDriverTestSuite;
-import net.truevfs.kernel.spec.cio.IoPool;
 
 /**
  * @author Christian Schlichtherle
@@ -15,12 +14,7 @@ extends FsArchiveDriverTestSuite<TarDriverEntry, TarGZipDriver> {
 
     @Override
     protected TarGZipDriver newArchiveDriver() {
-        return new TarGZipDriver() {
-            @Override
-            public IoPool<?> getIoPool() {
-                return getTestConfig().getIoPoolProvider().getIoPool();
-            }
-        };
+        return new TestTarGZipDriver();
     }
 
     @Override

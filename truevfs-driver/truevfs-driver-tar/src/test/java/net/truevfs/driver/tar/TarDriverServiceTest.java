@@ -14,7 +14,7 @@ public class TarDriverServiceTest extends FsDriverServiceTestSuite {
 
     @Override
     protected String getExtensions() {
-        return "tar|tar.bz2|tar.gz|tbz|tb2|tgz";
+        return "tar|tar.bz2|tbz|tb2|tar.gz|tgz|tar.xz|txz";
     }
 
     @Override
