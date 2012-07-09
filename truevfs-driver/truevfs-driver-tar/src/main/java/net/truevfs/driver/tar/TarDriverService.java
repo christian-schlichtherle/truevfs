@@ -34,6 +34,10 @@ import javax.annotation.concurrent.Immutable;
 <td>{@code tar.gz}, {@code tgz}</td>
 <td>{@link net.truevfs.driver.tar.TarGZipDriver}</td>
 </tr>
+<tr>
+<td>{@code tar.xz}, {@code txz}</td>
+<td>{@link de.schlichtherle.truezip.fs.archive.tar.TarXZDriver}</td>
+</tr>
 </tbody>
 </table>
  *
@@ -45,8 +49,9 @@ public final class TarDriverService extends FsDriverService {
     private final Map<FsScheme, FsDriver>
             drivers = newMap(new Object[][] {
                 { "tar", new TarDriver() },
-                { "tar.gz|tgz", new TarGZipDriver() },
                 { "tar.bz2|tb2|tbz|tbz2", new TarBZip2Driver() },
+                { "tar.gz|tgz", new TarGZipDriver() },
+                { "tar.xz|txz", new TarXZDriver() },
             });
 
     @Override

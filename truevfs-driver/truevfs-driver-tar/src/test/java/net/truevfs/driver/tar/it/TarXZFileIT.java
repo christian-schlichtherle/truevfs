@@ -4,21 +4,21 @@
  */
 package net.truevfs.driver.tar.it;
 
-import net.truevfs.driver.tar.TarGZipDriver;
-import net.truevfs.driver.tar.TestTarGZipDriver;
+import net.truevfs.driver.tar.TarXZDriver;
+import net.truevfs.driver.tar.TestTarXZDriver;
 
 /**
  * @author Christian Schlichtherle
  */
-public final class TarGZipPathIT extends TarPathITSuite<TarGZipDriver> {
+public final class TarXZFileIT extends TarFileITSuite<TarXZDriver> {
 
     @Override
     protected String getExtensionList() {
-        return "tar.gz";
+        return "tar.xz";
     }
 
     @Override
-    protected TarGZipDriver newArchiveDriver() {
-        return new TestTarGZipDriver();
+    protected TarXZDriver newArchiveDriver() {
+        return new TestTarXZDriver();
     }
 }

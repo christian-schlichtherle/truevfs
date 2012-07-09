@@ -4,7 +4,10 @@
  */
 package net.truevfs.driver.tar;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import javax.annotation.concurrent.Immutable;
 import static net.truevfs.kernel.spec.FsAccessOption.STORE;
 import net.truevfs.kernel.spec.*;
@@ -29,21 +32,15 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
 public class TarBZip2Driver extends TarDriver {
 
     /**
-     * The buffer size used for reading and writing.
-     * Optimized for performance.
-     */
-    public static final int BUFFER_SIZE = Streams.BUFFER_SIZE;
-
-    /**
      * Returns the size of the I/O buffer.
      * <p>
      * The implementation in the class {@link TarBZip2Driver} returns
-     * {@link #BUFFER_SIZE}.
+     * {@link Streams#BUFFER_SIZE}.
      *
      * @return The size of the I/O buffer.
      */
     public int getBufferSize() {
-        return BUFFER_SIZE;
+        return Streams.BUFFER_SIZE;
     }
 
     /**
@@ -80,7 +77,6 @@ public class TarBZip2Driver extends TarDriver {
                 }
             }
         } // Source
-
         return new TarInputService(model, new Source(), this);
     }
 
@@ -96,7 +92,7 @@ public class TarBZip2Driver extends TarDriver {
                 final OutputStream out = sink.stream();
                 try {
                     return new FixedBZip2CompressorOutputStream(
-                            new BufferedOutputStream(out, getBufferSize()),
+                            new FixedBufferedOutputStream(out, getBufferSize()),
                             getLevel());
                 } catch (final Throwable ex) {
                     try {
@@ -108,7 +104,6 @@ public class TarBZip2Driver extends TarDriver {
                 }
             }
         } // Sink
-
         return new MultiplexingOutputService<>(getIoPool(),
                 new TarOutputService(model, new Sink(), this));
     }
@@ -131,9 +126,11 @@ public class TarBZip2Driver extends TarDriver {
 
     private static final class FixedBZip2CompressorOutputStream
     extends BZip2CompressorOutputStream {
-        final OutputStream out;
+        final FixedBufferedOutputStream out;
 
-        FixedBZip2CompressorOutputStream(final OutputStream out, final int level)
+        FixedBZip2CompressorOutputStream(
+                final FixedBufferedOutputStream out,
+                final int level)
         throws IOException {
             super(out, level);
             this.out = out;
@@ -145,8 +142,10 @@ public class TarBZip2Driver extends TarDriver {
             // the decorated stream on a subsequent call if the initial attempt
             // failed with an IOException.
             // See http://java.net/jira/browse/TRUEZIP-234
+            out.ignoreClose = true;
             super.close();
+            out.ignoreClose = false;
             out.close();
         }
-    } // FixedBZip2CompressorOutputStream
+    } //FixedBZip2CompressorOutputStream
 }
