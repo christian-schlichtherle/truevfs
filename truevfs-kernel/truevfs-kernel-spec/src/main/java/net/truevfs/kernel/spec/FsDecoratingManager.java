@@ -17,7 +17,7 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public abstract class FsDecoratingManager<M extends FsManager>
-extends FsManager {
+extends FsAbstractManager {
 
     /** The nullable decorated file system manager. */
     protected @Nullable M manager;

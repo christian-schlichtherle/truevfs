@@ -7,11 +7,12 @@ package net.truevfs.kernel.spec;
 import javax.annotation.CheckForNull;
 
 /**
- * Defines the common properties of a file system.
+ * Defines common properties of any file system.
  * <p>
- * Implementations must be thread-safe.
+ * Implementations should be thread-safe.
  * 
  * @see    FsController
+ * @see    FsManager
  * @author Christian Schlichtherle
  */
 public interface FsModel {
@@ -49,13 +50,11 @@ public interface FsModel {
     boolean isTouched();
 
     /**
-     * <b>Optional operation:</b> Sets the value of the property
-     * {@link #isTouched() touched}.
+     * Sets the value of the property {@link #isTouched() touched}.
      *
      * @param  touched the new value of this property.
-     * @throws UnsupportedOperationException At the discretion of the
-     *         implementation, e.g. if the file system type does not support
-     *         {@link FsController#sync syncing}.
+     * @throws UnsupportedOperationException If the file system is not
+     *         federated, i.e. if it does not have a parent file system.
      */
-    public void setTouched(boolean touched);
+    void setTouched(boolean touched);
 }

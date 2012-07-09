@@ -5,120 +5,93 @@
 package net.truevfs.kernel.spec;
 
 import java.util.Iterator;
-import javax.annotation.concurrent.ThreadSafe;
-import static net.truevfs.kernel.spec.FsSyncOption.ABORT_CHANGES;
 import net.truevfs.kernel.spec.util.BitField;
-import net.truevfs.kernel.spec.util.UniqueObject;
 
 /**
- * An abstract container which manages the life cycle of controllers for
- * federated file systems.
- * A file system is federated if and only if it's a member of a parent
- * (virtual) file system.
+ * A container which creates {@linkplain FsController} file system controllers
+ * and manages their life cycle.
  * <p>
- * Sub-classes must be thread-safe, too.
+ * Implementations should be thread-safe.
  *
+ * @see    FsController
+ * @see    FsModel
  * @author Christian Schlichtherle
  */
-@ThreadSafe
-public abstract class FsManager
-extends UniqueObject implements Iterable<FsController<? extends FsModel>> {
+public interface FsManager extends Iterable<FsController<? extends FsModel>> {
 
     /**
-     * Returns a thread-safe file system controller for the given mount point.
-     * If and only if the given mount point addresses a federated file system,
-     * the returned file system controller is remembered for life cycle
-     * management, i.e. future lookup and {@link #sync synchronization}
-     * operations.
+     * Returns the number of archive file systems managed by this instance.
      *
-     * @param  mountPoint the mount point of the file system.
-     * @param  driver the file system composite driver which shall get used to
-     *         create a new file system controller if required.
-     * @return A thread-safe file system controller for the given mount point.
+     * @return The number of archive file systems managed by this instance.
      */
-    public abstract FsController<? extends FsModel> controller(
-            FsCompositeDriver driver,
-            FsMountPoint mountPoint);
+    int size();
 
     /**
-     * Returns a new archive file system controller.
-     * 
-     * @param driver the archive driver.
-     * @param model the file system model.
-     * @param parent the parent file system controller.
-     * @return A new archive file system controller.
-     */
-    public abstract FsController<? extends FsModel> newController(
-            FsArchiveDriver<? extends FsArchiveEntry> driver,
-            FsModel model,
-            FsController<? extends FsModel> parent);
-
-    /**
-     * Returns the number of federated file systems managed by this instance.
-     *
-     * @return The number of federated file systems managed by this instance.
-     */
-    public abstract int size();
-
-    /**
-     * Returns an iterator over the controllers of all federated file systems
-     * managed by this instance in sorted order.
+     * Returns an iterator over the controllers of all archive file systems
+     * managed by this instance in reverse order.
      * The iterated file system controllers must be ordered so that all file
      * systems appear before any of their parent file systems.
      * Last, but not least: The iterator must be consistent in multithreaded
      * environments!
      *
-     * @return An iterator over the controllers of all federated file systems
-     *         managed by this instance in sorted order.
+     * @return An iterator over the controllers of all archive file systems
+     *         managed by this instance in reverse order.
      */
     @Override
-    public abstract Iterator<FsController<? extends FsModel>> iterator();
+    Iterator<FsController<? extends FsModel>> iterator();
 
     /**
-     * Commits all unsynchronized changes to the contents of all federated file
+     * Returns a new archive file system controller.
+     * This is pure function without side effects.
+     *
+     * @param  driver the archive driver.
+     * @param  model the file system model.
+     * @param  parent the parent file system controller.
+     * @return A new archive file system controller.
+     */
+    FsController<? extends FsModel> newController(
+            FsArchiveDriver<? extends FsArchiveEntry> driver,
+            FsModel model,
+            FsController<? extends FsModel> parent);
+
+    /**
+     * Returns a thread-safe file system controller for the given mount point.
+     * If and only if the given mount point addresses an archive file system,
+     * the life cycle of the returned file system controller gets managed by
+     * this instance, i.e. it gets remembered for future lookup and
+     * {@link #sync synchronization}.
+     *
+     * @param  mountPoint the mount point of the file system.
+     * @param  driver the composite file system driver which shall get used to
+     *         create a new file system controller if required.
+     * @return A thread-safe file system controller for the given mount point.
+     */
+    FsController<? extends FsModel> controller(
+            FsCompositeDriver driver,
+            FsMountPoint mountPoint);
+
+    /**
+     * Commits all unsynchronized changes to the contents of all archive file
      * systems managed by this instance to their respective parent file system,
      * releases the associated resources (e.g. target archive files) for
      * access by third parties (e.g. other processes), cleans up any temporary
      * allocated resources (e.g. temporary files) and purges any cached data.
-     * Note that temporary resources may get allocated even if the federated
-     * file systems were accessed read-only.
+     * Note that temporary resources may get allocated even if the archive file
+     * systems were accessed read-only.
      * As a side effect, this will reset the state of the respective file
      * system controllers.
      *
      * @param  options the options for synchronizing the file system.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         apply.
-     *         This implies that the respective parent file system has been
-     *         synchronized with constraints, e.g. if an unclosed archive entry
-     *         stream gets forcibly closed.
+     * apply.
+     * This implies that the respective parent file system has been
+     * synchronized with constraints, e.g. if an unclosed archive entry
+     * stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if {@link FsSyncOption#ABORT_CHANGES}
-     *         is set.
+     * options is illegal, e.g. if {@link FsSyncOption#ABORT_CHANGES}
+     * is set.
      */
-    public void sync(final BitField<FsSyncOption> options)
-    throws FsSyncWarningException, FsSyncException {
-        if (options.get(ABORT_CHANGES))
-            throw new IllegalArgumentException();
-        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
-        for (final FsController<?> controller : this) {
-            try {
-                controller.sync(options);
-            } catch (final FsSyncException ex) {
-                builder.warn(ex);
-            }
-        }
-        builder.check();
-    }
-
-    /**
-     * Returns a string representation of this object for debugging and logging
-     * purposes.
-     */
-    @Override
-    public String toString() {
-        return String.format("%s[size=%d]",
-                getClass().getName(),
-                size());
-    }
+    void sync(final BitField<FsSyncOption> options)
+    throws FsSyncWarningException, FsSyncException;
 }

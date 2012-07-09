@@ -16,21 +16,17 @@ import net.truevfs.kernel.spec.cio.OutputSocket;
 import net.truevfs.kernel.spec.util.BitField;
 
 /**
- * Provides read/write access to a file system.
- * Implementations of this interface are typically organized in a chain of
- * responsibility for file system federation and a decorator chain for
- * implementing different aspects of the management of the file system state,
- * e.g. lock management for concurrent access.
+ * Provides file system operations.
  * 
  * <h3>General Properties</h3>
  * <p>
  * The {@link FsModel#getMountPoint() mount point} of the
- * {@link #getModel() file system model} addresses the file system at the head
- * of this chain of federated file systems.
+ * {@linkplain #getModel() file system model} addresses the file system operated by
+ * this controller.
  * Where the methods of this abstract class accept a
  * {@link FsEntryName file system entry name} as a parameter, this MUST get
  * resolved against the {@link FsModel#getMountPoint() mount point} URI of this
- * controller's {@link #getModel() file system model}.
+ * controller's {@linkplain #getModel() file system model}.
  * 
  * <h3>Transaction Support</h3>
  * <p>
@@ -38,7 +34,7 @@ import net.truevfs.kernel.spec.util.BitField;
  * can fail on hardware errors, network timeouts, third party interactions etc.
  * In an ideal world, we would like all file system operations to be truly
  * transactional like some relational database services.
- * However, file system have to cope with really big data, much more than most
+ * However, file systems have to manage really big data, much more than most
  * relational databases will ever see.
  * Its not uncommon these days to store some gigabytes of data in a single
  * file, for example a video file.
@@ -88,9 +84,12 @@ import net.truevfs.kernel.spec.util.BitField;
  * eventually synchronize their contents with the parent file system or storage
  * system upon a call to {@code sync}.
  * </ol>
+ * <p>
+ * Implementations should be thread-safe.
  * 
  * @param  <M> the type of the file system model.
  * @see    FsManager
+ * @see    FsModel
  * @see    <a href="http://www.ietf.org/rfc/rfc2119.txt">RFC 2119: Key words for use in RFCs to Indicate Requirement Levels</a>
  * @author Christian Schlichtherle
  */
