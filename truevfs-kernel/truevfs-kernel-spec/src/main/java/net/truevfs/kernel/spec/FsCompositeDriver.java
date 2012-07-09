@@ -19,7 +19,7 @@ public interface FsCompositeDriver {
 
     /**
      * Returns a new thread-safe file system controller for the mount point of
-     * the given file system model and parent file system controller.
+     * the given file system model and nullable parent file system controller.
      * The file system controller gets created by using a
      * {@link FsDriver file system driver} which gets looked up by querying the
      * scheme of the mount point of the given file system model with the
