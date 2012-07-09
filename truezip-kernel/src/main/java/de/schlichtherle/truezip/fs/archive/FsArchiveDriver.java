@@ -204,7 +204,7 @@ extends FsDriver {
      *         type, then this exception is deemed to indicate a
      *         <em>persistent false positive</em> archive file and gets cached
      *         until the file system controller for the given model is
-     *         {@linkplain FsController#sync(de.schlichtherle.truezip.util.BitField, de.schlichtherle.truezip.util.ExceptionHandler) synced}
+     *         {@linkplain FsController#sync(de.schlichtherle.truezip.util.BitField) synced}
      *         again.
      *         Otherwise, this exception is deemed to indicate a
      *         <em>transient false positive</em> archive file and does not
