@@ -4,8 +4,9 @@
  */
 package net.truevfs.kernel.spec;
 
-import javax.annotation.Nullable;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.spec.util.UniqueObject;
 
 /**
  * An abstract factory for components required to access a file system.
@@ -16,26 +17,24 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class FsDriver {
+public abstract class FsDriver extends UniqueObject {
 
     /**
-     * Returns {@code true} iff this file system driver implements a federated
-     * file system type, i.e. if the type of file system must be a member of a
-     * parent file system.
+     * Returns {@code true} iff this is an archive driver, i.e. if file systems
+     * of this type must be a member of a parent file system.
      * <p>
      * The implementation in the class {@link FsDriver} returns {@code false}.
      * 
-     * @return {@code true} iff the type of the file system implemented by this
-     *         file system driver is federated, that is it must be a member of
-     *         a parent file system.
+     * @return {@code true} iff this is an archive driver, i.e. if file systems
+     *         of this type must be a member of a parent file system.
      */
-    public boolean isFederated() {
+    public boolean isArchiveDriver() {
         return false;
     }
 
     /**
      * Returns a new thread-safe file system controller for the mount point of
-     * the given file system model and parent file system controller.
+     * the given file system model and nullable parent file system controller.
      * <p>
      * When called, you may assert the following precondition:
      * <pre>{@code
@@ -48,13 +47,13 @@ public abstract class FsDriver {
      * @param  model the file system model.
      * @param  parent the nullable parent file system controller.
      * @return A new thread-safe file system controller for the given mount
-     *         point and parent file system controller.
+     *         point and nullable parent file system controller.
      * @see    FsCompositeDriver#newController
      */
     public abstract FsController<? extends FsModel> newController(
             FsManager manager,
             FsModel model,
-            @Nullable FsController<? extends FsModel> parent);
+            @CheckForNull FsController<? extends FsModel> parent);
 
     /**
      * Returns a string representation of this object for debugging and logging
@@ -62,8 +61,8 @@ public abstract class FsDriver {
      */
     @Override
     public String toString() {
-        return String.format("%s[federated=%b]",
+        return String.format("%s[archiveDriver=%b]",
                 getClass().getName(),
-                isFederated());
+                isArchiveDriver());
     }
 }

@@ -4,14 +4,6 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.kernel.spec.FsDriver;
-import net.truevfs.kernel.spec.FsDriverProvider;
-import net.truevfs.kernel.spec.FsScheme;
-import net.truevfs.kernel.spec.FsAbstractCompositeDriver;
-import net.truevfs.kernel.spec.FsAbstractDriverProvider;
-import net.truevfs.kernel.spec.sl.FsDriverLocator;
-import net.truevfs.kernel.spec.util.ExtensionSet;
-import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Collection;
@@ -20,6 +12,10 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.spec.*;
+import net.truevfs.kernel.spec.sl.FsDriverLocator;
+import net.truevfs.kernel.spec.util.ExtensionSet;
+import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 
 /**
  * Detects a <em>prospective</em> archive file and declares its file system
@@ -122,19 +118,14 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
         for (final Map.Entry<FsScheme, FsDriver> entry : inDrivers.entrySet()) {
             final FsDriver driver = entry.getValue();
             assert null != driver;
-            /*if (null == driver)
-                continue;*/
             final FsScheme scheme = entry.getKey();
-            final boolean federated = driver.isFederated();
+            final boolean ad = driver.isArchiveDriver();
             if (null != inExtensions) {
                 final boolean accepted = inExtensions.contains(scheme.toString());
-                if (!federated || accepted)
-                    outDrivers.put(scheme, driver);
-                if (federated && accepted)
-                    outExtensions.add(scheme.toString());
+                if (!ad || accepted) outDrivers.put(scheme, driver);
+                if (ad && accepted) outExtensions.add(scheme.toString());
             } else {
-                if (federated)
-                    outExtensions.add(scheme.toString());
+                if (ad) outExtensions.add(scheme.toString());
             }
         }
         if (null != inExtensions) {
@@ -242,8 +233,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
                 continue;*/
             final FsScheme scheme = entry.getKey();
             outDrivers.put(scheme, driver);
-            if (driver.isFederated())
-                outExtensions.add(scheme.toString());
+            if (driver.isArchiveDriver()) outExtensions.add(scheme.toString());
         }
         for (final Map.Entry<FsScheme, FsDriver> entry : config.entrySet()) {
             final FsScheme scheme = entry.getKey();
@@ -297,8 +287,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
                 continue; // TODO: http://java.net/jira/browse/TRUEZIP-132
             }
             final FsDriver driver = drivers.get(scheme);
-            if (null != driver && driver.isFederated())
-                return scheme;
+            if (null != driver && driver.isArchiveDriver()) return scheme;
         }
         return null;
     }

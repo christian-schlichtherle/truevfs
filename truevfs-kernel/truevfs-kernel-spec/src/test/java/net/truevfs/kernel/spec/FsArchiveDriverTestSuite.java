@@ -103,8 +103,8 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     @Test
-    public void testArchiveDriverMustBeFederated() {
-        assertTrue(getArchiveDriver().isFederated());
+    public void testArchiveDriverProperty() {
+        assertTrue(getArchiveDriver().isArchiveDriver());
     }
 
     @Test

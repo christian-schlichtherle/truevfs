@@ -44,8 +44,24 @@ extends FsDriver {
      * {@code true}.
      */
     @Override
-    public final boolean isFederated() {
+    public final boolean isArchiveDriver() {
         return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link FsArchiveDriver} simply forwards
+     * the call to the given file system manager after asserting that
+     * {@code model.getParent().equals(parent.getModel())} is {@code true}.
+     */
+    @Override
+    public final FsController<? extends FsModel> newController(
+            FsManager manager,
+            FsModel model,
+            @Nonnull FsController<? extends FsModel> parent) {
+        assert parent.getModel().equals(model.getParent());
+        return manager.newController(this, model, parent);
     }
 
     /**
@@ -130,22 +146,6 @@ extends FsDriver {
      */
     public boolean getRedundantMetaDataSupport() {
         return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in the class {@link FsArchiveDriver} simply forwards
-     * the call to the given file system manager after asserting that
-     * {@code model.getParent().equals(parent.getModel())} is {@code true}.
-     */
-    @Override
-    public final FsController<? extends FsModel> newController(
-            FsManager manager,
-            FsModel model,
-            @Nonnull FsController<? extends FsModel> parent) {
-        assert parent.getModel().equals(model.getParent());
-        return manager.newController(this, model, parent);
     }
 
     /**
@@ -390,9 +390,9 @@ extends FsDriver {
      */
     @Override
     public String toString() {
-        return String.format("%s[federated=%b, charset=%s]",
+        return String.format("%s[archiveDriver=%b, charset=%s]",
                 getClass().getName(),
-                isFederated(),
+                isArchiveDriver(),
                 getCharset());
     }
 }

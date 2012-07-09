@@ -59,7 +59,7 @@ public final class DriverMap implements Runnable {
                 .append("      <thead>\n")
                 .append("        <tr>\n")
                 .append("          <th>URI Schemes</th>\n")
-                .append("          <th>Archive File System?</th>\n")
+                .append("          <th>Archive Driver?</th>\n")
                 .append("          <th>File System Driver Class</th>\n")
                 .append("        </tr>\n")
                 .append("      </thead>\n")
@@ -69,7 +69,7 @@ public final class DriverMap implements Runnable {
             List<String> set = new ArrayList<>(entry.getValue());
             String federated = Boolean.toString(
                     map .get(FsScheme.create(set.iterator().next()))
-                        .isFederated());
+                        .isArchiveDriver());
             out .append("        <tr>\n")
                 .append("          <td>");
             for (int i = 0; i < set.size(); i++) {
