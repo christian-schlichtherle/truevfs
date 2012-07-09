@@ -26,7 +26,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class KeyManagerController<D extends ZipDriver>
+public abstract class KeyController<D extends ZipDriver>
 extends FsDecoratingController<FsModel, FsController<?>> {
 
     private static final String ROOT_PATH = ROOT.getPath();
@@ -41,7 +41,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
      *        decorate.
      * @param driver the ZIP driver.
      */
-    protected KeyManagerController(
+    protected KeyController(
             final FsController<?> controller,
             final D driver) {
         super(controller);
@@ -85,7 +85,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
                 entry = ((FsCovariantEntry<?>) entry).getEntry();
             final FsCovariantEntry<FsArchiveEntry>
                     special = new FsCovariantEntry<FsArchiveEntry>(ROOT_PATH);
-            special.putEntry(SPECIAL, driver.newEntry(ROOT_PATH, SPECIAL, entry));
+            special.put(SPECIAL, driver.newEntry(ROOT_PATH, SPECIAL, entry));
             return special;
         }
     }

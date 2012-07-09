@@ -14,7 +14,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * A covariant file system entry maintains a map of
  * {@link FsArchiveEntry archive entries} and uses its
  * {@link #setKey(Entry.Type) key} property to determine the archive entry
- * in the map to which it forwards calls to {@link #getEntry()},
+ * in the map to which it forwards calls to {@link #get()},
  * {@link #getSize(Size)} and {@link #getTime(Access)}.
  * 
  * @param  <E> the type of the mapped archive entries.
@@ -91,7 +91,7 @@ implements Cloneable {
 
     /**
      * Returns the type of the file system entry to which calls to
-     * {@link #getEntry()}, {@link #getSize(Size)} and
+     * {@link #get()}, {@link #getSize(Size)} and
      * {@link #getTime(Access)} shall get forwarded.
      * <p>
      * Note that an arbitrary property value may get returned:
@@ -99,7 +99,7 @@ implements Cloneable {
      * no entry of this type needs to be mapped.
      * 
      * @return the type of the file system entry to which calls to
-     *         {@link #getEntry()}, {@link #getSize(Size)} and
+     *         {@link #get()}, {@link #getSize(Size)} and
      *         {@link #getTime(Access)} shall get forwarded.
      */
     public @Nullable Type getKey() {
@@ -108,14 +108,14 @@ implements Cloneable {
 
     /**
      * Selects the type of the file system entry to which calls to
-     * {@link #getEntry()}, {@link #getSize(Size)} and
+     * {@link #get()}, {@link #getSize(Size)} and
      * {@link #getTime(Access)} shall get forwarded.
      * If the given type is {@code null} or no file system entry of this type
      * is mappeed, then any subsequent call to these methods will fail with a
      * {@link NullPointerException}.
      * 
      * @param type the type of the file system entry to which calls to
-     *        {@link #getEntry()}, {@link #getSize(Size)} and
+     *        {@link #get()}, {@link #getSize(Size)} and
      *        {@link #getTime(Access)} shall get forwarded.
      */
     public void setKey(final @Nullable Type type) {
@@ -131,7 +131,7 @@ implements Cloneable {
      * @param entry the entry to map.
      * @return The previously mapped entry.
      */
-    public @Nullable E putEntry(Type type, E entry) {
+    public @Nullable E put(Type type, E entry) {
         return map.put(key = type, entry);
     }
 
@@ -141,7 +141,7 @@ implements Cloneable {
      * @param type the type to remove.
      * @return The previously mapped entry.
      */
-    public @Nullable E removeEntry(Type type) {
+    public @Nullable E remove(Type type) {
         return map.remove(type);
     }
 
@@ -151,7 +151,7 @@ implements Cloneable {
      * @param type the type of the entry to lookup.
      * @return The entry for the given type.
      */
-    public @Nullable E getEntry(Type type) {
+    public @Nullable E get(Type type) {
         return map.get(type);
     }
 

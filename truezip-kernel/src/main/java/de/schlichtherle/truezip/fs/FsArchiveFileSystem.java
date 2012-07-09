@@ -416,7 +416,7 @@ implements Iterable<FsCovariantEntry<E>> {
                         "entry exists already");
         }
         while (template instanceof FsCovariantEntry<?>)
-            template = ((FsCovariantEntry<?>) template).getEntry(type);
+            template = ((FsCovariantEntry<?>) template).get(type);
         return new PathLink(path, type, options, template);
     }
 
@@ -468,14 +468,14 @@ implements Iterable<FsCovariantEntry<E>> {
                 elements = new SegmentLink[level + 1];
                 elements[0] = new SegmentLink<E>(null, parentEntry);
                 newEntry = new FsCovariantEntry<E>(entryName);
-                newEntry.putEntry(entryType,
+                newEntry.put(entryType,
                         newCheckedEntry(entryName, entryType, options, template));
                 elements[1] = new SegmentLink<E>(memberName, newEntry);
             } else if (createParents) {
                 elements = newSegmentLinks(
                         level + 1, parentPath, DIRECTORY, null);
                 newEntry = new FsCovariantEntry<E>(entryName);
-                newEntry.putEntry(entryType,
+                newEntry.put(entryType,
                         newCheckedEntry(entryName, entryType, options, template));
                 elements[elements.length - level]
                         = new SegmentLink<E>(memberName, newEntry);
@@ -493,7 +493,7 @@ implements Iterable<FsCovariantEntry<E>> {
             touch();
             final int l = links.length;
             FsCovariantEntry<E> parentCE = links[0].entry;
-            E parentAE = parentCE.getEntry(DIRECTORY);
+            E parentAE = parentCE.get(DIRECTORY);
             for (int i = 1; i < l ; i++) {
                 final SegmentLink<E> link = links[i];
                 final FsCovariantEntry<E> entryCE = link.entry;
@@ -606,7 +606,7 @@ implements Iterable<FsCovariantEntry<E>> {
         final boolean ok = pce.remove(splitter.getMemberName());
         assert ok : "The parent directory of \"" + name.toString()
                     + "\" does not contain this entry - archive file system is corrupted!";
-        final E pae = pce.getEntry(DIRECTORY);
+        final E pae = pce.get(DIRECTORY);
         if (UNKNOWN != pae.getTime(WRITE)) // never touch ghosts!
             pae.setTime(WRITE, System.currentTimeMillis());
     }
@@ -693,7 +693,7 @@ implements Iterable<FsCovariantEntry<E>> {
             FsCovariantEntry<E> ce = map.get(path);
             if (null == ce)
                 map.put(path, ce = new FsCovariantEntry<E>(path));
-            ce.putEntry(ae.getType(), ae);
+            ce.put(ae.getType(), ae);
             return ce;
         }
 
