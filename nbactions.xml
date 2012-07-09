@@ -2,8 +2,7 @@
 <!--
   - Copyright (C) 2005-2012 Schlichtherle IT Services.
   - All rights reserved. Use is subject to license terms.
-  -->
-<actions>
+  --><actions>
     <action>
         <actionName>CUSTOM-source:jar javadoc:jar deploy</actionName>
         <displayName>source:jar javadoc:jar deploy</displayName>
@@ -131,4 +130,12 @@
             <goal>versions:display-plugin-updates</goal>
         </goals>
     </action>
+    <action>
+            <actionName>CUSTOM-site site:stage</actionName>
+            <displayName>site site:stage</displayName>
+            <goals>
+                <goal>site</goal>
+                <goal>site:stage</goal>
+            </goals>
+        </action>
 </actions>
