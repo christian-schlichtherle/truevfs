@@ -151,9 +151,6 @@ private final class ResourceAccountant(lock: Lock) {
           // that anyway.
           closeable close ()
         } catch {
-          case ex: ControlFlowException =>
-            assert(ex.isInstanceOf[NeedsLockRetryException], ex)
-            throw ex
           case ex: IOException =>
             handler warn ex // may throw an exception!
         }

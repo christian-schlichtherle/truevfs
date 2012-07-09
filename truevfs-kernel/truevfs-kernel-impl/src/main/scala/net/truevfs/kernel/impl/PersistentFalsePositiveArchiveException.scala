@@ -19,5 +19,5 @@ import net.truevfs.kernel.spec.util._
   * @author Christian Schlichtherle
   */
 @Immutable
-private class PersistentFalsePositiveArchiveException(getCause: IOException)
-extends FalsePositiveArchiveException(getCause)
+private class PersistentFalsePositiveArchiveException(cause: IOException)
+extends FalsePositiveArchiveException(cause)
