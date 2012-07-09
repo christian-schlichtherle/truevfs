@@ -123,8 +123,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
         case ex: FalsePositiveArchiveException =>
           throw new AssertionError(ex)
         case inaccessibleEntry: IOException =>
-          if (autoCreate)
-            throw inaccessibleEntry
+          if (autoCreate) throw inaccessibleEntry
           throw new FalsePositiveArchiveException(inaccessibleEntry)
       }
     }
@@ -153,12 +152,8 @@ extends FileSystemArchiveController[E](model) with TouchListener {
             case ex: FalsePositiveArchiveException =>
               throw new AssertionError(ex)
             case ex: IOException =>
-              throw {
-                if (pe.isType(SPECIAL))
-                  new FalsePositiveArchiveException(ex)
-                else
-                  new PersistentFalsePositiveArchiveException(ex)
-              }
+              if (pe.isType(SPECIAL)) throw new FalsePositiveArchiveException(ex)
+              throw new PersistentFalsePositiveArchiveException(ex)
           }
         }
         val fs = ArchiveFileSystem(driver, is, Option(pe), ro);

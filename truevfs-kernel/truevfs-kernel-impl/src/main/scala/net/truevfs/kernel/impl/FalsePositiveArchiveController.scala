@@ -208,8 +208,7 @@ extends FsDecoratingController[FsModel, FsController[_ <: FsModel]](c) {
           assert(ex.isInstanceOf[NeedsLockRetryException])
           throw ex
         case ex: IOException =>
-          if (originalCause != ex)
-            originalCause.addSuppressed(ex)
+          if (originalCause != ex) originalCause.addSuppressed(ex)
           throw originalCause
       }
     }

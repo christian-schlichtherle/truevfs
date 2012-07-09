@@ -18,5 +18,7 @@ import net.truevfs.kernel.spec.util._
   * @author Christian Schlichtherle
   */
 @Immutable
-private class FalsePositiveArchiveException(override val getCause: IOException)
-extends ControlFlowException
+private class FalsePositiveArchiveException(cause: IOException)
+extends ControlFlowException(cause) {
+  override def getCause() = super.getCause.asInstanceOf[IOException]
+}

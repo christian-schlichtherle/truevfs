@@ -110,7 +110,6 @@ private trait ResourceController extends Controller[LockModel] {
     extends ExceptionHandler[IOException, RuntimeException] {
       def fail(ex: IOException) = throw new AssertionError(ex)
       def warn(ex: IOException) {
-        assert(!ex.isInstanceOf[ControlFlowException])
         builder.warn(new FsSyncWarningException(mountPoint, ex))
       }
     } // IOExceptionHandler
