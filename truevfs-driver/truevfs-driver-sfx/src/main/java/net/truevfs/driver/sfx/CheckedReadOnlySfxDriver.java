@@ -5,8 +5,8 @@
 package net.truevfs.driver.sfx;
 
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.driver.zip.ZipDriverEntry;
-import net.truevfs.driver.zip.ZipInputService;
+import net.truevfs.driver.zip.core.AbstractZipDriverEntry;
+import net.truevfs.driver.zip.core.ZipInputService;
 
 /**
  * An archive driver for SFX/EXE files which checks the CRC32 value for all
@@ -35,7 +35,7 @@ public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
      * @return {@code true}
      */
     @Override
-    protected boolean check(ZipDriverEntry entry, ZipInputService input) {
+    public boolean check(AbstractZipDriverEntry entry, ZipInputService input) {
         return true;
     }
 }

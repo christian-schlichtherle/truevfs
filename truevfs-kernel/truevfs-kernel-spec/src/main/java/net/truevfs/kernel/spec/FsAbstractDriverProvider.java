@@ -4,12 +4,12 @@
  */
 package net.truevfs.kernel.spec;
 
-import net.truevfs.kernel.spec.util.ExtensionSet;
-import net.truevfs.kernel.spec.util.HashMaps;
-import net.truevfs.kernel.spec.util.ServiceLocator;
 import java.net.URISyntaxException;
 import java.util.*;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.spec.util.ExtensionSet;
+import net.truevfs.kernel.spec.util.HashMaps;
+import net.truevfs.kernel.spec.util.ServiceLocator;
 
 /**
  * An abstract provider for an immutable map of file system schemes to file

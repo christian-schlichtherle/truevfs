@@ -29,6 +29,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-access</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -37,13 +38,12 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-driver-zip</artifactId>
+            <artifactId>truevfs-driver-jar</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-driver-zip</artifactId>
+            <artifactId>truevfs-driver-zip-core</artifactId>
             <type>test-jar</type>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

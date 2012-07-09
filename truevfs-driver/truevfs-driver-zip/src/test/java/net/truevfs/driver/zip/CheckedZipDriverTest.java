@@ -4,6 +4,7 @@
  */
 package net.truevfs.driver.zip;
 
+import net.truevfs.driver.zip.core.AbstractZipDriverEntry;
 import net.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.IoPool;
@@ -12,7 +13,7 @@ import net.truevfs.kernel.spec.cio.IoPool;
  * @author Christian Schlichtherle
  */
 public final class CheckedZipDriverTest
-extends FsArchiveDriverTestSuite<ZipDriverEntry, CheckedZipDriver> {
+extends FsArchiveDriverTestSuite<AbstractZipDriverEntry, CheckedZipDriver> {
 
     @Override
     protected CheckedZipDriver newArchiveDriver() {

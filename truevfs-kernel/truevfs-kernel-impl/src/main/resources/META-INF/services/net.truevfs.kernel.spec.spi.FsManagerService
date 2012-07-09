@@ -1,1 +1,1 @@
-net.truevfs.kernel.impl.ArchiveManagerService
+net.truevfs.kernel.impl.DefaultManagerService

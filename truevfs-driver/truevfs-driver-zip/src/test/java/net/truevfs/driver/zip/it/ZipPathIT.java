@@ -9,7 +9,7 @@ import net.truevfs.driver.zip.ZipDriver;
 import net.truevfs.kernel.spec.cio.IoPool;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class ZipPathIT extends TPathITSuite<ZipDriver> {
 

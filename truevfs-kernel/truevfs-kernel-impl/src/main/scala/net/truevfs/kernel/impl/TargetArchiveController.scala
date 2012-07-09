@@ -274,7 +274,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
    * Synchronizes all entries in the (virtual) archive file system with the
    * (temporary) output archive file.
    *
-   * @param  handler the strategy for assembling sync exceptions.
+   * @param handler the strategy for assembling sync exceptions.
    */
   private def copy(handler: FsSyncExceptionBuilder) {
     // Skip (In|Out)putArchive for better performance.

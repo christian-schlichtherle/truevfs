@@ -4,15 +4,6 @@
  */
 package net.truevfs.driver.zip.raes.crypto;
 
-import net.truevfs.driver.zip.crypto.CipherReadOnlyChannel;
-import net.truevfs.driver.zip.crypto.CtrBlockCipher;
-import net.truevfs.driver.zip.crypto.SeekableBlockCipher;
-import static net.truevfs.driver.zip.raes.crypto.Constants.AES_BLOCK_SIZE_BITS;
-import static net.truevfs.driver.zip.raes.crypto.Constants.TYPE_0_HEADER_LEN_WO_SALT;
-import net.truevfs.kernel.spec.io.IntervalReadOnlyChannel;
-import net.truevfs.kernel.spec.io.PowerBuffer;
-import net.truevfs.key.param.AesKeyStrength;
-import net.truevfs.key.util.SuspensionPenalty;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -20,6 +11,15 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.driver.zip.core.crypto.CipherReadOnlyChannel;
+import net.truevfs.driver.zip.core.crypto.CtrBlockCipher;
+import net.truevfs.driver.zip.core.crypto.SeekableBlockCipher;
+import static net.truevfs.driver.zip.raes.crypto.Constants.AES_BLOCK_SIZE_BITS;
+import static net.truevfs.driver.zip.raes.crypto.Constants.TYPE_0_HEADER_LEN_WO_SALT;
+import net.truevfs.kernel.spec.io.IntervalReadOnlyChannel;
+import net.truevfs.kernel.spec.io.PowerBuffer;
+import net.truevfs.key.param.AesKeyStrength;
+import net.truevfs.key.util.SuspensionPenalty;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS12PasswordToBytes;

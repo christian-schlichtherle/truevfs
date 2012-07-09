@@ -4,31 +4,26 @@
  */
 package net.truevfs.driver.zip.raes;
 
-import net.truevfs.driver.zip.KeyController;
+import java.io.IOException;
+import javax.annotation.concurrent.Immutable;
+import net.truevfs.driver.zip.core.KeyController;
 import net.truevfs.driver.zip.raes.crypto.RaesKeyException;
 import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsModel;
 import net.truevfs.key.param.AesPbeParameters;
-import java.io.IOException;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * This file system controller decorates another file system controller in
  * order to manage the authentication key required for accessing its
  * RAES encrypted ZIP file (ZIP.RAES).
  * 
+ * @param  <M> the type of the file system model.
  * @author Christian Schlichtherle
  */
-@ThreadSafe
+@Immutable
 final class ZipRaesKeyController<M extends FsModel>
 extends KeyController<M, ZipRaesDriver> {
 
-    /**
-     * Constructs a new ZIP.RAES archive controller.
-     *
-     * @param controller the file system controller to decorate.
-     * @param driver the ZIP.RAES driver.
-     */
     ZipRaesKeyController(FsController<? extends M> controller, ZipRaesDriver driver) {
         super(controller, driver);
     }

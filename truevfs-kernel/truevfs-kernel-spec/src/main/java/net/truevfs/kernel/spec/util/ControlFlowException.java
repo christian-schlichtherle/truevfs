@@ -4,6 +4,7 @@
  */
 package net.truevfs.kernel.spec.util;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -20,7 +21,7 @@ public class ControlFlowException extends RuntimeException {
 
     public ControlFlowException() { this(null); }
 
-    public ControlFlowException(final Throwable cause) {
+    public ControlFlowException(final @CheckForNull Throwable cause) {
         super(null != cause ? cause.toString() : null, cause, false, isTraceable());
     }
 

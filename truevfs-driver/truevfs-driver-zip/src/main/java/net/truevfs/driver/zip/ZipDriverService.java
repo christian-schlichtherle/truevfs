@@ -23,10 +23,6 @@ import net.truevfs.kernel.spec.spi.FsDriverService;
 </thead>
 <tbody>
 <tr>
-<td>{@code ear}, {@code jar}, {@code war}</td>
-<td>{@link net.truevfs.driver.zip.JarDriver}</td>
-</tr>
-<tr>
 <td>{@code zip}</td>
 <td>{@link net.truevfs.driver.zip.ZipDriver}</td>
 </tr>
@@ -45,7 +41,6 @@ public final class ZipDriverService extends FsDriverService {
     private final Map<FsScheme, FsDriver>
             drivers = newMap(new Object[][] {
                 { "zip", new ZipDriver() },
-                { "ear|jar|war", new JarDriver() },
             });
 
     @Override

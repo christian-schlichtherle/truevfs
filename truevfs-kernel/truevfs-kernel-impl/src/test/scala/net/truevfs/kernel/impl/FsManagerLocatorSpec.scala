@@ -21,7 +21,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
 
   "The file system manager locator singleton" should {
     "provide an archive file system manager" in {
-      FsManagerLocator.SINGLETON.getManager.isInstanceOf[ArchiveManager] should be (true)
+      FsManagerLocator.SINGLETON.getManager.isInstanceOf[DefaultManager] should be (true)
     }
   }
 }

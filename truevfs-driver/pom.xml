@@ -21,10 +21,12 @@
     <modules>
         <module>truevfs-driver-file</module>
         <module>truevfs-driver-http</module>
+        <module>truevfs-driver-jar</module>
         <module>truevfs-driver-odf</module>
         <module>truevfs-driver-sfx</module>
         <module>truevfs-driver-tar</module>
         <module>truevfs-driver-zip</module>
+        <module>truevfs-driver-zip-core</module>
         <module>truevfs-driver-zip-raes</module>
     </modules>
 

@@ -4,16 +4,16 @@
  */
 package net.truevfs.kernel.spec;
 
+import java.io.IOException;
+import java.util.Map;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.spec.cio.Entry;
 import net.truevfs.kernel.spec.cio.Entry.Access;
 import net.truevfs.kernel.spec.cio.Entry.Type;
 import net.truevfs.kernel.spec.cio.InputSocket;
 import net.truevfs.kernel.spec.cio.OutputSocket;
 import net.truevfs.kernel.spec.util.BitField;
-import java.io.IOException;
-import java.util.Map;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * An abstract decorator for a file system controller.

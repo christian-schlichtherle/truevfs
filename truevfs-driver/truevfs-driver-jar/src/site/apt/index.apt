@@ -1,0 +1,43 @@
+    -----------------------
+    About TrueVFS Driver JAR
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About TrueVFS Driver JAR
+
+    This module contains the file system driver service class
+    {{{./apidocs/net/truevfs/driver/jar/JarDriverService.html}JarDriverService}}
+    which provides the following map of file system drivers:
+
+*--*--*
+||URI Schemes / Archive File Extensions||File System Driver Class|
+*--+--+
+|<<<ear>>>, <<<jar>>>, <<<war>>>|{{{./apidocs/net/truevfs/driver/zip/JarDriver.html}<<<JarDriver>>>}}|
+*--+--+
+
+    Add the JAR artifact of this module to the run time class path to
+    make its file system drivers available for service location in the
+    client API modules.
+    The URI schemes will then get recognized as default archive file extensions
+    by the class
+    {{{../../apidocs/net/truevfs/file/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+
+* Key Features
+
+    [Appending To Existing JAR Files]
+        New JAR entries can get appended to existing JAR files.
+
+        To use this feature with the client API, set
+        {{{./apidocs/net/truevfs/kernel/spec/FsAccessOption.html#GROW}<<<FsAccessOption.GROW>>>}},
+        e.g. in
+        {{{./apidocs/net/truevfs/access/TConfig.html#setAccessPreferences(net.truevfs.kernel.spec.util.BitField)}<<<TConfig.setAccessPreferences(BitField)>>>}}.
+
+    [Recovery Of Lost JAR Entries]
+        When reading truncated JAR files, lost entries can get recovered.
+
+        To use this feature with the client API, you don't need to do anything.
+        This happens automatically if you use any of the file system drivers
+        for reading JAR files.
+
+    []

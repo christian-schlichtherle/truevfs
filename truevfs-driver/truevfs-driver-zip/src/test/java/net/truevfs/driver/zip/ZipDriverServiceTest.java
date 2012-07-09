@@ -13,7 +13,7 @@ import net.truevfs.kernel.spec.spi.FsDriverServiceTestSuite;
 public final class ZipDriverServiceTest extends FsDriverServiceTestSuite {
     @Override
     protected String getExtensions() {
-        return "zip|ear|jar|war";
+        return "zip";
     }
 
     @Override

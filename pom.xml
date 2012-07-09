@@ -15,7 +15,7 @@
     <parent>
         <groupId>de.schlichtherle</groupId>
         <artifactId>oss-parent</artifactId>
-        <version>11</version>
+        <version>17</version>
     </parent>
 
     <groupId>de.schlichtherle.truevfs</groupId>
@@ -83,9 +83,11 @@ system space.
         <!-- While using an older Maven version may work, this hasn't been
              tested and is probably not producing exactly the same results. -->
         <maven.enforcer.requireMavenVersion>3.0.4</maven.enforcer.requireMavenVersion>
-        <maven.enforcer.requireJavaVersion>1.7</maven.enforcer.requireJavaVersion>
+        <maven.enforcer.requireJavaVersion>${maven.compiler.source}</maven.enforcer.requireJavaVersion> <!-- forward reference -->
 
         <netbeans.hint.jdkPlatform>JDK_1.7</netbeans.hint.jdkPlatform>
+
+        <scala.version>2.9.2</scala.version>
 
         <maven.compiler.showDeprecation>false</maven.compiler.showDeprecation>
         <maven.compiler.source>1.7</maven.compiler.source>
@@ -116,21 +118,16 @@ system space.
             <!-- Header text -->
             &lt;b&gt;${project.name} ${project.version}&lt;/b&gt;
         </header>
-        <excludePackageNames>de.schlichtherle.truevfs</excludePackageNames>
 
         <!-- clirr-maven-plugin -->
         <comparisonVersion>8.0</comparisonVersion>
-
-        <scala.version>2.9.2</scala.version>
-        <scalacheck.version>1.9</scalacheck.version>
-        <scalatest.version>1.7.2</scalatest.version>
     </properties>
 
     <modules>
         <module>truevfs-access</module>
         <module>truevfs-archetype</module>
         <module>truevfs-driver</module>
-        <module>truevfs-inst</module>
+        <module>truevfs-ext</module>
         <module>truevfs-kernel</module>
         <module>truevfs-key</module>
         <module>truevfs-profile</module>
@@ -163,6 +160,18 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-jar</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-jar</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-odf</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -190,17 +199,29 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-zip-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-zip-core</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-zip-raes</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-inst-core</artifactId>
+                <artifactId>truevfs-ext-inst</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-inst-jmx-jul</artifactId>
+                <artifactId>truevfs-ext-jmx-jul</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -270,6 +291,17 @@ system space.
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
                 <version>1.4.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.tukaani</groupId>
+                        <artifactId>xz</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>4.2</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
@@ -290,14 +322,19 @@ system space.
             <dependency>
                 <groupId>org.scalacheck</groupId>
                 <artifactId>scalacheck_${scala.version}</artifactId>
-                <version>${scalacheck.version}</version>
+                <version>1.9</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.scalatest</groupId>
                 <artifactId>scalatest_${scala.version}</artifactId>
-                <version>${scalatest.version}</version>
+                <version>1.8</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.tukaani</groupId>
+                <artifactId>xz</artifactId>
+                <version>1.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -308,7 +345,6 @@ system space.
                 <plugin>
                     <groupId>net.alchim31.maven</groupId>
                     <artifactId>scala-maven-plugin</artifactId>
-                    <version>3.0.1</version>
                     <executions>
                         <execution>
                             <id>scala-compile-first</id>
@@ -345,29 +381,18 @@ system space.
                             <exclude>**/*TestSuite.class</exclude>
                         </excludes-->
                         <systemPropertyVariables>
-                            <net.truevfs.kernel.impl.ControlFlowException.traceable>true</net.truevfs.kernel.impl.ControlFlowException.traceable>
+                            <net.truevfs.kernel.spec.util.ControlFlowException.traceable>true</net.truevfs.kernel.spec.util.ControlFlowException.traceable>
                             <java.util.logging.config.file>${java.util.logging.config.file}</java.util.logging.config.file>
                         </systemPropertyVariables>
                     </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>integration-test</id>
-                            <goals>
-                                <goal>integration-test</goal>
-                                <goal>verify</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                     <configuration>
                         <!-- Consider 90% blocking factor for I/O. -->
                         <threadCount>10</threadCount>
                         <!-- The server VM is expected to be less tolerant
                              against multithreading bugs when running the tests.
-                             The server VM requires 650 MB to run the
-                             integration tests for TAR.BZ2 archive files.
                              Setting -XX:+DisableExplicitGC would trigger an
                              endless loop because some tests check if the
                              garbage collection and the finalization kicked
@@ -376,7 +401,7 @@ system space.
                              See http://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html .
                              See http://www.oracle.com/technetwork/java/tuning-139912.html#section4.2.5 .
                              -->
-                        <argLine>-server -Xms650m -Xmx650m</argLine>
+                        <argLine>-server</argLine>
                         <systemPropertyVariables>
                             <!-- While running the tests with isolated
                                  file system managers yields better performance
@@ -399,6 +424,7 @@ system space.
                             <link>http://commons.apache.org/compress/apidocs/</link>
                             <link>http://findbugs.sourceforge.net/api/</link>
                         </links>
+                        <!--show>private</show-->
                     </configuration>
                 </plugin>
                 <plugin>
@@ -455,17 +481,9 @@ system space.
         </pluginManagement>
     </build>
 
-    <distributionManagement>
-        <site>
-            <id>truevfs-website</id>
-            <name>TrueVFS Website</name>
-            <url>file:/C:/Users/christian/Documents/Schlichtherle_IT_Services/Projekte/truevfs~web</url>
-        </site>
-    </distributionManagement>
-
     <profiles>
         <profile>
-            <id>main-source-requirements</id>
+            <id>non-transitive-main-source-dependencies</id>
             <activation>
                 <file>
                     <exists>src/main</exists>
@@ -480,7 +498,7 @@ system space.
             </dependencies>
         </profile>
         <profile>
-            <id>test-source-requirements</id>
+            <id>non-transitive-test-source-dependencies</id>
             <activation>
                 <file>
                     <exists>src/test</exists>
@@ -488,29 +506,18 @@ system space.
             </activation>
             <dependencies>
                 <dependency>
-                    <groupId>com.google.code.findbugs</groupId>
-                    <artifactId>annotations</artifactId>
-                    <optional>true</optional>
-                </dependency>
-                <dependency>
                     <groupId>junit</groupId>
                     <artifactId>junit</artifactId>
                 </dependency>
             </dependencies>
         </profile>
         <profile>
-            <id>scala-source-requirements</id>
+            <id>compile-scala-main-sources</id>
             <activation>
                 <file>
                     <exists>src/main/scala</exists>
                 </file>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.scala-lang</groupId>
-                    <artifactId>scala-library</artifactId>
-                </dependency>
-            </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -521,17 +528,13 @@ system space.
             </build>
         </profile>
         <profile>
-            <id>scala-test-source-requirements</id>
+            <id>compile-scala-test-sources</id>
             <activation>
                 <file>
                     <exists>src/test/scala</exists>
                 </file>
             </activation>
             <dependencies>
-                <dependency>
-                    <groupId>org.scala-lang</groupId>
-                    <artifactId>scala-library</artifactId>
-                </dependency>
                 <dependency>
                     <groupId>org.scalatest</groupId>
                     <artifactId>scalatest_${scala.version}</artifactId>
@@ -564,9 +567,9 @@ system space.
                                     <goal>run</goal>
                                 </goals>
                                 <configuration>
-                                    <tasks>
+                                    <target name="create-it-directory">
                                         <mkdir dir="${java.io.tmpdir.it}"/>
-                                    </tasks>
+                                    </target>
                                 </configuration>
                             </execution>
                         </executions>
@@ -575,4 +578,12 @@ system space.
             </build>
         </profile>
     </profiles>
+
+    <distributionManagement>
+        <site>
+            <id>truevfs-website</id>
+            <name>TrueVFS Website</name>
+            <url>file:/C:/Users/christian/Documents/Schlichtherle_IT_Services/Projekte/truevfs~web</url>
+        </site>
+    </distributionManagement>
 </project>

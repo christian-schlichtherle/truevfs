@@ -9,8 +9,8 @@ import java.nio.charset.Charset;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.driver.zip.core.AbstractZipDriverEntry;
 import net.truevfs.driver.zip.ZipDriver;
-import net.truevfs.driver.zip.ZipDriverEntry;
 import net.truevfs.kernel.spec.*;
 import net.truevfs.kernel.spec.cio.InputService;
 import net.truevfs.kernel.spec.cio.OutputService;
@@ -58,12 +58,12 @@ public class ReadOnlySfxDriver extends ZipDriver {
     }
 
     @Override
-    public final OutputService<ZipDriverEntry> newOutput(
+    public final OutputService<AbstractZipDriverEntry> newOutput(
             FsModel model,
             BitField<FsAccessOption> options,
             FsController<?> controller,
             FsEntryName name,
-            @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
+            @CheckForNull @WillNotClose InputService<AbstractZipDriverEntry> input)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }

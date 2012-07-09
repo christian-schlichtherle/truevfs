@@ -37,26 +37,18 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-key</artifactId>
+            <artifactId>truevfs-driver-zip-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-driver-zip-core</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-key</artifactId>
             <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-compress</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.tukaani</groupId>
-                    <artifactId>xz</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk16</artifactId>
         </dependency>
     </dependencies>
 

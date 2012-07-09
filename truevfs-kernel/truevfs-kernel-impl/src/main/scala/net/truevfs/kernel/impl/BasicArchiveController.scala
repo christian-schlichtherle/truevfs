@@ -75,7 +75,7 @@ extends Controller[LockModel] with LockModelAspect {
         checkSync(options, name, READ)
         autoMount(options) stat (options, name) match {
           case Some(ce) =>
-            val ae = ce.getEntry(FILE)
+            val ae = ce.get(FILE)
             if (null eq ae)
               throw new FileSystemException(name.toString, null,
                                             "Expected a FILE entry, but is a " + ce.getTypes + " entry!");

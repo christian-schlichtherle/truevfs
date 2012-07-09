@@ -5,6 +5,8 @@
 package net.truevfs.driver.zip;
 
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.driver.zip.core.AbstractZipDriverEntry;
+import net.truevfs.driver.zip.core.ZipInputService;
 
 /**
  * An archive driver for ZIP files which checks the CRC32 values for all
@@ -33,7 +35,7 @@ public class CheckedZipDriver extends ZipDriver {
      * @return {@code true}
      */
     @Override
-    protected boolean check(ZipDriverEntry entry, ZipInputService input) {
+    public boolean check(AbstractZipDriverEntry entry, ZipInputService input) {
         return true;
     }
 }

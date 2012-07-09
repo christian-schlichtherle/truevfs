@@ -4,12 +4,12 @@
  */
 package net.truevfs.driver.zip;
 
+import java.net.URI;
+import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.key.PromptingKeyManager;
 import net.truevfs.key.PromptingKeyProvider;
 import net.truevfs.key.PromptingKeyProvider.View;
 import net.truevfs.key.SafeKey;
-import java.net.URI;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * @param  <K> the type of the safe keys.
