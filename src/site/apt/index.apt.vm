@@ -32,7 +32,7 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
 *--+--+
 | {{{./truevfs-driver/truevfs-driver-http/index.html}TrueVFS Driver HTTP(S)}} | Provides read-only access to HTTP(S) URLs.
 *--+--+
-| {{{./truevfs-driver/truevfs-driver-tar/index.html}TrueVFS Driver TAR}} | Provides read/write access to TAR, TAR.GZ and TAR.BZ2 files.
+| {{{./truevfs-driver/truevfs-driver-tar/index.html}TrueVFS Driver TAR}} | Provides read/write access to TAR, TAR.BZ2, TAR.GZ and TAR.XZ files.
 *--+--+
 | {{{./truevfs-driver/truevfs-driver-zip/index.html}TrueVFS Driver ZIP}} | Provides read/write access to ZIP, JAR, EAR, WAR etc. Supports appending to existing ZIP files, recovery of lost ZIP entries, WinZip AES encryption, BZIP2 compression, selectable character sets, external file attributes and ZIP64 extensions.
 *--+--+
