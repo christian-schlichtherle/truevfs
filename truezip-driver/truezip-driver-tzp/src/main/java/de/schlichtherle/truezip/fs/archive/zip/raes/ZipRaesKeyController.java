@@ -7,7 +7,7 @@ package de.schlichtherle.truezip.fs.archive.zip.raes;
 import de.schlichtherle.truezip.crypto.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.archive.zip.KeyManagerController;
+import de.schlichtherle.truezip.fs.archive.zip.KeyController;
 import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -19,7 +19,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class ZipRaesKeyController extends KeyManagerController<ZipRaesDriver> {
+final class ZipRaesKeyController extends KeyController<ZipRaesDriver> {
 
     ZipRaesKeyController(FsController<?> controller, ZipRaesDriver driver) {
         super(controller, driver);

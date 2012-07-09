@@ -186,7 +186,7 @@ extends FsLockModelController {
                 if (null == ce)
                     throw new FsEntryNotFoundException(getModel(),
                             name, "no such entry");
-                final FsArchiveEntry ae = ce.getEntry(FILE);
+                final FsArchiveEntry ae = ce.get(FILE);
                 if (null == ae)
                     throw new FsEntryNotFoundException(getModel(),
                             name, "expected FILE entry, but is a " + ce.getTypes() + " entry");

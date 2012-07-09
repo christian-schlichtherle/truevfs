@@ -18,7 +18,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class ZipKeyController extends KeyManagerController<ZipDriver> {
+final class ZipKeyController extends KeyController<ZipDriver> {
 
     ZipKeyController(FsController<?> controller, ZipDriver driver) {
         super(controller, driver);
