@@ -5,9 +5,9 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.socket.MultiplexedOutputShop;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.socket.MultiplexedOutputShop;
 import de.schlichtherle.truezip.socket.OutputShop;
 import java.io.IOException;
 import java.io.OutputStream;
