@@ -19,7 +19,7 @@ class ArchiveManagerServiceSpec
 extends WordSpec with ShouldMatchers with PropertyChecks {
 
   "An archive file system manager service" should {
-    val service = new ArchiveManagerService
+    val service = new DefaultManagerService
 
     "provide an archive file system manager" in {
       service.getManager should not be (null)

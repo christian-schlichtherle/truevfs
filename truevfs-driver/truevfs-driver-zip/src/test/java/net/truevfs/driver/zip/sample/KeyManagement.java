@@ -4,13 +4,13 @@
  */
 package net.truevfs.driver.zip.sample;
 
-import net.truevfs.driver.zip.JarDriver;
-import net.truevfs.driver.zip.ZipDriverEntry;
-import net.truevfs.driver.zip.io.WinZipAesParameters;
-import net.truevfs.driver.zip.io.ZipCryptoParameters;
-import net.truevfs.driver.zip.io.ZipKeyException;
+import java.nio.charset.Charset;
 import net.truevfs.access.TArchiveDetector;
 import net.truevfs.access.TConfig;
+import net.truevfs.driver.zip.core.AbstractZipDriverEntry;
+import net.truevfs.driver.zip.core.io.WinZipAesParameters;
+import net.truevfs.driver.zip.core.io.ZipKeyException;
+import net.truevfs.driver.zip.ZipDriver;
 import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsDriverProvider;
 import net.truevfs.kernel.spec.FsModel;
@@ -21,7 +21,6 @@ import net.truevfs.key.PromptingKeyProvider.View;
 import net.truevfs.key.UnknownKeyException;
 import net.truevfs.key.param.AesKeyStrength;
 import net.truevfs.key.param.AesPbeParameters;
-import java.nio.charset.Charset;
 
 /**
  * Provides static utility methods to set passwords for WinZip AES encrypted
@@ -70,18 +69,18 @@ public final class KeyManagement {
             String extensions,
             byte[] password) {
         return new TArchiveDetector(provider,
-                extensions, new CustomJarDriver1(password));
+                extensions, new CustomZipDriver1(password));
     }
     
-    private static final class CustomJarDriver1 extends JarDriver {
-        final ZipCryptoParameters param;
+    private static final class CustomZipDriver1 extends ZipDriver {
+        final WinZipAesParameters param;
         
-        CustomJarDriver1(byte[] password) {
+        CustomZipDriver1(byte[] password) {
             param = new CustomWinZipAesParameters(password);
         }
         
         @Override
-        protected ZipCryptoParameters zipCryptoParameters(
+        protected WinZipAesParameters zipCryptoParameters(
                 FsModel model,
                 Charset charset) {
             // If you need the URI of the particular archive file, then call
@@ -108,8 +107,8 @@ public final class KeyManagement {
         
         @Override
         protected boolean rdc(
-                ZipDriverEntry input,
-                ZipDriverEntry output) {
+                AbstractZipDriverEntry input,
+                AbstractZipDriverEntry output) {
             // Because we are using the same encryption key for all entries
             // of our custom archive file format we do NOT need to process the
             // entries according to the following pipeline when copying them:
@@ -123,7 +122,7 @@ public final class KeyManagement {
             // This is the default implementation - try to see the difference.
             //return input.isEncrypted() || output.isEncrypted();
         }
-    } // CustomJarDriver1
+    } // CustomZipDriver1
     
     private static final class CustomWinZipAesParameters
     implements WinZipAesParameters {
@@ -189,13 +188,13 @@ public final class KeyManagement {
             String extensions,
             char[] password) {
         return new TArchiveDetector(provider,
-                    extensions, new CustomJarDriver2(password));
+                    extensions, new CustomZipDriver2(password));
     }
     
-    private static final class CustomJarDriver2 extends JarDriver {
+    private static final class CustomZipDriver2 extends ZipDriver {
         final KeyManagerProvider provider;
         
-        CustomJarDriver2(char[] password) {
+        CustomZipDriver2(char[] password) {
             this.provider = new PromptingKeyManagerProvider(
                     AesPbeParameters.class,
                     new CustomView(password));
@@ -205,7 +204,7 @@ public final class KeyManagement {
         public KeyManagerProvider getKeyManagerProvider() {
             return provider;
         }
-    } // CustomJarDriver2
+    } // CustomZipDriver2
     
     private static final class CustomView
     implements View<AesPbeParameters> {

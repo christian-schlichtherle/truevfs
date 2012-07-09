@@ -8,9 +8,9 @@ import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.driver.zip.ZipDriverEntry;
-import net.truevfs.driver.zip.ZipInputService;
-import net.truevfs.driver.zip.ZipOutputService;
+import net.truevfs.driver.zip.core.AbstractZipDriverEntry;
+import net.truevfs.driver.zip.core.ZipInputService;
+import net.truevfs.driver.zip.core.ZipOutputService;
 import net.truevfs.kernel.spec.FsModel;
 import net.truevfs.kernel.spec.FsOutputSocketSink;
 import net.truevfs.kernel.spec.cio.InputService;
@@ -52,10 +52,10 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
      * written entries.
      */
     @Override
-    protected final OutputService<ZipDriverEntry> newOutput(
+    protected final OutputService<AbstractZipDriverEntry> newOutput(
             final FsModel model,
             final FsOutputSocketSink sink,
-            final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
+            final @CheckForNull @WillNotClose InputService<AbstractZipDriverEntry> input)
     throws IOException {
         final ZipInputService zis = (ZipInputService) input;
         return new ZipOutputService(model, new RaesSocketSink(model, sink), zis, this);

@@ -10,10 +10,10 @@ import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.driver.zip.JarDriver;
-import net.truevfs.driver.zip.ZipDriverEntry;
-import net.truevfs.driver.zip.ZipInputService;
-import net.truevfs.driver.zip.ZipOutputService;
+import net.truevfs.driver.zip.core.AbstractZipDriverEntry;
+import net.truevfs.driver.zip.core.ZipInputService;
+import net.truevfs.driver.zip.core.ZipOutputService;
+import net.truevfs.driver.jar.JarDriver;
 import net.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import net.truevfs.driver.zip.raes.crypto.RaesParameters;
 import net.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
@@ -88,7 +88,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     protected abstract long getAuthenticationTrigger();
 
     @Override
-    protected final boolean check(ZipDriverEntry entry, ZipInputService input) {
+    public final boolean check(AbstractZipDriverEntry entry, ZipInputService input) {
         // Optimization: If the cipher text alias the encrypted ZIP file is
         // smaller than the authentication trigger, then its entire cipher text
         // has already been authenticated by {@link ZipRaesDriver#zipInput}.
@@ -143,10 +143,10 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     @Override
-    protected OutputService<ZipDriverEntry> newOutput(
+    protected OutputService<AbstractZipDriverEntry> newOutput(
             final FsModel model,
             final FsOutputSocketSink sink,
-            final @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
+            final @CheckForNull @WillNotClose InputService<AbstractZipDriverEntry> input)
     throws IOException {
         final ZipInputService zis = (ZipInputService) input;
         return new MultiplexingOutputService<>(getIoPool(),
@@ -208,12 +208,12 @@ public abstract class ZipRaesDriver extends JarDriver {
      * of the resulting archive file and unecessarily heat the CPU.
      */
     @Override
-    public ZipDriverEntry newEntry(
+    public AbstractZipDriverEntry newEntry(
             final BitField<FsAccessOption> options,
             final String name,
             final Type type,
             final @CheckForNull Entry template) {
-        final ZipDriverEntry entry
+        final AbstractZipDriverEntry entry
                 = super.newEntry(options.set(COMPRESS), name, type, template);
         // Fix for http://java.net/jira/browse/TRUEZIP-176 :
         // Entry level encryption is enabled if mknod.getKeyManager(ENCRYPTED) is true

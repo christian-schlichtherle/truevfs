@@ -9,7 +9,7 @@ import net.truevfs.driver.odf.OdfDriver;
 import net.truevfs.kernel.spec.cio.IoPool;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class OdfFileIT extends TFileITSuite<OdfDriver> {
 

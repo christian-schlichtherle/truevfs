@@ -4,7 +4,6 @@
  */
 package net.truevfs.driver.zip.charset;
 
-import net.truevfs.driver.zip.charset.Ibm437Charset;
 import java.nio.charset.Charset;
 
 /**

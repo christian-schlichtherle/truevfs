@@ -4,9 +4,9 @@
  */
 package net.truevfs.driver.zip.sample;
 
+import java.nio.charset.Charset;
 import net.truevfs.access.TArchiveDetector;
 import net.truevfs.access.TConfig;
-import java.nio.charset.Charset;
 
 /**
  * @author Christian Schlichtherle

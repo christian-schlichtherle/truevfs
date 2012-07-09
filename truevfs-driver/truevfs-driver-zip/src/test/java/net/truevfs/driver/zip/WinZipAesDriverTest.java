@@ -4,13 +4,14 @@
  */
 package net.truevfs.driver.zip;
 
+import net.truevfs.driver.zip.core.AbstractZipDriverEntry;
 import net.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 
 /**
  * @author Christian Schlichtherle
  */
 public final class WinZipAesDriverTest
-extends FsArchiveDriverTestSuite<ZipDriverEntry, ZipDriver> {
+extends FsArchiveDriverTestSuite<AbstractZipDriverEntry, ZipDriver> {
 
     @Override
     protected ZipDriver newArchiveDriver() {

@@ -151,9 +151,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
     }
 
     final void storeBuffers() throws IOException {
-        if (isBusy())
-            return;
-
+        if (isBusy()) return;
         final ExceptionBuilder<IOException, IOException> builder
                 = new PriorityExceptionBuilder<>(IOExceptionComparator.INSTANCE);
         for (   final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
@@ -230,7 +228,6 @@ extends DecoratingOutputService<E, OutputService<E>> {
             final Entry _peer = null != input ? input.target() : null;
             final IoBuffer<?> buffer = this.buffer = pool.allocate();
             final Entry peer = null != _peer ? _peer : buffer;
-
             final class InputProxy extends DecoratingInputSocket<Entry> {
                 InputProxy() {
                     super(buffer.input());
@@ -241,7 +238,6 @@ extends DecoratingOutputService<E, OutputService<E>> {
                     return peer;
                 }
             } // InputProxy
-
             try {
                 this.input = new InputProxy();
                 this.out = buffer.output().stream(null);

@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.odf;
 
-import net.truevfs.driver.zip.ZipDriverEntry;
+import net.truevfs.driver.zip.core.AbstractZipDriverEntry;
 import net.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 import net.truevfs.kernel.spec.cio.IoPool;
 
@@ -12,7 +12,7 @@ import net.truevfs.kernel.spec.cio.IoPool;
  * @author Christian Schlichtherle
  */
 public final class OdfDriverTest
-extends FsArchiveDriverTestSuite<ZipDriverEntry, OdfDriver> {
+extends FsArchiveDriverTestSuite<AbstractZipDriverEntry, OdfDriver> {
 
     @Override
     protected OdfDriver newArchiveDriver() {

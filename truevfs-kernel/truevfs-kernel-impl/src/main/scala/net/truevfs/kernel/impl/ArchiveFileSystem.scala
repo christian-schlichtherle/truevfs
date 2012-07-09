@@ -212,7 +212,7 @@ extends Iterable[FsCovariantEntry[E]] {
         throw new FileAlreadyExistsException(name.toString)
     }
     val t = template match {
-      case Some(ce: FsCovariantEntry[_]) => Some(ce.getEntry(tµpe))
+      case Some(ce: FsCovariantEntry[_]) => Some(ce.get(tµpe))
       case x => x
     }
     new Mknod(options, path, tµpe, t)
@@ -250,14 +250,14 @@ extends Iterable[FsCovariantEntry[E]] {
           var segments = List[Segment[E]]()
           segments ::= Segment(None, pce)
           val mce = new FsCovariantEntry[E](path)
-          mce.putEntry(tµpe, newEntry(options, path, tµpe, template))
+          mce.put(tµpe, newEntry(options, path, tµpe, template))
           segments ::= Segment(Some(mn), mce)
           segments
         case _ =>
           if (options.get(CREATE_PARENTS)) {
             var segments = newSegments(pp, DIRECTORY, None)
             val mce = new FsCovariantEntry[E](path)
-            mce.putEntry(tµpe, newEntry(options, path, tµpe, template))
+            mce.put(tµpe, newEntry(options, path, tµpe, template))
             segments ::= Segment(Some(mn), mce)
             segments
           } else {
@@ -282,7 +282,7 @@ extends Iterable[FsCovariantEntry[E]] {
           val parentSize = commit(parentSegments)
           if (0 < parentSize) {
             val pce = parentSegments.head.entry
-            val pae = pce.getEntry(DIRECTORY)
+            val pae = pce.get(DIRECTORY)
             val mae = mce.getEntry
             master.add(mce.getName, mae)
             if (master.get(pce.getName).get.add(mn.get)
@@ -353,7 +353,7 @@ extends Iterable[FsCovariantEntry[E]] {
     val ok = pce.remove(splitter.getMemberName)
     assert(ok, "The parent directory of \"" + name.toString
                 + "\" does not contain this entry - archive file system is corrupted!")
-    val pae = pce.getEntry(DIRECTORY)
+    val pae = pce.get(DIRECTORY)
     if (UNKNOWN != pae.getTime(WRITE)) // never touch ghost directories!
         pae.setTime(WRITE, System.currentTimeMillis)
   }
@@ -514,7 +514,7 @@ private object ArchiveFileSystem {
           map.put(name, ce)
           ce
       }
-      ce.putEntry(ae.getType, ae)
+      ce.put(ae.getType, ae)
       ce
     }
 

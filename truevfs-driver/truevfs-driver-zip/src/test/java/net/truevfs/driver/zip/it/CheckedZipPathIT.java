@@ -1,17 +1,15 @@
-package net.truevfs.driver.zip.it;
-
 /*
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-
+package net.truevfs.driver.zip.it;
 
 import net.truevfs.access.TPathITSuite;
 import net.truevfs.driver.zip.CheckedZipDriver;
 import net.truevfs.kernel.spec.cio.IoPool;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public final class CheckedZipPathIT extends TPathITSuite<CheckedZipDriver> {
 

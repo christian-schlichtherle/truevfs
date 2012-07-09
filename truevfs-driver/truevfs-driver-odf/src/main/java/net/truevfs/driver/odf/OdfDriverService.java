@@ -6,8 +6,6 @@ package net.truevfs.driver.odf;
 
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.driver.zip.JarDriver;
-import net.truevfs.driver.zip.ZipDriver;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsScheme;
 import net.truevfs.kernel.spec.spi.FsDriverService;
