@@ -25,7 +25,7 @@ import javax.annotation.concurrent.ThreadSafe;
 public abstract class FsDecoratingController<
         M extends FsModel,
         C extends FsController<? extends M>>
-extends FsModelController<M> {
+extends FsAbstractController<M> {
 
     /** The decorated file system controller. */
     protected final C delegate;
@@ -127,8 +127,7 @@ extends FsModelController<M> {
     }
 
     @Override
-    public void sync(BitField<FsSyncOption> options)
-    throws FsSyncException, FsControllerException {
+    public void sync(BitField<FsSyncOption> options) throws FsSyncException {
         delegate.sync(options);
     }
 

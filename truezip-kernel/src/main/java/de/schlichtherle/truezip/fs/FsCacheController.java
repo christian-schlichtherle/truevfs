@@ -19,6 +19,7 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import static de.schlichtherle.truezip.socket.IOCache.Strategy.WRITE_BACK;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ControlFlowException;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
@@ -72,7 +73,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public final class FsCacheController
+final class FsCacheController
 extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     private static final Logger logger = Logger.getLogger(
@@ -94,9 +95,9 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
      * @param controller the decorated file system controller.
      * @param pool the pool of I/O buffers to hold the cached entry contents.
      */
-    public FsCacheController(
+    FsCacheController(
             final FsController<? extends FsLockModel> controller,
-                                final IOPool<?> pool) {
+            final IOPool<?> pool) {
         super(controller);
         if (null == (this.pool = pool))
             throw new NullPointerException();
@@ -174,7 +175,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     @Override
     public void sync(final BitField<FsSyncOption> options)
-    throws FsSyncException, FsControllerException {
+    throws FsSyncException {
         assert isWriteLockedByCurrentThread();
         FsNeedsSyncException preSyncEx;
         do {
@@ -221,7 +222,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     }
 
     private void preSync(final BitField<FsSyncOption> options)
-    throws FsSyncWarningException, FsSyncException, FsControllerException {
+    throws FsSyncWarningException, FsSyncException {
         if (0 >= caches.size()) return;
         final boolean flush = !options.get(ABORT_CHANGES);
         final boolean clear = !flush || options.get(CLEAR_CACHE);
@@ -233,8 +234,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             if (flush) {
                 try {
                     cache.flush();
-                } catch (final FsControllerException ex) {
-                    throw ex;
                 } catch (final IOException ex) {
                     throw builder.fail(new FsSyncException(getModel(), ex));
                 }
@@ -243,9 +242,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                 i.remove();
                 try {
                     cache.clear();
-                } catch (final FsControllerException ex) {
-                    assert false;
-                    throw ex;
                 } catch (final IOException ex) {
                     builder.warn(new FsSyncWarningException(getModel(), ex));
                 }

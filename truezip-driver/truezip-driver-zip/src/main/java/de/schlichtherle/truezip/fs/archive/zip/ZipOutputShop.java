@@ -7,7 +7,7 @@ package de.schlichtherle.truezip.fs.archive.zip;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
+import de.schlichtherle.truezip.socket.MultiplexedOutputShop;
 import de.schlichtherle.truezip.io.*;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.InputSocket;
@@ -38,7 +38,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * An output shop for writing ZIP files.
  * This output shop can only write one entry at a time.
  * Archive drivers may wrap this class in a
- * {@link FsMultiplexedOutputShop} to overcome this limitation.
+ * {@link MultiplexedOutputShop} to overcome this limitation.
  * 
  * @see    ZipInputShop
  * @author Christian Schlichtherle

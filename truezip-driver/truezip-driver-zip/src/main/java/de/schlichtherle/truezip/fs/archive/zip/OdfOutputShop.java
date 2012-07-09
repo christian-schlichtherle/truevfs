@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
-import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
+import de.schlichtherle.truezip.socket.MultiplexedOutputShop;
 import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.OutputSocket;
@@ -23,7 +23,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class OdfOutputShop extends FsMultiplexedOutputShop<ZipDriverEntry> {
+public class OdfOutputShop extends MultiplexedOutputShop<ZipDriverEntry> {
 
     /** The name of the entry to receive tender, loving care. */
     private static final String MIMETYPE = "mimetype";

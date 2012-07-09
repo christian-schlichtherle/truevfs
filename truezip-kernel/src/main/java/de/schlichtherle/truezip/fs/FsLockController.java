@@ -46,7 +46,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class FsLockController
+final class FsLockController
 extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
@@ -66,7 +66,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
      *
      * @param controller the decorated file system controller.
      */
-    public FsLockController(FsController<? extends FsLockModel> controller) {
+    FsLockController(FsController<? extends FsLockModel> controller) {
         super(controller);
         this.readLock = getModel().readLock();
         this.writeLock = getModel().writeLock();
@@ -228,7 +228,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     @Override
     public void sync(final BitField<FsSyncOption> options)
-    throws FsSyncException, FsControllerException {
+    throws FsSyncException {
         final class Sync implements Operation<Void> {
             @Override
             public Void call() throws IOException {
@@ -239,8 +239,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         try {
             writeLocked(new Sync());
         } catch (final FsSyncException ex) {
-            throw ex;
-        } catch (final FsControllerException ex) {
             throw ex;
         } catch (IOException ex) {
             throw new AssertionError(ex);
@@ -312,8 +310,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     throws IOException {
         final Account account = accounts.get();
         if (0 < account.lockCount) {
-            if (!lock.tryLock())
-                throw FsNeedsLockRetryException.get(getModel());
+            if (!lock.tryLock()) throw FsNeedsLockRetryException.get();
             account.lockCount++;
             try {
                 return operation.call();

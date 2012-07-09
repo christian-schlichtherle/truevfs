@@ -15,6 +15,7 @@ import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ControlFlowException;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.Closeable;
@@ -82,7 +83,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
             try {
                 delegate.close();
                 logger.log(Level.FINE, "finalizeCleared");
-            } catch (final FsControllerException ex) {  // report and swallow
+            } catch (final ControlFlowException ex) {  // report and swallow
                 logger.log(Level.WARNING, "finalizeFailed",
                         new AssertionError("Unexpected controller exception!", ex));
             } catch (final Throwable ex) {              // report and swallow
@@ -224,17 +225,10 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public void close() throws IOException {
             try {
                 delegate.close();
-            } catch (final FsControllerException ex) {
-                assert ex instanceof FsNeedsLockRetryException : ex;
-                // This is a non-local control flow exception.
-                // This call may or may not get retried again later.
-                // Do NOT record the status so that finalize() will call close()
-                // on the decorated resource if this call is NOT retried again.
-                throw ex;
+                close = OK;
             } catch (final IOException ex) {
                 throw close = ex;
             }
-            close = OK;
         }
 
         @Override
@@ -262,17 +256,10 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public void close() throws IOException {
             try {
                 delegate.close();
-            } catch (final FsControllerException ex) {
-                assert ex instanceof FsNeedsLockRetryException : ex;
-                // This is a non-local control flow exception.
-                // This call may or may not get retried again later.
-                // Do NOT record the status so that finalize() will call close()
-                // on the decorated resource if this call is NOT retried again.
-                throw ex;
+                close = OK;
             } catch (final IOException ex) {
                 throw close = ex;
             }
-            close = OK;
         }
 
         @Override
@@ -300,17 +287,10 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public void close() throws IOException {
             try {
                 delegate.close();
-            } catch (final FsControllerException ex) {
-                assert ex instanceof FsNeedsLockRetryException : ex;
-                // This is a non-local control flow exception.
-                // This call may or may not get retried again later.
-                // Do NOT record the status so that finalize() will call close()
-                // on the decorated resource if this call is NOT retried again.
-                throw ex;
+                close = OK;
             } catch (final IOException ex) {
                 throw close = ex;
             }
-            close = OK;
         }
 
         @Override
@@ -338,17 +318,10 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         public void close() throws IOException {
             try {
                 delegate.close();
-            } catch (final FsControllerException ex) {
-                assert ex instanceof FsNeedsLockRetryException : ex;
-                // This is a non-local control flow exception.
-                // This call may or may not get retried again later.
-                // Do NOT record the status so that finalize() will call close()
-                // on the decorated resource if this call is NOT retried again.
-                throw ex;
+                close = OK;
             } catch (final IOException ex) {
                 throw close = ex;
             }
-            close = OK;
         }
 
         @Override

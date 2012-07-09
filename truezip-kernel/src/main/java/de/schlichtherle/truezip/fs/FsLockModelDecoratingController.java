@@ -18,7 +18,7 @@ import javax.annotation.concurrent.Immutable;
  * @author  Christian Schlichtherle
  */
 @Immutable
-public abstract class FsLockModelDecoratingController<
+abstract class FsLockModelDecoratingController<
         C extends FsController<? extends FsLockModel>>
 extends FsDecoratingController<FsLockModel, C>  {
 
@@ -29,7 +29,7 @@ extends FsDecoratingController<FsLockModel, C>  {
      * 
      * @param controller the decorated file system controller.
      */
-    protected FsLockModelDecoratingController(C controller) {
+    FsLockModelDecoratingController(C controller) {
         super(controller);
     }
 

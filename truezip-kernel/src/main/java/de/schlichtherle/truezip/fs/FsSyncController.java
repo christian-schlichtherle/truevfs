@@ -44,7 +44,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class FsSyncController
+final class FsSyncController
 extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
@@ -59,12 +59,12 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
      *
      * @param controller the decorated file system controller.
      */
-    public FsSyncController(FsController<? extends FsLockModel> controller) {
+    FsSyncController(FsController<? extends FsLockModel> controller) {
         super(controller);
     }
 
     void sync(final FsNeedsSyncException trigger)
-    throws FsSyncException, FsControllerException {
+    throws FsSyncException {
         checkWriteLockedByCurrentThread();
         try {
             sync(SYNC);
@@ -226,7 +226,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     @Override
     public void sync(final BitField<FsSyncOption> options)
-    throws FsSyncException, FsControllerException {
+    throws FsSyncException {
         final BitField<FsSyncOption> modified = modify(options);
         try {
             delegate.sync(modified);
@@ -235,7 +235,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         } catch (final FsSyncException ex) {
             if (modified != options)
                 if (ex.getCause() instanceof FsResourceOpenException)
-                    throw FsNeedsLockRetryException.get(getModel());
+                    throw FsNeedsLockRetryException.get();
             throw ex;
         }
     }

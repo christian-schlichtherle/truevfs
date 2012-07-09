@@ -4,14 +4,13 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
+import de.schlichtherle.truezip.socket.MultiplexedOutputShop;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.COMPRESS;
-import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
-import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.JSE7;
@@ -186,7 +185,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
      * The implementation in the class {@link TarDriver} acquires an output
      * stream from the given socket, forwards the call to
      * {@link #newTarOutputShop} and wraps the result in a new
-     * {@link FsMultiplexedOutputShop}.
+     * {@link MultiplexedOutputShop}.
      */
     @Override
     public OutputShop<TarDriverEntry> newOutputShop(
@@ -198,7 +197,7 @@ public class TarDriver extends FsCharsetArchiveDriver<TarDriverEntry> {
             throw new NullPointerException();
         final OutputStream out = output.newOutputStream();
         try {
-            return new FsMultiplexedOutputShop<TarDriverEntry>(
+            return new MultiplexedOutputShop<TarDriverEntry>(
                     newTarOutputShop(model, out, (TarInputShop) source),
                     getPool());
         } catch (final IOException ex) {

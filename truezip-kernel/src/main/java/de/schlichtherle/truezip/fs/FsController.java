@@ -340,10 +340,9 @@ public abstract class FsController<M extends FsModel> {
      *         synchronized with constraints, e.g. if an unclosed archive entry
      *         stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
-     * @throws FsControllerException for non-local control flow.
      */
     public abstract void sync(BitField<FsSyncOption> options)
-    throws FsSyncWarningException, FsSyncException, FsControllerException;
+    throws FsSyncWarningException, FsSyncException;
 
     /**
      * Two file system controllers are considered equal if and only if they

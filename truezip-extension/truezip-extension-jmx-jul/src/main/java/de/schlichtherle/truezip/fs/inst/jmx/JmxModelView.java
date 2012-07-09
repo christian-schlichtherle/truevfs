@@ -28,7 +28,7 @@ implements JmxModelViewMXBean {
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
     private static final FsCompositeDriver
-            DRIVER = new FsDefaultDriver(FsDriverLocator.SINGLETON);
+            DRIVER = new FsSimpleCompositeDriver(FsDriverLocator.SINGLETON);
 
     private final FsModel model;
 

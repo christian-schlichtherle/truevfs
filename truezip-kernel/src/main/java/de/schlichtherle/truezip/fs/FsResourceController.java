@@ -37,7 +37,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public final class FsResourceController
+final class FsResourceController
 extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     private static final SocketFactory SOCKET_FACTORY = JSE7.AVAILABLE
@@ -47,7 +47,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
     private final FsResourceAccountant accountant =
             new FsResourceAccountant(writeLock());
 
-    public FsResourceController(FsController<? extends FsLockModel> controller) {
+    FsResourceController(FsController<? extends FsLockModel> controller) {
         super(controller);
     }
 
@@ -66,7 +66,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
     @Override
     public void sync(final BitField<FsSyncOption> options)
-    throws FsSyncException, FsControllerException {
+    throws FsSyncException {
         assert isWriteLockedByCurrentThread();
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         waitIdle(options, builder);
@@ -127,8 +127,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
      *
      * @param builder the exception handling strategy.
      */
-    private void closeAll(final FsSyncExceptionBuilder builder)
-    throws FsControllerException {
+    private void closeAll(final FsSyncExceptionBuilder builder) {
         final class IOExceptionHandler
         implements ExceptionHandler<IOException, RuntimeException> {
             @Override
@@ -138,7 +137,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
             @Override
             public void warn(final IOException ex) {
-                assert !(ex instanceof FsControllerException);
                 builder.warn(new FsSyncWarningException(getModel(), ex));
             }
         } // IOExceptionHandler

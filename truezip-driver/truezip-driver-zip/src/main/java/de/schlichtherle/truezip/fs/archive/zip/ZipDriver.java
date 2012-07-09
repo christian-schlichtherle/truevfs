@@ -4,27 +4,22 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
+import de.schlichtherle.truezip.socket.MultiplexedOutputShop;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
-import de.schlichtherle.truezip.fs.FsController;
-import de.schlichtherle.truezip.fs.FsEntryName;
-import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.FsOutputOption;
+import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
-import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriver;
-import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
 import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.sl.KeyManagerLocator;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.util.HashMaps;
+import de.schlichtherle.truezip.util.JSE7;
 import static de.schlichtherle.truezip.zip.ZipEntry.*;
 import de.schlichtherle.truezip.zip.*;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -368,7 +363,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link ZipDriver} returns the expression
-     * {@code new ZipController(superNewController(model, parent), this)}.
+     * {@code new ZipKeyController(superNewController(model, parent), this)}.
      * This method should be overridden in order to call only
      * {@link #superNewController} if and only if you are overriding
      * {@link #zipCryptoParameters(de.schlichtherle.truezip.fs.FsModel, java.nio.charset.Charset)}, too,
@@ -378,7 +373,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     @Override
     public FsController<?>
     newController(FsModel model, FsController<?> parent) {
-        return new ZipController(superNewController(model, parent), this);
+        return new ZipKeyController(superNewController(model, parent), this);
     }
 
     /**
@@ -536,7 +531,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * then it's marked for appending to it.
      * Then, an output stream is acquired from the given {@code output} socket
      * and the parameters are forwarded to {@link #newOutputShop(FsModel, OptionOutputSocket, ZipInputShop)}
-     * and the result gets wrapped in a new {@link FsMultiplexedOutputShop}
+     * and the result gets wrapped in a new {@link MultiplexedOutputShop}
      * which uses the current {@link #getPool}.
      */
     @Override
@@ -592,7 +587,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
             @WillCloseWhenClosed OutputStream out,
             @CheckForNull @WillNotClose ZipInputShop source)
     throws IOException {
-        return new FsMultiplexedOutputShop<ZipDriverEntry>(
+        return new MultiplexedOutputShop<ZipDriverEntry>(
                 new ZipOutputShop(this, model, out, source),
                 getPool());
     }

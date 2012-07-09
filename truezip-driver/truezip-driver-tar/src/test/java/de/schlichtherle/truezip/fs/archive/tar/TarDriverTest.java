@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.tar;
 
-import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriverTestSuite;
+import de.schlichtherle.truezip.fs.FsCharsetArchiveDriverTestSuite;
 
 /**
  * @author Christian Schlichtherle

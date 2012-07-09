@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.mock;
 
+import de.schlichtherle.truezip.util.ControlFlowException;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import de.schlichtherle.truezip.entry.Entry.Type;
@@ -273,12 +274,12 @@ public class MockController extends FsController<FsModel> {
 
     @Override
     public void sync(final BitField<FsSyncOption> options)
-    throws FsSyncException, FsControllerException {
+    throws FsSyncException, ControlFlowException {
         try {
             checkAllExceptions(this);
         } catch (final FsSyncException ex) {
             throw ex;
-        } catch (final FsControllerException ex) {
+        } catch (final ControlFlowException ex) {
             throw ex;
         } catch (final IOException ex) {
             throw new AssertionError(ex);

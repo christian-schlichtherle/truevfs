@@ -16,11 +16,11 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class FsLockModel extends FsDecoratingModel<FsModel> {
+final class FsLockModel extends FsDecoratingModel<FsModel> {
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
-    public FsLockModel(FsModel model) {
+    FsLockModel(FsModel model) {
         super(model);
     }
 
@@ -70,6 +70,6 @@ public final class FsLockModel extends FsDecoratingModel<FsModel> {
     public void checkWriteLockedByCurrentThread()
     throws FsNeedsWriteLockException {
         if (!isWriteLockedByCurrentThread())
-            throw FsNeedsWriteLockException.get(this);
+            throw FsNeedsWriteLockException.get();
     }
 }
