@@ -97,7 +97,7 @@ extends FsDriver {
      * @return The icon that should be displayed for the given archive file
      *         if it's open/expanded in the view.
      *         If {@code null} is returned, a default icon should be displayed.
-     * @deprecated GUI features will be removed from this class in TrueZIP 8.
+     * @deprecated Since TrueZIP 7.6. GUI features will be removed from this class in TrueZIP 8.
      */
     public @CheckForNull Icon getOpenIcon(FsModel model) {
         return null;
@@ -114,7 +114,7 @@ extends FsDriver {
      * @return The icon that should be displayed for the given archive file
      *         if it's closed/collapsed in the view.
      *         If {@code null} is returned, a default icon should be displayed.
-     * @deprecated GUI features will be removed from this class in TrueZIP 8.
+     * @deprecated Since TrueZIP 7.6. GUI features will be removed from this class in TrueZIP 8.
      */
     public @CheckForNull Icon getClosedIcon(FsModel model) {
         return null;
