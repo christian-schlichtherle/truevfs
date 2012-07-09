@@ -9,7 +9,7 @@ import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A shutdown hook singleton which {@linkplain FsManager#sync syncs} a
- * {@linkplain SyncShutdownHook#register registered} file system manager when
+ * {@linkplain FsSyncShutdownHook#register registered} file system manager when
  * it's run.
  * This is to protect an application from loss of data if the manager isn't
  * explicitly asked to {@code sync()} before the JVM terminates.
@@ -29,11 +29,11 @@ final class FsSyncShutdownHook {
     /**
      * Registers the given file system {@code manager} for
      * {@linkplain FsManager#sync synchronization} when the shutdown hook is
-     * {@linkplain #run run}.
+     * {@code run}.
      * 
      * @param manager the file system manager to
      *        {@linkplain FsManager#sync synchronize} when the shutdown hook
-     *        is {@linkplain #run run}.
+     *        is {@code run}.
      * @see   #cancel
      */
     static void register(final FsManager manager) {

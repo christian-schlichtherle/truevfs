@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import de.schlichtherle.truezip.util.ControlFlowException;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.HashMaps;
 import java.io.Closeable;
@@ -184,7 +185,7 @@ final class FsResourceAccountant {
      */
     <X extends Exception> void
     closeAllResources(final ExceptionHandler<? super IOException, X> handler)
-    throws X, FsControllerException {
+    throws X {
         assert null != handler;
         lock.lock();
         try {
@@ -203,9 +204,6 @@ final class FsResourceAccountant {
                     // already removed and a ConcurrentHashMap doesn't do that
                     // anyway.
                     closeable.close();
-                } catch (final FsControllerException ex) {
-                    assert ex instanceof FsNeedsLockRetryException : ex;
-                    throw ex;
                 } catch (final IOException ex) {
                     handler.warn(ex); // may throw an exception!
                 }

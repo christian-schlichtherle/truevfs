@@ -5,8 +5,8 @@
 package de.schlichtherle.truezip.fs.archive.mock;
 
 import de.schlichtherle.truezip.entry.Entry;
-import de.schlichtherle.truezip.fs.archive.FsArchiveEntries;
-import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
+import de.schlichtherle.truezip.fs.FsArchiveEntries;
+import de.schlichtherle.truezip.fs.FsArchiveEntry;
 import de.schlichtherle.truezip.socket.IOPool;
 import java.io.IOException;
 import java.util.EnumMap;

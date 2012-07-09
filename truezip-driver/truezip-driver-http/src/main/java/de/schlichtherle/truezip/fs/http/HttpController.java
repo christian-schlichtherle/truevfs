@@ -24,7 +24,7 @@ import org.apache.http.HttpResponse;
  * @author  Christian Schlichtherle
  */
 @Immutable
-public class HttpController extends FsModelController<FsModel>  {
+public class HttpController extends FsAbstractController<FsModel>  {
 
     private final HttpDriver driver;
 
@@ -127,7 +127,6 @@ public class HttpController extends FsModelController<FsModel>  {
     }
 
     @Override
-    public void sync(final BitField<FsSyncOption> options)
-    throws FsSyncException, FsControllerException {
+    public void sync(final BitField<FsSyncOption> options) {
     }
 }

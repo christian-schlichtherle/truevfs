@@ -8,6 +8,7 @@ import de.schlichtherle.truezip.key.KeyManagerProvider;
 import de.schlichtherle.truezip.key.MockView;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
+import de.schlichtherle.truezip.test.TestConfig;
 
 /**
  * @author Christian Schlichtherle
@@ -17,8 +18,8 @@ public final class TestWinZipAesDriver extends ZipDriver {
     private final KeyManagerProvider provider;
     private final MockView<AesPbeParameters> view;
 
-    public TestWinZipAesDriver(IOPoolProvider ioPoolProvider) {
-        this(ioPoolProvider, newView());
+    public TestWinZipAesDriver() {
+        this(TestConfig.get().getIOPoolProvider(), newView());
     }
 
     private TestWinZipAesDriver(

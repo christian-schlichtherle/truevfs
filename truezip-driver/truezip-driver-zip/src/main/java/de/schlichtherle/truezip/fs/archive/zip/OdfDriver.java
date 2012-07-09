@@ -5,7 +5,7 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsModel;
-import de.schlichtherle.truezip.fs.archive.FsMultiplexedOutputShop;
+import de.schlichtherle.truezip.socket.MultiplexedOutputShop;
 import de.schlichtherle.truezip.socket.IOPool;
 import de.schlichtherle.truezip.socket.IOPoolProvider;
 import de.schlichtherle.truezip.socket.OutputShop;
@@ -53,7 +53,7 @@ public class OdfDriver extends JarDriver {
         final ZipOutputShop shop = new ZipOutputShop(this, model, out, source);
         final IOPool<?> pool = getPool();
         return null != source && source.isAppendee()
-                ? new FsMultiplexedOutputShop<ZipDriverEntry>(shop, pool)
+                ? new MultiplexedOutputShop<ZipDriverEntry>(shop, pool)
                 : new OdfOutputShop(shop, pool);
     }
 }

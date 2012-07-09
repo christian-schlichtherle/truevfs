@@ -8,12 +8,11 @@ import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Type.SPECIAL;
 import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import de.schlichtherle.truezip.fs.*;
-import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
-import de.schlichtherle.truezip.fs.archive.FsCovariantEntry;
 import de.schlichtherle.truezip.key.KeyManager;
 import de.schlichtherle.truezip.key.KeyProvider;
 import de.schlichtherle.truezip.key.SafeKeyManager;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ControlFlowException;
 import java.io.IOException;
 import java.net.URI;
 import javax.annotation.CheckForNull;
@@ -68,7 +67,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     throws IOException {
         try {
             return delegate.getEntry(name);
-        } catch (final IOException ex) {
+        } catch (final ControlFlowException ex) {
             if (!name.isRoot() || null == findKeyException(ex)) throw ex;
             Entry entry = getParent().getEntry(
                     getModel()
@@ -96,16 +95,16 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     throws IOException {
         try {
             delegate.unlink(name, options);
-        } catch (final IOException ex) {
+        } catch (final ControlFlowException ex) {
             // If the exception is caused by a key exception, then throw this
             // cause instead in order to avoid treating the target archive file
             // like a false positive and routing this operation to the parent
             // file system.
             // This prevents the application from inadvertently deleting an
-            // encrypted ZIP file just because the user has cancelled key
-            // prompting.
+            // encrypted ZIP file just because the user cancelled key prompting.
             final IOException keyEx = findKeyException(ex);
-            throw null != keyEx ? keyEx : ex;
+            if (null == keyEx) throw ex;
+            throw keyEx;
         }
         if (name.isRoot())
             getKeyManager().removeKeyProvider(
@@ -115,15 +114,14 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     private @CheckForNull IOException findKeyException(Throwable ex) {
         final Class<? extends IOException> clazz = getKeyExceptionType();
         do {
-            if (clazz.isInstance(ex))
-                return clazz.cast(ex);
+            if (clazz.isInstance(ex)) return clazz.cast(ex);
         } while (null != (ex = ex.getCause()));
         return null;
     }
 
     @Override
     public void sync(final BitField<FsSyncOption> options)
-    throws FsSyncException, FsControllerException {
+    throws FsSyncException {
         delegate.sync(options);
         final KeyManager<?> manager = getKeyManager();
         final URI resource = driver.mountPointUri(getModel());

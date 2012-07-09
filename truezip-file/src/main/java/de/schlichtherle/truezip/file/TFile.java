@@ -17,7 +17,6 @@ import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.UMOUNT;
 import static de.schlichtherle.truezip.fs.FsUriModifier.CANONICALIZE;
-import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
 import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Streams;

@@ -4,6 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.nio.file;
 
+import de.schlichtherle.truezip.util.ControlFlowException;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
@@ -37,7 +38,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class FileController extends FsModelController<FsModel>  {
+final class FileController extends FsAbstractController<FsModel>  {
 
     private final Path target;
 
@@ -192,6 +193,6 @@ final class FileController extends FsModelController<FsModel>  {
 
     @Override
     public void sync(final BitField<FsSyncOption> options)
-    throws FsSyncException, FsControllerException {
+    throws FsSyncException, ControlFlowException {
     }
 }

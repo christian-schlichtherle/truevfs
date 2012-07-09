@@ -28,7 +28,7 @@ public final class WinZipAesFileIT extends TFileITSuite<TestWinZipAesDriver> {
 
     @Override
     protected TestWinZipAesDriver newArchiveDriver() {
-        return new TestWinZipAesDriver(getTestConfig().getIOPoolProvider());
+        return new TestWinZipAesDriver();
     }
 
     @Override

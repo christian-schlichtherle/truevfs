@@ -141,7 +141,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      * <p>
      * The implementation in the class {@link ZipRaesDriver} returns the
      * expression
-     * {@code new ZipRaesController(superNewController(model, parent), this)}.
+     * {@code new ZipRaesKeyController(superNewController(model, parent), this)}.
      * This method should be overridden in order to call only
      * {@link #superNewController} if and only if you are overriding
      * {@link #raesParameters(de.schlichtherle.truezip.fs.FsModel)}, too,
@@ -151,7 +151,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     @Override
     public FsController<?>
     newController(FsModel model, FsController<?> parent) {
-        return new ZipRaesController(superNewController(model, parent), this);
+        return new ZipRaesKeyController(superNewController(model, parent), this);
     }
 
     /**

@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.fs.archive.FsCharsetArchiveDriverTestSuite;
+import de.schlichtherle.truezip.fs.FsCharsetArchiveDriverTestSuite;
 
 /**
  * @author Christian Schlichtherle
@@ -14,7 +14,7 @@ extends FsCharsetArchiveDriverTestSuite<ZipDriverEntry, ZipDriver> {
 
     @Override
     protected ZipDriver newArchiveDriver() {
-        return new TestWinZipAesDriver(getTestConfig().getIOPoolProvider());
+        return new TestWinZipAesDriver();
     }
 
     @Override

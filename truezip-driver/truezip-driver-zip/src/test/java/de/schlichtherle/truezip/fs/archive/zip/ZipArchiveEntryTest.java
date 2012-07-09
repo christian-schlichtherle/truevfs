@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs.archive.zip;
 
-import de.schlichtherle.truezip.fs.archive.FsArchiveEntry;
+import de.schlichtherle.truezip.fs.FsArchiveEntry;
 import de.schlichtherle.truezip.zip.ZipEntry;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;

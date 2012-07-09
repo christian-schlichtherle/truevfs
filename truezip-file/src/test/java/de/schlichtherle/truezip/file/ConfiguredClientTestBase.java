@@ -4,11 +4,7 @@
  */
 package de.schlichtherle.truezip.file;
 
-import de.schlichtherle.truezip.fs.FsDefaultManager;
-import de.schlichtherle.truezip.fs.FsMountPoint;
-import de.schlichtherle.truezip.fs.FsScheme;
-import de.schlichtherle.truezip.fs.archive.FsArchiveDriver;
-import de.schlichtherle.truezip.fs.archive.FsArchiveDriverTestBase;
+import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.util.SuffixSet;
 import java.io.File;
 import java.io.IOException;

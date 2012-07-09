@@ -28,8 +28,8 @@ public final class FsDefaultManager extends FsManager {
      * The map of all schedulers for composite file system controllers,
      * keyed by the mount point of their respective file system model.
      */
-    private final Map<FsMountPoint, Link<FsFalsePositiveController>> controllers
-            = new WeakHashMap<FsMountPoint, Link<FsFalsePositiveController>>();
+    private final Map<FsMountPoint, Link<FsFalsePositiveArchiveController>> controllers
+            = new WeakHashMap<FsMountPoint, Link<FsFalsePositiveArchiveController>>();
 
     private final Type optionalScheduleType;
 
@@ -53,11 +53,20 @@ public final class FsDefaultManager extends FsManager {
     public FsController<?> getController(
             FsMountPoint mountPoint,
             FsCompositeDriver driver) {
-        writeLock.lock();
         try {
-            return getController0(mountPoint, driver);
-        } finally {
-            writeLock.unlock();
+            readLock.lock();
+            try {
+                return getController0(mountPoint, driver);
+            } finally {
+                readLock.unlock();
+            }
+        } catch (final FsNeedsWriteLockException ex) {
+            writeLock.lock();
+            try {
+                return getController0(mountPoint, driver);
+            } finally {
+                writeLock.unlock();
+            }
         }
     }
 
@@ -68,13 +77,15 @@ public final class FsDefaultManager extends FsManager {
             final FsModel m = new FsDefaultModel(mountPoint, null);
             return driver.newController(m, null);
         }
-        FsFalsePositiveController c = getTarget(controllers.get(mountPoint));
+        FsFalsePositiveArchiveController c = getTarget(controllers.get(mountPoint));
         if (null == c) {
+            if (!writeLock.isHeldByCurrentThread())
+                throw FsNeedsWriteLockException.get();
             final FsController<?> p = getController0(mountPoint.getParent(), driver);
             final ScheduledModel m = new ScheduledModel(mountPoint, p.getModel());
             // HC SVNT DRACONES!
             m.setController(c =
-                    new FsFalsePositiveController(
+                    new FsFalsePositiveArchiveController(
                         new FsFinalizeController<FsModel>(
                             driver.newController(m, p))));
         }
@@ -101,7 +112,7 @@ public final class FsDefaultManager extends FsManager {
         try {
             final Set<FsController<?>> snapshot
                     = new TreeSet<FsController<?>>(ReverseControllerComparator.INSTANCE);
-            for (final Link<FsFalsePositiveController> link : controllers.values()) {
+            for (final Link<FsFalsePositiveArchiveController> link : controllers.values()) {
                 final FsController<?> controller = getTarget(link);
                 if (null != controller)
                     snapshot.add(controller);
@@ -127,14 +138,14 @@ public final class FsDefaultManager extends FsManager {
      * the alternative observer pattern.
      */
     private final class ScheduledModel extends FsDefaultModel {
-        FsFalsePositiveController controller;
+        FsFalsePositiveArchiveController controller;
         boolean touched;
 
         ScheduledModel(FsMountPoint mountPoint, FsModel parent) {
             super(mountPoint, parent);
         }
 
-        void setController(final FsFalsePositiveController controller) {
+        void setController(final FsFalsePositiveArchiveController controller) {
             assert null != controller;
             assert !touched;
             this.controller = controller;
@@ -155,14 +166,20 @@ public final class FsDefaultManager extends FsManager {
             if (this.touched != touched) {
                 if (touched)
                     FsSyncShutdownHook.register(FsDefaultManager.this);
-                schedule(touched);
+                writeLock.lock();
+                try {
+                    schedule(touched);
+                } finally {
+                    writeLock.unlock();
+                }
                 this.touched = touched;
             }
         }
 
         void schedule(boolean mandatory) {
+            assert(writeLock.isHeldByCurrentThread());
             final FsMountPoint mountPoint = getMountPoint();
-            final Link<FsFalsePositiveController> link =
+            final Link<FsFalsePositiveArchiveController> link =
                     (mandatory ? STRONG : optionalScheduleType).newLink(controller);
             writeLock.lock();
             try {

@@ -18,8 +18,8 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class FsLockModelController
-extends FsModelController<FsLockModel>  {
+abstract class FsLockModelController
+extends FsAbstractController<FsLockModel>  {
 
     /**
      * Constructs a new file system controller for the given
@@ -27,7 +27,7 @@ extends FsModelController<FsLockModel>  {
      * 
      * @param model the concurrent file system model.
      */
-    protected FsLockModelController(FsLockModel model) {
+    FsLockModelController(FsLockModel model) {
         super(model);
     }
 
