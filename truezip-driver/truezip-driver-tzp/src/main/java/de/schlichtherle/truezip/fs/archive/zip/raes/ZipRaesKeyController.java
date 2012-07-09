@@ -7,21 +7,24 @@ package de.schlichtherle.truezip.fs.archive.zip.raes;
 import de.schlichtherle.truezip.crypto.raes.RaesKeyException;
 import de.schlichtherle.truezip.crypto.raes.param.AesCipherParameters;
 import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.archive.zip.KeyController;
 import java.io.IOException;
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * This file system controller decorates another file system controller in
  * order to manage the authentication key required for accessing its
  * RAES encrypted ZIP file (ZIP.RAES).
  * 
+ * @param  <M> the type of the file system model.
  * @author Christian Schlichtherle
  */
-@ThreadSafe
-final class ZipRaesKeyController extends KeyController<ZipRaesDriver> {
+@Immutable
+final class ZipRaesKeyController<M extends FsModel>
+extends KeyController<M, ZipRaesDriver> {
 
-    ZipRaesKeyController(FsController<?> controller, ZipRaesDriver driver) {
+    ZipRaesKeyController(FsController<? extends M> controller, ZipRaesDriver driver) {
         super(controller, driver);
     }
 

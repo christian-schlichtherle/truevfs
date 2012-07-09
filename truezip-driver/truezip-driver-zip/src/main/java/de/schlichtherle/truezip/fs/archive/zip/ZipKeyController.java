@@ -5,22 +5,25 @@
 package de.schlichtherle.truezip.fs.archive.zip;
 
 import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.key.pbe.AesPbeParameters;
 import de.schlichtherle.truezip.zip.ZipKeyException;
 import java.io.IOException;
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * This file system controller decorates another file system controller in
  * order to manage the authentication key(s) required for accessing its
  * WinZip AES encrypted ZIP file.
  * 
+ * @param  <M> the type of the file system model.
  * @author Christian Schlichtherle
  */
-@ThreadSafe
-final class ZipKeyController extends KeyController<ZipDriver> {
+@Immutable
+final class ZipKeyController<M extends FsModel>
+extends KeyController<M, ZipDriver> {
 
-    ZipKeyController(FsController<?> controller, ZipDriver driver) {
+    ZipKeyController(FsController<? extends M> controller, ZipDriver driver) {
         super(controller, driver);
     }
 
