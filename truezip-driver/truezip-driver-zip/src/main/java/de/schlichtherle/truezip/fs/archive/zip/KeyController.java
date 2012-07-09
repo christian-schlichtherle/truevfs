@@ -16,18 +16,21 @@ import de.schlichtherle.truezip.util.ControlFlowException;
 import java.io.IOException;
 import java.net.URI;
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * This file system controller decorates another file system controller in
  * order to manage the keys required for accessing encrypted ZIP files.
  * 
+ * @param  <M> the type of the file system model.
  * @param  <D> the type of the ZIP driver.
  * @author Christian Schlichtherle
  */
-@ThreadSafe
-public abstract class KeyController<D extends ZipDriver>
-extends FsDecoratingController<FsModel, FsController<?>> {
+@Immutable
+public abstract class KeyController<
+        M extends FsModel,
+        D extends ZipDriver>
+extends FsDecoratingController<M, FsController<? extends M>> {
 
     private static final String ROOT_PATH = ROOT.getPath();
 
@@ -42,7 +45,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
      * @param driver the ZIP driver.
      */
     protected KeyController(
-            final FsController<?> controller,
+            final FsController<? extends M> controller,
             final D driver) {
         super(controller);
         if (null == driver)
