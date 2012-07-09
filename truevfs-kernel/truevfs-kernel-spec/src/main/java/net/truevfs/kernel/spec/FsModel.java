@@ -4,33 +4,17 @@
  */
 package net.truevfs.kernel.spec;
 
-import java.util.Objects;
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
-import net.truevfs.kernel.spec.util.UniqueObject;
 
 /**
  * Defines the common properties of a file system.
  * <p>
- * Sub-classes must be thread-safe, too.
- *
+ * Implementations must be thread-safe.
+ * 
  * @see    FsController
  * @author Christian Schlichtherle
  */
-@ThreadSafe
-public class FsModel extends UniqueObject {
-
-    private final FsMountPoint mountPoint;
-    private @CheckForNull final FsModel parent;
-
-    public FsModel( final FsMountPoint mountPoint,
-                    final @CheckForNull FsModel parent) {
-        if (!Objects.equals(mountPoint.getParent(),
-                    (null == parent ? null : parent.getMountPoint())))
-            throw new IllegalArgumentException("Parent/Member mismatch!");
-        this.mountPoint = mountPoint;
-        this.parent = parent;
-    }
+public interface FsModel {
 
     /**
      * Returns the mount point of the file system.
@@ -40,9 +24,7 @@ public class FsModel extends UniqueObject {
      *
      * @return The mount point of the file system.
      */
-    public final FsMountPoint getMountPoint() {
-        return mountPoint;
-    }
+    FsMountPoint getMountPoint();
 
     /**
      * Returns the parent file system model or {@code null} if and only if the
@@ -51,54 +33,29 @@ public class FsModel extends UniqueObject {
      *
      * @return The nullable parent file system model.
      */
-    public final @CheckForNull FsModel getParent() {
-        return parent;
-    }
+    @CheckForNull FsModel getParent();
 
     /**
      * Returns {@code true} if and only if some state associated with the
      * federated file system has been modified so that the
      * corresponding {@link FsController} must not get discarded until
      * the next call to {@link FsController#sync sync}.
-     * <p>
-     * The implementation in the class {@link FsModel} always
-     * returns {@code false}.
      * 
      * @return {@code true} if and only if some state associated with the
      *         federated file system has been modified so that the
      *         corresponding {@link FsController} must not get discarded until
      *         the next {@link FsController#sync sync}.
      */
-    public boolean isTouched() {
-        return false;
-    }
+    boolean isTouched();
 
     /**
      * <b>Optional operation:</b> Sets the value of the property
      * {@link #isTouched() touched}.
-     * <p>
-     * The implementation in the class {@link FsModel} always
-     * throws an {@link UnsupportedOperationException}.
      *
      * @param  touched the new value of this property.
      * @throws UnsupportedOperationException At the discretion of the
      *         implementation, e.g. if the file system type does not support
      *         {@link FsController#sync syncing}.
      */
-    public void setTouched(boolean touched) {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * Returns a string representation of this object for debugging and logging
-     * purposes.
-     */
-    @Override
-    public String toString() {
-        return String.format("%s[mountPoint=%s, parent=%s, touched=%b]",
-                getClass().getName(),
-                getMountPoint(),
-                getParent(),
-                isTouched());
-    }
+    public void setTouched(boolean touched);
 }

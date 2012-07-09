@@ -63,7 +63,7 @@ private final class DefaultManager(
 
   private def controller0(driver: FsCompositeDriver, mountPoint: FsMountPoint): FsController[_ <: FsModel] = {
     if (null eq mountPoint.getParent) {
-      val m = new FsModel(mountPoint, null)
+      val m = new FsDefaultModel(mountPoint, null)
       return driver newController (this, m, null)
     }
     target(controllers get mountPoint orNull) match {
@@ -88,7 +88,7 @@ private final class DefaultManager(
    * the alternative observer pattern.
    */
   private final class ScheduledModel(mountPoint: FsMountPoint, parent: FsModel)
-  extends FsModel(mountPoint, parent) {
+  extends FsAbstractModel(mountPoint, parent) {
     private[this] var _controller: FsController[_ <: FsModel] = _
     private[this] var _touched: Boolean = _
 
