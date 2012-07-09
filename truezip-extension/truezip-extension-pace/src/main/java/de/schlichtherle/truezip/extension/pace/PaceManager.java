@@ -6,9 +6,7 @@ package de.schlichtherle.truezip.extension.pace;
 
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.HashMaps;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
