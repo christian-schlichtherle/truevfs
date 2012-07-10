@@ -47,13 +47,13 @@ public abstract class FsManagerTestSuite {
     public void testForward() throws InterruptedException {
         for (final String[] params : new String[][] {
             {
-                //"file:/", // does NOT get mapped!
+                "file:/",
                 "zip:file:/öuter.zip!/",
                 "zip:zip:file:/öuter.zip!/inner.zip!/",
                 "zip:zip:zip:file:/öuter.zip!/inner.zip!/nüts.zip!/",
             },
             {
-                //"file:/", // does NOT get mapped!
+                "file:/",
                 "zip:file:/föo.zip!/",
                 "zip:zip:file:/föo.zip!/bär.zip!/",
                 "zip:zip:zip:file:/föo.zip!/bär.zip!/bäz.zip!/",
@@ -69,7 +69,6 @@ public abstract class FsManagerTestSuite {
                     assertThat(controller.getParent(), sameInstance((Object) parent));
                 parent = controller;
             }
-
             assertThat(manager.size(), is(params.length));
             parent = null;
             waitAllManagers();
@@ -83,13 +82,13 @@ public abstract class FsManagerTestSuite {
                 "zip:zip:zip:file:/öuter.zip!/inner.zip!/nüts.zip!/",
                 "zip:zip:file:/öuter.zip!/inner.zip!/",
                 "zip:file:/öuter.zip!/",
-                //"file:/", // does NOT get mapped!
+                "file:/",
             },
             {
                 "zip:zip:zip:file:/föo.zip!/bär.zip!/bäz.zip!/",
                 "zip:zip:file:/föo.zip!/bär.zip!/",
                 "zip:file:/föo.zip!/",
-                //"file:/", // does NOT get mapped!
+                "file:/",
             },
         }) {
             FsController<?> top = null;
@@ -105,7 +104,6 @@ public abstract class FsManagerTestSuite {
                 if (null == top)
                     top = controller;
             }
-
             Iterator<FsController<?>> i = manager.iterator();
             for (final String param : params) {
                 final FsMountPoint mountPoint
@@ -113,7 +111,6 @@ public abstract class FsManagerTestSuite {
                 assertThat(i.next().getModel().getMountPoint(), equalTo(mountPoint));
             }
             assertThat(i.hasNext(), is(false));
-
             assertThat(manager.size(), is(params.length));
             member = null;
             i = null;

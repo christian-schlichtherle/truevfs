@@ -402,7 +402,7 @@ extends FsArchiveDriverTestBase<D> {
 
     protected FsModel newModel( FsMountPoint mountPoint,
                                 @CheckForNull FsModel parent) {
-        return new FsDefaultModel(mountPoint, parent);
+        return new FsTestModel(mountPoint, parent);
     }
 
     private int getMaxArchiveLength() {
