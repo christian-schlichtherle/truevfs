@@ -37,12 +37,12 @@ private final class DefaultManager(
    * keyed by the mount point of their respective file system model.
    */
   private[this] val controllers =
-    new WeakHashMap[FsMountPoint, Link[FsController[_ <: FsModel]]]
+    new WeakHashMap[FsMountPoint, Link[AnyController]]
 
   private[this] val readLock = lock.readLock
   private[this] val writeLock = lock.writeLock
 
-  override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint): FsController[_ <: FsModel] = {
+  override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint): AnyController = {
     try {
       readLock lock ()
       try {
@@ -61,20 +61,16 @@ private final class DefaultManager(
     }
   }
 
-  private def controller0(driver: FsCompositeDriver, mountPoint: FsMountPoint): FsController[_ <: FsModel] = {
-    if (null eq mountPoint.getParent) {
-      val m = new FsDefaultModel(mountPoint, null)
-      return driver newController (this, m, null)
-    }
-    target(controllers get mountPoint orNull) match {
-      case null =>
+  private def controller0(driver: FsCompositeDriver, mountPoint: FsMountPoint): AnyController = {
+    controllers.get(mountPoint).flatMap(l => Option[AnyController](l.get)) match {
+      case Some(c) => c
+      case None =>
         if (!writeLock.isHeldByCurrentThread) throw NeedsWriteLockException()
-        val p = controller0(driver, mountPoint.getParent)
-        val m = new ScheduledModel(mountPoint, p.getModel)
-        val c = driver newController (this, m, p)
-        m.controller = c
+        val p = Option(mountPoint.getParent) map (controller0(driver, _))
+        val m = new ManagedModel(mountPoint, p map (_.getModel) orNull)
+        val c = driver newController (this, m, p orNull)
+        m init c
         c
-      case c => c
     }
   }
 
@@ -87,14 +83,12 @@ private final class DefaultManager(
    * property is simpler, faster and requires a smaller memory footprint than
    * the alternative observer pattern.
    */
-  private final class ScheduledModel(mountPoint: FsMountPoint, parent: FsModel)
+  private final class ManagedModel(mountPoint: FsMountPoint, parent: FsModel)
   extends FsAbstractModel(mountPoint, parent) {
-    private[this] var _controller: FsController[_ <: FsModel] = _
-    private[this] var _touched: Boolean = _
+    private[this] var _controller: AnyController = _
+    @volatile private[this] var _touched: Boolean = _
 
-    def controller = _controller
-
-    def controller_=(controller: FsController[_ <: FsModel]) {
+    def init(controller: AnyController) {
       assert(null ne controller)
       assert(!_touched)
       _controller = controller
@@ -108,29 +102,26 @@ private final class DefaultManager(
      * to the given touch status.
      */
     override def setTouched(touched: Boolean) {
-      if (_touched != touched) {
-        if (touched)
-          SyncShutdownHook register DefaultManager.this
-        writeLock lock ()
-        try {
+      writeLock lock ()
+      try {
+        if (_touched != touched) {
+          if (touched) SyncShutdownHook register DefaultManager.this
           schedule(touched)
-        } finally {
-          writeLock unlock ()
+          _touched = touched
         }
-        _touched = touched
+      } finally {
+        writeLock unlock ()
       }
     }
 
     def schedule(mandatory: Boolean) {
       assert(writeLock.isHeldByCurrentThread)
-      val mountPoint = getMountPoint
-      val link: Link[FsController[_ <: FsModel]] =
-        (if (mandatory) STRONG else optionalScheduleType) newLink _controller
-      controllers put (mountPoint, link)
+      controllers += getMountPoint ->
+        ((if (mandatory) STRONG else optionalScheduleType) newLink _controller)
     }
-  } // ScheduledModel
+  } // ManagedModel
 
-  def newController(driver: AnyArchiveDriver, model: FsModel, parent: FsController[_ <: FsModel]) = {
+  def newController(driver: AnyArchiveDriver, model: FsModel, parent: AnyController) = {
     assert(!model.isInstanceOf[LockModel])
     // HC SVNT DRACONES!
     // The FalsePositiveArchiveController decorates the FrontController
@@ -178,8 +169,8 @@ private object DefaultManager {
                       classOf[DefaultManager] getName)
           .config("banner")
 
-  private final class FrontController(c: FsController[_ <: FsModel])
-  extends FsDecoratingController[FsModel, FsController[_ <: FsModel]](c)
+  private final class FrontController(c: AnyController)
+  extends FsDecoratingController[FsModel, AnyController](c)
   with FinalizeController
 
   // HC SVNT DRACONES!
@@ -194,7 +185,7 @@ private object DefaultManager {
   // trying to sync the file system while any stream or channel to the
   // latter is open gets detected and properly dealt with.
   private final class BackController[E <: FsArchiveEntry]
-  (driver: FsArchiveDriver[E], model: LockModel, parent: FsController[_ <: FsModel])
+  (driver: FsArchiveDriver[E], model: LockModel, parent: AnyController)
   extends TargetArchiveController(driver, model, parent)
   with ResourceController
   with CacheController
@@ -208,8 +199,8 @@ private object DefaultManager {
    * Orders file system controllers so that all file systems appear before
    * any of their parent file systems.
    */
-  private object ReverseControllerOrdering extends Ordering[FsController[_ <: FsModel]] {
-    override def compare(a: FsController[_ <: FsModel], b: FsController[_ <: FsModel]) =
+  private object ReverseControllerOrdering extends Ordering[AnyController] {
+    override def compare(a: AnyController, b: AnyController) =
       b.getModel.getMountPoint.toHierarchicalUri compareTo
         a.getModel.getMountPoint.toHierarchicalUri
   }
