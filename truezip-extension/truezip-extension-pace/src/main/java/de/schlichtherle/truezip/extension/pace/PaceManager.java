@@ -115,7 +115,7 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
                 }
                 if (fmp.equals(rmp)) {
                     // The theory is that another thread might have just
-                    // concurrently evicted the controller to retain for the
+                    // concurrently evicted the controller to retain for
                     // subsequent access.
                     // I assume this could only happen if there is heavy
                     // contention caused by many threads - but I have no test
