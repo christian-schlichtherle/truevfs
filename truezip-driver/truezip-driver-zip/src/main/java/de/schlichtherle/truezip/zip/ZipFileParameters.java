@@ -42,11 +42,11 @@ extends ZipCharsetParameters, ZipEntryFactory<E> {
      * actual ZIP file data.
      * Note that searching for an arbitrary length postamble can seriously
      * degrade the performance when reading a false positive ZIP file, i.e.
-     * an arbitrary file which not compatible to the ZIP File Format
+     * an arbitrary file which is not compatible to the ZIP File Format
      * Specification, because then the entire file needs to get searched for
      * an End Of Central Directory Record (EOCDR) signature.
-     * So this should only be used if self extracting ZIP files with very large
-     * postambles need to get supported.
+     * A valid use case are self extracting ZIP files with very large
+     * postambles to host the extraction code.
      * <p>
      * If this method returns {@code false}, then a ZIP file may still have a
      * postamble, but it must not exceed 64KB size, including the End Of
