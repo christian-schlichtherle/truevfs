@@ -10,6 +10,7 @@ import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.util.ExtensionSet;
 import net.truevfs.kernel.spec.util.HashMaps;
 import net.truevfs.kernel.spec.util.ServiceLocator;
+import net.truevfs.kernel.spec.util.UniqueObject;
 
 /**
  * An abstract provider for an immutable map of file system schemes to file
@@ -18,7 +19,8 @@ import net.truevfs.kernel.spec.util.ServiceLocator;
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class FsAbstractDriverProvider implements FsDriverProvider {
+public abstract class FsAbstractDriverProvider
+extends UniqueObject implements FsDriverProvider {
 
     /**
      * A static factory method for an unmodifiable driver map which is

@@ -7,6 +7,7 @@ package net.truevfs.kernel.spec;
 import java.util.ServiceConfigurationError;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.kernel.spec.util.UniqueObject;
 
 /**
  * An abstract composite driver.
@@ -18,7 +19,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 public abstract class FsAbstractCompositeDriver
-implements FsCompositeDriver, FsDriverProvider {
+extends UniqueObject implements FsCompositeDriver, FsDriverProvider {
 
     @Override
     public final FsController<? extends FsModel> newController(
