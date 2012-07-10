@@ -42,6 +42,19 @@ private final class DefaultManager(
   private[this] val readLock = lock.readLock
   private[this] val writeLock = lock.writeLock
 
+  override def newController(driver: AnyArchiveDriver, model: FsModel, parent: AnyController) = {
+    assert(!model.isInstanceOf[LockModel])
+    // HC SVNT DRACONES!
+    // The FalsePositiveArchiveController decorates the FrontController
+    // so that the decorated controller (chain) does not need to resolve
+    // operations on false positive archive files.
+    new FalsePositiveArchiveController(
+      new FrontController(
+        driver decorate 
+          asFsController(
+            new BackController(driver, new LockModel(model), parent), parent)))
+  }
+
   override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint): AnyController = {
     try {
       readLock lock ()
@@ -121,19 +134,6 @@ private final class DefaultManager(
     }
   } // ManagedModel
 
-  def newController(driver: AnyArchiveDriver, model: FsModel, parent: AnyController) = {
-    assert(!model.isInstanceOf[LockModel])
-    // HC SVNT DRACONES!
-    // The FalsePositiveArchiveController decorates the FrontController
-    // so that the decorated controller (chain) does not need to resolve
-    // operations on false positive archive files.
-    new FalsePositiveArchiveController(
-      new FrontController(
-        driver decorate 
-          asFsController(
-            new BackController(driver, new LockModel(model), parent), parent)))
-  }
-
   override def size = {
     readLock lock ()
     try {
@@ -159,7 +159,7 @@ private final class DefaultManager(
   }
 
   override def sync(options: SyncOptions) {
-    SyncShutdownHook.cancel()
+    SyncShutdownHook cancel ()
     super.sync(options)
   }
 }

@@ -21,8 +21,7 @@ extends UniqueObject implements FsManager {
     @Override
     public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        if (options.get(ABORT_CHANGES))
-            throw new IllegalArgumentException();
+        if (options.get(ABORT_CHANGES)) throw new IllegalArgumentException();
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         for (final FsController<?> controller : this) {
             try {
