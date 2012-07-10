@@ -47,7 +47,7 @@ extends FsDecoratingController<FsModel, FsController<?>> {
     }
 
     void accessMruAndSyncLru() throws FsSyncException {
-        manager.accessMru(this).syncLru();
+        manager.accessMru(this).syncLru(this);
     }
 
     @Override

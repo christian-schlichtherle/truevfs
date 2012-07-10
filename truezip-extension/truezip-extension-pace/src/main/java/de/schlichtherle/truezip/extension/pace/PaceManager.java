@@ -98,7 +98,8 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
      * 
      * @throws FsSyncException 
      */
-    void syncLru() throws FsSyncException {
+    void syncLru(final PaceController retain) throws FsSyncException {
+        final FsMountPoint rmp = retain.getMountPoint();
         iterating: for (final Iterator<PaceController> i = lru.iterator(); i.hasNext(); ) {
             final PaceController c = i.next();
             final FsMountPoint mp = c.getMountPoint();
@@ -110,6 +111,17 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
                 final FsMountPoint fmp = fc.getModel().getMountPoint();
                 if (mru.containsKey(fmp)) {
                     if (fmp.equals(mp)) i.remove(); // evicted, then accessed again
+                    continue iterating;
+                }
+                if (fmp.equals(rmp)) {
+                    // The theory is that another thread might have just
+                    // concurrently evicted the controller to retain for the
+                    // subsequent access.
+                    // I assume this could only happen if there is heavy
+                    // contention caused by many threads - but I have no test
+                    // case to cover this.
+                    i.remove();
+                    mru.put(fmp, retain); // recover
                     continue iterating;
                 }
             }
