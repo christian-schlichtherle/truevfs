@@ -4,6 +4,8 @@
  */
 package de.schlichtherle.truezip.fs;
 
+import java.util.Objects;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -18,6 +20,19 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public abstract class FsModel {
 
+    private final FsMountPoint mountPoint;
+    private @CheckForNull final FsModel parent;
+
+    protected FsModel(
+            final FsMountPoint mountPoint,
+            final @CheckForNull FsModel parent) {
+        if (!Objects.equals(mountPoint.getParent(),
+                    (null == parent ? null : parent.getMountPoint())))
+            throw new IllegalArgumentException("Parent/Member mismatch!");
+        this.mountPoint = mountPoint;
+        this.parent = parent;
+    }
+
     /**
      * Returns the mount point of the file system.
      * <p>
@@ -27,7 +42,9 @@ public abstract class FsModel {
      *
      * @return The mount point of the file system.
      */
-    public abstract FsMountPoint getMountPoint();
+    public final FsMountPoint getMountPoint() {
+        return mountPoint;
+    }
 
     /**
      * Returns the model of the parent file system or {@code null} if and
@@ -36,42 +53,37 @@ public abstract class FsModel {
      *
      * @return The nullable parent file system model.
      */
-    @Nullable
-    public abstract FsModel getParent();
+    public final @CheckForNull FsModel getParent() {
+        return parent;
+    }
 
     /**
      * Returns {@code true} if and only if some state associated with the
      * federated file system has been modified so that the
      * corresponding {@link FsController} must not get discarded until
-     * the next {@link FsController#sync sync}.
+     * the next call to {@link FsController#sync sync}.
      * <p>
-     * The implementation in the class {@link FsModel} always returns
-     * {@code false}.
+     * An implementation may always return {@code false} if the associated
+     * file system controller is stateless.
      * 
      * @return {@code true} if and only if some state associated with the
      *         federated file system has been modified so that the
      *         corresponding {@link FsController} must not get discarded until
      *         the next {@link FsController#sync sync}.
      */
-    public boolean isTouched() {
-        return false;
-    }
+    public abstract boolean isTouched();
 
     /**
-     * Sets the value of the property {@link #isTouched() touched}
-     * (optional operation).
+     * Sets the value of the property {@link #isTouched() touched}.
+     * Only file system controllers should call this method in order to
+     * register themselves for a call their {@link FsController#sync} method.
      * <p>
-     * The implementation in the class {@link FsModel} always throws an
-     * {@link UnsupportedOperationException}.
+     * An implementation may ignore calls to this method if the associated
+     * file system controller is stateless.
      *
-     * @param  touched the new value of this property.
-     * @throws UnsupportedOperationException At the discretion of the
-     *         implementation, e.g. if the file system type does not support
-     *         {@link FsController#sync syncing}.
+     * @param touched the new value of this property.
      */
-    public void setTouched(boolean touched) {
-        throw new UnsupportedOperationException();
-    }
+    public abstract void setTouched(boolean touched);
 
     /**
      * Two file system models are considered equal if and only if they are

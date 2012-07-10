@@ -90,13 +90,10 @@ public class HttpDriver extends FsDriver {
     }
 
     @Override
-    public FsController<?>
-    newController(FsModel model, @CheckForNull FsController<?> parent) {
-        assert null == model.getParent()
-                ? null == parent
-                : model.getParent().equals(parent.getModel());
-        if (null != parent)
-            throw new IllegalArgumentException();
+    public FsController<?> newController(
+            final FsModel model,
+            final @CheckForNull FsController<?> parent) {
+        assert null == parent;
         return new HttpController(this, model);
     }
 }

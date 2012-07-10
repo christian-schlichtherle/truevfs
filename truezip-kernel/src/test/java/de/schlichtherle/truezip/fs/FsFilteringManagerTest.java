@@ -33,21 +33,19 @@ public class FsFilteringManagerTest extends FsManagerTestSuite {
                 new MockDriverService("file|tar|tar.gz|zip"));
         for (final String[][] params : new String[][][] {
             // { { /* filter */ }, { /* test set */ }, { /* result set */ } },
-            { { "file:/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" } },
-            { { "tar:file:/bar.tar!/" }, { "tar:file:/bar.tar!/", "tar.gz:file:/bar.tar.gz!/" }, { "tar:file:/bar.tar!/" } },
-            { { "tar:zip:file:/foo.zip!/bar.tar!/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { } },
-            { { "file:/foo.zip/bar.tar/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { } },
-            { { "tar:file:/foo!/" }, { "zip:file:/foo!/", "tar:file:/bar!/" }, { "zip:file:/foo!/" } },
-            { { "zip:file:/foo.zip!/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { "zip:file:/foo.zip!/" } },
-            { { "file:/foo.zip/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { } },
-            { { "file:/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" } },
+            { { "tar:file:/bar.tar!/" }, { "file:/", "tar:file:/bar.tar!/", "tar.gz:file:/bar.tar.gz!/" }, { "tar:file:/bar.tar!/" } },
+            { { "tar:zip:file:/foo.zip!/bar.tar!/" }, { "file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { } },
+            { { "file:/foo.zip/bar.tar/" }, { "file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { } },
+            { { "tar:file:/foo!/" }, { "file:/", "zip:file:/foo!/", "tar:file:/bar!/" }, { "zip:file:/foo!/" } },
+            { { "zip:file:/foo.zip!/" }, { "file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { "zip:file:/foo.zip!/" } },
+            { { "file:/foo.zip/" }, { "file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { } },
+            { { "file:/" }, { "file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { "file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" } },
         }) {
             assert params[0].length == 1;
 
             final FsManager manager = new FsDefaultManager(STRONG);
             for (final String param : params[1])
-                manager.getController(  FsMountPoint.create(URI.create(param)),
-                                        driver);
+                manager.getController(  FsMountPoint.create(URI.create(param)), driver);
             assertThat(manager.getSize(), is(params[1].length));
 
             final Set<FsMountPoint> set = new HashSet<FsMountPoint>();

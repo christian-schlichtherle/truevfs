@@ -141,17 +141,15 @@ public abstract class ZipRaesDriver extends JarDriver {
      * <p>
      * The implementation in the class {@link ZipRaesDriver} returns the
      * expression
-     * {@code new ZipRaesKeyController(superNewController(model, parent), this)}.
-     * This method should be overridden in order to call only
-     * {@link #superNewController} if and only if you are overriding
-     * {@link #raesParameters(de.schlichtherle.truezip.fs.FsModel)}, too,
-     * and do not want to use the built-in key manager to resolve passwords
-     * for RAES encryption.
+     * {@code new ZipRaesKeyController<M>(controller, this)}.
+     * Overridde this method in order to return just the given
+     * {@code controller} if you are overriding
+     * {@link #raesParameters(FsModel)} and do not want to use
+     * a locatable key manager to resolve passwords for RAES encryption.
      */
     @Override
-    public FsController<?>
-    newController(FsModel model, FsController<?> parent) {
-        return new ZipRaesKeyController(superNewController(model, parent), this);
+    public <M extends FsModel> FsController<M> decorate(FsController<M> controller) {
+        return new ZipRaesKeyController<M>(controller, this);
     }
 
     /**

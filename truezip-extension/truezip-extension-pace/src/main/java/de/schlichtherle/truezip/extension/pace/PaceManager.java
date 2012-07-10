@@ -7,8 +7,14 @@ package de.schlichtherle.truezip.extension.pace;
 import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.util.BitField;
 import de.schlichtherle.truezip.util.HashMaps;
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.concurrent.ThreadSafe;
@@ -31,22 +37,17 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
             = new ConcurrentLinkedQueue<PaceController>();
 
     @SuppressWarnings("serial")
-    private final Map<FsMountPoint, PaceController> mru;
+    private final MruControllerMap mru = new MruControllerMap();
 
     public PaceManager(final FsManager manager) {
         super(manager);
-        mru = Collections.synchronizedMap(new MruControllerMap());
     }
 
     @Override
     public FsController<?> getController(
-            final FsMountPoint mountPoint,
-            final FsCompositeDriver driver) {
-        final FsController<?> controller
-                = delegate.getController(mountPoint, driver);
-        return null != controller.getParent()
-                ? new PaceController(this, controller)
-                : controller;
+            final FsMountPoint mp,
+            final FsCompositeDriver d) {
+        return new PaceController(this, delegate.getController(mp, d));
     }
 
     @Override
@@ -84,11 +85,12 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
      *         archive file system.
      * @return {@code this}
      */
-    PaceManager accessMru(final PaceController controller) {
-        final FsMountPoint mp = controller.getMountPoint();
-        logger.log(Level.FINEST, "accessMru", mp);
-        mru.put(mp, controller);
-        return this;
+    void accessedMru(final PaceController controller) {
+        if (controller.isTouched()) {
+            final FsMountPoint mp = controller.getMountPoint();
+            mru.put(mp, controller);
+            logger.log(Level.FINEST, "accessedMru", mp);
+        }
     }
 
     /**
@@ -126,8 +128,8 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
                 }
             }
             i.remove(); // even if subsequent umount fails
-            logger.log(Level.FINE, "syncLru", mp);
             fm.sync(FsSyncOptions.SYNC);
+            logger.log(Level.FINE, "syncedLru", mp);
         }
     }
 
@@ -139,33 +141,77 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
     @Override
     public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        logger.log(Level.FINER, "clearLruSize", getNumberOfLeastRecentlyUsedArchiveFiles());
         lru.clear();
-        logger.log(Level.FINER, "clearMruSize", getNumberOfMostRecentlyUsedArchiveFiles());
+        logger.log(Level.FINER, "clearedLruSize", getNumberOfLeastRecentlyUsedArchiveFiles());
         mru.clear();
+        logger.log(Level.FINER, "clearedMruSize", getNumberOfMostRecentlyUsedArchiveFiles());
         delegate.sync(options);
     }
 
     @SuppressWarnings("serial")
-    private final class MruControllerMap
-    extends LinkedHashMap<FsMountPoint, PaceController> {
+    private final class MruControllerMap {
+        private final LinkedHashMap<FsMountPoint, PaceController> map
+                = new LinkedHashMap<FsMountPoint, PaceController>(
+                    HashMaps.initialCapacity(getMaximumOfMostRecentlyUsedArchiveFiles() + 1),
+                    0.75f,
+                    true) {
+            @Override
+            public boolean removeEldestEntry(
+                    final Map.Entry<FsMountPoint, PaceController> entry) {
+                final boolean evict
+                        = size() > getMaximumOfMostRecentlyUsedArchiveFiles();
+                if (evict) {
+                    final PaceController c = entry.getValue();
+                    final boolean added = lru.add(c);
+                    assert added;
+                }
+                return evict;
+            }
+        };
+
+        private final ReadLock readLock;
+        private final WriteLock writeLock;
 
         MruControllerMap() {
-            super(HashMaps.initialCapacity(
-                    getMaximumOfMostRecentlyUsedArchiveFiles() + 1), 0.75f, true);
+            final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+            readLock = lock.readLock();
+            writeLock = lock.writeLock();
         }
 
-        @Override
-        public boolean removeEldestEntry(
-                final Map.Entry<FsMountPoint, PaceController> entry) {
-            final boolean evict
-                    = size() > getMaximumOfMostRecentlyUsedArchiveFiles();
-            if (evict) {
-                final PaceController c = entry.getValue();
-                final boolean added = lru.add(c);
-                assert added;
+        int size() {
+            readLock.lock();
+            try {
+                return map.size();
+            } finally {
+                readLock.unlock();
             }
-            return evict;
+        }
+
+        boolean containsKey(FsMountPoint key) {
+            readLock.lock();
+            try {
+                return map.containsKey(key);
+            } finally {
+                readLock.unlock();
+            }
+        }
+
+        PaceController put(FsMountPoint key, PaceController value) {
+            writeLock.lock();
+            try {
+                return map.put(key, value);
+            } finally {
+                writeLock.unlock();
+            }
+        }
+
+        void clear() {
+            writeLock.lock();
+            try {
+                map.clear();
+            } finally {
+                writeLock.unlock();
+            }
         }
     } // MruControllerMap
 }

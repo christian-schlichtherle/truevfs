@@ -359,33 +359,28 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     /**
-     * {@inheritDoc}
-     * <p>
-     * The implementation in the class {@link ZipDriver} returns the expression
-     * {@code new ZipKeyController(superNewController(model, parent), this)}.
-     * This method should be overridden in order to call only
-     * {@link #superNewController} if and only if you are overriding
-     * {@link #zipCryptoParameters(de.schlichtherle.truezip.fs.FsModel, java.nio.charset.Charset)}, too,
-     * and do not want to use the key manager to resolve passwords,
-     * e.g. for WinZip AES encryption.
-     */
-    @Override
-    public FsController<?>
-    newController(FsModel model, FsController<?> parent) {
-        return new ZipKeyController(superNewController(model, parent), this);
-    }
-
-    /**
-     * Equivalent to calling
-     * {@link FsArchiveDriver#newController} on the {@link FsArchiveDriver}
-     * class.
-     * Call this method when overriding {@link #newController} and you need the
-     * default file system controller chain instead of the implementation in
-     * the class {@link ZipDriver}.
+     * @deprecated since TrueZIP 7.6 - override {@link #decorate} instead.
      */
     protected final FsController<?>
     superNewController(FsModel model, FsController<?> parent) {
         return super.newController(model, parent);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link ZipDriver} returns the
+     * expression
+     * {@code new ZipKeyController<M>(controller, this)}.
+     * Overridde this method in order to return just the given
+     * {@code controller} if you are overriding
+     * {@link #zipCryptoParameters(FsModel, Charset)} and do not want to use
+     * a locatable key manager to resolve passwords for WinZip AES encryption.
+     */
+    @Override
+    public <M extends FsModel> FsController<M> decorate(
+            FsController<M> controller) {
+        return new ZipKeyController<M>(controller, this);
     }
 
     @Override

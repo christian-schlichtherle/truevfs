@@ -28,8 +28,8 @@ public final class FsDefaultManager extends FsManager {
      * The map of all schedulers for composite file system controllers,
      * keyed by the mount point of their respective file system model.
      */
-    private final Map<FsMountPoint, Link<FsFalsePositiveArchiveController>> controllers
-            = new WeakHashMap<FsMountPoint, Link<FsFalsePositiveArchiveController>>();
+    private final Map<FsMountPoint, Link<FsController<?>>> controllers
+            = new WeakHashMap<FsMountPoint, Link<FsController<?>>>();
 
     private final Type optionalScheduleType;
 
@@ -50,20 +50,32 @@ public final class FsDefaultManager extends FsManager {
     }
 
     @Override
+    public <E extends FsArchiveEntry> FsController<?> newController(
+            final FsArchiveDriver<E> driver,
+            final FsModel model,
+            final FsController<?> parent) {
+        assert !(model instanceof FsLockModel);
+        // HC SVNT DRACONES!
+        return new FsFalsePositiveArchiveController(
+                    new FsFinalizeController<FsModel>(
+                        driver.newController(model, parent)));
+    }
+
+    @Override
     public FsController<?> getController(
-            FsMountPoint mountPoint,
-            FsCompositeDriver driver) {
+            final FsMountPoint mp,
+            final FsCompositeDriver d) {
         try {
             readLock.lock();
             try {
-                return getController0(mountPoint, driver);
+                return getController0(mp, d);
             } finally {
                 readLock.unlock();
             }
         } catch (final FsNeedsWriteLockException ex) {
             writeLock.lock();
             try {
-                return getController0(mountPoint, driver);
+                return getController0(mp, d);
             } finally {
                 writeLock.unlock();
             }
@@ -71,26 +83,75 @@ public final class FsDefaultManager extends FsManager {
     }
 
     private FsController<?> getController0(
-            final FsMountPoint mountPoint,
-            final FsCompositeDriver driver) {
-        if (null == mountPoint.getParent()) {
-            final FsModel m = new FsDefaultModel(mountPoint, null);
-            return driver.newController(m, null);
-        }
-        FsFalsePositiveArchiveController c = getTarget(controllers.get(mountPoint));
-        if (null == c) {
-            if (!writeLock.isHeldByCurrentThread())
-                throw FsNeedsWriteLockException.get();
-            final FsController<?> p = getController0(mountPoint.getParent(), driver);
-            final ScheduledModel m = new ScheduledModel(mountPoint, p.getModel());
-            // HC SVNT DRACONES!
-            m.setController(c =
-                    new FsFalsePositiveArchiveController(
-                        new FsFinalizeController<FsModel>(
-                            driver.newController(m, p))));
-        }
+            final FsMountPoint mp,
+            final FsCompositeDriver d) {
+        FsController<?> c = getTarget(controllers.get(mp));
+        if (null != c) return c;
+        if (!writeLock.isHeldByCurrentThread())
+            throw FsNeedsWriteLockException.get();
+        final FsMountPoint pmp = mp.getParent();
+        final FsController<?> p = null == pmp ? null : getController0(pmp, d);
+        final ManagedModel m = new ManagedModel(mp, null == p ? null : p.getModel());
+        c = d.newController(this, m, p);
+        m.init(c);
         return c;
     }
+
+    /**
+     * A model which schedules its controller for
+     * {@link #sync(BitField) synchronization} by &quot;observing&quot; its
+     * {@code touched} property.
+     * Extending its sub-class to register for updates to the {@code touched}
+     * property is simpler, faster and requires a smaller memory footprint than
+     * the alternative observer pattern.
+     */
+    private final class ManagedModel extends FsModel {
+        FsController<?> controller;
+        volatile boolean touched;
+
+        ManagedModel(FsMountPoint mountPoint, FsModel parent) {
+            super(mountPoint, parent);
+        }
+
+        void init(final FsController<? extends FsModel> controller) {
+            assert null != controller;
+            assert !touched;
+            this.controller = controller;
+            schedule(false);
+        }
+
+        @Override
+        public boolean isTouched() {
+            return touched;
+        }
+
+        /**
+         * Schedules the file system controller for synchronization according
+         * to the given touch status.
+         */
+        @Override
+        public void setTouched(final boolean touched) {
+            writeLock.lock();
+            try {
+                if (this.touched != touched) {
+                    if (touched)
+                        FsSyncShutdownHook.register(FsDefaultManager.this);
+                    schedule(touched);
+                    this.touched = touched;
+                }
+            } finally {
+                writeLock.unlock();
+            }
+        }
+
+        @SuppressWarnings("unchecked")
+        void schedule(boolean mandatory) {
+            assert(writeLock.isHeldByCurrentThread());
+            final Type type = mandatory ? STRONG : optionalScheduleType;
+            controllers.put(getMountPoint(),
+                            (Link<FsController<?>>) type.newLink(controller));
+        }
+    } // ManagedModel
 
     @Override
     public int getSize() {
@@ -112,7 +173,7 @@ public final class FsDefaultManager extends FsManager {
         try {
             final Set<FsController<?>> snapshot
                     = new TreeSet<FsController<?>>(ReverseControllerComparator.INSTANCE);
-            for (final Link<FsFalsePositiveArchiveController> link : controllers.values()) {
+            for (final Link<FsController<? extends FsModel>> link : controllers.values()) {
                 final FsController<?> controller = getTarget(link);
                 if (null != controller)
                     snapshot.add(controller);
@@ -128,67 +189,6 @@ public final class FsDefaultManager extends FsManager {
         FsSyncShutdownHook.cancel();
         super.sync(options);
     }
-
-    /**
-     * A model which schedules its controller for
-     * {@link #sync(BitField) synchronization} by &quot;observing&quot; its
-     * {@code touched} property.
-     * Extending its sub-class to register for updates to the {@code touched}
-     * property is simpler, faster and requires a smaller memory footprint than
-     * the alternative observer pattern.
-     */
-    private final class ScheduledModel extends FsDefaultModel {
-        FsFalsePositiveArchiveController controller;
-        boolean touched;
-
-        ScheduledModel(FsMountPoint mountPoint, FsModel parent) {
-            super(mountPoint, parent);
-        }
-
-        void setController(final FsFalsePositiveArchiveController controller) {
-            assert null != controller;
-            assert !touched;
-            this.controller = controller;
-            schedule(false);
-        }
-
-        @Override
-        public boolean isTouched() {
-            return touched;
-        }
-
-        /**
-         * Schedules the file system controller for synchronization according
-         * to the given touch status.
-         */
-        @Override
-        public void setTouched(final boolean touched) {
-            if (this.touched != touched) {
-                if (touched)
-                    FsSyncShutdownHook.register(FsDefaultManager.this);
-                writeLock.lock();
-                try {
-                    schedule(touched);
-                } finally {
-                    writeLock.unlock();
-                }
-                this.touched = touched;
-            }
-        }
-
-        void schedule(boolean mandatory) {
-            assert(writeLock.isHeldByCurrentThread());
-            final FsMountPoint mountPoint = getMountPoint();
-            final Link<FsFalsePositiveArchiveController> link =
-                    (mandatory ? STRONG : optionalScheduleType).newLink(controller);
-            writeLock.lock();
-            try {
-                controllers.put(mountPoint, link);
-            } finally {
-                writeLock.unlock();
-            }
-        }
-    } // ScheduledModel
 
     /**
      * Orders file system controllers so that all file systems appear before

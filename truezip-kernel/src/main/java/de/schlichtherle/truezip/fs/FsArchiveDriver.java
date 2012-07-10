@@ -43,6 +43,79 @@ extends FsDriver {
     }
 
     /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link FsArchiveDriver} simply forwards
+     * the call to the given file system manager after asserting that
+     * {@code model.getParent().equals(parent.getModel())} is {@code true}.
+     */
+    @Override
+    public final FsController<? extends FsModel> newController(
+            final FsManager manager,
+            final FsModel model,
+            final @CheckForNull FsController<? extends FsModel> parent) {
+        assert parent.getModel().equals(model.getParent());
+        return manager.newController(this, model, parent);
+    }
+
+    /**
+     * Returns a new thread-safe file system controller for the mount point of
+     * the given file system model and parent file system controller.
+     * <p>
+     * When called, you may assert the following precondition:
+     * {@code model.getParent().equals(parent.getModel())}
+     * Note that the parent file system controller of an archive file system is
+     * never {@code null}.
+     * <p>
+     * The implementation in the class {@link FsArchiveDriver} creates a
+     * partial file system controller chain and passes the result to
+     * {@link #decorate} for further decoration.
+     *
+     * @param  model the file system model.
+     * @param  parent the non-null parent file system controller.
+     * @return A new thread-safe file system controller for the given mount
+     *         point and parent file system controller.
+     */
+    @Override
+    public FsController<?> newController(
+            final FsModel model,
+            final @Nonnull FsController<?> parent) {
+        assert model.getParent().equals(parent.getModel());
+        assert !(model instanceof FsLockModel);
+        // HC SVNT DRACONES!
+        return  decorate(
+                    new FsLockController(
+                        new FsSyncController(
+                            new FsCacheController(
+                                new FsResourceController(
+                                    new FsContextController(
+                                        new FsTargetArchiveController<E>(
+                                            this, new FsLockModel(model), parent))),
+                                getPool()))));
+    }
+
+    /**
+     * This hook can get overridden by archive drivers in order to decorate the
+     * given file system controller chain with some more file system
+     * controller(s).
+     * <p>
+     * The implementation in the class {@link FsArchiveDriver} simply returns
+     * the given controller.
+     * 
+     * @param  <M> the file system model used by the given controller.
+     * @param  controller the file system controller to decorate or return.
+     *         Note that this controller may throw {@link RuntimeException}s
+     *         for non-local control flow!
+     * @return The decorated file system controller or simply
+     *         {@code controller}.
+     * @since  TrueZIP 7.6
+     */
+    public <M extends FsModel> FsController<M> decorate(
+            FsController<M> controller) {
+        return controller;
+    }
+
+    /**
      * Returns the I/O buffer pool to use for allocating temporary I/O buffers.
      * <p>
      * Multiple invocations should return the same I/O buffer pool.
@@ -117,49 +190,6 @@ extends FsDriver {
      */
     public @CheckForNull Icon getClosedIcon(FsModel model) {
         return null;
-    }
-
-    /**
-     * Returns a new thread-safe file system controller for the mount point of
-     * the given file system model and parent file system controller.
-     * <p>
-     * When called, the following expression is a precondition:
-     * {@code model.getParent().equals(parent.getModel())}
-     * <p>
-     * Note that an archive file system is always federated and therefore
-     * its parent file system controller is never {@code null}.
-     * <p>
-     * Furthermore, an archive driver implementation is <em>not</em> expected
-     * to consider the scheme of the given mount point to determine the class
-     * of the returned file system controller.
-     * Consequently, it is an error to call this method with a mount point
-     * which has a scheme which is not supported by this archive driver.
-     * <p>
-     * Note again that unlike the other components created by this factory,
-     * the returned file system controller must be thread-safe!
-     *
-     * @param  model the file system model.
-     * @param  parent the non-null parent file system controller.
-     * @return A new thread-safe file system controller for the given mount
-     *         point and parent file system controller.
-     */
-    @Override
-    public FsController<?>
-    newController(final FsModel model, final @Nonnull FsController<?> parent) {
-        final boolean isLockModel = model instanceof FsLockModel;
-        assert !isLockModel;
-        final FsLockModel lockModel = isLockModel
-                ? (FsLockModel) model
-                : new FsLockModel(model);
-        // HC SVNT DRACONES!
-        return  new FsLockController(
-                    new FsSyncController(
-                        new FsCacheController(
-                            new FsResourceController(
-                                new FsContextController(
-                                    new FsTargetArchiveController<E>(
-                                        lockModel, parent, this))),
-                            getPool())));
     }
 
     /**

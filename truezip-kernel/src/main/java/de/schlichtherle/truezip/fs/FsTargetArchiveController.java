@@ -86,9 +86,9 @@ extends FsFileSystemArchiveController<E> {
      * @param driver the archive driver.
      */
     FsTargetArchiveController(
+            final FsArchiveDriver<E> driver,
             final FsLockModel model,
-            final FsController<?> parent,
-            final FsArchiveDriver<E> driver) {
+            final FsController<? extends FsModel> parent) {
         super(model);
         if (null == driver)
             throw new NullPointerException();
