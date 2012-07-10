@@ -4,6 +4,7 @@
  */
 package net.truevfs.driver.file;
 
+import de.schlichtherle.truecommons.io.DecoratingSeekableChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -11,7 +12,6 @@ import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
-import net.truevfs.kernel.spec.io.DecoratingSeekableChannel;
 
 /**
  * A decorating seekable byte channel which saves the last {@link IOException}

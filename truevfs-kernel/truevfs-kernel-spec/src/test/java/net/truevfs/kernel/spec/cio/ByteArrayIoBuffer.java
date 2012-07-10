@@ -4,6 +4,7 @@
  */
 package net.truevfs.kernel.spec.cio;
 
+import de.schlichtherle.truecommons.io.ByteBufferChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -20,7 +21,6 @@ import static net.truevfs.kernel.spec.cio.Entry.Access.WRITE;
 import net.truevfs.kernel.spec.cio.Entry.Entity;
 import net.truevfs.kernel.spec.cio.Entry.Size;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.spec.io.ByteBufferChannel;
 import net.truevfs.kernel.spec.io.DisconnectingInputStream;
 import net.truevfs.kernel.spec.io.DisconnectingOutputStream;
 import net.truevfs.kernel.spec.io.DisconnectingSeekableChannel;
@@ -282,7 +282,7 @@ public class ByteArrayIoBuffer implements IoBuffer<ByteArrayIoBuffer> {
             if (closed) return;
             channel.close();
             times.put(WRITE, System.currentTimeMillis());
-            final ByteBuffer buffer = ((ByteBufferChannel) channel).getByteBuffer();
+            final ByteBuffer buffer = ((ByteBufferChannel) channel).bufferDuplicate();
             data = Arrays.copyOf(buffer.array(), buffer.limit());
             closed = true;
         }

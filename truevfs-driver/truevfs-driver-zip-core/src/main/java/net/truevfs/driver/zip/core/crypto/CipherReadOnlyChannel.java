@@ -4,10 +4,11 @@
  */
 package net.truevfs.driver.zip.core.crypto;
 
-import net.truevfs.kernel.spec.io.DecoratingReadOnlyChannel;
-import net.truevfs.kernel.spec.io.Streams;
+import de.schlichtherle.truecommons.io.ReadOnlyChannel;
+import de.schlichtherle.truecommons.io.Streams;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
+import static java.lang.Math.min;
 import static java.lang.Math.min;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
@@ -30,7 +31,7 @@ import org.bouncycastle.crypto.Mac;
 // performance.
 //
 @NotThreadSafe
-public final class CipherReadOnlyChannel extends DecoratingReadOnlyChannel {
+public final class CipherReadOnlyChannel extends ReadOnlyChannel {
 
     private static final long INVALID = Long.MIN_VALUE;
 

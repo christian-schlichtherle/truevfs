@@ -11,6 +11,8 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.kernel.spec.io.DisconnectingOutputStream;
+import net.truevfs.kernel.spec.io.DisconnectingSeekableChannel;
 import net.truevfs.kernel.spec.io.OutputClosedException;
 
 /**
@@ -101,20 +103,20 @@ extends DecoratingOutputService<E, OutputService<E>> {
         @Override
         public OutputStream stream(InputSocket<? extends Entry> peer)
         throws IOException {
-            return new DisconnectingOutputStream(socket().stream(peer));
+            return new DisconnectingOutputStreamImpl(socket().stream(peer));
         }
 
         @Override
         public SeekableByteChannel channel(InputSocket<? extends Entry> peer)
         throws IOException {
-            return new DisconnectingSeekableChannel(socket().channel(peer));
+            return new DisconnectingSeekableChannelImpl(socket().channel(peer));
         }
     } // Output
 
-    private final class DisconnectingOutputStream
-    extends net.truevfs.kernel.spec.io.DisconnectingOutputStream {
+    private final class DisconnectingOutputStreamImpl
+    extends DisconnectingOutputStream {
 
-        DisconnectingOutputStream(@WillCloseWhenClosed OutputStream out) {
+        DisconnectingOutputStreamImpl(@WillCloseWhenClosed OutputStream out) {
             super(out);
         }
 
@@ -130,10 +132,10 @@ extends DecoratingOutputService<E, OutputService<E>> {
         }
     } // DisconnectingOutputStream
 
-    private final class DisconnectingSeekableChannel
-    extends net.truevfs.kernel.spec.io.DisconnectingSeekableChannel {
+    private final class DisconnectingSeekableChannelImpl
+    extends DisconnectingSeekableChannel {
 
-        DisconnectingSeekableChannel(@WillCloseWhenClosed SeekableByteChannel channel) {
+        DisconnectingSeekableChannelImpl(@WillCloseWhenClosed SeekableByteChannel channel) {
             super(channel);
         }
 

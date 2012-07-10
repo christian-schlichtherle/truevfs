@@ -4,6 +4,7 @@
  */
 package net.truevfs.kernel.spec.io;
 
+import de.schlichtherle.truecommons.io.DecoratingInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.annotation.concurrent.NotThreadSafe;

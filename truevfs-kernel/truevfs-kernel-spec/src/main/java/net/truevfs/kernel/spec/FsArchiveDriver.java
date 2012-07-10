@@ -4,13 +4,14 @@
  */
 package net.truevfs.kernel.spec;
 
+import de.schlichtherle.truecommons.io.Sink;
+import de.schlichtherle.truecommons.io.Source;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 import static net.truevfs.kernel.spec.FsEntryName.SEPARATOR;
@@ -18,8 +19,6 @@ import static net.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
 import net.truevfs.kernel.spec.cio.Entry.Type;
 import static net.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
 import net.truevfs.kernel.spec.cio.*;
-import net.truevfs.kernel.spec.io.Sink;
-import net.truevfs.kernel.spec.io.Source;
 import net.truevfs.kernel.spec.util.BitField;
 import static net.truevfs.kernel.spec.util.Paths.cutTrailingSeparators;
 
@@ -59,9 +58,28 @@ extends FsDriver {
     public final FsController<? extends FsModel> newController(
             FsManager manager,
             FsModel model,
-            @Nonnull FsController<? extends FsModel> parent) {
+            @CheckForNull FsController<? extends FsModel> parent) {
         assert parent.getModel().equals(model.getParent());
         return manager.newController(this, model, parent);
+    }
+
+    /**
+     * This hook can get overridden by archive drivers in order to decorate the
+     * given file system controller with some other file system controller(s).
+     * <p>
+     * The implementation in the class {@link FsArchiveDriver} simply returns
+     * the given controller.
+     * 
+     * @param  <M> the file system model used by the given controller.
+     * @param  controller the file system controller to decorate or return.
+     *         Note that this controller may throw {@link RuntimeException}s
+     *         for non-local control flow!
+     * @return The decorated file system controller or simply
+     *         {@code controller}.
+     */
+    public <M extends FsModel> FsController<M> decorate(
+            FsController<M> controller) {
+        return controller;
     }
 
     /**
@@ -146,25 +164,6 @@ extends FsDriver {
      */
     public boolean getRedundantMetaDataSupport() {
         return false;
-    }
-
-    /**
-     * This hook can get overridden by archive drivers in order to decorate the
-     * given file system controller with some other file system controller(s).
-     * <p>
-     * The implementation in the class {@link FsArchiveDriver} simply returns
-     * the given controller.
-     * 
-     * @param  <M> the file system model used by the given controller.
-     * @param  controller the file system controller to decorate or return.
-     *         Note that this controller may throw {@link RuntimeException}s
-     *         for non-local control flow!
-     * @return The decorated file system controller or simply
-     *         {@code controller}.
-     */
-    public <M extends FsModel> FsController<M> decorate(
-            FsController<M> controller) {
-        return controller;
     }
 
     /**

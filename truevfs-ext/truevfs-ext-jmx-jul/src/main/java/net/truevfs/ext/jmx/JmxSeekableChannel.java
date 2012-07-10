@@ -4,13 +4,13 @@
  */
 package net.truevfs.ext.jmx;
 
+import de.schlichtherle.truecommons.io.DecoratingSeekableChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.truevfs.kernel.spec.io.DecoratingSeekableChannel;
 
 /**
  * @author  Christian Schlichtherle

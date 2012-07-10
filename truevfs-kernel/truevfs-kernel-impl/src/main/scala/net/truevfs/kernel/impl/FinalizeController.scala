@@ -4,6 +4,7 @@
  */
 package net.truevfs.kernel.impl
 
+import de.schlichtherle.truecommons.io._
 import java.io._
 import java.nio.channels._
 import java.util.logging._

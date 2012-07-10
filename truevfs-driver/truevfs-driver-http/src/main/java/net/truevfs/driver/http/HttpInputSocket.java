@@ -4,6 +4,7 @@
  */
 package net.truevfs.driver.http;
 
+import de.schlichtherle.truecommons.io.ReadOnlyChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,7 +12,6 @@ import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.truevfs.kernel.spec.FsAccessOption;
 import net.truevfs.kernel.spec.cio.*;
-import net.truevfs.kernel.spec.io.DecoratingReadOnlyChannel;
 import net.truevfs.kernel.spec.util.BitField;
 
 /**
@@ -57,7 +57,7 @@ public class HttpInputSocket extends AbstractInputSocket<HttpEntry> {
             }
             throw ex;
         }
-        final class TempReadOnlyChannel extends DecoratingReadOnlyChannel {
+        final class TempReadOnlyChannel extends ReadOnlyChannel {
             boolean closed;
 
             @CreatesObligation

@@ -4,12 +4,12 @@
  */
 package net.truevfs.driver.file;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsManager;
 import net.truevfs.kernel.spec.FsModel;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * A file system driver for the FILE scheme.
@@ -20,10 +20,10 @@ import javax.annotation.concurrent.Immutable;
 public final class FileDriver extends FsDriver {
 
     @Override
-    public FsController<?>
-    newController(  final FsManager manager,
-                    final FsModel model,
-                    final @CheckForNull FsController<?> parent) {
+    public FsController<?> newController(
+            final FsManager manager,
+            final FsModel model,
+            final @CheckForNull FsController<?> parent) {
         assert null == parent;
         return new FileController(model);
     }

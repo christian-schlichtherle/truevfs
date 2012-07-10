@@ -22,8 +22,11 @@ import scala.collection.mutable.WeakHashMap
 @ThreadSafe
 private final class DefaultManager(
   optionalScheduleType: Type,
-  lock: ReentrantReadWriteLock = new ReentrantReadWriteLock
+  lock: ReentrantReadWriteLock
 ) extends FsAbstractManager {
+
+  def this(optionalScheduleType: Type)
+  = this(optionalScheduleType, new ReentrantReadWriteLock)
 
   def this() = this(WEAK)
 
@@ -42,7 +45,8 @@ private final class DefaultManager(
   private[this] val readLock = lock.readLock
   private[this] val writeLock = lock.writeLock
 
-  override def newController(driver: AnyArchiveDriver, model: FsModel, parent: AnyController) = {
+  override def newController[E <: FsArchiveEntry]
+  (driver: FsArchiveDriver[E], model: FsModel, parent: AnyController) = {
     assert(!model.isInstanceOf[LockModel])
     // HC SVNT DRACONES!
     // The FalsePositiveArchiveController decorates the FrontController
@@ -74,14 +78,14 @@ private final class DefaultManager(
     }
   }
 
-  private def controller0(driver: FsCompositeDriver, mountPoint: FsMountPoint): AnyController = {
-    controllers.get(mountPoint).flatMap(l => Option[AnyController](l.get)) match {
+  private def controller0(d: FsCompositeDriver, mp: FsMountPoint): AnyController = {
+    controllers.get(mp).flatMap(l => Option[AnyController](l.get)) match {
       case Some(c) => c
       case None =>
         if (!writeLock.isHeldByCurrentThread) throw NeedsWriteLockException()
-        val p = Option(mountPoint.getParent) map (controller0(driver, _))
-        val m = new ManagedModel(mountPoint, p map (_.getModel) orNull)
-        val c = driver newController (this, m, p orNull)
+        val p = Option(mp.getParent) map (controller0(d, _))
+        val m = new ManagedModel(mp, p map (_.getModel) orNull)
+        val c = d newController (this, m, p orNull)
         m init c
         c
     }

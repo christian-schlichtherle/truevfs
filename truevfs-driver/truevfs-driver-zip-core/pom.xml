@@ -32,6 +32,11 @@
             <type>test-jar</type>
         </dependency>
         <dependency>
+            <groupId>de.schlichtherle.truecommons</groupId>
+            <artifactId>truecommons-io</artifactId>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
             <exclusions>

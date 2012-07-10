@@ -90,10 +90,10 @@ public class HttpDriver extends FsDriver {
     }
 
     @Override
-    public FsController<?>
-    newController(  final FsManager manager,
-                    final FsModel model,
-                    final @CheckForNull FsController<?> parent) {
+    public FsController<?> newController(
+            final FsManager manager,
+            final FsModel model,
+            final @CheckForNull FsController<?> parent) {
         assert null == parent;
         return new HttpController(this, model);
     }

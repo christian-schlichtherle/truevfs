@@ -4,12 +4,12 @@
  */
 package net.truevfs.kernel.spec;
 
+import de.schlichtherle.truecommons.io.Sink;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import net.truevfs.kernel.spec.cio.Entry;
 import net.truevfs.kernel.spec.cio.OutputSocket;
-import net.truevfs.kernel.spec.io.Sink;
 import net.truevfs.kernel.spec.util.BitField;
 
 /**

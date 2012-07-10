@@ -4,12 +4,12 @@
  */
 package net.truevfs.kernel.spec.cio;
 
+import de.schlichtherle.truecommons.io.ChannelInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.spec.io.ChannelInputStream;
 
 /**
  * Abstract base class for input sockets.

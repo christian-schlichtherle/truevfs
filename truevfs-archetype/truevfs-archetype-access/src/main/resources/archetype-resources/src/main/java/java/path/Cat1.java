@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import net.truevfs.access.TFile;
 import net.truevfs.access.TPath;
-import net.truevfs.kernel.spec.io.Streams;
 
 /**
  * This command line utility concatenates the contents of the parameter paths
@@ -32,7 +32,7 @@ public class Cat1 extends Application<IOException> {
             try (InputStream in = Files.newInputStream(path)) {
                 // Much faster: Uses multithreaded I/O with pooled threads and
                 // ring buffers!
-                Streams.cat(in, System.out);
+                TFile.cat(in, System.out);
             }
             
         }

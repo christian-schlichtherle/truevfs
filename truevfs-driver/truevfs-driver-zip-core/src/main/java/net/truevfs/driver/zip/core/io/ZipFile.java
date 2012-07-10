@@ -4,9 +4,8 @@
  */
 package net.truevfs.driver.zip.core.io;
 
-import net.truevfs.kernel.spec.io.AbstractSource;
-import net.truevfs.kernel.spec.io.LockInputStream;
-import net.truevfs.kernel.spec.io.OneTimeSource;
+import de.schlichtherle.truecommons.io.AbstractSource;
+import de.schlichtherle.truecommons.io.OneTimeSource;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,7 +13,6 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
 import static java.nio.file.Files.newByteChannel;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
@@ -23,6 +21,7 @@ import java.util.zip.ZipException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
+import net.truevfs.kernel.spec.io.LockInputStream;
 
 /**
  * Replacement for {@link java.util.zip.ZipFile java.util.zip.ZipFile}.

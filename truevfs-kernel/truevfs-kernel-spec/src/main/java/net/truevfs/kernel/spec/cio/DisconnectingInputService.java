@@ -11,6 +11,8 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.kernel.spec.io.DisconnectingInputStream;
+import net.truevfs.kernel.spec.io.DisconnectingSeekableChannel;
 import net.truevfs.kernel.spec.io.InputClosedException;
 
 /**
@@ -101,20 +103,20 @@ extends DecoratingInputService<E, InputService<E>> {
         @Override
         public InputStream stream(OutputSocket<? extends Entry> peer)
         throws IOException {
-            return new DisconnectingInputStream(socket().stream(peer));
+            return new DisconnectingInputStreamImpl(socket().stream(peer));
         }
 
         @Override
         public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
         throws IOException {
-            return new DisconnectingSeekableChannel(socket().channel(peer));
+            return new DisconnectingSeekableChannelImpl(socket().channel(peer));
         }
     } // Input
 
-    private final class DisconnectingInputStream
-    extends net.truevfs.kernel.spec.io.DisconnectingInputStream {
+    private final class DisconnectingInputStreamImpl
+    extends DisconnectingInputStream {
 
-        DisconnectingInputStream(@WillCloseWhenClosed InputStream in) {
+        DisconnectingInputStreamImpl(@WillCloseWhenClosed InputStream in) {
             super(in);
         }
 
@@ -130,10 +132,10 @@ extends DecoratingInputService<E, InputService<E>> {
         }
     } // DisconnectingInputStream
 
-    private final class DisconnectingSeekableChannel
-    extends net.truevfs.kernel.spec.io.DisconnectingSeekableChannel {
+    private final class DisconnectingSeekableChannelImpl
+    extends DisconnectingSeekableChannel {
 
-        DisconnectingSeekableChannel(@WillCloseWhenClosed SeekableByteChannel channel) {
+        DisconnectingSeekableChannelImpl(@WillCloseWhenClosed SeekableByteChannel channel) {
             super(channel);
         }
 

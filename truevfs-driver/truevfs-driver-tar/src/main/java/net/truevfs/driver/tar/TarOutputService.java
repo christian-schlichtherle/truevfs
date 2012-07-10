@@ -4,6 +4,10 @@
  */
 package net.truevfs.driver.tar;
 
+import de.schlichtherle.truecommons.io.DecoratingOutputStream;
+import de.schlichtherle.truecommons.io.InputException;
+import de.schlichtherle.truecommons.io.Sink;
+import de.schlichtherle.truecommons.io.Streams;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -19,7 +23,7 @@ import net.truevfs.kernel.spec.FsModel;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.truevfs.kernel.spec.cio.*;
-import net.truevfs.kernel.spec.io.*;
+import net.truevfs.kernel.spec.io.DisconnectingOutputStream;
 import static net.truevfs.kernel.spec.util.HashMaps.OVERHEAD_SIZE;
 import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 import net.truevfs.kernel.spec.util.SuppressedExceptionBuilder;

@@ -4,6 +4,10 @@
  */
 package net.truevfs.kernel.spec;
 
+import de.schlichtherle.truecommons.io.DecoratingInputStream;
+import de.schlichtherle.truecommons.io.DecoratingOutputStream;
+import de.schlichtherle.truecommons.io.DecoratingSeekableChannel;
+import de.schlichtherle.truecommons.io.PowerBuffer;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.net.URI;
@@ -24,10 +28,6 @@ import static net.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
 import static net.truevfs.kernel.spec.cio.Entry.Type.FILE;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.truevfs.kernel.spec.cio.*;
-import net.truevfs.kernel.spec.io.DecoratingInputStream;
-import net.truevfs.kernel.spec.io.DecoratingOutputStream;
-import net.truevfs.kernel.spec.io.DecoratingSeekableChannel;
-import net.truevfs.kernel.spec.io.PowerBuffer;
 import net.truevfs.kernel.spec.util.BitField;
 import static net.truevfs.kernel.spec.util.Throwables.contains;
 import static org.junit.Assert.*;
@@ -108,55 +108,94 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     @Test
-    public void testIOPoolMustNotBeNull() {
+    public void testIoPoolMustNotBeNull() {
         assertNotNull(getArchiveDriver().getIoPool());
     }
 
     @Test
-    public void testIOPoolShouldBeConstant() {
+    public void testIoPoolShouldBeConstant() {
         final IoPool<?> p1 = getArchiveDriver().getIoPool();
         final IoPool<?> p2 = getArchiveDriver().getIoPool();
         if (p1 != p2)
             logger.log(Level.WARNING, "{0} returns different I/O buffer pools upon multiple invocations of getPool()!", getArchiveDriver().getClass());
     }
 
+    /*@Test(expected = NullPointerException.class)
+    public void testNewControllerMustNotTolerateNullModel() {
+        getArchiveDriver().newController(newManager(), null, parent);
+    }
+
     @Test(expected = NullPointerException.class)
-    public void testNewInputServiceMustNotTolerateNullModel() throws IOException {
+    public void testNewControllerMustNotTolerateNullParent() {
+        getArchiveDriver().newController(newManager(), model, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNewControllerMustCheckParentMemberMatch1() {
+        getArchiveDriver().newController(newManager(), model.getParent(), null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNewControllerMustCheckParentMemberMatch2() {
+        getArchiveDriver().newController(newManager(), model.getParent(), parent);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testNewControllerMustCheckParentMemberMatch3() {
+        getArchiveDriver().newController(newManager(), model, newController(model));
+    }
+
+    @Test
+    public void testNewControllerMustNotReturnNull() {
+        assertNotNull(getArchiveDriver().newController(newManager(), model, parent));
+    }
+
+    @Test
+    public void testNewControllerMustMeetPostConditions() {
+        final FsController<?> c = getArchiveDriver()
+                .newController(newManager(), model, parent);
+        assertNotNull(c);
+        assertEquals(model.getMountPoint(), c.getModel().getMountPoint());
+        assertSame(parent, c.getParent());
+    }*/
+
+    @Test(expected = NullPointerException.class)
+    public void testNewInputMustNotTolerateNullModel() throws IOException {
         getArchiveDriver().newInput(null, NONE, parent, entry);
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNewInputServiceMustNotTolerateNullParentController() throws IOException {
+    public void testNewInputMustNotTolerateNullParentController() throws IOException {
         getArchiveDriver().newInput(model, NONE, null, entry);
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNewInputServiceMustNotTolerateNullEntryName() throws IOException {
+    public void testNewInputMustNotTolerateNullEntryName() throws IOException {
         getArchiveDriver().newInput(model, NONE, parent, null);
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNewInputServiceMustNotTolerateNullOptions() throws IOException {
+    public void testNewInputMustNotTolerateNullOptions() throws IOException {
         getArchiveDriver().newInput(model, null, parent, entry);
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNewOutputServiceMustNotTolerateNullModel() throws IOException {
+    public void testNewOutputMustNotTolerateNullModel() throws IOException {
         getArchiveDriver().newOutput(null, NONE, parent, entry, null);
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNewOutputServiceMustNotTolerateNullParentController() throws IOException {
+    public void testNewOutputMustNotTolerateNullParentController() throws IOException {
         getArchiveDriver().newOutput(model, NONE, null, entry, null);
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNewOutputServiceMustNotTolerateNullEntryName() throws IOException {
+    public void testNewOutputMustNotTolerateNullEntryName() throws IOException {
         getArchiveDriver().newOutput(model, NONE, parent, null, null);
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNewOutputServiceMustNotTolerateNullOptions() throws IOException {
+    public void testNewOutputMustNotTolerateNullOptions() throws IOException {
         getArchiveDriver().newOutput(model, null, parent, entry, null);
     }
 

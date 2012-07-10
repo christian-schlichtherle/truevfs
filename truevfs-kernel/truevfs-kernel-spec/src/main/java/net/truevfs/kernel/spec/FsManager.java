@@ -23,13 +23,14 @@ public interface FsManager extends Iterable<FsController<? extends FsModel>> {
      * Returns a new thread-safe archive file system controller.
      * This is a pure function without side effects.
      *
+     * @param  <E> the type of the archive entries.
      * @param  driver the archive driver.
      * @param  model the file system model.
      * @param  parent the parent file system controller.
      * @return A new archive file system controller.
      */
-    FsController<? extends FsModel> newController(
-            FsArchiveDriver<? extends FsArchiveEntry> driver,
+    <E extends FsArchiveEntry> FsController<? extends FsModel> newController(
+            FsArchiveDriver<E> driver,
             FsModel model,
             FsController<? extends FsModel> parent);
 
@@ -39,9 +40,9 @@ public interface FsManager extends Iterable<FsController<? extends FsModel>> {
      * this manager, i.e. it gets remembered for future lookup and
      * {@link #sync synchronization}.
      *
-     * @param  mountPoint the mount point of the file system.
      * @param  driver the composite file system driver which shall get used to
      *         create a new file system controller if required.
+     * @param  mountPoint the mount point of the file system.
      * @return The thread-safe file system controller for the given mount point.
      */
     FsController<? extends FsModel> controller(
