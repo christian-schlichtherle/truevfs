@@ -44,8 +44,7 @@ package object impl {
     output
   }
 
-  private[impl] def asFsController[M <: FsModel](
-    controller: Controller[M],
-    parent: FsController[_ <: FsModel]) =
+  private[impl] def asFsController[M <: FsModel]
+  (controller: Controller[M], parent: AnyController) =
     new ControllerAdapter(controller, parent)
 }
