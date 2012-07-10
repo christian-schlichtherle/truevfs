@@ -4,6 +4,7 @@
  */
 package net.truevfs.kernel.impl
 
+import de.schlichtherle.truecommons.io._
 import edu.umd.cs.findbugs.annotations._
 import java.io._
 import java.nio.channels._
@@ -303,7 +304,7 @@ private final class CacheEntry private (
     extends DecoratingInputStream(in) with CacheInputResource
 
     private final class CacheReadOnlyChannel(channel: SeekableByteChannel)
-    extends DecoratingReadOnlyChannel(channel) with CacheInputResource
+    extends ReadOnlyChannel(channel) with CacheInputResource
 
     private final class CacheOutputStream(out: OutputStream)
     extends DecoratingOutputStream(out) with CacheOutputResource

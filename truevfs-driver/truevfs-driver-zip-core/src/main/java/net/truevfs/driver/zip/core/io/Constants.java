@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.zip.core.io;
 
-import net.truevfs.kernel.spec.io.Streams;
+import de.schlichtherle.truecommons.io.Streams;
 import java.nio.charset.Charset;
 
 /**

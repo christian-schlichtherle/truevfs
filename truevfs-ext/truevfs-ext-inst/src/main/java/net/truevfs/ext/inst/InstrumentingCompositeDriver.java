@@ -29,10 +29,10 @@ public class InstrumentingCompositeDriver implements FsCompositeDriver {
     }
 
     @Override
-    public FsController<?> newController(
+    public FsController<? extends FsModel> newController(
             final FsManager manager,
             final FsModel model,
-            final @CheckForNull FsController<?> parent) {
+            final @CheckForNull FsController<? extends FsModel> parent) {
         assert null == parent
                     ? null == model.getParent()
                     : parent.getModel().equals(model.getParent());

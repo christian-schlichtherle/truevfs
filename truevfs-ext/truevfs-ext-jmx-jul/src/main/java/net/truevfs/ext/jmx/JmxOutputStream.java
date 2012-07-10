@@ -4,12 +4,12 @@
  */
 package net.truevfs.ext.jmx;
 
+import de.schlichtherle.truecommons.io.DecoratingOutputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.truevfs.kernel.spec.io.DecoratingOutputStream;
 
 /**
  * @author  Christian Schlichtherle

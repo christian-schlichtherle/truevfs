@@ -4,12 +4,7 @@
  */
 package net.truevfs.driver.zip.core.io;
 
-import net.truevfs.kernel.spec.io.Source;
-import net.truevfs.kernel.spec.io.IntervalReadOnlyChannel;
-import net.truevfs.kernel.spec.io.ChannelInputStream;
-import net.truevfs.kernel.spec.io.DecoratingReadOnlyChannel;
-import net.truevfs.kernel.spec.io.BufferedReadOnlyChannel;
-import net.truevfs.kernel.spec.io.PowerBuffer;
+import de.schlichtherle.truecommons.io.*;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -1066,7 +1061,7 @@ implements Closeable, Iterable<E> {
      * Note that when an object of this class gets closed, the decorated
      * read-only channel, i.e. the raw file does NOT get closed!
      */
-    private final class EntryReadOnlyChannel extends DecoratingReadOnlyChannel {
+    private final class EntryReadOnlyChannel extends ReadOnlyChannel {
         boolean closed;
 
         @CreatesObligation

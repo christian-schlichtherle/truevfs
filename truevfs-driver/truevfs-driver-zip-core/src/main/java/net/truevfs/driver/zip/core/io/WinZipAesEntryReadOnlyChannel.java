@@ -4,15 +4,9 @@
  */
 package net.truevfs.driver.zip.core.io;
 
-import net.truevfs.driver.zip.core.crypto.CipherReadOnlyChannel;
-import net.truevfs.driver.zip.core.crypto.SeekableBlockCipher;
-import static net.truevfs.driver.zip.core.io.ExtraField.WINZIP_AES_ID;
-import static net.truevfs.driver.zip.core.io.WinZipAesEntryOutputStream.*;
-import net.truevfs.kernel.spec.io.DecoratingReadOnlyChannel;
-import net.truevfs.kernel.spec.io.IntervalReadOnlyChannel;
-import net.truevfs.kernel.spec.io.PowerBuffer;
-import net.truevfs.key.param.AesKeyStrength;
-import net.truevfs.key.util.SuspensionPenalty;
+import de.schlichtherle.truecommons.io.IntervalReadOnlyChannel;
+import de.schlichtherle.truecommons.io.PowerBuffer;
+import de.schlichtherle.truecommons.io.ReadOnlyChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.EOFException;
 import java.io.IOException;
@@ -21,6 +15,12 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.driver.zip.core.crypto.CipherReadOnlyChannel;
+import net.truevfs.driver.zip.core.crypto.SeekableBlockCipher;
+import static net.truevfs.driver.zip.core.io.ExtraField.WINZIP_AES_ID;
+import static net.truevfs.driver.zip.core.io.WinZipAesEntryOutputStream.*;
+import net.truevfs.key.param.AesKeyStrength;
+import net.truevfs.key.util.SuspensionPenalty;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.digests.SHA1Digest;
@@ -42,7 +42,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
-final class WinZipAesEntryReadOnlyChannel extends DecoratingReadOnlyChannel {
+final class WinZipAesEntryReadOnlyChannel extends ReadOnlyChannel {
 
     private final ByteBuffer authenticationCode;
 

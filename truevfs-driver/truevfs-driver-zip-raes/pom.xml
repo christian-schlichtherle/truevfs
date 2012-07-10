@@ -65,5 +65,10 @@
             <artifactId>truevfs-key</artifactId>
             <type>test-jar</type>
         </dependency>
+        <dependency>
+            <groupId>de.schlichtherle.truecommons</groupId>
+            <artifactId>truecommons-io</artifactId>
+            <type>test-jar</type>
+        </dependency>
     </dependencies>
 </project>

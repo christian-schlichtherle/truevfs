@@ -10,6 +10,6 @@ import net.truevfs.kernel.spec.util.Link._
 /**
   * @author Christian Schlichtherle
   */
-class ArchiveManagerTest extends FsManagerTestSuite {
+class DefaultManagerTest extends FsManagerTestSuite {
   override def newManager(tµpe: Type): FsManager = new DefaultManager(tµpe)
 }

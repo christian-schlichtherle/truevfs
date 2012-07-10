@@ -4,6 +4,9 @@
  */
 package net.truevfs.driver.zip.core.io;
 
+import de.schlichtherle.truecommons.io.DecoratingOutputStream;
+import de.schlichtherle.truecommons.io.LittleEndianOutputStream;
+import de.schlichtherle.truecommons.io.Sink;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,9 +29,6 @@ import static net.truevfs.driver.zip.core.io.WinZipAesEntryExtraField.VV_AE_2;
 import static net.truevfs.driver.zip.core.io.WinZipAesUtils.overhead;
 import static net.truevfs.driver.zip.core.io.ZipEntry.*;
 import static net.truevfs.driver.zip.core.io.ZipParametersUtils.parameters;
-import net.truevfs.kernel.spec.io.DecoratingOutputStream;
-import net.truevfs.kernel.spec.io.LittleEndianOutputStream;
-import net.truevfs.kernel.spec.io.Sink;
 import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 import net.truevfs.key.param.AesKeyStrength;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;

@@ -4,11 +4,7 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.kernel.spec.FsArchiveDriver;
-import net.truevfs.kernel.spec.FsSyncException;
-import net.truevfs.kernel.spec.FsSyncWarningException;
-import net.truevfs.kernel.spec.FsResourceOpenException;
-import net.truevfs.kernel.spec.FsController;
+import de.schlichtherle.truecommons.io.InputException;
 import static java.io.File.separatorChar;
 import java.io.*;
 import java.lang.ref.Reference;
@@ -26,8 +22,8 @@ import static net.truevfs.kernel.spec.FsAccessOption.GROW;
 import static net.truevfs.kernel.spec.FsSyncOption.CLEAR_CACHE;
 import static net.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
 import static net.truevfs.kernel.spec.FsSyncOptions.SYNC;
+import net.truevfs.kernel.spec.*;
 import net.truevfs.kernel.spec.io.InputClosedException;
-import net.truevfs.kernel.spec.io.InputException;
 import net.truevfs.kernel.spec.io.OutputClosedException;
 import net.truevfs.kernel.spec.util.BitField;
 import static net.truevfs.kernel.spec.util.ConcurrencyUtils.NUM_IO_THREADS;

@@ -4,6 +4,9 @@
  */
 package net.truevfs.samples.raes;
 
+import de.schlichtherle.truecommons.io.AbstractSink;
+import de.schlichtherle.truecommons.io.AbstractSource;
+import de.schlichtherle.truecommons.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,9 +16,6 @@ import java.nio.file.Path;
 import net.truevfs.driver.zip.raes.KeyManagerRaesParameters;
 import net.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import net.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
-import net.truevfs.kernel.spec.io.AbstractSink;
-import net.truevfs.kernel.spec.io.AbstractSource;
-import net.truevfs.kernel.spec.io.Streams;
 import net.truevfs.key.sl.KeyManagerLocator;
 
 /**

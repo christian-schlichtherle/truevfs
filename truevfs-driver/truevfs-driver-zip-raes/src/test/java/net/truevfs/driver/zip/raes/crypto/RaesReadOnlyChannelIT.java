@@ -4,10 +4,10 @@
  */
 package net.truevfs.driver.zip.raes.crypto;
 
-import net.truevfs.kernel.spec.io.AbstractSink;
-import net.truevfs.kernel.spec.io.AbstractSource;
-import net.truevfs.kernel.spec.io.ReadOnlyChannelITSuite;
-import net.truevfs.kernel.spec.io.Streams;
+import de.schlichtherle.truecommons.io.AbstractSink;
+import de.schlichtherle.truecommons.io.AbstractSource;
+import de.schlichtherle.truecommons.io.ReadOnlyChannelITSuite;
+import de.schlichtherle.truecommons.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

@@ -4,12 +4,12 @@
  */
 package net.truevfs.driver.zip.raes.sample;
 
+import net.truevfs.access.TArchiveDetector;
+import net.truevfs.access.TConfig;
 import net.truevfs.driver.zip.raes.SafeZipRaesDriver;
 import net.truevfs.driver.zip.raes.crypto.RaesKeyException;
 import net.truevfs.driver.zip.raes.crypto.RaesParameters;
 import net.truevfs.driver.zip.raes.crypto.Type0RaesParameters;
-import net.truevfs.access.TArchiveDetector;
-import net.truevfs.access.TConfig;
 import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsDriverProvider;
 import net.truevfs.kernel.spec.FsModel;

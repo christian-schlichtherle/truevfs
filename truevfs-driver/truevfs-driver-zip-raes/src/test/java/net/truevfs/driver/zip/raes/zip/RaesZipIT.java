@@ -4,6 +4,9 @@
  */
 package net.truevfs.driver.zip.raes.zip;
 
+import de.schlichtherle.truecommons.io.AbstractSource;
+import de.schlichtherle.truecommons.io.OneTimeSink;
+import de.schlichtherle.truecommons.io.OneTimeSource;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -18,9 +21,6 @@ import net.truevfs.driver.zip.raes.crypto.MockType0RaesParameters;
 import net.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import net.truevfs.driver.zip.raes.crypto.RaesParameters;
 import net.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
-import net.truevfs.kernel.spec.io.AbstractSource;
-import net.truevfs.kernel.spec.io.OneTimeSink;
-import net.truevfs.kernel.spec.io.OneTimeSource;
         
 /**
  * Tests compression and encryption of data.

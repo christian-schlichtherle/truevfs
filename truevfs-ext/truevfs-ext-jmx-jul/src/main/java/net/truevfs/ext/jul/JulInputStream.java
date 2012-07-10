@@ -4,6 +4,7 @@
  */
 package net.truevfs.ext.jul;
 
+import de.schlichtherle.truecommons.io.DecoratingInputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -13,7 +14,6 @@ import net.truevfs.kernel.spec.cio.Entry;
 import net.truevfs.kernel.spec.cio.InputSocket;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.OutputSocket;
-import net.truevfs.kernel.spec.io.DecoratingInputStream;
 
 /**
  * @author Christian Schlichtherle

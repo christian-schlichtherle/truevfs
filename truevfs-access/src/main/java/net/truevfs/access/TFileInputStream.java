@@ -4,10 +4,10 @@
  */
 package net.truevfs.access;
 
+import de.schlichtherle.truecommons.io.DecoratingInputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.spec.io.DecoratingInputStream;
 
 /**
  * A replacement for the class {@link FileInputStream} for reading plain old

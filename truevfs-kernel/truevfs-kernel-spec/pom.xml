@@ -24,6 +24,13 @@
         the file system drivers do not need to take care of this.
     </description>
 
+    <dependencies>
+        <dependency>
+            <groupId>de.schlichtherle.truecommons</groupId>
+            <artifactId>truecommons-io</artifactId>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>

@@ -4,13 +4,13 @@
  */
 package net.truevfs.driver.zip.raes.crypto;
 
-import net.truevfs.kernel.spec.io.DecoratingOutputStream;
-import net.truevfs.kernel.spec.io.Sink;
-import net.truevfs.key.param.KeyStrength;
+import de.schlichtherle.truecommons.io.DecoratingOutputStream;
+import de.schlichtherle.truecommons.io.Sink;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.key.param.KeyStrength;
 import org.bouncycastle.crypto.Mac;
 
 /**

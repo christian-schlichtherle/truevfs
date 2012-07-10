@@ -4,6 +4,7 @@
  */
 package net.truevfs.access;
 
+import de.schlichtherle.truecommons.io.Streams;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -29,7 +30,6 @@ import net.truevfs.kernel.spec.cio.Entry.Size;
 import static net.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
 import static net.truevfs.kernel.spec.cio.Entry.Type.FILE;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.spec.io.Streams;
 import net.truevfs.kernel.spec.util.BitField;
 import net.truevfs.kernel.spec.util.PathSplitter;
 import net.truevfs.kernel.spec.util.Paths;

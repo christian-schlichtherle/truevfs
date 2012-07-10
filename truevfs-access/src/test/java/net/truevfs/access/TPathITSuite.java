@@ -4,6 +4,7 @@
  */
 package net.truevfs.access;
 
+import de.schlichtherle.truecommons.io.Streams;
 import static java.io.File.separatorChar;
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -24,7 +25,6 @@ import static net.truevfs.kernel.spec.FsSyncOptions.SYNC;
 import net.truevfs.kernel.spec.FsSyncWarningException;
 import net.truevfs.kernel.spec.io.InputClosedException;
 import net.truevfs.kernel.spec.io.OutputClosedException;
-import net.truevfs.kernel.spec.io.Streams;
 import net.truevfs.kernel.spec.util.BitField;
 import static net.truevfs.kernel.spec.util.ConcurrencyUtils.NUM_IO_THREADS;
 import net.truevfs.kernel.spec.util.ConcurrencyUtils.TaskFactory;

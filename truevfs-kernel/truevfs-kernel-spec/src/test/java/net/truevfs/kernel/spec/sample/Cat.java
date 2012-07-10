@@ -4,16 +4,16 @@
  */
 package net.truevfs.kernel.spec.sample;
 
+import de.schlichtherle.truecommons.io.Streams;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import net.truevfs.kernel.spec.sl.FsDriverLocator;
-import net.truevfs.kernel.spec.sl.FsManagerLocator;
 import net.truevfs.kernel.spec.*;
 import net.truevfs.kernel.spec.cio.InputSocket;
-import net.truevfs.kernel.spec.io.Streams;
+import net.truevfs.kernel.spec.sl.FsDriverLocator;
+import net.truevfs.kernel.spec.sl.FsManagerLocator;
 import net.truevfs.kernel.spec.util.BitField;
 
 /**

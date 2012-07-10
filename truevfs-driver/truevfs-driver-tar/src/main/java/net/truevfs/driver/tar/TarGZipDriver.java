@@ -4,6 +4,9 @@
  */
 package net.truevfs.driver.tar;
 
+import de.schlichtherle.truecommons.io.AbstractSink;
+import de.schlichtherle.truecommons.io.AbstractSource;
+import de.schlichtherle.truecommons.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,9 +18,6 @@ import net.truevfs.kernel.spec.*;
 import net.truevfs.kernel.spec.cio.InputService;
 import net.truevfs.kernel.spec.cio.MultiplexingOutputService;
 import net.truevfs.kernel.spec.cio.OutputService;
-import net.truevfs.kernel.spec.io.AbstractSink;
-import net.truevfs.kernel.spec.io.AbstractSource;
-import net.truevfs.kernel.spec.io.Streams;
 import net.truevfs.kernel.spec.util.BitField;
 
 /**

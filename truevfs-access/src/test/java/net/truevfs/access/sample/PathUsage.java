@@ -4,14 +4,14 @@
  */
 package net.truevfs.access.sample;
 
-import net.truevfs.access.TVFS;
-import net.truevfs.kernel.spec.FsSyncException;
-import net.truevfs.kernel.spec.FsSyncWarningException;
-import net.truevfs.kernel.spec.io.Streams;
-import net.truevfs.access.TPath;
+import de.schlichtherle.truecommons.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import net.truevfs.access.TPath;
+import net.truevfs.access.TVFS;
+import net.truevfs.kernel.spec.FsSyncException;
+import net.truevfs.kernel.spec.FsSyncWarningException;
 
 /**
  * A collection of code snippets to demonstrate the usage of the API in the

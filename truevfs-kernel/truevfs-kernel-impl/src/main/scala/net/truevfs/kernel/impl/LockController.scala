@@ -4,6 +4,7 @@
  */
 package net.truevfs.kernel.impl
 
+import de.schlichtherle.truecommons.io._
 import net.truevfs.kernel.spec._
 import net.truevfs.kernel.spec._
 import net.truevfs.kernel.spec.cio._

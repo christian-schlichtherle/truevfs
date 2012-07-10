@@ -4,12 +4,9 @@
  */
 package net.truevfs.driver.zip.raes.crypto;
 
-import static net.truevfs.driver.zip.raes.crypto.Constants.HEADER_MIN_LEN;
-import static net.truevfs.driver.zip.raes.crypto.Constants.SIGNATURE;
-import net.truevfs.kernel.spec.io.DecoratingReadOnlyChannel;
-import net.truevfs.kernel.spec.io.PowerBuffer;
-import net.truevfs.kernel.spec.io.Source;
-import net.truevfs.key.param.AesKeyStrength;
+import de.schlichtherle.truecommons.io.PowerBuffer;
+import de.schlichtherle.truecommons.io.ReadOnlyChannel;
+import de.schlichtherle.truecommons.io.Source;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.EOFException;
 import java.io.IOException;
@@ -17,6 +14,9 @@ import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
+import static net.truevfs.driver.zip.raes.crypto.Constants.HEADER_MIN_LEN;
+import static net.truevfs.driver.zip.raes.crypto.Constants.SIGNATURE;
+import net.truevfs.key.param.AesKeyStrength;
 
 /**
  * This class implements a {@link SeekableByteChannel} for random read-only
@@ -50,7 +50,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public abstract class RaesReadOnlyChannel extends DecoratingReadOnlyChannel {
+public abstract class RaesReadOnlyChannel extends ReadOnlyChannel {
 
     /**
      * Creates a new RAES read-only channel.

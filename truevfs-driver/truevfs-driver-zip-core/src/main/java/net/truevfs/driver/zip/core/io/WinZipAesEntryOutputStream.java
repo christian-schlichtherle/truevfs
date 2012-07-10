@@ -4,14 +4,14 @@
  */
 package net.truevfs.driver.zip.core.io;
 
-import net.truevfs.driver.zip.core.crypto.CipherOutputStream;
-import net.truevfs.kernel.spec.io.DecoratingOutputStream;
-import net.truevfs.kernel.spec.io.LittleEndianOutputStream;
-import net.truevfs.key.param.KeyStrength;
+import de.schlichtherle.truecommons.io.DecoratingOutputStream;
+import de.schlichtherle.truecommons.io.LittleEndianOutputStream;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.driver.zip.core.crypto.CipherOutputStream;
+import net.truevfs.key.param.KeyStrength;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
