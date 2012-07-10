@@ -288,6 +288,8 @@ public interface FsController<M extends FsModel> {
      * If this is not a federated file system, i.e. if its not a member of a
      * parent file system, then nothing happens.
      * Otherwise, the state of this file system controller is reset.
+     * <p>
+     * An implementation may ignore calls to this method if its stateless.
      *
      * @param  options the options for synchronizing the file system.
      * @throws FsSyncWarningException if <em>only</em> warning conditions

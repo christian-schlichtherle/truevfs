@@ -41,6 +41,9 @@ public interface FsModel {
      * federated file system has been modified so that the
      * corresponding {@link FsController} must not get discarded until
      * the next call to {@link FsController#sync sync}.
+     * <p>
+     * An implementation may always return {@code false} if the associated
+     * file system controller is stateless.
      * 
      * @return {@code true} if and only if some state associated with the
      *         federated file system has been modified so that the
@@ -51,10 +54,13 @@ public interface FsModel {
 
     /**
      * Sets the value of the property {@link #isTouched() touched}.
+     * Only file system controllers should call this method in order to
+     * register themselves for a call their {@link FsController#sync} method.
+     * <p>
+     * An implementation may ignore calls to this method if the associated
+     * file system controller is stateless.
      *
-     * @param  touched the new value of this property.
-     * @throws UnsupportedOperationException If the file system is not
-     *         federated, i.e. if it does not have a parent file system.
+     * @param touched the new value of this property.
      */
     void setTouched(boolean touched);
 }
