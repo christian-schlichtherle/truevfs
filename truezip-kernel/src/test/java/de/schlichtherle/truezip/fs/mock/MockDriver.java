@@ -7,17 +7,19 @@ package de.schlichtherle.truezip.fs.mock;
 import de.schlichtherle.truezip.fs.FsController;
 import de.schlichtherle.truezip.fs.FsDriver;
 import de.schlichtherle.truezip.fs.FsModel;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 public final class MockDriver extends FsDriver {
 
     @Override
-    public FsController<?>
-    newController(FsModel model, FsController<?> parent) {
+    public FsController<?> newController(
+            final FsModel model,
+            final @CheckForNull FsController<?> parent) {
         return new MockController(model, parent, null);
     }
 }

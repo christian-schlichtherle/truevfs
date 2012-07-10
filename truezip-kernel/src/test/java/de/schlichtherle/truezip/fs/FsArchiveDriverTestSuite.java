@@ -4,8 +4,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.FsArchiveDriver;
-import de.schlichtherle.truezip.fs.FsArchiveEntry;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
@@ -13,7 +11,6 @@ import static de.schlichtherle.truezip.entry.Entry.Size.STORAGE;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import de.schlichtherle.truezip.entry.EntryContainer;
-import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.fs.mock.MockController;
 import de.schlichtherle.truezip.io.DecoratingInputStream;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
@@ -84,45 +81,6 @@ extends FsArchiveDriverTestBase<D> {
         final IOPool<?> p2 = getArchiveDriver().getPool();
         if (p1 != p2)
             logger.log(Level.WARNING, "{0} returns different I/O buffer pools upon multiple invocations of getPool()!", getArchiveDriver().getClass());
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testNewControllerMustNotTolerateNullModel() {
-        getArchiveDriver().newController(null, parent);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void testNewControllerMustNotTolerateNullParent() {
-        getArchiveDriver().newController(model, null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testNewControllerMustCheckParentMemberMatch1() {
-        getArchiveDriver().newController(model.getParent(), null);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testNewControllerMustCheckParentMemberMatch2() {
-        getArchiveDriver().newController(model.getParent(), parent);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testNewControllerMustCheckParentMemberMatch3() {
-        getArchiveDriver().newController(model, newController(model));
-    }
-
-    @Test
-    public void testNewControllerMustNotReturnNull() {
-        assertNotNull(getArchiveDriver().newController(model, parent));
-    }
-
-    @Test
-    public void testNewControllerMustMeetPostConditions() {
-        final FsController<?> c = getArchiveDriver()
-                .newController(model, parent);
-        assertNotNull(c);
-        assertEquals(model.getMountPoint(), c.getModel().getMountPoint());
-        assertSame(parent, c.getParent());
     }
 
     @Test
@@ -451,14 +409,14 @@ extends FsArchiveDriverTestBase<D> {
 
     private static FsModel newArchiveModel() {
         final FsModel parent = newNonArchiveModel();
-        return new FsDefaultModel(
+        return new FsTestModel(
                 FsMountPoint.create(URI.create(
                     "scheme:" + parent.getMountPoint() + name + "!/")),
                 parent);
     }
 
     private static FsModel newNonArchiveModel() {
-        return new FsDefaultModel(
+        return new FsTestModel(
                 FsMountPoint.create(URI.create("file:/")),
                 null);
     }

@@ -19,7 +19,7 @@ public class FsDefaultModelTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithNull() {
         try {
-            new FsDefaultModel(null, null);
+            new FsTestModel(null, null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -32,7 +32,7 @@ public class FsDefaultModelTest {
             { "foo:/bar/" },
         }) {
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[0]));
-            final FsModel model = new FsDefaultModel(mountPoint, null);
+            final FsModel model = new FsTestModel(mountPoint, null);
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
             assertThat(model.getMountPoint().getPath(), nullValue());
             assertThat(model.getParent(), nullValue());
@@ -49,9 +49,9 @@ public class FsDefaultModelTest {
         }) {
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[0]));
             final FsMountPoint parentMountPoint = FsMountPoint.create(URI.create(params[1]));
-            final FsModel parent = new FsDefaultModel(parentMountPoint, null);
+            final FsModel parent = new FsTestModel(parentMountPoint, null);
             try {
-                new FsDefaultModel(mountPoint, parent);
+                new FsTestModel(mountPoint, parent);
                 fail(params[0]);
             } catch (RuntimeException expected) {
             }
@@ -69,7 +69,7 @@ public class FsDefaultModelTest {
             final FsEntryName parentEntryName = FsEntryName.create(URI.create(params[3]));
             final FsPath path = FsPath.create(URI.create(params[4]));
             FsModel parent = newModel(parentMountPoint);
-            FsModel model = new FsDefaultModel(mountPoint, parent);
+            FsModel model = new FsTestModel(mountPoint, parent);
 
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
             assertThat(model.getParent(), sameInstance(parent));
@@ -80,7 +80,7 @@ public class FsDefaultModelTest {
     }
 
     private static FsModel newModel(final FsMountPoint mountPoint) {
-        return new FsDefaultModel(  mountPoint,
+        return new FsTestModel(  mountPoint,
                                     null == mountPoint.getParent()
                                         ? null
                                         : newModel(mountPoint.getParent()));

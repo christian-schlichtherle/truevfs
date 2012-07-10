@@ -6,7 +6,9 @@ package de.schlichtherle.truezip.fs.inst;
 
 import de.schlichtherle.truezip.fs.FsCompositeDriver;
 import de.schlichtherle.truezip.fs.FsController;
+import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsModel;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -27,8 +29,13 @@ public class InstrumentingCompositeDriver implements FsCompositeDriver {
     }
 
     @Override
-    public FsController<?> newController(   final FsModel model,
-                                            final FsController<?> parent) {
-        return director.instrument(delegate.newController(director.instrument(model, this), parent), this);
+    public FsController<? extends FsModel> newController(
+            final FsManager manager,
+            final FsModel model,
+            final @CheckForNull FsController<? extends FsModel> parent) {
+        assert null == parent
+                    ? null == model.getParent()
+                    : parent.getModel().equals(model.getParent());
+        return director.instrument(delegate.newController(manager, director.instrument(model, this), parent), this);
     }
 }

@@ -22,6 +22,8 @@ public final class FsSimpleCompositeDriver extends FsAbstractCompositeDriver {
      * Constructs a new file system default driver which will query the given
      * file system driver provider for an appropriate file system driver for
      * the scheme of a given mount point.
+     * 
+     * @param provider the driver provider.
      */
     public FsSimpleCompositeDriver(final FsDriverProvider provider) {
         this.drivers = provider.get(); // dedicated immutable map!
@@ -29,6 +31,7 @@ public final class FsSimpleCompositeDriver extends FsAbstractCompositeDriver {
     }
 
     @Override
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
     public Map<FsScheme, FsDriver> get() {
         return drivers;
     }

@@ -3543,10 +3543,10 @@ public final class TFile extends File {
      * should not concurrently access this archive file or any of its entries!
      * <p>
      * This operation performs in the order of <i>O(s)</i>, where <i>s</i> is
-     * the total size of the archive file either before (worst case) or after
+     * the total getSize of the archive file either before (worst case) or after
      * (best case) compacting it.
      * If this archive file has already been mounted, then <i>s</i> is the
-     * total size of the archive file after compacting it (best case).
+     * total getSize of the archive file after compacting it (best case).
      * Otherwise, the definition of <i>s</i> is specific to the archive file
      * system driver.
      * Usually, if the archive file contains a central directory, you could

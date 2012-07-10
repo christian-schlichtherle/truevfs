@@ -4,7 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import javax.annotation.Nullable;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -12,30 +12,11 @@ import javax.annotation.concurrent.Immutable;
  * <p>
  * Subclasses must be thread-safe and should be immutable!
  * 
+ * @see    FsCompositeDriver
  * @author Christian Schlichtherle
  */
 @Immutable
 public abstract class FsDriver {
-
-    /**
-     * Returns a new thread-safe file system controller for the mount point of
-     * the given file system model and parent file system controller.
-     * <p>
-     * When called, you may safely assume the following precondition:
-     * <pre>{@code
-     * assert null == model.getParent()
-     *         ? null == parent
-     *         : model.getParent().equals(parent.getModel())
-     * }</pre>
-     *
-     * @param  model the file system model.
-     * @param  parent the nullable parent file system controller.
-     * @return A new thread-safe file system controller for the given mount
-     *         point and parent file system controller.
-     * @see    FsCompositeDriver#newController
-     */
-    public abstract FsController<?>
-    newController(FsModel model, @Nullable FsController<?> parent);
 
     /**
      * Returns {@code true} iff this file system driver implements a federated
@@ -62,6 +43,55 @@ public abstract class FsDriver {
     public int getPriority() {
         return 0;
     }
+
+    /**
+     * Returns a new thread-safe file system controller for the mount point of
+     * the given file system model and nullable parent file system controller.
+     * <p>
+     * When called, you may assert the following precondition:
+     * <pre>{@code
+     * assert null == parent
+     *         ? null == model.getParent()
+     *         : parent.getModel().equals(model.getParent())
+     * }</pre>
+     * <p>
+     * The implementation in the class {@link FsDriver} simply forwards the
+     * call to {@link #newController(FsModel, FsController)}.
+     *
+     * @param  manager the file system manager for the new controller.
+     * @param  model the file system model.
+     * @param  parent the nullable parent file system controller.
+     * @return A new thread-safe file system controller for the given mount
+     *         point and nullable parent file system controller.
+     * @see    FsCompositeDriver#newController
+     * @since  TrueZIP 7.6
+     */
+    public FsController<? extends FsModel> newController(
+            FsManager manager,
+            FsModel model,
+            @CheckForNull FsController<? extends FsModel> parent) {
+        return newController(model, parent);
+    }
+
+    /**
+     * Returns a new thread-safe file system controller for the mount point of
+     * the given file system model and nullable parent file system controller.
+     * <p>
+     * When called, you may assert the following precondition:
+     * <pre>{@code
+     * assert null == parent
+     *         ? null == model.getParent()
+     *         : parent.getModel().equals(model.getParent())
+     * }</pre>
+     *
+     * @param  model the file system model.
+     * @param  parent the nullable parent file system controller.
+     * @return A new thread-safe file system controller for the given mount
+     *         point and nullable parent file system controller.
+     * @see    FsCompositeDriver#newController
+     */
+    public abstract FsController<?>
+    newController(FsModel model, @CheckForNull FsController<?> parent);
 
     /**
      * Returns a string representation of this object for debugging and logging

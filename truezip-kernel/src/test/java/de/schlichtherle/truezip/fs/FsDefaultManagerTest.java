@@ -7,7 +7,7 @@ package de.schlichtherle.truezip.fs;
 import de.schlichtherle.truezip.util.Link.Type;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public class FsDefaultManagerTest extends FsManagerTestSuite {
 

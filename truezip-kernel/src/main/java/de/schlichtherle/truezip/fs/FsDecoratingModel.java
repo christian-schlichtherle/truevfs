@@ -24,19 +24,8 @@ public abstract class FsDecoratingModel<M extends FsModel> extends FsModel {
      * @param delegate the file system model to decorate.
      */
     protected FsDecoratingModel(final M delegate) {
-        if (null == delegate)
-            throw new NullPointerException();
+        super(delegate.getMountPoint(), delegate.getParent());
         this.delegate = delegate;
-    }
-
-    @Override
-    public FsMountPoint getMountPoint() {
-        return delegate.getMountPoint();
-    }
-
-    @Override
-    public FsModel getParent() {
-        return delegate.getParent();
     }
 
     @Override
