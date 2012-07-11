@@ -9,12 +9,14 @@ import javax.annotation.concurrent.Immutable;
 
 /**
  * Indicates a condition which requires non-local control flow.
+ * Note that this class is an {@code Error} rather than a
+ * {@link RuntimeException} just to prevent it from being accidentally catched.
  * 
  * @author Christian Schlichtherle
  */
 @Immutable
 @SuppressWarnings("serial") // serializing control flow exceptions is nonsense!
-public class ControlFlowException extends RuntimeException {
+public class ControlFlowException extends Error {
 
     private static final String TRACEABLE_PROPERTY_KEY
             = ControlFlowException.class.getName() + ".traceable";

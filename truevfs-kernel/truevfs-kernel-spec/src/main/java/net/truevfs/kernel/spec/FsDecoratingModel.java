@@ -30,13 +30,13 @@ extends FsAbstractModel {
     }
 
     @Override
-    public boolean isTouched() {
-        return model.isTouched();
+    public boolean isMounted() {
+        return model.isMounted();
     }
 
     @Override
-    public void setTouched(boolean touched) {
-        model.setTouched(touched);
+    public void setMounted(boolean touched) {
+        model.setMounted(touched);
     }
 
     /**

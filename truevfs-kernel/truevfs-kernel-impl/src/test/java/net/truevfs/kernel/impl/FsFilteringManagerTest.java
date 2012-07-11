@@ -7,15 +7,8 @@ package net.truevfs.kernel.impl;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import net.truevfs.kernel.driver.mock.MockDriverService;
-import net.truevfs.kernel.spec.FsCompositeDriver;
-import net.truevfs.kernel.spec.FsController;
-import net.truevfs.kernel.spec.FsFilteringManager;
-import net.truevfs.kernel.spec.FsManager;
-import net.truevfs.kernel.spec.FsManagerTestSuite;
-import net.truevfs.kernel.spec.FsMountPoint;
-import net.truevfs.kernel.spec.FsSimpleCompositeDriver;
+import net.truevfs.kernel.spec.*;
 import net.truevfs.kernel.spec.util.Link.Type;
 import static net.truevfs.kernel.spec.util.Link.Type.STRONG;
 import static org.hamcrest.CoreMatchers.is;
@@ -56,7 +49,7 @@ public class FsFilteringManagerTest extends FsManagerTestSuite {
                 manager.controller(driver, FsMountPoint.create(URI.create(param)));
             assertThat(manager.size(), is(params[1].length));
 
-            final Set<FsMountPoint> set = new HashSet<FsMountPoint>();
+            final Set<FsMountPoint> set = new HashSet<>();
             for (final String param : params[2])
                 set.add(FsMountPoint.create(URI.create(param)));
 

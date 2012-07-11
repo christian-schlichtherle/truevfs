@@ -417,7 +417,7 @@ extends Iterable[FsCovariantEntry[E]] {
 
   /** Sets the archive file system touch listener.
     *
-    * @param  listener the listener for archive file system events.
+    * @param  listener the touch listener.
     * @throws IllegalStateException if `listener` is not null and the
     *         touch listener has already been set.
     */

@@ -15,9 +15,8 @@ import net.truevfs.kernel.spec.FsSyncException;
  */
 public interface JmxModelViewMXBean {
     String getMountPoint();
-    boolean isTouched();
-    @Nullable JmxModelViewMXBean getModelOfParent();
-    String getMountPointOfParent();
+    boolean isMounted();
+    String getParentMountPoint();
     long getSizeOfData();
     long getSizeOfStorage();
     @Nullable String getTimeWritten();

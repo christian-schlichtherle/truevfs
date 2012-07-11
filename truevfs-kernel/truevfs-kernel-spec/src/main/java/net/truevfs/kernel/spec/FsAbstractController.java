@@ -38,10 +38,10 @@ extends UniqueObject implements FsController<M> {
     }
 
     /**
-     * Returns the mount point of this (federated virtual) file system as
+     * Returns the mount point of this (virtual) file system as
      * defined by the {@linkplain #getModel() model}.
      * 
-     * @return The mount point of this (federated virtual) file system as
+     * @return The mount point of this (virtual) file system as
      *         defined by the {@linkplain #getModel() model}.
      */
     public final FsMountPoint getMountPoint() {
@@ -49,25 +49,25 @@ extends UniqueObject implements FsController<M> {
     }
 
     /**
-     * Returns the {@code touched} property of the
+     * Returns the {@code mounted} property of the
      * {@linkplain #getModel() file system model}.
      * 
-     * @return the {@code touched} property of the
+     * @return the {@code mounted} property of the
      *         {@linkplain #getModel() file system model}.
      */
-    public final boolean isTouched() {
-        return model.isTouched();
+    public final boolean isMounted() {
+        return model.isMounted();
     }
 
     /**
-     * Sets the {@code touched} property of the
+     * Sets the {@code mounted} property of the
      * {@linkplain #getModel() file system model}.
      * 
-     * @param touched the {@code touched} property of the
+     * @param mounted the {@code mounted} property of the
      *         {@linkplain #getModel() file system model}.
      */
-    protected final void setTouched(boolean touched) {
-        model.setTouched(touched);
+    protected final void setMounted(boolean mounted) {
+        model.setMounted(mounted);
     }
 
     @Override

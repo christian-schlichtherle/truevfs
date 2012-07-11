@@ -86,7 +86,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
 
   private def inputArchive_=(ia: Option[InputArchive[E]]) {
     assert(ia.isEmpty || _inputArchive.isEmpty)
-    ia foreach { _ => touched = true }
+    ia foreach { _ => mounted = true }
     _inputArchive = ia
   }
 
@@ -99,7 +99,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
 
   private def outputArchive_=(oa: Option[OutputArchive[E]]) {
     assert(oa.isEmpty || _outputArchive.isEmpty)
-    oa foreach { _ => touched = true }
+    oa foreach { _ => mounted = true }
     _outputArchive = oa
   }
 
@@ -159,7 +159,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
         }
         val fs = ArchiveFileSystem(driver, is, Option(pe), ro);
         inputArchive = Some(new InputArchive(is))
-        assert(touched)
+        assert(mounted)
         fs
       }
     }
@@ -191,7 +191,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
    * @return The output archive.
    */
   private def outputArchive(options: AccessOptions): OutputArchive[E] = {
-    outputArchive foreach { oa => assert(touched); return oa }
+    outputArchive foreach { oa => assert(mounted); return oa }
     val is = inputArchive match {
       case Some(ia) => ia.driverProduct
       case _ => null
@@ -211,7 +211,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
     }
     val oa = new OutputArchive(os)
     outputArchive = Some(oa)
-    assert(touched)
+    assert(mounted)
     oa
   }
 
@@ -375,7 +375,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
       outputArchive = None
     }
     fileSystem = None
-    if (options.get(ABORT_CHANGES)) touched = false
+    if (options.get(ABORT_CHANGES)) mounted = false
   }
 
   def checkSync(options: AccessOptions, name: FsEntryName, intention: Access) {
