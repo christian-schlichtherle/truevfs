@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
@@ -359,6 +360,23 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link FsArchiveDriver} calls
+     * {@link #superNewController} a
+     * partial file system controller chain and passes the result to
+     * {@link #decorate} for further decoration.
+     */
+    @Override
+    public FsController<?> newController(FsModel model, FsController<?> parent) {
+        return decorate(superNewController(model, parent));
+    }
+
+    /**
+     * Returns a partial file system controller chain by calling
+     * {@link FsCharsetArchiveDriver#newController(FsModel, FsController)} on
+     * the super class.
+     * 
      * @deprecated since TrueZIP 7.6 - override {@link #decorate} instead.
      */
     protected final FsController<?>
@@ -367,17 +385,24 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
     }
 
     /**
-     * {@inheritDoc}
+     * A hook which decorates the given file system controller chain with some
+     * more file system controller(s).
      * <p>
-     * The implementation in the class {@link ZipDriver} returns the
-     * expression
+     * The implementation in the class {@link ZipDriver} returns the expression
      * {@code new ZipKeyController<M>(controller, this)}.
      * Overridde this method in order to return just the given
      * {@code controller} if you are overriding
      * {@link #zipCryptoParameters(FsModel, Charset)} and do not want to use
      * a locatable key manager to resolve passwords for WinZip AES encryption.
+     * 
+     * @param  <M> the file system model used by the given controller.
+     * @param  controller the file system controller to decorate or return.
+     *         Note that this controller may throw {@link RuntimeException}s
+     *         for non-local control flow!
+     * @return The decorated file system controller or simply
+     *         {@code controller}.
+     * @since  TrueZIP 7.6
      */
-    @Override
     public <M extends FsModel> FsController<M> decorate(
             FsController<M> controller) {
         return new ZipKeyController<M>(controller, this);
