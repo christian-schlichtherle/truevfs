@@ -44,9 +44,7 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
     }
 
     @Override
-    public FsController<?> getController(
-            final FsMountPoint mp,
-            final FsCompositeDriver d) {
+    public FsController<?> getController(FsMountPoint mp, FsCompositeDriver d) {
         return new PaceController(this, delegate.getController(mp, d));
     }
 
@@ -81,55 +79,46 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
      * Registers the archive file system of the given controller as the most
      * recently used (MRU).
      * 
-     * @param  controller the throttle controller for the most recently used
-     *         archive file system.
-     * @return {@code this}
+     * @param  c the controller for the most recently used file system.
      */
-    void accessedMru(final PaceController controller) {
-        if (controller.isTouched()) {
-            final FsMountPoint mp = controller.getMountPoint();
-            mru.put(mp, controller);
-            logger.log(Level.FINEST, "accessedMru", mp);
+    void accessedMru(final PaceController c) {
+        if (c.isTouched()) {
+            final FsMountPoint mp = c.getMountPoint();
+            mru.put(mp, c);
+            logger.log(Level.FINEST, "accessed", mp);
         }
     }
 
     /**
      * If the number of mounted archive files exceeds {@link #getMaximumOfMostRecentlyUsedArchiveFiles()},
-     * then this method syncs the least recently used (LRU) archive files
+     * then this method sync()s the least recently used (LRU) archive files
      * which exceed this value.
      * 
+     * @param  c the controller for the file system to retain mounted for
+     *         subsequent access.
      * @throws FsSyncException 
      */
-    void syncLru(final PaceController retain) throws FsSyncException {
-        final FsMountPoint rmp = retain.getMountPoint();
+    void syncLru(final PaceController c) throws FsSyncException {
+        final FsMountPoint mp = c.getMountPoint();
         iterating: for (final Iterator<PaceController> i = lru.iterator(); i.hasNext(); ) {
-            final PaceController c = i.next();
-            final FsMountPoint mp = c.getMountPoint();
-            final FsManager fm = new FsFilteringManager(delegate, mp);
-            // Make sure not to umount a parent of a MRU controller because
-            // this would umount the MRU controller, too, which might
-            // result in excessive remounting.
+            final PaceController lc = i.next();
+            final FsMountPoint lmp = lc.getMountPoint();
+            final FsManager fm = new FsFilteringManager(delegate, lmp);
             for (final FsController<?> fc : fm) {
                 final FsMountPoint fmp = fc.getModel().getMountPoint();
-                if (mru.containsKey(fmp)) {
-                    if (fmp.equals(mp)) i.remove(); // evicted, then accessed again
-                    continue iterating;
-                }
-                if (fmp.equals(rmp)) {
-                    // The theory is that another thread might have just
-                    // concurrently evicted the controller to retain for
-                    // subsequent access.
-                    // I assume this could only happen if there is heavy
-                    // contention caused by many threads - but I have no test
-                    // case to cover this.
-                    i.remove();
-                    mru.put(fmp, retain); // recover
+                if (mp.equals(fmp) || mru.containsKey(fmp)) {
+                    if (lmp.equals(fmp) || mru.containsKey(lmp)) {
+                        i.remove();
+                        logger.log(Level.FINER, "recollected", lmp);
+                    } else {
+                        logger.log(Level.FINER, "retained", lmp);
+                    }
                     continue iterating;
                 }
             }
             i.remove(); // even if subsequent umount fails
             fm.sync(FsSyncOptions.SYNC);
-            logger.log(Level.FINE, "syncedLru", mp);
+            logger.log(Level.FINE, "synced", lmp);
         }
     }
 
@@ -142,10 +131,11 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
     public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
         lru.clear();
-        logger.log(Level.FINER, "clearedLruSize", getNumberOfLeastRecentlyUsedArchiveFiles());
-        mru.clear();
-        logger.log(Level.FINER, "clearedMruSize", getNumberOfMostRecentlyUsedArchiveFiles());
-        delegate.sync(options);
+        try {
+            delegate.sync(options);
+        } finally {
+            logger.log(Level.FINER, "cleared", mru.clear());
+        }
     }
 
     @SuppressWarnings("serial")
@@ -164,6 +154,7 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
                     final PaceController c = entry.getValue();
                     final boolean added = lru.add(c);
                     assert added;
+                    logger.log(Level.FINER, "evicted", entry.getKey());
                 }
                 return evict;
             }
@@ -205,10 +196,17 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
             }
         }
 
-        void clear() {
+        int clear() {
             writeLock.lock();
             try {
-                map.clear();
+                int c = 0;
+                for (final Iterator<PaceController> i = map.values().iterator(); i.hasNext(); ) {
+                    if (!i.next().isTouched()) {
+                        i.remove();
+                        c++;
+                    }
+                }
+                return c;
             } finally {
                 writeLock.unlock();
             }
