@@ -34,7 +34,6 @@ import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.TooManyListenersException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
@@ -50,7 +49,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 final class FsTargetArchiveController<E extends FsArchiveEntry>
-extends FsFileSystemArchiveController<E> {
+extends FsFileSystemArchiveController<E>
+implements FsArchiveFileSystem.TouchListener {
 
     private static final BitField<FsInputOption>
             MOUNT_INPUT_OPTIONS = BitField.of(FsInputOption.CACHE);
@@ -74,9 +74,6 @@ extends FsFileSystemArchiveController<E> {
      * created or modified entries to.
      */
     private @CheckForNull OutputArchive<E> outputArchive;
-
-    private final FsArchiveFileSystemTouchListener<E>
-            touchListener = new TouchListener();
 
     /**
      * Constructs a new default archive file system controller.
@@ -119,31 +116,32 @@ extends FsFileSystemArchiveController<E> {
     @Nullable InputArchive<E> getInputArchive()
     throws FsNeedsSyncException {
         final InputArchive<E> ia = inputArchive;
-        if (null != ia && ia.isClosed())
-            throw FsNeedsSyncException.get();
+        if (null != ia && ia.isClosed()) throw FsNeedsSyncException.get();
         return ia;
     }
 
     private void setInputArchive(final @CheckForNull InputArchive<E> ia) {
         assert null == ia || null == this.inputArchive;
         this.inputArchive = ia;
-        if (null != ia)
-            setTouched(true);
+        if (null != ia) setMounted(true);
     }
 
     @Nullable OutputArchive<E> getOutputArchive()
     throws FsNeedsSyncException {
         final OutputArchive<E> oa = outputArchive;
-        if (null != oa && oa.isClosed())
-            throw FsNeedsSyncException.get();
+        if (null != oa && oa.isClosed()) throw FsNeedsSyncException.get();
         return oa;
     }
 
     private void setOutputArchive(final @CheckForNull OutputArchive<E> oa) {
         assert null == oa || null == this.outputArchive;
         this.outputArchive = oa;
-        if (null != oa)
-            setTouched(true);
+        if (null != oa) setMounted(true);
+    }
+
+    @Override
+    public void preTouch() throws IOException {
+        makeOutputArchive();
     }
 
     @Override
@@ -206,6 +204,7 @@ extends FsFileSystemArchiveController<E> {
                     throw ex;
                 }
                 setInputArchive(ia);
+                assert isMounted();
             } catch (final FsFalsePositiveArchiveException ex) {
                 throw new AssertionError(ex);
             } catch (final IOException ex) {
@@ -216,16 +215,12 @@ extends FsFileSystemArchiveController<E> {
         }
 
         // Register file system.
-        try {
-            fs.addFsArchiveFileSystemTouchListener(touchListener);
-        } catch (final TooManyListenersException ex) {
-            throw new AssertionError(ex);
-        }
+        fs.setTouchListener(this);
         setFileSystem(fs);
     }
 
     /**
-     * Ensures that {@link #outputArchive} does not return {@code null}.
+     * Ensures that {@link #getOutputArchive} does not return {@code null}.
      * This method will use
      * <code>{@link #getContext()}.{@link FsOperationContext#getOutputOptions()}</code>
      * to obtain the output options to use for writing the entry in the parent
@@ -237,8 +232,10 @@ extends FsFileSystemArchiveController<E> {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION") // false positive
     OutputArchive<E> makeOutputArchive() throws IOException {
         OutputArchive<E> oa = getOutputArchive();
-        if (null != oa)
+        if (null != oa) {
+            assert isMounted();
             return oa;
+        }
         final BitField<FsOutputOption> options = getContext()
                 .getOutputOptions()
                 .and(OUTPUT_PREFERENCES_MASK)
@@ -256,6 +253,7 @@ extends FsFileSystemArchiveController<E> {
             throw ex;
         }
         setOutputArchive(oa);
+        assert isMounted();
         return oa;
     }
 
@@ -548,7 +546,7 @@ extends FsFileSystemArchiveController<E> {
             setOutputArchive(null);
         }
         setFileSystem(null);
-        if (options.get(ABORT_CHANGES)) setTouched(false);
+        if (options.get(ABORT_CHANGES)) setMounted(false);
     }
 
     /**
@@ -624,22 +622,4 @@ extends FsFileSystemArchiveController<E> {
             return (DisconnectingOutputShop<E>) delegate;
         }
     } // OutputArchive
-
-    /** An archive file system listener which makes the output archive. */
-    private final class TouchListener
-    implements FsArchiveFileSystemTouchListener<E> {
-        @Override
-        public void beforeTouch(FsArchiveFileSystemEvent<? extends E> event)
-        throws IOException {
-            assert event.getSource() == getFileSystem();
-            makeOutputArchive();
-            assert isTouched();
-        }
-
-        @Override
-        public void afterTouch(FsArchiveFileSystemEvent<? extends E> event) {
-            assert event.getSource() == getFileSystem();
-            assert isTouched();
-        }
-    } // TouchListener
 }

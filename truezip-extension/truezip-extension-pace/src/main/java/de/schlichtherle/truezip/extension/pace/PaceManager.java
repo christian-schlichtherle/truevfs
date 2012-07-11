@@ -17,6 +17,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -31,13 +32,13 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
                                         PaceManager.class.getName());
 
     private volatile int
-            maxMounts = DEFAULT_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES;
+            maxMounted = MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE;
 
-    private final Collection<PaceController> lru
+    private final Collection<PaceController> evicted
             = new ConcurrentLinkedQueue<PaceController>();
 
     @SuppressWarnings("serial")
-    private final MruControllerMap mru = new MruControllerMap();
+    private final MountedFileSystemMap mounted = new MountedFileSystemMap();
 
     public PaceManager(final FsManager manager) {
         super(manager);
@@ -49,30 +50,47 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
     }
 
     @Override
-    public int getNumberOfManagedArchiveFiles() {
+    public int getFileSystemsTotal() {
         return delegate.getSize();
     }
 
     @Override
-    public int getMaximumOfMostRecentlyUsedArchiveFiles() {
-        return maxMounts;
+    public int getFileSystemsMounted() {
+        return mounted.size();
     }
 
     @Override
-    public void setMaximumOfMostRecentlyUsedArchiveFiles(final int maxMounts) {
-        if (maxMounts < MINIMUM_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES)
+    public int getMaximumFileSystemsMounted() {
+        return maxMounted;
+    }
+
+    @Override
+    public void setMaximumFileSystemsMounted(final int maxMounted) {
+        if (maxMounted < MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE)
             throw new IllegalArgumentException();
-        this.maxMounts = maxMounts;
+        this.maxMounted = maxMounted;
     }
 
     @Override
-    public int getNumberOfMostRecentlyUsedArchiveFiles() {
-        return mru.size();
+    public int getTopLevelArchiveFileSystemsTotal() {
+        int total = 0;
+        for (FsController<?> controller : delegate)
+            if (isTopLevelArchive(controller)) total++;
+        return total;
     }
 
     @Override
-    public int getNumberOfLeastRecentlyUsedArchiveFiles() {
-        return lru.size();
+    public int getTopLevelArchiveFileSystemsMounted() {
+        int mounted = 0;
+        for (FsController<?> controller : delegate)
+            if (isTopLevelArchive(controller))
+                if (controller.getModel().isMounted()) mounted++;
+        return mounted;
+    }
+
+    private boolean isTopLevelArchive(final FsController<?> controller) {
+        final FsController<?> parent = controller.getParent();
+        return null != parent && null == parent.getParent();
     }
 
     /**
@@ -81,16 +99,16 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
      * 
      * @param  c the controller for the most recently used file system.
      */
-    void accessedMru(final PaceController c) {
-        if (c.isTouched()) {
+    void accessed(final PaceController c) {
+        if (c.isMounted()) {
             final FsMountPoint mp = c.getMountPoint();
-            mru.put(mp, c);
+            mounted.put(mp, c);
             logger.log(Level.FINEST, "accessed", mp);
         }
     }
 
     /**
-     * If the number of mounted archive files exceeds {@link #getMaximumOfMostRecentlyUsedArchiveFiles()},
+     * If the number of mounted archive files exceeds {@link #getMaximumFileSystemsMounted()},
      * then this method sync()s the least recently used (LRU) archive files
      * which exceed this value.
      * 
@@ -98,16 +116,16 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
      *         subsequent access.
      * @throws FsSyncException 
      */
-    void syncLru(final PaceController c) throws FsSyncException {
+    void retain(final PaceController c) throws FsSyncException {
         final FsMountPoint mp = c.getMountPoint();
-        iterating: for (final Iterator<PaceController> i = lru.iterator(); i.hasNext(); ) {
+        iterating: for (final Iterator<PaceController> i = evicted.iterator(); i.hasNext(); ) {
             final PaceController lc = i.next();
             final FsMountPoint lmp = lc.getMountPoint();
             final FsManager fm = new FsFilteringManager(delegate, lmp);
             for (final FsController<?> fc : fm) {
                 final FsMountPoint fmp = fc.getModel().getMountPoint();
-                if (mp.equals(fmp) || mru.containsKey(fmp)) {
-                    if (lmp.equals(fmp) || mru.containsKey(lmp)) {
+                if (mp.equals(fmp) || mounted.containsKey(fmp)) {
+                    if (lmp.equals(fmp) || mounted.containsKey(lmp)) {
                         i.remove();
                         logger.log(Level.FINER, "recollected", lmp);
                     } else {
@@ -130,29 +148,29 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
     @Override
     public void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        lru.clear();
+        evicted.clear();
         try {
             delegate.sync(options);
         } finally {
-            logger.log(Level.FINER, "cleared", mru.clear());
+            logger.log(Level.FINER, "cleared", mounted.clear());
         }
     }
 
     @SuppressWarnings("serial")
-    private final class MruControllerMap {
+    private final class MountedFileSystemMap {
         private final LinkedHashMap<FsMountPoint, PaceController> map
                 = new LinkedHashMap<FsMountPoint, PaceController>(
-                    HashMaps.initialCapacity(getMaximumOfMostRecentlyUsedArchiveFiles() + 1),
+                    HashMaps.initialCapacity(getMaximumFileSystemsMounted() + 1),
                     0.75f,
                     true) {
             @Override
             public boolean removeEldestEntry(
                     final Map.Entry<FsMountPoint, PaceController> entry) {
                 final boolean evict
-                        = size() > getMaximumOfMostRecentlyUsedArchiveFiles();
+                        = size() > getMaximumFileSystemsMounted();
                 if (evict) {
                     final PaceController c = entry.getValue();
-                    final boolean added = lru.add(c);
+                    final boolean added = evicted.add(c);
                     assert added;
                     logger.log(Level.FINER, "evicted", entry.getKey());
                 }
@@ -163,7 +181,7 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
         private final ReadLock readLock;
         private final WriteLock writeLock;
 
-        MruControllerMap() {
+        MountedFileSystemMap() {
             final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
             readLock = lock.readLock();
             writeLock = lock.writeLock();
@@ -201,7 +219,7 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
             try {
                 int c = 0;
                 for (final Iterator<PaceController> i = map.values().iterator(); i.hasNext(); ) {
-                    if (!i.next().isTouched()) {
+                    if (!i.next().isMounted()) {
                         i.remove();
                         c++;
                     }
@@ -211,5 +229,5 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
                 writeLock.unlock();
             }
         }
-    } // MruControllerMap
+    } // MountedFileSystemMap
 }

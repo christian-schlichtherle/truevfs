@@ -77,10 +77,8 @@ public final class IOCache implements Flushable, Closeable {
      */
     @CreatesObligation
     private IOCache(final Strategy strategy, final IOPool<?> pool) {
-        if (null == (this.strategy = strategy))
-            throw new NullPointerException();
-        if (null == (this.pool = pool))
-            throw new NullPointerException();
+        if (null == (this.strategy = strategy)) throw new NullPointerException();
+        if (null == (this.pool = pool)) throw new NullPointerException();
     }
 
     /**
@@ -97,8 +95,7 @@ public final class IOCache implements Flushable, Closeable {
      * @return {@code this}
      */
     public IOCache configure(final InputSocket<?> input) {
-        if (null == input)
-            throw new NullPointerException();
+        if (null == input) throw new NullPointerException();
         this.input = input;
         return this;
     }
@@ -117,8 +114,7 @@ public final class IOCache implements Flushable, Closeable {
      * @return {@code this}
      */
     public IOCache configure(final OutputSocket<?> output) {
-        if (null == output)
-            throw new NullPointerException();
+        if (null == output) throw new NullPointerException();
         this.output = output;
         return this;
     }
@@ -133,8 +129,7 @@ public final class IOCache implements Flushable, Closeable {
     @Override
     public void flush() throws IOException {
         final Buffer buffer = getBuffer();
-        if (null != buffer)
-            getOutputBufferPool().release(buffer);
+        if (null != buffer) getOutputBufferPool().release(buffer);
     }
 
     /**

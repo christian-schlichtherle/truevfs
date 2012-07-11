@@ -19,9 +19,9 @@ final class JmxModel extends InstrumentingModel {
     }
 
     @Override
-    public void setTouched(final boolean newTouched) {
+    public void setMounted(final boolean newTouched) {
         try {
-            delegate.setTouched(newTouched);
+            delegate.setMounted(newTouched);
         } finally {
             if (newTouched) JmxModelView.  register(delegate);
             else            JmxModelView.unregister(delegate);

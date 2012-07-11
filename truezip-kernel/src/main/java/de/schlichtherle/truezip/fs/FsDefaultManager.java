@@ -107,7 +107,7 @@ public final class FsDefaultManager extends FsManager {
      */
     private final class ManagedModel extends FsModel {
         FsController<?> controller;
-        volatile boolean touched;
+        volatile boolean mounted;
 
         ManagedModel(FsMountPoint mountPoint, FsModel parent) {
             super(mountPoint, parent);
@@ -115,29 +115,29 @@ public final class FsDefaultManager extends FsManager {
 
         void init(final FsController<? extends FsModel> controller) {
             assert null != controller;
-            assert !touched;
+            assert !mounted;
             this.controller = controller;
             schedule(false);
         }
 
         @Override
-        public boolean isTouched() {
-            return touched;
+        public boolean isMounted() {
+            return mounted;
         }
 
         /**
          * Schedules the file system controller for synchronization according
-         * to the given touch status.
+         * to the given mount status.
          */
         @Override
-        public void setTouched(final boolean touched) {
+        public void setMounted(final boolean mounted) {
             writeLock.lock();
             try {
-                if (this.touched != touched) {
-                    if (touched)
+                if (this.mounted != mounted) {
+                    if (mounted)
                         FsSyncShutdownHook.register(FsDefaultManager.this);
-                    schedule(touched);
-                    this.touched = touched;
+                    schedule(mounted);
+                    this.mounted = mounted;
                 }
             } finally {
                 writeLock.unlock();

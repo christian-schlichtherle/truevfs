@@ -15,13 +15,12 @@ import javax.annotation.Nullable;
  */
 public interface JmxModelViewMXBean {
     String getMountPoint();
-    boolean isTouched();
-    @Nullable JmxModelViewMXBean getModelOfParent();
-    String getMountPointOfParent();
+    boolean isMounted();
+    String getParentMountPoint();
     long getSizeOfData();
     long getSizeOfStorage();
     @Nullable String getTimeWritten();
     @Nullable String getTimeRead();
     @Nullable String getTimeCreated();
-    void umount() throws FsSyncException;
+    void sync() throws FsSyncException;
 }

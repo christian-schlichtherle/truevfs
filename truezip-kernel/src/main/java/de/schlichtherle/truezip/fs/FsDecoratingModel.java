@@ -29,13 +29,13 @@ public abstract class FsDecoratingModel<M extends FsModel> extends FsModel {
     }
 
     @Override
-    public boolean isTouched() {
-        return delegate.isTouched();
+    public boolean isMounted() {
+        return delegate.isMounted();
     }
 
     @Override
-    public void setTouched(boolean touched) {
-        delegate.setTouched(touched);
+    public void setMounted(boolean touched) {
+        delegate.setMounted(touched);
     }
 
     /**
