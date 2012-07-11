@@ -31,7 +31,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
