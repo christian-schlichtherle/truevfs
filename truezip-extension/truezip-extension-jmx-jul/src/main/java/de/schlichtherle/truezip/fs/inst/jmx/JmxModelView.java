@@ -96,30 +96,29 @@ implements JmxModelViewMXBean {
 
     @Override
     protected String getDescription(MBeanInfo info) {
-        return "A managed federated file system.";
+        return "A file system model.";
     }
 
     @Override
     protected String getDescription(MBeanAttributeInfo info) {
+        final String name = info.getName();
         String description = null;
-        if (info.getName().equals("MountPoint")) {
-            description = "The mount point URI of this managed federated file system.";
-        } else if (info.getName().equals("Touched")) {
-            description = "Whether or not this managed federated file system needs to get umount()ed.";
-        } else if (info.getName().equals("ModelOfParent")) {
-            description = "The enclosing managed federated file system.";
-        } else if (info.getName().equals("MountPointOfParent")) {
+        if (name.equals("MountPoint")) {
+            description = "The mount point URI of this file system.";
+        } else if (name.equals("Mounted")) {
+            description = "Whether or not this file system needs to get sync()ed.";
+        } else if (name.equals("ParentMountPoint")) {
             description = "The mount point URI of the parent file system.";
-        } else if (info.getName().equals("SizeOfData")) {
-            description = "The data size of this managed federated file system.";
-        } else if (info.getName().equals("SizeOfStorage")) {
-            description = "The storage size of this managed federated file system.";
-        } else if (info.getName().equals("TimeWritten")) {
-            description = "The last write time of this managed federated file system.";
-        } else if (info.getName().equals("TimeRead")) {
-            description = "The last read or access time of this managed federated file system.";
-        } else if (info.getName().equals("TimeCreated")) {
-            description = "The creation time of this managed federated file system.";
+        } else if (name.equals("SizeOfData")) {
+            description = "The data size of this file system.";
+        } else if (name.equals("SizeOfStorage")) {
+            description = "The storage size of this file system.";
+        } else if (name.equals("TimeWritten")) {
+            description = "The last write time of this file system.";
+        } else if (name.equals("TimeRead")) {
+            description = "The last read or access time of this file system.";
+        } else if (name.equals("TimeCreated")) {
+            description = "The creation time of this file system.";
         }
         return description;
     }
@@ -149,8 +148,8 @@ implements JmxModelViewMXBean {
     @Override
     protected String getDescription(MBeanOperationInfo info) {
         String description = null;
-        if (info.getName().equals("umount")) {
-            description = "Synchronizes this managed archive file system and all enclosed archive file systems. If any file system is busy with I/O, an FsSyncException is thrown.";
+        if (info.getName().equals("sync")) {
+            description = "Synchronizes this file system and all enclosed file systems. If any file system is busy with I/O, an FsSyncException is thrown.";
         }
         return description;
     }
@@ -161,21 +160,12 @@ implements JmxModelViewMXBean {
     }
 
     @Override
-    public boolean isTouched() {
-        return model.isTouched();
+    public boolean isMounted() {
+        return model.isMounted();
     }
 
     @Override
-    public JmxModelViewMXBean getModelOfParent() {
-        final FsModel parent = model.getParent();
-        assert null != parent;
-        return null == parent.getParent()
-                ? null
-                : JmxModelView.register(parent);
-    }
-
-    @Override
-    public String getMountPointOfParent() {
+    public String getParentMountPoint() {
         final FsModel parent = model.getParent();
         assert null != parent;
         return parent.getMountPoint().toString();
@@ -263,7 +253,7 @@ implements JmxModelViewMXBean {
     }
 
     @Override
-    public void umount() throws FsSyncException {
+    public void sync() throws FsSyncException {
         new FsFilteringManager( FsManagerLocator.SINGLETON.get(),
                                 model.getMountPoint())
                 .sync(FsSyncOptions.NONE);

@@ -35,15 +35,36 @@ extends FsController<M>  {
         return model;
     }
 
+    /**
+     * Returns the mount point of this (virtual) file system as
+     * defined by the {@linkplain #getModel() model}.
+     * 
+     * @return The mount point of this (virtual) file system as
+     *         defined by the {@linkplain #getModel() model}.
+     */
     public final FsMountPoint getMountPoint() {
         return model.getMountPoint();
     }
 
-    public final boolean isTouched() {
-        return model.isTouched();
+    /**
+     * Returns the {@code mounted} property of the
+     * {@linkplain #getModel() file system model}.
+     * 
+     * @return the {@code mounted} property of the
+     *         {@linkplain #getModel() file system model}.
+     */
+    public final boolean isMounted() {
+        return model.isMounted();
     }
 
-    protected final void setTouched(boolean touched) {
-        model.setTouched(touched);
+    /**
+     * Sets the {@code mounted} property of the
+     * {@linkplain #getModel() file system model}.
+     * 
+     * @param mounted the {@code mounted} property of the
+     *         {@linkplain #getModel() file system model}.
+     */
+    protected final void setMounted(boolean mounted) {
+        model.setMounted(mounted);
     }
 }

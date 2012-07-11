@@ -10,51 +10,55 @@ import de.schlichtherle.truezip.fs.FsSyncException;
 /**
  * The MXBean interface for a {@link FsManager file system manager}.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public interface JmxManagerViewMXBean {
 
     /**
-     * Returns a new array of all managed federated file systems.
+     * Returns the total number of file systems.
      * 
-     * @return A new array of all managed federated file systems.
-     */
-    JmxModelViewMXBean[] getFederatedFileSystems();
-
-    /**
-     * Returns the total number of managed federated file systems.
+     * @return The total number of file systems.
      */
     int getFileSystemsTotal();
 
     /**
-     * Returns the number of managed federated file systems which have been
-     * touched and need synchronization by calling {@link FsManager#sync}.
+     * Returns the number of file systems
+     * which have been mounted and need synchronization by calling
+     * {@link #sync}.
      * <p>
      * Note that you should <em>not</em> use the returned value to synchronize
-     * conditionally - this is unreliable!
-     */
-    int getFileSystemsTouched();
-
-    /**
-     * Returns the total number of managed <em>top level</em> federated file
-     * systems.
-     */
-    int getTopLevelFileSystemsTotal();
-
-    /**
-     * Returns the number of managed <em>top level</em> federated file systems
-     * which have been touched and need synchronization by calling
-     * {@link FsManager#sync}.
-     */
-    int getTopLevelFileSystemsTouched();
-
-    /**
-     * Unmounts all managed federated file systems.
+     * conditionally - this would be unreliable!
      * 
-     * @throws FsSyncException If any managed federated file system is busy
+     * @return The number of mounted file systems.
+     */
+    int getFileSystemsMounted();
+
+    /**
+     * Returns the total number of <em>top level archive</em> file systems.
+     * 
+     * @return The total number of <em>top level archive</em> file systems.
+     */
+    int getTopLevelArchiveFileSystemsTotal();
+
+    /**
+     * Returns the number of <em>top level archive</em> file systems
+     * which have been mounted and need synchronization by calling
+     * {@link #sync}.
+     * <p>
+     * Note that you should <em>not</em> use the returned value to synchronize
+     * conditionally - this would be unreliable!
+     * 
+     * @return The number of mounted <em>top level archive</em> file systems.
+     */
+    int getTopLevelArchiveFileSystemsMounted();
+
+    /**
+     * Synchronizes all managed file systems.
+     * 
+     * @throws FsSyncException If any managed file system is busy
      *         with I/O.
      */
-    void umount() throws FsSyncException;
+    void sync() throws FsSyncException;
     
     void clearStatistics();
 }

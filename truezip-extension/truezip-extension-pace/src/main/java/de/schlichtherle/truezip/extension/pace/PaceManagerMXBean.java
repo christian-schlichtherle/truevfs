@@ -12,111 +12,114 @@ import de.schlichtherle.truezip.fs.FsSyncException;
 public interface PaceManagerMXBean {
 
     /**
-     * The name of the property for the maximum number of archive files which
-     * may be mounted at any time, which is {@value}.
+     * The name of the property for the maximum number of file systems which
+     * may have been mounted at any time, which is {@value}.
      */
-    String MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES
-            = "maximumOfMostRecentlyUsedArchiveFiles";
+    String MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_NAME
+            = "maximumFileSystemsMounted";
 
     /**
      * The key string for the system property which defines the value of the
-     * constant {@link #DEFAULT_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES}.
+     * constant {@link #MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE}.
      * Equivalent to the expression
-     * {@code PaceManager.class.getName() + "." + MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES}.
+     * {@code PaceManager.class.getName() + "." + MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_NAME}.
      */
-    String MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES_PROPERTY_NAME
-            = PaceManager.class.getName() + "." + MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES;
+    String MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_KEY
+            = PaceManager.class.getName() + "." + MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_NAME;
 
     /**
-     * The minimum value for the maximum number of mounted archive files, which
+     * The minimum value for the maximum number of mounted file systems, which
      * is {@value}.
      */
-    int MINIMUM_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES = 2;
+    int MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE = 2;
 
     /**
-     * The default value for the maximum number of mounted archive files.
+     * The default value for the maximum number of mounted file systems.
      * The value of this constant will be set to
-     * {@link #MINIMUM_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES} unless a system
+     * {@link #MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE} unless a system
      * property with the key string
-     * {@link #MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES_PROPERTY_NAME}
+     * {@link #MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_KEY}
      * is set to a value which is greater than
-     * {@code MINIMUM_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES}.
+     * {@code MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE}.
      * <p>
      * Mind you that this constant is initialized when this interface is loaded
      * and cannot accurately reflect the value in a remote JVM instance.
      */
-    int DEFAULT_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES
-            = Math.max(MINIMUM_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES,
-                Integer.getInteger(MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES_PROPERTY_NAME,
-                    MINIMUM_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES));
+    int MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE
+            = Math.max(MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE,
+                Integer.getInteger(MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_KEY,
+                    MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE));
 
     /**
-     * Returns the number of managed archive files.
+     * Returns the total number of file systems.
      * 
-     * @return The number of managed archive files.
+     * @return The total number of file systems.
      */
-    int getNumberOfManagedArchiveFiles();
+    int getFileSystemsTotal();
 
     /**
-     * Returns the maximum number of archive files which may be mounted at any
-     * time.
-     * The mimimum value is {@link #MINIMUM_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES}.
-     * The default value is {@link #DEFAULT_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES}.
-     *
-     * @return The maximum number of archive files which may be mounted at any
-     *         time.
-     */
-    int getMaximumOfMostRecentlyUsedArchiveFiles();
-
-    /**
-     * Sets the maximum number of archive files which may be mounted at any
-     * time.
-     * Changing this property will show effect upon the next access to an
-     * archive file.
-     *
-     * @param  maxMounts the maximum number of mounted archive files.
-     * @throws IllegalArgumentException if {@code maxMounts} is less than
-     *         {@link #MINIMUM_MAXIMUM_OF_MOST_RECENTLY_USED_ARCHIVE_FILES}.
-     */
-    void setMaximumOfMostRecentlyUsedArchiveFiles(int maxMounts);
-
-    /**
-     * Returns the number of most recently used archive files.
+     * Returns the number of file systems
+     * which have been mounted and need synchronization by calling
+     * {@link #sync}.
      * The value of this property never exceeds
-     * {@link #getMaximumOfMostRecentlyUsedArchiveFiles()} nor
-     * {@link #getNumberOfManagedArchiveFiles()}.
-     * 
-     * @return The number of most recently used archive files.
-     */
-    int getNumberOfMostRecentlyUsedArchiveFiles();
-
-    /**
-     * Returns the number of archive files which have been evicted from the
-     * cache of most recently used archive files but not yet synced.
+     * {@link #getMaximumFileSystemsMounted()}.
      * <p>
-     * The value of this property should be zero unless the following applies:
-     * <ul>
-     * <li>There is lots of archive file activity caused by different threads.
-     *     In this case the number should decrease to zero as soon as possible.
-     * <li>Some evicted archive files are direct or indirect parents of the
-     *     most recently used archive files.
-     *     In that case the number will stay until the direct or indirect
-     *     children get evicted from the cache, too.
-     * </ul>
-     * In either case, a successful {@link #sync()} will reset the value of
-     * this property to zero.
+     * Note that you should <em>not</em> use the returned value to synchronize
+     * conditionally - this would be unreliable!
      * 
-     * @return The number of archive files which have been evicted from the
-     *         cache of most recently used archive files but not yet synced.
+     * @return The number of mounted file systems.
      */
-    int getNumberOfLeastRecentlyUsedArchiveFiles();
+    int getFileSystemsMounted();
 
     /**
-     * Syncs all managed archive files.
+     * Returns the maximum number of file systems which may have been mounted
+     * at any time.
+     * The mimimum value is {@link #MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE}.
+     * The default value is {@link #MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE}.
+     *
+     * @return The maximum number of mounted file systems.
+     */
+    int getMaximumFileSystemsMounted();
+
+    /**
+     * Sets the maximum number of file systems which may have been mounted
+     * at any time.
+     * Changing this property will show effect upon the next access to any
+     * file system.
+     *
+     * @param  maxMounted the maximum number of mounted file systems.
+     * @throws IllegalArgumentException if {@code maxMounted} is less than
+     *         {@link #MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE}.
+     */
+    void setMaximumFileSystemsMounted(int maxMounted);
+
+    /**
+     * Returns the total number of <em>top level archive</em> file systems.
+     * The value of this property never exceeds
+     * {@link #getFileSystemsTotal()}.
+     * 
+     * @return The total number of <em>top level archive</em> file systems.
+     */
+    int getTopLevelArchiveFileSystemsTotal();
+
+    /**
+     * Returns the number of <em>top level archive</em> file systems
+     * which have been mounted and need synchronization by calling
+     * {@link #sync}.
+     * The value of this property never exceeds
+     * {@link #getFileSystemsMounted()}.
+     * <p>
+     * Note that you should <em>not</em> use the returned value to synchronize
+     * conditionally - this would be unreliable!
+     * 
+     * @return The number of mounted <em>top level archive</em> file systems.
+     */
+    int getTopLevelArchiveFileSystemsMounted();
+
+    /**
+     * Synchronizes all file systems.
      * As a side effect, upon successful operation, the value of the properties
-     * {@link #getNumberOfMostRecentlyUsedArchiveFiles()} and
-     * {@link #getNumberOfLeastRecentlyUsedArchiveFiles()}
-     * is reset to zero.
+     * {@link #getFileSystemsMounted()} is reset to zero.
      * 
      * @throws FsSyncException if the synchronization fails for some reason.
      */

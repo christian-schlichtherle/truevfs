@@ -4,24 +4,16 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.FsArchiveFileSystemTouchListener;
-import de.schlichtherle.truezip.fs.FsCovariantEntry;
-import de.schlichtherle.truezip.fs.FsArchiveEntry;
-import de.schlichtherle.truezip.fs.FsArchiveFileSystemEvent;
-import de.schlichtherle.truezip.fs.FsArchiveFileSystem;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
-import de.schlichtherle.truezip.fs.FsEntryName;
 import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriver;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriverEntry;
 import de.schlichtherle.truezip.fs.archive.mock.MockArchiveDriverEntryContainer;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.util.UriBuilder;
-import java.util.TooManyListenersException;
-import static org.hamcrest.CoreMatchers.*;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -40,63 +32,6 @@ public class FsArchiveFileSystemTest {
     @After
     public void tearDown() {
         TestConfig.pop();
-    }
-
-    @Test
-    public void testListeners() throws TooManyListenersException {
-        final FsArchiveFileSystem<?>
-                fs = FsArchiveFileSystem.newEmptyFileSystem(
-                    new MockArchiveDriver());
-
-        try {
-            fs.addFsArchiveFileSystemTouchListener(null);
-        } catch (NullPointerException expected) {
-        }
-        assertThat(fs.getFsArchiveFileSystemTouchListeners(), notNullValue());
-        assertThat(fs.getFsArchiveFileSystemTouchListeners().length, is(0));
-
-        final Listener listener1 = new Listener(fs);
-        fs.addFsArchiveFileSystemTouchListener(listener1);
-        assertThat(fs.getFsArchiveFileSystemTouchListeners().length, is(1));
-
-        try {
-            fs.addFsArchiveFileSystemTouchListener(new Listener(fs));
-            fail();
-        } catch (TooManyListenersException expected) {
-        }
-        assertThat(fs.getFsArchiveFileSystemTouchListeners().length, is(1));
-
-        try {
-            fs.removeFsArchiveFileSystemTouchListener(null);
-            fail();
-        } catch (NullPointerException expected) {
-        }
-        assertThat(fs.getFsArchiveFileSystemTouchListeners().length, is(1));
-
-        fs.removeFsArchiveFileSystemTouchListener(listener1);
-        fs.removeFsArchiveFileSystemTouchListener(listener1);
-        assertThat(fs.getFsArchiveFileSystemTouchListeners().length, is(0));
-    }
-
-    private static class Listener
-    implements FsArchiveFileSystemTouchListener<FsArchiveEntry> {
-        final FsArchiveFileSystem<?> fileSystem;
-
-        Listener(final FsArchiveFileSystem<?> fileSystem) {
-            this.fileSystem = fileSystem;
-        }
-
-        @Override
-        public void beforeTouch(FsArchiveFileSystemEvent<?> event) {
-            assertThat(event, notNullValue());
-            assertThat(event.getSource(), sameInstance((Object) fileSystem));
-        }
-
-        @Override
-        public void afterTouch(FsArchiveFileSystemEvent<?> event) {
-            assertThat(event, notNullValue());
-            assertThat(event.getSource(), sameInstance((Object) fileSystem));
-        }
     }
 
     @Test

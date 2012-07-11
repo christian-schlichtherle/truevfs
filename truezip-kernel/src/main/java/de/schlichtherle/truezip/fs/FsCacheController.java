@@ -19,7 +19,6 @@ import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import static de.schlichtherle.truezip.socket.IOCache.Strategy.WRITE_BACK;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.ControlFlowException;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
@@ -218,7 +217,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             }
             delegate.sync(options.clear(CLEAR_CACHE));
         } while (null != preSyncEx);
-        if (caches.isEmpty()) setTouched(false);
+        if (caches.isEmpty()) setMounted(false);
     }
 
     private void preSync(final BitField<FsSyncOption> options)
@@ -358,7 +357,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
                     // socket even upon an exception!
                     //super(Input.super.newInputStream());
                     super(getBoundSocket().newInputStream());
-                    assert isTouched();
+                    assert isMounted();
                 }
 
                 @Override

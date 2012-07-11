@@ -52,8 +52,7 @@ implements Iterable<FsCovariantEntry<E>> {
     /** Whether or not this file system has been modified (touched). */
     private boolean touched;
 
-    private @CheckForNull FsArchiveFileSystemTouchListener<? super E>
-            touchListener;
+    private @CheckForNull TouchListener touchListener;
 
     /**
      * Returns a new empty archive file system and ensures its integrity.
@@ -214,59 +213,26 @@ implements Iterable<FsCovariantEntry<E>> {
      *         operation for any reason.
      */
     private void touch() throws IOException {
-        if (touched)
-            return;
-        // Order is important here because of veto exceptions!
-        final FsArchiveFileSystemEvent<E>
-                e = new FsArchiveFileSystemEvent<E>(this);
-        final FsArchiveFileSystemTouchListener<? super E> tl = touchListener;
-        if (null != tl)
-            tl.beforeTouch(e);
+        if (touched) return;
+        final TouchListener tl = touchListener;
+        if (null != tl) tl.preTouch();
         touched = true;
-        if (null != tl)
-            tl.afterTouch(e);
     }
 
-    /**
-     * Returns a protective copy of the set of archive file system listeners.
-     *
-     * @return A clone of the set of archive file system listeners.
-     */
-    @SuppressWarnings("unchecked")
-    final FsArchiveFileSystemTouchListener<? super E>[]
-    getFsArchiveFileSystemTouchListeners() {
-        return null == touchListener
-                ? new FsArchiveFileSystemTouchListener[0]
-                : new FsArchiveFileSystemTouchListener[] { touchListener };
-    }
+    /** Gets the archive file system touch listener. */
+    final TouchListener getTouchListener() { return touchListener; }
 
-    /**
-     * Adds the given listener to the set of archive file system listeners.
+    /** Sets the archive file system touch listener.
      *
-     * @param  listener the listener for archive file system events.
+     * @param  listener the touch listener.
+     * @throws IllegalStateException if `listener` is not null and the
+     *         touch listener has already been set.
      */
-    final void addFsArchiveFileSystemTouchListener(
-            final FsArchiveFileSystemTouchListener<? super E> listener)
-    throws TooManyListenersException {
-        if (null == listener)
-            throw new NullPointerException();
-        if (null != touchListener)
-            throw new TooManyListenersException();
-        touchListener = listener;
-    }
-
-    /**
-     * Removes the given listener from the set of archive file system listeners.
-     *
-     * @param  listener the listener for archive file system events.
-     */
-    final void removeFsArchiveFileSystemTouchListener(
-            final FsArchiveFileSystemTouchListener<? super E> listener) {
-        if (null == listener)
-            throw new NullPointerException();
-        if (touchListener == listener)
-            touchListener = null;
-    }
+  final void setTouchListener(final TouchListener listener) {
+        if (null != listener && null != touchListener)
+            throw new IllegalStateException("The touch listener has already been set!");
+      touchListener = listener;
+  }
 
     // TODO: Consider renaming to size().
     int getSize() {
@@ -719,4 +685,19 @@ implements Iterable<FsCovariantEntry<E>> {
             return null != path ? path : ROOT_PATH;
         }
     } // class Splitter
+
+    /** Used to notify implementations of an event in this file system. */
+    @SuppressWarnings("PackageVisibleInnerClass")
+    interface TouchListener {
+
+        /**
+         * Called immediately before the source archive file system is going to
+         * get modified (touched) for the first time.
+         * If this method throws an {@code IOException}), then the modification
+         * is effectively vetoed.
+         *
+         * @throws IOException at the discretion of the implementation.
+         */
+        void preTouch() throws IOException;
+    } // TouchListener
 }

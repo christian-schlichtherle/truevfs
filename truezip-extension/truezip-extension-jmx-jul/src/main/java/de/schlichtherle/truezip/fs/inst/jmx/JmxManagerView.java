@@ -9,14 +9,12 @@ import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.fs.FsSyncOptions;
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
-import java.util.List;
 import javax.management.*;
 
 /**
  * The MXBean implementation for a {@link FsManager file system manager}.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 final class JmxManagerView
 extends StandardMBean
@@ -59,10 +57,11 @@ implements JmxManagerViewMXBean {
     }
 
     private static ObjectName getObjectName(final FsManager model) {
+        final Class<?> clazz = model.getClass();
         try {
-            return new ObjectName(  FsManager.class.getName(),
-                                    "name",
-                                    "SINGLETON");
+            return new ObjectName(  clazz.getPackage().getName(),
+                                    "type",
+                                    clazz.getSimpleName());
         } catch (MalformedObjectNameException ex) {
             throw new AssertionError(ex);
         }
@@ -95,17 +94,16 @@ implements JmxManagerViewMXBean {
 
     @Override
     protected String getDescription(MBeanAttributeInfo info) {
+        final String name = info.getName();
         String description = null;
-        if (info.getName().equals("FederatedFileSystems")) {
-            description = "The federated file systems managed by this instance.";
-        } else if (info.getName().equals("FileSystemsTotal")) {
-            description = "The total number of managed federated file systems.";
-        } else if (info.getName().equals("FileSystemsTouched")) {
-            description = "The number of managed federated file systems which have been touched and need unmounting.";
-        } else if (info.getName().equals("TopLevelFileSystemsTotal")) {
-            description = "The total number of managed top level federated file systems.";
-        } else if (info.getName().equals("TopLevelFileSystemsTouched")) {
-            description = "The number of managed top level federated file systems which have been touched and need unmounting.";
+        if (name.equals("FileSystemsTotal")) {
+            description = "The total number of file systems.";
+        } else if (name.equals("FileSystemsMounted")) {
+            description = "The number of file systems which have been mounted and need sync()ing.";
+        } else if (name.equals("TopLevelArchiveFileSystemsTotal")) {
+            description = "The total number of top level archive file systems.";
+        } else if (name.equals("TopLevelArchiveFileSystemsMounted")) {
+            description = "The number of top level archive file systems which have been mounted and need sync()ing.";
         }
         return description;
     }
@@ -134,22 +132,14 @@ implements JmxManagerViewMXBean {
      */
     @Override
     protected String getDescription(MBeanOperationInfo info) {
+        final String name = info.getName();
         String description = null;
-        if (info.getName().equals("clearStatistics")) {
+        if (name.equals("sync")) {
+            description = "Synchronizes all managed file systems. If any file system is busy with I/O, an FsSyncException is thrown.";
+        } else if (name.equals("clearStatistics")) {
             description = "Clears all but the last I/O statistics.";
-        } else if (info.getName().equals("umount")) {
-            description = "Synchronizes all managed archive file systems. If any file system is busy with I/O, an FsSyncException is thrown.";
         }
         return description;
-    }
-
-    @Override
-    public JmxModelViewMXBean[] getFederatedFileSystems() {
-        int size = model.getSize();
-        List<JmxModelViewMXBean> list = new ArrayList<JmxModelViewMXBean>(size);
-        for (FsController<?> controller : model)
-            list.add(JmxModelView.register(controller.getModel()));
-        return list.toArray(new JmxModelViewMXBean[size]);
     }
 
     @Override
@@ -158,36 +148,37 @@ implements JmxManagerViewMXBean {
     }
 
     @Override
-    public int getFileSystemsTouched() {
-        int result = 0;
+    public int getFileSystemsMounted() {
+        int mounted = 0;
         for (FsController<?> controller : model)
-            if (controller.getModel().isTouched())
-                result++;
-        return result;
+            if (controller.getModel().isMounted()) mounted++;
+        return mounted;
     }
 
     @Override
-    public int getTopLevelFileSystemsTotal() {
-        int result = 0;
+    public int getTopLevelArchiveFileSystemsTotal() {
+        int total = 0;
         for (FsController<?> controller : model)
-            if (null == controller.getParent().getParent())
-                result++;
-        return result;
+            if (isTopLevelArchive(controller)) total++;
+        return total;
     }
 
     @Override
-    public int getTopLevelFileSystemsTouched() {
-        int result = 0;
-        for (FsController<?> controller : model) {
-            if (null == controller.getParent().getParent())
-                if (controller.getModel().isTouched())
-                    result++;
-        }
-        return result;
+    public int getTopLevelArchiveFileSystemsMounted() {
+        int mounted = 0;
+        for (FsController<?> controller : model)
+            if (isTopLevelArchive(controller))
+                if (controller.getModel().isMounted()) mounted++;
+        return mounted;
+    }
+
+    private boolean isTopLevelArchive(final FsController<?> controller) {
+        final FsController<?> parent = controller.getParent();
+        return null != parent && null == parent.getParent();
     }
 
     @Override
-    public void umount() throws FsSyncException {
+    public void sync() throws FsSyncException {
         model.sync(FsSyncOptions.NONE);
     }
 

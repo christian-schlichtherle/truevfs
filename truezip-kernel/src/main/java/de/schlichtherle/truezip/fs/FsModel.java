@@ -4,9 +4,7 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import java.util.Objects;
 import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -15,6 +13,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * Sub-classes must be thread-safe, too.
  *
  * @see    FsController
+ * @see    FsManager
  * @author Christian Schlichtherle
  */
 @ThreadSafe
@@ -75,19 +74,19 @@ public abstract class FsModel {
      *         corresponding {@link FsController} must not get discarded until
      *         the next {@link FsController#sync sync}.
      */
-    public abstract boolean isTouched();
+    public abstract boolean isMounted();
 
     /**
-     * Sets the value of the property {@link #isTouched() touched}.
+     * Sets the value of the property {@link #isMounted() mounted}.
      * Only file system controllers should call this method in order to
      * register themselves for a call their {@link FsController#sync} method.
      * <p>
      * An implementation may ignore calls to this method if the associated
      * file system controller is stateless.
      *
-     * @param touched the new value of this property.
+     * @param mounted the new value of this property.
      */
-    public abstract void setTouched(boolean touched);
+    public abstract void setMounted(boolean mounted);
 
     /**
      * Two file system models are considered equal if and only if they are
@@ -117,10 +116,10 @@ public abstract class FsModel {
      */
     @Override
     public String toString() {
-        return String.format("%s[mountPoint=%s, parent=%s, touched=%b]",
+        return String.format("%s[mountPoint=%s, parent=%s, mounted=%b]",
                 getClass().getName(),
                 getMountPoint(),
                 getParent(),
-                isTouched());
+                isMounted());
     }
 }
