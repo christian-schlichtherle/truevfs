@@ -26,11 +26,15 @@ public abstract class FsModel {
     protected FsModel(
             final FsMountPoint mountPoint,
             final @CheckForNull FsModel parent) {
-        if (!Objects.equals(mountPoint.getParent(),
+        if (!equals(mountPoint.getParent(),
                     (null == parent ? null : parent.getMountPoint())))
             throw new IllegalArgumentException("Parent/Member mismatch!");
         this.mountPoint = mountPoint;
         this.parent = parent;
+    }
+
+    private static boolean equals(Object o1, Object o2) {
+        return o1 == o2 || null != o1 && o1.equals(o2);
     }
 
     /**
