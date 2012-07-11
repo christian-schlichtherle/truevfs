@@ -28,11 +28,11 @@ private trait GenModelAspect[M <: FsModel] {
     *
     * @return The `touched` property of the (federated virtual) file system.
     */
-  final def touched = model.isTouched
+  final def mounted = model.isMounted
 
   /** Sets the `touched` property of the (federated virtual) file system.
     *
     * @param touched the `touched` property of the (federated virtual) file system.
     */
-  final def touched_=(touched: Boolean) { model setTouched touched }
+  final def mounted_=(mounted: Boolean) { model setMounted mounted }
 }

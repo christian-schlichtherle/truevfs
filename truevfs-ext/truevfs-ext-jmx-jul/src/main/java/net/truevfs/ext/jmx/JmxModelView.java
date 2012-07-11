@@ -97,7 +97,7 @@ implements JmxModelViewMXBean {
 
     @Override
     protected String getDescription(MBeanInfo info) {
-        return "A managed federated file system.";
+        return "A file system model.";
     }
 
     @Override
@@ -105,31 +105,28 @@ implements JmxModelViewMXBean {
         String description = null;
         switch (info.getName()) {
         case "MountPoint":
-            description = "The mount point URI of this managed federated file system.";
+            description = "The mount point URI of this file system.";
             break;
         case "Touched":
-            description = "Whether or not this managed federated file system needs to get umount()ed.";
+            description = "Whether or not this file system needs to get umount()ed.";
             break;
-        case "ModelOfParent":
-            description = "The enclosing managed federated file system.";
-            break;
-        case "MountPointOfParent":
+        case "ParentMountPoint":
             description = "The mount point URI of the parent file system.";
             break;
         case "SizeOfData":
-            description = "The data size of this managed federated file system.";
+            description = "The data size of this file system.";
             break;
         case "SizeOfStorage":
-            description = "The storage size of this managed federated file system.";
+            description = "The storage size of this file system.";
             break;
         case "TimeWritten":
-            description = "The last write time of this managed federated file system.";
+            description = "The last write time of this file system.";
             break;
         case "TimeRead":
-            description = "The last read or access time of this managed federated file system.";
+            description = "The last read or access time of this file system.";
             break;
         case "TimeCreated":
-            description = "The creation time of this managed federated file system.";
+            description = "The creation time of this file system.";
             break;
         }
         return description;
@@ -161,7 +158,7 @@ implements JmxModelViewMXBean {
     protected String getDescription(MBeanOperationInfo info) {
         String description = null;
         if (info.getName().equals("sync")) {
-            description = "Synchronizes this managed archive file system and all enclosed archive file systems. If any file system is busy with I/O, an FsSyncException is thrown.";
+            description = "Synchronizes this file system and all enclosed file systems. If any file system is busy with I/O, an FsSyncException is thrown.";
         }
         return description;
     }
@@ -172,21 +169,12 @@ implements JmxModelViewMXBean {
     }
 
     @Override
-    public boolean isTouched() {
-        return model.isTouched();
+    public boolean isMounted() {
+        return model.isMounted();
     }
 
     @Override
-    public JmxModelViewMXBean getModelOfParent() {
-        final FsModel parent = model.getParent();
-        assert null != parent;
-        return null == parent.getParent()
-                ? null
-                : JmxModelView.register(parent);
-    }
-
-    @Override
-    public String getMountPointOfParent() {
+    public String getParentMountPoint() {
         final FsModel parent = model.getParent();
         assert null != parent;
         return parent.getMountPoint().toString();

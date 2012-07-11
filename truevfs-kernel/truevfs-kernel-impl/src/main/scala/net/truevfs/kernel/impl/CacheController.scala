@@ -150,7 +150,7 @@ private trait CacheController extends Controller[LockModel] {
       }
       super.sync(options.clear(CLEAR_CACHE))
     } while (null ne preSyncEx)
-    if (caches.isEmpty) touched = false
+    if (caches.isEmpty) mounted = false
   }
 
   private def preSync(options: SyncOptions) {
@@ -206,7 +206,7 @@ private trait CacheController extends Controller[LockModel] {
           assert(writeLockedByCurrentThread)
 
           final class Stream extends DecoratingInputStream(socket.stream(peer)) {
-            assert(touched)
+            assert(mounted)
 
             override def close() {
               assert(writeLockedByCurrentThread)

@@ -103,28 +103,28 @@ private final class DefaultManager(
   private final class ManagedModel(mountPoint: FsMountPoint, parent: FsModel)
   extends FsAbstractModel(mountPoint, parent) {
     private[this] var _controller: AnyController = _
-    @volatile private[this] var _touched: Boolean = _
+    @volatile private[this] var _mounted: Boolean = _
 
     def init(controller: AnyController) {
       assert(null ne controller)
-      assert(!_touched)
+      assert(!_mounted)
       _controller = controller
       schedule(false)
     }
 
-    override def isTouched = _touched
+    override def isMounted = _mounted
 
     /**
      * Schedules the file system controller for synchronization according
-     * to the given touch status.
+     * to the given mount status.
      */
-    override def setTouched(touched: Boolean) {
+    override def setMounted(mounted: Boolean) {
       writeLock lock ()
       try {
-        if (_touched != touched) {
-          if (touched) SyncShutdownHook register DefaultManager.this
-          schedule(touched)
-          _touched = touched
+        if (_mounted != mounted) {
+          if (mounted) SyncShutdownHook register DefaultManager.this
+          schedule(mounted)
+          _mounted = mounted
         }
       } finally {
         writeLock unlock ()

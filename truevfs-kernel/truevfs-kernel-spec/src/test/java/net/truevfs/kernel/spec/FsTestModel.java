@@ -13,19 +13,19 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public class FsTestModel extends FsAbstractModel {
 
-    private volatile boolean touched;
+    private volatile boolean mounted;
 
     FsTestModel(FsMountPoint mountPoint, @CheckForNull FsModel parent) {
         super(mountPoint, parent);
     }
 
     @Override
-    public boolean isTouched() {
-        return touched;
+    public boolean isMounted() {
+        return mounted;
     }
 
     @Override
-    public void setTouched(final boolean touched) {
-        this.touched = touched;
+    public void setMounted(final boolean mounted) {
+        this.mounted = mounted;
     }
 }

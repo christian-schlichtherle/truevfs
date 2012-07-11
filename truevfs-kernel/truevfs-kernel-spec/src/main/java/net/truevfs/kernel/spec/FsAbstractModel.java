@@ -51,6 +51,6 @@ public abstract class FsAbstractModel extends UniqueObject implements FsModel {
                 getClass().getName(),
                 mountPoint,
                 parent,
-                isTouched());
+                isMounted());
     }
 }

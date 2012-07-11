@@ -50,17 +50,17 @@ public interface FsModel {
      *         corresponding {@link FsController} must not get discarded until
      *         the next {@link FsController#sync sync}.
      */
-    boolean isTouched();
+    boolean isMounted();
 
     /**
-     * Sets the value of the property {@link #isTouched() touched}.
+     * Sets the value of the property {@link #isMounted() mounted}.
      * Only file system controllers should call this method in order to
      * register themselves for a call their {@link FsController#sync} method.
      * <p>
      * An implementation may ignore calls to this method if the associated
      * file system controller is stateless.
      *
-     * @param touched the new value of this property.
+     * @param mounted the new value of this property.
      */
-    void setTouched(boolean touched);
+    void setMounted(boolean mounted);
 }

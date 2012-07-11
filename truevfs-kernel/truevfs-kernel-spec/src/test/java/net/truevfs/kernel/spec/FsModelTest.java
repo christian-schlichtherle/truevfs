@@ -48,7 +48,7 @@ public class FsModelTest {
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
             assertThat(model.getMountPoint().getPath(), nullValue());
             assertThat(model.getParent(), nullValue());
-            assertThat(model.isTouched(), is(false));
+            assertThat(model.isMounted(), is(false));
         }
     }
 
@@ -87,7 +87,7 @@ public class FsModelTest {
             assertThat(model.getParent(), sameInstance(parent));
             assertThat(model.getMountPoint().getPath().resolve(entryName).getEntryName(), equalTo(parentEntryName));
             assertThat(model.getMountPoint().resolve(entryName), equalTo(path));
-            assertThat(model.isTouched(), is(false));
+            assertThat(model.isMounted(), is(false));
         }
     }
 }

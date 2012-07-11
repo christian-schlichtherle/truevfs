@@ -5,8 +5,6 @@
 package net.truevfs.ext.jmx;
 
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
-import java.util.List;
 import javax.management.*;
 import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsManager;
@@ -59,10 +57,11 @@ implements JmxManagerViewMXBean {
     }
 
     private static ObjectName getObjectName(final FsManager model) {
+        final Class<?> clazz = model.getClass();
         try {
-            return new ObjectName(  model.getClass().getName(),
-                                    "scope",
-                                    "singleton");
+            return new ObjectName(  clazz.getPackage().getName(),
+                                    "type",
+                                    clazz.getSimpleName());
         } catch (MalformedObjectNameException ex) {
             throw new AssertionError(ex);
         }
@@ -153,46 +152,38 @@ implements JmxManagerViewMXBean {
     }
 
     @Override
-    public JmxModelViewMXBean[] getFederatedFileSystems() {
-        int size = model.size();
-        List<JmxModelViewMXBean> list = new ArrayList<>(size);
-        for (FsController<?> controller : model)
-            list.add(JmxModelView.register(controller.getModel()));
-        return list.toArray(new JmxModelViewMXBean[size]);
-    }
-
-    @Override
     public int getFileSystemsTotal() {
         return model.size();
     }
 
     @Override
-    public int getFileSystemsTouched() {
-        int result = 0;
+    public int getFileSystemsMounted() {
+        int mounted = 0;
         for (FsController<?> controller : model)
-            if (controller.getModel().isTouched())
-                result++;
-        return result;
+            if (controller.getModel().isMounted()) mounted++;
+        return mounted;
     }
 
     @Override
-    public int getTopLevelFileSystemsTotal() {
-        int result = 0;
+    public int getTopLevelArchiveFileSystemsTotal() {
+        int total = 0;
         for (FsController<?> controller : model)
-            if (null == controller.getParent().getParent())
-                result++;
-        return result;
+            if (isTopLevelArchive(controller)) total++;
+        return total;
     }
 
     @Override
-    public int getTopLevelFileSystemsTouched() {
-        int result = 0;
-        for (FsController<?> controller : model) {
-            if (null == controller.getParent().getParent())
-                if (controller.getModel().isTouched())
-                    result++;
-        }
-        return result;
+    public int getTopLevelArchiveFileSystemsMounted() {
+        int mounted = 0;
+        for (FsController<?> controller : model)
+            if (isTopLevelArchive(controller))
+                if (controller.getModel().isMounted()) mounted++;
+        return mounted;
+    }
+
+    private boolean isTopLevelArchive(final FsController<?> controller) {
+        final FsController<?> parent = controller.getParent();
+        return null != parent && null == parent.getParent();
     }
 
     @Override
