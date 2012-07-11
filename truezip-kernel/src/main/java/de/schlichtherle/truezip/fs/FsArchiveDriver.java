@@ -66,10 +66,6 @@ extends FsDriver {
      * {@code model.getParent().equals(parent.getModel())}
      * Note that the parent file system controller of an archive file system is
      * never {@code null}.
-     * <p>
-     * The implementation in the class {@link FsArchiveDriver} creates a
-     * partial file system controller chain and passes the result to
-     * {@link #decorate} for further decoration.
      *
      * @param  model the file system model.
      * @param  parent the non-null parent file system controller.
@@ -83,36 +79,14 @@ extends FsDriver {
         assert model.getParent().equals(parent.getModel());
         assert !(model instanceof FsLockModel);
         // HC SVNT DRACONES!
-        return  decorate(
-                    new FsLockController(
-                        new FsSyncController(
-                            new FsCacheController(
-                                new FsResourceController(
-                                    new FsContextController(
-                                        new FsTargetArchiveController<E>(
-                                            this, new FsLockModel(model), parent))),
-                                getPool()))));
-    }
-
-    /**
-     * This hook can get overridden by archive drivers in order to decorate the
-     * given file system controller chain with some more file system
-     * controller(s).
-     * <p>
-     * The implementation in the class {@link FsArchiveDriver} simply returns
-     * the given controller.
-     * 
-     * @param  <M> the file system model used by the given controller.
-     * @param  controller the file system controller to decorate or return.
-     *         Note that this controller may throw {@link RuntimeException}s
-     *         for non-local control flow!
-     * @return The decorated file system controller or simply
-     *         {@code controller}.
-     * @since  TrueZIP 7.6
-     */
-    public <M extends FsModel> FsController<M> decorate(
-            FsController<M> controller) {
-        return controller;
+        return  new FsLockController(
+                    new FsSyncController(
+                        new FsCacheController(
+                            new FsResourceController(
+                                new FsContextController(
+                                    new FsTargetArchiveController<E>(
+                                        this, new FsLockModel(model), parent))),
+                            getPool())));
     }
 
     /**
