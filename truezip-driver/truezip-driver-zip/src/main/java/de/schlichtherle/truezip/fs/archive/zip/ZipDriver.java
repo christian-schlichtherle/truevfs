@@ -378,6 +378,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<ZipDriverEntry> {
      * 
      * @deprecated since TrueZIP 7.6 - override {@link #decorate} instead.
      */
+    @Deprecated
     protected final FsController<?>
     superNewController(FsModel model, FsController<?> parent) {
         return super.newController(model, parent);
