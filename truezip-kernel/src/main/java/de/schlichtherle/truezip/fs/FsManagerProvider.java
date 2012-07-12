@@ -14,7 +14,7 @@ package de.schlichtherle.truezip.fs;
 public interface FsManagerProvider {
 
     /**
-     * Returns the singleton file system manager.
+     * Returns the file system manager.
      * <p>
      * Calling this method several times must return the <em>same</em> file
      * system manager in order to ensure integrity of the virtual file system
