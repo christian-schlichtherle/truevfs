@@ -15,9 +15,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -26,10 +23,6 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public final class PaceManager
 extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
-
-    private static final Logger
-            logger = Logger.getLogger(  PaceManager.class.getName(),
-                                        PaceManager.class.getName());
 
     private volatile int
             maxMounted = MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE;
@@ -100,11 +93,7 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
      * @param  c the controller for the most recently used file system.
      */
     void accessed(final PaceController c) {
-        if (c.isMounted()) {
-            final FsMountPoint mp = c.getMountPoint();
-            mounted.put(mp, c);
-            logger.log(Level.FINEST, "accessed", mp);
-        }
+        if (c.isMounted()) mounted.put(c.getMountPoint(), c);
     }
 
     /**
@@ -125,18 +114,12 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
             for (final FsController<?> fc : fm) {
                 final FsMountPoint fmp = fc.getModel().getMountPoint();
                 if (mp.equals(fmp) || mounted.containsKey(fmp)) {
-                    if (lmp.equals(fmp) || mounted.containsKey(lmp)) {
-                        i.remove();
-                        logger.log(Level.FINER, "recollected", lmp);
-                    } else {
-                        logger.log(Level.FINER, "retained", lmp);
-                    }
+                    if (lmp.equals(fmp) || mounted.containsKey(lmp)) i.remove();
                     continue iterating;
                 }
             }
             i.remove(); // even if subsequent umount fails
             fm.sync(FsSyncOptions.SYNC);
-            logger.log(Level.FINE, "synced", lmp);
         }
     }
 
@@ -152,7 +135,7 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
         try {
             delegate.sync(options);
         } finally {
-            logger.log(Level.FINER, "cleared", mounted.clear());
+            mounted.clear();
         }
     }
 
@@ -172,7 +155,6 @@ extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
                     final PaceController c = entry.getValue();
                     final boolean added = evicted.add(c);
                     assert added;
-                    logger.log(Level.FINER, "evicted", entry.getKey());
                 }
                 return evict;
             }
