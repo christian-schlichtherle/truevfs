@@ -1446,6 +1446,7 @@ public final class TFile extends File {
      *             easily corrupt the state of the (virtual) file system space,
      *             including loss of data!
      */
+    @Deprecated
     public File getFile() {
         return file;
     }
