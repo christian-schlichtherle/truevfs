@@ -12,7 +12,7 @@ package net.truevfs.kernel.spec;
 public interface FsManagerProvider {
 
     /**
-     * Returns the singleton file system manager.
+     * Returns the file system manager.
      * <p>
      * This is an immutable property - multiple calls must return the same
      * object.
