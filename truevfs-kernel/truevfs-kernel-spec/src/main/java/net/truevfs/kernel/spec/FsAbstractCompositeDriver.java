@@ -12,15 +12,14 @@ import net.truevfs.kernel.spec.util.UniqueObject;
 /**
  * An abstract composite driver.
  * This class provides an implementation of {@link #newController} which uses
- * the file system driver map returned by {@link #getDrivers()} to lookup the
+ * the file system driver map returned by {@link #drivers()} to lookup the
  * appropriate driver for the scheme of any given mount point.
  * 
  * @author Christian Schlichtherle
  */
 @Immutable
 public abstract class FsAbstractCompositeDriver
-extends UniqueObject implements FsCompositeDriver, FsDriverProvider {
-
+extends UniqueObject implements FsCompositeDriver, FsDriverMapProvider {
     @Override
     public final FsController<? extends FsModel> newController(
             final FsManager manager,
@@ -30,7 +29,7 @@ extends UniqueObject implements FsCompositeDriver, FsDriverProvider {
                     ? null == model.getParent()
                     : parent.getModel().equals(model.getParent());
         final FsScheme scheme = model.getMountPoint().getScheme();
-        final FsDriver driver = getDrivers().get(scheme);
+        final FsDriver driver = drivers().get(scheme);
         if (null == driver)
             throw new ServiceConfigurationError(scheme
                     + " (Unknown file system scheme! May be the class path doesn't contain the respective driver module or it isn't set up correctly?)");

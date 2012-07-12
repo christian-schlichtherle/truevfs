@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.FsManager;
 import net.truevfs.kernel.spec.FsManagerProvider;
-import net.truevfs.kernel.spec.spi.FsManagerService;
+import net.truevfs.kernel.spec.spi.FsManagerFactory;
 import net.truevfs.kernel.spec.util.ServiceLocator;
 
 /**
@@ -23,19 +23,19 @@ import net.truevfs.kernel.spec.util.ServiceLocator;
  * or using a default implementation, whatever yields a result first.
  * <p>
  * First, the value of the {@link System#getProperty system property}
- * with the class name {@code "net.truevfs.kernel.spi.FsManagerService"}
+ * with the class name {@code "net.truevfs.kernel.spi.FsManagerFactory"}
  * as the key is queried.
  * If this yields a value, the class with that name is then loaded and
  * instantiated by calling its public no-argument constructor.
  * <p>
  * Otherwise, the class path is searched for any resource file with the name
- * {@code "META-INF/services/net.truevfs.kernel.spi.FsManagerService"}.
+ * {@code "META-INF/services/net.truevfs.kernel.spi.FsManagerFactory"}.
  * If this yields a result, the class with the name in this file is then loaded
  * and instantiated by calling its public no-argument constructor.
  * <p>
  * Otherwise, a {@link ServiceConfigurationError} gets thrown.
  *
- * @see    FsManagerService
+ * @see    FsManagerFactory
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -48,25 +48,25 @@ public final class FsManagerLocator implements FsManagerProvider {
     private FsManagerLocator() { }
 
     @Override
-    public FsManager getManager() {
-        return Boot.SERVICE.getManager();
+    public FsManager manager() {
+        return Boot.SERVICE.manager();
     }
 
     /** A static data utility class used for lazy initialization. */
     private static final class Boot {
-        static final FsManagerService SERVICE;
+        static final FsManagerFactory SERVICE;
         static {
             final Logger logger = Logger.getLogger(
                     FsManagerLocator.class.getName(),
                     FsManagerLocator.class.getName());
             final ServiceLocator locator = new ServiceLocator(
                     FsManagerLocator.class.getClassLoader());
-            FsManagerService
-                    service = locator.getService(FsManagerService.class, null);
+            FsManagerFactory
+                    service = locator.getService(FsManagerFactory.class, null);
             if (null == service) {
-                FsManagerService newService = null;
-                for (   final Iterator<FsManagerService>
-                            i = locator.getServices(FsManagerService.class);
+                FsManagerFactory newService = null;
+                for (   final Iterator<FsManagerFactory>
+                            i = locator.getServices(FsManagerFactory.class);
                         i.hasNext();) {
                     newService = i.next();
                     logger.log(CONFIG, "located", newService);

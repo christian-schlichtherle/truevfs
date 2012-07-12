@@ -22,7 +22,7 @@ public final class TarFileIT extends TarFileITSuite<TarDriver> {
         return new TarDriver() {
             @Override
             public IoPool<?> getIoPool() {
-                return getTestConfig().getIoPoolProvider().getIoPool();
+                return getTestConfig().getIoPoolProvider().ioPool();
             }
         };
     }

@@ -72,7 +72,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      */
     @Override
     public IoPool<? extends IoBuffer<?>> getIoPool() {
-        return IoPoolLocator.SINGLETON.getIoPool();
+        return IoPoolLocator.SINGLETON.ioPool();
     }
 
     /**

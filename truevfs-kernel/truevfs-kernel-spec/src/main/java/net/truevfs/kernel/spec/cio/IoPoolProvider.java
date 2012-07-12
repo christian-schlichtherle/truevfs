@@ -4,20 +4,22 @@
  */
 package net.truevfs.kernel.spec.cio;
 
+import javax.annotation.concurrent.ThreadSafe;
+
 /**
- * A provider for an I/O buffer pool.
+ * Provides I/O buffer pools.
+ * <p>
+ * Implementations must be thread-safe.
  *
  * @author Christian Schlichtherle
  */
+@ThreadSafe
 public interface IoPoolProvider {
 
     /**
-     * Returns the pool to use for allocating temporary I/O buffers.
-     * <p>
-     * This is an immutable property - multiple calls must return the same
-     * object.
+     * Returns a pool for allocating temporary I/O buffers.
      *
-     * @return The pool to use for allocating temporary I/O buffers.
+     * @return A pool for allocating temporary I/O buffers.
      */
-    IoPool<? extends IoBuffer<?>> getIoPool();
+    IoPool<? extends IoBuffer<?>> ioPool();
 }

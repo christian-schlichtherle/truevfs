@@ -20,7 +20,7 @@ extends FsArchiveDriverTestSuite<AbstractZipDriverEntry, JarDriver> {
         return new JarDriver() {
             @Override
             public IoPool<? extends IoBuffer<?>> getIoPool() {
-                return getTestConfig().getIoPoolProvider().getIoPool();
+                return getTestConfig().getIoPoolProvider().ioPool();
             }
         };
     }

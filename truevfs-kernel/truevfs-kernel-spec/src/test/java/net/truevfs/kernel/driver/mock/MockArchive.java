@@ -65,7 +65,7 @@ implements Container<MockArchiveDriverEntry> {
     }
 
     public final IoPool<?> getIoPool() {
-        return getIoPoolProvider().getIoPool();
+        return getIoPoolProvider().ioPool();
     }
 
     @Override

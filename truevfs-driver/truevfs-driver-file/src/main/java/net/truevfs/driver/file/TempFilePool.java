@@ -27,17 +27,18 @@ final class TempFilePool implements IoPool<FileEntry> {
     private static final Path TEMP_DIR
             = Paths.get(System.getProperty("java.io.tmpdir"));
 
-    /**
-     * A default instance of this pool.
-     * Use this if you don't have special requirements regarding the temp file
-     * prefix, suffix or directory.
-     */
-    static final TempFilePool INSTANCE = new TempFilePool(null, null);
-
     private final @Nullable Path dir;
     private final String name;
 
-    /** Constructs a new temp file pool. */
+    /**
+     * Constructs a default instance of this pool.
+     * Use this if you don't have special requirements regarding the temp file
+     * prefix, suffix or directory.
+     */
+    TempFilePool() {
+        this(null, null);
+    }
+
     TempFilePool(
             final @CheckForNull Path dir,
             final @CheckForNull String name) {

@@ -6,7 +6,7 @@ package net.truevfs.kernel.spec;
 
 import java.net.URI;
 import java.util.Iterator;
-import net.truevfs.kernel.driver.mock.MockDriverService;
+import net.truevfs.kernel.driver.mock.MockDriverMapFactory;
 import net.truevfs.kernel.spec.util.BitField;
 import net.truevfs.kernel.spec.util.Link.Type;
 import static net.truevfs.kernel.spec.util.Link.Type.WEAK;
@@ -22,7 +22,7 @@ import org.junit.Test;
 public abstract class FsManagerTestSuite {
 
     private final FsCompositeDriver driver = new FsSimpleCompositeDriver(
-            new MockDriverService("file|zip"));
+            new MockDriverMapFactory("file|zip"));
     private FsManager manager;
 
     @Before

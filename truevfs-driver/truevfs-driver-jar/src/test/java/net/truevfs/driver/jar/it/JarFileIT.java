@@ -23,7 +23,7 @@ public final class JarFileIT extends TFileITSuite<JarDriver> {
         return new JarDriver() {
             @Override
             public IoPool<?> getIoPool() {
-                return getTestConfig().getIoPoolProvider().getIoPool();
+                return getTestConfig().getIoPoolProvider().ioPool();
             }
         };
     }

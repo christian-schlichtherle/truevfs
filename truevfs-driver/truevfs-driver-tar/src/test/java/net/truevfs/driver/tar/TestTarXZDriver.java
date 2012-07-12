@@ -17,7 +17,7 @@ public final class TestTarXZDriver extends TarXZDriver {
 
     @Override
     public IoPool<?> getIoPool() {
-        return TestConfig.get().getIoPoolProvider().getIoPool();
+        return TestConfig.get().getIoPoolProvider().ioPool();
     }
 
     @Override

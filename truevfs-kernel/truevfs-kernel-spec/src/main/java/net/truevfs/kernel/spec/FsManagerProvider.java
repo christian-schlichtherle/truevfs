@@ -4,20 +4,22 @@
  */
 package net.truevfs.kernel.spec;
 
+import javax.annotation.concurrent.ThreadSafe;
+
 /**
- * A provider for the singleton file system manager.
+ * Provides file system managers.
+ * <p>
+ * Implementations must be thread-safe.
  *
  * @author Christian Schlichtherle
  */
+@ThreadSafe
 public interface FsManagerProvider {
 
     /**
-     * Returns the file system manager.
-     * <p>
-     * This is an immutable property - multiple calls must return the same
-     * object.
+     * Returns a file system manager.
      *
-     * @return The file system manager.
+     * @return A file system manager.
      */
-    FsManager getManager();
+    FsManager manager();
 }

@@ -17,7 +17,7 @@ public final class TestTarBZip2Driver extends TarBZip2Driver {
 
     @Override
     public IoPool<?> getIoPool() {
-        return TestConfig.get().getIoPoolProvider().getIoPool();
+        return TestConfig.get().getIoPoolProvider().ioPool();
     }
 
     @Override

@@ -15,7 +15,7 @@ import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.IoPool;
 import net.truevfs.kernel.spec.cio.IoPoolProvider;
-import net.truevfs.kernel.spec.spi.IoPoolService;
+import net.truevfs.kernel.spec.spi.IoPoolFactory;
 import net.truevfs.kernel.spec.util.ServiceLocator;
 
 /**
@@ -24,19 +24,19 @@ import net.truevfs.kernel.spec.util.ServiceLocator;
  * whatever yields a result first.
  * <p>
  * First, the value of the {@link System#getProperty system property}
- * with the class name {@code "net.truevfs.kernel.spi.IoPoolService"}
+ * with the class name {@code "net.truevfs.kernel.spi.IoPoolFactory"}
  * as the key is queried.
  * If this yields a value, the class with that name is then loaded and
  * instantiated by calling its public no-argument constructor.
  * <p>
  * Otherwise, the class path is searched for any resource file with the name
- * {@code "META-INF/services/net.truevfs.kernel.spi.IoPoolService"}.
+ * {@code "META-INF/services/net.truevfs.kernel.spi.IoPoolFactory"}.
  * If this yields a result, the class with the name in this file is then loaded
  * and instantiated by calling its public no-argument constructor.
  * <p>
  * Otherwise, a {@link ServiceConfigurationError} gets thrown.
  *
- * @see    IoPoolService
+ * @see    IoPoolFactory
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -49,24 +49,24 @@ public final class IoPoolLocator implements IoPoolProvider {
     private IoPoolLocator() { }
 
     @Override
-    public IoPool<? extends IoBuffer<?>> getIoPool() {
-        return Boot.SERVICE.getIoPool();
+    public IoPool<? extends IoBuffer<?>> ioPool() {
+        return Boot.SERVICE.ioPool();
     }
 
     /** A static data utility class used for lazy initialization. */
     private static final class Boot {
-        static final IoPoolService SERVICE;
+        static final IoPoolFactory SERVICE;
         static {
             final Logger logger = Logger.getLogger(
                     IoPoolLocator.class.getName(),
                     IoPoolLocator.class.getName());
             final ServiceLocator locator = new ServiceLocator(
                     IoPoolLocator.class.getClassLoader());
-            IoPoolService service = locator.getService(IoPoolService.class, null);
+            IoPoolFactory service = locator.getService(IoPoolFactory.class, null);
             if (null == service) {
-                IoPoolService newService = null;
-                for (   final Iterator<IoPoolService>
-                            i = locator.getServices(IoPoolService.class);
+                IoPoolFactory newService = null;
+                for (   final Iterator<IoPoolFactory>
+                            i = locator.getServices(IoPoolFactory.class);
                         i.hasNext();) {
                     newService = i.next();
                     logger.log(CONFIG, "located", newService);
@@ -89,7 +89,7 @@ public final class IoPoolLocator implements IoPoolProvider {
                             ResourceBundle
                                 .getBundle(IoPoolLocator.class.getName())
                                 .getString("null"),
-                            IoPoolService.class));
+                            IoPoolFactory.class));
             logger.log(CONFIG, "provided", service);
             SERVICE = service;
         }

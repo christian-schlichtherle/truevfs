@@ -23,7 +23,7 @@ public final class CheckedOdfFileIT extends TFileITSuite<CheckedOdfDriver> {
         return new CheckedOdfDriver() {
             @Override
             public IoPool<?> getIoPool() {
-                return getTestConfig().getIoPoolProvider().getIoPool();
+                return getTestConfig().getIoPoolProvider().ioPool();
             }
         };
     }

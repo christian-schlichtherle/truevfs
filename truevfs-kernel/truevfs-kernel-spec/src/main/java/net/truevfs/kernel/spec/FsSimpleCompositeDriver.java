@@ -5,6 +5,7 @@
 package net.truevfs.kernel.spec;
 
 import java.util.Map;
+import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -16,23 +17,21 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public final class FsSimpleCompositeDriver extends FsAbstractCompositeDriver {
 
-    private final Map<FsScheme, FsDriver> drivers;
+    private final FsDriverMapProvider provider;
 
     /**
      * Constructs a new simple composite driver which will query the given
      * driver {@code provider} for an appropriate file system driver for
      * the scheme of a given mount point.
      * 
-     * @param provider the driver provider.
+     * @param provider the driver map provider.
      */
-    public FsSimpleCompositeDriver(final FsDriverProvider provider) {
-        this.drivers = provider.getDrivers(); // dedicated immutable map!
-        assert null != drivers;
+    public FsSimpleCompositeDriver(final FsDriverMapProvider provider) {
+        this.provider = Objects.requireNonNull(provider);
     }
 
     @Override
-    @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<FsScheme, FsDriver> getDrivers() {
-        return drivers;
+    public Map<FsScheme, FsDriver> drivers() {
+        return provider.drivers();
     }
 }

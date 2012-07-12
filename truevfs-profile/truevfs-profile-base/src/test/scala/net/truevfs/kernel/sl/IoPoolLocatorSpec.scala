@@ -13,8 +13,8 @@ import org.scalatest.prop._
 import org.scalatest._
 
 /**
-  * Tests if the class path has been properly configured so that any file
-  * system manager is locatable at RUNTIME!
+  * Tests if the class path has been properly configured so that any I/O buffer
+  * pool is locatable at RUNTIME!
   * 
   * @author Christian Schlichtherle
   */
@@ -24,7 +24,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
 
   "The I/O buffer pool locator singleton" should {
     "provide an I/O buffer pool" in {
-      (IoPoolLocator.SINGLETON.getIoPool: AnyRef) should not be (null)
+      (IoPoolLocator.SINGLETON.ioPool: AnyRef) should not be (null)
     }
   }
 }

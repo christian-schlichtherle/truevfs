@@ -14,7 +14,7 @@ import static net.truevfs.kernel.spec.cio.Entry.Access.*;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.spec.sl.FsDriverLocator;
+import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.truevfs.kernel.spec.sl.FsManagerLocator;
 
 /**
@@ -29,7 +29,7 @@ implements JmxModelViewMXBean {
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
     private static final FsCompositeDriver
-            DRIVER = new FsSimpleCompositeDriver(FsDriverLocator.SINGLETON);
+            DRIVER = new FsSimpleCompositeDriver(FsDriverMapLocator.SINGLETON);
 
     private final FsModel model;
 
@@ -186,7 +186,7 @@ implements JmxModelViewMXBean {
         final FsController<?> parentController = this.parentController;
         return null != parentController
                 ? parentController
-                : (this.parentController = FsManagerLocator.SINGLETON.getManager()
+                : (this.parentController = FsManagerLocator.SINGLETON.manager()
                     .controller(DRIVER, model.getMountPoint())
                     .getParent());
     }
@@ -263,7 +263,7 @@ implements JmxModelViewMXBean {
 
     @Override
     public void sync() throws FsSyncException {
-        new FsFilteringManager( FsManagerLocator.SINGLETON.getManager(),
+        new FsFilteringManager( FsManagerLocator.SINGLETON.manager(),
                                 model.getMountPoint())
                 .sync(FsSyncOptions.NONE);
     }
