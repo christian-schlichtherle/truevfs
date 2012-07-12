@@ -23,7 +23,7 @@ public final class CheckedZipFileIT extends TFileITSuite<CheckedZipDriver> {
         return new CheckedZipDriver() {
             @Override
             public IoPool<?> getIoPool() {
-                return getTestConfig().getIoPoolProvider().getIoPool();
+                return getTestConfig().getIoPoolProvider().ioPool();
             }
         };
     }

@@ -7,23 +7,23 @@ package net.truevfs.ext.comp;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.ext.jmx.JmxDirector;
 import net.truevfs.ext.jul.JulDirector;
-import net.truevfs.kernel.impl.DefaultManagerService;
+import net.truevfs.kernel.impl.DefaultManager;
 import net.truevfs.kernel.spec.FsManager;
-import net.truevfs.kernel.spec.spi.FsManagerService;
+import net.truevfs.kernel.spec.spi.FsManagerFactory;
 
 /**
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class CompositeManagerService extends FsManagerService {
+public final class CompositeManagerService extends FsManagerFactory {
 
     private final FsManager manager =
             JmxDirector.SINGLETON.instrument(
                 JulDirector.SINGLETON.instrument(
-                    new DefaultManagerService().getManager()));
+                    new DefaultManager()));
 
     @Override
-    public FsManager getManager() {
+    public FsManager manager() {
         return manager;
     }
 

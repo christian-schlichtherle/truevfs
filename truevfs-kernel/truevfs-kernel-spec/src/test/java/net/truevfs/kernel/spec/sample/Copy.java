@@ -7,7 +7,7 @@ package net.truevfs.kernel.spec.sample;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import net.truevfs.kernel.spec.sl.FsDriverLocator;
+import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.truevfs.kernel.spec.sl.FsManagerLocator;
 import static net.truevfs.kernel.spec.FsAccessOption.CREATE_PARENTS;
 import static net.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
@@ -54,12 +54,12 @@ public final class Copy {
     static void copy(String src, String dst) throws IOException {
         // Get a manager for the life cycle of controllers for federated
         // file systems.
-        FsManager manager = FsManagerLocator.SINGLETON.getManager();
+        FsManager manager = FsManagerLocator.SINGLETON.manager();
         try {
             // Search the class path for the set of all supported file system
             // drivers and build a composite driver from it.
             FsCompositeDriver driver = new FsSimpleCompositeDriver(
-                    FsDriverLocator.SINGLETON);
+                    FsDriverMapLocator.SINGLETON);
             // Resolve the source socket.
             // Note that an absolute URI is required, so we may need to use the
             // File class for transformation from a normal path name.

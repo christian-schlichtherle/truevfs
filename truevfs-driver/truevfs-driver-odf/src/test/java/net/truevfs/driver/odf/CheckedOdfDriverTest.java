@@ -19,7 +19,7 @@ extends FsArchiveDriverTestSuite<AbstractZipDriverEntry, CheckedOdfDriver> {
         return new CheckedOdfDriver() {
             @Override
             public IoPool<?> getIoPool() {
-                return getTestConfig().getIoPoolProvider().getIoPool();
+                return getTestConfig().getIoPoolProvider().ioPool();
             }
         };
     }

@@ -13,7 +13,7 @@ import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.*;
-import net.truevfs.kernel.spec.sl.FsDriverLocator;
+import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.truevfs.kernel.spec.util.ExtensionSet;
 import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 
@@ -29,7 +29,7 @@ import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
  * <li>Constructors which filter the driver map of a given file system driver
  *     provider by a given list of file name extensions.
  *     For example, the driver map of the provider
- *     {@link FsDriverLocator#SINGLETON} could be filtered by the file name
+ *     {@link FsDriverMapLocator#SINGLETON} could be filtered by the file name
  *     extension list {@code "tar|zip"} in order to recognize only TAR and ZIP
  *     files.
  * <li>Constructors which decorate a given file system driver provider with a
@@ -64,7 +64,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
     /**
      * This instance recognizes all archive types for which an archive driver
      * can be found by the file system driver service locator singleton
-     * {@link FsDriverLocator#SINGLETON}.
+     * {@link FsDriverMapLocator#SINGLETON}.
      */
     public static final TArchiveDetector ALL = new TArchiveDetector(null);
 
@@ -80,11 +80,11 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     /**
      * Equivalent to
-     * {@link #TArchiveDetector(FsDriverProvider, String)
-     * TArchiveDetector(FsDriverLocator.SINGLETON, extensions)}.
+     * {@link #TArchiveDetector(FsDriverMapProvider, String)
+     * TArchiveDetector(FsDriverMapLocator.SINGLETON, extensions)}.
      */
     public TArchiveDetector(@CheckForNull String extensions) {
-        this(FsDriverLocator.SINGLETON, extensions);
+        this(FsDriverMapLocator.SINGLETON, extensions);
     }
 
     /**
@@ -102,9 +102,9 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      *         provider.
      * @see    ExtensionSet Syntax constraints for extension lists.
      */
-    public TArchiveDetector(final FsDriverProvider provider,
+    public TArchiveDetector(final FsDriverMapProvider provider,
                             final @CheckForNull String extensions) {
-        final Map<FsScheme, FsDriver> inDrivers = provider.getDrivers();
+        final Map<FsScheme, FsDriver> inDrivers = provider.drivers();
         final ExtensionSet inExtensions;
         final Map<FsScheme, FsDriver> outDrivers;
         if (null != extensions) {
@@ -140,7 +140,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     /**
      * Equivalent to
-     * {@link #TArchiveDetector(FsDriverProvider, String, FsDriver)
+     * {@link #TArchiveDetector(FsDriverMapProvider, String, FsDriver)
      * TArchiveDetector(TArchiveDetector.NULL, extensions, driver)}.
      */
     public TArchiveDetector(String extensions, @CheckForNull FsDriver driver) {
@@ -167,7 +167,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      *         does not hold.
      * @see    ExtensionSet Syntax contraints for extension lists.
      */
-    public TArchiveDetector(FsDriverProvider provider,
+    public TArchiveDetector(FsDriverMapProvider provider,
                             String extensions,
                             @CheckForNull FsDriver driver) {
         this(provider, new Object[][] {{ extensions, driver }});
@@ -199,8 +199,8 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      *         does not hold.
      * @see    ExtensionSet Syntax contraints for extension lists.
      */
-    public TArchiveDetector(FsDriverProvider provider, Object[][] config) {
-        this(provider, FsAbstractDriverProvider.newMap(config));
+    public TArchiveDetector(FsDriverMapProvider provider, Object[][] config) {
+        this(provider, FsDriverMapProviders.newMap(config));
     }
 
     /**
@@ -220,9 +220,9 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      *         does not hold.
      * @see    ExtensionSet Syntax contraints for extension lists.
      */
-    public TArchiveDetector(final FsDriverProvider provider,
+    public TArchiveDetector(final FsDriverMapProvider provider,
                             final Map<FsScheme, FsDriver> config) {
-        final Map<FsScheme, FsDriver> inDrivers = provider.getDrivers();
+        final Map<FsScheme, FsDriver> inDrivers = provider.drivers();
         final Map<FsScheme, FsDriver> 
                 outDrivers = new HashMap<>(initialCapacity(inDrivers.size()));
         final ExtensionSet outExtensions = new ExtensionSet();
@@ -252,7 +252,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<FsScheme, FsDriver> getDrivers() {
+    public Map<FsScheme, FsDriver> drivers() {
         return drivers;
     }
 

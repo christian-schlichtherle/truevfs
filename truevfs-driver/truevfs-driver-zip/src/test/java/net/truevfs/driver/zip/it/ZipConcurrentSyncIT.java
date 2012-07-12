@@ -23,7 +23,7 @@ public final class ZipConcurrentSyncIT extends ConcurrentSyncITSuite<ZipDriver> 
         return new ZipDriver() {
             @Override
             public IoPool<?> getIoPool() {
-                return getTestConfig().getIoPoolProvider().getIoPool();
+                return getTestConfig().getIoPoolProvider().ioPool();
             }
         };
     }

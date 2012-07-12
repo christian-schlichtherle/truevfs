@@ -4,9 +4,8 @@
  */
 package net.truevfs.driver.file;
 
-import net.truevfs.kernel.spec.spi.IoPoolService;
+import net.truevfs.kernel.spec.spi.IoPoolFactory;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,20 +14,15 @@ import org.junit.Test;
  */
 public final class TempFilePoolServiceTest {
 
-    private IoPoolService service;
+    private IoPoolFactory service;
     
     @Before
     public void setUp() {
-        service = new TempFilePoolService();
-    }
-
-    @Test
-    public void testIoPool() {
-        assertSame(service.getIoPool(), TempFilePool.INSTANCE);
+        service = new TempFilePoolFactory();
     }
 
     @Test
     public void testPriority() {
-        assertEquals(-100, service.getPriority());
+        assertEquals(0, service.getPriority());
     }
 }

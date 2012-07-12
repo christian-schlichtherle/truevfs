@@ -20,12 +20,12 @@ import scala.collection.mutable.WeakHashMap
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private final class DefaultManager(
+final class DefaultManager private (
   optionalScheduleType: Type,
   lock: ReentrantReadWriteLock
 ) extends FsAbstractManager {
 
-  def this(optionalScheduleType: Type)
+  private[impl] def this(optionalScheduleType: Type)
   = this(optionalScheduleType, new ReentrantReadWriteLock)
 
   def this() = this(WEAK)
@@ -46,7 +46,7 @@ private final class DefaultManager(
   private[this] val writeLock = lock.writeLock
 
   override def newController[E <: FsArchiveEntry]
-  (driver: FsArchiveDriver[E], model: FsModel, parent: AnyController) = {
+  (driver: FsArchiveDriver[E], model: FsModel, parent: AnyController): AnyController = {
     assert(!model.isInstanceOf[LockModel])
     // HC SVNT DRACONES!
     // The FalsePositiveArchiveController decorates the FrontController
