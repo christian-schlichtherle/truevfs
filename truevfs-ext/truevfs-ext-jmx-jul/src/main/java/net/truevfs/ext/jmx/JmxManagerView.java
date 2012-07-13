@@ -67,7 +67,7 @@ implements JmxManagerViewMXBean {
         }
     }
 
-    private JmxManagerView(FsManager model) {
+    private JmxManagerView(final FsManager model) {
         super(JmxManagerViewMXBean.class, true);
         this.model = model;
     }
