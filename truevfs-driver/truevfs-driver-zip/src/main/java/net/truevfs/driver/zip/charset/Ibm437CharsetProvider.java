@@ -16,7 +16,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class ZipCharsetProvider extends CharsetProvider {
+public final class Ibm437CharsetProvider extends CharsetProvider {
 
     private static final Map<String, Charset> CHARSETS;
     static {
