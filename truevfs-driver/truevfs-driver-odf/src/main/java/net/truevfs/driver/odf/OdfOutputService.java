@@ -38,7 +38,7 @@ public class OdfOutputService extends MultiplexingOutputService<AbstractZipDrive
      * @param pool the pool for buffering entry data.
      */
     public OdfOutputService(
-            IoPool<?> pool,
+            IoBufferPool<?> pool,
             @WillCloseWhenClosed ZipOutputService output) {
         super(pool, output);
     }

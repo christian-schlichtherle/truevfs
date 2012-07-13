@@ -17,7 +17,7 @@ import net.truevfs.kernel.spec.cio.Entry.PosixEntity;
 import net.truevfs.kernel.spec.cio.Entry.Size;
 import net.truevfs.kernel.spec.cio.Entry.Type;
 import net.truevfs.kernel.spec.cio.IoBuffer;
-import net.truevfs.kernel.spec.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle
@@ -61,7 +61,7 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
         }
     }
 
-    IoBuffer<?> getBuffer(final IoPool<?> ioPool) throws IOException {
+    IoBuffer<?> getBuffer(final IoBufferPool<?> ioPool) throws IOException {
         final IoBuffer<?> buffer = this.buffer;
         return null != buffer ? buffer : (this.buffer = ioPool.allocate());
     }

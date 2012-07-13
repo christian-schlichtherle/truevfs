@@ -45,7 +45,7 @@ import CacheEntry._
 @CleanupObligation
 private final class CacheEntry private (
   private[this] val strategy: Strategy,
-  private[this] val pool: AnyIoPool
+  private[this] val pool: AnyIoBufferPool
 ) extends Entry with Releasable[IOException] with Flushable with Closeable {
 
   private[this] var _input: Option[AnyInputSocket] = None
@@ -347,7 +347,7 @@ private final class CacheEntry private (
 private object CacheEntry {
   /** Defines different cache entry strategies. */
   sealed trait Strategy {
-    final def newCacheEntry(pool: AnyIoPool) = new CacheEntry(this, pool)
+    final def newCacheEntry(pool: AnyIoBufferPool) = new CacheEntry(this, pool)
 
     private[CacheEntry] def newOutputBufferPool(cache: CacheEntry): CacheEntry#OutputBufferPool
   }

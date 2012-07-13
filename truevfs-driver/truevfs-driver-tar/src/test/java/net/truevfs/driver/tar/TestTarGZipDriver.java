@@ -6,7 +6,8 @@ package net.truevfs.driver.tar;
 
 import java.util.zip.Deflater;
 import net.truevfs.kernel.spec.TestConfig;
-import net.truevfs.kernel.spec.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoBuffer;
+import net.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
  * Extends its super class to configure it for minimizing heap usage.
@@ -16,8 +17,8 @@ import net.truevfs.kernel.spec.cio.IoPool;
 public final class TestTarGZipDriver extends TarGZipDriver {
 
     @Override
-    public IoPool<?> getIoPool() {
-        return TestConfig.get().getIoPoolProvider().ioPool();
+    public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
+        return TestConfig.get().getIoBufferPool();
     }
 
     @Override

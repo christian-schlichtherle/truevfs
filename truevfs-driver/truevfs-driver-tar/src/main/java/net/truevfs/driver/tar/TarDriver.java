@@ -71,7 +71,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      * equally named method on the {@link IoPoolLocator#SINGLETON}.
      */
     @Override
-    public IoPool<? extends IoBuffer<?>> getIoPool() {
+    public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
         return IoPoolLocator.SINGLETON.ioPool();
     }
 
@@ -102,7 +102,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
             final FsOutputSocketSink sink,
             final @CheckForNull @WillNotClose InputService<TarDriverEntry> input)
     throws IOException {
-        return new MultiplexingOutputService<>(getIoPool(),
+        return new MultiplexingOutputService<>(getIoBufferPool(),
                 new TarOutputService(model, sink, this));
     }
 

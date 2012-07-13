@@ -56,7 +56,7 @@ private trait CacheController extends Controller[LockModel] {
 
   import CacheController._
 
-  protected def pool: AnyIoPool
+  protected def pool: AnyIoBufferPool
 
   private[this] val caches = new java.util.HashMap[FsEntryName, EntryCache]
 

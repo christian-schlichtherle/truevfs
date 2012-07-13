@@ -42,7 +42,7 @@ import net.truevfs.kernel.spec.util.SuppressedExceptionBuilder;
 public class MultiplexingOutputService<E extends MutableEntry>
 extends DecoratingOutputService<E, OutputService<E>> {
 
-    private final IoPool<? extends IoBuffer<?>> pool;
+    private final IoBufferPool<? extends IoBuffer<?>> pool;
 
     /**
      * The map of temporary archive entries which have not yet been written
@@ -61,7 +61,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
      * @param pool the pool for buffering entry data.
      */
     public MultiplexingOutputService(
-            final IoPool<? extends IoBuffer<?>> pool,
+            final IoBufferPool<? extends IoBuffer<?>> pool,
             final @WillCloseWhenClosed OutputService<E> output) {
         super(output);
         this.pool = Objects.requireNonNull(pool);

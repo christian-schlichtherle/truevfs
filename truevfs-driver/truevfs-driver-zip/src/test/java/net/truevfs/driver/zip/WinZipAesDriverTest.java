@@ -15,7 +15,7 @@ extends FsArchiveDriverTestSuite<AbstractZipDriverEntry, ZipDriver> {
 
     @Override
     protected ZipDriver newArchiveDriver() {
-        return new TestWinZipAesDriver(getTestConfig().getIoPoolProvider());
+        return new TestWinZipAesDriver();
     }
 
     @Override

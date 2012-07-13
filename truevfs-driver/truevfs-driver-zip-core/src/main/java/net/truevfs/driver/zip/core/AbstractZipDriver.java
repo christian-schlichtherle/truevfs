@@ -57,7 +57,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<AbstractZipDriverEntry> 
      * equally named method on the {@link IoPoolLocator#SINGLETON}.
      */
     @Override
-    public IoPool<? extends IoBuffer<?>> getIoPool() {
+    public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
         return IoPoolLocator.SINGLETON.ioPool();
     }
 
@@ -346,7 +346,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<AbstractZipDriverEntry> 
             final @CheckForNull @WillNotClose InputService<AbstractZipDriverEntry> input)
     throws IOException {
         final ZipInputService zis = (ZipInputService) input;
-        return new MultiplexingOutputService<>(getIoPool(),
+        return new MultiplexingOutputService<>(getIoBufferPool(),
                 new ZipOutputService(model, sink, zis, this));
     }
 

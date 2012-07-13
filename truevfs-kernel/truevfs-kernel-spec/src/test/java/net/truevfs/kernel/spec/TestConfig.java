@@ -9,7 +9,8 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
-import net.truevfs.kernel.spec.cio.IoPoolProvider;
+import net.truevfs.kernel.spec.cio.IoBuffer;
+import net.truevfs.kernel.spec.cio.IoBufferPool;
 import net.truevfs.kernel.spec.spi.ByteArrayIoPoolFactory;
 import net.truevfs.kernel.spec.util.InheritableThreadLocalStack;
 import net.truevfs.kernel.spec.util.Resource;
@@ -68,7 +69,7 @@ public final class TestConfig extends Resource<RuntimeException> {
     private final ThrowManager throwControl;
     private int numEmtries = DEFAULT_NUM_ENTRIES;
     private int dataSize = DEFAULT_DATA_LENGTH;
-    private IoPoolProvider ioPoolProvider;
+    private IoBufferPool<? extends IoBuffer<?>> pool;
 
     /**
      * Returns the current configuration.
@@ -119,7 +120,7 @@ public final class TestConfig extends Resource<RuntimeException> {
         this.throwControl = new ThrowManager(template.getThrowControl());
         this.numEmtries = template.getNumEntries();
         this.dataSize = template.getDataSize();
-        this.ioPoolProvider = template.getIoPoolProvider();
+        this.pool = template.getIoBufferPool();
     }
 
     public ThrowManager getThrowControl() {
@@ -146,13 +147,13 @@ public final class TestConfig extends Resource<RuntimeException> {
         dataSize = size;
     }
 
-    public IoPoolProvider getIoPoolProvider() {
-        final IoPoolProvider p = ioPoolProvider;
-        return null != p ? p : (ioPoolProvider = new ByteArrayIoPoolFactory(getDataSize()));
+    public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
+        final IoBufferPool<? extends IoBuffer<?>> pool = this.pool;
+        return null != pool ? pool : (this.pool = new ByteArrayIoPoolFactory(getDataSize()).ioPool());
     }
 
-    public void setIOPoolProvider(final @CheckForNull IoPoolProvider iop) {
-        ioPoolProvider = iop;
+    public void setIoBufferPool(final @CheckForNull IoBufferPool<? extends IoBuffer<?>> pool) {
+        this.pool = pool;
     }
 
     @Override

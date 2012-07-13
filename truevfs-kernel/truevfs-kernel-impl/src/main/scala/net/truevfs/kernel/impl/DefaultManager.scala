@@ -195,7 +195,7 @@ private object DefaultManager {
   with CacheController
   with SyncController
   with LockController {
-    val pool = driver.getIoPool
+    val pool = driver.getIoBufferPool
     require(null ne pool)
   }
 

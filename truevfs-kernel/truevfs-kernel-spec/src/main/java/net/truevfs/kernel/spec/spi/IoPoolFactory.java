@@ -5,8 +5,8 @@
 package net.truevfs.kernel.spec.spi;
 
 import net.truevfs.kernel.spec.cio.IoBuffer;
-import net.truevfs.kernel.spec.cio.IoPool;
-import net.truevfs.kernel.spec.cio.IoPoolProvider;
+import net.truevfs.kernel.spec.cio.IoBufferPool;
+import net.truevfs.kernel.spec.cio.IoBufferPoolProvider;
 import net.truevfs.kernel.spec.sl.IoPoolLocator;
 
 /**
@@ -18,7 +18,7 @@ import net.truevfs.kernel.spec.sl.IoPoolLocator;
  */
 public abstract class IoPoolFactory
 extends ServiceProvider
-implements IoPoolProvider {
+implements IoBufferPoolProvider {
 
     /**
      * Returns a new pool to use for allocating temporary I/O buffers.
@@ -26,5 +26,5 @@ implements IoPoolProvider {
      * @return A new pool to use for allocating temporary I/O buffers.
      */
     @Override
-    public abstract IoPool<? extends IoBuffer<?>> ioPool();
+    public abstract IoBufferPool<? extends IoBuffer<?>> ioPool();
 }

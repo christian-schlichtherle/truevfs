@@ -26,7 +26,7 @@ public final class ZipRaesFileIT extends TFileITSuite<TestZipRaesDriver> {
 
     @Override
     protected TestZipRaesDriver newArchiveDriver() {
-        return new TestZipRaesDriver(getTestConfig().getIoPoolProvider());
+        return new TestZipRaesDriver();
     }
 
     private void setAction(Action action) {

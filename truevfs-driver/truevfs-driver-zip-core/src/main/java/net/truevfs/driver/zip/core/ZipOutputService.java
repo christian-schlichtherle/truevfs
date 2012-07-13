@@ -103,8 +103,8 @@ implements OutputService<AbstractZipDriverEntry> {
         return model;
     }
 
-    private IoPool<?> getIOPool() {
-        return driver.getIoPool();
+    private IoBufferPool<?> getIOPool() {
+        return driver.getIoBufferPool();
     }
 
     @Override

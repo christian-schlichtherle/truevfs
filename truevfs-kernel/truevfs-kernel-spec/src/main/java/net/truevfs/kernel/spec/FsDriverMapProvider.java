@@ -19,7 +19,11 @@ public interface FsDriverMapProvider {
 
     /**
      * Returns an immutable map of file system schemes to nullable drivers.
-     * Note that (only) the values of the returned map may be {@code null}!
+     * Only the values of the returned map may be {@code null}!
+     * <p>
+     * Implementations are free to return the same instance (property method)
+     * or a new instance (factory method) upon each call.
+     * So clients may need to cache the result for future reuse.
      *
      * @return An immutable map of file system schemes to nullable drivers.
      */

@@ -5,7 +5,8 @@
 package net.truevfs.driver.tar;
 
 import net.truevfs.kernel.spec.TestConfig;
-import net.truevfs.kernel.spec.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoBuffer;
+import net.truevfs.kernel.spec.cio.IoBufferPool;
 import org.tukaani.xz.LZMA2Options;
 
 /**
@@ -16,8 +17,8 @@ import org.tukaani.xz.LZMA2Options;
 public final class TestTarXZDriver extends TarXZDriver {
 
     @Override
-    public IoPool<?> getIoPool() {
-        return TestConfig.get().getIoPoolProvider().ioPool();
+    public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
+        return TestConfig.get().getIoBufferPool();
     }
 
     @Override

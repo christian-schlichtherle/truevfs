@@ -22,7 +22,7 @@ public final class WinZipAesConcurrentSyncIT extends ConcurrentSyncITSuite<TestW
 
     @Override
     protected TestWinZipAesDriver newArchiveDriver() {
-        return new TestWinZipAesDriver(getTestConfig().getIoPoolProvider());
+        return new TestWinZipAesDriver();
     }
 
     @Override

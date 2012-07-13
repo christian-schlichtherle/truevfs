@@ -20,6 +20,6 @@ import net.truevfs.kernel.spec.util.Pool;
  * @author Christian Schlichtherle
  */
 @SuppressWarnings("MarkerInterface")
-public interface IoPool<B extends IoBuffer<B>>
+public interface IoBufferPool<B extends IoBuffer<B>>
 extends Pool<IoBuffer<B>, IOException> {
 }

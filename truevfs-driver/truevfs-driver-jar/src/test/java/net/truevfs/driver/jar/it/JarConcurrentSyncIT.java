@@ -6,7 +6,7 @@ package net.truevfs.driver.jar.it;
 
 import net.truevfs.access.ConcurrentSyncITSuite;
 import net.truevfs.driver.jar.JarDriver;
-import net.truevfs.kernel.spec.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle
@@ -22,8 +22,8 @@ public final class JarConcurrentSyncIT extends ConcurrentSyncITSuite<JarDriver> 
     protected JarDriver newArchiveDriver() {
         return new JarDriver() {
             @Override
-            public IoPool<?> getIoPool() {
-                return getTestConfig().getIoPoolProvider().ioPool();
+            public IoBufferPool<?> getIoBufferPool() {
+                return getTestConfig().getIoBufferPool();
             }
         };
     }
