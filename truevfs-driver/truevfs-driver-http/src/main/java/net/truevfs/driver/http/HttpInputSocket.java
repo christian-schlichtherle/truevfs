@@ -46,7 +46,7 @@ public class HttpInputSocket extends AbstractInputSocket<HttpEntry> {
     @Override
     public SeekableByteChannel channel(final OutputSocket<? extends Entry> peer)
     throws IOException {
-        final IoBuffer<?> temp = entry.getPool().allocate();
+        final IoBuffer<?> temp = entry.getIoBufferPool().allocate();
         try {
             IoSockets.copy(entry.input(), temp.output());
         } catch (final Throwable ex) {

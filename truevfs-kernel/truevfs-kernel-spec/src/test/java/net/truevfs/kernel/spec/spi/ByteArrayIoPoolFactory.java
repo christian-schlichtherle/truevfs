@@ -31,7 +31,7 @@ public final class ByteArrayIoPoolFactory extends IoPoolFactory {
     }
 
     @Override
-    public ByteArrayIoPool ioPool() {
+    public ByteArrayIoPool ioBufferPool() {
         return new ByteArrayIoPool(initialCapacity);
     }
 }

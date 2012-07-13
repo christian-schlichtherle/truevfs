@@ -14,6 +14,6 @@ import org.junit.Test;
 public final class IOPoolLocatorTest {
     @Test
     public void testIoPool() {
-        assertTrue(IoPoolLocator.SINGLETON.ioPool() instanceof TempFilePool);
+        assertTrue(IoPoolLocator.SINGLETON.ioBufferPool() instanceof TempFilePool);
     }
 }

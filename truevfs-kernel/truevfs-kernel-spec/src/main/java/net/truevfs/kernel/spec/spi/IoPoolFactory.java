@@ -26,5 +26,5 @@ implements IoBufferPoolProvider {
      * @return A new pool to use for allocating temporary I/O buffers.
      */
     @Override
-    public abstract IoBufferPool<? extends IoBuffer<?>> ioPool();
+    public abstract IoBufferPool<? extends IoBuffer<?>> ioBufferPool();
 }

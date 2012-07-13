@@ -23,10 +23,10 @@ public final class CompositeIoPoolFactory extends IoPoolFactory {
     private final IoBufferPool<?> pool =
             JmxDirector.SINGLETON.instrument(
                 JulDirector.SINGLETON.instrument(
-                    (IoBufferPool<?>) service.ioPool()));
+                    (IoBufferPool<?>) service.ioBufferPool()));
 
     @Override
-    public IoBufferPool<? extends IoBuffer<?>> ioPool() {
+    public IoBufferPool<? extends IoBuffer<?>> ioBufferPool() {
         return pool;
     }
 

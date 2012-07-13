@@ -17,7 +17,7 @@ import net.truevfs.kernel.spec.spi.IoPoolFactory;
 @Immutable
 public final class TempFilePoolFactory extends IoPoolFactory {
     @Override
-    public IoBufferPool<? extends IoBuffer<?>> ioPool() {
+    public IoBufferPool<? extends IoBuffer<?>> ioBufferPool() {
         return new TempFilePool();
     }
 }
