@@ -19,7 +19,7 @@ import net.truevfs.kernel.spec.util.Resource;
  * A container for configuration options with global or inheritable thread
  * local scope.
  * <p>
- * A thread can call {@link #ioPool()} to ioPool access to the
+ * A thread can call {@link #ioBufferPool()} to ioBufferPool access to the
  * <i>current configuration</i> at any time .
  * If no configuration has been pushed onto the inheritable thread local
  * configuration stack before, this will return the <i>global configuration</i>
@@ -63,7 +63,7 @@ public final class TestConfig extends Resource<RuntimeException> {
     // I don't think this field should be volatile.
     // This would make a difference if and only if two threads were changing
     // the GLOBAL configuration concurrently, which is discouraged.
-    // Instead, the global configuration should only ioPool changed once at
+    // Instead, the global configuration should only ioBufferPool changed once at
     // application startup and then each thread should modify only its thread
     // local configuration which has been obtained by a call to TestConfig.push().
     private final ThrowManager throwControl;
@@ -92,7 +92,7 @@ public final class TestConfig extends Resource<RuntimeException> {
      * stack.
      * 
      * @return The new current configuration.
-     * @see    #ioPool()
+     * @see    #ioBufferPool()
      */
     @CreatesObligation
     public static TestConfig push() {
@@ -100,10 +100,10 @@ public final class TestConfig extends Resource<RuntimeException> {
     }
 
     /**
-     * Pops the {@link #ioPool() current configuration} off the inheritable thread
+     * Pops the {@link #ioBufferPool() current configuration} off the inheritable thread
      * local configuration stack.
      * 
-     * @throws IllegalStateException If the {@link #ioPool() current configuration}
+     * @throws IllegalStateException If the {@link #ioBufferPool() current configuration}
      *         is the global configuration.
      */
     public static void pop() {
@@ -149,7 +149,7 @@ public final class TestConfig extends Resource<RuntimeException> {
 
     public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
         final IoBufferPool<? extends IoBuffer<?>> pool = this.pool;
-        return null != pool ? pool : (this.pool = new ByteArrayIoPoolFactory(getDataSize()).ioPool());
+        return null != pool ? pool : (this.pool = new ByteArrayIoPoolFactory(getDataSize()).ioBufferPool());
     }
 
     public void setIoBufferPool(final @CheckForNull IoBufferPool<? extends IoBuffer<?>> pool) {

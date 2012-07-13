@@ -49,8 +49,8 @@ public final class IoPoolLocator implements IoBufferPoolProvider {
     private IoPoolLocator() { }
 
     @Override
-    public IoBufferPool<? extends IoBuffer<?>> ioPool() {
-        return Boot.SERVICE.ioPool();
+    public IoBufferPool<? extends IoBuffer<?>> ioBufferPool() {
+        return Boot.SERVICE.ioBufferPool();
     }
 
     /** A static data utility class used for lazy initialization. */

@@ -34,7 +34,7 @@ public class HttpDriver extends FsDriver {
     private volatile @CheckForNull HttpClient client;
 
     final IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
-        return IoPoolLocator.SINGLETON.ioPool();
+        return IoPoolLocator.SINGLETON.ioBufferPool();
     }
 
     /**
