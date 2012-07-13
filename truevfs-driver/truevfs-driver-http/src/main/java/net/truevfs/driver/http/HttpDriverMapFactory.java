@@ -9,7 +9,6 @@ import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsDriverMapProviders;
 import net.truevfs.kernel.spec.FsScheme;
-import net.truevfs.kernel.spec.sl.IoPoolLocator;
 import net.truevfs.kernel.spec.spi.FsDriverMapFactory;
 
 /**

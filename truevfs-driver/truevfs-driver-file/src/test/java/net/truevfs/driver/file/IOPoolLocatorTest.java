@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.file;
 
-import net.truevfs.kernel.spec.sl.IoPoolLocator;
+import net.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -14,6 +14,6 @@ import org.junit.Test;
 public final class IOPoolLocatorTest {
     @Test
     public void testIoPool() {
-        assertTrue(IoPoolLocator.SINGLETON.ioBufferPool() instanceof TempFilePool);
+        assertTrue(IoBufferPoolLocator.SINGLETON.ioBufferPool() instanceof TempFilePool);
     }
 }

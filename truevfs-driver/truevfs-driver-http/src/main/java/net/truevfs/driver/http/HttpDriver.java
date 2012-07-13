@@ -13,7 +13,7 @@ import net.truevfs.kernel.spec.FsManager;
 import net.truevfs.kernel.spec.FsModel;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
-import net.truevfs.kernel.spec.sl.IoPoolLocator;
+import net.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -34,7 +34,7 @@ public class HttpDriver extends FsDriver {
     private volatile @CheckForNull HttpClient client;
 
     final IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
-        return IoPoolLocator.SINGLETON.ioBufferPool();
+        return IoBufferPoolLocator.SINGLETON.ioBufferPool();
     }
 
     /**

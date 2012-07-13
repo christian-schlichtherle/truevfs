@@ -4,25 +4,19 @@
  */
 package net.truevfs.driver.file;
 
-import net.truevfs.kernel.spec.spi.IoPoolFactory;
+import net.truevfs.kernel.spec.spi.IoBufferPoolFactory;
 import static org.junit.Assert.assertEquals;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle
  */
-public final class TempFilePoolServiceTest {
+public final class TempFilePoolFactoryTest {
 
-    private IoPoolFactory service;
-    
-    @Before
-    public void setUp() {
-        service = new TempFilePoolFactory();
-    }
+    private final IoBufferPoolFactory factory = new TempFilePoolFactory();
 
     @Test
     public void testPriority() {
-        assertEquals(0, service.getPriority());
+        assertEquals(0, factory.getPriority());
     }
 }
