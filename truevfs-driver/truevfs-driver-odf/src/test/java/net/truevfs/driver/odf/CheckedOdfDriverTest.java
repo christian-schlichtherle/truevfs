@@ -6,6 +6,7 @@ package net.truevfs.driver.odf;
 
 import net.truevfs.driver.zip.core.AbstractZipDriverEntry;
 import net.truevfs.kernel.spec.FsArchiveDriverTestSuite;
+import net.truevfs.kernel.spec.TestConfig;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
@@ -18,8 +19,8 @@ extends FsArchiveDriverTestSuite<AbstractZipDriverEntry, CheckedOdfDriver> {
     protected CheckedOdfDriver newArchiveDriver() {
         return new CheckedOdfDriver() {
             @Override
-            public IoBufferPool<?> getIoBufferPool() {
-                return getTestConfig().getIoBufferPool();
+            public IoBufferPool<?> getPool() {
+                return TestConfig.get().getPool();
             }
         };
     }

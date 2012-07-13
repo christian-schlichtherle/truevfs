@@ -17,8 +17,8 @@ import net.truevfs.kernel.spec.cio.IoBufferPool;
 public final class TestTarGZipDriver extends TarGZipDriver {
 
     @Override
-    public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
-        return TestConfig.get().getIoBufferPool();
+    public IoBufferPool<? extends IoBuffer<?>> getPool() {
+        return TestConfig.get().getPool();
     }
 
     @Override

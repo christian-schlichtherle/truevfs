@@ -6,6 +6,7 @@ package net.truevfs.driver.zip.it;
 
 import net.truevfs.access.TFileITSuite;
 import net.truevfs.driver.zip.ZipDriver;
+import net.truevfs.kernel.spec.TestConfig;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
 
@@ -23,8 +24,8 @@ public final class ZipFileIT extends TFileITSuite<ZipDriver> {
     protected ZipDriver newArchiveDriver() {
         return new ZipDriver() {
             @Override
-            public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
-                return getTestConfig().getIoBufferPool();
+            public IoBufferPool<? extends IoBuffer<?>> getPool() {
+                return TestConfig.get().getPool();
             }
         };
     }

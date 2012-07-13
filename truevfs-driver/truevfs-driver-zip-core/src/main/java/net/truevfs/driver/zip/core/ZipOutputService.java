@@ -104,7 +104,7 @@ implements OutputService<AbstractZipDriverEntry> {
     }
 
     private IoBufferPool<?> getIOPool() {
-        return driver.getIoBufferPool();
+        return driver.getPool();
     }
 
     @Override

@@ -33,8 +33,8 @@ public class HttpDriver extends FsDriver {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private volatile @CheckForNull HttpClient client;
 
-    final IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
-        return IoBufferPoolLocator.SINGLETON.ioBufferPool();
+    final IoBufferPool<? extends IoBuffer<?>> getPool() {
+        return IoBufferPoolLocator.SINGLETON.pool();
     }
 
     /**

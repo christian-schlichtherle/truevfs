@@ -120,7 +120,7 @@ public final class TestConfig extends Resource<RuntimeException> {
         this.throwControl = new ThrowManager(template.getThrowControl());
         this.numEmtries = template.getNumEntries();
         this.dataSize = template.getDataSize();
-        this.pool = template.getIoBufferPool();
+        this.pool = template.getPool();
     }
 
     public ThrowManager getThrowControl() {
@@ -147,7 +147,7 @@ public final class TestConfig extends Resource<RuntimeException> {
         dataSize = size;
     }
 
-    public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
+    public IoBufferPool<? extends IoBuffer<?>> getPool() {
         final IoBufferPool<? extends IoBuffer<?>> pool = this.pool;
         return null != pool ? pool : (this.pool = new ByteArrayIoBufferPool(getDataSize()));
     }

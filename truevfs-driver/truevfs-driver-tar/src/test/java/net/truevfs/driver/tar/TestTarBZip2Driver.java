@@ -17,8 +17,8 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
 public final class TestTarBZip2Driver extends TarBZip2Driver {
 
     @Override
-    public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
-        return TestConfig.get().getIoBufferPool();
+    public IoBufferPool<? extends IoBuffer<?>> getPool() {
+        return TestConfig.get().getPool();
     }
 
     @Override

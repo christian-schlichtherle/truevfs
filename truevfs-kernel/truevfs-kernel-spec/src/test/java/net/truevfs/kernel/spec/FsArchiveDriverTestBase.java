@@ -52,9 +52,9 @@ public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
         TestConfig.pop();
     }
 
-    protected final TestConfig getTestConfig() {
+    /*protected final TestConfig getTestConfig() {
         return TestConfig.get();
-    }
+    }*/
 
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
     protected final byte[] getData() {

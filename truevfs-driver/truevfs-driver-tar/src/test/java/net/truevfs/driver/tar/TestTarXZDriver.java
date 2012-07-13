@@ -17,8 +17,8 @@ import org.tukaani.xz.LZMA2Options;
 public final class TestTarXZDriver extends TarXZDriver {
 
     @Override
-    public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
-        return TestConfig.get().getIoBufferPool();
+    public IoBufferPool<? extends IoBuffer<?>> getPool() {
+        return TestConfig.get().getPool();
     }
 
     @Override

@@ -66,7 +66,7 @@ extends FsArchiveDriverTestBase<D> {
     public void setUp() throws IOException {
         super.setUp();
         // Order is important here!
-        final TestConfig config = getTestConfig();
+        final TestConfig config = TestConfig.get();
         config.setDataSize(getMaxArchiveLength());
         config.setIoBufferPool(null); // reset
         model = newArchiveModel();
@@ -109,13 +109,13 @@ extends FsArchiveDriverTestBase<D> {
 
     @Test
     public void testIoPoolMustNotBeNull() {
-        assertNotNull(getArchiveDriver().getIoBufferPool());
+        assertNotNull(getArchiveDriver().getPool());
     }
 
     @Test
     public void testIoPoolShouldBeConstant() {
-        final IoBufferPool<?> p1 = getArchiveDriver().getIoBufferPool();
-        final IoBufferPool<?> p2 = getArchiveDriver().getIoBufferPool();
+        final IoBufferPool<?> p1 = getArchiveDriver().getPool();
+        final IoBufferPool<?> p2 = getArchiveDriver().getPool();
         if (p1 != p2)
             logger.log(Level.WARNING, "{0} returns different I/O buffer pools upon multiple invocations of getPool()!", getArchiveDriver().getClass());
     }
@@ -464,16 +464,16 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private ThrowManager getThrowControl() {
-        return getTestConfig().getThrowControl();
+        return TestConfig.get().getThrowControl();
     }
 
     private int getNumEntries() {
-        return getTestConfig().getNumEntries();
+        return TestConfig.get().getNumEntries();
     }
 
     private final class ParentController extends MockController {
         ParentController(FsModel model, @CheckForNull FsController<?> parent) {
-            super(model, parent, getTestConfig());
+            super(model, parent, TestConfig.get());
         }
 
         @Override

@@ -13,7 +13,6 @@ import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
 import net.truevfs.kernel.spec.cio.IoBufferPoolProvider;
-import net.truevfs.kernel.spec.spi.FsManagerDecorator;
 import net.truevfs.kernel.spec.spi.IoBufferPoolDecorator;
 import net.truevfs.kernel.spec.spi.IoBufferPoolFactory;
 import net.truevfs.kernel.spec.util.ServiceLocator;
@@ -49,7 +48,7 @@ public final class IoBufferPoolLocator implements IoBufferPoolProvider {
     private IoBufferPoolLocator() { }
 
     @Override
-    public IoBufferPool<? extends IoBuffer<?>> ioBufferPool() {
+    public IoBufferPool<? extends IoBuffer<?>> pool() {
         return Boot.pool;
     }
 
@@ -98,7 +97,7 @@ public final class IoBufferPoolLocator implements IoBufferPoolProvider {
                                 .getString("null"),
                             IoBufferPoolFactory.class));
             logger.log(CONFIG, "creating", factory);
-            return factory.ioBufferPool();
+            return factory.pool();
         }
 
         private static IoBufferPool<? extends IoBuffer<?>> decorate(
