@@ -31,7 +31,7 @@ class CacheEntrySpec extends WordSpec with ShouldMatchers with PropertyChecks {
 
   "A cache entry" should {
     "behave correctly" in {
-      val pool = new ByteArrayIoPool(5)
+      val pool = new ByteArrayIoBufferPool(5)
       forAll(Table("strategy", WriteThrough, WriteBack)) { strategy =>
         val cache: CacheEntry = strategy.newCacheEntry(pool)
         var front: ByteArrayIoBuffer = null
