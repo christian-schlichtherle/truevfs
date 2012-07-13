@@ -61,7 +61,7 @@ implements Container<MockArchiveDriverEntry> {
     }
 
     public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
-        return config.getIoBufferPool();
+        return config.getPool();
     }
 
     @Override

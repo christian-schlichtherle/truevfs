@@ -5,6 +5,7 @@
 package net.truevfs.driver.tar.it;
 
 import net.truevfs.driver.tar.TarDriver;
+import net.truevfs.kernel.spec.TestConfig;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
 
@@ -22,8 +23,8 @@ public final class TarPathIT extends TarPathITSuite<TarDriver> {
     protected TarDriver newArchiveDriver() {
         return new TarDriver() {
             @Override
-            public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
-                return getTestConfig().getIoBufferPool();
+            public IoBufferPool<? extends IoBuffer<?>> getPool() {
+                return TestConfig.get().getPool();
             }
         };
     }

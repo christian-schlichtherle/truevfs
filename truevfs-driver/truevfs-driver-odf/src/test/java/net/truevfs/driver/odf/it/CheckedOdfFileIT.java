@@ -6,6 +6,7 @@ package net.truevfs.driver.odf.it;
 
 import net.truevfs.access.TFileITSuite;
 import net.truevfs.driver.odf.CheckedOdfDriver;
+import net.truevfs.kernel.spec.TestConfig;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
@@ -22,8 +23,8 @@ public final class CheckedOdfFileIT extends TFileITSuite<CheckedOdfDriver> {
     protected CheckedOdfDriver newArchiveDriver() {
         return new CheckedOdfDriver() {
             @Override
-            public IoBufferPool<?> getIoBufferPool() {
-                return getTestConfig().getIoBufferPool();
+            public IoBufferPool<?> getPool() {
+                return TestConfig.get().getPool();
             }
         };
     }

@@ -31,13 +31,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
             containers;
 
     public MockArchiveDriver() {
-        this(null);
-    }
-
-    public MockArchiveDriver(@CheckForNull TestConfig config) {
-        if (null == config)
-            config = TestConfig.get();
-        this.config = config;
+        this.config = TestConfig.get();
         this.containers = new ConcurrentHashMap<>(
                 HashMaps.initialCapacity(config.getNumEntries()));
     }
@@ -53,8 +47,8 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     }
 
     @Override
-    public IoBufferPool<?> getIoBufferPool() {
-        return config.getIoBufferPool();
+    public IoBufferPool<?> getPool() {
+        return config.getPool();
     }
 
     @Override
@@ -80,7 +74,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
         MockArchive o = containers.get(mp);
         if (null == o)
             o = containers.putIfAbsent(mp, n);
-        return new MultiplexingOutputService<>(getIoBufferPool(),
+        return new MultiplexingOutputService<>(getPool(),
                 (null != o ? o : n).newOutputService());
     }
 

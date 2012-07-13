@@ -18,8 +18,8 @@ public final class TestWinZipAesDriver extends ZipDriver {
     private final TestKeyManagerProvider service = new TestKeyManagerProvider();
 
     @Override
-    public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
-        return TestConfig.get().getIoBufferPool();
+    public IoBufferPool<? extends IoBuffer<?>> getPool() {
+        return TestConfig.get().getPool();
     }
 
     @Override

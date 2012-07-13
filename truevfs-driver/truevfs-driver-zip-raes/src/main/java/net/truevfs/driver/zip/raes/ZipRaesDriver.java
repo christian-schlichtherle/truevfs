@@ -149,7 +149,7 @@ public abstract class ZipRaesDriver extends JarDriver {
             final @CheckForNull @WillNotClose InputService<AbstractZipDriverEntry> input)
     throws IOException {
         final ZipInputService zis = (ZipInputService) input;
-        return new MultiplexingOutputService<>(getIoBufferPool(),
+        return new MultiplexingOutputService<>(getPool(),
                 new ZipOutputService(model, new RaesSocketSink(model, sink), zis, this));
     }
 

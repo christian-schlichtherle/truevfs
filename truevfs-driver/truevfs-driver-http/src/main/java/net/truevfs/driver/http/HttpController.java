@@ -36,8 +36,8 @@ public class HttpController extends FsAbstractController<FsModel>  {
         this.driver = driver;
     }
 
-    final IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
-        return driver.getIoBufferPool();
+    final IoBufferPool<? extends IoBuffer<?>> getPool() {
+        return driver.getPool();
     }
 
     final HttpResponse executeHead(HttpEntry entry) throws IOException {

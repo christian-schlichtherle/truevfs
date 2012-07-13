@@ -6,6 +6,7 @@ package net.truevfs.driver.odf.it;
 
 import net.truevfs.access.TPathITSuite;
 import net.truevfs.driver.odf.OdfDriver;
+import net.truevfs.kernel.spec.TestConfig;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
@@ -22,8 +23,8 @@ public final class OdfPathIT extends TPathITSuite<OdfDriver> {
     protected OdfDriver newArchiveDriver() {
         return new OdfDriver() {
             @Override
-            public IoBufferPool<?> getIoBufferPool() {
-                return getTestConfig().getIoBufferPool();
+            public IoBufferPool<?> getPool() {
+                return TestConfig.get().getPool();
             }
         };
     }

@@ -14,7 +14,7 @@ extends FsArchiveDriverTestSuite<MockArchiveDriverEntry, MockArchiveDriver> {
 
     @Override
     protected MockArchiveDriver newArchiveDriver() {
-        return new MockArchiveDriver(getTestConfig());
+        return new MockArchiveDriver();
     }
 
     @Override

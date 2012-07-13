@@ -25,5 +25,5 @@ public interface IoBufferPoolProvider {
      *
      * @return A pool for allocating temporary I/O buffers.
      */
-    IoBufferPool<? extends IoBuffer<?>> ioBufferPool();
+    IoBufferPool<? extends IoBuffer<?>> pool();
 }

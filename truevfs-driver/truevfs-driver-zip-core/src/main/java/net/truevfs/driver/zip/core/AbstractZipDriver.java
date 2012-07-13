@@ -57,8 +57,8 @@ implements ZipOutputStreamParameters, ZipFileParameters<AbstractZipDriverEntry> 
      * equally named method on the {@link IoBufferPoolLocator#SINGLETON}.
      */
     @Override
-    public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
-        return IoBufferPoolLocator.SINGLETON.ioBufferPool();
+    public IoBufferPool<? extends IoBuffer<?>> getPool() {
+        return IoBufferPoolLocator.SINGLETON.pool();
     }
 
     /**
@@ -299,7 +299,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<AbstractZipDriverEntry> 
      * The implementation in the class {@link ZipDriver} decorates the
      * given controller with a package private controller which keeps track of
      * the AES PBE parameters.
-     * This should ioBufferPool overridden in order to return just {@code controller} if
+     * This should pool overridden in order to return just {@code controller} if
      * and only if you are overriding
      * {@link #zipCryptoParameters(FsModel, Charset)}, too, and do not want to
      * use the locatable key manager to resolve passwords, e.g. for WinZip AES
@@ -346,7 +346,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<AbstractZipDriverEntry> 
             final @CheckForNull @WillNotClose InputService<AbstractZipDriverEntry> input)
     throws IOException {
         final ZipInputService zis = (ZipInputService) input;
-        return new MultiplexingOutputService<>(getIoBufferPool(),
+        return new MultiplexingOutputService<>(getPool(),
                 new ZipOutputService(model, sink, zis, this));
     }
 
@@ -364,7 +364,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<AbstractZipDriverEntry> 
      * for an upcast in {@link #newOutput}.
      * Thus, when overriding this method, {@link #newOutput} should get
      * overridden, too.
-     * Otherwise, a class cast exception will ioBufferPool thrown in
+     * Otherwise, a class cast exception will pool thrown in
      * {@link #newOutput}.
      */
     @Override

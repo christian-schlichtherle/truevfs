@@ -105,7 +105,7 @@ public class TarXZDriver extends TarDriver {
                 }
             }
         } // Sink
-        return new MultiplexingOutputService<>(getIoBufferPool(),
+        return new MultiplexingOutputService<>(getPool(),
                 new TarOutputService(model, new Sink(), this));
     }
 

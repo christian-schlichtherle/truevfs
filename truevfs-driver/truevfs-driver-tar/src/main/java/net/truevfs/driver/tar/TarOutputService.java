@@ -83,7 +83,7 @@ implements OutputService<TarDriverEntry> {
     }
 
     private IoBufferPool<?> getIOPool() {
-        return driver.getIoBufferPool();
+        return driver.getPool();
     }
 
     @Override

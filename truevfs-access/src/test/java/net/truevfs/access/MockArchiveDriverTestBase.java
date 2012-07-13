@@ -19,6 +19,6 @@ extends ConfiguredClientTestBase<MockArchiveDriver> {
 
     @Override
     protected final MockArchiveDriver newArchiveDriver() {
-        return new MockArchiveDriver(getTestConfig());
+        return new MockArchiveDriver();
     }
 }

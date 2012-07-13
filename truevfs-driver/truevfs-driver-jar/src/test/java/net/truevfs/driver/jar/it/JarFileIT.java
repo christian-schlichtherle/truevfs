@@ -6,6 +6,7 @@ package net.truevfs.driver.jar.it;
 
 import net.truevfs.access.TFileITSuite;
 import net.truevfs.driver.jar.JarDriver;
+import net.truevfs.kernel.spec.TestConfig;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
@@ -22,8 +23,8 @@ public final class JarFileIT extends TFileITSuite<JarDriver> {
     protected JarDriver newArchiveDriver() {
         return new JarDriver() {
             @Override
-            public IoBufferPool<?> getIoBufferPool() {
-                return getTestConfig().getIoBufferPool();
+            public IoBufferPool<?> getPool() {
+                return TestConfig.get().getPool();
             }
         };
     }

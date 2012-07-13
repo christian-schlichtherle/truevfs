@@ -84,7 +84,7 @@ implements InputService<TarDriverEntry> {
     private void unpack(final @WillNotClose TarArchiveInputStream tin)
     throws IOException {
         final TarDriver driver = this.driver;
-        final IoBufferPool<?> pool = driver.getIoBufferPool();
+        final IoBufferPool<?> pool = driver.getPool();
         for (   TarArchiveEntry tinEntry;
                 null != (tinEntry = tin.getNextTarEntry()); ) {
             final String name = name(tinEntry);

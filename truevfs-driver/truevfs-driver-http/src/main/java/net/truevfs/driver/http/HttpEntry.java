@@ -48,8 +48,8 @@ public class HttpEntry extends FsEntry implements IoEntry<HttpEntry> {
         this.uri = controller.resolve(name).toUri();
     }
 
-    final IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
-        return controller.getIoBufferPool();
+    final IoBufferPool<? extends IoBuffer<?>> getPool() {
+        return controller.getPool();
     }
 
     private HttpResponse executeHead() throws IOException {

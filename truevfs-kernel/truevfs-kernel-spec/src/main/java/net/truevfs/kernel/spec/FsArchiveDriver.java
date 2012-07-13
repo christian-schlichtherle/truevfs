@@ -128,7 +128,7 @@ extends FsDriver {
      *
      * @return The pool to use for allocating temporary I/O buffers.
      */
-    public abstract IoBufferPool<? extends IoBuffer<?>> getIoBufferPool();
+    public abstract IoBufferPool<? extends IoBuffer<?>> getPool();
 
     /**
      * Returns {@code true} if and only if the archive files produced by this
