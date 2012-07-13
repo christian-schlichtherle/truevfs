@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
  * @author Christian Schlichtherle
  */
 public final class InheritableThreadLocalStack<T> {
-    private final Stacks<T> stacks = new Stacks<T>();
+    private final Stacks<T> stacks = new Stacks<>();
 
     public boolean isEmpty() {
         return stacks.get().isEmpty();
@@ -59,8 +59,7 @@ public final class InheritableThreadLocalStack<T> {
     public @Nullable T pop() {
         final Deque<T> stack = stacks.get();
         final T element = stack.pop();
-        if (stack.isEmpty())
-            stacks.remove();
+        if (stack.isEmpty()) stacks.remove();
         return element;
     }
 
@@ -89,12 +88,12 @@ public final class InheritableThreadLocalStack<T> {
 
         @Override
         protected Deque<T> initialValue() {
-            return new LinkedList<T>();
+            return new LinkedList<>();
         }
 
         @Override
         protected Deque<T> childValue(final Deque<T> parent) {
-            final Deque<T> child = new LinkedList<T>();
+            final Deque<T> child = new LinkedList<>();
             final T element = parent.peek();
             if (null != element) {
                 child.push(element);
