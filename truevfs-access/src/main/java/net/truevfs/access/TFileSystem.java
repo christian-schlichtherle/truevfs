@@ -47,7 +47,7 @@ public final class TFileSystem extends FileSystem {
     @SuppressWarnings("deprecation")
     TFileSystem(final TPath path) {
         assert null != path;
-        this.controller = TConfig.get().getFsManager().controller(
+        this.controller = TConfig.get().getManager().controller(
                 path.getArchiveDetector(), path.getMountPoint());
         this.provider = TFileSystemProvider.get(path.getName());
 
