@@ -5,15 +5,15 @@
 package net.truevfs.driver.http;
 
 import java.io.IOException;
-import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsManager;
 import net.truevfs.kernel.spec.FsModel;
-import net.truevfs.kernel.spec.cio.IoPool;
-import net.truevfs.kernel.spec.cio.IoPoolProvider;
+import net.truevfs.kernel.spec.cio.IoBuffer;
+import net.truevfs.kernel.spec.cio.IoBufferPool;
+import net.truevfs.kernel.spec.sl.IoPoolLocator;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -30,17 +30,11 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 @Immutable
 public class HttpDriver extends FsDriver {
 
-    private final IoPoolProvider provider;
-
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private volatile @CheckForNull HttpClient client;
 
-    public HttpDriver(final IoPoolProvider provider) {
-        this.provider = Objects.requireNonNull(provider);
-    }
-
-    final IoPool<?> getPool() {
-        return provider.ioPool();
+    final IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
+        return IoPoolLocator.SINGLETON.ioPool();
     }
 
     /**

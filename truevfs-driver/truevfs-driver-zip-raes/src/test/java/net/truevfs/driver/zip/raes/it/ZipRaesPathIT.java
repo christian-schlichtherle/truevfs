@@ -27,7 +27,7 @@ public final class ZipRaesPathIT extends TPathITSuite<TestZipRaesDriver> {
 
     @Override
     protected TestZipRaesDriver newArchiveDriver() {
-        return new TestZipRaesDriver(getTestConfig().getIoPoolProvider());
+        return new TestZipRaesDriver();
     }
 
     private void setAction(Action action) {

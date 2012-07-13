@@ -8,14 +8,11 @@ import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.*;
-import net.truevfs.kernel.spec.cio.Entry;
+import net.truevfs.kernel.spec.cio.*;
 import net.truevfs.kernel.spec.cio.Entry.Access;
 import static net.truevfs.kernel.spec.cio.Entry.Access.READ;
 import net.truevfs.kernel.spec.cio.Entry.Type;
 import static net.truevfs.kernel.spec.cio.Entry.Type.FILE;
-import net.truevfs.kernel.spec.cio.InputSocket;
-import net.truevfs.kernel.spec.cio.IoPool;
-import net.truevfs.kernel.spec.cio.OutputSocket;
 import net.truevfs.kernel.spec.util.BitField;
 import org.apache.http.HttpResponse;
 
@@ -39,8 +36,8 @@ public class HttpController extends FsAbstractController<FsModel>  {
         this.driver = driver;
     }
 
-    final IoPool<?> getPool() {
-        return driver.getPool();
+    final IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
+        return driver.getIoBufferPool();
     }
 
     final HttpResponse executeHead(HttpEntry entry) throws IOException {

@@ -19,6 +19,6 @@ public final class ZipRaesConcurrentSyncIT extends ConcurrentSyncITSuite<TestZip
 
     @Override
     protected TestZipRaesDriver newArchiveDriver() {
-        return new TestZipRaesDriver(getTestConfig().getIoPoolProvider());
+        return new TestZipRaesDriver();
     }
 }

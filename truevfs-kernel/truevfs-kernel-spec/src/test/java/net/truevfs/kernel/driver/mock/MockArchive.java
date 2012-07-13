@@ -60,12 +60,8 @@ implements Container<MockArchiveDriverEntry> {
         getThrowControl().check(this, Error.class);
     }
 
-    public IoPoolProvider getIoPoolProvider() {
-        return config.getIoPoolProvider();
-    }
-
-    public final IoPool<?> getIoPool() {
-        return getIoPoolProvider().ioPool();
+    public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
+        return config.getIoBufferPool();
     }
 
     @Override
@@ -138,7 +134,7 @@ implements Container<MockArchiveDriverEntry> {
 
                 InputSocket<? extends IoBuffer<?>>
                 getBufferInputSocket() throws IOException {
-                    return target().getBuffer(getIoPool()).input();
+                    return target().getBuffer(getIoBufferPool()).input();
                 }
             } // Input
 
@@ -206,14 +202,14 @@ implements Container<MockArchiveDriverEntry> {
                 OutputSocket<? extends IoBuffer<?>>
                 getBufferOutputSocket() throws IOException {
                     entries.put(entry.getName(), entry);
-                    return target().getBuffer(getIoPool()).output();
+                    return target().getBuffer(getIoBufferPool()).output();
                 }
 
                 void copyProperties() {
                     final MockArchiveDriverEntry target = target();
                     final IoBuffer<?> buffer;
                     try {
-                        buffer = target.getBuffer(getIoPool());
+                        buffer = target.getBuffer(getIoBufferPool());
                     } catch (final IOException ex) {
                         throw new AssertionError(ex);
                     }

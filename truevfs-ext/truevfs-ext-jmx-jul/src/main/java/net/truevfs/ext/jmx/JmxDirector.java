@@ -110,7 +110,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     }
 
     @Override
-    public <B extends IoBuffer<B>> IoPool<B> instrument(IoPool<B> pool) {
+    public <B extends IoBuffer<B>> IoBufferPool<B> instrument(IoBufferPool<B> pool) {
         return new JmxIoPool<B>(pool, this);
     }
 

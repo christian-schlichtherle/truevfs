@@ -121,14 +121,14 @@ extends FsDriver {
     private final ThreadLocal<CharsetEncoder> encoder = new ThreadLocal<>();
 
     /**
-     * Returns the pool to use for allocating temporary I/O buffers.
+     * Returns the pool for allocating temporary I/O buffers.
      * <p>
      * This is an immutable property - multiple calls must return the same
      * object.
      *
      * @return The pool to use for allocating temporary I/O buffers.
      */
-    public abstract IoPool<? extends IoBuffer<?>> getIoPool();
+    public abstract IoBufferPool<? extends IoBuffer<?>> getIoBufferPool();
 
     /**
      * Returns {@code true} if and only if the archive files produced by this

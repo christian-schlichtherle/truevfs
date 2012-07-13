@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.ext.inst.InstrumentingIoPool;
 import net.truevfs.kernel.spec.cio.IoBuffer;
-import net.truevfs.kernel.spec.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle
@@ -22,7 +22,7 @@ extends InstrumentingIoPool<B> {
     private static final Logger
             logger = Logger.getLogger(JulIoPool.class.getName());
 
-    JulIoPool(JulDirector director, IoPool<B> model) {
+    JulIoPool(JulDirector director, IoBufferPool<B> model) {
         super(director, model);
     }
 

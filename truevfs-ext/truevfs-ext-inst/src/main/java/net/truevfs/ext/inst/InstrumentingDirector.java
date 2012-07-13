@@ -22,7 +22,7 @@ public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> 
         return new InstrumentingManager(this, manager);
     }
 
-    public abstract <B extends IoBuffer<B>> IoPool<B> instrument(IoPool<B> pool);
+    public abstract <B extends IoBuffer<B>> IoBufferPool<B> instrument(IoBufferPool<B> pool);
 
     protected FsCompositeDriver instrument(
             FsCompositeDriver driver,

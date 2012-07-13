@@ -14,14 +14,14 @@ import net.truevfs.kernel.spec.cio.*;
  * @author Christian Schlichtherle
  */
 @Immutable
-public class InstrumentingIoPool<B extends IoBuffer<B>> implements IoPool<B> {
+public class InstrumentingIoPool<B extends IoBuffer<B>> implements IoBufferPool<B> {
 
     protected final InstrumentingDirector<?> director;
-    protected final IoPool<B> pool;
+    protected final IoBufferPool<B> pool;
 
     public InstrumentingIoPool(
             final InstrumentingDirector<?> director,
-            final IoPool<B> pool) {
+            final IoBufferPool<B> pool) {
         this.director = Objects.requireNonNull(director);
         this.pool = Objects.requireNonNull(pool);
     }

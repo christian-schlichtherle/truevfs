@@ -15,7 +15,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author  Christian Schlichtherle
  */
 @ThreadSafe
-public final class ByteArrayIoPool implements IoPool<ByteArrayIoBuffer> {
+public final class ByteArrayIoPool implements IoBufferPool<ByteArrayIoBuffer> {
 
     private static final String BUFFER_NAME = "buffer-";
 

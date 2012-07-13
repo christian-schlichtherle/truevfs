@@ -13,8 +13,8 @@ import static java.util.logging.Level.WARNING;
 import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.cio.IoBuffer;
-import net.truevfs.kernel.spec.cio.IoPool;
-import net.truevfs.kernel.spec.cio.IoPoolProvider;
+import net.truevfs.kernel.spec.cio.IoBufferPool;
+import net.truevfs.kernel.spec.cio.IoBufferPoolProvider;
 import net.truevfs.kernel.spec.spi.IoPoolFactory;
 import net.truevfs.kernel.spec.util.ServiceLocator;
 
@@ -40,7 +40,7 @@ import net.truevfs.kernel.spec.util.ServiceLocator;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class IoPoolLocator implements IoPoolProvider {
+public final class IoPoolLocator implements IoBufferPoolProvider {
 
     /** The singleton instance of this class. */
     public static final IoPoolLocator SINGLETON = new IoPoolLocator();
@@ -49,7 +49,7 @@ public final class IoPoolLocator implements IoPoolProvider {
     private IoPoolLocator() { }
 
     @Override
-    public IoPool<? extends IoBuffer<?>> ioPool() {
+    public IoBufferPool<? extends IoBuffer<?>> ioPool() {
         return Boot.SERVICE.ioPool();
     }
 

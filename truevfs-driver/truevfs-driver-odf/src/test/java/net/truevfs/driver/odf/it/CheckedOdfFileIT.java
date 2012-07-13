@@ -6,7 +6,7 @@ package net.truevfs.driver.odf.it;
 
 import net.truevfs.access.TFileITSuite;
 import net.truevfs.driver.odf.CheckedOdfDriver;
-import net.truevfs.kernel.spec.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle
@@ -22,8 +22,8 @@ public final class CheckedOdfFileIT extends TFileITSuite<CheckedOdfDriver> {
     protected CheckedOdfDriver newArchiveDriver() {
         return new CheckedOdfDriver() {
             @Override
-            public IoPool<?> getIoPool() {
-                return getTestConfig().getIoPoolProvider().ioPool();
+            public IoBufferPool<?> getIoBufferPool() {
+                return getTestConfig().getIoBufferPool();
             }
         };
     }

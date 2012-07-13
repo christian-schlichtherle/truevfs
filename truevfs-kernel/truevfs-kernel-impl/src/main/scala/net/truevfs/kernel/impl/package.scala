@@ -21,7 +21,7 @@ package object impl {
   private[impl] type AnyArchiveDriver = FsArchiveDriver[_ <: FsArchiveEntry]
   private[impl] type AnyInputSocket = InputSocket[_ <: Entry]
   private[impl] type AnyOutputSocket = OutputSocket[_ <: Entry]
-  private[impl] type AnyIoPool = IoPool[_ <: IoBuffer[_]]
+  private[impl] type AnyIoBufferPool = IoBufferPool[_ <: IoBuffer[_]]
   private[impl] type AnyIoBuffer = IoBuffer[_ <: IoBuffer[_]]
   private[impl] type AnyController = FsController[_ <: FsModel]
 

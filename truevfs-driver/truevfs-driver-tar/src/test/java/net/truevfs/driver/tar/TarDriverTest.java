@@ -5,7 +5,8 @@
 package net.truevfs.driver.tar;
 
 import net.truevfs.kernel.spec.FsArchiveDriverTestSuite;
-import net.truevfs.kernel.spec.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoBuffer;
+import net.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle
@@ -17,8 +18,8 @@ extends FsArchiveDriverTestSuite<TarDriverEntry, TarDriver> {
     protected TarDriver newArchiveDriver() {
         return new TarDriver() {
             @Override
-            public IoPool<?> getIoPool() {
-                return getTestConfig().getIoPoolProvider().ioPool();
+            public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
+                return getTestConfig().getIoBufferPool();
             }
         };
     }

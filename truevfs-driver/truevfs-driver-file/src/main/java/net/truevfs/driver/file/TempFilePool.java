@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.spec.cio.IoBuffer;
-import net.truevfs.kernel.spec.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
  * This I/O pool creates and deletes temporary files as {@link FileEntry}s.
@@ -22,7 +22,7 @@ import net.truevfs.kernel.spec.cio.IoPool;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class TempFilePool implements IoPool<FileEntry> {
+final class TempFilePool implements IoBufferPool<FileEntry> {
 
     private static final Path TEMP_DIR
             = Paths.get(System.getProperty("java.io.tmpdir"));

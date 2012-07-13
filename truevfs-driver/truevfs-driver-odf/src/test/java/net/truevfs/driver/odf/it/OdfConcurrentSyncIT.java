@@ -6,7 +6,7 @@ package net.truevfs.driver.odf.it;
 
 import net.truevfs.access.ConcurrentSyncITSuite;
 import net.truevfs.driver.odf.OdfDriver;
-import net.truevfs.kernel.spec.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle
@@ -22,8 +22,8 @@ public final class OdfConcurrentSyncIT extends ConcurrentSyncITSuite<OdfDriver> 
     protected OdfDriver newArchiveDriver() {
         return new OdfDriver() {
             @Override
-            public IoPool<?> getIoPool() {
-                return getTestConfig().getIoPoolProvider().ioPool();
+            public IoBufferPool<?> getIoBufferPool() {
+                return getTestConfig().getIoBufferPool();
             }
         };
     }

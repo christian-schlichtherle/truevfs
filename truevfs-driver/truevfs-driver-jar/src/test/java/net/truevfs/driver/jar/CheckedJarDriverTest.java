@@ -7,7 +7,7 @@ package net.truevfs.driver.jar;
 import net.truevfs.driver.zip.core.AbstractZipDriverEntry;
 import net.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 import net.truevfs.kernel.spec.cio.IoBuffer;
-import net.truevfs.kernel.spec.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle
@@ -19,8 +19,8 @@ extends FsArchiveDriverTestSuite<AbstractZipDriverEntry, CheckedJarDriver> {
     protected CheckedJarDriver newArchiveDriver() {
         return new CheckedJarDriver() {
             @Override
-            public IoPool<? extends IoBuffer<?>> getIoPool() {
-                return getTestConfig().getIoPoolProvider().ioPool();
+            public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
+                return getTestConfig().getIoBufferPool();
             }
         };
     }

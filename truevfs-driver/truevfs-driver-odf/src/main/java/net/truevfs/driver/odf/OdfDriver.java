@@ -16,7 +16,7 @@ import static net.truevfs.kernel.spec.FsAccessOption.GROW;
 import net.truevfs.kernel.spec.FsModel;
 import net.truevfs.kernel.spec.FsOutputSocketSink;
 import net.truevfs.kernel.spec.cio.InputService;
-import net.truevfs.kernel.spec.cio.IoPool;
+import net.truevfs.kernel.spec.cio.IoBufferPool;
 import net.truevfs.kernel.spec.cio.MultiplexingOutputService;
 import net.truevfs.kernel.spec.cio.OutputService;
 
@@ -54,7 +54,7 @@ public class OdfDriver extends JarDriver {
     throws IOException {
         final ZipInputService zis = (ZipInputService) input;
         final ZipOutputService zos = new ZipOutputService(model, sink, zis, this);
-        final IoPool<?> pool = getIoPool();
+        final IoBufferPool<?> pool = getIoBufferPool();
         return null != zis && sink.getOptions().get(GROW)
                 ? new MultiplexingOutputService<>(pool, zos)
                 : new OdfOutputService(pool, zos);

@@ -39,7 +39,7 @@ public final class HttpDriverMapFactory extends FsDriverMapFactory {
     @Override
     public Map<FsScheme, FsDriver> drivers() {
         return FsDriverMapProviders.newMap(new Object[][] {
-                { "http|https", new HttpDriver(IoPoolLocator.SINGLETON) },
+                { "http|https", new HttpDriver() },
             });
     }
 }
