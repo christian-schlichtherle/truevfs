@@ -27,7 +27,7 @@ import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import net.truevfs.kernel.spec.cio.Entry.Type;
 import static net.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
 import net.truevfs.kernel.spec.cio.*;
-import net.truevfs.kernel.spec.sl.IoPoolLocator;
+import net.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import net.truevfs.kernel.spec.util.BitField;
 import net.truevfs.kernel.spec.util.HashMaps;
 import net.truevfs.key.KeyManagerProvider;
@@ -54,11 +54,11 @@ implements ZipOutputStreamParameters, ZipFileParameters<AbstractZipDriverEntry> 
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link FsArchiveDriver} calls the
-     * equally named method on the {@link IoPoolLocator#SINGLETON}.
+     * equally named method on the {@link IoBufferPoolLocator#SINGLETON}.
      */
     @Override
     public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
-        return IoPoolLocator.SINGLETON.ioBufferPool();
+        return IoBufferPoolLocator.SINGLETON.ioBufferPool();
     }
 
     /**

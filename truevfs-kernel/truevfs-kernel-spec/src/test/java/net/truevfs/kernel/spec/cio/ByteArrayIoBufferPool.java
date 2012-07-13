@@ -15,7 +15,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author  Christian Schlichtherle
  */
 @ThreadSafe
-public final class ByteArrayIoPool implements IoBufferPool<ByteArrayIoBuffer> {
+public final class ByteArrayIoBufferPool implements IoBufferPool<ByteArrayIoBuffer> {
 
     private static final String BUFFER_NAME = "buffer-";
 
@@ -29,7 +29,7 @@ public final class ByteArrayIoPool implements IoBufferPool<ByteArrayIoBuffer> {
      * @param initialCapacity the initial capacity of the array to use for
      *        writing to an allocated I/O entry.
      */
-    public ByteArrayIoPool(final int initialCapacity) {
+    public ByteArrayIoBufferPool(final int initialCapacity) {
         if (0 > initialCapacity)
             throw new IllegalArgumentException("Negative initial capacity: " + initialCapacity);
         this.initialCapacity = initialCapacity;
@@ -63,7 +63,7 @@ public final class ByteArrayIoPool implements IoBufferPool<ByteArrayIoBuffer> {
         private boolean released;
 
         ByteBuffer(int i) {
-            super(BUFFER_NAME + i, ByteArrayIoPool.this.initialCapacity);
+            super(BUFFER_NAME + i, ByteArrayIoBufferPool.this.initialCapacity);
         }
 
         @Override
