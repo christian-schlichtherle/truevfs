@@ -100,8 +100,8 @@ public final class IoBufferPoolLocator implements IoBufferPoolProvider {
             return factory.pool();
         }
 
-        private static IoBufferPool<? extends IoBuffer<?>> decorate(
-                IoBufferPool<? extends IoBuffer<?>> pool,
+        private static <B extends IoBuffer<B>> IoBufferPool<B> decorate(
+                IoBufferPool<B> pool,
                 final ServiceLocator locator,
                 final Logger logger) {
             final List<IoBufferPoolDecorator> list = new ArrayList<>();
