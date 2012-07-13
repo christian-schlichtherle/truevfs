@@ -104,16 +104,6 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
         }
         final boolean wait = options.get(WAIT_CLOSE_INPUT)
                 || options.get(WAIT_CLOSE_OUTPUT);
-        if (!wait) {
-            // Spend some effort on closing streams which have already been
-            // garbage collected in order to compensates for a disadvantage of
-            // the FsNeedsLockRetryException:
-            // An FsArchiveDriver may try to close() a file system entry but
-            // fail to do so because of a FsNeedsLockRetryException which is
-            // impossible to resolve in a driver.
-            // The TarDriver family is known to be affected by this.
-            System.runFinalization();
-        }
         accountant.waitOtherThreads(wait ? 0 : WAIT_TIMEOUT_MILLIS);
         {
             final Resources r = accountant.resources();
