@@ -85,16 +85,6 @@ private trait ResourceController extends Controller[LockModel] {
           throw new FsResourceOpenException(local, total)
     }
     val wait = options get WAIT_CLOSE_IO
-    if (!wait) {
-      // Spend some effort on closing streams which have already been garbage
-      // collected in order to compensates for a disadvantage of the
-      // NeedsLockRetryException:
-      // An FsArchiveDriver may try to close() a file system entry but fail to
-      // do so because of a NeedsLockRetryException which is impossible to
-      // resolve in a driver.
-      // The TarDriver family is known to be affected by this.
-      System.runFinalization()
-    }
     accountant waitOtherThreads (if (wait) 0 else waitTimeoutMillis);
     {
       val Resources(local, total) = accountant.resources
