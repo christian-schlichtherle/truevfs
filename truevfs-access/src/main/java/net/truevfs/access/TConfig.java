@@ -314,7 +314,7 @@ public final class TConfig extends Resource<RuntimeException> {
 
     /** Copy constructor for inheritable thread local configurations. */
     private TConfig(final TConfig template) {
-        this.manager = template.getFsManager();
+        this.manager = template.getManager();
         this.detector = template.getArchiveDetector();
         this.accessPreferences = template.getAccessPreferences();
     }
@@ -324,7 +324,7 @@ public final class TConfig extends Resource<RuntimeException> {
      * 
      * @return The file system manager.
      */
-    FsManager getFsManager() {
+    FsManager getManager() {
         return this.manager;
     }
 

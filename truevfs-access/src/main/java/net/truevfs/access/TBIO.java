@@ -280,7 +280,7 @@ final class TBIO {
         }
         final FsPath path = new FsPath(src);
         return  TConfig.get()
-                .getFsManager()
+                .getManager()
                 .controller(getDetector(src), path.getMountPoint())
                 .input(options, path.getEntryName());
     }
@@ -308,7 +308,7 @@ final class TBIO {
         }
         final FsPath path = new FsPath(dst);
         return TConfig.get()
-                .getFsManager()
+                .getManager()
                 .controller(getDetector(dst), path.getMountPoint())
                 .output(options.clear(CREATE_PARENTS), path.getEntryName(), template);
     }
