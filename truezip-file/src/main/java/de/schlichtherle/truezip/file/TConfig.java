@@ -358,7 +358,7 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      * 
      * @param manager The file system manager.
      */
-    void setManager(final FsManager manager) {
+    void setFsManager(final FsManager manager) {
         if (null == manager)
             throw new NullPointerException();
         this.manager = manager;
