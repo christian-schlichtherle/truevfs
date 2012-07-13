@@ -220,7 +220,12 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-ext-jmx-jul</artifactId>
+                <artifactId>truevfs-ext-jmx</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-ext-jul</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
