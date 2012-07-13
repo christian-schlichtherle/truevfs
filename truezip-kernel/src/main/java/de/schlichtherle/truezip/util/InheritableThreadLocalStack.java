@@ -8,6 +8,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * An inheritable thread local stack of elements.
@@ -22,6 +23,7 @@ import javax.annotation.Nullable;
  * @since  TrueZIP 7.5
  * @author Christian Schlichtherle
  */
+@ThreadSafe
 public final class InheritableThreadLocalStack<T> {
     private final Stacks<T> stacks = new Stacks<T>();
 
@@ -60,8 +62,7 @@ public final class InheritableThreadLocalStack<T> {
     public @Nullable T pop() {
         final Deque<T> stack = stacks.get();
         final T element = stack.pop();
-        if (stack.isEmpty())
-            stacks.remove();
+        if (stack.isEmpty()) stacks.remove();
         return element;
     }
 
