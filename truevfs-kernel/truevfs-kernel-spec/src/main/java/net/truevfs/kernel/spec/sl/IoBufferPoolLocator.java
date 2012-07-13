@@ -5,9 +5,7 @@
 package net.truevfs.kernel.spec.sl;
 
 import java.text.MessageFormat;
-import java.util.Iterator;
-import java.util.ResourceBundle;
-import java.util.ServiceConfigurationError;
+import java.util.*;
 import static java.util.logging.Level.CONFIG;
 import static java.util.logging.Level.WARNING;
 import java.util.logging.Logger;
@@ -15,6 +13,8 @@ import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
 import net.truevfs.kernel.spec.cio.IoBufferPoolProvider;
+import net.truevfs.kernel.spec.spi.FsManagerDecorator;
+import net.truevfs.kernel.spec.spi.IoBufferPoolDecorator;
 import net.truevfs.kernel.spec.spi.IoBufferPoolFactory;
 import net.truevfs.kernel.spec.util.ServiceLocator;
 
@@ -50,48 +50,73 @@ public final class IoBufferPoolLocator implements IoBufferPoolProvider {
 
     @Override
     public IoBufferPool<? extends IoBuffer<?>> ioBufferPool() {
-        return Boot.SERVICE.ioBufferPool();
+        return Boot.pool;
     }
 
     /** A static data utility class used for lazy initialization. */
     private static final class Boot {
-        static final IoBufferPoolFactory SERVICE;
+        static final IoBufferPool<? extends IoBuffer<?>> pool;
         static {
+            final Class<?> clazz = IoBufferPoolLocator.class;
             final Logger logger = Logger.getLogger(
-                    IoBufferPoolLocator.class.getName(),
-                    IoBufferPoolLocator.class.getName());
+                    clazz.getName(), clazz.getName());
             final ServiceLocator locator = new ServiceLocator(
-                    IoBufferPoolLocator.class.getClassLoader());
-            IoBufferPoolFactory service = locator.getService(IoBufferPoolFactory.class, null);
-            if (null == service) {
-                IoBufferPoolFactory newService = null;
+                    clazz.getClassLoader());
+            pool = decorate(create(locator, logger), locator, logger);
+        }
+
+        private static IoBufferPool<? extends IoBuffer<?>> create(
+                final ServiceLocator locator,
+                final Logger logger) {
+            IoBufferPoolFactory factory
+                    = locator.getService(IoBufferPoolFactory.class, null);
+            if (null == factory) {
+                IoBufferPoolFactory newFactory = null;
                 for (   final Iterator<IoBufferPoolFactory>
                             i = locator.getServices(IoBufferPoolFactory.class);
                         i.hasNext();) {
-                    newService = i.next();
-                    logger.log(CONFIG, "located", newService);
-                    if (null == service) {
-                        service = newService;
+                    newFactory = i.next();
+                    logger.log(CONFIG, "located", newFactory);
+                    if (null == factory) {
+                        factory = newFactory;
                     } else {
-                        final int op = service.getPriority();
-                        final int np = newService.getPriority();
+                        final int op = factory.getPriority();
+                        final int np = newFactory.getPriority();
                         if (op < np)
-                            service = newService;
+                            factory = newFactory;
                         else if (op == np)
                             logger.log(WARNING, "collision",
-                                    new Object[] { op, service, newService });
+                                    new Object[] { op, factory, newFactory });
                     }
                 }
             }
-            if (null == service)
+            if (null == factory)
                 throw new ServiceConfigurationError(
                         MessageFormat.format(
                             ResourceBundle
                                 .getBundle(IoBufferPoolLocator.class.getName())
                                 .getString("null"),
                             IoBufferPoolFactory.class));
-            logger.log(CONFIG, "provided", service);
-            SERVICE = service;
+            logger.log(CONFIG, "creating", factory);
+            return factory.ioBufferPool();
+        }
+
+        private static IoBufferPool<? extends IoBuffer<?>> decorate(
+                IoBufferPool<? extends IoBuffer<?>> pool,
+                final ServiceLocator locator,
+                final Logger logger) {
+            final List<IoBufferPoolDecorator> list = new ArrayList<>();
+            for (final Iterator<IoBufferPoolDecorator> i = locator.getServices(IoBufferPoolDecorator.class);
+                    i.hasNext(); ) {
+                list.add(i.next());
+            }
+            final IoBufferPoolDecorator[] array = list.toArray(new IoBufferPoolDecorator[list.size()]);
+            Arrays.sort(array, new ServiceProviderComparator());
+            for (final IoBufferPoolDecorator decorator : array) {
+                logger.log(CONFIG, "decorating", decorator);
+                pool = decorator.decorate(pool);
+            }
+            return pool;
         }
     } // Boot
 }
