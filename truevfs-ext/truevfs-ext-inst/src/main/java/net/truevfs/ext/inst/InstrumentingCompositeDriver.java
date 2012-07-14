@@ -38,4 +38,9 @@ public class InstrumentingCompositeDriver implements FsCompositeDriver {
                     : parent.getModel().equals(model.getParent());
         return director.instrument(driver.newController(manager, director.instrument(model, this), parent), this);
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s[driver=%s]", getClass().getName(), driver);
+    }
 }

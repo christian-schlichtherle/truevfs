@@ -28,22 +28,19 @@ extends InstrumentingIoBufferPool<B> {
 
     @Override
     public IoBuffer<B> allocate() throws IOException {
-        return new JulBuffer(pool.allocate());
+        return new JulIoBuffer(pool.allocate());
     }
 
-    private final class JulBuffer extends InstrumentingBuffer {
-        JulBuffer(IoBuffer<B> model) {
+    private final class JulIoBuffer extends InstrumentingIoBuffer {
+        JulIoBuffer(IoBuffer<B> model) {
             super(model);
             logger.log(FINE, "Allocated " + entry, new NeverThrowable());
         }
 
         @Override
         public void release() throws IOException {
-            try {
-                entry.release();
-            } finally {
-                logger.log(FINE, "Released " + entry, new NeverThrowable());
-            }
+            entry.release();
+            logger.log(FINE, "Released " + entry, new NeverThrowable());
         }
-    } // JulBuffer
+    } // JulIoBuffer
 }

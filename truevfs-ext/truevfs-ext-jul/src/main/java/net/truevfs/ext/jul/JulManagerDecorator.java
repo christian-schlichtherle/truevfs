@@ -18,9 +18,9 @@ public final class JulManagerDecorator extends FsManagerDecorator {
         return JulDirector.SINGLETON.instrument(manager);
     }
 
-    /** Returns -200. */
+    /** Returns -100. */
     @Override
     public int getPriority() {
-        return -200;
+        return -100;
     }
 }

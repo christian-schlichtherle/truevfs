@@ -19,9 +19,9 @@ public final class JulIoBufferPoolDecorator extends IoBufferPoolDecorator {
         return JulDirector.SINGLETON.instrument(pool);
     }
 
-    /** Returns -200. */
+    /** Returns -100. */
     @Override
     public int getPriority() {
-        return -200;
+        return -100;
     }
 }

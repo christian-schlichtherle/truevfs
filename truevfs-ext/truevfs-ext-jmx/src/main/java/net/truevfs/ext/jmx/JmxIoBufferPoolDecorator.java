@@ -19,9 +19,9 @@ public final class JmxIoBufferPoolDecorator extends IoBufferPoolDecorator {
         return JmxDirector.SINGLETON.instrument(pool);
     }
 
-    /** Returns -100. */
+    /** Returns 100. */
     @Override
     public int getPriority() {
-        return -100;
+        return 100;
     }
 }

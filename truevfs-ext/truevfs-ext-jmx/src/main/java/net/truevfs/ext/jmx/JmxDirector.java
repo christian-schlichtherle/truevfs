@@ -134,7 +134,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     @Override
     protected <B extends IoBuffer<B>> InputSocket<B> instrument(
             InputSocket<B> input,
-            InstrumentingIoBufferPool<B>.InstrumentingBuffer context) {
+            InstrumentingIoBufferPool<B>.InstrumentingIoBuffer context) {
         return new JmxInputSocket<>(this, input, temp);
     }
 
@@ -149,7 +149,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     @Override
     protected <B extends IoBuffer<B>> OutputSocket<B> instrument(
             OutputSocket<B> output,
-            InstrumentingIoBufferPool<B>.InstrumentingBuffer context) {
+            InstrumentingIoBufferPool<B>.InstrumentingIoBuffer context) {
         return new JmxOutputSocket<>(this, output, temp);
     }
 
