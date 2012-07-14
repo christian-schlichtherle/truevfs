@@ -98,9 +98,7 @@ public final class InheritableThreadLocalStack<T> {
         protected Deque<T> childValue(final Deque<T> parent) {
             final Deque<T> child = new LinkedList<T>();
             final T element = parent.peek();
-            if (null != element) {
-                child.push(element);
-            }
+            if (null != element) child.push(element);
             return child;
         }
     } // Stacks
