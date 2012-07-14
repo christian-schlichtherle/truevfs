@@ -31,13 +31,13 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
 
     private volatile JmxIoStatistics application;
 
-    JmxIoStatistics getApplicationIOStatistics() {
+    JmxIoStatistics getApplicationIoStatistics() {
         final JmxIoStatistics stats = application;
         assert null != stats;
         return stats;
     }
 
-    void setApplicationIOStatistics(final JmxIoStatistics stats) {
+    void setApplicationIoStatistics(final JmxIoStatistics stats) {
         assert null != stats;
         this.application = stats;
         JmxIoStatisticsView.register(stats, APPLICATION_IO_STATISTICS);
@@ -45,13 +45,13 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
 
     private volatile JmxIoStatistics kernel;
 
-    JmxIoStatistics getKernelIOStatistics() {
+    JmxIoStatistics getKernelIoStatistics() {
         final JmxIoStatistics stats = kernel;
         assert null != stats;
         return stats;
     }
 
-    void setKernelIOStatistics(final JmxIoStatistics stats) {
+    void setKernelIoStatistics(final JmxIoStatistics stats) {
         assert null != stats;
         this.kernel = stats;
         JmxIoStatisticsView.register(stats, KERNEL_IO_STATISTICS);
@@ -59,13 +59,13 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
 
     private volatile JmxIoStatistics temp;
 
-    JmxIoStatistics getTempIOStatistics() {
+    JmxIoStatistics getTempIoStatistics() {
         final JmxIoStatistics stats = temp;
         assert null != stats;
         return stats;
     }
 
-    void setTempIOStatistics(final JmxIoStatistics stats) {
+    void setTempIoStatistics(final JmxIoStatistics stats) {
         assert null != stats;
         this.temp = stats;
         JmxIoStatisticsView.register(stats, BUFFER_IO_STATISTICS);

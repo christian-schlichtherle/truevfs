@@ -17,6 +17,6 @@ final class JmxKernelController extends JmxController {
 
     @Override
     JmxIoStatistics getIOStatistics() {
-        return director.getKernelIOStatistics();
+        return director.getKernelIoStatistics();
     }
 }

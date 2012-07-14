@@ -22,9 +22,9 @@ final class JmxManager extends InstrumentingManager {
     JmxManager(JmxDirector director, FsManager manager) {
         super(director, manager);
         assert null != director;
-        director.setApplicationIOStatistics(new JmxIoStatistics());
-        director.setKernelIOStatistics(new JmxIoStatistics());
-        director.setTempIOStatistics(new JmxIoStatistics());
+        director.setApplicationIoStatistics(new JmxIoStatistics());
+        director.setKernelIoStatistics(new JmxIoStatistics());
+        director.setTempIoStatistics(new JmxIoStatistics());
         JmxManagerView.register(this);
     }
 
@@ -33,7 +33,7 @@ final class JmxManager extends InstrumentingManager {
      * <p>
      * After the synchronization, this implementation creates a new statistics
      * object which can get accessed by calling
-     * {@link JmxDirector#getKernelIOStatistics}.
+     * {@link JmxDirector#getKernelIoStatistics}.
      */
     @Override
     public void sync(final BitField<FsSyncOption> options)
@@ -42,9 +42,9 @@ final class JmxManager extends InstrumentingManager {
             manager.sync(options);
         } finally {
             JmxDirector d = ((JmxDirector) director);
-            d.setApplicationIOStatistics(new JmxIoStatistics());
-            d.setKernelIOStatistics(new JmxIoStatistics());
-            d.setTempIOStatistics(new JmxIoStatistics());
+            d.setApplicationIoStatistics(new JmxIoStatistics());
+            d.setKernelIoStatistics(new JmxIoStatistics());
+            d.setTempIoStatistics(new JmxIoStatistics());
         }
     }
 }
