@@ -6,7 +6,7 @@ package net.truevfs.kernel.spec;
 
 import java.io.IOException;
 import java.util.Map;
-import javax.annotation.Nullable;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.spec.cio.Entry;
 import net.truevfs.kernel.spec.cio.Entry.Access;
@@ -42,7 +42,7 @@ extends FsAbstractController<M> {
     }
 
     @Override
-    public @Nullable FsEntry stat(
+    public @CheckForNull FsEntry stat(
             BitField<FsAccessOption> options,
             FsEntryName name)
     throws IOException {

@@ -4,6 +4,7 @@
  */
 package net.truevfs.kernel.spec.spi;
 
+import java.util.logging.Logger;
 import net.truevfs.kernel.spec.util.UniqueObject;
 
 /**
@@ -12,6 +13,12 @@ import net.truevfs.kernel.spec.util.UniqueObject;
  * @author Christian Schlichtherle
  */
 public class ServiceProvider extends UniqueObject {
+
+    static {
+        Logger  .getLogger( ServiceProvider.class.getName(),
+                            ServiceProvider.class.getName())
+                .config("banner");
+    }
 
     /**
      * Returns a priority to help service locators to prioritize the services

@@ -49,32 +49,30 @@ public final class IoBufferPoolLocator implements IoBufferPoolProvider {
 
     @Override
     public IoBufferPool<? extends IoBuffer<?>> pool() {
-        return Boot.pool;
+        return Boot.POOL;
     }
 
     /** A static data utility class used for lazy initialization. */
     private static final class Boot {
-        static final IoBufferPool<? extends IoBuffer<?>> pool;
-        static {
-            final Class<?> clazz = IoBufferPoolLocator.class;
-            final Logger logger = Logger.getLogger(
-                    clazz.getName(), clazz.getName());
-            final ServiceLocator locator = new ServiceLocator(
-                    clazz.getClassLoader());
-            pool = decorate(create(locator, logger), locator, logger);
-        }
+        static final IoBufferPool<? extends IoBuffer<?>> POOL = new Boot().create().decorate().result;
 
-        private static IoBufferPool<? extends IoBuffer<?>> create(
-                final ServiceLocator locator,
-                final Logger logger) {
-            IoBufferPoolFactory factory
-                    = locator.getService(IoBufferPoolFactory.class, null);
+        final Class<IoBufferPoolLocator> locatorClass = IoBufferPoolLocator.class;
+        final Class<IoBufferPoolFactory> factoryClass = IoBufferPoolFactory.class;
+        final Class<IoBufferPoolDecorator> decoratorClass = IoBufferPoolDecorator.class;
+        final ResourceBundle bundle = ResourceBundle.getBundle(
+                                                locatorClass.getName());
+        final Logger logger = Logger.getLogger( locatorClass.getName(),
+                                                locatorClass.getName());
+        final ServiceLocator locator = new ServiceLocator(
+                locatorClass.getClassLoader());
+        IoBufferPool<? extends IoBuffer<?>> result;
+
+        private Boot create() {
+            IoBufferPoolFactory factory = locator.getService(factoryClass, null);
             if (null == factory) {
-                IoBufferPoolFactory newFactory = null;
-                for (   final Iterator<IoBufferPoolFactory>
-                            i = locator.getServices(IoBufferPoolFactory.class);
+                for (final Iterator<IoBufferPoolFactory> i = locator.getServices(factoryClass);
                         i.hasNext();) {
-                    newFactory = i.next();
+                    final IoBufferPoolFactory newFactory = i.next();
                     logger.log(CONFIG, "located", newFactory);
                     if (null == factory) {
                         factory = newFactory;
@@ -91,19 +89,15 @@ public final class IoBufferPoolLocator implements IoBufferPoolProvider {
             }
             if (null == factory)
                 throw new ServiceConfigurationError(
-                        MessageFormat.format(
-                            ResourceBundle
-                                .getBundle(IoBufferPoolLocator.class.getName())
-                                .getString("null"),
-                            IoBufferPoolFactory.class));
+                        MessageFormat.format(   bundle.getString("null"),
+                                                factoryClass));
             logger.log(CONFIG, "creating", factory);
-            return factory.pool();
+            result = factory.pool();
+            logger.log(CONFIG, "result", result);
+            return this;
         }
 
-        private static <B extends IoBuffer<B>> IoBufferPool<B> decorate(
-                IoBufferPool<B> pool,
-                final ServiceLocator locator,
-                final Logger logger) {
+        private Boot decorate() {
             final List<IoBufferPoolDecorator> list = new ArrayList<>();
             for (final Iterator<IoBufferPoolDecorator> i = locator.getServices(IoBufferPoolDecorator.class);
                     i.hasNext(); ) {
@@ -113,9 +107,10 @@ public final class IoBufferPoolLocator implements IoBufferPoolProvider {
             Arrays.sort(array, new ServiceProviderComparator());
             for (final IoBufferPoolDecorator decorator : array) {
                 logger.log(CONFIG, "decorating", decorator);
-                pool = decorator.decorate(pool);
+                result = decorator.decorate(result);
+                logger.log(CONFIG, "result", result);
             }
-            return pool;
+            return this;
         }
     } // Boot
 }

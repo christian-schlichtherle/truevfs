@@ -230,6 +230,11 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-ext-pace</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-kernel-impl</artifactId>
                 <version>${project.version}</version>
             </dependency>

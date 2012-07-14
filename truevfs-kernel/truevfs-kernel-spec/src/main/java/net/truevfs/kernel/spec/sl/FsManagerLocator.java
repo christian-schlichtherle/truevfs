@@ -53,23 +53,22 @@ public final class FsManagerLocator implements FsManagerProvider {
 
     /** A static data utility class used for lazy initialization. */
     private static final class Boot {
-        static final FsManager manager;
-        static {
-            final Class<?> clazz = FsManagerLocator.class;
-            final Logger logger = Logger.getLogger(
-                    clazz.getName(), clazz.getName());
-            final ServiceLocator locator = new ServiceLocator(
-                    clazz.getClassLoader());
-            manager = decorate(create(locator, logger), locator, logger);
-        }
+        static final FsManager manager = new Boot().create().decorate().result;
 
-        private static FsManager create(
-                final ServiceLocator locator,
-                final Logger logger) {
-            FsManagerFactory factory
-                    = locator.getService(FsManagerFactory.class, null);
+        final Class<FsManagerLocator> locatorClass = FsManagerLocator.class;
+        final Class<FsManagerFactory> factoryClass = FsManagerFactory.class;
+        final Class<FsManagerDecorator> decoratorClass = FsManagerDecorator.class;
+        final ResourceBundle bundle = ResourceBundle.getBundle(
+                                                locatorClass.getName());
+        final Logger logger = Logger.getLogger( locatorClass.getName(),
+                                                locatorClass.getName());
+        final ServiceLocator locator = new ServiceLocator(locatorClass.getClassLoader());
+        FsManager result;
+
+        private Boot create() {
+            FsManagerFactory factory = locator.getService(factoryClass, null);
             if (null == factory) {
-                for (final Iterator<FsManagerFactory> i = locator.getServices(FsManagerFactory.class);
+                for (final Iterator<FsManagerFactory> i = locator.getServices(factoryClass);
                         i.hasNext(); ) {
                     final FsManagerFactory newFactory = i.next();
                     logger.log(CONFIG, "located", newFactory);
@@ -88,21 +87,17 @@ public final class FsManagerLocator implements FsManagerProvider {
             }
             if (null == factory)
                 throw new ServiceConfigurationError(
-                        MessageFormat.format(
-                            ResourceBundle
-                                .getBundle(FsManagerLocator.class.getName())
-                                .getString("null"),
-                            FsManagerLocator.class));
+                        MessageFormat.format(   bundle.getString("null"),
+                                                factoryClass));
             logger.log(CONFIG, "creating", factory);
-            return factory.manager();
+            result = factory.manager();
+            logger.log(CONFIG, "result", result);
+            return this;
         }
 
-        private static FsManager decorate(
-                FsManager manager,
-                final ServiceLocator locator,
-                final Logger logger) {
+        private Boot decorate() {
             final List<FsManagerDecorator> list = new ArrayList<>();
-            for (final Iterator<FsManagerDecorator> i = locator.getServices(FsManagerDecorator.class);
+            for (final Iterator<FsManagerDecorator> i = locator.getServices(decoratorClass);
                     i.hasNext(); ) {
                 list.add(i.next());
             }
@@ -110,9 +105,10 @@ public final class FsManagerLocator implements FsManagerProvider {
             Arrays.sort(array, new ServiceProviderComparator());
             for (final FsManagerDecorator decorator : array) {
                 logger.log(CONFIG, "decorating", decorator);
-                manager = decorator.decorate(manager);
+                result = decorator.decorate(result);
+                logger.log(CONFIG, "result", result);
             }
-            return manager;
+            return this;
         }
     } // Boot
 }
