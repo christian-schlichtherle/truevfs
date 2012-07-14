@@ -97,9 +97,15 @@ public abstract class FsEntry implements Entry {
      */
     @Override
     public String toString() {
+        // Cannot make copy of empty BitField, so we need to work around this.
+        final Set<Type> typesSet = getTypes();
+        final BitField<Type> typesBitField = typesSet.isEmpty()
+                ? BitField.noneOf(Type.class)
+                : BitField.copyOf(typesSet);
+
         final StringBuilder s = new StringBuilder(256);
         final Formatter f = new Formatter(s).format("%s[name=%s, types=%s",
-                getClass().getName(), getName(), BitField.copyOf(getTypes()));
+                getClass().getName(), getName(), typesBitField);
         for (Size type : ALL_SIZE_SET) {
             final long size = getSize(type);
             if (UNKNOWN != size)
