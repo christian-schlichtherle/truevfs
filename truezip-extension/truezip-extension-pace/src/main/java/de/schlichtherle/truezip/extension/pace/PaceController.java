@@ -33,7 +33,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @Immutable
 final class PaceController
-extends FsDecoratingController<FsModel, FsController<?>> {
+extends FsDecoratingController<FsModel, FsController<? extends FsModel>> {
 
     private final PaceManager manager;
 

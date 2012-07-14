@@ -7,10 +7,12 @@ package de.schlichtherle.truezip.fs.sl;
 import de.schlichtherle.truezip.fs.FsDefaultManager;
 import de.schlichtherle.truezip.fs.FsManager;
 import de.schlichtherle.truezip.fs.FsManagerProvider;
+import de.schlichtherle.truezip.fs.spi.FsManagerDecorator;
 import de.schlichtherle.truezip.fs.spi.FsManagerService;
 import de.schlichtherle.truezip.util.ServiceLocator;
-import java.util.Iterator;
+import java.util.*;
 import static java.util.logging.Level.CONFIG;
+import static java.util.logging.Level.WARNING;
 import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
 
@@ -44,48 +46,85 @@ public final class FsManagerLocator implements FsManagerProvider {
     /** The singleton instance of this class. */
     public static final FsManagerLocator SINGLETON = new FsManagerLocator();
 
-    /** You cannot instantiate this class. */
-    private FsManagerLocator() {
-    }
+    /** Can't touch this - hammer time! */
+    private FsManagerLocator() { }
 
     @Override
     public FsManager get() {
-        return Boot.MANAGER;
+        return Boot.manager;
     }
 
     /** A static data utility class used for lazy initialization. */
     private static final class Boot {
-        static final FsManager MANAGER;
+        static final FsManager manager;
         static {
+            final Class<?> clazz = FsManagerLocator.class;
             final Logger logger = Logger.getLogger(
-                    FsManagerLocator.class.getName(),
-                    FsManagerLocator.class.getName());
+                    clazz.getName(), clazz.getName());
             final ServiceLocator locator = new ServiceLocator(
-                    FsManagerLocator.class.getClassLoader());
-            FsManagerService
-                    service = locator.getService(FsManagerService.class, null);
+                    clazz.getClassLoader());
+            manager = decorate(create(locator, logger), locator, logger);
+        }
+
+        private static FsManager create(
+                final ServiceLocator locator,
+                final Logger logger) {
+            FsManagerService service
+                    = locator.getService(FsManagerService.class, null);
             if (null == service) {
-                FsManagerService oldService = null;
-                for (   final Iterator<FsManagerService>
-                            i = locator.getServices(FsManagerService.class);
-                        i.hasNext();
-                        oldService = service) {
-                    service = i.next();
-                    logger.log(CONFIG, "located", service);
-                    if (null != oldService
-                            && oldService.getPriority() > service.getPriority())
-                        service = oldService;
+                for (final Iterator<FsManagerService> i = locator.getServices(FsManagerService.class);
+                        i.hasNext(); ) {
+                    final FsManagerService newService = i.next();
+                    logger.log(CONFIG, "located", newService);
+                    if (null == service) {
+                        service = newService;
+                    } else {
+                        final int op = service.getPriority();
+                        final int np = newService.getPriority();
+                        if (op < np)
+                            service = newService;
+                        else if (op == np)
+                            logger.log(WARNING, "collision",
+                                    new Object[] { op, service, newService });
+                    }
                 }
             }
-            FsManager manager;
-            if (null != service) {
-                manager = service.get();
-                logger.log(CONFIG, "provided", manager);
-            } else {
-                manager = new FsDefaultManager();
-                logger.log(CONFIG, "default", manager);
+            if (null == service) service = new DefaultManagerService();
+            logger.log(CONFIG, "using", service);
+            final FsManager manager = service.get();
+            logger.log(CONFIG, "result", manager);
+            return manager;
+        }
+
+        private static FsManager decorate(
+                FsManager manager,
+                final ServiceLocator locator,
+                final Logger logger) {
+            final List<FsManagerDecorator> list = new ArrayList<FsManagerDecorator>();
+            for (final Iterator<FsManagerDecorator> i = locator.getServices(FsManagerDecorator.class);
+                    i.hasNext(); ) {
+                list.add(i.next());
             }
-            MANAGER = manager;
+            final FsManagerDecorator[] array = list.toArray(new FsManagerDecorator[list.size()]);
+            Arrays.sort(array, new Comparator<FsManagerDecorator>() {
+                @Override
+                public int compare(FsManagerDecorator o1, FsManagerDecorator o2) {
+                    return o1.getPriority() - o2.getPriority();
+                }
+            });
+            for (final FsManagerDecorator decorator : array) {
+                logger.log(CONFIG, "decorating", decorator);
+                manager = decorator.decorate(manager);
+                logger.log(CONFIG, "result", manager);
+            }
+            return manager;
         }
     } // Boot
+
+    private static final class DefaultManagerService extends FsManagerService {
+        @Override
+        public FsManager get() {
+            return new FsDefaultManager();
+        }
+    } // DefaultManagerService
 }
