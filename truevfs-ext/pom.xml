@@ -22,5 +22,6 @@
         <module>truevfs-ext-inst</module>
         <module>truevfs-ext-jmx</module>
         <module>truevfs-ext-jul</module>
+        <module>truevfs-ext-pace</module>
     </modules>
 </project>

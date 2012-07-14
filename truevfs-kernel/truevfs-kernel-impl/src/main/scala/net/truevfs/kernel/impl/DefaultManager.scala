@@ -32,7 +32,6 @@ final class DefaultManager private (
 
   import DefaultManager._
 
-  DefaultManager // init companion object
   assert(null ne optionalScheduleType)
 
   /**
@@ -169,10 +168,6 @@ final class DefaultManager private (
 }
 
 private object DefaultManager {
-  Logger  .getLogger( classOf[DefaultManager] getName,
-                      classOf[DefaultManager] getName)
-          .config("banner")
-
   private final class FrontController(c: AnyController)
   extends FsDecoratingController[FsModel, AnyController](c)
   with FinalizeController
