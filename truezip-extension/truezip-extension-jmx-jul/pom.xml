@@ -20,24 +20,12 @@
         for managing and monitoring TrueZIP via JMX and java.util.logging.
 
         Add the JAR artifact of this module to the run time class path to
-        make its file system manager and I/O pool service available for
-        service location in the client API modules.
-        
-        Note that TrueZIP Extension plugins are mutually exclusive:
-        If you put more than one on the runtime class path, then one will get
-        picked randomly at runtime.
-        You can stack them at compile time, however.
+        make its services available for service location in the client API
+        modules.
     </description>
 
     <properties>
         <!-- clirr-maven-plugin -->
         <comparisonVersion>7.4</comparisonVersion>
     </properties>
-
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truezip-driver-file</artifactId>
-        </dependency>
-    </dependencies>
 </project>

@@ -12,7 +12,7 @@ import de.schlichtherle.truezip.util.BitField;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 final class JmxManager extends InstrumentingManager {

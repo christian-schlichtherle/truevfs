@@ -43,6 +43,11 @@ implements IOPool<E> {
         resource.release();
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s[delegate=%s]", getClass().getName(), delegate);
+    }
+
     @SuppressWarnings("PublicInnerClass")
     public class Buffer
     extends DecoratingEntry<Entry<E>>

@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 final class JulIOPool<E extends Entry<E>>
@@ -33,7 +33,6 @@ extends InstrumentingIOPool<E, JulDirector> {
 
     private final class Buffer
     extends InstrumentingIOPool<E, JulDirector>.Buffer {
-
         Buffer(Entry<E> model) {
             super(model);
             logger.log(FINE, "Allocated " + delegate, new NeverThrowable());
@@ -41,11 +40,8 @@ extends InstrumentingIOPool<E, JulDirector> {
 
         @Override
         public void release() throws IOException {
-            try {
-                delegate.release();
-            } finally {
-                logger.log(FINE, "Released " + delegate, new NeverThrowable());
-            }
+            delegate.release();
+            logger.log(FINE, "Released " + delegate, new NeverThrowable());
         }
     } // Buffer
 }
