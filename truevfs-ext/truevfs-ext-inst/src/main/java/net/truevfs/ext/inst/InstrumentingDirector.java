@@ -46,7 +46,7 @@ public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> 
 
     protected <B extends IoBuffer<B>> InputSocket<B> instrument(
             InputSocket<B> input,
-            InstrumentingIoBufferPool<B>.InstrumentingBuffer context) {
+            InstrumentingIoBufferPool<B>.InstrumentingIoBuffer context) {
         return instrument(input);
     }
 
@@ -63,7 +63,7 @@ public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> 
 
     protected <B extends IoBuffer<B>> OutputSocket<B> instrument(
             OutputSocket<B> output,
-            InstrumentingIoBufferPool<B>.InstrumentingBuffer context) {
+            InstrumentingIoBufferPool<B>.InstrumentingIoBuffer context) {
         return instrument(output);
     }
 

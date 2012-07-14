@@ -26,7 +26,7 @@ extends InstrumentingIoBufferPool<B> {
         return new JmxBuffer(pool.allocate());
     }
 
-    private final class JmxBuffer extends InstrumentingBuffer {
+    private final class JmxBuffer extends InstrumentingIoBuffer {
 
         @SuppressWarnings("LeakingThisInConstructor")
         JmxBuffer(IoBuffer<B> model) {

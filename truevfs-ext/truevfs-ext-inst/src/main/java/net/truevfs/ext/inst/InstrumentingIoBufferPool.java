@@ -14,7 +14,8 @@ import net.truevfs.kernel.spec.cio.*;
  * @author Christian Schlichtherle
  */
 @Immutable
-public class InstrumentingIoBufferPool<B extends IoBuffer<B>> implements IoBufferPool<B> {
+public class InstrumentingIoBufferPool<B extends IoBuffer<B>>
+implements IoBufferPool<B> {
 
     protected final InstrumentingDirector<?> director;
     protected final IoBufferPool<B> pool;
@@ -28,7 +29,7 @@ public class InstrumentingIoBufferPool<B extends IoBuffer<B>> implements IoBuffe
 
     @Override
     public IoBuffer<B> allocate() throws IOException {
-        return new InstrumentingBuffer(pool.allocate());
+        return new InstrumentingIoBuffer(pool.allocate());
     }
 
     @Override
@@ -36,12 +37,17 @@ public class InstrumentingIoBufferPool<B extends IoBuffer<B>> implements IoBuffe
         resource.release();
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s[pool=%s]", getClass().getName(), pool);
+    }
+
     @SuppressWarnings("PublicInnerClass")
-    public class InstrumentingBuffer
+    public class InstrumentingIoBuffer
     extends DecoratingEntry<IoBuffer<B>>
     implements IoBuffer<B> {
 
-        protected InstrumentingBuffer(IoBuffer<B> buffer) {
+        protected InstrumentingIoBuffer(IoBuffer<B> buffer) {
             super(buffer);
         }
 
@@ -59,5 +65,5 @@ public class InstrumentingIoBufferPool<B extends IoBuffer<B>> implements IoBuffe
         public void release() throws IOException {
             entry.release();
         }
-    } // InstrumentingBuffer
+    } // InstrumentingIoBuffer
 }
