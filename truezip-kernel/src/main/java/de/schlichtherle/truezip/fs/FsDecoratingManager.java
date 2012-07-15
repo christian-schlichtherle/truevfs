@@ -26,8 +26,7 @@ extends FsManager {
      * @param delegate the file system manager to decorate.
      */
     protected FsDecoratingManager(final M delegate) {
-        if (null == delegate)
-            throw new NullPointerException();
+        if (null == delegate) throw new NullPointerException();
         this.delegate = delegate;
     }
 
