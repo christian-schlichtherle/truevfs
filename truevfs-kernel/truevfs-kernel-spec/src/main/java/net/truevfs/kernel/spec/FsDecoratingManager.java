@@ -25,7 +25,7 @@ extends FsAbstractManager {
     /**
      * Constructs a new decorating file system manager.
      *
-     * @param manager the file system manager to decorate.
+     * @param manager the nullable file system manager to decorate.
      */
     protected FsDecoratingManager(final @CheckForNull M manager) {
         this.manager = manager;
