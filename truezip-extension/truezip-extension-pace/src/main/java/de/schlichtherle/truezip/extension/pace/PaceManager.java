@@ -4,212 +4,128 @@
  */
 package de.schlichtherle.truezip.extension.pace;
 
-import de.schlichtherle.truezip.fs.*;
-import de.schlichtherle.truezip.util.BitField;
-import de.schlichtherle.truezip.util.HashMaps;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
-import javax.annotation.concurrent.ThreadSafe;
+import de.schlichtherle.truezip.fs.FsSyncException;
+import javax.management.MXBean;
 
 /**
+ * The pace manager MXBean interface.
+ * 
  * @author Christian Schlichtherle
  */
-@ThreadSafe
-public final class PaceManager
-extends FsDecoratingManager<FsManager> implements PaceManagerMXBean {
-
-    private volatile int
-            maxMounted = MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE;
-
-    private final Collection<PaceController> evicted
-            = new ConcurrentLinkedQueue<PaceController>();
-
-    @SuppressWarnings("serial")
-    private final MountedFileSystemMap mounted = new MountedFileSystemMap();
-
-    public PaceManager(final FsManager manager) {
-        super(manager);
-    }
-
-    @Override
-    public FsController<?> getController(FsMountPoint mp, FsCompositeDriver d) {
-        return new PaceController(this, delegate.getController(mp, d));
-    }
-
-    @Override
-    public int getFileSystemsTotal() {
-        return delegate.getSize();
-    }
-
-    @Override
-    public int getFileSystemsMounted() {
-        return mounted.size();
-    }
-
-    @Override
-    public int getMaximumFileSystemsMounted() {
-        return maxMounted;
-    }
-
-    @Override
-    public void setMaximumFileSystemsMounted(final int maxMounted) {
-        if (maxMounted < MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE)
-            throw new IllegalArgumentException();
-        this.maxMounted = maxMounted;
-    }
-
-    @Override
-    public int getTopLevelArchiveFileSystemsTotal() {
-        int total = 0;
-        for (FsController<?> controller : delegate)
-            if (isTopLevelArchive(controller)) total++;
-        return total;
-    }
-
-    @Override
-    public int getTopLevelArchiveFileSystemsMounted() {
-        int mounted = 0;
-        for (FsController<?> controller : delegate)
-            if (isTopLevelArchive(controller))
-                if (controller.getModel().isMounted()) mounted++;
-        return mounted;
-    }
-
-    private boolean isTopLevelArchive(final FsController<?> controller) {
-        final FsController<?> parent = controller.getParent();
-        return null != parent && null == parent.getParent();
-    }
+@MXBean
+public interface PaceManager {
 
     /**
-     * Registers the archive file system of the given controller as the most
-     * recently used (MRU).
-     * 
-     * @param  c the controller for the most recently used file system.
+     * The name of the property for the maximum number of file systems which
+     * may have been mounted at any time, which is {@value}.
      */
-    void accessed(final PaceController c) {
-        if (c.isMounted()) mounted.put(c.getMountPoint(), c);
-    }
+    String MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_NAME
+            = "maximumFileSystemsMounted";
 
     /**
-     * If the number of mounted archive files exceeds {@link #getMaximumFileSystemsMounted()},
-     * then this method sync()s the least recently used (LRU) archive files
-     * which exceed this value.
-     * 
-     * @param  c the controller for the file system to retain mounted for
-     *         subsequent access.
-     * @throws FsSyncException 
+     * The key string for the system property which defines the value of the
+     * constant {@link #MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE}.
+     * Equivalent to the expression
+     * {@code PaceManager.class.getName() + "." + MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_NAME}.
      */
-    void retain(final PaceController c) throws FsSyncException {
-        final FsMountPoint mp = c.getMountPoint();
-        iterating: for (final Iterator<PaceController> i = evicted.iterator(); i.hasNext(); ) {
-            final PaceController lc = i.next();
-            final FsMountPoint lmp = lc.getMountPoint();
-            final FsManager fm = new FsFilteringManager(delegate, lmp);
-            for (final FsController<?> fc : fm) {
-                final FsMountPoint fmp = fc.getModel().getMountPoint();
-                if (mp.equals(fmp) || mounted.containsKey(fmp)) {
-                    if (lmp.equals(fmp) || mounted.containsKey(lmp)) i.remove();
-                    continue iterating;
-                }
-            }
-            i.remove(); // even if subsequent umount fails
-            fm.sync(FsSyncOptions.SYNC);
-        }
-    }
+    String MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_KEY
+            = PaceManager.class.getName() + "." + MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_NAME;
 
-    @Override
-    public void sync() throws FsSyncException {
-        sync(FsSyncOptions.NONE);
-    }
+    /**
+     * The minimum value for the maximum number of mounted file systems, which
+     * is {@value}.
+     */
+    int MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE = 2;
 
-    @Override
-    public void sync(final BitField<FsSyncOption> options)
-    throws FsSyncWarningException, FsSyncException {
-        evicted.clear();
-        try {
-            delegate.sync(options);
-        } finally {
-            mounted.clear();
-        }
-    }
+    /**
+     * The default value for the maximum number of mounted file systems.
+     * The value of this constant will be set to
+     * {@link #MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE} unless a system
+     * property with the key string
+     * {@link #MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_KEY}
+     * is set to a value which is greater than
+     * {@code MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE}.
+     * <p>
+     * Mind you that this constant is initialized when this interface is loaded
+     * and cannot accurately reflect the value in a remote JVM instance.
+     */
+    int MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE
+            = Math.max(MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE,
+                Integer.getInteger(MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_KEY,
+                    MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE));
 
-    @SuppressWarnings("serial")
-    private final class MountedFileSystemMap {
-        private final LinkedHashMap<FsMountPoint, PaceController> map
-                = new LinkedHashMap<FsMountPoint, PaceController>(
-                    HashMaps.initialCapacity(getMaximumFileSystemsMounted() + 1),
-                    0.75f,
-                    true) {
-            @Override
-            public boolean removeEldestEntry(
-                    final Map.Entry<FsMountPoint, PaceController> entry) {
-                final boolean evict
-                        = size() > getMaximumFileSystemsMounted();
-                if (evict) {
-                    final PaceController c = entry.getValue();
-                    final boolean added = evicted.add(c);
-                    assert added;
-                }
-                return evict;
-            }
-        };
+    /**
+     * Returns the total number of file systems.
+     * 
+     * @return The total number of file systems.
+     */
+    int getFileSystemsTotal();
 
-        private final ReadLock readLock;
-        private final WriteLock writeLock;
+    /**
+     * Returns the number of file systems
+     * which have been mounted and need synchronization by calling
+     * {@link #sync}.
+     * The value of this property never exceeds
+     * {@link #getMaximumFileSystemsMounted()}.
+     * <p>
+     * Note that you should <em>not</em> use the returned value to synchronize
+     * conditionally - this would be unreliable!
+     * 
+     * @return The number of mounted file systems.
+     */
+    int getFileSystemsMounted();
 
-        MountedFileSystemMap() {
-            final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-            readLock = lock.readLock();
-            writeLock = lock.writeLock();
-        }
+    /**
+     * Returns the maximum number of file systems which may have been mounted
+     * at any time.
+     * The mimimum value is {@link #MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE}.
+     * The default value is {@link #MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE}.
+     *
+     * @return The maximum number of mounted file systems.
+     */
+    int getMaximumFileSystemsMounted();
 
-        int size() {
-            readLock.lock();
-            try {
-                return map.size();
-            } finally {
-                readLock.unlock();
-            }
-        }
+    /**
+     * Sets the maximum number of file systems which may have been mounted
+     * at any time.
+     * Changing this property will show effect upon the next access to any
+     * file system.
+     *
+     * @param  maxMounted the maximum number of mounted file systems.
+     * @throws IllegalArgumentException if {@code maxMounted} is less than
+     *         {@link #MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE}.
+     */
+    void setMaximumFileSystemsMounted(int maxMounted);
 
-        boolean containsKey(FsMountPoint key) {
-            readLock.lock();
-            try {
-                return map.containsKey(key);
-            } finally {
-                readLock.unlock();
-            }
-        }
+    /**
+     * Returns the total number of <em>top level archive</em> file systems.
+     * The value of this property never exceeds
+     * {@link #getFileSystemsTotal()}.
+     * 
+     * @return The total number of <em>top level archive</em> file systems.
+     */
+    int getTopLevelArchiveFileSystemsTotal();
 
-        PaceController put(FsMountPoint key, PaceController value) {
-            writeLock.lock();
-            try {
-                return map.put(key, value);
-            } finally {
-                writeLock.unlock();
-            }
-        }
+    /**
+     * Returns the number of <em>top level archive</em> file systems
+     * which have been mounted and need synchronization by calling
+     * {@link #sync}.
+     * The value of this property never exceeds
+     * {@link #getFileSystemsMounted()}.
+     * <p>
+     * Note that you should <em>not</em> use the returned value to synchronize
+     * conditionally - this would be unreliable!
+     * 
+     * @return The number of mounted <em>top level archive</em> file systems.
+     */
+    int getTopLevelArchiveFileSystemsMounted();
 
-        int clear() {
-            writeLock.lock();
-            try {
-                int c = 0;
-                for (final Iterator<PaceController> i = map.values().iterator(); i.hasNext(); ) {
-                    if (!i.next().isMounted()) {
-                        i.remove();
-                        c++;
-                    }
-                }
-                return c;
-            } finally {
-                writeLock.unlock();
-            }
-        }
-    } // MountedFileSystemMap
+    /**
+     * Synchronizes all file systems.
+     * As a side effect, upon successful operation, the value of the properties
+     * {@link #getFileSystemsMounted()} is reset to zero.
+     * 
+     * @throws FsSyncException if the synchronization fails for some reason.
+     */
+    void sync() throws FsSyncException;
 }

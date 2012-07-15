@@ -23,11 +23,12 @@ import javax.annotation.concurrent.Immutable;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * Calls back the given {@link PaceManager} before and after each file system
- * operation in order to {@linkplain PaceManager#sync sync} the least recently
- * touched file systems which exceed the property
- * {@link PaceManager#getMaximumFileSystemsMounted()}
- * and register itself as the most recently touched file system.
+ * Calls back the given {@link PaceManagerController} before and after each
+ * file system operation in order to
+ * {@linkplain PaceManagerController#sync sync} the least recently accessed
+ * file systems which exceed the property
+ * {@link PaceManagerController#getMaximumFileSystemsMounted()}
+ * and register itself as the most recently accessed file system.
  * 
  * @author Christian Schlichtherle
  */
@@ -35,10 +36,10 @@ import javax.annotation.concurrent.NotThreadSafe;
 final class PaceController
 extends FsDecoratingController<FsModel, FsController<? extends FsModel>> {
 
-    private final PaceManager manager;
+    private final PaceManagerController manager;
 
     PaceController(
-            final PaceManager manager,
+            final PaceManagerController manager,
             final FsController<?> controller) {
         super(controller);
         assert null != manager;
@@ -48,64 +49,72 @@ extends FsDecoratingController<FsModel, FsController<? extends FsModel>> {
 
     @Override
     public boolean isReadOnly() throws IOException {
-        manager.retain(this);
-        final boolean result = delegate.isReadOnly();
-        manager.accessed(this);
+        final FsController<? extends FsModel> c = this.delegate;
+        manager.retain(c);
+        final boolean result = c.isReadOnly();
+        manager.accessed(c);
         return result;
     }
 
     @Override
     public FsEntry getEntry(FsEntryName name) throws IOException {
-        manager.retain(this);
-        final FsEntry result = delegate.getEntry(name);
-        manager.accessed(this);
+        final FsController<? extends FsModel> c = this.delegate;
+        manager.retain(c);
+        final FsEntry result = c.getEntry(name);
+        manager.accessed(c);
         return result;
     }
 
     @Override
     public boolean isReadable(FsEntryName name) throws IOException {
-        manager.retain(this);
-        final boolean result = delegate.isReadable(name);
-        manager.accessed(this);
+        final FsController<? extends FsModel> c = this.delegate;
+        manager.retain(c);
+        final boolean result = c.isReadable(name);
+        manager.accessed(c);
         return result;
     }
 
     @Override
     public boolean isWritable(FsEntryName name) throws IOException {
-        manager.retain(this);
-        final boolean result = delegate.isWritable(name);
-        manager.accessed(this);
+        final FsController<? extends FsModel> c = this.delegate;
+        manager.retain(c);
+        final boolean result = c.isWritable(name);
+        manager.accessed(c);
         return result;
     }
 
     @Override
     public boolean isExecutable(FsEntryName name) throws IOException {
-        manager.retain(this);
-        final boolean result = delegate.isExecutable(name);
-        manager.accessed(this);
+        final FsController<? extends FsModel> c = this.delegate;
+        manager.retain(c);
+        final boolean result = c.isExecutable(name);
+        manager.accessed(c);
         return result;
     }
 
     @Override
     public void setReadOnly(FsEntryName name) throws IOException {
-        manager.retain(this);
-        delegate.setReadOnly(name);
-        manager.accessed(this);
+        final FsController<? extends FsModel> c = this.delegate;
+        manager.retain(c);
+        c.setReadOnly(name);
+        manager.accessed(c);
     }
 
     @Override
     public boolean setTime(FsEntryName name, Map<Access, Long> times, BitField<FsOutputOption> options) throws IOException {
-        manager.retain(this);
-        final boolean result = delegate.setTime(name, times, options);
-        manager.accessed(this);
+        final FsController<? extends FsModel> c = this.delegate;
+        manager.retain(c);
+        final boolean result = c.setTime(name, times, options);
+        manager.accessed(c);
         return result;
     }
 
     @Override
     public boolean setTime(FsEntryName name, BitField<Access> types, long value, BitField<FsOutputOption> options) throws IOException {
-        manager.retain(this);
-        final boolean result = delegate.setTime(name, types, value, options);
-        manager.accessed(this);
+        final FsController<? extends FsModel> c = this.delegate;
+        manager.retain(c);
+        final boolean result = c.setTime(name, types, value, options);
+        manager.accessed(c);
         return result;
     }
 
@@ -119,33 +128,37 @@ extends FsDecoratingController<FsModel, FsController<? extends FsModel>> {
 
             @Override
             public Entry getLocalTarget() throws IOException {
-                manager.retain(PaceController.this);
+                final FsController<? extends FsModel> c = PaceController.this.delegate;
+                manager.retain(c);
                 final Entry result = getBoundSocket().getLocalTarget();
-                manager.accessed(PaceController.this);
+                manager.accessed(c);
                 return result;
             }
 
             @Override
             public ReadOnlyFile newReadOnlyFile() throws IOException {
-                manager.retain(PaceController.this);
+                final FsController<? extends FsModel> c = PaceController.this.delegate;
+                manager.retain(c);
                 final ReadOnlyFile result = getBoundSocket().newReadOnlyFile();
-                manager.accessed(PaceController.this);
+                manager.accessed(c);
                 return result;
             }
 
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
-                manager.retain(PaceController.this);
+                final FsController<? extends FsModel> c = PaceController.this.delegate;
+                manager.retain(c);
                 final SeekableByteChannel result = getBoundSocket().newSeekableByteChannel();
-                manager.accessed(PaceController.this);
+                manager.accessed(c);
                 return result;
             }
 
             @Override
             public InputStream newInputStream() throws IOException {
-                manager.retain(PaceController.this);
+                final FsController<? extends FsModel> c = PaceController.this.delegate;
+                manager.retain(c);
                 final InputStream result = getBoundSocket().newInputStream();
-                manager.accessed(PaceController.this);
+                manager.accessed(c);
                 return result;
             }
         } // Input
@@ -163,25 +176,28 @@ extends FsDecoratingController<FsModel, FsController<? extends FsModel>> {
 
             @Override
             public Entry getLocalTarget() throws IOException {
-                manager.retain(PaceController.this);
+                final FsController<? extends FsModel> c = PaceController.this.delegate;
+                manager.retain(c);
                 final Entry result = getBoundSocket().getLocalTarget();
-                manager.accessed(PaceController.this);
+                manager.accessed(c);
                 return result;
             }
 
             @Override
             public SeekableByteChannel newSeekableByteChannel() throws IOException {
-                manager.retain(PaceController.this);
+                final FsController<? extends FsModel> c = PaceController.this.delegate;
+                manager.retain(c);
                 final SeekableByteChannel result = getBoundSocket().newSeekableByteChannel();
-                manager.accessed(PaceController.this);
+                manager.accessed(c);
                 return result;
             }
 
             @Override
             public OutputStream newOutputStream() throws IOException {
-                manager.retain(PaceController.this);
+                final FsController<? extends FsModel> c = PaceController.this.delegate;
+                manager.retain(c);
                 final OutputStream result = getBoundSocket().newOutputStream();
-                manager.accessed(PaceController.this);
+                manager.accessed(c);
                 return result;
             }
         } // Output
@@ -190,15 +206,17 @@ extends FsDecoratingController<FsModel, FsController<? extends FsModel>> {
 
     @Override
     public void mknod(FsEntryName name, Type type, BitField<FsOutputOption> options, Entry template) throws IOException {
-        manager.retain(this);
-        delegate.mknod(name, type, options, template);
-        manager.accessed(this);
+        final FsController<? extends FsModel> c = this.delegate;
+        manager.retain(c);
+        c.mknod(name, type, options, template);
+        manager.accessed(c);
     }
 
     @Override
     public void unlink(FsEntryName name, BitField<FsOutputOption> options) throws IOException {
-        manager.retain(this);
-        delegate.unlink(name, options);
-        manager.accessed(this);
+        final FsController<? extends FsModel> c = this.delegate;
+        manager.retain(c);
+        c.unlink(name, options);
+        manager.accessed(c);
     }
 }
