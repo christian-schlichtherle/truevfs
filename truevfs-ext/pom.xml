@@ -19,7 +19,7 @@
     <description>Parent POM for TrueVFS extensions.</description>
 
     <modules>
-        <module>truevfs-ext-inst</module>
+        <module>truevfs-ext-core</module>
         <module>truevfs-ext-jmx</module>
         <module>truevfs-ext-jul</module>
         <module>truevfs-ext-pace</module>

@@ -15,9 +15,9 @@
         <version>1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truevfs-ext-inst</artifactId>
+    <artifactId>truevfs-ext-core</artifactId>
 
-    <name>TrueVFS Extension Instrumentation</name>
+    <name>TrueVFS Extension Core</name>
     <description>
         Provides core functionality for instrumenting the TrueVFS Kernel at
         runtime.

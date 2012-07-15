@@ -89,7 +89,7 @@ implements JmxManagerViewMXBean {
 
     @Override
     protected String getDescription(MBeanInfo info) {
-        return "The federated file system manager.";
+        return "A JMX file system manager.";
     }
 
     @Override
