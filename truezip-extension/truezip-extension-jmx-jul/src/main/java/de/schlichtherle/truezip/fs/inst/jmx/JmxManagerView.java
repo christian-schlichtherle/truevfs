@@ -89,7 +89,7 @@ implements JmxManagerViewMXBean {
 
     @Override
     protected String getDescription(MBeanInfo info) {
-        return "The federated file system manager.";
+        return "A JMX file system manager.";
     }
 
     @Override
@@ -133,13 +133,12 @@ implements JmxManagerViewMXBean {
     @Override
     protected String getDescription(MBeanOperationInfo info) {
         final String name = info.getName();
-        String description = null;
         if (name.equals("sync")) {
-            description = "Synchronizes all managed file systems. If any file system is busy with I/O, an FsSyncException is thrown.";
+            return "Synchronizes all managed file systems. If any file system is busy with I/O, an FsSyncException is thrown.";
         } else if (name.equals("clearStatistics")) {
-            description = "Clears all but the last I/O statistics.";
+            return "Clears all but the last I/O statistics.";
         }
-        return description;
+        return null;
     }
 
     @Override
