@@ -15,7 +15,7 @@ import net.truevfs.kernel.spec.spi.IoBufferPoolDecorator;
 @Immutable
 public final class JulIoBufferPoolDecorator extends IoBufferPoolDecorator {
     @Override
-    public <B extends IoBuffer<B>> IoBufferPool<B> decorate(IoBufferPool<B> pool) {
+    public IoBufferPool<? extends IoBuffer<?>> apply(IoBufferPool<? extends IoBuffer<?>> pool) {
         return JulDirector.SINGLETON.instrument(pool);
     }
 

@@ -29,7 +29,7 @@ extends UniqueObject implements FsCompositeDriver, FsDriverMapProvider {
                     ? null == model.getParent()
                     : parent.getModel().equals(model.getParent());
         final FsScheme scheme = model.getMountPoint().getScheme();
-        final FsDriver driver = drivers().get(scheme);
+        final FsDriver driver = apply().get(scheme);
         if (null == driver)
             throw new ServiceConfigurationError(scheme
                     + " (Unknown file system scheme! May be the class path doesn't contain the respective driver module or it isn't set up correctly?)");

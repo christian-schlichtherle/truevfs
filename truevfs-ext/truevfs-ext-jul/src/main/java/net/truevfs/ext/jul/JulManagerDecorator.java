@@ -14,7 +14,7 @@ import net.truevfs.kernel.spec.spi.FsManagerDecorator;
 @Immutable
 public final class JulManagerDecorator extends FsManagerDecorator {
     @Override
-    public FsManager decorate(FsManager manager) {
+    public FsManager apply(FsManager manager) {
         return JulDirector.SINGLETON.instrument(manager);
     }
 

@@ -24,7 +24,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
 
   "The file system manager locator singleton" should {
     "provide a file system manager" in {
-      FsManagerLocator.SINGLETON.manager should not be (null)
+      FsManagerLocator.SINGLETON.apply should not be (null)
     }
   }
 }

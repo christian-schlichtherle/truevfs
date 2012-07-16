@@ -14,7 +14,7 @@ import net.truevfs.kernel.spec.spi.FsManagerDecorator;
 @Immutable
 public final class JmxManagerDecorator extends FsManagerDecorator {
     @Override
-    public FsManager decorate(FsManager manager) {
+    public FsManager apply(FsManager manager) {
         return JmxDirector.SINGLETON.instrument(manager);
     }
 

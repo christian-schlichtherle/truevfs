@@ -47,7 +47,7 @@ import net.truevfs.kernel.spec.spi.FsDriverMapFactory;
 @Immutable
 public final class OdfDriverMapFactory extends FsDriverMapFactory {
     @Override
-    public Map<FsScheme, FsDriver> drivers() {
+    public Map<FsScheme, FsDriver> apply() {
         return FsDriverMapProviders.newMap(new Object[][] {
                 { "odt|ott|odg|otg|odp|otp|ods|ots|odc|otc|odi|oti|odf|otf|odm|oth|odb", new OdfDriver() },
             });

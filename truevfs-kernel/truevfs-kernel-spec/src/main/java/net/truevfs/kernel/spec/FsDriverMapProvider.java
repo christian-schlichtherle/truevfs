@@ -27,5 +27,5 @@ public interface FsDriverMapProvider {
      *
      * @return An immutable map of file system schemes to nullable drivers.
      */
-    Map<FsScheme, FsDriver> drivers();
+    Map<FsScheme, FsDriver> apply();
 }

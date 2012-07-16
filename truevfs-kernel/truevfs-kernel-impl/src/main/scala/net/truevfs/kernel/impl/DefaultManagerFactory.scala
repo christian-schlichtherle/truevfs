@@ -14,5 +14,5 @@ import net.truevfs.kernel.spec.spi._
   */
 @Immutable
 final class DefaultManagerFactory extends FsManagerFactory {
-  override def manager = new DefaultManager
+  override def apply = new DefaultManager
 }

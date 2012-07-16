@@ -29,5 +29,5 @@ implements FsDriverMapProvider {
      * @return A new map of file system schemes to nullable drivers.
      */
     @Override
-    public abstract Map<FsScheme, FsDriver> drivers();
+    public abstract Map<FsScheme, FsDriver> apply();
 }

@@ -20,7 +20,6 @@ import net.truevfs.kernel.spec.cio.*;
 public final class JulDirector extends InstrumentingDirector<JulDirector> {
     public static final JulDirector SINGLETON = new JulDirector();
 
-    /** Can't touch this - hammer time! */
     private JulDirector() { }
 
     @Override
