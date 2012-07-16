@@ -58,7 +58,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<AbstractZipDriverEntry> 
      */
     @Override
     public IoBufferPool<? extends IoBuffer<?>> getPool() {
-        return IoBufferPoolLocator.SINGLETON.pool();
+        return IoBufferPoolLocator.SINGLETON.apply();
     }
 
     /**

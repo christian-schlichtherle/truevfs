@@ -36,7 +36,7 @@ import net.truevfs.kernel.spec.spi.FsDriverMapFactory;
 @Immutable
 public final class HttpDriverMapFactory extends FsDriverMapFactory {
     @Override
-    public Map<FsScheme, FsDriver> drivers() {
+    public Map<FsScheme, FsDriver> apply() {
         return FsDriverMapProviders.newMap(new Object[][] {
                 { "http|https", new HttpDriver() },
             });

@@ -19,6 +19,6 @@ extends FsDriverMapProviderTestSuite {
     @Test
     public void testIsLocatable() {
         for (final String extension : new ExtensionSet(getExtensions()))
-            assertNotNull(FsDriverMapLocator.SINGLETON.drivers().get(FsScheme.create(extension)));
+            assertNotNull(FsDriverMapLocator.SINGLETON.apply().get(FsScheme.create(extension)));
     }
 }

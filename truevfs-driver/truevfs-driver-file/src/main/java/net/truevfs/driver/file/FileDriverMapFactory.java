@@ -35,7 +35,7 @@ import net.truevfs.kernel.spec.spi.FsDriverMapFactory;
 @Immutable
 public final class FileDriverMapFactory extends FsDriverMapFactory {
     @Override
-    public Map<FsScheme, FsDriver> drivers() {
+    public Map<FsScheme, FsDriver> apply() {
         return FsDriverMapProviders.newMap(new Object[][] {
             { "file", new FileDriver() },
         });

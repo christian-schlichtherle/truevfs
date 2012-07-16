@@ -26,7 +26,6 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
             mbs = ManagementFactory.getPlatformMBeanServer();
     public static final JmxDirector SINGLETON = new JmxDirector();
 
-    /** Can't touch this - hammer time! */
     private JmxDirector() { }
 
     private volatile JmxIoStatistics application;

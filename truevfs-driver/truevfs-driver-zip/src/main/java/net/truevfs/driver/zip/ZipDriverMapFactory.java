@@ -39,7 +39,7 @@ import net.truevfs.kernel.spec.spi.FsDriverMapFactory;
 @Immutable
 public final class ZipDriverMapFactory extends FsDriverMapFactory {
     @Override
-    public Map<FsScheme, FsDriver> drivers() {
+    public Map<FsScheme, FsDriver> apply() {
         return FsDriverMapProviders.newMap(new Object[][] {
                 { "zip", new ZipDriver() },
             });

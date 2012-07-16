@@ -104,7 +104,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      */
     public TArchiveDetector(final FsDriverMapProvider provider,
                             final @CheckForNull String extensions) {
-        final Map<FsScheme, FsDriver> inDrivers = provider.drivers();
+        final Map<FsScheme, FsDriver> inDrivers = provider.apply();
         final ExtensionSet inExtensions;
         final Map<FsScheme, FsDriver> outDrivers;
         if (null != extensions) {
@@ -222,7 +222,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      */
     public TArchiveDetector(final FsDriverMapProvider provider,
                             final Map<FsScheme, FsDriver> config) {
-        final Map<FsScheme, FsDriver> inDrivers = provider.drivers();
+        final Map<FsScheme, FsDriver> inDrivers = provider.apply();
         final Map<FsScheme, FsDriver> 
                 outDrivers = new HashMap<>(initialCapacity(inDrivers.size()));
         final ExtensionSet outExtensions = new ExtensionSet();
@@ -252,7 +252,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<FsScheme, FsDriver> drivers() {
+    public Map<FsScheme, FsDriver> apply() {
         return drivers;
     }
 

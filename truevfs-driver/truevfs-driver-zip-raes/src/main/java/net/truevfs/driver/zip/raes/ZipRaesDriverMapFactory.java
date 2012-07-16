@@ -38,7 +38,7 @@ import net.truevfs.kernel.spec.spi.FsDriverMapFactory;
 @Immutable
 public final class ZipRaesDriverMapFactory extends FsDriverMapFactory {
     @Override
-    public Map<FsScheme, FsDriver> drivers() {
+    public Map<FsScheme, FsDriver> apply() {
         return FsDriverMapProviders.newMap(new Object[][] {
                 {   "tzp|zip.rae|zip.raes",
                     // Select exactly ONE of the following drivers by

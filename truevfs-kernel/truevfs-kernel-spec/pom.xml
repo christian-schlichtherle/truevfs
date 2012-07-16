@@ -29,6 +29,10 @@
             <groupId>de.schlichtherle.truecommons</groupId>
             <artifactId>truecommons-io</artifactId>
         </dependency>
+        <dependency>
+            <groupId>de.schlichtherle.truecommons</groupId>
+            <artifactId>truecommons-services</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

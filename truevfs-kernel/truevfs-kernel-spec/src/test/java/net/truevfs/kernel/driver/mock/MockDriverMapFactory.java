@@ -24,7 +24,7 @@ public final class MockDriverMapFactory extends FsDriverMapFactory {
     }
 
     @Override
-    public Map<FsScheme, FsDriver> drivers() {
+    public Map<FsScheme, FsDriver> apply() {
         return FsDriverMapProviders.newMap(new Object[][] {
             { extensions, new MockDriver() },
         });

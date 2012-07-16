@@ -49,7 +49,7 @@ public final class PaceManagerFactory extends FsManagerDecorator {
      */
     @Deprecated
     @Override
-    public FsManager decorate(FsManager manager) {
+    public FsManager apply(FsManager manager) {
         return Lazy.view.decorate(manager);
     }
 

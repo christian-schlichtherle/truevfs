@@ -4,27 +4,23 @@
  */
 package net.truevfs.kernel.spec.spi;
 
+import de.schlichtherle.truecommons.services.FactoryService;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
-import net.truevfs.kernel.spec.cio.IoBufferPoolProvider;
 import net.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 
 /**
- * An abstract locatable service for creating I/O buffer pools.
- * Implementations of this abstract class are subject to service location
- * by the class {@link IoBufferPoolLocator}.
+ * An abstract service for creating I/O buffer pools.
+ * Factory services are subject to service location by the
+ * {@link IoBufferPoolLocator#SINGLETON}.
+ * If multiple factory services are locatable on the class path at run time,
+ * the service with the greatest {@linkplain #getPriority() priority} gets
+ * selected.
+ * <p>
+ * Implementations should be thread-safe.
  *
  * @author Christian Schlichtherle
  */
 public abstract class IoBufferPoolFactory
-extends ServiceProvider
-implements IoBufferPoolProvider {
-
-    /**
-     * Returns a new pool to use for allocating temporary I/O buffers.
-     *
-     * @return A new pool to use for allocating temporary I/O buffers.
-     */
-    @Override
-    public abstract IoBufferPool<? extends IoBuffer<?>> pool();
+extends FactoryService<IoBufferPool<? extends IoBuffer<?>>> {
 }

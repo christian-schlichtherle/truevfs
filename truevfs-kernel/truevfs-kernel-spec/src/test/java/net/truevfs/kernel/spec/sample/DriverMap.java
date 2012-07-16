@@ -45,7 +45,7 @@ public final class DriverMap implements Runnable {
 
     @Override
     public void run() {
-        final Map<FsScheme, FsDriver> map = provider.drivers();
+        final Map<FsScheme, FsDriver> map = provider.apply();
         final Map<String, ExtensionSet> compact = compact(map);
         out     .append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
                 .append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n")

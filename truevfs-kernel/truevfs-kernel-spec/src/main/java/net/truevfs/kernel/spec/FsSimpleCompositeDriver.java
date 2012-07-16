@@ -31,7 +31,7 @@ public final class FsSimpleCompositeDriver extends FsAbstractCompositeDriver {
     }
 
     @Override
-    public Map<FsScheme, FsDriver> drivers() {
-        return provider.drivers();
+    public Map<FsScheme, FsDriver> apply() {
+        return provider.apply();
     }
 }

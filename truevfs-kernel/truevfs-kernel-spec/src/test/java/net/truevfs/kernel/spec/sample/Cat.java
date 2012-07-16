@@ -56,7 +56,7 @@ public final class Cat {
     throws IOException, URISyntaxException {
         // Get a manager for the life cycle of controllers for federated
         // file systems.
-        FsManager manager = FsManagerLocator.SINGLETON.manager();
+        FsManager manager = FsManagerLocator.SINGLETON.apply();
         try {
             // Search the class path for the set of all supported file system
             // drivers and build a composite driver from it.

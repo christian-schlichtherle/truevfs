@@ -36,7 +36,7 @@ public final class FsDriverMapLocator implements FsDriverMapProvider {
     private FsDriverMapLocator() { }
 
     @Override
-    public Map<FsScheme, FsDriver> drivers() {
+    public Map<FsScheme, FsDriver> apply() {
         return Boot.DRIVERS;
     }
 
@@ -69,7 +69,7 @@ public final class FsDriverMapLocator implements FsDriverMapProvider {
             final Map<FsScheme, FsDriver> sorted = new TreeMap<>();
             for (final FsDriverMapFactory service : prioritized) {
                 for (final Map.Entry<FsScheme, FsDriver> entry
-                        : service.drivers().entrySet()) {
+                        : service.apply().entrySet()) {
                     final FsScheme scheme = entry.getKey();
                     final FsDriver driver = entry.getValue();
                     if (null != scheme)
