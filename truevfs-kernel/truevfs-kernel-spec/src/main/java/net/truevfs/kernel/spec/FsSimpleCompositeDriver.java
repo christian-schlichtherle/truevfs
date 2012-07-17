@@ -4,6 +4,7 @@
  */
 package net.truevfs.kernel.spec;
 
+import de.schlichtherle.truecommons.services.Provider;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
@@ -17,16 +18,16 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public final class FsSimpleCompositeDriver extends FsAbstractCompositeDriver {
 
-    private final FsDriverMapProvider provider;
+    private final Provider<Map<FsScheme, FsDriver>> provider;
 
     /**
      * Constructs a new simple composite driver which will query the given
-     * driver {@code provider} for an appropriate file system driver for
-     * the scheme of a given mount point.
+     * {@code provider} for an appropriate file system driver for the scheme
+     * of a given mount point.
      * 
      * @param provider the driver map provider.
      */
-    public FsSimpleCompositeDriver(final FsDriverMapProvider provider) {
+    public FsSimpleCompositeDriver(final Provider<Map<FsScheme, FsDriver>> provider) {
         this.provider = Objects.requireNonNull(provider);
     }
 

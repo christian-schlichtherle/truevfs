@@ -14,7 +14,6 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class Threads {
 
-    /* Can't touch this - hammer time! */
     private Threads() { }
 
     /**

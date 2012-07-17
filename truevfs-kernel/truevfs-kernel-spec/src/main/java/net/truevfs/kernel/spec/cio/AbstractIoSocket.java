@@ -4,9 +4,9 @@
  */
 package net.truevfs.kernel.spec.cio;
 
+import de.schlichtherle.truecommons.services.UniqueObject;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.spec.util.UniqueObject;
 
 /**
  * Abstract base class for I/O sockets.

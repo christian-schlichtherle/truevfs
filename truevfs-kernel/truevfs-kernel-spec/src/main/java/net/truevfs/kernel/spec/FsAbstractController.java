@@ -4,12 +4,12 @@
  */
 package net.truevfs.kernel.spec;
 
+import de.schlichtherle.truecommons.services.UniqueObject;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import net.truevfs.kernel.spec.cio.Entry.Access;
 import net.truevfs.kernel.spec.util.BitField;
-import net.truevfs.kernel.spec.util.UniqueObject;
 
 /**
  * An abstract file system controller which implements the {@link #getModel()}

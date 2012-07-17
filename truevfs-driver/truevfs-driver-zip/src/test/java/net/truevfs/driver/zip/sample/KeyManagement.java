@@ -4,7 +4,9 @@
  */
 package net.truevfs.driver.zip.sample;
 
+import de.schlichtherle.truecommons.services.Provider;
 import java.nio.charset.Charset;
+import java.util.Map;
 import net.truevfs.access.TArchiveDetector;
 import net.truevfs.access.TConfig;
 import net.truevfs.driver.zip.ZipDriver;
@@ -12,8 +14,9 @@ import net.truevfs.driver.zip.core.AbstractZipDriverEntry;
 import net.truevfs.driver.zip.core.io.WinZipAesParameters;
 import net.truevfs.driver.zip.core.io.ZipKeyException;
 import net.truevfs.kernel.spec.FsController;
-import net.truevfs.kernel.spec.FsDriverMapProvider;
+import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsModel;
+import net.truevfs.kernel.spec.FsScheme;
 import net.truevfs.key.KeyManagerProvider;
 import net.truevfs.key.PromptingKeyManagerProvider;
 import net.truevfs.key.PromptingKeyProvider.Controller;
@@ -65,7 +68,7 @@ public final class KeyManagement {
      *         extensions.
      */
     public static TArchiveDetector newArchiveDetector1(
-            FsDriverMapProvider provider,
+            Provider<Map<FsScheme, FsDriver>> provider,
             String extensions,
             byte[] password) {
         return new TArchiveDetector(provider,
@@ -184,7 +187,7 @@ public final class KeyManagement {
      *         extensions.
      */
     public static TArchiveDetector newArchiveDetector2(
-            FsDriverMapProvider provider,
+            Provider<Map<FsScheme, FsDriver>> provider,
             String extensions,
             char[] password) {
         return new TArchiveDetector(provider,

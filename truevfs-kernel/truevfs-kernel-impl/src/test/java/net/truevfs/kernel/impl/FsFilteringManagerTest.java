@@ -7,7 +7,7 @@ package net.truevfs.kernel.impl;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
-import net.truevfs.kernel.driver.mock.MockDriverMapFactory;
+import net.truevfs.kernel.driver.mock.MockDriverMapContainer;
 import net.truevfs.kernel.spec.*;
 import net.truevfs.kernel.spec.util.Link.Type;
 import static net.truevfs.kernel.spec.util.Link.Type.STRONG;
@@ -31,7 +31,7 @@ public class FsFilteringManagerTest extends FsManagerTestSuite {
     @Test
     public void testFiltering() {
         final FsCompositeDriver driver = new FsSimpleCompositeDriver(
-                new MockDriverMapFactory("file|tar|tar.gz|zip"));
+                new MockDriverMapContainer("file|tar|tar.gz|zip"));
         for (final String[][] params : new String[][][] {
             // { { /* filter */ }, { /* test set */ }, { /* result set */ } },
             { { "tar:file:/bar.tar!/" }, { "file:/", "tar:file:/bar.tar!/", "tar.gz:file:/bar.tar.gz!/" }, { "tar:file:/bar.tar!/" } },

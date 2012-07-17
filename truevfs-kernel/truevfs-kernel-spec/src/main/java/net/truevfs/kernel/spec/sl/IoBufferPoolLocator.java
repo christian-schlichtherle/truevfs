@@ -33,7 +33,8 @@ implements Container<IoBufferPool<? extends IoBuffer<?>>> {
 
     /** A static data utility class used for lazy initialization. */
     private static final class Boot {
-        static final IoBufferPool<? extends IoBuffer<?>> pool = new Locator(IoBufferPoolLocator.class)
+        static final IoBufferPool<? extends IoBuffer<?>> pool
+                = new Locator(IoBufferPoolLocator.class)
                 .factory(IoBufferPoolFactory.class, IoBufferPoolDecorator.class)
                 .apply();
     }

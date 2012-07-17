@@ -4,6 +4,8 @@
  */
 package net.truevfs.driver.zip.raes.sample;
 
+import de.schlichtherle.truecommons.services.Provider;
+import java.util.Map;
 import net.truevfs.access.TArchiveDetector;
 import net.truevfs.access.TConfig;
 import net.truevfs.driver.zip.raes.SafeZipRaesDriver;
@@ -11,8 +13,9 @@ import net.truevfs.driver.zip.raes.crypto.RaesKeyException;
 import net.truevfs.driver.zip.raes.crypto.RaesParameters;
 import net.truevfs.driver.zip.raes.crypto.Type0RaesParameters;
 import net.truevfs.kernel.spec.FsController;
-import net.truevfs.kernel.spec.FsDriverMapProvider;
+import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsModel;
+import net.truevfs.kernel.spec.FsScheme;
 import net.truevfs.key.KeyManagerProvider;
 import net.truevfs.key.PromptingKeyManagerProvider;
 import net.truevfs.key.PromptingKeyProvider.Controller;
@@ -61,7 +64,7 @@ public final class KeyManagement {
      *         RAES encrypted ZIP files with the given list of extensions.
      */
     public static TArchiveDetector newArchiveDetector1(
-            FsDriverMapProvider provider,
+            Provider<Map<FsScheme, FsDriver>> provider,
             String extensions,
             char[] password) {
         return new TArchiveDetector(provider,
@@ -157,7 +160,7 @@ public final class KeyManagement {
      *         RAES encrypted ZIP files with the given list of extensions.
      */
     public static TArchiveDetector newArchiveDetector2(
-            FsDriverMapProvider provider,
+            Provider<Map<FsScheme, FsDriver>> provider,
             String extensions,
             char[] password) {
         return new TArchiveDetector(provider,

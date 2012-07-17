@@ -5,6 +5,7 @@
 package net.truevfs.kernel.spec.spi;
 
 import de.schlichtherle.truecommons.services.FactoryService;
+import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.spec.FsManager;
 import net.truevfs.kernel.spec.sl.FsManagerLocator;
 
@@ -20,5 +21,6 @@ import net.truevfs.kernel.spec.sl.FsManagerLocator;
  * 
  * @author Christian Schlichtherle
  */
+@ThreadSafe
 public abstract class FsManagerFactory extends FactoryService<FsManager> {
 }

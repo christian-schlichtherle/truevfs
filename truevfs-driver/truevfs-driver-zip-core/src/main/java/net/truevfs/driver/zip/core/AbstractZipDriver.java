@@ -32,7 +32,7 @@ import net.truevfs.kernel.spec.util.BitField;
 import net.truevfs.kernel.spec.util.HashMaps;
 import net.truevfs.key.KeyManagerProvider;
 import net.truevfs.key.KeyProvider;
-import net.truevfs.key.sl.KeyManagerLocator;
+import net.truevfs.key.sl.KeyManagerMapLocator;
 
 /**
  * An abstract archive driver for the ZIP file format.
@@ -72,7 +72,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<AbstractZipDriverEntry> 
      *         in the class {@link ZipDriver}.
      */
     public KeyManagerProvider getKeyManagerProvider() {
-        return KeyManagerLocator.SINGLETON;
+        return KeyManagerMapLocator.SINGLETON;
     }
 
     public final @CheckForNull ZipCryptoParameters zipCryptoParameters(ZipInputService input) {
