@@ -119,13 +119,21 @@ private trait ResourceController extends Controller[LockModel] {
   private trait ResourceCloseable extends Closeable {
     accountant startAccountingFor this
 
+    /**
+      * Close()s this resource and finally stops accounting for it unless a
+      * {@link ControlFlowException} is thrown.
+      * 
+      * @see http://java.net/jira/browse/TRUEZIP-279 .
+      */
     abstract override def close() {
-      super.close()
-      accountant stopAccountingFor this
+      var cfe = false
+      try     { super.close() }
+      catch   { case ex: ControlFlowException => cfe = true; throw ex }
+      finally { if (!cfe) accountant stopAccountingFor this }
     }
   }
 }
 
 private object ResourceController {
-  private val waitTimeoutMillis = LockingStrategy acquireTimeoutMillis
+  private val waitTimeoutMillis = LockingStrategy.acquireTimeoutMillis
 }
