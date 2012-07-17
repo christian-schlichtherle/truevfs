@@ -17,9 +17,11 @@ import de.schlichtherle.truezip.socket.DecoratingOutputSocket;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ControlFlowException;
 import de.schlichtherle.truezip.util.ExceptionHandler;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -131,6 +133,28 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
             }
         } // IOExceptionHandler
         accountant.closeAllResources(new IOExceptionHandler());
+    }
+
+    /**
+     * Close()s the given {@code resource} and finally stops accounting for the
+     * given {@code account} unless a {@link ControlFlowException} is thrown.
+     * 
+     * @param  delegate the resource to close().
+     * @param  thiz the resource to eventually stop accounting for.
+     * @throws IOException on any I/O error.
+     * @see http://java.net/jira/browse/TRUEZIP-279 .
+     */
+    private void close(final Closeable delegate, final Closeable thiz)
+    throws IOException {
+        boolean cfe = false;
+        try {
+            delegate.close();
+        } catch (final ControlFlowException ex) {
+            cfe = true;
+            throw ex;
+        } finally {
+            if (!cfe) accountant.stopAccountingFor(thiz);
+        }
     }
 
     @Immutable
@@ -262,8 +286,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public void close() throws IOException {
-            delegate.close();
-            accountant.stopAccountingFor(this);
+            close(delegate, this);
         }
     } // ResourceReadOnlyFile
 
@@ -278,8 +301,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public void close() throws IOException {
-            delegate.close();
-            accountant.stopAccountingFor(this);
+            close(delegate, this);
         }
     } // ResourceSeekableByteChannel
 
@@ -294,8 +316,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public void close() throws IOException {
-            delegate.close();
-            accountant.stopAccountingFor(this);
+            close(delegate, this);
         }
     } // ResourceInputStream
 
@@ -310,8 +331,7 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
 
         @Override
         public void close() throws IOException {
-            delegate.close();
-            accountant.stopAccountingFor(this);
+            close(delegate, this);
         }
     } // ResourceOutputStream
 }
