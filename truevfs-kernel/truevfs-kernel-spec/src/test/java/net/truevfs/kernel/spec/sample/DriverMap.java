@@ -7,10 +7,11 @@ package net.truevfs.kernel.spec.sample;
 import java.io.PrintStream;
 import java.util.Map.Entry;
 import java.util.*;
-import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.truevfs.kernel.spec.FsDriver;
-import net.truevfs.kernel.spec.FsDriverMapProvider;
 import net.truevfs.kernel.spec.FsScheme;
+import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
+import net.truevfs.kernel.spec.spi.FsDriverMapFactory;
+import net.truevfs.kernel.spec.spi.FsDriverMapModifier;
 import net.truevfs.kernel.spec.util.ExtensionSet;
 
 /**
@@ -28,24 +29,30 @@ public final class DriverMap implements Runnable {
     private static final String END_LINK   = "</code>"; //"}"
 
     private final PrintStream out;
-    private final FsDriverMapProvider provider;
+    private final Map<FsScheme, FsDriver> map;
 
-    public DriverMap(final PrintStream out, final FsDriverMapProvider provider) {
+    public DriverMap(final PrintStream out, final Map<FsScheme, FsDriver> map) {
         this.out = Objects.requireNonNull(out);
-        this.provider = Objects.requireNonNull(provider);
+        this.map = Objects.requireNonNull(new LinkedHashMap<>(map));
     }
 
     public static void main(String[] args) throws Exception {
-        final FsDriverMapProvider provider;
-        provider = 0 == args.length
-                ? FsDriverMapLocator.SINGLETON
-                : (FsDriverMapProvider) Class.forName(args[0]).newInstance();
-        new DriverMap(System.out, provider).run();
+        Map<FsScheme, FsDriver> map;
+        if (0 == args.length) {
+            map = FsDriverMapLocator.SINGLETON.apply();
+        } else {
+            map = new FsDriverMapFactory().apply();
+            for (final String arg : args) {
+                final FsDriverMapModifier modifier
+                        = (FsDriverMapModifier) Class.forName(arg).newInstance();
+                map = modifier.apply(map);
+            }
+        }
+        new DriverMap(System.out, map).run();
     }
 
     @Override
     public void run() {
-        final Map<FsScheme, FsDriver> map = provider.apply();
         final Map<String, ExtensionSet> compact = compact(map);
         out     .append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
                 .append("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n")
@@ -55,7 +62,7 @@ public final class DriverMap implements Runnable {
                 .append("  </head>\n")
                 .append("  <body>\n")
                 .append("    <table").append(TABLE_ATTRIBUTES).append(">\n")
-                .append("      <caption>File System Driver Provider Class ").append(BEGIN_LINK).append(provider.getClass().getName()).append(END_LINK).append("</caption>\n")
+                //.append("      <caption>File System Driver Provider Class ").append(BEGIN_LINK).append(provider.getClass().getName()).append(END_LINK).append("</caption>\n")
                 .append("      <thead>\n")
                 .append("        <tr>\n")
                 .append("          <th>URI Schemes</th>\n")

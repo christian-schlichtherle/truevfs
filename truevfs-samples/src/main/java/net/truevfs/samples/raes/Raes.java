@@ -16,7 +16,7 @@ import java.nio.file.Path;
 import net.truevfs.driver.zip.raes.KeyManagerRaesParameters;
 import net.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import net.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
-import net.truevfs.key.sl.KeyManagerLocator;
+import net.truevfs.key.sl.KeyManagerMapLocator;
 
 /**
  * Saves and restores the contents of arbitrary files to and from the RAES
@@ -50,7 +50,7 @@ public final class Raes {
                     public OutputStream stream() throws IOException {
                         return RaesOutputStream.create(
                                 new KeyManagerRaesParameters(
-                                    KeyManagerLocator.SINGLETON,
+                                    KeyManagerMapLocator.SINGLETON,
                                     cipher/*.getCanonicalFile()*/.toUri()),
                                 new AbstractSink() {
                                     @Override
@@ -83,7 +83,7 @@ public final class Raes {
                         final RaesReadOnlyChannel
                                 channel = RaesReadOnlyChannel.create(
                                     new KeyManagerRaesParameters(
-                                        KeyManagerLocator.SINGLETON,
+                                        KeyManagerMapLocator.SINGLETON,
                                         cipherFile/*.getCanonicalFile()*/.toUri()),
                                     new AbstractSource() {
                                         @Override

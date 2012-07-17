@@ -31,7 +31,8 @@ public class FsManagerLocator implements Container<FsManager> {
 
     /** A static data utility class used for lazy initialization. */
     private static final class Boot {
-        static final FsManager manager = new Locator(FsManagerLocator.class)
+        static final FsManager manager
+                = new Locator(FsManagerLocator.class)
                 .factory(FsManagerFactory.class, FsManagerDecorator.class)
                 .apply();
     }

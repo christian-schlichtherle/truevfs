@@ -4,9 +4,11 @@
  */
 package net.truevfs.key;
 
-import net.truevfs.key.PromptingKeyProvider.View;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.key.PromptingKeyProvider.View;
 
 /**
  * Implements a provider for a single prompting key manager which will use the
@@ -33,13 +35,13 @@ extends AbstractKeyManagerProvider {
     public <K extends SafeKey<K>> PromptingKeyManagerProvider(
             final Class<K> clazz,
             final View<K> view) {
-        this.managers = newMap(new Object[][] {{
-            clazz,
-            new PromptingKeyManager<>(view)
-        }});
+        final Map<Class<?>, KeyManager<?>> map = new HashMap<>(2);
+        map.put(clazz, new PromptingKeyManager<>(view));
+        managers = Collections.unmodifiableMap(map);
     }
 
     @Override
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
     public Map<Class<?>, KeyManager<?>> getKeyManagers() {
         return managers;
     }

@@ -4,18 +4,12 @@
  */
 package de.schlichtherle.truevfs.key.pbe.swing;
 
+import de.schlichtherle.truecommons.services.Loader;
 import de.schlichtherle.truevfs.key.pbe.swing.feedback.BasicInvalidKeyFeedback;
 import de.schlichtherle.truevfs.key.pbe.swing.feedback.BasicUnknownKeyFeedback;
 import de.schlichtherle.truevfs.key.pbe.swing.feedback.InvalidKeyFeedback;
 import de.schlichtherle.truevfs.key.pbe.swing.feedback.UnknownKeyFeedback;
 import de.schlichtherle.truevfs.key.swing.Windows;
-import net.truevfs.kernel.spec.util.ServiceLocator;
-import net.truevfs.key.KeyPromptingInterruptedException;
-import net.truevfs.key.PromptingKeyProvider.Controller;
-import net.truevfs.key.UnknownKeyException;
-import net.truevfs.key.param.KeyStrength;
-import net.truevfs.key.param.SafePbeParameters;
-import net.truevfs.key.param.SafePbeParametersView;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.io.*;
@@ -27,6 +21,12 @@ import java.util.ResourceBundle;
 import java.util.WeakHashMap;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.swing.JOptionPane;
+import net.truevfs.key.KeyPromptingInterruptedException;
+import net.truevfs.key.PromptingKeyProvider.Controller;
+import net.truevfs.key.UnknownKeyException;
+import net.truevfs.key.param.KeyStrength;
+import net.truevfs.key.param.SafePbeParameters;
+import net.truevfs.key.param.SafePbeParametersView;
 
 /**
  * A Swing based user interface for prompting for passwords or key files.
@@ -55,8 +55,8 @@ extends SafePbeParametersView<P> {
 
     private static final Map<URI, ReadKeyPanel> readKeyPanels = new WeakHashMap<>();
 
-    private static final ServiceLocator serviceLocator
-            = new ServiceLocator(SwingSafePbeParametersView.class.getClassLoader());
+    private static final Loader loader
+            = new Loader(SwingSafePbeParametersView.class.getClassLoader());
 
     /**
      * The last resource ID used when prompting.
@@ -89,7 +89,7 @@ extends SafePbeParametersView<P> {
         final UnknownKeyFeedback uckf = this.unknownKeyFeedback;
         return null != uckf
                 ? uckf
-                : (this.unknownKeyFeedback = serviceLocator.getService(
+                : (this.unknownKeyFeedback = loader.instanceOf(
                     UnknownKeyFeedback.class,
                     BasicUnknownKeyFeedback.class));
     }
@@ -102,7 +102,7 @@ extends SafePbeParametersView<P> {
         final InvalidKeyFeedback ickf = this.invalidKeyFeedback;
         return null != ickf
                 ? ickf
-                : (this.invalidKeyFeedback = serviceLocator.getService(
+                : (this.invalidKeyFeedback = loader.instanceOf(
                     InvalidKeyFeedback.class,
                     BasicInvalidKeyFeedback.class));
     }

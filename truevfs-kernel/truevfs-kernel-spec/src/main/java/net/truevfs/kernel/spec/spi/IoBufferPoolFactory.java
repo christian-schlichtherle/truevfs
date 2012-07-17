@@ -5,6 +5,7 @@
 package net.truevfs.kernel.spec.spi;
 
 import de.schlichtherle.truecommons.services.FactoryService;
+import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
 import net.truevfs.kernel.spec.sl.IoBufferPoolLocator;
@@ -21,6 +22,7 @@ import net.truevfs.kernel.spec.sl.IoBufferPoolLocator;
  *
  * @author Christian Schlichtherle
  */
+@ThreadSafe
 public abstract class IoBufferPoolFactory
 extends FactoryService<IoBufferPool<? extends IoBuffer<?>>> {
 }

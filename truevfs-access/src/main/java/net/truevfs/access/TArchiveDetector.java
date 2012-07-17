@@ -4,17 +4,20 @@
  */
 package net.truevfs.access;
 
+import de.schlichtherle.truecommons.services.Container;
+import de.schlichtherle.truecommons.services.Loader;
+import de.schlichtherle.truecommons.services.Provider;
 import java.io.File;
 import java.net.URISyntaxException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.spec.*;
+import net.truevfs.kernel.spec.FsAbstractCompositeDriver;
+import net.truevfs.kernel.spec.FsDriver;
+import net.truevfs.kernel.spec.FsScheme;
 import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.truevfs.kernel.spec.util.ExtensionSet;
+import net.truevfs.kernel.spec.util.HashMaps;
 import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 
 /**
@@ -51,7 +54,8 @@ import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class TArchiveDetector extends FsAbstractCompositeDriver {
+public final class TArchiveDetector
+extends FsAbstractCompositeDriver implements Container<Map<FsScheme, FsDriver>> {
 
     /**
      * This instance never recognizes any archive files in a path.
@@ -102,7 +106,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      *         provider.
      * @see    ExtensionSet Syntax constraints for extension lists.
      */
-    public TArchiveDetector(final FsDriverMapProvider provider,
+    public TArchiveDetector(final Provider<Map<FsScheme, FsDriver>> provider,
                             final @CheckForNull String extensions) {
         final Map<FsScheme, FsDriver> inDrivers = provider.apply();
         final ExtensionSet inExtensions;
@@ -167,7 +171,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      *         does not hold.
      * @see    ExtensionSet Syntax contraints for extension lists.
      */
-    public TArchiveDetector(FsDriverMapProvider provider,
+    public TArchiveDetector(Provider<Map<FsScheme, FsDriver>> provider,
                             String extensions,
                             @CheckForNull FsDriver driver) {
         this(provider, new Object[][] {{ extensions, driver }});
@@ -199,8 +203,8 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      *         does not hold.
      * @see    ExtensionSet Syntax contraints for extension lists.
      */
-    public TArchiveDetector(FsDriverMapProvider provider, Object[][] config) {
-        this(provider, FsDriverMapProviders.newMap(config));
+    public TArchiveDetector(Provider<Map<FsScheme, FsDriver>> provider, Object[][] config) {
+        this(provider, newMap(config));
     }
 
     /**
@@ -220,7 +224,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      *         does not hold.
      * @see    ExtensionSet Syntax contraints for extension lists.
      */
-    public TArchiveDetector(final FsDriverMapProvider provider,
+    public TArchiveDetector(final Provider<Map<FsScheme, FsDriver>> provider,
                             final Map<FsScheme, FsDriver> config) {
         final Map<FsScheme, FsDriver> inDrivers = provider.apply();
         final Map<FsScheme, FsDriver> 
@@ -308,5 +312,62 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
     @Override
     public String toString() {
         return extensions;
+    }
+
+    /**
+     * Creates an unmodifiable file system driver map which is constructed from
+     * the given configuration.
+     *
+     * @param  config an array of key-value pair arrays.
+     *         The first element of each inner array must either be a
+     *         {@link FsScheme file system scheme}, an object {@code o} which
+     *         is convertable to a set of file name extensions by calling
+     *         <code>new {@link ExtensionSet#ExtensionSet(String) ExtensionSet}(o.toString())</code>
+     *         or a {@link Collection collection} of these.
+     *         The second element of each inner array must either be a
+     *         {@link FsDriver file system driver instance}, a
+     *         {@link Class file system driver class}, a
+     *         {@link String fully qualified name of a file system driver class},
+     *         or {@code null}.
+     * @return The file system driver map created from the given configuration.
+     * @throws NullPointerException if a required configuration element is
+     *         {@code null}.
+     * @throws IllegalArgumentException if any other parameter precondition
+     *         does not hold.
+     * @see    ExtensionSet Syntax contraints for extension lists.
+     */
+    private static Map<FsScheme, FsDriver> newMap(final Object[][] config) {
+        final Map<FsScheme, FsDriver> drivers = new HashMap<>(
+                HashMaps.initialCapacity(config.length) * 2); // heuristics
+        for (final Object[] param : config) {
+            final Collection<FsScheme> schemes = toSchemes(param[0]);
+            if (schemes.isEmpty())
+                throw new IllegalArgumentException("No file system schemes!");
+            final FsDriver driver = Loader.promote(param[1], FsDriver.class);
+            for (final FsScheme scheme : schemes)
+                drivers.put(scheme, driver);
+        }
+        return Collections.unmodifiableMap(drivers);
+    }
+
+    private static Collection<FsScheme> toSchemes(final Object o) {
+        final Collection<FsScheme> set = new TreeSet<>();
+        try {
+            if (o instanceof Collection<?>)
+                for (final Object p : (Collection<?>) o)
+                    if (p instanceof FsScheme)
+                        set.add((FsScheme) p);
+                    else
+                        for (final String q : new ExtensionSet(p.toString()))
+                            set.add(new FsScheme(q));
+            else if (o instanceof FsScheme)
+                set.add((FsScheme) o);
+            else
+                for (final String p : new ExtensionSet(o.toString()))
+                    set.add(new FsScheme(p));
+        } catch (final URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+        return set;
     }
 }

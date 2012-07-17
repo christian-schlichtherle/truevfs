@@ -4,9 +4,9 @@
  */
 package net.truevfs.kernel.spec;
 
+import de.schlichtherle.truecommons.services.UniqueObject;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.spec.util.UniqueObject;
 
 /**
  * An abstract factory for components required to access a file system.

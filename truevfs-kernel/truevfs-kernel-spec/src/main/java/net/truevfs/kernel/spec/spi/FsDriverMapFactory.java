@@ -4,30 +4,35 @@
  */
 package net.truevfs.kernel.spec.spi;
 
+import de.schlichtherle.truecommons.services.FactoryService;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.spec.FsDriver;
-import net.truevfs.kernel.spec.FsDriverMapProvider;
 import net.truevfs.kernel.spec.FsScheme;
 import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
 
 /**
- * An abstract locatable service for creating maps of file system schemes to
- * file system drivers.
- * Implementations of this abstract class are subject to service location
- * by the class {@link FsDriverMapLocator}.
+ * A service for creating maps of file system schemes to file system drivers.
+ * Note that you can't subclass this class for customization.
+ * It solely exists in order to support the 
+ * {@link FsDriverMapLocator#SINGLETON}, which will use it to create the root
+ * of the driver map which gets subsequently decorated by the
+ * {@link FsDriverMapModifier} implementations found on the class path.
  *
  * @author Christian Schlichtherle
  */
-public abstract class FsDriverMapFactory
-extends ServiceProvider
-implements FsDriverMapProvider {
+@ThreadSafe
+public final class FsDriverMapFactory
+extends FactoryService<Map<FsScheme, FsDriver>> {
 
     /**
-     * Returns a new map of file system schemes to nullable drivers.
-     * Note that only the values of the returned map may be {@code null}!
+     * Returns a new empty map for subsequent modification.
      *
-     * @return A new map of file system schemes to nullable drivers.
+     * @return A new empty map for subsequent modification.
      */
     @Override
-    public abstract Map<FsScheme, FsDriver> apply();
+    public Map<FsScheme, FsDriver> apply() {
+        return new LinkedHashMap<>(32);
+    }
 }

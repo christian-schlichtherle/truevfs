@@ -4,12 +4,12 @@
  */
 package net.truevfs.kernel.spec;
 
+import de.schlichtherle.truecommons.services.UniqueObject;
 import java.util.Formatter;
 import java.util.Set;
 import javax.annotation.Nullable;
 import net.truevfs.kernel.spec.cio.Entry;
 import net.truevfs.kernel.spec.util.BitField;
-import net.truevfs.kernel.spec.util.UniqueObject;
 
 /**
  * An abstract file system entry is an entry which can implement multiple types
