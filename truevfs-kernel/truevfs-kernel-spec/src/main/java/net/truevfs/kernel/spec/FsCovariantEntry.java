@@ -14,8 +14,8 @@ import net.truevfs.kernel.spec.util.BitField;
  * A covariant file system entry maintains a map of
  * {@link FsArchiveEntry archive entries} and uses its
  * {@link #setKey(Entry.Type) key} property to determine the archive entry
- * in the map to which it forwards calls to {@link #get()},
- * {@link #getSize(Size)} and {@link #getTime(Access)}.
+ * in the map to which it forwards calls to {@link #getEntry()},
+ * {@link #getSize(Size)}, {@link #getTime(Access)} etc.
  * 
  * @param  <E> the type of the mapped archive entries.
  * @author Christian Schlichtherle
@@ -84,16 +84,16 @@ implements Cloneable {
 
     /**
      * Returns the type of the file system entry to which calls to
-     * {@link #get()}, {@link #getSize(Size)} and
-     * {@link #getTime(Access)} shall get forwarded.
+     * {@link #getEntry()}, {@link #getSize(Size)},
+     * {@link #getTime(Access)} et al shall get forwarded.
      * <p>
      * Note that an arbitrary property value may get returned:
      * The initial value is {@code null} and even if it's not {@code null},
      * no entry of this type needs to be mapped.
      * 
      * @return the type of the file system entry to which calls to
-     *         {@link #get()}, {@link #getSize(Size)} and
-     *         {@link #getTime(Access)} shall get forwarded.
+     *         {@link #getEntry()}, {@link #getSize(Size)},
+     *         {@link #getTime(Access)} et al shall get forwarded.
      */
     public @Nullable Type getKey() {
         return key;
@@ -101,15 +101,15 @@ implements Cloneable {
 
     /**
      * Selects the type of the file system entry to which calls to
-     * {@link #get()}, {@link #getSize(Size)} and
-     * {@link #getTime(Access)} shall get forwarded.
+     * {@link #getEntry()}, {@link #getSize(Size)},
+     * {@link #getTime(Access)} et al shall get forwarded.
      * If the given type is {@code null} or no file system entry of this type
      * is mappeed, then any subsequent call to these methods will fail with a
      * {@link NullPointerException}.
      * 
      * @param type the type of the file system entry to which calls to
-     *        {@link #get()}, {@link #getSize(Size)} and
-     *        {@link #getTime(Access)} shall get forwarded.
+     *        {@link #getEntry()}, {@link #getSize(Size)},
+     *        {@link #getTime(Access)} et al shall get forwarded.
      */
     public void setKey(final @Nullable Type type) {
         key = type;
