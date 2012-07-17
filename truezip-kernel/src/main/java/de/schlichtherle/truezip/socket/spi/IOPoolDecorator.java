@@ -34,8 +34,7 @@ public abstract class IOPoolDecorator {
      * the decorator with the greatest number becomes the head of the decorator
      * chain.
      * <p>
-     * The implementation in the class {@link IoBufferPoolDecorator} returns
-     * zero.
+     * The implementation in the class {@link IOPoolDecorator} returns zero.
      * 
      * @return A priority to help service locators to prioritize the services
      *         provided by this object.
