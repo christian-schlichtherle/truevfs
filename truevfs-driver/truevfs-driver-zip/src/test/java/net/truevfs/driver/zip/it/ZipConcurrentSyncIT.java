@@ -13,7 +13,8 @@ import net.truevfs.kernel.spec.cio.IoBufferPool;
 /**
  * @author Christian Schlichtherle
  */
-public final class ZipConcurrentSyncIT extends ConcurrentSyncITSuite<ZipDriver> {
+public final class ZipConcurrentSyncIT
+extends ConcurrentSyncITSuite<ZipDriver> {
 
     @Override
     protected String getExtensionList() {
