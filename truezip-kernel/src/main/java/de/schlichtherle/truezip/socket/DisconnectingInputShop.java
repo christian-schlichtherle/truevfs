@@ -5,7 +5,10 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.io.DisconnectingInputStream;
+import de.schlichtherle.truezip.io.DisconnectingSeekableByteChannel;
 import de.schlichtherle.truezip.io.InputClosedException;
+import de.schlichtherle.truezip.rof.DisconnectingReadOnlyFile;
 import de.schlichtherle.truezip.rof.ReadOnlyFile;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -135,7 +138,7 @@ extends DecoratingInputShop<E, InputShop<E>> {
 
         @Override
         public SeekableByteChannel newSeekableByteChannel() throws IOException {
-            return new DisconnectingSeekableByteChannel(
+            return new DisconnectingSeekableByteChannelImpl(
                     getBoundSocket().newSeekableByteChannel());
         }
     } // Nio2Input
@@ -153,22 +156,22 @@ extends DecoratingInputShop<E, InputShop<E>> {
 
         @Override
         public ReadOnlyFile newReadOnlyFile() throws IOException {
-            return new DisconnectingReadOnlyFile(
+            return new DisconnectingReadOnlyFileImpl(
                     getBoundSocket().newReadOnlyFile());
         }
 
         @Override
         public InputStream newInputStream() throws IOException {
-            return new DisconnectingInputStream(
+            return new DisconnectingInputStreamImpl(
                     getBoundSocket().newInputStream());
         }
     } // Input
 
-    private final class DisconnectingReadOnlyFile
-    extends de.schlichtherle.truezip.rof.DisconnectingReadOnlyFile {
+    private final class DisconnectingReadOnlyFileImpl
+    extends DisconnectingReadOnlyFile {
 
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        DisconnectingReadOnlyFile(@WillCloseWhenClosed ReadOnlyFile rof) {
+        DisconnectingReadOnlyFileImpl(@WillCloseWhenClosed ReadOnlyFile rof) {
             super(rof);
         }
 
@@ -182,13 +185,13 @@ extends DecoratingInputShop<E, InputShop<E>> {
         public void close() throws IOException {
             if (isOpen()) delegate.close();
         }
-    } // DisconnectingReadOnlyFile
+    } // DisconnectingReadOnlyFileImpl
 
-    private final class DisconnectingSeekableByteChannel
-    extends de.schlichtherle.truezip.io.DisconnectingSeekableByteChannel {
+    private final class DisconnectingSeekableByteChannelImpl
+    extends DisconnectingSeekableByteChannel {
 
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        DisconnectingSeekableByteChannel(@WillCloseWhenClosed SeekableByteChannel sbc) {
+        DisconnectingSeekableByteChannelImpl(@WillCloseWhenClosed SeekableByteChannel sbc) {
             super(sbc);
         }
 
@@ -202,13 +205,13 @@ extends DecoratingInputShop<E, InputShop<E>> {
         public void close() throws IOException {
             if (isOpen()) delegate.close();
         }
-    } // DisconnectingSeekableByteChannel
+    } // DisconnectingSeekableByteChannelImpl
 
-    private final class DisconnectingInputStream
-    extends de.schlichtherle.truezip.io.DisconnectingInputStream {
+    private final class DisconnectingInputStreamImpl
+    extends DisconnectingInputStream {
 
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        DisconnectingInputStream(@WillCloseWhenClosed InputStream in) {
+        DisconnectingInputStreamImpl(@WillCloseWhenClosed InputStream in) {
             super(in);
         }
 
@@ -222,5 +225,5 @@ extends DecoratingInputShop<E, InputShop<E>> {
         public void close() throws IOException {
             if (isOpen()) delegate.close();
         }
-    } // DisconnectingInputStream
+    } // DisconnectingInputStreamImpl
 }
