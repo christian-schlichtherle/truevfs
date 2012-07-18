@@ -4,16 +4,17 @@
  */
 package de.schlichtherle.truezip.socket;
 
-import de.schlichtherle.truezip.entry.MutableEntry;
 import de.schlichtherle.truezip.entry.Entry;
 import static de.schlichtherle.truezip.entry.Entry.ALL_ACCESS_SET;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import static de.schlichtherle.truezip.entry.Entry.Size.DATA;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
+import de.schlichtherle.truezip.entry.MutableEntry;
 import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.SequentialIOException;
 import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
+import de.schlichtherle.truezip.util.ControlFlowException;
 import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.util.JointIterator;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
@@ -193,13 +194,28 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             busy = true;
         }
 
+        /**
+         * Close()s this resource and finally stops accounting for it unless a
+         * {@link ControlFlowException} is thrown.
+         * 
+         * @see http://java.net/jira/browse/TRUEZIP-279 .
+         */
         @Override
         @DischargesObligation
         public void close() throws IOException {
             if (!closed) {
-                delegate.close();
-                closed = true;
-                busy = false;
+                boolean cfe = false;
+                try {
+                    delegate.close();
+                } catch (final ControlFlowException ex) {
+                    cfe = true;
+                    throw ex;
+                } finally {
+                    if (!cfe) {
+                        closed = true;
+                        busy = false;
+                    }
+                }
             }
             storeBuffers();
         }
