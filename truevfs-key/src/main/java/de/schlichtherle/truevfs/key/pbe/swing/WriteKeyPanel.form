@@ -2,9 +2,9 @@
 
 <Form version="1.5" maxVersion="1.5" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
-    <Container class="de.schlichtherle.truezip.swing.EnhancedPanel" name="passwdPanel">
+    <Container class="de.schlichtherle.truevfs.key.swing.EnhancedPanel" name="passwdPanel">
       <Events>
-        <EventHandler event="ancestorWindowShown" listener="de.schlichtherle.truezip.swing.PanelListener" parameters="de.schlichtherle.truezip.swing.PanelEvent" handler="passwdPanelAncestorWindowShown"/>
+        <EventHandler event="ancestorWindowShown" listener="de.schlichtherle.truevfs.swing.PanelListener" parameters="de.schlichtherle.truevfs.swing.PanelEvent" handler="passwdPanelAncestorWindowShown"/>
       </Events>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignGridBagLayout"/>
@@ -18,7 +18,7 @@
               <ComponentRef name="newPasswd1Field"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/schlichtherle/truezip/key/pbe/swing/WriteKeyPanel.properties" key="newPasswd1" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="de/schlichtherle/truevfs/key/pbe/swing/WriteKeyPanel.properties" key="newPasswd1" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -46,7 +46,7 @@
               <ComponentRef name="newPasswd2Field"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/schlichtherle/truezip/key/pbe/swing/WriteKeyPanel.properties" key="newPasswd2" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="de/schlichtherle/truevfs/key/pbe/swing/WriteKeyPanel.properties" key="newPasswd2" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -88,7 +88,7 @@
           <ComponentRef name="resource"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/schlichtherle/truezip/key/pbe/swing/WriteKeyPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="de/schlichtherle/truevfs/key/pbe/swing/WriteKeyPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <AuxValues>
@@ -129,7 +129,7 @@
         </Constraint>
       </Constraints>
     </Component>
-    <Component class="de.schlichtherle.truezip.key.pbe.swing.AuthenticationPanel" name="authenticationPanel">
+    <Component class="de.schlichtherle.truevfs.key.pbe.swing.AuthenticationPanel" name="authenticationPanel">
       <Properties>
         <Property name="passwdPanel" type="javax.swing.JPanel" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="passwdPanel"/>

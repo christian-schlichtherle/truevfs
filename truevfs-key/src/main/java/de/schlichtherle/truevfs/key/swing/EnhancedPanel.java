@@ -4,14 +4,13 @@
  */
 package de.schlichtherle.truevfs.key.swing;
 
-import javax.annotation.Nullable;
-import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.LayoutManager;
 import java.awt.Window;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import javax.swing.JPanel;
 
 /**

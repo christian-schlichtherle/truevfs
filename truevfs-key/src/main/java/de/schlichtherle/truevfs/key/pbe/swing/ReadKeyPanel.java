@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truevfs.key.pbe.swing;
 
-import net.truevfs.key.param.SafePbeParameters;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Window;
@@ -19,6 +18,7 @@ import java.util.Arrays;
 import java.util.ResourceBundle;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import net.truevfs.key.param.SafePbeParameters;
 
 /**
  * This panel prompts the user for a key to open an existing protected

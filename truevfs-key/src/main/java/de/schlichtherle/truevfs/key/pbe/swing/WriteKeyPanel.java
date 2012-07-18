@@ -4,7 +4,6 @@
  */
 package de.schlichtherle.truevfs.key.pbe.swing;
 
-import net.truevfs.key.param.SafePbeParameters;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
@@ -21,6 +20,7 @@ import javax.annotation.CheckForNull;
 import javax.swing.JComponent;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import net.truevfs.key.param.SafePbeParameters;
 
 /**
  * This panel prompts the user for a key to create or overwrite a protected
