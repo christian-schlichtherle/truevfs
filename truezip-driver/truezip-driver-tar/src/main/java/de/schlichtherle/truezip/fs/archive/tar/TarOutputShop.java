@@ -127,10 +127,9 @@ implements OutputShop<TarDriverEntry> {
             final @CheckForNull Entry peer) {
         if (UNKNOWN == local.getModTime().getTime())
             local.setModTime(System.currentTimeMillis());
-        if (null != peer) {
+        if (null != peer)
             if (UNKNOWN == local.getSize())
                 local.setSize(peer.getSize(DATA));
-        }
     }
 
     private static final class DirectoryTemplate implements Entry {
@@ -232,8 +231,7 @@ implements OutputShop<TarDriverEntry> {
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            if (closed)
-                return;
+            if (closed) return;
             delegate.close();
             updateProperties(local, buffer);
             storeBuffer();
