@@ -5,6 +5,7 @@
 package de.schlichtherle.truezip.socket;
 
 import de.schlichtherle.truezip.entry.Entry;
+import de.schlichtherle.truezip.io.DisconnectingOutputStream;
 import de.schlichtherle.truezip.io.OutputClosedException;
 import de.schlichtherle.truezip.util.JSE7;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
@@ -152,7 +153,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
 
         @Override
         public OutputStream newOutputStream() throws IOException {
-            return new DisconnectingOutputStream(
+            return new DisconnectingOutputStreamImpl(
                     getBoundSocket().newOutputStream());
         }
     } // Output
@@ -177,11 +178,11 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         }
     } // DisconnectingSeekableByteChannel
 
-    private final class DisconnectingOutputStream
-    extends de.schlichtherle.truezip.io.DisconnectingOutputStream {
+    private final class DisconnectingOutputStreamImpl
+    extends DisconnectingOutputStream {
 
         @edu.umd.cs.findbugs.annotations.SuppressWarnings("OBL_UNSATISFIED_OBLIGATION")
-        DisconnectingOutputStream(@WillCloseWhenClosed OutputStream out) {
+        DisconnectingOutputStreamImpl(@WillCloseWhenClosed OutputStream out) {
             super(out);
         }
 
@@ -195,5 +196,5 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         public void close() throws IOException {
             if (isOpen()) delegate.close();
         }
-    } // DisconnectingOutputStream
+    } // DisconnectingOutputStreamImpl
 }
