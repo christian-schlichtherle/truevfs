@@ -31,7 +31,7 @@ final class AuthenticationPanel extends JPanel {
 
     private static final String CLASS_NAME = AuthenticationPanel.class.getName();
     private static final ResourceBundle
-            resources = ResourceBundle.getBundle(CLASS_NAME);
+            bundle = ResourceBundle.getBundle(CLASS_NAME);
     private static final File
             BASE_DIR = FileSystemView.getFileSystemView().getDefaultDirectory();
 
@@ -63,7 +63,7 @@ final class AuthenticationPanel extends JPanel {
      */
     public void setPasswdPanel(JPanel passwdPanel) {
         passwdPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        final String title = resources.getString("tab.passwd");
+        final String title = bundle.getString("tab.passwd");
         if (title.equals(tabs.getTitleAt(AUTH_PASSWD)))
             tabs.removeTabAt(AUTH_PASSWD);
         tabs.insertTab(title, null, passwdPanel, null, AUTH_PASSWD); // NOI18N
@@ -100,13 +100,11 @@ final class AuthenticationPanel extends JPanel {
         final int method = tabs.getSelectedIndex();
         switch (method) {
             case AUTH_PASSWD:
-                assert resources.getString("tab.passwd").equals(tabs.getTitleAt(method));
+                assert bundle.getString("tab.passwd").equals(tabs.getTitleAt(method));
                 break;
-
             case AUTH_KEY_FILE:
-                assert resources.getString("tab.keyFile").equals(tabs.getTitleAt(method));
+                assert bundle.getString("tab.keyFile").equals(tabs.getTitleAt(method));
                 break;
-
             default:
                 throw new AssertionError("Unsupported authentication method!");
         }
@@ -137,9 +135,9 @@ final class AuthenticationPanel extends JPanel {
         });
         keyFilePanel.setLayout(new java.awt.GridBagLayout());
 
-        keyFileLabel.setDisplayedMnemonic(resources.getString("keyFile").charAt(0));
+        keyFileLabel.setDisplayedMnemonic(bundle.getString("keyFile").charAt(0));
         keyFileLabel.setLabelFor(keyFile);
-        keyFileLabel.setText(resources.getString("keyFile")); // NOI18N
+        keyFileLabel.setText(bundle.getString("keyFile")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
@@ -154,7 +152,7 @@ final class AuthenticationPanel extends JPanel {
         keyFilePanel.add(keyFile, gridBagConstraints);
 
         keyFileChooser.setIcon(UIManager.getIcon("FileView.directoryIcon"));
-        keyFileChooser.setToolTipText(resources.getString("selectKeyFile.toolTip")); // NOI18N
+        keyFileChooser.setToolTipText(bundle.getString("selectKeyFile.toolTip")); // NOI18N
         keyFileChooser.setName("keyFileChooser"); // NOI18N
         keyFileChooser.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -167,7 +165,7 @@ final class AuthenticationPanel extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
         keyFilePanel.add(keyFileChooser, gridBagConstraints);
 
-        tabs.addTab(resources.getString("tab.keyFile"), keyFilePanel); // NOI18N
+        tabs.addTab(bundle.getString("tab.keyFile"), keyFilePanel); // NOI18N
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -256,7 +254,7 @@ final class AuthenticationPanel extends JPanel {
         
         public CustomFileChooser() {
             super(BASE_DIR);
-            setDialogTitle(resources.getString("fileChooser.title"));
+            setDialogTitle(bundle.getString("fileChooser.title"));
             setFileHidingEnabled(false);
         }
     }

@@ -2,9 +2,9 @@
 
 <Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
-    <Container class="de.schlichtherle.truezip.swing.EnhancedPanel" name="passwdPanel">
+    <Container class="de.schlichtherle.truevfs.key.swing.EnhancedPanel" name="passwdPanel">
       <Events>
-        <EventHandler event="ancestorWindowShown" listener="de.schlichtherle.truezip.swing.PanelListener" parameters="de.schlichtherle.truezip.swing.PanelEvent" handler="passwdPanelAncestorWindowShown"/>
+        <EventHandler event="ancestorWindowShown" listener="de.schlichtherle.truevfs.swing.PanelListener" parameters="de.schlichtherle.truevfs.swing.PanelEvent" handler="passwdPanelAncestorWindowShown"/>
       </Events>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_SerializeTo" type="java.lang.String" value="PasswdPanel_passwdPanel"/>
@@ -21,7 +21,7 @@
               <ComponentRef name="passwdField"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/schlichtherle/truezip/key/pbe/swing/ReadKeyPanel.properties" key="passwd" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="de/schlichtherle/truevfs/key/pbe/swing/ReadKeyPanel.properties" key="passwd" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Constraints>
@@ -45,7 +45,7 @@
   </NonVisualComponents>
   <AuxValues>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
-    <AuxValue name="FormSettings_formBundle" type="java.lang.String" value="de/schlichtherle/truezip/key/pbe/swing/ReadKeyPanel"/>
+    <AuxValue name="FormSettings_formBundle" type="java.lang.String" value="de/schlichtherle/truevfs/key/pbe/swing/ReadKeyPanel"/>
     <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
@@ -64,7 +64,7 @@
           <ComponentRef name="resource"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/schlichtherle/truezip/key/pbe/swing/ReadKeyPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="de/schlichtherle/truevfs/key/pbe/swing/ReadKeyPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <AuxValues>
@@ -105,7 +105,7 @@
         </Constraint>
       </Constraints>
     </Component>
-    <Component class="de.schlichtherle.truezip.key.pbe.swing.AuthenticationPanel" name="authenticationPanel">
+    <Component class="de.schlichtherle.truevfs.key.pbe.swing.AuthenticationPanel" name="authenticationPanel">
       <Properties>
         <Property name="passwdPanel" type="javax.swing.JPanel" editor="org.netbeans.modules.form.ComponentChooserEditor">
           <ComponentRef name="passwdPanel"/>
@@ -120,7 +120,7 @@
     <Component class="javax.swing.JCheckBox" name="changeKey">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/schlichtherle/truezip/key/pbe/swing/ReadKeyPanel.properties" key="changeKey" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="de/schlichtherle/truevfs/key/pbe/swing/ReadKeyPanel.properties" key="changeKey" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <AuxValues>
