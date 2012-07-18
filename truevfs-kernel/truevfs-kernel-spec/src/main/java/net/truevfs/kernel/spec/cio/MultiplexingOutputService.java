@@ -20,6 +20,7 @@ import static net.truevfs.kernel.spec.cio.Entry.ALL_ACCESS;
 import net.truevfs.kernel.spec.cio.Entry.Access;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
+import net.truevfs.kernel.spec.util.ControlFlowException;
 import net.truevfs.kernel.spec.util.ExceptionBuilder;
 import net.truevfs.kernel.spec.util.PriorityExceptionBuilder;
 import net.truevfs.kernel.spec.util.SuppressedExceptionBuilder;
@@ -191,13 +192,28 @@ extends DecoratingOutputService<E, OutputService<E>> {
             busy = true;
         }
 
+        /**
+         * Close()s this resource and finally stops accounting for it unless a
+         * {@link ControlFlowException} is thrown.
+         * 
+         * @see http://java.net/jira/browse/TRUEZIP-279 .
+         */
         @Override
         @DischargesObligation
         public void close() throws IOException {
             if (!closed) {
-                out.close();
-                closed = true;
-                busy = false;
+                boolean cfe = false;
+                try {
+                    out.close();
+                } catch (final ControlFlowException ex) {
+                    cfe = true;
+                    throw ex;
+                } finally {
+                    if (!cfe) {
+                        closed = true;
+                        busy = false;
+                    }
+                }
             }
             storeBuffers();
         }
