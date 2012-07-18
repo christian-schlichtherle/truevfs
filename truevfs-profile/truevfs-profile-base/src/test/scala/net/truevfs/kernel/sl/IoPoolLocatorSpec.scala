@@ -24,7 +24,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
 
   "The I/O buffer pool locator singleton" should {
     "provide an I/O buffer pool" in {
-      (IoBufferPoolLocator.SINGLETON.apply: AnyRef) should not be (null)
+      (IoBufferPoolLocator.SINGLETON.get: AnyRef) should not be (null)
     }
   }
 }

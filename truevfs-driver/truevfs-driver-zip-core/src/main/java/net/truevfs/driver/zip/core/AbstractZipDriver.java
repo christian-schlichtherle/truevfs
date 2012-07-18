@@ -58,7 +58,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<AbstractZipDriverEntry> 
      */
     @Override
     public IoBufferPool<? extends IoBuffer<?>> getPool() {
-        return IoBufferPoolLocator.SINGLETON.apply();
+        return IoBufferPoolLocator.SINGLETON.get();
     }
 
     /**
@@ -373,7 +373,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<AbstractZipDriverEntry> 
             final FsController<?> controller,
             final FsEntryName name) {
         // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
-        // opportunity to apply its own preferences to sort out such a conflict.
+        // opportunity to get its own preferences to sort out such a conflict.
         options = options.set(STORE);
         if (options.get(GROW))
             options = options.set(APPEND).clear(CACHE);

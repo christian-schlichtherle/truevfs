@@ -4,9 +4,9 @@
  */
 package net.truevfs.driver.zip.sample;
 
-import de.schlichtherle.truecommons.services.Provider;
 import java.nio.charset.Charset;
 import java.util.Map;
+import javax.inject.Provider;
 import net.truevfs.access.TArchiveDetector;
 import net.truevfs.access.TConfig;
 import net.truevfs.driver.zip.ZipDriver;

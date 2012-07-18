@@ -34,7 +34,7 @@ implements Container<Map<FsScheme, FsDriver>> {
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<FsScheme, FsDriver> apply() {
+    public Map<FsScheme, FsDriver> get() {
         return drivers;
     }
 }

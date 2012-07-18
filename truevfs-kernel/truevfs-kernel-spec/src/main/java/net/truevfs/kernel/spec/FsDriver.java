@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.spec;
 
-import de.schlichtherle.truecommons.services.UniqueObject;
+import de.schlichtherle.truecommons.services.util.UniqueObject;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 

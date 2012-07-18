@@ -6,12 +6,12 @@ package net.truevfs.access;
 
 import de.schlichtherle.truecommons.services.Container;
 import de.schlichtherle.truecommons.services.Loader;
-import de.schlichtherle.truecommons.services.Provider;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import javax.inject.Provider;
 import net.truevfs.kernel.spec.FsAbstractCompositeDriver;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsScheme;
@@ -108,7 +108,7 @@ extends FsAbstractCompositeDriver implements Container<Map<FsScheme, FsDriver>> 
      */
     public TArchiveDetector(final Provider<Map<FsScheme, FsDriver>> provider,
                             final @CheckForNull String extensions) {
-        final Map<FsScheme, FsDriver> inDrivers = provider.apply();
+        final Map<FsScheme, FsDriver> inDrivers = provider.get();
         final ExtensionSet inExtensions;
         final Map<FsScheme, FsDriver> outDrivers;
         if (null != extensions) {
@@ -226,7 +226,7 @@ extends FsAbstractCompositeDriver implements Container<Map<FsScheme, FsDriver>> 
      */
     public TArchiveDetector(final Provider<Map<FsScheme, FsDriver>> provider,
                             final Map<FsScheme, FsDriver> config) {
-        final Map<FsScheme, FsDriver> inDrivers = provider.apply();
+        final Map<FsScheme, FsDriver> inDrivers = provider.get();
         final Map<FsScheme, FsDriver> 
                 outDrivers = new HashMap<>(initialCapacity(inDrivers.size()));
         final ExtensionSet outExtensions = new ExtensionSet();
@@ -256,7 +256,7 @@ extends FsAbstractCompositeDriver implements Container<Map<FsScheme, FsDriver>> 
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<FsScheme, FsDriver> apply() {
+    public Map<FsScheme, FsDriver> get() {
         return drivers;
     }
 

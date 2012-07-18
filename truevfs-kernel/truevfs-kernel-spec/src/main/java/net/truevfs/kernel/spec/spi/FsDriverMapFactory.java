@@ -32,7 +32,7 @@ extends FactoryService<Map<FsScheme, FsDriver>> {
      * @return A new empty map for subsequent modification.
      */
     @Override
-    public Map<FsScheme, FsDriver> apply() {
+    public Map<FsScheme, FsDriver> get() {
         return new LinkedHashMap<>(32);
     }
 }

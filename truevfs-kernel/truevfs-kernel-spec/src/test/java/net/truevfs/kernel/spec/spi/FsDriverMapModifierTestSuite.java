@@ -24,7 +24,7 @@ public abstract class FsDriverMapModifierTestSuite {
 
     @Test
     public void testApply() {
-        final Map<FsScheme, FsDriver> map = new FsDriverMapFactory().apply();
+        final Map<FsScheme, FsDriver> map = new FsDriverMapFactory().get();
         assertThat(newModifier().apply(map), is(sameInstance(map)));
         assertThat(map.size(), is(not(0)));
         for (final String extension : new ExtensionSet(getExtensions()))
@@ -33,7 +33,7 @@ public abstract class FsDriverMapModifierTestSuite {
 
     @Test
     public void testIsLocatable() {
-        final Map<FsScheme, FsDriver> map = FsDriverMapLocator.SINGLETON.apply();
+        final Map<FsScheme, FsDriver> map = FsDriverMapLocator.SINGLETON.get();
         for (final String extension : new ExtensionSet(getExtensions()))
             assertNotNull(map.get(FsScheme.create(extension)));
     }

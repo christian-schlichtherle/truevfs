@@ -39,9 +39,9 @@ public final class DriverMap implements Runnable {
     public static void main(String[] args) throws Exception {
         Map<FsScheme, FsDriver> map;
         if (0 == args.length) {
-            map = FsDriverMapLocator.SINGLETON.apply();
+            map = FsDriverMapLocator.SINGLETON.get();
         } else {
-            map = new FsDriverMapFactory().apply();
+            map = new FsDriverMapFactory().get();
             for (final String arg : args) {
                 final FsDriverMapModifier modifier
                         = (FsDriverMapModifier) Class.forName(arg).newInstance();

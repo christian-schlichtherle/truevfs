@@ -191,7 +191,7 @@ implements JmxModelViewMXBean {
         final FsController<?> parentController = this.parentController;
         return null != parentController
                 ? parentController
-                : (this.parentController = FsManagerLocator.SINGLETON.apply()
+                : (this.parentController = FsManagerLocator.SINGLETON.get()
                     .controller(DRIVER, model.getMountPoint())
                     .getParent());
     }
@@ -268,7 +268,7 @@ implements JmxModelViewMXBean {
 
     @Override
     public void sync() throws FsSyncException {
-        new FsFilteringManager( FsManagerLocator.SINGLETON.apply(),
+        new FsFilteringManager( FsManagerLocator.SINGLETON.get(),
                                 model.getMountPoint())
                 .sync(FsSyncOptions.NONE);
     }

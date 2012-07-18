@@ -22,7 +22,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
     val service = new DefaultManagerFactory
 
     "provide a default file system manager" in {
-      service.apply should not be (null)
+      service.get should not be (null)
     }
 
     "have priority 0" in {

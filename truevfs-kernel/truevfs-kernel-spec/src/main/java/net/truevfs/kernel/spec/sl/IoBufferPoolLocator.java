@@ -29,13 +29,13 @@ implements Container<IoBufferPool<? extends IoBuffer<?>>> {
     private IoBufferPoolLocator() { }
 
     @Override
-    public IoBufferPool<? extends IoBuffer<?>> apply() { return Boot.pool; }
+    public IoBufferPool<? extends IoBuffer<?>> get() { return Boot.pool; }
 
     /** A static data utility class used for lazy initialization. */
     private static final class Boot {
         static final IoBufferPool<? extends IoBuffer<?>> pool
                 = new Locator(IoBufferPoolLocator.class)
                 .factory(IoBufferPoolFactory.class, IoBufferPoolDecorator.class)
-                .apply();
+                .get();
     }
 }

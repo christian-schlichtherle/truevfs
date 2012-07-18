@@ -7,6 +7,7 @@ package net.truevfs.driver.zip.core;
 import de.schlichtherle.truecommons.io.DecoratingOutputStream;
 import de.schlichtherle.truecommons.io.InputException;
 import de.schlichtherle.truecommons.io.Streams;
+import de.schlichtherle.truecommons.services.util.JointIterator;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -33,7 +34,6 @@ import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.truevfs.kernel.spec.cio.*;
 import net.truevfs.kernel.spec.io.DisconnectingOutputStream;
-import net.truevfs.kernel.spec.util.JointIterator;
 import net.truevfs.kernel.spec.util.SuppressedExceptionBuilder;
 
 /**
