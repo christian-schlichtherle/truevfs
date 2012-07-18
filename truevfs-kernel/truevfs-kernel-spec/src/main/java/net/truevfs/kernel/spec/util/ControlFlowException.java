@@ -24,7 +24,8 @@ public class ControlFlowException extends Error {
     public ControlFlowException() { this(null); }
 
     public ControlFlowException(final @CheckForNull Throwable cause) {
-        super(null != cause ? cause.toString() : null, cause, false, isTraceable());
+        // Don't disable suppression!
+        super(null != cause ? cause.toString() : null, cause, true, isTraceable());
     }
 
     /**
