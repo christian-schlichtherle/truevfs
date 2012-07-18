@@ -285,8 +285,16 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                     = SequentialIOExceptionBuilder.create(IOException.class, SequentialIOException.class);
             if (!closed) {
                 try {
-                    delegate.close();
-                    closed = true;
+                    boolean cfe = false;
+                    try {
+                        delegate.close();
+                    } catch (final ControlFlowException ex) {
+                        assert false;
+                        cfe = true;
+                        throw ex;
+                    } finally {
+                        if (!cfe) closed = true;
+                    }
                     final E local = output.getLocalTarget();
                     if (this == buffers.get(local.getName()))
                         updateProperties(local, input.getLocalTarget());
