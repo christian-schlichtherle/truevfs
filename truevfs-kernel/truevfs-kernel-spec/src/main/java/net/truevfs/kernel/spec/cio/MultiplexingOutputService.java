@@ -283,8 +283,16 @@ extends DecoratingOutputService<E, OutputService<E>> {
                     builder = new SuppressedExceptionBuilder<>();
             if (!closed) {
                 try {
-                    out.close();
-                    closed = true;
+                    boolean cfe = false;
+                    try {
+                        out.close();
+                    } catch (final ControlFlowException ex) {
+                        assert false;
+                        cfe = true;
+                        throw ex;
+                    } finally {
+                        if (!cfe) closed = true;
+                    }
                     final E local = output.target();
                     if (this == buffers.get(local.getName()))
                         updateProperties(local, input.target());
