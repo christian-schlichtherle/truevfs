@@ -3111,7 +3111,6 @@ public final class TFile extends File {
      */
     public void input(final @WillNotClose InputStream in) throws IOException {
         Objects.requireNonNull(in);
-
         try {
             try (TFileOutputStream out = new TFileOutputStream(this)) {
                 Streams.cat(in, out);
@@ -3176,7 +3175,6 @@ public final class TFile extends File {
      */
     public void output(final @WillNotClose OutputStream out) throws IOException {
         Objects.requireNonNull(out);
-
         try (TFileInputStream in = new TFileInputStream(this)) {
             Streams.cat(in, out);
         }
