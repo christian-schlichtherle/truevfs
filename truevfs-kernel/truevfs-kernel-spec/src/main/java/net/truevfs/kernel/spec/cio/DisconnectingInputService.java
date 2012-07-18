@@ -130,7 +130,7 @@ extends DecoratingInputService<E, InputService<E>> {
         public void close() throws IOException {
             if (isOpen()) in.close();
         }
-    } // DisconnectingInputStream
+    } // DisconnectingInputStreamImpl
 
     private final class DisconnectingSeekableChannelImpl
     extends DisconnectingSeekableChannel {
@@ -149,5 +149,5 @@ extends DecoratingInputService<E, InputService<E>> {
         public void close() throws IOException {
             if (isOpen()) channel.close();
         }
-    } // DisconnectingSeekableChannel
+    } // DisconnectingSeekableChannelImpl
 }
