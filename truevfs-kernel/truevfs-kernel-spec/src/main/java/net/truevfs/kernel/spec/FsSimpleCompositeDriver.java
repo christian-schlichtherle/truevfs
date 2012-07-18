@@ -4,10 +4,10 @@
  */
 package net.truevfs.kernel.spec;
 
-import de.schlichtherle.truecommons.services.Provider;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
+import javax.inject.Provider;
 
 /**
  * Uses a given file system driver provider to lookup the appropriate driver
@@ -32,7 +32,7 @@ public final class FsSimpleCompositeDriver extends FsAbstractCompositeDriver {
     }
 
     @Override
-    public Map<FsScheme, FsDriver> apply() {
-        return provider.apply();
+    public Map<FsScheme, FsDriver> get() {
+        return provider.get();
     }
 }

@@ -72,7 +72,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      */
     @Override
     public IoBufferPool<? extends IoBuffer<?>> getPool() {
-        return IoBufferPoolLocator.SINGLETON.apply();
+        return IoBufferPoolLocator.SINGLETON.get();
     }
 
     /**
@@ -132,7 +132,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
             final FsController<?> controller,
             final FsEntryName name) {
         // Leave FsAccessOption.STORE untouched - the driver shall be given
-        // opportunity to apply its own preferences to sort out such a conflict.
+        // opportunity to get its own preferences to sort out such a conflict.
         options = options.set(COMPRESS);
         return new FsOutputSocketSink(options,
                 controller.output(options, name, null));

@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.spec;
 
-import de.schlichtherle.truecommons.services.UniqueObject;
+import de.schlichtherle.truecommons.services.util.UniqueObject;
 import java.util.Formatter;
 import java.util.Set;
 import javax.annotation.Nullable;

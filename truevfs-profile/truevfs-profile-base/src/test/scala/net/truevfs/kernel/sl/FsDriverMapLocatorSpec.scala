@@ -24,7 +24,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
 
   "The file system driver map locator singleton" should {
     "provide some file system drivers" in {
-      val drivers = FsDriverMapLocator.SINGLETON.apply
+      val drivers = FsDriverMapLocator.SINGLETON.get
       drivers should not be (null)
       drivers.size should be > (0)
     }

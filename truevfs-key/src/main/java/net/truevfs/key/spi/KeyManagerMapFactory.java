@@ -30,7 +30,7 @@ extends FactoryService<Map<Class<?>, KeyManager<?>>> {
      * @return A new empty map for subsequent modification.
      */
     @Override
-    public Map<Class<?>, KeyManager<?>> apply() {
+    public Map<Class<?>, KeyManager<?>> get() {
         return new LinkedHashMap<>(32);
     }
 }

@@ -307,7 +307,7 @@ public final class TConfig extends Resource<RuntimeException> {
 
     /** Default constructor for the global configuration. */
     private TConfig() {
-        this.manager = FsManagerLocator.SINGLETON.apply();
+        this.manager = FsManagerLocator.SINGLETON.get();
         this.detector = TArchiveDetector.ALL;
         this.accessPreferences = DEFAULT_ACCESS_PREFERENCES;
     }

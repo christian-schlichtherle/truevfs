@@ -35,7 +35,7 @@ implements Container<Map<FsScheme, FsDriver>> {
     private FsDriverMapLocator() { }
 
     @Override
-    public Map<FsScheme, FsDriver> apply() {
+    public Map<FsScheme, FsDriver> get() {
         return Boot.drivers;
     }
 
@@ -45,6 +45,6 @@ implements Container<Map<FsScheme, FsDriver>> {
                 = Collections.unmodifiableMap(
                     new Locator(FsDriverMapLocator.class)
                     .factory(FsDriverMapFactory.class, FsDriverMapModifier.class)
-                    .apply());
+                    .get());
     }
 }

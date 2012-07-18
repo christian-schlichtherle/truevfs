@@ -43,6 +43,6 @@ public final class KeyManagerMapLocator extends AbstractKeyManagerProvider {
                 = Collections.unmodifiableMap(
                     new Locator(KeyManagerMapLocator.class)
                     .factory(KeyManagerMapFactory.class, KeyManagerMapModifier.class)
-                    .apply());
+                    .get());
     }
 }

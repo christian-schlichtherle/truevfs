@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.spec;
 
-import de.schlichtherle.truecommons.services.UniqueObject;
+import de.schlichtherle.truecommons.services.util.UniqueObject;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;

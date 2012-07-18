@@ -22,7 +22,7 @@ public class ConsolePromptingAesPbeKeyManagerMapModifierTest
 extends PromptingKeyManagerTestSuite {
     @Override
     protected @CheckForNull PromptingKeyManager<?> newKeyManager() {
-        final Map<Class<?>, KeyManager<?>> map = new KeyManagerMapFactory().apply();
+        final Map<Class<?>, KeyManager<?>> map = new KeyManagerMapFactory().get();
         assertThat(new ConsolePromptingAesPbeKeyManagerMapModifier().apply(map), is(sameInstance(map)));
         return (PromptingKeyManager<?>) map.get(AesPbeParameters.class);
     }

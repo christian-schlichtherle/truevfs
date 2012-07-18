@@ -54,7 +54,7 @@ public final class Copy {
     static void copy(String src, String dst) throws IOException {
         // Get a manager for the life cycle of controllers for federated
         // file systems.
-        FsManager manager = FsManagerLocator.SINGLETON.apply();
+        FsManager manager = FsManagerLocator.SINGLETON.get();
         try {
             // Search the class path for the set of all supported file system
             // drivers and build a composite driver from it.
