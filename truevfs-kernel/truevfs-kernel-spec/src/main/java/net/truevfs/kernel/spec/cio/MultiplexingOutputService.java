@@ -20,7 +20,6 @@ import static net.truevfs.kernel.spec.cio.Entry.ALL_ACCESS;
 import net.truevfs.kernel.spec.cio.Entry.Access;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.spec.util.ControlFlowException;
 import net.truevfs.kernel.spec.util.ExceptionBuilder;
 import net.truevfs.kernel.spec.util.PriorityExceptionBuilder;
 import net.truevfs.kernel.spec.util.SuppressedExceptionBuilder;
@@ -102,8 +101,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
     @Override
     public @CheckForNull E entry(String name) {
         final E entry = container.entry(name);
-        if (null != entry)
-            return entry;
+        if (null != entry) return entry;
         final BufferedEntryOutputStream out = buffers.get(name);
         return null == out ? null : out.getTarget();
     }
@@ -111,7 +109,6 @@ extends DecoratingOutputService<E, OutputService<E>> {
     @Override
     public OutputSocket<E> output(final E local) {
         Objects.requireNonNull(local);
-
         final class Output extends DecoratingOutputSocket<E> {
             Output() { super(container.output(local)); }
 
@@ -126,7 +123,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
                 return isBusy() ? new BufferedEntryOutputStream(socket(), peer)
                                 : new EntryOutputStream(socket().stream(peer));
             }
-        }
+        } // Output
         return new Output();
     }
 
@@ -159,8 +156,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
                 i.hasNext(); ) {
             final BufferedEntryOutputStream out = i.next();
             try {
-                if (out.storeBuffer())
-                    i.remove();
+                if (out.storeBuffer()) i.remove();
             } catch (final InputException ex) {
                 builder.warn(ex);
             } catch (final IOException ex) {
@@ -192,28 +188,13 @@ extends DecoratingOutputService<E, OutputService<E>> {
             busy = true;
         }
 
-        /**
-         * Close()s this resource and finally stops accounting for it unless a
-         * {@link ControlFlowException} is thrown.
-         * 
-         * @see http://java.net/jira/browse/TRUEZIP-279 .
-         */
         @Override
         @DischargesObligation
         public void close() throws IOException {
             if (!closed) {
-                boolean cfe = false;
-                try {
-                    out.close();
-                } catch (final ControlFlowException ex) {
-                    cfe = true;
-                    throw ex;
-                } finally {
-                    if (!cfe) {
-                        closed = true;
-                        busy = false;
-                    }
-                }
+                closed = true;
+                busy = false;
+                out.close();
             }
             storeBuffers();
         }
@@ -245,9 +226,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
             final IoBuffer<?> buffer = this.buffer = pool.allocate();
             final Entry peer = null != _peer ? _peer : buffer;
             final class InputProxy extends DecoratingInputSocket<Entry> {
-                InputProxy() {
-                    super(buffer.input());
-                }
+                InputProxy() { super(buffer.input()); }
 
                 @Override
                 public Entry target() {
@@ -282,17 +261,9 @@ extends DecoratingOutputService<E, OutputService<E>> {
             final ExceptionBuilder<IOException, IOException>
                     builder = new SuppressedExceptionBuilder<>();
             if (!closed) {
+                closed = true;
                 try {
-                    boolean cfe = false;
-                    try {
-                        out.close();
-                    } catch (final ControlFlowException ex) {
-                        assert false;
-                        cfe = true;
-                        throw ex;
-                    } finally {
-                        if (!cfe) closed = true;
-                    }
+                    out.close();
                     final E local = output.target();
                     if (this == buffers.get(local.getName()))
                         updateProperties(local, input.target());
@@ -325,8 +296,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
         }
 
         boolean storeBuffer() throws InputException, IOException {
-            if (!closed || isBusy())
-                return false;
+            if (!closed || isBusy()) return false;
             IoSockets.copy(input, output);
             buffer.release();
             return true;
