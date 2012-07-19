@@ -31,18 +31,17 @@ public class ConcurrencyUtils {
         } finally {
             executor.shutdown();
         }
-
-        class TaskJoinerImpl implements TaskJoiner {
+        final class TaskJoinerImpl implements TaskJoiner {
             @Override
             public void cancel() {
-                //executor.shutdownNow(); // TODO: Explain why this doessn't work sometimes!
+                //executor.shutdownNow(); // TODO: Explain why this doesn't work sometimes!
                 for (final Future<?> result : results)
                     result.cancel(true);
             }
 
             @Override
             public void join() throws InterruptedException, ExecutionException {
-                final ExceptionBuilder<ExecutionException, ExecutionException>
+                final SuppressedExceptionBuilder<ExecutionException>
                         builder = new SuppressedExceptionBuilder<>();
                 for (final Future<?> result : results) {
                     try {
@@ -55,7 +54,6 @@ public class ConcurrencyUtils {
                 builder.check();
             }
         } // TaskJoinerImpl
-
         return new TaskJoinerImpl();
     }
 
