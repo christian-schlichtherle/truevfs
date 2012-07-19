@@ -4,13 +4,13 @@
  */
 package de.schlichtherle.truezip.file.zip.raes;
 
-import de.schlichtherle.truezip.file.ConcurrentSyncTestSuite;
+import de.schlichtherle.truezip.file.ConcurrentSyncITSuite;
 import de.schlichtherle.truezip.fs.archive.zip.raes.TestZipRaesDriver;
 
 /**
  * @author Christian Schlichtherle
  */
-public final class ZipRaesConcurrentSyncIT extends ConcurrentSyncTestSuite<TestZipRaesDriver> {
+public final class ZipRaesConcurrentSyncIT extends ConcurrentSyncITSuite<TestZipRaesDriver> {
 
     @Override
     protected String getSuffixList() {

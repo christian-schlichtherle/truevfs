@@ -4,14 +4,14 @@
  */
 package de.schlichtherle.truezip.file.tar;
 
-import de.schlichtherle.truezip.file.ConcurrentSyncTestSuite;
+import de.schlichtherle.truezip.file.ConcurrentSyncITSuite;
 import de.schlichtherle.truezip.fs.archive.tar.TarDriver;
 
 /**
  * @author Christian Schlichtherle
  */
 public final class TarConcurrentSyncIT
-extends ConcurrentSyncTestSuite<TarDriver> {
+extends ConcurrentSyncITSuite<TarDriver> {
 
     @Override
     protected String getSuffixList() {
