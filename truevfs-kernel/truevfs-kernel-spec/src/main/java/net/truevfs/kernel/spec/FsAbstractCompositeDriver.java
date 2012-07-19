@@ -4,7 +4,6 @@
  */
 package net.truevfs.kernel.spec;
 
-import de.schlichtherle.truecommons.services.util.UniqueObject;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
 import javax.annotation.CheckForNull;
@@ -21,7 +20,6 @@ import javax.inject.Provider;
  */
 @Immutable
 public abstract class FsAbstractCompositeDriver
-extends UniqueObject
 implements FsCompositeDriver, Provider<Map<FsScheme, FsDriver>> {
     @Override
     public final FsController<? extends FsModel> newController(

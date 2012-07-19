@@ -4,7 +4,6 @@
  */
 package net.truevfs.kernel.spec;
 
-import de.schlichtherle.truecommons.services.util.UniqueObject;
 import javax.annotation.concurrent.ThreadSafe;
 import static net.truevfs.kernel.spec.FsSyncOption.ABORT_CHANGES;
 import net.truevfs.kernel.spec.util.BitField;
@@ -16,7 +15,7 @@ import net.truevfs.kernel.spec.util.BitField;
  */
 @ThreadSafe
 public abstract class FsAbstractManager
-extends UniqueObject implements FsManager {
+implements FsManager {
 
     @Override
     public void sync(final BitField<FsSyncOption> options)
