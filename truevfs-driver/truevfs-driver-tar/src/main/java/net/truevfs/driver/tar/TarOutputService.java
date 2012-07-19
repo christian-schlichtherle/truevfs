@@ -24,6 +24,7 @@ import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.truevfs.kernel.spec.cio.*;
 import net.truevfs.kernel.spec.io.DisconnectingOutputStream;
+import net.truevfs.kernel.spec.util.ControlFlowException;
 import static net.truevfs.kernel.spec.util.HashMaps.OVERHEAD_SIZE;
 import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 import net.truevfs.kernel.spec.util.SuppressedExceptionBuilder;
@@ -76,6 +77,12 @@ implements OutputService<TarDriverEntry> {
             try {
                 out.close();
             } catch (final Throwable ex2) {
+                if (!(ex instanceof ControlFlowException)
+                        && ex2 instanceof ControlFlowException) {
+                    assert false;
+                    ex2.addSuppressed(ex);
+                    throw ex2;
+                }
                 ex.addSuppressed(ex2);
             }
             throw ex;
@@ -104,7 +111,6 @@ implements OutputService<TarDriverEntry> {
     @Override
     public OutputSocket<TarDriverEntry> output(final TarDriverEntry local) {
         Objects.requireNonNull(local);
-
         final class Output extends AbstractOutputSocket<TarDriverEntry> {
             @Override
             public TarDriverEntry target() {
@@ -120,12 +126,11 @@ implements OutputService<TarDriverEntry> {
                     return new EntryOutputStream(local);
                 }
                 updateProperties(local, target(peer));
-                if (UNKNOWN == local.getSize())
-                    return new BufferedEntryOutputStream(local);
-                return new EntryOutputStream(local);
+                return UNKNOWN == local.getSize()
+                        ? new BufferedEntryOutputStream(local)
+                        : new EntryOutputStream(local);
             }
         } // Output
-
         return new Output();
     }
 
@@ -134,10 +139,9 @@ implements OutputService<TarDriverEntry> {
             final @CheckForNull Entry peer) {
         if (UNKNOWN == local.getModTime().getTime())
             local.setModTime(System.currentTimeMillis());
-        if (null != peer) {
+        if (null != peer)
             if (UNKNOWN == local.getSize())
                 local.setSize(peer.getSize(DATA));
-        }
     }
 
     private static final class DirectoryTemplate implements Entry {
@@ -206,9 +210,9 @@ implements OutputService<TarDriverEntry> {
         @DischargesObligation
         public void close() throws IOException {
             if (closed) return;
-            tos.closeArchiveEntry();
             closed = true;
             busy = false;
+            tos.closeArchiveEntry();
         }
     } // EntryOutputStream
 
@@ -246,22 +250,21 @@ implements OutputService<TarDriverEntry> {
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            if (closed)
-                return;
+            if (closed) return;
+            closed = true;
+            busy = false;
             out.close();
             updateProperties(local, buffer);
             storeBuffer();
-            closed = true;
-            busy = false;
         }
 
         void storeBuffer() throws IOException {
             final IoBuffer<?> buffer = this.buffer;
+            final SuppressedExceptionBuilder<IOException>
+                    builder = new SuppressedExceptionBuilder<>();
             try (final InputStream in = buffer.input().stream(null)) {
                 final TarArchiveOutputStream taos = TarOutputService.this.tos;
                 taos.putArchiveEntry(local);
-                final SuppressedExceptionBuilder<IOException>
-                        builder = new SuppressedExceptionBuilder<>();
                 try {
                     Streams.cat(in, taos);
                 } catch (final InputException ex) { // NOT IOException!
@@ -272,9 +275,16 @@ implements OutputService<TarDriverEntry> {
                 } catch (final IOException ex) {
                     builder.warn(ex);
                 }
-                builder.check();
+            } catch (final IOException ex) {
+                builder.warn(ex);
+            } finally {
+                try {
+                    buffer.release();
+                } catch (final IOException ex) {
+                    builder.warn(ex);
+                }
             }
-            buffer.release();
+            builder.check();
         }
     } // BufferedEntryOutputStream
 }
