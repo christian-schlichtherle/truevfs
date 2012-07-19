@@ -292,11 +292,9 @@ private trait CacheController extends Controller[LockModel] {
                   // resolve the issue locally, that is if we were asked
                   // to create the entry exclusively or this is a
                   // non-recursive file system operation.
-                  if (mknodOpts get EXCLUSIVE)
-                    throw mknodEx
+                  if (mknodOpts get EXCLUSIVE) throw mknodEx
                   val syncOpts = SyncController modify SYNC
-                  if (SYNC eq syncOpts)
-                    throw mknodEx
+                  if (SYNC eq syncOpts) throw mknodEx
 
                   // Try to resolve the issue locally.
                   // Even if we were asked to create the entry
