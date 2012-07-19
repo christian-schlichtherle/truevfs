@@ -4,13 +4,13 @@
  */
 package de.schlichtherle.truezip.file.zip;
 
-import de.schlichtherle.truezip.file.ConcurrentSyncTestSuite;
+import de.schlichtherle.truezip.file.ConcurrentSyncITSuite;
 import de.schlichtherle.truezip.fs.archive.zip.TestWinZipAesDriver;
 
 /**
  * @author  Christian Schlichtherle
  */
-public final class WinZipAesConcurrentSyncIT extends ConcurrentSyncTestSuite<TestWinZipAesDriver> {
+public final class WinZipAesConcurrentSyncIT extends ConcurrentSyncITSuite<TestWinZipAesDriver> {
 
     @Override
     protected String getSuffixList() {

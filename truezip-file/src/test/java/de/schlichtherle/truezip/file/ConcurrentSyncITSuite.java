@@ -27,7 +27,7 @@ import org.junit.Test;
  * @param  <D> The type of the archive driver.
  * @author Christian Schlichtherle
  */
-public abstract class ConcurrentSyncTestSuite<D extends FsArchiveDriver<?>>
+public abstract class ConcurrentSyncITSuite<D extends FsArchiveDriver<?>>
 extends ConfiguredClientTestBase<D> {
 
     /**
