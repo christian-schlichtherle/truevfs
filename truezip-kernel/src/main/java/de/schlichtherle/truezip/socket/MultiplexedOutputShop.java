@@ -14,7 +14,6 @@ import de.schlichtherle.truezip.io.DecoratingOutputStream;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.SequentialIOException;
 import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
-import de.schlichtherle.truezip.util.ControlFlowException;
 import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.util.JointIterator;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
@@ -108,17 +107,14 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
     @Override
     public @CheckForNull E getEntry(String name) {
         final E entry = delegate.getEntry(name);
-        if (null != entry)
-            return entry;
+        if (null != entry) return entry;
         final BufferedEntryOutputStream out = buffers.get(name);
         return null == out ? null : out.getLocalTarget();
     }
 
     @Override
     public OutputSocket<? extends E> getOutputSocket(final E local) {
-        if (null == local)
-            throw new NullPointerException();
-
+        if (null == local) throw new NullPointerException();
         final class Output extends DecoratingOutputSocket<E> {
             Output() {
                 super(MultiplexedOutputShop.super.getOutputSocket(local));
@@ -137,7 +133,6 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
                                 : new EntryOutputStream(output);
             }
         } // Output
-
         return new Output();
     }
 
@@ -166,12 +161,11 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         if (isBusy()) return;
         final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
                 = SequentialIOExceptionBuilder.create(IOException.class, SequentialIOException.class);
-        final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
-        while (i.hasNext()) {
+        for (   final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
+                i.hasNext(); ) {
             final BufferedEntryOutputStream out = i.next();
             try {
-                if (out.storeBuffer())
-                    i.remove();
+                if (out.storeBuffer()) i.remove();
             } catch (final InputException ex) {
                 builder.warn(ex);
             } catch (final IOException ex) {
@@ -194,28 +188,13 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             busy = true;
         }
 
-        /**
-         * Close()s this resource and finally stops accounting for it unless a
-         * {@link ControlFlowException} is thrown.
-         * 
-         * @see http://java.net/jira/browse/TRUEZIP-279 .
-         */
         @Override
         @DischargesObligation
         public void close() throws IOException {
             if (!closed) {
-                boolean cfe = false;
-                try {
-                    delegate.close();
-                } catch (final ControlFlowException ex) {
-                    cfe = true;
-                    throw ex;
-                } finally {
-                    if (!cfe) {
-                        closed = true;
-                        busy = false;
-                    }
-                }
+                closed = true;
+                busy = false;
+                delegate.close();
             }
             storeBuffers();
         }
@@ -247,9 +226,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             final IOPool.Entry<?> buffer = this.buffer = pool.allocate();
             final Entry peer = null != _peer ? _peer : buffer;
             final class InputProxy extends DecoratingInputSocket<Entry> {
-                InputProxy() {
-                    super(buffer.getInputSocket());
-                }
+                InputProxy() { super(buffer.getInputSocket()); }
 
                 @Override
                 public Entry getLocalTarget() {
@@ -284,17 +261,9 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
             final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
                     = SequentialIOExceptionBuilder.create(IOException.class, SequentialIOException.class);
             if (!closed) {
+                closed = true;
                 try {
-                    boolean cfe = false;
-                    try {
-                        delegate.close();
-                    } catch (final ControlFlowException ex) {
-                        assert false;
-                        cfe = true;
-                        throw ex;
-                    } finally {
-                        if (!cfe) closed = true;
-                    }
+                    delegate.close();
                     final E local = output.getLocalTarget();
                     if (this == buffers.get(local.getName()))
                         updateProperties(local, input.getLocalTarget());
@@ -327,8 +296,7 @@ extends DecoratingOutputShop<E, OutputShop<E>> {
         }
 
         boolean storeBuffer() throws InputException, IOException {
-            if (!closed || isBusy())
-                return false;
+            if (!closed || isBusy()) return false;
             IOSocket.copy(input, output);
             buffer.release();
             return true;
