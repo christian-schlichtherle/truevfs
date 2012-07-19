@@ -24,7 +24,6 @@ import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.truevfs.kernel.spec.cio.*;
 import net.truevfs.kernel.spec.io.DisconnectingOutputStream;
-import net.truevfs.kernel.spec.util.ControlFlowException;
 import static net.truevfs.kernel.spec.util.HashMaps.OVERHEAD_SIZE;
 import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 import net.truevfs.kernel.spec.util.SuppressedExceptionBuilder;
@@ -77,12 +76,6 @@ implements OutputService<TarDriverEntry> {
             try {
                 out.close();
             } catch (final Throwable ex2) {
-                if (!(ex instanceof ControlFlowException)
-                        && ex2 instanceof ControlFlowException) {
-                    assert false;
-                    ex2.addSuppressed(ex);
-                    throw ex2;
-                }
                 ex.addSuppressed(ex2);
             }
             throw ex;
