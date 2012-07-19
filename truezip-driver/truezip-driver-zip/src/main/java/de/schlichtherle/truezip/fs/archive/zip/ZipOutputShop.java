@@ -318,8 +318,8 @@ implements OutputShop<ZipDriverEntry> {
         @DischargesObligation
         public void close() throws IOException {
             if (closed) return;
-            closeEntry();
             closed = true;
+            closeEntry();
         }
     } // EntryOutputStream
 
@@ -361,13 +361,12 @@ implements OutputShop<ZipDriverEntry> {
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            if (closed)
-                return;
+            if (closed) return;
+            closed = true;
+            bufferedEntry = null;
             delegate.close();
             updateProperties();
             storeBuffer();
-            closed = true;
-            bufferedEntry = null;
         }
 
         void updateProperties() {
@@ -382,34 +381,40 @@ implements OutputShop<ZipDriverEntry> {
 
         void storeBuffer() throws IOException {
             final IOPool.Entry<?> buffer = this.buffer;
-            final InputStream in = buffer.getInputSocket().newInputStream();
             final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
                     = SequentialIOExceptionBuilder.create(IOException.class, SequentialIOException.class);
             try {
-                final ZipOutputShop zos = ZipOutputShop.this;
-                zos.putNextEntry(local);
+                final InputStream in = buffer.getInputSocket().newInputStream();
                 try {
-                    Streams.cat(in, zos);
-                } catch (final InputException ex2) { // NOT IOException!
-                    builder.warn(ex2);
+                    final ZipOutputShop zos = ZipOutputShop.this;
+                    zos.putNextEntry(local);
+                    try {
+                        Streams.cat(in, zos);
+                    } catch (final InputException ex) { // NOT IOException!
+                        builder.warn(ex);
+                    }
+                    try {
+                        zos.closeEntry();
+                    } catch (final IOException ex) {
+                        builder.warn(ex);
+                    }
+                } catch (final IOException ex) {
+                    builder.warn(ex);
+                } finally {
+                    try {
+                        in.close();
+                    } catch (final IOException ex) {
+                        builder.warn(ex);
+                    }
                 }
-                try {
-                    zos.closeEntry();
-                } catch (final IOException ex2) {
-                    builder.warn(ex2);
-                }
-                builder.check();
-            } catch (final IOException ex) {
-                builder.warn(ex);
             } finally {
                 try {
-                    in.close();
+                    buffer.release();
                 } catch (final IOException ex) {
                     builder.warn(ex);
                 }
             }
             builder.check();
-            buffer.release();
         }
     } // BufferedEntryOutputStream
 }
