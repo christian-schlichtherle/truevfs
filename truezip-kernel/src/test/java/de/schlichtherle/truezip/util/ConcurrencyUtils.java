@@ -31,11 +31,10 @@ public class ConcurrencyUtils {
         } finally {
             executor.shutdown();
         }
-
-        class TaskJoinerImpl implements TaskJoiner {
+        final class TaskJoinerImpl implements TaskJoiner {
             @Override
             public void cancel() {
-                //executor.shutdownNow(); // TODO: Explain why this doessn't work sometimes!
+                //executor.shutdownNow(); // TODO: Explain why this doesn't work sometimes!
                 for (final Future<?> result : results)
                     result.cancel(true);
             }
@@ -47,15 +46,15 @@ public class ConcurrencyUtils {
                     try {
                         result.get(); // check exception from task
                     } catch (ExecutionException failed) {
+                        if (null != failure && JSE7.AVAILABLE)
+                            failure.addSuppressed(failed);
                         failure = failed;
                     } catch (CancellationException cancelled) {
                     }
                 }
-                if (null != failure)
-                    throw failure;
+                if (null != failure) throw failure;
             }
         } // TaskJoinerImpl
-
         return new TaskJoinerImpl();
     }
 
