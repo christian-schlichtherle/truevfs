@@ -313,8 +313,8 @@ implements OutputService<AbstractZipDriverEntry> {
         @DischargesObligation
         public void close() throws IOException {
             if (closed) return;
-            closeEntry();
             closed = true;
+            closeEntry();
         }
     } // EntryOutputStream
 
@@ -355,13 +355,12 @@ implements OutputService<AbstractZipDriverEntry> {
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            if (closed)
-                return;
+            if (closed) return;
+            closed = true;
+            bufferedEntry = null;
             out.close();
             updateProperties();
             storeBuffer();
-            closed = true;
-            bufferedEntry = null;
         }
 
         void updateProperties() {
@@ -376,11 +375,11 @@ implements OutputService<AbstractZipDriverEntry> {
 
         void storeBuffer() throws IOException {
             final IoBuffer<?> buffer = this.buffer;
+            final SuppressedExceptionBuilder<IOException>
+                    builder = new SuppressedExceptionBuilder<>();
             try (final InputStream in = buffer.input().stream(null)) {
                 final ZipOutputService zos = ZipOutputService.this;
                 zos.putNextEntry(local, true);
-                final SuppressedExceptionBuilder<IOException>
-                        builder = new SuppressedExceptionBuilder<>();
                 try {
                     Streams.cat(in, zos);
                 } catch (final InputException ex) { // NOT IOException!
@@ -391,9 +390,16 @@ implements OutputService<AbstractZipDriverEntry> {
                 } catch (final IOException ex) {
                     builder.warn(ex);
                 }
-                builder.check();
+            } catch (final IOException ex) {
+                builder.warn(ex);
+            } finally {
+                try {
+                    buffer.release();
+                } catch (final IOException ex) {
+                    builder.warn(ex);
+                }
             }
-            buffer.release();
+            builder.check();
         }
     } // BufferedEntryOutputStream
 }
