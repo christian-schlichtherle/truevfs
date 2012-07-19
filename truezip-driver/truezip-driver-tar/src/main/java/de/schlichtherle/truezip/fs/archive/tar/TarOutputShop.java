@@ -71,8 +71,9 @@ implements OutputShop<TarDriverEntry> {
     private boolean busy;
 
     @CreatesObligation
-    public TarOutputShop(   final TarDriver driver,
-                            final @WillCloseWhenClosed OutputStream out) {
+    public TarOutputShop(
+            final TarDriver driver,
+            final @WillCloseWhenClosed OutputStream out) {
         super(out, DEFAULT_BLKSIZE, DEFAULT_RCDSIZE, driver.getEncoding());
         super.setLongFileMode(LONGFILE_GNU);
         this.pool = driver.getPool();
@@ -95,9 +96,7 @@ implements OutputShop<TarDriverEntry> {
 
     @Override
     public OutputSocket<TarDriverEntry> getOutputSocket(final TarDriverEntry local) {
-        if (null == local)
-            throw new NullPointerException();
-
+        if (null == local) throw new NullPointerException();
         final class Output extends OutputSocket<TarDriverEntry> {
             @Override
             public TarDriverEntry getLocalTarget() {
@@ -106,19 +105,17 @@ implements OutputShop<TarDriverEntry> {
 
             @Override
             public OutputStream newOutputStream() throws IOException {
-                if (isBusy())
-                    throw new OutputBusyException(local.getName());
+                if (isBusy()) throw new OutputBusyException(local.getName());
                 if (local.isDirectory()) {
                     updateProperties(local, DirectoryTemplate.INSTANCE);
                     return new EntryOutputStream(local);
                 }
                 updateProperties(local, getPeerTarget());
-                if (UNKNOWN == local.getSize())
-                    return new BufferedEntryOutputStream(local);
-                return new EntryOutputStream(local);
+                return UNKNOWN == local.getSize()
+                        ? new BufferedEntryOutputStream(local)
+                        : new EntryOutputStream(local);
             }
         } // Output
-
         return new Output();
     }
 
@@ -189,9 +186,9 @@ implements OutputShop<TarDriverEntry> {
         @DischargesObligation
         public void close() throws IOException {
             if (closed) return;
-            closeArchiveEntry();
             closed = true;
             busy = false;
+            closeArchiveEntry();
         }
     } // EntryOutputStream
 
@@ -232,43 +229,49 @@ implements OutputShop<TarDriverEntry> {
         @DischargesObligation
         public void close() throws IOException {
             if (closed) return;
+            closed = true;
+            busy = false;
             delegate.close();
             updateProperties(local, buffer);
             storeBuffer();
-            closed = true;
-            busy = false;
         }
 
         void storeBuffer() throws IOException {
             final IOPool.Entry<?> buffer = this.buffer;
-            final InputStream in = buffer.getInputSocket().newInputStream();
             final SequentialIOExceptionBuilder<IOException, SequentialIOException> builder
                     = SequentialIOExceptionBuilder.create(IOException.class, SequentialIOException.class);
             try {
-                final TarArchiveOutputStream taos = TarOutputShop.this;
-                taos.putArchiveEntry(local);
+                final InputStream in = buffer.getInputSocket().newInputStream();
                 try {
-                    Streams.cat(in, taos);
-                } catch (final InputException ex2) { // NOT IOException!
-                    builder.warn(ex2);
+                    final TarArchiveOutputStream taos = TarOutputShop.this;
+                    taos.putArchiveEntry(local);
+                    try {
+                        Streams.cat(in, taos);
+                    } catch (final InputException ex) { // NOT IOException!
+                        builder.warn(ex);
+                    }
+                    try {
+                        taos.closeArchiveEntry();
+                    } catch (final IOException ex) {
+                        builder.warn(ex);
+                    }
+                } catch (final IOException ex) {
+                    builder.warn(ex);
+                } finally {
+                    try {
+                        in.close();
+                    } catch (final IOException ex) {
+                        builder.warn(ex);
+                    }
                 }
-                try {
-                    taos.closeArchiveEntry();
-                } catch (final IOException ex2) {
-                    builder.warn(ex2);
-                }
-                builder.check();
-            } catch (final IOException ex) {
-                builder.warn(ex);
             } finally {
                 try {
-                    in.close();
+                    buffer.release();
                 } catch (final IOException ex) {
                     builder.warn(ex);
                 }
             }
             builder.check();
-            buffer.release();
         }
     } // BufferedEntryOutputStream
 }
