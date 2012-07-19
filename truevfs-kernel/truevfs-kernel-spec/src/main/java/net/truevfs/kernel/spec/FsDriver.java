@@ -4,7 +4,6 @@
  */
 package net.truevfs.kernel.spec;
 
-import de.schlichtherle.truecommons.services.util.UniqueObject;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
@@ -17,7 +16,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class FsDriver extends UniqueObject {
+public abstract class FsDriver {
 
     /**
      * Returns {@code true} iff this is an archive driver, i.e. if file systems

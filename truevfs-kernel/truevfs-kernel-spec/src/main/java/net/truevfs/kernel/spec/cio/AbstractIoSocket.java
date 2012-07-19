@@ -4,7 +4,6 @@
  */
 package net.truevfs.kernel.spec.cio;
 
-import de.schlichtherle.truecommons.services.util.UniqueObject;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 
@@ -17,7 +16,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 public abstract class AbstractIoSocket<T extends Entry>
-extends UniqueObject implements IoSocket<T> {
+implements IoSocket<T> {
 
     /**
      * Returns a string representation of this object for debugging and logging

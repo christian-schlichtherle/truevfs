@@ -4,7 +4,6 @@
  */
 package net.truevfs.kernel.spec;
 
-import de.schlichtherle.truecommons.services.util.UniqueObject;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
@@ -16,7 +15,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class FsAbstractModel extends UniqueObject implements FsModel {
+public abstract class FsAbstractModel implements FsModel {
 
     private final FsMountPoint mountPoint;
     private @CheckForNull final FsModel parent;

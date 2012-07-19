@@ -4,7 +4,6 @@
  */
 package net.truevfs.kernel.spec;
 
-import de.schlichtherle.truecommons.services.util.UniqueObject;
 import java.util.Formatter;
 import java.util.Set;
 import javax.annotation.Nullable;
@@ -17,7 +16,7 @@ import net.truevfs.kernel.spec.util.BitField;
  *
  * @author Christian Schlichtherle
  */
-public abstract class FsEntry extends UniqueObject implements Entry {
+public abstract class FsEntry implements Entry {
 
     /**
      * Returns a string representation of the

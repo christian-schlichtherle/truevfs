@@ -4,7 +4,6 @@
  */
 package net.truevfs.kernel.spec;
 
-import de.schlichtherle.truecommons.services.util.UniqueObject;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
@@ -19,7 +18,7 @@ import net.truevfs.kernel.spec.util.BitField;
  * @author Christian Schlichtherle
  */
 public abstract class FsAbstractController<M extends FsModel>
-extends UniqueObject implements FsController<M> {
+implements FsController<M> {
 
     private final M model;
 
