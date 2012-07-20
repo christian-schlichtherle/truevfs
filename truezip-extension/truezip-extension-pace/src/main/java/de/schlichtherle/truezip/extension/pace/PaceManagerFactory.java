@@ -20,6 +20,18 @@ import javax.management.*;
 public final class PaceManagerFactory extends FsManagerDecorator {
 
     /**
+     * Constructs a new pace manager factory.
+     * 
+     * @deprecated This constructor is reserved for exclusive use by the
+     *             {@link FsManagerLocator#SINGLETON}!
+     *             Call {@link #newMXBeanProxy} instead to refer to the single
+     *             pace manager which interfaces with JMX.
+     *             
+     */
+    @Deprecated
+    public PaceManagerFactory() { }
+
+    /**
      * Returns a new MXBean proxy for the singleton pace manager which
      * interfaces with JMX.
      * Each proxy can get used immediately but will effectively refer to the
