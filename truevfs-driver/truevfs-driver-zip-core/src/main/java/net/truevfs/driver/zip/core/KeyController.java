@@ -17,7 +17,7 @@ import static net.truevfs.kernel.spec.cio.Entry.Type.SPECIAL;
 import net.truevfs.kernel.spec.util.BitField;
 import net.truevfs.kernel.spec.util.ControlFlowException;
 import net.truevfs.keymgr.spec.KeyManager;
-import net.truevfs.keymgr.spec.KeyManagerProvider;
+import net.truevfs.keymgr.spec.KeyManagerContainer;
 
 /**
  * This file system controller decorates another file system controller in
@@ -36,7 +36,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     private static final String ROOT_PATH = ROOT.getPath();
 
     protected final D driver;
-    private volatile KeyManagerProvider provider;
+    private volatile KeyManagerContainer provider;
 
     /**
      * Constructs a new key manager controller.
@@ -57,7 +57,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     protected abstract Class<? extends IOException> getKeyExceptionType();
 
     private @CheckForNull KeyManager<?> getKeyManager() {
-        final KeyManagerProvider provider = this.provider;
+        final KeyManagerContainer provider = this.provider;
         return (null != provider
                     ? provider
                     : (this.provider = driver.getKeyManagerProvider()))
