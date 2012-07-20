@@ -15,12 +15,12 @@ import java.util.Objects;
 import java.util.ServiceConfigurationError;
 import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.spec.FsModel;
-import net.truevfs.key.KeyManager;
-import net.truevfs.key.KeyManagerProvider;
-import net.truevfs.key.KeyProvider;
-import net.truevfs.key.UnknownKeyException;
-import net.truevfs.key.param.AesKeyStrength;
-import net.truevfs.key.param.AesPbeParameters;
+import net.truevfs.keymgr.spec.KeyManager;
+import net.truevfs.keymgr.spec.KeyManagerProvider;
+import net.truevfs.keymgr.spec.KeyProvider;
+import net.truevfs.keymgr.spec.UnknownKeyException;
+import net.truevfs.keymgr.spec.param.AesKeyStrength;
+import net.truevfs.keymgr.spec.param.AesPbeParameters;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS5PasswordToBytes;
 

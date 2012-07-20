@@ -16,7 +16,7 @@ import java.nio.file.Path;
 import net.truevfs.driver.zip.raes.KeyManagerRaesParameters;
 import net.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import net.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
-import net.truevfs.key.sl.KeyManagerMapLocator;
+import net.truevfs.keymgr.spec.sl.KeyManagerMapLocator;
 
 /**
  * Saves and restores the contents of arbitrary files to and from the RAES

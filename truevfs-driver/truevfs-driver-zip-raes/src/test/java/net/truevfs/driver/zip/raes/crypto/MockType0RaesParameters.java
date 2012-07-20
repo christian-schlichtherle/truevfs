@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.zip.raes.crypto;
 
-import net.truevfs.key.param.AesKeyStrength;
+import net.truevfs.keymgr.spec.param.AesKeyStrength;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;

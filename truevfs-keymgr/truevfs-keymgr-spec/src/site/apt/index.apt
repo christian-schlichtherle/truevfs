@@ -1,0 +1,10 @@
+    -----------------------
+    About TrueVFS Key
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About TrueVFS Key
+
+    Defines the secret key management API and provides a reference
+    implementation of its SPI which is locatable on the class path.

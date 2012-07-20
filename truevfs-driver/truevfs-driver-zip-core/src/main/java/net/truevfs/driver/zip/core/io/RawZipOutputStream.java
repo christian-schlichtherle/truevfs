@@ -30,7 +30,7 @@ import static net.truevfs.driver.zip.core.io.WinZipAesUtils.overhead;
 import static net.truevfs.driver.zip.core.io.ZipEntry.*;
 import static net.truevfs.driver.zip.core.io.ZipParametersUtils.parameters;
 import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
-import net.truevfs.key.param.AesKeyStrength;
+import net.truevfs.keymgr.spec.param.AesKeyStrength;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**

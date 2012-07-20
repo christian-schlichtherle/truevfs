@@ -7,8 +7,8 @@ package net.truevfs.driver.zip;
 import net.truevfs.kernel.spec.TestConfig;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
-import net.truevfs.key.MockView;
-import net.truevfs.key.param.AesPbeParameters;
+import net.truevfs.keymgr.spec.MockView;
+import net.truevfs.keymgr.spec.param.AesPbeParameters;
 
 /**
  * @author Christian Schlichtherle

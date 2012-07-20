@@ -4,8 +4,8 @@
  */
 package net.truevfs.samples.access;
 
-import de.schlichtherle.truevfs.key.pbe.swing.feedback.HurlingWindowFeedback;
-import de.schlichtherle.truevfs.key.pbe.swing.feedback.InvalidKeyFeedback;
+import net.truevfs.keymgr.swing.feedback.HurlingWindowFeedback;
+import net.truevfs.keymgr.swing.feedback.InvalidKeyFeedback;
 import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 import static org.junit.Assert.assertEquals;

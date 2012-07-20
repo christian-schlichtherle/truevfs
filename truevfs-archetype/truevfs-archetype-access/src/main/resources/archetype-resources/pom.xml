@@ -39,7 +39,7 @@
              entering wrong passwords. -->
         <dependency>
             <groupId>de.schlichtherle.truevfs</groupId>
-            <artifactId>truevfs-key</artifactId>
+            <artifactId>truevfs-keymgr-swing</artifactId>
             <version>${truevfs.version}</version>
         </dependency>
 
