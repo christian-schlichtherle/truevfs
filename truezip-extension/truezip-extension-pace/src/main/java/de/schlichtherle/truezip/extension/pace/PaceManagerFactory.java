@@ -5,6 +5,7 @@
 package de.schlichtherle.truezip.extension.pace;
 
 import de.schlichtherle.truezip.fs.FsManager;
+import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.fs.spi.FsManagerDecorator;
 import java.lang.management.ManagementFactory;
 import javax.annotation.concurrent.Immutable;
@@ -42,7 +43,7 @@ public final class PaceManagerFactory extends FsManagerDecorator {
      * @return     the decorated file system manager.
      * @deprecated This method is reserved for exclusive use by the
      *             {@link FsManagerLocator#SINGLETON}!
-     *             Call {@link #newProxy} instead to refer to the singleton
+     *             Call {@link #newMXBeanProxy} instead to refer to the single
      *             pace manager which interfaces with JMX.
      *             
      */
