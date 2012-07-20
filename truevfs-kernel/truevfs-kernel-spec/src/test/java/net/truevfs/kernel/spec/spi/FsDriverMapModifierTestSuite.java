@@ -10,7 +10,6 @@ import net.truevfs.kernel.spec.FsScheme;
 import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.truevfs.kernel.spec.util.ExtensionSet;
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
@@ -18,7 +17,6 @@ import org.junit.Test;
  * @author Christian Schlichtherle
  */
 public abstract class FsDriverMapModifierTestSuite {
-
     protected abstract String getExtensions();
     protected abstract FsDriverMapModifier newModifier();
 
@@ -28,13 +26,17 @@ public abstract class FsDriverMapModifierTestSuite {
         assertThat(newModifier().apply(map), is(sameInstance(map)));
         assertThat(map.size(), is(not(0)));
         for (final String extension : new ExtensionSet(getExtensions()))
-            assertNotNull(map.get(FsScheme.create(extension)));
+            assertThat(map.get(FsScheme.create(extension)), notNullValue());
     }
 
     @Test
     public void testIsLocatable() {
-        final Map<FsScheme, FsDriver> map = FsDriverMapLocator.SINGLETON.get();
-        for (final String extension : new ExtensionSet(getExtensions()))
-            assertNotNull(map.get(FsScheme.create(extension)));
+        final Map<FsScheme, FsDriver>
+                modified = newModifier().apply(new FsDriverMapFactory().get());
+        final Map<FsScheme, FsDriver>
+                located = FsDriverMapLocator.SINGLETON.get();
+        for (final FsScheme scheme : modified.keySet())
+            assertThat( located.get(scheme),
+                        instanceOf(modified.get(scheme).getClass()));
     }
 }
