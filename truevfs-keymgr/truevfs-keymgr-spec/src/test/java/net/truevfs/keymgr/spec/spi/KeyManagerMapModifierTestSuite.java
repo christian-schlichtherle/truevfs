@@ -8,7 +8,6 @@ import java.util.Map;
 import net.truevfs.keymgr.spec.KeyManager;
 import net.truevfs.keymgr.spec.sl.KeyManagerMapLocator;
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
 
@@ -25,13 +24,17 @@ public abstract class KeyManagerMapModifierTestSuite {
         assertThat(newModifier().apply(map), is(sameInstance(map)));
         assertThat(map.size(), is(not(0)));
         for (final Class<?> clazz : getClasses())
-            assertNotNull(map.get(clazz));
+            assertThat(map.get(clazz), notNullValue());
     }
 
     @Test
     public void testIsLocatable() {
-        final Map<Class<?>, KeyManager<?>> map = KeyManagerMapLocator.SINGLETON.getKeyManagers();
-        for (final Class<?> clazz : getClasses())
-            assertNotNull(map.get(clazz));
+        final Map<Class<?>, KeyManager<?>>
+                modified = newModifier().apply(new KeyManagerMapFactory().get());
+        final Map<Class<?>, KeyManager<?>>
+                located = KeyManagerMapLocator.SINGLETON.get();
+        for (final Class<?> clazz : modified.keySet())
+            assertThat( located.get(clazz),
+                        instanceOf(modified.get(clazz).getClass()));
     }
 }
