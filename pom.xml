@@ -128,7 +128,7 @@ system space.
         <module>truevfs-driver</module>
         <module>truevfs-ext</module>
         <module>truevfs-kernel</module>
-        <module>truevfs-key</module>
+        <module>truevfs-keymgr</module>
         <module>truevfs-profile</module>
         <module>truevfs-samples</module>
     </modules>
@@ -252,15 +252,25 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-key</artifactId>
+                <artifactId>truevfs-keymgr-console</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-key</artifactId>
+                <artifactId>truevfs-keymgr-spec</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-keymgr-spec</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-keymgr-swing</artifactId>
+                <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>

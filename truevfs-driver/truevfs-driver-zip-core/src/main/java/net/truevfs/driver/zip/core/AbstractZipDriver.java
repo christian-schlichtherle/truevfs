@@ -30,9 +30,9 @@ import net.truevfs.kernel.spec.cio.*;
 import net.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import net.truevfs.kernel.spec.util.BitField;
 import net.truevfs.kernel.spec.util.HashMaps;
-import net.truevfs.key.KeyManagerProvider;
-import net.truevfs.key.KeyProvider;
-import net.truevfs.key.sl.KeyManagerMapLocator;
+import net.truevfs.keymgr.spec.KeyManagerProvider;
+import net.truevfs.keymgr.spec.KeyProvider;
+import net.truevfs.keymgr.spec.sl.KeyManagerMapLocator;
 
 /**
  * An abstract archive driver for the ZIP file format.

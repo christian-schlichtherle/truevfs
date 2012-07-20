@@ -24,11 +24,11 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-key</artifactId>
+            <artifactId>truevfs-keymgr-spec</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-key</artifactId>
+            <artifactId>truevfs-keymgr-spec</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>

@@ -10,7 +10,8 @@ import net.truevfs.kernel.spec.spi.FsDriverMapModifierTestSuite;
 /**
  * @author Christian Schlichtherle
  */
-public final class JarDriverMapModifierTest extends FsDriverMapModifierTestSuite {
+public final class JarDriverMapModifierTest
+extends FsDriverMapModifierTestSuite {
     @Override
     protected String getExtensions() {
         return "ear|jar|war";

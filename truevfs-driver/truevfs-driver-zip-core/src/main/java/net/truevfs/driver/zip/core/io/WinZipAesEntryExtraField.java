@@ -4,8 +4,8 @@
  */
 package net.truevfs.driver.zip.core.io;
 
-import net.truevfs.key.param.AesKeyStrength;
-import static net.truevfs.key.param.AesKeyStrength.BITS_128;
+import net.truevfs.keymgr.spec.param.AesKeyStrength;
+import static net.truevfs.keymgr.spec.param.AesKeyStrength.BITS_128;
 import static net.truevfs.driver.zip.core.io.LittleEndian.readUShort;
 import static net.truevfs.driver.zip.core.io.LittleEndian.writeShort;
 import javax.annotation.concurrent.NotThreadSafe;

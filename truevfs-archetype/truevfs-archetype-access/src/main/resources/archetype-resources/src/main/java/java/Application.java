@@ -3,8 +3,8 @@
 #set( $symbol_escape = '\' )
 package ${package}.java;
 
-import de.schlichtherle.truevfs.key.pbe.swing.feedback.HurlingWindowFeedback;
-import de.schlichtherle.truevfs.key.pbe.swing.feedback.InvalidKeyFeedback;
+import net.truevfs.keymgr.swing.feedback.HurlingWindowFeedback;
+import net.truevfs.keymgr.swing.feedback.InvalidKeyFeedback;
 import net.truevfs.access.TApplication;
 
 /**

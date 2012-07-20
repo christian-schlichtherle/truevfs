@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.zip.core.io;
 
-import net.truevfs.key.param.AesKeyStrength;
+import net.truevfs.keymgr.spec.param.AesKeyStrength;
 
 /**
  * The parameters of this interface are used with WinZip AES encrypted entries.

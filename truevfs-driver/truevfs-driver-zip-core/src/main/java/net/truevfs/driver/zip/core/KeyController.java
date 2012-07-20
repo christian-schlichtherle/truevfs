@@ -16,8 +16,8 @@ import net.truevfs.kernel.spec.cio.Entry.Access;
 import static net.truevfs.kernel.spec.cio.Entry.Type.SPECIAL;
 import net.truevfs.kernel.spec.util.BitField;
 import net.truevfs.kernel.spec.util.ControlFlowException;
-import net.truevfs.key.KeyManager;
-import net.truevfs.key.KeyManagerProvider;
+import net.truevfs.keymgr.spec.KeyManager;
+import net.truevfs.keymgr.spec.KeyManagerProvider;
 
 /**
  * This file system controller decorates another file system controller in

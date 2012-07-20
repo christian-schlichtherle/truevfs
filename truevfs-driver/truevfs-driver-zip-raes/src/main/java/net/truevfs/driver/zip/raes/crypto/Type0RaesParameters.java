@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.zip.raes.crypto;
 
-import net.truevfs.key.param.AesKeyStrength;
+import net.truevfs.keymgr.spec.param.AesKeyStrength;
 
 /**
  * The parameters of this interface are used with RAES <i>type 0</i> files.

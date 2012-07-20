@@ -39,7 +39,12 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-key</artifactId>
+            <artifactId>truevfs-keymgr-console</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-keymgr-swing</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

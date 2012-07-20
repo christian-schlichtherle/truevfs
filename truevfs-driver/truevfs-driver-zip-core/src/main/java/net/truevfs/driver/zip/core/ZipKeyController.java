@@ -9,7 +9,7 @@ import javax.annotation.concurrent.Immutable;
 import net.truevfs.driver.zip.core.io.ZipKeyException;
 import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsModel;
-import net.truevfs.key.param.AesPbeParameters;
+import net.truevfs.keymgr.spec.param.AesPbeParameters;
 
 /**
  * This file system controller decorates another file system controller in

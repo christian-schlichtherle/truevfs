@@ -11,7 +11,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.truevfs.driver.zip.core.crypto.CipherOutputStream;
-import net.truevfs.key.param.KeyStrength;
+import net.truevfs.keymgr.spec.param.KeyStrength;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;

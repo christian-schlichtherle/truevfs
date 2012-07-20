@@ -16,13 +16,13 @@ import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsModel;
 import net.truevfs.kernel.spec.FsScheme;
-import net.truevfs.key.KeyManagerProvider;
-import net.truevfs.key.PromptingKeyManagerProvider;
-import net.truevfs.key.PromptingKeyProvider.Controller;
-import net.truevfs.key.PromptingKeyProvider.View;
-import net.truevfs.key.UnknownKeyException;
-import net.truevfs.key.param.AesKeyStrength;
-import net.truevfs.key.param.AesPbeParameters;
+import net.truevfs.keymgr.spec.KeyManagerProvider;
+import net.truevfs.keymgr.spec.PromptingKeyManagerProvider;
+import net.truevfs.keymgr.spec.PromptingKeyProvider.Controller;
+import net.truevfs.keymgr.spec.PromptingKeyProvider.View;
+import net.truevfs.keymgr.spec.UnknownKeyException;
+import net.truevfs.keymgr.spec.param.AesKeyStrength;
+import net.truevfs.keymgr.spec.param.AesPbeParameters;
 
 /**
  * Provides static utility methods to set passwords for RAES encrypted ZIP

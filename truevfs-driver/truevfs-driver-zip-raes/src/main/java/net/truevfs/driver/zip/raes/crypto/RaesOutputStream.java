@@ -10,7 +10,7 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.truevfs.key.param.KeyStrength;
+import net.truevfs.keymgr.spec.param.KeyStrength;
 import org.bouncycastle.crypto.Mac;
 
 /**

@@ -11,9 +11,9 @@ import net.truevfs.access.TPath;
 import net.truevfs.access.TPathITSuite;
 import net.truevfs.driver.zip.TestWinZipAesDriver;
 import static net.truevfs.kernel.spec.FsAccessOption.ENCRYPT;
-import net.truevfs.key.MockView;
-import static net.truevfs.key.MockView.Action.CANCEL;
-import static net.truevfs.key.MockView.Action.ENTER;
+import net.truevfs.keymgr.spec.MockView;
+import static net.truevfs.keymgr.spec.MockView.Action.CANCEL;
+import static net.truevfs.keymgr.spec.MockView.Action.ENTER;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
