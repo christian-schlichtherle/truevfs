@@ -69,30 +69,30 @@ private abstract class LockingStrategy {
       acquire(lock)
       account.lockCount += 1
       try {
-        return operation
+        operation
       } finally {
         account.lockCount -= 1
-        lock.unlock()
+        lock unlock ()
       }
     } else {
       try {
         while (true) {
           try {
-            lock.lock()
+            lock lock ()
             account.lockCount += 1
             try {
               return operation
             } finally {
               account.lockCount -= 1
-              lock unlock()
+              lock unlock ()
             }
           } catch {
-            case _: NeedsLockRetryException => account.arbitrate()
+            case _: NeedsLockRetryException => account arbitrate ()
           }
         }
         throw new AssertionError("dead code")
       } finally {
-        accounts.remove()
+        accounts remove ()
       }
     }
   }
@@ -112,7 +112,7 @@ private object LockingStrategy {
 
     def arbitrate() {
       try {
-        Thread sleep (1 + rnd.nextInt(arbitrateMaxMillis))
+        Thread sleep (1 + (rnd nextInt arbitrateMaxMillis))
       } catch {
         case _: InterruptedException =>
           Thread.currentThread.interrupt() // restore
@@ -125,7 +125,7 @@ private object LockingStrategy {
   /** Acquires the given lock using `Lock.tryLock()`. */
   object fastLocked extends LockingStrategy {
     override protected def acquire(lock: Lock) {
-      if (!lock.tryLock())
+      if (!(lock tryLock ()))
         throw NeedsLockRetryException()
     }
   }
@@ -138,7 +138,7 @@ private object LockingStrategy {
           throw NeedsLockRetryException()
       } catch {
         case ex: InterruptedException =>
-          Thread.currentThread interrupt() // restore
+          Thread.currentThread interrupt () // restore
           throw NeedsLockRetryException()
       }
     }
@@ -147,7 +147,7 @@ private object LockingStrategy {
   /** Acquires the given lock using `Lock.lock()`. */
   object deadLocked extends LockingStrategy {
     override protected def acquire(lock: Lock) {
-      lock.lock()
+      lock lock ()
     }
   }
 }
