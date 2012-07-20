@@ -3,9 +3,9 @@
 #set( $symbol_escape = '\' )
 package ${package}.scala
 
+import net.truevfs.access.TApplication
 import net.truevfs.keymgr.swing.feedback.HurlingWindowFeedback
 import net.truevfs.keymgr.swing.feedback.InvalidKeyFeedback
-import net.truevfs.access.TApplication
 
 /**
  * An abstract class which configures the TrueVFS Access Path module.
