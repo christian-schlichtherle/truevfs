@@ -34,11 +34,11 @@ public final class KeyManagerMapLocator extends AbstractKeyManagerContainer {
 
     @Override
     public Map<Class<?>, KeyManager<?>> get() {
-        return Boot.managers;
+        return Lazy.managers;
     }
 
     /** A static data utility class used for lazy initialization. */
-    private static final class Boot {
+    private static final class Lazy {
         static final Map<Class<?>, KeyManager<?>> managers
                 = Collections.unmodifiableMap(
                     new Locator(KeyManagerMapLocator.class)

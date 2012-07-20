@@ -27,10 +27,10 @@ public class FsManagerLocator implements Container<FsManager> {
     private FsManagerLocator() { }
 
     @Override
-    public FsManager get() { return Boot.manager; }
+    public FsManager get() { return Lazy.manager; }
 
     /** A static data utility class used for lazy initialization. */
-    private static final class Boot {
+    private static final class Lazy {
         static final FsManager manager
                 = new Locator(FsManagerLocator.class)
                 .factory(FsManagerFactory.class, FsManagerDecorator.class)
