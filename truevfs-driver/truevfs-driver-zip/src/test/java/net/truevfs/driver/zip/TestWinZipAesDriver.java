@@ -15,7 +15,7 @@ import net.truevfs.keymgr.spec.param.AesPbeParameters;
  */
 public final class TestWinZipAesDriver extends ZipDriver {
 
-    private final TestKeyManagerProvider service = new TestKeyManagerProvider();
+    private final TestKeyManagerContainer service = new TestKeyManagerContainer();
 
     @Override
     public IoBufferPool<? extends IoBuffer<?>> getPool() {
@@ -23,7 +23,7 @@ public final class TestWinZipAesDriver extends ZipDriver {
     }
 
     @Override
-    public TestKeyManagerProvider getKeyManagerProvider() {
+    public TestKeyManagerContainer getKeyManagerProvider() {
         return service;
     }
 

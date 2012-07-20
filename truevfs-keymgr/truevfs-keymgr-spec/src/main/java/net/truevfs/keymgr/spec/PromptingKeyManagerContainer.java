@@ -13,15 +13,15 @@ import net.truevfs.keymgr.spec.PromptingKeyProvider.View;
 /**
  * Implements a provider for a single prompting key manager which will use the
  * prompting key provider view given to the
- * {@linkplain #PromptingKeyManagerProvider constructor}.
+ * {@linkplain #PromptingKeyManagerContainer constructor}.
  * This class is convenient to use if you want to implement a custom view for
  * key prompting.
  * 
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class PromptingKeyManagerProvider
-extends AbstractKeyManagerProvider {
+public final class PromptingKeyManagerContainer
+extends AbstractKeyManagerContainer {
 
     private final Map<Class<?>, KeyManager<?>> managers;
 
@@ -32,7 +32,7 @@ extends AbstractKeyManagerProvider {
      * @param clazz the class of the safe keys.
      * @param view the prompting key provider view for the safe keys.
      */
-    public <K extends SafeKey<K>> PromptingKeyManagerProvider(
+    public <K extends SafeKey<K>> PromptingKeyManagerContainer(
             final Class<K> clazz,
             final View<K> view) {
         final Map<Class<?>, KeyManager<?>> map = new HashMap<>(2);
@@ -42,7 +42,7 @@ extends AbstractKeyManagerProvider {
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<Class<?>, KeyManager<?>> getKeyManagers() {
+    public Map<Class<?>, KeyManager<?>> get() {
         return managers;
     }
 }

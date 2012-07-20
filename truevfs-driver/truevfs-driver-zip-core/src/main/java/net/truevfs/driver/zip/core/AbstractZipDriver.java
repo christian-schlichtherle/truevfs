@@ -30,7 +30,7 @@ import net.truevfs.kernel.spec.cio.*;
 import net.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import net.truevfs.kernel.spec.util.BitField;
 import net.truevfs.kernel.spec.util.HashMaps;
-import net.truevfs.keymgr.spec.KeyManagerProvider;
+import net.truevfs.keymgr.spec.KeyManagerContainer;
 import net.truevfs.keymgr.spec.KeyProvider;
 import net.truevfs.keymgr.spec.sl.KeyManagerMapLocator;
 
@@ -71,7 +71,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<AbstractZipDriverEntry> 
      * @return {@link KeyManagerLocator#SINGLETON}, as by the implementation
      *         in the class {@link ZipDriver}.
      */
-    public KeyManagerProvider getKeyManagerProvider() {
+    public KeyManagerContainer getKeyManagerProvider() {
         return KeyManagerMapLocator.SINGLETON;
     }
 

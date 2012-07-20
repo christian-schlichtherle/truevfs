@@ -4,6 +4,7 @@
  */
 package net.truevfs.keymgr.spec;
 
+import de.schlichtherle.truecommons.services.Container;
 import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
@@ -15,13 +16,13 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class AbstractKeyManagerProvider
-implements KeyManagerProvider {
+public abstract class AbstractKeyManagerContainer
+implements KeyManagerContainer, Container<Map<Class<?>, KeyManager<?>>> {
 
     @Override
     @SuppressWarnings("unchecked")
     public final @CheckForNull <K> KeyManager<K> keyManager(final Class<K> type) {
-        return (KeyManager<K>) getKeyManagers().get(type);
+        return (KeyManager<K>) get().get(type);
     }
 
     /**
@@ -33,7 +34,8 @@ implements KeyManagerProvider {
      * 
      * @return An immutable map of secret key classes to nullable key managers.
      */
-    public abstract Map<Class<?>, KeyManager<?>> getKeyManagers();
+    @Override
+    public abstract Map<Class<?>, KeyManager<?>> get();
 
     /**
      * Returns a string representation of this object for debugging and logging
@@ -43,6 +45,6 @@ implements KeyManagerProvider {
     public String toString() {
         return String.format("%s[keyManagers=%s]",
                 getClass().getName(),
-                getKeyManagers());
+                get());
     }
 }

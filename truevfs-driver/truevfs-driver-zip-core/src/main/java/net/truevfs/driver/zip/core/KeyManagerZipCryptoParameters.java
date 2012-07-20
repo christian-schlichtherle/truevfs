@@ -16,7 +16,7 @@ import java.util.ServiceConfigurationError;
 import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.spec.FsModel;
 import net.truevfs.keymgr.spec.KeyManager;
-import net.truevfs.keymgr.spec.KeyManagerProvider;
+import net.truevfs.keymgr.spec.KeyManagerContainer;
 import net.truevfs.keymgr.spec.KeyProvider;
 import net.truevfs.keymgr.spec.UnknownKeyException;
 import net.truevfs.keymgr.spec.param.AesKeyStrength;
@@ -26,7 +26,7 @@ import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS5PasswordToByte
 
 /**
  * An adapter which provides {@link ZipCryptoParameters} by using a
- * {@link KeyManagerProvider}.
+ * {@link KeyManagerContainer}.
  * <p>
  * The current implementation supports only {@link WinZipAesParameters}.
  *
@@ -70,7 +70,7 @@ implements ZipParametersProvider, ZipCryptoParameters {
      * <p>
      * If {@code type} is assignable from {@link WinZipAesParameters}, then a
      * {@link KeyManager} for {@link AesPbeParameters} will getKeyManager used which
-     * is obtained from the {@link KeyManagerProvider provider} which has been
+     * is obtained from the {@link KeyManagerContainer provider} which has been
      * provided to the constructor.
      * <p>
      * Otherwise, {@code null} gets returned.

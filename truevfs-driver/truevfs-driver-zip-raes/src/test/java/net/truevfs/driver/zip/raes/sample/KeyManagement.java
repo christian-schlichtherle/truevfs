@@ -16,8 +16,8 @@ import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsModel;
 import net.truevfs.kernel.spec.FsScheme;
-import net.truevfs.keymgr.spec.KeyManagerProvider;
-import net.truevfs.keymgr.spec.PromptingKeyManagerProvider;
+import net.truevfs.keymgr.spec.KeyManagerContainer;
+import net.truevfs.keymgr.spec.PromptingKeyManagerContainer;
 import net.truevfs.keymgr.spec.PromptingKeyProvider.Controller;
 import net.truevfs.keymgr.spec.PromptingKeyProvider.View;
 import net.truevfs.keymgr.spec.UnknownKeyException;
@@ -168,16 +168,16 @@ public final class KeyManagement {
     }
     
     private static final class CustomZipRaesDriver2 extends SafeZipRaesDriver {
-        final KeyManagerProvider provider;
+        final KeyManagerContainer provider;
         
         CustomZipRaesDriver2(char[] password) {
-            this.provider = new PromptingKeyManagerProvider(
+            this.provider = new PromptingKeyManagerContainer(
                     AesPbeParameters.class,
                     new CustomView(password));
         }
         
         @Override
-        public KeyManagerProvider getKeyManagerProvider() {
+        public KeyManagerContainer getKeyManagerProvider() {
             return provider;
         }
     } // CustomZipRaesDriver2

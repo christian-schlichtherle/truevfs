@@ -11,7 +11,7 @@ import javax.annotation.CheckForNull;
  *
  * @author Christian Schlichtherle
  */
-public interface KeyManagerProvider {
+public interface KeyManagerContainer {
 
     /**
      * Returns the nullable key manager for the given secret key class.

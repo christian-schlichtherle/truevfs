@@ -13,7 +13,7 @@ import net.truevfs.driver.zip.raes.crypto.RaesParameters;
 import net.truevfs.driver.zip.raes.crypto.RaesParametersProvider;
 import net.truevfs.driver.zip.raes.crypto.Type0RaesParameters;
 import net.truevfs.keymgr.spec.KeyManager;
-import net.truevfs.keymgr.spec.KeyManagerProvider;
+import net.truevfs.keymgr.spec.KeyManagerContainer;
 import net.truevfs.keymgr.spec.KeyProvider;
 import net.truevfs.keymgr.spec.UnknownKeyException;
 import net.truevfs.keymgr.spec.param.AesKeyStrength;
@@ -45,7 +45,7 @@ implements RaesParametersProvider {
      * @param  raes the absolute URI of the RAES file.
      */
     public KeyManagerRaesParameters(
-            final KeyManagerProvider provider,
+            final KeyManagerContainer provider,
             final URI raes) {
         this(provider.keyManager(AesPbeParameters.class), raes);
     }

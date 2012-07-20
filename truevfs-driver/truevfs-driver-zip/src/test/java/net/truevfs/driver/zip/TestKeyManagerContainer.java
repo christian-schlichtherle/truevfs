@@ -7,7 +7,7 @@ package net.truevfs.driver.zip;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import net.truevfs.keymgr.spec.AbstractKeyManagerProvider;
+import net.truevfs.keymgr.spec.AbstractKeyManagerContainer;
 import net.truevfs.keymgr.spec.KeyManager;
 import net.truevfs.keymgr.spec.MockView;
 import net.truevfs.keymgr.spec.param.AesPbeParameters;
@@ -15,12 +15,12 @@ import net.truevfs.keymgr.spec.param.AesPbeParameters;
 /**
  * @author Christian Schlichtherle
  */
-public final class TestKeyManagerProvider extends AbstractKeyManagerProvider {
+public final class TestKeyManagerContainer extends AbstractKeyManagerContainer {
 
     private final MockView<AesPbeParameters> view;
     private final Map<Class<?>, KeyManager<?>> managers;
 
-    public TestKeyManagerProvider() {
+    public TestKeyManagerContainer() {
         final Map<Class<?>, KeyManager<?>> map = new HashMap<>(2);
         map.put(AesPbeParameters.class, new TestKeyManager<>(this.view = newView()));
         managers = Collections.unmodifiableMap(map);
@@ -40,7 +40,7 @@ public final class TestKeyManagerProvider extends AbstractKeyManagerProvider {
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<Class<?>, KeyManager<?>> getKeyManagers() {
+    public Map<Class<?>, KeyManager<?>> get() {
         return managers;
     }
 }
