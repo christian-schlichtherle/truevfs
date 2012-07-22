@@ -8,7 +8,7 @@ import java.io.IOException;
 import static java.util.logging.Level.FINE;
 import java.util.logging.Logger;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.ext.inst.InstrumentingIoBufferPool;
+import net.truevfs.comp.inst.InstrumentingIoBufferPool;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
 

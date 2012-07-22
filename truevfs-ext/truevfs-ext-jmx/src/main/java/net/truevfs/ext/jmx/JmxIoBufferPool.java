@@ -6,7 +6,7 @@ package net.truevfs.ext.jmx;
 
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.ext.inst.InstrumentingIoBufferPool;
+import net.truevfs.comp.inst.InstrumentingIoBufferPool;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
 
