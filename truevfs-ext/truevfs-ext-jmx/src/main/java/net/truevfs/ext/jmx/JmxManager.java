@@ -5,7 +5,7 @@
 package net.truevfs.ext.jmx;
 
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.ext.inst.InstrumentingManager;
+import net.truevfs.comp.inst.InstrumentingManager;
 import net.truevfs.kernel.spec.FsManager;
 import net.truevfs.kernel.spec.FsSyncException;
 import net.truevfs.kernel.spec.FsSyncOption;

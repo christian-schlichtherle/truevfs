@@ -4,7 +4,7 @@
  */
 package net.truevfs.ext.jmx;
 
-import net.truevfs.ext.inst.InstrumentingController;
+import net.truevfs.comp.inst.InstrumentingController;
 import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsModel;
 

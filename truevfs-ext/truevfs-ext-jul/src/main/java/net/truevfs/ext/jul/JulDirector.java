@@ -5,10 +5,10 @@
 package net.truevfs.ext.jul;
 
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.ext.inst.InstrumentingCompositeDriver;
-import net.truevfs.ext.inst.InstrumentingController;
-import net.truevfs.ext.inst.InstrumentingDirector;
-import net.truevfs.ext.inst.InstrumentingManager;
+import net.truevfs.comp.inst.InstrumentingCompositeDriver;
+import net.truevfs.comp.inst.InstrumentingController;
+import net.truevfs.comp.inst.InstrumentingDirector;
+import net.truevfs.comp.inst.InstrumentingManager;
 import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsModel;
 import net.truevfs.kernel.spec.cio.*;

@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.ext.inst.InstrumentingOutputSocket;
+import net.truevfs.comp.inst.InstrumentingOutputSocket;
 import net.truevfs.kernel.spec.cio.Entry;
 import net.truevfs.kernel.spec.cio.InputSocket;
 import net.truevfs.kernel.spec.cio.OutputSocket;

@@ -7,7 +7,7 @@ package net.truevfs.ext.jmx;
 import java.lang.management.ManagementFactory;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.*;
-import net.truevfs.ext.inst.*;
+import net.truevfs.comp.inst.*;
 import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsManager;
 import net.truevfs.kernel.spec.FsModel;
