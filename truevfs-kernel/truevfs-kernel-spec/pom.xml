@@ -31,7 +31,7 @@
         </dependency>
         <dependency>
             <groupId>de.schlichtherle.truecommons</groupId>
-            <artifactId>truecommons-logging</artifactId>
+            <artifactId>truecommons-log</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
