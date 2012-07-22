@@ -150,6 +150,11 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-comp-inst</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-comp-zip</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -212,11 +217,6 @@ system space.
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-zip-raes</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-ext-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

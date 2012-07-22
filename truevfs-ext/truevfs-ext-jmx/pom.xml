@@ -30,7 +30,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-ext-core</artifactId>
+            <artifactId>truevfs-comp-inst</artifactId>
         </dependency>
     </dependencies>
 </project>
