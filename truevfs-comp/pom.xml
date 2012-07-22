@@ -26,6 +26,7 @@
     </description>
 
     <modules>
+        <module>truevfs-comp-inst</module>
         <module>truevfs-comp-zip</module>
     </modules>
 </project>

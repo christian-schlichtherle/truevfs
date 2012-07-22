@@ -26,7 +26,6 @@
     </description>
 
     <modules>
-        <module>truevfs-ext-core</module>
         <module>truevfs-ext-jmx</module>
         <module>truevfs-ext-jul</module>
         <module>truevfs-ext-pace</module>

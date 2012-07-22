@@ -3,24 +3,22 @@
   - Copyright (C) 2005-2012 Schlichtherle IT Services.
   - All rights reserved. Use is subject to license terms.
   -->
-<project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project    xmlns="http://maven.apache.org/POM/4.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>de.schlichtherle.truevfs</groupId>
-        <artifactId>truevfs-ext</artifactId>
+        <artifactId>truevfs-comp</artifactId>
         <version>1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truevfs-ext-core</artifactId>
+    <artifactId>truevfs-comp-inst</artifactId>
 
-    <name>TrueVFS Extension Core</name>
+    <name>TrueVFS Component Instrumentation</name>
     <description>
-        Provides core functionality for instrumenting the TrueVFS Kernel at
-        runtime.
+        Provides basic functionality for instrumenting the TrueVFS Kernel.
     </description>
 
     <dependencies>
