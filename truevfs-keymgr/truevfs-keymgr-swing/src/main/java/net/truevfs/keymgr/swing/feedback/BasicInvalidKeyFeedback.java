@@ -4,13 +4,13 @@
  */
 package net.truevfs.keymgr.swing.feedback;
 
-import net.truevfs.keymgr.spec.SafeKeyProvider;
-import static net.truevfs.keymgr.spec.SafeKeyProvider.MIN_KEY_RETRY_DELAY;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import net.truevfs.keymgr.spec.SafeKeyProvider;
+import static net.truevfs.keymgr.spec.SafeKeyProvider.MIN_KEY_RETRY_DELAY;
 
 /**
  * Provides run by beeping using the default toolkit and disabling the
@@ -49,8 +49,7 @@ implements InvalidKeyFeedback {
     public void run(JPanel panel) {
         final JButton b = panel.getRootPane().getDefaultButton();
         super.run(panel);
-        if (null == b)
-            return;
+        if (null == b) return;
         b.setEnabled(false);
         final Timer t = new Timer(duration, new ActionListener() {
             @Override
