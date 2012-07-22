@@ -5,7 +5,7 @@
 package net.truevfs.kernel.impl
 
 import de.schlichtherle.truecommons.io._
-import de.schlichtherle.truecommons.logging._
+import de.schlichtherle.truecommons.log._
 import java.io._
 import java.nio.channels._
 import javax.annotation.concurrent._

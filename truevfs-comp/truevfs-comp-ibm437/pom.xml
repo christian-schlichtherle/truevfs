@@ -10,24 +10,19 @@
 
     <parent>
         <groupId>de.schlichtherle.truevfs</groupId>
-        <artifactId>truevfs</artifactId>
+        <artifactId>truevfs-comp</artifactId>
         <version>1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truevfs-comp</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>truevfs-comp-ibm437</artifactId>
 
-    <name>TrueVFS Component</name>
+    <name>TrueVFS Component IBM437</name>
     <description>
-        Components provide some functionality to serve as a building block for
-        other modules.
-        Unlike TrueZIP Driver or TrueZIP extension modules, components do NOT
-        advertise services on the class path.
-    </description>
+        Provides the IBM437 character set alias CP437 for use with genuine ZIP
+        files.
 
-    <modules>
-        <module>truevfs-comp-ibm437</module>
-        <module>truevfs-comp-inst</module>
-        <module>truevfs-comp-zip</module>
-    </modules>
+        Add the JAR artifact of this module to the run time class path to
+        make its file system drivers available for service location in the
+        client API modules.
+    </description>
 </project>

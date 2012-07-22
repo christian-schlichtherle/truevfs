@@ -8,4 +8,4 @@
  * @author Christian Schlichtherle
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
-package net.truevfs.driver.zip.charset;
+package net.truevfs.comp.ibm437;
