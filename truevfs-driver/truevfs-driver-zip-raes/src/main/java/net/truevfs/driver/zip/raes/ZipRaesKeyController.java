@@ -6,7 +6,7 @@ package net.truevfs.driver.zip.raes;
 
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.driver.zip.core.KeyController;
+import net.truevfs.comp.zip.driver.KeyController;
 import net.truevfs.driver.zip.raes.crypto.RaesKeyException;
 import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsModel;

@@ -4,9 +4,9 @@
  */
 package net.truevfs.driver.zip;
 
-import net.truevfs.driver.zip.core.AbstractZipDriverEntry;
-import net.truevfs.driver.zip.core.io.DateTimeConverter;
-import net.truevfs.driver.zip.core.io.ZipEntry;
+import net.truevfs.comp.zip.driver.AbstractZipDriverEntry;
+import net.truevfs.comp.zip.DateTimeConverter;
+import net.truevfs.comp.zip.ZipEntry;
 
 /**
  *

@@ -125,6 +125,7 @@ system space.
     <modules>
         <module>truevfs-access</module>
         <module>truevfs-archetype</module>
+        <module>truevfs-comp</module>
         <module>truevfs-driver</module>
         <module>truevfs-ext</module>
         <module>truevfs-kernel</module>
@@ -143,6 +144,18 @@ system space.
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-access</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-comp-zip</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-comp-zip</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
@@ -192,18 +205,6 @@ system space.
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-zip</artifactId>
-                <type>test-jar</type>
-                <version>${project.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-driver-zip-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-driver-zip-core</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>

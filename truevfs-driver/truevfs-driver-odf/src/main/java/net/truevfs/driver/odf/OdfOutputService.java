@@ -10,9 +10,9 @@ import java.io.OutputStream;
 import java.util.Objects;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.truevfs.driver.zip.core.AbstractZipDriverEntry;
-import net.truevfs.driver.zip.core.ZipOutputService;
-import static net.truevfs.driver.zip.core.io.ZipEntry.STORED;
+import net.truevfs.comp.zip.driver.AbstractZipDriverEntry;
+import net.truevfs.comp.zip.driver.ZipOutputService;
+import static net.truevfs.comp.zip.ZipEntry.STORED;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.truevfs.kernel.spec.cio.*;
 
