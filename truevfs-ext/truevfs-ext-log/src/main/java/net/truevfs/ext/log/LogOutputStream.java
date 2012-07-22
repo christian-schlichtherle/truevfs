@@ -34,13 +34,13 @@ final class LogOutputStream extends DecoratingOutputStream {
     throws IOException {
         super(socket.stream(peer));
         this.socket = socket;
-        log("Stream writing ");
+        log("Opened output stream for {}");
     }
 
     @Override
     public void close() throws IOException {
-        log("Closing ");
         out.close();
+        log("Closed output stream for {}");
     }
 
     private void log(String message) {
@@ -50,9 +50,8 @@ final class LogOutputStream extends DecoratingOutputStream {
         } catch (final IOException ignore) {
             entry = null;
         }
-        if (entry instanceof IoBuffer<?>)
-            logger.debug(message + entry, new NeverThrowable());
-        else
-            logger.trace(message + entry, new NeverThrowable());
+        logger.debug(message, entry);
+        if (logger.isTraceEnabled())
+            logger.trace("Stack trace:", new NeverThrowable());
     }
 }

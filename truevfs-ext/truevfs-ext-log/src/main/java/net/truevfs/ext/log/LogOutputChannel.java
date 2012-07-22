@@ -32,13 +32,13 @@ final class LogOutputChannel extends DecoratingSeekableChannel {
     throws IOException {
         super(socket.channel(peer));
         this.socket = socket;
-        log("Random writing ");
+        log("Opened output channel for {}");
     }
 
     @Override
     public void close() throws IOException {
-        log("Closing ");
         channel.close();
+        log("Closed output channel for {}");
     }
 
     private void log(String message) {
@@ -48,9 +48,8 @@ final class LogOutputChannel extends DecoratingSeekableChannel {
         } catch (final IOException ignore) {
             entry = null;
         }
-        if (entry instanceof IoBuffer<?>)
-            logger.debug(message + entry, new NeverThrowable());
-        else
-            logger.trace(message + entry, new NeverThrowable());
+        logger.debug(message, entry);
+        if (logger.isTraceEnabled())
+            logger.trace("Stack trace:", new NeverThrowable());
     }
 }
