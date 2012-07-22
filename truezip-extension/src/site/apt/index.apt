@@ -10,7 +10,8 @@ About TrueZIP Extension
     The following sub-modules are available:
 
     * {{{./truezip-extension-jmx-jul/index.html}TrueZIP Extension JMX/JUL}}
-    * {{{./truezip-extension-jmx-jul/index.html}TrueZIP Extension PaceManager}}
+
+    * {{{./truezip-extension-pace/index.html}TrueZIP Extension PaceManager}}
 
     []
 
