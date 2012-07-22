@@ -4,10 +4,6 @@
  */
 package net.truevfs.access;
 
-import net.truevfs.access.TConfig;
-import static net.truevfs.access.TArchiveDetector.NULL;
-import static net.truevfs.kernel.spec.FsEntryName.ROOT;
-import net.truevfs.kernel.spec.FsPath;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -17,11 +13,14 @@ import java.io.*;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URI;
 import java.util.ServiceConfigurationError;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import static net.truevfs.access.TArchiveDetector.NULL;
+import static net.truevfs.kernel.spec.FsEntryName.ROOT;
+import net.truevfs.kernel.spec.FsPath;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Tests archive type independent features of the {@link TFile} class.
@@ -31,7 +30,7 @@ import org.junit.Test;
 public final class TFileTest extends MockArchiveDriverTestBase {
 
     private static final Logger
-            logger = Logger.getLogger(TFileTest.class.getName());
+            logger = LoggerFactory.getLogger(TFileTest.class);
 
     private TFile archive;
 
@@ -489,7 +488,7 @@ public final class TFileTest extends MockArchiveDriverTestBase {
                     oos.writeObject(original);
                 }
 
-                logger.log(Level.FINEST, "Number of serialized bytes: {0}", bos.size());
+                logger.trace("Number of serialized bytes: {}", bos.size());
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final TFile clone;
@@ -508,7 +507,7 @@ public final class TFileTest extends MockArchiveDriverTestBase {
                     enc.writeObject(original);
                 }
 
-                logger.log(Level.FINEST, bos.toString("UTF-8"));
+                logger.trace("XML String: ", bos.toString("UTF-8"));
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final TFile clone;

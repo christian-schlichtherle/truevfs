@@ -46,6 +46,10 @@
             <type>test-jar</type>
         </dependency>
         <dependency>
+            <groupId>de.schlichtherle.truecommons</groupId>
+            <artifactId>truecommons-logging</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
             <exclusions>

@@ -53,6 +53,11 @@
             <artifactId>truevfs-keymgr-spec</artifactId>
             <type>test-jar</type>
         </dependency>
+        <dependency>
+            <groupId>de.schlichtherle.truecommons</groupId>
+            <artifactId>truecommons-logging</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

@@ -11,12 +11,12 @@ import java.io.*;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static net.truevfs.kernel.spec.util.BitFieldTest.Dummy.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Schlichtherle
@@ -24,7 +24,7 @@ import org.junit.Test;
 public class BitFieldTest {
 
     private static final Logger
-            logger = Logger.getLogger(BitFieldTest.class.getName());
+            logger = LoggerFactory.getLogger(BitFieldTest.class);
 
     @Test
     public void testSetOne() {
@@ -142,7 +142,7 @@ public class BitFieldTest {
                     oos.writeObject(original);
                 }
 
-                logger.log(Level.FINEST, "Number of serialized bytes: {0}", bos.size());
+                logger.trace("Number of serialized bytes: {}", bos.size());
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final Object clone;
@@ -161,7 +161,7 @@ public class BitFieldTest {
                     enc.writeObject(original);
                 }
 
-                logger.log(Level.FINEST, bos.toString("UTF-8"));
+                logger.trace("XML String: {}", bos.toString("UTF-8"));
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final Object clone;

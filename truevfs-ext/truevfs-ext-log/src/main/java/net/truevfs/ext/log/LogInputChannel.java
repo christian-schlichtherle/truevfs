@@ -7,15 +7,12 @@ package net.truevfs.ext.log;
 import de.schlichtherle.truecommons.io.ReadOnlyChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.cio.Entry;
 import net.truevfs.kernel.spec.cio.InputSocket;
-import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.OutputSocket;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Schlichtherle

@@ -4,6 +4,7 @@
  */
 package net.truevfs.keymgr.swing;
 
+import de.schlichtherle.truecommons.logging.LocalizedLogger;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
@@ -11,8 +12,6 @@ import java.awt.event.WindowFocusListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.text.Document;
@@ -29,9 +28,8 @@ public final class AuthenticationPanel extends JPanel {
 
     private static final long serialVersionUID = 3876515923659236921L;
 
-    private static final String CLASS_NAME = AuthenticationPanel.class.getName();
     private static final ResourceBundle
-            bundle = ResourceBundle.getBundle(CLASS_NAME);
+            bundle = ResourceBundle.getBundle(AuthenticationPanel.class.getName());
     private static final File
             BASE_DIR = FileSystemView.getFileSystemView().getDefaultDirectory();
 
@@ -187,8 +185,8 @@ public final class AuthenticationPanel extends JPanel {
                     file = new File(filePath.substring(userDirPath.length() + 1)); // cut off file separator, too.
                 setKeyFile(file);
             } catch (IOException ex) {
-                Logger  .getLogger(CLASS_NAME)
-                        .log(Level.WARNING, ex.getLocalizedMessage(), ex);
+                new LocalizedLogger(AuthenticationPanel.class)
+                        .warn("stackTrace", ex);
             }
         }
     }//GEN-LAST:event_keyFileChooserActionPerformed

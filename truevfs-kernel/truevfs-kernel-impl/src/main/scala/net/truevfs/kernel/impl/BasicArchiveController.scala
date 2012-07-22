@@ -5,10 +5,10 @@
 package net.truevfs.kernel.impl
 
 import de.schlichtherle.truecommons.io._
+import de.schlichtherle.truecommons.logging._
 import java.io._
 import java.nio.channels._
 import java.nio.file._
-import java.util.logging._
 import javax.annotation.concurrent._
 import net.truevfs.kernel.spec._
 import net.truevfs.kernel.spec.FsAccessOption._
@@ -223,9 +223,7 @@ extends Controller[LockModel] with LockModelAspect {
     if (name.isRoot) {
       // Check for any archive entries with absolute entry names.
       val size = fs.size - 1 // mind the ROOT entry
-      if (0 != size)
-          logger.log(Level.WARNING, "unlink.absolute",
-                     Array[AnyRef](mountPoint, size.asInstanceOf[AnyRef]));
+      if (0 != size) logger warn ("unlink.absolute", mountPoint, size)
     }
   }
 
@@ -259,9 +257,7 @@ extends Controller[LockModel] with LockModelAspect {
 }
 
 private object BasicArchiveController {
-  private val logger = Logger.getLogger(
-    classOf[BasicArchiveController[_]].getName,
-    classOf[BasicArchiveController[_]].getName)
+  private val logger = new LocalizedLogger(classOf[BasicArchiveController[_]])
 
   private final class ProxyEntry(entry: FsArchiveEntry)
   extends DecoratingEntry[FsArchiveEntry](entry) with FsArchiveEntry {

@@ -6,12 +6,11 @@ package net.truevfs.kernel.spec.util;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.logging.Level;
-import static java.util.logging.Level.FINE;
-import java.util.logging.Logger;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Schlichtherle
@@ -19,8 +18,8 @@ import org.junit.Test;
 public class UriBuilderTest {
 
     private static final Logger
-            logger = Logger.getLogger(UriBuilderTest.class.getName());
-    
+            logger = LoggerFactory.getLogger(UriBuilderTest.class);
+
     private UriBuilder builder;
 
     @Before
@@ -158,7 +157,7 @@ public class UriBuilderTest {
                 builder.getString();
                 fail();
             } catch (URISyntaxException expected) {
-                logger.log(Level.FINEST, expected.toString(), expected);
+                logger.trace("Stack trace:", expected);
             }
             try {
                 builder.toString();

@@ -4,7 +4,6 @@
  */
 package net.truevfs.kernel.spec;
 
-import static net.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -12,12 +11,13 @@ import java.io.*;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import static net.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Schlichtherle
@@ -25,7 +25,7 @@ import org.junit.Test;
 public class FsEntryNameTest {
 
     private static final Logger
-            logger = Logger.getLogger(FsEntryNameTest.class.getName());
+            logger = LoggerFactory.getLogger(FsEntryNameTest.class);
 
     @Test
     public void testSerialization() throws IOException, ClassNotFoundException {
@@ -52,7 +52,7 @@ public class FsEntryNameTest {
                     oos.writeObject(original);
                 }
 
-                logger.log(Level.FINEST, "Number of serialized bytes: {0}", bos.size());
+                logger.trace("Number of serialized bytes: {}", bos.size());
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final ObjectInputStream ois = new ObjectInputStream(bis);
@@ -70,7 +70,7 @@ public class FsEntryNameTest {
                     enc.writeObject(original);
                 }
 
-                logger.log(Level.FINEST, bos.toString("UTF-8"));
+                logger.trace("XML String: {}", bos.toString("UTF-8"));
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final XMLDecoder dec = new XMLDecoder(bis);

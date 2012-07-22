@@ -4,13 +4,12 @@
  */
 package net.truevfs.comp.zip.driver;
 
+import de.schlichtherle.truecommons.logging.LocalizedLogger;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.Deflater;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
@@ -33,6 +32,7 @@ import net.truevfs.kernel.spec.util.HashMaps;
 import net.truevfs.keymgr.spec.KeyManagerContainer;
 import net.truevfs.keymgr.spec.KeyProvider;
 import net.truevfs.keymgr.spec.sl.KeyManagerMapLocator;
+import org.slf4j.Logger;
 
 /**
  * An abstract archive driver for the ZIP file format.
@@ -46,9 +46,8 @@ public abstract class AbstractZipDriver
 extends FsArchiveDriver<AbstractZipDriverEntry>
 implements ZipOutputStreamParameters, ZipFileParameters<AbstractZipDriverEntry> {
 
-    private static final Logger logger = Logger.getLogger(
-            AbstractZipDriver.class.getName(),
-            AbstractZipDriver.class.getName());
+    private static final Logger
+            logger = new LocalizedLogger(AbstractZipDriver.class);
 
     /**
      * {@inheritDoc}
@@ -320,11 +319,10 @@ implements ZipOutputStreamParameters, ZipFileParameters<AbstractZipDriverEntry> 
         try {
             zis.recoverLostEntries();
         } catch (final IOException ex) {
-            logger.log(Level.WARNING, "junkInTheTrunk.warning", new Object[] {
+            logger.warn("junkInTheTrunk.warning", 
                 mountPointUri(model),
-                zis.getPostambleLength(),
-            });
-            logger.log(Level.FINE, "junkInTheTrunk.fine", ex);
+                zis.getPostambleLength());
+            logger.debug("junkInTheTrunk.debug", ex);
         }
         return zis;
     }
