@@ -45,8 +45,7 @@ abstract class KeyPanel extends EnhancedPanel {
 
     private void runFeedback() {
         final Feedback feedback = getFeedback();
-        if (null != feedback)
-            feedback.run(this);
+        if (null != feedback) feedback.run(this);
     }
 
     /**

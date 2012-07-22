@@ -5,11 +5,6 @@
 package net.truevfs.keymgr.swing;
 
 import de.schlichtherle.truecommons.services.Loader;
-import net.truevfs.keymgr.swing.feedback.BasicInvalidKeyFeedback;
-import net.truevfs.keymgr.swing.feedback.BasicUnknownKeyFeedback;
-import net.truevfs.keymgr.swing.feedback.InvalidKeyFeedback;
-import net.truevfs.keymgr.swing.feedback.UnknownKeyFeedback;
-import net.truevfs.keymgr.swing.util.Windows;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.io.*;
@@ -27,6 +22,11 @@ import net.truevfs.keymgr.spec.UnknownKeyException;
 import net.truevfs.keymgr.spec.param.KeyStrength;
 import net.truevfs.keymgr.spec.param.SafePbeParameters;
 import net.truevfs.keymgr.spec.param.SafePbeParametersView;
+import net.truevfs.keymgr.swing.feedback.BasicInvalidKeyFeedback;
+import net.truevfs.keymgr.swing.feedback.BasicUnknownKeyFeedback;
+import net.truevfs.keymgr.swing.feedback.InvalidKeyFeedback;
+import net.truevfs.keymgr.swing.feedback.UnknownKeyFeedback;
+import net.truevfs.keymgr.swing.util.Windows;
 
 /**
  * A Swing based user interface for prompting for passwords or key files.
@@ -152,7 +152,7 @@ extends SafePbeParametersView<P> {
             // loop iteration has to be repeated due to an invalid
             // user input.
             keyPanel.setResource(resource);
-            keyPanel.setFeedback(keyPanel.getError() != null
+            keyPanel.setFeedback(null != keyPanel.getError()
                     ? getInvalidKeyFeedback()
                     : getUnknownKeyFeedback());
 

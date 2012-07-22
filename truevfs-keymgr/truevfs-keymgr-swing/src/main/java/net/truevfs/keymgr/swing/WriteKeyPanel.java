@@ -29,7 +29,7 @@ import net.truevfs.keymgr.spec.param.SafePbeParameters;
  *
  * @author Christian Schlichtherle
  */
-class WriteKeyPanel extends KeyPanel {
+final class WriteKeyPanel extends KeyPanel {
 
     private static final long serialVersionUID = 6416529465492387235L;
     private static final String CLASS_NAME = WriteKeyPanel.class.getName();

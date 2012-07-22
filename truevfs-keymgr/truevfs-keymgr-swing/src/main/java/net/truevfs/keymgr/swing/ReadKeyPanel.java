@@ -32,7 +32,7 @@ import net.truevfs.keymgr.spec.param.SafePbeParameters;
  *
  * @author Christian Schlichtherle
  */
-public class ReadKeyPanel extends KeyPanel {
+final class ReadKeyPanel extends KeyPanel {
 
     private static final long serialVersionUID = 984673974236493651L;
     private static final String CLASS_NAME = ReadKeyPanel.class.getName();
@@ -42,7 +42,7 @@ public class ReadKeyPanel extends KeyPanel {
     private final Color defaultForeground;
     
     /** Constructs a new read key panel. */
-    public ReadKeyPanel() {
+    ReadKeyPanel() {
         initComponents();
         final DocumentListener dl = new DocumentListener() {
             @Override

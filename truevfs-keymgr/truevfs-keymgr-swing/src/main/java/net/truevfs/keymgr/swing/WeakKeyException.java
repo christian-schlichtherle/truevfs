@@ -12,7 +12,7 @@ import javax.annotation.CheckForNull;
  *
  * @author  Christian Schlichtherle
  */
-public class WeakKeyException extends GeneralSecurityException {
+final class WeakKeyException extends GeneralSecurityException {
     private static final long serialVersionUID = 2946387652018652745L;
 
     /**
