@@ -3,8 +3,7 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Provides classes to instrument the TrueVFS Kernel with
- * {@code java.util.logging}.
+ * Instruments the TrueVFS Kernel for monitoring via SLF4J.
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
-package net.truevfs.ext.jul;
+package net.truevfs.ext.log;

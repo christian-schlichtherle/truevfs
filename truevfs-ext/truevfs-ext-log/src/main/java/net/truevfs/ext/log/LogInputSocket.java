@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.ext.jul;
+package net.truevfs.ext.log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,22 +17,22 @@ import net.truevfs.kernel.spec.cio.OutputSocket;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class JulInputSocket<E extends Entry>
+final class LogInputSocket<E extends Entry>
 extends InstrumentingInputSocket<E> {
 
-    JulInputSocket(JulDirector director, InputSocket<? extends E> model) {
+    LogInputSocket(LogDirector director, InputSocket<? extends E> model) {
         super(director, model);
     }
 
     @Override
     public InputStream stream(OutputSocket<? extends Entry> peer)
     throws IOException {
-        return new JulInputStream(socket(), peer);
+        return new LogInputStream(socket(), peer);
     }
 
     @Override
     public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
     throws IOException {
-        return new JulInputChannel(socket(), peer);
+        return new LogInputChannel(socket(), peer);
     }
 }
