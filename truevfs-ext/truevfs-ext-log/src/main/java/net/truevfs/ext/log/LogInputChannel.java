@@ -34,13 +34,13 @@ final class LogInputChannel extends ReadOnlyChannel {
     throws IOException {
         super(socket.channel(peer));
         this.socket = socket;
-        log("Random reading ");
+        log("Opened input channel for {}");
     }
 
     @Override
     public void close() throws IOException {
-        log("Closing ");
         channel.close();
+        log("Closed input channel for {}");
     }
 
     private void log(String message) {
@@ -50,9 +50,8 @@ final class LogInputChannel extends ReadOnlyChannel {
         } catch (final IOException ignore) {
             entry = null;
         }
-        if (entry instanceof IoBuffer<?>)
-            logger.debug(message + entry, new NeverThrowable());
-        else
-            logger.trace(message + entry, new NeverThrowable());
+        logger.debug(message, entry);
+        if (logger.isTraceEnabled())
+            logger.trace("Stack trace:", new NeverThrowable());
     }
 }

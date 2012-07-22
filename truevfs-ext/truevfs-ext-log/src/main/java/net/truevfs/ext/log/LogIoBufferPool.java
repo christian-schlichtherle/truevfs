@@ -34,13 +34,17 @@ extends InstrumentingIoBufferPool<B> {
     private final class JulIoBuffer extends InstrumentingIoBuffer {
         JulIoBuffer(IoBuffer<B> model) {
             super(model);
-            logger.debug("Allocated " + entry, new NeverThrowable());
+            logger.debug("Allocated I/O buffer {}", entry);
+            if (logger.isTraceEnabled())
+                logger.trace("Stack trace:", new NeverThrowable());
         }
 
         @Override
         public void release() throws IOException {
             entry.release();
-            logger.debug("Released " + entry, new NeverThrowable());
+            logger.debug("Released I/O buffer {}", entry);
+            if (logger.isTraceEnabled())
+                logger.trace("Stack trace:", new NeverThrowable());
         }
     } // JulIoBuffer
 }
