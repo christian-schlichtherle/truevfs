@@ -6,7 +6,6 @@ package net.truevfs.kernel.impl
 
 import java.util.concurrent.locks._
 import java.util.concurrent.locks.ReentrantReadWriteLock._
-import java.util.logging._
 import javax.annotation.concurrent._
 import net.truevfs.kernel.spec._
 import net.truevfs.kernel.spec.util._

@@ -4,16 +4,6 @@
  */
 package net.truevfs.comp.zip;
 
-import net.truevfs.comp.zip.ZipEntry;
-import net.truevfs.comp.zip.ZipEntryFactory;
-import net.truevfs.comp.zip.Crc32Exception;
-import net.truevfs.comp.zip.ZipFile;
-import net.truevfs.comp.zip.ZipOutputStream;
-import static net.truevfs.comp.zip.Constants.FORCE_ZIP64_EXT;
-import static net.truevfs.kernel.spec.util.ConcurrencyUtils.NUM_IO_THREADS;
-import net.truevfs.kernel.spec.util.ConcurrencyUtils.TaskFactory;
-import static net.truevfs.kernel.spec.util.ConcurrencyUtils.runConcurrent;
-import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
@@ -24,12 +14,17 @@ import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.WRITE;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import static net.truevfs.comp.zip.Constants.FORCE_ZIP64_EXT;
+import static net.truevfs.kernel.spec.util.ConcurrencyUtils.NUM_IO_THREADS;
+import net.truevfs.kernel.spec.util.ConcurrencyUtils.TaskFactory;
+import static net.truevfs.kernel.spec.util.ConcurrencyUtils.runConcurrent;
+import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Performs an integration test for reading and writing ZIP files.
@@ -39,7 +34,7 @@ import org.junit.Test;
 public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
 
     private static final Logger
-            logger = Logger.getLogger(ZipTestSuite.class.getName());
+            logger = LoggerFactory.getLogger(ZipTestSuite.class);
 
     protected static final String TEMP_FILE_PREFIX = "tzp";
 
@@ -88,7 +83,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
         try {
             deleteIfExists(file);
         } catch (final IOException ex) {
-            logger.log(Level.FINEST,
+            logger.trace(
                     "Failed to clean up test file (this may be just an aftermath):",
                     ex);
         }

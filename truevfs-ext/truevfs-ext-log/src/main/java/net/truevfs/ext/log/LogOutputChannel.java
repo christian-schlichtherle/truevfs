@@ -10,7 +10,6 @@ import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.cio.Entry;
 import net.truevfs.kernel.spec.cio.InputSocket;
-import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.OutputSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

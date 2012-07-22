@@ -17,8 +17,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 import net.truevfs.kernel.driver.mock.MockController;
 import static net.truevfs.kernel.spec.FsAccessOptions.NONE;
@@ -32,6 +30,8 @@ import net.truevfs.kernel.spec.util.BitField;
 import static net.truevfs.kernel.spec.util.Throwables.contains;
 import static org.junit.Assert.*;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @param  <E> The type of the archive entries.
@@ -44,7 +44,7 @@ public abstract class FsArchiveDriverTestSuite<
 extends FsArchiveDriverTestBase<D> {
 
     private static final Logger
-            logger = Logger.getLogger(FsArchiveDriverTestSuite.class.getName());
+            logger = LoggerFactory.getLogger(FsArchiveDriverTestSuite.class);
 
     private static final FsEntryName
             entry = FsEntryName.create(URI.create("archive"));
@@ -117,7 +117,7 @@ extends FsArchiveDriverTestBase<D> {
         final IoBufferPool<?> p1 = getArchiveDriver().getPool();
         final IoBufferPool<?> p2 = getArchiveDriver().getPool();
         if (p1 != p2)
-            logger.log(Level.WARNING, "{0} returns different I/O buffer pools upon multiple invocations of getPool()!", getArchiveDriver().getClass());
+            logger.warn("{} returns different I/O buffer pools upon multiple invocations of getPool()!", getArchiveDriver().getClass());
     }
 
     /*@Test(expected = NullPointerException.class)
@@ -312,7 +312,7 @@ extends FsArchiveDriverTestBase<D> {
                 channel = input.channel(null);
             } catch (final UnsupportedOperationException ex) {
                 channel = null;
-                logger.log(Level.FINE,
+                logger.debug(
                         input.getClass()
                             + " does not support newChannel().",
                         ex);

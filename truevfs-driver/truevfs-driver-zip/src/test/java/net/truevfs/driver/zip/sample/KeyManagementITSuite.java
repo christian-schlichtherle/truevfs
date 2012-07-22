@@ -7,14 +7,14 @@ package net.truevfs.driver.zip.sample;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.truevfs.access.*;
 import net.truevfs.kernel.spec.FsSyncException;
 import org.junit.After;
 import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Schlichtherle
@@ -22,7 +22,7 @@ import org.junit.Test;
 public abstract class KeyManagementITSuite {
 
     private static final Logger
-            logger = Logger.getLogger(KeyManagementITSuite.class.getName());
+            logger = LoggerFactory.getLogger(KeyManagementITSuite.class);
 
     private static final String PREFIX = "tzp";
     private static final String EXTENSION = "eaff";
@@ -58,7 +58,7 @@ public abstract class KeyManagementITSuite {
                     throw new IOException(temp + " (could not delete)");
             }
         } catch (final IOException ex) {
-            logger.log(Level.FINEST,
+            logger.trace(
                     "Failed to clean up test file (this may be just an aftermath):",
                     ex);
         }

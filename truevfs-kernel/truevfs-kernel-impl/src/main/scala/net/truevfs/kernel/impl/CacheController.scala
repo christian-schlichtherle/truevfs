@@ -5,9 +5,9 @@
 package net.truevfs.kernel.impl
 
 import de.schlichtherle.truecommons.io._
+import de.schlichtherle.truecommons.logging._
 import java.io._
 import java.nio.channels._
-import java.util.logging._
 import javax.annotation.concurrent._
 import net.truevfs.kernel.spec._
 import net.truevfs.kernel.spec.FsAccessOption._
@@ -114,7 +114,7 @@ private trait CacheController extends Controller[LockModel] {
     assert(writeLockedByCurrentThread)
     var preSyncEx: NeedsSyncException = null
     do {
-      preSyncEx = null;
+      preSyncEx = null
       try {
           preSync(options)
       } catch {
@@ -145,8 +145,8 @@ private trait CacheController extends Controller[LockModel] {
           // So instead, the current thread will now attempt to resolve
           // the invalid state by sync()ing the target archive controller
           // before preSync()ing the cache again.
-          logger.log(Level.FINE, "recovering", invalidState);
-          preSyncEx = invalidState; // trigger another iteration
+          logger debug ("recovering", invalidState)
+          preSyncEx = invalidState // trigger another iteration
       }
       super.sync(options.clear(CLEAR_CACHE))
     } while (null ne preSyncEx)
@@ -347,7 +347,7 @@ private trait CacheController extends Controller[LockModel] {
                           // Let's log the sync exception - mind that it has
                           // suppressed the mknod exception - and continue
                           // anyway...
-                          logger log (Level.FINE, "ignoring", syncEx)
+                          logger debug ("ignoring", syncEx)
                           break
                       }
                   }
@@ -362,7 +362,5 @@ private trait CacheController extends Controller[LockModel] {
 }
 
 private object CacheController {
-  private val logger = Logger.getLogger(
-    classOf[CacheController].getName,
-    classOf[CacheController].getName);
+  private val logger = new LocalizedLogger(classOf[CacheController]);
 }

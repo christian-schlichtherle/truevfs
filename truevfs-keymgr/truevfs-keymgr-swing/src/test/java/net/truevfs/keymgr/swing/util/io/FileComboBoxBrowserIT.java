@@ -4,8 +4,6 @@
  */
 package net.truevfs.keymgr.swing.util.io;
 
-import net.truevfs.keymgr.swing.util.JemmyUtils;
-import net.truevfs.keymgr.swing.util.io.FileComboBoxBrowser;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -14,13 +12,15 @@ import java.text.Collator;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.JComboBox;
+import net.truevfs.keymgr.swing.util.JemmyUtils;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.netbeans.jemmy.operators.JFrameOperator;
 import org.netbeans.jemmy.operators.JTextComponentOperator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Schlichtherle
@@ -28,7 +28,7 @@ import org.netbeans.jemmy.operators.JTextComponentOperator;
 public final class FileComboBoxBrowserIT extends JemmyUtils {
 
     private static final Logger
-            logger = Logger.getLogger(FileComboBoxBrowserIT.class.getName());
+            logger = LoggerFactory.getLogger(FileComboBoxBrowserIT.class);
 
     @Test
     public void testDirectory() {
@@ -72,7 +72,7 @@ public final class FileComboBoxBrowserIT extends JemmyUtils {
     private void assertAutoCompletion(final File dir) {
         final String[] entries = dir.list();
         if (0 == entries.length) {
-            logger.warning("Current directory does not contain any files - skipping test!");
+            logger.warn("Current directory does not contain any files - skipping test!");
             return;
         }
 

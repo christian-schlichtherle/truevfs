@@ -21,8 +21,6 @@ import java.nio.file.spi.FileSystemProvider;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.spec.FsAccessOption;
@@ -37,6 +35,7 @@ import net.truevfs.kernel.spec.cio.InputSocket;
 import net.truevfs.kernel.spec.cio.IoSockets;
 import net.truevfs.kernel.spec.cio.OutputSocket;
 import net.truevfs.kernel.spec.util.BitField;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link FileSystemProvider} implementation
@@ -102,9 +101,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
         synchronized (TFileSystemProvider.class) {
             providers.put(scheme, this);
         }
-        Logger  .getLogger( TFileSystemProvider.class.getName(),
-                            TFileSystemProvider.class.getName())
-                .log(Level.CONFIG, "installed");
+        LoggerFactory.getLogger(TFileSystemProvider.class).debug("installed");
     }
 
     private TFileSystemProvider(final String scheme, final URI root) {

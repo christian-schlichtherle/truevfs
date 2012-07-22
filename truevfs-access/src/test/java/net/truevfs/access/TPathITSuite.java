@@ -13,8 +13,6 @@ import java.nio.file.*;
 import java.nio.file.attribute.FileTime;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static net.truevfs.kernel.spec.FsAccessOption.GROW;
 import net.truevfs.kernel.spec.FsArchiveDriver;
 import net.truevfs.kernel.spec.FsResourceOpenException;
@@ -33,6 +31,8 @@ import static net.truevfs.kernel.spec.util.ConcurrencyUtils.runConcurrent;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Performs integration testing of a particular {@link FsArchiveDriver}
@@ -46,7 +46,7 @@ public abstract class TPathITSuite<D extends FsArchiveDriver<?>>
 extends ConfiguredClientTestBase<D> {
 
     private static final Logger
-            logger = Logger.getLogger(TPathITSuite.class.getName());
+            logger = LoggerFactory.getLogger(TPathITSuite.class);
 
     /**
      * The prefix for temporary files, which is {@value}.
@@ -80,7 +80,7 @@ extends ConfiguredClientTestBase<D> {
                     delete(temp);                
             }
         } catch (final IOException ex) {
-            logger.log(Level.FINEST,
+            logger.trace(
                     "Failed to clean up test file (this may be just an aftermath):",
                     ex);
         } finally {
@@ -550,7 +550,7 @@ extends ConfiguredClientTestBase<D> {
         } catch (final FsSyncException ex) {
             if (!(ex.getCause() instanceof FsResourceOpenException))
                 throw ex;
-            logger.log(Level.INFO,
+            logger.info(
                     getArchiveDriver().getClass()
                         + " does not support concurrent writing of different entries in the same archive file.",
                     ex);

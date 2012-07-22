@@ -6,12 +6,12 @@ package net.truevfs.kernel.spec.util;
 
 import net.truevfs.kernel.spec.util.UriEncoder.Encoding;
 import static net.truevfs.kernel.spec.util.UriEncoder.Encoding.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Schlichtherle
@@ -21,7 +21,7 @@ public class UriCodecTest {
     private static final BitField<Encoding>
             ENCODING_MASK = BitField.allOf(Encoding.class);
     private static final Logger
-            logger = Logger.getLogger(UriCodecTest.class.getName());
+            logger = LoggerFactory.getLogger(UriCodecTest.class);
 
     private UriEncoder encoder;
     private UriDecoder decoder;
@@ -71,7 +71,7 @@ public class UriCodecTest {
                 decoder.decode(test[0]);
                 fail();
             } catch (IllegalArgumentException ex) {
-                logger.log(Level.FINEST, ex.toString(), ex);
+                logger.trace("Stack trace:", ex);
             }
         }
     }

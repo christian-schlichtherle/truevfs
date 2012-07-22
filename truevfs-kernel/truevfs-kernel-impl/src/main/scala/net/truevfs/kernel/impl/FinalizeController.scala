@@ -5,10 +5,9 @@
 package net.truevfs.kernel.impl
 
 import de.schlichtherle.truecommons.io._
+import de.schlichtherle.truecommons.logging._
 import java.io._
 import java.nio.channels._
-import java.util.logging._
-import java.util.logging.Level._
 import javax.annotation.concurrent._
 import net.truevfs.kernel.spec._
 import net.truevfs.kernel.spec.cio._
@@ -52,9 +51,7 @@ private trait FinalizeController extends FsController[FsModel] {
 }
 
 private object FinalizeController {
-  private val logger = Logger.getLogger(
-    classOf[FinalizeController].getName,
-    classOf[FinalizeController].getName);
+  private val logger = new LocalizedLogger(classOf[FinalizeController])
 
   private trait FinalizeResource extends Closeable {
     @volatile var ioException: Option[IOException] = _ // accessed by finalizer thread!
@@ -71,18 +68,18 @@ private object FinalizeController {
     abstract override def finalize() {
       try {
         ioException match {
-          case Some(ex) => logger.log(FINER, "closeFailed", ex);
-          case None => logger.log(FINEST, "closeCleared");
+          case Some(ex) => logger debug ("closeFailed", ex)
+          case None => logger debug "closeCleared"
           case _ =>
             try {
-              super.close();
-              logger.log(FINE, "finalizeCleared");
+              super.close()
+              logger debug "finalizeCleared"
             } catch {
               case ex: ControlFlowException => // report and swallow
-                logger.log(WARNING, "finalizeFailed",
-                           new AssertionError("Unexpected control flow exception!", ex));
+                logger warn ("finalizeFailed",
+                           new AssertionError("Unexpected control flow exception!", ex))
               case ex: Throwable => // report and swallow
-                logger.log(INFO, "finalizeFailed", ex);
+                logger info ("finalizeFailed", ex)
             }
         }
       } finally {

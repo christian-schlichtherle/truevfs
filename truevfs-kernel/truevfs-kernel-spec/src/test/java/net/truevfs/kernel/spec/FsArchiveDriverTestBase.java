@@ -8,10 +8,9 @@ import edu.umd.cs.findbugs.annotations.OverrideMustInvoke;
 import edu.umd.cs.findbugs.annotations.When;
 import java.io.IOException;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.Before;
+import org.slf4j.LoggerFactory;
 
 /**
  * @param  <D> The type of the archive driver.
@@ -22,9 +21,8 @@ public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
     protected static final boolean ISOLATE_FS_MANAGER = Boolean.getBoolean(
             FsArchiveDriverTestBase.class.getPackage().getName() + ".isolateFsManager");
     static {
-        Logger  .getLogger(FsArchiveDriverTestBase.class.getName())
-                .log(   Level.CONFIG,
-                        "Isolate file system manager: {0}",
+        LoggerFactory  .getLogger(FsArchiveDriverTestBase.class)
+                .debug( "Isolate file system manager: {}",
                         ISOLATE_FS_MANAGER);
     }
 

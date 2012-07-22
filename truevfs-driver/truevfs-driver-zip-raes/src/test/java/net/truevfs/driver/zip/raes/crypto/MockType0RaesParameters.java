@@ -4,12 +4,12 @@
  */
 package net.truevfs.driver.zip.raes.crypto;
 
-import net.truevfs.keymgr.spec.param.AesKeyStrength;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.truevfs.keymgr.spec.param.AesKeyStrength;
 import static org.junit.Assert.assertTrue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Schlichtherle
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 public final class MockType0RaesParameters implements Type0RaesParameters {
 
     private static final Logger
-            logger = Logger.getLogger(MockType0RaesParameters.class.getName());
+            logger = LoggerFactory.getLogger(MockType0RaesParameters.class);
     private static final String PASSWD = "top secret";
     private static final AesKeyStrength[] keyStrengths = AesKeyStrength.values();
 
@@ -35,7 +35,7 @@ public final class MockType0RaesParameters implements Type0RaesParameters {
     public char[] getReadPassword(boolean invalid) {
         assertTrue(secondTry || !invalid);
         if (secondTry) {
-            logger.finest("First returned password was wrong, providing the right one now!");
+            logger.trace("First returned password was wrong, providing the right one now!");
             return PASSWD.toCharArray();
         } else {
             secondTry = true;
@@ -48,7 +48,7 @@ public final class MockType0RaesParameters implements Type0RaesParameters {
     @Override
     public AesKeyStrength getKeyStrength() {
         keyStrength = keyStrengths[rnd.nextInt(keyStrengths.length)];
-        logger.log(Level.FINEST, "Using {0} bits cipher key.", keyStrength.getBits());
+        logger.trace("Using {} bits cipher key.", keyStrength.getBits());
         return keyStrength;
     }
 

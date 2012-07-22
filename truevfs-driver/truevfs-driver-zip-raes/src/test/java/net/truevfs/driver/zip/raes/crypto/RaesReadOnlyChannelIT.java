@@ -15,8 +15,8 @@ import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import static java.nio.file.Files.*;
 import java.nio.file.Path;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Schlichtherle
@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 public final class RaesReadOnlyChannelIT extends ReadOnlyChannelITSuite {
 
     private static final Logger
-            logger = Logger.getLogger(RaesReadOnlyChannelIT.class.getName());
+            logger = LoggerFactory.getLogger(RaesReadOnlyChannelIT.class);
 
     private static RaesParameters newRaesParameters() {
         return new MockType0RaesParameters();
@@ -47,8 +47,8 @@ public final class RaesReadOnlyChannelIT extends ReadOnlyChannelITSuite {
                             }
                         });
                 Streams.copy(in, out);
-                logger.log(Level.FINEST,
-                        "Encrypted {0} bytes of random data using AES-{1}/CTR/Hmac-SHA-256/PKCS#12v1",
+                logger.trace(
+                        "Encrypted {} bytes of random data using AES-{1}/CTR/Hmac-SHA-256/PKCS#12v1",
                         new Object[]{ Files.size(plainFile), out.getKeyStrength().getBits() });
                 // Open cipherFile for random access decryption.
             } catch (final Throwable ex) {
@@ -80,7 +80,7 @@ public final class RaesReadOnlyChannelIT extends ReadOnlyChannelITSuite {
                     deleteIfExists(cipherFile);
             }
         } catch (final IOException ex) {
-            logger.log(Level.FINEST,
+            logger.trace(
                     "Failed to clean up test file (this may be just an aftermath):",
                     ex);
         }

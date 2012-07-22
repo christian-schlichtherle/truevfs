@@ -11,11 +11,11 @@ import java.io.*;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URISyntaxException;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Christian Schlichtherle
@@ -23,7 +23,7 @@ import org.junit.Test;
 public class FsSchemeTest {
 
     private static final Logger
-            logger = Logger.getLogger(FsSchemeTest.class.getName());
+            logger = LoggerFactory.getLogger(FsSchemeTest.class);
 
     @Test
     public void testSerialization() throws IOException, ClassNotFoundException {
@@ -50,7 +50,7 @@ public class FsSchemeTest {
                     oos.writeObject(original);
                 }
 
-                logger.log(Level.FINEST, "Number of serialized bytes: {0}", bos.size());
+                logger.trace("Number of serialized bytes: {}", bos.size());
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final Object clone;
@@ -70,7 +70,7 @@ public class FsSchemeTest {
                     enc.writeObject(original);
                 }
 
-                logger.log(Level.FINEST, bos.toString("UTF-8"));
+                logger.trace("XML String: {}", bos.toString("UTF-8"));
 
                 final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
                 final Object clone;

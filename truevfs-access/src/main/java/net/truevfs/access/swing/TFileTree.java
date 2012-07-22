@@ -4,8 +4,6 @@
  */
 package net.truevfs.access.swing;
 
-import net.truevfs.access.TFile;
-import net.truevfs.access.TFileComparator;
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,8 +11,6 @@ import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillClose;
@@ -27,6 +23,9 @@ import javax.swing.event.TreeExpansionListener;
 import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
+import net.truevfs.access.TFile;
+import net.truevfs.access.TFileComparator;
+import org.slf4j.LoggerFactory;
 
 /**
  * A custom {@link JTree} to browse files and directories.
@@ -263,9 +262,8 @@ public final class TFileTree extends JTree {
         try {
             mv(oldNode, node);
         } catch (IOException ex) {
-            Logger  .getLogger(TFileTree.class.getName())
-                    .log(Level.WARNING, ex.toString(), ex);
             Toolkit.getDefaultToolkit().beep();
+            LoggerFactory.getLogger(TFileTree.class).warn("Stack trace:", ex);
         }
     }
 
