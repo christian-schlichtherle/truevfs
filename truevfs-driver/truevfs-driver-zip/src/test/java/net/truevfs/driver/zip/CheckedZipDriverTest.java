@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.zip;
 
-import net.truevfs.driver.zip.core.AbstractZipDriverEntry;
+import net.truevfs.comp.zip.driver.AbstractZipDriverEntry;
 import net.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 import net.truevfs.kernel.spec.TestConfig;
 import net.truevfs.kernel.spec.cio.IoBuffer;

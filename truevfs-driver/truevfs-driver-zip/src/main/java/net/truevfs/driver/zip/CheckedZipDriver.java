@@ -5,8 +5,8 @@
 package net.truevfs.driver.zip;
 
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.driver.zip.core.AbstractZipDriverEntry;
-import net.truevfs.driver.zip.core.ZipInputService;
+import net.truevfs.comp.zip.driver.AbstractZipDriverEntry;
+import net.truevfs.comp.zip.driver.ZipInputService;
 
 /**
  * An archive driver for ZIP files which checks the CRC32 values for all

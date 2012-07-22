@@ -18,7 +18,11 @@
     <packaging>pom</packaging>
 
     <name>TrueVFS Profile</name>
-    <description>Parent POM for configuration profiles.</description>
+    <description>
+        Profiles bundle some other TrueVFS modules to enable using them as a
+        single all-in-one dependency of client applications.
+        Profiles do NOT provide any additional functionality.
+    </description>
 
     <modules>
         <module>truevfs-profile-base</module>

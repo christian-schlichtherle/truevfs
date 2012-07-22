@@ -3,7 +3,9 @@
   - Copyright (C) 2005-2012 Schlichtherle IT Services.
   - All rights reserved. Use is subject to license terms.
   -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project    xmlns="http://maven.apache.org/POM/4.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -16,7 +18,12 @@
     <packaging>pom</packaging>
 
     <name>TrueVFS Driver</name>
-    <description>Parent POM for pluggable file system drivers.</description>
+    <description>
+        Drivers provide services to extend the TrueZIP Kernel with support for
+        a particular type of file system.
+        Drivers advertise their services on the class path in order to make
+        them locatable by the TrueZIP Kernel at runtime.
+    </description>
 
     <modules>
         <module>truevfs-driver-file</module>
@@ -26,7 +33,6 @@
         <module>truevfs-driver-sfx</module>
         <module>truevfs-driver-tar</module>
         <module>truevfs-driver-zip</module>
-        <module>truevfs-driver-zip-core</module>
         <module>truevfs-driver-zip-raes</module>
     </modules>
 
@@ -44,8 +50,8 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- All drivers depend on the JAR and the test JAR of the TrueVFS
-             Kernel. -->
+        <!-- All drivers depend on the TrueZIP Kernel and its test suite for
+             integration testing. -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-kernel-spec</artifactId>

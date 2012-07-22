@@ -6,9 +6,9 @@ package net.truevfs.driver.zip;
 
 import java.nio.charset.Charset;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.driver.zip.core.AbstractZipDriver;
-import net.truevfs.driver.zip.core.AbstractZipDriverEntry;
-import net.truevfs.driver.zip.core.io.ZipEntry;
+import net.truevfs.comp.zip.driver.AbstractZipDriver;
+import net.truevfs.comp.zip.driver.AbstractZipDriverEntry;
+import net.truevfs.comp.zip.ZipEntry;
 
 /**
  * An archive driver for ZIP files.

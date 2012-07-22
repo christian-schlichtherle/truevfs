@@ -40,6 +40,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-comp-zip</artifactId>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-driver-jar</artifactId>
         </dependency>
         <dependency>
@@ -51,12 +56,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-driver-zip</artifactId>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-driver-zip-core</artifactId>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
