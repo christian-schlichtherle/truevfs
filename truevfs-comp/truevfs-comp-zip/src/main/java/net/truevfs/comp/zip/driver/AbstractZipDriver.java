@@ -4,7 +4,7 @@
  */
 package net.truevfs.comp.zip.driver;
 
-import de.schlichtherle.truecommons.logging.LocalizedLogger;
+import de.schlichtherle.truecommons.log.LocalizedLogger;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.net.URI;

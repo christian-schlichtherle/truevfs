@@ -4,7 +4,7 @@
  */
 package net.truevfs.keymgr.swing;
 
-import de.schlichtherle.truecommons.logging.LocalizedLogger;
+import de.schlichtherle.truecommons.log.LocalizedLogger;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.WindowEvent;

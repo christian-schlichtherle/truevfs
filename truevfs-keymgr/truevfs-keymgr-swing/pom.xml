@@ -34,7 +34,7 @@ Swing based implementation of the KeyManager Specification.
         </dependency>
         <dependency>
             <groupId>de.schlichtherle.truecommons</groupId>
-            <artifactId>truecommons-logging</artifactId>
+            <artifactId>truecommons-log</artifactId>
         </dependency>
         <dependency>
             <groupId>org.netbeans</groupId>
