@@ -38,8 +38,7 @@ final class DummyByteChannelInputStream extends ChannelInputStream {
 
     @Override
     public int read(final byte[] buf, final int off, int len) throws IOException {
-        if (0 == len)
-            return 0;
+        if (0 == len) return 0;
         final int read = super.read(buf, off, len);
         if (read < len && !added) {
             added = true;
