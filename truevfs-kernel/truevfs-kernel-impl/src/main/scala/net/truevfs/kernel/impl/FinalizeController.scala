@@ -69,7 +69,7 @@ private object FinalizeController {
       try {
         ioException match {
           case Some(ex) => logger debug ("closeFailed", ex)
-          case None => logger debug "closeCleared"
+          case None => logger trace "closeCleared"
           case _ =>
             try {
               super.close()
