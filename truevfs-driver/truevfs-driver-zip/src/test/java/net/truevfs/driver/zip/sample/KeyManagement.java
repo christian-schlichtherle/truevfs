@@ -9,21 +9,21 @@ import java.util.Map;
 import javax.inject.Provider;
 import net.truevfs.access.TArchiveDetector;
 import net.truevfs.access.TConfig;
+import net.truevfs.component.zip.WinZipAesParameters;
+import net.truevfs.component.zip.ZipKeyException;
+import net.truevfs.component.zip.driver.AbstractZipDriverEntry;
 import net.truevfs.driver.zip.ZipDriver;
-import net.truevfs.comp.zip.driver.AbstractZipDriverEntry;
-import net.truevfs.comp.zip.WinZipAesParameters;
-import net.truevfs.comp.zip.ZipKeyException;
 import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsModel;
 import net.truevfs.kernel.spec.FsScheme;
-import net.truevfs.keymgr.spec.KeyManagerContainer;
-import net.truevfs.keymgr.spec.PromptingKeyManagerContainer;
-import net.truevfs.keymgr.spec.PromptingKeyProvider.Controller;
-import net.truevfs.keymgr.spec.PromptingKeyProvider.View;
-import net.truevfs.keymgr.spec.UnknownKeyException;
-import net.truevfs.keymgr.spec.param.AesKeyStrength;
-import net.truevfs.keymgr.spec.param.AesPbeParameters;
+import net.truevfs.keymanager.spec.KeyManagerContainer;
+import net.truevfs.keymanager.spec.PromptingKeyManagerContainer;
+import net.truevfs.keymanager.spec.PromptingKeyProvider.Controller;
+import net.truevfs.keymanager.spec.PromptingKeyProvider.View;
+import net.truevfs.keymanager.spec.UnknownKeyException;
+import net.truevfs.keymanager.spec.param.AesKeyStrength;
+import net.truevfs.keymanager.spec.param.AesPbeParameters;
 
 /**
  * Provides static utility methods to set passwords for WinZip AES encrypted

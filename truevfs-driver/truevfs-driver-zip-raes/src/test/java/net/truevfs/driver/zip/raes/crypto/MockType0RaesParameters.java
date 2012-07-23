@@ -6,7 +6,7 @@ package net.truevfs.driver.zip.raes.crypto;
 
 import java.util.Random;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.truevfs.keymgr.spec.param.AesKeyStrength;
+import net.truevfs.keymanager.spec.param.AesKeyStrength;
 import static org.junit.Assert.assertTrue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

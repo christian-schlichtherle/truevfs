@@ -9,7 +9,7 @@ import java.nio.charset.Charset;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.comp.zip.driver.AbstractZipDriverEntry;
+import net.truevfs.component.zip.driver.AbstractZipDriverEntry;
 import net.truevfs.driver.zip.ZipDriver;
 import net.truevfs.kernel.spec.*;
 import net.truevfs.kernel.spec.cio.InputService;

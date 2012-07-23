@@ -8,9 +8,9 @@ import java.io.IOException;
 import net.truevfs.access.TFile;
 import net.truevfs.access.TFileITSuite;
 import net.truevfs.driver.zip.raes.TestZipRaesDriver;
-import net.truevfs.keymgr.spec.MockView.Action;
-import static net.truevfs.keymgr.spec.MockView.Action.CANCEL;
-import static net.truevfs.keymgr.spec.MockView.Action.ENTER;
+import net.truevfs.keymanager.spec.MockView.Action;
+import static net.truevfs.keymanager.spec.MockView.Action.CANCEL;
+import static net.truevfs.keymanager.spec.MockView.Action.ENTER;
 import static org.junit.Assert.*;
 import org.junit.Test;
 

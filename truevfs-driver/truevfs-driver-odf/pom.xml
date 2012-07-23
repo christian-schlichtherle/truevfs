@@ -38,7 +38,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-comp-zip</artifactId>
+            <artifactId>truevfs-component-zip</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>

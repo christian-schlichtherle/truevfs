@@ -7,10 +7,10 @@ package net.truevfs.driver.zip;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import net.truevfs.keymgr.spec.AbstractKeyManagerContainer;
-import net.truevfs.keymgr.spec.KeyManager;
-import net.truevfs.keymgr.spec.MockView;
-import net.truevfs.keymgr.spec.param.AesPbeParameters;
+import net.truevfs.keymanager.spec.AbstractKeyManagerContainer;
+import net.truevfs.keymanager.spec.KeyManager;
+import net.truevfs.keymanager.spec.MockView;
+import net.truevfs.keymanager.spec.param.AesPbeParameters;
 
 /**
  * @author Christian Schlichtherle

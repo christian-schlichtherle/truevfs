@@ -40,7 +40,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-comp-zip</artifactId>
+            <artifactId>truevfs-component-zip</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>
@@ -61,7 +61,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-keymgr-spec</artifactId>
+            <artifactId>truevfs-keymanager-spec</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>
