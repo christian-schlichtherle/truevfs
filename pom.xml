@@ -278,6 +278,11 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-keymgr-swing-feedback-hurl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-profile-base</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>

@@ -4,12 +4,12 @@
 package ${package}.java.path;
 
 import ${package}.java.Application;
-import net.truevfs.access.TConfig;
-import net.truevfs.access.TPath;
 import java.io.IOException;
 import java.nio.file.Files;
 import static java.nio.file.StandardCopyOption.COPY_ATTRIBUTES;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import net.truevfs.access.TConfig;
+import net.truevfs.access.TPath;
 
 /**
  * This command line utility non-recursively copies the first file or directory

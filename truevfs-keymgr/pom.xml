@@ -25,5 +25,6 @@
         <module>truevfs-keymgr-console</module>
         <module>truevfs-keymgr-spec</module>
         <module>truevfs-keymgr-swing</module>
+        <module>truevfs-keymgr-swing-feedback-hurl</module>
     </modules>
 </project>

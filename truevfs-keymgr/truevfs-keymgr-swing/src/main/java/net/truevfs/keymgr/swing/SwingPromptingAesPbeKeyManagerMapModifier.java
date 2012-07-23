@@ -27,9 +27,9 @@ extends KeyManagerMapModifier {
         return map;
     }
 
-    /** @return zero if the graphics environment is available, -100 otherwise. */
+    /** @return zero if the graphics environment is available, -200 otherwise. */
     @Override
     public int getPriority() {
-        return GraphicsEnvironment.isHeadless() ? -100 : 0;
+        return GraphicsEnvironment.isHeadless() ? -200 : 0;
     }
 }

@@ -4,9 +4,9 @@
  */
 package net.truevfs.keymgr.spec;
 
-import net.truevfs.keymgr.spec.util.SuspensionPenalty;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
+import net.truevfs.keymgr.spec.util.SuspensionPenalty;
 
 /**
  * Provides the base functionality required to implement a "safe" key provider.

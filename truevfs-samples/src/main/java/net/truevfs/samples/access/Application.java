@@ -7,8 +7,6 @@ package net.truevfs.samples.access;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import net.truevfs.access.TApplication;
-import net.truevfs.keymgr.swing.feedback.HurlingWindowFeedback;
-import net.truevfs.keymgr.swing.feedback.InvalidKeyFeedback;
 
 /**
  * Abstract base class for command line utilities.
@@ -52,21 +50,6 @@ public abstract class Application extends TApplication<RuntimeException> {
         this.err = err instanceof PrintStream
                 ? (PrintStream) err
                 : new PrintStream(err, autoFlush);
-    }
-
-    /**
-     * Configures the type of the feedback when prompting the user for keys
-     * for RAES encrypted ZIP alias ZIP.RAES alias TZP files by the Swing
-     * based prompting key manager.
-     * If this JVM is running in headless mode, then this configuration is
-     * ignored and the user is prompted by the console I/O based prompting
-     * key manager.
-     */
-    @Override
-    protected void setup() {
-        String spec = InvalidKeyFeedback.class.getName();
-        String impl = HurlingWindowFeedback.class.getName();
-        System.setProperty(spec, System.getProperty(spec, impl));
     }
 
     /**

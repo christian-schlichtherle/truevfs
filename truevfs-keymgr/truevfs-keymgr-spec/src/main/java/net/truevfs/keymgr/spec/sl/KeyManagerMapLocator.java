@@ -28,7 +28,8 @@ import net.truevfs.keymgr.spec.spi.KeyManagerMapModifier;
 public final class KeyManagerMapLocator extends AbstractKeyManagerContainer {
 
     /** The singleton instance of this class. */
-    public static final KeyManagerMapLocator SINGLETON = new KeyManagerMapLocator();
+    public static final KeyManagerMapLocator
+            SINGLETON = new KeyManagerMapLocator();
 
     private KeyManagerMapLocator() { }
 

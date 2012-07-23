@@ -7,7 +7,7 @@ package net.truevfs.kernel.spec.spi;
 import de.schlichtherle.truecommons.services.FactoryService;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsScheme;
 import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
@@ -22,7 +22,7 @@ import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
+@Immutable
 public final class FsDriverMapFactory
 extends FactoryService<Map<FsScheme, FsDriver>> {
 

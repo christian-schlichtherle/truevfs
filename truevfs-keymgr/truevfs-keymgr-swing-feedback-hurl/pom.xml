@@ -11,27 +11,23 @@
 
     <parent>
         <groupId>de.schlichtherle.truevfs</groupId>
-        <artifactId>truevfs-archetype</artifactId>
+        <artifactId>truevfs-keymgr</artifactId>
         <version>1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truevfs-archetype-access</artifactId>
-    <packaging>maven-archetype</packaging>
+    <artifactId>truevfs-keymgr-swing-feedback-hurl</artifactId>
 
-    <name>TrueVFS Archetype Access</name>
-    <description>Showcases the client API of the module TrueZIP Access - requires JSE 7.</description>
+    <name>TrueVFS KeyManager Swing Feedback Hurl</name>
+    <description>
+        Provides feedback by hurling the containing window for 1.5 seconds
+        when prompting for a key again after an invalid key has been provided
+        before.
+    </description>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-profile-default</artifactId>
-            <type>pom</type>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-keymgr-swing-feedback-hurl</artifactId>
-            <optional>true</optional>
+            <artifactId>truevfs-keymgr-swing</artifactId>
         </dependency>
     </dependencies>
 </project>

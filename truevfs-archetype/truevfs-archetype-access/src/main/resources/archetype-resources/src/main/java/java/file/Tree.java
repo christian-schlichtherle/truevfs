@@ -4,10 +4,10 @@
 package ${package}.java.file;
 
 import ${package}.java.Application;
-import net.truevfs.access.TFile;
-import net.truevfs.kernel.spec.FsSyncException;
 import java.io.File;
 import java.util.Arrays;
+import net.truevfs.access.TFile;
+import net.truevfs.kernel.spec.FsSyncException;
 
 /**
  * This command line utility prints the tree graph of the directory structure

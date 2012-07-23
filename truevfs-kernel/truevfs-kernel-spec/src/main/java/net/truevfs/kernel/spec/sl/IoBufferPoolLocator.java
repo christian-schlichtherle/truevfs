@@ -13,9 +13,12 @@ import net.truevfs.kernel.spec.spi.IoBufferPoolDecorator;
 import net.truevfs.kernel.spec.spi.IoBufferPoolFactory;
 
 /**
- * Uses a {@link Locator} to resolve the singleton I/O buffer pool from
- * instances of the factory service class {@link IoBufferPoolFactory} and the
- * decorator service class {@link IoBufferPoolDecorator}.
+ * A container of the singleton I/O buffer pool.
+ * The I/O buffer pool is created by using a {@link Locator} to search for
+ * advertised implementations of the factory service specification class
+ * {@link IoBufferPoolFactory}
+ * and the decorator service specification class
+ * {@link IoBufferPoolDecorator}.
  *
  * @author Christian Schlichtherle
  */

@@ -14,9 +14,9 @@ import net.truevfs.keymgr.spec.SafeKeyProvider;
 import static net.truevfs.keymgr.spec.SafeKeyProvider.MIN_KEY_RETRY_DELAY;
 
 /**
- * Provides feedback by beeping using the default toolkit and disabling the
- * default button in the root pane for {@link SafeKeyProvider#MIN_KEY_RETRY_DELAY}
- * milliseconds when prompting for a key and the last input was invalid.
+ * Provides feedback by disabling the default button of the root pane for
+ * {@link SafeKeyProvider#MIN_KEY_RETRY_DELAY} milliseconds when prompting for
+ * a key and the last input was invalid.
  * <p>
  * Note that the root pane is normally the root pane of a parent
  * {@link JOptionPane} which has the OK button set as its default button.
@@ -24,35 +24,20 @@ import static net.truevfs.keymgr.spec.SafeKeyProvider.MIN_KEY_RETRY_DELAY;
  *
  * @author Christian Schlichtherle
  */
-public class BasicInvalidKeyFeedback
-extends BasicFeedback
-implements InvalidKeyFeedback {
+final class TemporarilyDisableDefaultButtonFeedback
+extends DecoratingFeedback implements Feedback {
 
-    private final int duration;
-
-    public BasicInvalidKeyFeedback() {
-        this(MIN_KEY_RETRY_DELAY);
-    }
-
-    /**
-     * Constructs a new feedback.
-     *
-     * @param duration the duration for disabling the default button in the
-     *        root pane in milliseconds.
-     * @throws IllegalArgumentException if the duration is not positive.
-     */
-    protected BasicInvalidKeyFeedback(int duration) {
-        if (0 >= (this.duration = duration))
-            throw new IllegalArgumentException();
+    TemporarilyDisableDefaultButtonFeedback(Feedback feedback) {
+        super(feedback);
     }
 
     @Override
     public void run(JPanel panel) {
-        super.run(panel);
+        feedback.run(panel);
         final JButton b = panel.getRootPane().getDefaultButton();
         if (null == b) return;
         b.setEnabled(false);
-        final Timer t = new Timer(duration, new ActionListener() {
+        final Timer t = new Timer(MIN_KEY_RETRY_DELAY, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 b.setEnabled(true);
