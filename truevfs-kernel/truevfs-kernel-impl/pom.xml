@@ -33,10 +33,6 @@
             <type>test-jar</type>
         </dependency>
         <dependency>
-            <groupId>de.schlichtherle.truecommons</groupId>
-            <artifactId>truecommons-log</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
         </dependency>
