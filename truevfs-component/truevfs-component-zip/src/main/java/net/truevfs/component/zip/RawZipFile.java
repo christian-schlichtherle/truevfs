@@ -30,7 +30,7 @@ import static net.truevfs.component.zip.WinZipAesEntryExtraField.VV_AE_2;
 import static net.truevfs.component.zip.WinZipAesUtils.overhead;
 import static net.truevfs.component.zip.ZipEntry.*;
 import static net.truevfs.component.zip.ZipParametersUtils.parameters;
-import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
+import net.truevfs.kernel.spec.util.HashMaps;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 /**
@@ -355,7 +355,7 @@ implements Closeable, Iterable<E> {
                 .allocate(CFH_MIN_LEN)
                 .littleEndian();
         final Map<String, E> entries = new LinkedHashMap<>(
-                Math.max(initialCapacity(numEntries), 16));
+                Math.max(HashMaps.initialCapacity(numEntries), 16));
         for (; ; numEntries--) {
             cfh.rewind().limit(4).load(channel);
             // central file header signature   4 bytes  (0x02014b50)

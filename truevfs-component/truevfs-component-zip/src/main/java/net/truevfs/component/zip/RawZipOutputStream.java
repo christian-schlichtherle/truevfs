@@ -29,7 +29,7 @@ import static net.truevfs.component.zip.WinZipAesEntryExtraField.VV_AE_2;
 import static net.truevfs.component.zip.WinZipAesUtils.overhead;
 import static net.truevfs.component.zip.ZipEntry.*;
 import static net.truevfs.component.zip.ZipParametersUtils.parameters;
-import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
+import net.truevfs.kernel.spec.util.HashMaps;
 import net.truevfs.keymanager.spec.param.AesKeyStrength;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
@@ -106,13 +106,13 @@ implements Iterable<E> {
                 this.charset = appendee.getRawCharset();
                 this.comment = appendee.getRawComment();
                 final Map<String, E> entries = new LinkedHashMap<>(
-                        initialCapacity(appendee.size() + param.getOverheadSize()));
+                        HashMaps.initialCapacity(appendee.size() + param.getOverheadSize()));
                 entries.putAll(appendee.getRawEntries());
                 this.entries = entries;
             } else {
                 this.charset = param.getCharset();
                 this.entries = new LinkedHashMap<>(
-                        initialCapacity(param.getOverheadSize()));
+                        HashMaps.initialCapacity(param.getOverheadSize()));
             }
             setMethod0(param.getMethod());
             setLevel0(param.getLevel());
