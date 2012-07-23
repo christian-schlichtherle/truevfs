@@ -70,7 +70,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<AbstractZipDriverEntry> 
      * @return {@link KeyManagerLocator#SINGLETON}, as by the implementation
      *         in the class {@link ZipDriver}.
      */
-    public KeyManagerContainer getKeyManagerProvider() {
+    public KeyManagerContainer getKeyManagerContainer() {
         return KeyManagerMapLocator.SINGLETON;
     }
 
@@ -89,7 +89,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<AbstractZipDriverEntry> 
      * client APIs, you must use {@link FsAccessOption#ENCRYPT}.
      * <p>
      * The implementation in the class {@link ZipDriver} returns
-     * {@code new KeyManagerZipCryptoParameters(getKeyManagerProvider(), mountPointUri(model), charset)}.
+     * {@code new KeyManagerZipCryptoParameters(this, model, charset)}.
      * 
      * @param  model the file system model.
      * @param  charset charset the character set used for encoding entry names

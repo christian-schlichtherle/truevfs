@@ -168,17 +168,17 @@ public final class KeyManagement {
     }
     
     private static final class CustomZipRaesDriver2 extends SafeZipRaesDriver {
-        final KeyManagerContainer provider;
+        final KeyManagerContainer container;
         
         CustomZipRaesDriver2(char[] password) {
-            this.provider = new PromptingKeyManagerContainer(
+            this.container = new PromptingKeyManagerContainer(
                     AesPbeParameters.class,
                     new CustomView(password));
         }
         
         @Override
-        public KeyManagerContainer getKeyManagerProvider() {
-            return provider;
+        public KeyManagerContainer getKeyManagerContainer() {
+            return container;
         }
     } // CustomZipRaesDriver2
     

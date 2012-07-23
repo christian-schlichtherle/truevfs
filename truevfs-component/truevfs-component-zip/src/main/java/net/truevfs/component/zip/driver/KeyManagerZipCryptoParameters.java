@@ -4,16 +4,12 @@
  */
 package net.truevfs.component.zip.driver;
 
-import net.truevfs.component.zip.ZipParameters;
-import net.truevfs.component.zip.ZipParametersProvider;
-import net.truevfs.component.zip.ZipKeyException;
-import net.truevfs.component.zip.ZipCryptoParameters;
-import net.truevfs.component.zip.WinZipAesParameters;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.ServiceConfigurationError;
 import javax.annotation.concurrent.ThreadSafe;
+import net.truevfs.component.zip.*;
 import net.truevfs.kernel.spec.FsModel;
 import net.truevfs.keymanager.spec.KeyManager;
 import net.truevfs.keymanager.spec.KeyManagerContainer;
@@ -69,9 +65,9 @@ implements ZipParametersProvider, ZipCryptoParameters {
      * {@inheritDoc}
      * <p>
      * If {@code type} is assignable from {@link WinZipAesParameters}, then a
-     * {@link KeyManager} for {@link AesPbeParameters} will getKeyManager used which
-     * is obtained from the {@link KeyManagerContainer provider} which has been
-     * provided to the constructor.
+     * {@link KeyManager} for {@link AesPbeParameters} will getKeyManager used
+     * which is obtained from the {@link AbstractZipDriver driver} which has
+     * been provided to the constructor.
      * <p>
      * Otherwise, {@code null} gets returned.
      */
@@ -116,7 +112,7 @@ implements ZipParametersProvider, ZipCryptoParameters {
     }
 
     private <K> KeyManager<K> keyManager(Class<K> type) {
-        final KeyManager<K> km = driver.getKeyManagerProvider().keyManager(type);
+        final KeyManager<K> km = driver.getKeyManagerContainer().keyManager(type);
         if (null == km)
             throw new ServiceConfigurationError("No key manager available for " + type + ".");
         return km;

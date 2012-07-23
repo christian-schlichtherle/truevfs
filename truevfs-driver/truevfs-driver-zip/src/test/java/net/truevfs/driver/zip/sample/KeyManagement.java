@@ -195,17 +195,17 @@ public final class KeyManagement {
     }
     
     private static final class CustomZipDriver2 extends ZipDriver {
-        final KeyManagerContainer provider;
+        final KeyManagerContainer container;
         
         CustomZipDriver2(char[] password) {
-            this.provider = new PromptingKeyManagerContainer(
+            this.container = new PromptingKeyManagerContainer(
                     AesPbeParameters.class,
                     new CustomView(password));
         }
         
         @Override
-        public KeyManagerContainer getKeyManagerProvider() {
-            return provider;
+        public KeyManagerContainer getKeyManagerContainer() {
+            return container;
         }
     } // CustomZipDriver2
     

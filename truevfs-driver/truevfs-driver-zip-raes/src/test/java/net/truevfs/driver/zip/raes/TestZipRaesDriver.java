@@ -16,7 +16,8 @@ import net.truevfs.keymanager.spec.param.AesPbeParameters;
  */
 public class TestZipRaesDriver extends SafeZipRaesDriver {
 
-    private final TestKeyManagerContainer service = new TestKeyManagerContainer();
+    private final TestKeyManagerContainer
+            container = new TestKeyManagerContainer();
 
     @Override
     public IoBufferPool<? extends IoBuffer<?>> getPool() {
@@ -24,11 +25,11 @@ public class TestZipRaesDriver extends SafeZipRaesDriver {
     }
     
     @Override
-    public TestKeyManagerContainer getKeyManagerProvider() {
-        return service;
+    public TestKeyManagerContainer getKeyManagerContainer() {
+        return container;
     }
 
     public MockView<AesPbeParameters> getView() {
-        return service.getView();
+        return container.getView();
     }
 }

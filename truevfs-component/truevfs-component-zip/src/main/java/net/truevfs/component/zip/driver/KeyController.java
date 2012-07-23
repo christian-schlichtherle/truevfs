@@ -36,7 +36,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     private static final String ROOT_PATH = ROOT.getPath();
 
     protected final D driver;
-    private volatile KeyManagerContainer provider;
+    private volatile KeyManagerContainer container;
 
     /**
      * Constructs a new key manager controller.
@@ -57,10 +57,10 @@ extends FsDecoratingController<M, FsController<? extends M>> {
     protected abstract Class<? extends IOException> getKeyExceptionType();
 
     private @CheckForNull KeyManager<?> getKeyManager() {
-        final KeyManagerContainer provider = this.provider;
-        return (null != provider
-                    ? provider
-                    : (this.provider = driver.getKeyManagerProvider()))
+        final KeyManagerContainer container = this.container;
+        return (null != container
+                    ? container
+                    : (this.container = driver.getKeyManagerContainer()))
                 .keyManager(getKeyType());
     }
 
