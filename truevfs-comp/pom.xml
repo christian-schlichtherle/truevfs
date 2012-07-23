@@ -21,8 +21,8 @@
     <description>
         Components provide some functionality to serve as a building block for
         other modules.
-        Unlike TrueZIP Driver or TrueZIP extension modules, components do NOT
-        advertise services on the class path.
+        Unlike TrueZIP Driver or TrueZIP Extension modules, components do NOT
+        advertise services for use by the TrueZIP Kernel on the class path.
     </description>
 
     <modules>
