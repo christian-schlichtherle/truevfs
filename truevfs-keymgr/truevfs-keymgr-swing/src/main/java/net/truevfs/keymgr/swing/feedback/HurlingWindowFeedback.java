@@ -64,10 +64,9 @@ public class HurlingWindowFeedback extends BasicInvalidKeyFeedback {
 
     @Override
     public void run(JPanel panel) {
-        final Window window = SwingUtilities.getWindowAncestor(panel);
         super.run(panel); // temporarily disable default button
-        if (null == window)
-            return;
+        final Window window = SwingUtilities.getWindowAncestor(panel);
+        if (null == window) return;
         final Point origin = window.getLocation();
         final long start = System.currentTimeMillis();
         final Timer timer = new Timer(1000 / fps, new ActionListener() {

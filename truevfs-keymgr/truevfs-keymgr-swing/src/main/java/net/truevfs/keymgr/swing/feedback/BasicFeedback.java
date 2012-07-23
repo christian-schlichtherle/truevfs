@@ -8,9 +8,9 @@ import java.awt.Toolkit;
 import javax.swing.JPanel;
 
 /**
- * Provides run by beeping using the default toolkit.
+ * Provides feedback by beeping using the default toolkit.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public class BasicFeedback implements Feedback {
 
