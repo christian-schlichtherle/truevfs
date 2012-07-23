@@ -37,26 +37,26 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-comp-ibm437</artifactId>
+            <artifactId>truevfs-component-ibm437</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-comp-zip</artifactId>
+            <artifactId>truevfs-component-zip</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-comp-zip</artifactId>
+            <artifactId>truevfs-component-zip</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-keymgr-spec</artifactId>
+            <artifactId>truevfs-keymanager-spec</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>de.schlichtherle.truecommons</groupId>
-            <artifactId>truecommons-log</artifactId>
+            <artifactId>truecommons-logging</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

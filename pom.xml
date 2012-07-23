@@ -123,11 +123,11 @@ system space.
     <modules>
         <module>truevfs-access</module>
         <module>truevfs-archetype</module>
-        <module>truevfs-comp</module>
+        <module>truevfs-component</module>
         <module>truevfs-driver</module>
-        <module>truevfs-ext</module>
+        <module>truevfs-extension</module>
         <module>truevfs-kernel</module>
-        <module>truevfs-keymgr</module>
+        <module>truevfs-keymanager</module>
         <module>truevfs-profile</module>
         <module>truevfs-samples</module>
     </modules>
@@ -148,22 +148,22 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-comp-ibm437</artifactId>
+                <artifactId>truevfs-component-ibm437</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-comp-inst</artifactId>
+                <artifactId>truevfs-component-instrumentation</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-comp-zip</artifactId>
+                <artifactId>truevfs-component-zip</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-comp-zip</artifactId>
+                <artifactId>truevfs-component-zip</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
@@ -224,17 +224,17 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-ext-jmx</artifactId>
+                <artifactId>truevfs-extension-jmx</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-ext-log</artifactId>
+                <artifactId>truevfs-extension-logging</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-ext-pace</artifactId>
+                <artifactId>truevfs-extension-pacemanager</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -256,29 +256,29 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-keymgr-console</artifactId>
+                <artifactId>truevfs-keymanager-console</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-keymgr-spec</artifactId>
+                <artifactId>truevfs-keymanager-spec</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-keymgr-spec</artifactId>
+                <artifactId>truevfs-keymanager-spec</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-keymgr-swing</artifactId>
+                <artifactId>truevfs-keymanager-swing</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-keymgr-swing-feedback-hurl</artifactId>
+                <artifactId>truevfs-keymanager-swing-feedback-hurl</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -323,7 +323,7 @@ system space.
             </dependency>
             <dependency>
                 <groupId>de.schlichtherle.truecommons</groupId>
-                <artifactId>truecommons-log</artifactId>
+                <artifactId>truecommons-logging</artifactId>
                 <version>1.1-SNAPSHOT</version>
             </dependency>
             <dependency>

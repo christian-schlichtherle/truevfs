@@ -12,12 +12,12 @@ import net.truevfs.driver.zip.raes.crypto.RaesKeyException;
 import net.truevfs.driver.zip.raes.crypto.RaesParameters;
 import net.truevfs.driver.zip.raes.crypto.RaesParametersProvider;
 import net.truevfs.driver.zip.raes.crypto.Type0RaesParameters;
-import net.truevfs.keymgr.spec.KeyManager;
-import net.truevfs.keymgr.spec.KeyManagerContainer;
-import net.truevfs.keymgr.spec.KeyProvider;
-import net.truevfs.keymgr.spec.UnknownKeyException;
-import net.truevfs.keymgr.spec.param.AesKeyStrength;
-import net.truevfs.keymgr.spec.param.AesPbeParameters;
+import net.truevfs.keymanager.spec.KeyManager;
+import net.truevfs.keymanager.spec.KeyManagerContainer;
+import net.truevfs.keymanager.spec.KeyProvider;
+import net.truevfs.keymanager.spec.UnknownKeyException;
+import net.truevfs.keymanager.spec.param.AesKeyStrength;
+import net.truevfs.keymanager.spec.param.AesPbeParameters;
 
 /**
  * An adapter which provides {@link RaesParameters} by using a

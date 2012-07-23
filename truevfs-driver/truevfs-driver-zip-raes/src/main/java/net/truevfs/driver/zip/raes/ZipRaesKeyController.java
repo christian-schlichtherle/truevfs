@@ -6,11 +6,11 @@ package net.truevfs.driver.zip.raes;
 
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.comp.zip.driver.KeyController;
+import net.truevfs.component.zip.driver.KeyController;
 import net.truevfs.driver.zip.raes.crypto.RaesKeyException;
 import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsModel;
-import net.truevfs.keymgr.spec.param.AesPbeParameters;
+import net.truevfs.keymanager.spec.param.AesPbeParameters;
 
 /**
  * This file system controller decorates another file system controller in

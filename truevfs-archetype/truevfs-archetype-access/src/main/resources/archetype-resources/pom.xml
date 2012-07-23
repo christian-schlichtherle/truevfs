@@ -33,7 +33,7 @@
         <!-- Lets hurl the key prompting window when entering an invalid key. -->
         <dependency>
             <groupId>de.schlichtherle.truevfs</groupId>
-            <artifactId>truevfs-keymgr-swing-feedback-hurl</artifactId>
+            <artifactId>truevfs-keymanager-swing-feedback-hurl</artifactId>
             <version>${truevfs.version}</version>
             <scope>runtime</scope>
         </dependency>
@@ -42,7 +42,7 @@
              for the TrueZIP Kernel. -->
         <!--dependency>
             <groupId>de.schlichtherle.truevfs</groupId>
-            <artifactId>truevfs-ext-jmx</artifactId>
+            <artifactId>truevfs-extension-jmx</artifactId>
             <version>${truevfs.version}</version>
             <scope>runtime</scope>
         </dependency-->
@@ -51,7 +51,7 @@
              for the TrueZIP Kernel. -->
         <!--dependency>
             <groupId>de.schlichtherle.truevfs</groupId>
-            <artifactId>truevfs-ext-log</artifactId>
+            <artifactId>truevfs-extension-logging</artifactId>
             <version>${truevfs.version}</version>
             <scope>runtime</scope>
         </dependency-->
@@ -61,7 +61,7 @@
              heap space. -->
         <!--dependency>
             <groupId>de.schlichtherle.truevfs</groupId>
-            <artifactId>truevfs-ext-pace</artifactId>
+            <artifactId>truevfs-extension-pacemanager</artifactId>
             <version>${truevfs.version}</version>
             <scope>runtime</scope>
         </dependency-->
