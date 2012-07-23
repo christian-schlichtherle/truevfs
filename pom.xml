@@ -352,6 +352,12 @@ system space.
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpclient</artifactId>
                 <version>4.2.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
@@ -380,6 +386,11 @@ system space.
                 <artifactId>scalatest_${scala.version}</artifactId>
                 <version>1.8</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>1.6.6</version>
             </dependency>
             <dependency>
                 <groupId>org.tukaani</groupId>

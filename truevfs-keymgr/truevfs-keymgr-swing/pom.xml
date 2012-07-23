@@ -33,10 +33,6 @@ Swing based implementation of the KeyManager Specification.
             <type>test-jar</type>
         </dependency>
         <dependency>
-            <groupId>de.schlichtherle.truecommons</groupId>
-            <artifactId>truecommons-log</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.netbeans</groupId>
             <artifactId>jemmy</artifactId>
         </dependency>
