@@ -40,14 +40,14 @@ implements RaesParametersProvider {
     /**
      * Constructs RAES parameters using the given key manager provider.
      *
-     * @param  provider the provider for the key manager for accessing RAES
+     * @param  container the container of the key manager for accessing RAES
      *         encrypted data.
      * @param  raes the absolute URI of the RAES file.
      */
     public KeyManagerRaesParameters(
-            final KeyManagerContainer provider,
+            final KeyManagerContainer container,
             final URI raes) {
-        this(provider.keyManager(AesPbeParameters.class), raes);
+        this(container.keyManager(AesPbeParameters.class), raes);
     }
 
     /**
