@@ -4,41 +4,26 @@
 package ${package}.scala
 
 import net.truevfs.access.TApplication
-import net.truevfs.keymgr.swing.feedback.HurlingWindowFeedback
-import net.truevfs.keymgr.swing.feedback.InvalidKeyFeedback
 
 /**
- * An abstract class which configures the TrueVFS Access Path module.
+ * An abstract class which configures the TrueVFS Access module.
  * 
  * @author Christian Schlichtherle
  */
 abstract class Application extends TApplication {
 
     /**
-     * Runs the setup phase.
-     * <p>
-     * This method is {@link #run run} only once at the start of the life
-     * cycle.
-     * Its task is to configure the default behavior of the TrueVFS FSP JSE7 API
-     * in order to answer the following questions:
-     * <ul>
-     * <li>What are the file extensions which shall get recognized as archive
-     *     files and hence as virtual directories?
-     * <li>Shall missing archive files and directory entries get automatically
-     *     created whenever required?
-     * </ul>
-     * <p>
-     * The implementation in the class {@link Application} configures
-     * the type of the feedback when prompting the user for keys for RAES
-     * encrypted ZIP alias ZIP.RAES alias TZP files by the Swing based
-     * prompting key manager.
-     * If this JVM is running in headless mode, then this configuration is
-     * ignored and the user is prompted by the console I/O based prompting
-     * key manager.
-     */
-    override protected def setup() {
-        val spec = classOf[InvalidKeyFeedback].getName();
-        val impl = classOf[HurlingWindowFeedback].getName();
-        System.setProperty(spec, System.getProperty(spec, impl));
-    }
+      * Overridden to make the application wait until it gets interrupted.
+      * Uncomment this method if you want to test the JMX interface with the
+      * short living sample applications of this archetype.
+      */
+    /*override protected def sync() {
+        System.err.println("Waiting until interrupt...");
+        try {
+          Thread.sleep(Long.MaxValue)
+        } catch {
+          case ex: InterruptedException =>
+        }
+        super.sync();
+    }*/
 }

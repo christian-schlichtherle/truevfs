@@ -4,10 +4,10 @@
 package ${package}.java.file;
 
 import ${package}.java.Application;
-import net.truevfs.access.TFile;
-import net.truevfs.access.TFileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import net.truevfs.access.TFile;
+import net.truevfs.access.TFileWriter;
 
 /**
  * Creates a ZIP file with the name {@code "archive.zip"} in the current

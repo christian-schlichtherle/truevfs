@@ -2,9 +2,8 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.keymgr.swing.feedback;
+package net.truevfs.keymgr.swing.feedback.hurl;
 
-import static net.truevfs.keymgr.spec.SafeKeyProvider.MIN_KEY_RETRY_DELAY;
 import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -12,11 +11,13 @@ import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import net.truevfs.keymgr.spec.SafeKeyProvider;
+import net.truevfs.keymgr.swing.feedback.DecoratingFeedback;
+import net.truevfs.keymgr.swing.feedback.Feedback;
 
 /**
- * Provides run by beeping using the default toolkit, disabling the
- * default button in the root pane for three seconds and concurrently
- * hurling the containing window for 1.5 seconds.
+ * Provides feedback by hurling the containing window for
+ * {@link SafeKeyProvider#MIN_KEY_RETRY_DELAY} / 2 milliseconds.
  * <p>
  * This class is inspired by chapter #38 "Earthquake Dialog" of the book
  * "Swing Hacks" by Joshua Marinacci & Chris Adamson, published by O'Reilly
@@ -24,47 +25,24 @@ import javax.swing.Timer;
  *
  * @author Christian Schlichtherle
  */
-public class HurlingWindowFeedback extends BasicInvalidKeyFeedback {
+final class HurlingWindowFeedback
+extends DecoratingFeedback implements Feedback {
 
     private static final double PI      = Math.PI;
     private static final double TWO_PI  = 2.0 * PI;
-    
-    public static final int AMPLITUDE = 25;
-    public static final int CYCLE     = 150;
-    public static final int DURATION  = 1500;
-    public static final int FPS       = 75;
 
-    private final double amplitude;
-    private final double cycle;
-    private final int    duration;
-    private final int    fps;
-    
-    public HurlingWindowFeedback() {
-        this(AMPLITUDE, CYCLE, DURATION, FPS);
-    }
+    private final double amplitude = 25;
+    private final double cycle = 150;
+    private final int    duration = SafeKeyProvider.MIN_KEY_RETRY_DELAY / 2;
+    private final int    fps = 75;
 
-    /**
-     * Constructs a new {@code HurlingWindowFeedback}.
-     * 
-     * @param amplitude the amplitude of pixels for offsetting the window.
-     * @param cycle milliseconds required for one cycle.
-     * @param duration millisecons of duration of quake.
-     * @param fps frames per second for animation.
-     */
-    protected HurlingWindowFeedback(    final int amplitude,
-                                        final int cycle,
-                                        final int duration,
-                                        final int fps) {
-        super(duration > MIN_KEY_RETRY_DELAY ? duration : MIN_KEY_RETRY_DELAY);
-        this.amplitude = amplitude;
-        this.cycle     = cycle;
-        this.duration  = duration;
-        this.fps       = fps;
+    HurlingWindowFeedback(Feedback feedback) {
+        super(feedback);
     }
 
     @Override
     public void run(JPanel panel) {
-        super.run(panel); // temporarily disable default button
+        feedback.run(panel); // temporarily disable default button
         final Window window = SwingUtilities.getWindowAncestor(panel);
         if (null == window) return;
         final Point origin = window.getLocation();

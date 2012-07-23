@@ -12,9 +12,12 @@ import net.truevfs.kernel.spec.spi.FsManagerDecorator;
 import net.truevfs.kernel.spec.spi.FsManagerFactory;
 
 /**
- * Uses a {@link Locator} to resolve the singleton file system manager from
- * instances of the factory service class {@link FsManagerFactory} and the
- * decorator service class {@link FsManagerDecorator}.
+ * A container of the singleton file system manager.
+ * The file system manager is created by using a {@link Locator} to search for
+ * advertised implementations of the factory service specification class
+ * {@link FsManagerFactory}
+ * and the decorator service specification class
+ * {@link FsManagerDecorator}.
  *
  * @author Christian Schlichtherle
  */

@@ -7,8 +7,9 @@ package net.truevfs.keymgr.spec.spi;
 import de.schlichtherle.truecommons.services.FactoryService;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.Immutable;
 import net.truevfs.keymgr.spec.KeyManager;
+import net.truevfs.keymgr.spec.sl.KeyManagerMapLocator;
 
 /**
  * A service for creating maps of classes to key managers.
@@ -20,7 +21,7 @@ import net.truevfs.keymgr.spec.KeyManager;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
+@Immutable
 public final class KeyManagerMapFactory
 extends FactoryService<Map<Class<?>, KeyManager<?>>> {
 

@@ -4,10 +4,11 @@
 package ${package}.scala.path
 
 import ${package}.scala.Application
-import net.truevfs.access.TPath
 import java.nio.file.Files._
 import java.nio.file.Path
 import java.util.TreeSet
+import net.truevfs.access.TApplication
+import net.truevfs.access.TPath
 import scala.collection.JavaConversions._
 
 /**

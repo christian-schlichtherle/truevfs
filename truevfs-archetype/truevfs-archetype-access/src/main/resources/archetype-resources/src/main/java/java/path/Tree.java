@@ -4,8 +4,6 @@
 package ${package}.java.path;
 
 import ${package}.java.Application;
-import net.truevfs.kernel.spec.FsSyncException;
-import net.truevfs.access.TPath;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -15,6 +13,8 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
+import net.truevfs.kernel.spec.FsSyncException;
+import net.truevfs.access.TPath;
 
 /**
  * This command line utility prints the tree graph of the directory structure

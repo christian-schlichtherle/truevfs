@@ -4,9 +4,9 @@
 package ${package}.scala.file
 
 import ${package}.scala.Application
-import net.truevfs.access.TFile
 import java.io.File
 import java.util.Arrays
+import net.truevfs.access.TFile
 
 /**
  * This command line utility prints the tree graph of the directory structure

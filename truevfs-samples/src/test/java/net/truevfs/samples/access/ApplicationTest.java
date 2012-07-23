@@ -4,13 +4,9 @@
  */
 package net.truevfs.samples.access;
 
-import net.truevfs.keymgr.swing.feedback.HurlingWindowFeedback;
-import net.truevfs.keymgr.swing.feedback.InvalidKeyFeedback;
 import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertEquals;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -18,19 +14,7 @@ import org.junit.Test;
  */
 public class ApplicationTest {
 
-    Application instance;
-
-    @Before
-    public void setUp() {
-        instance = new TestApplication();
-    }
-
-    @Test
-    public void testSetup() {
-        instance.setup();
-        assertEquals(HurlingWindowFeedback.class.getName(),
-                System.getProperty(InvalidKeyFeedback.class.getName()));
-    }
+    final Application instance = new TestApplication();
 
     @Test
     public void testWork() {

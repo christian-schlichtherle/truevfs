@@ -26,9 +26,9 @@ extends KeyManagerMapModifier {
         return map;
     }
 
-    /** @return -50 if console I/O is available, -150 otherwise. */
+    /** @return -100 if console I/O is available, -300 otherwise. */
     @Override
     public int getPriority() {
-        return null == System.console() ? -150 : -50;
+        return null == System.console() ? -300 : -100;
     }
 }

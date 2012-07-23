@@ -4,8 +4,8 @@
 package ${package}.java.file;
 
 import ${package}.java.Application;
-import net.truevfs.access.TFile;
 import java.io.IOException;
+import net.truevfs.access.TFile;
 
 /**
  * This command line utility concatenates the contents of the parameter paths

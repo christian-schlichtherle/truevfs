@@ -12,7 +12,7 @@ import javax.swing.JPanel;
  *
  * @author Christian Schlichtherle
  */
-public class BasicFeedback implements Feedback {
+public final class BeepFeedback implements Feedback {
 
     /**
      * {@inheritDoc}

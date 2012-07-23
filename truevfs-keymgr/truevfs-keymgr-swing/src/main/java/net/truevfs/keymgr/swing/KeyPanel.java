@@ -21,7 +21,7 @@ abstract class KeyPanel extends EnhancedPanel {
 
     private static final long serialVersionUID = 2762934728646652873L;
 
-    private Feedback feedback;
+    private @CheckForNull Feedback feedback;
 
     KeyPanel() {
         addPanelListener(new KeyPanelListener());
@@ -31,7 +31,7 @@ abstract class KeyPanel extends EnhancedPanel {
      * Returns the feedback to run when this panel is shown in its ancestor
      * window.
      */
-    public Feedback getFeedback() {
+    public @CheckForNull Feedback getFeedback() {
         return feedback;
     }
 
@@ -39,7 +39,7 @@ abstract class KeyPanel extends EnhancedPanel {
      * Sets the feedback to run when this panel is shown in its ancestor
      * window.
      */
-    public void setFeedback(final Feedback feedback) {
+    public void setFeedback(final @CheckForNull Feedback feedback) {
         this.feedback = feedback;
     }
 

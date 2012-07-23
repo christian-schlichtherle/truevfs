@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Provider;
 import javax.swing.JOptionPane;
 import net.truevfs.keymgr.spec.KeyPromptingInterruptedException;
 import net.truevfs.keymgr.spec.PromptingKeyProvider.Controller;
@@ -22,10 +23,9 @@ import net.truevfs.keymgr.spec.UnknownKeyException;
 import net.truevfs.keymgr.spec.param.KeyStrength;
 import net.truevfs.keymgr.spec.param.SafePbeParameters;
 import net.truevfs.keymgr.spec.param.SafePbeParametersView;
-import net.truevfs.keymgr.swing.feedback.BasicInvalidKeyFeedback;
-import net.truevfs.keymgr.swing.feedback.BasicUnknownKeyFeedback;
-import net.truevfs.keymgr.swing.feedback.InvalidKeyFeedback;
-import net.truevfs.keymgr.swing.feedback.UnknownKeyFeedback;
+import net.truevfs.keymgr.swing.feedback.Feedback;
+import net.truevfs.keymgr.swing.sl.InvalidKeyFeedbackLocator;
+import net.truevfs.keymgr.swing.sl.UnknownKeyFeedbackLocator;
 import net.truevfs.keymgr.swing.util.Windows;
 
 /**
@@ -64,8 +64,10 @@ extends SafePbeParametersView<P> {
      */
     static volatile URI lastResource = INITIAL_RESOURCE;
 
-    private volatile UnknownKeyFeedback unknownKeyFeedback;
-    private volatile InvalidKeyFeedback invalidKeyFeedback;
+    private volatile Provider<Feedback>
+            unknownKeyFeedbackProvider = UnknownKeyFeedbackLocator.SINGLETON;
+    private volatile Provider<Feedback>
+            invalidKeyFeedbackProvider = InvalidKeyFeedbackLocator.SINGLETON;
 
     /**
      * Reads the encryption key as a byte sequence from the given pathname
@@ -85,30 +87,20 @@ extends SafePbeParametersView<P> {
         return buf;
     }
 
-    UnknownKeyFeedback getUnknownKeyFeedback() {
-        final UnknownKeyFeedback uckf = this.unknownKeyFeedback;
-        return null != uckf
-                ? uckf
-                : (this.unknownKeyFeedback = loader.instanceOf(
-                    UnknownKeyFeedback.class,
-                    BasicUnknownKeyFeedback.class));
+    Provider<Feedback> getUnknownKeyFeedbackProvider() {
+        return unknownKeyFeedbackProvider;
     }
 
-    void setUnkownKeyFeedback(final UnknownKeyFeedback uckf) {
-        this.unknownKeyFeedback = uckf;
+    void setUnkownKeyFeedbackProvider(final Provider<Feedback> provider) {
+        unknownKeyFeedbackProvider = provider;
     }
 
-    InvalidKeyFeedback getInvalidKeyFeedback() {
-        final InvalidKeyFeedback ickf = this.invalidKeyFeedback;
-        return null != ickf
-                ? ickf
-                : (this.invalidKeyFeedback = loader.instanceOf(
-                    InvalidKeyFeedback.class,
-                    BasicInvalidKeyFeedback.class));
+    Provider<Feedback> getInvalidKeyFeedbackProvider() {
+        return invalidKeyFeedbackProvider;
     }
 
-    void setInvalidKeyFeedback(final InvalidKeyFeedback ickf) {
-        this.invalidKeyFeedback = ickf;
+    void setInvalidKeyFeedback(final Provider<Feedback> provider) {
+        invalidKeyFeedbackProvider = provider;
     }
 
     @Override
@@ -153,8 +145,8 @@ extends SafePbeParametersView<P> {
             // user input.
             keyPanel.setResource(resource);
             keyPanel.setFeedback(null != keyPanel.getError()
-                    ? getInvalidKeyFeedback()
-                    : getUnknownKeyFeedback());
+                    ? getInvalidKeyFeedbackProvider().get()
+                    : getUnknownKeyFeedbackProvider().get());
 
             final int result = JOptionPane.showConfirmDialog(
                     parent,
@@ -228,8 +220,8 @@ extends SafePbeParametersView<P> {
             // user input.
             keyPanel.setResource(resource);
             keyPanel.setFeedback(null != keyPanel.getError()
-                    ? getInvalidKeyFeedback()
-                    : getUnknownKeyFeedback());
+                    ? getInvalidKeyFeedbackProvider().get()
+                    : getUnknownKeyFeedbackProvider().get());
 
             final int result = JOptionPane.showConfirmDialog(
                     parent,
