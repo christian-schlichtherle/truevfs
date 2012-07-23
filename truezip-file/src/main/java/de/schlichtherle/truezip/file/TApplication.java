@@ -219,6 +219,7 @@ public abstract class TApplication<E extends Exception> {
      * TConfig.get().setLenient(false);
      * }</pre>
      */
+    @SuppressWarnings("NoopMethodInAbstractClass")
     protected void setup() {
     }
 
