@@ -71,7 +71,7 @@ public final class ExtensionSet extends CanonicalStringSet {
             String extension = o.toString();
             while (0 < extension.length() && extension.charAt(0) == PREFIX)
                 extension = extension.substring(1);
-            return extension.isEmpty() ? null : extension.toLowerCase(Locale.ENGLISH);
+            return extension.isEmpty() ? null : extension.toLowerCase(Locale.ROOT);
         }
     } // ExtensionMapper
 

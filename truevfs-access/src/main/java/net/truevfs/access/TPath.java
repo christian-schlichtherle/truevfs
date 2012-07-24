@@ -1101,7 +1101,7 @@ public final class TPath implements Path {
                 return hashCode;
             int result = 17;
             result = 37 * result + p.getAddress().getMountPoint().hashCode();
-            result = 37 * result + p.toString().toLowerCase().hashCode();
+            result = 37 * result + p.toString().toLowerCase(Locale.getDefault()).hashCode();
             return p.hashCode = result;
         }
     } // WindowsTPathComparator
