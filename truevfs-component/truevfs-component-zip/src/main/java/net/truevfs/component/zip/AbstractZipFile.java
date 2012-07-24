@@ -57,7 +57,7 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
  */
 @NotThreadSafe
 @CleanupObligation
-public abstract class RawZipFile<E extends ZipEntry>
+public abstract class AbstractZipFile<E extends ZipEntry>
 implements Closeable, Iterable<E> {
 
     private static final int LFH_FILE_NAME_LENGTH_POS =
@@ -121,7 +121,7 @@ implements Closeable, Iterable<E> {
      * @see    #recoverLostEntries()
      */
     @CreatesObligation
-    protected RawZipFile(
+    protected AbstractZipFile(
             final Source source,
             final ZipFileParameters<E> param)
     throws ZipException, EOFException, IOException {
@@ -488,7 +488,7 @@ implements Closeable, Iterable<E> {
      * @throws EOFException on unexpected end-of-file.
      * @throws IOException on any I/O error.
      */
-    public RawZipFile<E> recoverLostEntries()
+    public AbstractZipFile<E> recoverLostEntries()
     throws ZipException, EOFException, IOException {
         final long length = this.length;
         final SeekableByteChannel
@@ -1068,7 +1068,7 @@ implements Closeable, Iterable<E> {
         EntryReadOnlyChannel(final long start, final long size)
         throws IOException {
             super(new IntervalReadOnlyChannel(channel(), start, size));
-            RawZipFile.this.open++;
+            AbstractZipFile.this.open++;
         }
 
         @Override
@@ -1077,7 +1077,7 @@ implements Closeable, Iterable<E> {
                 return;
             // Never close the channel!
             //super.close();
-            RawZipFile.this.open--;
+            AbstractZipFile.this.open--;
             closed = true;
         }
     } // EntryReadOnlyChannel

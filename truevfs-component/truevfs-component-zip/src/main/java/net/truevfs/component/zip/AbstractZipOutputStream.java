@@ -41,11 +41,11 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
  * - its API may change at will without prior notification!
  *
  * @param  <E> the type of the ZIP entries.
- * @see    RawZipFile
+ * @see    AbstractZipFile
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public abstract class RawZipOutputStream<E extends ZipEntry>
+public abstract class AbstractZipOutputStream<E extends ZipEntry>
 extends DecoratingOutputStream
 implements Iterable<E> {
 
@@ -92,9 +92,9 @@ implements Iterable<E> {
      * @param  param the parameters for writing the ZIP file.
      */
     @CreatesObligation
-    protected RawZipOutputStream(
+    protected AbstractZipOutputStream(
             final Sink sink,
-            final @CheckForNull @WillNotClose RawZipFile<E> appendee,
+            final @CheckForNull @WillNotClose AbstractZipFile<E> appendee,
             final ZipOutputStreamParameters param)
     throws IOException {
         final OutputStream out = sink.stream();
@@ -297,7 +297,7 @@ implements Iterable<E> {
 
     /**
      * Returns {@code true} if and only if this
-     * {@code RawZipOutputStream} is currently writing a ZIP entry.
+     * {@code AbstractZipOutputStream} is currently writing a ZIP entry.
      */
     public boolean isBusy() {
         return null != this.entry;
@@ -686,7 +686,7 @@ implements Iterable<E> {
     extends LittleEndianOutputStream {
         AppendingLittleEndianOutputStream(
                 final @WillCloseWhenClosed OutputStream out,
-                final @WillNotClose RawZipFile<?> appendee) {
+                final @WillNotClose AbstractZipFile<?> appendee) {
             super(out);
             super.written = appendee.getOffsetMapper().unmap(appendee.length());
         }
@@ -739,7 +739,7 @@ implements Iterable<E> {
          */
         @Override
         public OutputStream start() throws IOException {
-            final LittleEndianOutputStream leos = RawZipOutputStream.this.leos;
+            final LittleEndianOutputStream leos = AbstractZipOutputStream.this.leos;
             final long offset = leos.size();
             final ZipEntry entry = this.entry;
             final boolean encrypted = entry.isEncrypted();
@@ -751,7 +751,7 @@ implements Iterable<E> {
                               | (dd        ? GPBF_DATA_DESCRIPTOR : 0)
                               | (utf8      ? GPBF_UTF8 : 0);
             // Start changes.
-            RawZipOutputStream.this.finished = false;
+            AbstractZipOutputStream.this.finished = false;
             // local file header signature     4 bytes  (0x04034b50)
             leos.writeInt(LFH_SIG);
             // version needed to extract       2 bytes
@@ -799,7 +799,7 @@ implements Iterable<E> {
          */
         @Override
         public void finish() throws IOException {
-            final LittleEndianOutputStream leos = RawZipOutputStream.this.leos;
+            final LittleEndianOutputStream leos = AbstractZipOutputStream.this.leos;
             final long csize = leos.size() - this.dataStart;
             final ZipEntry entry = this.entry;
             assert UNKNOWN != entry.getCrc();
@@ -969,7 +969,7 @@ implements Iterable<E> {
         }
 
         int getBZip2BlockSize() {
-            final int level = RawZipOutputStream.this.getLevel();
+            final int level = AbstractZipOutputStream.this.getLevel();
             if (BZip2CompressorOutputStream.MIN_BLOCKSIZE <= level
                     && level <= BZip2CompressorOutputStream.MAX_BLOCKSIZE)
                 return level;
@@ -1006,7 +1006,7 @@ implements Iterable<E> {
             assert null == this.out;
             return this.out = new ZipDeflaterOutputStream(
                     this.method.start(),
-                    RawZipOutputStream.this.getLevel(),
+                    AbstractZipOutputStream.this.getLevel(),
                     MAX_FLATER_BUF_LENGTH);
         }
 
@@ -1047,7 +1047,7 @@ implements Iterable<E> {
         @Override
         public void finish() throws IOException {
             this.method.finish();
-            final ZipEntry entry = RawZipOutputStream.this.entry;
+            final ZipEntry entry = AbstractZipOutputStream.this.entry;
             final long expectedCrc = entry.getCrc();
             if (UNKNOWN != expectedCrc) {
                 final long actualCrc = this.out.getChecksum().getValue();
@@ -1064,7 +1064,7 @@ implements Iterable<E> {
 
         @Override
         public void finish() throws IOException {
-            final ZipEntry entry = RawZipOutputStream.this.entry;
+            final ZipEntry entry = AbstractZipOutputStream.this.entry;
             final long crc = this.out.getChecksum().getValue();
             entry.setRawCrc(crc);
             this.method.finish();
