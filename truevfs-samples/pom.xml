@@ -29,7 +29,7 @@
         can be located at runtime.
         Location of the available file system drivers is performed by
         scanning the class path - see the Javaodoc for the TrueVFS Kernel class
-        net.truevfs.kernel.sl.FsDriverLocator for more information.
+        net.truevfs.kernel.spec.sl.FsDriverMapLocator for more information.
     </description>
 
     <dependencies>
