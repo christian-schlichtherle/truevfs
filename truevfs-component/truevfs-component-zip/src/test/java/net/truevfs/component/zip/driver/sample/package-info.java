@@ -6,4 +6,4 @@
  * Demonstrates key management for WinZip AES encrypted ZIP entries.
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
-package net.truevfs.driver.zip.sample;
+package net.truevfs.component.zip.driver.sample;

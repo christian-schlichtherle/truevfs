@@ -4,28 +4,16 @@
  */
 package net.truevfs.component.zip;
 
-import net.truevfs.component.zip.ULong;
-import net.truevfs.component.zip.UInt;
-import net.truevfs.component.zip.UByte;
-import net.truevfs.component.zip.DateTimeConverter;
-import net.truevfs.component.zip.UShort;
-import static net.truevfs.component.zip.ZipEntry.*;
 import java.util.Arrays;
+import static net.truevfs.component.zip.ZipEntry.*;
 import static org.junit.Assert.*;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle
  */
 public final class ZipEntryTest {
-    
-    private ZipEntry entry;
-
-    @Before
-    public void setUp() {
-        entry = new ZipEntry("test");
-    }
+    private final ZipEntry entry = new ZipEntry("test");
 
     @Test
     public void testClone() {

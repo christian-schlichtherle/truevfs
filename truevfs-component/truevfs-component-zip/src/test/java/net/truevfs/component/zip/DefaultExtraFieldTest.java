@@ -4,13 +4,10 @@
  */
 package net.truevfs.component.zip;
 
-import net.truevfs.component.zip.DefaultExtraField;
-import net.truevfs.component.zip.UShort;
-import java.util.*;
+import java.util.Arrays;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * A test case for the {@link DefaultExtraField} class.
@@ -19,12 +16,7 @@ import static org.junit.Assert.*;
  */
 public final class DefaultExtraFieldTest {
 
-    private DefaultExtraField def;
-
-    @Before
-    public void setUp() {
-        def = new DefaultExtraField(0x0000);
-    }
+    private DefaultExtraField def = new DefaultExtraField(0x0000);
 
     @Test
     public void testConstructor() {

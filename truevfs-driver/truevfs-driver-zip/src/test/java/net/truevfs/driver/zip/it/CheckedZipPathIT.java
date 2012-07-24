@@ -5,7 +5,7 @@
 package net.truevfs.driver.zip.it;
 
 import net.truevfs.access.TPathITSuite;
-import net.truevfs.driver.zip.CheckedZipDriver;
+import net.truevfs.component.zip.driver.CheckedZipDriver;
 import net.truevfs.kernel.spec.TestConfig;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.IoBufferPool;

@@ -36,19 +36,6 @@
         <module>truevfs-driver-zip-raes</module>
     </modules>
 
-    <dependencyManagement>
-        <dependencies>
-            <!-- Change default scope from compile time to test time for driver
-                 integration tests. -->
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-access</artifactId>
-                <version>${project.version}</version>
-                <scope>test</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <!-- All drivers depend on the TrueZIP Kernel and its test suite for
              integration testing. -->

@@ -2,8 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.driver.zip;
+package net.truevfs.component.zip.driver;
 
+import net.truevfs.component.zip.driver.JarDriver;
 import net.truevfs.component.zip.driver.AbstractZipDriverEntry;
 import net.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 import net.truevfs.kernel.spec.TestConfig;
@@ -13,12 +14,12 @@ import net.truevfs.kernel.spec.cio.IoBufferPool;
 /**
  * @author Christian Schlichtherle
  */
-public final class ZipDriverTest
-extends FsArchiveDriverTestSuite<AbstractZipDriverEntry, ZipDriver> {
+public final class JarDriverTest
+extends FsArchiveDriverTestSuite<AbstractZipDriverEntry, JarDriver> {
 
     @Override
-    protected ZipDriver newArchiveDriver() {
-        return new ZipDriver() {
+    protected JarDriver newArchiveDriver() {
+        return new JarDriver() {
             @Override
             public IoBufferPool<? extends IoBuffer<?>> getPool() {
                 return TestConfig.get().getPool();
@@ -28,6 +29,6 @@ extends FsArchiveDriverTestSuite<AbstractZipDriverEntry, ZipDriver> {
 
     @Override
     protected String getUnencodableName() {
-        return "\u2297";
+        return null;
     }
 }

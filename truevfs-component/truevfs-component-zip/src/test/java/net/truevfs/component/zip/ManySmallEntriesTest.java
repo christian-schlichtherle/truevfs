@@ -4,8 +4,6 @@
  */
 package net.truevfs.component.zip;
 
-import net.truevfs.component.zip.ZipFile;
-import net.truevfs.component.zip.ZipOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;

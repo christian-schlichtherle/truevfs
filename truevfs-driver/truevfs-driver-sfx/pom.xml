@@ -30,7 +30,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-driver-zip</artifactId>
+            <artifactId>truevfs-component-zip</artifactId>
         </dependency>
     </dependencies>
 </project>
