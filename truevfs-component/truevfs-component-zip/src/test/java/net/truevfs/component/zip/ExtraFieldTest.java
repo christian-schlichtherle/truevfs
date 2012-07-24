@@ -4,12 +4,8 @@
  */
 package net.truevfs.component.zip;
 
-import net.truevfs.component.zip.DefaultExtraField;
-import net.truevfs.component.zip.ExtraField;
-import net.truevfs.component.zip.UShort;
-import org.junit.Test;
-
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * A test case for the {@link ExtraField} class.
