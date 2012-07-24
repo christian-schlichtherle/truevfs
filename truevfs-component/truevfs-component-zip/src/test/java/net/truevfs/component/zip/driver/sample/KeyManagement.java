@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.driver.zip.sample;
+package net.truevfs.component.zip.driver.sample;
 
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -12,7 +12,7 @@ import net.truevfs.access.TConfig;
 import net.truevfs.component.zip.WinZipAesParameters;
 import net.truevfs.component.zip.ZipKeyException;
 import net.truevfs.component.zip.driver.AbstractZipDriverEntry;
-import net.truevfs.driver.zip.ZipDriver;
+import net.truevfs.component.zip.driver.ZipDriver;
 import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsModel;

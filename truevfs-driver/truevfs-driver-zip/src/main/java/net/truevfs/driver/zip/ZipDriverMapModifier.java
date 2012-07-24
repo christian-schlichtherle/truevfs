@@ -6,6 +6,7 @@ package net.truevfs.driver.zip;
 
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.component.zip.driver.ZipDriver;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsScheme;
 import net.truevfs.kernel.spec.spi.FsDriverMapModifier;
@@ -24,7 +25,7 @@ import net.truevfs.kernel.spec.spi.FsDriverMapModifier;
 <tbody>
 <tr>
 <td>{@code zip}</td>
-<td>{@link net.truevfs.driver.zip.ZipDriver}</td>
+<td>{@link net.truevfs.component.zip.driver.ZipDriver}</td>
 </tr>
 </tbody>
 </table>

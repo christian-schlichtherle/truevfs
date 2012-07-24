@@ -6,6 +6,7 @@ package net.truevfs.driver.jar;
 
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
+import net.truevfs.component.zip.driver.JarDriver;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsScheme;
 import net.truevfs.kernel.spec.spi.FsDriverMapModifier;
@@ -25,7 +26,7 @@ import net.truevfs.kernel.spec.util.ExtensionSet;
 <tbody>
 <tr>
 <td>{@code jar}, {@code war}, {@code ear}</td>
-<td>{@link net.truevfs.driver.zip.JarDriver}</td>
+<td>{@link net.truevfs.component.zip.driver.JarDriver}</td>
 </tr>
 </tbody>
 </table>

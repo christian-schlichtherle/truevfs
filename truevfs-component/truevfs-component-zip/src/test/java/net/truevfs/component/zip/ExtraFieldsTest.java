@@ -4,14 +4,9 @@
  */
 package net.truevfs.component.zip;
 
-import net.truevfs.component.zip.ExtraFields;
-import net.truevfs.component.zip.DefaultExtraField;
-import net.truevfs.component.zip.ExtraField;
 import java.util.Arrays;
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * Tests the collection of {@link ExtraFields Extra Fields}.
@@ -19,9 +14,8 @@ import static org.junit.Assert.*;
  * @author Christian Schlichtherle
  */
 public final class ExtraFieldsTest {
-
     // Serialized Extra Fields in little endian order.
-    private final byte[] SERIALIZED = new byte[] {
+    private final byte[] serialized = new byte[] {
         (byte) 0x00, (byte) 0x00, // Header ID: 0x0000 (undefined)
         (byte) 0x00, (byte) 0x00, // Data Size: 0x0000
         (byte) 0x01, (byte) 0x00, // Header ID: 0x0001 (Zip64)
@@ -36,15 +30,7 @@ public final class ExtraFieldsTest {
         (byte) 0xfe, (byte) 0xca, // Header ID: 0xcafe (JarMarker)
         (byte) 0x00, (byte) 0x00, // Data Size: 0x0000
     };
-
-    private ExtraFields fields;
-    private byte[] serialized;
-
-    @Before
-    public void setUp() {
-        fields = new ExtraFields();
-        serialized = SERIALIZED.clone();
-    }
+    private final ExtraFields fields = new ExtraFields();
 
     @Test
     public void testGetSet() {

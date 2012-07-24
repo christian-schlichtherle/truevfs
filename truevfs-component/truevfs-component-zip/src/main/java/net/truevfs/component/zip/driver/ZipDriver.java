@@ -2,13 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.driver.zip;
+package net.truevfs.component.zip.driver;
 
 import java.nio.charset.Charset;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.component.zip.ZipEntry;
-import net.truevfs.component.zip.driver.AbstractZipDriver;
-import net.truevfs.component.zip.driver.AbstractZipDriverEntry;
 
 /**
  * An archive driver for ZIP files.

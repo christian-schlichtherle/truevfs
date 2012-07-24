@@ -4,10 +4,10 @@
  */
 package net.truevfs.component.zip;
 
-import static net.truevfs.component.zip.LittleEndian.*;
 import java.util.Arrays;
-import static org.junit.Assert.*;
-import org.junit.Before;
+import static net.truevfs.component.zip.LittleEndian.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /**
@@ -16,20 +16,11 @@ import org.junit.Test;
  * @author  Christian Schlichtherle
  */
 public final class LittleEndianTest {
-
-    private static final byte[] DATA = {
+    private final byte[] read = {
         (byte) 0x00, // use an offset of one for testing
         (byte) 0x55, (byte) 0xaa, (byte) 0x55, (byte) 0xaa,
         (byte) 0x55, (byte) 0xaa, (byte) 0x55, (byte) 0xaa,
-    };
-
-    private byte[] read, write;
-
-    @Before
-    public void setUp() {
-        read = DATA.clone();
-        write = new byte[read.length];
-    }
+    }, write = new byte[read.length];
 
     @Test
     public void testByte() {

@@ -4,7 +4,8 @@
  */
 package net.truevfs.driver.jar.it;
 
-import net.truevfs.access.ConcurrentSyncITSuite;
+import net.truevfs.access.TFileITSuite;
+import net.truevfs.component.zip.driver.CheckedJarDriver;
 import net.truevfs.component.zip.driver.JarDriver;
 import net.truevfs.kernel.spec.TestConfig;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
@@ -12,7 +13,7 @@ import net.truevfs.kernel.spec.cio.IoBufferPool;
 /**
  * @author Christian Schlichtherle
  */
-public final class JarConcurrentSyncIT extends ConcurrentSyncITSuite<JarDriver> {
+public final class CheckedJarFileIT extends TFileITSuite<JarDriver> {
 
     @Override
     protected String getExtensionList() {
@@ -21,7 +22,7 @@ public final class JarConcurrentSyncIT extends ConcurrentSyncITSuite<JarDriver> 
 
     @Override
     protected JarDriver newArchiveDriver() {
-        return new JarDriver() {
+        return new CheckedJarDriver() {
             @Override
             public IoBufferPool<?> getPool() {
                 return TestConfig.get().getPool();

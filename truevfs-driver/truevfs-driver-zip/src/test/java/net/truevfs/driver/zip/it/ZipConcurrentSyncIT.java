@@ -5,7 +5,7 @@
 package net.truevfs.driver.zip.it;
 
 import net.truevfs.access.ConcurrentSyncITSuite;
-import net.truevfs.driver.zip.ZipDriver;
+import net.truevfs.component.zip.driver.ZipDriver;
 import net.truevfs.kernel.spec.TestConfig;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.IoBufferPool;

@@ -2,11 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.driver.zip;
+package net.truevfs.component.zip.driver;
 
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.component.zip.driver.AbstractZipDriverEntry;
-import net.truevfs.component.zip.driver.ZipInputService;
 
 /**
  * An archive driver for ZIP files which checks the CRC32 values for all

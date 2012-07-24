@@ -5,7 +5,7 @@
 package net.truevfs.driver.jar.it;
 
 import net.truevfs.access.TFileITSuite;
-import net.truevfs.driver.jar.JarDriver;
+import net.truevfs.component.zip.driver.JarDriver;
 import net.truevfs.kernel.spec.TestConfig;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
 

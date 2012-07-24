@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.zip.raes;
 
-import net.truevfs.driver.zip.TestKeyManagerContainer;
+import net.truevfs.component.zip.driver.TestKeyManagerContainer;
 import net.truevfs.kernel.spec.TestConfig;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
