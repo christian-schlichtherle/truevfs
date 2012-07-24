@@ -4,13 +4,16 @@
  */
 package de.schlichtherle.truezip.zip;
 
+import de.schlichtherle.truezip.util.ConcurrencyUtils;
+import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
 import static de.schlichtherle.truezip.zip.DateTimeConverter.MAX_DOS_TIME;
 import static de.schlichtherle.truezip.zip.DateTimeConverter.MIN_DOS_TIME;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.*;
+import java.util.concurrent.Callable;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,6 +29,7 @@ public abstract class DateTimeConverterTestSuite {
     public void setUp() {
         instance = getInstance();
         GregorianCalendar calendar = instance.getThreadLocalCalendar();
+        calendar.set(Calendar.ERA, GregorianCalendar.AD);
         calendar.set(Calendar.MILLISECOND, 0);
         calendar.set(1980, Calendar.JANUARY, 1, 0, 0, 0);
         minJavaTime = calendar.getTimeInMillis();
@@ -36,10 +40,22 @@ public abstract class DateTimeConverterTestSuite {
     abstract DateTimeConverter getInstance();
 
     @Test
-    public final void testGetThreadLocalCalendar() {
-        final GregorianCalendar cal1 = instance.getThreadLocalCalendar();
-        final GregorianCalendar cal2 = instance.getThreadLocalCalendar();
-        assertSame(cal1, cal2);
+    public final void testGetThreadLocalCalendar() throws Exception {
+        final GregorianCalendar ref = instance.getThreadLocalCalendar();
+        ConcurrencyUtils.runConcurrent(2, new TaskFactory() {
+            @Override
+            public Callable<?> newTask(int threadNum) {
+                return new Callable<Void>() {
+                    @Override
+                    public Void call() {
+                        assertThat(instance.getThreadLocalCalendar(),
+                                is(not(sameInstance(ref))));
+                        return null;
+                    }
+                };
+            }
+        }).join();
+        assertThat(instance.getThreadLocalCalendar(), is(sameInstance(ref)));
     }
 
     @Test
@@ -64,7 +80,6 @@ public abstract class DateTimeConverterTestSuite {
             fail();
         } catch (IllegalArgumentException expected) {
         }
-
         assertThat(instance.toDosTime(0), is(MIN_DOS_TIME));
         assertThat(instance.toDosTime(minJavaTime - 1), is(MIN_DOS_TIME));
         assertThat(instance.toDosTime(minJavaTime), is(MIN_DOS_TIME));
