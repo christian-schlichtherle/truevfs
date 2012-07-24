@@ -4,13 +4,10 @@
  */
 package net.truevfs.component.zip;
 
-import net.truevfs.component.zip.DateTimeConverter;
-
 /**
  * @author Christian Schlichtherle
  */
 public final class JarDateTimeConverterTest extends DateTimeConverterTestSuite {
-
     @Override
     DateTimeConverter getInstance() {
         return DateTimeConverter.JAR;
