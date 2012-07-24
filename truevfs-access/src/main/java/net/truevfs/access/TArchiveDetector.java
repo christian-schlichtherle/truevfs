@@ -281,7 +281,7 @@ extends FsAbstractCompositeDriver implements Container<Map<FsScheme, FsDriver>> 
         // look for the first dot in it and look up the remainder ...
         path = path.replace('/', File.separatorChar);
         int i = path.lastIndexOf(File.separatorChar) + 1;
-        path = path.substring(i);//.toLowerCase(Locale.ENGLISH);
+        path = path.substring(i);//.toLowerCase(Locale.ROOT);
         final int l = path.length();
         FsScheme scheme;
         for (i = 0; 0 < (i = path.indexOf('.', i) + 1) && i < l ;) {

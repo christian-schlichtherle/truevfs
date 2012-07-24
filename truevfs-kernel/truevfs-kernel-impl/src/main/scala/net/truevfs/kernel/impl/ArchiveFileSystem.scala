@@ -478,10 +478,10 @@ private object ArchiveFileSystem {
   private def typeName(entry: FsCovariantEntry[_ <: Entry]): String = {
     val types = entry.getTypes
     if (1 == types.cardinality) typeName(types.iterator.next)
-    else types.toString.toLowerCase(Locale.ENGLISH)
+    else types.toString.toLowerCase(Locale.ROOT)
   }
 
-  private def typeName(tµpe: Type) = tµpe.toString.toLowerCase(Locale.ENGLISH)
+  private def typeName(tµpe: Type) = tµpe.toString.toLowerCase(Locale.ROOT)
 
   /** The master archive entry table.
     *

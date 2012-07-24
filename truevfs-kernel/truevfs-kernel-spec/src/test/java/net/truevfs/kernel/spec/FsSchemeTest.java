@@ -130,7 +130,7 @@ public class FsSchemeTest {
             { "tar.bz2", },
         }) {
             final FsScheme original = FsScheme.create(params[0]);
-            final FsScheme copy = FsScheme.create(params[0].toUpperCase(Locale.ENGLISH));
+            final FsScheme copy = FsScheme.create(params[0].toUpperCase(Locale.ROOT));
             assertThat(original.toString(), equalTo(params[0]));
             assertThat(copy.toString(), not(equalTo(params[0])));
             assertThat(copy, equalTo(original));
