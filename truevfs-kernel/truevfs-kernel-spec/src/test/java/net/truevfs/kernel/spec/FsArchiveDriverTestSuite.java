@@ -249,7 +249,7 @@ extends FsArchiveDriverTestBase<D> {
     throws IOException {
         final String name = name(i);
         final E entry = newEntry(name);
-        final OutputSocket<? extends E> output = service.output(entry);
+        final OutputSocket<E> output = service.output(entry);
         assertSame(entry, output.target());
 
         assertNull(service.entry(name));
@@ -303,7 +303,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private InputStream input(final InputService<E> service, final int i)
     throws IOException {
-        final InputSocket<? extends E> input = service.input(name(i));
+        final InputSocket<E> input = service.input(name(i));
 
         {
             final PowerBuffer buf = PowerBuffer.allocate(getDataLength());
