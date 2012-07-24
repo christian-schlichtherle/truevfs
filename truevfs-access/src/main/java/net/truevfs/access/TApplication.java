@@ -52,7 +52,7 @@ public abstract class TApplication<E extends Exception> {
             } finally {
                 sync();
             }
-        } while (status < 0);
+        } while (0 > status);
         return status;
     }
 
