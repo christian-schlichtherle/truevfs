@@ -24,7 +24,7 @@ import net.truevfs.kernel.spec.util.ExtensionSet;
 </thead>
 <tbody>
 <tr>
-<td>{@code ear}, {@code jar}, {@code war}</td>
+<td>{@code jar}, {@code war}, {@code ear}</td>
 <td>{@link net.truevfs.driver.zip.JarDriver}</td>
 </tr>
 </tbody>
@@ -41,7 +41,7 @@ public final class JarDriverMapModifier extends FsDriverMapModifier {
     @Override
     public Map<FsScheme, FsDriver> apply(final Map<FsScheme, FsDriver> map) {
         final FsDriver driver = new JarDriver();
-        for (final String extension : new ExtensionSet("ear|jar|war"))
+        for (final String extension : new ExtensionSet("jar|war|ear"))
             map.put(FsScheme.create(extension), driver);
         return map;
     }
