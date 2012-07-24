@@ -35,15 +35,6 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-access</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-driver-http</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-driver-jar</artifactId>
             <!--scope>runtime</scope-->
         </dependency>
@@ -69,12 +60,13 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-keymanager-console</artifactId>
-            <scope>runtime</scope>
+            <artifactId>truevfs-profile-full</artifactId>
+            <type>pom</type>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-keymanager-swing-feedback-hurl</artifactId>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.6.6</version>
             <scope>runtime</scope>
         </dependency>
     </dependencies>

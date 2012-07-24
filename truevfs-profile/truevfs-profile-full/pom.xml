@@ -46,12 +46,13 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-keymanager-swing-feedback-hurl</artifactId>
+            <artifactId>truevfs-extension-pacemanager</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-samples</artifactId>
+            <artifactId>truevfs-keymanager-swing-feedback-hurl</artifactId>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 
