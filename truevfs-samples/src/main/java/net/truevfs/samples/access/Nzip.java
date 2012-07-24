@@ -21,6 +21,7 @@ import net.truevfs.driver.sfx.CheckedReadOnlySfxDriver;
 import net.truevfs.driver.tar.TarBZip2Driver;
 import net.truevfs.driver.tar.TarDriver;
 import net.truevfs.driver.tar.TarGZipDriver;
+import net.truevfs.driver.tar.TarXZDriver;
 import net.truevfs.driver.zip.CheckedZipDriver;
 import static net.truevfs.kernel.spec.FsAccessOption.*;
 import net.truevfs.kernel.spec.FsSyncException;
@@ -69,9 +70,9 @@ public class Nzip extends Application {
     protected TArchiveDetector newArchiveDetector() {
         return new TArchiveDetector(TArchiveDetector.ALL,
             new Object[][] {
-                { "ear|jar|war", new CheckedJarDriver() },// check CRC-32
-                { "zip", new CheckedZipDriver() }, // check CRC-32
                 { "exe", new CheckedReadOnlySfxDriver() }, // check CRC-32
+                { "jar|war|ear", new CheckedJarDriver() }, // check CRC-32
+                { "zip", new CheckedZipDriver() },         // check CRC-32
             });
     }
 
@@ -80,13 +81,13 @@ public class Nzip extends Application {
         assert null != charset;
         return new TArchiveDetector(TArchiveDetector.ALL,
                 new Object[][] {
-                    { "ear|jar|war|zip", new CheckedZipDriver() { // check CRC-32
+                    { "exe", new CheckedReadOnlySfxDriver() { // check CRC-32
                         @Override
                         public Charset getCharset() {
                             return charset;
                         }
                     } },
-                    { "exe", new CheckedReadOnlySfxDriver() { // check CRC-32
+                    { "jar|war|ear", new CheckedJarDriver() { // check CRC-32
                         @Override
                         public Charset getCharset() {
                             return charset;
@@ -98,13 +99,25 @@ public class Nzip extends Application {
                             return charset;
                         }
                     } },
-                    { "tgz|tar.gz", new TarGZipDriver() {
+                    { "tar.bz2|tb2|tbz|tbz2", new TarBZip2Driver() {
                         @Override
                         public Charset getCharset() {
                             return charset;
                         }
                     } },
-                    { "tbz|tb2|tar.bz2", new TarBZip2Driver() {
+                    { "tar.gz|tgz", new TarGZipDriver() {
+                        @Override
+                        public Charset getCharset() {
+                            return charset;
+                        }
+                    } },
+                    { "tar.xz|txz", new TarXZDriver() {
+                        @Override
+                        public Charset getCharset() {
+                            return charset;
+                        }
+                    } },
+                    { "zip", new CheckedZipDriver() {         // check CRC-32
                         @Override
                         public Charset getCharset() {
                             return charset;
@@ -133,16 +146,12 @@ public class Nzip extends Application {
     @Override
     protected int runChecked(String[] args)
     throws IllegalUsageException, IOException {
-        if (args.length < 1)
-            throw new IllegalUsageException();
-
+        if (1 > args.length) throw new IllegalUsageException();
         final String cmd = args[0].toLowerCase(Locale.ROOT);
         args = lshift(args);
-
-        final TArchiveDetector oldDetector = TConfig.get().getArchiveDetector();
         try {
             // Install custom archive detector.
-            TConfig.get().setArchiveDetector(newArchiveDetector());
+            TConfig.push().setArchiveDetector(newArchiveDetector());
             switch (cmd) {
             case "ls":
                 ls(args, false, false);
@@ -194,9 +203,8 @@ public class Nzip extends Application {
                 throw new IllegalUsageException();
             }
         } finally {
-            TConfig.get().setArchiveDetector(oldDetector);
+            TConfig.pop();
         }
-
         return 0;
     }
 
@@ -206,8 +214,7 @@ public class Nzip extends Application {
 
     private static String[] lshift(final String[] args, final int num) {
         final int rem = args.length - num;
-        if (rem < 0)
-            throw new IllegalArgumentException();
+        if (0 > rem) throw new IllegalArgumentException();
         final String[] ret = new String[rem];
         System.arraycopy(args, num, ret, 0, rem);
         return ret;
@@ -218,16 +225,12 @@ public class Nzip extends Application {
             final boolean detailed,
             final boolean recursive)
     throws IOException {
-        if (args.length <= 0)
-            args = new String[] { "." };
+        if (0 >= args.length) args = new String[] { "." };
         for (int i = 0; i < args.length; i++) {
             final TFile file = new TFile(args[i]);
-            if (args.length > 1)
-                out.println(args[i] + ":");
-            if (file.isDirectory())
-                ls(file, "", detailed, recursive);
-            else
-                ls(file, file.getPath(), detailed, recursive);
+            if (1 < args.length) out.println(args[i] + ":");
+            if (file.isDirectory()) ls(file, "", detailed, recursive);
+            else ls(file, file.getPath(), detailed, recursive);
         }
     }
 
@@ -242,7 +245,7 @@ public class Nzip extends Application {
     throws IOException {
         if (file.isDirectory()) {
             final TFile[] entries = file.listFiles();
-            if (entries == null)
+            if (null == entries)
                 throw new IOException(path + " (" + resources.getString("ls.dia") + ")");
             // Sort directories to the start.
             Arrays.sort(entries, new TFileComparator());
@@ -294,9 +297,7 @@ public class Nzip extends Application {
 
     private void cat(final String[] args)
     throws IllegalUsageException, IOException {
-        if (args.length < 1)
-            throw new IllegalUsageException();
-
+        if (1 > args.length) throw new IllegalUsageException();
         for (int i = 0; i < args.length; i++) {
             try (final InputStream in = new TFileInputStream(args[i])) {
                 TFile.cat(in, out);
@@ -306,9 +307,7 @@ public class Nzip extends Application {
 
     private void compact(String[] args)
     throws IllegalUsageException, IOException {
-        if (args.length < 1)
-            throw new IllegalUsageException();
-
+        if (1 > args.length) throw new IllegalUsageException();
         for (int i = 0; i < args.length; i++) {
             final TFile file = new TFile(args[i]);
             if (file.isArchive()) {
@@ -321,8 +320,7 @@ public class Nzip extends Application {
 
     private void cpOrMv(final String[] args, final boolean mv)
     throws IllegalUsageException, IOException {
-        if (args.length < 2)
-            throw new IllegalUsageException();
+        if (2 > args.length) throw new IllegalUsageException();
 
         int srcI = 0;
         boolean unzip = false;
@@ -423,9 +421,7 @@ public class Nzip extends Application {
 
     private void touch(final String[] args)
     throws IllegalUsageException, IOException {
-        if (args.length < 1)
-            throw new IllegalUsageException();
-
+        if (1 > args.length) throw new IllegalUsageException();
         for (int i = 0; i < args.length; i++) {
             final TFile file = new TFile(args[i]);
             final boolean ok;
@@ -450,9 +446,7 @@ public class Nzip extends Application {
 
     private void mkdir(final String[] args, final boolean recursive)
     throws IllegalUsageException, IOException {
-        if (args.length < 1)
-            throw new IllegalUsageException();
-
+        if (1 > args.length) throw new IllegalUsageException();
         for (int i = 0; i < args.length; i++) {
             final TFile file = new TFile(args[i]);
             final boolean ok = recursive ? file.mkdirs() : file.mkdir();
@@ -473,9 +467,7 @@ public class Nzip extends Application {
 
     private void rm(final String[] args, final boolean recursive)
     throws IllegalUsageException, IOException {
-        if (args.length < 1)
-            throw new IllegalUsageException();
-
+        if (1 > args.length) throw new IllegalUsageException();
         for (int i = 0; i < args.length; i++) {
             final TFile file = new TFile(args[i]);
             try {
@@ -503,9 +495,7 @@ public class Nzip extends Application {
 
     private boolean isArchive(final String[] args)
     throws IllegalUsageException {
-        if (args.length != 1)
-            throw new IllegalUsageException();
-
+        if (1 != args.length) throw new IllegalUsageException();
         final boolean success = new TFile(args[0]).isArchive();
         out.println(success);
         return success;
@@ -513,9 +503,7 @@ public class Nzip extends Application {
 
     private boolean isDirectory(final String[] args)
     throws IllegalUsageException {
-        if (args.length != 1)
-            throw new IllegalUsageException();
-
+        if (1 != args.length) throw new IllegalUsageException();
         final boolean success = new TFile(args[0]).isDirectory();
         out.println(success);
         return success;
@@ -523,9 +511,7 @@ public class Nzip extends Application {
 
     private boolean isFile(final String[] args)
     throws IllegalUsageException {
-        if (args.length != 1)
-            throw new IllegalUsageException();
-
+        if (1 != args.length) throw new IllegalUsageException();
         final boolean success = new TFile(args[0]).isFile();
         out.println(success);
         return success;
@@ -533,9 +519,7 @@ public class Nzip extends Application {
 
     private boolean exists(final String[] args)
     throws IllegalUsageException {
-        if (args.length != 1)
-            throw new IllegalUsageException();
-
+        if (1 != args.length) throw new IllegalUsageException();
         final boolean success = new TFile(args[0]).exists();
         out.println(success);
         return success;
@@ -543,9 +527,7 @@ public class Nzip extends Application {
 
     private boolean length(final String[] args)
     throws IllegalUsageException {
-        if (args.length != 1)
-            throw new IllegalUsageException();
-
+        if (1 != args.length) throw new IllegalUsageException();
         final long length = new TFile(args[0]).length();
         out.println(length);
         return true;
