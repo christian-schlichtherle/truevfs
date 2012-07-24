@@ -22,7 +22,7 @@ import java.util.zip.CheckedOutputStream;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.truevfs.component.zip.RawZipOutputStream;
+import net.truevfs.component.zip.AbstractZipOutputStream;
 import net.truevfs.component.zip.ZipCryptoParameters;
 import static net.truevfs.component.zip.ZipEntry.STORED;
 import static net.truevfs.kernel.spec.FsAccessOption.GROW;
@@ -45,7 +45,7 @@ import net.truevfs.kernel.spec.util.SuppressedExceptionBuilder;
  */
 @NotThreadSafe
 public final class ZipOutputService
-extends RawZipOutputStream<AbstractZipDriverEntry>
+extends AbstractZipOutputStream<AbstractZipDriverEntry>
 implements OutputService<AbstractZipDriverEntry> {
 
     private final FsModel model;

@@ -42,7 +42,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
-public class ZipOutputStream extends RawZipOutputStream<ZipEntry> {
+public class ZipOutputStream extends AbstractZipOutputStream<ZipEntry> {
 
     /**
      * The default character set used for entry names and comments in ZIP files.

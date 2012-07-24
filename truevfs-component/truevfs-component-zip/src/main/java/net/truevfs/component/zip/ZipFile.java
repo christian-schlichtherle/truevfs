@@ -44,7 +44,7 @@ import net.truevfs.kernel.spec.io.LockInputStream;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class ZipFile extends RawZipFile<ZipEntry> {
+public class ZipFile extends AbstractZipFile<ZipEntry> {
 
     /** The lock on which this object synchronizes. */
     protected final Lock lock = new ReentrantLock();

@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.nio.file.NoSuchFileException;
 import java.util.Objects;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.truevfs.component.zip.RawZipFile;
+import net.truevfs.component.zip.AbstractZipFile;
 import net.truevfs.component.zip.ZipCryptoParameters;
 import net.truevfs.kernel.spec.FsInputSocketSource;
 import net.truevfs.kernel.spec.FsModel;
@@ -24,7 +24,7 @@ import net.truevfs.kernel.spec.cio.*;
  */
 @NotThreadSafe
 public final class ZipInputService
-extends RawZipFile<AbstractZipDriverEntry>
+extends AbstractZipFile<AbstractZipDriverEntry>
 implements InputService<AbstractZipDriverEntry> {
 
     private final AbstractZipDriver driver;
