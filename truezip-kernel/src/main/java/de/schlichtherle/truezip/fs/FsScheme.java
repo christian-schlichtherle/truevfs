@@ -78,7 +78,7 @@ public final class FsScheme implements Serializable, Comparable<FsScheme> {
 
     @Override
     public int hashCode() {
-        return scheme.toLowerCase(Locale.ENGLISH).hashCode();
+        return scheme.toLowerCase(Locale.ROOT).hashCode();
     }
 
     @Override

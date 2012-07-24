@@ -68,7 +68,7 @@ public final class SuffixSet extends CanonicalStringSet {
             String suffix = o.toString();
             while (0 < suffix.length() && suffix.charAt(0) == PREFIX)
                 suffix = suffix.substring(1);
-            return 0 == suffix.length() ? null : suffix.toLowerCase(Locale.ENGLISH);
+            return 0 == suffix.length() ? null : suffix.toLowerCase(Locale.ROOT);
         }
     } // class SuffixMapper
 

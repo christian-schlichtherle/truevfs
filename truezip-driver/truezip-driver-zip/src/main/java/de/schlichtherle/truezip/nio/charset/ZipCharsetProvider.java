@@ -38,7 +38,7 @@ public final class ZipCharsetProvider extends CharsetProvider {
     }
 
     private static String lowerCase(String s) {
-        return s.toLowerCase(Locale.ENGLISH);
+        return s.toLowerCase(Locale.ROOT);
     }
 
     @Override
