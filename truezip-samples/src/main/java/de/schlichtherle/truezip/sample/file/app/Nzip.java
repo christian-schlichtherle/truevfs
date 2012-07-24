@@ -140,7 +140,7 @@ public class Nzip extends Application {
         if (args.length < 1)
             throw new IllegalUsageException();
 
-        final String cmd = args[0].toLowerCase(Locale.ENGLISH);
+        final String cmd = args[0].toLowerCase(Locale.ROOT);
         args = lshift(args);
 
         final TArchiveDetector oldDetector = TConfig.get().getArchiveDetector();
@@ -333,7 +333,7 @@ public class Nzip extends Application {
         for (; srcI < args.length && args[srcI].charAt(0) == '-'; srcI++) {
             if (mv) // mv
                 throw new IllegalUsageException();
-            final String opt = args[srcI].toLowerCase(Locale.ENGLISH);
+            final String opt = args[srcI].toLowerCase(Locale.ROOT);
             if ("-unzip".equals(opt)) {
                 unzip = true;
             } else if ("-cp437out".equals(opt)) {

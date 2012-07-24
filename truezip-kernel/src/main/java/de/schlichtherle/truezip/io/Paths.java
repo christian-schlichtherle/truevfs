@@ -351,12 +351,10 @@ public final class Paths {
     public static boolean contains(String a, String b, char separatorChar) {
         // Windows is just case preserving, all others are case sensitive.
         if ('\\' == File.separatorChar) {
-            a = a.toLowerCase();
-            b = b.toLowerCase();
+            a = a.toLowerCase(Locale.getDefault());
+            b = b.toLowerCase(Locale.getDefault());
         }
-        if (!b.startsWith(a)) {
-            return false;
-        }
+        if (!b.startsWith(a)) return false;
         final int lengthA = a.length();
         final int lengthB = b.length();
         if (lengthA == lengthB) {

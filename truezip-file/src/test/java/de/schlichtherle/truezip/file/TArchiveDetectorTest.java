@@ -364,8 +364,8 @@ public class TArchiveDetectorTest {
             final TArchiveDetector detector,
             final @Nullable FsScheme scheme,
             final String path) {
-        final String lpath = path.toLowerCase(Locale.ENGLISH);
-        final String upath = path.toUpperCase(Locale.ENGLISH);
+        final String lpath = path.toLowerCase(Locale.ROOT);
+        final String upath = path.toUpperCase(Locale.ROOT);
 
         assertThat(detector.getScheme(lpath), equalTo(scheme));
         assertThat(detector.getScheme(upath), equalTo(scheme));
