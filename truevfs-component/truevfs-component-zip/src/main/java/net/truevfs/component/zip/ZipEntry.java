@@ -331,8 +331,7 @@ public class ZipEntry implements Cloneable {
     }
 
     public final long getTime() {
-        if (!isInit(DTIME))
-            return UNKNOWN;
+        if (!isInit(DTIME)) return UNKNOWN;
         return getDateTimeConverter().toJavaTime(dtime & UInt.MAX_VALUE);
     }
 
@@ -421,8 +420,7 @@ public class ZipEntry implements Cloneable {
 
     final long getRawCompressedSize() {
         final long csize = this.csize;
-        if (UNKNOWN == csize)
-            return 0;
+        if (UNKNOWN == csize) return 0;
         return FORCE_ZIP64_EXT || UInt.MAX_VALUE <= csize
                 ? UInt.MAX_VALUE
                 : csize;
@@ -459,8 +457,7 @@ public class ZipEntry implements Cloneable {
 
     final long getRawSize() {
         final long size = this.size;
-        if (UNKNOWN == size)
-            return 0;
+        if (UNKNOWN == size) return 0;
         return FORCE_ZIP64_EXT || UInt.MAX_VALUE <= size
                 ? UInt.MAX_VALUE
                 : size;
@@ -497,8 +494,7 @@ public class ZipEntry implements Cloneable {
     }
 
     final long getRawExternalAttributes() {
-        if (!isInit(EATTR))
-            return isDirectory() ? 0x10 : 0;
+        if (!isInit(EATTR)) return isDirectory() ? 0x10 : 0;
         return eattr & UInt.MAX_VALUE;
     }
 
@@ -514,8 +510,7 @@ public class ZipEntry implements Cloneable {
 
     final long getRawOffset() {
         final long offset = this.offset;
-        if (UNKNOWN == offset)
-            return 0;
+        if (UNKNOWN == offset) return 0;
         return FORCE_ZIP64_EXT || UInt.MAX_VALUE <= offset
                 ? UInt.MAX_VALUE
                 : offset;
@@ -534,8 +529,7 @@ public class ZipEntry implements Cloneable {
     final @Nullable ExtraField addExtraField(final ExtraField field) {
         assert null != field;
         ExtraFields fields = this.fields;
-        if (null == fields)
-            this.fields = fields = new ExtraFields();
+        if (null == fields) this.fields = fields = new ExtraFields();
         return fields.add(field);
     }
 
@@ -571,10 +565,8 @@ public class ZipEntry implements Cloneable {
     public final void setExtra(final @CheckForNull byte[] data) {
         if (null != data)
             UShort.check(data.length, "Extra Fields too large", null);
-        if (null == data || data.length <= 0)
-            this.fields = null;
-        else
-            setExtraFields(data, false);
+        if (null == data || data.length <= 0) this.fields = null;
+        else setExtraFields(data, false);
     }
 
     /**
@@ -615,11 +607,9 @@ public class ZipEntry implements Cloneable {
 
     private void setExtraFields(final byte[] data, final boolean zip64) {
         ExtraFields fields = this.fields;
-        if (null == fields)
-            this.fields = fields = new ExtraFields();
+        if (null == fields) this.fields = fields = new ExtraFields();
         fields.readFrom(data, 0, data.length);
-        if (zip64)
-            parseZip64ExtraField();
+        if (zip64) parseZip64ExtraField();
         assert fields == this.fields;
         fields.remove(ZIP64_HEADER_ID);
         if (fields.size() <= 0) {
@@ -673,11 +663,9 @@ public class ZipEntry implements Cloneable {
      */
     private void parseZip64ExtraField() {
         final ExtraFields fields = this.fields;
-        if (null == fields)
-            return;
+        if (null == fields) return;
         final ExtraField ef = fields.get(ZIP64_HEADER_ID);
-        if (null == ef)
-            return;
+        if (null == ef) return;
         final byte[] data = ef.getDataBlock();
         int off = 0;
         // Read in Uncompressed Size.
@@ -740,14 +728,10 @@ public class ZipEntry implements Cloneable {
     final boolean isZip64ExtensionsRequired() {
         // Offset MUST be considered in decision about ZIP64 format - see
         // description of Data Descriptor in ZIP File Format Specification!
-        if (FORCE_ZIP64_EXT)
-            return true /*UNKNOWN != getCompressedSize()
-                    || UNKNOWN != getSize()
-                    || UNKNOWN != getOffset()*/;
-        else
-            return UInt.MAX_VALUE <= getCompressedSize()
-                    || UInt.MAX_VALUE <= getSize()
-                    || UInt.MAX_VALUE <= getOffset();
+        if (FORCE_ZIP64_EXT) return true;
+        return UInt.MAX_VALUE <= getCompressedSize()
+                || UInt.MAX_VALUE <= getSize()
+                || UInt.MAX_VALUE <= getOffset();
     }
 
     /**
