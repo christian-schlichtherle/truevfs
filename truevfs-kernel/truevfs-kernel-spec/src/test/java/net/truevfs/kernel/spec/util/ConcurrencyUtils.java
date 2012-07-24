@@ -17,7 +17,6 @@ public class ConcurrencyUtils {
     public static final int
             NUM_IO_THREADS = 10 * Runtime.getRuntime().availableProcessors();
 
-    /** You cannot instantiate this class. */
     private ConcurrencyUtils() { }
 
     public static TaskJoiner runConcurrent(
