@@ -28,7 +28,7 @@ import net.truevfs.keymanager.spec.KeyManagerContainer;
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class KeyController<
+public abstract class AbstractKeyController<
         M extends FsModel,
         D extends AbstractZipDriver>
 extends FsDecoratingController<M, FsController<? extends M>> {
@@ -45,7 +45,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
      *        decorate.
      * @param driver the ZIP driver.
      */
-    protected KeyController(
+    protected AbstractKeyController(
             final FsController<? extends M> controller,
             final D driver) {
         super(controller);

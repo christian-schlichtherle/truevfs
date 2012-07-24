@@ -20,7 +20,7 @@ import net.truevfs.keymanager.spec.param.AesPbeParameters;
  */
 @Immutable
 public final class ZipKeyController<M extends FsModel>
-extends KeyController<M, AbstractZipDriver> {
+extends AbstractKeyController<M, AbstractZipDriver> {
 
     public ZipKeyController(
             FsController<? extends M> controller,
