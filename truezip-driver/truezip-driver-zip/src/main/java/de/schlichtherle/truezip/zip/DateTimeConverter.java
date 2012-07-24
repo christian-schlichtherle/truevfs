@@ -39,10 +39,10 @@ public enum DateTimeConverter {
         @Override
         GregorianCalendar getThreadLocalCalendar() {
             GregorianCalendar cal = calendar.get();
-            if (null != cal)
-                return cal;
-            cal = new GregorianCalendar();
-            calendar.set(cal);
+            if (null == cal) {
+                cal = new GregorianCalendar();
+                calendar.set(cal);
+            }
             return cal;
         }
 
@@ -68,18 +68,21 @@ public enum DateTimeConverter {
     ZIP {
         @Override
         GregorianCalendar getThreadLocalCalendar() {
-            GregorianCalendar cal = calendar.get();
-            if (null != cal)
-                return cal;
             TimeZone tz = TimeZone.getDefault();
             tz = new SimpleTimeZone(
                     // See http://java.net/jira/browse/TRUEZIP-191 .
                     tz.getOffset(System.currentTimeMillis()),
                     tz.getID());
             assert !tz.useDaylightTime();
-            cal = new GregorianCalendar(tz);
+            GregorianCalendar cal = calendar.get();
+            if (null == cal) {
+                cal = new GregorianCalendar(tz);
+                calendar.set(cal);
+            } else {
+                // See http://java.net/jira/browse/TRUEZIP-281 .
+                cal.setTimeZone(tz);
+            }
             assert cal.isLenient();
-            calendar.set(cal);
             return cal;
         }
 
@@ -149,21 +152,19 @@ public enum DateTimeConverter {
      * @see    #toJavaTime(long)
      */
     final long toDosTime(final long jtime) {
-        if (jtime < 0)
+        if (0 > jtime)
             throw new IllegalArgumentException("Negative Java time: " + jtime);
         final GregorianCalendar cal = getThreadLocalCalendar();
         cal.setTimeInMillis(roundUp(jtime) ? jtime + 1999 : jtime);
         long dtime = cal.get(Calendar.YEAR) - 1980;
-        if (dtime < 0)
-            return MIN_DOS_TIME;
+        if (0 > dtime) return MIN_DOS_TIME;
         dtime = (dtime << 25)
                 | ((cal.get(Calendar.MONTH) + 1) << 21)
                 | (cal.get(Calendar.DAY_OF_MONTH) << 16)
                 | (cal.get(Calendar.HOUR_OF_DAY) << 11)
                 | (cal.get(Calendar.MINUTE) << 5)
                 | (cal.get(Calendar.SECOND) >> 1);
-        if (MAX_DOS_TIME < dtime)
-            return MAX_DOS_TIME;
+        if (MAX_DOS_TIME < dtime) return MAX_DOS_TIME;
         assert MIN_DOS_TIME <= dtime && dtime <= MAX_DOS_TIME;
         return dtime;
     }
@@ -197,10 +198,8 @@ public enum DateTimeConverter {
      * @see    #toDosTime(long)
      */
     final long toJavaTime(long dtime) {
-        if (dtime < MIN_DOS_TIME)
-            dtime = MIN_DOS_TIME;
-        if (MAX_DOS_TIME < dtime)
-            dtime = MAX_DOS_TIME;
+        if (MIN_DOS_TIME > dtime) dtime = MIN_DOS_TIME;
+        else if (MAX_DOS_TIME < dtime) dtime = MAX_DOS_TIME;
         final int time = (int) dtime;
         final GregorianCalendar cal = getThreadLocalCalendar();
         cal.set(Calendar.ERA, GregorianCalendar.AD);
