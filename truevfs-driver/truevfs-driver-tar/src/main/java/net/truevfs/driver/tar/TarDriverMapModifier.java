@@ -28,7 +28,7 @@ import net.truevfs.kernel.spec.util.ExtensionSet;
 <td>{@link net.truevfs.driver.tar.TarDriver}</td>
 </tr>
 <tr>
-<td>{@code tar.bz2}, {@code tb2}, {@code tbz}</td>
+<td>{@code tar.bz2}, {@code tb2}, {@code tbz}, {@code tbz2}</td>
 <td>{@link net.truevfs.driver.tar.TarBZip2Driver}</td>
 </tr>
 <tr>
