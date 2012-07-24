@@ -6,7 +6,7 @@ package net.truevfs.driver.zip.raes;
 
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.component.zip.driver.KeyController;
+import net.truevfs.component.zip.driver.AbstractKeyController;
 import net.truevfs.driver.zip.raes.crypto.RaesKeyException;
 import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsModel;
@@ -22,7 +22,7 @@ import net.truevfs.keymanager.spec.param.AesPbeParameters;
  */
 @Immutable
 final class ZipRaesKeyController<M extends FsModel>
-extends KeyController<M, ZipRaesDriver> {
+extends AbstractKeyController<M, ZipRaesDriver> {
 
     ZipRaesKeyController(FsController<? extends M> controller, ZipRaesDriver driver) {
         super(controller, driver);
