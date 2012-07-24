@@ -15,7 +15,7 @@ About TrueVFS Driver TAR
 *--+--+
 |<<<tar>>>|{{{./apidocs/net/truevfs/driver/tar/TarDriver.html}<<<TarDriver>>>}}|
 *--+--+
-|<<<tar.bz2>>>, <<<tb2>>>, <<<tbz>>>|{{{./apidocs/net/truevfs/driver/tar/TarBZip2Driver.html}<<<TarBZip2Driver>>>}}|
+|<<<tar.bz2>>>, <<<tb2>>>, <<<tbz>>>, <<<tbz2>>>|{{{./apidocs/net/truevfs/driver/tar/TarBZip2Driver.html}<<<TarBZip2Driver>>>}}|
 *--+--+
 |<<<tar.gz>>>, <<<tgz>>>|{{{./apidocs/net/truevfs/driver/tar/TarGZipDriver.html}<<<TarGZipDriver>>>}}|
 *--+--+
