@@ -312,10 +312,7 @@ extends FsArchiveDriverTestBase<D> {
                 channel = input.channel(null);
             } catch (final UnsupportedOperationException ex) {
                 channel = null;
-                logger.debug(
-                        input.getClass()
-                            + " does not support newChannel().",
-                        ex);
+                logger.trace(input.getClass().getName(), ex);
             }
             if (null != channel) {
                 try {
