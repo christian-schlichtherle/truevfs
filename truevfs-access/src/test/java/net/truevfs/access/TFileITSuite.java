@@ -4,9 +4,11 @@
  */
 package net.truevfs.access;
 
+import de.schlichtherle.truecommons.io.ClosedInputException;
+import de.schlichtherle.truecommons.io.ClosedOutputException;
 import de.schlichtherle.truecommons.io.InputException;
-import static java.io.File.separatorChar;
 import java.io.*;
+import static java.io.File.separatorChar;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -16,13 +18,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
+import net.truevfs.kernel.spec.*;
 import static net.truevfs.kernel.spec.FsAccessOption.GROW;
 import static net.truevfs.kernel.spec.FsSyncOption.CLEAR_CACHE;
 import static net.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
 import static net.truevfs.kernel.spec.FsSyncOptions.SYNC;
-import net.truevfs.kernel.spec.*;
-import de.schlichtherle.truecommons.io.ClosedInputException;
-import de.schlichtherle.truecommons.io.ClosedOutputException;
 import net.truevfs.kernel.spec.util.BitField;
 import static net.truevfs.kernel.spec.util.ConcurrencyUtils.NUM_IO_THREADS;
 import net.truevfs.kernel.spec.util.ConcurrencyUtils.TaskFactory;

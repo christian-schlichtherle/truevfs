@@ -4,12 +4,14 @@
  */
 package net.truevfs.access;
 
+import de.schlichtherle.truecommons.io.ClosedInputException;
+import de.schlichtherle.truecommons.io.ClosedOutputException;
 import de.schlichtherle.truecommons.io.Streams;
-import static java.io.File.separatorChar;
 import java.io.*;
+import static java.io.File.separatorChar;
 import java.nio.ByteBuffer;
-import static java.nio.file.Files.*;
 import java.nio.file.*;
+import static java.nio.file.Files.*;
 import java.nio.file.attribute.FileTime;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -21,8 +23,6 @@ import static net.truevfs.kernel.spec.FsSyncOption.CLEAR_CACHE;
 import static net.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
 import static net.truevfs.kernel.spec.FsSyncOptions.SYNC;
 import net.truevfs.kernel.spec.FsSyncWarningException;
-import de.schlichtherle.truecommons.io.ClosedInputException;
-import de.schlichtherle.truecommons.io.ClosedOutputException;
 import net.truevfs.kernel.spec.util.BitField;
 import static net.truevfs.kernel.spec.util.ConcurrencyUtils.NUM_IO_THREADS;
 import net.truevfs.kernel.spec.util.ConcurrencyUtils.TaskFactory;
