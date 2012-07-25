@@ -10,6 +10,7 @@ import java.util.concurrent.Callable;
 import static net.truevfs.component.zip.DateTimeConverter.MAX_DOS_TIME;
 import static net.truevfs.component.zip.DateTimeConverter.MIN_DOS_TIME;
 import net.truevfs.kernel.spec.util.ConcurrencyUtils;
+import static net.truevfs.kernel.spec.util.ConcurrencyUtils.*;
 import net.truevfs.kernel.spec.util.ConcurrencyUtils.TaskFactory;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
@@ -42,7 +43,7 @@ public abstract class DateTimeConverterTestSuite {
     @Test
     public final void testGetThreadLocalCalendar() throws Exception {
         final GregorianCalendar ref = instance.getThreadLocalCalendar();
-        ConcurrencyUtils.runConcurrent(2, new TaskFactory() {
+        ConcurrencyUtils.runConcurrent(NUM_CPU_THREADS, new TaskFactory() {
             @Override
             public Callable<?> newTask(int threadNum) {
                 return new Callable<Void>() {
