@@ -138,6 +138,18 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-component-tar-driver</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-component-tar-driver</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-component-zip</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -188,6 +200,21 @@ system space.
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-tar</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-tar-bzip2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-tar-gzip</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-tar-xz</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -386,9 +413,14 @@ system space.
                 </file>
             </activation>
             <dependencies>
-                <dependency>
+                <!--dependency>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-simple</artifactId>
+                    <scope>test</scope>
+                </dependency-->
+                <dependency>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>

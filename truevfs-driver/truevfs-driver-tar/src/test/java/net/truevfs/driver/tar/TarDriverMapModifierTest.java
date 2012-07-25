@@ -15,7 +15,7 @@ extends FsDriverMapModifierTestSuite {
 
     @Override
     protected String getExtensions() {
-        return "tar|tar.bz2|tbz|tb2|tar.gz|tgz|tar.xz|txz";
+        return "tar";
     }
 
     @Override

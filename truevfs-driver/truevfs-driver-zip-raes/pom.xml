@@ -19,8 +19,7 @@
 
     <name>TrueVFS Driver ZIP.RAES</name>
     <description>
-        The file system driver family for RAES encrypted ZIP files
-        alias ZIP.RAES files.
+        The file system driver family for RAES encrypted ZIP files.
         Files of this type typically have the extension .tzp.
 
         Add the JAR artifact of this module to the run time class path to
