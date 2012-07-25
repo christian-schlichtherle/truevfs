@@ -4,8 +4,6 @@
  */
 package net.truevfs.component.zip.crypto;
 
-import net.truevfs.component.zip.crypto.SeekableBlockCipher;
-import net.truevfs.component.zip.crypto.CipherReadOnlyChannel;
 import de.schlichtherle.truecommons.io.ReadOnlyChannelITSuite;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
@@ -25,8 +23,7 @@ public class CipherReadOnlyChannelIT extends ReadOnlyChannelITSuite {
     }
 
     private static final class SeekableNullEngine
-    extends NullEngine
-    implements SeekableBlockCipher {
+    extends NullEngine implements SeekableBlockCipher {
         long blockCounter;
 
         SeekableNullEngine() {
