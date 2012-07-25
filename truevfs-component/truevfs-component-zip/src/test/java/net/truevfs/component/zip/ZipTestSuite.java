@@ -4,11 +4,6 @@
  */
 package net.truevfs.component.zip;
 
-import net.truevfs.component.zip.ZipEntryFactory;
-import net.truevfs.component.zip.ZipFile;
-import net.truevfs.component.zip.ZipOutputStream;
-import net.truevfs.component.zip.ZipEntry;
-import net.truevfs.component.zip.Crc32Exception;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
@@ -20,9 +15,8 @@ import static java.nio.file.StandardOpenOption.WRITE;
 import java.util.*;
 import java.util.concurrent.Callable;
 import static net.truevfs.component.zip.Constants.FORCE_ZIP64_EXT;
-import static net.truevfs.kernel.spec.util.ConcurrencyUtils.NUM_IO_THREADS;
+import static net.truevfs.kernel.spec.util.ConcurrencyUtils.*;
 import net.truevfs.kernel.spec.util.ConcurrencyUtils.TaskFactory;
-import static net.truevfs.kernel.spec.util.ConcurrencyUtils.runConcurrent;
 import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 import org.junit.After;
 import static org.junit.Assert.*;
