@@ -2,8 +2,7 @@
 <!--
   - Copyright (C) 2005-2012 Schlichtherle IT Services.
   - All rights reserved. Use is subject to license terms.
-  -->
-<actions>
+  --><actions>
     <action>
         <actionName>CUSTOM-source:jar javadoc:jar deploy</actionName>
         <displayName>source:jar javadoc:jar deploy</displayName>
@@ -61,6 +60,7 @@
     <action>
         <actionName>CUSTOM-help:effective-pom</actionName>
         <displayName>help:effective-pom</displayName>
+        <recursive>false</recursive>
         <goals>
             <goal>help:effective-pom</goal>
         </goals>
