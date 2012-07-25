@@ -29,7 +29,7 @@ public class ConcurrencyUtils {
 
     private ConcurrencyUtils() { }
 
-    public static TaskJoiner runConcurrent(
+    public static TaskJoiner start(
             final int numThreads,
             final TaskFactory factory) {
         final List<Future<?>> results = new ArrayList<>(numThreads);

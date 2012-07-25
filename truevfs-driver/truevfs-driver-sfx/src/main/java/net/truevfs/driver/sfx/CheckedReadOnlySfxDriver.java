@@ -5,7 +5,7 @@
 package net.truevfs.driver.sfx;
 
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.component.zip.driver.AbstractZipDriverEntry;
+import net.truevfs.component.zip.driver.ZipDriverEntry;
 import net.truevfs.component.zip.driver.ZipInputService;
 
 /**
@@ -35,7 +35,7 @@ public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
      * @return {@code true}
      */
     @Override
-    public boolean check(AbstractZipDriverEntry entry, ZipInputService input) {
+    public boolean check(ZipDriverEntry local, ZipInputService<ZipDriverEntry> input) {
         return true;
     }
 }

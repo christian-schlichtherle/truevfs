@@ -10,7 +10,6 @@ import net.truevfs.kernel.spec.FsEntryName._;
 import net.truevfs.kernel.spec._
 import net.truevfs.kernel.spec.cio._
 import net.truevfs.kernel.spec.cio.Entry._;
-import net.truevfs.kernel.spec.io._
 import net.truevfs.kernel.spec.util._
 
 /** Implements a chain of responsibility for resolving

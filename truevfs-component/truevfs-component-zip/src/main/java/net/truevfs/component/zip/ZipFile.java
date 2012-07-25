@@ -21,7 +21,7 @@ import java.util.zip.ZipException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
-import net.truevfs.kernel.spec.io.LockInputStream;
+import de.schlichtherle.truecommons.io.LockInputStream;
 
 /**
  * Replacement for {@link java.util.zip.ZipFile java.util.zip.ZipFile}.

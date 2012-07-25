@@ -24,21 +24,6 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-access</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-access</artifactId>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-kernel-impl</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-kernel-spec</artifactId>
         </dependency>
         <dependency>
@@ -49,11 +34,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-keymanager-spec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-keymanager-spec</artifactId>
-            <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>de.schlichtherle.truecommons</groupId>

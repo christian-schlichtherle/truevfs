@@ -4,6 +4,7 @@
  */
 package net.truevfs.kernel.impl
 
+import de.schlichtherle.truecommons.io._
 import edu.umd.cs.findbugs.annotations._
 import java.io._
 import java.nio.channels._
@@ -11,7 +12,6 @@ import java.util.concurrent.locks._
 import javax.annotation._
 import javax.annotation.concurrent._
 import net.truevfs.kernel.spec.cio._
-import net.truevfs.kernel.spec.io._
 
 /**
   * Decorates another output service to allow concurrent access which is

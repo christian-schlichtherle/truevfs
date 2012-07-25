@@ -23,7 +23,7 @@ import net.truevfs.kernel.spec.FsModel;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.truevfs.kernel.spec.cio.*;
-import net.truevfs.kernel.spec.io.DisconnectingOutputStream;
+import de.schlichtherle.truecommons.io.DisconnectingOutputStream;
 import static net.truevfs.kernel.spec.util.HashMaps.OVERHEAD_SIZE;
 import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 import net.truevfs.kernel.spec.util.SuppressedExceptionBuilder;

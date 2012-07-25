@@ -43,7 +43,7 @@ public abstract class DateTimeConverterTestSuite {
     @Test
     public final void testGetThreadLocalCalendar() throws Exception {
         final GregorianCalendar ref = instance.getThreadLocalCalendar();
-        ConcurrencyUtils.runConcurrent(NUM_CPU_THREADS, new TaskFactory() {
+        ConcurrencyUtils.start(NUM_CPU_THREADS, new TaskFactory() {
             @Override
             public Callable<?> newTask(int threadNum) {
                 return new Callable<Void>() {

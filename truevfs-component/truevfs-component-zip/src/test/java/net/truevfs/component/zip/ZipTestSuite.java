@@ -355,7 +355,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
                 } // CheckAllEntries
             } // CheckAllEntriesFactory
 
-            runConcurrent(nThreads, new CheckAllEntriesFactory()).join();
+            start(nThreads, new CheckAllEntriesFactory()).join();
         }
     }
 

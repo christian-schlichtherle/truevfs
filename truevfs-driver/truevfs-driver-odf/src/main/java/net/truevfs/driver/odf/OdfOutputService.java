@@ -11,7 +11,7 @@ import java.util.Objects;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import static net.truevfs.component.zip.ZipEntry.STORED;
-import net.truevfs.component.zip.driver.AbstractZipDriverEntry;
+import net.truevfs.component.zip.driver.JarDriverEntry;
 import net.truevfs.component.zip.driver.ZipOutputService;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.truevfs.kernel.spec.cio.*;
@@ -23,7 +23,7 @@ import net.truevfs.kernel.spec.cio.*;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class OdfOutputService extends MultiplexingOutputService<AbstractZipDriverEntry> {
+public class OdfOutputService extends MultiplexingOutputService<JarDriverEntry> {
 
     /** The name of the entry to receive tender, loving care. */
     private static final String MIMETYPE = "mimetype";
@@ -39,19 +39,19 @@ public class OdfOutputService extends MultiplexingOutputService<AbstractZipDrive
      */
     public OdfOutputService(
             IoBufferPool<?> pool,
-            @WillCloseWhenClosed ZipOutputService output) {
+            @WillCloseWhenClosed ZipOutputService<JarDriverEntry> output) {
         super(pool, output);
     }
 
     @Override
-    public OutputSocket<AbstractZipDriverEntry> output(final AbstractZipDriverEntry entry) {
+    public OutputSocket<JarDriverEntry> output(final JarDriverEntry entry) {
         Objects.requireNonNull(entry);
 
-        final class Output extends DecoratingOutputSocket<AbstractZipDriverEntry> {
+        final class Output extends DecoratingOutputSocket<JarDriverEntry> {
             Output() { super(OdfOutputService.super.output(entry)); }
 
             @Override
-            public AbstractZipDriverEntry target() throws IOException {
+            public JarDriverEntry target() throws IOException {
                 return entry;
             }
 

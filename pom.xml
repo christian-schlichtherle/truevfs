@@ -170,6 +170,18 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-component-zip-driver</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-component-zip-driver</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-file</artifactId>
                 <version>${project.version}</version>
             </dependency>
@@ -182,13 +194,6 @@ system space.
                 <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-jar</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-driver-jar</artifactId>
-                <type>test-jar</type>
-                <version>${project.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -209,13 +214,6 @@ system space.
                 <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-zip</artifactId>
                 <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-driver-zip</artifactId>
-                <type>test-jar</type>
-                <version>${project.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -393,6 +391,12 @@ system space.
                 <version>1.6.6</version>
             </dependency>
             <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>1.6.6</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.tukaani</groupId>
                 <artifactId>xz</artifactId>
                 <version>1.1</version>
@@ -567,6 +571,10 @@ system space.
                 <dependency>
                     <groupId>junit</groupId>
                     <artifactId>junit</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
                 </dependency>
             </dependencies>
         </profile>

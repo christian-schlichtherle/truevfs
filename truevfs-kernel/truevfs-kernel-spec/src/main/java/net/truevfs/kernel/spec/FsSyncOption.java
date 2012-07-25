@@ -6,8 +6,8 @@ package net.truevfs.kernel.spec;
 
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.spec.io.InputClosedException;
-import net.truevfs.kernel.spec.io.OutputClosedException;
+import de.schlichtherle.truecommons.io.ClosedInputException;
+import de.schlichtherle.truecommons.io.ClosedOutputException;
 import net.truevfs.kernel.spec.util.BitField;
 
 /**
@@ -47,7 +47,7 @@ public enum FsSyncOption {
      * an {@link FsSyncWarningException} with a
      * {@link FsResourceOpenException} as its cause to indicate that any
      * subsequent operations on these resources will fail with an
-     * {@link InputClosedException} or {@link OutputClosedException}
+     * {@link ClosedInputException} or {@link ClosedOutputException}
      * respectively because they have been forced to close.
      * <p>
      * If this option is not set however, the federated file system is

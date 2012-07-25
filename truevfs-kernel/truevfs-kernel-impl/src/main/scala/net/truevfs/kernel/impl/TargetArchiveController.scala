@@ -18,7 +18,6 @@ import net.truevfs.kernel.spec.cio.Entry._;
 import net.truevfs.kernel.spec.cio.Entry.Access._;
 import net.truevfs.kernel.spec.cio.Entry.Size._;
 import net.truevfs.kernel.spec.cio.Entry.Type._;
-import net.truevfs.kernel.spec.io._
 import net.truevfs.kernel.spec.util._
 import ArchiveFileSystem._
 
@@ -219,13 +218,13 @@ extends FileSystemArchiveController[E](model) with TouchListener {
     final class Input extends AbstractInputSocket[E] {
       lazy val socket = inputArchive.get.input(name)
 
-      def target() = syncOn[InputClosedException] { socket.target() }
+      def target() = syncOn[ClosedInputException] { socket.target() }
 
       override def stream(peer: AnyOutputSocket) =
-        syncOn[InputClosedException] { socket.stream(peer) }
+        syncOn[ClosedInputException] { socket.stream(peer) }
 
       override def channel(peer: AnyOutputSocket) =
-        syncOn[InputClosedException] { socket.channel(peer) }
+        syncOn[ClosedInputException] { socket.channel(peer) }
     }
     new Input
   }
@@ -237,15 +236,15 @@ extends FileSystemArchiveController[E](model) with TouchListener {
       def target = entry
 
       override def stream(peer: AnyInputSocket) =
-        syncOn[OutputClosedException] { socket.stream(peer) }
+        syncOn[ClosedOutputException] { socket.stream(peer) }
 
       override def channel(peer: AnyInputSocket) =
-        syncOn[OutputClosedException] { socket.channel(peer) }
+        syncOn[ClosedOutputException] { socket.channel(peer) }
     }
     new Output
   }
 
-  private def syncOn[X <: ClosedException] = new {
+  private def syncOn[X <: ClosedStreamException] = new {
     def apply[A](operation: => A)(implicit mf: ClassManifest[X]) = {
       try {
         operation

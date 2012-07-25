@@ -5,7 +5,7 @@
 package net.truevfs.driver.odf;
 
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.component.zip.driver.AbstractZipDriverEntry;
+import net.truevfs.component.zip.driver.JarDriverEntry;
 import net.truevfs.component.zip.driver.ZipInputService;
 
 /**
@@ -35,7 +35,7 @@ public class CheckedOdfDriver extends OdfDriver {
      * @return {@code true}
      */
     @Override
-    public boolean check(AbstractZipDriverEntry entry, ZipInputService input) {
+    public boolean check(JarDriverEntry local, ZipInputService<JarDriverEntry> input) {
         return true;
     }
 }

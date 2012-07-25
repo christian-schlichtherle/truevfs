@@ -11,6 +11,7 @@ import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.component.zip.driver.AbstractZipDriverEntry;
 import net.truevfs.component.zip.driver.ZipDriver;
+import net.truevfs.component.zip.driver.ZipDriverEntry;
 import net.truevfs.kernel.spec.*;
 import net.truevfs.kernel.spec.cio.InputService;
 import net.truevfs.kernel.spec.cio.OutputService;
@@ -58,12 +59,12 @@ public class ReadOnlySfxDriver extends ZipDriver {
     }
 
     @Override
-    public final OutputService<AbstractZipDriverEntry> newOutput(
+    public final OutputService<ZipDriverEntry> newOutput(
             FsModel model,
             BitField<FsAccessOption> options,
             FsController<?> controller,
             FsEntryName name,
-            @CheckForNull @WillNotClose InputService<AbstractZipDriverEntry> input)
+            @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }
