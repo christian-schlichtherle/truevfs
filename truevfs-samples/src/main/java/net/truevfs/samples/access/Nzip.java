@@ -16,13 +16,13 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.truevfs.access.*;
+import net.truevfs.component.tar.driver.TarDriver;
 import net.truevfs.component.zip.driver.CheckedJarDriver;
 import net.truevfs.component.zip.driver.CheckedZipDriver;
 import net.truevfs.driver.sfx.CheckedReadOnlySfxDriver;
-import net.truevfs.driver.tar.TarBZip2Driver;
-import net.truevfs.driver.tar.TarDriver;
-import net.truevfs.driver.tar.TarGZipDriver;
-import net.truevfs.driver.tar.TarXZDriver;
+import net.truevfs.driver.tar.bzip2.TarBZip2Driver;
+import net.truevfs.driver.tar.gzip.TarGZipDriver;
+import net.truevfs.driver.tar.xz.TarXZDriver;
 import static net.truevfs.kernel.spec.FsAccessOption.*;
 import net.truevfs.kernel.spec.FsSyncException;
 

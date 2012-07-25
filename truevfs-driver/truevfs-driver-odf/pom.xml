@@ -19,6 +19,9 @@
     <name>TrueVFS Driver ODF</name>
     <description>
         The file system driver family for Open Document Format (ODF) files.
+        Files of this type typically have the extension .odt, .ott, .odg, .otg,
+        .odp, .otp, .ods, .ots, .odc, .otc, .odi, .oti, .odf, .otf, .odm, .oth
+        or .odb.
 
         Add the JAR artifact of this module to the run time class path to
         make its file system drivers available for service location in the

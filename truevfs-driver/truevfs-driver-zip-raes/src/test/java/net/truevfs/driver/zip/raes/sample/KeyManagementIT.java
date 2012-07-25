@@ -6,7 +6,7 @@ package net.truevfs.driver.zip.raes.sample;
 
 import net.truevfs.access.TArchiveDetector;
 import net.truevfs.access.TConfig;
-import net.truevfs.component.zip.driver.sample.KeyManagementITSuite;
+import net.truevfs.component.zip.driver.KeyManagementITSuite;
 
 /**
  * @author Christian Schlichtherle

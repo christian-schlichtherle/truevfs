@@ -3,10 +3,9 @@
   - Copyright (C) 2005-2012 Schlichtherle IT Services.
   - All rights reserved. Use is subject to license terms.
   -->
-<project
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project    xmlns="http://maven.apache.org/POM/4.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -19,7 +18,8 @@
 
     <name>TrueVFS Driver TAR</name>
     <description>
-        The file system driver family for TAR and related archive file types.
+        The file system driver for TAR files.
+        Files of this type typically have the extension .tar.
 
         Add the JAR artifact of this module to the run time class path to
         make its file system drivers available for service location in the
@@ -30,16 +30,16 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-access</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-access</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-compress</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-component-tar-driver</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-component-tar-driver</artifactId>
+            <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>org.tukaani</groupId>

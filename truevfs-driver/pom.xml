@@ -32,6 +32,9 @@
         <module>truevfs-driver-odf</module>
         <module>truevfs-driver-sfx</module>
         <module>truevfs-driver-tar</module>
+        <module>truevfs-driver-tar-bzip2</module>
+        <module>truevfs-driver-tar-gzip</module>
+        <module>truevfs-driver-tar-xz</module>
         <module>truevfs-driver-zip</module>
         <module>truevfs-driver-zip-raes</module>
     </modules>

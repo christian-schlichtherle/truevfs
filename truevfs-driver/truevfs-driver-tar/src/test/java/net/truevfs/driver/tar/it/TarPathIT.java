@@ -4,7 +4,8 @@
  */
 package net.truevfs.driver.tar.it;
 
-import net.truevfs.driver.tar.TarDriver;
+import net.truevfs.component.tar.driver.TarDriver;
+import net.truevfs.component.tar.driver.it.TarPathITSuite;
 import net.truevfs.kernel.spec.TestConfig;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
@@ -13,7 +14,6 @@ import net.truevfs.kernel.spec.cio.IoBufferPool;
  * @author Christian Schlichtherle
  */
 public final class TarPathIT extends TarPathITSuite<TarDriver> {
-
     @Override
     protected String getExtensionList() {
         return "tar";
