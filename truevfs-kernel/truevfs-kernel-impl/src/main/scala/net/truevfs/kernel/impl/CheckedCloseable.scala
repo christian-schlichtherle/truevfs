@@ -4,10 +4,10 @@
  */
 package net.truevfs.kernel.impl
 
+import de.schlichtherle.truecommons.io._
 import edu.umd.cs.findbugs.annotations._
 import java.io._
 import javax.annotation.concurrent._
-import net.truevfs.kernel.spec.io._
 
 /**
   * @author Christian Schlichtherle
@@ -25,6 +25,6 @@ private trait CheckedCloseable extends Closeable {
   final abstract override def close() { closed = true; super.close() }
 
   final def isOpen = !closed;
-  protected def check() { if (!isOpen) throw new ClosedException }
+  protected def check() { if (!isOpen) throw new ClosedStreamException }
   protected final def checked[V](operation: => V) = { check(); operation }
 }

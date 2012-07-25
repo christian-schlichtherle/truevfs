@@ -4,15 +4,14 @@
  */
 package net.truevfs.driver.zip.raes;
 
-import net.truevfs.component.zip.driver.AbstractZipDriverEntry;
+import net.truevfs.component.zip.driver.JarDriverEntry;
 import net.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 
 /**
  * @author  Christian Schlichtherle
  */
 public final class ZipRaesDriverTest
-extends FsArchiveDriverTestSuite<AbstractZipDriverEntry, ZipRaesDriver> {
-
+extends FsArchiveDriverTestSuite<JarDriverEntry, ZipRaesDriver> {
     @Override
     protected TestZipRaesDriver newArchiveDriver() {
         return new TestZipRaesDriver();

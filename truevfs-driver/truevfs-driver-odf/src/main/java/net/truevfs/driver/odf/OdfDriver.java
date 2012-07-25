@@ -8,8 +8,8 @@ import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.component.zip.driver.AbstractZipDriverEntry;
 import net.truevfs.component.zip.driver.JarDriver;
+import net.truevfs.component.zip.driver.JarDriverEntry;
 import net.truevfs.component.zip.driver.ZipInputService;
 import net.truevfs.component.zip.driver.ZipOutputService;
 import static net.truevfs.kernel.spec.FsAccessOption.GROW;
@@ -47,13 +47,13 @@ import net.truevfs.kernel.spec.cio.OutputService;
 public class OdfDriver extends JarDriver {
 
     @Override
-    protected OutputService<AbstractZipDriverEntry> newOutput(
+    protected OutputService<JarDriverEntry> newOutput(
             final FsModel model,
             final FsOutputSocketSink sink,
-            final @CheckForNull @WillNotClose InputService<AbstractZipDriverEntry> input)
+            final @CheckForNull @WillNotClose InputService<JarDriverEntry> input)
     throws IOException {
-        final ZipInputService zis = (ZipInputService) input;
-        final ZipOutputService zos = new ZipOutputService(model, sink, zis, this);
+        final ZipInputService<JarDriverEntry> zis = (ZipInputService<JarDriverEntry>) input;
+        final ZipOutputService<JarDriverEntry> zos = new ZipOutputService<>(model, sink, zis, this);
         final IoBufferPool<?> pool = getPool();
         return null != zis && sink.getOptions().get(GROW)
                 ? new MultiplexingOutputService<>(pool, zos)

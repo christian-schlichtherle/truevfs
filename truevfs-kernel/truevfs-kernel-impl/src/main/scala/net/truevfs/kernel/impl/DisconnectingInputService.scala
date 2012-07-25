@@ -4,20 +4,20 @@
  */
 package net.truevfs.kernel.impl
 
+import de.schlichtherle.truecommons.io._
 import edu.umd.cs.findbugs.annotations._
 import java.io._
 import java.nio.channels._
 import javax.annotation._
 import javax.annotation.concurrent._
 import net.truevfs.kernel.spec.cio._
-import net.truevfs.kernel.spec.io._
 
 /**
   * Decorates another input service in order to disconnect any resources when
   * this input service gets closed.
   * Once `close`d, all methods of all products of this service, including all
   * sockets, streams etc. but excluding `output` and all `close` methods of all
-  * products will throw an [[net.truevfs.kernel.spec.io.InputClosedException]]
+  * products will throw an [[de.schlichtherle.truecommons.io.ClosedInputException]]
   * when called.
   *
   * @tparam E the type of the entries.
@@ -49,7 +49,7 @@ with CheckedCloseable {
     new Input
   }
 
-  override protected def check() { if (!isOpen) throw new InputClosedException }
+  override protected def check() { if (!isOpen) throw new ClosedInputException }
 
   private final class DisconnectingInputStreamImpl
   (@WillCloseWhenClosed in: InputStream)

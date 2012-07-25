@@ -21,9 +21,9 @@ import static net.truevfs.kernel.spec.cio.Entry.Access.WRITE;
 import net.truevfs.kernel.spec.cio.Entry.Entity;
 import net.truevfs.kernel.spec.cio.Entry.Size;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.spec.io.DisconnectingInputStream;
-import net.truevfs.kernel.spec.io.DisconnectingOutputStream;
-import net.truevfs.kernel.spec.io.DisconnectingSeekableChannel;
+import de.schlichtherle.truecommons.io.DisconnectingInputStream;
+import de.schlichtherle.truecommons.io.DisconnectingOutputStream;
+import de.schlichtherle.truecommons.io.DisconnectingSeekableChannel;
 
 /**
  * An I/O buffer which is backed by a byte array.

@@ -15,7 +15,7 @@ import static net.truevfs.kernel.spec.FsSyncOptions.SYNC;
 import static net.truevfs.kernel.spec.util.ConcurrencyUtils.NUM_IO_THREADS;
 import net.truevfs.kernel.spec.util.ConcurrencyUtils.TaskFactory;
 import net.truevfs.kernel.spec.util.ConcurrencyUtils.TaskJoiner;
-import static net.truevfs.kernel.spec.util.ConcurrencyUtils.runConcurrent;
+import static net.truevfs.kernel.spec.util.ConcurrencyUtils.start;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -81,10 +81,10 @@ extends ConfiguredClientTestBase<D> {
         } // SyncFactory
 
         // Trigger sync mayhem!
-        final TaskJoiner sync = runConcurrent(
+        final TaskJoiner sync = start(
                 Runtime.getRuntime().availableProcessors(),
                 new SyncFactory());
-        runConcurrent(
+        start(
                 NUM_IO_THREADS,
                 new RoundTripFactory()).join();
         sync.cancel();

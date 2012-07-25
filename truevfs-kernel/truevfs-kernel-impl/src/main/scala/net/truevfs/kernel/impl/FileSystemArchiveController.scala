@@ -10,7 +10,6 @@ import javax.annotation.concurrent._
 import net.truevfs.kernel.spec._
 import net.truevfs.kernel.spec.cio._
 import net.truevfs.kernel.spec.cio.Entry._;
-import net.truevfs.kernel.spec.io._
 import net.truevfs.kernel.spec.util._
 
 /** This abstract archive controller controls the mount state transition.

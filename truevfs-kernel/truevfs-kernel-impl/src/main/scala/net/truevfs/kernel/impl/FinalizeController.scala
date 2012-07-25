@@ -12,7 +12,6 @@ import javax.annotation.concurrent._
 import net.truevfs.kernel.spec._
 import net.truevfs.kernel.spec.cio._
 import net.truevfs.kernel.spec.cio.Entry._;
-import net.truevfs.kernel.spec.io._
 import net.truevfs.kernel.spec.util._
 
 /** Finalizes unclosed resources returned by its decorated controller.
@@ -68,18 +67,18 @@ private object FinalizeController {
     abstract override def finalize() {
       try {
         ioException match {
-          case Some(ex) => logger debug ("closeFailed", ex)
+          case Some(ex) => logger trace ("closeFailed", ex)
           case None => logger trace "closeCleared"
           case _ =>
             try {
               super.close()
-              logger debug "finalizeCleared"
+              logger info "finalizeCleared"
             } catch {
-              case ex: ControlFlowException => // report and swallow
-                logger warn ("finalizeFailed",
+              case ex: ControlFlowException => // log and swallow!
+                logger error ("finalizeFailed",
                            new AssertionError("Unexpected control flow exception!", ex))
-              case ex: Throwable => // report and swallow
-                logger info ("finalizeFailed", ex)
+              case ex: Throwable => // log and swallow!
+                logger warn ("finalizeFailed", ex)
             }
         }
       } finally {

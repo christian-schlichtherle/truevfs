@@ -38,11 +38,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-component-zip</artifactId>
+            <artifactId>truevfs-component-zip-driver</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-component-zip</artifactId>
+            <artifactId>truevfs-component-zip-driver</artifactId>
             <type>test-jar</type>
         </dependency>
     </dependencies>

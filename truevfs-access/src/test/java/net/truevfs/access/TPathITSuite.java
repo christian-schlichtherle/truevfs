@@ -21,13 +21,13 @@ import static net.truevfs.kernel.spec.FsSyncOption.CLEAR_CACHE;
 import static net.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
 import static net.truevfs.kernel.spec.FsSyncOptions.SYNC;
 import net.truevfs.kernel.spec.FsSyncWarningException;
-import net.truevfs.kernel.spec.io.InputClosedException;
-import net.truevfs.kernel.spec.io.OutputClosedException;
+import de.schlichtherle.truecommons.io.ClosedInputException;
+import de.schlichtherle.truecommons.io.ClosedOutputException;
 import net.truevfs.kernel.spec.util.BitField;
 import static net.truevfs.kernel.spec.util.ConcurrencyUtils.NUM_IO_THREADS;
 import net.truevfs.kernel.spec.util.ConcurrencyUtils.TaskFactory;
 import net.truevfs.kernel.spec.util.ConcurrencyUtils.TaskJoiner;
-import static net.truevfs.kernel.spec.util.ConcurrencyUtils.runConcurrent;
+import static net.truevfs.kernel.spec.util.ConcurrencyUtils.start;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -472,7 +472,7 @@ extends ConfiguredClientTestBase<D> {
             try {
                 copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
                 fail();
-            } catch (InputClosedException ex) {
+            } catch (ClosedInputException ex) {
             }
 
             // Open file1 as stream and let the garbage collection close the stream automatically.
@@ -571,7 +571,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             Streams.cat(new ByteArrayInputStream(getData()), out); // write again
             fail();
-        } catch (OutputClosedException ex) {
+        } catch (ClosedOutputException ex) {
         }
 
         // The stream has been forcibly closed by TPath.update().
@@ -1209,7 +1209,7 @@ extends ConfiguredClientTestBase<D> {
         } // CheckAllEntriesFactory
 
         try {
-            runConcurrent(nThreads, new CheckAllEntriesFactory()).join();
+            start(nThreads, new CheckAllEntriesFactory()).join();
         } finally {
             archive.toFile().rm_r();
         }
@@ -1297,7 +1297,7 @@ extends ConfiguredClientTestBase<D> {
         } // WriteFactory
 
         try {
-            runConcurrent(NUM_IO_THREADS, new WriteFactory()).join();
+            start(NUM_IO_THREADS, new WriteFactory()).join();
         } finally {
             assertArchiveEntries(archive, NUM_IO_THREADS);
             archive.toFile().rm_r();
@@ -1358,7 +1358,7 @@ extends ConfiguredClientTestBase<D> {
             }
         } // WriteFactory
 
-        runConcurrent(NUM_IO_THREADS, new WriteFactory()).join();
+        start(NUM_IO_THREADS, new WriteFactory()).join();
     }
 
     /** Test for http://java.net/jira/browse/TRUEZIP-192 . */
@@ -1397,10 +1397,10 @@ extends ConfiguredClientTestBase<D> {
             delete(dst);
             try {
                 try {
-                    final TaskJoiner join = runConcurrent(NUM_IO_THREADS,
+                    final TaskJoiner join = start(NUM_IO_THREADS,
                             new CopyFactory(src, dst));
                     try {
-                        runConcurrent(NUM_IO_THREADS,
+                        start(NUM_IO_THREADS,
                                 new CopyFactory(dst, src)).join();
                     } finally {
                         join.join();

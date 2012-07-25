@@ -29,5 +29,6 @@
         <module>truevfs-component-ibm437</module>
         <module>truevfs-component-instrumentation</module>
         <module>truevfs-component-zip</module>
+        <module>truevfs-component-zip-driver</module>
     </modules>
 </project>

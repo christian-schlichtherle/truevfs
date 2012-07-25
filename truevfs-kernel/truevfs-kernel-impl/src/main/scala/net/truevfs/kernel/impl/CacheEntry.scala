@@ -11,7 +11,6 @@ import java.nio.channels._
 import javax.annotation.concurrent._
 import net.truevfs.kernel.spec.cio.Entry._
 import net.truevfs.kernel.spec.cio._
-import net.truevfs.kernel.spec.io._
 import net.truevfs.kernel.spec.util._
 import CacheEntry._
 

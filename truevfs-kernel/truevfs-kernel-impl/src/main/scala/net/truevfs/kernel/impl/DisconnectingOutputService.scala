@@ -4,20 +4,20 @@
  */
 package net.truevfs.kernel.impl
 
+import de.schlichtherle.truecommons.io._
 import edu.umd.cs.findbugs.annotations._
 import java.io._
 import java.nio.channels._
 import javax.annotation._
 import javax.annotation.concurrent._
 import net.truevfs.kernel.spec.cio._
-import net.truevfs.kernel.spec.io._
 
 /**
   * Decorates another output service in order to disconnect any resources when
   * this output service gets closed.
   * Once `close`d, all methods of all products of this service, including all
   * sockets, streams etc. but excluding `output` and all `close` methods of all
-  * products will throw an [[net.truevfs.kernel.spec.io.OutputClosedException]]
+  * products will throw an [[de.schlichtherle.truecommons.io.ClosedOutputException]]
   * when called.
   *
   * @tparam E the type of the entries.
@@ -49,7 +49,7 @@ with CheckedCloseable {
     new Output
   }
 
-  override protected def check() { if (!isOpen) throw new OutputClosedException }
+  override protected def check() { if (!isOpen) throw new ClosedOutputException }
 
   private final class DisconnectingOutputStreamImpl
   (@WillCloseWhenClosed out: OutputStream)

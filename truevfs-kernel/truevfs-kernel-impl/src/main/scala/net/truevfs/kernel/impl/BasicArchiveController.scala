@@ -17,7 +17,6 @@ import net.truevfs.kernel.spec.cio._
 import net.truevfs.kernel.spec.cio.Entry._;
 import net.truevfs.kernel.spec.cio.Entry.Access._;
 import net.truevfs.kernel.spec.cio.Entry.Type._;
-import net.truevfs.kernel.spec.io._
 import net.truevfs.kernel.spec.util._
 
 /** An abstract base class for any archive file system controller which
