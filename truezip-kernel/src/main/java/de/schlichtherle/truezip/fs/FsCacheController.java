@@ -95,11 +95,10 @@ extends FsLockModelDecoratingController<FsController<? extends FsLockModel>> {
      * @param pool the pool of I/O buffers to hold the cached entry contents.
      */
     FsCacheController(
-            final FsController<? extends FsLockModel> controller,
-            final IOPool<?> pool) {
+            final IOPool<?> pool,
+            final FsController<? extends FsLockModel> controller) {
         super(controller);
-        if (null == (this.pool = pool))
-            throw new NullPointerException();
+        if (null == (this.pool = pool)) throw new NullPointerException();
     }
 
     @Override

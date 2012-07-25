@@ -81,12 +81,11 @@ extends FsDriver {
         // HC SVNT DRACONES!
         return  new FsLockController(
                     new FsSyncController(
-                        new FsCacheController(
+                        new FsCacheController(getPool(),
                             new FsResourceController(
                                 new FsContextController(
                                     new FsTargetArchiveController<E>(
-                                        this, new FsLockModel(model), parent))),
-                            getPool())));
+                                        this, new FsLockModel(model), parent))))));
     }
 
     /**
