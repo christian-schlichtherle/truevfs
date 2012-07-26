@@ -6,7 +6,6 @@ package net.truevfs.kernel.spec.cio;
 
 import de.schlichtherle.truecommons.io.DecoratingOutputStream;
 import de.schlichtherle.truecommons.io.InputException;
-import de.schlichtherle.truecommons.services.util.JointIterator;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -20,6 +19,7 @@ import static net.truevfs.kernel.spec.cio.Entry.ALL_ACCESS;
 import net.truevfs.kernel.spec.cio.Entry.Access;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
+import net.truevfs.kernel.spec.util.CompoundIterator;
 import net.truevfs.kernel.spec.util.ExceptionBuilder;
 import net.truevfs.kernel.spec.util.PriorityExceptionBuilder;
 import net.truevfs.kernel.spec.util.SuppressedExceptionBuilder;
@@ -74,7 +74,7 @@ extends DecoratingOutputService<E, OutputService<E>> {
 
     @Override
     public Iterator<E> iterator() {
-        return new JointIterator<>(
+        return new CompoundIterator<>(
                 container.iterator(),
                 new BufferedEntriesIterator());
     }
