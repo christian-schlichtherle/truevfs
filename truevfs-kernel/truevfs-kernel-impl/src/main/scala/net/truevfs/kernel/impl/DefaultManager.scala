@@ -4,14 +4,14 @@
  */
 package net.truevfs.kernel.impl
 
+import de.schlichtherle.truecommons.shed._
+import de.schlichtherle.truecommons.shed.Link._
+import de.schlichtherle.truecommons.shed.Link.Type._
+import de.schlichtherle.truecommons.shed.Links._
 import java.util.concurrent.locks._
 import java.util.concurrent.locks.ReentrantReadWriteLock._
 import javax.annotation.concurrent._
 import net.truevfs.kernel.spec._
-import net.truevfs.kernel.spec.util._
-import net.truevfs.kernel.spec.util.Link._
-import net.truevfs.kernel.spec.util.Link.Type._
-import net.truevfs.kernel.spec.util.Links._
 import scala.collection.mutable.WeakHashMap
 
 /** The default implementation of a file system manager.

@@ -12,8 +12,8 @@ import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.spec.cio.ByteArrayIoBufferPool;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.IoBufferPool;
-import net.truevfs.kernel.spec.util.InheritableThreadLocalStack;
-import net.truevfs.kernel.spec.util.Resource;
+import de.schlichtherle.truecommons.shed.InheritableThreadLocalStack;
+import de.schlichtherle.truecommons.shed.Resource;
 
 /**
  * A container for configuration options with global or inheritable thread

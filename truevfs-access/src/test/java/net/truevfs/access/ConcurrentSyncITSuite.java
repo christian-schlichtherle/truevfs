@@ -4,6 +4,10 @@
  */
 package net.truevfs.access;
 
+import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
+import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskFactory;
+import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskJoiner;
+import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.start;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -12,10 +16,6 @@ import java.util.Arrays;
 import java.util.concurrent.Callable;
 import net.truevfs.kernel.spec.FsArchiveDriver;
 import static net.truevfs.kernel.spec.FsSyncOptions.SYNC;
-import static net.truevfs.kernel.spec.util.ConcurrencyUtils.NUM_IO_THREADS;
-import net.truevfs.kernel.spec.util.ConcurrencyUtils.TaskFactory;
-import net.truevfs.kernel.spec.util.ConcurrencyUtils.TaskJoiner;
-import static net.truevfs.kernel.spec.util.ConcurrencyUtils.start;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;

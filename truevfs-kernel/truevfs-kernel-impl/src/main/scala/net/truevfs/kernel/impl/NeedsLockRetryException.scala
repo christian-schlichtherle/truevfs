@@ -4,8 +4,8 @@
  */
 package net.truevfs.kernel.impl
 
+import de.schlichtherle.truecommons.shed._
 import javax.annotation.concurrent._
-import net.truevfs.kernel.spec.util._
 
 /** Indicates that all file system locks need to get released before the
   * operation can get retried.

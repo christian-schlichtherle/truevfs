@@ -4,6 +4,9 @@
  */
 package net.truevfs.kernel.impl
 
+import de.schlichtherle.truecommons.shed._
+import de.schlichtherle.truecommons.shed.HashMaps._
+import de.schlichtherle.truecommons.shed.Paths._
 import java.nio.file._
 import java.util.Locale
 import javax.annotation.concurrent._
@@ -15,9 +18,6 @@ import net.truevfs.kernel.spec.cio._
 import net.truevfs.kernel.spec.cio.Entry._
 import net.truevfs.kernel.spec.cio.Entry.Access._
 import net.truevfs.kernel.spec.cio.Entry.Type._
-import net.truevfs.kernel.spec.util._
-import net.truevfs.kernel.spec.util.HashMaps._
-import net.truevfs.kernel.spec.util.Paths._
 import scala.annotation._
 import ArchiveFileSystem._
 

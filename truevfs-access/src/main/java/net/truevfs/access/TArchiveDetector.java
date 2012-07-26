@@ -16,9 +16,9 @@ import net.truevfs.kernel.spec.FsAbstractCompositeDriver;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsScheme;
 import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
-import net.truevfs.kernel.spec.util.ExtensionSet;
-import net.truevfs.kernel.spec.util.HashMaps;
-import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
+import de.schlichtherle.truecommons.shed.ExtensionSet;
+import de.schlichtherle.truecommons.shed.HashMaps;
+import static de.schlichtherle.truecommons.shed.HashMaps.initialCapacity;
 
 /**
  * Detects a <em>prospective</em> archive file and declares its file system

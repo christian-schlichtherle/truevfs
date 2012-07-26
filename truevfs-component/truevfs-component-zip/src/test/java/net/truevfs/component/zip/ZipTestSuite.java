@@ -4,6 +4,9 @@
  */
 package net.truevfs.component.zip;
 
+import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.*;
+import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskFactory;
+import static de.schlichtherle.truecommons.shed.HashMaps.initialCapacity;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
@@ -15,9 +18,6 @@ import static java.nio.file.StandardOpenOption.WRITE;
 import java.util.*;
 import java.util.concurrent.Callable;
 import static net.truevfs.component.zip.Constants.FORCE_ZIP64_EXT;
-import static net.truevfs.kernel.spec.util.ConcurrencyUtils.*;
-import net.truevfs.kernel.spec.util.ConcurrencyUtils.TaskFactory;
-import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;

@@ -11,8 +11,8 @@ import java.util.Map;
 import java.util.Set;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsScheme;
-import net.truevfs.kernel.spec.util.ExtensionSet;
-import net.truevfs.kernel.spec.util.HashMaps;
+import de.schlichtherle.truecommons.shed.ExtensionSet;
+import de.schlichtherle.truecommons.shed.HashMaps;
 
 /**
  * Creates maps with a mock driver.

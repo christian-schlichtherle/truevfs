@@ -15,7 +15,7 @@ import net.truevfs.component.zip.driver.ZipDriverEntry;
 import net.truevfs.kernel.spec.*;
 import net.truevfs.kernel.spec.cio.InputService;
 import net.truevfs.kernel.spec.cio.OutputService;
-import net.truevfs.kernel.spec.util.BitField;
+import de.schlichtherle.truecommons.shed.BitField;
 
 /**
  * An archive driver which reads Self Executable (SFX/EXE) ZIP files,

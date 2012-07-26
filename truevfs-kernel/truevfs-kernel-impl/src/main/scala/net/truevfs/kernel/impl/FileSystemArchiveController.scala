@@ -4,13 +4,13 @@
  */
 package net.truevfs.kernel.impl
 
+import de.schlichtherle.truecommons.shed._
 import java.io._
 import java.nio.channels._
 import javax.annotation.concurrent._
 import net.truevfs.kernel.spec._
 import net.truevfs.kernel.spec.cio._
 import net.truevfs.kernel.spec.cio.Entry._;
-import net.truevfs.kernel.spec.util._
 
 /** This abstract archive controller controls the mount state transition.
   * It is up to the sub-class to implement the actual mounting/unmounting

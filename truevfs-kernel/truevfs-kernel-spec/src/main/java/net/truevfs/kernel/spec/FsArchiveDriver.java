@@ -19,8 +19,8 @@ import static net.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
 import net.truevfs.kernel.spec.cio.Entry.Type;
 import static net.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
 import net.truevfs.kernel.spec.cio.*;
-import net.truevfs.kernel.spec.util.BitField;
-import static net.truevfs.kernel.spec.util.Paths.cutTrailingSeparators;
+import de.schlichtherle.truecommons.shed.BitField;
+import static de.schlichtherle.truecommons.shed.Paths.cutTrailingSeparators;
 
 /**
  * An abstract factory for components required for accessing archive files.

@@ -4,13 +4,13 @@
  */
 package net.truevfs.kernel.impl;
 
+import de.schlichtherle.truecommons.shed.Link.Type;
+import static de.schlichtherle.truecommons.shed.Link.Type.STRONG;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 import net.truevfs.kernel.driver.mock.MockDriverMapContainer;
 import net.truevfs.kernel.spec.*;
-import net.truevfs.kernel.spec.util.Link.Type;
-import static net.truevfs.kernel.spec.util.Link.Type.STRONG;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;

@@ -28,8 +28,8 @@ import static net.truevfs.kernel.spec.cio.Entry.Access.*;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.truevfs.kernel.spec.cio.InputSocket;
 import net.truevfs.kernel.spec.cio.IoSockets;
-import net.truevfs.kernel.spec.util.BitField;
-import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
+import de.schlichtherle.truecommons.shed.BitField;
+import static de.schlichtherle.truecommons.shed.HashMaps.initialCapacity;
 
 /**
  * An output socket for a file entry.

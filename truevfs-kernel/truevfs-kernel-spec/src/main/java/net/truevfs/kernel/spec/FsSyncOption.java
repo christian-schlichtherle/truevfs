@@ -8,7 +8,7 @@ import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 import de.schlichtherle.truecommons.io.ClosedInputException;
 import de.schlichtherle.truecommons.io.ClosedOutputException;
-import net.truevfs.kernel.spec.util.BitField;
+import de.schlichtherle.truecommons.shed.BitField;
 
 /**
  * Defines options for (federated) file system synchronization.

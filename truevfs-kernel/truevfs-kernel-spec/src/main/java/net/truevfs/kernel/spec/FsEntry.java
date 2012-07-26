@@ -8,7 +8,7 @@ import java.util.Formatter;
 import java.util.Set;
 import javax.annotation.Nullable;
 import net.truevfs.kernel.spec.cio.Entry;
-import net.truevfs.kernel.spec.util.BitField;
+import de.schlichtherle.truecommons.shed.BitField;
 
 /**
  * An abstract file system entry is an entry which can implement multiple types

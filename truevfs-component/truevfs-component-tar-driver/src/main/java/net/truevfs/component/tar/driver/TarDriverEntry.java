@@ -16,7 +16,7 @@ import static net.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
 import static net.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
 import static net.truevfs.kernel.spec.cio.Entry.Type.FILE;
 import net.truevfs.kernel.spec.cio.IoBuffer;
-import net.truevfs.kernel.spec.util.Releasable;
+import de.schlichtherle.truecommons.shed.Releasable;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**

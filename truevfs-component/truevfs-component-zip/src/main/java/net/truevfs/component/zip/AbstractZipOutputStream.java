@@ -7,6 +7,7 @@ package net.truevfs.component.zip;
 import de.schlichtherle.truecommons.io.DecoratingOutputStream;
 import de.schlichtherle.truecommons.io.LittleEndianOutputStream;
 import de.schlichtherle.truecommons.io.Sink;
+import de.schlichtherle.truecommons.shed.HashMaps;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,7 +30,6 @@ import static net.truevfs.component.zip.WinZipAesEntryExtraField.VV_AE_2;
 import static net.truevfs.component.zip.WinZipAesUtils.overhead;
 import static net.truevfs.component.zip.ZipEntry.*;
 import static net.truevfs.component.zip.ZipParametersUtils.parameters;
-import net.truevfs.kernel.spec.util.HashMaps;
 import net.truevfs.keymanager.spec.param.AesKeyStrength;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 

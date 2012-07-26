@@ -4,12 +4,12 @@
  */
 package net.truevfs.kernel.impl
 
+import de.schlichtherle.truecommons.shed._
 import java.io._
 import java.nio.file._
 import net.truevfs.kernel.spec._
 import net.truevfs.kernel.spec.cio._
 import net.truevfs.kernel.spec.cio.Entry._
-import net.truevfs.kernel.spec.util._
 
 /** Provides read/write access to a file system.
   * Implementations of this interface are typically organized in a chain of

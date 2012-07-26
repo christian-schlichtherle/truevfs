@@ -28,7 +28,7 @@ import static net.truevfs.kernel.spec.cio.Entry.PosixEntity.*;
 import net.truevfs.kernel.spec.cio.InputSocket;
 import net.truevfs.kernel.spec.cio.IoBuffer;
 import net.truevfs.kernel.spec.cio.OutputSocket;
-import net.truevfs.kernel.spec.util.BitField;
+import de.schlichtherle.truecommons.shed.BitField;
 
 /**
  * Adapts a {@link Path} instance to a {@link FsEntry}.

@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import net.truevfs.kernel.spec.cio.Entry;
 import net.truevfs.kernel.spec.cio.InputSocket;
-import net.truevfs.kernel.spec.util.BitField;
+import de.schlichtherle.truecommons.shed.BitField;
 
 /**
  * An adapter from an input socket to a source with access options.

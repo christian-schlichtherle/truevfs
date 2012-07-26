@@ -21,7 +21,7 @@ import static net.truevfs.kernel.spec.cio.Entry.ALL_SIZES;
 import net.truevfs.kernel.spec.cio.Entry.Access;
 import net.truevfs.kernel.spec.cio.Entry.Size;
 import net.truevfs.kernel.spec.cio.*;
-import net.truevfs.kernel.spec.util.HashMaps;
+import de.schlichtherle.truecommons.shed.HashMaps;
 
 /**
  * @author Christian Schlichtherle

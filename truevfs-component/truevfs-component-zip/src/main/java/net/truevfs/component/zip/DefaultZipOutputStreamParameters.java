@@ -4,10 +4,10 @@
  */
 package net.truevfs.component.zip;
 
+import de.schlichtherle.truecommons.shed.HashMaps;
 import java.nio.charset.Charset;
 import java.util.zip.Deflater;
 import javax.annotation.concurrent.ThreadSafe;
-import net.truevfs.kernel.spec.util.HashMaps;
 
 /**
  * Default implementation of {@link ZipOutputStreamParameters}.

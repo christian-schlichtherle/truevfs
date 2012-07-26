@@ -6,6 +6,7 @@ package net.truevfs.kernel.impl
 
 import de.schlichtherle.truecommons.io._
 import de.schlichtherle.truecommons.logging._
+import de.schlichtherle.truecommons.shed._
 import java.io._
 import java.nio.channels._
 import javax.annotation.concurrent._
@@ -16,7 +17,6 @@ import net.truevfs.kernel.spec.FsSyncOptions._
 import net.truevfs.kernel.spec.cio._
 import net.truevfs.kernel.spec.cio.Entry._;
 import net.truevfs.kernel.spec.cio.Entry.Type._;
-import net.truevfs.kernel.spec.util._
 import scala.util.control.Breaks
 
 /** A selective cache for file system entries.

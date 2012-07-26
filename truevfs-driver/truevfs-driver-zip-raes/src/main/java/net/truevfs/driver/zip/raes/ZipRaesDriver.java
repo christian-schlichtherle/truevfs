@@ -21,7 +21,7 @@ import net.truevfs.kernel.spec.cio.Entry.Type;
 import net.truevfs.kernel.spec.cio.InputService;
 import net.truevfs.kernel.spec.cio.MultiplexingOutputService;
 import net.truevfs.kernel.spec.cio.OutputService;
-import net.truevfs.kernel.spec.util.BitField;
+import de.schlichtherle.truecommons.shed.BitField;
 
 /**
  * An abstract archive driver for RAES encrypted ZIP files which optionally

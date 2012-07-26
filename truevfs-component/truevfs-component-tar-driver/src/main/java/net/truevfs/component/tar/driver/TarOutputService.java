@@ -24,9 +24,9 @@ import net.truevfs.kernel.spec.FsModel;
 import net.truevfs.kernel.spec.cio.*;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import static net.truevfs.kernel.spec.util.HashMaps.OVERHEAD_SIZE;
-import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
-import net.truevfs.kernel.spec.util.SuppressedExceptionBuilder;
+import static de.schlichtherle.truecommons.shed.HashMaps.OVERHEAD_SIZE;
+import static de.schlichtherle.truecommons.shed.HashMaps.initialCapacity;
+import de.schlichtherle.truecommons.shed.SuppressedExceptionBuilder;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**

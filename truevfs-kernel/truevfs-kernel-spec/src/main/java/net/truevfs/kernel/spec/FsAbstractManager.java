@@ -6,7 +6,7 @@ package net.truevfs.kernel.spec;
 
 import javax.annotation.concurrent.ThreadSafe;
 import static net.truevfs.kernel.spec.FsSyncOption.ABORT_CHANGES;
-import net.truevfs.kernel.spec.util.BitField;
+import de.schlichtherle.truecommons.shed.BitField;
 
 /**
  * An abstract file system manager.

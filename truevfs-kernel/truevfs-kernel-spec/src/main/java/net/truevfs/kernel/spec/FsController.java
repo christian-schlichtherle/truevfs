@@ -13,7 +13,7 @@ import net.truevfs.kernel.spec.cio.Entry.Access;
 import net.truevfs.kernel.spec.cio.Entry.Type;
 import net.truevfs.kernel.spec.cio.InputSocket;
 import net.truevfs.kernel.spec.cio.OutputSocket;
-import net.truevfs.kernel.spec.util.BitField;
+import de.schlichtherle.truecommons.shed.BitField;
 
 /**
  * Provides file system operations.

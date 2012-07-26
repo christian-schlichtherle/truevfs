@@ -30,10 +30,10 @@ import net.truevfs.kernel.spec.cio.Entry.Size;
 import static net.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
 import static net.truevfs.kernel.spec.cio.Entry.Type.FILE;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.spec.util.BitField;
-import net.truevfs.kernel.spec.util.PathSplitter;
-import net.truevfs.kernel.spec.util.Paths;
-import net.truevfs.kernel.spec.util.UriBuilder;
+import de.schlichtherle.truecommons.shed.BitField;
+import de.schlichtherle.truecommons.shed.PathSplitter;
+import de.schlichtherle.truecommons.shed.Paths;
+import de.schlichtherle.truecommons.shed.UriBuilder;
 
 /**
  * A replacement for the class {@link File} which provides transparent

@@ -4,9 +4,9 @@
  */
 package net.truevfs.kernel.impl
 
+import de.schlichtherle.truecommons.shed._
 import java.io._
 import javax.annotation.concurrent._
-import net.truevfs.kernel.spec.util._
 
 /** Indicates that a file system is a false positive file system and that this
   * exception may get cached until the federated (archive) file system gets

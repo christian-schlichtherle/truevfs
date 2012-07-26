@@ -14,7 +14,7 @@ import net.truevfs.kernel.spec.*;
 import net.truevfs.kernel.spec.cio.InputSocket;
 import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.truevfs.kernel.spec.sl.FsManagerLocator;
-import net.truevfs.kernel.spec.util.BitField;
+import de.schlichtherle.truecommons.shed.BitField;
 
 /**
  * A poor man's blend of the cat(1) and wget(1) command line utility

@@ -22,7 +22,7 @@ import static net.truevfs.kernel.spec.FsAccessOption.STORE;
 import net.truevfs.kernel.spec.cio.InputService;
 import net.truevfs.kernel.spec.cio.MultiplexingOutputService;
 import net.truevfs.kernel.spec.cio.OutputService;
-import net.truevfs.kernel.spec.util.BitField;
+import de.schlichtherle.truecommons.shed.BitField;
 import org.tukaani.xz.LZMA2Options;
 import org.tukaani.xz.XZInputStream;
 import org.tukaani.xz.XZOutputStream;

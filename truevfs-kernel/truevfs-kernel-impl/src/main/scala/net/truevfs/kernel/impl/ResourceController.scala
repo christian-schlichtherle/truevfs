@@ -5,12 +5,12 @@
 package net.truevfs.kernel.impl
 
 import de.schlichtherle.truecommons.io._
+import de.schlichtherle.truecommons.shed._
 import net.truevfs.kernel.spec._
 import net.truevfs.kernel.spec._
 import net.truevfs.kernel.spec.FsSyncOption._
 import net.truevfs.kernel.spec.cio._
 import net.truevfs.kernel.spec.cio.Entry._;
-import net.truevfs.kernel.spec.util._
 import java.io._
 import java.nio.channels._
 import javax.annotation.concurrent._
