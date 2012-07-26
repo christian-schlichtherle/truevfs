@@ -5,9 +5,9 @@
 package net.truevfs.component.zip.driver;
 
 import de.schlichtherle.truecommons.io.DecoratingOutputStream;
+import de.schlichtherle.truecommons.io.DisconnectingOutputStream;
 import de.schlichtherle.truecommons.io.InputException;
 import de.schlichtherle.truecommons.io.Streams;
-import de.schlichtherle.truecommons.services.util.JointIterator;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -28,12 +28,12 @@ import static net.truevfs.component.zip.ZipEntry.STORED;
 import static net.truevfs.kernel.spec.FsAccessOption.GROW;
 import net.truevfs.kernel.spec.FsModel;
 import net.truevfs.kernel.spec.FsOutputSocketSink;
+import net.truevfs.kernel.spec.cio.*;
 import net.truevfs.kernel.spec.cio.Entry.Access;
 import net.truevfs.kernel.spec.cio.Entry.Size;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.spec.cio.*;
-import de.schlichtherle.truecommons.io.DisconnectingOutputStream;
+import net.truevfs.kernel.spec.util.CompoundIterator;
 import net.truevfs.kernel.spec.util.SuppressedExceptionBuilder;
 
 /**
@@ -123,9 +123,8 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
     @Override
     public Iterator<E> iterator() {
         final E bufferedEntry = this.bufferedEntry;
-        if (null == bufferedEntry)
-            return super.iterator();
-        return new JointIterator<>(
+        if (null == bufferedEntry) return super.iterator();
+        return new CompoundIterator<>(
                 super.iterator(),
                 Collections.singletonList(bufferedEntry).iterator());
     }
