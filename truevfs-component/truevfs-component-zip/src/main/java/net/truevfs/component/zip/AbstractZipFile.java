@@ -5,6 +5,7 @@
 package net.truevfs.component.zip;
 
 import de.schlichtherle.truecommons.io.*;
+import de.schlichtherle.truecommons.shed.HashMaps;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -30,7 +31,6 @@ import static net.truevfs.component.zip.WinZipAesEntryExtraField.VV_AE_2;
 import static net.truevfs.component.zip.WinZipAesUtils.overhead;
 import static net.truevfs.component.zip.ZipEntry.*;
 import static net.truevfs.component.zip.ZipParametersUtils.parameters;
-import net.truevfs.kernel.spec.util.HashMaps;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 /**

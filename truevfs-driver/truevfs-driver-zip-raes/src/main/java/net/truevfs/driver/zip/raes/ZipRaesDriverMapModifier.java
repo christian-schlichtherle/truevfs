@@ -9,7 +9,7 @@ import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsScheme;
 import net.truevfs.kernel.spec.spi.FsDriverMapModifier;
-import net.truevfs.kernel.spec.util.ExtensionSet;
+import de.schlichtherle.truecommons.shed.ExtensionSet;
 
 /**
  * Creates maps with drivers for the ZIP.RAES file format.

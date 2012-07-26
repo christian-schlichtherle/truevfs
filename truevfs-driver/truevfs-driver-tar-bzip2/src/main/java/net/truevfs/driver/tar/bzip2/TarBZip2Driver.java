@@ -22,7 +22,7 @@ import static net.truevfs.kernel.spec.FsAccessOption.STORE;
 import net.truevfs.kernel.spec.cio.InputService;
 import net.truevfs.kernel.spec.cio.MultiplexingOutputService;
 import net.truevfs.kernel.spec.cio.OutputService;
-import net.truevfs.kernel.spec.util.BitField;
+import de.schlichtherle.truecommons.shed.BitField;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 

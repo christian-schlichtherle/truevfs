@@ -10,7 +10,7 @@ import net.truevfs.kernel.spec.FsManager;
 import net.truevfs.kernel.spec.FsSyncException;
 import net.truevfs.kernel.spec.FsSyncOption;
 import net.truevfs.kernel.spec.FsSyncWarningException;
-import net.truevfs.kernel.spec.util.BitField;
+import de.schlichtherle.truecommons.shed.BitField;
 
 /**
  * @author Christian Schlichtherle

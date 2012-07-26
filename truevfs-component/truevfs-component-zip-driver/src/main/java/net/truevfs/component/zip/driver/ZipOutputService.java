@@ -33,8 +33,8 @@ import net.truevfs.kernel.spec.cio.Entry.Access;
 import net.truevfs.kernel.spec.cio.Entry.Size;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.spec.util.CompoundIterator;
-import net.truevfs.kernel.spec.util.SuppressedExceptionBuilder;
+import de.schlichtherle.truecommons.shed.CompoundIterator;
+import de.schlichtherle.truecommons.shed.SuppressedExceptionBuilder;
 
 /**
  * An output service for writing ZIP files.

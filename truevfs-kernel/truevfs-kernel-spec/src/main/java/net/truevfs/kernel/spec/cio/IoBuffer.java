@@ -5,7 +5,7 @@
 package net.truevfs.kernel.spec.cio;
 
 import java.io.IOException;
-import net.truevfs.kernel.spec.util.Releasable;
+import de.schlichtherle.truecommons.shed.Releasable;
 
 /**
  * A releasable I/O entry.

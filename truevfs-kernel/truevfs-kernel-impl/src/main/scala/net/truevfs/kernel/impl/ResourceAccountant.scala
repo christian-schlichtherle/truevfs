@@ -4,13 +4,13 @@
  */
 package net.truevfs.kernel.impl
 
+import de.schlichtherle.truecommons.shed._
 import collection.JavaConverters._
 import java.io._
 import java.util.concurrent._
 import java.util.concurrent.locks._
 import javax.annotation._
 import javax.annotation.concurrent._
-import net.truevfs.kernel.spec.util._
 import scala.util.control._
 
 /** Accounts for [[java.io.Closeable]] resources.

@@ -6,13 +6,13 @@ package net.truevfs.kernel.impl
 
 import de.schlichtherle.truecommons.io._
 import de.schlichtherle.truecommons.logging._
+import de.schlichtherle.truecommons.shed._
 import java.io._
 import java.nio.channels._
 import javax.annotation.concurrent._
 import net.truevfs.kernel.spec._
 import net.truevfs.kernel.spec.cio._
 import net.truevfs.kernel.spec.cio.Entry._;
-import net.truevfs.kernel.spec.util._
 
 /** Finalizes unclosed resources returned by its decorated controller.
   * 

@@ -4,6 +4,7 @@
  */
 package net.truevfs.access;
 
+import de.schlichtherle.truecommons.shed.ExtensionSet;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -14,7 +15,6 @@ import net.truevfs.kernel.spec.FsArchiveDriver;
 import net.truevfs.kernel.spec.FsArchiveDriverTestBase;
 import net.truevfs.kernel.spec.FsMountPoint;
 import net.truevfs.kernel.spec.FsScheme;
-import net.truevfs.kernel.spec.util.ExtensionSet;
 
 /**
  * @param  <D> the type of the archive driver.

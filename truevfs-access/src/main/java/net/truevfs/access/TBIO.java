@@ -20,8 +20,8 @@ import net.truevfs.kernel.spec.cio.Entry;
 import net.truevfs.kernel.spec.cio.InputSocket;
 import net.truevfs.kernel.spec.cio.IoSockets;
 import net.truevfs.kernel.spec.cio.OutputSocket;
-import net.truevfs.kernel.spec.util.BitField;
-import net.truevfs.kernel.spec.util.Paths;
+import de.schlichtherle.truecommons.shed.BitField;
+import de.schlichtherle.truecommons.shed.Paths;
 
 /**
  * Provides fast bulk I/O operations for {@link File}s and {@link TFile}s.

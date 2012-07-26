@@ -8,7 +8,7 @@ import java.util.Map;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsScheme;
 import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
-import net.truevfs.kernel.spec.util.ExtensionSet;
+import de.schlichtherle.truecommons.shed.ExtensionSet;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;

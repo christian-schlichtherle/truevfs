@@ -4,10 +4,10 @@
  */
 package net.truevfs.kernel
 
+import de.schlichtherle.truecommons.shed._
 import net.truevfs.kernel.spec._
 import net.truevfs.kernel.spec.cio._
 import net.truevfs.kernel.spec.cio.Entry._
-import net.truevfs.kernel.spec.util._
 import java.{lang => jl}
 import java.{util => ju}
 

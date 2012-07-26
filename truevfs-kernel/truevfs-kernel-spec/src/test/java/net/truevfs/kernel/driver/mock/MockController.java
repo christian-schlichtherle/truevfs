@@ -22,7 +22,7 @@ import net.truevfs.kernel.spec.cio.*;
 import net.truevfs.kernel.spec.io.ThrowingInputStream;
 import net.truevfs.kernel.spec.io.ThrowingOutputStream;
 import net.truevfs.kernel.spec.io.ThrowingSeekableChannel;
-import net.truevfs.kernel.spec.util.BitField;
+import de.schlichtherle.truecommons.shed.BitField;
 
 /**
  * @author Christian Schlichtherle

@@ -12,7 +12,7 @@ import net.truevfs.kernel.spec.FsScheme;
 import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.truevfs.kernel.spec.spi.FsDriverMapFactory;
 import net.truevfs.kernel.spec.spi.FsDriverMapModifier;
-import net.truevfs.kernel.spec.util.ExtensionSet;
+import de.schlichtherle.truecommons.shed.ExtensionSet;
 
 /**
  * Pretty-prints an HTML table of the driver map of a given file system driver

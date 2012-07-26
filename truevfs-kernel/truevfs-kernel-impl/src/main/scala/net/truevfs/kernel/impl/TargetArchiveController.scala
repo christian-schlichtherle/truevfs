@@ -5,6 +5,7 @@
 package net.truevfs.kernel.impl
 
 import de.schlichtherle.truecommons.io._
+import de.schlichtherle.truecommons.shed._
 import java.io._
 import java.nio.channels._
 import java.nio.file._
@@ -18,7 +19,6 @@ import net.truevfs.kernel.spec.cio.Entry._;
 import net.truevfs.kernel.spec.cio.Entry.Access._;
 import net.truevfs.kernel.spec.cio.Entry.Size._;
 import net.truevfs.kernel.spec.cio.Entry.Type._;
-import net.truevfs.kernel.spec.util._
 import ArchiveFileSystem._
 
 /** Manages I/O to the entry which represents the target archive file in its

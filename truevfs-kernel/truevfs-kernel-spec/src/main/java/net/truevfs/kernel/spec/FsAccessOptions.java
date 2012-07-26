@@ -5,7 +5,7 @@
 package net.truevfs.kernel.spec;
 
 import static net.truevfs.kernel.spec.FsAccessOption.*;
-import net.truevfs.kernel.spec.util.BitField;
+import de.schlichtherle.truecommons.shed.BitField;
 import javax.annotation.concurrent.Immutable;
 
 /**

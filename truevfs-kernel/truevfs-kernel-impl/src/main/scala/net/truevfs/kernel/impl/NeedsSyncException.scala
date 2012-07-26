@@ -4,9 +4,9 @@
  */
 package net.truevfs.kernel.impl
 
+import de.schlichtherle.truecommons.shed._
+import de.schlichtherle.truecommons.shed._
 import javax.annotation.concurrent._
-import net.truevfs.kernel.spec.util._
-import net.truevfs.kernel.spec.util._
 
 /** Indicates that a file system controller needs to get `sync`ed before the
   * operation can get retried.

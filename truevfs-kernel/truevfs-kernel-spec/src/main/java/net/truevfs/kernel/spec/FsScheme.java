@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.spec;
 
-import net.truevfs.kernel.spec.util.UriBuilder;
+import de.schlichtherle.truecommons.shed.UriBuilder;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.Locale;

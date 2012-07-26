@@ -21,7 +21,7 @@ import net.truevfs.kernel.spec.cio.Entry.PosixEntity;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import net.truevfs.kernel.spec.cio.Entry.Type;
 import net.truevfs.kernel.spec.sl.IoBufferPoolLocator;
-import net.truevfs.kernel.spec.util.BitField;
+import de.schlichtherle.truecommons.shed.BitField;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**

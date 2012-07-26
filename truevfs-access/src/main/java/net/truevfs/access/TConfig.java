@@ -15,9 +15,9 @@ import net.truevfs.kernel.spec.FsAccessOptions;
 import static net.truevfs.kernel.spec.FsAccessOptions.ACCESS_PREFERENCES_MASK;
 import net.truevfs.kernel.spec.FsManager;
 import net.truevfs.kernel.spec.sl.FsManagerLocator;
-import net.truevfs.kernel.spec.util.BitField;
-import net.truevfs.kernel.spec.util.InheritableThreadLocalStack;
-import net.truevfs.kernel.spec.util.Resource;
+import de.schlichtherle.truecommons.shed.BitField;
+import de.schlichtherle.truecommons.shed.InheritableThreadLocalStack;
+import de.schlichtherle.truecommons.shed.Resource;
 
 /**
  * A container for configuration options with global or inheritable thread

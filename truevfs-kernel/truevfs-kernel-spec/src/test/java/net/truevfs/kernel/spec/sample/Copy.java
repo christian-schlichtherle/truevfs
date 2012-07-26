@@ -15,7 +15,7 @@ import net.truevfs.kernel.spec.*;
 import net.truevfs.kernel.spec.cio.InputSocket;
 import net.truevfs.kernel.spec.cio.IoSockets;
 import net.truevfs.kernel.spec.cio.OutputSocket;
-import net.truevfs.kernel.spec.util.BitField;
+import de.schlichtherle.truecommons.shed.BitField;
 
 /**
  * A poor man's blend of the cp(1) or curl(1) command line utilities

@@ -19,10 +19,10 @@ import static net.truevfs.kernel.spec.cio.Entry.ALL_ACCESS;
 import net.truevfs.kernel.spec.cio.Entry.Access;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.spec.util.CompoundIterator;
-import net.truevfs.kernel.spec.util.ExceptionBuilder;
-import net.truevfs.kernel.spec.util.PriorityExceptionBuilder;
-import net.truevfs.kernel.spec.util.SuppressedExceptionBuilder;
+import de.schlichtherle.truecommons.shed.CompoundIterator;
+import de.schlichtherle.truecommons.shed.ExceptionBuilder;
+import de.schlichtherle.truecommons.shed.PriorityExceptionBuilder;
+import de.schlichtherle.truecommons.shed.SuppressedExceptionBuilder;
 
 /**
  * Decorates another output service to support a virtually unlimited number of

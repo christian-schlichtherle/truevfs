@@ -4,13 +4,13 @@
  */
 package net.truevfs.kernel.impl
 
+import de.schlichtherle.truecommons.shed._
 import java.io._
 import javax.annotation.concurrent._
 import net.truevfs.kernel.spec.FsEntryName._;
 import net.truevfs.kernel.spec._
 import net.truevfs.kernel.spec.cio._
 import net.truevfs.kernel.spec.cio.Entry._;
-import net.truevfs.kernel.spec.util._
 
 /** Implements a chain of responsibility for resolving
   * [[net.truevfs.kernel.impl.FalsePositiveArchiveException]]s which

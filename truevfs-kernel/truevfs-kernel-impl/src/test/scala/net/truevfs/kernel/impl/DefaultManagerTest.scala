@@ -4,8 +4,8 @@
  */
 package net.truevfs.kernel.impl
 
+import de.schlichtherle.truecommons.shed.Link._
 import net.truevfs.kernel.spec._
-import net.truevfs.kernel.spec.util.Link._
 
 /**
   * @author Christian Schlichtherle

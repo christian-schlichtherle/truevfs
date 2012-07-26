@@ -14,8 +14,8 @@ import net.truevfs.kernel.spec.*;
 import net.truevfs.kernel.spec.cio.Entry;
 import net.truevfs.kernel.spec.cio.Entry.Access;
 import static net.truevfs.kernel.spec.cio.Entry.Type.SPECIAL;
-import net.truevfs.kernel.spec.util.BitField;
-import net.truevfs.kernel.spec.util.ControlFlowException;
+import de.schlichtherle.truecommons.shed.BitField;
+import de.schlichtherle.truecommons.shed.ControlFlowException;
 import net.truevfs.keymanager.spec.KeyManager;
 import net.truevfs.keymanager.spec.KeyManagerContainer;
 

@@ -5,6 +5,9 @@
 package net.truevfs.kernel.spec.cio;
 
 import de.schlichtherle.truecommons.io.ByteBufferChannel;
+import de.schlichtherle.truecommons.io.DisconnectingInputStream;
+import de.schlichtherle.truecommons.io.DisconnectingOutputStream;
+import de.schlichtherle.truecommons.io.DisconnectingSeekableChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -21,9 +24,6 @@ import static net.truevfs.kernel.spec.cio.Entry.Access.WRITE;
 import net.truevfs.kernel.spec.cio.Entry.Entity;
 import net.truevfs.kernel.spec.cio.Entry.Size;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import de.schlichtherle.truecommons.io.DisconnectingInputStream;
-import de.schlichtherle.truecommons.io.DisconnectingOutputStream;
-import de.schlichtherle.truecommons.io.DisconnectingSeekableChannel;
 
 /**
  * An I/O buffer which is backed by a byte array.

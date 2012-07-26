@@ -4,14 +4,14 @@
  */
 package net.truevfs.component.zip;
 
+import de.schlichtherle.truecommons.shed.ConcurrencyUtils;
+import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.*;
+import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskFactory;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.concurrent.Callable;
 import static net.truevfs.component.zip.DateTimeConverter.MAX_DOS_TIME;
 import static net.truevfs.component.zip.DateTimeConverter.MIN_DOS_TIME;
-import net.truevfs.kernel.spec.util.ConcurrencyUtils;
-import static net.truevfs.kernel.spec.util.ConcurrencyUtils.*;
-import net.truevfs.kernel.spec.util.ConcurrencyUtils.TaskFactory;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;

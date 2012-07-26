@@ -10,7 +10,7 @@ import net.truevfs.access.TConfig;
 import static net.truevfs.kernel.spec.FsEntryName.SEPARATOR;
 import static net.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
 import net.truevfs.kernel.spec.FsPath;
-import net.truevfs.kernel.spec.util.Paths;
+import de.schlichtherle.truecommons.shed.Paths;
 import static java.io.File.separatorChar;
 import java.net.URI;
 import java.nio.file.Path;

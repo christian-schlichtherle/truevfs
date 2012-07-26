@@ -4,6 +4,9 @@
  */
 package net.truevfs.component.zip;
 
+import de.schlichtherle.truecommons.io.ByteBufferChannel;
+import de.schlichtherle.truecommons.io.ChannelOutputStream;
+import static de.schlichtherle.truecommons.shed.HashMaps.initialCapacity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -11,10 +14,6 @@ import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashSet;
 import static net.truevfs.component.zip.ZipEntry.STORED;
-import net.truevfs.kernel.spec.cio.ByteArrayIoBuffer;
-import net.truevfs.kernel.spec.cio.Entry.Size;
-import net.truevfs.kernel.spec.cio.IoEntry;
-import static net.truevfs.kernel.spec.util.HashMaps.initialCapacity;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -36,13 +35,14 @@ public final class ManySmallEntriesTest {
     private static final int ZIP_SIZE = 7000098; // pre-computed
 
     @Test
-    public void testManySmallEntries() throws IOException {
-        final IoEntry<?> buffer = new ByteArrayIoBuffer("zip", ZIP_SIZE);
+    public void testRoundTripPersistence() throws IOException {
         final byte[] data = DATA_STRING.getBytes(DATA_CHARSET);
+        ByteBuffer bb = ByteBuffer.allocate(ZIP_SIZE);
         final HashSet<String> set = new HashSet<>(initialCapacity(NUM_ENTRIES));
 
+        final ByteBufferChannel bbc = new ByteBufferChannel(bb);
         try (final ZipOutputStream zos = new ZipOutputStream(
-               buffer.output().stream(null))) {
+                new ChannelOutputStream(bbc))) {
             for (int i = FIRST_ENTRY; i <= LAST_ENTRY; i++) {
                 final String name = Integer.toString(i);
                 final ZipEntry entry = new ZipEntry(name);
@@ -58,9 +58,10 @@ public final class ManySmallEntriesTest {
                 assertTrue(set.add(name));
             }
         }
-        assertEquals(ZIP_SIZE, buffer.getSize(Size.STORAGE));
+        (bb = bbc.bufferDuplicate()).flip();
+        assertEquals(ZIP_SIZE, bb.limit());
 
-        try (final ZipFile zf = new ZipFile(buffer.input().channel(null))) {
+        try (final ZipFile zf = new ZipFile(new ByteBufferChannel(bb))) {
             final byte[] buf = new byte[data.length];
             for (   final Enumeration<? extends ZipEntry> e = zf.entries();
                     e.hasMoreElements(); ) {

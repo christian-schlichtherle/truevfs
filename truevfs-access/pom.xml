@@ -48,6 +48,11 @@ and choosing entries in archive files.
             <artifactId>truevfs-kernel-spec</artifactId>
             <type>test-jar</type>
         </dependency>
+        <dependency>
+            <groupId>de.schlichtherle.truecommons</groupId>
+            <artifactId>truecommons-shed</artifactId>
+            <type>test-jar</type>
+        </dependency>
     </dependencies>
 
     <build>
