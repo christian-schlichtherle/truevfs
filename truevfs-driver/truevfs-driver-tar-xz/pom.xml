@@ -47,8 +47,9 @@
             <type>test-jar</type>
         </dependency>
         <dependency>
-            <groupId>org.tukaani</groupId>
-            <artifactId>xz</artifactId>
+            <groupId>de.schlichtherle.truecommons</groupId>
+            <artifactId>truecommons-shed</artifactId>
+            <type>test-jar</type>
         </dependency>
     </dependencies>
 </project>
