@@ -48,5 +48,10 @@
             <artifactId>truevfs-component-zip-driver</artifactId>
             <type>test-jar</type>
         </dependency>
+        <dependency>
+            <groupId>de.schlichtherle.truecommons</groupId>
+            <artifactId>truecommons-shed</artifactId>
+            <type>test-jar</type>
+        </dependency>
     </dependencies>
 </project>
