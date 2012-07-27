@@ -115,7 +115,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @Test
-    public final void testFalsePositives() throws IOException {
+    public void testFalsePositives() throws IOException {
         assertFalsePositive(archive);
 
         // Dito for entry.
@@ -227,7 +227,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @Test
-    public final void testCreateNewFile() throws IOException{
+    public void testCreateNewFile() throws IOException{
         assertCreateNewPlainFile();
         assertCreateNewEnhancedFile();
     }
@@ -313,7 +313,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @Test
-    public final void testIllegalDirectoryOperations() throws IOException {
+    public void testIllegalDirectoryOperations() throws IOException {
         try {
             final String[] names = {
                 "inner" + getExtension(),
@@ -369,7 +369,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @Test
-    public final void testStrictFileOutputStream() throws IOException {
+    public void testStrictFileOutputStream() throws IOException {
         TPath file = archive.resolve("test.txt");
         try (final TConfig config = TConfig.push()) {
             config.setLenient(false);
@@ -385,7 +385,7 @@ extends ConfiguredClientTestBase<D> {
     }
     
     @Test
-    public final void testLenientFileOutputStream() throws IOException {
+    public void testLenientFileOutputStream() throws IOException {
         TPath file = archive.resolve("dir/inner" + getExtension() + "/dir/test.txt");
 
         assertFileOutputStream(file);
@@ -448,7 +448,7 @@ extends ConfiguredClientTestBase<D> {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
     @Test
-    public final void testBusyFileInputStream()
+    public void testBusyFileInputStream()
     throws IOException, InterruptedException {
         final TPath file1 = archive.resolve("file1");
         final TPath file2 = archive.resolve("file2");
@@ -513,7 +513,7 @@ extends ConfiguredClientTestBase<D> {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
     @Test
-    public final void testBusyFileOutputStream()
+    public void testBusyFileOutputStream()
     throws IOException, InterruptedException {
         TPath file1 = archive.resolve("file1");
         TPath file2 = archive.resolve("file2");
@@ -601,7 +601,7 @@ extends ConfiguredClientTestBase<D> {
     }
     
     @Test
-    public final void testMkdir() throws IOException {
+    public void testMkdir() throws IOException {
         final TPath dir1 = archive;
         final TPath dir2 = dir1.resolve("dir");
         final TPath dir3 = dir2.resolve("inner" + getExtension());
@@ -697,7 +697,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @Test
-    public final void testDirectoryTree() throws IOException {
+    public void testDirectoryTree() throws IOException {
         assertDirectoryTree(
                 new TPath(System.getProperty("java.io.tmpdir")), // base directory
                 new TPath("dir/inner" + getExtension() + "/dir/outer" + getExtension() + "/" + archive.getFileName())); // this path is reversed!!!
@@ -764,7 +764,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @Test
-    public final void testInputOutput() throws IOException {
+    public void testInputOutput() throws IOException {
         assertInputOutput(archive);
         
         final TPath archiveTest = archive.resolve("test");
@@ -801,7 +801,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @Test
-    public final void testCopyContainingOrSameFiles() throws IOException {
+    public void testCopyContainingOrSameFiles() throws IOException {
         assert !exists(archive);
         
         final TPath dir = archive.getParent();
@@ -852,7 +852,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @Test
-    public final void testCopyDelete() throws IOException {
+    public void testCopyDelete() throws IOException {
         final String[] names = {
             "0" + getExtension(),
             "1" + getExtension(),
@@ -965,7 +965,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @Test
-    public final void testIllegalDeleteOfEntryWithOpenStream()
+    public void testIllegalDeleteOfEntryWithOpenStream()
     throws IOException {
         final TPath entry1 = archive.resolve("entry1");
         final TPath entry2 = archive.resolve("entry2");
@@ -1034,7 +1034,7 @@ extends ConfiguredClientTestBase<D> {
     }
     
     @Test
-    public final void testRenameValidArchive() throws IOException {
+    public void testRenameValidArchive() throws IOException {
         try (final PrintStream out = new PrintStream(
                      newOutputStream(archive.resolve("entry")))) {
             out.println("Hello World!");
@@ -1043,7 +1043,7 @@ extends ConfiguredClientTestBase<D> {
     }
     
     @Test
-    public final void testRenameFalsePositive() throws IOException {
+    public void testRenameFalsePositive() throws IOException {
         // Create false positive archive.
         // Note that archive is a TPath instance which returns isArchive()
         // == true, so we must create a new TPath instance which is guaranteed
@@ -1084,7 +1084,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @Test
-    public final void testRenameRecursively() throws IOException {
+    public void testRenameRecursively() throws IOException {
         final TPath temp = new TPath(createTempFile());
         final TPath archive2 = archive.resolve("inner" + getExtension());
         final TPath archive3 = archive2.resolve("nuts" + getExtension());
@@ -1139,7 +1139,7 @@ extends ConfiguredClientTestBase<D> {
     };
 
     @Test
-    public final void testList() throws IOException {
+    public void testList() throws IOException {
         final Path dir = createTempFile();
         final TPath tdir = new TPath(dir);
 
@@ -1181,7 +1181,7 @@ extends ConfiguredClientTestBase<D> {
     }
     
     @Test
-    public final void testMultithreadedSingleArchiveMultipleEntriesReading()
+    public void testMultithreadedSingleArchiveMultipleEntriesReading()
     throws Exception {
         assertMultithreadedSingleArchiveMultipleEntriesReading(NUM_IO_THREADS, NUM_IO_THREADS);
     }
@@ -1251,7 +1251,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @Test
-    public final void testMultithreadedSingleArchiveMultipleEntriesWriting()
+    public void testMultithreadedSingleArchiveMultipleEntriesWriting()
     throws Exception {
         assertMultithreadedSingleArchiveMultipleEntriesWriting(false);
         assertMultithreadedSingleArchiveMultipleEntriesWriting(true);
@@ -1305,7 +1305,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @Test
-    public final void testMultithreadedMultipleArchivesSingleEntryWriting()
+    public void testMultithreadedMultipleArchivesSingleEntryWriting()
     throws Exception {
         assertMultithreadedMultipleArchivesSingleEntryWriting(false);
         assertMultithreadedMultipleArchivesSingleEntryWriting(true);
