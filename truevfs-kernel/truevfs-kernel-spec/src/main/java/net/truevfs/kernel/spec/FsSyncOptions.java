@@ -4,9 +4,9 @@
  */
 package net.truevfs.kernel.spec;
 
+import de.schlichtherle.truecommons.shed.BitField;
 import javax.annotation.concurrent.Immutable;
 import static net.truevfs.kernel.spec.FsSyncOption.*;
-import de.schlichtherle.truecommons.shed.BitField;
 
 /**
  * Provides common bit fields of synchronization options.
