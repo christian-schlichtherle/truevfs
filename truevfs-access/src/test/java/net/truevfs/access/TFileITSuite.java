@@ -7,6 +7,11 @@ package net.truevfs.access;
 import de.schlichtherle.truecommons.io.ClosedInputException;
 import de.schlichtherle.truecommons.io.ClosedOutputException;
 import de.schlichtherle.truecommons.io.InputException;
+import de.schlichtherle.truecommons.shed.BitField;
+import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
+import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskFactory;
+import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskJoiner;
+import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.start;
 import java.io.*;
 import static java.io.File.separatorChar;
 import java.lang.ref.Reference;
@@ -23,11 +28,6 @@ import static net.truevfs.kernel.spec.FsAccessOption.GROW;
 import static net.truevfs.kernel.spec.FsSyncOption.CLEAR_CACHE;
 import static net.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
 import static net.truevfs.kernel.spec.FsSyncOptions.SYNC;
-import de.schlichtherle.truecommons.shed.BitField;
-import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
-import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskFactory;
-import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskJoiner;
-import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.start;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -94,8 +94,7 @@ extends ConfiguredClientTestBase<D> {
 
     /** Unmounts the {@linkplain #getArchive() current archive file}. */
     protected final void umount() throws FsSyncException {
-        if (null != archive)
-            TVFS.umount(archive);
+        if (null != archive) TVFS.umount(archive);
     }
 
     private File createTempFile() throws IOException {
@@ -141,7 +140,7 @@ extends ConfiguredClientTestBase<D> {
     private void assertArchiveControllerStateWithResource(
             final Factory<? extends Closeable, ? super String, ? extends IOException> factory)
     throws IOException, InterruptedException {
-        final String entry = archive.getPath() + "/entry";
+        final String entry = archive + "/entry";
         archive = null;
         assertTrue(new TFile(entry).createNewFile());
         TVFS.umount(new TFile(entry).getTopLevelArchive());
@@ -152,20 +151,17 @@ extends ConfiguredClientTestBase<D> {
             expected = new WeakReference<FsController<?>>(
                          new TFile(entry).getInnerArchive().getController(), queue);
             System.gc();
-            System.runFinalization();
             assertNull(queue.remove(TIMEOUT_MILLIS));
             assertSame(expected.get(), new TFile(entry).getInnerArchive().getController());
         }
         System.gc();
-        System.runFinalization();
         assertNull(queue.remove(TIMEOUT_MILLIS));
         assertSame(expected.get(), new TFile(entry).getInnerArchive().getController());
         TVFS.umount(new TFile(entry).getTopLevelArchive());
         Reference<? extends FsController<?>> got;
         do {
-            // triggering GC and finalizer in a loop seems to help with concurrency!
+            // triggering GC in a loop seems to help with concurrency!
             System.gc();
-            System.runFinalization();
         } while (null == (got = queue.remove(TIMEOUT_MILLIS)));
         assert expected == got;
         assert null == expected.get();
@@ -485,8 +481,8 @@ extends ConfiguredClientTestBase<D> {
 
         assertTrue(file1.createNewFile());
         umount(); // redundant
-        final InputStream in1 = new TFileInputStream(file1);
         assertTrue(file2.createNewFile()); // calls FsController.mknod()
+        final InputStream in1 = new TFileInputStream(file1);
         try {
             try {
                 new TFileInputStream(file2).close();
