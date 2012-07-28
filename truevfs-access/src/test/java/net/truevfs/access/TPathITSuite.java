@@ -7,8 +7,16 @@ package net.truevfs.access;
 import de.schlichtherle.truecommons.io.ClosedInputException;
 import de.schlichtherle.truecommons.io.ClosedOutputException;
 import de.schlichtherle.truecommons.io.Streams;
+import de.schlichtherle.truecommons.shed.BitField;
+import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
+import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskFactory;
+import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskJoiner;
+import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.start;
 import java.io.*;
 import static java.io.File.separatorChar;
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.file.*;
 import static java.nio.file.Files.*;
@@ -17,17 +25,13 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import static net.truevfs.kernel.spec.FsAccessOption.GROW;
 import net.truevfs.kernel.spec.FsArchiveDriver;
+import net.truevfs.kernel.spec.FsController;
 import net.truevfs.kernel.spec.FsResourceOpenException;
 import net.truevfs.kernel.spec.FsSyncException;
 import static net.truevfs.kernel.spec.FsSyncOption.CLEAR_CACHE;
 import static net.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
 import static net.truevfs.kernel.spec.FsSyncOptions.SYNC;
 import net.truevfs.kernel.spec.FsSyncWarningException;
-import de.schlichtherle.truecommons.shed.BitField;
-import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
-import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskFactory;
-import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskJoiner;
-import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.start;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -95,8 +99,7 @@ extends ConfiguredClientTestBase<D> {
 
     /** Unmounts the {@linkplain #getArchive() current archive file}. */
     protected final void umount() throws FsSyncException {
-        if (null != archive)
-            archive.getFileSystem().close();
+        if (null != archive) archive.getFileSystem().close();
     }
 
     private Path createTempFile() throws IOException {
@@ -112,6 +115,64 @@ extends ConfiguredClientTestBase<D> {
         } finally {
             out.close();
         }
+    }
+
+    @Test
+    public void testArchiveControllerStateWithInputStream()
+    throws IOException, InterruptedException {
+        assertArchiveControllerStateWithResource(
+                new Factory<InputStream, String, IOException>() {
+            @Override
+            public InputStream create(String entry) throws IOException {
+                return newInputStream(new TPath(entry));
+            }
+        });
+    }
+
+    @Test
+    public void testArchiveControllerStateWithOutputStream()
+    throws IOException, InterruptedException {
+        assertArchiveControllerStateWithResource(
+                new Factory<OutputStream, String, IOException>() {
+            @Override
+            public OutputStream create(String entry) throws IOException {
+                return newOutputStream(new TPath(entry));
+            }
+        });
+    }
+
+    private interface Factory<O, P, E extends Exception> {
+        O create(P param) throws E;
+    }
+
+    private void assertArchiveControllerStateWithResource(
+            final Factory<? extends Closeable, ? super String, ? extends IOException> factory)
+    throws IOException, InterruptedException {
+        final String entry = archive + "/entry";
+        archive = null;
+        createFile(new TPath(entry));
+        TVFS.umount(new TFile(entry).getTopLevelArchive());
+        final ReferenceQueue<FsController<?>> queue;
+        final Reference<FsController<?>> expected;
+        try (final Closeable resource = factory.create(entry)) {
+            queue = new ReferenceQueue<>();
+            expected = new WeakReference<FsController<?>>(
+                         new TFile(entry).getInnerArchive().getController(), queue);
+            System.gc();
+            assertNull(queue.remove(TIMEOUT_MILLIS));
+            assertSame(expected.get(), new TFile(entry).getInnerArchive().getController());
+        }
+        System.gc();
+        assertNull(queue.remove(TIMEOUT_MILLIS));
+        assertSame(expected.get(), new TFile(entry).getInnerArchive().getController());
+        TVFS.umount(new TFile(entry).getTopLevelArchive());
+        Reference<? extends FsController<?>> got;
+        do {
+            // triggering GC in a loop seems to help with concurrency!
+            System.gc();
+        } while (null == (got = queue.remove(TIMEOUT_MILLIS)));
+        assert expected == got;
+        assert null == expected.get();
     }
 
     @Test
@@ -455,8 +516,8 @@ extends ConfiguredClientTestBase<D> {
 
         createFile(file1); // uses FsAccessOption.CACHE!
         umount();
-        final InputStream in1 = newInputStream(file1);
         createFile(file2); // uses FsAccessOption.CACHE!
+        final InputStream in1 = newInputStream(file1);
         try {
             copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
 
