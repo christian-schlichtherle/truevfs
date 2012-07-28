@@ -4,10 +4,9 @@
  */
 package net.truevfs.access;
 
-import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
+import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.*;
 import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskFactory;
 import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskJoiner;
-import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.start;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +58,6 @@ extends ConfiguredClientTestBase<D> {
                         return null;
                     }
                 } // RoundTrip
-
                 return new RoundTrip();
             }
         } // RoundTripFactory
@@ -75,18 +73,13 @@ extends ConfiguredClientTestBase<D> {
                         return null;
                     }
                 } // Sync
-
                 return new Sync();
             }
         } // SyncFactory
 
         // Trigger sync mayhem!
-        final TaskJoiner sync = start(
-                Runtime.getRuntime().availableProcessors(),
-                new SyncFactory());
-        start(
-                NUM_IO_THREADS,
-                new RoundTripFactory()).join();
+        final TaskJoiner sync = start(NUM_CPU_THREADS, new SyncFactory());
+        start(NUM_IO_THREADS, new RoundTripFactory()).join();
         sync.cancel();
         sync.join(); // check exception
     }
