@@ -5,8 +5,6 @@
 package net.truevfs.access;
 
 import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.*;
-import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskFactory;
-import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskJoiner;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
