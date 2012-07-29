@@ -4,15 +4,15 @@
  */
 package net.truevfs.component.tar.driver;
 
+import de.schlichtherle.truecommons.shed.BitField;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
-import net.truevfs.kernel.spec.*;
 import static net.truevfs.kernel.spec.FsAccessOption.CACHE;
 import static net.truevfs.kernel.spec.FsAccessOption.COMPRESS;
-import net.truevfs.kernel.spec.cio.*;
+import net.truevfs.kernel.spec.*;
 import static net.truevfs.kernel.spec.cio.Entry.ALL_POSIX_ACCESS;
 import static net.truevfs.kernel.spec.cio.Entry.ALL_POSIX_ENTITIES;
 import net.truevfs.kernel.spec.cio.Entry.Access;
@@ -20,8 +20,8 @@ import static net.truevfs.kernel.spec.cio.Entry.Access.WRITE;
 import net.truevfs.kernel.spec.cio.Entry.PosixEntity;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import net.truevfs.kernel.spec.cio.Entry.Type;
+import net.truevfs.kernel.spec.cio.*;
 import net.truevfs.kernel.spec.sl.IoBufferPoolLocator;
-import de.schlichtherle.truecommons.shed.BitField;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**
