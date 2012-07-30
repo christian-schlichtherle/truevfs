@@ -49,7 +49,7 @@ and choosing entries in archive files.
             <type>test-jar</type>
         </dependency>
         <dependency>
-            <groupId>de.schlichtherle.truecommons</groupId>
+            <groupId>net.java.truecommons</groupId>
             <artifactId>truecommons-shed</artifactId>
             <type>test-jar</type>
         </dependency>

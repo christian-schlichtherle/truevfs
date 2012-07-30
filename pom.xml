@@ -101,7 +101,7 @@ system space.
             &lt;b&gt;${project.name} ${project.version}&lt;/b&gt;
         </header>
 
-        <truecommons.version>2.0-SNAPSHOT</truecommons.version>
+        <truecommons.version>1.0</truecommons.version>
     </properties>
 
     <modules>
@@ -314,34 +314,34 @@ system space.
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>de.schlichtherle.truecommons</groupId>
+                <groupId>net.java.truecommons</groupId>
                 <artifactId>truecommons-io</artifactId>
                 <version>${truecommons.version}</version>
             </dependency>
             <dependency>
-                <groupId>de.schlichtherle.truecommons</groupId>
+                <groupId>net.java.truecommons</groupId>
                 <artifactId>truecommons-io</artifactId>
                 <type>test-jar</type>
                 <version>${truecommons.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>de.schlichtherle.truecommons</groupId>
+                <groupId>net.java.truecommons</groupId>
                 <artifactId>truecommons-logging</artifactId>
                 <version>${truecommons.version}</version>
             </dependency>
             <dependency>
-                <groupId>de.schlichtherle.truecommons</groupId>
+                <groupId>net.java.truecommons</groupId>
                 <artifactId>truecommons-services</artifactId>
                 <version>${truecommons.version}</version>
             </dependency>
             <dependency>
-                <groupId>de.schlichtherle.truecommons</groupId>
+                <groupId>net.java.truecommons</groupId>
                 <artifactId>truecommons-shed</artifactId>
                 <version>${truecommons.version}</version>
             </dependency>
             <dependency>
-                <groupId>de.schlichtherle.truecommons</groupId>
+                <groupId>net.java.truecommons</groupId>
                 <artifactId>truecommons-shed</artifactId>
                 <type>test-jar</type>
                 <version>${truecommons.version}</version>

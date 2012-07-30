@@ -24,7 +24,7 @@ Specification of the KeyManager API.
 
     <dependencies>
         <dependency>
-            <groupId>de.schlichtherle.truecommons</groupId>
+            <groupId>net.java.truecommons</groupId>
             <artifactId>truecommons-services</artifactId>
         </dependency>
     </dependencies>

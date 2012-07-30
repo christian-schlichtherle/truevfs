@@ -33,7 +33,7 @@
             <artifactId>truevfs-component-zip-driver</artifactId>
         </dependency>
         <dependency>
-            <groupId>de.schlichtherle.truecommons</groupId>
+            <groupId>net.java.truecommons</groupId>
             <artifactId>truecommons-shed</artifactId>
             <type>test-jar</type>
         </dependency>

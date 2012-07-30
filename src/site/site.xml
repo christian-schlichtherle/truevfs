@@ -25,9 +25,9 @@
     </custom>
     <publishDate position="bottom"/>
     <skin>
-        <groupId>de.schlichtherle.truezip</groupId>
-        <artifactId>truezip-skin</artifactId>
-        <version>7</version>
+        <groupId>net.java.truecommons</groupId>
+        <artifactId>truecommons-skin</artifactId>
+        <version>${truecommons.version}</version>
      </skin>
     <body>
         <head>
