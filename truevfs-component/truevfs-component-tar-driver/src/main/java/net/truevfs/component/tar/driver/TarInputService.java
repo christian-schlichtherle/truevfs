@@ -4,8 +4,8 @@
  */
 package net.truevfs.component.tar.driver;
 
-import de.schlichtherle.truecommons.io.Source;
-import de.schlichtherle.truecommons.io.Streams;
+import net.java.truecommons.io.Source;
+import net.java.truecommons.io.Streams;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.nio.channels.SeekableByteChannel;
@@ -22,10 +22,10 @@ import net.truevfs.kernel.spec.cio.*;
 import net.truevfs.kernel.spec.cio.Entry.Type;
 import static net.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
 import static net.truevfs.kernel.spec.cio.Entry.Type.FILE;
-import de.schlichtherle.truecommons.shed.ExceptionBuilder;
-import static de.schlichtherle.truecommons.shed.HashMaps.OVERHEAD_SIZE;
-import static de.schlichtherle.truecommons.shed.HashMaps.initialCapacity;
-import de.schlichtherle.truecommons.shed.SuppressedExceptionBuilder;
+import net.java.truecommons.shed.ExceptionBuilder;
+import static net.java.truecommons.shed.HashMaps.OVERHEAD_SIZE;
+import static net.java.truecommons.shed.HashMaps.initialCapacity;
+import net.java.truecommons.shed.SuppressedExceptionBuilder;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import static org.apache.commons.compress.archivers.tar.TarConstants.*;

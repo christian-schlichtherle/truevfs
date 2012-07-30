@@ -4,7 +4,7 @@
  */
 package net.truevfs.driver.tar.bzip2;
 
-import de.schlichtherle.truecommons.shed.ExtensionSet;
+import net.java.truecommons.shed.ExtensionSet;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.FsDriver;

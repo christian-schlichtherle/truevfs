@@ -4,8 +4,8 @@
  */
 package net.truevfs.driver.zip.raes.crypto;
 
-import de.schlichtherle.truecommons.io.IntervalReadOnlyChannel;
-import de.schlichtherle.truecommons.io.PowerBuffer;
+import net.java.truecommons.io.IntervalReadOnlyChannel;
+import net.java.truecommons.io.PowerBuffer;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;

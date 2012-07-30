@@ -4,8 +4,13 @@
  */
 package net.truevfs.component.zip;
 
-import de.schlichtherle.truecommons.io.*;
-import de.schlichtherle.truecommons.shed.HashMaps;
+import net.java.truecommons.io.PowerBuffer;
+import net.java.truecommons.io.Source;
+import net.java.truecommons.io.BufferedReadOnlyChannel;
+import net.java.truecommons.io.ChannelInputStream;
+import net.java.truecommons.io.ReadOnlyChannel;
+import net.java.truecommons.io.IntervalReadOnlyChannel;
+import net.java.truecommons.shed.HashMaps;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;

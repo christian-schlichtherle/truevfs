@@ -7,7 +7,7 @@ package net.truevfs.keymanager.swing.util;
 import java.util.EventListener;
 
 /**
- * Used to notify listeners of an {@link de.schlichtherle.truevfs.key.swing.EnhancedPanel}
+ * Used to notify listeners of an {@link net.truevfs.keymanager.swing.util.EnhancedPanel}
  * that its ancestor window is shown or hidden.
  *
  * @author Christian Schlichtherle
@@ -16,7 +16,7 @@ public interface PanelListener extends EventListener {
     
     /**
      * Invoked when the ancestor window of an
-     * {@link de.schlichtherle.truevfs.key.swing.EnhancedPanel} is shown.
+     * {@link net.truevfs.keymanager.swing.util.EnhancedPanel} is shown.
      * 
      * @param evt A panel event.
      */
@@ -24,7 +24,7 @@ public interface PanelListener extends EventListener {
 
     /**
      * Invoked when the ancestor window of an
-     * {@link de.schlichtherle.truevfs.key.swing.EnhancedPanel} is hidden.
+     * {@link net.truevfs.keymanager.swing.util.EnhancedPanel} is hidden.
      * 
      * @param evt A panel event.
      */

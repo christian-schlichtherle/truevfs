@@ -4,7 +4,7 @@
  */
 package net.truevfs.access.sample;
 
-import de.schlichtherle.truecommons.io.Streams;
+import net.java.truecommons.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;

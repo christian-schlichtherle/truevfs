@@ -4,7 +4,7 @@
  */
 package net.truevfs.keymanager.spec;
 
-import de.schlichtherle.truecommons.services.Container;
+import net.java.truecommons.services.Container;
 import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;

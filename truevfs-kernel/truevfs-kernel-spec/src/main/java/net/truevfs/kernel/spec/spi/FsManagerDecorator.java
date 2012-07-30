@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.spec.spi;
 
-import de.schlichtherle.truecommons.services.DecoratorService;
+import net.java.truecommons.services.DecoratorService;
 import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.spec.FsManager;
 import net.truevfs.kernel.spec.sl.FsManagerLocator;

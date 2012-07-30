@@ -11,8 +11,8 @@ import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import static net.truevfs.kernel.spec.FsUriModifier.NULL;
 import static net.truevfs.kernel.spec.FsUriModifier.PostFix.ENTRY_NAME;
-import de.schlichtherle.truecommons.shed.QuotedUriSyntaxException;
-import de.schlichtherle.truecommons.shed.UriBuilder;
+import net.java.truecommons.shed.QuotedUriSyntaxException;
+import net.java.truecommons.shed.UriBuilder;
 
 /**
  * Addresses a file system entry relative to its {@link FsMountPoint mount point}.

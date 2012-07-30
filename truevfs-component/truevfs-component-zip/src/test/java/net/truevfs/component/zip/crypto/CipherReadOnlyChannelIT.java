@@ -4,7 +4,7 @@
  */
 package net.truevfs.component.zip.crypto;
 
-import de.schlichtherle.truecommons.io.ReadOnlyChannelITSuite;
+import net.java.truecommons.io.ReadOnlyChannelITSuite;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;

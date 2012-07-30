@@ -5,7 +5,7 @@
 package net.truevfs.kernel.spec;
 
 import java.util.Iterator;
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.shed.BitField;
 
 /**
  * A container which creates {@linkplain FsController} file system controllers

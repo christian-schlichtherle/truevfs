@@ -4,10 +4,10 @@
  */
 package net.truevfs.kernel.spec.cio;
 
-import de.schlichtherle.truecommons.io.InputException;
-import de.schlichtherle.truecommons.io.Sink;
-import de.schlichtherle.truecommons.io.Source;
-import de.schlichtherle.truecommons.io.Streams;
+import net.java.truecommons.io.InputException;
+import net.java.truecommons.io.Sink;
+import net.java.truecommons.io.Source;
+import net.java.truecommons.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

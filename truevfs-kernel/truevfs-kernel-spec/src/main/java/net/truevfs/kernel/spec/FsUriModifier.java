@@ -4,8 +4,8 @@
  */
 package net.truevfs.kernel.spec;
 
-import de.schlichtherle.truecommons.shed.QuotedUriSyntaxException;
-import de.schlichtherle.truecommons.shed.UriBuilder;
+import net.java.truecommons.shed.QuotedUriSyntaxException;
+import net.java.truecommons.shed.UriBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 import javax.annotation.concurrent.Immutable;

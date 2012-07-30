@@ -4,10 +4,10 @@
  */
 package net.truevfs.kernel.spec;
 
-import de.schlichtherle.truecommons.io.DecoratingInputStream;
-import de.schlichtherle.truecommons.io.DecoratingOutputStream;
-import de.schlichtherle.truecommons.io.DecoratingSeekableChannel;
-import de.schlichtherle.truecommons.io.PowerBuffer;
+import net.java.truecommons.io.DecoratingInputStream;
+import net.java.truecommons.io.DecoratingOutputStream;
+import net.java.truecommons.io.DecoratingSeekableChannel;
+import net.java.truecommons.io.PowerBuffer;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.net.URI;
@@ -26,8 +26,8 @@ import static net.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
 import static net.truevfs.kernel.spec.cio.Entry.Type.FILE;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.truevfs.kernel.spec.cio.*;
-import de.schlichtherle.truecommons.shed.BitField;
-import static de.schlichtherle.truecommons.shed.Throwables.contains;
+import net.java.truecommons.shed.BitField;
+import static net.java.truecommons.shed.Throwables.contains;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.slf4j.Logger;

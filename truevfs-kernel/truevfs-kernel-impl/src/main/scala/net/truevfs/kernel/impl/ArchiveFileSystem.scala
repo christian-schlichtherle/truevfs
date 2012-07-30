@@ -4,9 +4,9 @@
  */
 package net.truevfs.kernel.impl
 
-import de.schlichtherle.truecommons.shed._
-import de.schlichtherle.truecommons.shed.HashMaps._
-import de.schlichtherle.truecommons.shed.Paths._
+import net.java.truecommons.shed._
+import net.java.truecommons.shed.HashMaps._
+import net.java.truecommons.shed.Paths._
 import java.nio.file._
 import java.util.Locale
 import javax.annotation.concurrent._

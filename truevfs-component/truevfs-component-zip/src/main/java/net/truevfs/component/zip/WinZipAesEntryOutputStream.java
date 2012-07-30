@@ -4,8 +4,8 @@
  */
 package net.truevfs.component.zip;
 
-import de.schlichtherle.truecommons.io.DecoratingOutputStream;
-import de.schlichtherle.truecommons.io.LittleEndianOutputStream;
+import net.java.truecommons.io.DecoratingOutputStream;
+import net.java.truecommons.io.LittleEndianOutputStream;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Arrays;

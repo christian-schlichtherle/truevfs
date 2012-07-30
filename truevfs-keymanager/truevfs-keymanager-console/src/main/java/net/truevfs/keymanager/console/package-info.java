@@ -4,7 +4,7 @@
  */
 /**
  * Provides the console based implementation of the interface
- * {@link de.schlichtherle.truevfs.key.PromptingKeyProviderView}.
+ * {@link net.truevfs.keymanager.spec.PromptingKeyProvider.View}.
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
 package net.truevfs.keymanager.console;

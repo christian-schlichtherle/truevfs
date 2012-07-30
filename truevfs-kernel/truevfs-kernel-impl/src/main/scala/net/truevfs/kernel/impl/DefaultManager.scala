@@ -4,10 +4,10 @@
  */
 package net.truevfs.kernel.impl
 
-import de.schlichtherle.truecommons.shed._
-import de.schlichtherle.truecommons.shed.Link._
-import de.schlichtherle.truecommons.shed.Link.Type._
-import de.schlichtherle.truecommons.shed.Links._
+import net.java.truecommons.shed._
+import net.java.truecommons.shed.Link._
+import net.java.truecommons.shed.Link.Type._
+import net.java.truecommons.shed.Links._
 import java.util.concurrent.locks._
 import java.util.concurrent.locks.ReentrantReadWriteLock._
 import javax.annotation.concurrent._

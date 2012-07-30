@@ -4,8 +4,8 @@
  */
 package net.truevfs.kernel.spec.cio;
 
-import de.schlichtherle.truecommons.io.DecoratingOutputStream;
-import de.schlichtherle.truecommons.io.InputException;
+import net.java.truecommons.io.DecoratingOutputStream;
+import net.java.truecommons.io.InputException;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -19,10 +19,10 @@ import static net.truevfs.kernel.spec.cio.Entry.ALL_ACCESS;
 import net.truevfs.kernel.spec.cio.Entry.Access;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import de.schlichtherle.truecommons.shed.CompoundIterator;
-import de.schlichtherle.truecommons.shed.ExceptionBuilder;
-import de.schlichtherle.truecommons.shed.PriorityExceptionBuilder;
-import de.schlichtherle.truecommons.shed.SuppressedExceptionBuilder;
+import net.java.truecommons.shed.CompoundIterator;
+import net.java.truecommons.shed.ExceptionBuilder;
+import net.java.truecommons.shed.PriorityExceptionBuilder;
+import net.java.truecommons.shed.SuppressedExceptionBuilder;
 
 /**
  * Decorates another output service to support a virtually unlimited number of

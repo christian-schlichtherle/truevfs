@@ -5,7 +5,7 @@
 package net.truevfs.kernel.spec.cio;
 
 import java.io.IOException;
-import de.schlichtherle.truecommons.shed.Pool;
+import net.java.truecommons.shed.Pool;
 
 /**
  * A pool for allocating I/O buffers, which can get used as a volatile storage

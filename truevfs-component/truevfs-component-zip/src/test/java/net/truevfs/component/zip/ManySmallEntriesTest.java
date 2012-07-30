@@ -4,9 +4,9 @@
  */
 package net.truevfs.component.zip;
 
-import de.schlichtherle.truecommons.io.ByteBufferChannel;
-import de.schlichtherle.truecommons.io.ChannelOutputStream;
-import static de.schlichtherle.truecommons.shed.HashMaps.initialCapacity;
+import net.java.truecommons.io.ByteBufferChannel;
+import net.java.truecommons.io.ChannelOutputStream;
+import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;

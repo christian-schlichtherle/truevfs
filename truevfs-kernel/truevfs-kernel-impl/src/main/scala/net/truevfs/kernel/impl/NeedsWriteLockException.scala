@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.impl
 
-import de.schlichtherle.truecommons.shed._
+import net.java.truecommons.shed._
 import javax.annotation.concurrent._
 
 /** Indicates that the file system needs to get write locked before the

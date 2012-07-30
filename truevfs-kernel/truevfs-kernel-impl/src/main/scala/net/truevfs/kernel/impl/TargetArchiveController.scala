@@ -4,8 +4,8 @@
  */
 package net.truevfs.kernel.impl
 
-import de.schlichtherle.truecommons.io._
-import de.schlichtherle.truecommons.shed._
+import net.java.truecommons.io._
+import net.java.truecommons.shed._
 import java.io._
 import java.nio.channels._
 import java.nio.file._

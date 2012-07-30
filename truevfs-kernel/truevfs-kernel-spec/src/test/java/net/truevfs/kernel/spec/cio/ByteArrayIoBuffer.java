@@ -4,10 +4,10 @@
  */
 package net.truevfs.kernel.spec.cio;
 
-import de.schlichtherle.truecommons.io.ByteBufferChannel;
-import de.schlichtherle.truecommons.io.DisconnectingInputStream;
-import de.schlichtherle.truecommons.io.DisconnectingOutputStream;
-import de.schlichtherle.truecommons.io.DisconnectingSeekableChannel;
+import net.java.truecommons.io.ByteBufferChannel;
+import net.java.truecommons.io.DisconnectingInputStream;
+import net.java.truecommons.io.DisconnectingOutputStream;
+import net.java.truecommons.io.DisconnectingSeekableChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.nio.ByteBuffer;

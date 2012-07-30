@@ -15,8 +15,8 @@ import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.spec.*;
 import net.truevfs.kernel.spec.cio.Entry.Type;
 import net.truevfs.kernel.spec.cio.*;
-import de.schlichtherle.truecommons.shed.BitField;
-import de.schlichtherle.truecommons.shed.HashMaps;
+import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.HashMaps;
 
 /**
  * @author Christian Schlichtherle

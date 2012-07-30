@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.driver.mock;
 
-import de.schlichtherle.truecommons.io.DecoratingOutputStream;
+import net.java.truecommons.io.DecoratingOutputStream;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +21,7 @@ import static net.truevfs.kernel.spec.cio.Entry.ALL_SIZES;
 import net.truevfs.kernel.spec.cio.Entry.Access;
 import net.truevfs.kernel.spec.cio.Entry.Size;
 import net.truevfs.kernel.spec.cio.*;
-import de.schlichtherle.truecommons.shed.HashMaps;
+import net.java.truecommons.shed.HashMaps;
 
 /**
  * @author Christian Schlichtherle

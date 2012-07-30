@@ -13,8 +13,8 @@ import javax.annotation.concurrent.Immutable;
 import static net.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 import static net.truevfs.kernel.spec.FsUriModifier.NULL;
 import static net.truevfs.kernel.spec.FsUriModifier.PostFix.PATH;
-import de.schlichtherle.truecommons.shed.QuotedUriSyntaxException;
-import de.schlichtherle.truecommons.shed.UriBuilder;
+import net.java.truecommons.shed.QuotedUriSyntaxException;
+import net.java.truecommons.shed.UriBuilder;
 
 /**
  * Addresses a file system entry.

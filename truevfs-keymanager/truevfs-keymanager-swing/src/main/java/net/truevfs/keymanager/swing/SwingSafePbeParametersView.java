@@ -4,7 +4,7 @@
  */
 package net.truevfs.keymanager.swing;
 
-import de.schlichtherle.truecommons.services.Loader;
+import net.java.truecommons.services.Loader;
 import java.awt.EventQueue;
 import java.awt.Window;
 import java.io.*;

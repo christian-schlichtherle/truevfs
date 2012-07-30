@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.spec.spi;
 
-import de.schlichtherle.truecommons.services.ModifierService;
+import net.java.truecommons.services.ModifierService;
 import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.kernel.spec.FsDriver;

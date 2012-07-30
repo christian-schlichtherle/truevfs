@@ -8,7 +8,7 @@ import java.util.NoSuchElementException;
 import static net.truevfs.kernel.spec.FsAccessOption.*;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.driver.mock.MockArchiveDriver;
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.shed.BitField;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.*;

@@ -6,7 +6,7 @@ package net.truevfs.extension.pacemanager;
 
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.*;
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.shed.BitField;
 
 /**
  * The pace manager controller.

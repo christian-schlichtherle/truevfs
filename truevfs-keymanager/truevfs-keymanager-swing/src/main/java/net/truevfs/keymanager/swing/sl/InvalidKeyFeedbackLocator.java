@@ -4,8 +4,8 @@
  */
 package net.truevfs.keymanager.swing.sl;
 
-import de.schlichtherle.truecommons.services.Container;
-import de.schlichtherle.truecommons.services.Locator;
+import net.java.truecommons.services.Container;
+import net.java.truecommons.services.Locator;
 import net.truevfs.keymanager.swing.feedback.Feedback;
 import net.truevfs.keymanager.swing.spi.FeedbackFactory;
 import net.truevfs.keymanager.swing.spi.InvalidKeyFeedbackDecorator;

@@ -7,26 +7,24 @@ package net.truevfs.kernel.spec.sample;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
-import net.truevfs.kernel.spec.sl.FsManagerLocator;
+import net.java.truecommons.shed.BitField;
+import net.truevfs.kernel.spec.*;
 import static net.truevfs.kernel.spec.FsAccessOption.CREATE_PARENTS;
 import static net.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
-import net.truevfs.kernel.spec.*;
 import net.truevfs.kernel.spec.cio.InputSocket;
 import net.truevfs.kernel.spec.cio.IoSockets;
 import net.truevfs.kernel.spec.cio.OutputSocket;
-import de.schlichtherle.truecommons.shed.BitField;
+import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
+import net.truevfs.kernel.spec.sl.FsManagerLocator;
 
 /**
  * A poor man's blend of the cp(1) or curl(1) command line utilities
  * for copying the contents of the first parameter URI to the second parameter
  * URI.
  * 
- * @deprecated Since TrueVFS 7.2, the new TrueVFS Access Path API provides the same
- *             functionality with much more ease and comfort.
- *             Use the Maven archetype for the module TrueVFS Access Path instead.
+ * @deprecated Use the Maven archetype for the module TrueVFS Access instead.
  *             Its group ID is {@code de.schlichtherle.truevfs}.
- *             Its artifact ID is {@code truevfs-archetype-path}.
+ *             Its artifact ID is {@code truevfs-archetype-access}.
  * @see        <a href="http://curl.haxx.se/">cURL and libcurl - Home Page</a>
  * @author     Christian Schlichtherle
  * @version    $Id$

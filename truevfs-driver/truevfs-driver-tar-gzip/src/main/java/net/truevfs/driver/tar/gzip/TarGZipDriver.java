@@ -4,9 +4,9 @@
  */
 package net.truevfs.driver.tar.gzip;
 
-import de.schlichtherle.truecommons.io.AbstractSink;
-import de.schlichtherle.truecommons.io.AbstractSource;
-import de.schlichtherle.truecommons.io.Streams;
+import net.java.truecommons.io.AbstractSink;
+import net.java.truecommons.io.AbstractSource;
+import net.java.truecommons.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -22,7 +22,7 @@ import static net.truevfs.kernel.spec.FsAccessOption.STORE;
 import net.truevfs.kernel.spec.cio.InputService;
 import net.truevfs.kernel.spec.cio.MultiplexingOutputService;
 import net.truevfs.kernel.spec.cio.OutputService;
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.shed.BitField;
 
 /**
  * An archive driver for GZIP compressed TAR files (TAR.GZIP).

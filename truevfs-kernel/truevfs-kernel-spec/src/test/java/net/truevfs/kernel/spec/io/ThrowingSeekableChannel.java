@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.spec.io;
 
-import de.schlichtherle.truecommons.io.DecoratingSeekableChannel;
+import net.java.truecommons.io.DecoratingSeekableChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.ByteBuffer;

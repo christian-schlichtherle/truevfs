@@ -164,7 +164,7 @@ Basic Concepts
     For example, the abstract class
     {{{./apidocs/net/truevfs/kernel/FsDriver.html}<<<FsDriver>>>}}
     consists of only one abstract method
-    {{{./apidocs/net/truevfs/kernel/FsDriver.html#newController(de.schlichtherle.fs.FsModel,de.schlichtherle.fs.FsController)}<<<FsDriver.newController(FsModel, FsController)>>>}}
+    {{{./apidocs/net/truevfs/kernel/FsDriver.html#newController(net.truevfs.kernel.spec.FsModel,net.truevfs.kernel.spec.FsController)}<<<FsDriver.newController(FsModel, FsController)>>>}}
     which needs to get implemented in any file system driver module.    
 
 ** Composition Over Inheritance

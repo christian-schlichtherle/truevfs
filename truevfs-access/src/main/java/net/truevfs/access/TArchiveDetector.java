@@ -4,8 +4,8 @@
  */
 package net.truevfs.access;
 
-import de.schlichtherle.truecommons.services.Container;
-import de.schlichtherle.truecommons.services.Loader;
+import net.java.truecommons.services.Container;
+import net.java.truecommons.services.Loader;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -16,9 +16,9 @@ import net.truevfs.kernel.spec.FsAbstractCompositeDriver;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsScheme;
 import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
-import de.schlichtherle.truecommons.shed.ExtensionSet;
-import de.schlichtherle.truecommons.shed.HashMaps;
-import static de.schlichtherle.truecommons.shed.HashMaps.initialCapacity;
+import net.java.truecommons.shed.ExtensionSet;
+import net.java.truecommons.shed.HashMaps;
+import static net.java.truecommons.shed.HashMaps.initialCapacity;
 
 /**
  * Detects a <em>prospective</em> archive file and declares its file system

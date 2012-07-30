@@ -4,11 +4,11 @@
  */
 package net.truevfs.component.tar.driver;
 
-import de.schlichtherle.truecommons.io.DecoratingOutputStream;
-import de.schlichtherle.truecommons.io.DisconnectingOutputStream;
-import de.schlichtherle.truecommons.io.InputException;
-import de.schlichtherle.truecommons.io.Sink;
-import de.schlichtherle.truecommons.io.Streams;
+import net.java.truecommons.io.DecoratingOutputStream;
+import net.java.truecommons.io.DisconnectingOutputStream;
+import net.java.truecommons.io.InputException;
+import net.java.truecommons.io.Sink;
+import net.java.truecommons.io.Streams;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -24,9 +24,9 @@ import net.truevfs.kernel.spec.FsModel;
 import net.truevfs.kernel.spec.cio.*;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import static de.schlichtherle.truecommons.shed.HashMaps.OVERHEAD_SIZE;
-import static de.schlichtherle.truecommons.shed.HashMaps.initialCapacity;
-import de.schlichtherle.truecommons.shed.SuppressedExceptionBuilder;
+import static net.java.truecommons.shed.HashMaps.OVERHEAD_SIZE;
+import static net.java.truecommons.shed.HashMaps.initialCapacity;
+import net.java.truecommons.shed.SuppressedExceptionBuilder;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**

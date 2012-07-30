@@ -16,7 +16,7 @@ import net.truevfs.kernel.spec.*;
 import net.truevfs.kernel.spec.cio.Entry.Access;
 import net.truevfs.kernel.spec.cio.Entry.Type;
 import net.truevfs.kernel.spec.cio.*;
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.shed.BitField;
 
 /**
  * Calls back the given {@link PaceManagerController} before and after each

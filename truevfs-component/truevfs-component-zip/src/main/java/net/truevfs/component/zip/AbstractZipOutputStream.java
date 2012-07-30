@@ -4,10 +4,10 @@
  */
 package net.truevfs.component.zip;
 
-import de.schlichtherle.truecommons.io.DecoratingOutputStream;
-import de.schlichtherle.truecommons.io.LittleEndianOutputStream;
-import de.schlichtherle.truecommons.io.Sink;
-import de.schlichtherle.truecommons.shed.HashMaps;
+import net.java.truecommons.io.DecoratingOutputStream;
+import net.java.truecommons.io.LittleEndianOutputStream;
+import net.java.truecommons.io.Sink;
+import net.java.truecommons.shed.HashMaps;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;

@@ -4,18 +4,18 @@
  */
 package net.truevfs.driver.tar.bzip2;
 
-import de.schlichtherle.truecommons.io.AbstractSink;
-import de.schlichtherle.truecommons.io.AbstractSource;
-import de.schlichtherle.truecommons.io.Streams;
-import de.schlichtherle.truecommons.shed.BitField;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.io.AbstractSink;
+import net.java.truecommons.io.AbstractSource;
+import net.java.truecommons.io.Streams;
+import net.java.truecommons.shed.BitField;
 import net.truevfs.component.tar.driver.*;
-import static net.truevfs.kernel.spec.FsAccessOption.STORE;
 import net.truevfs.kernel.spec.*;
+import static net.truevfs.kernel.spec.FsAccessOption.STORE;
 import net.truevfs.kernel.spec.cio.InputService;
 import net.truevfs.kernel.spec.cio.MultiplexingOutputService;
 import net.truevfs.kernel.spec.cio.OutputService;

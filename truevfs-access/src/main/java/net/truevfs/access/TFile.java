@@ -4,7 +4,7 @@
  */
 package net.truevfs.access;
 
-import de.schlichtherle.truecommons.io.Streams;
+import net.java.truecommons.io.Streams;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -30,10 +30,10 @@ import net.truevfs.kernel.spec.cio.Entry.Size;
 import static net.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
 import static net.truevfs.kernel.spec.cio.Entry.Type.FILE;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import de.schlichtherle.truecommons.shed.BitField;
-import de.schlichtherle.truecommons.shed.PathSplitter;
-import de.schlichtherle.truecommons.shed.Paths;
-import de.schlichtherle.truecommons.shed.UriBuilder;
+import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.PathSplitter;
+import net.java.truecommons.shed.Paths;
+import net.java.truecommons.shed.UriBuilder;
 
 /**
  * A replacement for the class {@link File} which provides transparent

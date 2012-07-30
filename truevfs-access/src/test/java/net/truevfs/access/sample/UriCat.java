@@ -4,12 +4,12 @@
  */
 package net.truevfs.access.sample;
 
-import net.truevfs.access.TApplication;
-import net.truevfs.access.TConfig;
-import net.truevfs.access.TFile;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import net.truevfs.access.TApplication;
+import net.truevfs.access.TConfig;
+import net.truevfs.access.TFile;
 
 /**
  * A poor man's imitate of the cat(1) command line utility
@@ -17,9 +17,9 @@ import java.net.URISyntaxException;
  * The URI must be file-based, i.e. the top level file system scheme must
  * be {@code file}.
  *
- * @deprecated Use the Maven archetype for the module TrueVFS Access File* instead.
+ * @deprecated Use the Maven archetype for the module TrueVFS Access instead.
  *             Its group ID is {@code de.schlichtherle.truevfs}.
- *             Its artifact ID is {@code truevfs-archetype-file}.
+ *             Its artifact ID is {@code truevfs-archetype-access}.
  * @author     Christian Schlichtherle
  * @version    $Id$
  */

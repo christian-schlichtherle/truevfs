@@ -4,7 +4,7 @@
  */
 package net.truevfs.component.zip;
 
-import de.schlichtherle.truecommons.io.ChannelInputStream;
+import net.java.truecommons.io.ChannelInputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;

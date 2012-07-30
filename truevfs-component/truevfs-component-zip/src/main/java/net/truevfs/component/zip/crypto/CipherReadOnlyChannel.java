@@ -4,8 +4,8 @@
  */
 package net.truevfs.component.zip.crypto;
 
-import de.schlichtherle.truecommons.io.ReadOnlyChannel;
-import de.schlichtherle.truecommons.io.Streams;
+import net.java.truecommons.io.ReadOnlyChannel;
+import net.java.truecommons.io.Streams;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import static java.lang.Math.min;

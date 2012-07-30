@@ -4,7 +4,7 @@
  */
 package net.truevfs.extension.logging;
 
-import de.schlichtherle.truecommons.io.DecoratingSeekableChannel;
+import net.java.truecommons.io.DecoratingSeekableChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;

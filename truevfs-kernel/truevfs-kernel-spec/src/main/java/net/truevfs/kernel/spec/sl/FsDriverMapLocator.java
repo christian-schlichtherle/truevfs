@@ -4,8 +4,8 @@
  */
 package net.truevfs.kernel.spec.sl;
 
-import de.schlichtherle.truecommons.services.Container;
-import de.schlichtherle.truecommons.services.Locator;
+import net.java.truecommons.services.Container;
+import net.java.truecommons.services.Locator;
 import java.util.Collections;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;

@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.impl
 
-import de.schlichtherle.truecommons.shed._
+import net.java.truecommons.shed._
 import java.{lang => jl}
 import java.{util => ju}
 import net.truevfs.kernel.spec._

@@ -4,8 +4,8 @@
  */
 package net.truevfs.driver.zip.raes.crypto;
 
-import de.schlichtherle.truecommons.io.DecoratingOutputStream;
-import de.schlichtherle.truecommons.io.Sink;
+import net.java.truecommons.io.DecoratingOutputStream;
+import net.java.truecommons.io.Sink;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;

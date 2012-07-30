@@ -4,9 +4,9 @@
  */
 package net.truevfs.driver.zip.raes.crypto;
 
-import de.schlichtherle.truecommons.io.PowerBuffer;
-import de.schlichtherle.truecommons.io.ReadOnlyChannel;
-import de.schlichtherle.truecommons.io.Source;
+import net.java.truecommons.io.PowerBuffer;
+import net.java.truecommons.io.ReadOnlyChannel;
+import net.java.truecommons.io.Source;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.EOFException;
 import java.io.IOException;
