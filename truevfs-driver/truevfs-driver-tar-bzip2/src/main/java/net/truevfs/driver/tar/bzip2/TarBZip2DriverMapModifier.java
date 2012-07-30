@@ -4,12 +4,12 @@
  */
 package net.truevfs.driver.tar.bzip2;
 
+import de.schlichtherle.truecommons.shed.ExtensionSet;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsScheme;
 import net.truevfs.kernel.spec.spi.FsDriverMapModifier;
-import de.schlichtherle.truecommons.shed.ExtensionSet;
 
 /**
  * Creates maps with drivers for the TAR file format.
