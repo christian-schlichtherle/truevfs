@@ -4,7 +4,6 @@
  */
 package net.truevfs.driver.tar.bzip2;
 
-import net.truevfs.driver.tar.bzip2.TarBZip2Driver;
 import net.truevfs.component.tar.driver.TarDriverEntry;
 import net.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 
