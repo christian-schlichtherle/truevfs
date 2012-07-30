@@ -23,11 +23,22 @@ public class ConcurrencyUtils {
     public static TaskJoiner runConcurrent(
             final int numThreads,
             final TaskFactory factory) {
+        final CountDownLatch latch = new CountDownLatch(numThreads);
         final List<Future<?>> results = new ArrayList<Future<?>>(numThreads);
         final ExecutorService executor = Executors.newFixedThreadPool(numThreads);
         try {
-            for (int threadNum = 0; threadNum < numThreads; threadNum++)
-                results.add(executor.submit(factory.newTask(threadNum)));
+            for (int threadNum = 0; threadNum < numThreads; threadNum++) {
+                final Callable<?> task = factory.newTask(threadNum);
+                final class Starter implements Callable<Void> {
+                    @Override
+                    public Void call() throws Exception {
+                        latch.countDown();
+                        task.call();
+                        return null;
+                    }
+                }
+                results.add(executor.submit(new Starter()));
+            }
         } finally {
             executor.shutdown();
         }
