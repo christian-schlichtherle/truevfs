@@ -27,20 +27,20 @@
             <artifactId>truevfs-keymanager-spec</artifactId>
         </dependency>
         <dependency>
-            <groupId>de.schlichtherle.truecommons</groupId>
+            <groupId>net.java.truecommons</groupId>
             <artifactId>truecommons-io</artifactId>
         </dependency>
         <dependency>
-            <groupId>de.schlichtherle.truecommons</groupId>
+            <groupId>net.java.truecommons</groupId>
             <artifactId>truecommons-io</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>
-            <groupId>de.schlichtherle.truecommons</groupId>
+            <groupId>net.java.truecommons</groupId>
             <artifactId>truecommons-shed</artifactId>
         </dependency>
         <dependency>
-            <groupId>de.schlichtherle.truecommons</groupId>
+            <groupId>net.java.truecommons</groupId>
             <artifactId>truecommons-shed</artifactId>
             <type>test-jar</type>
         </dependency>
