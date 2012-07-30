@@ -5,12 +5,15 @@
 package net.truevfs.access;
 
 import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.*;
+import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskFactory;
+import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskJoiner;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import net.truevfs.kernel.spec.FsArchiveDriver;
 import static net.truevfs.kernel.spec.FsSyncOptions.SYNC;
 import static org.junit.Assert.assertEquals;
@@ -76,10 +79,22 @@ extends ConfiguredClientTestBase<D> {
         } // SyncFactory
 
         // Trigger sync mayhem!
+        Throwable ex = null;
         final TaskJoiner sync = start(NUM_CPU_THREADS, new SyncFactory());
-        start(NUM_IO_THREADS, new RoundTripFactory()).join();
-        sync.cancel();
-        sync.join(); // check exception
+        try {
+            start(NUM_IO_THREADS, new RoundTripFactory()).join();
+        } catch (final InterruptedException | ExecutionException ex2) {
+            ex = ex2;
+            throw ex2;
+        } finally {
+            try {
+                sync.cancel();
+                sync.join();
+            } catch (final InterruptedException | ExecutionException ex2) {
+                if (null == ex) throw ex2;
+                ex.addSuppressed(ex2);
+            }
+        }
     }
 
     void roundTrip(final int i) throws IOException {
