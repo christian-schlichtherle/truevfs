@@ -6,7 +6,7 @@ package net.truevfs.samples.access;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
-import net.truevfs.access.TApplication;
+import net.java.truevfs.access.TApplication;
 
 /**
  * Abstract base class for command line utilities.

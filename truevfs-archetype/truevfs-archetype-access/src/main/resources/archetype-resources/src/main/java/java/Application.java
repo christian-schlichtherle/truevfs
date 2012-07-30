@@ -3,8 +3,8 @@
 #set( $symbol_escape = '\' )
 package ${package}.java;
 
-import net.truevfs.access.TApplication;
-import net.truevfs.kernel.spec.FsSyncException;
+import net.java.truevfs.access.TApplication;
+import net.java.truevfs.kernel.spec.FsSyncException;
 
 /**
  * An abstract class which configures the TrueVFS Access module.

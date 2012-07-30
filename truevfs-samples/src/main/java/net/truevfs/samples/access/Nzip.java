@@ -4,6 +4,11 @@
  */
 package net.truevfs.samples.access;
 
+import net.java.truevfs.access.TConfig;
+import net.java.truevfs.access.TArchiveDetector;
+import net.java.truevfs.access.TFileInputStream;
+import net.java.truevfs.access.TFile;
+import net.java.truevfs.access.TFileComparator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -15,16 +20,15 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.truevfs.access.*;
-import net.truevfs.component.tar.driver.TarDriver;
-import net.truevfs.component.zip.driver.CheckedJarDriver;
-import net.truevfs.component.zip.driver.CheckedZipDriver;
-import net.truevfs.driver.sfx.CheckedReadOnlySfxDriver;
-import net.truevfs.driver.tar.bzip2.TarBZip2Driver;
-import net.truevfs.driver.tar.gzip.TarGZipDriver;
-import net.truevfs.driver.tar.xz.TarXZDriver;
-import static net.truevfs.kernel.spec.FsAccessOption.*;
-import net.truevfs.kernel.spec.FsSyncException;
+import net.java.truevfs.component.tar.driver.TarDriver;
+import net.java.truevfs.component.zip.driver.CheckedJarDriver;
+import net.java.truevfs.component.zip.driver.CheckedZipDriver;
+import net.java.truevfs.driver.sfx.CheckedReadOnlySfxDriver;
+import net.java.truevfs.driver.tar.bzip2.TarBZip2Driver;
+import net.java.truevfs.driver.tar.gzip.TarGZipDriver;
+import net.java.truevfs.driver.tar.xz.TarXZDriver;
+import static net.java.truevfs.kernel.spec.FsAccessOption.*;
+import net.java.truevfs.kernel.spec.FsSyncException;
 
 /**
  * A comprehensive command line utility which allows you to work

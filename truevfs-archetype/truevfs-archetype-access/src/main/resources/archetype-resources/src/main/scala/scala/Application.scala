@@ -3,7 +3,7 @@
 #set( $symbol_escape = '\' )
 package ${package}.scala
 
-import net.truevfs.access.TApplication
+import net.java.truevfs.access.TApplication
 
 /**
  * An abstract class which configures the TrueVFS Access module.
