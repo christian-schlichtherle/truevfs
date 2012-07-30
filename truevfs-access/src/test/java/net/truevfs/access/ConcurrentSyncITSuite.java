@@ -4,9 +4,6 @@
  */
 package net.truevfs.access;
 
-import static net.java.truecommons.shed.ConcurrencyUtils.*;
-import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
-import net.java.truecommons.shed.ConcurrencyUtils.TaskJoiner;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +11,9 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
+import static net.java.truecommons.shed.ConcurrencyUtils.*;
+import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
+import net.java.truecommons.shed.ConcurrencyUtils.TaskJoiner;
 import net.truevfs.kernel.spec.FsArchiveDriver;
 import static net.truevfs.kernel.spec.FsSyncOptions.SYNC;
 import static org.junit.Assert.assertEquals;
@@ -39,12 +39,6 @@ extends ConfiguredClientTestBase<D> {
     private static final String TEMP_FILE_PREFIX = "tzp-sync";
 
     private static final int NUM_REPEATS = 10;
-
-    private File createTempArchive() throws IOException {
-        // TODO: Removing .getCanonicalFile() causes archive.rm_r() to
-        // fail in testCopyContainingOrSameFiles() - explain why!
-        return File.createTempFile(TEMP_FILE_PREFIX, getExtension()).getCanonicalFile();
-    }
 
     @Test
     public void testConcurrentSync() throws Exception {
@@ -98,12 +92,19 @@ extends ConfiguredClientTestBase<D> {
     }
 
     void roundTrip(final int i) throws IOException {
-        final File temp = createTempArchive();
-        TFile.rm(temp);
-        final TFile archive = new TFile(temp);
+        final TFile archive = newTempArchive();
         final TFile file = new TFile(archive, i + getExtension() + "/" + i);
         roundTrip(file);
         archive.rm_r();
+    }
+
+    private TFile newTempArchive() throws IOException {
+        // TODO: Removing .getCanonicalFile() causes archive.rm_r() to
+        // fail in testCopyContainingOrSameFiles() - explain why!
+        final File temp = File.createTempFile(TEMP_FILE_PREFIX, getExtension())
+                .getCanonicalFile();
+        TFile.rm(temp);
+        return new TFile(temp);
     }
 
     private void roundTrip(final TFile outer) throws IOException {
