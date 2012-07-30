@@ -7,14 +7,11 @@
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <prerequisites>
-        <maven>${maven.enforcer.requireMavenVersion}</maven>
-    </prerequisites>
 
     <parent>
-        <groupId>de.schlichtherle</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>21</version>
+        <groupId>net.java.truecommons</groupId>
+        <artifactId>truecommons-parent</artifactId>
+        <version>1</version>
     </parent>
 
     <groupId>de.schlichtherle.truevfs</groupId>
@@ -39,6 +36,13 @@ system space.
     </description>
     <url>http://truevfs.java.net</url>
     <inceptionYear>2005</inceptionYear>
+    <licenses>
+        <license>
+            <name>Eclipse Public License, Version 1.0</name>
+            <url>http://www.eclipse.org/legal/epl-v10.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
     <mailingLists>
         <mailingList>
             <name>Announce Mailing List</name>
