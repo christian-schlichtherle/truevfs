@@ -4,9 +4,9 @@
  */
 package net.truevfs.component.zip;
 
-import de.schlichtherle.truecommons.io.IntervalReadOnlyChannel;
-import de.schlichtherle.truecommons.io.PowerBuffer;
-import de.schlichtherle.truecommons.io.ReadOnlyChannel;
+import net.java.truecommons.io.IntervalReadOnlyChannel;
+import net.java.truecommons.io.PowerBuffer;
+import net.java.truecommons.io.ReadOnlyChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.EOFException;
 import java.io.IOException;

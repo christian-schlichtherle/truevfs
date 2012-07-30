@@ -4,7 +4,7 @@
  */
 package net.truevfs.access;
 
-import de.schlichtherle.truecommons.io.DecoratingInputStream;
+import net.java.truecommons.io.DecoratingInputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;

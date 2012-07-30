@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.spec.cio;
 
-import de.schlichtherle.truecommons.io.ChannelOutputStream;
+import net.java.truecommons.io.ChannelOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;

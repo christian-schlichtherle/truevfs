@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.impl
 
-import de.schlichtherle.truecommons.shed.Link._
+import net.java.truecommons.shed.Link._
 import net.truevfs.kernel.spec._
 
 /**

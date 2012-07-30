@@ -10,7 +10,7 @@ import net.truevfs.component.zip.driver.JarDriver;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsScheme;
 import net.truevfs.kernel.spec.spi.FsDriverMapModifier;
-import de.schlichtherle.truecommons.shed.ExtensionSet;
+import net.java.truecommons.shed.ExtensionSet;
 
 /**
  * Creates maps with drivers for the ZIP file format.

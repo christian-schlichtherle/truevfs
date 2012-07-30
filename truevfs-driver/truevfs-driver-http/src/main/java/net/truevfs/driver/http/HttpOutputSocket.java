@@ -12,7 +12,7 @@ import net.truevfs.kernel.spec.FsAccessOption;
 import net.truevfs.kernel.spec.cio.AbstractOutputSocket;
 import net.truevfs.kernel.spec.cio.Entry;
 import net.truevfs.kernel.spec.cio.InputSocket;
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.shed.BitField;
 
 /**
  * An output socket for HTTP(S) entries.

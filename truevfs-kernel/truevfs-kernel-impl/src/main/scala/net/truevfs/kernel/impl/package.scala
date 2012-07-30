@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel
 
-import de.schlichtherle.truecommons.shed._
+import net.java.truecommons.shed._
 import net.truevfs.kernel.spec._
 import net.truevfs.kernel.spec.cio._
 import net.truevfs.kernel.spec.cio.Entry._

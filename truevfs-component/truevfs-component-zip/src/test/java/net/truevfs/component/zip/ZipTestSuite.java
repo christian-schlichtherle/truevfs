@@ -4,9 +4,9 @@
  */
 package net.truevfs.component.zip;
 
-import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.*;
-import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskFactory;
-import static de.schlichtherle.truecommons.shed.HashMaps.initialCapacity;
+import static net.java.truecommons.shed.ConcurrencyUtils.*;
+import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
+import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;

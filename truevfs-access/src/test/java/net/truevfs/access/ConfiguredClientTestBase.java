@@ -4,7 +4,7 @@
  */
 package net.truevfs.access;
 
-import de.schlichtherle.truecommons.shed.ExtensionSet;
+import net.java.truecommons.shed.ExtensionSet;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;

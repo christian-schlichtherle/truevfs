@@ -4,8 +4,8 @@
  */
 package net.truevfs.kernel.spec;
 
-import de.schlichtherle.truecommons.io.Sink;
-import de.schlichtherle.truecommons.io.Source;
+import net.java.truecommons.io.Sink;
+import net.java.truecommons.io.Source;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.CharConversionException;
 import java.io.IOException;
@@ -19,8 +19,8 @@ import static net.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
 import net.truevfs.kernel.spec.cio.Entry.Type;
 import static net.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
 import net.truevfs.kernel.spec.cio.*;
-import de.schlichtherle.truecommons.shed.BitField;
-import static de.schlichtherle.truecommons.shed.Paths.cutTrailingSeparators;
+import net.java.truecommons.shed.BitField;
+import static net.java.truecommons.shed.Paths.cutTrailingSeparators;
 
 /**
  * An abstract factory for components required for accessing archive files.

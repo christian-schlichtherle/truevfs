@@ -4,7 +4,7 @@
  */
 package net.truevfs.keymanager.swing.spi;
 
-import de.schlichtherle.truecommons.services.FactoryService;
+import net.java.truecommons.services.FactoryService;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.keymanager.swing.feedback.BeepFeedback;
 import net.truevfs.keymanager.swing.feedback.Feedback;

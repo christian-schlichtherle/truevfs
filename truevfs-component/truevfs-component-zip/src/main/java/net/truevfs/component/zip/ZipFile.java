@@ -4,8 +4,8 @@
  */
 package net.truevfs.component.zip;
 
-import de.schlichtherle.truecommons.io.AbstractSource;
-import de.schlichtherle.truecommons.io.OneTimeSource;
+import net.java.truecommons.io.AbstractSource;
+import net.java.truecommons.io.OneTimeSource;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +21,7 @@ import java.util.zip.ZipException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
-import de.schlichtherle.truecommons.io.LockInputStream;
+import net.java.truecommons.io.LockInputStream;
 
 /**
  * Replacement for {@link java.util.zip.ZipFile java.util.zip.ZipFile}.

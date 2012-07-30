@@ -15,10 +15,10 @@ import net.truevfs.kernel.spec.FsPath;
 import net.truevfs.kernel.spec.FsScheme;
 import static net.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 import static net.truevfs.kernel.spec.FsUriModifier.NULL;
-import de.schlichtherle.truecommons.shed.PathSplitter;
-import de.schlichtherle.truecommons.shed.Paths;
-import de.schlichtherle.truecommons.shed.QuotedUriSyntaxException;
-import de.schlichtherle.truecommons.shed.UriBuilder;
+import net.java.truecommons.shed.PathSplitter;
+import net.java.truecommons.shed.Paths;
+import net.java.truecommons.shed.QuotedUriSyntaxException;
+import net.java.truecommons.shed.UriBuilder;
 
 /**
  * Scans hierarchical {@link URI}s for prospective archive files with the help

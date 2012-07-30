@@ -30,8 +30,8 @@ import static net.truevfs.kernel.spec.cio.Entry.Type.*;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.truevfs.kernel.spec.cio.InputSocket;
 import net.truevfs.kernel.spec.cio.OutputSocket;
-import de.schlichtherle.truecommons.shed.BitField;
-import de.schlichtherle.truecommons.shed.FilteringIterator;
+import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.FilteringIterator;
 
 /**
  * A {@link FileSystem} implementation based on the TrueVFS Kernel module.

@@ -34,7 +34,7 @@ import static net.truevfs.kernel.spec.cio.Entry.Type.FILE;
 import net.truevfs.kernel.spec.cio.InputSocket;
 import net.truevfs.kernel.spec.cio.IoSockets;
 import net.truevfs.kernel.spec.cio.OutputSocket;
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.shed.BitField;
 import org.slf4j.LoggerFactory;
 
 /**

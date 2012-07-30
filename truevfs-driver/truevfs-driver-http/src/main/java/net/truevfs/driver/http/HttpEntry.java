@@ -20,7 +20,7 @@ import static net.truevfs.kernel.spec.cio.Entry.Access.WRITE;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.Type.FILE;
 import net.truevfs.kernel.spec.cio.*;
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.shed.BitField;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;

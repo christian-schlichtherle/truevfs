@@ -13,7 +13,7 @@ import net.truevfs.kernel.spec.cio.Entry.Access;
 import static net.truevfs.kernel.spec.cio.Entry.Access.READ;
 import net.truevfs.kernel.spec.cio.Entry.Type;
 import static net.truevfs.kernel.spec.cio.Entry.Type.FILE;
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.shed.BitField;
 import org.apache.http.HttpResponse;
 
 /**

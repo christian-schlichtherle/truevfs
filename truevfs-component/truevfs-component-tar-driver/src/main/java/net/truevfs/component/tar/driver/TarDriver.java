@@ -4,7 +4,7 @@
  */
 package net.truevfs.component.tar.driver;
 
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.shed.BitField;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import javax.annotation.CheckForNull;

@@ -4,7 +4,7 @@
  */
 package net.truevfs.component.zip;
 
-import de.schlichtherle.truecommons.io.Streams;
+import net.java.truecommons.io.Streams;
 import java.nio.charset.Charset;
 
 /**

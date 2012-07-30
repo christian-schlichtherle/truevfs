@@ -24,7 +24,7 @@ import net.truevfs.kernel.spec.cio.Entry.Type;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.truevfs.kernel.spec.cio.InputSocket;
 import net.truevfs.kernel.spec.cio.OutputSocket;
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.shed.BitField;
 
 /**
  * A file system controller with a prospective directory in the platform file

@@ -7,7 +7,7 @@ package net.truevfs.kernel.spec.cio;
 import javax.annotation.CheckForNull;
 import static net.truevfs.kernel.spec.cio.Entry.Access.*;
 import static net.truevfs.kernel.spec.cio.Entry.Type.*;
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.shed.BitField;
 
 /**
  * Represents an entry in a container.

@@ -31,11 +31,11 @@ import net.truevfs.kernel.spec.*;
 import net.truevfs.kernel.spec.cio.Entry;
 import net.truevfs.kernel.spec.cio.InputSocket;
 import net.truevfs.kernel.spec.cio.OutputSocket;
-import de.schlichtherle.truecommons.shed.BitField;
-import static de.schlichtherle.truecommons.shed.HashMaps.initialCapacity;
-import de.schlichtherle.truecommons.shed.Paths;
-import de.schlichtherle.truecommons.shed.QuotedUriSyntaxException;
-import de.schlichtherle.truecommons.shed.UriBuilder;
+import net.java.truecommons.shed.BitField;
+import static net.java.truecommons.shed.HashMaps.initialCapacity;
+import net.java.truecommons.shed.Paths;
+import net.java.truecommons.shed.QuotedUriSyntaxException;
+import net.java.truecommons.shed.UriBuilder;
 
 /**
  * A {@link Path} implementation based on the TrueVFS Kernel module.

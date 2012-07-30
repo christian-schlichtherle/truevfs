@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.concurrent.NotThreadSafe;
-import static de.schlichtherle.truecommons.shed.Throwables.wrap;
+import static net.java.truecommons.shed.Throwables.wrap;
 
 /**
  * @author Christian Schlichtherle

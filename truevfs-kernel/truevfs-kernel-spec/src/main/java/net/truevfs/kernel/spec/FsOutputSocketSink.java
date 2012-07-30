@@ -4,13 +4,13 @@
  */
 package net.truevfs.kernel.spec;
 
-import de.schlichtherle.truecommons.io.Sink;
+import net.java.truecommons.io.Sink;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import net.truevfs.kernel.spec.cio.Entry;
 import net.truevfs.kernel.spec.cio.OutputSocket;
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.shed.BitField;
 
 /**
  * An adapter from an output socket to a sink with access options.

@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.impl
 
-import de.schlichtherle.truecommons.shed._
+import net.java.truecommons.shed._
 import collection.JavaConverters._
 import java.io._
 import java.util.concurrent._

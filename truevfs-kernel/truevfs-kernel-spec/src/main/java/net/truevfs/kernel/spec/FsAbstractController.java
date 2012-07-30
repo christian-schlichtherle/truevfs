@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import net.truevfs.kernel.spec.cio.Entry.Access;
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.shed.BitField;
 
 /**
  * An abstract file system controller which implements the {@link #getModel()}

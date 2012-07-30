@@ -6,9 +6,9 @@ package net.truevfs.kernel.spec;
 
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
-import de.schlichtherle.truecommons.io.ClosedInputException;
-import de.schlichtherle.truecommons.io.ClosedOutputException;
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.io.ClosedInputException;
+import net.java.truecommons.io.ClosedOutputException;
+import net.java.truecommons.shed.BitField;
 
 /**
  * Defines options for (federated) file system synchronization.

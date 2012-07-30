@@ -4,8 +4,8 @@
  */
 package net.truevfs.driver.zip.raes.crypto;
 
-import de.schlichtherle.truecommons.io.LittleEndianOutputStream;
-import de.schlichtherle.truecommons.io.Sink;
+import net.java.truecommons.io.LittleEndianOutputStream;
+import net.java.truecommons.io.Sink;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;

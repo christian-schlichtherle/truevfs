@@ -4,9 +4,9 @@
  */
 package net.truevfs.component.zip;
 
-import de.schlichtherle.truecommons.shed.ConcurrencyUtils;
-import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.*;
-import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskFactory;
+import net.java.truecommons.shed.ConcurrencyUtils;
+import static net.java.truecommons.shed.ConcurrencyUtils.*;
+import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.concurrent.Callable;

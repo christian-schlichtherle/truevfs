@@ -12,7 +12,7 @@ import net.truevfs.kernel.spec.FsArchiveDriver;
 import net.truevfs.kernel.spec.FsDriver;
 import net.truevfs.kernel.spec.FsScheme;
 import net.truevfs.kernel.driver.mock.MockArchiveDriver;
-import de.schlichtherle.truecommons.shed.ExtensionSet;
+import net.java.truecommons.shed.ExtensionSet;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 import org.junit.Before;

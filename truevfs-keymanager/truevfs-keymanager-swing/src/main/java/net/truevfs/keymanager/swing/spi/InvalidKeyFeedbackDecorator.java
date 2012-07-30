@@ -4,7 +4,7 @@
  */
 package net.truevfs.keymanager.swing.spi;
 
-import de.schlichtherle.truecommons.services.DecoratorService;
+import net.java.truecommons.services.DecoratorService;
 import javax.annotation.concurrent.ThreadSafe;
 import net.truevfs.keymanager.swing.feedback.Feedback;
 

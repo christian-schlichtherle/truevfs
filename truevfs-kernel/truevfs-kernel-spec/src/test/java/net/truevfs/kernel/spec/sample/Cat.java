@@ -4,17 +4,17 @@
  */
 package net.truevfs.kernel.spec.sample;
 
-import de.schlichtherle.truecommons.io.Streams;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import net.java.truecommons.io.Streams;
+import net.java.truecommons.shed.BitField;
 import net.truevfs.kernel.spec.*;
 import net.truevfs.kernel.spec.cio.InputSocket;
 import net.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.truevfs.kernel.spec.sl.FsManagerLocator;
-import de.schlichtherle.truecommons.shed.BitField;
 
 /**
  * A poor man's blend of the cat(1) and wget(1) command line utility
@@ -22,11 +22,9 @@ import de.schlichtherle.truecommons.shed.BitField;
  * This version can address any URI scheme which is supported by a file system
  * driver which is available on the run-time class path.
  *
- * @deprecated Since TrueVFS 7.2, the new TrueVFS Access Path API provides the same
- *             functionality with much more ease and comfort.
- *             Use the Maven archetype for the module TrueVFS Access Path instead.
+ * @deprecated Use the Maven archetype for the module TrueVFS Access instead.
  *             Its group ID is {@code de.schlichtherle.truevfs}.
- *             Its artifact ID is {@code truevfs-archetype-path}.
+ *             Its artifact ID is {@code truevfs-archetype-access}.
  * @see        <a href="http://www.gnu.org/software/wget/">GNU Cat - Home Page</a>
  * @author     Christian Schlichtherle
  * @version    $Id$

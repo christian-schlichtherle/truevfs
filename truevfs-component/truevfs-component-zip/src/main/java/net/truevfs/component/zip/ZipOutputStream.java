@@ -4,7 +4,7 @@
  */
 package net.truevfs.component.zip;
 
-import de.schlichtherle.truecommons.io.OneTimeSink;
+import net.java.truecommons.io.OneTimeSink;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;

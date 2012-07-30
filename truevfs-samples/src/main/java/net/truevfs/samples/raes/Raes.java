@@ -4,9 +4,9 @@
  */
 package net.truevfs.samples.raes;
 
-import de.schlichtherle.truecommons.io.AbstractSink;
-import de.schlichtherle.truecommons.io.AbstractSource;
-import de.schlichtherle.truecommons.io.Streams;
+import net.java.truecommons.io.AbstractSink;
+import net.java.truecommons.io.AbstractSource;
+import net.java.truecommons.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;

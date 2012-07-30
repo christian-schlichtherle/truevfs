@@ -4,7 +4,7 @@
  */
 package net.truevfs.component.instrumentation;
 
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.shed.BitField;
 import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
 import net.truevfs.kernel.spec.*;

@@ -4,8 +4,8 @@
  */
 package net.truevfs.kernel.impl;
 
-import de.schlichtherle.truecommons.shed.Link.Type;
-import static de.schlichtherle.truecommons.shed.Link.Type.STRONG;
+import net.java.truecommons.shed.Link.Type;
+import static net.java.truecommons.shed.Link.Type.STRONG;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;

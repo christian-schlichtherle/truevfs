@@ -4,7 +4,7 @@
  */
 package net.truevfs.component.zip.driver;
 
-import de.schlichtherle.truecommons.logging.LocalizedLogger;
+import net.java.truecommons.logging.LocalizedLogger;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.net.URI;
@@ -27,8 +27,8 @@ import net.truevfs.kernel.spec.cio.Entry.Type;
 import static net.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
 import net.truevfs.kernel.spec.cio.*;
 import net.truevfs.kernel.spec.sl.IoBufferPoolLocator;
-import de.schlichtherle.truecommons.shed.BitField;
-import de.schlichtherle.truecommons.shed.HashMaps;
+import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.HashMaps;
 import net.truevfs.keymanager.spec.KeyManagerContainer;
 import net.truevfs.keymanager.spec.KeyProvider;
 import net.truevfs.keymanager.spec.sl.KeyManagerMapLocator;

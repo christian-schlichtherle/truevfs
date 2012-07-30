@@ -4,7 +4,7 @@
  */
 package net.truevfs.keymanager.spec.spi;
 
-import de.schlichtherle.truecommons.services.FactoryService;
+import net.java.truecommons.services.FactoryService;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;

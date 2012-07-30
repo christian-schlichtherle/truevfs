@@ -9,7 +9,7 @@ import java.net.URISyntaxException;
 import static net.truevfs.kernel.spec.FsSyncOptions.UMOUNT;
 import net.truevfs.kernel.spec.*;
 import static net.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.shed.BitField;
 
 /**
  * Static utility methods for virtual file system operations with global scope.

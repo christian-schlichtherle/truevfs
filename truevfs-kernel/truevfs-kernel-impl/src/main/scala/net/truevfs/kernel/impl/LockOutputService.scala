@@ -4,7 +4,7 @@
  */
 package net.truevfs.kernel.impl
 
-import de.schlichtherle.truecommons.io._
+import net.java.truecommons.io._
 import edu.umd.cs.findbugs.annotations._
 import java.io._
 import java.nio.channels._

@@ -4,10 +4,10 @@
  */
 package net.truevfs.component.zip.driver;
 
-import de.schlichtherle.truecommons.io.DecoratingOutputStream;
-import de.schlichtherle.truecommons.io.DisconnectingOutputStream;
-import de.schlichtherle.truecommons.io.InputException;
-import de.schlichtherle.truecommons.io.Streams;
+import net.java.truecommons.io.DecoratingOutputStream;
+import net.java.truecommons.io.DisconnectingOutputStream;
+import net.java.truecommons.io.InputException;
+import net.java.truecommons.io.Streams;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -33,8 +33,8 @@ import net.truevfs.kernel.spec.cio.Entry.Access;
 import net.truevfs.kernel.spec.cio.Entry.Size;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import de.schlichtherle.truecommons.shed.CompoundIterator;
-import de.schlichtherle.truecommons.shed.SuppressedExceptionBuilder;
+import net.java.truecommons.shed.CompoundIterator;
+import net.java.truecommons.shed.SuppressedExceptionBuilder;
 
 /**
  * An output service for writing ZIP files.

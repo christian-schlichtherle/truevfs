@@ -6,7 +6,7 @@ package net.truevfs.kernel.spec;
 
 import static net.truevfs.kernel.spec.FsSyncOption.*;
 import static net.truevfs.kernel.spec.FsSyncOptions.*;
-import de.schlichtherle.truecommons.shed.BitField;
+import net.java.truecommons.shed.BitField;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 

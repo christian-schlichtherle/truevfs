@@ -4,9 +4,9 @@
  */
 package net.truevfs.driver.zip.raes.zip;
 
-import de.schlichtherle.truecommons.io.AbstractSource;
-import de.schlichtherle.truecommons.io.OneTimeSink;
-import de.schlichtherle.truecommons.io.OneTimeSource;
+import net.java.truecommons.io.AbstractSource;
+import net.java.truecommons.io.OneTimeSink;
+import net.java.truecommons.io.OneTimeSource;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;

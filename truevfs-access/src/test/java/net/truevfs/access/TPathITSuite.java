@@ -4,14 +4,14 @@
  */
 package net.truevfs.access;
 
-import de.schlichtherle.truecommons.io.ClosedInputException;
-import de.schlichtherle.truecommons.io.ClosedOutputException;
-import de.schlichtherle.truecommons.io.Streams;
-import de.schlichtherle.truecommons.shed.BitField;
-import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
-import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskFactory;
-import de.schlichtherle.truecommons.shed.ConcurrencyUtils.TaskJoiner;
-import static de.schlichtherle.truecommons.shed.ConcurrencyUtils.start;
+import net.java.truecommons.io.ClosedInputException;
+import net.java.truecommons.io.ClosedOutputException;
+import net.java.truecommons.io.Streams;
+import net.java.truecommons.shed.BitField;
+import static net.java.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
+import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
+import net.java.truecommons.shed.ConcurrencyUtils.TaskJoiner;
+import static net.java.truecommons.shed.ConcurrencyUtils.start;
 import java.io.*;
 import static java.io.File.separatorChar;
 import java.lang.ref.Reference;

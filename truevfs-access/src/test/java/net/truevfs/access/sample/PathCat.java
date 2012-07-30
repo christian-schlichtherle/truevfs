@@ -4,19 +4,19 @@
  */
 package net.truevfs.access.sample;
 
+import java.io.IOException;
 import net.truevfs.access.TApplication;
 import net.truevfs.access.TConfig;
 import net.truevfs.access.TFile;
-import java.io.IOException;
 
 /**
  * A poor man's imitate of the cat(1) command line utility
  * for concatenating the contents of each parameter path name on the standard
  * output.
  *
- * @deprecated Use the Maven archetype for the module TrueVFS Access File* instead.
+ * @deprecated Use the Maven archetype for the module TrueVFS Access instead.
  *             Its group ID is {@code de.schlichtherle.truevfs}.
- *             Its artifact ID is {@code truevfs-archetype-file}.
+ *             Its artifact ID is {@code truevfs-archetype-access}.
  * @see        <a href="http://www.gnu.org/software/wget/">GNU Cat - Home Page</a>
  * @author     Christian Schlichtherle
  * @version    $Id$
