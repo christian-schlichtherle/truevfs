@@ -6,16 +6,17 @@ package de.schlichtherle.truezip.file;
 
 import de.schlichtherle.truezip.fs.FsArchiveDriver;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
-import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
+import static de.schlichtherle.truezip.util.ConcurrencyUtils.*;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskJoiner;
-import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
+import de.schlichtherle.truezip.util.JSE7;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -81,14 +82,28 @@ extends ConfiguredClientTestBase<D> {
         } // SyncFactory
 
         // Trigger sync mayhem!
-        final TaskJoiner sync = runConcurrent(
-                Runtime.getRuntime().availableProcessors(),
-                new SyncFactory());
-        runConcurrent(
-                NUM_IO_THREADS,
-                new RoundTripFactory()).join();
-        sync.cancel();
-        sync.join(); // check exception
+        Throwable ex = null;
+        final TaskJoiner sync = runConcurrent(NUM_CPU_THREADS, new SyncFactory());
+        try {
+            runConcurrent(NUM_IO_THREADS, new RoundTripFactory()).join();
+        } catch (final InterruptedException ex2) {
+            ex = ex2;
+            throw ex2;
+        } catch (final ExecutionException ex2) {
+            ex = ex2;
+            throw ex2;
+        } finally {
+            try {
+                sync.cancel();
+                sync.join();
+            } catch (final InterruptedException ex2) {
+                if (null == ex) throw ex2;
+                if (JSE7.AVAILABLE) ex.addSuppressed(ex2);
+            } catch (final ExecutionException ex2) {
+                if (null == ex) throw ex2;
+                if (JSE7.AVAILABLE) ex.addSuppressed(ex2);
+            }
+        }
     }
 
     void roundTrip(final int i) throws IOException {
