@@ -4,10 +4,6 @@
  */
 package net.truevfs.kernel.spec;
 
-import net.java.truecommons.io.DecoratingInputStream;
-import net.java.truecommons.io.DecoratingOutputStream;
-import net.java.truecommons.io.DecoratingSeekableChannel;
-import net.java.truecommons.io.PowerBuffer;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.net.URI;
@@ -18,16 +14,20 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
+import net.java.truecommons.io.DecoratingInputStream;
+import net.java.truecommons.io.DecoratingOutputStream;
+import net.java.truecommons.io.DecoratingSeekableChannel;
+import net.java.truecommons.io.PowerBuffer;
+import net.java.truecommons.shed.BitField;
+import static net.java.truecommons.shed.Throwables.contains;
 import net.truevfs.kernel.driver.mock.MockController;
 import static net.truevfs.kernel.spec.FsAccessOptions.NONE;
+import net.truevfs.kernel.spec.cio.*;
 import static net.truevfs.kernel.spec.cio.Entry.Access.*;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
 import static net.truevfs.kernel.spec.cio.Entry.Type.FILE;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.truevfs.kernel.spec.cio.*;
-import net.java.truecommons.shed.BitField;
-import static net.java.truecommons.shed.Throwables.contains;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.slf4j.Logger;
