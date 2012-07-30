@@ -49,7 +49,7 @@ try {
     applications as described in the
     {{{../kick-start/index.html}Kick-Starting TrueVFS}} section.
     You might also want to
-    {{{http://repo1.maven.org/maven2/de/schlichtherle/truevfs/truevfs-samples/${project.version}/truevfs-samples-${project.version}-sources.jar}download}}
+    {{{http://repo1.maven.org/maven2/net/java/truevfs/truevfs-samples/${project.version}/truevfs-samples-${project.version}-sources.jar}download}}
     the source code of the module
     {{{../truevfs-samples/index.html}TrueVFS Samples}}.
 
@@ -112,7 +112,7 @@ try (InputStream in = Files.newInputStream(path)) {
     applications as described in the
     {{{../kick-start/index.html}Kick-Starting TrueVFS}} section.
     You might also want to
-    {{{http://repo1.maven.org/maven2/de/schlichtherle/truevfs/truevfs-samples/${project.version}/truevfs-samples-${project.version}-sources.jar}download}}
+    {{{http://repo1.maven.org/maven2/net/java/truevfs/truevfs-samples/${project.version}/truevfs-samples-${project.version}-sources.jar}download}}
     the source code of the module
     {{{../truevfs-samples/index.html}TrueVFS Samples}}.
 

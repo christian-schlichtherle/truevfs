@@ -69,8 +69,8 @@ Getting started with NetBeans
 
 [netbeans/02_Specify_archetype_details.png] Specify archetype details
 
-    Enter <<<de.schlichtherle.truevfs>>> as the Group Id,
-    <<<truevfs-archetype-file>>> as the Artifact Id
+    Enter <<<net.java.truevfs>>> as the Group Id,
+    <<<truevfs-archetype-access>>> as the Artifact Id
     and click <OK> to return to the top dialog should look like this now:
 
 [netbeans/03_New_Project.png] New Project
@@ -80,10 +80,10 @@ Getting started with NetBeans
 
 [netbeans/04_New_Project.png] New Project
 
-    Enter the appropriate values for your <Project Name>, <Group Id>, <Version>
-    and <Package> and then click <Finish> to see the magical population
-    of the Projects window with your shiny new TrueVFS Access File* application
-    happen:
+    Enter the appropriate values for your project's <Group Id>, <Artifact Id>,
+    <Version> and <Package> and then click <Finish> to see the magical
+    population of the Package Explorer with your shiny new TrueVFS Access
+    application happen:
 
 [netbeans/05_Projects.png] Package Explorer
 

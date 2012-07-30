@@ -99,7 +99,7 @@ Getting started with Eclipse
 
     Enter the appropriate values for your project's <Group Id>, <Artifact Id>,
     <Version> and <Package> and then click <Finish> to see the magical
-    population of the Package Explorer with your shiny new TrueVFS Access File*
+    population of the Package Explorer with your shiny new TrueVFS Access
     application happen:
 
 [eclipse/07_Package_Explorer.png] Package Explorer

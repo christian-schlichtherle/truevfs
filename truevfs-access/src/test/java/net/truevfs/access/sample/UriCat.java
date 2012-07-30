@@ -18,7 +18,7 @@ import net.truevfs.access.TFile;
  * be {@code file}.
  *
  * @deprecated Use the Maven archetype for the module TrueVFS Access instead.
- *             Its group ID is {@code de.schlichtherle.truevfs}.
+ *             Its group ID is {@code net.java.truevfs}.
  *             Its artifact ID is {@code truevfs-archetype-access}.
  * @author     Christian Schlichtherle
  * @version    $Id$

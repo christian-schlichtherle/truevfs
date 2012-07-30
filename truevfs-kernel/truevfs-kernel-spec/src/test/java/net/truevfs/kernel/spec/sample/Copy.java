@@ -23,7 +23,7 @@ import net.truevfs.kernel.spec.sl.FsManagerLocator;
  * URI.
  * 
  * @deprecated Use the Maven archetype for the module TrueVFS Access instead.
- *             Its group ID is {@code de.schlichtherle.truevfs}.
+ *             Its group ID is {@code net.java.truevfs}.
  *             Its artifact ID is {@code truevfs-archetype-access}.
  * @see        <a href="http://curl.haxx.se/">cURL and libcurl - Home Page</a>
  * @author     Christian Schlichtherle
