@@ -4,11 +4,6 @@
  */
 package net.truevfs.component.tar.driver;
 
-import net.java.truecommons.io.DecoratingOutputStream;
-import net.java.truecommons.io.DisconnectingOutputStream;
-import net.java.truecommons.io.InputException;
-import net.java.truecommons.io.Sink;
-import net.java.truecommons.io.Streams;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -18,15 +13,20 @@ import java.io.OutputStream;
 import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.io.DecoratingOutputStream;
+import net.java.truecommons.io.DisconnectingOutputStream;
+import net.java.truecommons.io.InputException;
+import net.java.truecommons.io.Sink;
+import net.java.truecommons.io.Streams;
+import static net.java.truecommons.shed.HashMaps.OVERHEAD_SIZE;
+import static net.java.truecommons.shed.HashMaps.initialCapacity;
+import net.java.truecommons.shed.SuppressedExceptionBuilder;
 import static net.truevfs.component.tar.driver.TarDriver.DEFAULT_BLKSIZE;
 import static net.truevfs.component.tar.driver.TarDriver.DEFAULT_RCDSIZE;
 import net.truevfs.kernel.spec.FsModel;
 import net.truevfs.kernel.spec.cio.*;
 import static net.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import static net.java.truecommons.shed.HashMaps.OVERHEAD_SIZE;
-import static net.java.truecommons.shed.HashMaps.initialCapacity;
-import net.java.truecommons.shed.SuppressedExceptionBuilder;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**
@@ -162,8 +162,11 @@ implements OutputService<TarDriverEntry> {
     } // DirectoryTemplate
 
     /**
-     * Returns whether this output archive is busy writing an archive entry
+     * Returns whether this TAR output service is busy writing an archive entry
      * or not.
+     * 
+     * @return Whether this TAR output service is busy writing an archive entry
+     *         or not.
      */
     private boolean isBusy() {
         return busy;
