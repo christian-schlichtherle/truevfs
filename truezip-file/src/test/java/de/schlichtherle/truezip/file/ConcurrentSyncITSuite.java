@@ -41,12 +41,6 @@ extends ConfiguredClientTestBase<D> {
 
     private static final int NUM_REPEATS = 10;
 
-    private File createTempArchive() throws IOException {
-        // TODO: Removing .getCanonicalFile() causes archive.rm_r() to
-        // fail in testCopyContainingOrSameFiles() - explain why!
-        return File.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
-    }
-
     @Test
     public void testConcurrentSync() throws Exception {
         class RoundTripFactory implements TaskFactory {
@@ -107,12 +101,19 @@ extends ConfiguredClientTestBase<D> {
     }
 
     void roundTrip(final int i) throws IOException {
-        final File temp = createTempArchive();
-        TFile.rm(temp);
-        final TFile archive = new TFile(temp);
+        final TFile archive = newTempArchive();
         final TFile file = new TFile(archive, i + getSuffix() + "/" + i);
         roundTrip(file);
         archive.rm_r();
+    }
+
+    private TFile newTempArchive() throws IOException {
+        // TODO: Removing .getCanonicalFile() causes archive.rm_r() to
+        // fail in testCopyContainingOrSameFiles() - explain why!
+        final File temp = File.createTempFile(TEMP_FILE_PREFIX, getSuffix())
+                .getCanonicalFile();
+        TFile.rm(temp);
+        return new TFile(temp);
     }
 
     private void roundTrip(final TFile outer) throws IOException {
