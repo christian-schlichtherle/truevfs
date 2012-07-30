@@ -40,7 +40,7 @@ extends ConfiguredClientTestBase<D> {
 
     private static final int NUM_REPEATS = 10;
 
-    private File createTempFile() throws IOException {
+    private File createTempArchive() throws IOException {
         // TODO: Removing .getCanonicalFile() causes archive.rm_r() to
         // fail in testCopyContainingOrSameFiles() - explain why!
         return File.createTempFile(TEMP_FILE_PREFIX, getExtension()).getCanonicalFile();
@@ -98,7 +98,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     void roundTrip(final int i) throws IOException {
-        final File temp = createTempFile();
+        final File temp = createTempArchive();
         TFile.rm(temp);
         final TFile archive = new TFile(temp);
         final TFile file = new TFile(archive, i + getExtension() + "/" + i);
