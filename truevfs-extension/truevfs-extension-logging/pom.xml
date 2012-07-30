@@ -10,7 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>de.schlichtherle.truevfs</groupId>
+        <groupId>net.java.truevfs</groupId>
         <artifactId>truevfs-extension</artifactId>
         <version>1-SNAPSHOT</version>
     </parent>

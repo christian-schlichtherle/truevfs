@@ -23,7 +23,7 @@ import net.truevfs.kernel.spec.sl.FsManagerLocator;
  * driver which is available on the run-time class path.
  *
  * @deprecated Use the Maven archetype for the module TrueVFS Access instead.
- *             Its group ID is {@code de.schlichtherle.truevfs}.
+ *             Its group ID is {@code net.java.truevfs}.
  *             Its artifact ID is {@code truevfs-archetype-access}.
  * @see        <a href="http://www.gnu.org/software/wget/">GNU Cat - Home Page</a>
  * @author     Christian Schlichtherle

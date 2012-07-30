@@ -24,7 +24,7 @@
         <!-- Depending on the TrueZIP Profile Default is a good starting point.
              Typical applications will need nothing else. -->
         <dependency>
-            <groupId>de.schlichtherle.truevfs</groupId>
+            <groupId>net.java.truevfs</groupId>
             <artifactId>truevfs-profile-default</artifactId>
             <version>${truevfs.version}</version>
             <type>pom</type>
@@ -32,7 +32,7 @@
 
         <!-- Lets hurl the key prompting window when entering an invalid key. -->
         <dependency>
-            <groupId>de.schlichtherle.truevfs</groupId>
+            <groupId>net.java.truevfs</groupId>
             <artifactId>truevfs-keymanager-swing-feedback-hurl</artifactId>
             <version>${truevfs.version}</version>
             <scope>runtime</scope>
@@ -41,7 +41,7 @@
         <!-- This runtime dependency adds some monitoring and management
              for the TrueZIP Kernel. -->
         <!--dependency>
-            <groupId>de.schlichtherle.truevfs</groupId>
+            <groupId>net.java.truevfs</groupId>
             <artifactId>truevfs-extension-jmx</artifactId>
             <version>${truevfs.version}</version>
             <scope>runtime</scope>
@@ -50,7 +50,7 @@
         <!-- This runtime dependency adds some logging
              for the TrueZIP Kernel. -->
         <!--dependency>
-            <groupId>de.schlichtherle.truevfs</groupId>
+            <groupId>net.java.truevfs</groupId>
             <artifactId>truevfs-extension-logging</artifactId>
             <version>${truevfs.version}</version>
             <scope>runtime</scope>
@@ -60,7 +60,7 @@
              mounted archive file systems in the TrueZIP Kernel to save some
              heap space. -->
         <!--dependency>
-            <groupId>de.schlichtherle.truevfs</groupId>
+            <groupId>net.java.truevfs</groupId>
             <artifactId>truevfs-extension-pacemanager</artifactId>
             <version>${truevfs.version}</version>
             <scope>runtime</scope>

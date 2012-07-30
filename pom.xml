@@ -14,7 +14,7 @@
         <version>1</version>
     </parent>
 
-    <groupId>de.schlichtherle.truevfs</groupId>
+    <groupId>net.java.truevfs</groupId>
     <artifactId>truevfs</artifactId>
     <version>1-SNAPSHOT</version>
     <packaging>pom</packaging>

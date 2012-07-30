@@ -33,7 +33,7 @@ Getting Started
 *--+--+--+--+--+
 || Client API || Requires || Archetype Group Id || Archetype Artifact Id || Archetype Version
 *--+--+--+--+--+
-| {{{../truevfs-access/index.html}TrueVFS Access}} | JSE&#160;7 | <<<de.schlichtherle.truevfs>>> | <<<truevfs-archetype-access>>> | <<<${project.version}>>>
+| {{{../truevfs-access/index.html}TrueVFS Access}} | JSE&#160;7 | <<<net.java.truevfs>>> | <<<truevfs-archetype-access>>> | <<<${project.version}>>>
 *--+--+--+--+--+
 
 * Manual Download
@@ -44,7 +44,7 @@ Getting Started
 
     If you are looking for more sample code and applications, then please
     {{{../source-repository.html}check out}} or
-    {{{http://repo1.maven.org/maven2/de/schlichtherle/truevfs/truevfs-samples/${project.version}/truevfs-samples-${project.version}-sources.jar}download}}
+    {{{http://repo1.maven.org/maven2/net/java/truevfs/truevfs-samples/${project.version}/truevfs-samples-${project.version}-sources.jar}download}}
     the source code of the module
     {{{../truevfs-samples/index.html}TrueVFS Samples}}.
 

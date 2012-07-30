@@ -59,8 +59,8 @@ Getting started with a Shell
 
 +--
 $ mvn archetype:generate -B \
-    -DarchetypeGroupId=de.schlichtherle.truevfs \
-    -DarchetypeArtifactId=truevfs-archetype-file \
+    -DarchetypeGroupId=net.java.truevfs \
+    -DarchetypeArtifactId=truevfs-archetype-access \
     -DarchetypeVersion=${project.version} \
     -DgroupId=com.company \
     -DartifactId=project \

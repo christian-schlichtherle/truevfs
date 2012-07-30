@@ -32,7 +32,7 @@ Configuring TrueVFS Access
   <dependencies>
     ...
     <dependency>
-      <groupId>de.schlichtherle.truevfs</groupId>
+      <groupId>net.java.truevfs</groupId>
       <artifactId>truevfs-driver-zip</artifactId>
       <version>$project.version</version>
       <scope>runtime</scope>
