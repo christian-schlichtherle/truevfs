@@ -244,7 +244,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
     new Output
   }
 
-  private def syncOn[X <: ClosedStreamException] = new {
+  private def syncOn[X <: IOException] = new {
     def apply[A](operation: => A)(implicit mf: ClassManifest[X]) = {
       try {
         operation
