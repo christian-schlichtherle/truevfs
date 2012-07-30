@@ -11,7 +11,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import net.truevfs.access.TPath;
+import net.java.truevfs.access.TPath;
 
 /**
  * This command line utility concatenates the contents of the parameter paths

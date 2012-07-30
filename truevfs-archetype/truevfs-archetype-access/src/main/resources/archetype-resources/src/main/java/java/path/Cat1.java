@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import net.truevfs.access.TFile;
-import net.truevfs.access.TPath;
+import net.java.truevfs.access.TFile;
+import net.java.truevfs.access.TPath;
 
 /**
  * This command line utility concatenates the contents of the parameter paths

@@ -7,8 +7,8 @@ import ${package}.scala.Application
 import java.nio.file.Files._
 import java.nio.file.Path
 import java.util.TreeSet
-import net.truevfs.access.TApplication
-import net.truevfs.access.TPath
+import net.java.truevfs.access.TApplication
+import net.java.truevfs.access.TPath
 import scala.collection.JavaConversions._
 
 /**

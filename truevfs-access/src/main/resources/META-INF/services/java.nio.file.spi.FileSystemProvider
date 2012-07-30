@@ -1,1 +1,1 @@
-net.truevfs.access.TFileSystemProvider
+net.java.truevfs.access.TFileSystemProvider

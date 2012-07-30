@@ -5,7 +5,7 @@ package ${package}.java.file;
 
 import ${package}.java.Application;
 import javax.swing.SwingUtilities;
-import net.truevfs.access.swing.TFileChooser;
+import net.java.truevfs.access.swing.TFileChooser;
 
 /**
  * This command line utility lets you pick a file using a {@link TFileChooser}

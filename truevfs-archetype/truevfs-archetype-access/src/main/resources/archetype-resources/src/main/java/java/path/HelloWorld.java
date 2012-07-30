@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import static java.nio.file.Files.newBufferedWriter;
-import net.truevfs.access.TPath;
+import net.java.truevfs.access.TPath;
 
 /**
  * Creates a ZIP file with the name {@code "archive.zip"} in the current

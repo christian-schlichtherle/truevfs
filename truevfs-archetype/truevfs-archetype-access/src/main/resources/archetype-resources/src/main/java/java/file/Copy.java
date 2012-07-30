@@ -4,9 +4,9 @@
 package ${package}.java.file;
 
 import ${package}.java.Application;
-import net.truevfs.access.TFile;
+import net.java.truevfs.access.TFile;
 import java.io.IOException;
-import net.truevfs.access.TConfig;
+import net.java.truevfs.access.TConfig;
 
 /**
  * This command line utility recursively copies the first file or directory
