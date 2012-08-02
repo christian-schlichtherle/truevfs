@@ -107,15 +107,15 @@ private trait ResourceController extends Controller[LockModel] {
   }
 
   private class ResourceInputStream(in: InputStream)
-  extends DecoratingInputStream(in) with ResourceCloseable
+  extends DecoratingInputStream(in) with Resource
 
   private class ResourceOutputStream(out: OutputStream)
-  extends DecoratingOutputStream(out) with ResourceCloseable
+  extends DecoratingOutputStream(out) with Resource
 
   private class ResourceSeekableChannel(channel: SeekableByteChannel)
-  extends DecoratingSeekableChannel(channel) with ResourceCloseable
+  extends DecoratingSeekableChannel(channel) with Resource
 
-  private trait ResourceCloseable extends Closeable {
+  private trait Resource extends Closeable {
     accountant startAccountingFor this
 
     /**

@@ -274,7 +274,7 @@ private final class CacheEntry private (
       data release ()
     }
 
-    private trait CacheResource extends Closeable {
+    private trait Resource extends Closeable {
       private[this] var closed: Boolean = _
 
       protected final def close(pool: Pool[Buffer, _]) {
@@ -288,25 +288,25 @@ private final class CacheEntry private (
       abstract override def close()
     }
 
-    private trait CacheInputResource extends CacheResource {
+    private trait InputResource extends Resource {
       abstract override def close() = close(inputBufferPool)
     }
 
-    private trait CacheOutputResource extends CacheResource {
+    private trait OutputResource extends Resource {
       abstract override def close() = close(outputBufferPool)
     }
-    
+
     private final class CacheInputStream(in: InputStream)
-    extends DecoratingInputStream(in) with CacheInputResource
+    extends DecoratingInputStream(in) with InputResource
 
     private final class CacheReadOnlyChannel(channel: SeekableByteChannel)
-    extends ReadOnlyChannel(channel) with CacheInputResource
+    extends ReadOnlyChannel(channel) with InputResource
 
     private final class CacheOutputStream(out: OutputStream)
-    extends DecoratingOutputStream(out) with CacheOutputResource
+    extends DecoratingOutputStream(out) with OutputResource
 
     private final class CacheSeekableChannel(channel: SeekableByteChannel)
-    extends DecoratingSeekableChannel(channel) with CacheOutputResource
+    extends DecoratingSeekableChannel(channel) with OutputResource
 
     override def input: InputSocket[Buffer] = {
       final class Input extends AbstractInputSocket[Buffer] {
