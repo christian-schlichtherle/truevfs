@@ -17,7 +17,6 @@ import net.java.truevfs.kernel.spec.FsSyncOptions._
 import net.java.truevfs.kernel.spec.cio._
 import net.java.truevfs.kernel.spec.cio.Entry._;
 import net.java.truevfs.kernel.spec.cio.Entry.Type._;
-import scala.util.control.Breaks
 
 /** A selective cache for file system entries.
   * Decorating a file system controller with this class has the following
@@ -70,7 +69,7 @@ private trait CacheController extends Controller[LockModel] {
               return CacheController.super.input(options, name)
           cache = new EntryCache(name)
         }
-        cache.input(options)
+        cache input options
       }
     }
     new Input
@@ -87,7 +86,7 @@ private trait CacheController extends Controller[LockModel] {
               return CacheController.super.output(options, name, template)
           cache = new EntryCache(name)
         }
-        cache.output(options, template)
+        cache output (options, template)
       }
     }
     new Output
@@ -97,16 +96,14 @@ private trait CacheController extends Controller[LockModel] {
     assert(writeLockedByCurrentThread)
     super.mknod(options, name, tµpe, template)
     val cache = caches remove name
-    if (null ne cache)
-      cache release()
+    if (null ne cache) cache clear ()
   }
 
   abstract override def unlink(options: AccessOptions, name: FsEntryName) {
     assert(writeLockedByCurrentThread)
     super.unlink(options, name)
     val cache = caches remove name
-    if (null ne cache)
-      cache release()
+    if (null ne cache) cache clear()
   }
 
   abstract override def sync(options: SyncOptions) {
@@ -172,7 +169,7 @@ private trait CacheController extends Controller[LockModel] {
       if (clear) {
         i remove ()
         try {
-          cache release ()
+          cache clear ()
         } catch {
           case ex: IOException =>
             builder warn new FsSyncWarningException(mountPoint, ex)
@@ -186,9 +183,9 @@ private trait CacheController extends Controller[LockModel] {
   private final class EntryCache(val name: FsEntryName) {
     val cache = CacheEntry.Strategy.WriteBack.newCacheEntry(pool)
 
-    def flush() { cache flush() }
+    def flush() { cache flush () }
 
-    def release() { cache release() }
+    def clear() { cache release () }
 
     def register() { caches put (name, this) }
 
@@ -204,12 +201,12 @@ private trait CacheController extends Controller[LockModel] {
         override def stream(peer: AnyOutputSocket) = {
           assert(writeLockedByCurrentThread)
 
-          final class Stream extends DecoratingInputStream(socket.stream(peer)) {
+          final class Stream extends DecoratingInputStream(socket stream peer) {
             assert(mounted)
 
             override def close() {
               assert(writeLockedByCurrentThread)
-              in.close()
+              in close ()
               register()
             }
           }
@@ -218,8 +215,8 @@ private trait CacheController extends Controller[LockModel] {
 
         override def channel(peer: AnyOutputSocket) = throw new AssertionError
       }
-      cache.configure(new Input) input
-    }: AnyInputSocket
+      cache.configure(new Input).input
+    }
 
     def output(options: AccessOptions, template: Option[Entry]) = {
       /** This class requires LAZY INITIALIZATION of its channel, but NO
@@ -237,12 +234,12 @@ private trait CacheController extends Controller[LockModel] {
           assert(writeLockedByCurrentThread)
           preOutput()
 
-          final class Stream extends DecoratingOutputStream(socket.stream(peer)) {
+          final class Stream extends DecoratingOutputStream(socket stream peer) {
             register()
 
             override def close() {
               assert(writeLockedByCurrentThread)
-              out.close()
+              out close ()
               postOutput()
             }
           }
@@ -253,12 +250,12 @@ private trait CacheController extends Controller[LockModel] {
           assert(writeLockedByCurrentThread)
           preOutput()
 
-          final class Channel extends DecoratingSeekableChannel(socket.channel(peer)) {
+          final class Channel extends DecoratingSeekableChannel(socket channel peer) {
             register()
 
             override def close() {
               assert(writeLockedByCurrentThread)
-              channel.close()
+              channel close ()
               postOutput()
             }
           }
@@ -268,95 +265,91 @@ private trait CacheController extends Controller[LockModel] {
         def preOutput() { mknod(_options, template) }
 
         def postOutput() {
-          mknod(_options clear EXCLUSIVE, template.orElse(Option(cache))) 
+          mknod(_options clear EXCLUSIVE, template orElse Option(cache)) 
           register()
         }
 
         def mknod(options: AccessOptions, template: Option[Entry]) {
           var mknodOpts = options
-          val breaks = new Breaks
-          import breaks.{break, breakable}
-          breakable {
-            while (true) {
-              try {
-                CacheController.super.mknod(mknodOpts, name, FILE, template)
-                break
-              } catch {
-                case mknodEx: NeedsSyncException =>
-                  // In this context, this exception means that the entry
-                  // has already been written to the output archive for
-                  // the target archive file.
+          while (true) {
+            try {
+              CacheController.super.mknod(mknodOpts, name, FILE, template)
+              return
+            } catch {
+              case mknodEx: NeedsSyncException =>
+                // In this context, this exception means that the entry
+                // has already been written to the output archive for
+                // the target archive file.
 
-                  // Pass on the exception if there is no means to
-                  // resolve the issue locally, that is if we were asked
-                  // to create the entry exclusively or this is a
-                  // non-recursive file system operation.
-                  if (mknodOpts get EXCLUSIVE) throw mknodEx
-                  val syncOpts = SyncController modify SYNC
-                  if (SYNC eq syncOpts) throw mknodEx
+                // Pass on the exception if there is no means to
+                // resolve the issue locally, that is if we were asked
+                // to create the entry exclusively or this is a
+                // non-recursive file system operation.
+                if (mknodOpts get EXCLUSIVE) throw mknodEx
+                val syncOpts = SyncController modify SYNC
+                if (SYNC eq syncOpts) throw mknodEx
 
-                  // Try to resolve the issue locally.
-                  // Even if we were asked to create the entry
-                  // EXCLUSIVEly, first we must try to get the cache in
-                  // sync() with the virtual file system again and retry
-                  // the mknod().
-                  try {
-                    CacheController.super.sync(syncOpts)
-                    //continue; // sync() succeeded, now repeat mknod()
-                  } catch {
-                    case syncEx: FsSyncException =>
-                      syncEx addSuppressed mknodEx
+                // Try to resolve the issue locally.
+                // Even if we were asked to create the entry
+                // EXCLUSIVEly, first we must try to get the cache in
+                // sync() with the virtual file system again and retry
+                // the mknod().
+                try {
+                  CacheController.super.sync(syncOpts)
+                  // sync() succeeded, now repeat the mknod()
+                } catch {
+                  case syncEx: FsSyncException =>
+                    syncEx addSuppressed mknodEx
 
-                      // sync() failed, maybe just because the current
-                      // thread has already acquired some open I/O
-                      // resources for the same target archive file, e.g.
-                      // an input stream for a copy operation and this
-                      // is an artifact of an attempt to acquire the
-                      // output stream for a child file system.
-                      syncEx.getCause match {
-                        case _: FsResourceOpenException =>
-                        // Too bad, sync() failed because of a more
-                        // serious issue than just some open resources.
-                        // Let's rethrow the sync exception.
-                        case _ => throw syncEx
-                      }
+                    // sync() failed, maybe just because the current
+                    // thread has already acquired some open I/O
+                    // resources for the same target archive file, e.g.
+                    // an input stream for a copy operation and this
+                    // is an artifact of an attempt to acquire the
+                    // output stream for a child file system.
+                    syncEx.getCause match {
+                      case _: FsResourceOpenException =>
+                      // Too bad, sync() failed because of a more
+                      // serious issue than just some open resources.
+                      // Let's rethrow the sync exception.
+                      case _ => throw syncEx
+                    }
 
-                      // OK, we couldn't sync() because the current
-                      // thread has acquired open I/O resources for the
-                      // same target archive file.
-                      // Normally, we would be expected to rethrow the
-                      // mknod exception to trigger another sync(), but
-                      // this would fail for the same reason und create
-                      // an endless loop, so we can't do this.
-                      //throw mknodEx;
+                    // OK, we couldn't sync() because the current
+                    // thread has acquired open I/O resources for the
+                    // same target archive file.
+                    // Normally, we would be expected to rethrow the
+                    // mknod exception to trigger another sync(), but
+                    // this would fail for the same reason und create
+                    // an endless loop, so we can't do this.
+                    //throw mknodEx;
 
-                      // Dito for mapping the exception.
-                      //throw FsNeedsLockRetryException.get(getModel());
+                    // Dito for mapping the exception.
+                    //throw FsNeedsLockRetryException.get(getModel());
 
-                      // Check if we can retry the mknod with GROW set.
-                      val oldMknodOpts = mknodOpts
-                      mknodOpts = oldMknodOpts set GROW
-                      if (mknodOpts eq oldMknodOpts) {
-                          // Finally, the mknod failed because the entry
-                          // has already been output to the target archive
-                          // file - so what?!
-                          // This should mark only a volatile issue because
-                          // the next sync() will sort it out once all the
-                          // I/O resources have been closed.
-                          // Let's log the sync exception - mind that it has
-                          // suppressed the mknod exception - and continue
-                          // anyway...
-                          logger debug ("ignoring", syncEx)
-                          break
-                      }
-                  }
-              }
+                    // Check if we can retry the mknod with GROW set.
+                    val oldMknodOpts = mknodOpts
+                    mknodOpts = oldMknodOpts set GROW
+                    if (mknodOpts eq oldMknodOpts) {
+                        // Finally, the mknod failed because the entry
+                        // has already been output to the target archive
+                        // file - so what?!
+                        // This should mark only a volatile issue because
+                        // the next sync() will sort it out once all the
+                        // I/O resources have been closed.
+                        // Let's log the sync exception - mind that it has
+                        // suppressed the mknod exception - and continue
+                        // anyway...
+                        logger debug ("ignoring", syncEx)
+                        return
+                    }
+                }
             }
           }
         }
       } // Output
       new Output
-    }: AnyOutputSocket
+    }
   } // EntryCache
 }
 
