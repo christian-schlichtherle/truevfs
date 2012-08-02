@@ -47,12 +47,44 @@ private final class CacheEntry private (
   private[this] val pool: AnyIoBufferPool
 ) extends Entry with Releasable[IOException] with Flushable with Closeable {
 
-  private[this] var _input: Option[AnyInputSocket] = None
-  private[this] var _output: Option[AnyOutputSocket] = None
   private[this] val inputBufferPool = new InputBufferPool
   private[this] val outputBufferPool =
     strategy.newOutputBufferPool(this).asInstanceOf[OutputBufferPool]
+
   private[this] var _buffer: Option[Buffer] = None
+  private[this] var _input: Option[AnyInputSocket] = None
+  private[this] var _output: Option[AnyOutputSocket] = None
+
+  private def buffer = _buffer
+
+  private def buffer_=(nb: Option[Buffer]) {
+    val ob = _buffer
+    if (ob != nb) {
+      _buffer = nb
+      ob foreach { b => if (0 == b.writers && 0 == b.readers) b release () }
+    }
+  }
+
+  override def getName = "Johnny Cache!"
+
+  override def getSize(tµpe: Size) = {
+    buffer match {
+      case Some(b) => b getSize tµpe
+      case None => UNKNOWN
+    }
+  }
+
+  override def getTime(tµpe: Access) = {
+    buffer match {
+      case Some(b) => b getTime tµpe
+      case None => UNKNOWN
+    }
+  }
+
+  /** Returns `null` in order to block copying of access permissions of cache
+    * entries.
+    */
+  override def isPermitted(tµpe: Access, entity: Entity) = null
 
   /** Configures the input socket for reading the entry data from the backing
     * store.
@@ -88,27 +120,6 @@ private final class CacheEntry private (
     this
   }
 
-  override def getName = "Johnny Cache!"
-
-  override def getSize(tµpe: Size) = {
-    _buffer match {
-      case Some(buffer) => buffer.getSize(tµpe)
-      case None => UNKNOWN
-    }
-  }
-
-  override def getTime(tµpe: Access) = {
-    _buffer match {
-      case Some(buffer) => buffer.getTime(tµpe)
-      case None => UNKNOWN
-    }
-  }
-
-  /** Returns `null` in order to block copying of access permissions of cache
-    * entries.
-    */
-  override def isPermitted(tµpe: Access, entity: Entity) = null
-
   /** Returns an input socket for reading the cached entry data.
     *
     * @return An input socket for reading the cached entry data.
@@ -134,17 +145,17 @@ private final class CacheEntry private (
   }
 
   private trait BufferAllocator {
-    private[this] var _buffer: Option[Buffer] = None
+    private[this] var allocated: Option[Buffer] = None
 
     def buffer(pool: Pool[Buffer, _]) = {
-      val buffer = pool allocate ()
-      _buffer = Some(buffer)
-      buffer
+      val b = pool allocate ()
+      allocated = Some(b)
+      b
     }
 
     def target(socket: IoSocket[_ <: Entry]) = {
-      _buffer match {
-        case Some(buffer) => buffer
+      allocated match {
+        case Some(b) => b
         case None => new ProxyEntry(socket target ())
       }
     }
@@ -159,101 +170,91 @@ private final class CacheEntry private (
     * effect.
     */
   override def flush() {
-    _buffer foreach { outputBufferPool release _ }
+    buffer foreach { outputBufferPool release _ }
   }
 
   /** Clears the entry data from this cache without flushing it.
     *
     * @throws IOException on any I/O error.
     */
-  override def release() { setBuffer(None) }
+  override def release() { buffer = None }
 
   override def close() {
     flush()
     release()
   }
 
-  private def setBuffer(newBuffer: Option[Buffer]) {
-    val oldBuffer = _buffer
-    if (oldBuffer.orNull ne newBuffer.orNull) {
-      _buffer = newBuffer
-      oldBuffer foreach { buffer =>
-        if (0 == buffer.writers && 0 == buffer.readers)
-          buffer release ()
-      }
-    }
-  }
-
   private final class InputBufferPool extends Pool[Buffer, IOException] {
     override def allocate() = {
-      if (_buffer.isEmpty) {
-        val buffer = new Buffer
-        try {
-          buffer load _input.get
-        } catch {
-          case ex: Throwable =>
-            try {
-              buffer release ()
-            } catch {
-              case ex2: Throwable =>
-                ex addSuppressed ex2
-            }
-            throw ex
-        }
-        setBuffer(Some(buffer))
+      val b = buffer match {
+        case Some(b) => b
+        case None =>
+          val b = new Buffer
+          try {
+            b load _input.get
+          } catch {
+            case ex: Throwable =>
+              try {
+                b release ()
+              } catch {
+                case ex2: Throwable =>
+                  ex addSuppressed ex2
+              }
+              throw ex
+          }
+          buffer = Some(b)
+          b
       }
-      val buffer = _buffer.get
-      assert(Strategy.WriteBack.eq(strategy) || 0 == buffer.writers)
-      buffer.readers += 1
-      buffer
+      assert(Strategy.WriteBack.eq(strategy) || 0 == b.writers)
+      b.readers += 1
+      b
     }
 
-    override def release(buffer: Buffer) {
-      assert(Strategy.WriteBack.eq(strategy) || 0 == buffer.writers)
-      buffer.readers -= 1
-      if (0 == buffer.readers && 0 == buffer.writers
-          && _buffer.orNull.ne(buffer))
-        buffer release ()
+    override def release(b: Buffer) {
+      assert(Strategy.WriteBack.eq(strategy) || 0 == b.writers)
+      b.readers -= 1
+      if (0 == b.readers && 0 == b.writers && buffer.orNull.ne(b)) b release ()
     }
   } // InputBufferPool
 
   private[CacheEntry] abstract class OutputBufferPool
   extends Pool[Buffer, IOException] {
     override def allocate() = {
-      val buffer = new Buffer
-      assert(0 == buffer.readers)
-      buffer.writers = 1
-      buffer
+      val b = new Buffer
+      assert(0 == b.readers)
+      b.writers = 1
+      b
     }
 
-    override def release(buffer: Buffer) {
-      assert(Strategy.WriteBack.eq(strategy) || 0 == buffer.readers)
-      buffer.writers = 0
+    override def release(b: Buffer) {
+      assert(Strategy.WriteBack.eq(strategy) || 0 == b.readers)
+      b.writers = 0
       try {
-        buffer save _output.get
+        b save _output.get
       } finally {
-        setBuffer(Some(buffer))
+        buffer = Some(b)
       }
     }
   } // OutputBufferPool
 
   private[CacheEntry] final class WriteThroughOutputBufferPool extends OutputBufferPool {
-    override def release(buffer: Buffer) {
-      if (0 != buffer.writers) super.release(buffer)
+    override def release(b: Buffer) {
+      if (0 != b.writers) super.release(b)
     }
   } // WriteThroughOutputBufferPool
 
   private[CacheEntry] final class WriteBackOutputBufferPool extends OutputBufferPool {
-    override def release(buffer: Buffer) {
-      if (0 != buffer.writers)
-        if (_buffer.orNull ne buffer) setBuffer(Some(buffer))
-        else super.release(buffer)
+    override def release(b: Buffer) {
+      if (0 != b.writers) {
+        if (buffer.orNull ne b) buffer = Some(b)
+        else super.release(b)
+      }
     }
   } // WriteBackOutputBufferPool
 
   /** An I/O buffer for the cached contents. */
   private final class Buffer extends IoBuffer[Buffer] {
-    private[this] val data = pool.allocate()
+    private[this] val data = pool allocate ()
 
     var readers: Int = _
     var writers: Int = _
