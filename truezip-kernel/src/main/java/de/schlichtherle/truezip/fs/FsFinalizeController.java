@@ -78,16 +78,16 @@ extends FsDecoratingController<M, FsController<? extends M>> {
         if (OK == close) {
             logger.log(Level.FINEST, "closeCleared");
         } else if (null != close) {
-            logger.log(Level.FINER, "closeFailed", close);
+            logger.log(Level.FINEST, "closeFailed", close);
         } else {
             try {
                 delegate.close();
-                logger.log(Level.FINE, "finalizeCleared");
-            } catch (final ControlFlowException ex) {  // report and swallow
-                logger.log(Level.WARNING, "finalizeFailed",
-                        new AssertionError("Unexpected controller exception!", ex));
-            } catch (final Throwable ex) {              // report and swallow
-                logger.log(Level.INFO, "finalizeFailed", ex);
+                logger.log(Level.INFO, "finalizeCleared");
+            } catch (final ControlFlowException ex) {  // log and swallow!
+                logger.log(Level.SEVERE, "finalizeFailed",
+                        new AssertionError("Unexpected control flow exception!", ex));
+            } catch (final Throwable ex) {              // log and swallow!
+                logger.log(Level.WARNING, "finalizeFailed", ex);
             }
         }
     }
