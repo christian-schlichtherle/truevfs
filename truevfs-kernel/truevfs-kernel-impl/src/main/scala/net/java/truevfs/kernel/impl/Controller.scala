@@ -12,15 +12,11 @@ import net.java.truevfs.kernel.spec.cio._
 import net.java.truevfs.kernel.spec.cio.Entry._
 
 /** Provides read/write access to a file system.
-  * Implementations of this interface are typically organized in a chain of
-  * responsibility for file system federation and a decorator chain for
-  * implementing different aspects of the management of the file system state,
-  * e.g. lock management for concurrent access.
   * 
   * === General Properties ===
   * The [[FsModel#getMountPoint() mount point]] of the
-  * [[#model file system model]] addresses the file system at the head
-  * of this chain of federated file systems.
+  * [[#model file system model]]
+  * addresses the file system accessed by this controller.
   * Where the methods of this abstract class accept a
   * {@link FsEntryName file system entry name} as a parameter, this MUST get
   * resolved against the {@link FsModel#getMountPoint() mount point} URI of this
