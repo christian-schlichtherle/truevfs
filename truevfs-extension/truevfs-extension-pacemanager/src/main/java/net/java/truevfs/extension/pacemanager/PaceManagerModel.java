@@ -4,14 +4,6 @@
  */
 package net.java.truevfs.extension.pacemanager;
 
-import net.java.truevfs.kernel.spec.FsFilteringManager;
-import net.java.truevfs.kernel.spec.FsSyncOption;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsSyncException;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsSyncOptions;
-import net.java.truevfs.kernel.spec.FsManager;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -22,10 +14,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
-import static net.java.truevfs.extension.pacemanager.PaceManager.MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE;
-import static net.java.truevfs.extension.pacemanager.PaceManager.MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.HashMaps;
+import static net.java.truevfs.extension.pacemanager.PaceManager.MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE;
+import static net.java.truevfs.extension.pacemanager.PaceManager.MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE;
+import net.java.truevfs.kernel.spec.*;
 
 /**
  * The pace manager model.

@@ -24,7 +24,7 @@ import net.java.truevfs.keymanager.spec.param.AesPbeParameters;
 final class ZipRaesKeyController<M extends FsModel>
 extends AbstractKeyController<M, ZipRaesDriver> {
 
-    ZipRaesKeyController(FsController<? extends M> controller, ZipRaesDriver driver) {
+    ZipRaesKeyController(FsController<M> controller, ZipRaesDriver driver) {
         super(controller, driver);
     }
 

@@ -25,7 +25,7 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
 @ThreadSafe
 public abstract class FsDecoratingController<
         M extends FsModel,
-        C extends FsController<? extends M>>
+        C extends FsController<M>>
 extends FsAbstractController<M> {
 
     /** The decorated file system controller. */

@@ -10,16 +10,16 @@ import net.java.truevfs.kernel.spec.FsDecoratingModel;
 import net.java.truevfs.kernel.spec.FsModel;
 
 /**
+ * @param  <D> the type of the instrumenting director.
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class InstrumentingModel extends FsDecoratingModel<FsModel> {
+public class InstrumentingModel<D extends InstrumentingDirector<D>>
+extends FsDecoratingModel<FsModel> {
+    protected final D director;
 
-    protected final InstrumentingDirector<?> director;
-
-    @SuppressWarnings("LeakingThisInConstructor")
-    protected InstrumentingModel(
-            final InstrumentingDirector<?> director,
+    public InstrumentingModel(
+            final D director,
             final FsModel model) {
         super(model);
         this.director = Objects.requireNonNull(director);

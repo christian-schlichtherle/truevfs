@@ -4,25 +4,21 @@
  */
 package net.java.truevfs.component.instrumentation;
 
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsManager;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsDecoratingManager;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsCompositeDriver;
 import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
+import net.java.truevfs.kernel.spec.*;
 
 /**
+ * @param  <D> the type of the instrumenting director.
  * @author Christian Schlichtherle
  */
 @Immutable
-public class InstrumentingManager extends FsDecoratingManager<FsManager> {
-
-    protected final InstrumentingDirector<?> director;
+public class InstrumentingManager<D extends InstrumentingDirector<D>>
+extends FsDecoratingManager<FsManager> {
+    protected final D director;
 
     public InstrumentingManager(
-            final InstrumentingDirector<?> director,
+            final D director,
             final FsManager manager) {
         super(manager);
         this.director = Objects.requireNonNull(director);

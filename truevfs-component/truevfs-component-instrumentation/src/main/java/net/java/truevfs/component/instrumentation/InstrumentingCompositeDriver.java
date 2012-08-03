@@ -13,16 +13,17 @@ import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsModel;
 
 /**
+ * @param  <D> the type of the instrumenting director.
  * @author Christian Schlichtherle
  */
 @Immutable
-public class InstrumentingCompositeDriver implements FsCompositeDriver {
-
-    protected final InstrumentingDirector<?> director;
+public class InstrumentingCompositeDriver<D extends InstrumentingDirector<D>>
+implements FsCompositeDriver {
+    protected final D director;
     protected final FsCompositeDriver driver;
 
     public InstrumentingCompositeDriver(
-            final InstrumentingDirector<?> director,
+            final D director,
             final FsCompositeDriver driver) {
         this.director = Objects.requireNonNull(director);
         this.driver = Objects.requireNonNull(driver);

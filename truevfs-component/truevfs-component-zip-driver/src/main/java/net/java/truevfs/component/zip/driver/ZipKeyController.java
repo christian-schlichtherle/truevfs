@@ -23,7 +23,7 @@ public final class ZipKeyController<M extends FsModel>
 extends AbstractKeyController<M, AbstractZipDriver<?>> {
 
     public ZipKeyController(
-            FsController<? extends M> controller,
+            FsController<M> controller,
             AbstractZipDriver<?> driver) {
         super(controller, driver);
     }

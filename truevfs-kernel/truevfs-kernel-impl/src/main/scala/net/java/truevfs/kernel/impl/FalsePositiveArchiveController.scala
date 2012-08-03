@@ -57,8 +57,8 @@ import net.java.truevfs.kernel.spec.cio.Entry._;
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private final class FalsePositiveArchiveController(c: FsController[_ <: FsModel])
-extends FsDecoratingController[FsModel, FsController[_ <: FsModel]](c) {
+private final class FalsePositiveArchiveController(c: FsController[FsModel])
+extends FsDecoratingController[FsModel, FsController[FsModel]](c) {
 
   @volatile private[this] var state: State = TryChild
 
