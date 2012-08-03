@@ -19,10 +19,11 @@ package object impl {
   private[impl] type AccessOptions = BitField[FsAccessOption]
   private[impl] type SyncOptions = BitField[FsSyncOption]
   private[impl] type AnyArchiveDriver = FsArchiveDriver[_ <: FsArchiveEntry]
+  private[impl] type AnyIoSocket = IoSocket[_ <: Entry]
   private[impl] type AnyInputSocket = InputSocket[_ <: Entry]
   private[impl] type AnyOutputSocket = OutputSocket[_ <: Entry]
-  private[impl] type AnyIoBufferPool = IoBufferPool[_ <: IoBuffer[_]]
   private[impl] type AnyIoBuffer = IoBuffer[_ <: IoBuffer[_]]
+  private[impl] type AnyIoBufferPool = IoBufferPool[_ <: AnyIoBuffer]
   private[impl] type AnyController = FsController[_ <: FsModel]
 
   // Used for looping through BitField, Container etc.
