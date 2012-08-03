@@ -41,8 +41,9 @@ extends FsAbstractManager {
     }
 
     @Override
-    public FsController<? extends FsModel>
-    controller(FsCompositeDriver driver, FsMountPoint mountPoint) {
+    public FsController<? extends FsModel> controller(
+            FsCompositeDriver driver,
+            FsMountPoint mountPoint) {
         return manager.controller(driver, mountPoint);
     }
 
