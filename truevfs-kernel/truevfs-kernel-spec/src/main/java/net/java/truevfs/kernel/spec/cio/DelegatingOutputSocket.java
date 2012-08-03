@@ -13,13 +13,13 @@ import javax.annotation.concurrent.Immutable;
  * Delegates all methods to another output socket.
  *
  * @see    DelegatingInputSocket
- * @param  <T> the type of the {@linkplain #target() target} entry for I/O
+ * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class DelegatingOutputSocket<T extends Entry>
-extends AbstractOutputSocket<T> {
+public abstract class DelegatingOutputSocket<E extends Entry>
+extends AbstractOutputSocket<E> {
 
     /**
      * Returns the delegate socket.
@@ -27,11 +27,11 @@ extends AbstractOutputSocket<T> {
      * @return The delegate socket.
      * @throws IOException on any I/O error. 
      */
-    protected abstract OutputSocket<? extends T> socket()
+    protected abstract OutputSocket<? extends E> socket()
     throws IOException;
 
     @Override
-    public T target() throws IOException {
+    public E target() throws IOException {
         return socket().target();
     }
 

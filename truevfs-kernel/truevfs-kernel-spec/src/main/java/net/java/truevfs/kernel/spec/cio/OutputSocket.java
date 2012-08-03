@@ -16,13 +16,13 @@ import javax.annotation.concurrent.Immutable;
  * A <em>stateless</em> factory for output streams and seekable byte channels
  * which operate on a {@linkplain #target() target entry}.
  *
- * @param  <T> the type of the {@linkplain #target() target} entry for I/O
+ * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.
  * @see    InputSocket
  * @author Christian Schlichtherle
  */
 @Immutable
-public interface OutputSocket<T extends Entry> extends IoSocket<T> {
+public interface OutputSocket<E extends Entry> extends IoSocket<E> {
 
     /**
      * Returns a new output stream for writing bytes.

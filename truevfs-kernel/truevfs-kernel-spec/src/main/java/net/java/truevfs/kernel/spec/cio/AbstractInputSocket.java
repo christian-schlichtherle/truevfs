@@ -4,24 +4,24 @@
  */
 package net.java.truevfs.kernel.spec.cio;
 
-import net.java.truecommons.io.ChannelInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.io.ChannelInputStream;
 
 /**
  * Abstract base class for input sockets.
  *
- * @param  <T> the type of the {@linkplain #target() target} entry for I/O
+ * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.
  * @see    AbstractOutputSocket
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class AbstractInputSocket<T extends Entry>
-extends AbstractIoSocket<T> implements InputSocket<T> {
+public abstract class AbstractInputSocket<E extends Entry>
+extends AbstractIoSocket<E> implements InputSocket<E> {
 
     /**
      * Returns the target of the given nullable peer socket or null.

@@ -12,24 +12,24 @@ import javax.annotation.Nullable;
  * An abstract decorator for an input socket.
  * 
  * @see    DecoratingOutputSocket
- * @param  <T> the type of the {@linkplain #target() target} entry for I/O
+ * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.
  * @author Christian Schlichtherle
  */
-public abstract class DecoratingInputSocket<T extends Entry>
-extends DelegatingInputSocket<T> {
+public abstract class DecoratingInputSocket<E extends Entry>
+extends DelegatingInputSocket<E> {
 
     /** The nullable decorated input socket. */
-    protected @Nullable InputSocket<? extends T> socket;
+    protected @Nullable InputSocket<? extends E> socket;
 
     protected DecoratingInputSocket() { }
 
-    protected DecoratingInputSocket(final InputSocket<? extends T> socket) {
+    protected DecoratingInputSocket(final InputSocket<? extends E> socket) {
         this.socket = Objects.requireNonNull(socket);
     }
 
     @Override
-    protected InputSocket<? extends T> socket() throws IOException {
+    protected InputSocket<? extends E> socket() throws IOException {
         return socket;
     }
 
