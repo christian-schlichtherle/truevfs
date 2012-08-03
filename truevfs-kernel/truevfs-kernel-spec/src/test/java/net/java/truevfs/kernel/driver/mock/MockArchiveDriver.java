@@ -14,19 +14,9 @@ import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.HashMaps;
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truevfs.kernel.spec.FsArchiveDriver;
-import net.java.truevfs.kernel.spec.FsInputSocketSource;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsOutputSocketSink;
-import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truevfs.kernel.spec.cio.Entry;
+import net.java.truevfs.kernel.spec.*;
 import net.java.truevfs.kernel.spec.cio.Entry.Type;
-import net.java.truevfs.kernel.spec.cio.InputService;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
-import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
-import net.java.truevfs.kernel.spec.cio.OutputService;
+import net.java.truevfs.kernel.spec.cio.*;
 
 /**
  * @author Christian Schlichtherle

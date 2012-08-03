@@ -17,22 +17,11 @@ import net.java.truecommons.io.DecoratingOutputStream;
 import net.java.truecommons.shed.HashMaps;
 import net.java.truevfs.kernel.spec.TestConfig;
 import net.java.truevfs.kernel.spec.ThrowManager;
-import net.java.truevfs.kernel.spec.cio.AbstractInputSocket;
-import net.java.truevfs.kernel.spec.cio.AbstractOutputSocket;
-import net.java.truevfs.kernel.spec.cio.Container;
-import net.java.truevfs.kernel.spec.cio.Entry;
 import static net.java.truevfs.kernel.spec.cio.Entry.ALL_ACCESS;
 import static net.java.truevfs.kernel.spec.cio.Entry.ALL_SIZES;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
 import net.java.truevfs.kernel.spec.cio.Entry.Size;
-import net.java.truevfs.kernel.spec.cio.InputService;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
-import net.java.truevfs.kernel.spec.cio.OutputService;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truevfs.kernel.spec.cio.ThrowingInputService;
-import net.java.truevfs.kernel.spec.cio.ThrowingOutputService;
+import net.java.truevfs.kernel.spec.cio.*;
 
 /**
  * @author Christian Schlichtherle
