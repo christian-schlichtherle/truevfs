@@ -125,7 +125,8 @@ private final class CacheEntry private (
     * @return An input socket for reading the cached entry data.
     */
   def input: AnyInputSocket = {
-    final class Input extends DelegatingInputSocket[Entry] with BufferAllocator {
+    final class Input extends DelegatingInputSocket[Entry]
+    with BufferAllocator {
       override def socket() = buffer(inputBufferPool).input
       override def target() = target(_input.get)
     }
@@ -137,7 +138,8 @@ private final class CacheEntry private (
     * @return An output socket for writing the cached entry data.
     */
   def output: AnyOutputSocket = {
-    final class Output extends DelegatingOutputSocket[Entry] with BufferAllocator {
+    final class Output extends DelegatingOutputSocket[Entry]
+    with BufferAllocator {
       override def socket() = buffer(outputBufferPool).output
       override def target() = target(_output.get)
     }
@@ -147,13 +149,13 @@ private final class CacheEntry private (
   private trait BufferAllocator {
     private[this] var allocated: Option[Buffer] = None
 
-    def buffer(pool: Pool[Buffer, _]) = {
+    def buffer(pool: Pool[Buffer, IOException]) = {
       val b = pool allocate ()
       allocated = Some(b)
       b
     }
 
-    def target(socket: IoSocket[_ <: Entry]) = {
+    def target(socket: AnyIoSocket) = {
       allocated match {
         case Some(b) => b
         case None => new ProxyEntry(socket target ())
@@ -212,8 +214,10 @@ private final class CacheEntry private (
 
     override def release(b: Buffer) {
       assert(Strategy.WriteBack.eq(strategy) || 0 == b.writers)
-      b.readers -= 1
-      if (0 == b.readers && 0 == b.writers && buffer.orNull.ne(b)) b release ()
+      if (0 < b.readers) {
+        b.readers -= 1
+        if (1 == b.readers && 0 == b.writers && buffer.orNull.ne(b)) b release ()
+      }
     }
   } // InputBufferPool
 
@@ -237,13 +241,15 @@ private final class CacheEntry private (
     }
   } // OutputBufferPool
 
-  private[CacheEntry] final class WriteThroughOutputBufferPool extends OutputBufferPool {
+  private[CacheEntry] final class WriteThroughOutputBufferPool
+  extends OutputBufferPool {
     override def release(b: Buffer) {
       if (0 != b.writers) super.release(b)
     }
   } // WriteThroughOutputBufferPool
 
-  private[CacheEntry] final class WriteBackOutputBufferPool extends OutputBufferPool {
+  private[CacheEntry] final class WriteBackOutputBufferPool
+  extends OutputBufferPool {
     override def release(b: Buffer) {
       if (0 != b.writers) {
         if (buffer.orNull ne b) buffer = Some(b)
@@ -260,53 +266,19 @@ private final class CacheEntry private (
     var writers: Int = _
 
     override def getName = data.getName
-    override def getSize(tµpe: Size) = data.getSize(tµpe)
-    override def getTime(tµpe: Access) = data.getTime(tµpe)
+    override def getSize(tµpe: Size) = data getSize tµpe
+    override def getTime(tµpe: Access) = data getTime tµpe
     override def isPermitted(tµpe: Access, entity: Entity) =
-      data.isPermitted(tµpe, entity)
+      data isPermitted (tµpe, entity)
 
-    def load(input: AnyInputSocket) { IoSockets.copy(input, data.output) }
-    def save(output: AnyOutputSocket) { IoSockets.copy(data.input, output) }
+    def load(input: AnyInputSocket) { IoSockets copy (input, data.output) }
+    def save(output: AnyOutputSocket) { IoSockets copy (data.input, output) }
 
     override def release {
       assert(0 == writers)
       assert(0 == readers)
       data release ()
     }
-
-    private trait Resource extends Closeable {
-      private[this] var closed: Boolean = _
-
-      protected final def close(pool: Pool[Buffer, _]) {
-        if (closed) return
-        // HC SUNT DRACONES!
-        super.close()
-        pool release Buffer.this
-        closed = true
-      }
-
-      abstract override def close()
-    }
-
-    private trait InputResource extends Resource {
-      abstract override def close() = close(inputBufferPool)
-    }
-
-    private trait OutputResource extends Resource {
-      abstract override def close() = close(outputBufferPool)
-    }
-
-    private final class CacheInputStream(in: InputStream)
-    extends DecoratingInputStream(in) with InputResource
-
-    private final class CacheReadOnlyChannel(channel: SeekableByteChannel)
-    extends ReadOnlyChannel(channel) with InputResource
-
-    private final class CacheOutputStream(out: OutputStream)
-    extends DecoratingOutputStream(out) with OutputResource
-
-    private final class CacheSeekableChannel(channel: SeekableByteChannel)
-    extends DecoratingSeekableChannel(channel) with OutputResource
 
     override def input: InputSocket[Buffer] = {
       final class Input extends AbstractInputSocket[Buffer] {
@@ -336,6 +308,40 @@ private final class CacheEntry private (
           new CacheSeekableChannel(socket channel peer)
       }
       new Output
+    }
+
+    private final class CacheInputStream(in: InputStream)
+    extends DecoratingInputStream(in) with InputResource
+
+    private final class CacheReadOnlyChannel(channel: SeekableByteChannel)
+    extends ReadOnlyChannel(channel) with InputResource
+
+    private final class CacheOutputStream(out: OutputStream)
+    extends DecoratingOutputStream(out) with OutputResource
+
+    private final class CacheSeekableChannel(channel: SeekableByteChannel)
+    extends DecoratingSeekableChannel(channel) with OutputResource
+
+    private trait InputResource extends Resource {
+      abstract override def close() = close(inputBufferPool)
+    }
+
+    private trait OutputResource extends Resource {
+      abstract override def close() = close(outputBufferPool)
+    }
+
+    private trait Resource extends Closeable {
+      private[this] var closed: Boolean = _
+
+      protected final def close(pool: Pool[Buffer, IOException]) {
+        // HC SUNT DRACONES!
+        if (closed) return
+        super.close()
+        pool release Buffer.this
+        closed = true
+      }
+
+      abstract override def close()
     }
   }
 }
