@@ -7,8 +7,8 @@ package net.java.truevfs.kernel.spec;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
-import net.java.truevfs.kernel.spec.cio.Entry.Access;
 import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.cio.Entry.Access;
 
 /**
  * An abstract file system controller which implements the {@link #getModel()}
