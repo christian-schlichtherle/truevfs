@@ -41,12 +41,12 @@ import javax.annotation.concurrent.Immutable;
  * the container and it should never throw an {@link IOException} when creating
  * a I/O socket.
  *
- * @param  <T> the type of the {@linkplain #target() target} entry for I/O
+ * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.
  * @author Christian Schlichtherle
  */
 @Immutable
-public interface IoSocket<T extends Entry> {
+public interface IoSocket<E extends Entry> {
     /**
      * Resolves the <i>target</i> for I/O operations.
      * <p>
@@ -63,5 +63,5 @@ public interface IoSocket<T extends Entry> {
      * @return The local target for I/O operations.
      * @throws IOException on any I/O error. 
      */
-    T target() throws IOException;
+    E target() throws IOException;
 }

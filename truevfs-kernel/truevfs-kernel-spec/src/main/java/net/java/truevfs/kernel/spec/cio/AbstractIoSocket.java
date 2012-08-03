@@ -10,13 +10,13 @@ import javax.annotation.concurrent.Immutable;
 /**
  * Abstract base class for I/O sockets.
  * 
- * @param  <T> the type of the {@linkplain #target() target} entry for I/O
+ * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class AbstractIoSocket<T extends Entry>
-implements IoSocket<T> {
+public abstract class AbstractIoSocket<E extends Entry>
+implements IoSocket<E> {
 
     /**
      * Returns a string representation of this object for debugging and logging
