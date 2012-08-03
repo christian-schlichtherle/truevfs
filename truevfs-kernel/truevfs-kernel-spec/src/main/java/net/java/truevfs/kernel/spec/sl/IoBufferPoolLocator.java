@@ -4,9 +4,9 @@
  */
 package net.java.truevfs.kernel.spec.sl;
 
+import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.services.Container;
 import net.java.truecommons.services.Locator;
-import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.kernel.spec.cio.IoBuffer;
 import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.spi.IoBufferPoolDecorator;

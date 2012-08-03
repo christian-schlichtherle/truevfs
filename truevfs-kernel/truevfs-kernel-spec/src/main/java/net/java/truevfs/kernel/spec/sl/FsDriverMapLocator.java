@@ -4,11 +4,11 @@
  */
 package net.java.truevfs.kernel.spec.sl;
 
-import net.java.truecommons.services.Container;
-import net.java.truecommons.services.Locator;
 import java.util.Collections;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.services.Container;
+import net.java.truecommons.services.Locator;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapFactory;
