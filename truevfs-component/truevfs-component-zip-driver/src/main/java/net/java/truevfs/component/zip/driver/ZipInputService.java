@@ -4,11 +4,6 @@
  */
 package net.java.truevfs.component.zip.driver;
 
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truevfs.kernel.spec.cio.InputService;
-import net.java.truevfs.kernel.spec.cio.AbstractInputSocket;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +14,7 @@ import net.java.truevfs.component.zip.AbstractZipFile;
 import net.java.truevfs.component.zip.ZipCryptoParameters;
 import net.java.truevfs.kernel.spec.FsInputSocketSource;
 import net.java.truevfs.kernel.spec.FsModel;
+import net.java.truevfs.kernel.spec.cio.*;
 
 /**
  * An input service for reading ZIP files.

@@ -4,18 +4,6 @@
  */
 package net.java.truevfs.component.zip.driver;
 
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
-import net.java.truevfs.kernel.spec.cio.AbstractOutputSocket;
-import net.java.truevfs.kernel.spec.cio.OutputBusyException;
-import net.java.truevfs.kernel.spec.cio.OutputService;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truecommons.io.DecoratingOutputStream;
-import net.java.truecommons.io.DisconnectingOutputStream;
-import net.java.truecommons.io.InputException;
-import net.java.truecommons.io.Streams;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -30,6 +18,12 @@ import java.util.zip.CheckedOutputStream;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.io.DecoratingOutputStream;
+import net.java.truecommons.io.DisconnectingOutputStream;
+import net.java.truecommons.io.InputException;
+import net.java.truecommons.io.Streams;
+import net.java.truecommons.shed.CompoundIterator;
+import net.java.truecommons.shed.SuppressedExceptionBuilder;
 import net.java.truevfs.component.zip.AbstractZipOutputStream;
 import net.java.truevfs.component.zip.ZipCryptoParameters;
 import static net.java.truevfs.component.zip.ZipEntry.STORED;
@@ -40,8 +34,7 @@ import net.java.truevfs.kernel.spec.cio.Entry.Access;
 import net.java.truevfs.kernel.spec.cio.Entry.Size;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.java.truecommons.shed.CompoundIterator;
-import net.java.truecommons.shed.SuppressedExceptionBuilder;
+import net.java.truevfs.kernel.spec.cio.*;
 
 /**
  * An output service for writing ZIP files.
