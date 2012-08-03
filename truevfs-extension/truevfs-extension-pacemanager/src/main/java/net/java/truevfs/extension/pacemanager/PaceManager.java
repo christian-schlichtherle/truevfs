@@ -25,16 +25,16 @@ public interface PaceManager {
 
     /**
      * The key string for the system property which defines the value of the
-     * constant {@link #MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE}.
-     * Equivalent to the expression
+     * constant {@link #MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE},
+     * which is equivalent to the expression
      * {@code PaceManager.class.getName() + "." + MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_NAME}.
      */
     String MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_KEY
             = PaceManager.class.getName() + "." + MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_NAME;
 
     /**
-     * The minimum value for the maximum number of mounted file systems, which
-     * is {@value}.
+     * The minimum value for the maximum number of mounted file systems,
+     * which is {@value}.
      */
     int MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE = 2;
 
