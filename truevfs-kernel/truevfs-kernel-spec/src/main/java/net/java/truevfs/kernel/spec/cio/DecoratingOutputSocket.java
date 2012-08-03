@@ -11,9 +11,9 @@ import javax.annotation.Nullable;
 /**
  * An abstract decorator for an output socket.
  * 
- * @see    DecoratingInputSocket
  * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.
+ * @see    DecoratingInputSocket
  * @author Christian Schlichtherle
  */
 public abstract class DecoratingOutputSocket<E extends Entry>
