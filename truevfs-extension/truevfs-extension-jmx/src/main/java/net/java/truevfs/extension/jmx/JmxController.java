@@ -11,10 +11,10 @@ import net.java.truevfs.kernel.spec.FsModel;
 /**
  * @author  Christian Schlichtherle
  */
-abstract class JmxController
-extends InstrumentingController<JmxDirector> {
+abstract class JmxController<M extends FsModel>
+extends InstrumentingController<JmxDirector, M> {
 
-    JmxController(JmxDirector director, FsController<? extends FsModel> controller) {
+    JmxController(JmxDirector director, FsController<M> controller) {
         super(director, controller);
     }
 

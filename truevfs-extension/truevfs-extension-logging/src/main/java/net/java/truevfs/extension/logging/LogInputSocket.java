@@ -18,7 +18,7 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  */
 @Immutable
 final class LogInputSocket<E extends Entry>
-extends InstrumentingInputSocket<E> {
+extends InstrumentingInputSocket<LogDirector, E> {
 
     LogInputSocket(LogDirector director, InputSocket<? extends E> model) {
         super(director, model);

@@ -11,17 +11,21 @@ import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
 
 /**
- * @param  <E> the type of the {@linkplain #localTarget() local target}.
+ * @param  <D> the type of the instrumenting director.
+ * @param  <E> the type of the {@linkplain #target() target entry} for I/O
+ *         operations.
+ * @see    InstrumentingOutputSocket
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class InstrumentingInputSocket<E extends Entry>
+public class InstrumentingInputSocket<
+        D extends InstrumentingDirector<D>,
+        E extends Entry>
 extends DecoratingInputSocket<E> {
+    protected final D director;
 
-    protected final InstrumentingDirector<?> director;
-
-    protected InstrumentingInputSocket(
-            final InstrumentingDirector<?> director,
+    public InstrumentingInputSocket(
+            final D director,
             final InputSocket<? extends E> socket) {
         super(socket);
         this.director = Objects.requireNonNull(director);

@@ -4,81 +4,88 @@
  */
 package net.java.truevfs.component.instrumentation;
 
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
 import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.kernel.spec.FsCompositeDriver;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsModel;
+import net.java.truevfs.kernel.spec.cio.*;
 
 /**
- * @param  <D> the type of this instrumenting director.
+ * @param  <This> the type of this instrumenting director.
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class InstrumentingDirector<D extends InstrumentingDirector<D>> {
+public abstract class InstrumentingDirector<
+        This extends InstrumentingDirector<This>> {
 
+    @SuppressWarnings("unchecked")
     public FsManager instrument(FsManager manager) {
-        return new InstrumentingManager(this, manager);
+        return new InstrumentingManager<>((This) this, manager);
     }
 
-    public abstract <B extends IoBuffer<B>> IoBufferPool<B> instrument(IoBufferPool<B> pool);
+    @SuppressWarnings("unchecked")
+    public <B extends IoBuffer<B>> IoBufferPool<B> instrument(IoBufferPool<B> pool) {
+        return new InstrumentingIoBufferPool<>((This) this, pool);
+    }
 
-    protected FsCompositeDriver instrument(
+    @SuppressWarnings("unchecked")
+    public FsCompositeDriver instrument(
             FsCompositeDriver driver,
-            InstrumentingManager context) {
-        return new InstrumentingCompositeDriver(this, driver);
+            InstrumentingManager<This> context) {
+        return new InstrumentingCompositeDriver<>((This) this, driver);
     }
 
-    protected FsModel instrument(
+    public FsModel instrument(
             FsModel model,
-            InstrumentingCompositeDriver context) {
-        return model; //new InstrumentingModel(model, this);
+            InstrumentingCompositeDriver<This> context) {
+        return model; //new InstrumentingModel<>((This) this, model);
     }
 
-    protected abstract FsController<? extends FsModel> instrument(
-            FsController<? extends FsModel> controller,
-            InstrumentingManager context);
+    public <M extends FsModel> FsController<M> instrument(
+            FsController<M> controller,
+            InstrumentingManager<This> context) {
+        return controller;
+    }
 
-    protected abstract FsController<? extends FsModel> instrument(
-            FsController<? extends FsModel> controller,
-            InstrumentingCompositeDriver context);
+    @SuppressWarnings("unchecked")
+    public <M extends FsModel> FsController<M> instrument(
+            FsController<M> controller,
+            InstrumentingCompositeDriver<This> context) {
+        return new InstrumentingController<>((This) this, controller);
+    }
 
-    protected <B extends IoBuffer<B>> InputSocket<B> instrument(
+    public <B extends IoBuffer<B>> InputSocket<B> instrument(
             InputSocket<B> input,
-            InstrumentingIoBufferPool<B>.InstrumentingIoBuffer context) {
+            InstrumentingIoBuffer<This, B> context) {
         return instrument(input);
     }
 
-    protected <E extends Entry> InputSocket<E> instrument(
+    public <E extends Entry> InputSocket<E> instrument(
             InputSocket<E> input,
-            InstrumentingController<D> context) {
+            InstrumentingController<This, ?> context) {
         return instrument(input);
     }
 
     protected <E extends Entry> InputSocket<E> instrument(
             InputSocket<E> input) {
-        return input; //new InstrumentingInputSocket<E>(input, this);
+        return input; //new InstrumentingInputSocket<>((This) this, input);
     }
 
-    protected <B extends IoBuffer<B>> OutputSocket<B> instrument(
+    public <B extends IoBuffer<B>> OutputSocket<B> instrument(
             OutputSocket<B> output,
-            InstrumentingIoBufferPool<B>.InstrumentingIoBuffer context) {
+            InstrumentingIoBuffer<This, B> context) {
         return instrument(output);
     }
 
-    protected <E extends Entry> OutputSocket<E> instrument(
+    public <E extends Entry> OutputSocket<E> instrument(
             OutputSocket<E> output,
-            InstrumentingController<D> context) {
+            InstrumentingController<This, ?> context) {
         return instrument(output);
     }
 
     protected <E extends Entry> OutputSocket<E> instrument(
             OutputSocket<E> output) {
-        return output; //new InstrumentingOutputSocket<E>(output, this);
+        return output; //new InstrumentingOutputSocket<>((This) this, output);
     }
 }

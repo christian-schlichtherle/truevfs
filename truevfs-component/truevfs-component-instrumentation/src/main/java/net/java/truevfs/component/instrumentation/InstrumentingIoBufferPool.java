@@ -4,28 +4,27 @@
  */
 package net.java.truevfs.component.instrumentation;
 
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truevfs.kernel.spec.cio.DecoratingEntry;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
 import java.io.IOException;
 import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
+import net.java.truevfs.kernel.spec.cio.IoBuffer;
+import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
- * @param  <B> the type of I/O buffers managed by this pool.
+ * @param  <D> the type of the instrumenting director.
+ * @param  <B> the type of the instrumented I/O buffers.
  * @author Christian Schlichtherle
  */
 @Immutable
-public class InstrumentingIoBufferPool<B extends IoBuffer<B>>
+public class InstrumentingIoBufferPool<
+        D extends InstrumentingDirector<D>,
+        B extends IoBuffer<B>>
 implements IoBufferPool<B> {
-
-    protected final InstrumentingDirector<?> director;
+    protected final D director;
     protected final IoBufferPool<B> pool;
 
     public InstrumentingIoBufferPool(
-            final InstrumentingDirector<?> director,
+            final D director,
             final IoBufferPool<B> pool) {
         this.director = Objects.requireNonNull(director);
         this.pool = Objects.requireNonNull(pool);
@@ -33,7 +32,7 @@ implements IoBufferPool<B> {
 
     @Override
     public IoBuffer<B> allocate() throws IOException {
-        return new InstrumentingIoBuffer(pool.allocate());
+        return new InstrumentingIoBuffer<>(director, pool.allocate());
     }
 
     @Override
@@ -45,29 +44,4 @@ implements IoBufferPool<B> {
     public String toString() {
         return String.format("%s[pool=%s]", getClass().getName(), pool);
     }
-
-    @SuppressWarnings("PublicInnerClass")
-    public class InstrumentingIoBuffer
-    extends DecoratingEntry<IoBuffer<B>>
-    implements IoBuffer<B> {
-
-        protected InstrumentingIoBuffer(IoBuffer<B> buffer) {
-            super(buffer);
-        }
-
-        @Override
-        public InputSocket<B> input() {
-            return director.instrument(entry.input(), this);
-        }
-
-        @Override
-        public OutputSocket<B> output() {
-            return director.instrument(entry.output(), this);
-        }
-
-        @Override
-        public void release() throws IOException {
-            entry.release();
-        }
-    } // InstrumentingIoBuffer
 }

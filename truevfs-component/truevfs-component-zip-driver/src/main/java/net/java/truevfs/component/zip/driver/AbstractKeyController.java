@@ -31,7 +31,7 @@ import net.java.truevfs.keymanager.spec.KeyManagerContainer;
 public abstract class AbstractKeyController<
         M extends FsModel,
         D extends AbstractZipDriver<?>>
-extends FsDecoratingController<M, FsController<? extends M>> {
+extends FsDecoratingController<M, FsController<M>> {
 
     private static final String ROOT_PATH = ROOT.getPath();
 
@@ -46,7 +46,7 @@ extends FsDecoratingController<M, FsController<? extends M>> {
      * @param driver the ZIP driver.
      */
     protected AbstractKeyController(
-            final FsController<? extends M> controller,
+            final FsController<M> controller,
             final D driver) {
         super(controller);
         this.driver = Objects.requireNonNull(driver);

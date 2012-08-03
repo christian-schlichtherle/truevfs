@@ -4,16 +4,9 @@
  */
 package net.java.truevfs.extension.pacemanager;
 
-import net.java.truevfs.kernel.spec.FsSyncOption;
-import net.java.truevfs.kernel.spec.FsDecoratingManager;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsCompositeDriver;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsSyncException;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsManager;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.*;
 
 /**
  * The pace manager controller.
@@ -32,8 +25,8 @@ final class PaceManagerController extends FsDecoratingManager<FsManager> {
     }
 
     @Override
-    public FsController<?> controller(FsCompositeDriver d, FsMountPoint mp) {
-        return new PaceController(this, manager.controller(d, mp));
+    public FsController<? extends FsModel> controller(FsCompositeDriver d, FsMountPoint mp) {
+        return new PaceController(this, (FsController<FsModel>) manager.controller(d, mp));
     }
 
     /**

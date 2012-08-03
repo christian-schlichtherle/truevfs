@@ -4,10 +4,10 @@
  */
 package net.java.truevfs.extension.logging;
 
-import net.java.truecommons.io.DecoratingSeekableChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.io.DecoratingSeekableChannel;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
@@ -49,6 +49,6 @@ final class LogOutputChannel extends DecoratingSeekableChannel {
         }
         logger.debug(message, entry);
         if (logger.isTraceEnabled())
-            logger.trace("Stack trace:", new NeverThrowable());
+            logger.trace("Stack trace:", new Throwable());
     }
 }

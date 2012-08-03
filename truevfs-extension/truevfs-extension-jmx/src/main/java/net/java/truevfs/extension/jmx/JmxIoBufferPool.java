@@ -15,7 +15,7 @@ import net.java.truevfs.kernel.spec.cio.IoBufferPool;
  */
 @Immutable
 final class JmxIoBufferPool<B extends IoBuffer<B>>
-extends InstrumentingIoBufferPool<B> {
+extends InstrumentingIoBufferPool<JmxDirector, B> {
 
     JmxIoBufferPool(JmxDirector director, IoBufferPool<B> model) {
         super(director, model);
@@ -23,24 +23,6 @@ extends InstrumentingIoBufferPool<B> {
 
     @Override
     public IoBuffer<B> allocate() throws IOException {
-        return new JmxBuffer(pool.allocate());
+        return new JmxIoBuffer<>(director, pool.allocate());
     }
-
-    private final class JmxBuffer extends InstrumentingIoBuffer {
-
-        @SuppressWarnings("LeakingThisInConstructor")
-        JmxBuffer(IoBuffer<B> model) {
-            super(model);
-            JmxIoBufferView.register(this);
-        }
-
-        @Override
-        public void release() throws IOException {
-            try {
-                entry.release();
-            } finally {
-                JmxIoBufferView.unregister(this);
-            }
-        }
-    } // JmxBuffer
 }

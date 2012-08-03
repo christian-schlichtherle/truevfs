@@ -5,13 +5,15 @@
 package net.java.truevfs.extension.jmx;
 
 import net.java.truevfs.kernel.spec.FsController;
+import net.java.truevfs.kernel.spec.FsModel;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
-final class JmxApplicationController extends JmxController {
+final class JmxApplicationController<M extends FsModel>
+extends JmxController<M> {
 
-    JmxApplicationController(JmxDirector director, FsController<?> controller) {
+    JmxApplicationController(JmxDirector director, FsController<M> controller) {
         super(director, controller);
     }
 

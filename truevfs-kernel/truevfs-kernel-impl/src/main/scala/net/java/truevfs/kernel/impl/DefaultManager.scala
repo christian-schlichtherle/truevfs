@@ -167,8 +167,8 @@ final class DefaultManager private (
 }
 
 private object DefaultManager {
-  private final class FrontController(c: AnyController)
-  extends FsDecoratingController[FsModel, AnyController](c)
+  private final class FrontController(c: FsController[FsModel])
+  extends FsDecoratingController[FsModel, FsController[FsModel]](c)
   with FinalizeController
 
   // HC SVNT DRACONES!
