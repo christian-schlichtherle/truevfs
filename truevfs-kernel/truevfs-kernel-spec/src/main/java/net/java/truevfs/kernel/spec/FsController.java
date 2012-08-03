@@ -8,21 +8,21 @@ import java.io.IOException;
 import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
+import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
 import net.java.truevfs.kernel.spec.cio.Entry.Type;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truecommons.shed.BitField;
 
 /**
- * Provides file system operations.
+ * Provides read/write access to a file system.
  * 
  * <h3>General Properties</h3>
  * <p>
  * The {@link FsModel#getMountPoint() mount point} of the
- * {@linkplain #getModel() file system model} addresses the file system operated by
- * this controller.
+ * {@linkplain #getModel() file system model}
+ * addresses the file system accessed by this controller.
  * Where the methods of this abstract class accept a
  * {@link FsEntryName file system entry name} as a parameter, this MUST get
  * resolved against the {@link FsModel#getMountPoint() mount point} URI of this
