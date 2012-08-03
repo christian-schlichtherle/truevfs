@@ -18,13 +18,9 @@ import net.java.truecommons.shed.BitField;
 import static net.java.truecommons.shed.Paths.cutTrailingSeparators;
 import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR;
 import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
-import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.Entry.Type;
 import static net.java.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
-import net.java.truevfs.kernel.spec.cio.InputService;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
-import net.java.truevfs.kernel.spec.cio.OutputService;
+import net.java.truevfs.kernel.spec.cio.*;
 
 /**
  * An abstract factory for components required for accessing archive files.
