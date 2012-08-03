@@ -4,8 +4,8 @@
  */
 package net.java.truevfs.kernel.spec.spi;
 
-import net.java.truecommons.services.DecoratorService;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.services.DecoratorService;
 import net.java.truevfs.kernel.spec.cio.IoBuffer;
 import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
