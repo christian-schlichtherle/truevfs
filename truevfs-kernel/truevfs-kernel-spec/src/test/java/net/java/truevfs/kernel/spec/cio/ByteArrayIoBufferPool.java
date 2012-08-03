@@ -4,8 +4,6 @@
  */
 package net.java.truevfs.kernel.spec.cio;
 
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -14,7 +12,7 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * A pool of byte array I/O buffers.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 public final class ByteArrayIoBufferPool implements IoBufferPool<ByteArrayIoBuffer> {
@@ -39,14 +37,14 @@ public final class ByteArrayIoBufferPool implements IoBufferPool<ByteArrayIoBuff
 
     @Override
     public IoBuffer<ByteArrayIoBuffer> allocate() {
-        ByteBuffer entry = new ByteBuffer(total.getAndIncrement());
+        final ByteBuffer buffer = new ByteBuffer(total.getAndIncrement());
         active.getAndIncrement();
-        return entry;
+        return buffer;
     }
 
     @Override
-    public void release(IoBuffer<ByteArrayIoBuffer> entry) throws IOException {
-        entry.release();
+    public void release(IoBuffer<ByteArrayIoBuffer> buffer) throws IOException {
+        buffer.release();
     }
 
     /**
