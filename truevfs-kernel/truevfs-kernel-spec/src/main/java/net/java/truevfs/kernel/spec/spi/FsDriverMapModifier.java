@@ -4,9 +4,9 @@
  */
 package net.java.truevfs.kernel.spec.spi;
 
-import net.java.truecommons.services.ModifierService;
 import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.services.ModifierService;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
