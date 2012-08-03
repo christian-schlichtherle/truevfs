@@ -5,8 +5,8 @@
 package net.java.truevfs.kernel.spec;
 
 import javax.annotation.concurrent.ThreadSafe;
-import static net.java.truevfs.kernel.spec.FsSyncOption.ABORT_CHANGES;
 import net.java.truecommons.shed.BitField;
+import static net.java.truevfs.kernel.spec.FsSyncOption.ABORT_CHANGES;
 
 /**
  * An abstract file system manager.
