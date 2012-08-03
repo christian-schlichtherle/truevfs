@@ -12,9 +12,9 @@ import javax.annotation.concurrent.Immutable;
 /**
  * Delegates all methods to another input socket.
  * 
- * @see    DelegatingOutputSocket
  * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.
+ * @see    DelegatingOutputSocket
  * @author Christian Schlichtherle
  */
 @Immutable
