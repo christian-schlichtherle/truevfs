@@ -4,16 +4,15 @@
  */
 package net.java.truevfs.driver.file;
 
-import net.java.truevfs.driver.file.TempFilePoolFactory;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle
  */
-public final class TempFilePoolFactoryTest {
+public final class FileIoBufferPoolFactoryTest {
     @Test
     public void testPriority() {
-        assertEquals(0, new TempFilePoolFactory().getPriority());
+        assertEquals(0, new FileIoBufferPoolFactory().getPriority());
     }
 }
