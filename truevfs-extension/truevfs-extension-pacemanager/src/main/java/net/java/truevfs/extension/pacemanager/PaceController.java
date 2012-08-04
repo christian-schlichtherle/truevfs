@@ -29,8 +29,7 @@ import net.java.truevfs.kernel.spec.cio.*;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class PaceController
-extends FsDecoratingController<FsController> {
+final class PaceController extends FsDecoratingController {
 
     private final PaceManagerController manager;
 

@@ -18,17 +18,15 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
 /**
  * An abstract decorator for a file system controller.
  *
- * @param  <C> the type of the decorated file system controller.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class FsDecoratingController<C extends FsController>
-extends FsAbstractController {
+public abstract class FsDecoratingController extends FsAbstractController {
 
     /** The decorated file system controller. */
-    protected final C controller;
+    protected final FsController controller;
 
-    protected FsDecoratingController(final C controller) {
+    protected FsDecoratingController(final FsController controller) {
         super(controller.getModel());
         this.controller = controller;
     }
