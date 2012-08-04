@@ -10,6 +10,8 @@ import java.nio.channels.SeekableByteChannel;
 import static java.nio.file.Files.newByteChannel;
 import static java.nio.file.Files.newInputStream;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.FsAccessOption;
 import net.java.truevfs.kernel.spec.cio.AbstractInputSocket;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
@@ -25,7 +27,9 @@ final class FileInputSocket extends AbstractInputSocket<FileEntry> {
 
     private final FileEntry entry;
 
-    FileInputSocket(final FileEntry entry) {
+    FileInputSocket(
+            final BitField<FsAccessOption> unused, // maybe later
+            final FileEntry entry) {
         assert null != entry;
         this.entry = entry;
     }
