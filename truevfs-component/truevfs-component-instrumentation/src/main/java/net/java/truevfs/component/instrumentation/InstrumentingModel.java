@@ -15,7 +15,7 @@ import net.java.truevfs.kernel.spec.FsModel;
  */
 @Immutable
 public class InstrumentingModel<D extends InstrumentingDirector<D>>
-extends FsDecoratingModel<FsModel> {
+extends FsDecoratingModel {
     protected final D director;
 
     public InstrumentingModel(

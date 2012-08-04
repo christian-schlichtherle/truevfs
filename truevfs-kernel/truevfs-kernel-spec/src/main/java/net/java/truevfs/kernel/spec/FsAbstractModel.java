@@ -46,7 +46,7 @@ public abstract class FsAbstractModel implements FsModel {
      */
     @Override
     public String toString() {
-        return String.format("%s[mountPoint=%s, parent=%s, touched=%b]",
+        return String.format("%s[mountPoint=%s, parent=%s, mounted=%b]",
                 getClass().getName(),
                 mountPoint,
                 parent,

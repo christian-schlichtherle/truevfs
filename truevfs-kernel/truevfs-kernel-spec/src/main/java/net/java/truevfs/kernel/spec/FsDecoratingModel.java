@@ -9,22 +9,15 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * An abstract decorator for a file system model.
  *
- * @param  <M> the type of the decorated file system model.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class FsDecoratingModel<M extends FsModel>
-extends FsAbstractModel {
+public abstract class FsDecoratingModel extends FsAbstractModel {
 
     /** The decorated file system model. */
-    protected final M model;
+    protected final FsModel model;
 
-    /**
-     * Constructs a new decorating file system model.
-     *
-     * @param model the file system model to decorate.
-     */
-    protected FsDecoratingModel(final M model) {
+    protected FsDecoratingModel(final FsModel model) {
         super(model.getMountPoint(), model.getParent());
         this.model = model;
     }
