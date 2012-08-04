@@ -42,7 +42,7 @@ import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 public class MultiplexingOutputService<E extends MutableEntry>
 extends DecoratingOutputService<E> {
 
-    private final IoBufferPool<? extends IoBuffer<?>> pool;
+    private final IoBufferPool<?> pool;
 
     /**
      * The map of temporary archive entries which have not yet been written
