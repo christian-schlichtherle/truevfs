@@ -12,7 +12,7 @@ import net.java.truevfs.kernel.spec.FsModel;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class JmxModel extends InstrumentingModel {
+final class JmxModel extends InstrumentingModel<JmxDirector> {
 
     JmxModel(JmxDirector director, FsModel model) {
         super(director, model);
