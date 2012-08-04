@@ -15,8 +15,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class DecoratingEntry<E extends Entry>
-implements Entry {
+public abstract class DecoratingEntry<E extends Entry> implements Entry {
 
     /** The nullable decorated entry. */
     protected @Nullable E entry;
