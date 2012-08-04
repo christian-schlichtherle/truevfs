@@ -5,18 +5,18 @@
 package net.java.truevfs.extension.jmx;
 
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.BitField;
 import net.java.truevfs.component.instrumentation.InstrumentingManager;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsSyncException;
 import net.java.truevfs.kernel.spec.FsSyncOption;
 import net.java.truevfs.kernel.spec.FsSyncWarningException;
-import net.java.truecommons.shed.BitField;
 
 /**
  * @author Christian Schlichtherle
  */
 @Immutable
-final class JmxManager extends InstrumentingManager {
+final class JmxManager extends InstrumentingManager<JmxDirector> {
 
     @SuppressWarnings("LeakingThisInConstructor")
     JmxManager(JmxDirector director, FsManager manager) {
@@ -41,7 +41,7 @@ final class JmxManager extends InstrumentingManager {
         try {
             manager.sync(options);
         } finally {
-            JmxDirector d = ((JmxDirector) director);
+            final JmxDirector d = director;
             d.setApplicationIoStatistics(new JmxIoStatistics());
             d.setKernelIoStatistics(new JmxIoStatistics());
             d.setTempIoStatistics(new JmxIoStatistics());
