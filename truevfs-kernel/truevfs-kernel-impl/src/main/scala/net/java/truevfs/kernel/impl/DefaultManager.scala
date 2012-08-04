@@ -154,7 +154,10 @@ final class DefaultManager private (
   private def sortedControllers = {
     readLock lock ()
     try {
-      controllers.values.flatMap(l => Option[FsController](l.get)).toIndexedSeq
+      controllers
+      .values
+      .flatMap(l => Option(l.get))
+      .toIndexedSeq
       .sorted(ReverseControllerOrdering)
     } finally {
       readLock unlock ()
