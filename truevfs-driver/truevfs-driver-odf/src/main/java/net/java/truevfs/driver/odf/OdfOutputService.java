@@ -4,12 +4,6 @@
  */
 package net.java.truevfs.driver.odf;
 
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truevfs.kernel.spec.cio.DecoratingOutputSocket;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -20,6 +14,7 @@ import static net.java.truevfs.component.zip.ZipEntry.STORED;
 import net.java.truevfs.component.zip.driver.JarDriverEntry;
 import net.java.truevfs.component.zip.driver.ZipOutputService;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
+import net.java.truevfs.kernel.spec.cio.*;
 
 /**
  * Created by {@link OdfDriver} to meet the special requirements of

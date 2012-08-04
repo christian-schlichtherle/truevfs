@@ -24,7 +24,7 @@ import net.java.truevfs.kernel.spec.cio._
 @Immutable
 private class LockOutputService[E <: Entry]
 (@WillCloseWhenClosed output: OutputService[E])
-extends DecoratingOutputService[E, OutputService[E]](output)
+extends DecoratingOutputService[E](output)
 with LockedOperation {
 
   @DischargesObligation

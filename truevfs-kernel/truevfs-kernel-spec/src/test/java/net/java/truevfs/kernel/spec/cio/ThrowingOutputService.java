@@ -4,10 +4,6 @@
  */
 package net.java.truevfs.kernel.spec.cio;
 
-import net.java.truevfs.kernel.spec.cio.DecoratingOutputService;
-import net.java.truevfs.kernel.spec.cio.OutputService;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.util.Iterator;
@@ -24,7 +20,7 @@ import net.java.truevfs.kernel.spec.ThrowManager;
  */
 @ThreadSafe
 public class ThrowingOutputService<E extends Entry>
-extends DecoratingOutputService<E, OutputService<E>> {
+extends DecoratingOutputService<E> {
     private final TestConfig config;
     private volatile @CheckForNull ThrowManager control;
 

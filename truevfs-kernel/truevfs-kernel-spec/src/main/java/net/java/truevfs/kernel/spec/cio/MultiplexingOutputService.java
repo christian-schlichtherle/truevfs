@@ -4,8 +4,6 @@
  */
 package net.java.truevfs.kernel.spec.cio;
 
-import net.java.truecommons.io.DecoratingOutputStream;
-import net.java.truecommons.io.InputException;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -15,14 +13,16 @@ import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
-import static net.java.truevfs.kernel.spec.cio.Entry.ALL_ACCESS;
-import net.java.truevfs.kernel.spec.cio.Entry.Access;
-import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
-import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
+import net.java.truecommons.io.DecoratingOutputStream;
+import net.java.truecommons.io.InputException;
 import net.java.truecommons.shed.CompoundIterator;
 import net.java.truecommons.shed.ExceptionBuilder;
 import net.java.truecommons.shed.PriorityExceptionBuilder;
 import net.java.truecommons.shed.SuppressedExceptionBuilder;
+import static net.java.truevfs.kernel.spec.cio.Entry.ALL_ACCESS;
+import net.java.truevfs.kernel.spec.cio.Entry.Access;
+import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
+import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 
 /**
  * Decorates another output service to support a virtually unlimited number of
@@ -40,7 +40,7 @@ import net.java.truecommons.shed.SuppressedExceptionBuilder;
  */
 @NotThreadSafe
 public class MultiplexingOutputService<E extends MutableEntry>
-extends DecoratingOutputService<E, OutputService<E>> {
+extends DecoratingOutputService<E> {
 
     private final IoBufferPool<? extends IoBuffer<?>> pool;
 

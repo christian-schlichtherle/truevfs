@@ -27,7 +27,7 @@ import net.java.truevfs.kernel.spec.cio._
 @NotThreadSafe
 private class DisconnectingInputService[E <: Entry]
 (@WillCloseWhenClosed input: InputService[E])
-extends DecoratingInputService[E, InputService[E]](input)
+extends DecoratingInputService[E](input)
 with CheckedCloseable {
 
   override def size = checked(container.size)
