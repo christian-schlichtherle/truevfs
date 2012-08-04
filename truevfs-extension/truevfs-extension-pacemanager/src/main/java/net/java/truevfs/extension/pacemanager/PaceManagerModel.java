@@ -70,7 +70,7 @@ final class PaceManagerModel {
         for (final Iterator<FsController> i = evicted.iterator(); i.hasNext();) {
             final FsController ec = i.next();
             final FsMountPoint emp = ec.getModel().getMountPoint();
-            final FsManager fm = new FsFilteringManager(manager, emp);
+            final FsManager fm = new FsFilteringManager(emp, manager);
             for (final FsController fc : fm) {
                 final FsMountPoint fmp = fc.getModel().getMountPoint();
                 if (mp.equals(fmp) || mounted.contains(fmp)) {

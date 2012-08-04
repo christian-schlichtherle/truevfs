@@ -268,8 +268,8 @@ implements JmxModelViewMXBean {
 
     @Override
     public void sync() throws FsSyncException {
-        new FsFilteringManager( FsManagerLocator.SINGLETON.get(),
-                                model.getMountPoint())
-                .sync(FsSyncOptions.NONE);
+        new FsFilteringManager(
+                model.getMountPoint(),
+                FsManagerLocator.SINGLETON.get()).sync(FsSyncOptions.NONE);
     }
 }

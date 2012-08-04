@@ -5,30 +5,22 @@
 package net.java.truevfs.kernel.spec;
 
 import java.util.Iterator;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
+import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * An abstract decorator for a file system manager.
  * 
- * @param  <M> the type of the decorated file system manager.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class FsDecoratingManager<M extends FsManager>
-extends FsAbstractManager {
+public abstract class FsDecoratingManager extends FsAbstractManager {
 
-    /** The nullable decorated file system manager. */
-    protected @Nullable M manager;
+    /** The decorated file system manager. */
+    protected final FsManager manager;
 
-    /**
-     * Constructs a new decorating file system manager.
-     *
-     * @param manager the nullable file system manager to decorate.
-     */
-    protected FsDecoratingManager(final @CheckForNull M manager) {
-        this.manager = manager;
+    protected FsDecoratingManager(final FsManager manager) {
+        this.manager = Objects.requireNonNull(manager);
     }
 
     @Override

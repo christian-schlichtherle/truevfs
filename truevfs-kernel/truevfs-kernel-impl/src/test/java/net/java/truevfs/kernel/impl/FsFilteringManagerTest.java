@@ -24,8 +24,8 @@ public class FsFilteringManagerTest extends FsManagerTestSuite {
     @Override
     protected FsManager newManager(Type type) {
         return new FsFilteringManager(
-                new DefaultManager(type),
-                FsMountPoint.create(URI.create("file:/")));
+                FsMountPoint.create(URI.create("file:/")),
+                new DefaultManager(type));
     }
 
     @Test
@@ -54,7 +54,8 @@ public class FsFilteringManagerTest extends FsManagerTestSuite {
                 set.add(FsMountPoint.create(URI.create(param)));
 
             final FsManager filter = new FsFilteringManager(
-                    manager, FsMountPoint.create(URI.create(params[0][0])));
+                    FsMountPoint.create(URI.create(params[0][0])),
+                    manager);
             assertThat(filter.size(), is(params[2].length));
             for (final FsController controller : filter)
                 assertTrue(set.contains(controller.getModel().getMountPoint()));
