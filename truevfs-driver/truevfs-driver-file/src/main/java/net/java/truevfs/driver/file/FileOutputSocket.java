@@ -20,6 +20,8 @@ import java.util.Set;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.shed.BitField;
+import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 import net.java.truevfs.kernel.spec.cio.AbstractOutputSocket;
@@ -28,8 +30,6 @@ import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
 import net.java.truevfs.kernel.spec.cio.IoSockets;
-import net.java.truecommons.shed.BitField;
-import static net.java.truecommons.shed.HashMaps.initialCapacity;
 
 /**
  * An output socket for a file entry.
@@ -72,7 +72,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
     }
 
     private FileEntry begin() throws IOException {
-        final FileEntry temp;
+        final FileEntry buffer;
         final Path entryFile = entry.getPath();
         Boolean exists = null;
         if (options.get(EXCLUSIVE) && (exists = exists(entryFile)))
@@ -88,21 +88,21 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
             } else {
                 createFile(entryFile);
             }
-            temp = entry.createTempFile();
+            buffer = entry.createIoBuffer();
         } else {
-            temp = entry;
+            buffer = entry;
         }
         if (options.get(CREATE_PARENTS) && !TRUE.equals(exists)) {
             final Path parentFile = entryFile.getParent();
             if (null != parentFile)
                 createDirectories(parentFile);
         }
-        return temp;
+        return buffer;
     }
 
-    void append(final FileEntry temp) throws IOException {
-        if (temp != entry && options.get(APPEND) && exists(entry.getPath()))
-            IoSockets.copy(entry.input(), temp.output());
+    void append(final FileEntry buffer) throws IOException {
+        if (buffer != entry && options.get(APPEND) && exists(entry.getPath()))
+            IoSockets.copy(entry.input(), buffer.output());
     }
 
     Set<OpenOption> optionSet() {
@@ -122,26 +122,26 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
         return set.toArray(new OpenOption[set.size()]);
     }
 
-    void close(final FileEntry temp, final boolean commit)
+    void close(final FileEntry buffer, final boolean commit)
     throws IOException {
         final Path entryFile = entry.getPath();
-        if (temp != entry) {
-            final Path tempFile = temp.getPath();
-            updateProperties(tempFile);
+        if (buffer != entry) {
+            final Path bufferFile = buffer.getPath();
+            updateProperties(bufferFile);
             if (commit) {
                 try {
-                    move(tempFile, entryFile, REPLACE_EXISTING);
+                    move(bufferFile, entryFile, REPLACE_EXISTING);
                 } catch (final IOException ex) {
                     // Slow:
-                    /*Files.copy(tempFile, entryFile,
+                    /*Files.copy(bufferFile, entryFile,
                             StandardCopyOption.REPLACE_EXISTING);*/
                     // Fast:
-                    IoSockets.copy(temp.input(), entry.output());
+                    IoSockets.copy(buffer.input(), entry.output());
                     updateProperties(entryFile);
                 }
-                release(temp, null);
+                buffer.release();
             } else {
-                // Leave temp file for post-mortem analysis.
+                // Leave bufferFile for post-mortem analysis.
             }
         } else {
             updateProperties(entryFile);
@@ -162,28 +162,28 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
         return UNKNOWN == time ? null : FileTime.fromMillis(time);
     }
 
-    void release(
-            final FileEntry temp,
-            final @CheckForNull IOException ex)
+    IOException release(
+            final IOException ex,
+            final FileEntry buffer)
     throws IOException {
         try {
-            temp.release();
-        } catch (IOException ex2) {
-            ex2.initCause(ex);
-            throw ex2;
+            buffer.release();
+        } catch (final IOException ex2) {
+            ex.addSuppressed(ex2);
         }
+        return ex;
     }
 
     @Override
     public SeekableByteChannel channel(final InputSocket<? extends Entry> peer)
     throws IOException {
-        final FileEntry temp = begin();
+        final FileEntry buffer = begin();
 
         final class Channel extends IOExceptionSeekableChannel {
             boolean closed;
 
             Channel() throws IOException {
-                super(newByteChannel(temp.getPath(), optionSet()));
+                super(newByteChannel(buffer.getPath(), optionSet()));
             }
 
             @Override
@@ -191,30 +191,29 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
                 if (closed) return;
                 super.close();
                 closed = true;
-                close(temp, null == exception);
+                close(buffer, null == exception);
             }
         } // Channel
 
         try {
-            append(temp);
+            append(buffer);
             return new Channel();
         } catch (IOException ex) {
-            release(temp, ex);
-            throw ex;
+            throw release(ex, buffer);
         }
     }
 
     @Override
     public OutputStream stream(final InputSocket<? extends Entry> peer)
     throws IOException {
-        final FileEntry temp = begin();
+        final FileEntry buffer = begin();
 
         final class Stream extends IOExceptionOutputStream {
             boolean closed;
 
             @CreatesObligation
             Stream() throws IOException {
-                super(Files.newOutputStream(temp.getPath(), optionArray()));
+                super(Files.newOutputStream(buffer.getPath(), optionArray()));
             }
 
             @Override
@@ -223,16 +222,15 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
                     return;
                 super.close();
                 closed = true;
-                close(temp, null == exception);
+                close(buffer, null == exception);
             }
         } // Stream
 
         try {
-            append(temp);
+            append(buffer);
             return new Stream();
         } catch (IOException ex) {
-            release(temp, ex);
-            throw ex;
+            throw release(ex, buffer);
         }
     }
 }
