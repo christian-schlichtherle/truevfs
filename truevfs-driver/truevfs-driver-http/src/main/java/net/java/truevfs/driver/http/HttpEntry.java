@@ -4,17 +4,6 @@
  */
 package net.java.truevfs.driver.http;
 
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truevfs.kernel.spec.cio.IoEntry;
-import net.java.truevfs.kernel.spec.FsReadOnlyFileSystemException;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.FsEntry;
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truevfs.kernel.spec.FsEntryName;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.FsAccessOptions;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,11 +14,13 @@ import java.util.Set;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.READ;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.WRITE;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.java.truevfs.kernel.spec.cio.Entry.Type.FILE;
-import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.cio.*;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
