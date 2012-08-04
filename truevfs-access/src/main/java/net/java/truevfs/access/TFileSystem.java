@@ -48,7 +48,7 @@ import net.java.truecommons.shed.FilteringIterator;
 @ThreadSafe
 public final class TFileSystem extends FileSystem {
 
-    private final FsController<?> controller;
+    private final FsController controller;
     private final TFileSystemProvider provider;
 
     @SuppressWarnings("deprecation")
@@ -67,7 +67,7 @@ public final class TFileSystem extends FileSystem {
         return true;
     }
 
-    private FsController<?> getController() {
+    private FsController getController() {
         return controller;
     }
 
@@ -223,7 +223,7 @@ public final class TFileSystem extends FileSystem {
             final FileAttribute<?>... attrs)
     throws IOException {
         final FsEntryName name = path.getEntryName();
-        final FsController<?> controller = getController();
+        final FsController controller = getController();
         if (options.isEmpty() || options.contains(StandardOpenOption.READ)) {
             final BitField<FsAccessOption>
                     o = path.inputOptions(options).set(CACHE);
@@ -334,7 +334,7 @@ public final class TFileSystem extends FileSystem {
     throws IOException {
         if (0 < attrs.length)
             throw new UnsupportedOperationException();
-        final FsController<?> controller = getController();
+        final FsController controller = getController();
         final FsEntryName name = path.getEntryName();
         final BitField<FsAccessOption> options = path.getAccessPreferences();
         try {
@@ -438,7 +438,7 @@ public final class TFileSystem extends FileSystem {
                                 final FileTime lastAccessTime,
                                 final FileTime createTime)
         throws IOException {
-            final FsController<?> controller = getController();
+            final FsController controller = getController();
             final Map<Access, Long> times = new EnumMap<>(Access.class);
             if (null != lastModifiedTime)
                 times.put(WRITE, lastModifiedTime.toMillis());

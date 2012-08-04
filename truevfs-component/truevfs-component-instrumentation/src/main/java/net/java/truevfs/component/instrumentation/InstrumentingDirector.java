@@ -42,15 +42,15 @@ public abstract class InstrumentingDirector<
         return model; //new InstrumentingModel<>((This) this, model);
     }
 
-    public <M extends FsModel> FsController<M> instrument(
-            FsController<M> controller,
+    public FsController instrument(
+            FsController controller,
             InstrumentingManager<This> context) {
         return controller;
     }
 
     @SuppressWarnings("unchecked")
-    public <M extends FsModel> FsController<M> instrument(
-            FsController<M> controller,
+    public FsController instrument(
+            FsController controller,
             InstrumentingCompositeDriver<This> context) {
         return new InstrumentingController<>((This) this, controller);
     }
@@ -63,7 +63,7 @@ public abstract class InstrumentingDirector<
 
     public <E extends Entry> InputSocket<E> instrument(
             InputSocket<E> input,
-            InstrumentingController<This, ?> context) {
+            InstrumentingController<This> context) {
         return instrument(input);
     }
 
@@ -80,7 +80,7 @@ public abstract class InstrumentingDirector<
 
     public <E extends Entry> OutputSocket<E> instrument(
             OutputSocket<E> output,
-            InstrumentingController<This, ?> context) {
+            InstrumentingController<This> context) {
         return instrument(output);
     }
 

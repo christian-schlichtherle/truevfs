@@ -38,13 +38,13 @@ final class DefaultManager private (
    * keyed by the mount point of their respective file system model.
    */
   private[this] val controllers =
-    new WeakHashMap[FsMountPoint, Link[AnyController]]
+    new WeakHashMap[FsMountPoint, Link[FsController]]
 
   private[this] val readLock = lock.readLock
   private[this] val writeLock = lock.writeLock
 
-  override def newController[E <: FsArchiveEntry]
-  (driver: FsArchiveDriver[E], model: FsModel, parent: AnyController): AnyController = {
+  override def newController
+  (driver: AnyArchiveDriver, model: FsModel, parent: FsController): FsController = {
     assert(!model.isInstanceOf[LockModel])
     // HC SVNT DRACONES!
     // The FalsePositiveArchiveController decorates the FrontController
@@ -53,11 +53,12 @@ final class DefaultManager private (
     new FalsePositiveArchiveController(
       new FrontController(
         driver decorate 
-          asFsController(
-            new BackController(driver, new LockModel(model), parent), parent)))
+          new ControllerAdapter(
+            new BackController(driver, new LockModel(model), parent),
+            parent)))
   }
 
-  override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint): AnyController = {
+  override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint): FsController = {
     try {
       readLock lock ()
       try {
@@ -76,8 +77,8 @@ final class DefaultManager private (
     }
   }
 
-  private def controller0(d: FsCompositeDriver, mp: FsMountPoint): AnyController = {
-    controllers.get(mp).flatMap(l => Option[AnyController](l.get)) match {
+  private def controller0(d: FsCompositeDriver, mp: FsMountPoint): FsController = {
+    controllers.get(mp).flatMap(l => Option[FsController](l.get)) match {
       case Some(c) => c
       case None =>
         if (!writeLock.isHeldByCurrentThread) throw NeedsWriteLockException()
@@ -100,10 +101,10 @@ final class DefaultManager private (
    */
   private final class ManagedModel(mountPoint: FsMountPoint, parent: FsModel)
   extends FsAbstractModel(mountPoint, parent) {
-    private[this] var _controller: AnyController = _
+    private[this] var _controller: FsController = _
     @volatile private[this] var _mounted: Boolean = _
 
-    def init(controller: AnyController) {
+    def init(controller: FsController) {
       assert(null ne controller)
       assert(!_mounted)
       _controller = controller
@@ -153,7 +154,7 @@ final class DefaultManager private (
   private def sortedControllers = {
     readLock lock ()
     try {
-      controllers.values.flatMap(l => Option[AnyController](l.get)).toIndexedSeq
+      controllers.values.flatMap(l => Option[FsController](l.get)).toIndexedSeq
       .sorted(ReverseControllerOrdering)
     } finally {
       readLock unlock ()
@@ -167,8 +168,8 @@ final class DefaultManager private (
 }
 
 private object DefaultManager {
-  private final class FrontController(c: FsController[FsModel])
-  extends FsDecoratingController[FsModel, FsController[FsModel]](c)
+  private final class FrontController(c: FsController)
+  extends FsDecoratingController[FsController](c)
   with FinalizeController
 
   // HC SVNT DRACONES!
@@ -183,7 +184,7 @@ private object DefaultManager {
   // trying to sync the file system while any stream or channel to the
   // latter is open gets detected and properly dealt with.
   private final class BackController[E <: FsArchiveEntry]
-  (driver: FsArchiveDriver[E], model: LockModel, parent: AnyController)
+  (driver: FsArchiveDriver[E], model: LockModel, parent: FsController)
   extends TargetArchiveController(driver, model, parent)
   with ResourceController
   with CacheController
@@ -197,8 +198,8 @@ private object DefaultManager {
    * Orders file system controllers so that all file systems appear before
    * any of their parent file systems.
    */
-  private object ReverseControllerOrdering extends Ordering[AnyController] {
-    override def compare(a: AnyController, b: AnyController) =
+  private object ReverseControllerOrdering extends Ordering[FsController] {
+    override def compare(a: FsController, b: FsController) =
       b.getModel.getMountPoint.toHierarchicalUri compareTo
         a.getModel.getMountPoint.toHierarchicalUri
   }

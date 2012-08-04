@@ -18,15 +18,13 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  * @author Christian Schlichtherle
  */
 @Immutable
-public class InstrumentingController<
-        D extends InstrumentingDirector<D>,
-        M extends FsModel>
-extends FsDecoratingController<M, FsController<M>> {
+public class InstrumentingController<D extends InstrumentingDirector<D>>
+extends FsDecoratingController<FsController> {
     protected final D director;
 
     public InstrumentingController(
             final D director,
-            final FsController<M> controller) {
+            final FsController controller) {
         super(controller);
         this.director = Objects.requireNonNull(director);
     }

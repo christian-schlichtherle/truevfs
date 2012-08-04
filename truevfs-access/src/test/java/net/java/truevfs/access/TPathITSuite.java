@@ -156,11 +156,11 @@ extends ConfiguredClientTestBase<D> {
         archive = null;
         createFile(new TPath(entry));
         TVFS.umount(new TFile(entry).getTopLevelArchive());
-        final ReferenceQueue<FsController<?>> queue;
-        final Reference<FsController<?>> expected;
+        final ReferenceQueue<FsController> queue;
+        final Reference<FsController> expected;
         try (final Closeable resource = factory.create(entry)) {
             queue = new ReferenceQueue<>();
-            expected = new WeakReference<FsController<?>>(
+            expected = new WeakReference<>(
                          new TFile(entry).getInnerArchive().getController(), queue);
             System.gc();
             assertNull(queue.remove(TIMEOUT_MILLIS));
@@ -170,7 +170,7 @@ extends ConfiguredClientTestBase<D> {
         assertNull(queue.remove(TIMEOUT_MILLIS));
         assertSame(expected.get(), new TFile(entry).getInnerArchive().getController());
         TVFS.umount(new TFile(entry).getTopLevelArchive());
-        Reference<? extends FsController<?>> got;
+        Reference<? extends FsController> got;
         do {
             // triggering GC in a loop seems to help with concurrency!
             System.gc();

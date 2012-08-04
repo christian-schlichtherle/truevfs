@@ -25,8 +25,8 @@ final class PaceManagerController extends FsDecoratingManager<FsManager> {
     }
 
     @Override
-    public FsController<? extends FsModel> controller(FsCompositeDriver d, FsMountPoint mp) {
-        return new PaceController(this, (FsController<FsModel>) manager.controller(d, mp));
+    public FsController controller(FsCompositeDriver d, FsMountPoint mp) {
+        return new PaceController(this, manager.controller(d, mp));
     }
 
     /**
@@ -38,7 +38,7 @@ final class PaceManagerController extends FsDecoratingManager<FsManager> {
      *         for subsequent access.
      * @throws FsSyncException 
      */
-    void retain(FsController<? extends FsModel> controller) throws FsSyncException {
+    void retain(FsController controller) throws FsSyncException {
         model.retain(controller);
     }
 
@@ -48,7 +48,7 @@ final class PaceManagerController extends FsDecoratingManager<FsManager> {
      * 
      * @param  controller the controller for the most recently used file system.
      */
-    void accessed(FsController<? extends FsModel> controller) {
+    void accessed(FsController controller) {
         model.accessed(controller);
     }
 

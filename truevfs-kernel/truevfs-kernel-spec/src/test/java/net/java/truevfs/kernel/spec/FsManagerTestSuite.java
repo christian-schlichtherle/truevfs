@@ -4,17 +4,12 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import net.java.truevfs.kernel.spec.FsSimpleCompositeDriver;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsManager;
-import net.java.truevfs.kernel.spec.FsCompositeDriver;
 import java.net.URI;
 import java.util.Iterator;
-import net.java.truevfs.kernel.driver.mock.MockDriverMapContainer;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.Link.Type;
 import static net.java.truecommons.shed.Link.Type.WEAK;
+import net.java.truevfs.kernel.driver.mock.MockDriverMapContainer;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -64,11 +59,11 @@ public abstract class FsManagerTestSuite {
                 "zip:zip:zip:file:/föo.zip!/bär.zip!/bäz.zip!/",
             },
         }) {
-            FsController<?> parent = null;
+            FsController parent = null;
             for (final String param : params) {
                 final FsMountPoint mountPoint
                         = FsMountPoint.create(URI.create(param));
-                final FsController<?> controller
+                final FsController controller
                         = manager.controller(driver, mountPoint);
                 if (null != parent && null != parent.getParent())
                     assertThat(controller.getParent(), sameInstance((Object) parent));
@@ -96,12 +91,12 @@ public abstract class FsManagerTestSuite {
                 "file:/",
             },
         }) {
-            FsController<?> top = null;
-            FsController<?> member = null;
+            FsController top = null;
+            FsController member = null;
             for (final String param : params) {
                 final FsMountPoint mountPoint
                         = FsMountPoint.create(URI.create(param));
-                final FsController<?> controller
+                final FsController controller
                         = manager.controller(driver, mountPoint);
                 if (null != member && null != controller.getParent())
                     assertThat(controller, sameInstance((Object) member.getParent()));
@@ -109,7 +104,7 @@ public abstract class FsManagerTestSuite {
                 if (null == top)
                     top = controller;
             }
-            Iterator<FsController<?>> i = manager.iterator();
+            Iterator<FsController> i = manager.iterator();
             for (final String param : params) {
                 final FsMountPoint mountPoint
                         = FsMountPoint.create(URI.create(param));

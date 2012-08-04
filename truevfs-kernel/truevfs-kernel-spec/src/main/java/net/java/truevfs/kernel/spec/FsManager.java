@@ -17,22 +17,21 @@ import net.java.truecommons.shed.BitField;
  * @see    FsModel
  * @author Christian Schlichtherle
  */
-public interface FsManager extends Iterable<FsController<? extends FsModel>> {
+public interface FsManager extends Iterable<FsController> {
 
     /**
      * Returns a new thread-safe archive file system controller.
      * This is a pure function without side effects.
      *
-     * @param  <E> the type of the archive entries.
      * @param  driver the archive driver.
      * @param  model the file system model.
      * @param  parent the parent file system controller.
      * @return A new archive file system controller.
      */
-    <E extends FsArchiveEntry> FsController<? extends FsModel> newController(
-            FsArchiveDriver<E> driver,
+    FsController newController(
+            FsArchiveDriver<? extends FsArchiveEntry> driver,
             FsModel model,
-            FsController<? extends FsModel> parent);
+            FsController parent);
 
     /**
      * Returns the thread-safe file system controller for the given mount point.
@@ -45,9 +44,7 @@ public interface FsManager extends Iterable<FsController<? extends FsModel>> {
      * @param  mountPoint the mount point of the file system.
      * @return The thread-safe file system controller for the given mount point.
      */
-    FsController<? extends FsModel> controller(
-            FsCompositeDriver driver,
-            FsMountPoint mountPoint);
+    FsController controller(FsCompositeDriver driver, FsMountPoint mountPoint);
 
     /**
      * Returns the number of managed file system controllers.
@@ -66,7 +63,7 @@ public interface FsManager extends Iterable<FsController<? extends FsModel>> {
      * @return An ordered iterator for the managed file system controllers.
      */
     @Override
-    Iterator<FsController<? extends FsModel>> iterator();
+    Iterator<FsController> iterator();
 
     /**
      * Calls {@link FsController#sync(BitField)} on all managed file system

@@ -30,13 +30,13 @@ import net.java.truevfs.kernel.spec.cio.*;
  */
 @Immutable
 final class PaceController
-extends FsDecoratingController<FsModel, FsController<FsModel>> {
+extends FsDecoratingController<FsController> {
 
     private final PaceManagerController manager;
 
     PaceController(
             final PaceManagerController manager,
-            final FsController<FsModel> controller) {
+            final FsController controller) {
         super(controller);
         assert null != manager;
         assert null != controller.getParent();
@@ -48,7 +48,7 @@ extends FsDecoratingController<FsModel, FsController<FsModel>> {
             final BitField<FsAccessOption> options,
             final FsEntryName name)
     throws IOException {
-        final FsController<FsModel> c = this.controller;
+        final FsController c = this.controller;
         manager.retain(c);
         final FsEntry result = c.stat(options, name);
         manager.accessed(c);
@@ -61,7 +61,7 @@ extends FsDecoratingController<FsModel, FsController<FsModel>> {
             final FsEntryName name,
             final BitField<Access> types)
     throws IOException {
-        final FsController<FsModel> c = this.controller;
+        final FsController c = this.controller;
         manager.retain(c);
         c.checkAccess(options, name, types);
         manager.accessed(c);
@@ -69,7 +69,7 @@ extends FsDecoratingController<FsModel, FsController<FsModel>> {
 
     @Override
     public void setReadOnly(FsEntryName name) throws IOException {
-        final FsController<FsModel> c = this.controller;
+        final FsController c = this.controller;
         manager.retain(c);
         c.setReadOnly(name);
         manager.accessed(c);
@@ -81,7 +81,7 @@ extends FsDecoratingController<FsModel, FsController<FsModel>> {
             final FsEntryName name,
             final Map<Access, Long> times)
     throws IOException {
-        final FsController<FsModel> c = this.controller;
+        final FsController c = this.controller;
         manager.retain(c);
         final boolean result = c.setTime(options, name, times);
         manager.accessed(c);
@@ -95,7 +95,7 @@ extends FsDecoratingController<FsModel, FsController<FsModel>> {
             final BitField<Access> types,
             final long value)
     throws IOException {
-        final FsController<FsModel> c = this.controller;
+        final FsController c = this.controller;
         manager.retain(c);
         final boolean result = c.setTime(options, name, types, value);
         manager.accessed(c);
@@ -112,7 +112,7 @@ extends FsDecoratingController<FsModel, FsController<FsModel>> {
 
             @Override
             public Entry target() throws IOException {
-                final FsController<FsModel> c = PaceController.this.controller;
+                final FsController c = PaceController.this.controller;
                 manager.retain(c);
                 final Entry result = socket().target();
                 manager.accessed(c);
@@ -121,7 +121,7 @@ extends FsDecoratingController<FsModel, FsController<FsModel>> {
 
             @Override
             public SeekableByteChannel channel(@CheckForNull OutputSocket<? extends Entry> peer) throws IOException {
-                final FsController<FsModel> c = PaceController.this.controller;
+                final FsController c = PaceController.this.controller;
                 manager.retain(c);
                 final SeekableByteChannel result = socket().channel(peer);
                 manager.accessed(c);
@@ -130,7 +130,7 @@ extends FsDecoratingController<FsModel, FsController<FsModel>> {
 
             @Override
             public InputStream stream(@CheckForNull OutputSocket<? extends Entry> peer) throws IOException {
-                final FsController<FsModel> c = PaceController.this.controller;
+                final FsController c = PaceController.this.controller;
                 manager.retain(c);
                 final InputStream result = socket().stream(peer);
                 manager.accessed(c);
@@ -151,7 +151,7 @@ extends FsDecoratingController<FsModel, FsController<FsModel>> {
 
             @Override
             public Entry target() throws IOException {
-                final FsController<FsModel> c = PaceController.this.controller;
+                final FsController c = PaceController.this.controller;
                 manager.retain(c);
                 final Entry result = socket().target();
                 manager.accessed(c);
@@ -160,7 +160,7 @@ extends FsDecoratingController<FsModel, FsController<FsModel>> {
 
             @Override
             public SeekableByteChannel channel(@CheckForNull InputSocket<? extends Entry> peer) throws IOException {
-                final FsController<FsModel> c = PaceController.this.controller;
+                final FsController c = PaceController.this.controller;
                 manager.retain(c);
                 final SeekableByteChannel result = socket().channel(peer);
                 manager.accessed(c);
@@ -169,7 +169,7 @@ extends FsDecoratingController<FsModel, FsController<FsModel>> {
 
             @Override
             public OutputStream stream(@CheckForNull InputSocket<? extends Entry> peer) throws IOException {
-                final FsController<FsModel> c = PaceController.this.controller;
+                final FsController c = PaceController.this.controller;
                 manager.retain(c);
                 final OutputStream result = socket().stream(peer);
                 manager.accessed(c);
@@ -186,7 +186,7 @@ extends FsDecoratingController<FsModel, FsController<FsModel>> {
             final Type type,
             final Entry template)
     throws IOException {
-        final FsController<FsModel> c = this.controller;
+        final FsController c = this.controller;
         manager.retain(c);
         c.mknod(options, name, type, template);
         manager.accessed(c);
@@ -197,7 +197,7 @@ extends FsDecoratingController<FsModel, FsController<FsModel>> {
             final BitField<FsAccessOption> options,
             final FsEntryName name)
     throws IOException {
-        final FsController<FsModel> c = this.controller;
+        final FsController c = this.controller;
         manager.retain(c);
         c.unlink(options, name);
         manager.accessed(c);

@@ -24,7 +24,6 @@ package object impl {
   private[impl] type AnyOutputSocket = OutputSocket[_ <: Entry]
   private[impl] type AnyIoBuffer = IoBuffer[_ <: IoBuffer[_]]
   private[impl] type AnyIoBufferPool = IoBufferPool[_ <: AnyIoBuffer]
-  private[impl] type AnyController = FsController[_ <: FsModel]
 
   // Used for looping through BitField, Container etc.
   implicit private[impl] def asScalaIterable[E](i: jl.Iterable[E]): Iterable[E] = {
@@ -44,8 +43,4 @@ package object impl {
       output.put(key, Long.box(value))
     output
   }
-
-  private[impl] def asFsController[M <: FsModel]
-  (controller: Controller[M], parent: AnyController) =
-    new ControllerAdapter(controller, parent)
 }

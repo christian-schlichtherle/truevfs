@@ -122,7 +122,7 @@ public class TarGZipDriver extends TarDriver {
     @Override
     protected FsOutputSocketSink sink(
             BitField<FsAccessOption> options,
-            final FsController<?> controller,
+            final FsController controller,
             final FsEntryName name) {
         // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
         // opportunity to apply its own preferences to sort out such a conflict.

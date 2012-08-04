@@ -139,7 +139,7 @@ final class PaceManagerView extends StandardMBean implements PaceManager {
     public int getTopLevelArchiveFileSystemsTotal() {
         int total = 0;
         if (null != controller)
-            for (final FsController<?> c : controller)
+            for (final FsController c : controller)
                 if (isTopLevelArchive(c)) total++;
         return total;
     }
@@ -148,14 +148,14 @@ final class PaceManagerView extends StandardMBean implements PaceManager {
     public int getTopLevelArchiveFileSystemsMounted() {
         int mounted = 0;
         if (null != controller)
-            for (final FsController<?> c : controller)
+            for (final FsController c : controller)
                 if (isTopLevelArchive(c))
                     if (c.getModel().isMounted()) mounted++;
         return mounted;
     }
 
-    private boolean isTopLevelArchive(final FsController<?> c) {
-        final FsController<?> parent = c.getParent();
+    private boolean isTopLevelArchive(final FsController c) {
+        final FsController parent = c.getParent();
         return null != parent && null == parent.getParent();
     }
 }

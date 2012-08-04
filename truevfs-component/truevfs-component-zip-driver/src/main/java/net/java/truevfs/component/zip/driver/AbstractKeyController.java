@@ -23,15 +23,12 @@ import net.java.truevfs.keymanager.spec.KeyManagerContainer;
  * This file system controller decorates another file system controller in
  * order to manage the keys required for accessing encrypted ZIP files.
  * 
- * @param  <M> the type of the file system model.
  * @param  <D> the type of the ZIP driver.
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class AbstractKeyController<
-        M extends FsModel,
-        D extends AbstractZipDriver<?>>
-extends FsDecoratingController<M, FsController<M>> {
+public abstract class AbstractKeyController<D extends AbstractZipDriver<?>>
+extends FsDecoratingController<FsController> {
 
     private static final String ROOT_PATH = ROOT.getPath();
 
@@ -46,7 +43,7 @@ extends FsDecoratingController<M, FsController<M>> {
      * @param driver the ZIP driver.
      */
     protected AbstractKeyController(
-            final FsController<M> controller,
+            final FsController controller,
             final D driver) {
         super(controller);
         this.driver = Objects.requireNonNull(driver);

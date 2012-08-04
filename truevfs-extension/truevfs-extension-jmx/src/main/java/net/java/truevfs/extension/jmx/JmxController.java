@@ -6,15 +6,13 @@ package net.java.truevfs.extension.jmx;
 
 import net.java.truevfs.component.instrumentation.InstrumentingController;
 import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsModel;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
-abstract class JmxController<M extends FsModel>
-extends InstrumentingController<JmxDirector, M> {
+abstract class JmxController extends InstrumentingController<JmxDirector> {
 
-    JmxController(JmxDirector director, FsController<M> controller) {
+    JmxController(JmxDirector director, FsController controller) {
         super(director, controller);
     }
 

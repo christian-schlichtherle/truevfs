@@ -38,7 +38,7 @@ import ArchiveFileSystem._
 private class TargetArchiveController[E <: FsArchiveEntry](
   driver: FsArchiveDriver[E],
   model: LockModel,
-  _parent: FsController[_ <: FsModel])
+  _parent: FsController)
 extends FileSystemArchiveController[E](model) with TouchListener {
   import TargetArchiveController._
 

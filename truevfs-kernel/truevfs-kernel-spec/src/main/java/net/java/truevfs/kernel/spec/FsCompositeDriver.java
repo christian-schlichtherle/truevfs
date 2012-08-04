@@ -41,9 +41,9 @@ public interface FsCompositeDriver {
      *         is known for the scheme of the given mount point.
      * @see    FsDriver#newController
      */
-    FsController<? extends FsModel> newController(
+    FsController newController(
             FsManager manager,
             FsModel model,
-            @CheckForNull FsController<? extends FsModel> parent)
+            @CheckForNull FsController parent)
     throws ServiceConfigurationError;
 }

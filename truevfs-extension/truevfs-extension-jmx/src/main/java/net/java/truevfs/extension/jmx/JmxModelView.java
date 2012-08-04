@@ -4,19 +4,12 @@
  */
 package net.java.truevfs.extension.jmx;
 
-import net.java.truevfs.kernel.spec.FsSimpleCompositeDriver;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsFilteringManager;
-import net.java.truevfs.kernel.spec.FsSyncOptions;
-import net.java.truevfs.kernel.spec.FsCompositeDriver;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsEntryName;
-import net.java.truevfs.kernel.spec.FsSyncException;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Date;
 import javax.management.*;
 import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
+import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
@@ -192,10 +185,10 @@ implements JmxModelViewMXBean {
         return parent.getMountPoint().toString();
     }
 
-    private volatile FsController<?> parentController;
+    private volatile FsController parentController;
 
-    private FsController<?> getParentController() {
-        final FsController<?> parentController = this.parentController;
+    private FsController getParentController() {
+        final FsController parentController = this.parentController;
         return null != parentController
                 ? parentController
                 : (this.parentController = FsManagerLocator.SINGLETON.get()

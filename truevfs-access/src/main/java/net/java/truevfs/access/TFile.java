@@ -4,14 +4,6 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truevfs.kernel.spec.FsEntryName;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsPath;
-import net.java.truevfs.kernel.spec.FsEntry;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsScheme;
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truecommons.io.Streams;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -25,10 +17,16 @@ import javax.annotation.WillClose;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 import javax.swing.filechooser.FileSystemView;
+import net.java.truecommons.io.Streams;
+import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.PathSplitter;
+import net.java.truecommons.shed.Paths;
+import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
 import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
 import static net.java.truevfs.kernel.spec.FsEntryName.ROOT;
 import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
+import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
@@ -36,10 +34,6 @@ import net.java.truevfs.kernel.spec.cio.Entry.Size;
 import static net.java.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
 import static net.java.truevfs.kernel.spec.cio.Entry.Type.FILE;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.java.truecommons.shed.BitField;
-import net.java.truecommons.shed.PathSplitter;
-import net.java.truecommons.shed.Paths;
-import net.java.truecommons.shed.UriBuilder;
 
 /**
  * A replacement for the class {@link File} which provides transparent
@@ -399,7 +393,7 @@ public final class TFile extends File {
      * @see #readObject
      */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
-    private transient volatile @CheckForNull FsController<?> controller;
+    private transient volatile @CheckForNull FsController controller;
 
     /**
      * Copy constructor.
@@ -1311,8 +1305,8 @@ public final class TFile extends File {
      * @return A file system controller if and only if the path denotes an
      *         archive file, or {@code null} otherwise.
      */
-    @Nullable FsController<?> getController() {
-        final FsController<?> controller = this.controller;
+    @Nullable FsController getController() {
+        final FsController controller = this.controller;
         if (this != innerArchive || null != controller)
             return controller;
         final File file = this.file;
@@ -1342,7 +1336,7 @@ public final class TFile extends File {
     }
 
     @SuppressWarnings("deprecation")
-    private FsController<?> getController(FsMountPoint mountPoint) {
+    private FsController getController(FsMountPoint mountPoint) {
         return TConfig.get().getManager().controller(detector, mountPoint);
     }
 
@@ -1656,7 +1650,7 @@ public final class TFile extends File {
     private @Nullable FsScheme getScheme() {
         if (this != innerArchive)
             return null;
-        final FsController<?> controller = this.controller;
+        final FsController controller = this.controller;
         if (null != controller)
             return controller.getModel().getMountPoint().getScheme();
         return detector.scheme(file.getPath());
@@ -2172,7 +2166,7 @@ public final class TFile extends File {
     @Override
     public boolean createNewFile() throws IOException {
         if (null != innerArchive) {
-            final FsController<?> controller = innerArchive.getController();
+            final FsController controller = innerArchive.getController();
             final FsEntryName entryName = getInnerFsEntryName();
             // This is not really atomic, but should be OK in this case.
             if (null != controller.stat(getAccessPreferences(), entryName))
@@ -2251,7 +2245,7 @@ public final class TFile extends File {
                 if (null != parent && !parent.exists())
                     parent.mkdir(recursive);
             }
-            final FsController<?> controller = innerArchive.getController();
+            final FsController controller = innerArchive.getController();
             final FsEntryName innerEntryName = getInnerFsEntryName();
             try {
                 controller.mknod(

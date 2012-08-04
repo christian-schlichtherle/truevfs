@@ -57,8 +57,9 @@ import net.java.truevfs.kernel.spec.cio.Entry._;
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private final class FalsePositiveArchiveController(c: FsController[FsModel])
-extends FsDecoratingController[FsModel, FsController[FsModel]](c) {
+private final class FalsePositiveArchiveController(
+  c: FsController
+) extends FsDecoratingController[FsController](c) {
 
   @volatile private[this] var state: State = TryChild
 
@@ -83,10 +84,10 @@ extends FsDecoratingController[FsModel, FsController[FsModel]](c) {
 
   override def input(options: AccessOptions, name: FsEntryName) = {
     final class Input extends AbstractInputSocket[Entry] {
-      var _last: FsController[_] = _
+      var _last: FsController = _
       var _socket: AnyInputSocket = _
 
-      def socket(c: FsController[_], n: FsEntryName) = {
+      def socket(c: FsController, n: FsEntryName) = {
         if (_last ne c) { _last = c; _socket = c.input(options, n) }
         _socket
       }
@@ -104,10 +105,10 @@ extends FsDecoratingController[FsModel, FsController[FsModel]](c) {
 
   override def output(options: AccessOptions, name: FsEntryName, template: Entry) = {
     final class Output extends AbstractOutputSocket[Entry] {
-      var _last: FsController[_] = _
+      var _last: FsController = _
       var _socket: AnyOutputSocket = _
 
-      def socket(c: FsController[_], n: FsEntryName) = {
+      def socket(c: FsController, n: FsEntryName) = {
         if (_last ne c) { _last = c; _socket = c.output(options, n, template) }
         _socket
       }
@@ -183,7 +184,7 @@ extends FsDecoratingController[FsModel, FsController[FsModel]](c) {
 
   private def parent(name: FsEntryName) = path.resolve(name).getEntryName
 
-  private type Operation[V] = (FsController[_ <: FsModel], FsEntryName) => V
+  private type Operation[V] = (FsController, FsEntryName) => V
 
   private sealed trait State {
     def apply[V](name: FsEntryName, operation: Operation[V]): V

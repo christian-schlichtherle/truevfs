@@ -28,16 +28,17 @@ import net.java.truevfs.kernel.spec.io.ThrowingSeekableChannel;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class MockController extends FsAbstractController<FsModel> {
+public class MockController
+extends FsAbstractController {
 
-    private final @Nullable FsController<?> parent;
+    private final @Nullable FsController parent;
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final ConcurrentMap<FsEntryName, IoEntry<?>>
             map = new ConcurrentHashMap<>();
     private final TestConfig config;
     private volatile @CheckForNull ThrowManager control;
 
-    public MockController(FsModel model, @CheckForNull FsController<?> parent) {
+    public MockController(FsModel model, @CheckForNull FsController parent) {
         this(model, parent, null);
     }
 
@@ -49,7 +50,7 @@ public class MockController extends FsAbstractController<FsModel> {
      * @param config The mocking configuration.
      */
     public MockController(  final FsModel model,
-                            final @CheckForNull FsController<?> parent,
+                            final @CheckForNull FsController parent,
                             final @CheckForNull TestConfig config) {
         super(model);
         assert null == model.getParent()
@@ -75,7 +76,7 @@ public class MockController extends FsAbstractController<FsModel> {
     }
 
     @Override
-    public FsController<?> getParent() {
+    public FsController getParent() {
         checkUndeclaredExceptions(this);
         return parent;
     }

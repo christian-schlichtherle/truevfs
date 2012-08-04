@@ -87,20 +87,19 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  * <p>
  * Implementations should be thread-safe.
  * 
- * @param  <M> the type of the file system model.
  * @see    FsManager
  * @see    FsModel
  * @see    <a href="http://www.ietf.org/rfc/rfc2119.txt">RFC 2119: Key words for use in RFCs to Indicate Requirement Levels</a>
  * @author Christian Schlichtherle
  */
-public interface FsController<M extends FsModel> {
+public interface FsController {
 
     /**
      * Returns the file system model.
      * 
      * @return The file system model.
      */
-    M getModel();
+    FsModel getModel();
 
     /**
      * Returns the controller for the parent file system or {@code null} if
@@ -110,7 +109,7 @@ public interface FsController<M extends FsModel> {
      * 
      * @return The nullable controller for the parent file system.
      */
-    @Nullable FsController<? extends FsModel> getParent();
+    @Nullable FsController getParent();
 
     /**
      * Returns the file system entry for the given {@code name} or {@code null}
