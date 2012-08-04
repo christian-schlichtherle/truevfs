@@ -7,14 +7,16 @@ package net.java.truevfs.component.instrumentation;
 import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.BitField;
-import net.java.truevfs.kernel.spec.*;
+import net.java.truevfs.kernel.spec.FsAccessOption;
+import net.java.truevfs.kernel.spec.FsController;
+import net.java.truevfs.kernel.spec.FsDecoratingController;
+import net.java.truevfs.kernel.spec.FsEntryName;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
 
 /**
  * @param  <D> the type of the instrumenting director.
- * @param  <M> the type of the instrumented file system model.
  * @author Christian Schlichtherle
  */
 @Immutable

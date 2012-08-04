@@ -16,13 +16,10 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  * @author Christian Schlichtherle
  */
 public class InstrumentingIoBuffer<D extends InstrumentingDirector<D>>
-extends DecoratingEntry<IoBuffer>
-implements IoBuffer {
+extends DecoratingEntry<IoBuffer> implements IoBuffer {
     protected final D director;
 
-    public InstrumentingIoBuffer(
-            final D director,
-            final IoBuffer buffer) {
+    public InstrumentingIoBuffer(final D director, final IoBuffer buffer) {
         super(buffer);
         this.director = Objects.requireNonNull(director);
     }
