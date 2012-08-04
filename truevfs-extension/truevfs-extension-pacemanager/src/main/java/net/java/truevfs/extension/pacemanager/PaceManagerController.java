@@ -14,7 +14,7 @@ import net.java.truevfs.kernel.spec.*;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class PaceManagerController extends FsDecoratingManager<FsManager> {
+final class PaceManagerController extends FsDecoratingManager {
 
     private final PaceManagerModel model;
 

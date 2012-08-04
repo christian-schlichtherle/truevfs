@@ -14,7 +14,7 @@ import net.java.truevfs.kernel.spec.*;
  */
 @Immutable
 public class InstrumentingManager<D extends InstrumentingDirector<D>>
-extends FsDecoratingManager<FsManager> {
+extends FsDecoratingManager {
     protected final D director;
 
     public InstrumentingManager(

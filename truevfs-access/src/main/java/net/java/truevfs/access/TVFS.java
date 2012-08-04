@@ -258,6 +258,6 @@ public final class TVFS {
     @SuppressWarnings("deprecation")
     public static void sync(FsMountPoint tree, BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        new FsFilteringManager(TConfig.get().getManager(), tree).sync(options);
+        new FsFilteringManager(tree, TConfig.get().getManager()).sync(options);
     }
 }

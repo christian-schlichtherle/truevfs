@@ -18,7 +18,7 @@ import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class FsFilteringManager extends FsDecoratingManager<FsManager> {
+public final class FsFilteringManager extends FsDecoratingManager {
 
     private final URI prefix;
 
@@ -31,8 +31,8 @@ public final class FsFilteringManager extends FsDecoratingManager<FsManager> {
      *        file systems of the decorated file system manager.
      */
     public FsFilteringManager(
-            final FsManager manager,
-            final FsMountPoint prefix) {
+            final FsMountPoint prefix,
+            final FsManager manager) {
         super(manager);
         this.prefix = prefix.toHierarchicalUri();
     }
@@ -40,8 +40,7 @@ public final class FsFilteringManager extends FsDecoratingManager<FsManager> {
     @Override
     public int size() {
         int size = 0;
-        for (FsController controller : this)
-            size++;
+        for (FsController controller : this) size++;
         return size;
     }
 
