@@ -80,9 +80,6 @@ class FileEntry extends FsEntry implements IoBuffer {
         return null != path ? path.toString() : "";
     }
 
-    /**
-     * @throws UnsupportedOperationException always
-     */
     @Override
     public void release() throws IOException {
     }

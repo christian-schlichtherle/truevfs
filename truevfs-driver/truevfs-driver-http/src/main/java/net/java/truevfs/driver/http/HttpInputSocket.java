@@ -25,8 +25,9 @@ public class HttpInputSocket extends AbstractInputSocket<HttpEntry> {
 
     private final HttpEntry entry;
 
-    HttpInputSocket(final HttpEntry                entry, 
-                    final BitField<FsAccessOption> options) {
+    HttpInputSocket(
+            final BitField<FsAccessOption> options,
+            final HttpEntry entry) {
         assert null != entry;
         assert null != options;
         this.entry = entry;
@@ -46,23 +47,23 @@ public class HttpInputSocket extends AbstractInputSocket<HttpEntry> {
     @Override
     public SeekableByteChannel channel(final OutputSocket<? extends Entry> peer)
     throws IOException {
-        final IoBuffer temp = entry.getPool().allocate();
+        final IoBuffer buffer = entry.getPool().allocate();
         try {
-            IoSockets.copy(entry.input(), temp.output());
+            IoSockets.copy(entry.input(), buffer.output());
         } catch (final Throwable ex) {
             try {
-                temp.release();
+                buffer.release();
             } catch (final Throwable ex2) {
                 ex.addSuppressed(ex2);
             }
             throw ex;
         }
-        final class TempReadOnlyChannel extends ReadOnlyChannel {
+        final class BufferReadOnlyChannel extends ReadOnlyChannel {
             boolean closed;
 
             @CreatesObligation
-            TempReadOnlyChannel() throws IOException {
-                super(temp.input().channel(peer)); // or .channel(null)
+            BufferReadOnlyChannel() throws IOException {
+                super(buffer.input().channel(peer)); // or .channel(null)
             }
 
             @Override
@@ -70,10 +71,10 @@ public class HttpInputSocket extends AbstractInputSocket<HttpEntry> {
                 if (!closed) {
                     channel.close();
                     closed = true;
-                    temp.release();
+                    buffer.release();
                 }
             }
         }
-        return new TempReadOnlyChannel();
+        return new BufferReadOnlyChannel();
     }
 }
