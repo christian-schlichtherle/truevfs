@@ -27,7 +27,7 @@ import net.java.truevfs.kernel.spec.cio._
 @NotThreadSafe
 private class DisconnectingOutputService[E <: Entry]
 (@WillCloseWhenClosed output: OutputService[E])
-extends DecoratingOutputService[E, OutputService[E]](output)
+extends DecoratingOutputService[E](output)
 with CheckedCloseable {
 
   override def size = checked(container.size)
