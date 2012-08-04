@@ -17,7 +17,7 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-final class FileIoBuffer extends FileEntry implements IoBuffer<FileEntry> {
+final class FileIoBuffer extends FileEntry implements IoBuffer {
 
     FileIoBuffer(Path file, final FileIoBufferPool pool) {
         super(file);

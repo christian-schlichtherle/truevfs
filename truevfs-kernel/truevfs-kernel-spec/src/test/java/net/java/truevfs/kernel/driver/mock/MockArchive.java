@@ -60,7 +60,7 @@ implements Container<MockArchiveDriverEntry> {
         getThrowControl().check(this, Error.class);
     }
 
-    public IoBufferPool<? extends IoBuffer<?>> getIoBufferPool() {
+    public IoBufferPool getPool() {
         return config.getPool();
     }
 
@@ -97,8 +97,7 @@ implements Container<MockArchiveDriverEntry> {
     }
 
     private static final class MockInputService
-    extends MockArchive
-    implements InputService<MockArchiveDriverEntry> {
+    extends MockArchive implements InputService<MockArchiveDriverEntry> {
 
         MockInputService(
                 Map<String, MockArchiveDriverEntry> entries,
@@ -110,7 +109,8 @@ implements Container<MockArchiveDriverEntry> {
         public InputSocket<MockArchiveDriverEntry> input(final String name) {
             Objects.requireNonNull(name);
 
-            final class Input extends AbstractInputSocket<MockArchiveDriverEntry> {
+            final class Input
+            extends AbstractInputSocket<MockArchiveDriverEntry> {
                 @Override
                 public MockArchiveDriverEntry target()
                 throws IOException {
@@ -123,18 +123,17 @@ implements Container<MockArchiveDriverEntry> {
                 @Override
                 public InputStream stream(OutputSocket<? extends Entry> peer)
                 throws IOException {
-                    return getBufferInputSocket().stream(peer);
+                    return socket().stream(peer);
                 }
 
                 @Override
                 public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
                 throws IOException {
-                    return getBufferInputSocket().channel(peer);
+                    return socket().channel(peer);
                 }
 
-                InputSocket<? extends IoBuffer<?>>
-                getBufferInputSocket() throws IOException {
-                    return target().getBuffer(getIoBufferPool()).input();
+                InputSocket<? extends IoBuffer> socket() throws IOException {
+                    return target().getBuffer(getPool()).input();
                 }
             } // Input
 
@@ -147,8 +146,7 @@ implements Container<MockArchiveDriverEntry> {
     } // MockInputService
 
     private static final class MockOutputService
-    extends MockArchive
-    implements OutputService<MockArchiveDriverEntry> {
+    extends MockArchive implements OutputService<MockArchiveDriverEntry> {
         boolean busy;
 
         MockOutputService(
@@ -162,7 +160,8 @@ implements Container<MockArchiveDriverEntry> {
                 final MockArchiveDriverEntry entry) {
             Objects.requireNonNull(entry);
 
-            final class Output extends AbstractOutputSocket<MockArchiveDriverEntry> {
+            final class Output
+            extends AbstractOutputSocket<MockArchiveDriverEntry> {
                 @Override
                 public MockArchiveDriverEntry target() {
                     return entry;
@@ -176,7 +175,7 @@ implements Container<MockArchiveDriverEntry> {
 
                         Stream() throws IOException {
                             if (busy) throw new IOException("Busy!");
-                            this.out = getBufferOutputSocket().stream(peer);
+                            this.out = socket().stream(peer);
                             busy = true;
                         }
 
@@ -196,20 +195,19 @@ implements Container<MockArchiveDriverEntry> {
 
                 /*@Override
                 public SeekableByteChannel channel() throws IOException {
-                    return getBufferOutputSocket().channel();
+                    return socket().channel();
                 }*/
 
-                OutputSocket<? extends IoBuffer<?>>
-                getBufferOutputSocket() throws IOException {
+                OutputSocket<? extends IoBuffer> socket() throws IOException {
                     entries.put(entry.getName(), entry);
-                    return target().getBuffer(getIoBufferPool()).output();
+                    return target().getBuffer(getPool()).output();
                 }
 
                 void copyProperties() {
                     final MockArchiveDriverEntry target = target();
-                    final IoBuffer<?> buffer;
+                    final IoBuffer buffer;
                     try {
-                        buffer = target.getBuffer(getIoBufferPool());
+                        buffer = target.getBuffer(getPool());
                     } catch (final IOException ex) {
                         throw new AssertionError(ex);
                     }

@@ -54,7 +54,7 @@ public class OdfDriver extends JarDriver {
     throws IOException {
         final ZipInputService<JarDriverEntry> zis = (ZipInputService<JarDriverEntry>) input;
         final ZipOutputService<JarDriverEntry> zos = new ZipOutputService<>(model, sink, zis, this);
-        final IoBufferPool<?> pool = getPool();
+        final IoBufferPool pool = getPool();
         return null != zis && sink.getOptions().get(GROW)
                 ? new MultiplexingOutputService<>(pool, zos)
                 : new OdfOutputService(pool, zos);

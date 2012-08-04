@@ -22,8 +22,6 @@ package object impl {
   private[impl] type AnyIoSocket = IoSocket[_ <: Entry]
   private[impl] type AnyInputSocket = InputSocket[_ <: Entry]
   private[impl] type AnyOutputSocket = OutputSocket[_ <: Entry]
-  private[impl] type AnyIoBuffer = IoBuffer[_ <: IoBuffer[_]]
-  private[impl] type AnyIoBufferPool = IoBufferPool[_ <: AnyIoBuffer]
 
   // Used for looping through BitField, Container etc.
   implicit private[impl] def asScalaIterable[E](i: jl.Iterable[E]): Iterable[E] = {

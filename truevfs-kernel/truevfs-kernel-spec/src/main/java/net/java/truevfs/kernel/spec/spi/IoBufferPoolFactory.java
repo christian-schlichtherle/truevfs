@@ -6,7 +6,6 @@ package net.java.truevfs.kernel.spec.spi;
 
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.services.FactoryService;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
 import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 
@@ -24,5 +23,5 @@ import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
  */
 @ThreadSafe
 public abstract class IoBufferPoolFactory
-extends FactoryService<IoBufferPool<? extends IoBuffer<?>>> {
+extends FactoryService<IoBufferPool> {
 }

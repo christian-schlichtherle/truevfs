@@ -42,7 +42,7 @@ public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
         data = DATA.clone();
         final TestConfig config = TestConfig.push();
         config.setDataSize(data.length * 4 / 3); // account for archive type specific overhead
-        config.setIoBufferPool(null); // reset
+        config.setPool(null); // reset
     }
 
     @After

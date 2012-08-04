@@ -23,7 +23,7 @@ public final class CheckedOdfPathIT extends TPathITSuite<CheckedOdfDriver> {
     protected CheckedOdfDriver newArchiveDriver() {
         return new CheckedOdfDriver() {
             @Override
-            public IoBufferPool<?> getPool() {
+            public IoBufferPool getPool() {
                 return TestConfig.get().getPool();
             }
         };

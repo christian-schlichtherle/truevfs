@@ -16,10 +16,8 @@ import net.java.truecommons.shed.Pool;
  * Implementations must be thread-safe.
  * However, this does not necessarily apply to its managed I/O buffers.
  *
- * @param  <B> the type of the I/O buffers managed by this pool.
  * @author Christian Schlichtherle
  */
 @SuppressWarnings("MarkerInterface")
-public interface IoBufferPool<B extends IoBuffer<B>>
-extends Pool<IoBuffer<B>, IOException> {
+public interface IoBufferPool extends Pool<IoBuffer, IOException> {
 }

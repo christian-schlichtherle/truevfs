@@ -42,7 +42,7 @@ import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 public class MultiplexingOutputService<E extends MutableEntry>
 extends DecoratingOutputService<E> {
 
-    private final IoBufferPool<?> pool;
+    private final IoBufferPool pool;
 
     /**
      * The map of temporary archive entries which have not yet been written
@@ -61,7 +61,7 @@ extends DecoratingOutputService<E> {
      * @param pool the pool for buffering entry data.
      */
     public MultiplexingOutputService(
-            final IoBufferPool<? extends IoBuffer<?>> pool,
+            final IoBufferPool pool,
             final @WillCloseWhenClosed OutputService<E> output) {
         super(output);
         this.pool = Objects.requireNonNull(pool);
@@ -211,7 +211,7 @@ extends DecoratingOutputService<E> {
     extends DecoratingOutputStream {
         final InputSocket<?> input;
         final OutputSocket<? extends E> output;
-        final IoBuffer<?> buffer;
+        final IoBuffer buffer;
         boolean closed;
 
         @CreatesObligation
@@ -223,7 +223,7 @@ extends DecoratingOutputService<E> {
             // HC SVNT DRACONES!
             final E local = (this.output = output).target();
             final Entry _peer = null != input ? input.target() : null;
-            final IoBuffer<?> buffer = this.buffer = pool.allocate();
+            final IoBuffer buffer = this.buffer = pool.allocate();
             final Entry peer = null != _peer ? _peer : buffer;
             final class InputProxy extends DecoratingInputSocket<Entry> {
                 InputProxy() { super(buffer.input()); }

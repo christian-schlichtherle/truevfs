@@ -23,7 +23,7 @@ public final class JarPathIT extends TPathITSuite<JarDriver> {
     protected JarDriver newArchiveDriver() {
         return new JarDriver() {
             @Override
-            public IoBufferPool<?> getPool() {
+            public IoBufferPool getPool() {
                 return TestConfig.get().getPool();
             }
         };

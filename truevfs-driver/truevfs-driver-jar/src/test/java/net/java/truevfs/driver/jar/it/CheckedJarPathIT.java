@@ -24,7 +24,7 @@ public final class CheckedJarPathIT extends TPathITSuite<JarDriver> {
     protected JarDriver newArchiveDriver() {
         return new CheckedJarDriver() {
             @Override
-            public IoBufferPool<?> getPool() {
+            public IoBufferPool getPool() {
                 return TestConfig.get().getPool();
             }
         };

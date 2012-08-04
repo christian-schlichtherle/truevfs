@@ -68,7 +68,7 @@ extends FsArchiveDriverTestBase<D> {
         // Order is important here!
         final TestConfig config = TestConfig.get();
         config.setDataSize(getMaxArchiveLength());
-        config.setIoBufferPool(null); // reset
+        config.setPool(null); // reset
         model = newArchiveModel();
         parent = newParentController(model.getParent());
         assert !UTF8.equals(getArchiveDriver().getCharset())
@@ -114,8 +114,8 @@ extends FsArchiveDriverTestBase<D> {
 
     @Test
     public void testIoPoolShouldBeConstant() {
-        final IoBufferPool<?> p1 = getArchiveDriver().getPool();
-        final IoBufferPool<?> p2 = getArchiveDriver().getPool();
+        final IoBufferPool p1 = getArchiveDriver().getPool();
+        final IoBufferPool p2 = getArchiveDriver().getPool();
         if (p1 != p2)
             logger.warn("{} returns different I/O buffer pools upon multiple invocations of getPool()!", getArchiveDriver().getClass());
     }

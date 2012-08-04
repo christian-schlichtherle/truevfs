@@ -36,7 +36,7 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  * @author Christian Schlichtherle
  */
 @Immutable
-class FileEntry extends FsEntry implements IoBuffer<FileEntry> {
+class FileEntry extends FsEntry implements IoBuffer {
 
     private static final Path CURRENT_DIRECTORY = Paths.get(".");
 

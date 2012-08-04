@@ -5,7 +5,6 @@
 package net.java.truevfs.extension.jmx;
 
 import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
 import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.spi.IoBufferPoolDecorator;
 
@@ -15,7 +14,7 @@ import net.java.truevfs.kernel.spec.spi.IoBufferPoolDecorator;
 @Immutable
 public final class JmxIoBufferPoolDecorator extends IoBufferPoolDecorator {
     @Override
-    public IoBufferPool<? extends IoBuffer<?>> apply(IoBufferPool<? extends IoBuffer<?>> pool) {
+    public IoBufferPool apply(IoBufferPool pool) {
         return JmxDirector.SINGLETON.instrument(pool);
     }
 

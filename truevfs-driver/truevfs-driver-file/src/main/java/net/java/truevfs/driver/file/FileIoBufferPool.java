@@ -11,8 +11,7 @@ import java.nio.file.Paths;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
+import net.java.truevfs.kernel.spec.cio.AbstractIoBufferPool;
 
 /**
  * This I/O pool creates and deletes temporary files as {@link FileEntry}s.
@@ -20,7 +19,7 @@ import net.java.truevfs.kernel.spec.cio.IoBufferPool;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class FileIoBufferPool implements IoBufferPool<FileEntry> {
+final class FileIoBufferPool extends AbstractIoBufferPool {
 
     private static final Path TEMP_DIR
             = Paths.get(System.getProperty("java.io.tmpdir"));
@@ -48,10 +47,5 @@ final class FileIoBufferPool implements IoBufferPool<FileEntry> {
     @Override
     public FileEntry allocate() throws IOException {
         return new FileIoBuffer(createTempFile(dir, name, null), this);
-    }
-
-    @Override
-    public void release(IoBuffer<FileEntry> resource) throws IOException {
-        resource.release();
     }
 }

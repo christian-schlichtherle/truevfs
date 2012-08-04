@@ -4,16 +4,6 @@
  */
 package net.java.truevfs.kernel.spec.cio;
 
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.AbstractOutputSocket;
-import net.java.truevfs.kernel.spec.cio.AbstractInputSocket;
-import net.java.truecommons.io.ByteBufferChannel;
-import net.java.truecommons.io.DisconnectingInputStream;
-import net.java.truecommons.io.DisconnectingOutputStream;
-import net.java.truecommons.io.DisconnectingSeekableChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -24,6 +14,10 @@ import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.io.ByteBufferChannel;
+import net.java.truecommons.io.DisconnectingInputStream;
+import net.java.truecommons.io.DisconnectingOutputStream;
+import net.java.truecommons.io.DisconnectingSeekableChannel;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.READ;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.WRITE;
@@ -46,7 +40,7 @@ import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class ByteArrayIoBuffer implements IoBuffer<ByteArrayIoBuffer> {
+public class ByteArrayIoBuffer implements IoBuffer {
 
     private final String name;
     private int initialCapacity;
