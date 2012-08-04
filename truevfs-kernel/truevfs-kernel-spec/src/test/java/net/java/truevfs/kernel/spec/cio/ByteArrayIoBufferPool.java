@@ -37,7 +37,7 @@ public final class ByteArrayIoBufferPool implements IoBufferPool<ByteArrayIoBuff
 
     @Override
     public IoBuffer<ByteArrayIoBuffer> allocate() {
-        final ByteBuffer buffer = new ByteBuffer(total.getAndIncrement());
+        final ByteIoBuffer buffer = new ByteIoBuffer(total.getAndIncrement());
         active.getAndIncrement();
         return buffer;
     }
@@ -59,10 +59,10 @@ public final class ByteArrayIoBufferPool implements IoBufferPool<ByteArrayIoBuff
     }
 
     @NotThreadSafe
-    private final class ByteBuffer extends ByteArrayIoBuffer {
+    private final class ByteIoBuffer extends ByteArrayIoBuffer {
         private boolean released;
 
-        ByteBuffer(int i) {
+        ByteIoBuffer(int i) {
             super(BUFFER_NAME + i, ByteArrayIoBufferPool.this.initialCapacity);
         }
 

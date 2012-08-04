@@ -18,6 +18,7 @@ import java.util.Set;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import net.java.truevfs.kernel.spec.FsAccessOptions;
 import net.java.truevfs.kernel.spec.FsEntry;
@@ -28,7 +29,6 @@ import static net.java.truevfs.kernel.spec.cio.Entry.PosixEntity.*;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
 import net.java.truevfs.kernel.spec.cio.IoBuffer;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truecommons.shed.BitField;
 
 /**
  * Adapts a {@link Path} instance to a {@link FsEntry}.
@@ -44,7 +44,7 @@ class FileEntry extends FsEntry implements IoBuffer<FileEntry> {
     private final String name;
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
-    volatile @CheckForNull TempFilePool pool;
+    volatile @CheckForNull FileIoBufferPool pool;
 
     FileEntry(final Path path) {
         assert null != path;
@@ -63,9 +63,9 @@ class FileEntry extends FsEntry implements IoBuffer<FileEntry> {
     }
 
     final FileEntry createTempFile() throws IOException {
-        TempFilePool pool = this.pool;
+        FileIoBufferPool pool = this.pool;
         if (null == pool)
-            this.pool = pool = new TempFilePool(getParent(), getFileName());
+            this.pool = pool = new FileIoBufferPool(getParent(), getFileName());
         return pool.allocate();
     }
 

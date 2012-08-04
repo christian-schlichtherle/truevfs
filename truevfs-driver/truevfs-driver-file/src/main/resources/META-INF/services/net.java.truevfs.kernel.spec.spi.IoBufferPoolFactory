@@ -1,1 +1,1 @@
-net.java.truevfs.driver.file.TempFilePoolFactory
+net.java.truevfs.driver.file.FileIoBufferPoolFactory
