@@ -21,7 +21,7 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  */
 @Immutable
 public class InstrumentingController<D extends InstrumentingDirector<D>>
-extends FsDecoratingController<FsController> {
+extends FsDecoratingController {
     protected final D director;
 
     public InstrumentingController(

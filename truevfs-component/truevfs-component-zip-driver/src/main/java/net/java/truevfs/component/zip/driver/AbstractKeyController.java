@@ -28,7 +28,7 @@ import net.java.truevfs.keymanager.spec.KeyManagerContainer;
  */
 @Immutable
 public abstract class AbstractKeyController<D extends AbstractZipDriver<?>>
-extends FsDecoratingController<FsController> {
+extends FsDecoratingController {
 
     private static final String ROOT_PATH = ROOT.getPath();
 
