@@ -16,8 +16,7 @@ import javax.annotation.WillCloseWhenClosed;
  * @author Christian Schlichtherle
  */
 public abstract class DecoratingOutputService<E extends Entry>
-extends DecoratingContainer<E, OutputService<E>>
-implements OutputService<E> {
+extends DecoratingContainer<E, OutputService<E>> implements OutputService<E> {
 
     protected DecoratingOutputService() { }
 
