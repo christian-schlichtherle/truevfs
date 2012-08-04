@@ -4,17 +4,12 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truevfs.kernel.spec.FsSyncWarningException;
-import net.java.truevfs.kernel.spec.FsFilteringManager;
-import net.java.truevfs.kernel.spec.FsSyncOption;
-import net.java.truevfs.kernel.spec.FsSyncException;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsSyncOptions;
 import java.net.URI;
 import java.net.URISyntaxException;
-import static net.java.truevfs.kernel.spec.FsSyncOptions.UMOUNT;
-import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 import net.java.truecommons.shed.BitField;
+import static net.java.truevfs.kernel.spec.FsSyncOptions.UMOUNT;
+import net.java.truevfs.kernel.spec.*;
+import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 
 /**
  * Static utility methods for virtual file system operations with global scope.
@@ -263,7 +258,6 @@ public final class TVFS {
     @SuppressWarnings("deprecation")
     public static void sync(FsMountPoint tree, BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        new FsFilteringManager(TConfig.get().getManager(), tree)
-                .sync(options);
+        new FsFilteringManager(TConfig.get().getManager(), tree).sync(options);
     }
 }
