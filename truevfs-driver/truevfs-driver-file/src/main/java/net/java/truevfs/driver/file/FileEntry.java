@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truevfs.kernel.spec.FsAccessOptions;
+import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
 import net.java.truevfs.kernel.spec.FsEntry;
 import net.java.truevfs.kernel.spec.FsEntryName;
 import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
@@ -221,12 +221,16 @@ class FileEntry extends FsEntry implements IoBuffer {
 
     @Override
     public final InputSocket<FileEntry> input() {
-        return new FileInputSocket(this);
+        return input(NONE);
+    }
+
+    final InputSocket<FileEntry> input(BitField<FsAccessOption> options) {
+        return new FileInputSocket(options, this);
     }
 
     @Override
     public final OutputSocket<FileEntry> output() {
-        return new FileOutputSocket(FsAccessOptions.NONE, this, null);
+        return output(NONE, null);
     }
 
     final OutputSocket<FileEntry> output(

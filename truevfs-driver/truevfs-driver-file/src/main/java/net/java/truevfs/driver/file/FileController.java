@@ -134,7 +134,7 @@ final class FileController extends FsAbstractController {
     public InputSocket<?> input(
             BitField<FsAccessOption> options,
             FsEntryName name) {
-        return new FileEntry(target, name).input();
+        return new FileEntry(target, name).input(options);
     }
 
     @Override
@@ -146,8 +146,11 @@ final class FileController extends FsAbstractController {
     }
 
     @Override
-    public void mknod(  final BitField<FsAccessOption> options, final FsEntryName name, final Type type, @CheckForNull
-    final Entry template)
+    public void mknod(
+            final BitField<FsAccessOption> options,
+            final FsEntryName name,
+            final Type type,
+            final @CheckForNull Entry template)
     throws IOException {
         final Path file = target.resolve(name.getPath());
         switch (type) {
