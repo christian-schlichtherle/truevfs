@@ -7,7 +7,7 @@ package net.java.truevfs.extension.jmx;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
 final class JmxIoStatistics {
