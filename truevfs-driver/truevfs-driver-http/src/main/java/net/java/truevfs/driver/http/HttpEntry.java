@@ -15,7 +15,11 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.BitField;
-import net.java.truevfs.kernel.spec.*;
+import net.java.truevfs.kernel.spec.FsAccessOption;
+import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
+import net.java.truevfs.kernel.spec.FsEntry;
+import net.java.truevfs.kernel.spec.FsEntryName;
+import net.java.truevfs.kernel.spec.FsReadOnlyFileSystemException;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.READ;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.WRITE;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
@@ -150,22 +154,22 @@ public class HttpEntry extends FsEntry implements IoEntry<HttpEntry> {
     }
 
     @Override
-    public InputSocket<HttpEntry> input() {
-        return newInputSocket(FsAccessOptions.NONE);
+    public final InputSocket<HttpEntry> input() {
+        return input(NONE);
     }
 
-    protected InputSocket<HttpEntry> newInputSocket(BitField<FsAccessOption> options) {
-        return new HttpInputSocket(this, options);
+    protected InputSocket<HttpEntry> input(BitField<FsAccessOption> options) {
+        return new HttpInputSocket(options, this);
     }
 
     @Override
-    public OutputSocket<HttpEntry> output() {
-        return newOutputSocket(FsAccessOptions.NONE, null);
+    public final OutputSocket<HttpEntry> output() {
+        return output(NONE, null);
     }
 
-    protected OutputSocket<HttpEntry> newOutputSocket(
+    protected OutputSocket<HttpEntry> output(
             BitField<FsAccessOption> options,
             @CheckForNull Entry template) {
-        return new HttpOutputSocket(this, options, template);
+        return new HttpOutputSocket(options, this, template);
     }
 }

@@ -9,7 +9,6 @@ import static java.nio.file.Files.deleteIfExists;
 import java.nio.file.Path;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
 
 /**
  * A temp file pool entry.
@@ -17,7 +16,7 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-final class FileIoBuffer extends FileEntry implements IoBuffer {
+final class FileIoBuffer extends FileEntry {
 
     FileIoBuffer(Path file, final FileIoBufferPool pool) {
         super(file);

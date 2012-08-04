@@ -22,7 +22,7 @@ import org.apache.http.HttpResponse;
 /**
  * A file system controller for the HTTP(S) schemes.
  * 
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
 public class HttpController extends FsAbstractController {
@@ -94,15 +94,17 @@ public class HttpController extends FsAbstractController {
 
     @Override
     public InputSocket<?> input(
-            BitField<FsAccessOption> options, FsEntryName name) {
-        return newEntry(name).newInputSocket(options);
+            BitField<FsAccessOption> options,
+            FsEntryName name) {
+        return newEntry(name).input(options);
     }
 
     @Override
     public OutputSocket<?> output(
-            BitField<FsAccessOption> options, FsEntryName name, @CheckForNull
-    Entry template) {
-        return newEntry(name).newOutputSocket(options, template);
+            BitField<FsAccessOption> options,
+            FsEntryName name,
+            @CheckForNull Entry template) {
+        return newEntry(name).output(options, template);
     }
 
     @Override
