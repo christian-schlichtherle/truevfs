@@ -14,7 +14,7 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  * @param  <D> the type of the instrumenting director.
  * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.
- * @see    InstrumentingOutputSocket
+ * @see    InstrumentingInputSocket
  * @author Christian Schlichtherle
  */
 @Immutable
