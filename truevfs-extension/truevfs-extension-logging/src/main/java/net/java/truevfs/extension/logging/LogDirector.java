@@ -6,7 +6,10 @@ package net.java.truevfs.extension.logging;
 
 import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.component.instrumentation.InstrumentingDirector;
-import net.java.truevfs.kernel.spec.cio.*;
+import net.java.truevfs.kernel.spec.cio.Entry;
+import net.java.truevfs.kernel.spec.cio.InputSocket;
+import net.java.truevfs.kernel.spec.cio.IoBufferPool;
+import net.java.truevfs.kernel.spec.cio.OutputSocket;
 
 /**
  * @author Christian Schlichtherle
@@ -18,9 +21,9 @@ public final class LogDirector extends InstrumentingDirector<LogDirector> {
     private LogDirector() { }
 
     @Override
-    public <B extends IoBuffer<B>> IoBufferPool<B> instrument(
-            IoBufferPool<B> pool) {
-        return new LogIoBufferPool<>(this, pool);
+    public IoBufferPool instrument(
+            IoBufferPool pool) {
+        return new LogIoBufferPool(this, pool);
     }
 
     @Override

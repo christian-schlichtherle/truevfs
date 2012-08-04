@@ -23,7 +23,7 @@ public final class OdfConcurrentSyncIT extends ConcurrentSyncITSuite<OdfDriver> 
     protected OdfDriver newArchiveDriver() {
         return new OdfDriver() {
             @Override
-            public IoBufferPool<?> getPool() {
+            public IoBufferPool getPool() {
                 return TestConfig.get().getPool();
             }
         };

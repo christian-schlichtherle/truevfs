@@ -14,15 +14,14 @@ import net.java.truevfs.kernel.spec.cio.IoBufferPool;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class JmxIoBufferPool<B extends IoBuffer<B>>
-extends InstrumentingIoBufferPool<JmxDirector, B> {
+final class JmxIoBufferPool extends InstrumentingIoBufferPool<JmxDirector> {
 
-    JmxIoBufferPool(JmxDirector director, IoBufferPool<B> model) {
+    JmxIoBufferPool(JmxDirector director, IoBufferPool model) {
         super(director, model);
     }
 
     @Override
-    public IoBuffer<B> allocate() throws IOException {
-        return new JmxIoBuffer<>(director, pool.allocate());
+    public IoBuffer allocate() throws IOException {
+        return new JmxIoBuffer(director, pool.allocate());
     }
 }

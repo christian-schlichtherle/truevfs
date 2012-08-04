@@ -25,9 +25,9 @@ implements JmxIoBufferViewMXBean {
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
 
-    private final IoBuffer<?> model;
+    private final IoBuffer model;
 
-    static JmxIoBufferViewMXBean register(final IoBuffer<?> model) {
+    static JmxIoBufferViewMXBean register(final IoBuffer model) {
         final ObjectName name = getObjectName(model);
         final JmxIoBufferViewMXBean view = new JmxIoBufferView(model);
         try {
@@ -44,7 +44,7 @@ implements JmxIoBufferViewMXBean {
         }
     }
 
-    static void unregister(final IoBuffer<?> model) {
+    static void unregister(final IoBuffer model) {
         final ObjectName name = getObjectName(model);
         try {
             try {
@@ -58,7 +58,7 @@ implements JmxIoBufferViewMXBean {
         }
     }
 
-    private static ObjectName getObjectName(final IoBuffer<?> model) {
+    private static ObjectName getObjectName(final IoBuffer model) {
         final String path = model.getName();
         @SuppressWarnings("UseOfObsoleteCollectionType")
         final java.util.Hashtable<String, String>
@@ -74,7 +74,7 @@ implements JmxIoBufferViewMXBean {
         }
     }
 
-    private JmxIoBufferView(IoBuffer<?> model) {
+    private JmxIoBufferView(IoBuffer model) {
         super(JmxIoBufferViewMXBean.class, true);
         this.model = model;
     }

@@ -4,19 +4,15 @@
  */
 package net.java.truevfs.driver.http;
 
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truevfs.kernel.spec.cio.IoSockets;
-import net.java.truevfs.kernel.spec.cio.AbstractInputSocket;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truecommons.io.ReadOnlyChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truevfs.kernel.spec.FsAccessOption;
+import net.java.truecommons.io.ReadOnlyChannel;
 import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.FsAccessOption;
+import net.java.truevfs.kernel.spec.cio.*;
 
 /**
  * An input socket for HTTP(S) entries.
@@ -50,7 +46,7 @@ public class HttpInputSocket extends AbstractInputSocket<HttpEntry> {
     @Override
     public SeekableByteChannel channel(final OutputSocket<? extends Entry> peer)
     throws IOException {
-        final IoBuffer<?> temp = entry.getPool().allocate();
+        final IoBuffer temp = entry.getPool().allocate();
         try {
             IoSockets.copy(entry.input(), temp.output());
         } catch (final Throwable ex) {

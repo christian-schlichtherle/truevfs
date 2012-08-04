@@ -11,7 +11,6 @@ import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
 import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import org.apache.http.HttpResponse;
@@ -33,7 +32,7 @@ public class HttpDriver extends FsDriver {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private volatile @CheckForNull HttpClient client;
 
-    final IoBufferPool<? extends IoBuffer<?>> getPool() {
+    final IoBufferPool getPool() {
         return IoBufferPoolLocator.SINGLETON.get();
     }
 

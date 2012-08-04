@@ -44,7 +44,7 @@ import CacheEntry._
 @CleanupObligation
 private final class CacheEntry private (
   private[this] val strategy: Strategy,
-  private[this] val pool: AnyIoBufferPool
+  private[this] val pool: IoBufferPool
 ) extends Entry with Releasable[IOException] with Flushable with Closeable {
 
   private[this] val inputBufferPool = new InputBufferPool
@@ -259,7 +259,7 @@ private final class CacheEntry private (
   } // WriteBackOutputBufferPool
 
   /** An I/O buffer for the cached contents. */
-  private final class Buffer extends IoBuffer[Buffer] {
+  private final class Buffer extends IoBuffer {
     private[this] val data = pool allocate ()
 
     var readers: Int = _
@@ -349,7 +349,7 @@ private final class CacheEntry private (
 private object CacheEntry {
   /** Defines different cache entry strategies. */
   sealed trait Strategy {
-    final def newCacheEntry(pool: AnyIoBufferPool) = new CacheEntry(this, pool)
+    final def newCacheEntry(pool: IoBufferPool) = new CacheEntry(this, pool)
 
     private[CacheEntry] def newOutputBufferPool(cache: CacheEntry)
     : CacheEntry#OutputBufferPool

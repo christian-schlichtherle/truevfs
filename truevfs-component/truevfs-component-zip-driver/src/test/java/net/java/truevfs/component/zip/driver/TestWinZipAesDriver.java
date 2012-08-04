@@ -4,9 +4,7 @@
  */
 package net.java.truevfs.component.zip.driver;
 
-import net.java.truevfs.component.zip.driver.ZipDriver;
 import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
 import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 import net.java.truevfs.keymanager.spec.MockView;
 import net.java.truevfs.keymanager.spec.param.AesPbeParameters;
@@ -20,7 +18,7 @@ public final class TestWinZipAesDriver extends ZipDriver {
             container = new TestKeyManagerContainer();
 
     @Override
-    public IoBufferPool<? extends IoBuffer<?>> getPool() {
+    public IoBufferPool getPool() {
         return TestConfig.get().getPool();
     }
 

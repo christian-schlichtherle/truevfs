@@ -4,10 +4,8 @@
  */
 package net.java.truevfs.driver.tar.gzip;
 
-import net.java.truevfs.driver.tar.gzip.TarGZipDriver;
 import java.util.zip.Deflater;
 import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
 import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
@@ -17,7 +15,7 @@ import net.java.truevfs.kernel.spec.cio.IoBufferPool;
  */
 public final class TestTarGZipDriver extends TarGZipDriver {
     @Override
-    public IoBufferPool<? extends IoBuffer<?>> getPool() {
+    public IoBufferPool getPool() {
         return TestConfig.get().getPool();
     }
 

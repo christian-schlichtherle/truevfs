@@ -22,7 +22,7 @@ public class MultiplexingOutputServiceTest {
 
     private final MockArchive archive = MockArchive.create(null);
     private final MultiplexingOutputService<MockArchiveDriverEntry>
-            service = new MultiplexingOutputService<>(archive.getIoBufferPool(),
+            service = new MultiplexingOutputService<>(archive.getPool(),
                 archive.newOutputService());
 
     @Test

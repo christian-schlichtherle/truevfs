@@ -38,7 +38,7 @@ public class OdfOutputService extends MultiplexingOutputService<JarDriverEntry> 
      * @param pool the pool for buffering entry data.
      */
     public OdfOutputService(
-            IoBufferPool<?> pool,
+            IoBufferPool pool,
             @WillCloseWhenClosed ZipOutputService<JarDriverEntry> output) {
         super(pool, output);
     }

@@ -4,14 +4,6 @@
  */
 package net.java.truevfs.component.tar.driver;
 
-import net.java.truevfs.kernel.spec.cio.OutputBusyException;
-import net.java.truevfs.kernel.spec.cio.OutputService;
-import net.java.truevfs.kernel.spec.cio.AbstractOutputSocket;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -21,11 +13,7 @@ import java.io.OutputStream;
 import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truecommons.io.DecoratingOutputStream;
-import net.java.truecommons.io.DisconnectingOutputStream;
-import net.java.truecommons.io.InputException;
-import net.java.truecommons.io.Sink;
-import net.java.truecommons.io.Streams;
+import net.java.truecommons.io.*;
 import static net.java.truecommons.shed.HashMaps.OVERHEAD_SIZE;
 import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import net.java.truecommons.shed.SuppressedExceptionBuilder;
@@ -34,6 +22,7 @@ import static net.java.truevfs.component.tar.driver.TarDriver.DEFAULT_RCDSIZE;
 import net.java.truevfs.kernel.spec.FsModel;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
+import net.java.truevfs.kernel.spec.cio.*;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**
@@ -89,7 +78,7 @@ implements OutputService<TarDriverEntry> {
         }
     }
 
-    private IoBufferPool<?> getIOPool() {
+    private IoBufferPool getPool() {
         return driver.getPool();
     }
 
@@ -227,7 +216,7 @@ implements OutputService<TarDriverEntry> {
     @CleanupObligation
     private final class BufferedEntryOutputStream
     extends DecoratingOutputStream {
-        final IoBuffer<?> buffer;
+        final IoBuffer buffer;
         final TarDriverEntry local;
         boolean closed;
 
@@ -235,7 +224,7 @@ implements OutputService<TarDriverEntry> {
         BufferedEntryOutputStream(final TarDriverEntry local)
         throws IOException {
             this.local = local;
-            final IoBuffer<?> buffer = this.buffer = getIOPool().allocate();
+            final IoBuffer buffer = this.buffer = getPool().allocate();
             try {
                 this.out = buffer.output().stream(null);
             } catch (final Throwable ex) {
@@ -262,7 +251,7 @@ implements OutputService<TarDriverEntry> {
         }
 
         void storeBuffer() throws IOException {
-            final IoBuffer<?> buffer = this.buffer;
+            final IoBuffer buffer = this.buffer;
             final SuppressedExceptionBuilder<IOException>
                     builder = new SuppressedExceptionBuilder<>();
             try (final InputStream in = buffer.input().stream(null)) {

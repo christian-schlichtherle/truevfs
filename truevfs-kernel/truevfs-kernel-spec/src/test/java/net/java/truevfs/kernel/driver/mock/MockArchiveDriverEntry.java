@@ -32,7 +32,7 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
             times = new EnumMap<>(Access.class);
     private final Boolean[][] permissions
             = new Boolean[Access.values().length][PosixEntity.values().length];
-    private @CheckForNull IoBuffer<?> buffer;
+    private @CheckForNull IoBuffer buffer;
 
     public MockArchiveDriverEntry(final String name, final Type type) {
         this(name, type, null);
@@ -61,9 +61,9 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
         }
     }
 
-    IoBuffer<?> getBuffer(final IoBufferPool<?> ioPool) throws IOException {
-        final IoBuffer<?> buffer = this.buffer;
-        return null != buffer ? buffer : (this.buffer = ioPool.allocate());
+    IoBuffer getBuffer(final IoBufferPool pool) throws IOException {
+        final IoBuffer buffer = this.buffer;
+        return null != buffer ? buffer : (this.buffer = pool.allocate());
     }
 
     @Override

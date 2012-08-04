@@ -25,7 +25,7 @@ public abstract class InstrumentingDirector<
     }
 
     @SuppressWarnings("unchecked")
-    public <B extends IoBuffer<B>> IoBufferPool<B> instrument(IoBufferPool<B> pool) {
+    public IoBufferPool instrument(IoBufferPool pool) {
         return new InstrumentingIoBufferPool<>((This) this, pool);
     }
 
@@ -55,9 +55,9 @@ public abstract class InstrumentingDirector<
         return new InstrumentingController<>((This) this, controller);
     }
 
-    public <B extends IoBuffer<B>> InputSocket<B> instrument(
-            InputSocket<B> input,
-            InstrumentingIoBuffer<This, B> context) {
+    public InputSocket<? extends IoBuffer> instrument(
+            InputSocket<? extends IoBuffer> input,
+            InstrumentingIoBuffer<This> context) {
         return instrument(input);
     }
 
@@ -72,9 +72,9 @@ public abstract class InstrumentingDirector<
         return input; //new InstrumentingInputSocket<>((This) this, input);
     }
 
-    public <B extends IoBuffer<B>> OutputSocket<B> instrument(
-            OutputSocket<B> output,
-            InstrumentingIoBuffer<This, B> context) {
+    public OutputSocket<? extends IoBuffer> instrument(
+            OutputSocket<? extends IoBuffer> output,
+            InstrumentingIoBuffer<This> context) {
         return instrument(output);
     }
 

@@ -57,7 +57,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * equally named method on the {@link IoBufferPoolLocator#SINGLETON}.
      */
     @Override
-    public IoBufferPool<? extends IoBuffer<?>> getPool() {
+    public IoBufferPool getPool() {
         return IoBufferPoolLocator.SINGLETON.get();
     }
 

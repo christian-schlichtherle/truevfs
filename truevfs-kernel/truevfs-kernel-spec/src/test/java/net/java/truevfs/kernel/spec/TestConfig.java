@@ -69,7 +69,7 @@ public final class TestConfig extends Resource<RuntimeException> {
     private final ThrowManager throwControl;
     private int numEmtries = DEFAULT_NUM_ENTRIES;
     private int dataSize = DEFAULT_DATA_LENGTH;
-    private IoBufferPool<? extends IoBuffer<?>> pool;
+    private IoBufferPool pool;
 
     /**
      * Returns the current configuration.
@@ -147,12 +147,12 @@ public final class TestConfig extends Resource<RuntimeException> {
         dataSize = size;
     }
 
-    public IoBufferPool<? extends IoBuffer<?>> getPool() {
-        final IoBufferPool<? extends IoBuffer<?>> pool = this.pool;
+    public IoBufferPool getPool() {
+        final IoBufferPool pool = this.pool;
         return null != pool ? pool : (this.pool = new ByteArrayIoBufferPool(getDataSize()));
     }
 
-    public void setIoBufferPool(final @CheckForNull IoBufferPool<? extends IoBuffer<?>> pool) {
+    public void setPool(final @CheckForNull IoBufferPool pool) {
         this.pool = pool;
     }
 

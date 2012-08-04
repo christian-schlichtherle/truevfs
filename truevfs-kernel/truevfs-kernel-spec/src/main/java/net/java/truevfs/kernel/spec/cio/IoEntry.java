@@ -19,7 +19,7 @@ public interface IoEntry<This extends IoEntry<This>> extends Entry {
      *
      * @return An input socket for reading this entry.
      */
-    InputSocket<This> input();
+    InputSocket<? extends This> input();
 
     /**
      * Returns an output socket for writing this entry.
@@ -28,5 +28,5 @@ public interface IoEntry<This extends IoEntry<This>> extends Entry {
      *
      * @return An output socket for writing this entry.
      */
-    OutputSocket<This> output();
+    OutputSocket<? extends This> output();
 }

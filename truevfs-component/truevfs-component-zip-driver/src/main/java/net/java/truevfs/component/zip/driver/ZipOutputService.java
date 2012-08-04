@@ -50,7 +50,7 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
 
     private final FsModel model;
     private final AbstractZipDriver<E> driver;
-    private @CheckForNull IoBuffer<?> postamble;
+    private @CheckForNull IoBuffer postamble;
     private @CheckForNull E bufferedEntry;
     private ZipCryptoParameters param;
 
@@ -79,7 +79,7 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
                 }
                 // Retain postamble of input ZIP file.
                 if (0 < source.getPostambleLength()) {
-                    this.postamble = getIOPool().allocate();
+                    this.postamble = getPool().allocate();
                     Streams.copy(   source.getPostambleInputStream(),
                                     this.postamble.output().stream(null));
                 }
@@ -103,7 +103,7 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
         return model;
     }
 
-    private IoBufferPool<?> getIOPool() {
+    private IoBufferPool getPool() {
         return driver.getPool();
     }
 
@@ -248,7 +248,7 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
     @Override
     public void close() throws IOException {
         super.finish();
-        final IoBuffer<?> postamble = this.postamble;
+        final IoBuffer postamble = this.postamble;
         if (null != postamble) {
             this.postamble = null;
             final InputSocket<?> input = postamble.input();
@@ -324,7 +324,7 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
     @CleanupObligation
     private final class BufferedEntryOutputStream
     extends DecoratingOutputStream {
-        final IoBuffer<?> buffer;
+        final IoBuffer buffer;
         final E local;
         boolean closed;
 
@@ -333,7 +333,7 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
         throws IOException {
             assert STORED == local.getMethod();
             this.local = local;
-            final IoBuffer<?> buffer = this.buffer = getIOPool().allocate();
+            final IoBuffer buffer = this.buffer = getPool().allocate();
             try {
                 this.out = new CheckedOutputStream(
                         buffer.output().stream(null),
@@ -362,7 +362,7 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
 
         void updateProperties() {
             final E local = this.local;
-            final IoBuffer<?> buffer = this.buffer;
+            final IoBuffer buffer = this.buffer;
             local.setCrc(((CheckedOutputStream) out).getChecksum().getValue());
             final long length = buffer.getSize(DATA);
             local.setSize(length);
@@ -371,7 +371,7 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
         }
 
         void storeBuffer() throws IOException {
-            final IoBuffer<?> buffer = this.buffer;
+            final IoBuffer buffer = this.buffer;
             final SuppressedExceptionBuilder<IOException>
                     builder = new SuppressedExceptionBuilder<>();
             try (final InputStream in = buffer.input().stream(null)) {

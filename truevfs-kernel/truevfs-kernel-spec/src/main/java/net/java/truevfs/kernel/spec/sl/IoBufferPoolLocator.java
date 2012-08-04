@@ -7,7 +7,6 @@ package net.java.truevfs.kernel.spec.sl;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.services.Container;
 import net.java.truecommons.services.Locator;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
 import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.spi.IoBufferPoolDecorator;
 import net.java.truevfs.kernel.spec.spi.IoBufferPoolFactory;
@@ -23,8 +22,7 @@ import net.java.truevfs.kernel.spec.spi.IoBufferPoolFactory;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class IoBufferPoolLocator
-implements Container<IoBufferPool<? extends IoBuffer<?>>> {
+public final class IoBufferPoolLocator implements Container<IoBufferPool> {
 
     /** The singleton instance of this class. */
     public static final IoBufferPoolLocator SINGLETON = new IoBufferPoolLocator();
@@ -32,11 +30,11 @@ implements Container<IoBufferPool<? extends IoBuffer<?>>> {
     private IoBufferPoolLocator() { }
 
     @Override
-    public IoBufferPool<? extends IoBuffer<?>> get() { return Lazy.pool; }
+    public IoBufferPool get() { return Lazy.pool; }
 
     /** A static data utility class used for lazy initialization. */
     private static final class Lazy {
-        static final IoBufferPool<? extends IoBuffer<?>> pool
+        static final IoBufferPool pool
                 = new Locator(IoBufferPoolLocator.class)
                 .factory(IoBufferPoolFactory.class, IoBufferPoolDecorator.class)
                 .get();

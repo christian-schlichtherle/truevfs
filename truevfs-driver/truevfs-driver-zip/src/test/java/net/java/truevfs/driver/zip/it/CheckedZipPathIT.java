@@ -7,7 +7,6 @@ package net.java.truevfs.driver.zip.it;
 import net.java.truevfs.access.TPathITSuite;
 import net.java.truevfs.component.zip.driver.CheckedZipDriver;
 import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
 import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
@@ -24,7 +23,7 @@ public final class CheckedZipPathIT extends TPathITSuite<CheckedZipDriver> {
     protected CheckedZipDriver newArchiveDriver() {
         return new CheckedZipDriver() {
             @Override
-            public IoBufferPool<? extends IoBuffer<?>> getPool() {
+            public IoBufferPool getPool() {
                 return TestConfig.get().getPool();
             }
         };

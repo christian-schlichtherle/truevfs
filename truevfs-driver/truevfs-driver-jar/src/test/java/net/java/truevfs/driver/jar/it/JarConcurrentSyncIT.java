@@ -23,7 +23,7 @@ public final class JarConcurrentSyncIT extends ConcurrentSyncITSuite<JarDriver> 
     protected JarDriver newArchiveDriver() {
         return new JarDriver() {
             @Override
-            public IoBufferPool<?> getPool() {
+            public IoBufferPool getPool() {
                 return TestConfig.get().getPool();
             }
         };
