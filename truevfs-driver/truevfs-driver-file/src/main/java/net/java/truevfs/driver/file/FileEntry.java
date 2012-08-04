@@ -62,7 +62,7 @@ class FileEntry extends FsEntry implements IoBuffer {
         return readAttributes(path, BasicFileAttributes.class);
     }
 
-    final FileEntry createTempFile() throws IOException {
+    final FileEntry createIoBuffer() throws IOException {
         FileIoBufferPool pool = this.pool;
         if (null == pool)
             this.pool = pool = new FileIoBufferPool(getParent(), getFileName());
