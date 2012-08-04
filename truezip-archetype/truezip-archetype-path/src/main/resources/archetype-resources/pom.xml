@@ -40,11 +40,21 @@
              java.util.logging.
              This module is designed for testing purposes only.
              It should not be used in production environments because of its
-             negative performance impact.
+             performance impact.
              -->
         <!--dependency>
             <groupId>de.schlichtherle.truezip</groupId>
             <artifactId>truezip-extension-jmx-jul</artifactId>
+            <version>${truezip.version}</version>
+            <scope>runtime</scope>
+        </dependency-->
+
+        <!-- This runtime dependency constrains the number of concurrently
+             mounted archive file systems in the TrueZIP Kernel to save some
+             heap space. -->
+        <!--dependency>
+            <groupId>de.schlichtherle.truezip</groupId>
+            <artifactId>truezip-extension-pace</artifactId>
             <version>${truezip.version}</version>
             <scope>runtime</scope>
         </dependency-->

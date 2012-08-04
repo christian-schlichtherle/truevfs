@@ -4,13 +4,14 @@
 package ${package};
 
 import de.schlichtherle.truezip.file.TApplication;
+import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.key.pbe.swing.HurlingWindowFeedback;
 import de.schlichtherle.truezip.key.pbe.swing.InvalidKeyFeedback;
 
 /**
  * An abstract class which configures the TrueZIP File* module.
  * 
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 abstract class Application<E extends Exception> extends TApplication<E> {
 
@@ -43,13 +44,17 @@ abstract class Application<E extends Exception> extends TApplication<E> {
         System.setProperty(spec, System.getProperty(spec, impl));
     }
 
+    /**
+     * Overridden to make the application wait until it gets interrupted.
+     * Uncomment this method if you want to test the JMX interface with the
+     * short living sample applications of this archetype.
+     */
     /*@Override
     protected void sync() throws FsSyncException {
+        System.out.println("Waiting until interrupt...");
         try {
             Thread.sleep(Long.MAX_VALUE);
         } catch (InterruptedException ex) {
-            Logger  .getLogger(Application.class.getName())
-                    .log(Level.SEVERE, null, ex);
         }
         super.sync();
     }*/
