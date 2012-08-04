@@ -4,12 +4,6 @@
  */
 package net.java.truevfs.driver.file;
 
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsSyncOption;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truevfs.kernel.spec.FsEntryName;
-import net.java.truevfs.kernel.spec.FsAbstractController;
 import java.io.IOException;
 import static java.nio.file.Files.*;
 import java.nio.file.*;
@@ -21,7 +15,9 @@ import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.BitField;
 import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
+import net.java.truevfs.kernel.spec.*;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
@@ -29,7 +25,6 @@ import net.java.truevfs.kernel.spec.cio.Entry.Type;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truecommons.shed.BitField;
 
 /**
  * A file system controller with a prospective directory in the platform file
@@ -38,7 +33,7 @@ import net.java.truecommons.shed.BitField;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class FileController extends FsAbstractController<FsModel>  {
+final class FileController extends FsAbstractController {
 
     private final Path target;
 
@@ -57,7 +52,7 @@ final class FileController extends FsAbstractController<FsModel>  {
     }
 
     @Override
-    public FsController<?> getParent() {
+    public FsController getParent() {
         return null;
     }
 

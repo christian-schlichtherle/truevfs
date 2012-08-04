@@ -22,7 +22,7 @@ implements FsManager {
     throws FsSyncWarningException, FsSyncException {
         if (options.get(ABORT_CHANGES)) throw new IllegalArgumentException();
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
-        for (final FsController<?> controller : this) {
+        for (final FsController controller : this) {
             try {
                 controller.sync(options);
             } catch (final FsSyncException ex) {

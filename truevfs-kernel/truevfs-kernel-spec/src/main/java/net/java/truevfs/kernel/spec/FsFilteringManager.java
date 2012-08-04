@@ -7,8 +7,8 @@ package net.java.truevfs.kernel.spec;
 import java.net.URI;
 import java.util.Iterator;
 import javax.annotation.concurrent.ThreadSafe;
-import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
 import net.java.truecommons.shed.FilteringIterator;
+import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
 
 /**
  * Filters the list of federated file systems managed by the decorated file
@@ -40,18 +40,18 @@ public final class FsFilteringManager extends FsDecoratingManager<FsManager> {
     @Override
     public int size() {
         int size = 0;
-        for (FsController<?> controller : this)
+        for (FsController controller : this)
             size++;
         return size;
     }
 
     @Override
-    public Iterator<FsController<?>> iterator() {
+    public Iterator<FsController> iterator() {
         return new FilteredControllerIterator();
     }
 
     private final class FilteredControllerIterator
-    extends FilteringIterator<FsController<?>> {
+    extends FilteringIterator<FsController> {
         final String ps = prefix.getScheme();
         final String pp = prefix.getPath();
         final int ppl = pp.length();
@@ -62,7 +62,7 @@ public final class FsFilteringManager extends FsDecoratingManager<FsManager> {
         }
 
         @Override
-        protected boolean accept(final FsController<?> controller) {
+        protected boolean accept(final FsController controller) {
             assert null != controller : "null elements are not allowed in this collection!";
             final URI mp = controller.getModel().getMountPoint().toHierarchicalUri();
             final String mpp;

@@ -4,27 +4,15 @@
  */
 package net.java.truevfs.component.tar.driver;
 
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.cio.OutputService;
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.FsInputSocketSource;
-import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
-import net.java.truevfs.kernel.spec.cio.InputService;
-import net.java.truevfs.kernel.spec.FsOutputSocketSink;
-import net.java.truevfs.kernel.spec.FsEntryName;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truevfs.kernel.spec.FsArchiveDriver;
-import net.java.truecommons.shed.BitField;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.BitField;
 import static net.java.truevfs.kernel.spec.FsAccessOption.CACHE;
 import static net.java.truevfs.kernel.spec.FsAccessOption.COMPRESS;
+import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.ALL_POSIX_ACCESS;
 import static net.java.truevfs.kernel.spec.cio.Entry.ALL_POSIX_ENTITIES;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
@@ -32,6 +20,7 @@ import static net.java.truevfs.kernel.spec.cio.Entry.Access.WRITE;
 import net.java.truevfs.kernel.spec.cio.Entry.PosixEntity;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import net.java.truevfs.kernel.spec.cio.Entry.Type;
+import net.java.truevfs.kernel.spec.cio.*;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
@@ -124,7 +113,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     @Override
     protected FsInputSocketSource source(
             BitField<FsAccessOption> options,
-            final FsController<?> controller,
+            final FsController controller,
             final FsEntryName name) {
         // The target archive file will be only used to extract the TAR entries
         // to a temporary file, so we don't need to put it into the selective
@@ -140,7 +129,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     @Override
     protected FsOutputSocketSink sink(
             BitField<FsAccessOption> options,
-            final FsController<?> controller,
+            final FsController controller,
             final FsEntryName name) {
         // Leave FsAccessOption.STORE untouched - the driver shall be given
         // opportunity to get its own preferences to sort out such a conflict.

@@ -14,25 +14,24 @@ import net.java.truevfs.kernel.spec.cio.Entry.Access;
  * An abstract file system controller which implements the {@link #getModel()}
  * method.
  * 
- * @param  <M> the type of the file system model.
  * @author Christian Schlichtherle
  */
-public abstract class FsAbstractController<M extends FsModel>
-implements FsController<M> {
+public abstract class FsAbstractController
+implements FsController {
 
-    private final M model;
+    private final FsModel model;
 
     /**
      * Constructs a new file system controller for the given model.
      * 
      * @param model the file system model.
      */
-    protected FsAbstractController(final M model) {
+    protected FsAbstractController(final FsModel model) {
         this.model = Objects.requireNonNull(model);
     }
 
     @Override
-    public final M getModel() {
+    public final FsModel getModel() {
         return model;
     }
 

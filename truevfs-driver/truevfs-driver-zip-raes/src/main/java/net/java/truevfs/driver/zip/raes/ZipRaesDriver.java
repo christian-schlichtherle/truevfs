@@ -113,9 +113,8 @@ public abstract class ZipRaesDriver extends JarDriver {
      * locatable key manager to resolve passwords for RAES encryption.
      */
     @Override
-    public <M extends FsModel> FsController<M>
-    decorate(FsController<M> controller) {
-        return new ZipRaesKeyController<>(controller, this);
+    public FsController decorate(FsController controller) {
+        return new ZipRaesKeyController(controller, this);
     }
 
     @Override
@@ -187,7 +186,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     @Override
     protected final FsOutputSocketSink sink(
             BitField<FsAccessOption> options,
-            final FsController<?> controller,
+            final FsController controller,
             final FsEntryName name) {
         // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
         // opportunity to apply its own preferences to sort out such a conflict.

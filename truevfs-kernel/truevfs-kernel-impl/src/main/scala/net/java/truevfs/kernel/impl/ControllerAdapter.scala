@@ -11,26 +11,26 @@ import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.cio._
 import net.java.truevfs.kernel.spec.cio.Entry._
 
-private final class ControllerAdapter[M <: FsModel](
-  c: Controller[M],
-  override val getParent: FsController[_ <: FsModel]
-) extends FsAbstractController[M](c.model) {
+private final class ControllerAdapter(
+  c: Controller[_ <: FsModel],
+  override val getParent: FsController
+) extends FsAbstractController(c.model) {
 
   override def stat(options: AccessOptions, name: FsEntryName) =
-    c.stat(options, name).orNull
+    c stat (options, name) orNull
   override def checkAccess(options: AccessOptions, name: FsEntryName, types: BitField[Access]) =
-    c.checkAccess(options, name, types)
-  override def setReadOnly(name: FsEntryName) = c.setReadOnly(name)
+    c checkAccess (options, name, types)
+  override def setReadOnly(name: FsEntryName) = c setReadOnly (name)
   override def setTime(options: AccessOptions, name: FsEntryName, times: ju.Map[Access, jl.Long]) =
-    c.setTime(options, name, times)
+    c setTime (options, name, times)
   override def setTime(options: AccessOptions, name: FsEntryName, types: BitField[Access], value: Long) =
-    c.setTime(options, name, types, value)
-  def input(options: AccessOptions, name: FsEntryName) = c.input(options, name)
+    c setTime (options, name, types, value)
+  def input(options: AccessOptions, name: FsEntryName) = c input (options, name)
   def output(options: AccessOptions, name: FsEntryName, template: Entry) =
-    c.output(options, name, Option(template))
+    c output (options, name, Option(template))
   override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Entry) =
-    c.mknod(options, name, tµpe, Option(template))
+    c mknod (options, name, tµpe, Option(template))
   override def unlink(options: AccessOptions, name: FsEntryName) =
-    c.unlink(options, name)
-  override def sync(options: SyncOptions) = c.sync(options)
+    c unlink (options, name)
+  override def sync(options: SyncOptions) = c sync(options)
 }

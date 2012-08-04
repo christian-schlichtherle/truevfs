@@ -22,10 +22,10 @@ import javax.inject.Provider;
 public abstract class FsAbstractCompositeDriver
 implements FsCompositeDriver, Provider<Map<FsScheme, FsDriver>> {
     @Override
-    public final FsController<? extends FsModel> newController(
+    public final FsController newController(
             final FsManager manager,
             final FsModel model,
-            final @CheckForNull FsController<? extends FsModel> parent) {
+            final @CheckForNull FsController parent) {
         assert null == parent
                     ? null == model.getParent()
                     : parent.getModel().equals(model.getParent());

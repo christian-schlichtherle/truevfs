@@ -4,22 +4,17 @@
  */
 package net.java.truevfs.driver.sfx;
 
-import net.java.truevfs.kernel.spec.FsReadOnlyFileSystemException;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truevfs.kernel.spec.FsEntryName;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.component.zip.driver.AbstractZipDriverEntry;
+import net.java.truecommons.shed.BitField;
 import net.java.truevfs.component.zip.driver.ZipDriver;
 import net.java.truevfs.component.zip.driver.ZipDriverEntry;
+import net.java.truevfs.kernel.spec.*;
 import net.java.truevfs.kernel.spec.cio.InputService;
 import net.java.truevfs.kernel.spec.cio.OutputService;
-import net.java.truecommons.shed.BitField;
 
 /**
  * An archive driver which reads Self Executable (SFX/EXE) ZIP files,
@@ -66,7 +61,7 @@ public class ReadOnlySfxDriver extends ZipDriver {
     public final OutputService<ZipDriverEntry> newOutput(
             FsModel model,
             BitField<FsAccessOption> options,
-            FsController<?> controller,
+            FsController controller,
             FsEntryName name,
             @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {

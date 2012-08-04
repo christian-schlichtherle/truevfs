@@ -159,7 +159,7 @@ implements JmxManagerViewMXBean {
     @Override
     public int getFileSystemsMounted() {
         int mounted = 0;
-        for (FsController<?> controller : model)
+        for (FsController controller : model)
             if (controller.getModel().isMounted()) mounted++;
         return mounted;
     }
@@ -167,7 +167,7 @@ implements JmxManagerViewMXBean {
     @Override
     public int getTopLevelArchiveFileSystemsTotal() {
         int total = 0;
-        for (FsController<?> controller : model)
+        for (FsController controller : model)
             if (isTopLevelArchive(controller)) total++;
         return total;
     }
@@ -175,14 +175,14 @@ implements JmxManagerViewMXBean {
     @Override
     public int getTopLevelArchiveFileSystemsMounted() {
         int mounted = 0;
-        for (FsController<?> controller : model)
+        for (FsController controller : model)
             if (isTopLevelArchive(controller))
                 if (controller.getModel().isMounted()) mounted++;
         return mounted;
     }
 
-    private boolean isTopLevelArchive(final FsController<?> controller) {
-        final FsController<?> parent = controller.getParent();
+    private boolean isTopLevelArchive(final FsController controller) {
+        final FsController parent = controller.getParent();
         return null != parent && null == parent.getParent();
     }
 

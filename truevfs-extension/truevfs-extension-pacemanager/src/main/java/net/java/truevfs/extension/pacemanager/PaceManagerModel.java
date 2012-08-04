@@ -28,7 +28,7 @@ import net.java.truevfs.kernel.spec.*;
 @ThreadSafe
 final class PaceManagerModel {
 
-    private final Collection<FsController<? extends FsModel>> evicted = new ConcurrentLinkedQueue<>();
+    private final Collection<FsController> evicted = new ConcurrentLinkedQueue<>();
     private final MountedControllerSet mounted = new MountedControllerSet();
     private volatile int maxMounted = MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE;
     private @Nullable volatile FsManager manager;
@@ -63,15 +63,15 @@ final class PaceManagerModel {
      * for subsequent access.
      * @throws FsSyncException
      */
-    void retain(final FsController<? extends FsModel> controller)
+    void retain(final FsController controller)
     throws FsSyncException {
         final FsMountPoint mp = controller.getModel().getMountPoint();
         iterating:
-        for (final Iterator<FsController<? extends FsModel>> i = evicted.iterator(); i.hasNext();) {
-            final FsController<? extends FsModel> ec = i.next();
+        for (final Iterator<FsController> i = evicted.iterator(); i.hasNext();) {
+            final FsController ec = i.next();
             final FsMountPoint emp = ec.getModel().getMountPoint();
             final FsManager fm = new FsFilteringManager(manager, emp);
-            for (final FsController<?> fc : fm) {
+            for (final FsController fc : fm) {
                 final FsMountPoint fmp = fc.getModel().getMountPoint();
                 if (mp.equals(fmp) || mounted.contains(fmp)) {
                     if (emp.equals(fmp) || mounted.contains(emp)) i.remove();
@@ -89,7 +89,7 @@ final class PaceManagerModel {
      *
      * @param controller the controller for the most recently used file system.
      */
-    void accessed(final FsController<? extends FsModel> controller) {
+    void accessed(final FsController controller) {
         if (controller.getModel().isMounted()) mounted.add(controller);
     }
 
@@ -105,16 +105,16 @@ final class PaceManagerModel {
 
     @SuppressWarnings("serial")
     private final class MountedControllerSet {
-        private final LinkedHashMap<FsMountPoint, FsController<? extends FsModel>> map = new LinkedHashMap<FsMountPoint, FsController<? extends FsModel>>(
+        private final LinkedHashMap<FsMountPoint, FsController> map = new LinkedHashMap<FsMountPoint, FsController>(
                 HashMaps.initialCapacity(getMaximumFileSystemsMounted() + 1),
                 0.75f,
                 true) {
             @Override
             public boolean removeEldestEntry(
-                    final Map.Entry<FsMountPoint, FsController<? extends FsModel>> entry) {
+                    final Map.Entry<FsMountPoint, FsController> entry) {
                 final boolean evict = size() > getMaximumFileSystemsMounted();
                 if (evict) {
-                    final FsController<? extends FsModel> c = entry.getValue();
+                    final FsController c = entry.getValue();
                     final boolean added = evicted.add(c);
                     assert added;
                 }
@@ -139,7 +139,7 @@ final class PaceManagerModel {
             }
         }
 
-        void add(final FsController<? extends FsModel> controller) {
+        void add(final FsController controller) {
             final FsMountPoint mp = controller.getModel().getMountPoint();
             writeLock.lock();
             try {
@@ -154,7 +154,7 @@ final class PaceManagerModel {
             writeLock.lock();
             try {
                 map.clear();
-                for (final FsController<?> c : manager)
+                for (final FsController c : manager)
                     if (c.getModel().isMounted())
                         map.put(c.getModel().getMountPoint(), c);
                 return map.size();
@@ -162,5 +162,5 @@ final class PaceManagerModel {
                 writeLock.unlock();
             }
         }
-    } // MountedFileSystemMap
+    } // MountedControllerSet
 }

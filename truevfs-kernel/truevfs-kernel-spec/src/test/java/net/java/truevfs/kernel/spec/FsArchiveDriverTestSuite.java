@@ -4,22 +4,6 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import net.java.truevfs.kernel.spec.cio.DecoratingOutputSocket;
-import net.java.truevfs.kernel.spec.cio.InputService;
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.FsEntryName;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsArchiveEntry;
-import net.java.truevfs.kernel.spec.FsArchiveDriver;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truevfs.kernel.spec.cio.OutputService;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.cio.Container;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.DecoratingInputSocket;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import java.net.URI;
@@ -43,6 +27,7 @@ import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
 import static net.java.truevfs.kernel.spec.cio.Entry.Type.FILE;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
+import net.java.truevfs.kernel.spec.cio.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -75,7 +60,7 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private FsModel model;
-    private FsController<?> parent;
+    private FsController parent;
 
     @Override
     public void setUp() throws IOException {
@@ -433,7 +418,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private MockController newParentController(final FsModel model) {
         final FsModel pm = model.getParent();
-        final FsController<?> pc = null == pm ? null : newParentController(pm);
+        final FsController pc = null == pm ? null : newParentController(pm);
         return new ParentController(model, pc);
     }
 
@@ -484,7 +469,7 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private final class ParentController extends MockController {
-        ParentController(FsModel model, @CheckForNull FsController<?> parent) {
+        ParentController(FsModel model, @CheckForNull FsController parent) {
             super(model, parent, TestConfig.get());
         }
 

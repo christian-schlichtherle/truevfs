@@ -18,10 +18,10 @@ import net.java.truevfs.kernel.spec.FsModel;
 public final class MockDriver extends FsDriver {
 
     @Override
-    public FsController<?> newController(
+    public FsController newController(
             final FsManager manager,
             final FsModel model,
-            final @CheckForNull FsController<?> parent) {
+            final @CheckForNull FsController parent) {
         return new MockController(model, parent, null);
     }
 }

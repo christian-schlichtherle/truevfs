@@ -25,7 +25,7 @@ extends FsDecoratingManager<FsManager> {
     }
 
     @Override
-    public FsController<? extends FsModel> controller(FsCompositeDriver driver, FsMountPoint mountPoint) {
+    public FsController controller(FsCompositeDriver driver, FsMountPoint mountPoint) {
         return director.instrument(manager.controller(director.instrument(driver, this), mountPoint), this);
     }
 }

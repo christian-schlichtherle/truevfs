@@ -4,27 +4,16 @@
  */
 package net.java.truevfs.driver.http;
 
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.FsEntryName;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.FsReadOnlyFileSystemException;
-import net.java.truevfs.kernel.spec.FsAbstractController;
-import net.java.truevfs.kernel.spec.FsSyncOption;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsPath;
-import net.java.truevfs.kernel.spec.FsModel;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.*;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.READ;
 import net.java.truevfs.kernel.spec.cio.Entry.Type;
 import static net.java.truevfs.kernel.spec.cio.Entry.Type.FILE;
-import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.cio.*;
 import org.apache.http.HttpResponse;
 
 /**
@@ -33,7 +22,7 @@ import org.apache.http.HttpResponse;
  * @author  Christian Schlichtherle
  */
 @Immutable
-public class HttpController extends FsAbstractController<FsModel>  {
+public class HttpController extends FsAbstractController {
 
     private static final BitField<Access> READ_ONLY = BitField.of(READ);
 
@@ -68,7 +57,7 @@ public class HttpController extends FsAbstractController<FsModel>  {
     }
 
     @Override
-    public FsController<?> getParent() {
+    public FsController getParent() {
         return null;
     }
 

@@ -55,10 +55,10 @@ extends FsDriver {
      * {@code model.getParent().equals(parent.getModel())} is {@code true}.
      */
     @Override
-    public final FsController<? extends FsModel> newController(
+    public final FsController newController(
             FsManager manager,
             FsModel model,
-            @CheckForNull FsController<? extends FsModel> parent) {
+            @CheckForNull FsController parent) {
         assert parent.getModel().equals(model.getParent());
         return manager.newController(this, model, parent);
     }
@@ -70,15 +70,13 @@ extends FsDriver {
      * The implementation in the class {@link FsArchiveDriver} simply returns
      * the given controller.
      * 
-     * @param  <M> the file system model used by the given controller.
      * @param  controller the file system controller to decorate or return.
      *         Note that this controller may throw {@link RuntimeException}s
      *         for non-local control flow!
      * @return The decorated file system controller or simply
      *         {@code controller}.
      */
-    public <M extends FsModel> FsController<M> decorate(
-            FsController<M> controller) {
+    public FsController decorate(FsController controller) {
         return controller;
     }
 
@@ -198,7 +196,7 @@ extends FsDriver {
     public InputService<E> newInput(
             FsModel model,
             BitField<FsAccessOption> options,
-            FsController<? extends FsModel> controller,
+            FsController controller,
             FsEntryName name)
     throws IOException {
         return newInput(model, source(options, controller, name));
@@ -251,7 +249,7 @@ extends FsDriver {
     public OutputService<E> newOutput(
             FsModel model,
             BitField<FsAccessOption> options,
-            FsController<? extends FsModel> controller,
+            FsController controller,
             FsEntryName name,
             @CheckForNull @WillNotClose InputService<E> input)
     throws IOException {
@@ -301,7 +299,7 @@ extends FsDriver {
      */
     protected FsInputSocketSource source(
             BitField<FsAccessOption> options,
-            FsController<? extends FsModel> controller,
+            FsController controller,
             FsEntryName name) {
         return new FsInputSocketSource(options, controller.input(options, name));
     }
@@ -325,7 +323,7 @@ extends FsDriver {
      */
     protected FsOutputSocketSink sink(
             BitField<FsAccessOption> options,
-            FsController<? extends FsModel> controller,
+            FsController controller,
             FsEntryName name) {
         return new FsOutputSocketSink(options,
                 controller.output(options, name, null));

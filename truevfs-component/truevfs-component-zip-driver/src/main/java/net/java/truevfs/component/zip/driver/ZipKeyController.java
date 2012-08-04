@@ -8,22 +8,20 @@ import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.component.zip.ZipKeyException;
 import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.keymanager.spec.param.AesPbeParameters;
 
 /**
  * This file system controller decorates another file system controller in
  * order to manage its AES PBE parameters.
  * 
- * @param  <M> the type of the file system model.
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class ZipKeyController<M extends FsModel>
-extends AbstractKeyController<M, AbstractZipDriver<?>> {
+public final class ZipKeyController
+extends AbstractKeyController<AbstractZipDriver<?>> {
 
     public ZipKeyController(
-            FsController<M> controller,
+            FsController controller,
             AbstractZipDriver<?> driver) {
         super(controller, driver);
     }

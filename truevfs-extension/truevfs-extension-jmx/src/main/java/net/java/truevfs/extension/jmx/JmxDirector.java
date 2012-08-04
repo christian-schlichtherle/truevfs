@@ -117,17 +117,17 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     }
 
     @Override
-    public <M extends FsModel> FsController<M> instrument(
-            FsController<M> controller,
+    public FsController instrument(
+            FsController controller,
             InstrumentingManager<JmxDirector> context) {
-        return new JmxApplicationController<>(this, controller);
+        return new JmxApplicationController(this, controller);
     }
 
     @Override
-    public <M extends FsModel> FsController<M> instrument(
-            FsController<M> controller,
+    public FsController instrument(
+            FsController controller,
             InstrumentingCompositeDriver<JmxDirector> context) {
-        return new JmxKernelController<>(this, controller);
+        return new JmxKernelController(this, controller);
     }
 
     @Override
@@ -140,7 +140,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     @Override
     public <E extends Entry> InputSocket<E> instrument(
             InputSocket<E> input,
-            InstrumentingController<JmxDirector, ?> context) {
+            InstrumentingController<JmxDirector> context) {
         return new JmxInputSocket<>(this, input,
                 JmxController.class.cast(context).getIOStatistics());
     }
@@ -155,7 +155,7 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     @Override
     public <E extends Entry> OutputSocket<E> instrument(
             OutputSocket<E> output,
-            InstrumentingController<JmxDirector, ?> context) {
+            InstrumentingController<JmxDirector> context) {
         return new JmxOutputSocket<>(this, output,
                 JmxController.class.cast(context).getIOStatistics());
     }

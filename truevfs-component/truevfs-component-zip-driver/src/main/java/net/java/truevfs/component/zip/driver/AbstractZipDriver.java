@@ -306,9 +306,8 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * encryption.
      */
     @Override
-    public <M extends FsModel> FsController<M> decorate(
-            FsController<M> controller) {
-        return new ZipKeyController<>(controller, this);
+    public FsController decorate(FsController controller) {
+        return new ZipKeyController(controller, this);
     }
 
     @Override
@@ -369,7 +368,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
     @Override
     protected FsOutputSocketSink sink(
             BitField<FsAccessOption> options,
-            final FsController<?> controller,
+            final FsController controller,
             final FsEntryName name) {
         // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
         // opportunity to get its own preferences to sort out such a conflict.

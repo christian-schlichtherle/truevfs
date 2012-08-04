@@ -19,7 +19,7 @@ import net.java.truevfs.kernel.spec.cio.Entry._;
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private trait FinalizeController extends FsController[FsModel] {
+private trait FinalizeController extends FsController {
   import FinalizeController._
 
   abstract override def input(options: AccessOptions, name: FsEntryName) = {

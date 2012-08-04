@@ -30,10 +30,10 @@ implements FsCompositeDriver {
     }
 
     @Override
-    public FsController<? extends FsModel> newController(
+    public FsController newController(
             final FsManager manager,
             final FsModel model,
-            final @CheckForNull FsController<? extends FsModel> parent) {
+            final @CheckForNull FsController parent) {
         assert null == parent
                     ? null == model.getParent()
                     : parent.getModel().equals(model.getParent());
