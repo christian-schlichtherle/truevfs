@@ -26,7 +26,7 @@
         <fileSet filtered="false" packaged="false" encoding="UTF-8">
             <directory/>
             <includes>
-                <include>**/*.jar</include>
+                <include>test.zip</include>
             </includes>
         </fileSet>
     </fileSets>
