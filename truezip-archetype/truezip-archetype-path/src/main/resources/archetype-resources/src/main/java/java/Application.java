@@ -4,6 +4,7 @@
 package ${package}.java;
 
 import de.schlichtherle.truezip.file.TApplication;
+import de.schlichtherle.truezip.fs.FsSyncException;
 import de.schlichtherle.truezip.key.pbe.swing.HurlingWindowFeedback;
 import de.schlichtherle.truezip.key.pbe.swing.InvalidKeyFeedback;
 
@@ -17,7 +18,7 @@ abstract class Application<E extends Exception> extends TApplication<E> {
     /**
      * Runs the setup phase.
      * <p>
-     * This method is {@link ${symbol_pound}run run} only once at the start of the life
+     * This method is {@link #run run} only once at the start of the life
      * cycle.
      * Its task is to configure the default behavior of the TrueZIP FSP JSE7 API
      * in order to answer the following questions:
@@ -42,4 +43,19 @@ abstract class Application<E extends Exception> extends TApplication<E> {
         String impl = HurlingWindowFeedback.class.getName();
         System.setProperty(spec, System.getProperty(spec, impl));
     }
+
+    /**
+     * Overridden to make the application wait until it gets interrupted.
+     * Uncomment this method if you want to test the JMX interface with the
+     * short living sample applications of this archetype.
+     */
+    /*@Override
+    protected void sync() throws FsSyncException {
+        System.out.println("Waiting until interrupt...");
+        try {
+            Thread.sleep(Long.MAX_VALUE);
+        } catch (InterruptedException ex) {
+        }
+        super.sync();
+    }*/
 }
