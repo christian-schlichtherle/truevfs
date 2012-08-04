@@ -22,13 +22,12 @@ public abstract class DelegatingOutputSocket<E extends Entry>
 extends AbstractOutputSocket<E> {
 
     /**
-     * Returns the delegate socket.
+     * Returns the delegate output socket.
      * 
-     * @return The delegate socket.
+     * @return The delegate output socket.
      * @throws IOException on any I/O error. 
      */
-    protected abstract OutputSocket<? extends E> socket()
-    throws IOException;
+    protected abstract OutputSocket<? extends E> socket() throws IOException;
 
     @Override
     public E target() throws IOException {
