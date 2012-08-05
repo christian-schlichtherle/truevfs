@@ -21,11 +21,13 @@ import javax.inject.Provider;
 @Immutable
 public abstract class FsAbstractCompositeDriver
 implements FsCompositeDriver, Provider<Map<FsScheme, FsDriver>> {
+
     @Override
     public final FsController newController(
             final FsManager manager,
             final FsModel model,
-            final @CheckForNull FsController parent) {
+            final @CheckForNull FsController parent)
+    throws ServiceConfigurationError {
         assert null == parent
                     ? null == model.getParent()
                     : parent.getModel().equals(model.getParent());
