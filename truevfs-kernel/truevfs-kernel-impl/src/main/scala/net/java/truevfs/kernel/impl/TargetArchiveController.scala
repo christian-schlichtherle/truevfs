@@ -38,7 +38,7 @@ import ArchiveFileSystem._
 private class TargetArchiveController[E <: FsArchiveEntry](
   driver: FsArchiveDriver[E],
   model: LockModel,
-  _parent: FsController)
+  parent: FsController)
 extends FileSystemArchiveController[E](model) with TouchListener {
   import TargetArchiveController._
 
@@ -59,12 +59,12 @@ extends FileSystemArchiveController[E](model) with TouchListener {
   private[this] var _outputArchive: Option[OutputArchive[E]] = None
 
   require(null ne driver)
-  require(model.getParent eq _parent.getModel, "Parent/member mismatch!")
+  require(model.getParent eq parent.getModel, "Parent/member mismatch!")
   assert(invariants)
 
   private def invariants = {
     assert(null ne driver)
-    assert(null ne _parent)
+    assert(null ne parent)
     assert(null ne name)
     val fs = fileSystem
     assert(_inputArchive.isEmpty || fs.isDefined)
@@ -118,7 +118,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
     // Check parent file system entry.
     val pe = {
       try {
-        _parent.stat(options, name)
+        parent.stat(options, name)
       } catch {
         case ex: FalsePositiveArchiveException =>
           throw new AssertionError(ex)
@@ -147,7 +147,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
         val ro = isReadOnlyTarget()
         val is = {
           try {
-            driver.newInput(model, MOUNT_OPTIONS, _parent, name);
+            driver.newInput(model, MOUNT_OPTIONS, parent, name);
           } catch {
             case ex: FalsePositiveArchiveException =>
               throw new AssertionError(ex)
@@ -170,7 +170,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
 
   private def isReadOnlyTarget() = {
     try {
-      _parent.checkAccess(MOUNT_OPTIONS, name, WRITE_ACCESS);
+      parent.checkAccess(MOUNT_OPTIONS, name, WRITE_ACCESS);
       false
     } catch {
       case ex: FalsePositiveArchiveException =>
@@ -199,7 +199,7 @@ extends FileSystemArchiveController[E](model) with TouchListener {
       try {
         driver newOutput (model,
                           options.and(ACCESS_PREFERENCES_MASK).set(CACHE),
-                          _parent, name, is)
+                          parent, name, is)
       } catch {
         case ex: FalsePositiveArchiveException =>
           throw new AssertionError(ex)
