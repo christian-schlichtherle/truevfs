@@ -33,7 +33,7 @@ public abstract class FsDriver {
 
     /**
      * Returns a new thread-safe file system controller for the mount point of
-     * the given file system model and nullable parent file system controller.
+     * the given file system model.
      * <p>
      * When called, you may assert the following precondition:
      * <pre>{@code
