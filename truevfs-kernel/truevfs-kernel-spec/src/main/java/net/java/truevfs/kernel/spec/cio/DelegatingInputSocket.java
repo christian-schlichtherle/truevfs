@@ -36,15 +36,14 @@ extends AbstractInputSocket<E> {
     }
 
     @Override
-    public InputStream stream(
-            final @CheckForNull OutputSocket<? extends Entry> peer)
+    public InputStream stream(@CheckForNull OutputSocket<? extends Entry> peer)
     throws IOException {
         return socket().stream(peer);
     }
 
     @Override
     public SeekableByteChannel channel(
-            final @CheckForNull OutputSocket<? extends Entry> peer)
+            @CheckForNull OutputSocket<? extends Entry> peer)
     throws IOException {
         return socket().channel(peer);
     }
