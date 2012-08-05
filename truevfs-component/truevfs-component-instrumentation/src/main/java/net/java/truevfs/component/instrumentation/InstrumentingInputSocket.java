@@ -4,14 +4,19 @@
  */
 package net.java.truevfs.component.instrumentation;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.channels.SeekableByteChannel;
 import java.util.Objects;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.kernel.spec.cio.DecoratingInputSocket;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
+import net.java.truevfs.kernel.spec.cio.OutputSocket;
 
 /**
- * @param  <D> the type of the instrumenting director.
+ * @param  <D> the type of the director.
  * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.
  * @see    InstrumentingOutputSocket
@@ -19,7 +24,7 @@ import net.java.truevfs.kernel.spec.cio.InputSocket;
  */
 @Immutable
 public class InstrumentingInputSocket<
-        D extends InstrumentingDirector<D>,
+        D extends Director<D>,
         E extends Entry>
 extends DecoratingInputSocket<E> {
     protected final D director;
@@ -29,5 +34,18 @@ extends DecoratingInputSocket<E> {
             final InputSocket<? extends E> socket) {
         super(socket);
         this.director = Objects.requireNonNull(director);
+    }
+
+    @Override
+    public InputStream stream(@CheckForNull OutputSocket<? extends Entry> peer)
+    throws IOException {
+        return director.instrument(this, socket.stream(peer));
+    }
+
+    @Override
+    public SeekableByteChannel channel(
+            @CheckForNull OutputSocket<? extends Entry> peer)
+    throws IOException {
+        return director.instrument(this, socket.channel(peer));
     }
 }

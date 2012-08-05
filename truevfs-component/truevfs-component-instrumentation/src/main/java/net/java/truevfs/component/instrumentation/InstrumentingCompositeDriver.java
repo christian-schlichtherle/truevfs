@@ -5,6 +5,7 @@
 package net.java.truevfs.component.instrumentation;
 
 import java.util.Objects;
+import java.util.ServiceConfigurationError;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.kernel.spec.FsCompositeDriver;
@@ -13,11 +14,11 @@ import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsModel;
 
 /**
- * @param  <D> the type of the instrumenting director.
+ * @param  <D> the type of the director.
  * @author Christian Schlichtherle
  */
 @Immutable
-public class InstrumentingCompositeDriver<D extends InstrumentingDirector<D>>
+public class InstrumentingCompositeDriver<D extends Director<D>>
 implements FsCompositeDriver {
     protected final D director;
     protected final FsCompositeDriver driver;
@@ -33,11 +34,16 @@ implements FsCompositeDriver {
     public FsController newController(
             final FsManager manager,
             final FsModel model,
-            final @CheckForNull FsController parent) {
+            final @CheckForNull FsController parent)
+    throws ServiceConfigurationError {
         assert null == parent
                     ? null == model.getParent()
                     : parent.getModel().equals(model.getParent());
-        return director.instrument(driver.newController(manager, director.instrument(model, this), parent), this);
+        return director.instrument(this,
+                driver.newController(
+                    manager,
+                    director.instrument(this, model),
+                    parent));
     }
 
     @Override

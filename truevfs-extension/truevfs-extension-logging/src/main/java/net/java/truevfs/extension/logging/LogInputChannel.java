@@ -6,11 +6,11 @@ package net.java.truevfs.extension.logging;
 
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
+import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.io.ReadOnlyChannel;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,15 +22,14 @@ final class LogInputChannel extends ReadOnlyChannel {
     private static final Logger
             logger = LoggerFactory.getLogger(LogInputChannel.class);
 
-    private final InputSocket<?> socket;
+    private final InputSocket<? extends Entry> origin;
 
     @CreatesObligation
     LogInputChannel(
-            final InputSocket<? extends Entry> socket,
-            final OutputSocket<? extends Entry> peer)
-    throws IOException {
-        super(socket.channel(peer));
-        this.socket = socket;
+            final InputSocket<? extends Entry> origin,
+            final SeekableByteChannel channel) {
+        super(channel);
+        this.origin = origin;
         log("Opened input channel for {}");
     }
 
@@ -43,7 +42,7 @@ final class LogInputChannel extends ReadOnlyChannel {
     private void log(String message) {
         Entry entry;
         try {
-            entry = socket.target();
+            entry = origin.target();
         } catch (final IOException ignore) {
             entry = null;
         }

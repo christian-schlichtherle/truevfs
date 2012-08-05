@@ -12,11 +12,11 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
 import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
- * @param  <D> the type of the instrumenting director.
+ * @param  <D> the type of the director.
  * @author Christian Schlichtherle
  */
 @Immutable
-public class InstrumentingIoBufferPool<D extends InstrumentingDirector<D>>
+public class InstrumentingIoBufferPool<D extends Director<D>>
 extends AbstractIoBufferPool {
     protected final D director;
     protected final IoBufferPool pool;
@@ -30,7 +30,7 @@ extends AbstractIoBufferPool {
 
     @Override
     public IoBuffer allocate() throws IOException {
-        return new InstrumentingIoBuffer<>(director, pool.allocate());
+        return director.instrument(this, pool.allocate());
     }
 
     @Override

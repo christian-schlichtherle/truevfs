@@ -12,10 +12,10 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
 
 /**
- * @param  <D> the type of the instrumenting director.
+ * @param  <D> the type of the director.
  * @author Christian Schlichtherle
  */
-public class InstrumentingIoBuffer<D extends InstrumentingDirector<D>>
+public class InstrumentingIoBuffer<D extends Director<D>>
 extends DecoratingEntry<IoBuffer> implements IoBuffer {
     protected final D director;
 
@@ -26,12 +26,12 @@ extends DecoratingEntry<IoBuffer> implements IoBuffer {
 
     @Override
     public InputSocket<? extends IoBuffer> input() {
-        return director.instrument(entry.input(), this);
+        return director.instrument(this, entry.input());
     }
 
     @Override
     public OutputSocket<? extends IoBuffer> output() {
-        return director.instrument(entry.output(), this);
+        return director.instrument(this, entry.output());
     }
 
     @Override

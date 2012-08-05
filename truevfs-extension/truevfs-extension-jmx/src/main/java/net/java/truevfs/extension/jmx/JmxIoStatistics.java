@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.extension.jmx;
 
+import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -11,10 +12,9 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 final class JmxIoStatistics {
-
     private final long time;
-    private volatile long read;
-    private volatile long written;
+    private final AtomicLong read = new AtomicLong();
+    private final AtomicLong written = new AtomicLong();
 
     JmxIoStatistics() {
         time = System.currentTimeMillis();
@@ -25,18 +25,18 @@ final class JmxIoStatistics {
     }
     
     long getBytesRead() {
-        return read;
+        return read.get();
     }
 
-    synchronized void incBytesRead(int inc) {
-        read += inc;
+    void addBytesRead(int inc) {
+        read.addAndGet(inc);
     }
 
     long getBytesWritten() {
-        return written;
+        return written.get();
     }
 
-    synchronized void incBytesWritten(int inc) {
-        written += inc;
+    void addBytesWritten(int inc) {
+        written.addAndGet(inc);
     }
 }

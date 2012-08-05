@@ -5,18 +5,16 @@
 package net.java.truevfs.extension.jmx;
 
 import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.component.instrumentation.InstrumentingModel;
+import net.java.truevfs.kernel.spec.FsDecoratingModel;
 import net.java.truevfs.kernel.spec.FsModel;
 
 /**
  * @author Christian Schlichtherle
  */
 @Immutable
-final class JmxModel extends InstrumentingModel<JmxDirector> {
+final class JmxModel extends FsDecoratingModel {
 
-    JmxModel(JmxDirector director, FsModel model) {
-        super(director, model);
-    }
+    JmxModel(FsModel model) { super(model); }
 
     @Override
     public void setMounted(final boolean mounted) {

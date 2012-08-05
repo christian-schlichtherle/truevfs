@@ -7,10 +7,12 @@ package net.java.truevfs.extension.jmx;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.Date;
+import javax.annotation.CheckForNull;
 import javax.management.*;
 import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
 import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
+import net.java.truevfs.kernel.spec.cio.Entry.Size;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
@@ -109,13 +111,13 @@ implements JmxModelViewMXBean {
     protected String getDescription(MBeanAttributeInfo info) {
         String description = null;
         switch (info.getName()) {
-        case "MountPoint":
-            description = "The mount point URI of this file system.";
-            break;
         case "Mounted":
             description = "Whether or not this file system needs to get sync()ed.";
             break;
-        case "ParentMountPoint":
+        case "MountPoint":
+            description = "The mount point URI of this file system.";
+            break;
+        case "MountPointOfParent":
             description = "The mount point URI of the parent file system.";
             break;
         case "SizeOfData":
@@ -169,101 +171,70 @@ implements JmxModelViewMXBean {
     }
 
     @Override
-    public String getMountPoint() {
-        return model.getMountPoint().toString();
-    }
-
-    @Override
     public boolean isMounted() {
         return model.isMounted();
     }
 
     @Override
-    public String getParentMountPoint() {
+    public String getMountPoint() {
+        return model.getMountPoint().toString();
+    }
+
+    @Override
+    public String getMountPointOfParent() {
         final FsModel parent = model.getParent();
-        assert null != parent;
-        return parent.getMountPoint().toString();
-    }
-
-    private volatile FsController parentController;
-
-    private FsController getParentController() {
-        final FsController parentController = this.parentController;
-        return null != parentController
-                ? parentController
-                : (this.parentController = FsManagerLocator.SINGLETON.get()
-                    .controller(DRIVER, model.getMountPoint())
-                    .getParent());
-    }
-
-    private volatile FsEntryName parentEntryName;
-
-    private FsEntryName getParentEntryName() {
-        final FsEntryName parentEntryName = this.parentEntryName;
-        return null != parentEntryName
-                ? parentEntryName
-                : (this.parentEntryName = model.getMountPoint().getPath().getEntryName());
+        return null != parent ? parent.getMountPoint().toString() : null;
     }
 
     @Override
     public long getSizeOfData() {
-        try {
-            return getParentController()
-                    .stat(NONE, getParentEntryName())
-                    .getSize(DATA);
-        } catch (IOException ex) {
-            return UNKNOWN;
-        }
+        return sizeOf(DATA);
     }
 
     @Override
     public long getSizeOfStorage() {
-        try {
-            return getParentController()
-                    .stat(NONE, getParentEntryName())
-                    .getSize(STORAGE);
-        } catch (IOException ex) {
-            return UNKNOWN;
-        }
+        return sizeOf(STORAGE);
+    }
+
+    private long sizeOf(Size type) {
+        final FsEntry entry = stat();
+        return null == entry ? UNKNOWN : entry.getSize(type);
     }
 
     @Override
     public String getTimeWritten() {
-        final long time;
-        try {
-            time = getParentController()
-                        .stat(NONE, getParentEntryName())
-                        .getTime(WRITE);
-        } catch (IOException ex) {
-            return null;
-        }
+        final FsEntry entry = stat();
+        final long time = null == entry ? UNKNOWN : entry.getTime(WRITE);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 
     @Override
     public String getTimeRead() {
-        final long time;
-        try {
-            time = getParentController()
-                        .stat(NONE, getParentEntryName())
-                        .getTime(READ);
-        } catch (IOException ex) {
-            return null;
-        }
+        final FsEntry entry = stat();
+        final long time = null == entry ? UNKNOWN : entry.getTime(READ);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 
     @Override
     public String getTimeCreated() {
-        final long time;
+        final FsEntry entry = stat();
+        final long time = null == entry ? UNKNOWN : entry.getTime(CREATE);
+        return UNKNOWN == time ? null : new Date(time).toString();
+    }
+
+    private @CheckForNull FsEntry stat() {
+        final FsMountPoint mp = model.getMountPoint();
+        final FsMountPoint pmp = mp.getParent();
         try {
-            time = getParentController()
-                        .stat(NONE, getParentEntryName())
-                        .getTime(CREATE);
+            final FsManager m = FsManagerLocator.SINGLETON.get();
+            return null == pmp
+                    ? m.controller(DRIVER, mp)
+                        .stat(NONE, FsEntryName.ROOT)
+                    : m.controller(DRIVER, pmp)
+                        .stat(NONE, mp.getPath().getEntryName());
         } catch (IOException ex) {
             return null;
         }
-        return UNKNOWN == time ? null : new Date(time).toString();
     }
 
     @Override

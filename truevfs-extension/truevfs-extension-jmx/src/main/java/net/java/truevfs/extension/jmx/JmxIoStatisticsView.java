@@ -25,7 +25,7 @@ implements JmxIoStatisticsMXBean {
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
 
-    private final JmxIoStatistics model;
+    private final JmxIoStatistics stats;
     private final String type;
 
     static synchronized JmxIoStatisticsMXBean register(final JmxIoStatistics model, final String type) {
@@ -73,12 +73,12 @@ implements JmxIoStatisticsMXBean {
         }
     }
 
-    private JmxIoStatisticsView(final JmxIoStatistics model, final String name) {
+    private JmxIoStatisticsView(final JmxIoStatistics stats, final String type) {
         super(JmxIoStatisticsMXBean.class, true);
-        assert null != model;
-        assert null != name;
-        this.model = model;
-        this.type = name;
+        assert null != stats;
+        assert null != type;
+        this.stats = stats;
+        this.type = type;
     }
 
     @Override
@@ -167,7 +167,7 @@ implements JmxIoStatisticsMXBean {
 
     @Override
     public String getTimeCreated() {
-        return format(model.getTimeCreatedMillis());
+        return format(stats.getTimeCreatedMillis());
     }
 
     private static String format(long time) {
@@ -176,21 +176,21 @@ implements JmxIoStatisticsMXBean {
 
     @Override
     public long getTimeCreatedMillis() {
-        return model.getTimeCreatedMillis();
+        return stats.getTimeCreatedMillis();
     }
 
     @Override
     public long getBytesRead() {
-        return model.getBytesRead();
+        return stats.getBytesRead();
     }
 
     @Override
     public long getBytesWritten() {
-        return model.getBytesWritten();
+        return stats.getBytesWritten();
     }
 
     @Override
     public void close() {
-        unregister(model, type);
+        unregister(stats, type);
     }
 }

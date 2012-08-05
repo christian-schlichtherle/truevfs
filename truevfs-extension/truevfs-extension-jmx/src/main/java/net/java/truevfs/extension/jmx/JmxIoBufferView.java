@@ -25,7 +25,7 @@ implements JmxIoBufferViewMXBean {
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
 
-    private final IoBuffer model;
+    private final IoBuffer buffer;
 
     static JmxIoBufferViewMXBean register(final IoBuffer model) {
         final ObjectName name = getObjectName(model);
@@ -74,9 +74,9 @@ implements JmxIoBufferViewMXBean {
         }
     }
 
-    private JmxIoBufferView(IoBuffer model) {
+    private JmxIoBufferView(IoBuffer buffer) {
         super(JmxIoBufferViewMXBean.class, true);
-        this.model = model;
+        this.buffer = buffer;
     }
 
     @Override
@@ -155,34 +155,34 @@ implements JmxIoBufferViewMXBean {
 
     @Override
     public String getName() {
-        return model.getName();
+        return buffer.getName();
     }
 
     @Override
     public long getSizeOfData() {
-        return model.getSize(DATA);
+        return buffer.getSize(DATA);
     }
 
     @Override
     public long getSizeOfStorage() {
-        return model.getSize(STORAGE);
+        return buffer.getSize(STORAGE);
     }
 
     @Override
     public String getTimeWritten() {
-        final long time = model.getTime(WRITE);
+        final long time = buffer.getTime(WRITE);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 
     @Override
     public String getTimeRead() {
-        final long time = model.getTime(READ);
+        final long time = buffer.getTime(READ);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 
     @Override
     public String getTimeCreated() {
-        final long time = model.getTime(CREATE);
+        final long time = buffer.getTime(CREATE);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 }
