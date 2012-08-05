@@ -88,7 +88,7 @@ public abstract class FsDecoratingController extends FsAbstractController {
     public OutputSocket<? extends Entry> output(
             BitField<FsAccessOption> options,
             FsEntryName name,
-            Entry template) {
+            @CheckForNull Entry template) {
         return controller.output(options, name, template);
     }
 
@@ -97,7 +97,7 @@ public abstract class FsDecoratingController extends FsAbstractController {
             BitField<FsAccessOption> options,
             FsEntryName name,
             Type type,
-            Entry template)
+            @CheckForNull Entry template)
     throws IOException {
         controller.mknod(options, name, type, template);
     }
