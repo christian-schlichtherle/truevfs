@@ -7,6 +7,7 @@ package net.java.truevfs.kernel.spec.cio;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -35,13 +36,15 @@ extends AbstractInputSocket<E> {
     }
 
     @Override
-    public InputStream stream(OutputSocket<? extends Entry> peer)
+    public InputStream stream(
+            final @CheckForNull OutputSocket<? extends Entry> peer)
     throws IOException {
         return socket().stream(peer);
     }
 
     @Override
-    public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
+    public SeekableByteChannel channel(
+            final @CheckForNull OutputSocket<? extends Entry> peer)
     throws IOException {
         return socket().channel(peer);
     }
