@@ -30,7 +30,7 @@ public class FsFilteringManagerTest extends FsManagerTestSuite {
 
     @Test
     public void testFiltering() {
-        final FsCompositeDriver driver = new FsSimpleCompositeDriver(
+        final FsMetaDriver driver = new FsSimpleMetaDriver(
                 new MockDriverMapContainer("file|tar|tar.gz|zip"));
         for (final String[][] params : new String[][][] {
             // { { /* filter */ }, { /* test set */ }, { /* result set */ } },

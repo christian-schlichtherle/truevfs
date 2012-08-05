@@ -15,7 +15,7 @@ import javax.annotation.CheckForNull;
  * @see    FsDriver
  * @author Christian Schlichtherle
  */
-public interface FsCompositeDriver {
+public interface FsMetaDriver {
 
     /**
      * Returns a new thread-safe file system controller for the mount point of
@@ -32,11 +32,11 @@ public interface FsCompositeDriver {
      *         : parent.getModel().equals(model.getParent())
      * }</pre>
      * 
-     * @param  manager the file system manager for the new controller.
+     * @param  manager the manager of the new file system controller.
      * @param  model the file system model.
      * @param  parent the nullable parent file system controller.
-     * @return A new thread-safe file system controller for the given mount
-     *         point and parent file system controller.
+     * @return A new thread-safe file system controller for the mount point of
+     *         the given file system model.
      * @throws ServiceConfigurationError if no appropriate file system driver
      *         is known for the scheme of the given mount point.
      * @see    FsDriver#newController

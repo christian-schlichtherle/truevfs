@@ -44,7 +44,7 @@ public interface FsManager extends Iterable<FsController> {
      * @param  mountPoint the mount point of the file system.
      * @return The thread-safe file system controller for the given mount point.
      */
-    FsController controller(FsCompositeDriver driver, FsMountPoint mountPoint);
+    FsController controller(FsMetaDriver driver, FsMountPoint mountPoint);
 
     /**
      * Returns the number of managed file system controllers.

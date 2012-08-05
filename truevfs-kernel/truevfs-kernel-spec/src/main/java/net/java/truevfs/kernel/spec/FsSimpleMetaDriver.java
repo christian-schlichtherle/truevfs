@@ -16,8 +16,7 @@ import javax.inject.Provider;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class FsSimpleCompositeDriver extends FsAbstractCompositeDriver {
-
+public final class FsSimpleMetaDriver extends FsAbstractMetaDriver {
     private final Provider<Map<FsScheme, FsDriver>> provider;
 
     /**
@@ -27,7 +26,7 @@ public final class FsSimpleCompositeDriver extends FsAbstractCompositeDriver {
      * 
      * @param provider the driver map provider.
      */
-    public FsSimpleCompositeDriver(final Provider<Map<FsScheme, FsDriver>> provider) {
+    public FsSimpleMetaDriver(final Provider<Map<FsScheme, FsDriver>> provider) {
         this.provider = Objects.requireNonNull(provider);
     }
 

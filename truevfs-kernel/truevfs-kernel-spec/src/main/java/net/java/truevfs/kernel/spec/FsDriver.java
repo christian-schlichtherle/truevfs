@@ -42,11 +42,11 @@ public abstract class FsDriver {
      *         : parent.getModel().equals(model.getParent())
      * }</pre>
      *
-     * @param  manager the file system manager for the new controller.
+     * @param  manager the manager of the new file system controller.
      * @param  model the file system model.
      * @param  parent the nullable parent file system controller.
-     * @return A new thread-safe file system controller for the given mount
-     *         point and nullable parent file system controller.
+     * @return A new thread-safe file system controller for the mount point of
+     *         the given file system model.
      * @see    FsCompositeDriver#newController
      */
     public abstract FsController newController(

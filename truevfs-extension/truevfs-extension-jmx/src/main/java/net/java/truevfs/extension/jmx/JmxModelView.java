@@ -30,8 +30,8 @@ implements JmxModelViewMXBean {
 
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
-    private static final FsCompositeDriver
-            DRIVER = new FsSimpleCompositeDriver(FsDriverMapLocator.SINGLETON);
+    private static final FsMetaDriver
+            DRIVER = new FsSimpleMetaDriver(FsDriverMapLocator.SINGLETON);
 
     private final FsModel model;
 

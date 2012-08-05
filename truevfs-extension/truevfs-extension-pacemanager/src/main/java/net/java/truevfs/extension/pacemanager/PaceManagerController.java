@@ -25,7 +25,7 @@ final class PaceManagerController extends FsDecoratingManager {
     }
 
     @Override
-    public FsController controller(FsCompositeDriver d, FsMountPoint mp) {
+    public FsController controller(FsMetaDriver d, FsMountPoint mp) {
         return new PaceController(this, manager.controller(d, mp));
     }
 

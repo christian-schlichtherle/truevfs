@@ -118,14 +118,14 @@ public class JmxDirector extends AbstractDirector<JmxDirector> {
 
     @Override
     public FsModel instrument(
-            InstrumentingCompositeDriver<JmxDirector> origin,
+            InstrumentingMetaDriver<JmxDirector> origin,
             FsModel object) {
         return new JmxModel(object);
     }
 
     @Override
     public FsController instrument(
-            InstrumentingCompositeDriver<JmxDirector> origin,
+            InstrumentingMetaDriver<JmxDirector> origin,
             FsController object) {
         return new JmxKernelController(this, object);
     }
