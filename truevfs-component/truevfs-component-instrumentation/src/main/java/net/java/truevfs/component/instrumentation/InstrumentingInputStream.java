@@ -4,24 +4,23 @@
  */
 package net.java.truevfs.component.instrumentation;
 
+import java.io.InputStream;
 import java.util.Objects;
-import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.kernel.spec.FsDecoratingModel;
-import net.java.truevfs.kernel.spec.FsModel;
+import net.java.truecommons.io.DecoratingInputStream;
 
 /**
  * @param  <D> the type of the director.
+ * @see    InstrumentingOutputStream
  * @author Christian Schlichtherle
  */
-@Immutable
-public class InstrumentingModel<D extends Director<D>>
-extends FsDecoratingModel {
+public class InstrumentingInputStream<D extends Director<D>>
+extends DecoratingInputStream {
     protected final D director;
 
-    public InstrumentingModel(
+    public InstrumentingInputStream(
             final D director,
-            final FsModel model) {
-        super(model);
+            final InputStream in) {
+        super(in);
         this.director = Objects.requireNonNull(director);
     }
 }

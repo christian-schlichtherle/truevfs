@@ -15,10 +15,10 @@ import org.slf4j.LoggerFactory;
  */
 final class LogIoBuffer extends InstrumentingIoBuffer<LogDirector> {
     private static final Logger logger =
-            LoggerFactory.getLogger(LogIoBufferPool.class);
+            LoggerFactory.getLogger(LogIoBuffer.class);
 
-    LogIoBuffer(LogDirector director, IoBuffer model) {
-        super(director, model);
+    LogIoBuffer(LogDirector director, IoBuffer buffer) {
+        super(director, buffer);
         logger.debug("Allocated I/O buffer {}", entry);
         if (logger.isTraceEnabled())
             logger.trace("Stack trace:", new Throwable());

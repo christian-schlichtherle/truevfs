@@ -23,7 +23,7 @@ implements JmxManagerViewMXBean {
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
 
-    private final FsManager model;
+    private final FsManager manager;
 
     static JmxManagerViewMXBean register(final FsManager model) {
         final JmxManagerViewMXBean view = new JmxManagerView(model);
@@ -67,9 +67,9 @@ implements JmxManagerViewMXBean {
         }
     }
 
-    private JmxManagerView(final FsManager model) {
+    private JmxManagerView(final FsManager manager) {
         super(JmxManagerViewMXBean.class, true);
-        this.model = model;
+        this.manager = manager;
     }
 
     @Override
@@ -153,13 +153,13 @@ implements JmxManagerViewMXBean {
 
     @Override
     public int getFileSystemsTotal() {
-        return model.size();
+        return manager.size();
     }
 
     @Override
     public int getFileSystemsMounted() {
         int mounted = 0;
-        for (FsController controller : model)
+        for (FsController controller : manager)
             if (controller.getModel().isMounted()) mounted++;
         return mounted;
     }
@@ -167,7 +167,7 @@ implements JmxManagerViewMXBean {
     @Override
     public int getTopLevelArchiveFileSystemsTotal() {
         int total = 0;
-        for (FsController controller : model)
+        for (FsController controller : manager)
             if (isTopLevelArchive(controller)) total++;
         return total;
     }
@@ -175,7 +175,7 @@ implements JmxManagerViewMXBean {
     @Override
     public int getTopLevelArchiveFileSystemsMounted() {
         int mounted = 0;
-        for (FsController controller : model)
+        for (FsController controller : manager)
             if (isTopLevelArchive(controller))
                 if (controller.getModel().isMounted()) mounted++;
         return mounted;
@@ -188,11 +188,11 @@ implements JmxManagerViewMXBean {
 
     @Override
     public void sync() throws FsSyncException {
-        model.sync(FsSyncOptions.NONE);
+        manager.sync(FsSyncOptions.NONE);
     }
 
     @Override
     public void clearStatistics() {
-        JmxDirector.SINGLETON.clearStatistics();
+        JmxDirector.SINGLETON.clearStats();
     }
 }

@@ -9,11 +9,11 @@ import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.kernel.spec.*;
 
 /**
- * @param  <D> the type of the instrumenting director.
+ * @param  <D> the type of the director.
  * @author Christian Schlichtherle
  */
 @Immutable
-public class InstrumentingManager<D extends InstrumentingDirector<D>>
+public class InstrumentingManager<D extends Director<D>>
 extends FsDecoratingManager {
     protected final D director;
 
@@ -25,7 +25,12 @@ extends FsDecoratingManager {
     }
 
     @Override
-    public FsController controller(FsCompositeDriver driver, FsMountPoint mountPoint) {
-        return director.instrument(manager.controller(director.instrument(driver, this), mountPoint), this);
+    public FsController controller(
+            FsCompositeDriver driver,
+            FsMountPoint mountPoint) {
+        return director.instrument(this,
+                manager.controller(
+                    director.instrument(this, driver),
+                    mountPoint));
     }
 }

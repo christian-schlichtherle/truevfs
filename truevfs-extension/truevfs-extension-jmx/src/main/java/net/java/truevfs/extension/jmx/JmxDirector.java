@@ -4,7 +4,10 @@
  */
 package net.java.truevfs.extension.jmx;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.management.ManagementFactory;
+import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.*;
 import net.java.truevfs.component.instrumentation.*;
@@ -17,64 +20,61 @@ import net.java.truevfs.kernel.spec.cio.*;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxDirector extends InstrumentingDirector<JmxDirector> {
+public class JmxDirector extends AbstractDirector<JmxDirector> {
 
     private static final String APPLICATION_IO_STATISTICS = "Application I/O Statistics";
     private static final String KERNEL_IO_STATISTICS = "Kernel I/O Statistics";
     private static final String BUFFER_IO_STATISTICS = "Buffer I/O Statistics";
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
-    public static final JmxDirector SINGLETON = new JmxDirector();
+
+    static final JmxDirector SINGLETON = new JmxDirector();
+
+    private volatile JmxIoStatistics appStats, kernelStats, bufferStats;
 
     private JmxDirector() { }
 
-    private volatile JmxIoStatistics application;
-
-    JmxIoStatistics getApplicationIoStatistics() {
-        final JmxIoStatistics stats = application;
+    JmxIoStatistics getAppStats() {
+        final JmxIoStatistics stats = appStats;
         assert null != stats;
         return stats;
     }
 
-    void setApplicationIoStatistics(final JmxIoStatistics stats) {
+    void setAppStats(final JmxIoStatistics stats) {
         assert null != stats;
-        this.application = stats;
+        this.appStats = stats;
         JmxIoStatisticsView.register(stats, APPLICATION_IO_STATISTICS);
     }
 
-    private volatile JmxIoStatistics kernel;
-
-    JmxIoStatistics getKernelIoStatistics() {
-        final JmxIoStatistics stats = kernel;
+    JmxIoStatistics getKernelStats() {
+        final JmxIoStatistics stats = kernelStats;
         assert null != stats;
         return stats;
     }
 
-    void setKernelIoStatistics(final JmxIoStatistics stats) {
+    void setKernelStats(final JmxIoStatistics stats) {
         assert null != stats;
-        this.kernel = stats;
+        this.kernelStats = stats;
         JmxIoStatisticsView.register(stats, KERNEL_IO_STATISTICS);
     }
 
-    private volatile JmxIoStatistics temp;
-
-    JmxIoStatistics getTempIoStatistics() {
-        final JmxIoStatistics stats = temp;
+    JmxIoStatistics getBufferStats() {
+        final JmxIoStatistics stats = bufferStats;
         assert null != stats;
         return stats;
     }
 
-    void setTempIoStatistics(final JmxIoStatistics stats) {
+    void setBufferStats(final JmxIoStatistics stats) {
         assert null != stats;
-        this.temp = stats;
+        this.bufferStats = stats;
         JmxIoStatisticsView.register(stats, BUFFER_IO_STATISTICS);
     }
 
-    void clearStatistics() {
+    void clearStats() {
         for (final Object[] params : new Object[][] {
-            { APPLICATION_IO_STATISTICS, application, },
-            { KERNEL_IO_STATISTICS, kernel, },
-            { BUFFER_IO_STATISTICS, temp, },
+            { APPLICATION_IO_STATISTICS, appStats, },
+            { KERNEL_IO_STATISTICS, kernelStats, },
+            { BUFFER_IO_STATISTICS, bufferStats, },
         }) {
             final ObjectName pattern;
             try {
@@ -100,63 +100,95 @@ public class JmxDirector extends InstrumentingDirector<JmxDirector> {
     }
 
     @Override
-    public FsManager instrument(FsManager manager) {
-        return new JmxManager(this, manager);
+    public FsManager instrument(FsManager object) {
+        return new JmxManager(this, object);
     }
 
     @Override
-    public IoBufferPool instrument(IoBufferPool pool) {
-        return new JmxIoBufferPool(this, pool);
-    }
-
-    @Override
-    public FsModel instrument(
-            FsModel model,
-            InstrumentingCompositeDriver<JmxDirector> context) {
-        return new JmxModel(this, model);
+    public IoBufferPool instrument(IoBufferPool object) {
+        return new JmxIoBufferPool(this, object);
     }
 
     @Override
     public FsController instrument(
-            FsController controller,
-            InstrumentingManager<JmxDirector> context) {
+            InstrumentingManager<JmxDirector> origin,
+            FsController controller) {
         return new JmxApplicationController(this, controller);
     }
 
     @Override
+    public FsModel instrument(
+            InstrumentingCompositeDriver<JmxDirector> origin,
+            FsModel object) {
+        return new JmxModel(object);
+    }
+
+    @Override
     public FsController instrument(
-            FsController controller,
-            InstrumentingCompositeDriver<JmxDirector> context) {
-        return new JmxKernelController(this, controller);
+            InstrumentingCompositeDriver<JmxDirector> origin,
+            FsController object) {
+        return new JmxKernelController(this, object);
+    }
+
+    @Override
+    public InputSocket<? extends Entry> instrument(
+            InstrumentingController<JmxDirector> origin,
+            InputSocket<? extends Entry> object) {
+        return new JmxInputSocket<>(this, object,
+                ((WithIoStatistics) origin).getStats());
+    }
+
+    @Override
+    public OutputSocket<? extends Entry> instrument(
+            InstrumentingController<JmxDirector> origin,
+            OutputSocket<? extends Entry> object) {
+        return new JmxOutputSocket<>(this, object,
+                ((WithIoStatistics) origin).getStats());
     }
 
     @Override
     public InputSocket<? extends IoBuffer> instrument(
-            InputSocket<? extends IoBuffer> input,
-            InstrumentingIoBuffer<JmxDirector> context) {
-        return new JmxInputSocket<>(this, input, temp);
-    }
-
-    @Override
-    public <E extends Entry> InputSocket<E> instrument(
-            InputSocket<E> input,
-            InstrumentingController<JmxDirector> context) {
-        return new JmxInputSocket<>(this, input,
-                JmxController.class.cast(context).getIOStatistics());
+            InstrumentingIoBuffer<JmxDirector> origin,
+            InputSocket<? extends IoBuffer> object) {
+        return new JmxInputSocket<>(this, object, bufferStats);
     }
 
     @Override
     public OutputSocket<? extends IoBuffer> instrument(
-            OutputSocket<? extends IoBuffer> output,
-            InstrumentingIoBuffer<JmxDirector> context) {
-        return new JmxOutputSocket<>(this, output, temp);
+            InstrumentingIoBuffer<JmxDirector> origin,
+            OutputSocket<? extends IoBuffer> object) {
+        return new JmxOutputSocket<>(this, object, bufferStats);
     }
 
     @Override
-    public <E extends Entry> OutputSocket<E> instrument(
-            OutputSocket<E> output,
-            InstrumentingController<JmxDirector> context) {
-        return new JmxOutputSocket<>(this, output,
-                JmxController.class.cast(context).getIOStatistics());
+    public InputStream instrument(
+            InstrumentingInputSocket<JmxDirector, ? extends Entry> origin,
+            InputStream object) {
+        return new JmxInputStream(object,
+                ((WithIoStatistics) origin).getStats());
+    }
+
+    @Override
+    public SeekableByteChannel instrument(
+            InstrumentingInputSocket<JmxDirector, ? extends Entry> origin,
+            SeekableByteChannel object) {
+        return new JmxSeekableChannel(object,
+                ((WithIoStatistics) origin).getStats());
+    }
+
+    @Override
+    public OutputStream instrument(
+            InstrumentingOutputSocket<JmxDirector, ? extends Entry> origin,
+            OutputStream object) {
+        return new JmxOutputStream(object,
+                ((WithIoStatistics) origin).getStats());
+    }
+
+    @Override
+    public SeekableByteChannel instrument(
+            InstrumentingOutputSocket<JmxDirector, ? extends Entry> origin,
+            SeekableByteChannel object) {
+        return new JmxSeekableChannel(object,
+                ((WithIoStatistics) origin).getStats());
     }
 }

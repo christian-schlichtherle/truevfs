@@ -4,19 +4,21 @@
  */
 package net.java.truevfs.extension.jmx;
 
+import net.java.truevfs.component.instrumentation.InstrumentingController;
 import net.java.truevfs.kernel.spec.FsController;
 
 /**
  * @author Christian Schlichtherle
  */
-final class JmxKernelController extends JmxController {
+final class JmxKernelController
+extends InstrumentingController<JmxDirector> implements WithIoStatistics {
 
     JmxKernelController(JmxDirector director, FsController controller) {
         super(director, controller);
     }
 
     @Override
-    JmxIoStatistics getIOStatistics() {
-        return director.getKernelIoStatistics();
+    public JmxIoStatistics getStats() {
+        return director.getKernelStats();
     }
 }
