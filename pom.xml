@@ -10,9 +10,9 @@
     </prerequisites>
 
     <parent>
-        <groupId>de.schlichtherle</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>19</version>
+        <groupId>net.java.truecommons</groupId>
+        <artifactId>truecommons-parent</artifactId>
+        <version>3</version>
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
@@ -74,13 +74,10 @@ system space.
         <connection>scm:hg:https://hg.java.net/hg/truezip~v7</connection>
         <developerConnection>scm:hg:ssh://hg.java.net/truezip~v7</developerConnection>
         <url>http://java.net/projects/truezip/sources/v7/show</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
-        <!-- While using an older Maven version may work, this hasn't been
-             tested and is probably not producing exactly the same results. -->
-        <maven.enforcer.requireMavenVersion>3.0.4</maven.enforcer.requireMavenVersion>
         <!-- Most modules require JSE 7 at compile time.
              At run time however, most modules require only JSE 6.
              So while you can't compile TrueZIP with JSE 6, you can still run
@@ -259,13 +256,11 @@ system space.
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>annotations</artifactId>
-            <version>2.0.0</version>
             <optional>true</optional>
         </dependency>
     </dependencies>
