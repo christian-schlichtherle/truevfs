@@ -8,8 +8,8 @@ import de.schlichtherle.truezip.fs.FsManager;
 import java.lang.management.ManagementFactory;
 import java.text.DateFormat;
 import java.util.Date;
-import javax.management.*;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.management.*;
 
 /**
  * Provides statistics for the federated file systems managed by a single file
@@ -25,7 +25,7 @@ implements JmxIOStatisticsMXBean {
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
 
-    private final JmxIOStatistics model;
+    private final JmxIOStatistics stats;
     private final String type;
 
     static synchronized JmxIOStatisticsMXBean register(final JmxIOStatistics model, final String type) {
@@ -76,12 +76,12 @@ implements JmxIOStatisticsMXBean {
         }
     }
 
-    private JmxIOStatisticsView(final JmxIOStatistics model, final String name) {
+    private JmxIOStatisticsView(final JmxIOStatistics stats, final String type) {
         super(JmxIOStatisticsMXBean.class, true);
-        assert null != model;
-        assert null != name;
-        this.model = model;
-        this.type = name;
+        assert null != stats;
+        assert null != type;
+        this.stats = stats;
+        this.type = type;
     }
     
     @Override
@@ -165,7 +165,7 @@ implements JmxIOStatisticsMXBean {
 
     @Override
     public String getTimeCreated() {
-        return format(model.getTimeCreatedMillis());
+        return format(stats.getTimeCreatedMillis());
     }
 
     private static String format(long time) {
@@ -174,21 +174,21 @@ implements JmxIOStatisticsMXBean {
 
     @Override
     public long getTimeCreatedMillis() {
-        return model.getTimeCreatedMillis();
+        return stats.getTimeCreatedMillis();
     }
 
     @Override
     public long getBytesRead() {
-        return model.getBytesRead();
+        return stats.getBytesRead();
     }
 
     @Override
     public long getBytesWritten() {
-        return model.getBytesWritten();
+        return stats.getBytesWritten();
     }
 
     @Override
     public void close() {
-        unregister(model, type);
+        unregister(stats, type);
     }
 }
