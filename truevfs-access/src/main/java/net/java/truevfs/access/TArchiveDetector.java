@@ -4,21 +4,21 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truecommons.services.Container;
-import net.java.truecommons.services.Loader;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import javax.inject.Provider;
-import net.java.truevfs.kernel.spec.FsAbstractCompositeDriver;
-import net.java.truevfs.kernel.spec.FsDriver;
-import net.java.truevfs.kernel.spec.FsScheme;
-import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
+import net.java.truecommons.services.Container;
+import net.java.truecommons.services.Loader;
 import net.java.truecommons.shed.ExtensionSet;
 import net.java.truecommons.shed.HashMaps;
 import static net.java.truecommons.shed.HashMaps.initialCapacity;
+import net.java.truevfs.kernel.spec.FsAbstractMetaDriver;
+import net.java.truevfs.kernel.spec.FsDriver;
+import net.java.truevfs.kernel.spec.FsScheme;
+import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
 
 /**
  * Detects a <em>prospective</em> archive file and declares its file system
@@ -55,7 +55,7 @@ import static net.java.truecommons.shed.HashMaps.initialCapacity;
  */
 @Immutable
 public final class TArchiveDetector
-extends FsAbstractCompositeDriver implements Container<Map<FsScheme, FsDriver>> {
+extends FsAbstractMetaDriver implements Container<Map<FsScheme, FsDriver>> {
 
     /**
      * This instance never recognizes any archive files in a path.

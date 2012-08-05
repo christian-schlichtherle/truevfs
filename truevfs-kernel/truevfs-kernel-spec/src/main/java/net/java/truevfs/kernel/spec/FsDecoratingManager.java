@@ -34,7 +34,7 @@ public abstract class FsDecoratingManager extends FsAbstractManager {
 
     @Override
     public FsController controller(
-            FsCompositeDriver driver,
+            FsMetaDriver driver,
             FsMountPoint mountPoint) {
         return manager.controller(driver, mountPoint);
     }

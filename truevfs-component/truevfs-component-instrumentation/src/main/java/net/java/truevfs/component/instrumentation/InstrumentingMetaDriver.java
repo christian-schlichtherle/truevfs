@@ -8,9 +8,9 @@ import java.util.Objects;
 import java.util.ServiceConfigurationError;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.kernel.spec.FsCompositeDriver;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
+import net.java.truevfs.kernel.spec.FsMetaDriver;
 import net.java.truevfs.kernel.spec.FsModel;
 
 /**
@@ -18,14 +18,14 @@ import net.java.truevfs.kernel.spec.FsModel;
  * @author Christian Schlichtherle
  */
 @Immutable
-public class InstrumentingCompositeDriver<D extends Director<D>>
-implements FsCompositeDriver {
+public class InstrumentingMetaDriver<D extends Director<D>>
+implements FsMetaDriver {
     protected final D director;
-    protected final FsCompositeDriver driver;
+    protected final FsMetaDriver driver;
 
-    public InstrumentingCompositeDriver(
+    public InstrumentingMetaDriver(
             final D director,
-            final FsCompositeDriver driver) {
+            final FsMetaDriver driver) {
         this.director = Objects.requireNonNull(director);
         this.driver = Objects.requireNonNull(driver);
     }

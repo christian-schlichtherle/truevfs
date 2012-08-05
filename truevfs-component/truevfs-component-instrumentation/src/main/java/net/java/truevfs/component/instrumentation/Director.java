@@ -7,7 +7,7 @@ package net.java.truevfs.component.instrumentation;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
-import net.java.truevfs.kernel.spec.FsCompositeDriver;
+import net.java.truevfs.kernel.spec.FsMetaDriver;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsModel;
@@ -52,9 +52,9 @@ public interface Director<This extends Director<This>> {
      *         does not want to instrument it.
      * @see    #instrument(FsManager)
      */
-    FsCompositeDriver instrument(
+    FsMetaDriver instrument(
             InstrumentingManager<This> origin,
-            FsCompositeDriver object);
+            FsMetaDriver object);
 
     /**
      * Instruments the given {@code object}.
@@ -89,10 +89,10 @@ public interface Director<This extends Director<This>> {
      * @param  object the object to instrument.
      * @return An instrumenting object or {@code object} if the implementation
      *         does not want to instrument it.
-     * @see    #instrument(FsManager, FsCompositeDriver)
+     * @see    #instrument(FsManager, FsMetaDriver)
      */
     FsModel instrument(
-            InstrumentingCompositeDriver<This> origin,
+            InstrumentingMetaDriver<This> origin,
             FsModel object);
 
     /**
@@ -102,10 +102,10 @@ public interface Director<This extends Director<This>> {
      * @param  object the object to instrument.
      * @return An instrumenting object or {@code object} if the implementation
      *         does not want to instrument it.
-     * @see    #instrument(FsManager, FsCompositeDriver)
+     * @see    #instrument(FsManager, FsMetaDriver)
      */
     FsController instrument(
-            InstrumentingCompositeDriver<This> origin,
+            InstrumentingMetaDriver<This> origin,
             FsController object);
 
     /**
@@ -116,7 +116,7 @@ public interface Director<This extends Director<This>> {
      * @return An instrumenting object or {@code object} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(FsManager, FsController)
-     * @see    #instrument(FsCompositeDriver, FsController)
+     * @see    #instrument(FsMetaDriver, FsController)
      */
     InputSocket<? extends Entry> instrument(
             InstrumentingController<This> origin,
@@ -130,7 +130,7 @@ public interface Director<This extends Director<This>> {
      * @return An instrumenting object or {@code object} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(FsManager, FsController)
-     * @see    #instrument(FsCompositeDriver, FsController)
+     * @see    #instrument(FsMetaDriver, FsController)
      */
     OutputSocket<? extends Entry> instrument(
             InstrumentingController<This> origin,

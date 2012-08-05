@@ -19,8 +19,8 @@ import javax.inject.Provider;
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class FsAbstractCompositeDriver
-implements FsCompositeDriver, Provider<Map<FsScheme, FsDriver>> {
+public abstract class FsAbstractMetaDriver
+implements FsMetaDriver, Provider<Map<FsScheme, FsDriver>> {
 
     @Override
     public final FsController newController(

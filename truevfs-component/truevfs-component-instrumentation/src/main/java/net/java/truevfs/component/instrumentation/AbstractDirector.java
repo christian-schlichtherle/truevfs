@@ -7,7 +7,7 @@ package net.java.truevfs.component.instrumentation;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
-import net.java.truevfs.kernel.spec.FsCompositeDriver;
+import net.java.truevfs.kernel.spec.FsMetaDriver;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsModel;
@@ -34,10 +34,10 @@ implements Director<This> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public FsCompositeDriver instrument(
+    public FsMetaDriver instrument(
             InstrumentingManager<This> origin,
-            FsCompositeDriver object) {
-        return new InstrumentingCompositeDriver<>((This) this, object);
+            FsMetaDriver object) {
+        return new InstrumentingMetaDriver<>((This) this, object);
     }
 
     @Override
@@ -57,7 +57,7 @@ implements Director<This> {
 
     @Override
     public FsModel instrument(
-            InstrumentingCompositeDriver<This> origin,
+            InstrumentingMetaDriver<This> origin,
             FsModel object) {
         return object;
     }
@@ -65,7 +65,7 @@ implements Director<This> {
     @Override
     @SuppressWarnings("unchecked")
     public FsController instrument(
-            InstrumentingCompositeDriver<This> origin,
+            InstrumentingMetaDriver<This> origin,
             FsController object) {
         return new InstrumentingController<>((This) this, object);
     }
