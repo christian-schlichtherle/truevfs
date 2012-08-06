@@ -9,15 +9,15 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.InheritableThreadLocalStack;
+import net.java.truecommons.shed.Resource;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 import net.java.truevfs.kernel.spec.FsAccessOptions;
 import static net.java.truevfs.kernel.spec.FsAccessOptions.ACCESS_PREFERENCES_MASK;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
-import net.java.truecommons.shed.BitField;
-import net.java.truecommons.shed.InheritableThreadLocalStack;
-import net.java.truecommons.shed.Resource;
 
 /**
  * A container for configuration options with global or inheritable thread
