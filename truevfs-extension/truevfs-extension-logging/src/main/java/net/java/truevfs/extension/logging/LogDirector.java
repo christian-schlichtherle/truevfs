@@ -19,7 +19,7 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class LogDirector extends AbstractDirector<LogDirector> {
+final class LogDirector extends AbstractDirector<LogDirector> {
     static final LogDirector SINGLETON = new LogDirector();
 
     private LogDirector() { }
