@@ -12,7 +12,7 @@ import net.java.truevfs.kernel.spec.FsSyncException;
  *
  * @author Christian Schlichtherle
  */
-public interface JmxManagerViewMXBean {
+public interface JmxManagerMXBean {
 
     /**
      * Returns the total number of file systems.

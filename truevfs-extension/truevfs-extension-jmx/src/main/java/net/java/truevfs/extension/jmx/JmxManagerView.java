@@ -17,23 +17,22 @@ import net.java.truevfs.kernel.spec.FsSyncOptions;
  * @author Christian Schlichtherle
  */
 final class JmxManagerView
-extends StandardMBean
-implements JmxManagerViewMXBean {
+extends StandardMBean implements JmxManagerMXBean {
 
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
 
     private final FsManager manager;
 
-    static JmxManagerViewMXBean register(final FsManager model) {
-        final JmxManagerViewMXBean view = new JmxManagerView(model);
+    static JmxManagerMXBean register(final FsManager model) {
         final ObjectName name = getObjectName(model);
+        final JmxManagerMXBean view = new JmxManagerView(model);
         try {
             try {
                 mbs.registerMBean(view, name);
                 return view;
             } catch (InstanceAlreadyExistsException ignored) {
-                return JMX.newMXBeanProxy(mbs, name, JmxManagerViewMXBean.class);
+                return JMX.newMXBeanProxy(mbs, name, JmxManagerMXBean.class);
             }
         } catch (RuntimeException ex) {
             throw ex;
@@ -57,18 +56,16 @@ implements JmxManagerViewMXBean {
     }
 
     private static ObjectName getObjectName(final FsManager model) {
-        final Class<?> clazz = model.getClass();
         try {
-            return new ObjectName(  clazz.getPackage().getName(),
-                                    "type",
-                                    clazz.getSimpleName());
+            return new ObjectName(JmxManagerView.class.getPackage().getName(),
+                    "type", FsManager.class.getSimpleName());
         } catch (MalformedObjectNameException ex) {
             throw new AssertionError(ex);
         }
     }
 
     private JmxManagerView(final FsManager manager) {
-        super(JmxManagerViewMXBean.class, true);
+        super(JmxManagerMXBean.class, true);
         this.manager = manager;
     }
 

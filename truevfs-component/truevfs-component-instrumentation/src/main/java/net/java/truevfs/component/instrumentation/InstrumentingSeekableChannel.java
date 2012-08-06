@@ -11,7 +11,9 @@ import net.java.truecommons.io.DecoratingSeekableChannel;
 /**
  * @param  <D> the type of the director.
  * @author Christian Schlichtherle
+ * @deprecated Unused.
  */
+@Deprecated
 public class InstrumentingSeekableChannel<D extends Director<D>>
 extends DecoratingSeekableChannel {
     protected final D director;

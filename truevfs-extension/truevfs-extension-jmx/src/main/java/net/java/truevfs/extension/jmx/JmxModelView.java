@@ -25,8 +25,7 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  * @author Christian Schlichtherle
  */
 final class JmxModelView
-extends StandardMBean
-implements JmxModelViewMXBean {
+extends StandardMBean implements JmxModelMXBean {
 
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
@@ -35,15 +34,15 @@ implements JmxModelViewMXBean {
 
     private final FsModel model;
 
-    static JmxModelViewMXBean register(final FsModel model) {
+    static JmxModelMXBean register(final FsModel model) {
         final ObjectName name = getObjectName(model);
-        final JmxModelViewMXBean view = new JmxModelView(model);
+        final JmxModelMXBean view = new JmxModelView(model);
         try {
             try {
                 mbs.registerMBean(view, name);
                 return view;
             } catch (InstanceAlreadyExistsException ignored) {
-                return JMX.newMXBeanProxy(mbs, name, JmxModelViewMXBean.class);
+                return JMX.newMXBeanProxy(mbs, name, JmxModelMXBean.class);
             }
         } catch (RuntimeException ex) {
             throw ex;
@@ -74,8 +73,7 @@ implements JmxModelViewMXBean {
         table.put("type", FsModel.class.getSimpleName());
         table.put("path", ObjectName.quote(path));
         try {
-            return new ObjectName(
-                    JmxModelView.class.getPackage().getName(),
+            return new ObjectName(JmxModelView.class.getPackage().getName(),
                     table);
         } catch (MalformedObjectNameException ex) {
             throw new AssertionError(ex);
@@ -83,7 +81,7 @@ implements JmxModelViewMXBean {
     }
 
     private JmxModelView(FsModel model) {
-        super(JmxModelViewMXBean.class, true);
+        super(JmxModelMXBean.class, true);
         this.model = model;
     }
 

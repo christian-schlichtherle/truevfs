@@ -19,23 +19,22 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
  * @author Christian Schlichtherle
  */
 final class JmxIoBufferView
-extends StandardMBean
-implements JmxIoBufferViewMXBean {
+extends StandardMBean implements JmxIoBufferMXBean {
 
     private static final MBeanServer
             mbs = ManagementFactory.getPlatformMBeanServer();
 
     private final IoBuffer buffer;
 
-    static JmxIoBufferViewMXBean register(final IoBuffer model) {
+    static JmxIoBufferMXBean register(final IoBuffer model) {
         final ObjectName name = getObjectName(model);
-        final JmxIoBufferViewMXBean view = new JmxIoBufferView(model);
+        final JmxIoBufferMXBean view = new JmxIoBufferView(model);
         try {
             try {
                 mbs.registerMBean(view, name);
                 return view;
             } catch (InstanceAlreadyExistsException ignored) {
-                return JMX.newMXBeanProxy(mbs, name, JmxIoBufferViewMXBean.class);
+                return JMX.newMXBeanProxy(mbs, name, JmxIoBufferMXBean.class);
             }
         } catch (RuntimeException ex) {
             throw ex;
@@ -66,8 +65,7 @@ implements JmxIoBufferViewMXBean {
         table.put("type", IoBuffer.class.getSimpleName());
         table.put("path", ObjectName.quote(path));
         try {
-            return new ObjectName(
-                    JmxIoBufferView.class.getPackage().getName(),
+            return new ObjectName(JmxIoBufferView.class.getPackage().getName(),
                     table);
         } catch (MalformedObjectNameException ex) {
             throw new AssertionError(ex);
@@ -75,7 +73,7 @@ implements JmxIoBufferViewMXBean {
     }
 
     private JmxIoBufferView(IoBuffer buffer) {
-        super(JmxIoBufferViewMXBean.class, true);
+        super(JmxIoBufferMXBean.class, true);
         this.buffer = buffer;
     }
 
