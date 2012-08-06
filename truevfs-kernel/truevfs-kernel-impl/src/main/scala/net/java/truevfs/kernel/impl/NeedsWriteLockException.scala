@@ -7,10 +7,9 @@ package net.java.truevfs.kernel.impl
 import net.java.truecommons.shed._
 import javax.annotation.concurrent._
 
-/** Indicates that the file system needs to get write locked before the
-  * operation can get retried.
+/** Indicates that an operation needs to get write locked before it can get
+  * retried.
   *
-  * @see    LockController
   * @author Christian Schlichtherle
   */
 @Immutable
