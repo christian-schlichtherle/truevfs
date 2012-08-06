@@ -7,6 +7,6 @@ package net.java.truevfs.extension.jmx;
 /**
  * @author Christian Schlichtherle
  */
-interface JmxWithIoStatistics {
-    JmxIoStatistics getStats();
+interface JmxIoStatisticsProvider {
+    JmxIoStatistics getStatistics();
 }

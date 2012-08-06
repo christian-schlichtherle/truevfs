@@ -11,14 +11,14 @@ import net.java.truevfs.kernel.spec.FsController;
  * @author Christian Schlichtherle
  */
 final class JmxKernelController
-extends InstrumentingController<JmxDirector> implements JmxWithIoStatistics {
+extends InstrumentingController<JmxDirector> implements JmxIoStatisticsProvider {
 
     JmxKernelController(JmxDirector director, FsController controller) {
         super(director, controller);
     }
 
     @Override
-    public JmxIoStatistics getStats() {
+    public JmxIoStatistics getStatistics() {
         return director.getKernelStatistics();
     }
 }
