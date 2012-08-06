@@ -50,12 +50,7 @@ private final class ResourceAccountant(lock: Lock) {
     */
   def stopAccountingFor(@WillNotClose resource: Closeable) {
     accounts.remove(resource) foreach { _ =>
-      lock lock()
-      try {
-        condition signalAll()
-      } finally {
-        lock unlock()
-      }
+      lockOn(lock) (condition signalAll ())
     }
   }
 
@@ -84,8 +79,7 @@ private final class ResourceAccountant(lock: Lock) {
     *        If this is non-positive, then there is no timeout for waiting.
     */
   def waitOtherThreads(timeout: Long) {
-    lock lock()
-    try {
+    lockOn(lock) {
       try {
         var toWait = TimeUnit.MILLISECONDS toNanos timeout
         val mybreaks = new Breaks
@@ -107,8 +101,6 @@ private final class ResourceAccountant(lock: Lock) {
           if (0 == resources.total)
             Thread.currentThread.interrupt()
       }
-    } finally {
-      lock unlock()
     }
   }
 

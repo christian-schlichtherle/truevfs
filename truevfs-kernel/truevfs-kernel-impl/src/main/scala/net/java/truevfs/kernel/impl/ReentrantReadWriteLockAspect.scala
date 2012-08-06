@@ -21,6 +21,8 @@ private trait ReentrantReadWriteLockAspect {
   /** Returns the read lock. */
   final def readLock = lock.readLock
 
+  final def readLocked[V] = lockOn[V](readLock)_
+  
   /** Returns `true` if and only if the read lock is held by the
     * current thread.
     * This method should only get used for assertions, not for lock control.
@@ -32,6 +34,8 @@ private trait ReentrantReadWriteLockAspect {
 
   /** Returns the write lock. */
   final def writeLock = lock.writeLock
+
+  final def writeLocked[V] = lockOn[V](writeLock)_
 
   /** Returns `true` if and only if the write lock is held by the current
     * thread.

@@ -10,6 +10,7 @@ import net.java.truevfs.kernel.spec.cio._
 import net.java.truevfs.kernel.spec.cio.Entry._
 import java.{lang => jl}
 import java.{util => ju}
+import ju.concurrent.locks._
 
 /** Implements the Kernel API.
   * 
@@ -40,5 +41,14 @@ package object impl {
     for ((key, value) <- input)
       output.put(key, Long.box(value))
     output
+  }
+
+  def lockOn[V](lock: Lock)(operation: => V) = {
+    lock lock ()
+    try {
+      operation
+    } finally {
+      lock unlock ()
+    }
   }
 }
