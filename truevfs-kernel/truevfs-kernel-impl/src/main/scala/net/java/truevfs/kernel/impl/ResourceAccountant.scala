@@ -29,7 +29,8 @@ import scala.util.control._
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private final class ResourceAccountant(lock: Lock) {
+private final class ResourceAccountant(override val lock: Lock)
+extends LockAspect {
   import ResourceAccountant._
 
   private[this] val condition = lock.newCondition
@@ -49,9 +50,7 @@ private final class ResourceAccountant(lock: Lock) {
     * @param resource the closeable resource to stop accounting for.
     */
   def stopAccountingFor(@WillNotClose resource: Closeable) {
-    accounts.remove(resource) foreach { _ =>
-      lockOn(lock) (condition signalAll ())
-    }
+    accounts.remove(resource) foreach { _ => locked (condition signalAll ()) }
   }
 
   /** Waits until all closeable resources which have been started accounting
@@ -79,7 +78,7 @@ private final class ResourceAccountant(lock: Lock) {
     *        If this is non-positive, then there is no timeout for waiting.
     */
   def waitOtherThreads(timeout: Long) {
-    lockOn(lock) {
+    locked {
       try {
         var toWait = TimeUnit.MILLISECONDS toNanos timeout
         val mybreaks = new Breaks
@@ -132,7 +131,7 @@ private final class ResourceAccountant(lock: Lock) {
     */
   def closeAllResources[X <: Exception](handler: ExceptionHandler[_ >: IOException, X]) {
     assert(null != handler)
-    lock lock()
+    lock lock ()
     try {
       for ((closeable, account) <- accounts if account.accountant eq this) {
         accounts -= closeable
@@ -170,9 +169,9 @@ private object ResourceAccountant {
 
   private final case class Account(accountant: ResourceAccountant) {
     val owner = Thread.currentThread
-  } // Account
+  }
 
   final case class Resources(local: Int, total: Int) {
     def isBusy = local < total
-  } // Resources
+  }
 }

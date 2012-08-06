@@ -13,9 +13,9 @@ import net.java.truevfs.kernel.spec.cio._
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private trait ReentrantLockAspect {
+private trait LockAspect {
 
-  def lock: ReentrantLock
+  def lock: Lock
 
-  final def locked[V] = lockOn[V](lock)_
+  final def locked[V] = LockOn[V](lock)_
 }
