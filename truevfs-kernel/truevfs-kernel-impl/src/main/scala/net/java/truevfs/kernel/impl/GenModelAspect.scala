@@ -13,7 +13,7 @@ import net.java.truevfs.kernel.spec._
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private trait GenModelAspect[M <: FsModel] {
+private trait GenModelAspect[+M <: FsModel] {
 
   /** The model with the features to provide as an aspect. */
   def model: M
