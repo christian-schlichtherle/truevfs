@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.extension.jmx;
 
-import java.lang.management.ManagementFactory;
 import javax.management.*;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
@@ -18,41 +17,17 @@ import net.java.truevfs.kernel.spec.FsSyncOptions;
  */
 final class JmxManagerView
 extends StandardMBean implements JmxManagerMXBean {
-
-    private static final MBeanServer
-            mbs = ManagementFactory.getPlatformMBeanServer();
-
     private final FsManager manager;
 
-    static JmxManagerMXBean register(final FsManager model) {
+    static void register(final FsManager model) {
+        final JmxManagerMXBean mbean = new JmxManagerView(model);
         final ObjectName name = getObjectName(model);
-        final JmxManagerMXBean view = new JmxManagerView(model);
-        try {
-            try {
-                mbs.registerMBean(view, name);
-                return view;
-            } catch (InstanceAlreadyExistsException ignored) {
-                return JMX.newMXBeanProxy(mbs, name, JmxManagerMXBean.class);
-            }
-        } catch (RuntimeException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new IllegalArgumentException(ex);
-        }
+        JmxRegistry.register(mbean, name);
     }
 
     static void unregister(final FsManager model) {
         final ObjectName name = getObjectName(model);
-        try {
-            try {
-                mbs.unregisterMBean(name);
-            } catch (InstanceNotFoundException ignored) {
-            }
-        } catch (RuntimeException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new IllegalArgumentException(ex);
-        }
+        JmxRegistry.unregister(name);
     }
 
     private static ObjectName getObjectName(final FsManager model) {

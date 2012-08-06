@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.extension.jmx;
 
-import java.lang.management.ManagementFactory;
 import java.util.Date;
 import javax.management.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
@@ -20,41 +19,17 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
  */
 final class JmxIoBufferView
 extends StandardMBean implements JmxIoBufferMXBean {
-
-    private static final MBeanServer
-            mbs = ManagementFactory.getPlatformMBeanServer();
-
     private final IoBuffer buffer;
 
-    static JmxIoBufferMXBean register(final IoBuffer model) {
+    static void register(final IoBuffer model) {
+        final JmxIoBufferMXBean mbean = new JmxIoBufferView(model);
         final ObjectName name = getObjectName(model);
-        final JmxIoBufferMXBean view = new JmxIoBufferView(model);
-        try {
-            try {
-                mbs.registerMBean(view, name);
-                return view;
-            } catch (InstanceAlreadyExistsException ignored) {
-                return JMX.newMXBeanProxy(mbs, name, JmxIoBufferMXBean.class);
-            }
-        } catch (RuntimeException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new IllegalArgumentException(ex);
-        }
+        JmxRegistry.register(mbean, name);
     }
 
     static void unregister(final IoBuffer model) {
         final ObjectName name = getObjectName(model);
-        try {
-            try {
-                mbs.unregisterMBean(name);
-            } catch (InstanceNotFoundException ignored) {
-            }
-        } catch (RuntimeException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new IllegalArgumentException(ex);
-        }
+        JmxRegistry.unregister(name);
     }
 
     private static ObjectName getObjectName(final IoBuffer model) {
