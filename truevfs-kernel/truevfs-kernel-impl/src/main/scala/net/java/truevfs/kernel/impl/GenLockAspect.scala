@@ -11,4 +11,9 @@ import javax.annotation.concurrent._
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private trait LockAspect extends GenLockAspect[Lock]
+private trait GenLockAspect[+L <: Lock] {
+
+  def lock: L
+
+  final def locked[V] = LockOn[V](lock)_
+}
