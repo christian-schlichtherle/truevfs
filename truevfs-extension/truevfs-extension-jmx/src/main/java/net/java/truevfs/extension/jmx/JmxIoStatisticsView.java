@@ -7,7 +7,7 @@ package net.java.truevfs.extension.jmx;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Objects;
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.Immutable;
 import javax.management.*;
 import net.java.truecommons.shed.HashMaps;
 
@@ -17,7 +17,7 @@ import net.java.truecommons.shed.HashMaps;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
+@Immutable
 final class JmxIoStatisticsView
 extends StandardMBean implements JmxIoStatisticsMXBean {
     private final JmxIoStatistics stats;
