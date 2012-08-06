@@ -12,6 +12,7 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 final class JmxIoStatistics {
+
     private final long time;
     private final AtomicLong read = new AtomicLong();
     private final AtomicLong written = new AtomicLong();
@@ -23,7 +24,7 @@ final class JmxIoStatistics {
     long getTimeCreatedMillis() {
         return time;
     }
-    
+
     long getBytesRead() {
         return read.get();
     }

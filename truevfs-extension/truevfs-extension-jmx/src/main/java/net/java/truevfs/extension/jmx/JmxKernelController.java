@@ -19,6 +19,6 @@ extends InstrumentingController<JmxDirector> implements JmxWithIoStatistics {
 
     @Override
     public JmxIoStatistics getStats() {
-        return director.getKernelStats();
+        return director.getKernelStatistics();
     }
 }

@@ -6,10 +6,12 @@ package net.java.truevfs.extension.jmx;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.management.ManagementFactory;
 import java.nio.channels.SeekableByteChannel;
+import java.util.Hashtable;
 import javax.annotation.concurrent.ThreadSafe;
-import javax.management.*;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import net.java.truecommons.shed.HashMaps;
 import net.java.truevfs.component.instrumentation.*;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
@@ -25,76 +27,74 @@ public class JmxDirector extends AbstractDirector<JmxDirector> {
     private static final String APPLICATION_IO_STATISTICS = "Application I/O Statistics";
     private static final String KERNEL_IO_STATISTICS = "Kernel I/O Statistics";
     private static final String BUFFER_IO_STATISTICS = "Buffer I/O Statistics";
-    private static final MBeanServer
-            mbs = ManagementFactory.getPlatformMBeanServer();
 
     static final JmxDirector SINGLETON = new JmxDirector();
 
-    private volatile JmxIoStatistics appStats, kernelStats, bufferStats;
+    private volatile JmxIoStatistics appStatistics, kernelStatistics, bufferStatistics;
 
     private JmxDirector() { }
 
-    JmxIoStatistics getAppStats() {
-        final JmxIoStatistics stats = appStats;
+    JmxIoStatistics getAppStatistics() {
+        final JmxIoStatistics stats = appStatistics;
         assert null != stats;
         return stats;
     }
 
-    void setAppStats(final JmxIoStatistics stats) {
+    void setAppStatistics(final JmxIoStatistics stats) {
         assert null != stats;
-        this.appStats = stats;
+        this.appStatistics = stats;
         JmxIoStatisticsView.register(stats, APPLICATION_IO_STATISTICS);
     }
 
-    JmxIoStatistics getKernelStats() {
-        final JmxIoStatistics stats = kernelStats;
+    JmxIoStatistics getKernelStatistics() {
+        final JmxIoStatistics stats = kernelStatistics;
         assert null != stats;
         return stats;
     }
 
-    void setKernelStats(final JmxIoStatistics stats) {
+    void setKernelStatistics(final JmxIoStatistics stats) {
         assert null != stats;
-        this.kernelStats = stats;
+        this.kernelStatistics = stats;
         JmxIoStatisticsView.register(stats, KERNEL_IO_STATISTICS);
     }
 
-    JmxIoStatistics getBufferStats() {
-        final JmxIoStatistics stats = bufferStats;
+    JmxIoStatistics getBufferStatistics() {
+        final JmxIoStatistics stats = bufferStatistics;
         assert null != stats;
         return stats;
     }
 
-    void setBufferStats(final JmxIoStatistics stats) {
+    void setBufferStatistics(final JmxIoStatistics stats) {
         assert null != stats;
-        this.bufferStats = stats;
+        this.bufferStatistics = stats;
         JmxIoStatisticsView.register(stats, BUFFER_IO_STATISTICS);
     }
 
-    void clearStats() {
+    void clearStatistics() {
         for (final Object[] params : new Object[][] {
-            { APPLICATION_IO_STATISTICS, appStats, },
-            { KERNEL_IO_STATISTICS, kernelStats, },
-            { BUFFER_IO_STATISTICS, bufferStats, },
+            { APPLICATION_IO_STATISTICS, appStatistics, },
+            { KERNEL_IO_STATISTICS, kernelStatistics, },
+            { BUFFER_IO_STATISTICS, bufferStatistics, },
         }) {
+            @SuppressWarnings("UseOfObsoleteCollectionType")
+            final java.util.Hashtable<String, String>
+                    table = new Hashtable<>(HashMaps.initialCapacity(2));
+            table.put("type", (String) params[0]);
+            table.put("time", "*");
             final ObjectName pattern;
             try {
-                pattern = new ObjectName(FsManager.class.getName() + ":type=" + params[0] + ",name=*");
+                pattern = new ObjectName(
+                        JmxIoStatisticsView.class.getPackage().getName(),
+                        table);
             } catch (MalformedObjectNameException ex) {
                 throw new AssertionError();
             }
-            for (final ObjectName found : mbs.queryNames(pattern, null)) {
-                final JmxIoStatisticsMXBean proxy = JMX.newMXBeanProxy(
-                        mbs, found, JmxIoStatisticsMXBean.class);
+            for (final ObjectName found : JmxUtils.queryNames(pattern)) {
+                final JmxIoStatisticsMXBean proxy = JmxUtils
+                        .newMXBeanProxy(found, JmxIoStatisticsMXBean.class);
                 if (((JmxIoStatistics) params[1]).getTimeCreatedMillis()
-                        == proxy.getTimeCreatedMillis())
-                    continue;
-                try {
-                    mbs.unregisterMBean(found);
-                } catch (InstanceNotFoundException ex) {
-                    throw new AssertionError();
-                } catch (MBeanRegistrationException ex) {
-                    throw new AssertionError(ex);
-                }
+                        != proxy.getTimeCreatedMillis())
+                    JmxUtils.unregister(found);
             }
         }
     }
@@ -150,14 +150,14 @@ public class JmxDirector extends AbstractDirector<JmxDirector> {
     public InputSocket<? extends IoBuffer> instrument(
             InstrumentingIoBuffer<JmxDirector> origin,
             InputSocket<? extends IoBuffer> object) {
-        return new JmxInputSocket<>(this, object, bufferStats);
+        return new JmxInputSocket<>(this, object, bufferStatistics);
     }
 
     @Override
     public OutputSocket<? extends IoBuffer> instrument(
             InstrumentingIoBuffer<JmxDirector> origin,
             OutputSocket<? extends IoBuffer> object) {
-        return new JmxOutputSocket<>(this, object, bufferStats);
+        return new JmxOutputSocket<>(this, object, bufferStatistics);
     }
 
     @Override

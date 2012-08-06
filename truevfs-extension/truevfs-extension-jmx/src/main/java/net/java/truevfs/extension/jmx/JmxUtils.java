@@ -5,19 +5,17 @@
 package net.java.truevfs.extension.jmx;
 
 import java.lang.management.ManagementFactory;
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
+import java.util.Set;
+import javax.management.*;
 
 /**
- * A registry for JMX views.
+ * Provides utility methods for JMX.
  * 
  * @author Christian Schlichtherle
  */
-public class JmxRegistry {
-    private static final MBeanServer
-            mbs = ManagementFactory.getPlatformMBeanServer();
+public class JmxUtils {
+    private static final MBeanServer mbs =
+            ManagementFactory.getPlatformMBeanServer();
 
     static void register(final Object mbean, final ObjectName name) {
         try {
@@ -45,5 +43,13 @@ public class JmxRegistry {
         }
     }
 
-    private JmxRegistry() { }
+    static Set<ObjectName> queryNames(final ObjectName name) {
+        return mbs.queryNames(name, null);
+    }
+
+    static <T> T newMXBeanProxy(final ObjectName name, Class<T> clazz) {
+        return JMX.newMBeanProxy(mbs, name, clazz);
+    }
+
+    private JmxUtils() { }
 }
