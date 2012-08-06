@@ -6,8 +6,10 @@ package net.java.truevfs.extension.jmx;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Hashtable;
 import javax.annotation.CheckForNull;
 import javax.management.*;
+import net.java.truecommons.shed.HashMaps;
 import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
 import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
@@ -33,23 +35,24 @@ extends StandardMBean implements JmxModelMXBean {
     static void register(final FsModel model) {
         final JmxModelMXBean mbean = new JmxModelView(model);
         final ObjectName name = getObjectName(model);
-        JmxRegistry.register(mbean, name);
+        JmxUtils.register(mbean, name);
     }
 
     static void unregister(final FsModel model) {
         final ObjectName name = getObjectName(model);
-        JmxRegistry.unregister(name);
+        JmxUtils.unregister(name);
     }
 
     private static ObjectName getObjectName(final FsModel model) {
         final String path = model.getMountPoint().toHierarchicalUri().toString();
         @SuppressWarnings("UseOfObsoleteCollectionType")
         final java.util.Hashtable<String, String>
-                table = new java.util.Hashtable<>(2 * 4 / 3 + 1);
+                table = new Hashtable<>(HashMaps.initialCapacity(2));
         table.put("type", FsModel.class.getSimpleName());
         table.put("path", ObjectName.quote(path));
         try {
-            return new ObjectName(JmxModelView.class.getPackage().getName(),
+            return new ObjectName(
+                    JmxModelView.class.getPackage().getName(),
                     table);
         } catch (MalformedObjectNameException ex) {
             throw new AssertionError(ex);
@@ -59,21 +62,6 @@ extends StandardMBean implements JmxModelMXBean {
     private JmxModelView(FsModel model) {
         super(JmxModelMXBean.class, true);
         this.model = model;
-    }
-
-    @Override
-    public MBeanInfo getMBeanInfo() {
-        MBeanInfo mbinfo = super.getMBeanInfo();
-        return new MBeanInfo(mbinfo.getClassName(),
-                mbinfo.getDescription(),
-                mbinfo.getAttributes(),
-                mbinfo.getConstructors(),
-                mbinfo.getOperations(),
-                getNotificationInfo());
-    }
-
-    public MBeanNotificationInfo[] getNotificationInfo() {
-        return new MBeanNotificationInfo[]{};
     }
 
     @Override
@@ -111,24 +99,6 @@ extends StandardMBean implements JmxModelMXBean {
             break;
         }
         return description;
-    }
-
-    /**
-     * Override customization hook:
-     * You can supply a customized description for MBeanParameterInfo.getDescription()
-     */
-    @Override
-    protected String getDescription(MBeanOperationInfo op, MBeanParameterInfo param, int sequence) {
-        return null;
-    }
-
-    /**
-     * Override customization hook:
-     * You can supply a customized description for MBeanParameterInfo.getName()
-     */
-    @Override
-    protected String getParameterName(MBeanOperationInfo op, MBeanParameterInfo param, int sequence) {
-        return null;
     }
 
     /**

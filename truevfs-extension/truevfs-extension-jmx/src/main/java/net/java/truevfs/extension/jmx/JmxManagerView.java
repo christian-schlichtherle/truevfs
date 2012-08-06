@@ -22,17 +22,18 @@ extends StandardMBean implements JmxManagerMXBean {
     static void register(final FsManager model) {
         final JmxManagerMXBean mbean = new JmxManagerView(model);
         final ObjectName name = getObjectName(model);
-        JmxRegistry.register(mbean, name);
+        JmxUtils.register(mbean, name);
     }
 
     static void unregister(final FsManager model) {
         final ObjectName name = getObjectName(model);
-        JmxRegistry.unregister(name);
+        JmxUtils.unregister(name);
     }
 
     private static ObjectName getObjectName(final FsManager model) {
         try {
-            return new ObjectName(JmxManagerView.class.getPackage().getName(),
+            return new ObjectName(
+                    JmxManagerView.class.getPackage().getName(),
                     "type", FsManager.class.getSimpleName());
         } catch (MalformedObjectNameException ex) {
             throw new AssertionError(ex);
@@ -42,21 +43,6 @@ extends StandardMBean implements JmxManagerMXBean {
     private JmxManagerView(final FsManager manager) {
         super(JmxManagerMXBean.class, true);
         this.manager = manager;
-    }
-
-    @Override
-    public MBeanInfo getMBeanInfo() {
-        MBeanInfo mbinfo = super.getMBeanInfo();
-        return new MBeanInfo(mbinfo.getClassName(),
-                mbinfo.getDescription(),
-                mbinfo.getAttributes(),
-                mbinfo.getConstructors(),
-                mbinfo.getOperations(),
-                getNotificationInfo());
-    }
-
-    public MBeanNotificationInfo[] getNotificationInfo() {
-        return new MBeanNotificationInfo[]{};
     }
 
     @Override
@@ -85,24 +71,6 @@ extends StandardMBean implements JmxManagerMXBean {
             break;
         }
         return description;
-    }
-
-    /**
-     * Override customization hook:
-     * You can supply a customized description for MBeanParameterInfo.getDescription()
-     */
-    @Override
-    protected String getDescription(MBeanOperationInfo op, MBeanParameterInfo param, int sequence) {
-        return null;
-    }
-
-    /**
-     * Override customization hook:
-     * You can supply a customized description for MBeanParameterInfo.getName()
-     */
-    @Override
-    protected String getParameterName(MBeanOperationInfo op, MBeanParameterInfo param, int sequence) {
-        return null;
     }
 
     /**
@@ -165,6 +133,6 @@ extends StandardMBean implements JmxManagerMXBean {
 
     @Override
     public void clearStatistics() {
-        JmxDirector.SINGLETON.clearStats();
+        JmxDirector.SINGLETON.clearStatistics();
     }
 }

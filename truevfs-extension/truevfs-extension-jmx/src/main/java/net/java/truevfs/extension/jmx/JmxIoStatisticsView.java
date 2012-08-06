@@ -4,12 +4,12 @@
  */
 package net.java.truevfs.extension.jmx;
 
-import java.lang.management.ManagementFactory;
-import java.text.DateFormat;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.*;
+import net.java.truecommons.shed.HashMaps;
 
 /**
  * Provides statistics for the federated file systems managed by a single file
@@ -19,55 +19,34 @@ import javax.management.*;
  */
 @ThreadSafe
 public class JmxIoStatisticsView
-extends StandardMBean
-implements JmxIoStatisticsMXBean {
-
-    private static final MBeanServer
-            mbs = ManagementFactory.getPlatformMBeanServer();
-
+extends StandardMBean implements JmxIoStatisticsMXBean {
     private final JmxIoStatistics stats;
     private final String type;
 
-    static synchronized JmxIoStatisticsMXBean register(final JmxIoStatistics model, final String type) {
-        final JmxIoStatisticsView view = new JmxIoStatisticsView(model, type);
+    static void register(final JmxIoStatistics model, final String type) {
+        final JmxIoStatisticsView mbean = new JmxIoStatisticsView(model, type);
         final ObjectName name = getObjectName(model, type);
-        try {
-            try {
-                mbs.registerMBean(view, name);
-                return view;
-            } catch (InstanceAlreadyExistsException ignored) {
-                return JMX.newMXBeanProxy(mbs, name, JmxIoStatisticsMXBean.class);
-            }
-        } catch (RuntimeException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new IllegalArgumentException(ex);
-        }
+        JmxUtils.register(mbean, name);
     }
 
     static void unregister(final JmxIoStatistics model, final String type) {
         final ObjectName name = getObjectName(model, type);
-        try {
-            try {
-                mbs.unregisterMBean(name);
-            } catch (InstanceNotFoundException ignored) {
-            }
-        } catch (RuntimeException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new IllegalArgumentException(ex);
-        }
+        JmxUtils.unregister(name);
     }
 
-    private static synchronized ObjectName getObjectName(
+    private static ObjectName getObjectName(
             final JmxIoStatistics model,
             final String type) {
         final long time = model.getTimeCreatedMillis();
+        @SuppressWarnings("UseOfObsoleteCollectionType")
+        final java.util.Hashtable<String, String>
+                table = new Hashtable<>(HashMaps.initialCapacity(2));
+        table.put("type", Objects.requireNonNull(type));
+        table.put("time", ObjectName.quote(new Date(time).toString()));
         try {
-            return new ObjectName(String.format("%s:time=%s,type=%s",
+            return new ObjectName(
                     JmxIoStatisticsView.class.getPackage().getName(),
-                    ObjectName.quote(format(time)),
-                    Objects.requireNonNull(type)));
+                    table);
         } catch (MalformedObjectNameException ex) {
             throw new AssertionError(ex);
         }
@@ -79,21 +58,6 @@ implements JmxIoStatisticsMXBean {
         assert null != type;
         this.stats = stats;
         this.type = type;
-    }
-
-    @Override
-    public MBeanInfo getMBeanInfo() {
-        MBeanInfo mbinfo = super.getMBeanInfo();
-        return new MBeanInfo(mbinfo.getClassName(),
-                mbinfo.getDescription(),
-                mbinfo.getAttributes(),
-                mbinfo.getConstructors(),
-                mbinfo.getOperations(),
-                getNotificationInfo());
-    }
-
-    public MBeanNotificationInfo[] getNotificationInfo() {
-        return new MBeanNotificationInfo[]{};
     }
 
     /**
@@ -119,32 +83,14 @@ implements JmxIoStatisticsMXBean {
         case "TimeCreated":
             description = "The time these I/O statistics have been created.";
             break;
-        case "Read":
+        case "BytesRead":
             description = "The number of bytes read.";
             break;
-        case "Written":
+        case "BytesWritten":
             description = "The number of bytes written.";
             break;
         }
         return description;
-    }
-
-    /**
-     * Override customization hook:
-     * You can supply a customized description for MBeanParameterInfo.getDescription()
-     */
-    @Override
-    protected String getDescription(MBeanOperationInfo op, MBeanParameterInfo param, int sequence) {
-        return null;
-    }
-
-    /**
-     * Override customization hook:
-     * You can supply a customized description for MBeanParameterInfo.getType()
-     */
-    @Override
-    protected String getParameterName(MBeanOperationInfo op, MBeanParameterInfo param, int sequence) {
-        return null;
     }
 
     /**
@@ -154,9 +100,8 @@ implements JmxIoStatisticsMXBean {
     @Override
     protected String getDescription(MBeanOperationInfo info) {
         String description = null;
-        if (info.getName().equals("close")) {
+        if (info.getName().equals("close"))
             description = "Closes these I/O statistics log.";
-        }
         return description;
     }
 
@@ -167,11 +112,7 @@ implements JmxIoStatisticsMXBean {
 
     @Override
     public String getTimeCreated() {
-        return format(stats.getTimeCreatedMillis());
-    }
-
-    private static String format(long time) {
-        return DateFormat.getDateTimeInstance().format(new Date(time));
+        return new Date(stats.getTimeCreatedMillis()).toString();
     }
 
     @Override

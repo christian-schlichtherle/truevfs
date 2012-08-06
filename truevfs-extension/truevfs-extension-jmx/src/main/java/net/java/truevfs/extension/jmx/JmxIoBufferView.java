@@ -5,7 +5,9 @@
 package net.java.truevfs.extension.jmx;
 
 import java.util.Date;
+import java.util.Hashtable;
 import javax.management.*;
+import net.java.truecommons.shed.HashMaps;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
@@ -24,23 +26,24 @@ extends StandardMBean implements JmxIoBufferMXBean {
     static void register(final IoBuffer model) {
         final JmxIoBufferMXBean mbean = new JmxIoBufferView(model);
         final ObjectName name = getObjectName(model);
-        JmxRegistry.register(mbean, name);
+        JmxUtils.register(mbean, name);
     }
 
     static void unregister(final IoBuffer model) {
         final ObjectName name = getObjectName(model);
-        JmxRegistry.unregister(name);
+        JmxUtils.unregister(name);
     }
 
     private static ObjectName getObjectName(final IoBuffer model) {
         final String path = model.getName();
         @SuppressWarnings("UseOfObsoleteCollectionType")
         final java.util.Hashtable<String, String>
-                table = new java.util.Hashtable<>(2 * 4 / 3 + 1);
+                table = new Hashtable<>(HashMaps.initialCapacity(2));
         table.put("type", IoBuffer.class.getSimpleName());
         table.put("path", ObjectName.quote(path));
         try {
-            return new ObjectName(JmxIoBufferView.class.getPackage().getName(),
+            return new ObjectName(
+                    JmxIoBufferView.class.getPackage().getName(),
                     table);
         } catch (MalformedObjectNameException ex) {
             throw new AssertionError(ex);
@@ -50,21 +53,6 @@ extends StandardMBean implements JmxIoBufferMXBean {
     private JmxIoBufferView(IoBuffer buffer) {
         super(JmxIoBufferMXBean.class, true);
         this.buffer = buffer;
-    }
-
-    @Override
-    public MBeanInfo getMBeanInfo() {
-        MBeanInfo mbinfo = super.getMBeanInfo();
-        return new MBeanInfo(mbinfo.getClassName(),
-                mbinfo.getDescription(),
-                mbinfo.getAttributes(),
-                mbinfo.getConstructors(),
-                mbinfo.getOperations(),
-                getNotificationInfo());
-    }
-
-    public MBeanNotificationInfo[] getNotificationInfo() {
-        return new MBeanNotificationInfo[]{};
     }
 
     @Override
@@ -95,34 +83,6 @@ extends StandardMBean implements JmxIoBufferMXBean {
             description = "The creation time of this I/O pool entry.";
             break;
         }
-        return description;
-    }
-
-    /**
-     * Override customization hook:
-     * You can supply a customized description for MBeanParameterInfo.getDescription()
-     */
-    @Override
-    protected String getDescription(MBeanOperationInfo op, MBeanParameterInfo param, int sequence) {
-        return null;
-    }
-
-    /**
-     * Override customization hook:
-     * You can supply a customized description for MBeanParameterInfo.getName()
-     */
-    @Override
-    protected String getParameterName(MBeanOperationInfo op, MBeanParameterInfo param, int sequence) {
-        return null;
-    }
-
-    /**
-     * Override customization hook:
-     * You can supply a customized description for MBeanOperationInfo.getDescription()
-     */
-    @Override
-    protected String getDescription(MBeanOperationInfo info) {
-        String description = null;
         return description;
     }
 
