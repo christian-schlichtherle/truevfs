@@ -5,7 +5,6 @@
 package net.java.truevfs.extension.jmx;
 
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.util.Date;
 import javax.annotation.CheckForNull;
 import javax.management.*;
@@ -26,43 +25,20 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  */
 final class JmxModelView
 extends StandardMBean implements JmxModelMXBean {
-
-    private static final MBeanServer
-            mbs = ManagementFactory.getPlatformMBeanServer();
     private static final FsMetaDriver
             DRIVER = new FsSimpleMetaDriver(FsDriverMapLocator.SINGLETON);
 
     private final FsModel model;
 
-    static JmxModelMXBean register(final FsModel model) {
+    static void register(final FsModel model) {
+        final JmxModelMXBean mbean = new JmxModelView(model);
         final ObjectName name = getObjectName(model);
-        final JmxModelMXBean view = new JmxModelView(model);
-        try {
-            try {
-                mbs.registerMBean(view, name);
-                return view;
-            } catch (InstanceAlreadyExistsException ignored) {
-                return JMX.newMXBeanProxy(mbs, name, JmxModelMXBean.class);
-            }
-        } catch (RuntimeException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new IllegalArgumentException(ex);
-        }
+        JmxRegistry.register(mbean, name);
     }
 
     static void unregister(final FsModel model) {
         final ObjectName name = getObjectName(model);
-        try {
-            try {
-                mbs.unregisterMBean(name);
-            } catch (InstanceNotFoundException ignored) {
-            }
-        } catch (RuntimeException ex) {
-            throw ex;
-        } catch (Exception ex) {
-            throw new IllegalArgumentException(ex);
-        }
+        JmxRegistry.unregister(name);
     }
 
     private static ObjectName getObjectName(final FsModel model) {
