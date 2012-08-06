@@ -13,10 +13,9 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
  */
 final class JmxIoBuffer extends InstrumentingIoBuffer<JmxDirector> {
 
-    @SuppressWarnings(value = "LeakingThisInConstructor")
-    JmxIoBuffer(JmxDirector director, IoBuffer model) {
-        super(director, model);
-        JmxIoBufferView.register(this);
+    JmxIoBuffer(JmxDirector director, IoBuffer entry) {
+        super(director, entry);
+        JmxIoBufferView.register(entry);
     }
 
     @Override
@@ -24,7 +23,7 @@ final class JmxIoBuffer extends InstrumentingIoBuffer<JmxDirector> {
         try {
             entry.release();
         } finally {
-            JmxIoBufferView.unregister(this);
+            JmxIoBufferView.unregister(entry);
         }
     }
 }

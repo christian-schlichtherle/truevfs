@@ -4,9 +4,8 @@
  */
 package net.java.truevfs.component.instrumentation;
 
-import java.io.IOException;
 import java.util.Objects;
-import net.java.truevfs.kernel.spec.cio.DecoratingEntry;
+import net.java.truevfs.kernel.spec.cio.DecoratingIoBuffer;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
 import net.java.truevfs.kernel.spec.cio.IoBuffer;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
@@ -16,11 +15,11 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  * @author Christian Schlichtherle
  */
 public class InstrumentingIoBuffer<D extends Director<D>>
-extends DecoratingEntry<IoBuffer> implements IoBuffer {
+extends DecoratingIoBuffer {
     protected final D director;
 
-    public InstrumentingIoBuffer(final D director, final IoBuffer buffer) {
-        super(buffer);
+    public InstrumentingIoBuffer(final D director, final IoBuffer entry) {
+        super(entry);
         this.director = Objects.requireNonNull(director);
     }
 
@@ -32,10 +31,5 @@ extends DecoratingEntry<IoBuffer> implements IoBuffer {
     @Override
     public OutputSocket<? extends IoBuffer> output() {
         return director.instrument(this, entry.output());
-    }
-
-    @Override
-    public void release() throws IOException {
-        entry.release();
     }
 }

@@ -12,7 +12,9 @@ import net.java.truecommons.io.DecoratingOutputStream;
  * @param  <D> the type of the director.
  * @see    InstrumentingInputStream
  * @author Christian Schlichtherle
+ * @deprecated Unused.
  */
+@Deprecated
 public class InstrumentingOutputStream<D extends Director<D>>
 extends DecoratingOutputStream {
     protected final D director;

@@ -18,14 +18,13 @@ import net.java.truevfs.kernel.spec.FsSyncWarningException;
 @Immutable
 final class JmxManager extends InstrumentingManager<JmxDirector> {
 
-    @SuppressWarnings("LeakingThisInConstructor")
     JmxManager(JmxDirector director, FsManager manager) {
         super(director, manager);
         assert null != director;
         director.setAppStats(new JmxIoStatistics());
         director.setKernelStats(new JmxIoStatistics());
         director.setBufferStats(new JmxIoStatistics());
-        JmxManagerView.register(this);
+        JmxManagerView.register(manager);
     }
 
     /**

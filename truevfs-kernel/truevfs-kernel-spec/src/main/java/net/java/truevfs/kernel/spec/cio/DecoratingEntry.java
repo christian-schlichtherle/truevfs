@@ -52,8 +52,6 @@ public abstract class DecoratingEntry<E extends Entry> implements Entry {
      */
     @Override
     public String toString() {
-        return String.format("%s[entry=%s]",
-                getClass().getName(),
-                entry);
+        return String.format("%s[entry=%s]", getClass().getName(), entry);
     }
 }

@@ -5,22 +5,18 @@
 package net.java.truevfs.extension.jmx;
 
 import javax.annotation.Nullable;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsSyncException;
+import net.java.truevfs.kernel.spec.cio.IoBuffer;
 
 /**
- * The MXBean interface for a {@link FsModel file system model}.
+ * The MXBean interface for an {@link IoBuffer I/O pool entry}.
  *
  * @author Christian Schlichtherle
  */
-public interface JmxModelViewMXBean {
-    boolean isMounted();
-    String getMountPoint();
-    String getMountPointOfParent();
+public interface JmxIoBufferMXBean {
+    String getName();
     long getSizeOfData();
     long getSizeOfStorage();
     @Nullable String getTimeWritten();
     @Nullable String getTimeRead();
     @Nullable String getTimeCreated();
-    void sync() throws FsSyncException;
 }
