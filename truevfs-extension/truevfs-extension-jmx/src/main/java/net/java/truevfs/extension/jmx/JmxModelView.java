@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Hashtable;
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.Immutable;
 import javax.management.*;
 import net.java.truecommons.shed.HashMaps;
 import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
@@ -26,7 +26,7 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
+@Immutable
 final class JmxModelView
 extends StandardMBean implements JmxModelMXBean {
     private static final FsMetaDriver

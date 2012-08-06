@@ -6,7 +6,7 @@ package net.java.truevfs.extension.jmx;
 
 import java.util.Date;
 import java.util.Hashtable;
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.Immutable;
 import javax.management.*;
 import net.java.truecommons.shed.HashMaps;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
@@ -20,7 +20,7 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
+@Immutable
 final class JmxIoBufferView
 extends StandardMBean implements JmxIoBufferMXBean {
     private final IoBuffer buffer;
