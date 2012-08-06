@@ -135,7 +135,7 @@ public class JmxDirector extends AbstractDirector<JmxDirector> {
             InstrumentingController<JmxDirector> origin,
             InputSocket<? extends Entry> object) {
         return new JmxInputSocket<>(this, object,
-                ((JmxWithIoStatistics) origin).getStats());
+                ((JmxIoStatisticsProvider) origin).getStatistics());
     }
 
     @Override
@@ -143,7 +143,7 @@ public class JmxDirector extends AbstractDirector<JmxDirector> {
             InstrumentingController<JmxDirector> origin,
             OutputSocket<? extends Entry> object) {
         return new JmxOutputSocket<>(this, object,
-                ((JmxWithIoStatistics) origin).getStats());
+                ((JmxIoStatisticsProvider) origin).getStatistics());
     }
 
     @Override
@@ -165,7 +165,7 @@ public class JmxDirector extends AbstractDirector<JmxDirector> {
             InstrumentingInputSocket<JmxDirector, ? extends Entry> origin,
             InputStream object) {
         return new JmxInputStream(object,
-                ((JmxWithIoStatistics) origin).getStats());
+                ((JmxIoStatisticsProvider) origin).getStatistics());
     }
 
     @Override
@@ -173,7 +173,7 @@ public class JmxDirector extends AbstractDirector<JmxDirector> {
             InstrumentingInputSocket<JmxDirector, ? extends Entry> origin,
             SeekableByteChannel object) {
         return new JmxSeekableChannel(object,
-                ((JmxWithIoStatistics) origin).getStats());
+                ((JmxIoStatisticsProvider) origin).getStatistics());
     }
 
     @Override
@@ -181,7 +181,7 @@ public class JmxDirector extends AbstractDirector<JmxDirector> {
             InstrumentingOutputSocket<JmxDirector, ? extends Entry> origin,
             OutputStream object) {
         return new JmxOutputStream(object,
-                ((JmxWithIoStatistics) origin).getStats());
+                ((JmxIoStatisticsProvider) origin).getStatistics());
     }
 
     @Override
@@ -189,6 +189,6 @@ public class JmxDirector extends AbstractDirector<JmxDirector> {
             InstrumentingOutputSocket<JmxDirector, ? extends Entry> origin,
             SeekableByteChannel object) {
         return new JmxSeekableChannel(object,
-                ((JmxWithIoStatistics) origin).getStats());
+                ((JmxIoStatisticsProvider) origin).getStatistics());
     }
 }

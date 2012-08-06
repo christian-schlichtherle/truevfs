@@ -16,7 +16,7 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
 @Immutable
 final class JmxOutputSocket<E extends Entry>
 extends InstrumentingOutputSocket<JmxDirector, E>
-implements JmxWithIoStatistics {
+implements JmxIoStatisticsProvider {
     final JmxIoStatistics stats;
 
     JmxOutputSocket(
@@ -29,7 +29,7 @@ implements JmxWithIoStatistics {
     }
 
     @Override
-    public JmxIoStatistics getStats() {
+    public JmxIoStatistics getStatistics() {
         return stats;
     }
 }
