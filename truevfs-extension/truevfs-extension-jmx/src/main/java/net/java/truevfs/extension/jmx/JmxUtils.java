@@ -13,7 +13,7 @@ import javax.management.*;
  * 
  * @author Christian Schlichtherle
  */
-public class JmxUtils {
+final class JmxUtils {
     private static final MBeanServer mbs =
             ManagementFactory.getPlatformMBeanServer();
 
