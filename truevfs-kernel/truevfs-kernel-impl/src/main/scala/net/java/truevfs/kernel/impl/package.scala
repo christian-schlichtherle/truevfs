@@ -42,13 +42,4 @@ package object impl {
       output.put(key, Long.box(value))
     output
   }
-
-  def lockOn[V](lock: Lock)(operation: => V) = {
-    lock lock ()
-    try {
-      operation
-    } finally {
-      lock unlock ()
-    }
-  }
 }

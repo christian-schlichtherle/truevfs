@@ -66,7 +66,7 @@ private final class DefaultManager private (
   }
 
   private def controller0(d: FsMetaDriver, mp: FsMountPoint): FsController = {
-    controllers.get(mp).flatMap(l => Option[FsController](l.get)) match {
+    controllers.get(mp).flatMap(l => Option(l.get)) match {
       case Some(c) => c
       case None =>
         checkWriteLockedByCurrentThread
