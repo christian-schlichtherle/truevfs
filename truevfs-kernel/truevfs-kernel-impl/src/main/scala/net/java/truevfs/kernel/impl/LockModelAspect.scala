@@ -6,13 +6,13 @@ package net.java.truevfs.kernel.impl
 
 import javax.annotation.concurrent._
 
-/** A mixin which implements some features of its associated
+/** A mixin which provides some features of its associated
   * [[net.java.truevfs.kernel.impl.LockModel]].
   *
   * @author Christian Schlichtherle
   */
 @ThreadSafe
 private trait LockModelAspect
-extends GenModelAspect[LockModel] with LockModelLike {
-  final def lock = model.lock
+extends GenModelAspect[LockModel] with ReentrantReadWriteLockAspect {
+  final override def lock = model.lock
 }

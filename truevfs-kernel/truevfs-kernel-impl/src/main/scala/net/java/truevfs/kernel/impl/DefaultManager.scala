@@ -19,10 +19,10 @@ import scala.collection.mutable.WeakHashMap
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-final class DefaultManager private (
+private final class DefaultManager private (
   optionalScheduleType: Type,
-  lock: ReentrantReadWriteLock
-) extends FsAbstractManager {
+  override val lock: ReentrantReadWriteLock
+) extends FsAbstractManager with ReentrantReadWriteLockAspect {
 
   private[impl] def this(optionalScheduleType: Type)
   = this(optionalScheduleType, new ReentrantReadWriteLock)
@@ -39,9 +39,6 @@ final class DefaultManager private (
    */
   private[this] val controllers =
     new WeakHashMap[FsMountPoint, Link[FsController]]
-
-  private[this] val readLock = lock.readLock
-  private[this] val writeLock = lock.writeLock
 
   override def newController
   (driver: AnyArchiveDriver, model: FsModel, parent: FsController): FsController = {
@@ -68,6 +65,7 @@ final class DefaultManager private (
       }
     } catch {
       case ex: NeedsWriteLockException =>
+        if (readLockedByCurrentThread) throw ex;
         writeLock lock ()
         try {
           return controller0(driver, mountPoint)

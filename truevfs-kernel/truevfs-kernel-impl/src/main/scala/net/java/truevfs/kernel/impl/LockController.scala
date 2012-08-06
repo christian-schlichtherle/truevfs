@@ -97,7 +97,9 @@ private trait LockController extends Controller[LockModel] {
     try {
       timedLocked(readLock)(operation)
     } catch {
-      case _: NeedsWriteLockException => timedLocked(writeLock)(operation)
+      case ex: NeedsWriteLockException =>
+        if (readLockedByCurrentThread) throw ex
+        timedLocked(writeLock)(operation)
     }
   }
 
