@@ -116,7 +116,7 @@ private final class DefaultManager private (
     }
 
     def schedule(mandatory: Boolean) {
-      assert(writeLock.isHeldByCurrentThread)
+      assert(writeLockedByCurrentThread)
       controllers += getMountPoint ->
         ((if (mandatory) STRONG else optionalScheduleType) newLink _controller)
     }
