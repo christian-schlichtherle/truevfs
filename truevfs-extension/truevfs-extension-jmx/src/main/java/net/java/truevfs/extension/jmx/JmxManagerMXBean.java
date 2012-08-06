@@ -4,14 +4,16 @@
  */
 package net.java.truevfs.extension.jmx;
 
+import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsSyncException;
 
 /**
- * The MXBean interface for a {@link FsManager file system manager}.
+ * The MXBean interface for a {@linkplain FsManager file system manager}.
  *
  * @author Christian Schlichtherle
  */
+@ThreadSafe
 public interface JmxManagerMXBean {
 
     /**

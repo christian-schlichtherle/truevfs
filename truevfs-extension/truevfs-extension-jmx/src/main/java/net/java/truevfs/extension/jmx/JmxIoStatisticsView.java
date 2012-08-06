@@ -18,7 +18,7 @@ import net.java.truecommons.shed.HashMaps;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxIoStatisticsView
+final class JmxIoStatisticsView
 extends StandardMBean implements JmxIoStatisticsMXBean {
     private final JmxIoStatistics stats;
     private final String type;

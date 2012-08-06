@@ -22,7 +22,7 @@ import net.java.truevfs.kernel.spec.cio.*;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxDirector extends AbstractDirector<JmxDirector> {
+final class JmxDirector extends AbstractDirector<JmxDirector> {
 
     private static final String APPLICATION_IO_STATISTICS = "Application I/O Statistics";
     private static final String KERNEL_IO_STATISTICS = "Kernel I/O Statistics";

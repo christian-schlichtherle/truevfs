@@ -6,6 +6,7 @@ package net.java.truevfs.extension.jmx;
 
 import java.util.Date;
 import java.util.Hashtable;
+import javax.annotation.concurrent.ThreadSafe;
 import javax.management.*;
 import net.java.truecommons.shed.HashMaps;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
@@ -15,10 +16,11 @@ import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.java.truevfs.kernel.spec.cio.IoBuffer;
 
 /**
- * The MXBean implementation for an {@link IoBuffer I/O pool entry}.
+ * The MXBean implementation for an {@linkplain IoBuffer I/O buffer}.
  *
  * @author Christian Schlichtherle
  */
+@ThreadSafe
 final class JmxIoBufferView
 extends StandardMBean implements JmxIoBufferMXBean {
     private final IoBuffer buffer;
