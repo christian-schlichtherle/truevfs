@@ -94,7 +94,7 @@ public class JmxDirector extends AbstractDirector<JmxDirector> {
                         .newMXBeanProxy(found, JmxIoStatisticsMXBean.class);
                 if (((JmxIoStatistics) params[1]).getTimeCreatedMillis()
                         != proxy.getTimeCreatedMillis())
-                    JmxUtils.unregister(found);
+                    JmxUtils.unregisterMBean(found);
             }
         }
     }

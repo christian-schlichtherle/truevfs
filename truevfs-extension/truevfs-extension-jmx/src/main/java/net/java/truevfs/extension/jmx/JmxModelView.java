@@ -35,12 +35,12 @@ extends StandardMBean implements JmxModelMXBean {
     static void register(final FsModel model) {
         final JmxModelMXBean mbean = new JmxModelView(model);
         final ObjectName name = getObjectName(model);
-        JmxUtils.register(mbean, name);
+        JmxUtils.registerMBean(mbean, name);
     }
 
     static void unregister(final FsModel model) {
         final ObjectName name = getObjectName(model);
-        JmxUtils.unregister(name);
+        JmxUtils.unregisterMBean(name);
     }
 
     private static ObjectName getObjectName(final FsModel model) {
