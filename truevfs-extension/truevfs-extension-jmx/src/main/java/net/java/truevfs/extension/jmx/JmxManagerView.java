@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.extension.jmx;
 
+import javax.annotation.concurrent.ThreadSafe;
 import javax.management.*;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
@@ -11,10 +12,11 @@ import net.java.truevfs.kernel.spec.FsSyncException;
 import net.java.truevfs.kernel.spec.FsSyncOptions;
 
 /**
- * The MXBean implementation for a {@link FsManager file system manager}.
+ * The MXBean implementation for a {@linkplain FsManager file system manager}.
  *
  * @author Christian Schlichtherle
  */
+@ThreadSafe
 final class JmxManagerView
 extends StandardMBean implements JmxManagerMXBean {
     private final FsManager manager;
