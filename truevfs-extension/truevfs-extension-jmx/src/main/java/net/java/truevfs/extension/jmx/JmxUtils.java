@@ -17,7 +17,7 @@ final class JmxUtils {
     private static final MBeanServer mbs =
             ManagementFactory.getPlatformMBeanServer();
 
-    static void register(final Object mbean, final ObjectName name) {
+    static void registerMBean(final Object mbean, final ObjectName name) {
         try {
             try {
                 mbs.registerMBean(mbean, name);
@@ -30,7 +30,7 @@ final class JmxUtils {
         }
     }
 
-    static void unregister(final ObjectName name) {
+    static void unregisterMBean(final ObjectName name) {
         try {
             try {
                 mbs.unregisterMBean(name);

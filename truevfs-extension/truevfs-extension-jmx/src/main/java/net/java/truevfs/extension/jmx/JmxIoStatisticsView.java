@@ -26,12 +26,12 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
     static void register(final JmxIoStatistics model, final String type) {
         final JmxIoStatisticsView mbean = new JmxIoStatisticsView(model, type);
         final ObjectName name = getObjectName(model, type);
-        JmxUtils.register(mbean, name);
+        JmxUtils.registerMBean(mbean, name);
     }
 
     static void unregister(final JmxIoStatistics model, final String type) {
         final ObjectName name = getObjectName(model, type);
-        JmxUtils.unregister(name);
+        JmxUtils.unregisterMBean(name);
     }
 
     private static ObjectName getObjectName(

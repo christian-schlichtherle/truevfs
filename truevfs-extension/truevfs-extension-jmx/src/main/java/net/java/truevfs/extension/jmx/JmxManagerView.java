@@ -22,12 +22,12 @@ extends StandardMBean implements JmxManagerMXBean {
     static void register(final FsManager model) {
         final JmxManagerMXBean mbean = new JmxManagerView(model);
         final ObjectName name = getObjectName(model);
-        JmxUtils.register(mbean, name);
+        JmxUtils.registerMBean(mbean, name);
     }
 
     static void unregister(final FsManager model) {
         final ObjectName name = getObjectName(model);
-        JmxUtils.unregister(name);
+        JmxUtils.unregisterMBean(name);
     }
 
     private static ObjectName getObjectName(final FsManager model) {

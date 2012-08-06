@@ -26,12 +26,12 @@ extends StandardMBean implements JmxIoBufferMXBean {
     static void register(final IoBuffer model) {
         final JmxIoBufferMXBean mbean = new JmxIoBufferView(model);
         final ObjectName name = getObjectName(model);
-        JmxUtils.register(mbean, name);
+        JmxUtils.registerMBean(mbean, name);
     }
 
     static void unregister(final IoBuffer model) {
         final ObjectName name = getObjectName(model);
-        JmxUtils.unregister(name);
+        JmxUtils.unregisterMBean(name);
     }
 
     private static ObjectName getObjectName(final IoBuffer model) {
