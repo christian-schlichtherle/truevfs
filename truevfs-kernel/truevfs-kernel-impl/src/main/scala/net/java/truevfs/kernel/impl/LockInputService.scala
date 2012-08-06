@@ -24,8 +24,7 @@ import net.java.truevfs.kernel.spec.cio._
 @Immutable
 private class LockInputService[E <: Entry]
 (@WillCloseWhenClosed input: InputService[E])
-extends DecoratingInputService[E](input)
-with LockedOperation {
+extends DecoratingInputService[E](input) with LockedOperation {
 
   @DischargesObligation
   override def close() = locked(container close ())

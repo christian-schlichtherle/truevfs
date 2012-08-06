@@ -41,11 +41,8 @@ import net.java.truevfs.kernel.spec.cio.Entry.Type._;
   */
 @NotThreadSafe
 private abstract class BasicArchiveController[E <: FsArchiveEntry]
-(final override val model: LockModel)
 extends Controller[LockModel] with LockModelAspect {
   import BasicArchiveController._
-
-  require(null ne model.getParent)
 
   def stat(options: AccessOptions, name: FsEntryName): Option[FsEntry] =
     autoMount(options).stat(options, name)

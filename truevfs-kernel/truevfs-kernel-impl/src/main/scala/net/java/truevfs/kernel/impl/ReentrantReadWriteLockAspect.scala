@@ -8,14 +8,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock._
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.annotation.concurrent._
 
-/** Specifies (and implements) some features of a lock model.
+/** A mixin which provides some features of its associated `lock`.
   *
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private trait LockModelLike {
+private trait ReentrantReadWriteLockAspect {
 
-  /** The lock on which the file system controller(s) shall synchronize. */
+  /** The lock with the features to provide as an aspect. */
   def lock: ReentrantReadWriteLock
 
   /** Returns the read lock. */

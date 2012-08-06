@@ -10,7 +10,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 import net.java.truecommons.shed.ExtensionSet;
-import net.java.truevfs.kernel.impl.DefaultManager;
+import net.java.truevfs.kernel.impl.DefaultManagerFactory;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsArchiveDriverTestBase;
 import net.java.truevfs.kernel.spec.FsMountPoint;
@@ -51,7 +51,7 @@ extends FsArchiveDriverTestBase<D> {
         // issues in case this invariant is not met.
         // See http://truevfs.java.net/truevfs-access/usage.html#Third_Party_Access
         if (ISOLATE_FS_MANAGER)
-            config.setManager(new DefaultManager());
+            config.setManager(new DefaultManagerFactory().get());
         config.setLenient(true);
         config.setArchiveDetector(detector);
     }

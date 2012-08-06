@@ -37,9 +37,9 @@ import ArchiveFileSystem._
 @NotThreadSafe
 private class TargetArchiveController[E <: FsArchiveEntry](
   driver: FsArchiveDriver[E],
-  model: LockModel,
+  final override val model: LockModel,
   parent: FsController)
-extends FileSystemArchiveController[E](model) with TouchListener {
+extends FileSystemArchiveController[E] with TouchListener {
   import TargetArchiveController._
 
   /** The entry name of the target archive file in the parent file system. */
