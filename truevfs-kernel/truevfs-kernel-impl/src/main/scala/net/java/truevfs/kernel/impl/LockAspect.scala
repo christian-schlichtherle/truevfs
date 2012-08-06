@@ -7,7 +7,8 @@ package net.java.truevfs.kernel.impl
 import java.util.concurrent.locks._
 import javax.annotation.concurrent._
 
-/**
+/** A mixin which provides some features of its associated reentrant `lock`.
+  *
   * @author Christian Schlichtherle
   */
 @ThreadSafe
