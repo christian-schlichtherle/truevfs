@@ -54,15 +54,25 @@ public final class PaceManagerFactory extends FsManagerDecorator {
      * @param      manager the file system manager to decorate.
      * @return     the decorated file system manager.
      * @deprecated This method is reserved for exclusive use by the
-     *             {@link FsManagerLocator#SINGLETON}!
-     *             Call {@link #newMXBeanProxy} instead to refer to the singleton
-     *             pace manager which interfaces with JMX.
+     *             {@link FsManagerLocator#SINGLETON}.
      *             
      */
     @Deprecated
     @Override
     public FsManager apply(FsManager manager) {
         return Lazy.view.decorate(manager);
+    }
+
+    /**
+     * Returns 100.
+     * 
+     * @deprecated This method is reserved for exclusive use by the
+     *             {@link FsManagerLocator#SINGLETON}.
+     */
+    @Deprecated
+    @Override
+    public int getPriority() {
+        return 100;
     }
 
     private static final class Lazy {
