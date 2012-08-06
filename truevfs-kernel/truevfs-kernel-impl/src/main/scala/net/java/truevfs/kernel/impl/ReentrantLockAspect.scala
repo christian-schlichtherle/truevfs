@@ -13,16 +13,9 @@ import net.java.truevfs.kernel.spec.cio._
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private trait LockedOperation {
+private trait ReentrantLockAspect {
 
-  protected val lock = new ReentrantLock();
+  def lock: ReentrantLock
 
-  def locked[V](operation: => V) = {
-    lock lock ()
-    try {
-      operation
-    } finally {
-      lock unlock ()
-    }
-  }
+  final def locked[V] = lockOn[V](lock)_
 }

@@ -55,23 +55,13 @@ private final class DefaultManager private (
             parent)))
   }
 
-  override def controller(driver: FsMetaDriver, mountPoint: FsMountPoint): FsController = {
+  override def controller(d: FsMetaDriver, mp: FsMountPoint): FsController = {
     try {
-      readLock lock ()
-      try {
-        return controller0(driver, mountPoint)
-      } finally {
-        readLock unlock ()
-      }
+      readLocked(controller0(d, mp))
     } catch {
       case ex: NeedsWriteLockException =>
         if (readLockedByCurrentThread) throw ex;
-        writeLock lock ()
-        try {
-          return controller0(driver, mountPoint)
-        } finally {
-          writeLock unlock ()
-        }
+        writeLocked(controller0(d, mp))
     }
   }
 
@@ -79,7 +69,7 @@ private final class DefaultManager private (
     controllers.get(mp).flatMap(l => Option[FsController](l.get)) match {
       case Some(c) => c
       case None =>
-        if (!writeLock.isHeldByCurrentThread) throw NeedsWriteLockException()
+        checkWriteLockedByCurrentThread
         val p = Option(mp.getParent) map (controller0(d, _))
         val m = new ManagedModel(mp, p map (_.getModel) orNull)
         val c = d newController (this, m, p orNull)
@@ -116,15 +106,12 @@ private final class DefaultManager private (
      * to the given mount status.
      */
     override def setMounted(mounted: Boolean) {
-      writeLock lock ()
-      try {
+      writeLocked {
         if (_mounted != mounted) {
           if (mounted) SyncShutdownHook register DefaultManager.this
           schedule(mounted)
           _mounted = mounted
         }
-      } finally {
-        writeLock unlock ()
       }
     }
 
@@ -135,14 +122,7 @@ private final class DefaultManager private (
     }
   } // ManagedModel
 
-  override def size = {
-    readLock lock ()
-    try {
-      controllers size
-    } finally {
-      readLock unlock ()
-    }
-  }
+  override def size = readLocked(controllers.size)
 
   override def iterator = {
     import collection.JavaConverters._
@@ -150,16 +130,13 @@ private final class DefaultManager private (
   }
 
   private def sortedControllers = {
-    readLock lock ()
-    try {
+    readLocked (
       controllers
       .values
       .flatMap(l => Option(l.get))
       .toIndexedSeq
       .sorted(ReverseControllerOrdering)
-    } finally {
-      readLock unlock ()
-    }
+    )
   }
 
   override def sync(options: SyncOptions) {
