@@ -17,10 +17,4 @@ public final class JmxManagerDecorator extends FsManagerDecorator {
     public FsManager apply(FsManager manager) {
         return JmxDirector.SINGLETON.instrument(manager);
     }
-
-    /** Returns 100. */
-    @Override
-    public int getPriority() {
-        return 100;
-    }
 }
