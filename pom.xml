@@ -11,7 +11,7 @@
     <parent>
         <groupId>net.java.truecommons</groupId>
         <artifactId>truecommons-parent</artifactId>
-        <version>4</version>
+        <version>5</version>
     </parent>
 
     <groupId>net.java.truevfs</groupId>
@@ -139,6 +139,11 @@ system space.
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-component-instrumentation</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-component-jmx</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
