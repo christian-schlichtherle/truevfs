@@ -14,8 +14,7 @@ import net.java.truecommons.shed.Pool;
  * Typical implementations may use temporary files for big data or byte arrays
  * for small data.
  * <p>
- * Implementations must be thread-safe.
- * However, this does not necessarily apply to its managed I/O buffers.
+ * Implementations should be thread-safe.
  * 
  * @author Christian Schlichtherle
  */
