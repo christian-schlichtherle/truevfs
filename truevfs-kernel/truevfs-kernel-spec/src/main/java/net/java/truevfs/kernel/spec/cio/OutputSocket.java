@@ -10,18 +10,18 @@ import java.io.OutputStream;
 import java.nio.channels.NonReadableChannelException;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * A <em>stateless</em> factory for output streams and seekable byte channels
  * which operate on a {@linkplain #target() target entry}.
+ * <p>
+ * Implementations should be immutable.
  *
  * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.
  * @see    InputSocket
  * @author Christian Schlichtherle
  */
-@Immutable
 public interface OutputSocket<E extends Entry> extends IoSocket<E> {
 
     /**
