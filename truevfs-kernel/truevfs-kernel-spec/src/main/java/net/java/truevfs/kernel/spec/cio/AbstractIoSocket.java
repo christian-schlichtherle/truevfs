@@ -9,6 +9,8 @@ import javax.annotation.concurrent.Immutable;
 
 /**
  * Abstract base class for I/O sockets.
+ * <p>
+ * Implementations should be immutable.
  * 
  * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.

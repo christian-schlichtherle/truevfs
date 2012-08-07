@@ -7,15 +7,19 @@ package net.java.truevfs.kernel.spec.cio;
 import java.io.IOException;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * An abstract decorator for an input socket.
+ * <p>
+ * Implementations should be immutable.
  * 
  * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.
  * @see    DecoratingOutputSocket
  * @author Christian Schlichtherle
  */
+@Immutable
 public abstract class DecoratingInputSocket<E extends Entry>
 extends DelegatingInputSocket<E> {
 
