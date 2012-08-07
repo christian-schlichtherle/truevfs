@@ -5,7 +5,6 @@
 package net.java.truevfs.kernel.spec.cio;
 
 import java.io.IOException;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * An I/O socket is a <em>stateless</em> factory for I/O streams and channels
@@ -40,12 +39,13 @@ import javax.annotation.concurrent.Immutable;
  * In order to reflect this, an implementation should not access the entry nor
  * the container and it should never throw an {@link IOException} when creating
  * a I/O socket.
+ * <p>
+ * Implementations should be immutable.
  *
  * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.
  * @author Christian Schlichtherle
  */
-@Immutable
 public interface IoSocket<E extends Entry> {
     /**
      * Resolves the <i>target</i> for I/O operations.
