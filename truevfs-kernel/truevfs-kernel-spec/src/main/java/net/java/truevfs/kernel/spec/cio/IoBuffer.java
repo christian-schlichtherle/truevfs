@@ -9,6 +9,8 @@ import net.java.truecommons.shed.Releasable;
 
 /**
  * A releasable I/O entry.
+ * <p>
+ * Implementations should be thread-safe.
  *
  * @author Christian Schlichtherle
  */
