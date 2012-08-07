@@ -13,6 +13,8 @@ import net.java.truecommons.io.ChannelOutputStream;
 
 /**
  * Abstract base class for output sockets.
+ * <p>
+ * Implementations should be immutable.
  *
  * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.

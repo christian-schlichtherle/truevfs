@@ -12,6 +12,8 @@ import javax.annotation.concurrent.Immutable;
 
 /**
  * Delegates all methods to another input socket.
+ * <p>
+ * Implementations should be immutable.
  * 
  * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.
