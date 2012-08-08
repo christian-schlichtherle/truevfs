@@ -68,7 +68,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * This is an immutable property - multiple calls must return the same
      * object.
      * 
-     * @return {@link KeyManagerLocator#SINGLETON}, as by the implementation
+     * @return {@link KeyManagerMapLocator#SINGLETON}, as by the implementation
      *         in the class {@link ZipDriver}.
      */
     public KeyManagerContainer getKeyManagerContainer() {

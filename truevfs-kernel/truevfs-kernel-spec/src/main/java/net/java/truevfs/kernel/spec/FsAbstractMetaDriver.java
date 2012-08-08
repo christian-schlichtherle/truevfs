@@ -13,7 +13,7 @@ import net.java.truecommons.services.Container;
 /**
  * An abstract composite driver.
  * This class provides an implementation of {@link #newController} which uses
- * the file system driver map returned by {@link #drivers()} to lookup the
+ * the file system driver map returned by {@link #get()} to lookup the
  * appropriate driver for the scheme of any given mount point.
  * <p>
  * Subclasses should be immutable.

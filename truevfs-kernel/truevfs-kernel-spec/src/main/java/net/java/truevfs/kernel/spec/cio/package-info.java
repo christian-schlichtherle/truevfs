@@ -4,8 +4,8 @@
  */
 /**
  * Provides generic services for reading and writing
- * {@linkplain net.truevfs.kernel.cio.Entry entries} in
- * {@linkplain net.truevfs.kernel.cio.Container containers},
+ * {@linkplain net.java.truevfs.kernel.spec.cio.Entry entries} in
+ * {@linkplain net.java.truevfs.kernel.spec.cio.Container containers},
  * e.g.&#160;file systems, archive files or I/O buffer pools.
  * 
  * @author Christian Schlichtherle

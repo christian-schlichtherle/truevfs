@@ -25,7 +25,7 @@ import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
 <tbody>
 <tr>
 <td>{@code zip}</td>
-<td>{@link net.truevfs.component.zip.driver.ZipDriver}</td>
+<td>{@link ZipDriver}</td>
 </tr>
 </tbody>
 </table>

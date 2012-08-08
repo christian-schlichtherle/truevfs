@@ -12,7 +12,7 @@ import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.QuotedUriSyntaxException;
 import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
-import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.ENTRY_NAME;
+import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_NAME;
 
 /**
  * Addresses a file system node relative to its {@link FsMountPoint mount point}.
@@ -123,10 +123,10 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.ENTRY_NAME;
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
  *
- * @see    FsPath
+ * @see    FsNodePath
  * @see    FsMountPoint
  * @see    FsScheme
- * @see    FsEntry#getName()
+ * @see    FsNode#getName()
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -241,7 +241,7 @@ implements Serializable, Comparable<FsNodeName> {
      */
     public FsNodeName(URI uri, final FsUriModifier modifier)
     throws URISyntaxException {
-        parse(modifier.modify(uri, ENTRY_NAME));
+        parse(modifier.modify(uri, NODE_NAME));
     }
 
     private void writeObject(ObjectOutputStream out)

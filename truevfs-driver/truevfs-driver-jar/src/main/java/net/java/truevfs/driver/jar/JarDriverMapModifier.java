@@ -6,11 +6,11 @@ package net.java.truevfs.driver.jar;
 
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.ExtensionSet;
 import net.java.truevfs.comp.zip.driver.JarDriver;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
-import net.java.truecommons.shed.ExtensionSet;
 
 /**
  * Creates maps with drivers for the ZIP file format.
@@ -26,7 +26,7 @@ import net.java.truecommons.shed.ExtensionSet;
 <tbody>
 <tr>
 <td>{@code ear}, {@code jar}, {@code war}</td>
-<td>{@link net.truevfs.component.zip.driver.JarDriver}</td>
+<td>{@link JarDriver}</td>
 </tr>
 </tbody>
 </table>

@@ -32,7 +32,7 @@ import static net.java.truevfs.comp.zip.LittleEndian.writeLong;
  *
  * @author  Christian Schlichtherle
  */
-// TODO: Consider implementing net.truevfs.kernel.entry.Entry.
+// TODO: Consider implementing net.java.truevfs.kernel.entry.Entry.
 @NotThreadSafe
 public class ZipEntry implements Cloneable {
 
@@ -409,7 +409,7 @@ public class ZipEntry implements Cloneable {
      * @param csize The Compressed Size.
      * @throws IllegalArgumentException If {@code csize} is not in the
      *         range from {@code 0} to {@link ULong#MAX_VALUE}
-     *         ({@value net.truevfs.driver.zip.io.ULong#MAX_VALUE}).
+     *         ({@value net.java.truevfs.comp.zip.ULong#MAX_VALUE}).
      * @see #getCompressedSize
      */
     public final void setCompressedSize(final long csize) {
@@ -446,7 +446,7 @@ public class ZipEntry implements Cloneable {
      * @param size The (Uncompressed) Size.
      * @throws IllegalArgumentException If {@code size} is not in the
      *         range from {@code 0} to {@link ULong#MAX_VALUE}
-     *         ({@value net.truevfs.driver.zip.io.ULong#MAX_VALUE}).
+     *         ({@value net.java.truevfs.comp.zip.ULong#MAX_VALUE}).
      * @see #getCompressedSize
      */
     public final void setSize(final long size) {

@@ -24,7 +24,7 @@ import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
 <tbody>
 <tr>
 <td>{@code file}</td>
-<td>{@link net.truevfs.driver.file.FileDriver}</td>
+<td>{@link FileDriver}</td>
 </tr>
 </tbody>
 </table>

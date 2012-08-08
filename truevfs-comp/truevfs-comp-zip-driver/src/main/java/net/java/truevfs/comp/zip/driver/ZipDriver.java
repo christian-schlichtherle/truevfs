@@ -6,6 +6,7 @@ package net.java.truevfs.comp.zip.driver;
 
 import java.nio.charset.Charset;
 import javax.annotation.concurrent.Immutable;
+import net.java.truevfs.comp.zip.DateTimeConverter;
 import net.java.truevfs.comp.zip.ZipEntry;
 
 /**

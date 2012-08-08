@@ -89,7 +89,7 @@ public interface Director<This extends Director<This>> {
      * @param  object the object to instrument.
      * @return An instrumenting object or {@code object} if the implementation
      *         does not want to instrument it.
-     * @see    #instrument(FsManager, FsMetaDriver)
+     * @see    #instrument(InstrumentingManager, FsMetaDriver)
      */
     FsModel instrument(
             InstrumentingMetaDriver<This> origin,
@@ -102,7 +102,7 @@ public interface Director<This extends Director<This>> {
      * @param  object the object to instrument.
      * @return An instrumenting object or {@code object} if the implementation
      *         does not want to instrument it.
-     * @see    #instrument(FsManager, FsMetaDriver)
+     * @see    #instrument(InstrumentingManager, FsMetaDriver)
      */
     FsController instrument(
             InstrumentingMetaDriver<This> origin,
@@ -115,8 +115,8 @@ public interface Director<This extends Director<This>> {
      * @param  object the object to instrument.
      * @return An instrumenting object or {@code object} if the implementation
      *         does not want to instrument it.
-     * @see    #instrument(FsManager, FsController)
-     * @see    #instrument(FsMetaDriver, FsController)
+     * @see    #instrument(InstrumentingManager, FsController)
+     * @see    #instrument(InstrumentingMetaDriver, FsController)
      */
     InputSocket<? extends Entry> instrument(
             InstrumentingController<This> origin,
@@ -129,8 +129,8 @@ public interface Director<This extends Director<This>> {
      * @param  object the object to instrument.
      * @return An instrumenting object or {@code object} if the implementation
      *         does not want to instrument it.
-     * @see    #instrument(FsManager, FsController)
-     * @see    #instrument(FsMetaDriver, FsController)
+     * @see    #instrument(InstrumentingManager, FsController)
+     * @see    #instrument(InstrumentingMetaDriver, FsController)
      */
     OutputSocket<? extends Entry> instrument(
             InstrumentingController<This> origin,
@@ -143,7 +143,7 @@ public interface Director<This extends Director<This>> {
      * @param  object the object to instrument.
      * @return An instrumenting object or {@code object} if the implementation
      *         does not want to instrument it.
-     * @see    #instrument(IoBufferPool, IoBuffer)
+     * @see    #instrument(InstrumentingBufferPool, IoBuffer)
      */
     InputSocket<? extends IoBuffer> instrument(
             InstrumentingBuffer<This> origin,
@@ -156,7 +156,7 @@ public interface Director<This extends Director<This>> {
      * @param  object the object to instrument.
      * @return An instrumenting object or {@code object} if the implementation
      *         does not want to instrument it.
-     * @see    #instrument(IoBufferPool, IoBuffer)
+     * @see    #instrument(InstrumentingBufferPool, IoBuffer)
      */
     OutputSocket<? extends IoBuffer> instrument(
             InstrumentingBuffer<This> origin,
@@ -169,8 +169,8 @@ public interface Director<This extends Director<This>> {
      * @param  object the object to instrument.
      * @return An instrumenting object or {@code object} if the implementation
      *         does not want to instrument it.
-     * @see    #instrument(FsController, InputSocket)
-     * @see    #instrument(IoBuffer, InputSocket)
+     * @see    #instrument(InstrumentingController, InputSocket)
+     * @see    #instrument(InstrumentingBuffer, InputSocket)
      */
     InputStream instrument(
             InstrumentingInputSocket<This, ? extends Entry> origin,
@@ -183,8 +183,8 @@ public interface Director<This extends Director<This>> {
      * @param  object the object to instrument.
      * @return An instrumenting object or {@code object} if the implementation
      *         does not want to instrument it.
-     * @see    #instrument(FsController, InputSocket)
-     * @see    #instrument(IoBuffer, InputSocket)
+     * @see    #instrument(InstrumentingController, InputSocket)
+     * @see    #instrument(InstrumentingBuffer, InputSocket)
      */
     SeekableByteChannel instrument(
             InstrumentingInputSocket<This, ? extends Entry> origin,
@@ -197,8 +197,8 @@ public interface Director<This extends Director<This>> {
      * @param  object the object to instrument.
      * @return An instrumenting object or {@code object} if the implementation
      *         does not want to instrument it.
-     * @see    #instrument(FsController, OutputSocket)
-     * @see    #instrument(IoBuffer, OutputSocket)
+     * @see    #instrument(InstrumentingController, OutputSocket)
+     * @see    #instrument(InstrumentingBuffer, OutputSocket)
      */
     OutputStream instrument(
             InstrumentingOutputSocket<This, ? extends Entry> origin,
@@ -211,8 +211,8 @@ public interface Director<This extends Director<This>> {
      * @param  object the object to instrument.
      * @return An instrumenting object or {@code object} if the implementation
      *         does not want to instrument it.
-     * @see    #instrument(FsController, OutputSocket)
-     * @see    #instrument(IoBuffer, OutputSocket)
+     * @see    #instrument(InstrumentingController, OutputSocket)
+     * @see    #instrument(InstrumentingBuffer, OutputSocket)
      */
     SeekableByteChannel instrument(
             InstrumentingOutputSocket<This, ? extends Entry> origin,

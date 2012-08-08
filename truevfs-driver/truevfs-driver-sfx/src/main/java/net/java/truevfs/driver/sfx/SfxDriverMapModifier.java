@@ -24,7 +24,7 @@ import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
 <tbody>
 <tr>
 <td>{@code exe}</td>
-<td>{@link net.truevfs.driver.zip.ReadOnlySfxDriver}</td>
+<td>{@link ReadOnlySfxDriver}</td>
 </tr>
 </tbody>
 </table>

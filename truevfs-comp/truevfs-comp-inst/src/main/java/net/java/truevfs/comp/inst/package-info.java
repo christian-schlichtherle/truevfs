@@ -6,4 +6,4 @@
  * Provides core functionality for instrumenting TrueVFS at runtime.
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
-package net.java.truevfs.component.instrumentation;
+package net.java.truevfs.comp.inst;

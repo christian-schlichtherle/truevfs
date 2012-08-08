@@ -25,7 +25,7 @@ import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
 <tbody>
 <tr>
 <td>{@code tar.bz2}, {@code tar.bzip2}, {@code tb2}, {@code tbz}, {@code tbz2}</td>
-<td>{@link net.truevfs.driver.tar.bzip2.TarBZip2Driver}</td>
+<td>{@link TarBZip2Driver}</td>
 </tr>
 </tbody>
 </table>

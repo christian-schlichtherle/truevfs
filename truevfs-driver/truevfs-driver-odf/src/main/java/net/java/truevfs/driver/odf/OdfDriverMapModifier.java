@@ -6,10 +6,10 @@ package net.java.truevfs.driver.odf;
 
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.ExtensionSet;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
-import net.java.truecommons.shed.ExtensionSet;
 
 /**
  * Creates maps with drivers for the ZIP file format.
@@ -24,16 +24,8 @@ import net.java.truecommons.shed.ExtensionSet;
 </thead>
 <tbody>
 <tr>
-<td>{@code ear}, {@code jar}, {@code war}</td>
-<td>{@link net.truevfs.driver.zip.JarDriver}</td>
-</tr>
-<tr>
 <td>{@code odt}, {@code ott}, {@code odg}, {@code otg}, {@code odp}, {@code otp}, {@code ods}, {@code ots}, {@code odc}, {@code otc}, {@code odi}, {@code oti}, {@code odf}, {@code otf}, {@code odm}, {@code oth}, {@code odb}</td>
-<td>{@link net.truevfs.driver.zip.OdfDriver}</td>
-</tr>
-<tr>
-<td>{@code zip}</td>
-<td>{@link net.truevfs.driver.zip.ZipDriver}</td>
+<td>{@link OdfDriver}</td>
 </tr>
 </tbody>
 </table>

@@ -173,7 +173,7 @@ extends FsDriver {
      * <p>
      * The implementation in {@link FsArchiveDriver} simply forwards the call
      * to {@link #source}
-     * and {@link #newInput(FsModel, Source)}.
+     * and {@link #newInput(FsModel, FsInputSocketSource)}.
      * 
      * @param  model the file system model for the target archive file.
      * @param  options the options for accessing the target archive file in the
@@ -228,7 +228,7 @@ extends FsDriver {
      * <p>
      * The implementation in {@link FsArchiveDriver} simply forwards the call
      * to {@link #sink}
-     * and {@link #newOutput(FsModel, Sink, InputService)}.
+     * and {@link #newOutput(FsModel, FsOutputSocketSink, InputService)}.
      * 
      * @param  model the file system model for the target archive file.
      * @param  options the options for accessing the target archive file in the

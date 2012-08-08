@@ -69,7 +69,7 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  * thread-safe.
  * Note that some factory methods declare this as a MUST requirement for their
  * generated file system controllers, for example
- * {@link FsDriver#newController} and {@link FsCompositeDriver#newController}.
+ * {@link FsDriver#newController} and {@link FsMetaDriver#newController}.
  * <li>
  * All file system operations SHOULD be <i>durable</i>, that is their side
  * effect on the stored data SHOULD be permanent in the parent file system or

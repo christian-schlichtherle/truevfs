@@ -54,7 +54,7 @@ public class TarGZipDriver extends TarDriver {
     /**
      * Returns the compression level to use when writing a GZIP sink stream.
      * <p>
-     * The implementation in the class {@link TarBZip2Driver} returns
+     * The implementation in the class {@link TarGZipDriver} returns
      * {@link Deflater#BEST_COMPRESSION}.
      * 
      * @return The compression level to use when writing a GZIP sink stream.
