@@ -41,7 +41,7 @@ private final class DefaultManager private (
     new WeakHashMap[FsMountPoint, Link[FsController]]
 
   override def newController
-  (driver: AnyArchiveDriver, model: FsModel, parent: FsController): FsController = {
+  (driver: AnyArchiveDriver, model: FsModel, parent: FsController) = {
     assert(!model.isInstanceOf[LockModel])
     // HC SVNT DRACONES!
     // The FalsePositiveArchiveController decorates the FrontController
@@ -50,9 +50,8 @@ private final class DefaultManager private (
     new FalsePositiveArchiveController(
       new FrontController(
         driver decorate 
-          new ControllerAdapter(
-            new BackController(driver, new LockModel(model), parent),
-            parent)))
+          new ControllerAdapter(parent,
+            new BackController(driver, new LockModel(model), parent))))
   }
 
   override def controller(d: FsMetaDriver, mp: FsMountPoint): FsController = {
@@ -145,6 +144,7 @@ private final class DefaultManager private (
   }
 }
 
+@ThreadSafe
 private object DefaultManager {
   private final class FrontController(c: FsController)
   extends FsDecoratingController(c)
