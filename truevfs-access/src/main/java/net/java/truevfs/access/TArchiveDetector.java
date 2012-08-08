@@ -10,7 +10,6 @@ import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import javax.inject.Provider;
-import net.java.truecommons.services.Container;
 import net.java.truecommons.services.Loader;
 import net.java.truecommons.shed.ExtensionSet;
 import net.java.truecommons.shed.HashMaps;
@@ -54,8 +53,7 @@ import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class TArchiveDetector
-extends FsAbstractMetaDriver implements Container<Map<FsScheme, FsDriver>> {
+public final class TArchiveDetector extends FsAbstractMetaDriver {
 
     /**
      * This instance never recognizes any archive files in a path.
