@@ -7,7 +7,7 @@ package net.java.truevfs.kernel.spec;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
-import javax.inject.Provider;
+import net.java.truecommons.services.Container;
 
 /**
  * Uses a given file system driver provider to lookup the appropriate driver
@@ -17,7 +17,7 @@ import javax.inject.Provider;
  */
 @Immutable
 public final class FsSimpleMetaDriver extends FsAbstractMetaDriver {
-    private final Provider<Map<FsScheme, FsDriver>> provider;
+    private final Container<Map<FsScheme, FsDriver>> container;
 
     /**
      * Constructs a new simple composite driver which will query the given
@@ -26,12 +26,12 @@ public final class FsSimpleMetaDriver extends FsAbstractMetaDriver {
      * 
      * @param provider the driver map provider.
      */
-    public FsSimpleMetaDriver(final Provider<Map<FsScheme, FsDriver>> provider) {
-        this.provider = Objects.requireNonNull(provider);
+    public FsSimpleMetaDriver(final Container<Map<FsScheme, FsDriver>> provider) {
+        this.container = Objects.requireNonNull(provider);
     }
 
     @Override
     public Map<FsScheme, FsDriver> get() {
-        return provider.get();
+        return container.get();
     }
 }

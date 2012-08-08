@@ -14,7 +14,7 @@ import net.java.truecommons.shed.Pool;
  * Typical implementations may use temporary files for big data or byte arrays
  * for small data.
  * <p>
- * Implementations should be thread-safe.
+ * Subclasses should be thread-safe.
  * 
  * @author Christian Schlichtherle
  */

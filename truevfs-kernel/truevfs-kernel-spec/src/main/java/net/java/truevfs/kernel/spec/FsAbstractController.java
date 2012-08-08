@@ -7,17 +7,20 @@ package net.java.truevfs.kernel.spec;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
 
 /**
  * An abstract file system controller which implements the {@link #getModel()}
  * method.
+ * <p>
+ * Subclasses should be thread-safe.
  * 
  * @author Christian Schlichtherle
  */
-public abstract class FsAbstractController
-implements FsController {
+@ThreadSafe
+public abstract class FsAbstractController implements FsController {
 
     private final FsModel model;
 

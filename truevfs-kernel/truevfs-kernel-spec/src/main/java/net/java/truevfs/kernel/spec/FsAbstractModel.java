@@ -11,6 +11,8 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * An abstract file system model which does <em>not</em> implement the property
  * {@code touched}.
+ * <p>
+ * Subclasses should be thread-safe.
  *
  * @author Christian Schlichtherle
  */
