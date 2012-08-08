@@ -12,12 +12,12 @@ import net.java.truevfs.driver.zip.raes.crypto.RaesKeyException;
 import net.java.truevfs.driver.zip.raes.crypto.RaesParameters;
 import net.java.truevfs.driver.zip.raes.crypto.RaesParametersProvider;
 import net.java.truevfs.driver.zip.raes.crypto.Type0RaesParameters;
-import net.java.truevfs.keymanager.spec.KeyManager;
-import net.java.truevfs.keymanager.spec.KeyManagerContainer;
-import net.java.truevfs.keymanager.spec.KeyProvider;
-import net.java.truevfs.keymanager.spec.UnknownKeyException;
-import net.java.truevfs.keymanager.spec.param.AesKeyStrength;
-import net.java.truevfs.keymanager.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.KeyManager;
+import net.java.truevfs.key.spec.KeyManagerContainer;
+import net.java.truevfs.key.spec.KeyProvider;
+import net.java.truevfs.key.spec.UnknownKeyException;
+import net.java.truevfs.key.spec.param.AesKeyStrength;
+import net.java.truevfs.key.spec.param.AesPbeParameters;
 
 /**
  * An adapter which provides {@link RaesParameters} by using a

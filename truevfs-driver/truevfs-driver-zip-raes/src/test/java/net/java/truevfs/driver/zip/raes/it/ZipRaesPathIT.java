@@ -9,9 +9,9 @@ import static java.nio.file.Files.*;
 import net.java.truevfs.access.TPath;
 import net.java.truevfs.access.TPathITSuite;
 import net.java.truevfs.driver.zip.raes.TestZipRaesDriver;
-import net.java.truevfs.keymanager.spec.MockView.Action;
-import static net.java.truevfs.keymanager.spec.MockView.Action.CANCEL;
-import static net.java.truevfs.keymanager.spec.MockView.Action.ENTER;
+import net.java.truevfs.key.spec.MockView.Action;
+import static net.java.truevfs.key.spec.MockView.Action.CANCEL;
+import static net.java.truevfs.key.spec.MockView.Action.ENTER;
 import static org.junit.Assert.*;
 import org.junit.Test;
 

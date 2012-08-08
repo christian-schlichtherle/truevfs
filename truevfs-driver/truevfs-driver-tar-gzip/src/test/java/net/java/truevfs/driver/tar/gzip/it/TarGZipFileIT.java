@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.driver.tar.gzip.it;
 
-import net.java.truevfs.component.tar.driver.it.TarFileITSuite;
+import net.java.truevfs.comp.tar.driver.it.TarFileITSuite;
 import net.java.truevfs.driver.tar.gzip.TarGZipDriver;
 import net.java.truevfs.driver.tar.gzip.TestTarGZipDriver;
 

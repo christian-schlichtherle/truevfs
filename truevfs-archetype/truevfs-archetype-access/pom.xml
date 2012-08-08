@@ -30,7 +30,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-keymanager-swing-feedback-hurl</artifactId>
+            <artifactId>truevfs-key-swing-feedback-hurl</artifactId>
             <optional>true</optional>
         </dependency>
     </dependencies>
