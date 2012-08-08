@@ -3,7 +3,7 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Sample code for the TrueVFS Access File* API.
+ * Sample code for encryption and decryption with RAES.
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
-package net.truevfs.samples.access;
+package net.java.truevfs.samples.raes;

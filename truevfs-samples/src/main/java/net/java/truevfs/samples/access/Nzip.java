@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.samples.access;
+package net.java.truevfs.samples.access;
 
 import net.java.truevfs.access.TConfig;
 import net.java.truevfs.access.TArchiveDetector;
@@ -538,7 +538,7 @@ public class Nzip extends Application {
     }
 
     private static class IllegalUsageException
-    extends net.truevfs.samples.access.IllegalUsageException {
+    extends net.java.truevfs.samples.access.IllegalUsageException {
         private static final long serialVersionUID = 2660653252314854276L;
 
         IllegalUsageException() {
