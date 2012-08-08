@@ -62,7 +62,7 @@ public class ReadOnlySfxDriver extends ZipDriver {
             FsModel model,
             BitField<FsAccessOption> options,
             FsController controller,
-            FsEntryName name,
+            FsNodeName name,
             @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {
         throw new FsReadOnlyFileSystemException();

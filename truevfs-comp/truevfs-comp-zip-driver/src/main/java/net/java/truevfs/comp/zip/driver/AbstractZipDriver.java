@@ -21,13 +21,13 @@ import net.java.truevfs.comp.zip.ZipEntry;
 import static net.java.truevfs.comp.zip.ZipEntry.*;
 import net.java.truevfs.comp.zip.ZipFileParameters;
 import net.java.truevfs.comp.zip.ZipOutputStreamParameters;
-import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 import net.java.truevfs.kernel.spec.*;
+import static net.java.truevfs.kernel.spec.FsAccessOption.*;
+import net.java.truevfs.kernel.spec.cio.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.WRITE;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import net.java.truevfs.kernel.spec.cio.Entry.Type;
 import static net.java.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
-import net.java.truevfs.kernel.spec.cio.*;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import net.java.truevfs.key.spec.KeyManagerContainer;
 import net.java.truevfs.key.spec.KeyProvider;
@@ -369,7 +369,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
     protected FsOutputSocketSink sink(
             BitField<FsAccessOption> options,
             final FsController controller,
-            final FsEntryName name) {
+            final FsNodeName name) {
         // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
         // opportunity to get its own preferences to sort out such a conflict.
         options = options.set(STORE);

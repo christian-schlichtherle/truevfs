@@ -27,24 +27,24 @@ private final class ReadOnlyArchiveFileSystem[E <: FsArchiveEntry](
 extends ArchiveFileSystem(driver, archive, rootTemplate) {
   import ReadOnlyArchiveFileSystem._
 
-  override def checkAccess(options: AccessOptions, name: FsEntryName, types: BitField[Access]) {
+  override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) {
     if (!types.isEmpty && READ_ONLY != types)
         throw new FsReadOnlyFileSystemException();
     super.checkAccess(options, name, types)
   }
 
-  override def setReadOnly(name: FsEntryName) { }
+  override def setReadOnly(name: FsNodeName) { }
 
-  override def setTime(options: AccessOptions, name: FsEntryName, times: Map[Access, Long]) =
+  override def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]) =
     throw new FsReadOnlyFileSystemException
 
-  override def setTime(options: AccessOptions, name: FsEntryName, types: BitField[Access], value: Long) =
+  override def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long) =
     throw new FsReadOnlyFileSystemException
 
-  override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Option[Entry]) =
+  override def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) =
     throw new FsReadOnlyFileSystemException
 
-  override def unlink(options: AccessOptions, name: FsEntryName) =
+  override def unlink(options: AccessOptions, name: FsNodeName) =
     throw new FsReadOnlyFileSystemException
 }
 

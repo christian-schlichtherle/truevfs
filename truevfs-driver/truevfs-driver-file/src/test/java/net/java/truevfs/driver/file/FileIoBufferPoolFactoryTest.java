@@ -13,6 +13,6 @@ import org.junit.Test;
 public final class FileIoBufferPoolFactoryTest {
     @Test
     public void testPriority() {
-        assertEquals(0, new FileIoBufferPoolFactory().getPriority());
+        assertEquals(0, new FileBufferPoolFactory().getPriority());
     }
 }

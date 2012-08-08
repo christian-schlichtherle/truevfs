@@ -17,9 +17,9 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
+import net.java.truevfs.kernel.spec.cio.*;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
 import net.java.truevfs.kernel.spec.cio.Entry.Type;
-import net.java.truevfs.kernel.spec.cio.*;
 import net.java.truevfs.kernel.spec.io.ThrowingInputStream;
 import net.java.truevfs.kernel.spec.io.ThrowingOutputStream;
 import net.java.truevfs.kernel.spec.io.ThrowingSeekableChannel;
@@ -33,7 +33,7 @@ extends FsAbstractController {
 
     private final @Nullable FsController parent;
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final ConcurrentMap<FsEntryName, IoEntry<?>>
+    private final ConcurrentMap<FsNodeName, IoEntry<?>>
             map = new ConcurrentHashMap<>();
     private final TestConfig config;
     private volatile @CheckForNull ThrowManager control;
@@ -82,8 +82,8 @@ extends FsAbstractController {
     }
 
     @Override
-    public FsEntry stat(
-            BitField<FsAccessOption> options, FsEntryName name)
+    public FsNode stat(
+            BitField<FsAccessOption> options, FsNodeName name)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -93,7 +93,7 @@ extends FsAbstractController {
 
     @Override
     public void checkAccess(
-            final BitField<FsAccessOption> options, final FsEntryName name, final BitField<Access> types)
+            final BitField<FsAccessOption> options, final FsNodeName name, final BitField<Access> types)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -103,7 +103,7 @@ extends FsAbstractController {
     }
 
     @Override
-    public void setReadOnly(FsEntryName name) throws IOException {
+    public void setReadOnly(FsNodeName name) throws IOException {
         checkAllExceptions(this);
         assert null != name;
         throw new UnsupportedOperationException();
@@ -111,7 +111,7 @@ extends FsAbstractController {
 
     @Override
     public boolean setTime(
-            BitField<FsAccessOption> options, FsEntryName name, Map<Access, Long> times)
+            BitField<FsAccessOption> options, FsNodeName name, Map<Access, Long> times)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -122,7 +122,7 @@ extends FsAbstractController {
 
     @Override
     public boolean setTime(
-            BitField<FsAccessOption> options, FsEntryName name, BitField<Access> types, long value)
+            BitField<FsAccessOption> options, FsNodeName name, BitField<Access> types, long value)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -134,7 +134,7 @@ extends FsAbstractController {
     @Override
     public InputSocket<?> input(
             final BitField<FsAccessOption> options,
-            final FsEntryName name) {
+            final FsNodeName name) {
         checkUndeclaredExceptions(this);
         assert null != name;
         assert null != options;
@@ -171,7 +171,7 @@ extends FsAbstractController {
     @Override
     public OutputSocket<?> output(
             final BitField<FsAccessOption> options,
-            final FsEntryName name,
+            final FsNodeName name,
             final @CheckForNull Entry template) {
         checkUndeclaredExceptions(this);
         assert null != name;
@@ -209,7 +209,7 @@ extends FsAbstractController {
     }
 
     @Override
-    public void mknod(  BitField<FsAccessOption> options, FsEntryName name, Type type, Entry template)
+    public void mknod(  BitField<FsAccessOption> options, FsNodeName name, Type type, Entry template)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -219,7 +219,7 @@ extends FsAbstractController {
     }
 
     @Override
-    public void unlink(BitField<FsAccessOption> options, FsEntryName name)
+    public void unlink(BitField<FsAccessOption> options, FsNodeName name)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;

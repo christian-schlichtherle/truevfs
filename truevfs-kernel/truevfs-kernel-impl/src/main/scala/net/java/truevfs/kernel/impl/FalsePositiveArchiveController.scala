@@ -7,7 +7,7 @@ package net.java.truevfs.kernel.impl
 import net.java.truecommons.shed._
 import java.io._
 import javax.annotation.concurrent._
-import net.java.truevfs.kernel.spec.FsEntryName._;
+import net.java.truevfs.kernel.spec.FsNodeName._;
 import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.cio._
 import net.java.truevfs.kernel.spec.cio.Entry._;
@@ -67,27 +67,27 @@ private final class FalsePositiveArchiveController(
 
   private lazy val path = getMountPoint.getPath
 
-  override def stat(options: AccessOptions, name: FsEntryName) =
+  override def stat(options: AccessOptions, name: FsNodeName) =
     apply(name, (c, n) => c.stat(options, n))
 
-  override def checkAccess(options: AccessOptions, name: FsEntryName, types: BitField[Access]) =
+  override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
     apply(name, (c, n) => c.checkAccess(options, n, types))
 
-  override def setReadOnly(name: FsEntryName) =
+  override def setReadOnly(name: FsNodeName) =
     apply(name, (c, n) => c.setReadOnly(n))
 
-  override def setTime(options: AccessOptions, name: FsEntryName, times: java.util.Map[Access, java.lang.Long]) =
+  override def setTime(options: AccessOptions, name: FsNodeName, times: java.util.Map[Access, java.lang.Long]) =
     apply(name, (c, n) => c.setTime(options, n, times))
 
-  override def setTime(options: AccessOptions, name: FsEntryName, types: BitField[Access], value: Long) =
+  override def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long) =
     apply(name, (c, n) => c.setTime(options, n, types, value))
 
-  override def input(options: AccessOptions, name: FsEntryName) = {
+  override def input(options: AccessOptions, name: FsNodeName) = {
     final class Input extends AbstractInputSocket[Entry] {
       var _last: FsController = _
       var _socket: AnyInputSocket = _
 
-      def socket(c: FsController, n: FsEntryName) = {
+      def socket(c: FsController, n: FsNodeName) = {
         if (_last ne c) { _last = c; _socket = c.input(options, n) }
         _socket
       }
@@ -103,12 +103,12 @@ private final class FalsePositiveArchiveController(
     new Input
   }: AnyInputSocket
 
-  override def output(options: AccessOptions, name: FsEntryName, template: Entry) = {
+  override def output(options: AccessOptions, name: FsNodeName, template: Entry) = {
     final class Output extends AbstractOutputSocket[Entry] {
       var _last: FsController = _
       var _socket: AnyOutputSocket = _
 
-      def socket(c: FsController, n: FsEntryName) = {
+      def socket(c: FsController, n: FsNodeName) = {
         if (_last ne c) { _last = c; _socket = c.output(options, n, template) }
         _socket
       }
@@ -124,10 +124,10 @@ private final class FalsePositiveArchiveController(
     new Output
   }: AnyOutputSocket
 
-  override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Entry) =
+  override def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Entry) =
     apply(name, (c, n) => c.mknod(options, n, tµpe, template))
 
-  override def unlink(options: AccessOptions, name: FsEntryName) {
+  override def unlink(options: AccessOptions, name: FsNodeName) {
     val operation: Operation[Unit] = { (c, n) =>
       c.unlink(options, n)
       if (n.isRoot) {
@@ -166,7 +166,7 @@ private final class FalsePositiveArchiveController(
     state = TryChild
   }
 
-  private def apply[V](name: FsEntryName, operation: Operation[V]): V = {
+  private def apply[V](name: FsNodeName, operation: Operation[V]): V = {
     var state = this.state
     try {
       state(name, operation)
@@ -182,23 +182,23 @@ private final class FalsePositiveArchiveController(
     }
   }
 
-  private def parent(name: FsEntryName) = path.resolve(name).getEntryName
+  private def parent(name: FsNodeName) = path.resolve(name).getNodeName
 
-  private type Operation[V] = (FsController, FsEntryName) => V
+  private type Operation[V] = (FsController, FsNodeName) => V
 
   private sealed trait State {
-    def apply[V](name: FsEntryName, operation: Operation[V]): V
+    def apply[V](name: FsNodeName, operation: Operation[V]): V
   } // State
 
   private object TryChild extends State {
-    override def apply[V](name: FsEntryName, operation: Operation[V]) =
+    override def apply[V](name: FsNodeName, operation: Operation[V]) =
       operation(controller, name)
   } // TryChild
 
   private case class UseParent(ex: FalsePositiveArchiveException) extends State {
     val originalCause = ex.getCause
 
-    override def apply[V](name: FsEntryName, operation: Operation[V]) = {
+    override def apply[V](name: FsNodeName, operation: Operation[V]) = {
       try {
         operation(getParent, parent(name))
       } catch {

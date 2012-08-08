@@ -13,15 +13,15 @@ import java.nio.file.NotDirectoryException;
 import java.util.Arrays;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.Paths;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOption.CREATE_PARENTS;
-import net.java.truevfs.kernel.spec.FsPath;
+import net.java.truevfs.kernel.spec.FsNodePath;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
 import net.java.truevfs.kernel.spec.cio.IoSockets;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truecommons.shed.BitField;
-import net.java.truecommons.shed.Paths;
 
 /**
  * Provides fast bulk I/O operations for {@link File}s and {@link TFile}s.
@@ -278,11 +278,11 @@ final class TBIO {
                 return archive.getController()
                         .input(options, tsrc.getInnerFsEntryName());
         }
-        final FsPath path = new FsPath(src);
+        final FsNodePath path = new FsNodePath(src);
         return  TConfig.get()
                 .getManager()
                 .controller(getDetector(src), path.getMountPoint())
-                .input(options, path.getEntryName());
+                .input(options, path.getNodeName());
     }
 
     /**
@@ -306,11 +306,11 @@ final class TBIO {
                 return archive.getController()
                         .output(options, tdst.getInnerFsEntryName(), template);
         }
-        final FsPath path = new FsPath(dst);
+        final FsNodePath path = new FsNodePath(dst);
         return TConfig.get()
                 .getManager()
                 .controller(getDetector(dst), path.getMountPoint())
-                .output(options.clear(CREATE_PARENTS), path.getEntryName(), template);
+                .output(options.clear(CREATE_PARENTS), path.getNodeName(), template);
     }
 
     private static TArchiveDetector getDetector(File file) {

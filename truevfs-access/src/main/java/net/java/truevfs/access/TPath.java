@@ -4,11 +4,6 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truevfs.kernel.spec.FsEntryName;
-import net.java.truevfs.kernel.spec.FsPath;
-import net.java.truevfs.kernel.spec.FsEntry;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsAccessOption;
 import java.io.File;
 import static java.io.File.separator;
 import static java.io.File.separatorChar;
@@ -18,10 +13,10 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.*;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchEvent.Modifier;
-import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
@@ -29,17 +24,22 @@ import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
-import static net.java.truevfs.access.TPathScanner.*;
-import static net.java.truevfs.kernel.spec.FsAccessOption.*;
-import static net.java.truevfs.kernel.spec.FsEntryName.*;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
 import net.java.truecommons.shed.BitField;
 import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import net.java.truecommons.shed.Paths;
 import net.java.truecommons.shed.QuotedUriSyntaxException;
 import net.java.truecommons.shed.UriBuilder;
+import static net.java.truevfs.access.TPathScanner.*;
+import net.java.truevfs.kernel.spec.FsAccessOption;
+import static net.java.truevfs.kernel.spec.FsAccessOption.*;
+import net.java.truevfs.kernel.spec.FsMountPoint;
+import net.java.truevfs.kernel.spec.FsNode;
+import net.java.truevfs.kernel.spec.FsNodeName;
+import static net.java.truevfs.kernel.spec.FsNodeName.*;
+import net.java.truevfs.kernel.spec.FsNodePath;
+import net.java.truevfs.kernel.spec.cio.Entry;
+import net.java.truevfs.kernel.spec.cio.InputSocket;
+import net.java.truevfs.kernel.spec.cio.OutputSocket;
 
 /**
  * A {@link Path} implementation based on the TrueVFS Kernel module.
@@ -105,7 +105,7 @@ public final class TPath implements Path {
 
     private final URI name;
     private final TArchiveDetector detector;
-    private final FsPath address;
+    private final FsNodePath nodePath;
     private volatile @CheckForNull TFileSystem fileSystem;
     private volatile @CheckForNull String string;
     private volatile @CheckForNull Integer hashCode;
@@ -173,8 +173,8 @@ public final class TPath implements Path {
         this.name = name;
         final TArchiveDetector detector = getDefaultArchiveDetector();
         this.detector = detector;
-        this.address = new TPathScanner(detector).scan(
-                new FsPath(fileSystem.getMountPoint(), ROOT),
+        this.nodePath = new TPathScanner(detector).scan(
+                new FsNodePath(fileSystem.getMountPoint(), ROOT),
                 name);
         this.fileSystem = fileSystem;
 
@@ -242,7 +242,8 @@ public final class TPath implements Path {
      * <p>
      * If {@code file} is an instance of {@link TFile}, its
      * {@linkplain TFile#getArchiveDetector() archive detector} and
-     * {@linkplain TFile#toFsPath() file system path} get shared with this instance.
+     * {@linkplain TFile#toNodePath() file system node path} get shared with
+     * this instance.
      * <p>
      * Otherwise, this constructor scans the {@linkplain File#getPath() path name}
      * of the file to detect prospective archive files using the
@@ -272,7 +273,8 @@ public final class TPath implements Path {
      * @param file a file.
      *        If this is an instance of {@link TFile}, its
      *        {@linkplain TFile#getArchiveDetector() archive detector} and
-     *        {@linkplain TFile#toFsPath() address} get shared with this instance.
+     *        {@linkplain TFile#toNodePath() file system node path} get shared
+     *        with this instance.
      */
     public TPath(File file) {
         final URI name = name(file.getPath());
@@ -280,11 +282,11 @@ public final class TPath implements Path {
         if (file instanceof TFile) {
             final TFile f = (TFile) file;
             this.detector = f.getArchiveDetector();
-            this.address = f.toFsPath();
+            this.nodePath = f.toNodePath();
         } else {
             final TArchiveDetector detector = getDefaultArchiveDetector();
             this.detector = detector;
-            this.address = address(name, detector);
+            this.nodePath = nodePath(name, detector);
         }
 
         assert invariants();
@@ -320,12 +322,12 @@ public final class TPath implements Path {
     private TPath(
             URI name,
             @CheckForNull TArchiveDetector detector,
-            final @CheckForNull FsPath address) {
+            final @CheckForNull FsNodePath nodePath) {
         this.name = name = name(name);
         if (null == detector)
             detector = getDefaultArchiveDetector();
         this.detector = detector;
-        this.address = null != address ? address : address(name, detector);
+        this.nodePath = null != nodePath ? nodePath : nodePath(name, detector);
 
         assert invariants();
     }
@@ -421,7 +423,7 @@ public final class TPath implements Path {
         return Paths.prefixLength(p, SEPARATOR_CHAR, true);
     }
 
-    private static FsPath address(URI name, TArchiveDetector detector) {
+    private static FsNodePath nodePath(URI name, TArchiveDetector detector) {
         return new TPathScanner(detector).scan(
                 TFileSystemProvider.get(name).getRoot(),
                 name);
@@ -448,7 +450,7 @@ public final class TPath implements Path {
     private boolean invariants() {
         assert null != getName();
         assert null != getArchiveDetector();
-        assert null != getAddress();
+        assert null != getNodePath();
         return true;
     }
 
@@ -480,8 +482,8 @@ public final class TPath implements Path {
      * @see    #isEntry
      */
     public boolean isArchive() {
-        final FsPath address = getAddress();
-        final boolean root = address.getEntryName().isRoot();
+        final FsNodePath address = getNodePath();
+        final boolean root = address.getNodeName().isRoot();
         final FsMountPoint parent = address.getMountPoint().getParent();
         return root && null != parent;
     }
@@ -498,8 +500,8 @@ public final class TPath implements Path {
      * @see #isArchive
      */
     public boolean isEntry() {
-        final FsPath address = getAddress();
-        final boolean root = address.getEntryName().isRoot();
+        final FsNodePath address = getNodePath();
+        final boolean root = address.getNodeName().isRoot();
         final FsMountPoint parent = address.getMountPoint().getParent();
         return !root    ? null != parent
                         : null != parent && null != parent.getParent();
@@ -534,8 +536,8 @@ public final class TPath implements Path {
      * 
      * @return The file system path for this path with an absolute URI.
      */
-    private FsPath getAddress() {
-        return this.address;
+    private FsNodePath getNodePath() {
+        return this.nodePath;
     }
 
     /**
@@ -544,7 +546,7 @@ public final class TPath implements Path {
      * @return The file system mount point for this path.
      */
     FsMountPoint getMountPoint() {
-        return getAddress().getMountPoint();
+        return getNodePath().getMountPoint();
     }
 
     /**
@@ -552,8 +554,8 @@ public final class TPath implements Path {
      * 
      * @return The file system entry name for this path.
      */
-    FsEntryName getEntryName() {
-        return getAddress().getEntryName();
+    FsNodeName getNodeName() {
+        return getNodePath().getNodeName();
     }
 
     /**
@@ -715,7 +717,7 @@ public final class TPath implements Path {
 
     @Override
     public TPath normalize() {
-        return new TPath(getName().normalize(), getArchiveDetector(), getAddress());
+        return new TPath(getName().normalize(), getArchiveDetector(), getNodePath());
     }
 
     @Override
@@ -756,10 +758,10 @@ public final class TPath implements Path {
             }
         }
         final TArchiveDetector d = getDefaultArchiveDetector();
-        final FsPath a = new TPathScanner(d).scan(
+        final FsNodePath a = new TPathScanner(d).scan(
                 TPathScanner.isAbsolute(m)
                     ? TFileSystemProvider.get(getName()).getRoot()
-                    : getAddress(),
+                    : getNodePath(),
                 m);
         return new TPath(n, d, a);
     }
@@ -793,20 +795,20 @@ public final class TPath implements Path {
     public URI toUri() {
         URI n = getName();
         String s = n.getScheme();
-        return new UriBuilder(getAddress().toHierarchicalUri())
+        return new UriBuilder(getNodePath().toHierarchicalUri())
                 .scheme(null != s ? s : TFileSystemProvider.get(n).getScheme())
                 .toUri();
     }
 
     @Override
     public TPath toAbsolutePath() {
-        return new TPath(toUri(), getArchiveDetector(), getAddress());
+        return new TPath(toUri(), getArchiveDetector(), getNodePath());
     }
 
     @Override
     public TPath toRealPath(LinkOption... options) throws IOException {
         // TODO: scan symlinks!
-        return new TPath(toUri(), getArchiveDetector(), getAddress());
+        return new TPath(toUri(), getArchiveDetector(), getNodePath());
     }
 
     /**
@@ -825,7 +827,7 @@ public final class TPath implements Path {
     public TFile toFile() {
         try {
             return getName().isAbsolute()
-                    ? new TFile(getAddress(), getArchiveDetector())
+                    ? new TFile(getNodePath(), getArchiveDetector())
                     : new TFile(toString(), getArchiveDetector());
         } catch (IllegalArgumentException ex) {
             throw new UnsupportedOperationException(ex);
@@ -954,7 +956,7 @@ public final class TPath implements Path {
         getFileSystem().delete(this);
     }
 
-    FsEntry stat() throws IOException {
+    FsNode stat() throws IOException {
         return getFileSystem().stat(this);
     }
 
@@ -1042,7 +1044,7 @@ public final class TPath implements Path {
 
     /**
      * The methods in this class use
-     * {@link TPath#getAddress()}.{@link FsPath#getMountPoint()} as an
+     * {@link TPath#getNodePath()}.{@link FsNodePath#getMountPoint()} as an
      * identifier for the file system in order to avoid creating the
      * {@link TFileSystem} object for a {@code TPath}.
      * Creating the file system object usually creates an {@link FsController}
@@ -1059,16 +1061,15 @@ public final class TPath implements Path {
         }
 
         boolean equals(TPath p1, TPath p2) {
-            return p1.getAddress().getMountPoint().equals(p2.getAddress().getMountPoint())
+            return p1.getNodePath().getMountPoint().equals(p2.getNodePath().getMountPoint())
                     && p1.toString().equals(p2.toString());
         }
         
         int hashCode(TPath p) {
             final Integer hashCode = p.hashCode;
-            if (null != hashCode)
-                return hashCode;
+            if (null != hashCode) return hashCode;
             int result = 17;
-            result = 37 * result + p.getAddress().getMountPoint().hashCode();
+            result = 37 * result + p.getNodePath().getMountPoint().hashCode();
             result = 37 * result + p.toString().hashCode();
             return p.hashCode = result;
         }
@@ -1076,7 +1077,7 @@ public final class TPath implements Path {
 
     /**
      * The methods in this class use
-     * {@link TPath#getAddress()}.{@link FsPath#getMountPoint()} as an
+     * {@link TPath#getNodePath()}.{@link FsNodePath#getMountPoint()} as an
      * identifier for the file system in order to avoid creating the
      * {@link TFileSystem} object for a {@code TPath}.
      * Creating the file system object usually creates an {@link FsController}
@@ -1094,17 +1095,16 @@ public final class TPath implements Path {
 
         @Override
         boolean equals(TPath p1, TPath p2) {
-            return p1.getAddress().getMountPoint().equals(p2.getAddress().getMountPoint())
+            return p1.getNodePath().getMountPoint().equals(p2.getNodePath().getMountPoint())
                     && p1.toString().equalsIgnoreCase(p2.toString());
         }
 
         @Override
         int hashCode(TPath p) {
             final Integer hashCode = p.hashCode;
-            if (null != hashCode)
-                return hashCode;
+            if (null != hashCode) return hashCode;
             int result = 17;
-            result = 37 * result + p.getAddress().getMountPoint().hashCode();
+            result = 37 * result + p.getNodePath().getMountPoint().hashCode();
             result = 37 * result + p.toString().toLowerCase(Locale.getDefault()).hashCode();
             return p.hashCode = result;
         }

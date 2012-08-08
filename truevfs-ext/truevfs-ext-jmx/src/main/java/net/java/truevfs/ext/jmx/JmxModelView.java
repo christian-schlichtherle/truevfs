@@ -12,8 +12,8 @@ import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.StandardMBean;
 import net.java.truevfs.comp.jmx.JmxModelMXBean;
-import net.java.truevfs.kernel.spec.FsEntry;
 import net.java.truevfs.kernel.spec.FsModel;
+import net.java.truevfs.kernel.spec.FsNode;
 import net.java.truevfs.kernel.spec.FsSyncException;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
 import net.java.truevfs.kernel.spec.cio.Entry.Size;
@@ -112,28 +112,28 @@ extends StandardMBean implements JmxModelMXBean {
     }
 
     private long sizeOf(Size type) {
-        final FsEntry entry = model.stat();
-        return null == entry ? UNKNOWN : entry.getSize(type);
+        final FsNode node = model.stat();
+        return null == node ? UNKNOWN : node.getSize(type);
     }
 
     @Override
     public String getTimeWritten() {
-        final FsEntry entry = model.stat();
-        final long time = null == entry ? UNKNOWN : entry.getTime(WRITE);
+        final FsNode node = model.stat();
+        final long time = null == node ? UNKNOWN : node.getTime(WRITE);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 
     @Override
     public String getTimeRead() {
-        final FsEntry entry = model.stat();
-        final long time = null == entry ? UNKNOWN : entry.getTime(READ);
+        final FsNode node = model.stat();
+        final long time = null == node ? UNKNOWN : node.getTime(READ);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 
     @Override
     public String getTimeCreated() {
-        final FsEntry entry = model.stat();
-        final long time = null == entry ? UNKNOWN : entry.getTime(CREATE);
+        final FsNode node = model.stat();
+        final long time = null == node ? UNKNOWN : node.getTime(CREATE);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 

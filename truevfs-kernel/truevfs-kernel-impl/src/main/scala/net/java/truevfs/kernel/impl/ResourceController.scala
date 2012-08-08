@@ -29,7 +29,7 @@ private trait ResourceController extends Controller[LockModel] {
 
   private[this] val accountant = new ResourceAccountant(writeLock)
 
-  abstract override def input(options: AccessOptions, name: FsEntryName) = {
+  abstract override def input(options: AccessOptions, name: FsNodeName) = {
     final class Input extends DelegatingInputSocket[Entry] {
       val socket = ResourceController.super.input(options, name)
 
@@ -42,7 +42,7 @@ private trait ResourceController extends Controller[LockModel] {
     new Input
   }: AnyInputSocket
 
-  abstract override def output(options: AccessOptions, name: FsEntryName, template: Option[Entry]) = {
+  abstract override def output(options: AccessOptions, name: FsNodeName, template: Option[Entry]) = {
     final class Output extends DelegatingOutputSocket[Entry] {
       val socket = ResourceController.super.output(options, name, template)
 

@@ -24,7 +24,7 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  * {@linkplain #getModel() file system model}
  * addresses the file system accessed by this controller.
  * Where the methods of this abstract class accept a
- * {@link FsEntryName file system entry name} as a parameter, this MUST get
+ * {@link FsNodeName file system node name} as a parameter, this MUST get
  * resolved against the {@link FsModel#getMountPoint() mount point} URI of this
  * controller's {@linkplain #getModel() file system model}.
  * 
@@ -112,59 +112,59 @@ public interface FsController {
     FsModel getModel();
 
     /**
-     * Returns the file system entry for the given {@code name} or {@code null}
+     * Returns the file system node for the given {@code name} or {@code null}
      * if it doesn't exist.
-     * Modifying the returned entry does not show any effect on the file system
+     * Modifying the returned node does not show any effect on the file system
      * and should result in an {@link UnsupportedOperationException}.
      * 
-     * @param  options the options for accessing the file system entry.
-     * @param  name the name of the file system entry.
-     * @return A file system entry or {@code null} if no file system entry
+     * @param  options the options for accessing the file system node.
+     * @param  name the name of the file system node.
+     * @return A file system node or {@code null} if no file system node
      *         exists for the given name.
      * @throws IOException on any I/O error.
      */
-    @CheckForNull FsEntry stat(
+    @CheckForNull FsNode stat(
             BitField<FsAccessOption> options,
-            FsEntryName name)
+            FsNodeName name)
     throws IOException;
 
     /**
-     * Checks if the file system entry for the given {@code name} exists when
+     * Checks if the file system node for the given {@code name} exists when
      * constrained by the given access {@code options} and permits the given
      * access {@code types}.
      * 
-     * @param  options the options for accessing the file system entry.
-     * @param  name the name of the file system entry.
+     * @param  options the options for accessing the file system node.
+     * @param  name the name of the file system node.
      * @param  types the types of the desired access.
      * @throws IOException on any I/O error.
      */
     void checkAccess(
             BitField<FsAccessOption> options,
-            FsEntryName name,
+            FsNodeName name,
             BitField<Access> types)
     throws IOException;
 
     /**
-     * Sets the named file system entry as read-only.
+     * Sets the named file system node as read-only.
      * This method will fail for typical federated (archive) file system
      * controller implementations because they do not support it.
      * 
-     * @param  name the name of the file system entry.
+     * @param  name the name of the file system node.
      * @throws IOException on any I/O error or if this operation is not
      *         supported.
      */
-    void setReadOnly(FsEntryName name) throws IOException;
+    void setReadOnly(FsNodeName name) throws IOException;
 
     /**
      * Makes an attempt to set the last access time of all types in the given
-     * map for the file system entry with the given name.
+     * map for the file system node with the given name.
      * If {@code false} is returned or an {@link IOException} is thrown, then
      * still some of the last access times may have been set.
      * Whether or not this is an atomic operation is specific to the
      * implementation.
      * 
-     * @param  options the options for accessing the file system entry.
-     * @param  name the name of the file system entry.
+     * @param  options the options for accessing the file system node.
+     * @param  name the name of the file system node.
      * @param  times the access times.
      * @return {@code true} if and only if setting the access time for all
      *         types in {@code times} succeeded.
@@ -174,18 +174,18 @@ public interface FsController {
      */
     boolean setTime(
             BitField<FsAccessOption> options,
-            FsEntryName name,
+            FsNodeName name,
             Map<Access, Long> times)
     throws IOException;
 
     /**
      * Makes an attempt to set the last access time of all types in the given
-     * bit field for the file system entry with the given name.
+     * bit field for the file system node with the given name.
      * If {@code false} is returned or an {@link IOException} is thrown, then
      * still some of the last access times may have been set.
      * 
-     * @param  options the options for accessing the file system entry.
-     * @param  name the name of the file system entry.
+     * @param  options the options for accessing the file system node.
+     * @param  name the name of the file system node.
      * @param  types the access types.
      * @param  value the last access time.
      * @return {@code true} if and only if setting the access time for all
@@ -194,86 +194,86 @@ public interface FsController {
      */
     boolean setTime(
             BitField<FsAccessOption> options,
-            FsEntryName name,
+            FsNodeName name,
             BitField<Access> types,
             long value)
     throws IOException;
 
     /**
      * Returns an input socket for reading the contents of the file system
-     * entry addressed by the given name from the file system.
+     * node addressed by the given name from the file system.
      *
-     * @param  options the options for accessing the file system entry.
-     * @param  name the name of the file system entry.
+     * @param  options the options for accessing the file system node.
+     * @param  name the name of the file system node.
      * @return An {@code InputSocket}.
      */
     InputSocket<? extends Entry> input(
             BitField<FsAccessOption> options,
-            FsEntryName name);
+            FsNodeName name);
 
     /**
-     * Returns an output socket for writing the contents of the entry addressed
+     * Returns an output socket for writing the contents of the node addressed
      * by the given name to the file system.
      *
-     * @param  options the options for accessing the file system entry.
+     * @param  options the options for accessing the file system node.
      *         If {@link FsAccessOption#CREATE_PARENTS} is set, any missing
      *         parent directories shall get created with an undefined last
      *         modification time.
-     * @param  name the name of the file system entry.
-     * @param  template if not {@code null}, then the file system entry
+     * @param  name the name of the file system node.
+     * @param  template if not {@code null}, then the file system node
      *         at the end of the chain shall inherit as much properties from
-     *         this entry as possible - with the exception of its name and type.
+     *         this node as possible - with the exception of its name and type.
      * @return An {@code OutputSocket}.
      */
     OutputSocket<? extends Entry> output(
             BitField<FsAccessOption> options,
-            FsEntryName name,
+            FsNodeName name,
             @CheckForNull Entry template);
 
     /**
      * Creates or replaces and finally links a chain of one or more entries
-     * for the given entry {@code name} into the file system.
+     * for the given node {@code name} into the file system.
      *
-     * @param  options the options for accessing the file system entry.
+     * @param  options the options for accessing the file system node.
      *         If {@link FsAccessOption#CREATE_PARENTS} is set, any missing
      *         parent directories shall get created with an undefined last
      *         modification time.
-     * @param  name the name of the file system entry.
-     * @param  type the file system entry type.
-     * @param  template if not {@code null}, then the file system entry
+     * @param  name the name of the file system node.
+     * @param  type the file system node type.
+     * @param  template if not {@code null}, then the file system node
      *         at the end of the chain shall inherit as much properties from
-     *         this entry as possible - with the exception of its name and type.
+     *         this node as possible - with the exception of its name and type.
      * @throws IOException on any I/O error, including but not limited to
      *         these reasons:
      *         <ul>
      *         <li>The file system is read only.
      *         <li>{@code name} contains characters which are not
      *             supported by the file system.
-     *         <li>The entry already exists and either the option
-     *             {@link FsAccessOption#EXCLUSIVE} is set or the entry is a
+     *         <li>The node already exists and either the option
+     *             {@link FsAccessOption#EXCLUSIVE} is set or the node is a
      *             directory.
-     *         <li>The entry exists as a different type.
-     *         <li>A parent entry exists but is not a directory.
-     *         <li>A parent entry is missing and {@code createParents} is
+     *         <li>The node exists as a different type.
+     *         <li>A parent node exists but is not a directory.
+     *         <li>A parent node is missing and {@code createParents} is
      *             {@code false}.
      *         </ul>
      */
     void mknod(
             BitField<FsAccessOption> options,
-            FsEntryName name,
+            FsNodeName name,
             Type type,
             @CheckForNull Entry template)
     throws IOException;
 
     /**
-     * Removes the named file system entry from the file system.
-     * If the named file system entry is a directory, it must be empty.
+     * Removes the named file system node from the file system.
+     * If the named file system node is a directory, it must be empty.
      * 
-     * @param  options the options for accessing the file system entry.
-     * @param  name the name of the file system entry.
+     * @param  options the options for accessing the file system node.
+     * @param  name the name of the file system node.
      * @throws IOException on any I/O error.
      */
-    void unlink(BitField<FsAccessOption> options, FsEntryName name)
+    void unlink(BitField<FsAccessOption> options, FsNodeName name)
     throws IOException;
 
     /**

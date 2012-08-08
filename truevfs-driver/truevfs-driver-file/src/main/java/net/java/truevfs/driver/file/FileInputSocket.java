@@ -23,31 +23,31 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-final class FileInputSocket extends AbstractInputSocket<FileEntry> {
+final class FileInputSocket extends AbstractInputSocket<FileNode> {
 
-    private final FileEntry entry;
+    private final FileNode node;
 
     FileInputSocket(
             final BitField<FsAccessOption> unused, // maybe later
-            final FileEntry entry) {
-        assert null != entry;
-        this.entry = entry;
+            final FileNode node) {
+        assert null != node;
+        this.node = node;
     }
 
     @Override
-    public FileEntry target() {
-        return entry;
+    public FileNode target() {
+        return node;
     }
 
     @Override
     public InputStream stream(OutputSocket<? extends Entry> peer)
     throws IOException {
-        return newInputStream(entry.getPath());
+        return newInputStream(node.getPath());
     }
 
     @Override
     public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
     throws IOException {
-        return newByteChannel(entry.getPath());
+        return newByteChannel(node.getPath());
     }
 }

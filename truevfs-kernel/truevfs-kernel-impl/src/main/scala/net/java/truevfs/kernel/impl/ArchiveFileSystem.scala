@@ -13,7 +13,7 @@ import javax.annotation.concurrent._
 import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.FsAccessOption._
 import net.java.truevfs.kernel.spec.FsAccessOptions._
-import net.java.truevfs.kernel.spec.FsEntryName._
+import net.java.truevfs.kernel.spec.FsNodeName._
 import net.java.truevfs.kernel.spec.cio._
 import net.java.truevfs.kernel.spec.cio.Entry._
 import net.java.truevfs.kernel.spec.cio.Entry.Access._
@@ -33,7 +33,7 @@ import ArchiveFileSystem._
 private class ArchiveFileSystem[E <: FsArchiveEntry] private(
   driver: FsArchiveDriver[E],
   master: EntryTable[E])
-extends Iterable[FsCovariantEntry[E]] {
+extends Iterable[FsCovariantNode[E]] {
 
   private val splitter = new Splitter
 
@@ -119,24 +119,24 @@ extends Iterable[FsCovariantEntry[E]] {
     * @return A covariant file system entry or `None` if no file system
     *         entry exists for the given name.
     */
-  def stat(options: AccessOptions, name: FsEntryName) = {
+  def stat(options: AccessOptions, name: FsNodeName) = {
     master.get(name.getPath) match {
       case Some(ce) => Some(ce.clone(driver))
       case None => None
     }
   }
 
-  def checkAccess(options: AccessOptions, name: FsEntryName, types: BitField[Access]) {
+  def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) {
     if (master.get(name.getPath).isEmpty)
       throw new NoSuchFileException(name.toString)
   }
 
-  def setReadOnly(name: FsEntryName) {
+  def setReadOnly(name: FsNodeName) {
     throw new FileSystemException(name.toString, null,
         "Cannot set read-only state!")
   }
 
-  def setTime(options: AccessOptions, name: FsEntryName, times: Map[Access, Long]) = {
+  def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]) = {
     val ce = master.get(name.getPath) match {
       case Some(ce) => ce
       case _ => throw new NoSuchFileException(name.toString)
@@ -150,7 +150,7 @@ extends Iterable[FsCovariantEntry[E]] {
     ok
   }
 
-  def setTime(options: AccessOptions, name: FsEntryName, types: BitField[Access], value: Long) = {
+  def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long) = {
     if (0 > value)
       throw new IllegalArgumentException(name.toString
                                          + " (negative access time)")
@@ -195,7 +195,7 @@ extends Iterable[FsCovariantEntry[E]] {
     *         [[net.java.truevfs.kernel.impl.ArchiveFileSystem.Mknod]]
     *         object.
     */
-  def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Option[Entry]) = {
+  def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) = {
     require(null ne tµpe)
     if (FILE.ne(tµpe) && DIRECTORY.ne(tµpe)) // TODO: Add support for other types.
       throw new FileSystemException(name.toString, null,
@@ -212,7 +212,7 @@ extends Iterable[FsCovariantEntry[E]] {
         throw new FileAlreadyExistsException(name.toString)
     }
     val t = template match {
-      case Some(ce: FsCovariantEntry[_]) => Some(ce.get(tµpe))
+      case Some(ce: FsCovariantNode[_]) => Some(ce.get(tµpe))
       case x => x
     }
     new Mknod(options, path, tµpe, t)
@@ -249,14 +249,14 @@ extends Iterable[FsCovariantEntry[E]] {
             throw new NotDirectoryException(path)
           var segments = List[Segment[E]]()
           segments ::= Segment(None, pce)
-          val mce = new FsCovariantEntry[E](path)
+          val mce = new FsCovariantNode[E](path)
           mce.put(tµpe, newEntry(options, path, tµpe, template))
           segments ::= Segment(Some(mn), mce)
           segments
         case _ =>
           if (options.get(CREATE_PARENTS)) {
             var segments = newSegments(pp, DIRECTORY, None)
-            val mce = new FsCovariantEntry[E](path)
+            val mce = new FsCovariantNode[E](path)
             mce.put(tµpe, newEntry(options, path, tµpe, template))
             segments ::= Segment(Some(mn), mce)
             segments
@@ -313,7 +313,7 @@ extends Iterable[FsCovariantEntry[E]] {
     * @param  name the archive file system entry name.
     * @throws IOException on any I/O error.
     */
-  def unlink(options: AccessOptions, name: FsEntryName) {
+  def unlink(options: AccessOptions, name: FsNodeName) {
     // Test.
     val path = name.getPath
     val mce = master.get(path) match {
@@ -475,7 +475,7 @@ private object ArchiveFileSystem {
     else new ArchiveFileSystem(driver, archive, rootTemplate)
   }
 
-  private def typeName(entry: FsCovariantEntry[_ <: Entry]): String = {
+  private def typeName(entry: FsCovariantNode[_ <: Entry]): String = {
     val types = entry.getTypes
     if (1 == types.cardinality) typeName(types.iterator.next)
     else types.toString.toLowerCase(Locale.ROOT)
@@ -488,7 +488,7 @@ private object ArchiveFileSystem {
     * @tparam E The type of the archive entries.
     */
   final class EntryTable[E <: FsArchiveEntry](_initialSize: Int)
-  extends Iterable[FsCovariantEntry[E]] {
+  extends Iterable[FsCovariantNode[E]] {
 
     /** The map of covariant file system entries.
       *
@@ -496,7 +496,7 @@ private object ArchiveFileSystem {
       * in this map are shared with the constructor parameter  `archive` of
       * the archive file system object.
       */
-    private[this] val map = new collection.mutable.LinkedHashMap[String, FsCovariantEntry[E]] {
+    private[this] val map = new collection.mutable.LinkedHashMap[String, FsCovariantNode[E]] {
       // See https://issues.scala-lang.org/browse/SI-5804 .
       table = new Array(initialCapacity(_initialSize))
       threshold = (table.size * 3L / 4).toInt
@@ -510,7 +510,7 @@ private object ArchiveFileSystem {
       val ce = map.get(name) match {
         case Some(ce) => ce
         case _ =>
-          val ce = new FsCovariantEntry[E](name)
+          val ce = new FsCovariantNode[E](name)
           map.put(name, ce)
           ce
       }
@@ -550,5 +550,5 @@ private object ArchiveFileSystem {
     */
   private final case class Segment[E <: FsArchiveEntry](
     name: Option[String],
-    entry: FsCovariantEntry[E])
+    entry: FsCovariantNode[E])
 } // ArchiveFileSystem

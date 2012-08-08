@@ -4,13 +4,6 @@
  */
 package net.java.truevfs.kernel.spec.sample;
 
-import net.java.truevfs.kernel.spec.FsSimpleMetaDriver;
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truevfs.kernel.spec.FsUriModifier;
-import net.java.truevfs.kernel.spec.FsManager;
-import net.java.truevfs.kernel.spec.FsSyncOptions;
-import net.java.truevfs.kernel.spec.FsMetaDriver;
-import net.java.truevfs.kernel.spec.FsPath;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,6 +11,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import net.java.truecommons.io.Streams;
 import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.FsAccessOption;
+import net.java.truevfs.kernel.spec.FsManager;
+import net.java.truevfs.kernel.spec.FsMetaDriver;
+import net.java.truevfs.kernel.spec.FsNodePath;
+import net.java.truevfs.kernel.spec.FsSimpleMetaDriver;
+import net.java.truevfs.kernel.spec.FsSyncOptions;
+import net.java.truevfs.kernel.spec.FsUriModifier;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
@@ -76,10 +76,10 @@ public final class Cat {
             // module TrueVFS Access File*, so it's not an option for this sample.
             URI uri = new URI(resource);
             uri = uri.isAbsolute() ? uri : new File(resource).toURI();
-            FsPath path = FsPath.create(uri, FsUriModifier.CANONICALIZE);
+            FsNodePath path = FsNodePath.create(uri, FsUriModifier.CANONICALIZE);
             InputSocket<?> socket = manager
-                    .controller(     driver, path.getMountPoint())
-                    .input(    BitField.noneOf(FsAccessOption.class), path.getEntryName());
+                    .controller(driver, path.getMountPoint())
+                    .input(BitField.noneOf(FsAccessOption.class), path.getNodeName());
             try (InputStream in = socket.stream(null)) {
                 Streams.cat(in, System.out); // copy the data
             }

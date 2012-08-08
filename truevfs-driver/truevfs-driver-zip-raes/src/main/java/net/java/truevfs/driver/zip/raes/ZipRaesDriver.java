@@ -4,32 +4,32 @@
  */
 package net.java.truevfs.driver.zip.raes;
 
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truevfs.kernel.spec.FsInputSocketSource;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsEntryName;
-import net.java.truevfs.kernel.spec.FsOutputSocketSink;
-import net.java.truevfs.comp.zip.driver.ZipInputService;
-import net.java.truevfs.comp.zip.driver.ZipOutputService;
-import net.java.truevfs.comp.zip.driver.JarDriver;
-import net.java.truevfs.comp.zip.driver.JarDriverEntry;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.BitField;
+import net.java.truevfs.comp.zip.driver.JarDriver;
+import net.java.truevfs.comp.zip.driver.JarDriverEntry;
+import net.java.truevfs.comp.zip.driver.ZipInputService;
+import net.java.truevfs.comp.zip.driver.ZipOutputService;
 import net.java.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import net.java.truevfs.driver.zip.raes.crypto.RaesParameters;
 import net.java.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
+import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
+import net.java.truevfs.kernel.spec.FsController;
+import net.java.truevfs.kernel.spec.FsInputSocketSource;
+import net.java.truevfs.kernel.spec.FsModel;
+import net.java.truevfs.kernel.spec.FsNodeName;
+import net.java.truevfs.kernel.spec.FsOutputSocketSink;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.Entry.Type;
 import net.java.truevfs.kernel.spec.cio.InputService;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
 import net.java.truevfs.kernel.spec.cio.OutputService;
-import net.java.truecommons.shed.BitField;
 
 /**
  * An abstract archive driver for RAES encrypted ZIP files which optionally
@@ -187,7 +187,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     protected final FsOutputSocketSink sink(
             BitField<FsAccessOption> options,
             final FsController controller,
-            final FsEntryName name) {
+            final FsNodeName name) {
         // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
         // opportunity to apply its own preferences to sort out such a conflict.
         options = options.set(STORE);

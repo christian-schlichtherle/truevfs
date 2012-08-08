@@ -4,20 +4,18 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truevfs.access.TFile;
-import net.java.truevfs.access.TConfig;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
+import java.io.*;
 import static java.io.File.separator;
 import static java.io.File.separatorChar;
-import java.io.*;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URI;
 import java.util.ServiceConfigurationError;
 import static net.java.truevfs.access.TArchiveDetector.NULL;
-import static net.java.truevfs.kernel.spec.FsEntryName.ROOT;
-import net.java.truevfs.kernel.spec.FsPath;
+import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
+import net.java.truevfs.kernel.spec.FsNodePath;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -69,10 +67,10 @@ public final class TFileTest extends MockArchiveDriverTestBase {
             { "file:/", "/", null, null, null, },
         }) {
             assertPathConstructor(
-                    new TFile(FsPath.create(URI.create(params[0]))),
+                    new TFile(FsNodePath.create(URI.create(params[0]))),
                     params);
             assertPathConstructor(
-                    new TFile(FsPath.create(URI.create(params[0])), null),
+                    new TFile(FsNodePath.create(URI.create(params[0])), null),
                     params);
         }
     }
@@ -92,7 +90,7 @@ public final class TFileTest extends MockArchiveDriverTestBase {
             assertThat(file.getEnclArchive(), nullValue());
             assertThat(file.getEnclEntryName(), nullValue());
         }
-        assertThat(new TFile(file.toFsPath()), equalTo(file.getNormalizedAbsoluteFile()));
+        assertThat(new TFile(file.toNodePath()), equalTo(file.getNormalizedAbsoluteFile()));
         assertThat(new TFile(file.toURI()), equalTo(file.getAbsoluteFile()));
     }
 
@@ -440,7 +438,7 @@ public final class TFileTest extends MockArchiveDriverTestBase {
         }) {
             final String name = params[0];
             final URI uri = URI.create(params[1]);
-            final FsPath path = FsPath.create(URI.create(params[1]));
+            final FsNodePath path = FsNodePath.create(URI.create(params[1]));
             final TFile file = new TFile(name);
             assertThat(new TFile(name), equalTo(file));
             assertThat(new TFile(uri), equalTo(file));
@@ -448,15 +446,15 @@ public final class TFileTest extends MockArchiveDriverTestBase {
             assertThat(new TFile(name).toURI(), equalTo(file.toURI()));
             assertThat(new TFile(uri).toURI(), equalTo(file.toURI()));
             assertThat(new TFile(path).toURI(), equalTo(file.toURI()));
-            assertThat(new TFile(name).toFsPath(), equalTo(file.toFsPath()));
-            assertThat(new TFile(uri).toFsPath(), equalTo(file.toFsPath()));
-            assertThat(new TFile(path).toFsPath(), equalTo(file.toFsPath()));
+            assertThat(new TFile(name).toNodePath(), equalTo(file.toNodePath()));
+            assertThat(new TFile(uri).toNodePath(), equalTo(file.toNodePath()));
+            assertThat(new TFile(path).toNodePath(), equalTo(file.toNodePath()));
             assertThat(new TFile(new TFile(name).toURI()), equalTo(file.getAbsoluteFile()));
             assertThat(new TFile(new TFile(uri).toURI()), equalTo(file.getAbsoluteFile()));
             assertThat(new TFile(new TFile(path).toURI()), equalTo(file.getAbsoluteFile()));
-            assertThat(new TFile(new TFile(name).toFsPath()), equalTo(file.getAbsoluteFile()));
-            assertThat(new TFile(new TFile(uri).toFsPath()), equalTo(file.getAbsoluteFile()));
-            assertThat(new TFile(new TFile(path).toFsPath()), equalTo(file.getAbsoluteFile()));
+            assertThat(new TFile(new TFile(name).toNodePath()), equalTo(file.getAbsoluteFile()));
+            assertThat(new TFile(new TFile(uri).toNodePath()), equalTo(file.getAbsoluteFile()));
+            assertThat(new TFile(new TFile(path).toNodePath()), equalTo(file.getAbsoluteFile()));
         }
     }
 
@@ -534,7 +532,7 @@ public final class TFileTest extends MockArchiveDriverTestBase {
             "mok:file:/foo!/",
             "mok:mok:file:/foo!/bar!/",
         }) {
-            FsPath path = FsPath.create(URI.create(param));
+            FsNodePath path = FsNodePath.create(URI.create(param));
             try {
                 assertIssue154(new TFile(path));
                 assertIssue154(new TFile(path.toUri()));

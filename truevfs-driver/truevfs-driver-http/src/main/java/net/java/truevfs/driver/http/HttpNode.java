@@ -17,14 +17,14 @@ import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
-import net.java.truevfs.kernel.spec.FsEntry;
-import net.java.truevfs.kernel.spec.FsEntryName;
+import net.java.truevfs.kernel.spec.FsNodeName;
+import net.java.truevfs.kernel.spec.FsNode;
 import net.java.truevfs.kernel.spec.FsReadOnlyFileSystemException;
+import net.java.truevfs.kernel.spec.cio.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.READ;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.WRITE;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.java.truevfs.kernel.spec.cio.Entry.Type.FILE;
-import net.java.truevfs.kernel.spec.cio.*;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -38,14 +38,14 @@ import org.apache.http.client.methods.HttpUriRequest;
  * @author Christian Schlichtherle
  */
 @Immutable
-public class HttpEntry extends FsEntry implements IoEntry<HttpEntry> {
+public class HttpNode extends FsNode implements IoEntry<HttpNode> {
 
     private final HttpController controller;
     private final String name;
     protected final URI uri;
 
-    HttpEntry(  final HttpController controller,
-                final FsEntryName name) {
+    HttpNode(  final HttpController controller,
+                final FsNodeName name) {
         assert null != controller;
         this.controller = controller;
         this.name = name.toString();
@@ -154,20 +154,20 @@ public class HttpEntry extends FsEntry implements IoEntry<HttpEntry> {
     }
 
     @Override
-    public final InputSocket<HttpEntry> input() {
+    public final InputSocket<HttpNode> input() {
         return input(NONE);
     }
 
-    protected InputSocket<HttpEntry> input(BitField<FsAccessOption> options) {
+    protected InputSocket<HttpNode> input(BitField<FsAccessOption> options) {
         return new HttpInputSocket(options, this);
     }
 
     @Override
-    public final OutputSocket<HttpEntry> output() {
+    public final OutputSocket<HttpNode> output() {
         return output(NONE, null);
     }
 
-    protected OutputSocket<HttpEntry> output(
+    protected OutputSocket<HttpNode> output(
             BitField<FsAccessOption> options,
             @CheckForNull Entry template) {
         return new HttpOutputSocket(options, this, template);

@@ -10,17 +10,17 @@ import java.net.URISyntaxException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.QuotedUriSyntaxException;
+import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
 import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.PATH;
-import net.java.truecommons.shed.QuotedUriSyntaxException;
-import net.java.truecommons.shed.UriBuilder;
 
 /**
- * Addresses a file system entry.
+ * Addresses a file system node.
  * The purpose of a file system path is to parse a {@link URI} and decompose it
  * into a file system {@link #getMountPoint() mount point} and
- * {@link #getEntryName() entry name}.
+ * {@linkplain #getNodeName() node name}.
  * 
  * <h3><a name="specification"/>Specification</h3>
  * <p>
@@ -34,20 +34,20 @@ import net.java.truecommons.shed.UriBuilder;
  *     according to the syntax constraints for an {@link FsMountPoint} and set
  *     as the value of the {@link #getMountPoint() mountPoint} property.
  *     The part <em>after</em> the last mount point separator is parsed
- *     according to the syntax constraints for an {@link FsEntryName} and set
- *     as the value of the {@link #getEntryName() entryName} property.
+ *     according to the syntax constraints for an {@link FsNodeName} and set
+ *     as the value of the {@linkplain #getNodeName() node name} property.
  * <li>Otherwise, if the URI is absolute, it's resolved with {@code "."},
  *     parsed according to the syntax constraints for an {@link FsMountPoint}
  *     and set as the value of the {@link #getMountPoint() mountPoint} property.
  *     The URI relativized to this mount point is parsed according to the
- *     syntax constraints for an {@link FsEntryName} and set as the value of
- *     the {@link #getEntryName() entryName} property.
+ *     syntax constraints for an {@link FsNodeName} and set as the value of
+ *     the {@linkplain #getNodeName() node name} property.
  * <li>Otherwise, the value of the {@link #getMountPoint() mountPoint} property
  *     is set to {@code null} and the URI is parsed according to the syntax
- *     constraints for an {@link FsEntryName} and set as the value of the
- *     {@link #getEntryName() entryName} property.
+ *     constraints for an {@link FsNodeName} and set as the value of the
+ *     {@linkplain #getNodeName() node name} property.
  * </ol>
- * For opaque URIs of the form {@code jar:<url>!/<entry>}, these constraints
+ * For opaque URIs of the form {@code jar:<url>!/<node>}, these constraints
  * build a close subset of the syntax allowed by a
  * {@link java.net.JarURLConnection}.
  * 
@@ -59,7 +59,7 @@ import net.java.truecommons.shed.UriBuilder;
  * <tr>
  *   <th>{@link #toUri() uri} property</th>
  *   <th>{@link #getMountPoint() mountPoint} URI</th>
- *   <th>{@link #getEntryName() entryName} URI</th>
+ *   <th>{@link #getNodeName() nodeName} URI</th>
  * </tr>
  * </thead>
  * <tbody>
@@ -117,10 +117,10 @@ import net.java.truecommons.shed.UriBuilder;
  * <h3><a name="identities"/>Identities</h3>
  * <p>
  * For any path {@code p}, it's generally true that
- * {@code new FsPath(p.toUri()).equals(p)}.
+ * {@code new FsNodePath(p.toUri()).equals(p)}.
  * <p>
  * Furthermore, it's generally true that
- * {@code new FsPath(p.getMountPoint(), p.getEntryName()).equals(p)}.
+ * {@code new FsNodePath(p.getMountPoint(), p.getNodeName()).equals(p)}.
  * 
  * <h3><a name="serialization"/>Serialization</h3>
  * <p>
@@ -128,12 +128,12 @@ import net.java.truecommons.shed.UriBuilder;
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
  *
  * @see    FsMountPoint
- * @see    FsEntryName
+ * @see    FsNodeName
  * @see    FsScheme
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class FsPath implements Serializable, Comparable<FsPath> {
+public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
 
     private static final long serialVersionUID = 5798435461242930648L;
 
@@ -144,14 +144,14 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
 
     private transient @Nullable FsMountPoint mountPoint;
 
-    private transient FsEntryName entryName;
+    private transient FsNodeName nodeName;
 
     private transient volatile @Nullable URI hierarchical;
 
     /**
      * Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NULL)}.
      */
-    public static FsPath
+    public static FsNodePath
     create(URI uri) {
         return create(uri, NULL);
     }
@@ -159,7 +159,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     /**
      * Constructs a new path by parsing the given URI.
      * This static factory method calls
-     * {@link #FsPath(URI, FsUriModifier) new FsPath(uri, modifier)}
+     * {@link #FsNodePath(URI, FsUriModifier) new FsNodePath(uri, modifier)}
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
@@ -169,20 +169,20 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      *         syntax constraints for paths.
      * @return A new path.
      */
-    public static FsPath
+    public static FsNodePath
     create(URI uri, FsUriModifier modifier) {
         try {
-            return new FsPath(uri, modifier);
+            return new FsNodePath(uri, modifier);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
     }
 
     /**
-     * Equivalent to {@link #FsPath(URI, FsUriModifier) new FsPath(file.toURI(), FsUriModifier.CANONICALIZE)}.
+     * Equivalent to {@link #FsNodePath(URI, FsUriModifier) new FsNodePath(file.toURI(), FsUriModifier.CANONICALIZE)}.
      * Note that this constructor is expected not to throw any exceptions.
      */
-    public FsPath(File file) {
+    public FsNodePath(File file) {
         try {
             parse(file.toURI(), CANONICALIZE);
         } catch (URISyntaxException ex) {
@@ -191,9 +191,9 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     }
 
     /**
-     * Equivalent to {@link #FsPath(URI, FsUriModifier) new FsPath(uri, FsUriModifier.NULL)}.
+     * Equivalent to {@link #FsNodePath(URI, FsUriModifier) new FsNodePath(uri, FsUriModifier.NULL)}.
      */
-    public FsPath(URI uri) throws URISyntaxException {
+    public FsNodePath(URI uri) throws URISyntaxException {
         parse(uri, NULL);
     }
 
@@ -205,34 +205,34 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for paths.
      */
-    public FsPath(URI uri, FsUriModifier modifier)
+    public FsNodePath(URI uri, FsUriModifier modifier)
     throws URISyntaxException {
         parse(uri, modifier);
     }
 
     /**
      * Constructs a new path by composing its URI from the given nullable mount
-     * point and entry name.
+     * point and node name.
      *
      * @param  mountPoint the nullable {@link #getMountPoint() mount point}.
-     * @param  entryName the {@link #getEntryName() entry name}.
+     * @param  nodeName the {@link #getNodeName() node name}.
      * @throws URISyntaxException if the composed path URI would not conform
      *         to the syntax constraints for paths.
      */
-    public FsPath(  final @CheckForNull FsMountPoint mountPoint,
-                    final FsEntryName entryName) {
+    public FsNodePath(  final @CheckForNull FsMountPoint mountPoint,
+                    final FsNodeName nodeName) {
         URI mpu;
         if (null == mountPoint) {
-            this.uri = entryName.toUri();
-        } else if (entryName.isRoot()) {
+            this.uri = nodeName.toUri();
+        } else if (nodeName.isRoot()) {
             this.uri = mountPoint.toUri();
         } else if ((mpu = mountPoint.toUri()).isOpaque()) {
             try {
-                // Compute mountPoint + entryName, but ensure that all URI
+                // Compute mountPoint + nodeName, but ensure that all URI
                 // components are properly quoted.
                 final String mpussp = mpu.getRawSchemeSpecificPart();
                 final int mpusspl = mpussp.length();
-                final URI enu = entryName.toUri();
+                final URI enu = nodeName.toUri();
                 final String enup = enu.getRawPath();
                 final int enupl = enup.length();
                 final String enuq = enu.getRawQuery();
@@ -252,10 +252,10 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
                 throw new AssertionError(ex);
             }
         } else {
-            this.uri = mpu.resolve(entryName.toUri());
+            this.uri = mpu.resolve(nodeName.toUri());
         }
         this.mountPoint = mountPoint;
-        this.entryName = entryName;
+        this.nodeName = nodeName;
 
         assert invariants();
     }
@@ -292,7 +292,7 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
                      .path(ssp.substring(0, i + 2))
                      .toUri(),
                     modifier);
-            entryName = new FsEntryName(
+            nodeName = new FsNodeName(
                     b.clear()
                      .pathQuery(ssp.substring(i + 2))
                      .fragment(uri.getRawFragment())
@@ -300,18 +300,18 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
                     modifier);
             if (NULL != modifier) {
                 URI mpu = mountPoint.toUri();
-                URI nuri = new URI(mpu.getScheme() + ':' + mpu.getRawSchemeSpecificPart() + entryName.toUri());
+                URI nuri = new URI(mpu.getScheme() + ':' + mpu.getRawSchemeSpecificPart() + nodeName.toUri());
                 if (!uri.equals(nuri))
                     uri = nuri;
             }
         } else if (uri.isAbsolute()) {
             mountPoint = new FsMountPoint(uri.resolve(DOT), modifier);
-            entryName = new FsEntryName(mountPoint.toUri().relativize(uri), modifier);
+            nodeName = new FsNodeName(mountPoint.toUri().relativize(uri), modifier);
         } else {
             mountPoint = null;
-            entryName = new FsEntryName(uri, modifier);
+            nodeName = new FsNodeName(uri, modifier);
             if (NULL != modifier)
-                uri = entryName.toUri();
+                uri = nodeName.toUri();
         }
         this.uri = uri;
 
@@ -322,20 +322,20 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
         assert null != toUri();
         assert null == toUri().getRawFragment();
         assert (null != getMountPoint()) == toUri().isAbsolute();
-        assert null != getEntryName();
+        assert null != getNodeName();
         if (toUri().isOpaque()) {
             assert toUri().getRawSchemeSpecificPart().contains(FsMountPoint.SEPARATOR);
             /*try {
-                assert toUri().equals(new URI(getMountPoint().toUri().getScheme(), getMountPoint().toUri().getSchemeSpecificPart() + toDecodedUri(getEntryName()), null));
+                assert toUri().equals(new URI(getMountPoint().toUri().getScheme(), getMountPoint().toUri().getSchemeSpecificPart() + toDecodedUri(getNodeName()), null));
             } catch (URISyntaxException ex) {
                 throw new AssertionError(ex);
             }*/
         } else if (toUri().isAbsolute()) {
             assert toUri().normalize() == toUri();
-            assert toUri().equals(getMountPoint().toUri().resolve(getEntryName().toUri()));
+            assert toUri().equals(getMountPoint().toUri().resolve(getNodeName().toUri()));
         } else {
             assert toUri().normalize() == toUri();
-            assert getEntryName().toUri() == toUri();
+            assert getNodeName().toUri() == toUri();
         }
         return true;
     }
@@ -355,9 +355,9 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * If this path is already in absolute and hierarchical form, its URI gets
      * returned.
      * <p>
-     * For example, the path URIs {@code zip:file:/archive!/entry} and
-     * {@code tar:file:/archive!/entry} would both produce the hierarchical URI
-     * {@code file:/archive/entry}.
+     * For example, the path URIs {@code zip:file:/archive!/node} and
+     * {@code tar:file:/archive!/node} would both produce the hierarchical URI
+     * {@code file:/archive/node}.
      *
      * @return A URI which is recursively transformed from the URI of this
      *         path so that it's absolute and hierarchical.
@@ -368,12 +368,12 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
             return hierarchical;
         if (uri.isOpaque()) {
             final URI mpu = mountPoint.toHierarchicalUri();
-            final URI enu = entryName.toUri();
+            final URI enu = nodeName.toUri();
             try {
                 return this.hierarchical = enu.toString().isEmpty()
                         ? mpu
                         : new UriBuilder(mpu, true)
-                            .path(mpu.getRawPath() + FsEntryName.SEPARATOR)
+                            .path(mpu.getRawPath() + FsNodeName.SEPARATOR)
                             .getUri()
                             .resolve(enu);
             } catch (URISyntaxException ex) {
@@ -395,28 +395,28 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
     }
 
     /**
-     * Returns the entry name component.
+     * Returns the node name component.
      * This may be empty, but is never {@code null}.
      *
-     * @return The entry name.
+     * @return The node name component.
      */
-    public FsEntryName getEntryName() {
-        return entryName;
+    public FsNodeName getNodeName() {
+        return nodeName;
     }
 
     /**
-     * Resolves the given entry name against this path.
+     * Resolves the given node name against this path.
      *
-     * @param  entryName an entry name relative to this path.
+     * @param  nodeName a node name relative to this path.
      * @return A new path with an absolute URI.
      */
-    public FsPath
-    resolve(final FsEntryName entryName) {
-        if (entryName.isRoot() && null == this.uri.getQuery())
+    public FsNodePath
+    resolve(final FsNodeName nodeName) {
+        if (nodeName.isRoot() && null == this.uri.getQuery())
             return this;
-        return new FsPath(
+        return new FsNodePath(
                 this.mountPoint,
-                new FsEntryName(this.entryName, entryName));
+                new FsNodeName(this.nodeName, nodeName));
     }
 
     /**
@@ -424,20 +424,20 @@ public final class FsPath implements Serializable, Comparable<FsPath> {
      * {@link #equals(Object)}.
      */
     @Override
-    public int compareTo(FsPath that) {
+    public int compareTo(FsNodePath that) {
         return this.uri.compareTo(that.uri);
     }
 
     /**
      * Returns {@code true} iff the given object is a path name and its URI
      * {@link URI#equals(Object) equals} the URI of this path name.
-     * Note that this ignores the mount point and entry name.
+     * Note that this ignores the mount point and node name.
      */
     @Override
     public boolean equals(@CheckForNull Object that) {
         return this == that
-                || that instanceof FsPath
-                    && this.uri.equals(((FsPath) that).uri);
+                || that instanceof FsNodePath
+                    && this.uri.equals(((FsNodePath) that).uri);
     }
 
     /**

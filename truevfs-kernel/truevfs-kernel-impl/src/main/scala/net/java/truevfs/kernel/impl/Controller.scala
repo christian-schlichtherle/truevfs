@@ -18,7 +18,7 @@ import net.java.truevfs.kernel.spec.cio.Entry._
   * [[#model file system model]]
   * addresses the file system accessed by this controller.
   * Where the methods of this abstract class accept a
-  * {@link FsEntryName file system entry name} as a parameter, this MUST get
+  * {@link FsNodeName file system entry name} as a parameter, this MUST get
   * resolved against the {@link FsModel#getMountPoint() mount point} URI of this
   * controller's {@link #getModel() file system model}.
   * 
@@ -105,7 +105,7 @@ private trait Controller[+M <: FsModel] {
     * @throws FileSystemException on any file system error.
     * @throws IOException on any I/O error.
     */
-  def stat(options: AccessOptions, name: FsEntryName): Option[FsEntry]
+  def stat(options: AccessOptions, name: FsNodeName): Option[FsNode]
 
   /** Checks if the file system entry for the given `name` exists when
     * constrained by the given access {@code options} and permits the given
@@ -117,7 +117,7 @@ private trait Controller[+M <: FsModel] {
     * @throws FileSystemException on any file system error.
     * @throws IOException on any I/O error.
     */
-  def checkAccess(options: AccessOptions, name: FsEntryName, types: BitField[Access])
+  def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access])
 
   /** Sets the named file system entry as read-only.
     * This method will fail for typical federated (archive) file system
@@ -127,7 +127,7 @@ private trait Controller[+M <: FsModel] {
     * @throws FileSystemException on any file system error.
     * @throws IOException on any I/O error.
     */
-  def setReadOnly(name: FsEntryName)
+  def setReadOnly(name: FsNodeName)
 
   /** Makes an attempt to set the last access time of all types in the given
     * map for the file system entry with the given name.
@@ -144,7 +144,7 @@ private trait Controller[+M <: FsModel] {
     * @throws FileSystemException on any file system error.
     * @throws IOException on any I/O error.
     */
-  def setTime(options: AccessOptions, name: FsEntryName, times: Map[Access, Long]): Boolean
+  def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]): Boolean
 
   /** Makes an attempt to set the last access time of all types in the given
     * bit field for the file system entry with the given name.
@@ -160,7 +160,7 @@ private trait Controller[+M <: FsModel] {
     * @throws FileSystemException on any file system error.
     * @throws IOException on any I/O error.
     */
-  def setTime(options: AccessOptions, name: FsEntryName, types: BitField[Access], value: Long): Boolean
+  def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long): Boolean
 
   /** Returns an input socket for reading the contents of the file system
     * entry addressed by the given name from the file system.
@@ -169,7 +169,7 @@ private trait Controller[+M <: FsModel] {
     * @param  name the name of the file system entry.
     * @return An {@code InputSocket}.
     */
-  def input(options: AccessOptions, name: FsEntryName): AnyInputSocket
+  def input(options: AccessOptions, name: FsNodeName): AnyInputSocket
 
   /** Returns an output socket for writing the contents of the entry addressed
     * by the given name to the file system.
@@ -184,7 +184,7 @@ private trait Controller[+M <: FsModel] {
     *         this entry as possible - with the exception of its name and type.
     * @return An [[net.java.truevfs.kernel.impl.cio.OutputSocket]].
     */
-  def output(options: AccessOptions, name: FsEntryName, template: Option[Entry]): AnyOutputSocket
+  def output(options: AccessOptions, name: FsNodeName, template: Option[Entry]): AnyOutputSocket
 
   /** Creates or replaces and finally links a chain of one or more entries
     * for the given entry `name` into the file system.
@@ -201,7 +201,7 @@ private trait Controller[+M <: FsModel] {
     * @throws FileSystemException on any file system error.
     * @throws IOException on any I/O error.
     */
-  def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Option[Entry])
+  def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry])
 
   /** Removes the named file system entry from the file system.
     * If the named file system entry is a directory, it must be empty.
@@ -211,7 +211,7 @@ private trait Controller[+M <: FsModel] {
     * @throws FileSystemException on any file system error.
     * @throws IOException on any I/O error.
     */
-  def unlink(options: AccessOptions, name: FsEntryName)
+  def unlink(options: AccessOptions, name: FsNodeName)
 
   /** Commits all unsynchronized changes to the contents of this file system
     * to its parent file system,

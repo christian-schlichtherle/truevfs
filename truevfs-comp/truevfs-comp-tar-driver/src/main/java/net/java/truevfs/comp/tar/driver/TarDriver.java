@@ -10,9 +10,10 @@ import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsAccessOption.CACHE;
 import static net.java.truevfs.kernel.spec.FsAccessOption.COMPRESS;
-import net.java.truevfs.kernel.spec.*;
+import net.java.truevfs.kernel.spec.cio.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.ALL_POSIX_ACCESS;
 import static net.java.truevfs.kernel.spec.cio.Entry.ALL_POSIX_ENTITIES;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
@@ -20,7 +21,6 @@ import static net.java.truevfs.kernel.spec.cio.Entry.Access.WRITE;
 import net.java.truevfs.kernel.spec.cio.Entry.PosixEntity;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import net.java.truevfs.kernel.spec.cio.Entry.Type;
-import net.java.truevfs.kernel.spec.cio.*;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
@@ -114,7 +114,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     protected FsInputSocketSource source(
             BitField<FsAccessOption> options,
             final FsController controller,
-            final FsEntryName name) {
+            final FsNodeName name) {
         // The target archive file will be only used to extract the TAR entries
         // to a temporary file, so we don't need to put it into the selective
         // entry cache.
@@ -130,7 +130,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     protected FsOutputSocketSink sink(
             BitField<FsAccessOption> options,
             final FsController controller,
-            final FsEntryName name) {
+            final FsNodeName name) {
         // Leave FsAccessOption.STORE untouched - the driver shall be given
         // opportunity to get its own preferences to sort out such a conflict.
         options = options.set(COMPRESS);

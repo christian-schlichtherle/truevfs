@@ -64,7 +64,7 @@ public class HttpDriver extends FsDriver {
      * Executes the HEAD request method for the given URI.
      * Equivalent to {@code getClient().execute(entry.newHead())}.
      */
-    protected HttpResponse executeHead(HttpEntry entry) throws IOException {
+    protected HttpResponse executeHead(HttpNode entry) throws IOException {
         // This version could be better when using a CachingHttpDriver:
         /*HttpUriRequest request = entry.newGet();
         HttpResponse response = getClient().execute(request);
@@ -78,7 +78,7 @@ public class HttpDriver extends FsDriver {
      * Executes the GET request method for the given URI.
      * Equivalent to {@code getClient().execute(entry.newGet())}.
      */
-    protected HttpResponse executeGet(HttpEntry entry) throws IOException {
+    protected HttpResponse executeGet(HttpNode entry) throws IOException {
         return getClient().execute(entry.newGet());
     }
 

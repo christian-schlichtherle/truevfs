@@ -4,15 +4,12 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truevfs.access.TPathScanner;
-import net.java.truevfs.access.MockArchiveDriverTestBase;
-import net.java.truevfs.access.TConfig;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsPath;
-import static net.java.truevfs.access.TPathScanner.parent;
 import static java.io.File.separatorChar;
 import java.net.URI;
 import java.net.URISyntaxException;
+import static net.java.truevfs.access.TPathScanner.parent;
+import net.java.truevfs.kernel.spec.FsMountPoint;
+import net.java.truevfs.kernel.spec.FsNodePath;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -69,13 +66,13 @@ public class TPathScannerTest extends MockArchiveDriverTestBase {
     }
 
     private static void assertScan(final String... params) throws URISyntaxException {
-        final FsPath parent = new FsPath(new URI(params[0]));
+        final FsNodePath parent = new FsNodePath(new URI(params[0]));
         final URI member = new URI(params[1]);
-        final FsPath path = new FsPath(new URI(params[2]));
+        final FsNodePath path = new FsNodePath(new URI(params[2]));
         final FsMountPoint mountPoint = null == params[3]
                 ? null
                 : new FsMountPoint(new URI(params[3]));
-        final FsPath result = new TPathScanner(
+        final FsNodePath result = new TPathScanner(
                     TConfig.get().getArchiveDetector())
                 .scan(parent, member);
         assertThat(result, equalTo(path));
@@ -99,10 +96,10 @@ public class TPathScannerTest extends MockArchiveDriverTestBase {
             { "mok:mok:file:/foo!/bar!/baz", "mok:mok:file:/foo!/bar!/" },
             { "mok:mok:file:/foo!/bar!/baz/boom", "mok:mok:file:/foo!/bar!/baz" },
         }) {
-            final FsPath path = new FsPath(new URI(params[0]));
-            final FsPath parent = params[1] == null
+            final FsNodePath path = new FsNodePath(new URI(params[0]));
+            final FsNodePath parent = params[1] == null
                     ? null
-                    : new FsPath(new URI(params[1]));
+                    : new FsNodePath(new URI(params[1]));
             assertThat(parent(path), is(parent));
         }
     }

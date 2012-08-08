@@ -43,19 +43,19 @@ public class HttpController extends FsAbstractController {
         return driver.getPool();
     }
 
-    final HttpResponse executeHead(HttpEntry entry) throws IOException {
+    final HttpResponse executeHead(HttpNode entry) throws IOException {
         return driver.executeHead(entry);
     }
 
-    final HttpResponse executeGet(HttpEntry entry) throws IOException {
+    final HttpResponse executeGet(HttpNode entry) throws IOException {
         return driver.executeGet(entry);
     }
 
-    protected HttpEntry newEntry(FsEntryName name) {
-        return new HttpEntry(this, name);
+    protected HttpNode newEntry(FsNodeName name) {
+        return new HttpNode(this, name);
     }
 
-    final FsPath resolve(FsEntryName name) {
+    final FsNodePath resolve(FsNodeName name) {
         return getMountPoint().resolve(name);
     }
 
@@ -65,16 +65,16 @@ public class HttpController extends FsAbstractController {
     }
 
     @Override
-    public HttpEntry stat(
-            final BitField<FsAccessOption> options, final FsEntryName name)
+    public HttpNode stat(
+            final BitField<FsAccessOption> options, final FsNodeName name)
     throws IOException {
-        HttpEntry entry = newEntry(name);
+        HttpNode entry = newEntry(name);
         return entry.isType(FILE) ? entry : null;
     }
 
     @Override
     public void checkAccess(
-            final BitField<FsAccessOption> options, final FsEntryName name, final BitField<Access> types)
+            final BitField<FsAccessOption> options, final FsNodeName name, final BitField<Access> types)
     throws IOException {
         if (!types.isEmpty() && !READ_ONLY.equals(types))
             throw new FsReadOnlyFileSystemException();
@@ -82,12 +82,12 @@ public class HttpController extends FsAbstractController {
     }
 
     @Override
-    public void setReadOnly(FsEntryName name) throws IOException {
+    public void setReadOnly(FsNodeName name) throws IOException {
     }
 
     @Override
     public boolean setTime(
-            BitField<FsAccessOption> options, FsEntryName name, BitField<Access> types, long value)
+            BitField<FsAccessOption> options, FsNodeName name, BitField<Access> types, long value)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }
@@ -95,27 +95,27 @@ public class HttpController extends FsAbstractController {
     @Override
     public InputSocket<?> input(
             BitField<FsAccessOption> options,
-            FsEntryName name) {
+            FsNodeName name) {
         return newEntry(name).input(options);
     }
 
     @Override
     public OutputSocket<?> output(
             BitField<FsAccessOption> options,
-            FsEntryName name,
+            FsNodeName name,
             @CheckForNull Entry template) {
         return newEntry(name).output(options, template);
     }
 
     @Override
-    public void mknod(  final BitField<FsAccessOption> options, final FsEntryName name, final Type type, @CheckForNull
+    public void mknod(  final BitField<FsAccessOption> options, final FsNodeName name, final Type type, @CheckForNull
     final Entry template)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }
 
     @Override
-    public void unlink(BitField<FsAccessOption> options, FsEntryName name)
+    public void unlink(BitField<FsAccessOption> options, FsNodeName name)
     throws IOException {
         throw new FsReadOnlyFileSystemException();
     }

@@ -4,11 +4,6 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import net.java.truevfs.kernel.spec.FsUriModifier;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsPath;
-import net.java.truevfs.kernel.spec.FsScheme;
-import net.java.truevfs.kernel.spec.FsEntryName;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -16,7 +11,7 @@ import java.io.*;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import static net.java.truevfs.kernel.spec.FsEntryName.ROOT;
+import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
 import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
 import static org.hamcrest.CoreMatchers.*;
@@ -195,7 +190,7 @@ public class FsMountPointTest {
             { "foo", "bar:/baz/" },
         }) {
             final FsScheme scheme = FsScheme.create(params[0]);
-            final FsPath path = FsPath.create(URI.create(params[1]));
+            final FsNodePath path = FsNodePath.create(URI.create(params[1]));
             try {
                 new FsMountPoint(scheme, path);
                 fail(params[0] + ":" + params[1] + "!/");
@@ -234,7 +229,7 @@ public class FsMountPointTest {
         }) {
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[0]), FsUriModifier.CANONICALIZE);
             final FsScheme scheme = FsScheme.create(params[1]);
-            final FsPath path = FsPath.create(URI.create(params[2]));
+            final FsNodePath path = FsNodePath.create(URI.create(params[2]));
 
             assertThat(mountPoint.getScheme(), equalTo(scheme));
             assertThat(mountPoint.getPath(), equalTo(path));
@@ -244,7 +239,7 @@ public class FsMountPointTest {
             assertThat(FsMountPoint.create(mountPoint.getScheme(), mountPoint.getPath()), equalTo(mountPoint));
             assertThat(FsMountPoint.create(mountPoint.toUri()), equalTo(mountPoint));
             assertThat(FsMountPoint.create(mountPoint.toUri()).hashCode(), equalTo(mountPoint.hashCode()));
-            //assertThat(FsMountPoint.create(mountPoint.getScheme(), new FsPath(mountPoint.getParent(), mountPoint.resolveParentEntryName(ROOT))), equalTo(mountPoint));
+            //assertThat(FsMountPoint.create(mountPoint.getScheme(), new FsNodePath(mountPoint.getParent(), mountPoint.resolveParentEntryName(ROOT))), equalTo(mountPoint));
             assertThat(FsMountPoint.create(mountPoint.resolve(ROOT).toUri()), equalTo(mountPoint));
         }
     }
@@ -265,11 +260,11 @@ public class FsMountPointTest {
             { "foo:/bar/", "baz", null, "foo:/bar/baz" },
         }) {
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[0]));
-            final FsEntryName entryName = FsEntryName.create(URI.create(params[1]));
-            final FsEntryName parentEntryName = null == params[2] ? null : FsEntryName.create(URI.create(params[2]));
-            final FsPath path = FsPath.create(URI.create(params[3]));
+            final FsNodeName entryName = FsNodeName.create(URI.create(params[1]));
+            final FsNodeName parentEntryName = null == params[2] ? null : FsNodeName.create(URI.create(params[2]));
+            final FsNodePath path = FsNodePath.create(URI.create(params[3]));
             if (null != parentEntryName)
-                assertThat(mountPoint.getPath().resolve(entryName).getEntryName(), equalTo(parentEntryName));
+                assertThat(mountPoint.getPath().resolve(entryName).getNodeName(), equalTo(parentEntryName));
             assertThat(mountPoint.resolve(entryName), equalTo(path));
             assertThat(mountPoint.resolve(entryName).toUri().isAbsolute(), is(true));
         }
@@ -288,7 +283,7 @@ public class FsMountPointTest {
         }) {
             final FsMountPoint mp = FsMountPoint.create(URI.create(params[0]));
             final URI hmp = mp.toHierarchicalUri();
-            final FsPath p = FsPath.create(URI.create(params[0]));
+            final FsNodePath p = FsNodePath.create(URI.create(params[0]));
             final URI hp = p.toHierarchicalUri();
             assertThat(hmp, equalTo(URI.create(params[1])));
             assertThat(hmp, equalTo(hp));

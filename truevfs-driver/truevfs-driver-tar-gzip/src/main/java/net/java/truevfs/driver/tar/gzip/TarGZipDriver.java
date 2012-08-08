@@ -4,30 +4,30 @@
  */
 package net.java.truevfs.driver.tar.gzip;
 
-import net.java.truevfs.kernel.spec.FsInputSocketSource;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsOutputSocketSink;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truevfs.kernel.spec.FsEntryName;
-import net.java.truecommons.io.AbstractSink;
-import net.java.truecommons.io.AbstractSource;
-import net.java.truecommons.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.io.AbstractSink;
+import net.java.truecommons.io.AbstractSource;
+import net.java.truecommons.io.Streams;
+import net.java.truecommons.shed.BitField;
 import net.java.truevfs.comp.tar.driver.TarDriver;
 import net.java.truevfs.comp.tar.driver.TarDriverEntry;
 import net.java.truevfs.comp.tar.driver.TarInputService;
 import net.java.truevfs.comp.tar.driver.TarOutputService;
+import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOption.STORE;
+import net.java.truevfs.kernel.spec.FsController;
+import net.java.truevfs.kernel.spec.FsInputSocketSource;
+import net.java.truevfs.kernel.spec.FsModel;
+import net.java.truevfs.kernel.spec.FsNodeName;
+import net.java.truevfs.kernel.spec.FsOutputSocketSink;
 import net.java.truevfs.kernel.spec.cio.InputService;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
 import net.java.truevfs.kernel.spec.cio.OutputService;
-import net.java.truecommons.shed.BitField;
 
 /**
  * An archive driver for GZIP compressed TAR files (TAR.GZIP).
@@ -123,7 +123,7 @@ public class TarGZipDriver extends TarDriver {
     protected FsOutputSocketSink sink(
             BitField<FsAccessOption> options,
             final FsController controller,
-            final FsEntryName name) {
+            final FsNodeName name) {
         // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
         // opportunity to apply its own preferences to sort out such a conflict.
         options = options.set(STORE);

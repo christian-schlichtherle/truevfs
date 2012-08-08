@@ -44,26 +44,26 @@ private abstract class BasicArchiveController[E <: FsArchiveEntry]
 extends Controller[LockModel] with LockModelAspect {
   import BasicArchiveController._
 
-  def stat(options: AccessOptions, name: FsEntryName): Option[FsEntry] =
+  def stat(options: AccessOptions, name: FsNodeName): Option[FsNode] =
     autoMount(options).stat(options, name)
 
-  def checkAccess(options: AccessOptions, name: FsEntryName, types: BitField[Access]) =
+  def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
     autoMount(options).checkAccess(options, name, types)
 
-  def setReadOnly(name: FsEntryName) =
+  def setReadOnly(name: FsNodeName) =
     autoMount(NONE).setReadOnly(name)
 
-  def setTime(options: AccessOptions, name: FsEntryName, times: Map[Access, Long]) = {
+  def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]) = {
     checkSync(options, name, CREATE) // alias for UPDATE
     autoMount(options).setTime(options, name, times)
   }
 
-  def setTime(options: AccessOptions, name: FsEntryName, types: BitField[Access], value: Long) = {
+  def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long) = {
     checkSync(options, name, CREATE) // alias for UPDATE
     autoMount(options).setTime(options, name, types, value)
   }
 
-  def input(options: AccessOptions, name: FsEntryName) = {
+  def input(options: AccessOptions, name: FsNodeName) = {
     require(null ne options)
     require(null ne name)
 
@@ -96,7 +96,7 @@ extends Controller[LockModel] with LockModelAspect {
 
   def input(name: String): InputSocket[E]
 
-  def output(options: AccessOptions, name: FsEntryName, template: Option[Entry]) = {
+  def output(options: AccessOptions, name: FsNodeName, template: Option[Entry]) = {
     require(null ne options)
     require(null ne name)
 
@@ -191,7 +191,7 @@ extends Controller[LockModel] with LockModelAspect {
 
   def output(options: AccessOptions, entry: E): OutputSocket[E]
 
-  def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Option[Entry]) {
+  def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) {
     if (name.isRoot) { // TODO: Is this case differentiation still required?
       try {
         autoMount(options) // detect false positives!
@@ -212,7 +212,7 @@ extends Controller[LockModel] with LockModelAspect {
     }
   }
 
-  def unlink(options: AccessOptions, name: FsEntryName) {
+  def unlink(options: AccessOptions, name: FsNodeName) {
     checkSync(options, name, DELETE)
     val fs = autoMount(options)
     fs.unlink(options, name)
@@ -235,7 +235,7 @@ extends Controller[LockModel] with LockModelAspect {
    * @throws NeedsSyncException If a sync operation is required before the
    *         intended access could succeed.
    */
-  def checkSync(options: AccessOptions, name: FsEntryName, intention: Access)
+  def checkSync(options: AccessOptions, name: FsNodeName, intention: Access)
 
   /**
    * Returns the (virtual) archive file system mounted from the target

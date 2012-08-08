@@ -7,11 +7,11 @@ package net.java.truevfs.kernel.spec;
 import java.util.*;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
-import static net.java.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
 import net.java.truecommons.shed.BitField;
+import static net.java.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
 
 /**
- * A covariant file system entry maintains a map of
+ * A covariant file system node maintains a map of
  * {@link FsArchiveEntry archive entries} and uses its
  * {@link #setKey(Entry.Type) key} property to determine the archive entry
  * in the map to which it forwards calls to {@link #getEntry()},
@@ -21,8 +21,8 @@ import net.java.truecommons.shed.BitField;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public final class FsCovariantEntry<E extends FsArchiveEntry>
-extends FsEntry
+public final class FsCovariantNode<E extends FsArchiveEntry>
+extends FsNode
 implements Cloneable {
 
     private final String name;
@@ -31,26 +31,26 @@ implements Cloneable {
     private @Nullable LinkedHashSet<String> members;
 
     /**
-     * Constructs a new covariant file system entry with the given path.
+     * Constructs a new covariant file system node with the given path.
      * 
      * @param path the file system path.
      */
-    public FsCovariantEntry(String path) {
+    public FsCovariantNode(String path) {
         name = path.toString();
     }
 
     /**
-     * Returns a deep clone of this covariant file system entry.
+     * Returns a deep clone of this covariant file system node.
      * 
      * @param  driver the archive driver to use for cloning the mapped archive
      *         entries.
-     * @return A deep clone of this covariant file system entry.
+     * @return A deep clone of this covariant file system node.
      */
     @SuppressWarnings("unchecked")
-    public FsCovariantEntry<E> clone(FsArchiveDriver<E> driver) {
-        final FsCovariantEntry<E> clone;
+    public FsCovariantNode<E> clone(FsArchiveDriver<E> driver) {
+        final FsCovariantNode<E> clone;
         try {
-            clone = (FsCovariantEntry<E>) super.clone();
+            clone = (FsCovariantNode<E>) super.clone();
         } catch (CloneNotSupportedException ex) {
             throw new AssertionError(ex);
         }
@@ -72,26 +72,26 @@ implements Cloneable {
     }
 
     /**
-     * Returns {@code true} if and only if the name of this covariant entry
-     * identifies it as a root entry.
+     * Returns {@code true} if and only if the name of this covariant node
+     * identifies it as a root node.
      * 
-     * @return {@code true} if and only if the name of this covariant entry
-     *         identifies it as a root entry.
+     * @return {@code true} if and only if the name of this covariant node
+     *         identifies it as a root node.
      */
     public boolean isRoot() {
         return name.isEmpty();
     }
 
     /**
-     * Returns the type of the file system entry to which calls to
+     * Returns the type of the file system node to which calls to
      * {@link #getEntry()}, {@link #getSize(Size)},
      * {@link #getTime(Access)} et al shall get forwarded.
      * <p>
      * Note that an arbitrary property value may get returned:
      * The initial value is {@code null} and even if it's not {@code null},
-     * no entry of this type needs to be mapped.
+     * no node of this type needs to be mapped.
      * 
-     * @return the type of the file system entry to which calls to
+     * @return the type of the file system node to which calls to
      *         {@link #getEntry()}, {@link #getSize(Size)},
      *         {@link #getTime(Access)} et al shall get forwarded.
      */
@@ -100,14 +100,14 @@ implements Cloneable {
     }
 
     /**
-     * Selects the type of the file system entry to which calls to
+     * Selects the type of the file system node to which calls to
      * {@link #getEntry()}, {@link #getSize(Size)},
      * {@link #getTime(Access)} et al shall get forwarded.
-     * If the given type is {@code null} or no file system entry of this type
+     * If the given type is {@code null} or no file system node of this type
      * is mappeed, then any subsequent call to these methods will fail with a
      * {@link NullPointerException}.
      * 
-     * @param type the type of the file system entry to which calls to
+     * @param type the type of the file system node to which calls to
      *        {@link #getEntry()}, {@link #getSize(Size)},
      *        {@link #getTime(Access)} et al shall get forwarded.
      */
@@ -116,33 +116,33 @@ implements Cloneable {
     }
 
     /**
-     * Maps the given type to the given entry.
+     * Maps the given type to the given archive entry.
      * As a side effect, the {@link #getKey() key} property is set to the given
      * type.
      * 
      * @param type the type to map.
-     * @param entry the entry to map.
-     * @return The previously mapped entry.
+     * @param entry the archive entry to map.
+     * @return The previously mapped archive entry.
      */
     public @Nullable E put(Type type, E entry) {
         return map.put(key = type, entry);
     }
 
     /**
-     * Removes the entry for the given type from the map.
+     * Removes the archive entry for the given type from the map.
      * 
      * @param type the type to remove.
-     * @return The previously mapped entry.
+     * @return The previously mapped archive entry.
      */
     public @Nullable E remove(Type type) {
         return map.remove(type);
     }
 
     /**
-     * Returns the entry for the given type.
+     * Returns the archive entry for the given type.
      * 
-     * @param type the type of the entry to lookup.
-     * @return The entry for the given type.
+     * @param type the type of the archive entry to lookup.
+     * @return The archive entry for the given type.
      */
     public @Nullable E get(Type type) {
         return map.get(type);
@@ -179,8 +179,8 @@ implements Cloneable {
     }
 
     /**
-     * Returns {@code true} if and only if there is an entry mapped for the
-     * given type.
+     * Returns {@code true} if and only if there is an archive entry mapped for
+     * the given type.
      */
     @Override
     public boolean isType(final Type type) {
@@ -214,7 +214,7 @@ implements Cloneable {
 
     /**
      * Returns a set of the members of this directory or {@code null} if and
-     * only if there is no directory entry mapped.
+     * only if there is no directory archive entry mapped.
      * This is a bidirectional view: Any change is reflected in the set and
      * vice versa.
      */
@@ -227,12 +227,12 @@ implements Cloneable {
 
     /**
      * Adds the given base path to the set of members of this directory
-     * if and only if this covariant file system entry implements a directory.
+     * if and only if this covariant file system node implements a directory.
      *
      * @param  member The base path of the member to add.
      * @return Whether the member has been added or an equal member was
      *         already present in the directory.
-     * @throws NullPointerException if this covariant file system entry does
+     * @throws NullPointerException if this covariant file system node does
      *         not implement a directory.
      */
     public boolean add(String member) {
@@ -240,14 +240,13 @@ implements Cloneable {
     }
 
     /**
-     * Removes the given base path from the set of members of this
-     * directory
-     * if and only if this covariant file system entry implements a directory.
+     * Removes the given base path from the set of members of this directory
+     * if and only if this covariant file system node implements a directory.
      *
      * @param  member The base path of the member to remove.
      * @return Whether the member has been removed or no equal member was
      *         present in the directory.
-     * @throws NullPointerException if this covariant file system entry does
+     * @throws NullPointerException if this covariant file system node does
      *         not implement a directory.
      */
     public boolean remove(String member) {
