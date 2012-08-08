@@ -16,7 +16,7 @@ import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import static net.java.truevfs.driver.zip.raes.crypto.Constants.HEADER_MIN_LEN;
 import static net.java.truevfs.driver.zip.raes.crypto.Constants.SIGNATURE;
-import net.java.truevfs.keymanager.spec.param.AesKeyStrength;
+import net.java.truevfs.key.spec.param.AesKeyStrength;
 
 /**
  * This class implements a {@link SeekableByteChannel} for random read-only

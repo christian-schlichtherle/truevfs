@@ -36,22 +36,22 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-extension-jmx</artifactId>
+            <artifactId>truevfs-ext-jmx</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-extension-logging</artifactId>
+            <artifactId>truevfs-ext-log</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-extension-pacemanager</artifactId>
+            <artifactId>truevfs-ext-pace</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-keymanager-swing-feedback-hurl</artifactId>
+            <artifactId>truevfs-key-swing-feedback-hurl</artifactId>
             <scope>runtime</scope>
         </dependency>
     </dependencies>

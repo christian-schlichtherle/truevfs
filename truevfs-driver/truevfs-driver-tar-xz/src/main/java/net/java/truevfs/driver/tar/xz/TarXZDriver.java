@@ -4,6 +4,11 @@
  */
 package net.java.truevfs.driver.tar.xz;
 
+import net.java.truevfs.comp.tar.driver.TarDriver;
+import net.java.truevfs.comp.tar.driver.TarInputService;
+import net.java.truevfs.comp.tar.driver.FixedBufferedOutputStream;
+import net.java.truevfs.comp.tar.driver.TarDriverEntry;
+import net.java.truevfs.comp.tar.driver.TarOutputService;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +18,6 @@ import net.java.truecommons.io.AbstractSink;
 import net.java.truecommons.io.AbstractSource;
 import net.java.truecommons.io.Streams;
 import net.java.truecommons.shed.BitField;
-import net.java.truevfs.component.tar.driver.*;
 import static net.java.truevfs.kernel.spec.FsAccessOption.STORE;
 import net.java.truevfs.kernel.spec.*;
 import net.java.truevfs.kernel.spec.cio.InputService;

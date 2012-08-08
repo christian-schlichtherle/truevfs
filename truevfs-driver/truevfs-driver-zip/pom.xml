@@ -39,21 +39,21 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-component-ibm437</artifactId>
+            <artifactId>truevfs-comp-ibm437</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-component-zip-driver</artifactId>
+            <artifactId>truevfs-comp-zip-driver</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-component-zip-driver</artifactId>
+            <artifactId>truevfs-comp-zip-driver</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-keymanager-spec</artifactId>
+            <artifactId>truevfs-key-spec</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>

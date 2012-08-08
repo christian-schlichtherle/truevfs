@@ -5,7 +5,7 @@
 package net.java.truevfs.driver.zip.raes;
 
 import net.java.truevfs.driver.zip.raes.ZipRaesDriver;
-import net.java.truevfs.component.zip.driver.JarDriverEntry;
+import net.java.truevfs.comp.zip.driver.JarDriverEntry;
 import net.java.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 
 /**

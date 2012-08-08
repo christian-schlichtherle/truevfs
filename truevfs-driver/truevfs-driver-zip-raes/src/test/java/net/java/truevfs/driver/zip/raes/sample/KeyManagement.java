@@ -16,13 +16,13 @@ import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsScheme;
-import net.java.truevfs.keymanager.spec.KeyManagerContainer;
-import net.java.truevfs.keymanager.spec.PromptingKeyManagerContainer;
-import net.java.truevfs.keymanager.spec.PromptingKeyProvider.Controller;
-import net.java.truevfs.keymanager.spec.PromptingKeyProvider.View;
-import net.java.truevfs.keymanager.spec.UnknownKeyException;
-import net.java.truevfs.keymanager.spec.param.AesKeyStrength;
-import net.java.truevfs.keymanager.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.KeyManagerContainer;
+import net.java.truevfs.key.spec.PromptingKeyManagerContainer;
+import net.java.truevfs.key.spec.PromptingKeyProvider.Controller;
+import net.java.truevfs.key.spec.PromptingKeyProvider.View;
+import net.java.truevfs.key.spec.UnknownKeyException;
+import net.java.truevfs.key.spec.param.AesKeyStrength;
+import net.java.truevfs.key.spec.param.AesPbeParameters;
 
 /**
  * Provides static utility methods to set passwords for RAES encrypted ZIP

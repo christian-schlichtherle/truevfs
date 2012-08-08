@@ -9,11 +9,11 @@ import static java.nio.file.Files.*;
 import net.java.truevfs.access.TConfig;
 import net.java.truevfs.access.TPath;
 import net.java.truevfs.access.TPathITSuite;
-import net.java.truevfs.component.zip.driver.TestWinZipAesDriver;
+import net.java.truevfs.comp.zip.driver.TestWinZipAesDriver;
 import static net.java.truevfs.kernel.spec.FsAccessOption.ENCRYPT;
-import net.java.truevfs.keymanager.spec.MockView;
-import static net.java.truevfs.keymanager.spec.MockView.Action.CANCEL;
-import static net.java.truevfs.keymanager.spec.MockView.Action.ENTER;
+import net.java.truevfs.key.spec.MockView;
+import static net.java.truevfs.key.spec.MockView.Action.CANCEL;
+import static net.java.truevfs.key.spec.MockView.Action.ENTER;
 import static org.junit.Assert.*;
 import org.junit.Test;
 

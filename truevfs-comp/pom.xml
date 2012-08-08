@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2012 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
+  -->
+<project    xmlns="http://maven.apache.org/POM/4.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>net.java.truevfs</groupId>
+        <artifactId>truevfs</artifactId>
+        <version>1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>truevfs-comp</artifactId>
+    <packaging>pom</packaging>
+
+    <name>TrueVFS Component</name>
+    <description>
+        Components provide some functionality to serve as a building block for
+        other modules.
+        Unlike TrueZIP Driver or TrueZIP Extension modules, components do NOT
+        advertise services for use by the TrueZIP Kernel on the class path.
+    </description>
+
+    <modules>
+        <module>truevfs-comp-ibm437</module>
+        <module>truevfs-comp-inst</module>
+        <module>truevfs-comp-jmx</module>
+        <module>truevfs-comp-tar-driver</module>
+        <module>truevfs-comp-zip</module>
+        <module>truevfs-comp-zip-driver</module>
+    </modules>
+</project>
