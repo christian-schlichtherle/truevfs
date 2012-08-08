@@ -35,7 +35,7 @@ import javax.annotation.concurrent._
   * @see    LockingStrategy
   * @author Christian Schlichtherle
   */
-@Immutable
+@ThreadSafe
 private trait LockController extends Controller[LockModel] {
   this: LockModelAspect =>
 
