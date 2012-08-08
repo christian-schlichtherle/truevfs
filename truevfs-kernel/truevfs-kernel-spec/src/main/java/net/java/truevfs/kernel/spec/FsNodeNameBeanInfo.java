@@ -13,15 +13,15 @@ import javax.annotation.concurrent.Immutable;
  * Provides a persistence delegate to support
  * {@link XMLEncoder}/{@link XMLDecoder}.
  *
- * @see    FsPath
+ * @see    FsNodeName
  * @author Christian Schlichtherle
  */
 @Immutable
 @DefaultAnnotation(Nullable.class)
-public final class FsPathBeanInfo extends SimpleBeanInfo {
+public final class FsNodeNameBeanInfo extends SimpleBeanInfo {
 
     // Bean descriptor//GEN-FIRST:BeanDescriptor
-    private static BeanDescriptor beanDescriptor = new BeanDescriptor  ( net.java.truevfs.kernel.spec.FsPath.class , null ); // NOI18N
+    private static BeanDescriptor beanDescriptor = new BeanDescriptor  ( net.java.truevfs.kernel.spec.FsNodeName.class , null ); // NOI18N
 
     private static BeanDescriptor getBdescriptor(){
         return beanDescriptor;
@@ -32,14 +32,12 @@ public final class FsPathBeanInfo extends SimpleBeanInfo {
         final PersistenceDelegate pd = new PersistenceDelegate() {
             @Override
             protected Expression instantiate(Object oldInstance, Encoder out) {
-                final FsPath path = (FsPath) oldInstance;
+                final FsNodeName name = (FsNodeName) oldInstance;
                 return new Expression(
-                    path,
-                    path.getClass(),
+                    name,
+                    name.getClass(),
                     "new", // NOI18N
-                    new Object[] {
-                        path.toUri(),
-                    });
+                    new Object[] { name.toUri() });
             }
         };
         beanDescriptor.setValue("persistenceDelegate", pd); // NOI18N
@@ -47,25 +45,34 @@ public final class FsPathBeanInfo extends SimpleBeanInfo {
 }//GEN-LAST:BeanDescriptor
 
 
-    // Properties information will be obtained from introspection.//GEN-FIRST:Properties
-    private static PropertyDescriptor[] properties = null;
-    private static PropertyDescriptor[] getPdescriptor(){//GEN-HEADEREND:Properties
+    // Property identifiers//GEN-FIRST:Properties
+
+    // Property array 
+    /*lazy PropertyDescriptor*/
+    private static PropertyDescriptor[] getPdescriptor(){
+        PropertyDescriptor[] properties = new PropertyDescriptor[0];//GEN-HEADEREND:Properties
 
     // Here you can add code for customizing the properties array.
 
         return properties;     }//GEN-LAST:Properties
 
-    // Event set information will be obtained from introspection.//GEN-FIRST:Events
-    private static EventSetDescriptor[] eventSets = null;
-    private static EventSetDescriptor[] getEdescriptor(){//GEN-HEADEREND:Events
+    // EventSet identifiers//GEN-FIRST:Events
+
+    // EventSet array
+    /*lazy EventSetDescriptor*/
+    private static EventSetDescriptor[] getEdescriptor(){
+        EventSetDescriptor[] eventSets = new EventSetDescriptor[0];//GEN-HEADEREND:Events
 
     // Here you can add code for customizing the event sets array.
 
         return eventSets;     }//GEN-LAST:Events
 
-    // Method information will be obtained from introspection.//GEN-FIRST:Methods
-    private static MethodDescriptor[] methods = null;
-    private static MethodDescriptor[] getMdescriptor(){//GEN-HEADEREND:Methods
+    // Method identifiers//GEN-FIRST:Methods
+
+    // Method array 
+    /*lazy MethodDescriptor*/
+    private static MethodDescriptor[] getMdescriptor(){
+        MethodDescriptor[] methods = new MethodDescriptor[0];//GEN-HEADEREND:Methods
 
     // Here you can add code for customizing the methods array.
     
@@ -82,7 +89,6 @@ public final class FsPathBeanInfo extends SimpleBeanInfo {
 
     private static final int defaultPropertyIndex = -1;//GEN-BEGIN:Idx
     private static final int defaultEventIndex = -1;//GEN-END:Idx
-
     
 //GEN-FIRST:Superclass
 
@@ -184,7 +190,7 @@ public final class FsPathBeanInfo extends SimpleBeanInfo {
      * so they can be rendered onto an existing background.
      *
      * @param  iconKind  The kind of icon requested.  This should be
-     *    one of the constant values ICON_COLOR_16x16, ICON_COLOR_32x32, 
+     *    one of the constant values ICON_COLOR_16x16, ICON_COLOR_32x32,
      *    ICON_MONO_16x16, or ICON_MONO_32x32.
      * @return  An image object representing the requested icon.  May
      *    return null if no suitable icon is available.

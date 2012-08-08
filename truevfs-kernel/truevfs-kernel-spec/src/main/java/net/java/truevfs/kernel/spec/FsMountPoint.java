@@ -10,10 +10,10 @@ import java.net.URISyntaxException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
-import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
-import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
 import net.java.truecommons.shed.QuotedUriSyntaxException;
 import net.java.truecommons.shed.UriBuilder;
+import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
+import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
 
 /**
  * Addresses a file system mount point.
@@ -29,10 +29,10 @@ import net.java.truecommons.shed.UriBuilder;
  * <li>If the URI is opaque, its scheme specific part must end with the mount
  *     point separator {@code "!/"}.
  *     The scheme specific part <em>before</em> the mount point separator is
- *     parsed according the syntax constraints for a {@link FsPath} and the
+ *     parsed according the syntax constraints for a {@link FsNodePath} and the
  *     following additional syntax constraints:
  *     The path component must be absolute.
- *     If its opaque, it's entry name must not be empty.
+ *     If its opaque, it's node name must not be empty.
  *     Finally, its set as the value of the {@link #getPath() path} component
  *     property.
  * <li>Otherwise, if the URI is hierarchical, its path component must be in
@@ -105,7 +105,7 @@ import net.java.truecommons.shed.UriBuilder;
  * </tr>
  * <tr>
  *   <td>{@code foo:bar:baz:/bang!/!/}</td>
- *   <td>empty entry name in path component after mount point {@code "bar:baz:/bang!/"}</td>
+ *   <td>empty node name in path component after mount point {@code "bar:baz:/bang!/"}</td>
  * </tr>
  * </tbody>
  * </table>
@@ -123,8 +123,8 @@ import net.java.truecommons.shed.UriBuilder;
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
  *
- * @see    FsPath
- * @see    FsEntryName
+ * @see    FsNodePath
+ * @see    FsNodeName
  * @see    FsScheme
  * @author Christian Schlichtherle
  */
@@ -136,16 +136,16 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
 
     /**
      * The separator which is used to split opaque path names into
-     * {@link FsMountPoint mount points} and {@link FsEntryName entry names}.
+     * {@link FsMountPoint mount points} and {@link FsNodeName node names}.
      * This is identical to the separator in the class
      * {@link java.net.JarURLConnection}.
      */
-    public static final String SEPARATOR = "!" + FsEntryName.SEPARATOR;
+    public static final String SEPARATOR = "!" + FsNodeName.SEPARATOR;
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private URI uri; // not final for serialization only!
 
-    private transient @Nullable FsPath path;
+    private transient @Nullable FsNodePath path;
 
     private transient volatile @Nullable FsScheme scheme;
 
@@ -185,7 +185,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * Constructs a new mount point by composing its URI from the given scheme
      * and path.
      * This static factory method calls
-     * {@link #FsMountPoint(FsScheme, FsPath) new FsMountPoint(scheme, path)}
+     * {@link #FsMountPoint(FsScheme, FsNodePath) new FsMountPoint(scheme, path)}
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
@@ -196,7 +196,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * @return A new mount point.
      */
     public static FsMountPoint
-    create(FsScheme scheme, FsPath path) {
+    create(FsScheme scheme, FsNodePath path) {
         try {
             return new FsMountPoint(scheme, path);
         } catch (URISyntaxException ex) {
@@ -234,14 +234,14 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      *         conform to the syntax constraints for mount points.
      */
     public FsMountPoint(final FsScheme scheme,
-                        final FsPath path)
+                        final FsNodePath path)
     throws URISyntaxException {
         final URI pu = path.toUri();
         if (!pu.isAbsolute())
             throw new QuotedUriSyntaxException(pu, "Path not absolute");
-        final String penup = path.getEntryName().toUri().getPath();
+        final String penup = path.getNodeName().toUri().getPath();
         if (0 == penup.length())
-            throw new QuotedUriSyntaxException(pu, "Empty entry name");
+            throw new QuotedUriSyntaxException(pu, "Empty node name");
         this.uri = new UriBuilder(true)
                 .scheme(scheme.toString())
                 .path(new StringBuilder(pu.getScheme())
@@ -284,12 +284,12 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
             if (ssp.length() - 2 != i)
                 throw new QuotedUriSyntaxException(uri,
                         "Doesn't end with mount point separator \"" + SEPARATOR + '"');
-            path = new FsPath(new URI(ssp.substring(0, i)), modifier);
+            path = new FsNodePath(new URI(ssp.substring(0, i)), modifier);
             final URI pu = path.toUri();
             if (!pu.isAbsolute())
                 throw new QuotedUriSyntaxException(uri, "Path not absolute");
-            if (0 == path.getEntryName().getPath().length())
-                throw new QuotedUriSyntaxException(uri, "Empty URI path of entry name of path");
+            if (0 == path.getNodeName().getPath().length())
+                throw new QuotedUriSyntaxException(uri, "Empty URI path of node name of path");
             if (NULL != modifier) {
                 URI nuri = new UriBuilder(true)
                         .scheme(uri.getScheme())
@@ -305,9 +305,9 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
         } else {
             if (!uri.isAbsolute())
                 throw new QuotedUriSyntaxException(uri, "Not absolute");
-            if (!uri.getRawPath().endsWith(FsEntryName.SEPARATOR))
+            if (!uri.getRawPath().endsWith(FsNodeName.SEPARATOR))
                 throw new QuotedUriSyntaxException(uri,
-                        "URI path doesn't end with separator \"" + FsEntryName.SEPARATOR + '"');
+                        "URI path doesn't end with separator \"" + FsNodeName.SEPARATOR + '"');
             path = null;
         }
         this.uri = uri;
@@ -325,10 +325,10 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
             assert null != getPath();
             assert getPath().toUri().isAbsolute();
             assert null == getPath().toUri().getRawFragment();
-            assert 0 != getPath().getEntryName().toUri().getRawPath().length();
+            assert 0 != getPath().getNodeName().toUri().getRawPath().length();
         } else {
             assert toUri().normalize() == toUri();
-            assert toUri().getRawPath().endsWith(FsEntryName.SEPARATOR);
+            assert toUri().getRawPath().endsWith(FsNodeName.SEPARATOR);
             assert null == getPath();
         }
         return true;
@@ -384,7 +384,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      *
      * @return The nullable path component.
      */
-    public @Nullable FsPath getPath() {
+    public @Nullable FsNodePath getPath() {
         return path;
     }
 
@@ -402,14 +402,14 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     }
 
     /**
-     * Resolves the given entry name against this mount point.
+     * Resolves the given node name against this mount point.
      *
-     * @param  entryName an entry name relative to this mount point.
+     * @param  name a node name relative to this mount point.
      * @return A new path with an absolute URI.
      */
-    public FsPath
-    resolve(FsEntryName entryName) {
-        return new FsPath(this, entryName);
+    public FsNodePath
+    resolve(FsNodeName name) {
+        return new FsNodePath(this, name);
     }
 
     /**

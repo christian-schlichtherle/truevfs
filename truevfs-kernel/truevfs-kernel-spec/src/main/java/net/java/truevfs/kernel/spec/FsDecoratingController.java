@@ -37,9 +37,9 @@ public abstract class FsDecoratingController extends FsAbstractController {
     }
 
     @Override
-    public @CheckForNull FsEntry stat(
+    public @CheckForNull FsNode stat(
             BitField<FsAccessOption> options,
-            FsEntryName name)
+            FsNodeName name)
     throws IOException {
         return controller.stat(options, name);
     }
@@ -47,21 +47,21 @@ public abstract class FsDecoratingController extends FsAbstractController {
     @Override
     public void checkAccess(
             BitField<FsAccessOption> options,
-            FsEntryName name,
+            FsNodeName name,
             BitField<Access> types)
     throws IOException {
         controller.checkAccess(options, name, types);
     }
 
     @Override
-    public void setReadOnly(FsEntryName name) throws IOException {
+    public void setReadOnly(FsNodeName name) throws IOException {
         controller.setReadOnly(name);
     }
 
     @Override
     public boolean setTime(
             BitField<FsAccessOption> options,
-            FsEntryName name,
+            FsNodeName name,
             Map<Access, Long> times)
     throws IOException {
         return controller.setTime(options, name, times);
@@ -70,7 +70,7 @@ public abstract class FsDecoratingController extends FsAbstractController {
     @Override
     public boolean setTime(
             BitField<FsAccessOption> options,
-            FsEntryName name,
+            FsNodeName name,
             BitField<Access> types,
             long value)
     throws IOException {
@@ -80,14 +80,14 @@ public abstract class FsDecoratingController extends FsAbstractController {
     @Override
     public InputSocket<? extends Entry> input(
             BitField<FsAccessOption> options,
-            FsEntryName name) {
+            FsNodeName name) {
         return controller.input(options, name);
     }
 
     @Override
     public OutputSocket<? extends Entry> output(
             BitField<FsAccessOption> options,
-            FsEntryName name,
+            FsNodeName name,
             @CheckForNull Entry template) {
         return controller.output(options, name, template);
     }
@@ -95,7 +95,7 @@ public abstract class FsDecoratingController extends FsAbstractController {
     @Override
     public void mknod(
             BitField<FsAccessOption> options,
-            FsEntryName name,
+            FsNodeName name,
             Type type,
             @CheckForNull Entry template)
     throws IOException {
@@ -105,7 +105,7 @@ public abstract class FsDecoratingController extends FsAbstractController {
     @Override
     public void unlink(
             BitField<FsAccessOption> options,
-            FsEntryName name)
+            FsNodeName name)
     throws IOException {
         controller.unlink(options, name);
     }

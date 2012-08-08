@@ -9,14 +9,14 @@ import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.spi.IoBufferPoolFactory;
 
 /**
- * Creates {@linkplain FileIoBufferPool temp file based I/O buffer pools}.
+ * Creates {@linkplain FileBufferPool temp file based I/O buffer pools}.
  *
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class FileIoBufferPoolFactory extends IoBufferPoolFactory {
+public final class FileBufferPoolFactory extends IoBufferPoolFactory {
     @Override
     public IoBufferPool get() {
-        return new FileIoBufferPool();
+        return new FileBufferPool();
     }
 }

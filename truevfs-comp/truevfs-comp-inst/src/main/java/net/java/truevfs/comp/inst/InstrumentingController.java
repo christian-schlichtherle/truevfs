@@ -11,7 +11,7 @@ import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsDecoratingController;
-import net.java.truevfs.kernel.spec.FsEntryName;
+import net.java.truevfs.kernel.spec.FsNodeName;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
@@ -35,7 +35,7 @@ extends FsDecoratingController {
     @Override
     public InputSocket<? extends Entry> input(
             BitField<FsAccessOption> options,
-            FsEntryName name) {
+            FsNodeName name) {
         return director.instrument(this,
                 controller.input(options, name));
     }
@@ -43,7 +43,7 @@ extends FsDecoratingController {
     @Override
     public OutputSocket<? extends Entry> output(
             BitField<FsAccessOption> options,
-            FsEntryName name,
+            FsNodeName name,
             @CheckForNull Entry template) {
         return director.instrument(this,
                 controller.output(options, name, template));

@@ -22,11 +22,11 @@ import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.PathSplitter;
 import net.java.truecommons.shed.Paths;
 import net.java.truecommons.shed.UriBuilder;
+import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
 import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
-import static net.java.truevfs.kernel.spec.FsEntryName.ROOT;
-import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
-import net.java.truevfs.kernel.spec.*;
+import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
@@ -383,7 +383,7 @@ public final class TFile extends File {
     private transient TArchiveDetector detector;
     private transient @CheckForNull TFile innerArchive;
     private transient @CheckForNull TFile enclArchive;
-    private transient @CheckForNull FsEntryName enclEntryName;
+    private transient @CheckForNull FsNodeName enclEntryName;
 
     /**
      * This refers to the file system controller if and only if this file
@@ -583,38 +583,38 @@ public final class TFile extends File {
     /**
      * Constructs a new {@code TFile} instance from the given {@code uri}.
      * This constructor is equivalent to
-     * <code>new {@link #TFile(FsPath, TArchiveDetector) TFile(FsPath.create(uri, CANONICALIZE), null))}</code>,
+     * <code>new {@link #TFile(FsNodePath, TArchiveDetector) TFile(FsNodePath.create(uri, CANONICALIZE), null))}</code>,
      *
      * @param  uri an absolute URI which has a scheme component which is
      *         known by the
      *         {@linkplain TConfig#getArchiveDetector default archive detector}.
      * @throws IllegalArgumentException if the given URI does not conform to
-     *         the syntax constraints for {@link FsPath}s or
+     *         the syntax constraints for {@link FsNodePath}s or
      *         {@link File#File(URI)}.
      * @see    #toURI()
-     * @see    #TFile(FsPath)
+     * @see    #TFile(FsNodePath)
      */
     public TFile(URI uri) {
-        this(FsPath.create(uri, CANONICALIZE), null);
+        this(FsNodePath.create(uri, CANONICALIZE), null);
     }
 
     /**
      * Constructs a new {@code TFile} instance from the given {@code path}.
      * This constructor is equivalent to
-     * <code>new {@link #TFile(FsPath, TArchiveDetector) TFile(path, null)}</code>
+     * <code>new {@link #TFile(FsNodePath, TArchiveDetector) TFile(path, null)}</code>
      *
      * @param  path a path with an absolute
-     *         {@link FsPath#toHierarchicalUri() hierarchical URI} which has a
+     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} which has a
      *         scheme component which is known by the
      *         {@linkplain TConfig#getArchiveDetector default archive detector}.
      * @throws IllegalArgumentException if the
-     *         {@link FsPath#toHierarchicalUri() hierarchical URI} of the given
+     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} of the given
      *         path does not conform to the syntax constraints for
      *         {@link File#File(URI)}.
-     * @see    #toFsPath()
+     * @see    #toNodePath()
      * @see    #TFile(URI)
      */
-    public TFile(FsPath path) {
+    public TFile(FsNodePath path) {
         this(path, null);
     }
 
@@ -635,7 +635,7 @@ public final class TFile extends File {
      * The scheme component of this hierarchical URI must be {@code file}.
      *
      * @param  path a path with an absolute
-     *         {@link FsPath#toHierarchicalUri() hierarchical URI} which has a
+     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} which has a
      *         scheme component which is known by the given {@code detector}.
      * @param  detector the archive detector to look up archive file system
      *         drivers for the named URI scheme components.
@@ -643,36 +643,36 @@ public final class TFile extends File {
      *         {@linkplain TConfig#getArchiveDetector default archive detector}.
      *         is used instead.
      * @throws IllegalArgumentException if the
-     *         {@link FsPath#toHierarchicalUri() hierarchical URI} of the given
+     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} of the given
      *         path does not conform to the syntax constraints for
      *         {@link File#File(URI)}.
-     * @see    #toFsPath()
+     * @see    #toNodePath()
      */
-    public TFile(   final FsPath path,
+    public TFile(   final FsNodePath path,
                     final @CheckForNull TArchiveDetector detector) {
         super(path.toHierarchicalUri());
         parse(path, null != detector ? detector : TConfig.get().getArchiveDetector());
     }
 
-    private void parse( final FsPath path,
+    private void parse( final FsNodePath path,
                         final TArchiveDetector detector) {
         this.file = new File(super.getPath());
         this.detector = detector;
 
         final FsMountPoint mp = path.getMountPoint();
-        final FsPath mpp = mp.getPath();
-        final FsEntryName en;
+        final FsNodePath mpp = mp.getPath();
+        final FsNodeName en;
 
         if (null == mpp) {
             assert !path.toUri().isOpaque();
             this.enclArchive = null;
             this.enclEntryName = null;
             this.innerArchive = null;
-        } else if ((en = path.getEntryName()).isRoot()) {
+        } else if ((en = path.getNodeName()).isRoot()) {
             assert path.toUri().isOpaque();
             if (mpp.toUri().isOpaque()) {
                 this.enclArchive = new TFile(mpp.getMountPoint(), detector);
-                this.enclEntryName = mpp.getEntryName();
+                this.enclEntryName = mpp.getNodeName();
             } else {
                 this.enclArchive = null;
                 this.enclEntryName = null;
@@ -698,7 +698,7 @@ public final class TFile extends File {
         this.file = new File(super.getPath());
         this.detector = detector;
 
-        final FsPath mpp = mountPoint.getPath();
+        final FsNodePath mpp = mountPoint.getPath();
         if (null == mpp) {
             assert !mountPoint.toUri().isOpaque();
             this.enclArchive = null;
@@ -709,7 +709,7 @@ public final class TFile extends File {
             if (mpp.toUri().isOpaque()) {
                 this.enclArchive
                         = new TFile(mpp.getMountPoint(), detector);
-                this.enclEntryName = mpp.getEntryName();
+                this.enclEntryName = mpp.getNodeName();
             } else {
                 this.enclArchive = null;
                 this.enclEntryName = null;
@@ -742,7 +742,7 @@ public final class TFile extends File {
                 this.detector = detector;
                 this.innerArchive = this.enclArchive = innerArchive;
                 try {
-                    this.enclEntryName = new FsEntryName(
+                    this.enclEntryName = new FsNodeName(
                             new UriBuilder()
                                 .path(
                                     path.substring(iapl + 1) // cut off leading separatorChar
@@ -778,7 +778,7 @@ public final class TFile extends File {
         try {
             enclEntryName = 0 >= enclEntryNameBuf.length()
                     ? null
-                    : new FsEntryName(
+                    : new FsNodeName(
                         new UriBuilder().path(enclEntryNameBuf.toString()).getUri(),
                         CANONICALIZE);
         } catch (URISyntaxException ex) {
@@ -885,7 +885,7 @@ public final class TFile extends File {
 
     private void readObject(ObjectInputStream in)
     throws IOException, ClassNotFoundException {
-        parse(  FsPath.create((URI) in.readObject(), CANONICALIZE),
+        parse(  FsNodePath.create((URI) in.readObject(), CANONICALIZE),
                 TConfig.get().getArchiveDetector());
     }
 
@@ -909,7 +909,7 @@ public final class TFile extends File {
         final File file = this.file;
         final TFile innerArchive = this.innerArchive;
         final TFile enclArchive = this.enclArchive;
-        final FsEntryName enclEntryName = this.enclEntryName;
+        final FsNodeName enclEntryName = this.enclEntryName;
 
         assert null != file;
         assert !(file instanceof TFile);
@@ -1193,7 +1193,7 @@ public final class TFile extends File {
      * @return The entry name relative to the innermost archive file.
      */
     public @Nullable String getInnerEntryName() {
-        final FsEntryName enclEntryName;
+        final FsNodeName enclEntryName;
         return this == innerArchive
                 ? ROOT.getPath()
                 : null == (enclEntryName = this.enclEntryName)
@@ -1201,12 +1201,12 @@ public final class TFile extends File {
                     : enclEntryName.getPath();
     }
 
-    @Nullable FsEntryName getInnerFsEntryName() {
+    @Nullable FsNodeName getInnerFsEntryName() {
         return this == innerArchive ? ROOT : enclEntryName;
     }
 
     /**
-     * Returns the enclosing archive file object for this file object.
+     * Returns the parent file system object for this file object.
      * That is, if this object addresses an entry located within an archive
      * file, then this method returns the file object representing the
      * enclosing archive file, or {@code null} otherwise.
@@ -1226,7 +1226,7 @@ public final class TFile extends File {
     }
 
     /**
-     * Returns the entry name relative to the enclosing archive file.
+     * Returns the node name relative to the parent file system.
      * That is, if this object addresses an entry located within an archive
      * file, then this method returns the relative path of the entry in the
      * enclosing archive file separated by the entry separator character
@@ -1242,7 +1242,7 @@ public final class TFile extends File {
         return null == enclEntryName ? null : enclEntryName.getPath();
     }
 
-    @Nullable FsEntryName getEnclFsEntryName() {
+    @Nullable FsNodeName getEnclFsEntryName() {
         return enclEntryName;
     }
 
@@ -1321,11 +1321,11 @@ public final class TFile extends File {
         final FsMountPoint mountPoint;
         try {
             final TFile enclArchive = this.enclArchive;
-            final FsEntryName enclEntryName = this.enclEntryName;
+            final FsNodeName enclEntryName = this.enclEntryName;
             assert (null != enclArchive) == (null != enclEntryName);
             mountPoint = new FsMountPoint(scheme, null == enclArchive
-                    ? new FsPath(   file)
-                    : new FsPath(   enclArchive .getController()
+                    ? new FsNodePath(   file)
+                    : new FsNodePath(   enclArchive .getController()
                                                 .getModel()
                                                 .getMountPoint(),
                                     enclEntryName));
@@ -1476,21 +1476,21 @@ public final class TFile extends File {
      * {@link #getFile() decorated file}.
      * This implies that only the hierarchicalized file system path
      * of this file instance is considered in the comparison.
-     * E.g. {@code new TFile(FsPath.create("zip:file:/archive!/entry"))} and
-     * {@code new TFile(FsPath.create("tar:file:/archive!/entry"))} would
+     * E.g. {@code new TFile(FsNodePath.create("zip:file:/archive!/entry"))} and
+     * {@code new TFile(FsNodePath.create("tar:file:/archive!/entry"))} would
      * compare equal because their hierarchicalized file system path is
      * {@code "file:/archive/entry"}.
      * <p>
      * More formally, let {@code a} and {@code b} be two TFile objects.
      * Then if the expression
-     * {@code a.toFsPath().toHierarchicalUri().equals(b.toFsPath().toHierarchicalUri())}
+     * {@code a.toNodePath().toHierarchicalUri().equals(b.toNodePath().toHierarchicalUri())}
      * is true, the expression {@code a.equals(b)} is also true.
      * <p>
      * Note that this does <em>not</em> work vice versa:
      * E.g. on Windows, the expression
      * {@code new TFile("file").equals(new TFile("FILE"))} is true, but
-     * {@code new TFile("file").toFsPath().toHierarchicalUri().equals(new TFile("FILE").toFsPath().toHierarchicalUri())}
-     * is false because {@link FsPath#equals(Object)} is case sensitive.
+     * {@code new TFile("file").toNodePath().toHierarchicalUri().equals(new TFile("FILE").toNodePath().toHierarchicalUri())}
+     * is false because {@link FsNodePath#equals(Object)} is case sensitive.
      *
      * @param that the object to get compared with this object
      * @see   #hashCode()
@@ -1509,21 +1509,21 @@ public final class TFile extends File {
      * {@link #getFile() decorated file} object.
      * This implies that only the hierarchicalized file system path
      * of this file instance is considered in the comparison.
-     * E.g. {@code new TFile(FsPath.create("zip:file:/archive!/entry"))} and
-     * {@code new TFile(FsPath.create("tar:file:/archive!/entry"))} would
+     * E.g. {@code new TFile(FsNodePath.create("zip:file:/archive!/entry"))} and
+     * {@code new TFile(FsNodePath.create("tar:file:/archive!/entry"))} would
      * compare equal because their hierarchicalized file system path is
      * {@code "file:/archive/entry"}.
      * <p>
      * More formally, let {@code a} and {@code b} be two TFile objects.
      * Now if the expression
-     * {@code a.toFsPath().toHierarchicalUri().compareTo(b.toFsPath().toHierarchicalUri()) == 0}
+     * {@code a.toNodePath().toHierarchicalUri().compareTo(b.toNodePath().toHierarchicalUri()) == 0}
      * is true, then the expression {@code a.compareTo(b) == 0} is also true.
      * <p>
      * Note that this does <em>not</em> work vice versa:
      * E.g. on Windows, the expression
      * {@code new TFile("file").compareTo(new TFile("FILE")) == 0} is true, but
-     * {@code new TFile("file").toFsPath().toHierarchicalUri().compareTo(new TFile("FILE").toFsPath().toHierarchicalUri()) == 0}
-     * is false because {@link FsPath#equals(Object)} is case sensitive.
+     * {@code new TFile("file").toNodePath().toHierarchicalUri().compareTo(new TFile("FILE").toNodePath().toHierarchicalUri()) == 0}
+     * is false because {@link FsNodePath#equals(Object)} is case sensitive.
      *
      * @param that the file object to get compared with this object
      * @see   #equals(Object)
@@ -1579,7 +1579,7 @@ public final class TFile extends File {
      * 
      * @return A URI for this file object.
      * @see    #TFile(URI)
-     * @see    #toFsPath()
+     * @see    #toNodePath()
      */
     @Override
     public URI toURI() {
@@ -1590,15 +1590,15 @@ public final class TFile extends File {
                     assert null != enclEntryName;
                     return new FsMountPoint(
                             scheme,
-                            new FsPath(
+                            new FsNodePath(
                                 new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
                                 enclEntryName)).toUri();
                 } else {
-                    return new FsMountPoint(scheme, new FsPath(file)).toUri();
+                    return new FsMountPoint(scheme, new FsNodePath(file)).toUri();
                 }
             } else if (null != enclArchive) {
                 assert null != enclEntryName;
-                return new FsPath(
+                return new FsNodePath(
                         new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
                         enclEntryName).toUri();
             } else {
@@ -1610,37 +1610,37 @@ public final class TFile extends File {
     }
 
     /**
-     * Returns a file system path which is consistent with {@link #toURI()}.
+     * Returns a file system node path which is consistent with {@link #toURI()}.
      * 
-     * @return A file system path which is consistent with {@link #toURI()}.
-     * @see    #TFile(FsPath)
+     * @return A file system node path which is consistent with {@link #toURI()}.
+     * @see    #TFile(FsNodePath)
      * @see    #toURI()
      */
-    public FsPath toFsPath() {
+    public FsNodePath toNodePath() {
         try {
             if (this == innerArchive) {
                 final FsScheme scheme = getScheme();
                 if (null != enclArchive) {
                     assert null != enclEntryName;
-                    return new FsPath(
+                    return new FsNodePath(
                             new FsMountPoint(
                                 scheme,
-                                new FsPath(
+                                new FsNodePath(
                                     new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
                                     enclEntryName)),
                             ROOT);
                 } else {
-                    return new FsPath(
-                            new FsMountPoint(scheme, new FsPath(file)),
+                    return new FsNodePath(
+                            new FsMountPoint(scheme, new FsNodePath(file)),
                             ROOT);
                 }
             } else if (null != enclArchive) {
                 assert null != enclEntryName;
-                return new FsPath(
+                return new FsNodePath(
                         new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
                         enclEntryName);
             } else {
-                return new FsPath(file);
+                return new FsNodePath(file);
             }
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
@@ -1710,7 +1710,7 @@ public final class TFile extends File {
     public boolean isFile() {
         if (null != innerArchive) {
             try {
-                final FsEntry entry = innerArchive.getController()
+                final FsNode entry = innerArchive.getController()
                         .stat(getAccessPreferences(), getInnerFsEntryName());
                 return null != entry && entry.isType(FILE);
             } catch (IOException ex) {
@@ -1739,7 +1739,7 @@ public final class TFile extends File {
     public boolean isDirectory() {
         if (null != innerArchive) {
             try {
-                final FsEntry entry = innerArchive.getController()
+                final FsNode entry = innerArchive.getController()
                         .stat(getAccessPreferences(), getInnerFsEntryName());
                 return null != entry && entry.isType(DIRECTORY);
             } catch (IOException ex) {
@@ -1833,7 +1833,7 @@ public final class TFile extends File {
     @Override
     public long length() {
         if (null != innerArchive) {
-            final FsEntry entry;
+            final FsNode entry;
             try {
                 entry = innerArchive.getController()
                         .stat(getAccessPreferences(), getInnerFsEntryName());
@@ -1862,7 +1862,7 @@ public final class TFile extends File {
     @Override
     public long lastModified() {
         if (null != innerArchive) {
-            final FsEntry entry;
+            final FsNode entry;
             try {
                 entry = innerArchive.getController()
                         .stat(getAccessPreferences(), getInnerFsEntryName());
@@ -1929,7 +1929,7 @@ public final class TFile extends File {
     @Override
     public @Nullable String[] list() {
         if (null != innerArchive) {
-            final FsEntry entry;
+            final FsNode entry;
             try {
                 entry = innerArchive.getController()
                         .stat(getAccessPreferences(), getInnerFsEntryName());
@@ -1962,7 +1962,7 @@ public final class TFile extends File {
     @Override
     public @Nullable String[] list(final @CheckForNull FilenameFilter filter) {
         if (null != innerArchive) {
-            final FsEntry entry;
+            final FsNode entry;
             try {
                 entry = innerArchive.getController()
                         .stat(getAccessPreferences(), getInnerFsEntryName());
@@ -2045,7 +2045,7 @@ public final class TFile extends File {
             final @CheckForNull FilenameFilter filter,
             final TArchiveDetector detector) {
         if (null != innerArchive) {
-            final FsEntry entry;
+            final FsNode entry;
             try {
                 entry = innerArchive.getController()
                         .stat(getAccessPreferences(), getInnerFsEntryName());
@@ -2058,7 +2058,7 @@ public final class TFile extends File {
         }
     }
 
-    private static @CheckForNull Set<String> members(@CheckForNull FsEntry entry) {
+    private static @CheckForNull Set<String> members(@CheckForNull FsNode entry) {
         return null == entry ? null : entry.getMembers();
     }
 
@@ -2118,7 +2118,7 @@ public final class TFile extends File {
             final @CheckForNull FileFilter filter,
             final TArchiveDetector detector) {
         if (null != innerArchive) {
-            final FsEntry entry;
+            final FsNode entry;
             try {
                 entry = innerArchive.getController()
                         .stat(getAccessPreferences(), getInnerFsEntryName());
@@ -2167,7 +2167,7 @@ public final class TFile extends File {
     public boolean createNewFile() throws IOException {
         if (null != innerArchive) {
             final FsController controller = innerArchive.getController();
-            final FsEntryName entryName = getInnerFsEntryName();
+            final FsNodeName entryName = getInnerFsEntryName();
             // This is not really atomic, but should be OK in this case.
             if (null != controller.stat(getAccessPreferences(), entryName))
                 return false;
@@ -2246,14 +2246,14 @@ public final class TFile extends File {
                     parent.mkdir(recursive);
             }
             final FsController controller = innerArchive.getController();
-            final FsEntryName innerEntryName = getInnerFsEntryName();
+            final FsNodeName innerEntryName = getInnerFsEntryName();
             try {
                 controller.mknod(
                         getAccessPreferences(), innerEntryName,
                         DIRECTORY,
                         null);
             } catch (IOException ex) {
-                final FsEntry entry = controller
+                final FsNode entry = controller
                         .stat(getAccessPreferences(), innerEntryName);
                 if (null == entry || !entry.isType(DIRECTORY))
                     throw ex;

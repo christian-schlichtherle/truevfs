@@ -9,17 +9,17 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
-import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
-import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.ENTRY_NAME;
 import net.java.truecommons.shed.QuotedUriSyntaxException;
 import net.java.truecommons.shed.UriBuilder;
+import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
+import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.ENTRY_NAME;
 
 /**
- * Addresses a file system entry relative to its {@link FsMountPoint mount point}.
+ * Addresses a file system node relative to its {@link FsMountPoint mount point}.
  * 
  * <h3><a name="specification"/>Specification</h3>
  * <p>
- * An entry name adds the following syntax constraints to a
+ * An node name adds the following syntax constraints to a
  * {@link URI Uniform Resource Identifier}:
  * <ol>
  * <li>The URI must be relative, that is it must not define a scheme component.
@@ -39,7 +39,7 @@ import net.java.truecommons.shed.UriBuilder;
  * 
  * <h3><a name="examples"/>Examples</h3>
  * <p>
- * Examples for valid entry name URIs are:
+ * Examples for valid node name URIs are:
  * <ul>
  * <li>{@code "foo"}
  * <li>{@code "foo/bar"}
@@ -81,7 +81,7 @@ import net.java.truecommons.shed.UriBuilder;
  * </tbody>
  * </table>
  * <p>
- * Examples for invalid entry name URIs are:
+ * Examples for invalid node name URIs are:
  * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
@@ -115,8 +115,8 @@ import net.java.truecommons.shed.UriBuilder;
  * 
  * <h3><a name="identities"/>Identities</h3>
  * <p>
- * For any entry name {@code e}, it's generally true that
- * {@code new FsEntryName(e.toUri()).equals(e)}.
+ * For any node name {@code e}, it's generally true that
+ * {@code new FsNodeName(e.toUri()).equals(e)}.
  * 
  * <h3><a name="serialization"/>Serialization</h3>
  * <p>
@@ -130,13 +130,13 @@ import net.java.truecommons.shed.UriBuilder;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class FsEntryName
-implements Serializable, Comparable<FsEntryName> {
+public final class FsNodeName
+implements Serializable, Comparable<FsNodeName> {
 
     private static final long serialVersionUID = 3453442253468244275L;
 
     /**
-     * The separator string for file names in an entry name,
+     * The separator string for file names in an node name,
      * which is {@value}.
      *
      * @see #SEPARATOR_CHAR
@@ -144,7 +144,7 @@ implements Serializable, Comparable<FsEntryName> {
     public static final String SEPARATOR = "/";
 
     /**
-     * The separator character for file names in an entry name,
+     * The separator character for file names in an node name,
      * which is {@value}.
      *
      * @see #SEPARATOR
@@ -154,13 +154,13 @@ implements Serializable, Comparable<FsEntryName> {
     private static final String ILLEGAL_PREFIX = ".." + SEPARATOR;
 
     /**
-     * The file system entry name of the root directory,
+     * The file system node name of the root directory,
      * which is an empty URI.
      */
-    public static final FsEntryName ROOT;
+    public static final FsNodeName ROOT;
     static {
         try {
-            ROOT = new FsEntryName(new URI(""));
+            ROOT = new FsNodeName(new URI(""));
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
@@ -170,28 +170,28 @@ implements Serializable, Comparable<FsEntryName> {
     private URI uri; // not final for serialization only!
 
     /**
-     * Constructs a new file system entry name by parsing the given URI.
+     * Constructs a new file system node name by parsing the given URI.
      * This static factory method calls
-     * {@link #FsEntryName(URI, FsUriModifier) new FsEntryName(uri, FsUriModifier.NULL)}
+     * {@link #FsNodeName(URI, FsUriModifier) new FsNodeName(uri, FsUriModifier.NULL)}
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
      * @param  uri the {@link #toUri() URI}.
      * @throws NullPointerException if {@code uri} is {@code null}.
      * @throws IllegalArgumentException if {@code uri} does not conform to the
-     *         syntax constraints for file system entry names.
-     * @return A new file system entry name.
+     *         syntax constraints for file system node names.
+     * @return A new file system node name.
      */
-    public static FsEntryName
+    public static FsNodeName
     create(URI uri) {
         return create(uri, NULL);
     }
 
     /**
-     * Constructs a new file system entry name by parsing the given URI
+     * Constructs a new file system node name by parsing the given URI
      * after applying the given URI modifier.
      * This static factory method calls
-     * {@link #FsEntryName(URI, FsUriModifier) new FsEntryName(uri, modifier)}
+     * {@link #FsNodeName(URI, FsUriModifier) new FsNodeName(uri, modifier)}
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
@@ -200,35 +200,35 @@ implements Serializable, Comparable<FsEntryName> {
      * @throws NullPointerException if {@code uri} or {@code modifier} are
      *         {@code null}.
      * @throws IllegalArgumentException if {@code uri} still does not conform
-     *         to the syntax constraints for file system entry names after its
+     *         to the syntax constraints for file system node names after its
      *         modification.
-     * @return A new file system entry name.
+     * @return A new file system node name.
      */
-    public static FsEntryName
+    public static FsNodeName
     create(URI uri, FsUriModifier modifier) {
         try {
             return uri.toString().isEmpty()
                     ? ROOT
-                    : new FsEntryName(uri, modifier);
+                    : new FsNodeName(uri, modifier);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
     }
 
     /**
-     * Constructs a new file system entry name by parsing the given URI.
+     * Constructs a new file system node name by parsing the given URI.
      *
      * @param  uri the {@link #toUri() URI}.
      * @throws NullPointerException if {@code uri} is {@code null}.
      * @throws URISyntaxException if {@code uri} does not conform to the
-     *         syntax constraints for file system entry names.
+     *         syntax constraints for file system node names.
      */
-    public FsEntryName(URI uri) throws URISyntaxException {
+    public FsNodeName(URI uri) throws URISyntaxException {
         this(uri, NULL);
     }
 
     /**
-     * Constructs a new file system entry name by parsing the given URI
+     * Constructs a new file system node name by parsing the given URI
      * after applying the given URI modifier.
      *
      * @param  uri the {@link #toUri() URI}.
@@ -236,10 +236,10 @@ implements Serializable, Comparable<FsEntryName> {
      * @throws NullPointerException if {@code uri} or {@code modifier} are
      *         {@code null}.
      * @throws URISyntaxException if {@code uri} still does not conform to the
-     *         syntax constraints for file system entry names after its
+     *         syntax constraints for file system node names after its
      *         modification.
      */
-    public FsEntryName(URI uri, final FsUriModifier modifier)
+    public FsNodeName(URI uri, final FsUriModifier modifier)
     throws URISyntaxException {
         parse(modifier.modify(uri, ENTRY_NAME));
     }
@@ -285,19 +285,19 @@ implements Serializable, Comparable<FsEntryName> {
     }
 
     /**
-     * Constructs a new file system entry name by resolving the given member
-     * file system entry name against the given parent file system entry name.
-     * Note that the URI of the parent file system entry name is always
+     * Constructs a new file system node name by resolving the given member
+     * file system node name against the given parent file system node name.
+     * Note that the URI of the parent file system node name is always
      * considered to name a directory, so calling this constructor with
      * {@code "foo"} and {@code "bar"} as the URIs for the parent and member
-     * file system entry names results in {@code "foo/bar"} as the file system
-     * entry name URI.
+     * file system node names results in {@code "foo/bar"} as the file system
+     * node name URI.
      *
-     * @param  parent an entry name for the parent.
-     * @param  member an entry name for the member.
+     * @param  parent an node name for the parent.
+     * @param  member an node name for the member.
      */
-    public FsEntryName( final FsEntryName parent,
-                        final FsEntryName member) {
+    public FsNodeName( final FsNodeName parent,
+                        final FsNodeName member) {
         final URI pu = parent.uri;
         final String pup = pu.getRawPath();
         final URI mu = member.uri;
@@ -339,10 +339,10 @@ implements Serializable, Comparable<FsEntryName> {
 
     /**
      * Returns {@code true} if and only if the path component of this file
-     *         system entry name is empty and no query component is defined.
+     *         system node name is empty and no query component is defined.
      * 
      * @return {@code true} if and only if the path component of this file
-     *         system entry name is empty and no query component is defined.
+     *         system node name is empty and no query component is defined.
      */
     public boolean isRoot() {
         //return toUri().toString().isEmpty();
@@ -357,39 +357,39 @@ implements Serializable, Comparable<FsEntryName> {
     }
 
     /**
-     * Returns the URI for this entry name.
+     * Returns the URI for this node name.
      *
-     * @return The URI for this entry name.
+     * @return The URI for this node name.
      */
     public URI toUri() {
         return uri;
     }
 
     /**
-     * Returns the path of this entry name.
+     * Returns the path of this node name.
      * Equivalent to {@link #toUri() toUri()}{@code .getPath()}.
      *
-     * @return The path of this entry name.
+     * @return The path of this node name.
      */
     public String getPath() {
         return uri.getPath();
     }
 
     /**
-     * Returns the query of this entry name.
+     * Returns the query of this node name.
      * Equivalent to {@link #toUri() toUri()}{@code .getQuery()}.
      *
-     * @return The query of this entry name.
+     * @return The query of this node name.
      */
     public @CheckForNull String getQuery() {
         return uri.getQuery();
     }
 
     /**
-     * Returns the fragment of this entry name.
+     * Returns the fragment of this node name.
      * Equivalent to {@link #toUri() toUri()}{@code .getFragment()}.
      *
-     * @return The fragment of this entry name.
+     * @return The fragment of this node name.
      */
     public @CheckForNull String getFragment() {
         return uri.getFragment();
@@ -399,24 +399,24 @@ implements Serializable, Comparable<FsEntryName> {
      * Implements a natural ordering which is consistent with
      * {@link #equals(Object)}.
      * 
-     * @param that the entry name to compare.
+     * @param that the node name to compare.
      */
     @Override
-    public int compareTo(FsEntryName that) {
+    public int compareTo(FsNodeName that) {
         return this.uri.compareTo(that.uri);
     }
 
     /**
-     * Returns {@code true} iff the given object is a entry name
-     * and its URI {@link URI#equals(Object) equals} the URI of this entry name.
+     * Returns {@code true} iff the given object is a node name
+     * and its URI {@link URI#equals(Object) equals} the URI of this node name.
      * 
      * @param that the object to compare.
      */
     @Override
     public boolean equals(@CheckForNull Object that) {
         return this == that
-                || that instanceof FsEntryName
-                    && this.uri.equals(((FsEntryName) that).uri);
+                || that instanceof FsNodeName
+                    && this.uri.equals(((FsNodeName) that).uri);
     }
 
     /**

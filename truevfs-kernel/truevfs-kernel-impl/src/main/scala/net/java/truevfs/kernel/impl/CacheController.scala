@@ -56,9 +56,9 @@ private trait CacheController extends Controller[LockModel] {
 
   protected def pool: IoBufferPool
 
-  private[this] val caches = new java.util.HashMap[FsEntryName, EntryCache]
+  private[this] val caches = new java.util.HashMap[FsNodeName, EntryCache]
 
-  abstract override def input(options: AccessOptions, name: FsEntryName) = {
+  abstract override def input(options: AccessOptions, name: FsNodeName) = {
     /** This class requires ON-DEMAND LOOKUP of its delegate socket! */
     class Input extends DelegatingInputSocket[Entry] {
       override def socket(): AnyInputSocket = {
@@ -75,7 +75,7 @@ private trait CacheController extends Controller[LockModel] {
     new Input
   }: AnyInputSocket
 
-  abstract override def output(options: AccessOptions, name: FsEntryName, template: Option[Entry]) = {
+  abstract override def output(options: AccessOptions, name: FsNodeName, template: Option[Entry]) = {
     /** This class requires ON-DEMAND LOOKUP of its delegate socket! */
     class Output extends DelegatingOutputSocket[Entry] {
       override def socket(): AnyOutputSocket = {
@@ -92,14 +92,14 @@ private trait CacheController extends Controller[LockModel] {
     new Output
   }: AnyOutputSocket
 
-  abstract override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Option[Entry]) {
+  abstract override def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) {
     assert(writeLockedByCurrentThread)
     super.mknod(options, name, tµpe, template)
     val cache = caches remove name
     if (null ne cache) cache clear ()
   }
 
-  abstract override def unlink(options: AccessOptions, name: FsEntryName) {
+  abstract override def unlink(options: AccessOptions, name: FsNodeName) {
     assert(writeLockedByCurrentThread)
     super.unlink(options, name)
     val cache = caches remove name
@@ -180,7 +180,7 @@ private trait CacheController extends Controller[LockModel] {
   }
 
   /** A cache for the contents of an individual archive entry. */
-  private final class EntryCache(val name: FsEntryName) {
+  private final class EntryCache(val name: FsNodeName) {
     val cache = CacheEntry.Strategy.WriteBack.newCacheEntry(pool)
 
     def flush() { cache flush () }

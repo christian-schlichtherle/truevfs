@@ -43,7 +43,7 @@ extends FileSystemArchiveController[E] with TouchListener {
   import TargetArchiveController._
 
   /** The entry name of the target archive file in the parent file system. */
-  private[this] val name = mountPoint.getPath.getEntryName
+  private[this] val name = mountPoint.getPath.getNodeName
 
   /**
    * The (possibly cached) {@link InputArchive} which is used to mount the
@@ -379,7 +379,7 @@ extends FileSystemArchiveController[E] with TouchListener {
     if (options.get(ABORT_CHANGES)) mounted = false
   }
 
-  def checkSync(options: AccessOptions, name: FsEntryName, intention: Access) {
+  def checkSync(options: AccessOptions, name: FsNodeName, intention: Access) {
     // HC SVNT DRACONES!
 
     // If no file system exists then pass the test.

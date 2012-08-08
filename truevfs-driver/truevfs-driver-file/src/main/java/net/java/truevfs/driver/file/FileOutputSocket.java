@@ -38,7 +38,7 @@ import net.java.truevfs.kernel.spec.cio.IoSockets;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
+final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
 
     private static final int
             INITIAL_CAPACITY = initialCapacity(FsAccessOption.values().length);
@@ -50,33 +50,32 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
             };
 
     private final BitField<FsAccessOption> options;
-    private final FileEntry entry;
+    private final FileNode node;
     private final @CheckForNull Entry template;
 
     FileOutputSocket(
             final BitField<FsAccessOption> options,
-            final FileEntry entry,
+            final FileNode node,
             final @CheckForNull Entry template) {
-        assert null != entry;
-        assert null != options;
+        assert null != node;
+        this.node = node;
         if (options.get(EXCLUSIVE) && options.get(APPEND))
             throw new IllegalArgumentException();
-        this.entry = entry;
         this.options = options;
         this.template = template;
     }
 
     @Override
-    public FileEntry target() {
-        return entry;
+    public FileNode target() {
+        return node;
     }
 
-    private FileEntry begin() throws IOException {
-        final FileEntry buffer;
-        final Path entryFile = entry.getPath();
+    private FileNode begin() throws IOException {
+        final FileNode buffer;
+        final Path entryFile = node.getPath();
         Boolean exists = null;
         if (options.get(EXCLUSIVE) && (exists = exists(entryFile)))
-            throw new FileAlreadyExistsException(entry.toString());
+            throw new FileAlreadyExistsException(node.toString());
         if (options.get(CACHE)) {
             // This is obviously NOT atomic.
             if (TRUE.equals(exists)
@@ -88,9 +87,9 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
             } else {
                 createFile(entryFile);
             }
-            buffer = entry.createIoBuffer();
+            buffer = node.createIoBuffer();
         } else {
-            buffer = entry;
+            buffer = node;
         }
         if (options.get(CREATE_PARENTS) && !TRUE.equals(exists)) {
             final Path parentFile = entryFile.getParent();
@@ -100,9 +99,9 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
         return buffer;
     }
 
-    void append(final FileEntry buffer) throws IOException {
-        if (buffer != entry && options.get(APPEND) && exists(entry.getPath()))
-            IoSockets.copy(entry.input(), buffer.output());
+    void append(final FileNode buffer) throws IOException {
+        if (buffer != node && options.get(APPEND) && exists(node.getPath()))
+            IoSockets.copy(node.input(), buffer.output());
     }
 
     Set<OpenOption> optionSet() {
@@ -122,10 +121,10 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
         return set.toArray(new OpenOption[set.size()]);
     }
 
-    void close(final FileEntry buffer, final boolean commit)
+    void close(final FileNode buffer, final boolean commit)
     throws IOException {
-        final Path entryFile = entry.getPath();
-        if (buffer != entry) {
+        final Path entryFile = node.getPath();
+        if (buffer != node) {
             final Path bufferFile = buffer.getPath();
             updateProperties(bufferFile);
             if (commit) {
@@ -136,7 +135,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
                     /*Files.copy(bufferFile, entryFile,
                             StandardCopyOption.REPLACE_EXISTING);*/
                     // Fast:
-                    IoSockets.copy(buffer.input(), entry.output());
+                    IoSockets.copy(buffer.input(), node.output());
                     updateProperties(entryFile);
                 }
                 buffer.release();
@@ -164,7 +163,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
 
     IOException release(
             final IOException ex,
-            final FileEntry buffer)
+            final FileNode buffer)
     throws IOException {
         try {
             buffer.release();
@@ -177,7 +176,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
     @Override
     public SeekableByteChannel channel(final InputSocket<? extends Entry> peer)
     throws IOException {
-        final FileEntry buffer = begin();
+        final FileNode buffer = begin();
 
         final class Channel extends IOExceptionSeekableChannel {
             boolean closed;
@@ -206,7 +205,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileEntry> {
     @Override
     public OutputStream stream(final InputSocket<? extends Entry> peer)
     throws IOException {
-        final FileEntry buffer = begin();
+        final FileNode buffer = begin();
 
         final class Stream extends IOExceptionOutputStream {
             boolean closed;

@@ -21,9 +21,9 @@ import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
-import net.java.truevfs.kernel.spec.FsEntry;
-import net.java.truevfs.kernel.spec.FsEntryName;
-import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
+import net.java.truevfs.kernel.spec.FsNode;
+import net.java.truevfs.kernel.spec.FsNodeName;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import static net.java.truevfs.kernel.spec.cio.Entry.PosixEntity.*;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
@@ -31,12 +31,12 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
 
 /**
- * Adapts a {@link Path} instance to a {@link FsEntry}.
+ * Adapts a {@link Path} instance to a {@link FsNode}.
  *
  * @author Christian Schlichtherle
  */
 @Immutable
-class FileEntry extends FsEntry implements IoBuffer {
+class FileNode extends FsNode implements IoBuffer {
 
     private static final Path CURRENT_DIRECTORY = Paths.get(".");
 
@@ -44,15 +44,15 @@ class FileEntry extends FsEntry implements IoBuffer {
     private final String name;
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
-    volatile @CheckForNull FileIoBufferPool pool;
+    volatile @CheckForNull FileBufferPool pool;
 
-    FileEntry(final Path path) {
+    FileNode(final Path path) {
         assert null != path;
         this.path = path;
-        this.name = path.toString(); // deliberately breaks contract for FsEntry.getName()
+        this.name = path.toString(); // deliberately breaks contract for FsNode.getName()
     }
 
-    FileEntry(final Path path, final FsEntryName name) {
+    FileNode(final Path path, final FsNodeName name) {
         assert null != path;
         this.path = path.resolve(name.getPath());
         this.name = name.toString();
@@ -62,10 +62,10 @@ class FileEntry extends FsEntry implements IoBuffer {
         return readAttributes(path, BasicFileAttributes.class);
     }
 
-    final FileEntry createIoBuffer() throws IOException {
-        FileIoBufferPool pool = this.pool;
+    final FileNode createIoBuffer() throws IOException {
+        FileBufferPool pool = this.pool;
         if (null == pool)
-            this.pool = pool = new FileIoBufferPool(getParent(), getFileName());
+            this.pool = pool = new FileBufferPool(getParent(), getFileName());
         return pool.allocate();
     }
 
@@ -217,20 +217,20 @@ class FileEntry extends FsEntry implements IoBuffer {
     }
 
     @Override
-    public final InputSocket<FileEntry> input() {
+    public final InputSocket<FileNode> input() {
         return input(NONE);
     }
 
-    final InputSocket<FileEntry> input(BitField<FsAccessOption> options) {
+    final InputSocket<FileNode> input(BitField<FsAccessOption> options) {
         return new FileInputSocket(options, this);
     }
 
     @Override
-    public final OutputSocket<FileEntry> output() {
+    public final OutputSocket<FileNode> output() {
         return output(NONE, null);
     }
 
-    final OutputSocket<FileEntry> output(
+    final OutputSocket<FileNode> output(
             BitField<FsAccessOption> options,
             @CheckForNull Entry template) {
         return new FileOutputSocket(options, this, template);

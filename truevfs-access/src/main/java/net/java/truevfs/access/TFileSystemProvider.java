@@ -25,10 +25,10 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
-import net.java.truevfs.kernel.spec.FsEntry;
-import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR;
+import net.java.truevfs.kernel.spec.FsNode;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
 import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsPath;
+import net.java.truevfs.kernel.spec.FsNodePath;
 import static net.java.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
 import static net.java.truevfs.kernel.spec.cio.Entry.Type.FILE;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
@@ -58,7 +58,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
             providers = new WeakHashMap<>();
 
     private final String scheme;
-    private final FsPath root;
+    private final FsNodePath root;
 
     private Map<FsMountPoint, WeakReference<TFileSystem>>
             fileSystems = new WeakHashMap<>();
@@ -107,7 +107,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
     private TFileSystemProvider(final String scheme, final URI root) {
         assert null != scheme;
         this.scheme = scheme;
-        this.root = FsPath.create(root);
+        this.root = FsNodePath.create(root);
     }
 
     /**
@@ -125,7 +125,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * 
      * @return The root mount point of this provider.
      */
-    public FsPath getRoot() {
+    public FsNodePath getRoot() {
         return root;
     }
 
@@ -330,8 +330,8 @@ public final class TFileSystemProvider extends FileSystemProvider {
                     throw new UnsupportedOperationException(option.toString());
             }
         }
-        final FsEntry srcEntry = src.stat();
-        final FsEntry dstEntry = dst.stat();
+        final FsNode srcEntry = src.stat();
+        final FsNode dstEntry = dst.stat();
         if (null == srcEntry)
             throw new NoSuchFileException(src.toString());
         if (!srcEntry.isType(FILE))

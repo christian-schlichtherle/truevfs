@@ -30,22 +30,22 @@ import javax.annotation.concurrent._
 private trait SyncController extends Controller[LockModel] {
   this: LockModelAspect =>
 
-  abstract override def stat(options: AccessOptions, name: FsEntryName) =
+  abstract override def stat(options: AccessOptions, name: FsNodeName) =
     apply(super.stat(options, name))
 
-  abstract override def checkAccess(options: AccessOptions, name: FsEntryName, types: BitField[Access]) =
+  abstract override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
     apply(super.checkAccess(options, name, types))
 
-  abstract override def setReadOnly(name: FsEntryName) =
+  abstract override def setReadOnly(name: FsNodeName) =
     apply(super.setReadOnly(name))
 
-  abstract override def setTime(options: AccessOptions, name: FsEntryName, times: Map[Access, Long]) =
+  abstract override def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]) =
     apply(super.setTime(options, name, times))
 
-  abstract override def setTime(options: AccessOptions, name: FsEntryName, types: BitField[Access], value: Long) =
+  abstract override def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long) =
     apply(super.setTime(options, name, types, value))
 
-  abstract override def input(options: AccessOptions, name: FsEntryName) = {
+  abstract override def input(options: AccessOptions, name: FsNodeName) = {
     final class Input extends AbstractInputSocket[Entry] {
       private[this] val socket = SyncController.super.input(options, name)
 
@@ -60,7 +60,7 @@ private trait SyncController extends Controller[LockModel] {
     new Input
   }: AnyInputSocket
 
-  abstract override def output(options: AccessOptions, name: FsEntryName, template: Option[Entry]) = {
+  abstract override def output(options: AccessOptions, name: FsNodeName, template: Option[Entry]) = {
     final class Output extends AbstractOutputSocket[Entry] {
       private[this] val socket = SyncController.super.output(options, name, template)
 
@@ -90,10 +90,10 @@ private trait SyncController extends Controller[LockModel] {
     override def close = apply(channel.close())
   }
 
-  abstract override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, template: Option[Entry]) =
+  abstract override def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) =
     apply(super.mknod(options, name, tµpe, template))
 
-  abstract override def unlink(options: AccessOptions, name: FsEntryName) =
+  abstract override def unlink(options: AccessOptions, name: FsNodeName) =
     apply {
       // HC SVNT DRACONES!
       super.unlink(options, name)

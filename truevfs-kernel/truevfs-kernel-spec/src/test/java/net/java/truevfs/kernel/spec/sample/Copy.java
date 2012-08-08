@@ -6,7 +6,7 @@ package net.java.truevfs.kernel.spec.sample;
 
 import net.java.truevfs.kernel.spec.FsUriModifier;
 import net.java.truevfs.kernel.spec.FsManager;
-import net.java.truevfs.kernel.spec.FsPath;
+import net.java.truevfs.kernel.spec.FsNodePath;
 import net.java.truevfs.kernel.spec.FsSimpleMetaDriver;
 import net.java.truevfs.kernel.spec.FsAccessOptions;
 import net.java.truevfs.kernel.spec.FsMetaDriver;
@@ -74,18 +74,18 @@ public final class Copy {
             // module TrueVFS Access File*, so it's not an option for this sample.
             URI srcUri = URI.create(src);
             srcUri = srcUri.isAbsolute() ? srcUri : new File(src).toURI();
-            FsPath srcPath = FsPath.create(srcUri, FsUriModifier.CANONICALIZE);
+            FsNodePath srcPath = FsNodePath.create(srcUri, FsUriModifier.CANONICALIZE);
             InputSocket<?> srcSocket = manager
                     .controller(driver, srcPath.getMountPoint())
-                    .input(FsAccessOptions.NONE, srcPath.getEntryName());
+                    .input(FsAccessOptions.NONE, srcPath.getNodeName());
             // Resolve the destination socket. Again, we need an absolute URI.
             URI dstUri = URI.create(dst);
             dstUri = dstUri.isAbsolute() ? dstUri : new File(dst).toURI();
-            FsPath dstPath = FsPath.create(dstUri, FsUriModifier.CANONICALIZE);
+            FsNodePath dstPath = FsNodePath.create(dstUri, FsUriModifier.CANONICALIZE);
             OutputSocket<?> dstSocket = manager
                     .controller(driver, dstPath.getMountPoint())
                     .output(BitField.of(CREATE_PARENTS, EXCLUSIVE),
-                            dstPath.getEntryName(),
+                            dstPath.getNodeName(),
                             srcSocket.target());
             IoSockets.copy(srcSocket, dstSocket);
         } finally {

@@ -6,8 +6,8 @@ package net.java.truevfs.access;
 
 import net.java.truevfs.kernel.spec.FsSyncWarningException;
 import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsEntryName;
-import net.java.truevfs.kernel.spec.FsEntry;
+import net.java.truevfs.kernel.spec.FsNodeName;
+import net.java.truevfs.kernel.spec.FsNode;
 import net.java.truevfs.kernel.spec.FsSyncOption;
 import net.java.truevfs.kernel.spec.FsSyncException;
 import net.java.truevfs.kernel.spec.FsMountPoint;
@@ -27,7 +27,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
 import static net.java.truevfs.kernel.spec.FsAccessOption.CACHE;
 import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
-import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
 import static net.java.truevfs.kernel.spec.FsSyncOptions.UMOUNT;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
@@ -222,7 +222,7 @@ public final class TFileSystem extends FileSystem {
             final Set<? extends OpenOption> options,
             final FileAttribute<?>... attrs)
     throws IOException {
-        final FsEntryName name = path.getEntryName();
+        final FsNodeName name = path.getNodeName();
         final FsController controller = getController();
         if (options.isEmpty() || options.contains(StandardOpenOption.READ)) {
             final BitField<FsAccessOption>
@@ -250,14 +250,14 @@ public final class TFileSystem extends FileSystem {
     InputStream newInputStream(TPath path, OpenOption... options)
     throws IOException {
         return getController()
-                .input(path.inputOptions(options), path.getEntryName())
+                .input(path.inputOptions(options), path.getNodeName())
                 .stream(null);
     }
 
     OutputStream newOutputStream(TPath path, OpenOption... options)
     throws IOException {
         return getController()
-                .output(path.outputOptions(options), path.getEntryName(), null)
+                .output(path.outputOptions(options), path.getNodeName(), null)
                 .stream(null);
     }
 
@@ -265,7 +265,7 @@ public final class TFileSystem extends FileSystem {
             final TPath path,
             final Filter<? super Path> filter)
     throws IOException {
-        final FsEntry entry = stat(path);
+        final FsNode entry = stat(path);
         final Set<String> set;
         if (null == entry || null == (set = entry.getMembers()))
             throw new NotDirectoryException(path.toString());
@@ -335,7 +335,7 @@ public final class TFileSystem extends FileSystem {
         if (0 < attrs.length)
             throw new UnsupportedOperationException();
         final FsController controller = getController();
-        final FsEntryName name = path.getEntryName();
+        final FsNodeName name = path.getNodeName();
         final BitField<FsAccessOption> options = path.getAccessPreferences();
         try {
             controller.mknod(
@@ -351,27 +351,27 @@ public final class TFileSystem extends FileSystem {
     }
 
     void delete(TPath path) throws IOException {
-        getController().unlink(path.getAccessPreferences(), path.getEntryName());
+        getController().unlink(path.getAccessPreferences(), path.getNodeName());
     }
 
-    FsEntry stat(TPath path) throws IOException {
-        return getController().stat(path.getAccessPreferences(), path.getEntryName());
+    FsNode stat(TPath path) throws IOException {
+        return getController().stat(path.getAccessPreferences(), path.getNodeName());
     }
 
     InputSocket<?> input(   TPath path,
                             BitField<FsAccessOption> options) {
-        return getController().input(options, path.getEntryName());
+        return getController().input(options, path.getNodeName());
     }
 
     OutputSocket<?> output( TPath path,
                             BitField<FsAccessOption> options,
                             @CheckForNull Entry template) {
-        return getController().output(options, path.getEntryName(), template);
+        return getController().output(options, path.getNodeName(), template);
     }
 
     void checkAccess(final TPath path, final AccessMode... modes)
     throws IOException {
-        final FsEntryName name = path.getEntryName();
+        final FsNodeName name = path.getNodeName();
         final BitField<FsAccessOption> options = path.getAccessPreferences();
         final BitField<Access> types = types(modes);
         getController().checkAccess(options, name, types);
@@ -447,18 +447,18 @@ public final class TFileSystem extends FileSystem {
             if (null != createTime)
                 times.put(CREATE, createTime.toMillis());
             controller.setTime(
-                    path.getAccessPreferences(), path.getEntryName(),
+                    path.getAccessPreferences(), path.getNodeName(),
                     times);
         }
     } // FsEntryAttributeView
 
     private final class FsEntryAttributes
     implements BasicFileAttributes {
-        private final FsEntry entry;
+        private final FsNode entry;
 
         FsEntryAttributes(final TPath path) throws IOException {
             if (null == (entry = getController()
-                    .stat(path.getAccessPreferences(), path.getEntryName())))
+                    .stat(path.getAccessPreferences(), path.getNodeName())))
                 throw new NoSuchFileException(path.toString());
         }
 

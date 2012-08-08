@@ -74,7 +74,7 @@ public abstract class FsAbstractController implements FsController {
     @Override
     public boolean setTime(
             final BitField<FsAccessOption> options,
-            final FsEntryName name,
+            final FsNodeName name,
             final Map<Access, Long> times)
     throws IOException {
         boolean ok = true;

@@ -30,22 +30,22 @@ extends FsDecoratingController(c) {
 
   private type AccessOptions = BitField[FsAccessOption]
 
-  override def stat(options: AccessOptions, name: FsEntryName) =
+  override def stat(options: AccessOptions, name: FsNodeName) =
     apply(c stat (options, name))
 
-  override def checkAccess(options: AccessOptions, name: FsEntryName, types: BitField[Access]) =
+  override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
     apply(c checkAccess (options, name, types))
 
-  override def setReadOnly(name: FsEntryName) =
+  override def setReadOnly(name: FsNodeName) =
     apply(c setReadOnly (name))
 
-  override def setTime(options: AccessOptions, name: FsEntryName, times: java.util.Map[Access, java.lang.Long]) =
+  override def setTime(options: AccessOptions, name: FsNodeName, times: java.util.Map[Access, java.lang.Long]) =
     apply(c setTime (options, name, times))
 
-  override def setTime(options: AccessOptions, name: FsEntryName, types: BitField[Access], value: Long) =
+  override def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long) =
     apply(c setTime (options, name, types, value))
 
-  override def input(options: AccessOptions, name: FsEntryName) =
+  override def input(options: AccessOptions, name: FsNodeName) =
     new AspectInputSocket(c input (options, name))
 
   protected class AspectInputSocket(socket: InputSocket[_ <: Entry])
@@ -59,7 +59,7 @@ extends FsDecoratingController(c) {
       apply(socket channel peer)
   }
 
-  override def output(options: AccessOptions, name: FsEntryName, @CheckForNull template: Entry) =
+  override def output(options: AccessOptions, name: FsNodeName, @CheckForNull template: Entry) =
     new AspectOutputSocket(c output (options, name, template))
 
   protected class AspectOutputSocket(socket: OutputSocket[_ <: Entry])
@@ -73,10 +73,10 @@ extends FsDecoratingController(c) {
       apply(socket channel peer)
   }
 
-  override def mknod(options: AccessOptions, name: FsEntryName, tµpe: Type, @CheckForNull template: Entry) =
+  override def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, @CheckForNull template: Entry) =
     apply(c mknod (options, name, tµpe, template))
 
-  override def unlink(options: AccessOptions, name: FsEntryName) =
+  override def unlink(options: AccessOptions, name: FsNodeName) =
     apply(c unlink (options, name))
 
   override def sync(options: BitField[FsSyncOption]) =

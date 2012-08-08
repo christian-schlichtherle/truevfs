@@ -22,13 +22,13 @@ import net.java.truevfs.kernel.spec.cio.InputSocket;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class HttpOutputSocket extends AbstractOutputSocket<HttpEntry> {
+public class HttpOutputSocket extends AbstractOutputSocket<HttpNode> {
 
-    private final HttpEntry entry;
+    private final HttpNode entry;
 
     HttpOutputSocket(
             final BitField<FsAccessOption> options,
-            final HttpEntry entry,
+            final HttpNode entry,
             final @CheckForNull Entry template) {
         assert null != entry;
         assert null != options;
@@ -36,7 +36,7 @@ public class HttpOutputSocket extends AbstractOutputSocket<HttpEntry> {
     }
 
     @Override
-    public HttpEntry target() {
+    public HttpNode target() {
         return entry;
     }
 

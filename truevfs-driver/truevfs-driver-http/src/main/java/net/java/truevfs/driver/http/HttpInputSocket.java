@@ -21,20 +21,20 @@ import net.java.truevfs.kernel.spec.cio.*;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class HttpInputSocket extends AbstractInputSocket<HttpEntry> {
+public class HttpInputSocket extends AbstractInputSocket<HttpNode> {
 
-    private final HttpEntry entry;
+    private final HttpNode entry;
 
     HttpInputSocket(
             final BitField<FsAccessOption> options,
-            final HttpEntry entry) {
+            final HttpNode entry) {
         assert null != entry;
         assert null != options;
         this.entry = entry;
     }
 
     @Override
-    public HttpEntry target() {
+    public HttpNode target() {
         return entry;
     }
 

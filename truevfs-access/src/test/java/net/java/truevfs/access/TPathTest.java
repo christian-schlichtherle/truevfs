@@ -4,19 +4,15 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truevfs.access.TPath;
-import net.java.truevfs.access.MockArchiveDriverTestBase;
-import net.java.truevfs.access.TArchiveDetector;
-import net.java.truevfs.access.TConfig;
-import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR;
-import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
-import net.java.truevfs.kernel.spec.FsPath;
-import net.java.truecommons.shed.Paths;
 import static java.io.File.separatorChar;
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.ServiceConfigurationError;
+import net.java.truecommons.shed.Paths;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
+import net.java.truevfs.kernel.spec.FsNodePath;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -95,11 +91,11 @@ public class TPathTest extends MockArchiveDriverTestBase {
         final String first = params[0].toString();
         final String[] more = (String[]) params[1];
         final String name = params[2].toString();
-        final FsPath address = FsPath.create(URI.create(params[3].toString()));
+        final FsNodePath nodePath = FsNodePath.create(URI.create(params[3].toString()));
         final TPath path = new TPath(first, more);
         assertThat(path.toString(), equalTo(name.replace(SEPARATOR, path.getFileSystem().getSeparator())));
-        assertThat(path.getMountPoint(), equalTo(address.getMountPoint()));
-        assertThat(path.getEntryName(), equalTo(address.getEntryName()));
+        assertThat(path.getMountPoint(), equalTo(nodePath.getMountPoint()));
+        assertThat(path.getNodeName(), equalTo(nodePath.getNodeName()));
     }
 
     @Test
@@ -186,12 +182,12 @@ public class TPathTest extends MockArchiveDriverTestBase {
         final TPath parent = new TPath(params[0].toString());
         final String first = params[1].toString();
         final String name = params[2].toString();
-        final FsPath address = FsPath.create(URI.create(params[3].toString()));
+        final FsNodePath nodePath = FsNodePath.create(URI.create(params[3].toString()));
         final TPath member = new TPath(first);
         final TPath path = parent.resolve(member);
         assertThat(path.toString(), equalTo(name.replace(SEPARATOR, path.getFileSystem().getSeparator())));
-        assertThat(path.getMountPoint(), equalTo(address.getMountPoint()));
-        assertThat(path.getEntryName(), equalTo(address.getEntryName()));
+        assertThat(path.getMountPoint(), equalTo(nodePath.getMountPoint()));
+        assertThat(path.getNodeName(), equalTo(nodePath.getNodeName()));
     }
 
     @Test
@@ -251,12 +247,12 @@ public class TPathTest extends MockArchiveDriverTestBase {
         final TPath parent = new TPath(params[0].toString());
         final String first = params[1].toString();
         final String name = params[2].toString();
-        final FsPath address = FsPath.create(URI.create(params[3].toString()));
+        final FsNodePath nodePath = FsNodePath.create(URI.create(params[3].toString()));
         final TPath member = new TPath(first);
         final TPath path = parent.resolveSibling(member);
         assertThat(path.toString(), equalTo(name.replace(SEPARATOR, path.getFileSystem().getSeparator())));
-        assertThat(path.getMountPoint(), equalTo(address.getMountPoint()));
-        assertThat(path.getEntryName(), equalTo(address.getEntryName()));
+        assertThat(path.getMountPoint(), equalTo(nodePath.getMountPoint()));
+        assertThat(path.getNodeName(), equalTo(nodePath.getNodeName()));
     }
 
     @Test

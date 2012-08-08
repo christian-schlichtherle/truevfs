@@ -22,7 +22,7 @@ import net.java.truevfs.kernel.spec.cio.Entry._;
 private trait FinalizeController extends FsController {
   import FinalizeController._
 
-  abstract override def input(options: AccessOptions, name: FsEntryName) = {
+  abstract override def input(options: AccessOptions, name: FsNodeName) = {
     final class Input extends DelegatingInputSocket[Entry] {
       val socket = FinalizeController.super.input(options, name)
 
@@ -35,7 +35,7 @@ private trait FinalizeController extends FsController {
     new Input
   }: AnyInputSocket
 
-  abstract override def output(options: AccessOptions, name: FsEntryName, template: Entry) = {
+  abstract override def output(options: AccessOptions, name: FsNodeName, template: Entry) = {
     final class Output extends DelegatingOutputSocket[Entry] {
       val socket = FinalizeController.super.output(options, name, template)
 

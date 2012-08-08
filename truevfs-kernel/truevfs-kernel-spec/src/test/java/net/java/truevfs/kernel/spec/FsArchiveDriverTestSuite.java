@@ -22,12 +22,12 @@ import net.java.truecommons.shed.BitField;
 import static net.java.truecommons.shed.Throwables.contains;
 import net.java.truevfs.kernel.driver.mock.MockController;
 import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
+import net.java.truevfs.kernel.spec.cio.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
 import static net.java.truevfs.kernel.spec.cio.Entry.Type.FILE;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.java.truevfs.kernel.spec.cio.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -46,8 +46,8 @@ extends FsArchiveDriverTestBase<D> {
     private static final Logger
             logger = LoggerFactory.getLogger(FsArchiveDriverTestSuite.class);
 
-    private static final FsEntryName
-            entry = FsEntryName.create(URI.create("archive"));
+    private static final FsNodeName
+            name = FsNodeName.create(URI.create("archive"));
 
     private static final Charset UTF8 = Charset.forName("UTF-8");
 
@@ -161,12 +161,12 @@ extends FsArchiveDriverTestBase<D> {
 
     @Test(expected = NullPointerException.class)
     public void testNewInputMustNotTolerateNullModel() throws IOException {
-        getArchiveDriver().newInput(null, NONE, parent, entry);
+        getArchiveDriver().newInput(null, NONE, parent, name);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewInputMustNotTolerateNullParentController() throws IOException {
-        getArchiveDriver().newInput(model, NONE, null, entry);
+        getArchiveDriver().newInput(model, NONE, null, name);
     }
 
     @Test(expected = NullPointerException.class)
@@ -176,17 +176,17 @@ extends FsArchiveDriverTestBase<D> {
 
     @Test(expected = NullPointerException.class)
     public void testNewInputMustNotTolerateNullOptions() throws IOException {
-        getArchiveDriver().newInput(model, null, parent, entry);
+        getArchiveDriver().newInput(model, null, parent, name);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputMustNotTolerateNullModel() throws IOException {
-        getArchiveDriver().newOutput(null, NONE, parent, entry, null);
+        getArchiveDriver().newOutput(null, NONE, parent, name, null);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputMustNotTolerateNullParentController() throws IOException {
-        getArchiveDriver().newOutput(model, NONE, null, entry, null);
+        getArchiveDriver().newOutput(model, NONE, null, name, null);
     }
 
     @Test(expected = NullPointerException.class)
@@ -196,7 +196,7 @@ extends FsArchiveDriverTestBase<D> {
 
     @Test(expected = NullPointerException.class)
     public void testNewOutputMustNotTolerateNullOptions() throws IOException {
-        getArchiveDriver().newOutput(model, null, parent, entry, null);
+        getArchiveDriver().newOutput(model, null, parent, name, null);
     }
 
     @Test
@@ -216,7 +216,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private void output(final int numEntries) throws IOException {
         final OutputService<E> service = getArchiveDriver()
-                .newOutput(model, NONE, parent, entry, null);
+                .newOutput(model, NONE, parent, name, null);
         try {
             final Closeable[] streams = new Closeable[numEntries];
             try {
@@ -270,7 +270,7 @@ extends FsArchiveDriverTestBase<D> {
 
     private void input(final int numEntries) throws IOException {
         final InputService<E> service = getArchiveDriver()
-                .newInput(model, NONE, parent, entry);
+                .newInput(model, NONE, parent, name);
         try {
             check(service, numEntries);
             final Closeable[] streams = new Closeable[numEntries];
@@ -426,7 +426,7 @@ extends FsArchiveDriverTestBase<D> {
         final FsModel parent = newNonArchiveModel();
         return newModel(
                 FsMountPoint.create(URI.create(
-                    "scheme:" + parent.getMountPoint() + entry + "!/")),
+                    "scheme:" + parent.getMountPoint() + name + "!/")),
                 parent);
     }
 
@@ -476,7 +476,7 @@ extends FsArchiveDriverTestBase<D> {
         @Override
         public InputSocket<?> input(
                 final BitField<FsAccessOption> options,
-                final FsEntryName name) {
+                final FsNodeName name) {
             Objects.requireNonNull(name);
             Objects.requireNonNull(options);
 
@@ -504,7 +504,7 @@ extends FsArchiveDriverTestBase<D> {
         @Override
         public OutputSocket<?> output(
                 final BitField<FsAccessOption> options,
-                final FsEntryName name,
+                final FsNodeName name,
                 final @CheckForNull Entry template) {
             Objects.requireNonNull(name);
             Objects.requireNonNull(options);

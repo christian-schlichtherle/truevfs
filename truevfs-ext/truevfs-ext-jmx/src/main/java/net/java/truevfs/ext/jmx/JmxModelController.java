@@ -4,12 +4,12 @@
  */
 package net.java.truevfs.ext.jmx;
 
-import net.java.truevfs.comp.jmx.JmxController;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.InstrumentingModel;
+import net.java.truevfs.comp.jmx.JmxController;
 import net.java.truevfs.comp.jmx.JmxModelMXBean;
 import static net.java.truevfs.comp.jmx.JmxUtils.deregister;
 import static net.java.truevfs.comp.jmx.JmxUtils.register;
@@ -55,17 +55,17 @@ extends InstrumentingModel<JmxDirector> implements JmxController {
         }
     }
 
-    public @CheckForNull FsEntry stat() {
+    public @CheckForNull FsNode stat() {
         final FsMountPoint mmp = model.getMountPoint();
         final FsMountPoint pmp = mmp.getParent();
         final FsMountPoint mp;
-        final FsEntryName en;
+        final FsNodeName en;
         if (null != pmp) {
             mp = pmp;
-            en = mmp.getPath().getEntryName();
+            en = mmp.getPath().getNodeName();
         } else {
             mp = mmp;
-            en = FsEntryName.ROOT;
+            en = FsNodeName.ROOT;
         }
         try {
             return FsManagerLocator

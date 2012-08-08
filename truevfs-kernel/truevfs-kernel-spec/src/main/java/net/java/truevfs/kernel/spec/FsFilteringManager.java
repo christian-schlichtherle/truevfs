@@ -8,7 +8,7 @@ import java.net.URI;
 import java.util.Iterator;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.FilteringIterator;
-import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 
 /**
  * Filters the list of federated file systems managed by the decorated file

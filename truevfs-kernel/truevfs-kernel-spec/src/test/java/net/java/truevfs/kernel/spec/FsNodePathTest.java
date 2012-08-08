@@ -4,9 +4,6 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import net.java.truevfs.kernel.spec.FsEntryName;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsPath;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -25,10 +22,10 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Christian Schlichtherle
  */
-public class FsPathTest {
+public class FsNodePathTest {
 
     private static final Logger
-            logger = LoggerFactory.getLogger(FsPathTest.class);
+            logger = LoggerFactory.getLogger(FsNodePathTest.class);
 
     @Test
     public void testSerialization() throws IOException, ClassNotFoundException {
@@ -52,7 +49,7 @@ public class FsPathTest {
             { "föö?bär", },
             { "", },
         }) {
-            final FsPath original = FsPath.create(URI.create(params[0]));
+            final FsNodePath original = FsNodePath.create(URI.create(params[0]));
             assertThat(original.toString(), equalTo(params[0]));
 
             {
@@ -100,43 +97,43 @@ public class FsPathTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithInvalidUri() throws URISyntaxException {
         try {
-            FsPath.create((URI) null);
+            FsNodePath.create((URI) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FsPath((URI) null);
+            new FsNodePath((URI) null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FsPath.create((URI) null, NULL);
+            FsNodePath.create((URI) null, NULL);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FsPath((URI) null, NULL);
+            new FsNodePath((URI) null, NULL);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            FsPath.create((URI) null, CANONICALIZE);
+            FsNodePath.create((URI) null, CANONICALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FsPath((URI) null, CANONICALIZE);
+            new FsNodePath((URI) null, CANONICALIZE);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            new FsPath((FsMountPoint) null, null);
+            new FsNodePath((FsMountPoint) null, null);
             fail();
         } catch (NullPointerException expected) {
         }
@@ -219,13 +216,13 @@ public class FsPathTest {
             final URI uri = URI.create(param);
 
             try {
-                FsPath.create(uri);
+                FsNodePath.create(uri);
                 fail(param);
             } catch (IllegalArgumentException expected) {
             }
 
             try {
-                new FsPath(uri);
+                new FsNodePath(uri);
                 fail(param);
             } catch (URISyntaxException expected) {
             }
@@ -303,26 +300,26 @@ public class FsPathTest {
             { "/C%3A/", null, "C%3A" },
             { "C%3A/", null, "C%3A" },
         }) {
-            FsPath path = FsPath.create(URI.create(params[0]), CANONICALIZE);
+            FsNodePath path = FsNodePath.create(URI.create(params[0]), CANONICALIZE);
             final FsMountPoint mountPoint = null == params[1] ? null : FsMountPoint.create(URI.create(params[1]));
-            final FsEntryName entryName = FsEntryName.create(URI.create(params[2]));
+            final FsNodeName entryName = FsNodeName.create(URI.create(params[2]));
             assertPath(path, mountPoint, entryName);
-            path = new FsPath(mountPoint, entryName);
+            path = new FsNodePath(mountPoint, entryName);
             assertPath(path, mountPoint, entryName);
         }
     }
 
-    private void assertPath(final FsPath path,
+    private void assertPath(final FsNodePath path,
                             final FsMountPoint mountPoint,
-                            final FsEntryName entryName) {
+                            final FsNodeName entryName) {
         if (null != mountPoint)
             assertThat(path.getMountPoint(), equalTo(mountPoint));
         else
             assertThat(path.getMountPoint(), nullValue());
-        assertThat(path.getEntryName(), equalTo(entryName));
+        assertThat(path.getNodeName(), equalTo(entryName));
         assertThat(path.toString(), equalTo(path.toUri().toString()));
-        assertThat(FsPath.create(path.toUri()), equalTo(path));
-        assertThat(FsPath.create(path.toUri()).hashCode(), equalTo(path.hashCode()));
+        assertThat(FsNodePath.create(path.toUri()), equalTo(path));
+        assertThat(FsNodePath.create(path.toUri()).hashCode(), equalTo(path.hashCode()));
     }
 
     @Test
@@ -331,9 +328,9 @@ public class FsPathTest {
             { "foo:bar:baz:/%20!/%20/%20!/%20/%20", " ", " / ", " / ", },
             { "foo:bar:baz:/%20a%20!/%20b%20!/%20c%20", " a ", " b ", " c ", },
         }) {
-            FsPath path = FsPath.create(URI.create(params[0]));
+            FsNodePath path = FsNodePath.create(URI.create(params[0]));
             for (int i = params.length; 0 < --i; ) {
-                assertThat(path.getEntryName().getPath(), equalTo(params[i]));
+                assertThat(path.getNodeName().getPath(), equalTo(params[i]));
                 path = path.getMountPoint().getPath();
             }
         }
@@ -362,7 +359,7 @@ public class FsPathTest {
             { "foo:/bar/", "foo:/bar/" },
             { "bar", "bar" },
         }) {
-            final FsPath path = FsPath.create(URI.create(params[0]));
+            final FsNodePath path = FsNodePath.create(URI.create(params[0]));
             final URI hierarchical = path.toHierarchicalUri();
             assertThat(hierarchical, equalTo(URI.create(params[1])));
         }

@@ -4,18 +4,18 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import net.java.truecommons.shed.QuotedUriSyntaxException;
-import net.java.truecommons.shed.UriBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 import javax.annotation.concurrent.Immutable;
-import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR;
-import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
+import net.java.truecommons.shed.QuotedUriSyntaxException;
+import net.java.truecommons.shed.UriBuilder;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 
 /**
  * Modifies a URI when parsing a file system {@linkplain FsPath path}, a
  * {@linkplain FsMountPoint mount point} or an
- * {@linkplain FsEntryName entry name}.
+ * {@linkplain FsNodeName node name}.
  * 
  * @author Christian Schlichtherle
  */
@@ -73,7 +73,7 @@ public enum FsUriModifier {
          *     This behavior is intended to fix URIs returned by
          *     {@link java.io.File#toURI()}.
          * <li>The URI path component gets truncated so that it does not end
-         *     with {@link FsEntryName#SEPARATOR} whereby a trailing separator
+         *     with {@link FsNodeName#SEPARATOR} whereby a trailing separator
          *     after a Windows-like drive letter is preserved.
          * <li>An empty authority component in the scheme specific part gets
          *     truncated.
@@ -131,11 +131,11 @@ public enum FsUriModifier {
         },
 
         /**
-         * The post-fix for an {@link FsEntryName} depends on the given URI:
+         * The post-fix for an {@link FsNodeName} depends on the given URI:
          * If the URI is absolute or has an authority or a fragment component
          * defined, nothing is modified.
          * Otherwise, the URI path component gets truncated so that it does not
-         * start or end with {@link FsEntryName#SEPARATOR}.
+         * start or end with {@link FsNodeName#SEPARATOR}.
          */
         ENTRY_NAME {
             @Override

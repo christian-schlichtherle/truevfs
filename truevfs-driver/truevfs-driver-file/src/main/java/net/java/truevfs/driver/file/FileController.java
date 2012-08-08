@@ -5,8 +5,8 @@
 package net.java.truevfs.driver.file;
 
 import java.io.IOException;
-import static java.nio.file.Files.*;
 import java.nio.file.*;
+import static java.nio.file.Files.*;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
 import java.util.EnumMap;
@@ -16,8 +16,8 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.BitField;
-import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
 import net.java.truevfs.kernel.spec.*;
+import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
@@ -57,16 +57,19 @@ final class FileController extends FsAbstractController {
     }
 
     @Override
-    public FileEntry stat(
-            final BitField<FsAccessOption> options, final FsEntryName name)
+    public FileNode stat(
+            final BitField<FsAccessOption> options,
+            final FsNodeName name)
     throws IOException {
-        final FileEntry entry = new FileEntry(target, name);
+        final FileNode entry = new FileNode(target, name);
         return exists(entry.getPath()) ? entry : null;
     }
 
     @Override
     public void checkAccess(
-            final BitField<FsAccessOption> options, final FsEntryName name, final BitField<Access> types)
+            final BitField<FsAccessOption> options,
+            final FsNodeName name,
+            final BitField<Access> types)
     throws IOException {
         final Path file = target.resolve(name.getPath());
         final AccessMode[] modes = modes(types);
@@ -92,7 +95,7 @@ final class FileController extends FsAbstractController {
     }
 
     @Override
-    public void setReadOnly(FsEntryName name) throws IOException {
+    public void setReadOnly(final FsNodeName name) throws IOException {
         Path file = target.resolve(name.getPath());
         // Confirmed: There is no equivalent NIO.2 method, e.g. something like
         //   setAttribute(file, "readOnly", Boolean.TRUE, null);
@@ -106,7 +109,9 @@ final class FileController extends FsAbstractController {
 
     @Override
     public boolean setTime(
-            BitField<FsAccessOption> options, final FsEntryName name, final Map<Access, Long> times)
+            final BitField<FsAccessOption> options,
+            final FsNodeName name,
+            final Map<Access, Long> times)
     throws IOException {
         final Path file = target.resolve(name.getPath());
         final Map<Access, Long> t = new EnumMap<>(times);
@@ -119,7 +124,10 @@ final class FileController extends FsAbstractController {
 
     @Override
     public boolean setTime(
-            BitField<FsAccessOption> options, final FsEntryName name, final BitField<Access> types, final long value)
+            final BitField<FsAccessOption> options,
+            final FsNodeName name,
+            final BitField<Access> types,
+            final long value)
     throws IOException {
         final Path file = target.resolve(name.getPath());
         final FileTime time = FileTime.fromMillis(value);
@@ -133,22 +141,22 @@ final class FileController extends FsAbstractController {
     @Override
     public InputSocket<?> input(
             BitField<FsAccessOption> options,
-            FsEntryName name) {
-        return new FileEntry(target, name).input(options);
+            FsNodeName name) {
+        return new FileNode(target, name).input(options);
     }
 
     @Override
     public OutputSocket<?> output(
             BitField<FsAccessOption> options,
-            FsEntryName name,
+            FsNodeName name,
             @CheckForNull Entry template) {
-        return new FileEntry(target, name).output(options, template);
+        return new FileNode(target, name).output(options, template);
     }
 
     @Override
     public void mknod(
             final BitField<FsAccessOption> options,
-            final FsEntryName name,
+            final FsNodeName name,
             final Type type,
             final @CheckForNull Entry template)
     throws IOException {
@@ -183,7 +191,9 @@ final class FileController extends FsAbstractController {
     }
 
     @Override
-    public void unlink(BitField<FsAccessOption> options, FsEntryName name)
+    public void unlink(
+            final BitField<FsAccessOption> options,
+            final FsNodeName name)
     throws IOException {
         Path file = target.resolve(name.getPath());
         delete(file);

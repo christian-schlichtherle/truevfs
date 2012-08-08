@@ -16,11 +16,10 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-final class FileIoBuffer extends FileEntry {
+final class FileBuffer extends FileNode {
 
-    FileIoBuffer(Path file, final FileIoBufferPool pool) {
-        super(file);
-        assert null != file;
+    FileBuffer(final Path path, final FileBufferPool pool) {
+        super(path);
         assert null != pool;
         this.pool = pool;
     }
@@ -32,8 +31,8 @@ final class FileIoBuffer extends FileEntry {
         pool(null);
     }
 
-    private void pool(@CheckForNull final FileIoBufferPool newPool) throws IOException {
-        final FileIoBufferPool oldPool = this.pool;
+    private void pool(@CheckForNull final FileBufferPool newPool) throws IOException {
+        final FileBufferPool oldPool = this.pool;
         this.pool = newPool;
         if (oldPool != newPool) deleteIfExists(getPath());
     }

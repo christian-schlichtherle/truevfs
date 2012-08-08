@@ -8,10 +8,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truevfs.kernel.spec.FsEntryName;
-import static net.java.truevfs.kernel.spec.FsEntryName.*;
+import net.java.truevfs.kernel.spec.FsNodeName;
+import static net.java.truevfs.kernel.spec.FsNodeName.*;
 import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsPath;
+import net.java.truevfs.kernel.spec.FsNodePath;
 import net.java.truevfs.kernel.spec.FsScheme;
 import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
@@ -39,7 +39,7 @@ final class TPathScanner {
 
     private final TArchiveDetector detector;
     private final PathSplitter splitter = new PathSplitter(SEPARATOR_CHAR, false);
-    private FsPath root;
+    private FsNodePath root;
     private String memberQuery;
     private final UriBuilder uri = new UriBuilder();
 
@@ -55,7 +55,7 @@ final class TPathScanner {
     }
 
     /**
-     * Constructs a new {@link FsPath} from the given {@code parent} and scans
+     * Constructs a new {@link FsNodePath} from the given {@code parent} and scans
      * the given {@code member} for prospective archive files.
      * <p>
      * {@code member} must not be opaque and must not define a fragment
@@ -66,10 +66,10 @@ final class TPathScanner {
      * An authority component gets copied to the result.
      * A path component gets normalized and scanned for prospective archive
      * files using the {@link TArchiveDetector} provided to the constructor and
-     * rewritten according to the syntax constraints for an {@link FsPath}.
+     * rewritten according to the syntax constraints for an {@link FsNodePath}.
      * {@code ".."} segments at the beginning of the normalized path component
      * are resolved against the scheme specific part of {@code parent}
-     * according to the syntax constraints for an {@link FsPath}.
+     * according to the syntax constraints for an {@link FsNodePath}.
      * A query component is copied to the result.
      * 
      * @param  parent the file system path to use as the parent.
@@ -79,7 +79,7 @@ final class TPathScanner {
      *         prospective archive files.
      * @throws IllegalArgumentException if any precondition is violated.
      */
-    FsPath scan(FsPath parent, URI member) {
+    FsNodePath scan(FsNodePath parent, URI member) {
         try {
             member = checkFix(member.normalize());
             String mp;
@@ -98,7 +98,7 @@ final class TPathScanner {
                 final String p = null != ma || mp.startsWith(SEPARATOR)
                         ? mp.substring(0, mpl)
                         : pu.getPath() + mp.substring(0, mpl);
-                this.root = new FsPath(
+                this.root = new FsNodePath(
                         new UriBuilder()
                             .scheme(pu.getScheme())
                             .authority(ma)
@@ -115,35 +115,35 @@ final class TPathScanner {
         }
     }
 
-    private FsPath scan(final String path) throws URISyntaxException {
+    private FsNodePath scan(final String path) throws URISyntaxException {
         splitter.split(path);
         final String ps = splitter.getParentPath();
-        final FsEntryName men;
-        final FsPath pp;
+        final FsNodeName men;
+        final FsNodePath pp;
         if (null != ps) {
-            men = new FsEntryName(
+            men = new FsNodeName(
                     uri.path(splitter.getMemberName()).getUri(),
                     NULL);
             pp = scan(ps);
         } else {
-            men = new FsEntryName(
+            men = new FsNodeName(
                     uri.path(path).query(memberQuery).getUri(),
                     CANONICALIZE);
             pp = root;
         }
         URI ppu;
-        FsPath mp;
+        FsNodePath mp;
         if (men.isRoot() || (ppu = pp.toUri()).isOpaque() || !ppu.isAbsolute()) {
             mp = pp.resolve(men);
         } else {
             final String pup = ppu.getPath();
             if (!pup.endsWith(SEPARATOR))
                 ppu = new UriBuilder(ppu).path(pup + SEPARATOR_CHAR).getUri();
-            mp = new FsPath(new FsMountPoint(ppu), men);
+            mp = new FsNodePath(new FsMountPoint(ppu), men);
         }
         final FsScheme s = detector.scheme(men.toString());
         if (null != s)
-            mp = new FsPath(new FsMountPoint(s, mp), ROOT);
+            mp = new FsNodePath(new FsMountPoint(s, mp), ROOT);
         return mp;
     }
 
@@ -196,9 +196,9 @@ final class TPathScanner {
      * @return The parent file system path.
      * @throws URISyntaxException 
      */
-    static @Nullable FsPath parent(FsPath path) throws URISyntaxException {
+    static @Nullable FsNodePath parent(FsNodePath path) throws URISyntaxException {
         FsMountPoint mp = path.getMountPoint();
-        FsEntryName  en = path.getEntryName();
+        FsNodeName  en = path.getNodeName();
         if (en.isRoot()) {
             if (null == mp)
                 return null;
@@ -209,11 +209,11 @@ final class TPathScanner {
             URI pu = mpu.resolve(DOT_DOT_URI);
             if (mpu.getRawPath().length() <= pu.getRawPath().length())
                 return null;
-            return new FsPath(pu);
+            return new FsNodePath(pu);
         } else {
             URI pu = en.toUri().resolve(DOT_URI);
-            en = new FsEntryName(pu, CANONICALIZE);
-            return new FsPath(mp, en);
+            en = new FsNodeName(pu, CANONICALIZE);
+            return new FsNodePath(mp, en);
         }
     }
 }

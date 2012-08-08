@@ -4,10 +4,6 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsPath;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsEntryName;
 import java.net.URI;
 import javax.annotation.CheckForNull;
 import static org.hamcrest.CoreMatchers.*;
@@ -81,15 +77,15 @@ public class FsModelTest {
         }) {
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[0]));
             final FsMountPoint parentMountPoint = FsMountPoint.create(URI.create(params[1]));
-            final FsEntryName entryName = FsEntryName.create(URI.create(params[2]));
-            final FsEntryName parentEntryName = FsEntryName.create(URI.create(params[3]));
-            final FsPath path = FsPath.create(URI.create(params[4]));
+            final FsNodeName entryName = FsNodeName.create(URI.create(params[2]));
+            final FsNodeName parentEntryName = FsNodeName.create(URI.create(params[3]));
+            final FsNodePath path = FsNodePath.create(URI.create(params[4]));
             FsModel parent = newModel(parentMountPoint);
             FsModel model = newModel(mountPoint, parent);
 
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
             assertThat(model.getParent(), sameInstance(parent));
-            assertThat(model.getMountPoint().getPath().resolve(entryName).getEntryName(), equalTo(parentEntryName));
+            assertThat(model.getMountPoint().getPath().resolve(entryName).getNodeName(), equalTo(parentEntryName));
             assertThat(model.getMountPoint().resolve(entryName), equalTo(path));
             assertThat(model.isMounted(), is(false));
         }

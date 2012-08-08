@@ -11,8 +11,8 @@ import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.ControlFlowException;
-import static net.java.truevfs.kernel.spec.FsEntryName.ROOT;
 import net.java.truevfs.kernel.spec.*;
+import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
 import static net.java.truevfs.kernel.spec.cio.Entry.Type.SPECIAL;
@@ -70,37 +70,38 @@ extends FsDecoratingController {
     }
 
     @Override
-    public final FsEntry stat(
-            final BitField<FsAccessOption> options, final FsEntryName name)
+    public final FsNode stat(
+            final BitField<FsAccessOption> options,
+            final FsNodeName name)
     throws IOException {
         try {
             return controller.stat(options, name);
         } catch (final ControlFlowException ex) {
             if (!name.isRoot() || null == findKeyException(ex)) throw ex;
-            Entry entry = getParent().stat(
+            Entry node = getParent().stat(
                     options, getModel()
                                  .getMountPoint()
                                  .getPath()
                                  .resolve(name)
-                                 .getEntryName());
+                                 .getNodeName());
             // We're not holding any locks, so it's possible that someone else
             // has concurrently modified the parent file system.
-            if (null == entry) return null;
+            if (null == node) return null;
             // The entry is inaccessible for some reason.
             // This may be because the cipher key is not available.
             // Now mask the entry as a special file.
-            if (entry instanceof FsCovariantEntry<?>)
-                entry = ((FsCovariantEntry<?>) entry).getEntry();
-            final FsCovariantEntry<FsArchiveEntry>
-                    special = new FsCovariantEntry<>(ROOT_PATH);
-            special.put(SPECIAL, driver.newEntry(ROOT_PATH, SPECIAL, entry));
+            if (node instanceof FsCovariantNode<?>)
+                node = ((FsCovariantNode<?>) node).getEntry();
+            final FsCovariantNode<FsArchiveEntry>
+                    special = new FsCovariantNode<>(ROOT_PATH);
+            special.put(SPECIAL, driver.newEntry(ROOT_PATH, SPECIAL, node));
             return special;
         }
     }
 
     @Override
     public void checkAccess(
-            final BitField<FsAccessOption> options, final FsEntryName name, final BitField<Access> types)
+            final BitField<FsAccessOption> options, final FsNodeName name, final BitField<Access> types)
     throws IOException {
         try {
             controller.checkAccess(options, name, types);
@@ -111,13 +112,15 @@ extends FsDecoratingController {
                                  .getMountPoint()
                                  .getPath()
                                  .resolve(name)
-                                 .getEntryName(),
+                                 .getNodeName(),
                     types);
         }
     }
 
     @Override
-    public final void unlink(   final BitField<FsAccessOption> options, final FsEntryName name)
+    public final void unlink(
+            final BitField<FsAccessOption> options,
+            final FsNodeName name)
     throws IOException {
         try {
             controller.unlink(options, name);

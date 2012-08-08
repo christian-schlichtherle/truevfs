@@ -4,11 +4,6 @@
  */
 package net.java.truevfs.driver.tar.bzip2;
 
-import net.java.truevfs.comp.tar.driver.TarDriverEntry;
-import net.java.truevfs.comp.tar.driver.TarOutputService;
-import net.java.truevfs.comp.tar.driver.TarDriver;
-import net.java.truevfs.comp.tar.driver.TarInputService;
-import net.java.truevfs.comp.tar.driver.FixedBufferedOutputStream;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,8 +13,13 @@ import net.java.truecommons.io.AbstractSink;
 import net.java.truecommons.io.AbstractSource;
 import net.java.truecommons.io.Streams;
 import net.java.truecommons.shed.BitField;
-import static net.java.truevfs.kernel.spec.FsAccessOption.STORE;
+import net.java.truevfs.comp.tar.driver.FixedBufferedOutputStream;
+import net.java.truevfs.comp.tar.driver.TarDriver;
+import net.java.truevfs.comp.tar.driver.TarDriverEntry;
+import net.java.truevfs.comp.tar.driver.TarInputService;
+import net.java.truevfs.comp.tar.driver.TarOutputService;
 import net.java.truevfs.kernel.spec.*;
+import static net.java.truevfs.kernel.spec.FsAccessOption.STORE;
 import net.java.truevfs.kernel.spec.cio.InputService;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
 import net.java.truevfs.kernel.spec.cio.OutputService;
@@ -121,7 +121,7 @@ public class TarBZip2Driver extends TarDriver {
     protected FsOutputSocketSink sink(
             BitField<FsAccessOption> options,
             final FsController controller,
-            final FsEntryName name) {
+            final FsNodeName name) {
         // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
         // opportunity to apply its own preferences to sort out such a conflict.
         options = options.set(STORE);

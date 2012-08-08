@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import net.java.truevfs.kernel.spec.FsEntryName;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -23,10 +22,10 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Christian Schlichtherle
  */
-public class FsEntryNameTest {
+public class FsNodeNameTest {
 
     private static final Logger
-            logger = LoggerFactory.getLogger(FsEntryNameTest.class);
+            logger = LoggerFactory.getLogger(FsNodeNameTest.class);
 
     @Test
     public void testSerialization() throws IOException, ClassNotFoundException {
@@ -45,7 +44,7 @@ public class FsEntryNameTest {
             { "föö?bär", },
             { "", },
         }) {
-            final FsEntryName original = FsEntryName.create(URI.create(params[0]));
+            final FsNodeName original = FsNodeName.create(URI.create(params[0]));
 
             {
                 final ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -165,13 +164,13 @@ public class FsEntryNameTest {
             final URI uri = URI.create(param);
 
             try {
-                FsEntryName.create(uri);
+                FsNodeName.create(uri);
                 fail(param);
             } catch (IllegalArgumentException ex) {
             }
 
             try {
-                new FsEntryName(uri);
+                new FsNodeName(uri);
                 fail(param);
             } catch (URISyntaxException ex) {
             }
@@ -193,11 +192,11 @@ public class FsEntryNameTest {
             { "", "föö", "föö" },
             { "föö", "bär", "föö/bär" },
         }) {
-            final FsEntryName parent = FsEntryName.create(URI.create(params[0]));
-            final FsEntryName member = FsEntryName.create(URI.create(params[1]));
-            final FsEntryName result = new FsEntryName(parent, member);
+            final FsNodeName parent = FsNodeName.create(URI.create(params[0]));
+            final FsNodeName member = FsNodeName.create(URI.create(params[1]));
+            final FsNodeName result = new FsNodeName(parent, member);
             assertThat(result.toUri(), equalTo(URI.create(params[2])));
-            assertThat(FsEntryName.create(result.toUri()), equalTo(result));
+            assertThat(FsNodeName.create(result.toUri()), equalTo(result));
         }
     }
 
@@ -213,7 +212,7 @@ public class FsEntryNameTest {
         }) {
             final URI uri = URI.create(params[0]);
             final URI expected = URI.create(params[1]);
-            final FsEntryName name = FsEntryName.create(uri, CANONICALIZE);
+            final FsNodeName name = FsNodeName.create(uri, CANONICALIZE);
             final URI result = name.toUri();
             assertThat(result, equalTo(expected));
         }
@@ -225,7 +224,7 @@ public class FsEntryNameTest {
             { "", true },
             { "?", false, },
         }) {
-            assertThat(FsEntryName.create(URI.create(params[0].toString())).isRoot(), is(params[1]));
+            assertThat(FsNodeName.create(URI.create(params[0].toString())).isRoot(), is(params[1]));
         }
     }
 }
