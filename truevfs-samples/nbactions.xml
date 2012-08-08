@@ -2,8 +2,7 @@
 <!--
   - Copyright (C) 2005-2012 Schlichtherle IT Services.
   - All rights reserved. Use is subject to license terms.
-  -->
-<actions>
+  --><actions>
     <action>
         <actionName>run</actionName>
         <goals>
@@ -12,8 +11,8 @@
         </goals>
         <properties>
             <exec.classpathScope>runtime</exec.classpathScope>
-            <exec.workingdir>C:\Users\christian\Documents\temp</exec.workingdir>
-            <exec.args>-ea -classpath %classpath net.truevfs.samples.Nzip llr test.zip</exec.args>
+            <exec.workingdir></exec.workingdir>
+            <exec.args>-ea -classpath %classpath net.java.truevfs.samples.Nzip llr test.zip</exec.args>
             <exec.executable>java</exec.executable>
         </properties>
     </action>
@@ -25,8 +24,8 @@
         </goals>
         <properties>
             <exec.classpathScope>runtime</exec.classpathScope>
-            <exec.workingdir>C:\Users\christian\Documents\temp</exec.workingdir>
-            <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -ea -classpath %classpath net.truevfs.samples.Nzip llr test.zip</exec.args>
+            <exec.workingdir></exec.workingdir>
+            <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -ea -classpath %classpath net.java.truevfs.samples.Nzip llr test.zip</exec.args>
             <jpda.listen>true</jpda.listen>
             <exec.executable>java</exec.executable>
         </properties>
@@ -38,8 +37,8 @@
             <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
         </goals>
         <properties>
-            <exec.args>${profiler.args} -ea -classpath %classpath net.truevfs.samples.Nzip llr test.zip</exec.args>
-            <exec.workingdir>C:\Users\christian\Documents\temp</exec.workingdir>
+            <exec.args>${profiler.args} -ea -classpath %classpath net.java.truevfs.samples.Nzip llr test.zip</exec.args>
+            <exec.workingdir></exec.workingdir>
             <profiler.action>profile</profiler.action>
             <exec.executable>${profiler.java}</exec.executable>
         </properties>

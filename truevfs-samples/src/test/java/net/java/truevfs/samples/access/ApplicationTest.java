@@ -2,8 +2,9 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.truevfs.samples.access;
+package net.java.truevfs.samples.access;
 
+import net.java.truevfs.samples.access.Application;
 import java.io.ByteArrayOutputStream;
 import java.util.Objects;
 import static org.junit.Assert.assertEquals;
