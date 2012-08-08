@@ -18,9 +18,8 @@ package net.java.truevfs.comp.jmx;
 public interface JmxController {
 
     /**
-     * A hook which gets called by the {@link JmxDirector} after the
-     * instantiation of the implementation class in order to enable this
-     * controller to setup its view.
+     * A hook which gets called after the instantiation of the implementation
+     * class in order to enable this controller to setup its view.
      */
     void init();
 }

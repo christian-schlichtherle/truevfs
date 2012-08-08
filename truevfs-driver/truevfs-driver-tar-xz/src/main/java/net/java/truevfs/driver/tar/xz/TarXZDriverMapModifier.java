@@ -6,10 +6,10 @@ package net.java.truevfs.driver.tar.xz;
 
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.ExtensionSet;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
-import net.java.truecommons.shed.ExtensionSet;
 
 /**
  * Creates maps with drivers for the TAR file format.
@@ -25,7 +25,7 @@ import net.java.truecommons.shed.ExtensionSet;
 <tbody>
 <tr>
 <td>{@code tar.xz}, {@code txz}</td>
-<td>{@link net.truevfs.driver.tar.xz.TarDriver}</td>
+<td>{@link TarXZDriver}</td>
 </tr>
 </tbody>
 </table>

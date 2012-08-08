@@ -25,7 +25,7 @@ import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
 <tbody>
 <tr>
 <td>{@code tar}</td>
-<td>{@link net.truevfs.driver.tar.TarDriver}</td>
+<td>{@link TarDriver}</td>
 </tr>
 </tbody>
 </table>

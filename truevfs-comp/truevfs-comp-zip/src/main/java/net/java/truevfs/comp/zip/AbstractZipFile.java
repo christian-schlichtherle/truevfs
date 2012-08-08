@@ -57,7 +57,7 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
  * archives.
  *
  * @param  <E> the type of the ZIP entries.
- * @see    RawZipOutputStream
+ * @see    AbstractZipOutputStream
  * @author Christian Schlichtherle
  */
 @NotThreadSafe

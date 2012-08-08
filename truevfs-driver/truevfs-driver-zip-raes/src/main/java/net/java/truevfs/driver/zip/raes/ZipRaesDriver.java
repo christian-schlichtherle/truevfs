@@ -198,7 +198,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     /**
-     * Returns a new {@link ZipDriverEntry}, enforcing that the data gets
+     * Returns a new {@link JarDriverEntry}, enforcing that the data gets
      * {@code DEFLATED} when written, even if copying data from a
      * {@code STORED} source entry.
      * This feature strengthens the security level of the authentication
@@ -206,7 +206,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      * (usually a temporary file) in case the sink is not copied from a file
      * system entry as its input.
      * <p>
-     * Furthermore, the method {@link ZipDriverEntry#clearEncryption()} is
+     * Furthermore, the method {@link JarDriverEntry#clearEncryption()} is
      * called in order to prevent adding a redundant encryption layer for the
      * individual ZIP entry because this would confuse users, increase the size
      * of the resulting archive file and unecessarily heat the CPU.

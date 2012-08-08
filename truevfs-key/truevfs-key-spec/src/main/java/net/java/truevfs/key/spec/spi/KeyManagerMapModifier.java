@@ -4,10 +4,11 @@
  */
 package net.java.truevfs.key.spec.spi;
 
-import net.java.truecommons.services.ModifierService;
 import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.services.ModifierService;
 import net.java.truevfs.key.spec.KeyManager;
+import net.java.truevfs.key.spec.sl.KeyManagerMapLocator;
 
 /**
  * An abstract service for modifying maps of classes to key managers.

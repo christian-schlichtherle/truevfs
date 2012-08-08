@@ -13,8 +13,8 @@ import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 
 /**
- * Modifies a URI when parsing a file system {@linkplain FsPath path}, a
- * {@linkplain FsMountPoint mount point} or an
+ * Modifies a URI when parsing a file system {@linkplain FsNodePath node path},
+ * a {@linkplain FsMountPoint mount point} or an
  * {@linkplain FsNodeName node name}.
  * 
  * @author Christian Schlichtherle
@@ -62,7 +62,7 @@ public enum FsUriModifier {
     public enum PostFix {
 
         /**
-         * The post-fix for an {@link FsPath} depends on the given URI:
+         * The post-fix for an {@link FsNodePath} depends on the given URI:
          * If the URI is opaque or not absolute or has a fragment component
          * defined, nothing is modified.
          * Otherwise, the following modifications are conducted:
@@ -82,7 +82,7 @@ public enum FsUriModifier {
          * Note that this fix is not limited to Windows in order to make
          * this function work identically on all platforms.
          */
-        PATH {
+        NODE_PATH {
             @Override
             @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
             URI modify(URI uri) throws URISyntaxException {
@@ -137,7 +137,7 @@ public enum FsUriModifier {
          * Otherwise, the URI path component gets truncated so that it does not
          * start or end with {@link FsNodeName#SEPARATOR}.
          */
-        ENTRY_NAME {
+        NODE_NAME {
             @Override
             @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
             URI modify(URI uri) throws URISyntaxException {

@@ -14,7 +14,7 @@ import net.java.truecommons.shed.QuotedUriSyntaxException;
 import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
-import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.PATH;
+import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
 
 /**
  * Addresses a file system node.
@@ -277,7 +277,7 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
 
     private void parse(URI uri, final FsUriModifier modifier)
     throws URISyntaxException {
-        uri = modifier.modify(uri, PATH);
+        uri = modifier.modify(uri, NODE_PATH);
         if (null != uri.getRawFragment())
             throw new QuotedUriSyntaxException(uri, "Fragment not allowed");
         if (uri.isOpaque()) {

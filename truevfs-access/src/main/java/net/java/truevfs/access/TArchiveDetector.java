@@ -82,7 +82,7 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
 
     /**
      * Equivalent to
-     * {@link #TArchiveDetector(FsDriverMapProvider, String)
+     * {@link #TArchiveDetector(Provider, String)
      * TArchiveDetector(FsDriverMapLocator.SINGLETON, extensions)}.
      */
     public TArchiveDetector(@CheckForNull String extensions) {
@@ -142,7 +142,7 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
 
     /**
      * Equivalent to
-     * {@link #TArchiveDetector(FsDriverMapProvider, String, FsDriver)
+     * {@link #TArchiveDetector(Provider, String, FsDriver)
      * TArchiveDetector(TArchiveDetector.NULL, extensions, driver)}.
      */
     public TArchiveDetector(String extensions, @CheckForNull FsDriver driver) {

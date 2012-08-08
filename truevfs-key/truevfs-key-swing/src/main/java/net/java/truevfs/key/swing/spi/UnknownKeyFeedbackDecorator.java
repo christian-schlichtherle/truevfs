@@ -4,8 +4,8 @@
  */
 package net.java.truevfs.key.swing.spi;
 
-import net.java.truecommons.services.DecoratorService;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.services.DecoratorService;
 import net.java.truevfs.key.swing.feedback.Feedback;
 import net.java.truevfs.key.swing.sl.UnknownKeyFeedbackLocator;
 

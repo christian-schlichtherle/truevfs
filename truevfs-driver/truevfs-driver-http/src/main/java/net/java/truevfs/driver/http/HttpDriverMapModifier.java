@@ -6,10 +6,10 @@ package net.java.truevfs.driver.http;
 
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.ExtensionSet;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
-import net.java.truecommons.shed.ExtensionSet;
 
 /**
  * Creates maps with drivers for accessing the {@code http} and {@code https}
@@ -26,7 +26,7 @@ import net.java.truecommons.shed.ExtensionSet;
 <tbody>
 <tr>
 <td>{@code http}, {@code https}</td>
-<td>{@link net.truevfs.driver.http.HttpDriver}</td>
+<td>{@link HttpDriver}</td>
 </tr>
 </tbody>
 </table>

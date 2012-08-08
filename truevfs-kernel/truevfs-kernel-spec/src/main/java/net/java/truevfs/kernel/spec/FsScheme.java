@@ -4,11 +4,11 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import net.java.truecommons.shed.UriBuilder;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.Locale;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.UriBuilder;
 
 /**
  * Addresses a file system scheme.
@@ -21,9 +21,9 @@ import javax.annotation.concurrent.Immutable;
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
  *
- * @see    FsPath
+ * @see    FsNodePath
  * @see    FsMountPoint
- * @see    FsEntryName
+ * @see    FsNodeName
  * @author Christian Schlichtherle
  */
 @Immutable

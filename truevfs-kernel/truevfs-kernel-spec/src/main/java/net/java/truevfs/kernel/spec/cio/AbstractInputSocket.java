@@ -45,10 +45,10 @@ extends AbstractIoSocket<E> implements InputSocket<E> {
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link InputSocket} calls
-     * {@link #channel()} and wraps the result in a
+     * {@link #channel} and wraps the result in a
      * {@link ChannelInputStream} adapter.
      * Note that this violates the contract for this method unless you
-     * override either this method or {@link #channel()} with a valid
+     * override either this method or {@link #channel} with a valid
      * implementation.
      */
     @Override

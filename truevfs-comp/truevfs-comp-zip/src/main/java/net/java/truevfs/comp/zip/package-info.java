@@ -16,30 +16,30 @@
  * <li>Full interoperability with ZIP files read or written by the package
  *     {@link java.util.zip} of Oracle's Java SE&nbsp;7 implementation.
  * <li>Support for
- *     {@link net.truevfs.driver.zip.io.ZipOutputStream#ZipOutputStream(java.io.OutputStream,net.truevfs.driver.zip.io.ZipFile) appending}
+ *     {@link net.java.truevfs.comp.zip.ZipOutputStream#ZipOutputStream(java.io.OutputStream,net.java.truevfs.comp.zip.ZipFile) appending}
  *     to existing ZIP files.
  * <li>Support for
- *     {@link net.truevfs.driver.zip.io.ZipFile#recoverLostEntries() recovering}
+ *     {@link net.java.truevfs.comp.zip.ZipFile#recoverLostEntries() recovering}
  *     lost entries when reading a ZIP file.
  * <li>Support for
- *     {@link net.truevfs.driver.zip.io.ZipEntry#isEncrypted() reading}
+ *     {@link net.java.truevfs.comp.zip.ZipEntry#isEncrypted() reading}
  *     and
- *     {@link net.truevfs.driver.zip.io.ZipEntry#setEncrypted(boolean) writing}
+ *     {@link net.java.truevfs.comp.zip.ZipEntry#setEncrypted(boolean) writing}
  *     encrypted or authenticated ZIP entries.
  *     Currently, only the
  *     <a href="http://www.winzip.com/win/en/aes_info.htm">WinZip AES Specification</a>
  *     is supported.
  *     You need to implement the interface
- *     {@link net.truevfs.driver.zip.io.WinZipAesParameters}
+ *     {@link net.java.truevfs.comp.zip.WinZipAesParameters}
  *     and inject it for reading and writing to the
- *     {@link net.truevfs.driver.zip.io.ZipFile#setCryptoParameters(net.truevfs.driver.zip.io.ZipCryptoParameters) ZipFile.setCryptoParameters(ZipCryptoParameters)}
+ *     {@link net.java.truevfs.comp.zip.ZipFile#setCryptoParameters(net.java.truevfs.comp.zip.ZipCryptoParameters) ZipFile.setCryptoParameters(ZipCryptoParameters)}
  *     and
- *     {@link net.truevfs.driver.zip.io.ZipOutputStream#setCryptoParameters(net.truevfs.driver.zip.io.ZipCryptoParameters) ZipOutputStream.setCryptoParameters(ZipCryptoParameters)}
+ *     {@link net.java.truevfs.comp.zip.ZipOutputStream#setCryptoParameters(net.java.truevfs.comp.zip.ZipCryptoParameters) ZipOutputStream.setCryptoParameters(ZipCryptoParameters)}
  *     classes.
  * <li>Support for
- *     {@link net.truevfs.driver.zip.io.ZipEntry#getMethod() reading}
+ *     {@link net.java.truevfs.comp.zip.ZipEntry#getMethod() reading}
  *     and
- *     {@link net.truevfs.driver.zip.io.ZipEntry#setMethod(int) writing}
+ *     {@link net.java.truevfs.comp.zip.ZipEntry#setMethod(int) writing}
  *     BZIP2 compressed ZIP entries.
  * <li>Support for selectable character sets, in particular IBM Code Page 437
  *     (alias IBM PC) for PKZIP compatibility and UTF-8 for Java Archive (JAR)
@@ -49,9 +49,9 @@
  *     with third party tools, especially when sharing archive files between
  *     different locales!
  * <li>Support for
- *     {@link net.truevfs.driver.zip.io.ZipEntry#getExternalAttributes() reading}
+ *     {@link net.java.truevfs.comp.zip.ZipEntry#getExternalAttributes() reading}
  *     and
- *     {@link net.truevfs.driver.zip.io.ZipEntry#setExternalAttributes(long) writing}
+ *     {@link net.java.truevfs.comp.zip.ZipEntry#setExternalAttributes(long) writing}
  *     external file attributes.
  * <li>Support for reading and writing ZIP64 extensions with the following
  *     restrictions:
@@ -66,7 +66,7 @@
  *         Preambles are primarily used to contain self extracting (SFX)
  *         executable code.
  *     </ol>
- * <li>{@link net.truevfs.driver.zip.io.ZipFile} supports reading archive
+ * <li>{@link net.java.truevfs.comp.zip.ZipFile} supports reading archive
  *     data from a {@link java.nio.channel.SeekableByteChannel}, which allows
  *     to read archive data from composite data sources like e.g. RAES
  *     encrypted ZIP files directly without the need to decrypt them to a

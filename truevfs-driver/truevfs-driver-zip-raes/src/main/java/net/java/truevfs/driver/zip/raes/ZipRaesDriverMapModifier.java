@@ -6,10 +6,10 @@ package net.java.truevfs.driver.zip.raes;
 
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.ExtensionSet;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
-import net.java.truecommons.shed.ExtensionSet;
 
 /**
  * Creates maps with drivers for the ZIP.RAES file format.
@@ -25,7 +25,7 @@ import net.java.truecommons.shed.ExtensionSet;
 <tbody>
 <tr>
 <td>{@code tzp}, {@code zip.rae}, {@code zip.raes}</td>
-<td>{@link net.truevfs.driver.zip.raes.SafeZipRaesDriver}</td>
+<td>{@link SafeZipRaesDriver}</td>
 </tr>
 </tbody>
 </table>
