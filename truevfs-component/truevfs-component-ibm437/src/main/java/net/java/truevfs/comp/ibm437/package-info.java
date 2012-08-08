@@ -8,4 +8,4 @@
  * @author Christian Schlichtherle
  */
 @edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
-package net.java.truevfs.component.ibm437;
+package net.java.truevfs.comp.ibm437;
