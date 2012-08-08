@@ -1,1 +1,1 @@
-net.java.truevfs.extension.logging.LogManagerDecorator
+net.java.truevfs.ext.log.LogManagerDecorator

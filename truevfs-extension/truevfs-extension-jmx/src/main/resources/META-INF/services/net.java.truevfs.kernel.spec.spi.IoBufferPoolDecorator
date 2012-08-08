@@ -1,1 +1,1 @@
-net.java.truevfs.extension.jmx.JmxIoBufferPoolDecorator
+net.java.truevfs.ext.jmx.JmxBufferPoolDecorator

@@ -30,7 +30,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-component-instrumentation</artifactId>
+            <artifactId>truevfs-component-jmx</artifactId>
         </dependency>
     </dependencies>
 </project>
