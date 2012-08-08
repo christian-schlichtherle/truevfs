@@ -8,19 +8,21 @@ import java.util.Map;
 import java.util.ServiceConfigurationError;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
-import javax.inject.Provider;
+import net.java.truecommons.services.Container;
 
 /**
  * An abstract composite driver.
  * This class provides an implementation of {@link #newController} which uses
  * the file system driver map returned by {@link #drivers()} to lookup the
  * appropriate driver for the scheme of any given mount point.
+ * <p>
+ * Subclasses should be immutable.
  * 
  * @author Christian Schlichtherle
  */
 @Immutable
 public abstract class FsAbstractMetaDriver
-implements FsMetaDriver, Provider<Map<FsScheme, FsDriver>> {
+implements FsMetaDriver, Container<Map<FsScheme, FsDriver>> {
 
     @Override
     public final FsController newController(

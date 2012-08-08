@@ -10,12 +10,13 @@ import static net.java.truevfs.kernel.spec.FsSyncOption.ABORT_CHANGES;
 
 /**
  * An abstract file system manager.
+ * <p>
+ * Subclasses should be thread-safe.
  *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class FsAbstractManager
-implements FsManager {
+public abstract class FsAbstractManager implements FsManager {
 
     @Override
     public void sync(final BitField<FsSyncOption> options)

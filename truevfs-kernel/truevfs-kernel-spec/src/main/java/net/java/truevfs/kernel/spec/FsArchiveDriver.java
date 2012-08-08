@@ -18,16 +18,19 @@ import net.java.truecommons.shed.BitField;
 import static net.java.truecommons.shed.Paths.cutTrailingSeparators;
 import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR;
 import static net.java.truevfs.kernel.spec.FsEntryName.SEPARATOR_CHAR;
+import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.Entry.Type;
 import static net.java.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
-import net.java.truevfs.kernel.spec.cio.*;
+import net.java.truevfs.kernel.spec.cio.InputService;
+import net.java.truevfs.kernel.spec.cio.IoBufferPool;
+import net.java.truevfs.kernel.spec.cio.OutputService;
 
 /**
  * An abstract factory for components required for accessing archive files.
  * Implementations of this abstract base class are used to access specific
  * archive formats like ZIP, TAR et al.
  * <p>
- * Subclasses must be thread-safe and should be immutable!
+ * Subclasses should be immutable.
  *
  * @param  <E> the type of the archive entries.
  * @author Christian Schlichtherle

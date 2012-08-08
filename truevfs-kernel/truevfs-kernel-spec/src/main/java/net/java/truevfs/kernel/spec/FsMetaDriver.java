@@ -12,7 +12,7 @@ import javax.annotation.CheckForNull;
  * order to lookup the appropriate file system driver which is then used to
  * create the requested thread-safe file system controller.
  * <p>
- * Implementations must be thread-safe and should be immutable!
+ * Implementations should be immutable.
  *
  * @see    FsDriver
  * @author Christian Schlichtherle

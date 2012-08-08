@@ -95,13 +95,6 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
 public interface FsController {
 
     /**
-     * Returns the file system model.
-     * 
-     * @return The file system model.
-     */
-    FsModel getModel();
-
-    /**
      * Returns the controller for the parent file system or {@code null} if
      * and only if this file system is not federated, i.e. not a member of
      * another file system.
@@ -110,6 +103,13 @@ public interface FsController {
      * @return The nullable controller for the parent file system.
      */
     @Nullable FsController getParent();
+
+    /**
+     * Returns the file system model.
+     * 
+     * @return The file system model.
+     */
+    FsModel getModel();
 
     /**
      * Returns the file system entry for the given {@code name} or {@code null}
