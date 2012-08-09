@@ -9,6 +9,7 @@ import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.InstrumentingManager;
 import net.java.truevfs.comp.jmx.JmxManagerMXBean;
 import static net.java.truevfs.comp.jmx.JmxUtils.*;
+import net.java.truevfs.ext.jmx.JmxStatistics.Kind;
 import net.java.truevfs.ext.jmx.model.IoLogger;
 import net.java.truevfs.ext.jmx.model.IoStatistics;
 import net.java.truevfs.kernel.spec.FsManager;
@@ -28,8 +29,8 @@ extends InstrumentingManager<JmxMediator> implements JmxColleague {
 
     @Override
     public void start() {
+        mediator.switchLoggers();
         register(newView(), name());
-        mediator.nextLoggers();
     }
 
     protected JmxManagerMXBean newView() {
@@ -42,12 +43,12 @@ extends InstrumentingManager<JmxMediator> implements JmxColleague {
 
     void sync() throws FsSyncException {
         FsManagerLocator.SINGLETON.get().sync(FsSyncOptions.NONE);
-        mediator.nextLoggers();
+        mediator.switchLoggers();
     }
 
     void clearStatistics() {
-        for (final JmxStatisticsKind kind : JmxStatisticsKind.values()) {
-            final IoLogger logger = mediator.getLogger(kind);
+        for (final Kind kind : Kind.values()) {
+            final IoLogger logger = mediator.logger(kind);
             final int keep = logger.getSequenceNumber();
             final ObjectName pattern = mediator.nameBuilder(IoStatistics.class)
                     .put("kind", kind.toString())

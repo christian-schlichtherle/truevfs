@@ -6,7 +6,6 @@ package net.java.truevfs.ext.jmx;
 
 import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
-import javax.inject.Provider;
 import javax.management.ObjectName;
 import static net.java.truevfs.comp.jmx.JmxUtils.deregister;
 import static net.java.truevfs.comp.jmx.JmxUtils.register;
@@ -19,18 +18,18 @@ import net.java.truevfs.ext.jmx.model.IoStatistics;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxStatistics implements JmxColleague, Provider<IoLogger> {
+public class JmxStatistics implements JmxColleague {
     private final JmxMediator mediator;
-    private final JmxStatisticsKind kind;
+    private final Kind kind;
     private final IoLogger logger;
 
     public JmxStatistics(
             final JmxMediator mediator,
-            final JmxStatisticsKind kind,
+            final Kind kind,
             final IoLogger logger) {
         this.mediator = Objects.requireNonNull(mediator);
-        this.kind = Objects.requireNonNull(kind);
         this.logger = Objects.requireNonNull(logger);
+        this.kind = Objects.requireNonNull(kind);
     }
 
     @Override
@@ -49,10 +48,7 @@ public class JmxStatistics implements JmxColleague, Provider<IoLogger> {
                 .get();
     }
 
-    @Override
-    public IoLogger get() { return logger; }
-
-    JmxStatisticsKind getKind() {
+    Kind getKind() {
         return kind;
     }
 
@@ -82,5 +78,21 @@ public class JmxStatistics implements JmxColleague, Provider<IoLogger> {
 
     void close() {
         deregister(name());
+    }
+
+    @SuppressWarnings("PublicInnerClass")
+    public enum Kind {
+        APPLICATION {
+            @Override 
+            public String toString() { return "Application I/O Statistics"; }
+        },
+        KERNEL {
+            @Override 
+            public String toString() { return "Kernel I/O Statistics"; }
+        },
+        BUFFER {
+            @Override 
+            public String toString() { return "Buffer I/O Statistics"; }
+        };
     }
 }

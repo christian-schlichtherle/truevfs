@@ -49,7 +49,7 @@ public final class IoLogger {
      * @param  bytes the number of bytes read.
      * @param  nanos the execution time in nanoseconds.
      */
-    public void read(int bytes, long nanos) {
+    public void logRead(int bytes, long nanos) {
         log(read, bytes, nanos);
     }
 
@@ -59,7 +59,7 @@ public final class IoLogger {
      * @param  bytes the number of bytes written.
      * @param  nanos the execution time in nanoseconds.
      */
-    public void write(int bytes, long nanos) {
+    public void logWrite(int bytes, long nanos) {
         log(write, bytes, nanos);
     }
 

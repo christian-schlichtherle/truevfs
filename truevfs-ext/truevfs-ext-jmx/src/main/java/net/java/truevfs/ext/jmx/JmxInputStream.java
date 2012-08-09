@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truecommons.io.DecoratingInputStream;
+import net.java.truevfs.comp.inst.InstrumentingInputStream;
 import net.java.truevfs.ext.jmx.model.IoLogger;
 
 /**
@@ -16,15 +16,15 @@ import net.java.truevfs.ext.jmx.model.IoLogger;
  */
 @NotThreadSafe
 public class JmxInputStream
-extends DecoratingInputStream implements JmxColleague {
+extends InstrumentingInputStream<JmxMediator> implements JmxColleague {
     private final IoLogger logger;
 
     JmxInputStream(
+            final JmxMediator mediator,
             final @WillCloseWhenClosed InputStream in,
-            final IoLogger logger) {
-        super(in);
-        assert null != logger;
-        this.logger = logger;
+            final JmxStatistics.Kind kind) {
+        super(mediator, in);
+        this.logger = mediator.logger(kind);
     }
 
     @Override
@@ -35,7 +35,7 @@ extends DecoratingInputStream implements JmxColleague {
     public int read() throws IOException {
         final long start = System.nanoTime();
         int ret = in.read();
-        if (0 < ret) logger.read(1, System.nanoTime() - start);
+        if (0 < ret) logger.logRead(1, System.nanoTime() - start);
         return ret;
     }
 
@@ -43,7 +43,7 @@ extends DecoratingInputStream implements JmxColleague {
     public int read(byte[] b, int off, int len) throws IOException {
         final long start = System.nanoTime();
         int ret = in.read(b, off, len);
-        if (0 < ret) logger.read(ret, System.nanoTime() - start);
+        if (0 < ret) logger.logRead(ret, System.nanoTime() - start);
         return ret;
     }
 }

@@ -70,7 +70,7 @@ public final class IoStatistics {
      * @return New I/O statistics with an incremented sequence number and
      *         updated properties to reflect the given metric data.
      */
-    public IoStatistics log(long bytes, long nanos) {
+    public IoStatistics log(int bytes, long nanos) {
         return new IoStatistics(seqno + 1, this.bytes + bytes, this.nanos + nanos);
     }
 
