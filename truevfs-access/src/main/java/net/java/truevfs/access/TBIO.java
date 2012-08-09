@@ -276,7 +276,7 @@ final class TBIO {
             final TFile archive = tsrc.getInnerArchive();
             if (null != archive)
                 return archive.getController()
-                        .input(options, tsrc.getInnerFsEntryName());
+                        .input(options, tsrc.getNodeName());
         }
         final FsNodePath path = new FsNodePath(src);
         return  TConfig.get()
@@ -304,7 +304,7 @@ final class TBIO {
             final TFile archive = tdst.getInnerArchive();
             if (null != archive)
                 return archive.getController()
-                        .output(options, tdst.getInnerFsEntryName(), template);
+                        .output(options, tdst.getNodeName(), template);
         }
         final FsNodePath path = new FsNodePath(dst);
         return TConfig.get()

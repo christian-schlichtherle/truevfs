@@ -7,21 +7,24 @@ package net.java.truevfs.ext.jmx;
 import net.java.truevfs.ext.jmx.model.IoStatistics;
 import net.java.truevfs.comp.jmx.JmxController;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truecommons.io.DecoratingInputStream;
+import net.java.truecommons.io.DecoratingSeekableChannel;
 
 /**
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class JmxInputStream
-extends DecoratingInputStream implements JmxController {
+public class JmxSeekableChannelController
+extends DecoratingSeekableChannel implements JmxController {
     private final IoStatistics stats;
 
-    JmxInputStream(@WillCloseWhenClosed InputStream in, IoStatistics stats) {
-        super(in);
+    JmxSeekableChannelController(
+            @WillCloseWhenClosed SeekableByteChannel sbc,
+            IoStatistics stats) {
+        super(sbc);
         assert null != stats;
         this.stats = stats;
     }
@@ -31,16 +34,17 @@ extends DecoratingInputStream implements JmxController {
     }
 
     @Override
-    public int read() throws IOException {
-        int ret = in.read();
-        if (0 < ret) stats.addBytesRead(1);
+    public int read(ByteBuffer buf) throws IOException {
+        int ret = channel.read(buf);
+        if (0 < ret)
+            stats.addBytesRead(ret);
         return ret;
     }
 
     @Override
-    public int read(byte[] b, int off, int len) throws IOException {
-        int ret = in.read(b, off, len);
-        if (0 < ret) stats.addBytesRead(ret);
+    public int write(ByteBuffer buf) throws IOException {
+        int ret = channel.write(buf);
+        stats.addBytesWritten(ret);
         return ret;
     }
 }

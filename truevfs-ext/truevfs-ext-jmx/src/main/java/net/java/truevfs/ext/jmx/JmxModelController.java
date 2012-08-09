@@ -42,7 +42,7 @@ extends InstrumentingModel<JmxDirector> implements JmxController {
         return director.nameBuilder(FsModel.class)
                 .put("mountPoint", ObjectName.quote(
                     getMountPoint().toHierarchicalUri().toString()))
-                .name();
+                .get();
     }
 
     @Override

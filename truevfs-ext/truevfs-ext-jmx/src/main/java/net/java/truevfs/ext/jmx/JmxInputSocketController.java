@@ -18,12 +18,12 @@ import net.java.truevfs.kernel.spec.cio.InputSocket;
  * @author Christian Schlichtherle
  */
 @Immutable
-public class JmxInputSocket<E extends Entry>
+public class JmxInputSocketController<E extends Entry>
 extends InstrumentingInputSocket<JmxDirector, E>
 implements JmxController, JmxStatisticsProvider {
     final IoStatistics stats;
 
-    JmxInputSocket(
+    JmxInputSocketController(
             JmxDirector director,
             InputSocket<? extends E> socket,
             IoStatistics stats) {

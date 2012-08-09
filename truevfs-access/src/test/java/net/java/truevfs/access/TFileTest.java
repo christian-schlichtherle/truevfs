@@ -125,7 +125,7 @@ public final class TFileTest extends MockArchiveDriverTestBase {
         // One ZIP file in path.
         file = new TFile(new URI("mok", "file:/a .mok/b .mok!/", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerFsEntryName());
+        assertSame(ROOT, file.getNodeName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 
@@ -191,7 +191,7 @@ public final class TFileTest extends MockArchiveDriverTestBase {
 
         file = new TFile(new URI("mok", "mok:file:/a .mok!/b .mok!/", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerFsEntryName());
+        assertSame(ROOT, file.getNodeName());
         assertEquals(fs + "a .mok", file.getEnclArchive().getPath());
         assertEquals("b .mok", file.getEnclEntryName());
 
@@ -199,7 +199,7 @@ public final class TFileTest extends MockArchiveDriverTestBase {
 
         file = new TFile(new URI("mok", "file:/a .mok!/b .mok!/", null));
         assertSame(file, file.getInnerArchive());
-        assertSame(ROOT, file.getInnerFsEntryName());
+        assertSame(ROOT, file.getNodeName());
         assertNull(file.getEnclArchive());
         assertNull(file.getEnclEntryName());
 

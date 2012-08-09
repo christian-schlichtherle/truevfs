@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.ext.jmx;
 
-import net.java.truevfs.ext.jmx.model.IoStatistics;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -18,7 +17,8 @@ import net.java.truevfs.comp.inst.InstrumentingManager;
 import net.java.truevfs.comp.inst.InstrumentingMetaDriver;
 import net.java.truevfs.comp.inst.InstrumentingOutputSocket;
 import net.java.truevfs.comp.jmx.JmxController;
-import net.java.truevfs.comp.jmx.JmxNameBuilder;
+import net.java.truevfs.comp.jmx.JmxObjectNameBuilder;
+import net.java.truevfs.ext.jmx.model.IoStatistics;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsModel;
@@ -116,7 +116,7 @@ public class JmxDirector extends AbstractDirector<JmxDirector> {
     public InputSocket<? extends Entry> instrument(
             InstrumentingController<JmxDirector> origin,
             InputSocket<? extends Entry> object) {
-        return init(new JmxInputSocket<>(this, object,
+        return init(new JmxInputSocketController<>(this, object,
                 ((JmxStatisticsProvider) origin).getStatistics()));
     }
 
@@ -124,7 +124,7 @@ public class JmxDirector extends AbstractDirector<JmxDirector> {
     public OutputSocket<? extends Entry> instrument(
             InstrumentingController<JmxDirector> origin,
             OutputSocket<? extends Entry> object) {
-        return init(new JmxOutputSocket<>(this, object,
+        return init(new JmxOutputSocketController<>(this, object,
                 ((JmxStatisticsProvider) origin).getStatistics()));
     }
 
@@ -132,21 +132,21 @@ public class JmxDirector extends AbstractDirector<JmxDirector> {
     public InputSocket<? extends IoBuffer> instrument(
             InstrumentingBuffer<JmxDirector> origin,
             InputSocket<? extends IoBuffer> object) {
-        return init(new JmxInputSocket<>(this, object, buffer));
+        return init(new JmxInputSocketController<>(this, object, buffer));
     }
 
     @Override
     public OutputSocket<? extends IoBuffer> instrument(
             InstrumentingBuffer<JmxDirector> origin,
             OutputSocket<? extends IoBuffer> object) {
-        return init(new JmxOutputSocket<>(this, object, buffer));
+        return init(new JmxOutputSocketController<>(this, object, buffer));
     }
 
     @Override
     public InputStream instrument(
             InstrumentingInputSocket<JmxDirector, ? extends Entry> origin,
             InputStream object) {
-        return init(new JmxInputStream(object,
+        return init(new JmxInputStreamController(object,
                 ((JmxStatisticsProvider) origin).getStatistics()));
     }
 
@@ -154,7 +154,7 @@ public class JmxDirector extends AbstractDirector<JmxDirector> {
     public SeekableByteChannel instrument(
             InstrumentingInputSocket<JmxDirector, ? extends Entry> origin,
             SeekableByteChannel object) {
-        return init(new JmxSeekableChannel(object,
+        return init(new JmxSeekableChannelController(object,
                 ((JmxStatisticsProvider) origin).getStatistics()));
     }
 
@@ -162,7 +162,7 @@ public class JmxDirector extends AbstractDirector<JmxDirector> {
     public OutputStream instrument(
             InstrumentingOutputSocket<JmxDirector, ? extends Entry> origin,
             OutputStream object) {
-        return init(new JmxOutputStream(object,
+        return init(new JmxOutputStreamController(object,
                 ((JmxStatisticsProvider) origin).getStatistics()));
     }
 
@@ -170,12 +170,12 @@ public class JmxDirector extends AbstractDirector<JmxDirector> {
     public SeekableByteChannel instrument(
             InstrumentingOutputSocket<JmxDirector, ? extends Entry> origin,
             SeekableByteChannel object) {
-        return init(new JmxSeekableChannel(object,
+        return init(new JmxSeekableChannelController(object,
                 ((JmxStatisticsProvider) origin).getStatistics()));
     }
 
-    public JmxNameBuilder nameBuilder(Class<?> type) {
-        return new JmxNameBuilder(getDomain())
+    public JmxObjectNameBuilder nameBuilder(Class<?> type) {
+        return new JmxObjectNameBuilder(getDomain())
                 .put("type", type.getSimpleName());
     }
 

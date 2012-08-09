@@ -4,13 +4,13 @@
  */
 package net.java.truevfs.ext.jmx;
 
-import net.java.truevfs.ext.jmx.model.IoStatistics;
-import net.java.truevfs.comp.jmx.JmxController;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.InstrumentingManager;
+import net.java.truevfs.comp.jmx.JmxController;
 import net.java.truevfs.comp.jmx.JmxManagerMXBean;
 import static net.java.truevfs.comp.jmx.JmxUtils.*;
+import net.java.truevfs.ext.jmx.model.IoStatistics;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsSyncException;
 import net.java.truevfs.kernel.spec.FsSyncOptions;
@@ -44,7 +44,7 @@ extends InstrumentingManager<JmxDirector> implements JmxController {
     }
 
     private ObjectName name() {
-        return director.nameBuilder(FsManager.class).name();
+        return director.nameBuilder(FsManager.class).get();
     }
 
     void sync() throws FsSyncException {
@@ -61,7 +61,7 @@ extends InstrumentingManager<JmxDirector> implements JmxController {
             final ObjectName pattern = director.nameBuilder(IoStatistics.class)
                     .put("kind", stats.getKind())
                     .put("time", "*")
-                    .name();
+                    .get();
             for (final ObjectName found : query(pattern)) {
                 final JmxStatisticsMXBean proxy =
                         proxy(found, JmxStatisticsMXBean.class);
