@@ -12,23 +12,23 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
 import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
- * @param  <D> the type of the director.
+ * @param  <M> the type of the mediator.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class InstrumentingBufferPool<D extends Director<D>>
+public class InstrumentingBufferPool<M extends Mediator<M>>
 extends DecoratingIoBufferPool {
-    protected final D director;
+    protected final M mediator;
 
     public InstrumentingBufferPool(
-            final D director,
+            final M mediator,
             final IoBufferPool pool) {
         super(pool);
-        this.director = Objects.requireNonNull(director);
+        this.mediator = Objects.requireNonNull(mediator);
     }
 
     @Override
     public IoBuffer allocate() throws IOException {
-        return director.instrument(this, pool.allocate());
+        return mediator.instrument(this, pool.allocate());
     }
 }

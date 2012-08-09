@@ -4,22 +4,22 @@
  */
 package net.java.truevfs.ext.jmx;
 
-import net.java.truevfs.comp.jmx.JmxController;
+import javax.inject.Provider;
 import net.java.truevfs.comp.inst.InstrumentingController;
 import net.java.truevfs.kernel.spec.FsController;
 
 /**
  * @author Christian Schlichtherle
  */
-public abstract class JmxFileSystemController
-extends InstrumentingController<JmxDirector>
-implements JmxController, JmxStatisticsProvider {
+public abstract class JmxController
+extends InstrumentingController<JmxMediator>
+implements JmxColleague, Provider<JmxStatisticsKind> {
 
-    JmxFileSystemController(JmxDirector director, FsController controller) {
+    JmxController(JmxMediator director, FsController controller) {
         super(director, controller);
     }
 
     @Override
-    public void init() {
+    public void start() {
     }
 }

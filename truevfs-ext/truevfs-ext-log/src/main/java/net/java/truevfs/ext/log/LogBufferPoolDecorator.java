@@ -19,7 +19,7 @@ import net.java.truevfs.kernel.spec.spi.IoBufferPoolDecorator;
 public final class LogBufferPoolDecorator extends IoBufferPoolDecorator {
     @Override
     public IoBufferPool apply(IoBufferPool pool) {
-        return LogDirector.SINGLETON.instrument(pool);
+        return LogMediator.SINGLETON.instrument(pool);
     }
 
     /** Returns -100. */

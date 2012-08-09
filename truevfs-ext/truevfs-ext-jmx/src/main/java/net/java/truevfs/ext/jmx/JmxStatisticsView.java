@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.ext.jmx;
 
+import java.util.Date;
 import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanAttributeInfo;
@@ -12,19 +13,18 @@ import javax.management.MBeanOperationInfo;
 import javax.management.StandardMBean;
 
 /**
- * Provides statistics for the federated file systems managed by a single file
- * system manager.
+ * The MXBean implementation for the I/O statistics.
  *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
 public class JmxStatisticsView
 extends StandardMBean implements JmxStatisticsMXBean {
-    protected final JmxStatisticsController stats;
+    protected final JmxStatistics sampler;
 
-    public JmxStatisticsView(final JmxStatisticsController stats) {
+    public JmxStatisticsView(final JmxStatistics sampler) {
         super(JmxStatisticsMXBean.class, true);
-        this.stats = Objects.requireNonNull(stats);
+        this.sampler = Objects.requireNonNull(sampler);
     }
 
     /**
@@ -77,31 +77,66 @@ extends StandardMBean implements JmxStatisticsMXBean {
 
     @Override
     public String getKind() {
-        return stats.getKind();
+        return sampler.getKindString();
+    }
+
+    @Override
+    public int getSequenceNumber() {
+        return sampler.getSequenceNumber();
     }
 
     @Override
     public String getTimeCreated() {
-        return stats.getTimeCreated();
+        return new Date(sampler.getTimeCreatedMillis()).toString();
     }
 
     @Override
     public long getTimeCreatedMillis() {
-        return stats.getTimeCreatedMillis();
+        return sampler.getTimeCreatedMillis();
     }
 
     @Override
-    public long getBytesRead() {
-        return stats.getBytesRead();
+    public long getReadSumOfBytes() {
+        return sampler.getReadStats().getSumOfBytes();
     }
 
     @Override
-    public long getBytesWritten() {
-        return stats.getBytesWritten();
+    public int getReadBytesPerOperation() {
+        return sampler.getReadStats().getAverageBytesPerOperation();
+    }
+
+    @Override
+    public long getReadKilobytesPerSecond() {
+        return sampler.getReadStats().getKilobytesPerSecond();
+    }
+
+    @Override
+    public int getReadNumberOfOperations() {
+        return sampler.getReadStats().getSequenceNumber();
+    }
+
+    @Override
+    public long getWriteSumOfBytes() {
+        return sampler.getWriteStats().getSumOfBytes();
+    }
+
+    @Override
+    public int getWriteBytesPerOperation() {
+        return sampler.getWriteStats().getAverageBytesPerOperation();
+    }
+
+    @Override
+    public long getWriteKilobytesPerSecond() {
+        return sampler.getWriteStats().getKilobytesPerSecond();
+    }
+
+    @Override
+    public int getWriteNumberOfOperations() {
+        return sampler.getWriteStats().getSequenceNumber();
     }
 
     @Override
     public void close() {
-        stats.close();
+        sampler.close();
     }
 }

@@ -22,9 +22,9 @@ import net.java.truevfs.kernel.spec.FsSyncException;
 @ThreadSafe
 public class JmxManagerView 
 extends StandardMBean implements JmxManagerMXBean {
-    protected final JmxManagerController manager;
+    protected final JmxManager manager;
 
-    public JmxManagerView(final JmxManagerController manager) {
+    public JmxManagerView(final JmxManager manager) {
         super(JmxManagerMXBean.class, true);
         this.manager = Objects.requireNonNull(manager);
     }

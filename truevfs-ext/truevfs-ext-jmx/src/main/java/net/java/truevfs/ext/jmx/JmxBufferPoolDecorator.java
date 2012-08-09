@@ -19,6 +19,6 @@ import net.java.truevfs.kernel.spec.spi.IoBufferPoolDecorator;
 public final class JmxBufferPoolDecorator extends IoBufferPoolDecorator {
     @Override
     public IoBufferPool apply(IoBufferPool pool) {
-        return JmxDirector.SINGLETON.instrument(pool);
+        return JmxMediator.SINGLETON.instrument(pool);
     }
 }

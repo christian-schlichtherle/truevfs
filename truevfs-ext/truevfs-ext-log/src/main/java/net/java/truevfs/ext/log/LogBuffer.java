@@ -13,11 +13,11 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Christian Schlichtherle
  */
-final class LogBuffer extends InstrumentingBuffer<LogDirector> {
+final class LogBuffer extends InstrumentingBuffer<LogMediator> {
     private static final Logger logger =
             LoggerFactory.getLogger(LogBuffer.class);
 
-    LogBuffer(LogDirector director, IoBuffer buffer) {
+    LogBuffer(LogMediator director, IoBuffer buffer) {
         super(director, buffer);
         logger.debug("Allocated I/O buffer {}", entry);
         if (logger.isTraceEnabled())

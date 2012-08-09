@@ -29,9 +29,9 @@ import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 @ThreadSafe
 public class JmxModelView
 extends StandardMBean implements JmxModelMXBean {
-    protected final JmxModelController model;
+    protected final JmxModel model;
 
-    public JmxModelView(final JmxModelController model) {
+    public JmxModelView(final JmxModel model) {
         super(JmxModelMXBean.class, true);
         this.model = Objects.requireNonNull(model);
     }

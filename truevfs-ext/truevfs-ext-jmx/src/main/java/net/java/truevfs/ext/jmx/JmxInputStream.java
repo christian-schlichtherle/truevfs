@@ -4,43 +4,46 @@
  */
 package net.java.truevfs.ext.jmx;
 
-import net.java.truevfs.ext.jmx.model.IoStatistics;
-import net.java.truevfs.comp.jmx.JmxController;
 import java.io.IOException;
 import java.io.InputStream;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.io.DecoratingInputStream;
+import net.java.truevfs.ext.jmx.model.IoLogger;
 
 /**
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class JmxInputStreamController
-extends DecoratingInputStream implements JmxController {
-    private final IoStatistics stats;
+public class JmxInputStream
+extends DecoratingInputStream implements JmxColleague {
+    private final IoLogger logger;
 
-    JmxInputStreamController(@WillCloseWhenClosed InputStream in, IoStatistics stats) {
+    JmxInputStream(
+            final @WillCloseWhenClosed InputStream in,
+            final IoLogger logger) {
         super(in);
-        assert null != stats;
-        this.stats = stats;
+        assert null != logger;
+        this.logger = logger;
     }
 
     @Override
-    public void init() {
+    public void start() {
     }
 
     @Override
     public int read() throws IOException {
+        final long start = System.nanoTime();
         int ret = in.read();
-        if (0 < ret) stats.addBytesRead(1);
+        if (0 < ret) logger.read(1, System.nanoTime() - start);
         return ret;
     }
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
+        final long start = System.nanoTime();
         int ret = in.read(b, off, len);
-        if (0 < ret) stats.addBytesRead(ret);
+        if (0 < ret) logger.read(ret, System.nanoTime() - start);
         return ret;
     }
 }

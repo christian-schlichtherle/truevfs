@@ -9,7 +9,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.InstrumentingModel;
-import net.java.truevfs.comp.jmx.JmxController;
 import net.java.truevfs.comp.jmx.JmxModelMXBean;
 import static net.java.truevfs.comp.jmx.JmxUtils.deregister;
 import static net.java.truevfs.comp.jmx.JmxUtils.register;
@@ -21,17 +20,17 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxModelController
-extends InstrumentingModel<JmxDirector> implements JmxController {
+public class JmxModel
+extends InstrumentingModel<JmxMediator> implements JmxColleague {
     private static final FsMetaDriver
             DRIVER = new FsSimpleMetaDriver(FsDriverMapLocator.SINGLETON);
 
-    public JmxModelController(JmxDirector director, FsModel model) {
+    public JmxModel(JmxMediator director, FsModel model) {
         super(director, model);
     }
 
     @Override
-    public void init() {
+    public void start() {
     }
 
     protected JmxModelMXBean newView() {
@@ -39,7 +38,7 @@ extends InstrumentingModel<JmxDirector> implements JmxController {
     }
 
     private ObjectName name() {
-        return director.nameBuilder(FsModel.class)
+        return mediator.nameBuilder(FsModel.class)
                 .put("mountPoint", ObjectName.quote(
                     getMountPoint().toHierarchicalUri().toString()))
                 .get();

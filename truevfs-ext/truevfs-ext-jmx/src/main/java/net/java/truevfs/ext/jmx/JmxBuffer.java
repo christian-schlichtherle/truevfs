@@ -9,7 +9,6 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.InstrumentingBuffer;
 import net.java.truevfs.comp.jmx.JmxBufferMXBean;
-import net.java.truevfs.comp.jmx.JmxController;
 import static net.java.truevfs.comp.jmx.JmxUtils.deregister;
 import static net.java.truevfs.comp.jmx.JmxUtils.register;
 import net.java.truevfs.kernel.spec.cio.IoBuffer;
@@ -18,15 +17,15 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxBufferController
-extends InstrumentingBuffer<JmxDirector> implements JmxController {
+public class JmxBuffer
+extends InstrumentingBuffer<JmxMediator> implements JmxColleague {
 
-    public JmxBufferController(JmxDirector director, IoBuffer entry) {
+    public JmxBuffer(JmxMediator director, IoBuffer entry) {
         super(director, entry);
     }
 
     @Override
-    public void init() {
+    public void start() {
         register(newView(), name());
     }
 
@@ -35,7 +34,7 @@ extends InstrumentingBuffer<JmxDirector> implements JmxController {
     }
 
     private ObjectName name() {
-        return director.nameBuilder(IoBuffer.class)
+        return mediator.nameBuilder(IoBuffer.class)
                 .put("name", ObjectName.quote(getName()))
                 .get();
     }

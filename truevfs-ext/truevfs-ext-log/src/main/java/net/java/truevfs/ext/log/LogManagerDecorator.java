@@ -19,7 +19,7 @@ import net.java.truevfs.kernel.spec.spi.FsManagerDecorator;
 public final class LogManagerDecorator extends FsManagerDecorator {
     @Override
     public FsManager apply(FsManager manager) {
-        return LogDirector.SINGLETON.instrument(manager);
+        return LogMediator.SINGLETON.instrument(manager);
     }
 
     /** Returns -100. */
