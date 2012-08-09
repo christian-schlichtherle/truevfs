@@ -19,13 +19,13 @@ import net.java.truevfs.kernel.spec.cio.InputSocket;
 @Immutable
 public class JmxInputSocket<E extends Entry>
 extends InstrumentingInputSocket<JmxMediator, E>
-implements JmxColleague, Provider<JmxStatisticsKind> {
-    private final JmxStatisticsKind kind;
+implements JmxColleague, Provider<JmxStatistics.Kind> {
+    private final JmxStatistics.Kind kind;
 
     JmxInputSocket(
-            JmxMediator director,
-            InputSocket<? extends E> socket,
-            JmxStatisticsKind kind) {
+            final JmxMediator director,
+            final InputSocket<? extends E> socket,
+            final JmxStatistics.Kind kind) {
         super(director, socket);
         assert null != kind;
         this.kind = kind;
@@ -36,7 +36,7 @@ implements JmxColleague, Provider<JmxStatisticsKind> {
     }
 
     @Override
-    public JmxStatisticsKind get() {
+    public JmxStatistics.Kind get() {
         return kind;
     }
 }

@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truecommons.io.DecoratingOutputStream;
+import net.java.truevfs.comp.inst.InstrumentingOutputStream;
 import net.java.truevfs.ext.jmx.model.IoLogger;
 
 /**
@@ -16,15 +16,15 @@ import net.java.truevfs.ext.jmx.model.IoLogger;
  */
 @NotThreadSafe
 public class JmxOutputStream
-extends DecoratingOutputStream implements JmxColleague {
+extends InstrumentingOutputStream<JmxMediator> implements JmxColleague {
     private final IoLogger logger;
 
     JmxOutputStream(
+            final JmxMediator mediator,
             final @WillCloseWhenClosed OutputStream out,
-            final IoLogger logger) {
-        super(out);
-        assert null != logger;
-        this.logger = logger;
+            final JmxStatistics.Kind kind) {
+        super(mediator, out);
+        this.logger = mediator.logger(kind);
     }
 
     @Override
@@ -35,13 +35,13 @@ extends DecoratingOutputStream implements JmxColleague {
     public void write(int b) throws IOException {
         final long start = System.nanoTime();
         out.write(b);
-        logger.write(1, System.nanoTime() - start);
+        logger.logWrite(1, System.nanoTime() - start);
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         final long start = System.nanoTime();
         out.write(b, off, len);
-        logger.write(len, System.nanoTime() - start);
+        logger.logWrite(len, System.nanoTime() - start);
     }    
 }

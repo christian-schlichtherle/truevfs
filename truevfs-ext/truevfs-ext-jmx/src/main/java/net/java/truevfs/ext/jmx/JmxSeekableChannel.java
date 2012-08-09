@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truecommons.io.DecoratingSeekableChannel;
+import net.java.truevfs.comp.inst.InstrumentingSeekableChannel;
 import net.java.truevfs.ext.jmx.model.IoLogger;
 
 /**
@@ -17,15 +17,15 @@ import net.java.truevfs.ext.jmx.model.IoLogger;
  */
 @NotThreadSafe
 public class JmxSeekableChannel
-extends DecoratingSeekableChannel implements JmxColleague {
+extends InstrumentingSeekableChannel<JmxMediator> implements JmxColleague {
     private final IoLogger logger;
 
     JmxSeekableChannel(
-            final @WillCloseWhenClosed SeekableByteChannel sbc,
-            final IoLogger logger) {
-        super(sbc);
-        assert null != logger;
-        this.logger = logger;
+            final JmxMediator mediator,
+            final @WillCloseWhenClosed SeekableByteChannel channel,
+            final JmxStatistics.Kind kind) {
+        super(mediator, channel);
+        this.logger = mediator.logger(kind);
     }
 
     @Override
@@ -36,7 +36,7 @@ extends DecoratingSeekableChannel implements JmxColleague {
     public int read(ByteBuffer buf) throws IOException {
         final long start = System.nanoTime();
         int ret = channel.read(buf);
-        if (0 < ret) logger.read(ret, System.nanoTime() - start);
+        if (0 < ret) logger.logRead(ret, System.nanoTime() - start);
         return ret;
     }
 
@@ -44,7 +44,7 @@ extends DecoratingSeekableChannel implements JmxColleague {
     public int write(ByteBuffer buf) throws IOException {
         final long start = System.nanoTime();
         int ret = channel.write(buf);
-        logger.write(ret, System.nanoTime() - start);
+        logger.logWrite(ret, System.nanoTime() - start);
         return ret;
     }
 }

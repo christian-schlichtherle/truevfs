@@ -19,7 +19,8 @@ import net.java.truevfs.comp.inst.InstrumentingMetaDriver;
 import net.java.truevfs.comp.inst.InstrumentingOutputSocket;
 import net.java.truevfs.comp.inst.Mediator;
 import net.java.truevfs.comp.jmx.JmxObjectNameBuilder;
-import static net.java.truevfs.ext.jmx.JmxStatisticsKind.*;
+import net.java.truevfs.ext.jmx.JmxStatistics.Kind;
+import static net.java.truevfs.ext.jmx.JmxStatistics.Kind.*;
 import net.java.truevfs.ext.jmx.model.IoLogger;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
@@ -39,9 +40,9 @@ public class JmxMediator extends Mediator<JmxMediator> {
     private final AtomicReferenceArray<IoLogger> loggers;
 
     private JmxMediator() {
-        final JmxStatisticsKind[] kinds = JmxStatisticsKind.values();
+        final Kind[] kinds = Kind.values();
         loggers = new AtomicReferenceArray<>(kinds.length);
-        for (final JmxStatisticsKind kind : kinds)
+        for (final Kind kind : kinds)
             loggers.set(kind.ordinal(), new IoLogger());
             
     }
@@ -59,12 +60,12 @@ public class JmxMediator extends Mediator<JmxMediator> {
         return colleague;
     }
 
-    final IoLogger getLogger(JmxStatisticsKind kind) {
+    IoLogger logger(Kind kind) {
         return loggers.get(kind.ordinal());
     }
 
-    final void nextLoggers() {
-        for (JmxStatisticsKind kind : JmxStatisticsKind.values()) {
+    void switchLoggers() {
+        for (final Kind kind : Kind.values()) {
             final int ordinal = kind.ordinal();
             while (true) {
                 final IoLogger expected = loggers.get(ordinal);
@@ -86,7 +87,7 @@ public class JmxMediator extends Mediator<JmxMediator> {
     public FsController instrument(
             InstrumentingManager<JmxMediator> origin,
             FsController object) {
-        return start(new JmxApplicationController(this, object));
+        return start(new JmxController(this, object, JmxStatistics.Kind.APPLICATION));
     }
 
     @Override
@@ -107,7 +108,7 @@ public class JmxMediator extends Mediator<JmxMediator> {
     public FsController instrument(
             InstrumentingMetaDriver<JmxMediator> origin,
             FsController object) {
-        return start(new JmxKernelController(this, object));
+        return start(new JmxController(this, object, JmxStatistics.Kind.KERNEL));
     }
 
     @Override
@@ -116,7 +117,7 @@ public class JmxMediator extends Mediator<JmxMediator> {
             InstrumentingController<JmxMediator> origin,
             InputSocket<E> object) {
         return start(new JmxInputSocket<>(this, object,
-                ((Provider<JmxStatisticsKind>) origin).get()));
+                ((Provider<JmxStatistics.Kind>) origin).get()));
     }
 
     @Override
@@ -125,7 +126,7 @@ public class JmxMediator extends Mediator<JmxMediator> {
             InstrumentingController<JmxMediator> origin,
             OutputSocket<E> object) {
         return start(new JmxOutputSocket<>(this, object,
-                ((Provider<JmxStatisticsKind>) origin).get()));
+                ((Provider<JmxStatistics.Kind>) origin).get()));
     }
 
     @Override
@@ -147,8 +148,8 @@ public class JmxMediator extends Mediator<JmxMediator> {
     public <E extends Entry> InputStream instrument(
             InstrumentingInputSocket<JmxMediator, E> origin,
             InputStream object) {
-        return start(new JmxInputStream(object,
-                getLogger(((Provider<JmxStatisticsKind>) origin).get())));
+        return start(new JmxInputStream(this, object,
+                ((Provider<JmxStatistics.Kind>) origin).get()));
     }
 
     @Override
@@ -156,8 +157,8 @@ public class JmxMediator extends Mediator<JmxMediator> {
     public <E extends Entry> SeekableByteChannel instrument(
             InstrumentingInputSocket<JmxMediator, E> origin,
             SeekableByteChannel object) {
-        return start(new JmxSeekableChannel(object,
-                getLogger(((Provider<JmxStatisticsKind>) origin).get())));
+        return start(new JmxSeekableChannel(this, object,
+                ((Provider<JmxStatistics.Kind>) origin).get()));
     }
 
     @Override
@@ -165,8 +166,8 @@ public class JmxMediator extends Mediator<JmxMediator> {
     public <E extends Entry> OutputStream instrument(
             InstrumentingOutputSocket<JmxMediator, E> origin,
             OutputStream object) {
-        return start(new JmxOutputStream(object,
-                getLogger(((Provider<JmxStatisticsKind>) origin).get())));
+        return start(new JmxOutputStream(this, object,
+                ((Provider<JmxStatistics.Kind>) origin).get()));
     }
 
     @Override
@@ -174,8 +175,8 @@ public class JmxMediator extends Mediator<JmxMediator> {
     public <E extends Entry> SeekableByteChannel instrument(
             InstrumentingOutputSocket<JmxMediator, E> origin,
             SeekableByteChannel object) {
-        return start(new JmxSeekableChannel(object,
-                getLogger(((Provider<JmxStatisticsKind>) origin).get())));
+        return start(new JmxSeekableChannel(this, object,
+                ((Provider<JmxStatistics.Kind>) origin).get()));
     }
 
     public JmxObjectNameBuilder nameBuilder(Class<?> type) {
