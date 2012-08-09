@@ -43,7 +43,7 @@ public class JmxStatisticsController implements JmxController {
         return director.nameBuilder(IoStatistics.class)
                 .put("kind", getKind())
                 .put("time", ObjectName.quote(getTimeCreated()))
-                .name();
+                .get();
     }
 
     String getKind() {

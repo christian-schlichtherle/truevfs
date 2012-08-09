@@ -383,7 +383,7 @@ public final class TFile extends File {
     private transient TArchiveDetector detector;
     private transient @CheckForNull TFile innerArchive;
     private transient @CheckForNull TFile enclArchive;
-    private transient @CheckForNull FsNodeName enclEntryName;
+    private transient @CheckForNull FsNodeName nodeName;
 
     /**
      * This refers to the file system controller if and only if this file
@@ -430,7 +430,7 @@ public final class TFile extends File {
             this.file = tfile.file;
             this.detector = tfile.detector;
             this.enclArchive = tfile.enclArchive;
-            this.enclEntryName = tfile.enclEntryName;
+            this.nodeName = tfile.nodeName;
             this.innerArchive = tfile.isArchive() ? this : tfile.innerArchive;
             this.controller = tfile.controller;
         } else {
@@ -661,21 +661,21 @@ public final class TFile extends File {
 
         final FsMountPoint mp = path.getMountPoint();
         final FsNodePath mpp = mp.getPath();
-        final FsNodeName en;
+        final FsNodeName nn;
 
         if (null == mpp) {
             assert !path.toUri().isOpaque();
             this.enclArchive = null;
-            this.enclEntryName = null;
+            this.nodeName = null;
             this.innerArchive = null;
-        } else if ((en = path.getNodeName()).isRoot()) {
+        } else if ((nn = path.getNodeName()).isRoot()) {
             assert path.toUri().isOpaque();
             if (mpp.toUri().isOpaque()) {
                 this.enclArchive = new TFile(mpp.getMountPoint(), detector);
-                this.enclEntryName = mpp.getNodeName();
+                this.nodeName = mpp.getNodeName();
             } else {
                 this.enclArchive = null;
-                this.enclEntryName = null;
+                this.nodeName = null;
             }
             this.innerArchive = this;
             // See http://java.net/jira/browse/TRUEZIP-154 .
@@ -683,7 +683,7 @@ public final class TFile extends File {
         } else {
             assert path.toUri().isOpaque();
             this.enclArchive = new TFile(mp, detector);
-            this.enclEntryName = en;
+            this.nodeName = nn;
             this.innerArchive = this.enclArchive;
         }
 
@@ -702,17 +702,17 @@ public final class TFile extends File {
         if (null == mpp) {
             assert !mountPoint.toUri().isOpaque();
             this.enclArchive = null;
-            this.enclEntryName = null;
+            this.nodeName = null;
             this.innerArchive = null;
         } else {
             assert mountPoint.toUri().isOpaque();
             if (mpp.toUri().isOpaque()) {
                 this.enclArchive
                         = new TFile(mpp.getMountPoint(), detector);
-                this.enclEntryName = mpp.getNodeName();
+                this.nodeName = mpp.getNodeName();
             } else {
                 this.enclArchive = null;
-                this.enclEntryName = null;
+                this.nodeName = null;
             }
             this.innerArchive = this;
             this.controller = getController(mountPoint);
@@ -735,14 +735,14 @@ public final class TFile extends File {
             if (path.length() == iapl) {
                 this.detector = innerArchive.detector;
                 this.enclArchive = innerArchive.enclArchive;
-                this.enclEntryName = innerArchive.enclEntryName;
+                this.nodeName = innerArchive.nodeName;
                 this.innerArchive = this;
                 this.controller = innerArchive.controller;
             } else {
                 this.detector = detector;
                 this.innerArchive = this.enclArchive = innerArchive;
                 try {
-                    this.enclEntryName = new FsNodeName(
+                    this.nodeName = new FsNodeName(
                             new UriBuilder()
                                 .path(
                                     path.substring(iapl + 1) // cut off leading separatorChar
@@ -773,13 +773,13 @@ public final class TFile extends File {
         assert file.getPath().equals(path);
         assert null != detector;
 
-        final StringBuilder enclEntryNameBuf = new StringBuilder(path.length());
-        scan(ancestor, detector, 0, path, enclEntryNameBuf, new PathSplitter(separatorChar, false));
+        final StringBuilder nodeNameBuf = new StringBuilder(path.length());
+        scan(ancestor, detector, 0, path, nodeNameBuf, new PathSplitter(separatorChar, false));
         try {
-            enclEntryName = 0 >= enclEntryNameBuf.length()
+            nodeName = 0 >= nodeNameBuf.length()
                     ? null
                     : new FsNodeName(
-                        new UriBuilder().path(enclEntryNameBuf.toString()).getUri(),
+                        new UriBuilder().path(nodeNameBuf.toString()).getUri(),
                         CANONICALIZE);
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
@@ -824,14 +824,14 @@ public final class TFile extends File {
                     enclArchive = ancestor.innerArchive;
                     if (!ancestor.isArchive()) {
                         if (ancestor.isEntry()) {
-                            assert null != ancestor.enclEntryName;
+                            assert null != ancestor.nodeName;
                             if (0 < enclEntryNameBuf.length()) {
                                 enclEntryNameBuf.insert(0, '/');
-                                enclEntryNameBuf.insert(0, ancestor.enclEntryName.getPath());
+                                enclEntryNameBuf.insert(0, ancestor.nodeName.getPath());
                             } else { // TODO: Simplify this!
                                 // Example: new TFile(new TFile(new TFile("archive.zip"), "entry"), ".")
                                 assert enclArchive == ancestor.enclArchive;
-                                enclEntryNameBuf.append(ancestor.enclEntryName.getPath());
+                                enclEntryNameBuf.append(ancestor.nodeName.getPath());
                             }
                         } else {
                             assert null == enclArchive;
@@ -842,8 +842,8 @@ public final class TFile extends File {
                         assert enclArchive == ancestor;
                         innerArchive = this;
                         enclArchive = ancestor.enclArchive;
-                        if (ancestor.enclEntryName != null)
-                            enclEntryNameBuf.append(ancestor.enclEntryName.getPath());
+                        if (ancestor.nodeName != null)
+                            enclEntryNameBuf.append(ancestor.nodeName.getPath());
                     }
                     if (this != innerArchive)
                         innerArchive = enclArchive;
@@ -909,14 +909,14 @@ public final class TFile extends File {
         final File file = this.file;
         final TFile innerArchive = this.innerArchive;
         final TFile enclArchive = this.enclArchive;
-        final FsNodeName enclEntryName = this.enclEntryName;
+        final FsNodeName nodeName = this.nodeName;
 
         assert null != file;
         assert !(file instanceof TFile);
         assert file.getPath().equals(super.getPath());
         assert null != detector;
         assert (null != innerArchive) == (getInnerEntryName() != null);
-        assert (null != enclArchive) == (enclEntryName != null);
+        assert (null != enclArchive) == (null != nodeName);
         assert this != enclArchive;
         assert (this == innerArchive)
                 ^ (innerArchive == enclArchive && null == controller);
@@ -924,7 +924,7 @@ public final class TFile extends File {
                 || Paths.contains(  enclArchive.getPath(),
                                     file.getParentFile().getPath(),
                                     separatorChar)
-                    && !enclEntryName.toString().isEmpty();
+                    && !nodeName.toString().isEmpty();
         return true;
     }
 
@@ -1152,7 +1152,7 @@ public final class TFile extends File {
      * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      */
     public boolean isEntry() {
-        return enclEntryName != null;
+        return null != nodeName;
     }
 
     /**
@@ -1193,16 +1193,16 @@ public final class TFile extends File {
      * @return The entry name relative to the innermost archive file.
      */
     public @Nullable String getInnerEntryName() {
-        final FsNodeName enclEntryName;
+        final FsNodeName nodeName;
         return this == innerArchive
                 ? ROOT.getPath()
-                : null == (enclEntryName = this.enclEntryName)
+                : null == (nodeName = this.nodeName)
                     ? null
-                    : enclEntryName.getPath();
+                    : nodeName.getPath();
     }
 
-    @Nullable FsNodeName getInnerFsEntryName() {
-        return this == innerArchive ? ROOT : enclEntryName;
+    @Nullable FsNodeName getNodeName() {
+        return this == innerArchive ? ROOT : nodeName;
     }
 
     /**
@@ -1239,11 +1239,7 @@ public final class TFile extends File {
      * @return The entry name relative to the enclosing archive file.
      */
     public @Nullable String getEnclEntryName() {
-        return null == enclEntryName ? null : enclEntryName.getPath();
-    }
-
-    @Nullable FsNodeName getEnclFsEntryName() {
-        return enclEntryName;
+        return null == nodeName ? null : nodeName.getPath();
     }
 
     /**
@@ -1321,14 +1317,14 @@ public final class TFile extends File {
         final FsMountPoint mountPoint;
         try {
             final TFile enclArchive = this.enclArchive;
-            final FsNodeName enclEntryName = this.enclEntryName;
-            assert (null != enclArchive) == (null != enclEntryName);
+            final FsNodeName nodeName = this.nodeName;
+            assert (null != enclArchive) == (null != nodeName);
             mountPoint = new FsMountPoint(scheme, null == enclArchive
                     ? new FsNodePath(   file)
                     : new FsNodePath(   enclArchive .getController()
                                                 .getModel()
                                                 .getMountPoint(),
-                                    enclEntryName));
+                                    nodeName));
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
@@ -1587,20 +1583,20 @@ public final class TFile extends File {
             if (this == innerArchive) {
                 final FsScheme scheme = getScheme();
                 if (null != enclArchive) {
-                    assert null != enclEntryName;
+                    assert null != nodeName;
                     return new FsMountPoint(
                             scheme,
                             new FsNodePath(
                                 new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
-                                enclEntryName)).toUri();
+                                nodeName)).toUri();
                 } else {
                     return new FsMountPoint(scheme, new FsNodePath(file)).toUri();
                 }
             } else if (null != enclArchive) {
-                assert null != enclEntryName;
+                assert null != nodeName;
                 return new FsNodePath(
                         new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
-                        enclEntryName).toUri();
+                        nodeName).toUri();
             } else {
                 return file.toURI();
             }
@@ -1621,13 +1617,13 @@ public final class TFile extends File {
             if (this == innerArchive) {
                 final FsScheme scheme = getScheme();
                 if (null != enclArchive) {
-                    assert null != enclEntryName;
+                    assert null != nodeName;
                     return new FsNodePath(
                             new FsMountPoint(
                                 scheme,
                                 new FsNodePath(
                                     new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
-                                    enclEntryName)),
+                                    nodeName)),
                             ROOT);
                 } else {
                     return new FsNodePath(
@@ -1635,10 +1631,10 @@ public final class TFile extends File {
                             ROOT);
                 }
             } else if (null != enclArchive) {
-                assert null != enclEntryName;
+                assert null != nodeName;
                 return new FsNodePath(
                         new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
-                        enclEntryName);
+                        nodeName);
             } else {
                 return new FsNodePath(file);
             }
@@ -1677,13 +1673,13 @@ public final class TFile extends File {
      */
     @Override
     public boolean exists() {
-        // DONT test existance of getEnclFsEntryName() in enclArchive because
+        // DONT test existance of getNodeName() in enclArchive because
         // it doesn't need to exist - see
         // http://java.net/jira/browse/TRUEZIP-136 .
         if (null != innerArchive) {
             try {
                 innerArchive.getController().checkAccess(
-                        getAccessPreferences(), getInnerFsEntryName(),
+                        getAccessPreferences(), getNodeName(),
                         NO_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1711,7 +1707,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 final FsNode entry = innerArchive.getController()
-                        .stat(getAccessPreferences(), getInnerFsEntryName());
+                        .stat(getAccessPreferences(), getNodeName());
                 return null != entry && entry.isType(FILE);
             } catch (IOException ex) {
                 return false;
@@ -1740,7 +1736,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 final FsNode entry = innerArchive.getController()
-                        .stat(getAccessPreferences(), getInnerFsEntryName());
+                        .stat(getAccessPreferences(), getNodeName());
                 return null != entry && entry.isType(DIRECTORY);
             } catch (IOException ex) {
                 return false;
@@ -1754,7 +1750,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().checkAccess(
-                        getAccessPreferences(), getInnerFsEntryName(),
+                        getAccessPreferences(), getNodeName(),
                         READ_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1769,7 +1765,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().checkAccess(
-                        getAccessPreferences(), getInnerFsEntryName(),
+                        getAccessPreferences(), getNodeName(),
                         WRITE_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1784,7 +1780,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().checkAccess(
-                        getAccessPreferences(), getInnerFsEntryName(),
+                        getAccessPreferences(), getNodeName(),
                         EXECUTE_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1807,7 +1803,7 @@ public final class TFile extends File {
     public boolean setReadOnly() {
         if (null != innerArchive) {
             try {
-                innerArchive.getController().setReadOnly(getInnerFsEntryName());
+                innerArchive.getController().setReadOnly(getNodeName());
                 return true;
             } catch (IOException ex) {
                 return false;
@@ -1836,7 +1832,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getAccessPreferences(), getInnerFsEntryName());
+                        .stat(getAccessPreferences(), getNodeName());
             } catch (final IOException ex) {
                 return 0;
             }
@@ -1865,7 +1861,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getAccessPreferences(), getInnerFsEntryName());
+                        .stat(getAccessPreferences(), getNodeName());
             } catch (final IOException ex) {
                 return 0;
             }
@@ -1899,7 +1895,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().setTime(
-                        getAccessPreferences(), getInnerFsEntryName(),
+                        getAccessPreferences(), getNodeName(),
                         WRITE_ACCESS,
                         time);
                 return true;
@@ -1932,7 +1928,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getAccessPreferences(), getInnerFsEntryName());
+                        .stat(getAccessPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
@@ -1965,7 +1961,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getAccessPreferences(), getInnerFsEntryName());
+                        .stat(getAccessPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
@@ -2048,7 +2044,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getAccessPreferences(), getInnerFsEntryName());
+                        .stat(getAccessPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
@@ -2121,7 +2117,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getAccessPreferences(), getInnerFsEntryName());
+                        .stat(getAccessPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
@@ -2167,7 +2163,7 @@ public final class TFile extends File {
     public boolean createNewFile() throws IOException {
         if (null != innerArchive) {
             final FsController controller = innerArchive.getController();
-            final FsNodeName entryName = getInnerFsEntryName();
+            final FsNodeName entryName = getNodeName();
             // This is not really atomic, but should be OK in this case.
             if (null != controller.stat(getAccessPreferences(), entryName))
                 return false;
@@ -2217,7 +2213,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().mknod(
-                        getAccessPreferences(), getInnerFsEntryName(),
+                        getAccessPreferences(), getNodeName(),
                         DIRECTORY,
                         null);
                 return true;
@@ -2246,7 +2242,7 @@ public final class TFile extends File {
                     parent.mkdir(recursive);
             }
             final FsController controller = innerArchive.getController();
-            final FsNodeName innerEntryName = getInnerFsEntryName();
+            final FsNodeName innerEntryName = getNodeName();
             try {
                 controller.mknod(
                         getAccessPreferences(), innerEntryName,
@@ -2314,7 +2310,7 @@ public final class TFile extends File {
             TFile file = (TFile) node;
             if (null != file.innerArchive) {
                 file.innerArchive.getController().unlink(
-                        getAccessPreferences(), file.getInnerFsEntryName());
+                        getAccessPreferences(), file.getNodeName());
                 return;
             }
             node = file.file;

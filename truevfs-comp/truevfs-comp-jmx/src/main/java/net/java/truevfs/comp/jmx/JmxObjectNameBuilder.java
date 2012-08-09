@@ -5,27 +5,29 @@
 package net.java.truevfs.comp.jmx;
 
 import java.util.Hashtable;
+import javax.inject.Provider;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
 /**
  * @author Christian Schlichtherle
  */
-public final class JmxNameBuilder {
+public final class JmxObjectNameBuilder implements Provider<ObjectName> {
     final Hashtable<String, String> table = new Hashtable<>();
 
     private final String domain;
 
-    public JmxNameBuilder(Package domain) {
+    public JmxObjectNameBuilder(Package domain) {
         this.domain = domain.getName();
     }
 
-    public JmxNameBuilder put(String key, String value) {
+    public JmxObjectNameBuilder put(String key, String value) {
         table.put(key, value);
         return this;
     }
 
-    public ObjectName name() {
+    @Override
+    public ObjectName get() {
         try {
             return new ObjectName(domain, table);
         } catch (MalformedObjectNameException ex) {

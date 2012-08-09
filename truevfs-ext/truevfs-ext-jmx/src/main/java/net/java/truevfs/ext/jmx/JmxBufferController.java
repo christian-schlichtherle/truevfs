@@ -4,12 +4,12 @@
  */
 package net.java.truevfs.ext.jmx;
 
-import net.java.truevfs.comp.jmx.JmxController;
 import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.InstrumentingBuffer;
 import net.java.truevfs.comp.jmx.JmxBufferMXBean;
+import net.java.truevfs.comp.jmx.JmxController;
 import static net.java.truevfs.comp.jmx.JmxUtils.deregister;
 import static net.java.truevfs.comp.jmx.JmxUtils.register;
 import net.java.truevfs.kernel.spec.cio.IoBuffer;
@@ -37,7 +37,7 @@ extends InstrumentingBuffer<JmxDirector> implements JmxController {
     private ObjectName name() {
         return director.nameBuilder(IoBuffer.class)
                 .put("name", ObjectName.quote(getName()))
-                .name();
+                .get();
     }
 
     @Override

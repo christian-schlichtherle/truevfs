@@ -16,11 +16,11 @@ import net.java.truecommons.io.DecoratingOutputStream;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class JmxOutputStream
+public class JmxOutputStreamController
 extends DecoratingOutputStream implements JmxController {
     private final IoStatistics stats;
 
-    JmxOutputStream(@WillCloseWhenClosed OutputStream out, IoStatistics stats) {
+    JmxOutputStreamController(@WillCloseWhenClosed OutputStream out, IoStatistics stats) {
         super(out);
         assert null != stats;
         this.stats = stats;
