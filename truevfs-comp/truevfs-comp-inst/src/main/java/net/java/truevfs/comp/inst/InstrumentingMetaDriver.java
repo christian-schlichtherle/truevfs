@@ -14,19 +14,19 @@ import net.java.truevfs.kernel.spec.FsMetaDriver;
 import net.java.truevfs.kernel.spec.FsModel;
 
 /**
- * @param  <D> the type of the director.
+ * @param  <M> the type of the mediator.
  * @author Christian Schlichtherle
  */
 @Immutable
-public class InstrumentingMetaDriver<D extends Director<D>>
+public class InstrumentingMetaDriver<M extends Mediator<M>>
 implements FsMetaDriver {
-    protected final D director;
+    protected final M mediator;
     protected final FsMetaDriver driver;
 
     public InstrumentingMetaDriver(
-            final D director,
+            final M mediator,
             final FsMetaDriver driver) {
-        this.director = Objects.requireNonNull(director);
+        this.mediator = Objects.requireNonNull(mediator);
         this.driver = Objects.requireNonNull(driver);
     }
 
@@ -39,10 +39,10 @@ implements FsMetaDriver {
         assert null == parent
                     ? null == model.getParent()
                     : parent.getModel().equals(model.getParent());
-        return director.instrument(this,
+        return mediator.instrument(this,
                 driver.newController(
                     manager,
-                    director.instrument(this, model),
+                    mediator.instrument(this, model),
                     parent));
     }
 

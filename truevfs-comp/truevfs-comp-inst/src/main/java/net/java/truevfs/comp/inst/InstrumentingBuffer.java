@@ -12,26 +12,26 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
 
 /**
- * @param  <D> the type of the director.
+ * @param  <M> the type of the mediator.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class InstrumentingBuffer<D extends Director<D>>
+public class InstrumentingBuffer<M extends Mediator<M>>
 extends DecoratingIoBuffer {
-    protected final D director;
+    protected final M mediator;
 
-    public InstrumentingBuffer(final D director, final IoBuffer entry) {
+    public InstrumentingBuffer(final M mediator, final IoBuffer entry) {
         super(entry);
-        this.director = Objects.requireNonNull(director);
+        this.mediator = Objects.requireNonNull(mediator);
     }
 
     @Override
     public InputSocket<? extends IoBuffer> input() {
-        return director.instrument(this, entry.input());
+        return mediator.instrument(this, entry.input());
     }
 
     @Override
     public OutputSocket<? extends IoBuffer> output() {
-        return director.instrument(this, entry.output());
+        return mediator.instrument(this, entry.output());
     }
 }

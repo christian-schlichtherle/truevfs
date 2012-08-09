@@ -10,18 +10,18 @@ import net.java.truevfs.kernel.spec.FsDecoratingModel;
 import net.java.truevfs.kernel.spec.FsModel;
 
 /**
- * @param  <D> the type of the director.
+ * @param  <M> the type of the mediator.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class InstrumentingModel<D extends Director<D>>
+public class InstrumentingModel<M extends Mediator<M>>
 extends FsDecoratingModel {
-    protected final D director;
+    protected final M mediator;
 
     public InstrumentingModel(
-            final D director,
+            final M mediator,
             final FsModel model) {
         super(model);
-        this.director = Objects.requireNonNull(director);
+        this.mediator = Objects.requireNonNull(mediator);
     }
 }

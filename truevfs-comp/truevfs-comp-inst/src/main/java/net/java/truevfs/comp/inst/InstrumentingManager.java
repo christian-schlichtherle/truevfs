@@ -9,28 +9,28 @@ import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.kernel.spec.*;
 
 /**
- * @param  <D> the type of the director.
+ * @param  <M> the type of the mediator.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class InstrumentingManager<D extends Director<D>>
+public class InstrumentingManager<M extends Mediator<M>>
 extends FsDecoratingManager {
-    protected final D director;
+    protected final M mediator;
 
     public InstrumentingManager(
-            final D director,
+            final M mediator,
             final FsManager manager) {
         super(manager);
-        this.director = Objects.requireNonNull(director);
+        this.mediator = Objects.requireNonNull(mediator);
     }
 
     @Override
     public FsController controller(
             FsMetaDriver driver,
             FsMountPoint mountPoint) {
-        return director.instrument(this,
+        return mediator.instrument(this,
                 manager.controller(
-                    director.instrument(this, driver),
+                    mediator.instrument(this, driver),
                     mountPoint));
     }
 }

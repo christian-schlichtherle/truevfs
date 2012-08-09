@@ -4,20 +4,19 @@
  */
 package net.java.truevfs.ext.jmx;
 
-import net.java.truevfs.ext.jmx.model.IoStatistics;
 import net.java.truevfs.kernel.spec.FsController;
 
 /**
  * @author Christian Schlichtherle
  */
-public class JmxApplicationController extends JmxFileSystemController {
+public class JmxApplicationController extends JmxController {
 
-    JmxApplicationController(JmxDirector director, FsController controller) {
+    JmxApplicationController(JmxMediator director, FsController controller) {
         super(director, controller);
     }
 
     @Override
-    public IoStatistics getStatistics() {
-        return director.getApplicationStatistics();
+    public JmxStatisticsKind get() {
+        return JmxStatisticsKind.APPLICATION;
     }
 }

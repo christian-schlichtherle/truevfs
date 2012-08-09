@@ -4,47 +4,47 @@
  */
 package net.java.truevfs.ext.jmx;
 
-import net.java.truevfs.ext.jmx.model.IoStatistics;
-import net.java.truevfs.comp.jmx.JmxController;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.io.DecoratingSeekableChannel;
+import net.java.truevfs.ext.jmx.model.IoLogger;
 
 /**
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class JmxSeekableChannelController
-extends DecoratingSeekableChannel implements JmxController {
-    private final IoStatistics stats;
+public class JmxSeekableChannel
+extends DecoratingSeekableChannel implements JmxColleague {
+    private final IoLogger logger;
 
-    JmxSeekableChannelController(
-            @WillCloseWhenClosed SeekableByteChannel sbc,
-            IoStatistics stats) {
+    JmxSeekableChannel(
+            final @WillCloseWhenClosed SeekableByteChannel sbc,
+            final IoLogger logger) {
         super(sbc);
-        assert null != stats;
-        this.stats = stats;
+        assert null != logger;
+        this.logger = logger;
     }
 
     @Override
-    public void init() {
+    public void start() {
     }
 
     @Override
     public int read(ByteBuffer buf) throws IOException {
+        final long start = System.nanoTime();
         int ret = channel.read(buf);
-        if (0 < ret)
-            stats.addBytesRead(ret);
+        if (0 < ret) logger.read(ret, System.nanoTime() - start);
         return ret;
     }
 
     @Override
     public int write(ByteBuffer buf) throws IOException {
+        final long start = System.nanoTime();
         int ret = channel.write(buf);
-        stats.addBytesWritten(ret);
+        logger.write(ret, System.nanoTime() - start);
         return ret;
     }
 }

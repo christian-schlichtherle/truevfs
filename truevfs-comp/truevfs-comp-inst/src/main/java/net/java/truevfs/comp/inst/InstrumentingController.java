@@ -17,26 +17,26 @@ import net.java.truevfs.kernel.spec.cio.InputSocket;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
 
 /**
- * @param  <D> the type of the director.
+ * @param  <M> the type of the mediator.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class InstrumentingController<D extends Director<D>>
+public class InstrumentingController<M extends Mediator<M>>
 extends FsDecoratingController {
-    protected final D director;
+    protected final M mediator;
 
     public InstrumentingController(
-            final D director,
+            final M mediator,
             final FsController controller) {
         super(controller);
-        this.director = Objects.requireNonNull(director);
+        this.mediator = Objects.requireNonNull(mediator);
     }
 
     @Override
     public InputSocket<? extends Entry> input(
             BitField<FsAccessOption> options,
             FsNodeName name) {
-        return director.instrument(this,
+        return mediator.instrument(this,
                 controller.input(options, name));
     }
 
@@ -45,7 +45,7 @@ extends FsDecoratingController {
             BitField<FsAccessOption> options,
             FsNodeName name,
             @CheckForNull Entry template) {
-        return director.instrument(this,
+        return mediator.instrument(this,
                 controller.output(options, name, template));
     }
 }

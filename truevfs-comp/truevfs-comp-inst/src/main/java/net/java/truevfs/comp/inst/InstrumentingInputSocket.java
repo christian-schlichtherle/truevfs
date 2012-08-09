@@ -16,7 +16,7 @@ import net.java.truevfs.kernel.spec.cio.InputSocket;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
 
 /**
- * @param  <D> the type of the director.
+ * @param  <M> the type of the mediator.
  * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.
  * @see    InstrumentingOutputSocket
@@ -24,28 +24,28 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  */
 @Immutable
 public class InstrumentingInputSocket<
-        D extends Director<D>,
+        M extends Mediator<M>,
         E extends Entry>
 extends DecoratingInputSocket<E> {
-    protected final D director;
+    protected final M mediator;
 
     public InstrumentingInputSocket(
-            final D director,
+            final M mediator,
             final InputSocket<? extends E> socket) {
         super(socket);
-        this.director = Objects.requireNonNull(director);
+        this.mediator = Objects.requireNonNull(mediator);
     }
 
     @Override
     public InputStream stream(@CheckForNull OutputSocket<? extends Entry> peer)
     throws IOException {
-        return director.instrument(this, socket.stream(peer));
+        return mediator.instrument(this, socket.stream(peer));
     }
 
     @Override
     public SeekableByteChannel channel(
             @CheckForNull OutputSocket<? extends Entry> peer)
     throws IOException {
-        return director.instrument(this, socket.channel(peer));
+        return mediator.instrument(this, socket.channel(peer));
     }
 }

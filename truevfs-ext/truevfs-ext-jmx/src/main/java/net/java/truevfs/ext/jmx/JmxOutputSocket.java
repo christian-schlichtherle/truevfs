@@ -4,9 +4,8 @@
  */
 package net.java.truevfs.ext.jmx;
 
-import net.java.truevfs.ext.jmx.model.IoStatistics;
-import net.java.truevfs.comp.jmx.JmxController;
 import javax.annotation.concurrent.Immutable;
+import javax.inject.Provider;
 import net.java.truevfs.comp.inst.InstrumentingOutputSocket;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
@@ -18,26 +17,26 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  * @author Christian Schlichtherle
  */
 @Immutable
-public class JmxOutputSocketController<E extends Entry>
-extends InstrumentingOutputSocket<JmxDirector, E>
-implements JmxController, JmxStatisticsProvider {
-    final IoStatistics stats;
+public class JmxOutputSocket<E extends Entry>
+extends InstrumentingOutputSocket<JmxMediator, E>
+implements JmxColleague, Provider<JmxStatisticsKind> {
+    private final JmxStatisticsKind kind;
 
-    JmxOutputSocketController(
-            JmxDirector director,
+    JmxOutputSocket(
+            JmxMediator director,
             OutputSocket<? extends E> socket,
-            IoStatistics stats) {
+            JmxStatisticsKind kind) {
         super(director, socket);
-        assert null != stats;
-        this.stats = stats;
+        assert null != kind;
+        this.kind = kind;
     }
 
     @Override
-    public void init() {
+    public void start() {
     }
 
     @Override
-    public IoStatistics getStatistics() {
-        return stats;
+    public JmxStatisticsKind get() {
+        return kind;
     }
 }

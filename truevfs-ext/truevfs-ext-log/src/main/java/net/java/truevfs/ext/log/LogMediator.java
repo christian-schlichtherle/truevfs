@@ -8,10 +8,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.comp.inst.AbstractDirector;
-import net.java.truevfs.comp.inst.InstrumentingInputSocket;
 import net.java.truevfs.comp.inst.InstrumentingBufferPool;
+import net.java.truevfs.comp.inst.InstrumentingInputSocket;
 import net.java.truevfs.comp.inst.InstrumentingOutputSocket;
+import net.java.truevfs.comp.inst.Mediator;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.IoBuffer;
 
@@ -19,42 +19,42 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class LogDirector extends AbstractDirector<LogDirector> {
-    static final LogDirector SINGLETON = new LogDirector();
+final class LogMediator extends Mediator<LogMediator> {
+    static final LogMediator SINGLETON = new LogMediator();
 
-    private LogDirector() { }
+    private LogMediator() { }
 
     @Override
     public IoBuffer instrument(
-            InstrumentingBufferPool<LogDirector> origin,
+            InstrumentingBufferPool<LogMediator> origin,
             IoBuffer object) {
         return new LogBuffer(this, object);
     }
 
     @Override
-    public InputStream instrument(
-            InstrumentingInputSocket<LogDirector, ? extends Entry> origin,
+    public <E extends Entry> InputStream instrument(
+            InstrumentingInputSocket<LogMediator, E> origin,
             InputStream object) {
         return new LogInputStream(origin, object);
     }
 
     @Override
-    public SeekableByteChannel instrument(
-            InstrumentingInputSocket<LogDirector, ? extends Entry> origin,
+    public <E extends Entry> SeekableByteChannel instrument(
+            InstrumentingInputSocket<LogMediator, E> origin,
             SeekableByteChannel object) {
         return new LogInputChannel(origin, object);
     }
 
     @Override
-    public OutputStream instrument(
-            InstrumentingOutputSocket<LogDirector, ? extends Entry> origin,
+    public <E extends Entry> OutputStream instrument(
+            InstrumentingOutputSocket<LogMediator, E> origin,
             OutputStream object) {
         return new LogOutputStream(origin, object);
     }
 
     @Override
-    public SeekableByteChannel instrument(
-            InstrumentingOutputSocket<LogDirector, ? extends Entry> origin,
+    public <E extends Entry> SeekableByteChannel instrument(
+            InstrumentingOutputSocket<LogMediator, E> origin,
             SeekableByteChannel object) {
         return new LogOutputChannel(origin, object);
     }
