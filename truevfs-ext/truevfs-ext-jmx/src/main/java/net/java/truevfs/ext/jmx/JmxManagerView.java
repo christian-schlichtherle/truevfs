@@ -32,30 +32,23 @@ extends StandardMBean implements JmxManagerMXBean {
 
     @Override
     protected String getDescription(MBeanInfo info) {
-        return "A JMX file system manager.";
+        return "A file system manager.";
     }
 
     @Override
     protected String getDescription(MBeanAttributeInfo info) {
-        String description = null;
         switch (info.getName()) {
-        case "FederatedFileSystems":
-            description = "The federated file systems managed by this instance.";
-            break;
         case "FileSystemsTotal":
-            description = "The total number of managed federated file systems.";
-            break;
-        case "FileSystemsTouched":
-            description = "The number of managed federated file systems which have been touched and need unmounting.";
-            break;
-        case "TopLevelFileSystemsTotal":
-            description = "The total number of managed top level federated file systems.";
-            break;
-        case "TopLevelFileSystemsTouched":
-            description = "The number of managed top level federated file systems which have been touched and need unmounting.";
-            break;
+            return "The total number of file systems.";
+        case "FileSystemsMounted":
+            return "The number of file systems which have been mounted.";
+        case "TopLevelArchiveFileSystemsTotal":
+            return "The total number of top level archive file systems.";
+        case "TopLevelArchiveFileSystemsMounted":
+            return "The number of top level archive file systems which have been mounted.";
+        default:
+            return null;
         }
-        return description;
     }
 
     /**
@@ -64,13 +57,12 @@ extends StandardMBean implements JmxManagerMXBean {
      */
     @Override
     protected String getDescription(MBeanOperationInfo info) {
-        String description = null;
         switch (info.getName()) {
         case "sync":
-            description = "Synchronizes all managed archive file systems. If any file system is busy with I/O, an FsSyncException is thrown.";
-            break;
+            return "Synchronizes all file systems and eventually unmounts them.";
+        default:
+            return null;
         }
-        return description;
     }
 
     @Override

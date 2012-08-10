@@ -42,52 +42,42 @@ extends StandardMBean implements JmxStatisticsMXBean {
      */
     @Override
     protected String getDescription(MBeanAttributeInfo info) {
-        String description = null;
         switch (info.getName()) {
         case "Subject":
-            description = "The subject of this I/O statistics log.";
-            break;
+            return "The subject of this log.";
         case "SequenceNumber":
-            description = "The sequence number of I/O statistics log.";
-            break;
+            return "The sequence number of this log.";
         case "TimeCreated":
-            description = "The time this I/O statistics log has been created.";
-            break;
+            return "The time this log has been created.";
         case "TimeCreatedMillis":
-            description = "The time this I/O statistics log has been created in milliseconds.";
-            break;
+            return "The time this log has been created in milliseconds.";
+        case "TimeUpdated":
+            return "The last time this log has been updated.";
+        case "TimeUpdatedMillis":
+            return "The last time this log has been updated in milliseconds.";
         case "ReadBytesPerOperation":
-            description = "The average number of bytes per read operation.";
-            break;
+            return "The average number of bytes per read operation.";
         case "ReadBytesTotal":
-            description = "The total number of bytes read.";
-            break;
+            return "The total number of bytes read.";
         case "ReadKilobytesPerSecond":
-            description = "The average throughput for read operations.";
-            break;
+            return "The average throughput for read operations.";
         case "ReadNanosecondsTotal":
-            description = "The total execution time for read operations.";
-            break;
+            return "The total execution time for read operations.";
         case "ReadOperationsTotal":
-            description = "The total number of read operations.";
-            break;
+            return "The total number of read operations.";
         case "WriteBytesPerOperation":
-            description = "The average number of bytes per write operation.";
-            break;
+            return "The average number of bytes per write operation.";
         case "WriteBytesTotal":
-            description = "The total number of bytes written.";
-            break;
+            return "The total number of bytes written.";
         case "WriteKilobytesPerSecond":
-            description = "The average throughput for write operations.";
-            break;
+            return "The average throughput for write operations.";
         case "WriteNanosecondsTotal":
-            description = "The total execution time for write operations.";
-            break;
+            return "The total execution time for write operations.";
         case "WriteOperationsTotal":
-            description = "The total number of write operations.";
-            break;
+            return "The total number of write operations.";
+        default:
+            return null;
         }
-        return description;
     }
 
     /**
@@ -96,10 +86,12 @@ extends StandardMBean implements JmxStatisticsMXBean {
      */
     @Override
     protected String getDescription(MBeanOperationInfo info) {
-        String description = null;
-        if (info.getName().equals("close"))
-            description = "Closes this I/O statistics log.";
-        return description;
+        switch (info.getName()) {
+        case "close":
+            return "Closes this I/O statistics log.";
+        default:
+            return null;
+        }
     }
 
     @Override
@@ -114,12 +106,24 @@ extends StandardMBean implements JmxStatisticsMXBean {
 
     @Override
     public String getTimeCreated() {
-        return new Date(stats.getTimeCreatedMillis()).toString();
+        return new Date(getTimeCreatedMillis()).toString();
     }
 
     @Override
     public long getTimeCreatedMillis() {
         return stats.getTimeCreatedMillis();
+    }
+
+    @Override
+    public String getTimeUpdated() {
+        return new Date(getTimeUpdatedMillis()).toString();
+    }
+
+    @Override
+    public long getTimeUpdatedMillis() {
+        return Math.max(
+                stats.getReadStats().getTimeCreatedMillis(),
+                stats.getWriteStats().getTimeCreatedMillis());
     }
 
     @Override

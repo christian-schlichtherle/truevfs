@@ -43,34 +43,26 @@ extends StandardMBean implements JmxModelMXBean {
 
     @Override
     protected String getDescription(MBeanAttributeInfo info) {
-        String description = null;
         switch (info.getName()) {
         case "Mounted":
-            description = "Whether or not this file system needs to get sync()ed.";
-            break;
+            return "Whether or not this file system is mounted.";
         case "MountPoint":
-            description = "The mount point URI of this file system.";
-            break;
+            return "The mount point URI of this file system.";
         case "MountPointOfParent":
-            description = "The mount point URI of the parent file system.";
-            break;
+            return "The mount point URI of the parent file system.";
         case "SizeOfData":
-            description = "The data size of this file system.";
-            break;
+            return "The data size of this file system.";
         case "SizeOfStorage":
-            description = "The storage size of this file system.";
-            break;
+            return "The storage size of this file system.";
         case "TimeWritten":
-            description = "The last write time of this file system.";
-            break;
+            return "The last write time of this file system.";
         case "TimeRead":
-            description = "The last read or access time of this file system.";
-            break;
+            return "The last read or access time of this file system.";
         case "TimeCreated":
-            description = "The creation time of this file system.";
-            break;
+            return "The creation time of this file system.";
+        default:
+            return null;
         }
-        return description;
     }
 
     /**
@@ -79,10 +71,12 @@ extends StandardMBean implements JmxModelMXBean {
      */
     @Override
     protected String getDescription(MBeanOperationInfo info) {
-        String description = null;
-        if (info.getName().equals("sync"))
-            description = "Synchronizes this file system and all enclosed file systems. If any file system is busy with I/O, an FsSyncException is thrown.";
-        return description;
+        switch (info.getName()) {
+        case "sync":
+            return "Synchronizes this file system and all enclosed file systems and eventually unmounts them.";
+        default:
+            return null;
+        }
     }
 
     @Override
