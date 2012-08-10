@@ -23,9 +23,7 @@ public interface JmxManagerMXBean {
     int getFileSystemsTotal();
 
     /**
-     * Returns the number of file systems
-     * which have been mounted and need synchronization by calling
-     * {@link #sync}.
+     * Returns the number of file systems which have been mounted.
      * <p>
      * Note that you should <em>not</em> use the returned value to synchronize
      * conditionally - this would be unreliable!
@@ -45,8 +43,7 @@ public interface JmxManagerMXBean {
 
     /**
      * Returns the number of <em>top level archive</em> file systems
-     * which have been mounted and need synchronization by calling
-     * {@link #sync}.
+     * which have been mounted.
      * The value of this property never exceeds
      * {@link #getFileSystemsMounted()}.
      * <p>
@@ -58,7 +55,7 @@ public interface JmxManagerMXBean {
     int getTopLevelArchiveFileSystemsMounted();
 
     /**
-     * Synchronizes all managed file systems.
+     * Synchronizes all file systems and eventually unmounts them.
      * As a side effect, upon successful operation, the value of the property
      * {@link #getFileSystemsMounted() fileSystemsMounted} is reset to zero
      * unless some mounted file systems retain elements in their selective
