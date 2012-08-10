@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import edu.umd.cs.findbugs.annotations.OverrideMustInvoke;
 import edu.umd.cs.findbugs.annotations.When;
 import java.io.IOException;
@@ -18,9 +17,10 @@ import org.slf4j.LoggerFactory;
  * @author Christian Schlichtherle
  */
 public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
-
-    protected static final boolean ISOLATE_FS_MANAGER = Boolean.getBoolean(
-            FsArchiveDriverTestBase.class.getPackage().getName() + ".isolateFsManager");
+    private static final String ISOLATE_FS_MANAGER_PROPERTY_KEY =
+            FsManager.class.getName() + ".isolate";
+    protected static final boolean ISOLATE_FS_MANAGER =
+            Boolean.getBoolean(ISOLATE_FS_MANAGER_PROPERTY_KEY);
     static {
         LoggerFactory  .getLogger(FsArchiveDriverTestBase.class)
                 .debug( "Isolate file system manager: {}",
