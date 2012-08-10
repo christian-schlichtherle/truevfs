@@ -19,7 +19,7 @@ public final class JmxUtils {
     private static final MBeanServer mbs =
             ManagementFactory.getPlatformMBeanServer();
 
-    public static boolean register(final Object mbean, final ObjectName name) {
+    public static boolean register(final ObjectName name, final Object mbean) {
         try {
             mbs.registerMBean(mbean, name);
             return true;
