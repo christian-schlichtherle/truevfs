@@ -39,28 +39,22 @@ extends StandardMBean implements JmxBufferMXBean {
 
     @Override
     protected String getDescription(MBeanAttributeInfo info) {
-        String description = null;
         switch (info.getName()) {
         case "Name":
-            description = "The name of this I/O pool entry.";
-            break;
+            return "The name of this buffer.";
         case "SizeOfData":
-            description = "The data size of this I/O pool entry.";
-            break;
+            return "The data size of this buffer.";
         case "SizeOfStorage":
-            description = "The storage size of this I/O pool entry.";
-            break;
+            return "The storage size of this buffer.";
         case "TimeWritten":
-            description = "The last write time of this I/O pool entry.";
-            break;
+            return "The last write time of this buffer.";
         case "TimeRead":
-            description = "The last read or access time of this I/O pool entry.";
-            break;
+            return "The last read or access time of this buffer.";
         case "TimeCreated":
-            description = "The creation time of this I/O pool entry.";
-            break;
+            return "The creation time of this buffer.";
+        default:
+            return null;
         }
-        return description;
     }
 
     @Override

@@ -18,8 +18,8 @@ public final class IoLogger {
             new AtomicReference<>(IoStatistics.get());
     private final AtomicReference<IoStatistics> write =
             new AtomicReference<>(IoStatistics.get());
-    private final long created = System.currentTimeMillis();
     private final int seqno;
+    private final long created = System.currentTimeMillis();
 
     public IoLogger() { this(0); }
 

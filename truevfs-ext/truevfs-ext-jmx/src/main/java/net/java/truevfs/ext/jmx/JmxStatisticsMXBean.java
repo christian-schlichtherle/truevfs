@@ -18,6 +18,8 @@ public interface JmxStatisticsMXBean {
     int    getSequenceNumber();
     String getTimeCreated();
     long   getTimeCreatedMillis();
+    String getTimeUpdated();
+    long   getTimeUpdatedMillis();
     int    getReadBytesPerOperation();
     long   getReadBytesTotal();
     long   getReadKilobytesPerSecond();

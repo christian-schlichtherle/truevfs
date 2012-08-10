@@ -29,6 +29,7 @@ public final class IoStatistics {
     }
 
     private final int seqno;
+    private final long created = System.currentTimeMillis();
     private final long bytes, nanos;
 
     private IoStatistics(final int seqno, final long bytes, final long nanos) {
@@ -39,6 +40,10 @@ public final class IoStatistics {
 
     public int getSequenceNumber() {
         return seqno;
+    }
+
+    public long getTimeCreatedMillis() {
+        return created;
     }
 
     public long getBytesTotal() {
