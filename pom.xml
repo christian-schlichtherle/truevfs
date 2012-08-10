@@ -415,7 +415,7 @@ system space.
                                  it would also conceal any multithreading bugs
                                  in the classes under test, so it's generally
                                  discouraged. -->
-                            <net.truevfs.kernel.spec.isolateFsManager>false</net.truevfs.kernel.spec.isolateFsManager>
+                            <net.truevfs.kernel.spec.FsManager.isolate>false</net.truevfs.kernel.spec.FsManager.isolate>
                             <net.java.truecommons.shed.ControlFlowException.traceable>true</net.java.truecommons.shed.ControlFlowException.traceable>
                             <net.truevfs.driver.zip.io.forceZip64Ext>false</net.truevfs.driver.zip.io.forceZip64Ext>
                             <java.io.tmpdir>${java.io.tmpdir.it}</java.io.tmpdir>
