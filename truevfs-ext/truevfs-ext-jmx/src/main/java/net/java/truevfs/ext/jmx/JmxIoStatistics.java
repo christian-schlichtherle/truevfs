@@ -10,25 +10,23 @@ import javax.management.ObjectName;
 import static net.java.truevfs.comp.jmx.JmxUtils.*;
 import net.java.truevfs.ext.jmx.stats.FsStatistics;
 import net.java.truevfs.ext.jmx.stats.IoStatistics;
-import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 
 /**
- * The combined JMX controller for an {@linkplain FsStatistics I/O logger}
- * and its {@linkplain IoStatistics I/O statistics}.
+ * The JMX controller for {@linkplain IoStatistics I/O statistics}.
  * 
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxStatistics implements JmxColleague {
+public class JmxIoStatistics implements JmxColleague {
     /*private static final String SIZE_PROPERTY_KEY =
-            JmxStatistics.class.getName() + ".size";
+            JmxIoStatistics.class.getName() + ".size";
     private static final int SIZE =
             Integer.getInteger(SIZE_PROPERTY_KEY, 10);*/
 
     private final long time = System.currentTimeMillis();
     private final JmxMediator mediator;
 
-    public JmxStatistics(final JmxMediator mediator) {
+    public JmxIoStatistics(final JmxMediator mediator) {
         this.mediator = Objects.requireNonNull(mediator);
     }
 
@@ -48,10 +46,6 @@ public class JmxStatistics implements JmxColleague {
         return mediator.getWriteStats();
     }
 
-    SyncStatistics getSyncStats() {
-        return mediator.getSyncStats();
-    }
-
     @Override
     public void start() {
         register(name(), newView());
@@ -65,8 +59,8 @@ public class JmxStatistics implements JmxColleague {
                 .get();
     }
 
-    protected JmxStatisticsMXBean newView() {
-        return new JmxStatisticsView(this);
+    protected JmxIoStatisticsMXBean newView() {
+        return new JmxIoStatisticsView(this);
     }
 
     /*protected void roll(final int size) {
@@ -77,8 +71,8 @@ public class JmxStatistics implements JmxColleague {
                 .put("seqno", "*")
                 .stats();
         for (final ObjectName name : query(pattern)) {
-            final JmxStatisticsMXBean bean =
-                    proxy(name, JmxStatisticsMXBean.class);
+            final JmxIoStatisticsMXBean bean =
+                    proxy(name, JmxIoStatisticsMXBean.class);
             final int seqno = bean.sequenceNumber();
             if (seqno < min || max < seqno) deregister(name);
         }

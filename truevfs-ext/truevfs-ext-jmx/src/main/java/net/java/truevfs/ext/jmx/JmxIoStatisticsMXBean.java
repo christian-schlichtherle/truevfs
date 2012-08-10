@@ -5,17 +5,15 @@
 package net.java.truevfs.ext.jmx;
 
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.ext.jmx.stats.FsStatistics;
 import net.java.truevfs.ext.jmx.stats.IoStatistics;
 
 /**
- * The combined MXBean interface for an {@linkplain FsStatistics I/O logger}
- * and its {@linkplain IoStatistics I/O statistics}.
+ * The MXBean interface for {@linkplain IoStatistics I/O statistics}.
  *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public interface JmxStatisticsMXBean {
+public interface JmxIoStatisticsMXBean {
     int    getReadBytesPerOperation();
     long   getReadBytesTotal();
     long   getReadKilobytesPerSecond();
@@ -23,9 +21,6 @@ public interface JmxStatisticsMXBean {
     long   getReadNanosecondsTotal();
     int    getReadOperations();
     String getSubject();
-    long   getSyncNanosecondsPerOperation();
-    long   getSyncNanosecondsTotal();
-    int    getSyncOperations();
     long   getTimeCreatedMillis();
     String getTimeCreatedString();
     long   getTimeUpdatedMillis();
