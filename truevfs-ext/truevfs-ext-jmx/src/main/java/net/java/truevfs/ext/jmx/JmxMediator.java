@@ -143,7 +143,7 @@ public class JmxMediator extends Mediator<JmxMediator> {
     }
 
     /**
-     * Logs a getSyncStats operation with the given sample data and returns a new
+     * Logs a sync operation with the given sample data and returns a new
      * object to reflect the updated statistics.
      * The sequence number of the returned object will be incremented and may
      * eventually overflow to zero.
