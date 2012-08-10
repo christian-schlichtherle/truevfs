@@ -5,7 +5,8 @@
 package net.java.truevfs.ext.jmx.model;
 
 import java.math.BigInteger;
-import static java.math.BigInteger.*;
+import static java.math.BigInteger.TEN;
+import static java.math.BigInteger.valueOf;
 import javax.annotation.concurrent.Immutable;
 
 /**
