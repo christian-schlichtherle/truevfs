@@ -28,17 +28,17 @@ extends InstrumentingBuffer<JmxMediator> implements JmxColleague {
 
     @Override
     public void start() {
-        register(newView(), name());
-    }
-
-    protected JmxBufferMXBean newView() {
-        return new JmxBufferView(this);
+        register(name(), newView());
     }
 
     private ObjectName name() {
         return mediator.nameBuilder(IoBuffer.class)
                 .put("name", ObjectName.quote(getName()))
                 .get();
+    }
+
+    protected JmxBufferMXBean newView() {
+        return new JmxBufferView(this);
     }
 
     @Override

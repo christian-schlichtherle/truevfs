@@ -19,7 +19,9 @@ import net.java.truevfs.comp.inst.InstrumentingMetaDriver;
 import net.java.truevfs.comp.inst.InstrumentingOutputSocket;
 import net.java.truevfs.comp.inst.Mediator;
 import net.java.truevfs.comp.jmx.JmxObjectNameBuilder;
-import net.java.truevfs.ext.jmx.model.IoLogger;
+import net.java.truevfs.ext.jmx.stats.FsStatistics;
+import net.java.truevfs.ext.jmx.stats.IoStatistics;
+import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsModel;
@@ -31,18 +33,18 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
 /**
  * A mediator for the instrumentation of the TrueVFS Kernel with JMX.
  * Each instance of this class manages its own
- * {@linkplain #getLogger() I/O logger}.
+ * {@linkplain #stats() file system statistics}.
  * 
  * @author Christian Schlichtherle
  */
 @ThreadSafe
 public class JmxMediator extends Mediator<JmxMediator> {
     public static final JmxMediator APPLICATION = new JmxMediator("Application");
+    public static final JmxMediator BUFFERS = new JmxMediator("Buffers");
     public static final JmxMediator KERNEL = new JmxMediator("Kernel");
-    public static final JmxMediator BUFFER = new JmxMediator("Buffer");
 
-    private final AtomicReference<IoLogger> logger =
-            new AtomicReference<>(new IoLogger());
+    private final AtomicReference<FsStatistics> stats =
+            new AtomicReference<>(FsStatistics.zero());
     private String subject;
 
     protected JmxMediator(final String subject) {
@@ -68,48 +70,111 @@ public class JmxMediator extends Mediator<JmxMediator> {
      */
     @Override
     public String toString() {
-        return String.format("%s[subject=%s, logger=%s]",
-                getClass().getName(), getSubject(), getLogger());
+        return String.format("%s[subject=%s]",
+                getClass().getName(), getSubject());
     }
 
     public String getSubject() {
         return subject;
     }
 
+    private AtomicReference<FsStatistics> getInputRef() {
+        return stats;
+    }
+
+    private AtomicReference<FsStatistics> getOutputRef() {
+        return stats;
+    }
+
+    private AtomicReference<FsStatistics> getSyncRef() {
+        return APPLICATION.stats;
+    }
+
+    public IoStatistics getInputStats() {
+        return getInputRef().get().getInput();
+    }
+
+    public IoStatistics getOutputStats() {
+        return getOutputRef().get().getOutput();
+    }
+
+    public SyncStatistics getSyncStats() {
+        return getSyncRef().get().getSync();
+    }
+
     /**
-     * Returns the current I/O logger.
-     * This may change over time so a caller may need to cache the result.
+     * Logs an getInputStats operation with the given sample data and returns a new
+     * object to reflect the updated statistics.
+     * The sequence number of the returned object will be incremented and may
+     * eventually overflow to zero.
      * 
-     * @return the current I/O logger.
+     * @param  nanos the execution time in nanoseconds.
+     * @param  bytes the number of bytes read.
+     * @return A new object which reflects the updated statistics.
+     * @throws IllegalArgumentException if any parameter value is negative.
      */
-    public IoLogger getLogger() {
-        return logger.get();
-    }
-
-    public void rollLoggers() {
-        for (JmxMediator mediator : allMediators()) mediator.nextLogger();
-    }
-
-    protected JmxMediator[] allMediators() {
-        return new JmxMediator[] { APPLICATION, KERNEL, BUFFER };
-    }
-
-    public IoLogger nextLogger() {
-        final IoLogger next = nextLogger0();
-        start(newStatistics(next));
-        return next;
-    }
-
-    private IoLogger nextLogger0() {
+    public final FsStatistics logInput(long nanos, int bytes) {
+        final AtomicReference<FsStatistics> ref = getInputRef();
         while (true) {
-            final IoLogger expected = logger.get();
-            final IoLogger updated = expected.next();
-            if (logger.weakCompareAndSet(expected, updated)) return updated;
+            final FsStatistics expected = ref.get();
+            final FsStatistics updated = expected.logInput(nanos, bytes);
+            if (ref.weakCompareAndSet(expected, updated)) return updated;
         }
     }
 
-    protected JmxStatistics newStatistics(IoLogger logger) {
-        return new JmxStatistics(this, logger);
+    /**
+     * Logs an getOutputStats operation with the given sample data and returns a new
+     * object to reflect the updated statistics.
+     * The sequence number of the returned object will be incremented and may
+     * eventually overflow to zero.
+     * 
+     * @param  nanos the execution time in nanoseconds.
+     * @param  bytes the number of bytes written.
+     * @return A new object which reflects the updated statistics.
+     * @throws IllegalArgumentException if any parameter is negative.
+     */
+    public final FsStatistics logOutput(long nanos, int bytes) {
+        final AtomicReference<FsStatistics> ref = getOutputRef();
+        while (true) {
+            final FsStatistics expected = ref.get();
+            final FsStatistics updated = expected.logOutput(nanos, bytes);
+            if (ref.weakCompareAndSet(expected, updated)) return updated;
+        }
+    }
+
+    /**
+     * Logs a getSyncStats operation with the given sample data and returns a new
+     * object to reflect the updated statistics.
+     * The sequence number of the returned object will be incremented and may
+     * eventually overflow to zero.
+     * 
+     * @param  nanos the execution time in nanoseconds.
+     * @return A new object which reflects the updated statistics.
+     * @throws IllegalArgumentException if any parameter value is negative.
+     */
+    public final FsStatistics logSync(long nanos) {
+        final AtomicReference<FsStatistics> ref = getSyncRef();
+        while (true) {
+            final FsStatistics expected = ref.get();
+            final FsStatistics updated = expected.logSync(nanos);
+            if (ref.weakCompareAndSet(expected, updated)) return updated;
+        }
+    }
+
+    public void rotateStatistics() {
+        for (JmxMediator mediator : allMediators()) mediator.nextStatistics();
+    }
+
+    protected JmxMediator[] allMediators() {
+        return new JmxMediator[] { APPLICATION, KERNEL, BUFFERS };
+    }
+
+    private void nextStatistics() {
+        start(newStatistics());
+    }
+
+    protected JmxStatistics newStatistics() {
+        return new JmxStatistics(this);
     }
 
     @Override

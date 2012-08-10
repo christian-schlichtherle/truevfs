@@ -8,81 +8,79 @@ import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import static net.java.truevfs.comp.jmx.JmxUtils.*;
-import net.java.truevfs.ext.jmx.model.IoLogger;
-import net.java.truevfs.ext.jmx.model.IoStatistics;
+import net.java.truevfs.ext.jmx.stats.FsStatistics;
+import net.java.truevfs.ext.jmx.stats.IoStatistics;
+import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 
 /**
- * The combined JMX controller for an {@linkplain IoLogger I/O logger}
+ * The combined JMX controller for an {@linkplain FsStatistics I/O logger}
  * and its {@linkplain IoStatistics I/O statistics}.
  * 
  * @author Christian Schlichtherle
  */
 @ThreadSafe
 public class JmxStatistics implements JmxColleague {
-    private static final String SIZE_PROPERTY_KEY =
+    /*private static final String SIZE_PROPERTY_KEY =
             JmxStatistics.class.getName() + ".size";
     private static final int SIZE =
-            Integer.getInteger(SIZE_PROPERTY_KEY, 10);
+            Integer.getInteger(SIZE_PROPERTY_KEY, 10);*/
 
+    private final long time = System.currentTimeMillis();
     private final JmxMediator mediator;
-    private final IoLogger logger;
 
-    public JmxStatistics(
-            final JmxMediator mediator,
-            final IoLogger logger) {
+    public JmxStatistics(final JmxMediator mediator) {
         this.mediator = Objects.requireNonNull(mediator);
-        this.logger = Objects.requireNonNull(logger);
+    }
+
+    long getTimeCreatedMillis() {
+        return time;
     }
 
     String getSubject() {
         return mediator.getSubject();
     }
 
-    int getSequenceNumber() {
-        return logger.getSequenceNumber();
+    IoStatistics getInputStats() {
+        return mediator.getInputStats();
     }
 
-    long getTimeCreatedMillis() {
-        return logger.getTimeCreatedMillis();
+    IoStatistics getOutputStats() {
+        return mediator.getOutputStats();
     }
 
-    IoStatistics getReadStats() {
-        return logger.getReadStats();
-    }
-
-    IoStatistics getWriteStats() {
-        return logger.getWriteStats();
+    SyncStatistics getSyncStats() {
+        return mediator.getSyncStats();
     }
 
     @Override
     public void start() {
-        register(newView(), name());
-        roll(SIZE);
+        register(name(), newView());
+        //roll(SIZE);
+    }
+
+    private ObjectName name() {
+        return mediator.nameBuilder(FsStatistics.class)
+                .put("subject", getSubject())
+                //.put("seqno", String.format("%08x", sequenceNumber() & 0xffff_ffffL))
+                .get();
     }
 
     protected JmxStatisticsMXBean newView() {
         return new JmxStatisticsView(this);
     }
 
-    private ObjectName name() {
-        return mediator.nameBuilder(IoStatistics.class)
-                .put("subject", getSubject())
-                .put("seqno", String.format("%08x", getSequenceNumber() & 0xffff_ffffL))
-                .get();
-    }
-
-    protected void roll(final int size) {
-        final int max = logger.getSequenceNumber();
+    /*protected void roll(final int size) {
+        final int max = stats.sequenceNumber();
         final int min = max - size + 1;
-        final ObjectName pattern = mediator.nameBuilder(IoStatistics.class)
+        final ObjectName pattern = mediator.nameBuilder(FsStatistics.class)
                 .put("subject", getSubject())
                 .put("seqno", "*")
-                .get();
+                .stats();
         for (final ObjectName name : query(pattern)) {
             final JmxStatisticsMXBean bean =
                     proxy(name, JmxStatisticsMXBean.class);
-            final int seqno = bean.getSequenceNumber();
+            final int seqno = bean.sequenceNumber();
             if (seqno < min || max < seqno) deregister(name);
         }
-    }
+    }*/
 }

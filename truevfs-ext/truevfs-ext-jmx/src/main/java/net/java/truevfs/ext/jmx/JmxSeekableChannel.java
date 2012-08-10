@@ -10,7 +10,6 @@ import java.nio.channels.SeekableByteChannel;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truevfs.comp.inst.InstrumentingSeekableChannel;
-import net.java.truevfs.ext.jmx.model.IoLogger;
 
 /**
  * The MXBean controller for a
@@ -21,13 +20,11 @@ import net.java.truevfs.ext.jmx.model.IoLogger;
 @NotThreadSafe
 public class JmxSeekableChannel
 extends InstrumentingSeekableChannel<JmxMediator> implements JmxColleague {
-    private IoLogger logger;
 
     JmxSeekableChannel(
-            final JmxMediator mediator,
-            final @WillCloseWhenClosed SeekableByteChannel channel) {
+            JmxMediator mediator,
+            @WillCloseWhenClosed SeekableByteChannel channel) {
         super(mediator, channel);
-        this.logger = mediator.getLogger();
     }
 
     @Override
@@ -38,10 +35,7 @@ extends InstrumentingSeekableChannel<JmxMediator> implements JmxColleague {
     public int read(ByteBuffer buf) throws IOException {
         final long start = System.nanoTime();
         final int ret = channel.read(buf);
-        if (0 <= ret)
-            for (final long time = System.nanoTime() - start;
-                    !logger.tryLogRead(ret, time); )
-                logger = mediator.nextLogger();
+        if (0 <= ret) mediator.logInput(System.nanoTime() - start, ret);
         return ret;
     }
 
@@ -49,9 +43,7 @@ extends InstrumentingSeekableChannel<JmxMediator> implements JmxColleague {
     public int write(ByteBuffer buf) throws IOException {
         final long start = System.nanoTime();
         final int ret = channel.write(buf);
-        for (final long time = System.nanoTime() - start;
-                logger.tryLogWrite(ret, time); )
-            logger = mediator.nextLogger();
+        mediator.logOutput(System.nanoTime() - start, ret);
         return ret;
     }
 }

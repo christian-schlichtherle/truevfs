@@ -10,11 +10,12 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.StandardMBean;
-import net.java.truevfs.ext.jmx.model.IoLogger;
-import net.java.truevfs.ext.jmx.model.IoStatistics;
+import net.java.truevfs.ext.jmx.stats.FsStatistics;
+import net.java.truevfs.ext.jmx.stats.IoStatistics;
+import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 
 /**
- * The combined MXBean view for an {@linkplain IoLogger I/O logger}
+ * The combined MXBean view for an {@linkplain FsStatistics I/O logger}
  * and its {@linkplain IoStatistics I/O statistics}.
  *
  * @author Christian Schlichtherle
@@ -35,7 +36,7 @@ extends StandardMBean implements JmxStatisticsMXBean {
      */
     @Override
     protected String getDescription(MBeanInfo info) {
-        return "A log of I/O statistics.";
+        return "A log of file system statistics.";
     }
 
     /**
@@ -45,41 +46,91 @@ extends StandardMBean implements JmxStatisticsMXBean {
     @Override
     protected String getDescription(MBeanAttributeInfo info) {
         switch (info.getName()) {
-        case "Subject":
-            return "The subject of this log.";
-        case "SequenceNumber":
-            return "The sequence number of this log.";
-        case "TimeCreated":
-            return "The time this log has been created.";
-        case "TimeCreatedMillis":
-            return "The time this log has been created in milliseconds.";
-        case "TimeUpdated":
-            return "The last time this log has been updated.";
-        case "TimeUpdatedMillis":
-            return "The last time this log has been updated in milliseconds.";
         case "ReadBytesPerOperation":
             return "The average number of bytes per read operation.";
         case "ReadBytesTotal":
             return "The total number of bytes read.";
         case "ReadKilobytesPerSecond":
             return "The average throughput for read operations.";
+        case "ReadNanosecondsPerOperation":
+            return "The average execution time per read operation.";
         case "ReadNanosecondsTotal":
             return "The total execution time for read operations.";
-        case "ReadOperationsTotal":
+        case "ReadOperations":
             return "The total number of read operations.";
+        case "Subject":
+            return "The subject of this log.";
+        case "SyncNanosecondsPerOperation":
+            return "The average execution time per sync operation.";
+        case "SyncNanosecondsTotal":
+            return "The total execution time for sync operations.";
+        case "SyncOperations":
+            return "The total number of sync operations.";
+        case "TimeCreatedMillis":
+            return "The time this log has been created in milliseconds.";
+        case "TimeCreatedString":
+            return "The time this log has been created.";
+        case "TimeUpdatedMillis":
+            return "The last time this log has been updated in milliseconds.";
+        case "TimeUpdatedString":
+            return "The last time this log has been updated.";
         case "WriteBytesPerOperation":
             return "The average number of bytes per write operation.";
         case "WriteBytesTotal":
             return "The total number of bytes written.";
         case "WriteKilobytesPerSecond":
             return "The average throughput for write operations.";
+        case "WriteNanosecondsPerOperation":
+            return "The average execution time per write operation.";
         case "WriteNanosecondsTotal":
             return "The total execution time for write operations.";
-        case "WriteOperationsTotal":
+        case "WriteOperations":
             return "The total number of write operations.";
         default:
             return null;
         }
+    }
+
+    private IoStatistics getInputStats() {
+        return stats.getInputStats();
+    }
+
+    private IoStatistics getOutputStats() {
+        return stats.getOutputStats();
+    }
+
+    private SyncStatistics getSyncStats() {
+        return stats.getSyncStats();
+    }
+
+    @Override
+    public int getReadBytesPerOperation() {
+        return getInputStats().getBytesPerOperation();
+    }
+
+    @Override
+    public long getReadBytesTotal() {
+        return getInputStats().getBytesTotal();
+    }
+
+    @Override
+    public long getReadKilobytesPerSecond() {
+        return getInputStats().getKilobytesPerSecond();
+    }
+
+    @Override
+    public long getReadNanosecondsPerOperation() {
+        return getInputStats().getNanosecondsPerOperation();
+    }
+
+    @Override
+    public long getReadNanosecondsTotal() {
+        return getInputStats().getNanosecondsTotal();
+    }
+
+    @Override
+    public int getReadOperations() {
+        return getInputStats().getSequenceNumber();
     }
 
     @Override
@@ -88,13 +139,18 @@ extends StandardMBean implements JmxStatisticsMXBean {
     }
 
     @Override
-    public int getSequenceNumber() {
-        return stats.getSequenceNumber();
+    public long getSyncNanosecondsPerOperation() {
+        return getSyncStats().getNanosecondsPerOperation();
     }
 
     @Override
-    public String getTimeCreated() {
-        return new Date(getTimeCreatedMillis()).toString();
+    public long getSyncNanosecondsTotal() {
+        return getSyncStats().getNanosecondsTotal();
+    }
+
+    @Override
+    public int getSyncOperations() {
+        return getSyncStats().getSequenceNumber();
     }
 
     @Override
@@ -103,64 +159,49 @@ extends StandardMBean implements JmxStatisticsMXBean {
     }
 
     @Override
-    public String getTimeUpdated() {
-        return new Date(getTimeUpdatedMillis()).toString();
+    public String getTimeCreatedString() {
+        return new Date(getTimeCreatedMillis()).toString();
     }
 
     @Override
     public long getTimeUpdatedMillis() {
         return Math.max(
-                stats.getReadStats().getTimeCreatedMillis(),
-                stats.getWriteStats().getTimeCreatedMillis());
+                Math.max(getInputStats().getTimeMillis(), getOutputStats().getTimeMillis()),
+                getSyncStats().getTimeMillis());
     }
 
     @Override
-    public long getReadBytesTotal() {
-        return stats.getReadStats().getBytesTotal();
-    }
-
-    @Override
-    public long getReadNanosecondsTotal() {
-        return stats.getReadStats().getNanosecondsTotal();
-    }
-
-    @Override
-    public int getReadBytesPerOperation() {
-        return stats.getReadStats().getBytesPerOperation();
-    }
-
-    @Override
-    public long getReadKilobytesPerSecond() {
-        return stats.getReadStats().getKilobytesPerSecond();
-    }
-
-    @Override
-    public int getReadOperationsTotal() {
-        return stats.getReadStats().getSequenceNumber();
-    }
-
-    @Override
-    public long getWriteBytesTotal() {
-        return stats.getWriteStats().getBytesTotal();
+    public String getTimeUpdatedString() {
+        return new Date(getTimeUpdatedMillis()).toString();
     }
 
     @Override
     public int getWriteBytesPerOperation() {
-        return stats.getWriteStats().getBytesPerOperation();
+        return getOutputStats().getBytesPerOperation();
+    }
+
+    @Override
+    public long getWriteBytesTotal() {
+        return getOutputStats().getBytesTotal();
     }
 
     @Override
     public long getWriteKilobytesPerSecond() {
-        return stats.getWriteStats().getKilobytesPerSecond();
+        return getOutputStats().getKilobytesPerSecond();
+    }
+
+    @Override
+    public long getWriteNanosecondsPerOperation() {
+        return getOutputStats().getNanosecondsPerOperation();
     }
 
     @Override
     public long getWriteNanosecondsTotal() {
-        return stats.getWriteStats().getNanosecondsTotal();
+        return getOutputStats().getNanosecondsTotal();
     }
 
     @Override
-    public int getWriteOperationsTotal() {
-        return stats.getWriteStats().getSequenceNumber();
+    public int getWriteOperations() {
+        return getOutputStats().getSequenceNumber();
     }
 }
