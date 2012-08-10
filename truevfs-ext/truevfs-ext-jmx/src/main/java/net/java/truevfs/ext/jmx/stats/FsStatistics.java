@@ -25,20 +25,20 @@ public final class FsStatistics {
     }
 
     private final int seqno;
-    private final IoStatistics input, output;
+    private final IoStatistics read, write;
     private final SyncStatistics sync;
 
     private FsStatistics(
             final int seqno,
-            final IoStatistics input,
-            final IoStatistics output,
+            final IoStatistics read,
+            final IoStatistics write,
             final SyncStatistics sync) {
-        assert null != input;
-        assert null != output;
+        assert null != read;
+        assert null != write;
         assert null != sync;
         this.seqno = 0 > seqno ? 0 : seqno;
-        this.input = input;
-        this.output = output;
+        this.read = read;
+        this.write = write;
         this.sync = sync;
     }
 
@@ -51,7 +51,7 @@ public final class FsStatistics {
      */
     public long getTimeMillis() {
         return Math.max(
-                Math.max(input.getTimeMillis(), output.getTimeMillis()),
+                Math.max(read.getTimeMillis(), write.getTimeMillis()),
                 sync.getTimeMillis());
     }
 
@@ -64,20 +64,20 @@ public final class FsStatistics {
         return seqno;
     }
 
-    public IoStatistics getInput() {
-        return input;
+    public IoStatistics getReadStats() {
+        return read;
     }
 
-    public IoStatistics getOutput() {
-        return output;
+    public IoStatistics getWriteStats() {
+        return write;
     }
 
-    public SyncStatistics getSync() {
+    public SyncStatistics getSyncStats() {
         return sync;
     }
 
     /**
-     * Logs an input operation with the given sample data and returns a new
+     * Logs a read operation with the given sample data and returns a new
      * object to reflect the updated statistics.
      * The sequence number of the returned object will be incremented and may
      * eventually overflow to zero.
@@ -87,12 +87,12 @@ public final class FsStatistics {
      * @return A new object which reflects the updated statistics.
      * @throws IllegalArgumentException if any parameter value is negative.
      */
-    public FsStatistics logInput(long nanos, int bytes) {
-        return new FsStatistics(seqno + 1, input.log(nanos, bytes), output, sync);
+    public FsStatistics logRead(long nanos, int bytes) {
+        return new FsStatistics(seqno + 1, read.log(nanos, bytes), write, sync);
     }
 
     /**
-     * Logs an output operation with the given sample data and returns a new
+     * Logs a write operation with the given sample data and returns a new
      * object to reflect the updated statistics.
      * The sequence number of the returned object will be incremented and may
      * eventually overflow to zero.
@@ -102,8 +102,8 @@ public final class FsStatistics {
      * @return A new object which reflects the updated statistics.
      * @throws IllegalArgumentException if any parameter is negative.
      */
-    public FsStatistics logOutput(long nanos, int bytes) {
-        return new FsStatistics(seqno + 1, input, output.log(nanos, bytes), sync);
+    public FsStatistics logWrite(long nanos, int bytes) {
+        return new FsStatistics(seqno + 1, read, write.log(nanos, bytes), sync);
     }
 
     /**
@@ -117,7 +117,7 @@ public final class FsStatistics {
      * @throws IllegalArgumentException if any parameter value is negative.
      */
     public FsStatistics logSync(long nanos) {
-        return new FsStatistics(seqno + 1, input, output, sync.log(nanos));
+        return new FsStatistics(seqno + 1, read, write, sync.log(nanos));
     }
 
     /**
@@ -126,7 +126,7 @@ public final class FsStatistics {
      */
     @Override
     public String toString() {
-        return String.format("%s[sequenceNumber=%d, input=%s, output=%s, sync=%s]",
-                getClass().getName(), seqno, input, output, sync);
+        return String.format("%s[sequenceNumber=%d, readStats=%s, writeStats=%s, syncStats=%s]",
+                getClass().getName(), seqno, read, write, sync);
     }
 }

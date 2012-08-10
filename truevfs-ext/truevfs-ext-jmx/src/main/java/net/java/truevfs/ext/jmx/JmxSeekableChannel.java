@@ -35,7 +35,7 @@ extends InstrumentingSeekableChannel<JmxMediator> implements JmxColleague {
     public int read(ByteBuffer buf) throws IOException {
         final long start = System.nanoTime();
         final int ret = channel.read(buf);
-        if (0 <= ret) mediator.logInput(System.nanoTime() - start, ret);
+        if (0 <= ret) mediator.logRead(System.nanoTime() - start, ret);
         return ret;
     }
 
@@ -43,7 +43,7 @@ extends InstrumentingSeekableChannel<JmxMediator> implements JmxColleague {
     public int write(ByteBuffer buf) throws IOException {
         final long start = System.nanoTime();
         final int ret = channel.write(buf);
-        mediator.logOutput(System.nanoTime() - start, ret);
+        mediator.logWrite(System.nanoTime() - start, ret);
         return ret;
     }
 }

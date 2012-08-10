@@ -41,11 +41,11 @@ public class JmxStatistics implements JmxColleague {
     }
 
     IoStatistics getInputStats() {
-        return mediator.getInputStats();
+        return mediator.getReadStats();
     }
 
     IoStatistics getOutputStats() {
-        return mediator.getOutputStats();
+        return mediator.getWriteStats();
     }
 
     SyncStatistics getSyncStats() {
