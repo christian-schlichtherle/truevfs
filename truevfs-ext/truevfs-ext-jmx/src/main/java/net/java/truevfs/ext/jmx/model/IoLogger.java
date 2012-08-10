@@ -44,29 +44,72 @@ public final class IoLogger {
     }
 
     /**
-     * Logs a read operation with the given metric data.
+     * Logs a read operation with the given sample data.
      * 
      * @param  bytes the number of bytes read.
      * @param  nanos the execution time in nanoseconds.
+     * @throws IllegalArgumentException if any parameter is negative.
+     * @throws IoOverflowException if any statistical property would overflow.
      */
-    public void logRead(int bytes, long nanos) {
+    public void logRead(int bytes, long nanos) throws IoOverflowException {
         log(read, bytes, nanos);
     }
 
     /**
-     * Logs a write operation with the given metric data.
+     * Attempts to log a read operation with the given sample data.
+     * 
+     * @param  bytes the number of bytes read.
+     * @param  nanos the execution time in nanoseconds.
+     * @return {@cod false} if and only if the operation fails because any
+     *         statistical property would overflow.
+     * @throws IllegalArgumentException if any parameter is negative.
+     */
+    public boolean tryLogRead(int bytes, long nanos) {
+        return tryLog(read, bytes, nanos);
+    }
+
+    /**
+     * Logs a write operation with the given sample data.
      * 
      * @param  bytes the number of bytes written.
      * @param  nanos the execution time in nanoseconds.
+     * @throws IllegalArgumentException if any parameter is negative.
+     * @throws IoOverflowException if any statistical property would overflow.
      */
-    public void logWrite(int bytes, long nanos) {
+    public void logWrite(int bytes, long nanos) throws IoOverflowException {
         log(write, bytes, nanos);
+    }
+
+    /**
+     * Attempts to log a write operation with the given sample data.
+     * 
+     * @param  bytes the number of bytes written.
+     * @param  nanos the execution time in nanoseconds.
+     * @return {@cod false} if and only if the operation fails because any
+     *         statistical property would overflow.
+     * @throws IllegalArgumentException if any parameter is negative.
+     */
+    public boolean tryLogWrite(int bytes, long nanos) {
+        return tryLog(write, bytes, nanos);
+    }
+
+    private static boolean tryLog(
+            final AtomicReference<IoStatistics> reference,
+            final int bytes,
+            final long nanos) {
+        try {
+            log(reference, bytes, nanos);
+            return true;
+        } catch (final IoOverflowException ex) {
+            return false;
+        }
     }
 
     private static void log(
             final AtomicReference<IoStatistics> reference,
             final int bytes,
-            final long nanos) {
+            final long nanos)
+    throws IoOverflowException {
         while (true) {
             final IoStatistics expected = reference.get();
             final IoStatistics updated = expected.log(bytes, nanos);

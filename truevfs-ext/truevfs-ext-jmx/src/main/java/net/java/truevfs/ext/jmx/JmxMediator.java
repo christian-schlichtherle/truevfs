@@ -29,6 +29,10 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
 
 /**
+ * A mediator for the instrumentation of the TrueVFS Kernel with JMX.
+ * Each instance of this class manages its own
+ * {@linkplain #getLogger() I/O logger}.
+ * 
  * @author Christian Schlichtherle
  */
 @ThreadSafe
@@ -72,28 +76,40 @@ public class JmxMediator extends Mediator<JmxMediator> {
         return subject;
     }
 
+    /**
+     * Returns the current I/O logger.
+     * This may change over time so a caller may need to cache the result.
+     * 
+     * @return the current I/O logger.
+     */
     public IoLogger getLogger() {
         return logger.get();
     }
 
-    public void rotateAllLoggers() {
-        for (JmxMediator mediator : allMediators()) mediator.rotateLoggers();
+    public void rollLoggers() {
+        for (JmxMediator mediator : allMediators()) mediator.nextLogger();
     }
 
     protected JmxMediator[] allMediators() {
         return new JmxMediator[] { APPLICATION, KERNEL, BUFFER };
     }
 
-    public void rotateLoggers() {
-        start(new JmxStatistics(this, nextLogger()));
+    public IoLogger nextLogger() {
+        final IoLogger next = nextLogger0();
+        start(newStatistics(next));
+        return next;
     }
 
-    protected final IoLogger nextLogger() {
+    private IoLogger nextLogger0() {
         while (true) {
             final IoLogger expected = logger.get();
             final IoLogger updated = expected.next();
             if (logger.weakCompareAndSet(expected, updated)) return updated;
         }
+    }
+
+    protected JmxStatistics newStatistics(IoLogger logger) {
+        return new JmxStatistics(this, logger);
     }
 
     @Override

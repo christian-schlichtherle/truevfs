@@ -6,15 +6,19 @@ package net.java.truevfs.ext.jmx;
 
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
+import net.java.truecommons.shed.BitField;
 import net.java.truevfs.comp.inst.InstrumentingManager;
 import net.java.truevfs.comp.jmx.JmxManagerMXBean;
 import static net.java.truevfs.comp.jmx.JmxUtils.*;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsSyncException;
+import net.java.truevfs.kernel.spec.FsSyncOption;
 import net.java.truevfs.kernel.spec.FsSyncOptions;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 
 /**
+ * The MXBean controller for a {@linkplain FsManager file system manager}.
+ * 
  * @author Christian Schlichtherle
  */
 @ThreadSafe
@@ -28,7 +32,7 @@ extends InstrumentingManager<JmxMediator> implements JmxColleague {
     @Override
     public void start() {
         register(newView(), name());
-        mediator.rotateAllLoggers();
+        mediator.rollLoggers();
     }
 
     protected JmxManagerMXBean newView() {
@@ -39,8 +43,13 @@ extends InstrumentingManager<JmxMediator> implements JmxColleague {
         return mediator.nameBuilder(FsManager.class).get();
     }
 
+    @Override
+    public void sync(BitField<FsSyncOption> options) throws FsSyncException {
+        super.sync(options);
+        mediator.rollLoggers();
+    }
+
     void sync() throws FsSyncException {
         FsManagerLocator.SINGLETON.get().sync(FsSyncOptions.NONE);
-        mediator.rotateAllLoggers();
     }
 }

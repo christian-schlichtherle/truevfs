@@ -17,6 +17,8 @@ import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 
 /**
+ * The MXBean controller for a {@linkplain FsModel file system model}.
+ * 
  * @author Christian Schlichtherle
  */
 @ThreadSafe

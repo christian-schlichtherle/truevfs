@@ -16,7 +16,7 @@ import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsSyncException;
 
 /**
- * The MXBean implementation for a {@linkplain FsManager file system manager}.
+ * The MXBean view for a {@linkplain FsManager file system manager}.
  *
  * @author Christian Schlichtherle
  */

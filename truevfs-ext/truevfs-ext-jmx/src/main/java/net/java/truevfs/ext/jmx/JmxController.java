@@ -4,12 +4,16 @@
  */
 package net.java.truevfs.ext.jmx;
 
+import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.comp.inst.InstrumentingController;
 import net.java.truevfs.kernel.spec.FsController;
 
 /**
+ * The MXBean controller for a {@linkplain FsController file system controller}.
+ * 
  * @author Christian Schlichtherle
  */
+@ThreadSafe
 public class JmxController
 extends InstrumentingController<JmxMediator> implements JmxColleague {
 

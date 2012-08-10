@@ -9,11 +9,13 @@ import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
-import javax.management.MBeanOperationInfo;
 import javax.management.StandardMBean;
+import net.java.truevfs.ext.jmx.model.IoLogger;
+import net.java.truevfs.ext.jmx.model.IoStatistics;
 
 /**
- * The MXBean implementation for the I/O statistics.
+ * The combined MXBean view for an {@linkplain IoLogger I/O logger}
+ * and its {@linkplain IoStatistics I/O statistics}.
  *
  * @author Christian Schlichtherle
  */
@@ -75,20 +77,6 @@ extends StandardMBean implements JmxStatisticsMXBean {
             return "The total execution time for write operations.";
         case "WriteOperationsTotal":
             return "The total number of write operations.";
-        default:
-            return null;
-        }
-    }
-
-    /**
-     * Override customization hook:
-     * You can supply a customized description for MBeanOperationInfo.getDescription()
-     */
-    @Override
-    protected String getDescription(MBeanOperationInfo info) {
-        switch (info.getName()) {
-        case "close":
-            return "Closes this I/O statistics log.";
         default:
             return null;
         }
@@ -174,10 +162,5 @@ extends StandardMBean implements JmxStatisticsMXBean {
     @Override
     public int getWriteOperationsTotal() {
         return stats.getWriteStats().getSequenceNumber();
-    }
-
-    @Override
-    public void close() {
-        stats.close();
     }
 }

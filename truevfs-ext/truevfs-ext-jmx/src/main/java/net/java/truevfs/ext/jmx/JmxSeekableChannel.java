@@ -13,12 +13,15 @@ import net.java.truevfs.comp.inst.InstrumentingSeekableChannel;
 import net.java.truevfs.ext.jmx.model.IoLogger;
 
 /**
+ * The MXBean controller for a
+ * {@linkplain SeekableByteChannel seekable byte channel}.
+ * 
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public class JmxSeekableChannel
 extends InstrumentingSeekableChannel<JmxMediator> implements JmxColleague {
-    private final IoLogger logger;
+    private IoLogger logger;
 
     JmxSeekableChannel(
             final JmxMediator mediator,
@@ -34,16 +37,21 @@ extends InstrumentingSeekableChannel<JmxMediator> implements JmxColleague {
     @Override
     public int read(ByteBuffer buf) throws IOException {
         final long start = System.nanoTime();
-        int ret = channel.read(buf);
-        if (0 < ret) logger.logRead(ret, System.nanoTime() - start);
+        final int ret = channel.read(buf);
+        if (0 <= ret)
+            for (final long time = System.nanoTime() - start;
+                    !logger.tryLogRead(ret, time); )
+                logger = mediator.nextLogger();
         return ret;
     }
 
     @Override
     public int write(ByteBuffer buf) throws IOException {
         final long start = System.nanoTime();
-        int ret = channel.write(buf);
-        logger.logWrite(ret, System.nanoTime() - start);
+        final int ret = channel.write(buf);
+        for (final long time = System.nanoTime() - start;
+                logger.tryLogWrite(ret, time); )
+            logger = mediator.nextLogger();
         return ret;
     }
 }
