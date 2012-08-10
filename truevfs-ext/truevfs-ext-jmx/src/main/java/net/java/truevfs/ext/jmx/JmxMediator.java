@@ -161,7 +161,7 @@ public class JmxMediator extends Mediator<JmxMediator> {
         }
     }
 
-    public void rotateStats() {
+    public void rotateStatistics() {
         for (JmxMediator mediator : allMediators()) mediator.nextStatistics();
     }
 
