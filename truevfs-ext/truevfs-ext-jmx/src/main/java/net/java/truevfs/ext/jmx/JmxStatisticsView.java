@@ -20,11 +20,11 @@ import javax.management.StandardMBean;
 @ThreadSafe
 public class JmxStatisticsView
 extends StandardMBean implements JmxStatisticsMXBean {
-    protected final JmxStatistics sampler;
+    protected final JmxStatistics stats;
 
-    public JmxStatisticsView(final JmxStatistics sampler) {
+    public JmxStatisticsView(final JmxStatistics stats) {
         super(JmxStatisticsMXBean.class, true);
-        this.sampler = Objects.requireNonNull(sampler);
+        this.stats = Objects.requireNonNull(stats);
     }
 
     /**
@@ -33,7 +33,7 @@ extends StandardMBean implements JmxStatisticsMXBean {
      */
     @Override
     protected String getDescription(MBeanInfo info) {
-        return "A record of I/O statistics.";
+        return "A log of I/O statistics.";
     }
 
     /**
@@ -44,20 +44,47 @@ extends StandardMBean implements JmxStatisticsMXBean {
     protected String getDescription(MBeanAttributeInfo info) {
         String description = null;
         switch (info.getName()) {
-        case "Kind":
-            description = "The kind of these I/O statistics.";
+        case "Subject":
+            description = "The subject of this I/O statistics log.";
+            break;
+        case "SequenceNumber":
+            description = "The sequence number of I/O statistics log.";
             break;
         case "TimeCreated":
-            description = "The time these I/O statistics have been created.";
+            description = "The time this I/O statistics log has been created.";
             break;
         case "TimeCreatedMillis":
-            description = "The time these I/O statistics have been created in milliseconds.";
+            description = "The time this I/O statistics log has been created in milliseconds.";
             break;
-        case "BytesRead":
-            description = "The number of bytes read.";
+        case "ReadBytesPerOperation":
+            description = "The average number of bytes per read operation.";
             break;
-        case "BytesWritten":
-            description = "The number of bytes written.";
+        case "ReadBytesTotal":
+            description = "The total number of bytes read.";
+            break;
+        case "ReadKilobytesPerSecond":
+            description = "The average throughput for read operations.";
+            break;
+        case "ReadNanosecondsTotal":
+            description = "The total execution time for read operations.";
+            break;
+        case "ReadOperationsTotal":
+            description = "The total number of read operations.";
+            break;
+        case "WriteBytesPerOperation":
+            description = "The average number of bytes per write operation.";
+            break;
+        case "WriteBytesTotal":
+            description = "The total number of bytes written.";
+            break;
+        case "WriteKilobytesPerSecond":
+            description = "The average throughput for write operations.";
+            break;
+        case "WriteNanosecondsTotal":
+            description = "The total execution time for write operations.";
+            break;
+        case "WriteOperationsTotal":
+            description = "The total number of write operations.";
             break;
         }
         return description;
@@ -71,72 +98,82 @@ extends StandardMBean implements JmxStatisticsMXBean {
     protected String getDescription(MBeanOperationInfo info) {
         String description = null;
         if (info.getName().equals("close"))
-            description = "Closes these I/O statistics.";
+            description = "Closes this I/O statistics log.";
         return description;
     }
 
     @Override
-    public String getKind() {
-        return sampler.getKindString();
+    public String getSubject() {
+        return stats.getSubject();
     }
 
     @Override
     public int getSequenceNumber() {
-        return sampler.getSequenceNumber();
+        return stats.getSequenceNumber();
     }
 
     @Override
     public String getTimeCreated() {
-        return new Date(sampler.getTimeCreatedMillis()).toString();
+        return new Date(stats.getTimeCreatedMillis()).toString();
     }
 
     @Override
     public long getTimeCreatedMillis() {
-        return sampler.getTimeCreatedMillis();
+        return stats.getTimeCreatedMillis();
     }
 
     @Override
-    public long getReadSumOfBytes() {
-        return sampler.getReadStats().getSumOfBytes();
+    public long getReadBytesTotal() {
+        return stats.getReadStats().getBytesTotal();
+    }
+
+    @Override
+    public long getReadNanosecondsTotal() {
+        return stats.getReadStats().getNanosecondsTotal();
     }
 
     @Override
     public int getReadBytesPerOperation() {
-        return sampler.getReadStats().getAverageBytesPerOperation();
+        return stats.getReadStats().getBytesPerOperation();
     }
 
     @Override
     public long getReadKilobytesPerSecond() {
-        return sampler.getReadStats().getKilobytesPerSecond();
+        return stats.getReadStats().getKilobytesPerSecond();
     }
 
     @Override
-    public int getReadNumberOfOperations() {
-        return sampler.getReadStats().getSequenceNumber();
+    public int getReadOperationsTotal() {
+        return stats.getReadStats().getSequenceNumber();
     }
 
     @Override
-    public long getWriteSumOfBytes() {
-        return sampler.getWriteStats().getSumOfBytes();
+    public long getWriteBytesTotal() {
+        return stats.getWriteStats().getBytesTotal();
     }
 
     @Override
     public int getWriteBytesPerOperation() {
-        return sampler.getWriteStats().getAverageBytesPerOperation();
+        return stats.getWriteStats().getBytesPerOperation();
     }
 
     @Override
     public long getWriteKilobytesPerSecond() {
-        return sampler.getWriteStats().getKilobytesPerSecond();
+        return stats.getWriteStats().getKilobytesPerSecond();
     }
 
     @Override
-    public int getWriteNumberOfOperations() {
-        return sampler.getWriteStats().getSequenceNumber();
+    public long getWriteNanosecondsTotal() {
+        return stats.getWriteStats().getNanosecondsTotal();
+    }
+
+    @Override
+    public int getWriteOperationsTotal() {
+        return stats.getWriteStats().getSequenceNumber();
     }
 
     @Override
     public void close() {
-        sampler.close();
+        stats.close();
     }
 }

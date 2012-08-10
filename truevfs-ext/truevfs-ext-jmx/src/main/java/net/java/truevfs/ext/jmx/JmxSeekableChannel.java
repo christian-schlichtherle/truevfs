@@ -22,10 +22,9 @@ extends InstrumentingSeekableChannel<JmxMediator> implements JmxColleague {
 
     JmxSeekableChannel(
             final JmxMediator mediator,
-            final @WillCloseWhenClosed SeekableByteChannel channel,
-            final JmxStatistics.Kind kind) {
+            final @WillCloseWhenClosed SeekableByteChannel channel) {
         super(mediator, channel);
-        this.logger = mediator.logger(kind);
+        this.logger = mediator.getLogger();
     }
 
     @Override

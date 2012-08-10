@@ -9,9 +9,6 @@ import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.InstrumentingManager;
 import net.java.truevfs.comp.jmx.JmxManagerMXBean;
 import static net.java.truevfs.comp.jmx.JmxUtils.*;
-import net.java.truevfs.ext.jmx.JmxStatistics.Kind;
-import net.java.truevfs.ext.jmx.model.IoLogger;
-import net.java.truevfs.ext.jmx.model.IoStatistics;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsSyncException;
 import net.java.truevfs.kernel.spec.FsSyncOptions;
@@ -23,14 +20,15 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 @ThreadSafe
 public class JmxManager
 extends InstrumentingManager<JmxMediator> implements JmxColleague {
+
     public JmxManager(JmxMediator mediator, FsManager manager) {
         super(mediator, manager);
     }
 
     @Override
     public void start() {
-        mediator.switchLoggers();
         register(newView(), name());
+        mediator.rotateAllLoggers();
     }
 
     protected JmxManagerMXBean newView() {
@@ -43,22 +41,6 @@ extends InstrumentingManager<JmxMediator> implements JmxColleague {
 
     void sync() throws FsSyncException {
         FsManagerLocator.SINGLETON.get().sync(FsSyncOptions.NONE);
-        mediator.switchLoggers();
-    }
-
-    void clearStatistics() {
-        for (final Kind kind : Kind.values()) {
-            final IoLogger logger = mediator.logger(kind);
-            final int keep = logger.getSequenceNumber();
-            final ObjectName pattern = mediator.nameBuilder(IoStatistics.class)
-                    .put("kind", kind.toString())
-                    .put("seqno", "*")
-                    .get();
-            for (final ObjectName found : query(pattern)) {
-                final JmxStatisticsMXBean proxy =
-                        proxy(found, JmxStatisticsMXBean.class);
-                if (proxy.getSequenceNumber() != keep) deregister(found);
-            }
-        }
+        mediator.rotateAllLoggers();
     }
 }

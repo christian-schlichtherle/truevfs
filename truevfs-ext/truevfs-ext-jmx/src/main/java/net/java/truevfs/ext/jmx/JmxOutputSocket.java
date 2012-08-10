@@ -5,7 +5,6 @@
 package net.java.truevfs.ext.jmx;
 
 import javax.annotation.concurrent.Immutable;
-import javax.inject.Provider;
 import net.java.truevfs.comp.inst.InstrumentingOutputSocket;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
@@ -19,24 +18,15 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
 @Immutable
 public class JmxOutputSocket<E extends Entry>
 extends InstrumentingOutputSocket<JmxMediator, E>
-implements JmxColleague, Provider<JmxStatistics.Kind> {
-    private final JmxStatistics.Kind kind;
+implements JmxColleague {
 
     JmxOutputSocket(
             final JmxMediator director,
-            final OutputSocket<? extends E> socket,
-            final JmxStatistics.Kind kind) {
+            final OutputSocket<? extends E> socket) {
         super(director, socket);
-        assert null != kind;
-        this.kind = kind;
     }
 
     @Override
     public void start() {
-    }
-
-    @Override
-    public JmxStatistics.Kind get() {
-        return kind;
     }
 }

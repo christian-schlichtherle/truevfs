@@ -7,8 +7,7 @@ package net.java.truevfs.ext.jmx;
 import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
-import static net.java.truevfs.comp.jmx.JmxUtils.deregister;
-import static net.java.truevfs.comp.jmx.JmxUtils.register;
+import static net.java.truevfs.comp.jmx.JmxUtils.*;
 import net.java.truevfs.ext.jmx.model.IoLogger;
 import net.java.truevfs.ext.jmx.model.IoStatistics;
 
@@ -19,22 +18,39 @@ import net.java.truevfs.ext.jmx.model.IoStatistics;
  */
 @ThreadSafe
 public class JmxStatistics implements JmxColleague {
+    private static final String MAX_STATISTICS_PROPERTY_KEY =
+            JmxStatistics.class.getName() + ".maxStatistics";
+    private static final int MAX_STATISTICS =
+            Integer.getInteger(MAX_STATISTICS_PROPERTY_KEY, 10);
+
     private final JmxMediator mediator;
-    private final Kind kind;
     private final IoLogger logger;
 
     public JmxStatistics(
             final JmxMediator mediator,
-            final Kind kind,
             final IoLogger logger) {
         this.mediator = Objects.requireNonNull(mediator);
         this.logger = Objects.requireNonNull(logger);
-        this.kind = Objects.requireNonNull(kind);
     }
 
     @Override
     public void start() {
         register(newView(), name());
+        rotate(MAX_STATISTICS);
+    }
+
+    protected void rotate(final int max) {
+        final IoLogger logger = mediator.getLogger();
+        final int maxDiscard = logger.getSequenceNumber() - max;
+        final ObjectName pattern = mediator.nameBuilder(IoStatistics.class)
+                .put("subject", getSubject())
+                .put("seqno", "*")
+                .get();
+        for (final ObjectName name : query(pattern)) {
+            final JmxStatisticsMXBean proxy =
+                    proxy(name, JmxStatisticsMXBean.class);
+            if (proxy.getSequenceNumber() <= maxDiscard) deregister(name);
+        }
     }
 
     protected JmxStatisticsMXBean newView() {
@@ -43,25 +59,17 @@ public class JmxStatistics implements JmxColleague {
 
     private ObjectName name() {
         return mediator.nameBuilder(IoStatistics.class)
-                .put("kind", getKindString())
-                .put("seqno", getSequenceNumberString())
+                .put("subject", getSubject())
+                .put("seqno", Integer.toString(getSequenceNumber()))
                 .get();
     }
 
-    Kind getKind() {
-        return kind;
-    }
-
-    String getKindString() {
-        return kind.toString();
+    String getSubject() {
+        return mediator.getSubject();
     }
 
     int getSequenceNumber() {
         return logger.getSequenceNumber();
-    }
-
-    String getSequenceNumberString() {
-        return Integer.toString(getSequenceNumber());
     }
 
     long getTimeCreatedMillis() {
@@ -78,21 +86,5 @@ public class JmxStatistics implements JmxColleague {
 
     void close() {
         deregister(name());
-    }
-
-    @SuppressWarnings("PublicInnerClass")
-    public enum Kind {
-        APPLICATION {
-            @Override 
-            public String toString() { return "Application I/O Statistics"; }
-        },
-        KERNEL {
-            @Override 
-            public String toString() { return "Kernel I/O Statistics"; }
-        },
-        BUFFER {
-            @Override 
-            public String toString() { return "Buffer I/O Statistics"; }
-        };
     }
 }

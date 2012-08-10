@@ -40,11 +40,11 @@ public final class IoStatistics {
         return seqno;
     }
 
-    public long getSumOfBytes() {
+    public long getBytesTotal() {
         return bytes;
     }
 
-    public long getSumOfNanoseconds() {
+    public long getNanosecondsTotal() {
         return nanos;
     }
 
@@ -57,7 +57,7 @@ public final class IoStatistics {
                 .longValue();
     }
 
-    public int getAverageBytesPerOperation() {
+    public int getBytesPerOperation() {
         final int seqNo = this.seqno;
         return 0 == seqNo ? 0 : (int) (bytes / seqNo);
     }
