@@ -33,7 +33,7 @@ extends InstrumentingInputStream<JmxMediator> implements JmxColleague {
     public int read() throws IOException {
         final long start = System.nanoTime();
         final int ret = in.read();
-        if (0 <= ret) mediator.logInput(System.nanoTime() - start, 1);
+        if (0 <= ret) mediator.logRead(System.nanoTime() - start, 1);
         return ret;
     }
 
@@ -41,7 +41,7 @@ extends InstrumentingInputStream<JmxMediator> implements JmxColleague {
     public int read(byte[] b, int off, int len) throws IOException {
         final long start = System.nanoTime();
         final int ret = in.read(b, off, len);
-        if (0 <= ret) mediator.logInput(System.nanoTime() - start, ret);
+        if (0 <= ret) mediator.logRead(System.nanoTime() - start, ret);
         return ret;
     }
 }

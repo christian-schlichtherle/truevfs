@@ -78,32 +78,32 @@ public class JmxMediator extends Mediator<JmxMediator> {
         return subject;
     }
 
-    private AtomicReference<FsStatistics> getInputRef() {
+    private AtomicReference<FsStatistics> getReadStatsRef() {
         return stats;
     }
 
-    private AtomicReference<FsStatistics> getOutputRef() {
+    private AtomicReference<FsStatistics> getWriteStatsRef() {
         return stats;
     }
 
-    private AtomicReference<FsStatistics> getSyncRef() {
+    private AtomicReference<FsStatistics> getSyncStatsRef() {
         return APPLICATION.stats;
     }
 
-    public IoStatistics getInputStats() {
-        return getInputRef().get().getInput();
+    public IoStatistics getReadStats() {
+        return getReadStatsRef().get().getReadStats();
     }
 
-    public IoStatistics getOutputStats() {
-        return getOutputRef().get().getOutput();
+    public IoStatistics getWriteStats() {
+        return getWriteStatsRef().get().getWriteStats();
     }
 
     public SyncStatistics getSyncStats() {
-        return getSyncRef().get().getSync();
+        return getSyncStatsRef().get().getSyncStats();
     }
 
     /**
-     * Logs an getInputStats operation with the given sample data and returns a new
+     * Logs a read operation with the given sample data and returns a new
      * object to reflect the updated statistics.
      * The sequence number of the returned object will be incremented and may
      * eventually overflow to zero.
@@ -113,17 +113,17 @@ public class JmxMediator extends Mediator<JmxMediator> {
      * @return A new object which reflects the updated statistics.
      * @throws IllegalArgumentException if any parameter value is negative.
      */
-    public final FsStatistics logInput(long nanos, int bytes) {
-        final AtomicReference<FsStatistics> ref = getInputRef();
+    public final FsStatistics logRead(long nanos, int bytes) {
+        final AtomicReference<FsStatistics> ref = getReadStatsRef();
         while (true) {
             final FsStatistics expected = ref.get();
-            final FsStatistics updated = expected.logInput(nanos, bytes);
+            final FsStatistics updated = expected.logRead(nanos, bytes);
             if (ref.weakCompareAndSet(expected, updated)) return updated;
         }
     }
 
     /**
-     * Logs an getOutputStats operation with the given sample data and returns a new
+     * Logs a write operation with the given sample data and returns a new
      * object to reflect the updated statistics.
      * The sequence number of the returned object will be incremented and may
      * eventually overflow to zero.
@@ -133,11 +133,11 @@ public class JmxMediator extends Mediator<JmxMediator> {
      * @return A new object which reflects the updated statistics.
      * @throws IllegalArgumentException if any parameter is negative.
      */
-    public final FsStatistics logOutput(long nanos, int bytes) {
-        final AtomicReference<FsStatistics> ref = getOutputRef();
+    public final FsStatistics logWrite(long nanos, int bytes) {
+        final AtomicReference<FsStatistics> ref = getWriteStatsRef();
         while (true) {
             final FsStatistics expected = ref.get();
-            final FsStatistics updated = expected.logOutput(nanos, bytes);
+            final FsStatistics updated = expected.logWrite(nanos, bytes);
             if (ref.weakCompareAndSet(expected, updated)) return updated;
         }
     }
@@ -153,7 +153,7 @@ public class JmxMediator extends Mediator<JmxMediator> {
      * @throws IllegalArgumentException if any parameter value is negative.
      */
     public final FsStatistics logSync(long nanos) {
-        final AtomicReference<FsStatistics> ref = getSyncRef();
+        final AtomicReference<FsStatistics> ref = getSyncStatsRef();
         while (true) {
             final FsStatistics expected = ref.get();
             final FsStatistics updated = expected.logSync(nanos);
@@ -161,7 +161,7 @@ public class JmxMediator extends Mediator<JmxMediator> {
         }
     }
 
-    public void rotateStatistics() {
+    public void rotateStats() {
         for (JmxMediator mediator : allMediators()) mediator.nextStatistics();
     }
 

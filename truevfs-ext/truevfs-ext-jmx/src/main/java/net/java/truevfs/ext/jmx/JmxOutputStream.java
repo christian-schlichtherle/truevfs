@@ -33,13 +33,13 @@ extends InstrumentingOutputStream<JmxMediator> implements JmxColleague {
     public void write(int b) throws IOException {
         final long start = System.nanoTime();
         out.write(b);
-        mediator.logOutput(System.nanoTime() - start, 1);
+        mediator.logWrite(System.nanoTime() - start, 1);
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         final long start = System.nanoTime();
         out.write(b, off, len);
-        mediator.logOutput(System.nanoTime() - start, len);
+        mediator.logWrite(System.nanoTime() - start, len);
     }    
 }

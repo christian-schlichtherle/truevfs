@@ -32,7 +32,7 @@ extends InstrumentingManager<JmxMediator> implements JmxColleague {
     @Override
     public void start() {
         register(name(), newView());
-        mediator.rotateStatistics();
+        mediator.rotateStats();
     }
 
     private ObjectName name() {
@@ -48,7 +48,7 @@ extends InstrumentingManager<JmxMediator> implements JmxColleague {
         final long start = System.nanoTime();
         super.sync(options);
         mediator.logSync(System.nanoTime() - start);
-        mediator.rotateStatistics();
+        mediator.rotateStats();
     }
 
     void sync() throws FsSyncException {
