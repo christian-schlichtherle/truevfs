@@ -31,22 +31,24 @@ extends InstrumentingManager<JmxMediator> implements JmxColleague {
 
     @Override
     public void start() {
-        register(newView(), name());
-        mediator.rollLoggers();
-    }
-
-    protected JmxManagerMXBean newView() {
-        return new JmxManagerView(this);
+        register(name(), newView());
+        mediator.rotateStatistics();
     }
 
     private ObjectName name() {
         return mediator.nameBuilder(FsManager.class).get();
     }
 
+    protected JmxManagerMXBean newView() {
+        return new JmxManagerView(this);
+    }
+
     @Override
     public void sync(BitField<FsSyncOption> options) throws FsSyncException {
+        final long start = System.nanoTime();
         super.sync(options);
-        mediator.rollLoggers();
+        mediator.logSync(System.nanoTime() - start);
+        mediator.rotateStatistics();
     }
 
     void sync() throws FsSyncException {

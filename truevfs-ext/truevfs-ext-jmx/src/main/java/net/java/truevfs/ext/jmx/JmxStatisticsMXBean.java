@@ -5,31 +5,35 @@
 package net.java.truevfs.ext.jmx;
 
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.ext.jmx.model.IoLogger;
-import net.java.truevfs.ext.jmx.model.IoStatistics;
+import net.java.truevfs.ext.jmx.stats.FsStatistics;
+import net.java.truevfs.ext.jmx.stats.IoStatistics;
 
 /**
- * The combined MXBean interface for an {@linkplain IoLogger I/O logger}
+ * The combined MXBean interface for an {@linkplain FsStatistics I/O logger}
  * and its {@linkplain IoStatistics I/O statistics}.
  *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
 public interface JmxStatisticsMXBean {
-    String getSubject();
-    int    getSequenceNumber();
-    String getTimeCreated();
-    long   getTimeCreatedMillis();
-    String getTimeUpdated();
-    long   getTimeUpdatedMillis();
     int    getReadBytesPerOperation();
     long   getReadBytesTotal();
     long   getReadKilobytesPerSecond();
+    long   getReadNanosecondsPerOperation();
     long   getReadNanosecondsTotal();
-    int    getReadOperationsTotal();
+    int    getReadOperations();
+    String getSubject();
+    long   getSyncNanosecondsPerOperation();
+    long   getSyncNanosecondsTotal();
+    int    getSyncOperations();
+    long   getTimeCreatedMillis();
+    String getTimeCreatedString();
+    long   getTimeUpdatedMillis();
+    String getTimeUpdatedString();
     int    getWriteBytesPerOperation();
     long   getWriteBytesTotal();
     long   getWriteKilobytesPerSecond();
+    long   getWriteNanosecondsPerOperation();
     long   getWriteNanosecondsTotal();
-    int    getWriteOperationsTotal();
+    int    getWriteOperations();
 }

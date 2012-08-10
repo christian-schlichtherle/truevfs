@@ -27,16 +27,15 @@ extends InstrumentingModel<JmxMediator> implements JmxColleague {
     private static final FsMetaDriver
             DRIVER = new FsSimpleMetaDriver(FsDriverMapLocator.SINGLETON);
 
+    private final ObjectName name;
+
     public JmxModel(JmxMediator director, FsModel model) {
         super(director, model);
+        this.name = name();
     }
 
     @Override
     public void start() {
-    }
-
-    protected JmxModelMXBean newView() {
-        return new JmxModelView(this);
     }
 
     private ObjectName name() {
@@ -46,13 +45,17 @@ extends InstrumentingModel<JmxMediator> implements JmxColleague {
                 .get();
     }
 
+    protected JmxModelMXBean newView() {
+        return new JmxModelView(this);
+    }
+
     @Override
     public void setMounted(final boolean mounted) {
         try {
             model.setMounted(mounted);
         } finally {
-            if (mounted) register(newView(), name());
-            else deregister(name());
+            if (mounted) register(name, newView());
+            else deregister(name);
         }
     }
 
