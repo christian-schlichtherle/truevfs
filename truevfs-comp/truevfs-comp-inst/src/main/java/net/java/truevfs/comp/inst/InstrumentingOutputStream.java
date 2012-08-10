@@ -6,6 +6,7 @@ package net.java.truevfs.comp.inst;
 
 import java.io.OutputStream;
 import java.util.Objects;
+import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.io.DecoratingOutputStream;
 
 /**
@@ -13,6 +14,7 @@ import net.java.truecommons.io.DecoratingOutputStream;
  * @see    InstrumentingInputStream
  * @author Christian Schlichtherle
  */
+@Immutable
 public class InstrumentingOutputStream<M extends Mediator<M>>
 extends DecoratingOutputStream {
     protected final M mediator;

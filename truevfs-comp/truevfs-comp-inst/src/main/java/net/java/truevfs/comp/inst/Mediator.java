@@ -20,6 +20,8 @@ import net.java.truevfs.kernel.spec.cio.*;
  * When any of the instrumentation methods are called, subclasses are given the
  * choice to either return the given object as is or to decorate it with a
  * colleague for instrumentation.
+ * <p>
+ * Subclasses should be thread-safe.
  *
  * @param  <This> the type of this mediator.
  * @author Christian Schlichtherle
