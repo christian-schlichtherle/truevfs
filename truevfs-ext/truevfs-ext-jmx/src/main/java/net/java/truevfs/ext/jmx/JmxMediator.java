@@ -39,9 +39,9 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  */
 @ThreadSafe
 public class JmxMediator extends Mediator<JmxMediator> {
-    public static final JmxMediator APPLICATION = new JmxMediator("Application");
-    public static final JmxMediator BUFFERS = new JmxMediator("Buffers");
-    public static final JmxMediator KERNEL = new JmxMediator("Kernel");
+    public static final JmxMediator APPLICATION_IO = new JmxMediator("Application I/O");
+    public static final JmxMediator BUFFER_IO = new JmxMediator("Buffer I/O");
+    public static final JmxMediator KERNEL_IO = new JmxMediator("Kernel I/O");
 
     private final AtomicReference<FsStatistics> stats =
             new AtomicReference<>(FsStatistics.zero());
@@ -87,7 +87,7 @@ public class JmxMediator extends Mediator<JmxMediator> {
     }
 
     private AtomicReference<FsStatistics> getSyncStatsRef() {
-        return APPLICATION.stats;
+        return APPLICATION_IO.stats;
     }
 
     public IoStatistics getReadStats() {
@@ -163,18 +163,23 @@ public class JmxMediator extends Mediator<JmxMediator> {
 
     public void rotateStatistics() {
         for (JmxMediator mediator : allMediators()) mediator.nextStatistics();
+        start(newSyncStatistics());
     }
 
     protected JmxMediator[] allMediators() {
-        return new JmxMediator[] { APPLICATION, KERNEL, BUFFERS };
+        return new JmxMediator[] { APPLICATION_IO, KERNEL_IO, BUFFER_IO };
     }
 
     private void nextStatistics() {
-        start(newStatistics());
+        start(newIoStatistics());
     }
 
-    protected JmxStatistics newStatistics() {
-        return new JmxStatistics(this);
+    protected JmxIoStatistics newIoStatistics() {
+        return new JmxIoStatistics(this);
+    }
+
+    protected JmxSyncStatistics newSyncStatistics() {
+        return new JmxSyncStatistics(this);
     }
 
     @Override
@@ -186,7 +191,7 @@ public class JmxMediator extends Mediator<JmxMediator> {
     public FsController instrument(
             InstrumentingManager<JmxMediator> origin,
             FsController object) {
-        return start(new JmxController(APPLICATION, object)); // switch mediator!
+        return start(new JmxController(APPLICATION_IO, object)); // switch mediator!
     }
 
     @Override
@@ -207,7 +212,7 @@ public class JmxMediator extends Mediator<JmxMediator> {
     public FsController instrument(
             InstrumentingMetaDriver<JmxMediator> origin,
             FsController object) {
-        return start(new JmxController(KERNEL, object)); // switch mediator!
+        return start(new JmxController(KERNEL_IO, object)); // switch mediator!
     }
 
     @Override

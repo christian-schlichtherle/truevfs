@@ -10,23 +10,20 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.StandardMBean;
-import net.java.truevfs.ext.jmx.stats.FsStatistics;
 import net.java.truevfs.ext.jmx.stats.IoStatistics;
-import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 
 /**
- * The combined MXBean view for an {@linkplain FsStatistics I/O logger}
- * and its {@linkplain IoStatistics I/O statistics}.
+ * The MXBean view for {@linkplain IoStatistics I/O statistics}.
  *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxStatisticsView
-extends StandardMBean implements JmxStatisticsMXBean {
-    protected final JmxStatistics stats;
+public class JmxIoStatisticsView
+extends StandardMBean implements JmxIoStatisticsMXBean {
+    protected final JmxIoStatistics stats;
 
-    public JmxStatisticsView(final JmxStatistics stats) {
-        super(JmxStatisticsMXBean.class, true);
+    public JmxIoStatisticsView(final JmxIoStatistics stats) {
+        super(JmxIoStatisticsMXBean.class, true);
         this.stats = Objects.requireNonNull(stats);
     }
 
@@ -36,7 +33,7 @@ extends StandardMBean implements JmxStatisticsMXBean {
      */
     @Override
     protected String getDescription(MBeanInfo info) {
-        return "A log of file system statistics.";
+        return "A log of I/O statistics.";
     }
 
     /**
@@ -60,12 +57,6 @@ extends StandardMBean implements JmxStatisticsMXBean {
             return "The total number of read operations.";
         case "Subject":
             return "The subject of this log.";
-        case "SyncNanosecondsPerOperation":
-            return "The average execution time per sync operation.";
-        case "SyncNanosecondsTotal":
-            return "The total execution time for sync operations.";
-        case "SyncOperations":
-            return "The total number of sync operations.";
         case "TimeCreatedMillis":
             return "The time this log has been created in milliseconds.";
         case "TimeCreatedString":
@@ -97,10 +88,6 @@ extends StandardMBean implements JmxStatisticsMXBean {
 
     private IoStatistics getOutputStats() {
         return stats.getOutputStats();
-    }
-
-    private SyncStatistics getSyncStats() {
-        return stats.getSyncStats();
     }
 
     @Override
@@ -139,21 +126,6 @@ extends StandardMBean implements JmxStatisticsMXBean {
     }
 
     @Override
-    public long getSyncNanosecondsPerOperation() {
-        return getSyncStats().getNanosecondsPerOperation();
-    }
-
-    @Override
-    public long getSyncNanosecondsTotal() {
-        return getSyncStats().getNanosecondsTotal();
-    }
-
-    @Override
-    public int getSyncOperations() {
-        return getSyncStats().getSequenceNumber();
-    }
-
-    @Override
     public long getTimeCreatedMillis() {
         return stats.getTimeCreatedMillis();
     }
@@ -166,8 +138,8 @@ extends StandardMBean implements JmxStatisticsMXBean {
     @Override
     public long getTimeUpdatedMillis() {
         return Math.max(
-                Math.max(getInputStats().getTimeMillis(), getOutputStats().getTimeMillis()),
-                getSyncStats().getTimeMillis());
+                getInputStats().getTimeMillis(),
+                getOutputStats().getTimeMillis());
     }
 
     @Override
