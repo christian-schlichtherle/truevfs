@@ -10,6 +10,7 @@ import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.StandardMBean;
+import net.java.truevfs.comp.jmx.JmxManagerMXBean;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsSyncException;
@@ -68,9 +69,6 @@ extends StandardMBean implements JmxManagerMXBean {
         case "sync":
             description = "Synchronizes all managed archive file systems. If any file system is busy with I/O, an FsSyncException is thrown.";
             break;
-        case "clearStatistics":
-            description = "Clears all but the last I/O statistics.";
-            break;
         }
         return description;
     }
@@ -113,10 +111,5 @@ extends StandardMBean implements JmxManagerMXBean {
     @Override
     public void sync() throws FsSyncException {
         manager.sync();
-    }
-
-    @Override
-    public void clearStatistics() {
-        manager.clearStatistics();
     }
 }

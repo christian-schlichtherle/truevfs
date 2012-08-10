@@ -21,10 +21,9 @@ extends InstrumentingOutputStream<JmxMediator> implements JmxColleague {
 
     JmxOutputStream(
             final JmxMediator mediator,
-            final @WillCloseWhenClosed OutputStream out,
-            final JmxStatistics.Kind kind) {
+            final @WillCloseWhenClosed OutputStream out) {
         super(mediator, out);
-        this.logger = mediator.logger(kind);
+        this.logger = mediator.getLogger();
     }
 
     @Override

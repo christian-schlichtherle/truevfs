@@ -14,17 +14,19 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public interface JmxStatisticsMXBean {
-    String getKind();
+    String getSubject();
     int    getSequenceNumber();
     String getTimeCreated();
     long   getTimeCreatedMillis();
-    long   getReadSumOfBytes();
     int    getReadBytesPerOperation();
+    long   getReadBytesTotal();
     long   getReadKilobytesPerSecond();
-    int    getReadNumberOfOperations();
-    long   getWriteSumOfBytes();
+    long   getReadNanosecondsTotal();
+    int    getReadOperationsTotal();
     int    getWriteBytesPerOperation();
+    long   getWriteBytesTotal();
     long   getWriteKilobytesPerSecond();
-    int    getWriteNumberOfOperations();
+    long   getWriteNanosecondsTotal();
+    int    getWriteOperationsTotal();
     void   close();
 }
