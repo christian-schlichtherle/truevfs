@@ -12,12 +12,14 @@ import net.java.truevfs.comp.inst.InstrumentingOutputStream;
 import net.java.truevfs.ext.jmx.model.IoLogger;
 
 /**
+ * The MXBean controller for an {@linkplain OutputStream output stream}.
+ * 
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public class JmxOutputStream
 extends InstrumentingOutputStream<JmxMediator> implements JmxColleague {
-    private final IoLogger logger;
+    private IoLogger logger;
 
     JmxOutputStream(
             final JmxMediator mediator,
@@ -34,13 +36,17 @@ extends InstrumentingOutputStream<JmxMediator> implements JmxColleague {
     public void write(int b) throws IOException {
         final long start = System.nanoTime();
         out.write(b);
-        logger.logWrite(1, System.nanoTime() - start);
+        for (final long time = System.nanoTime() - start;
+                !logger.tryLogWrite(1, time); )
+            logger = mediator.nextLogger();
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         final long start = System.nanoTime();
         out.write(b, off, len);
-        logger.logWrite(len, System.nanoTime() - start);
+        for (final long time = System.nanoTime() - start;
+                !logger.tryLogWrite(len, time); )
+            logger = mediator.nextLogger();
     }    
 }

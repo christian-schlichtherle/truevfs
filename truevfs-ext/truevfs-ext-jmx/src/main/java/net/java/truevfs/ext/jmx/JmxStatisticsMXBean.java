@@ -5,10 +5,12 @@
 package net.java.truevfs.ext.jmx;
 
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truevfs.ext.jmx.model.IoLogger;
+import net.java.truevfs.ext.jmx.model.IoStatistics;
 
 /**
- * Provides statistics for the federated file systems managed by a file system
- * manager.
+ * The combined MXBean interface for an {@linkplain IoLogger I/O logger}
+ * and its {@linkplain IoStatistics I/O statistics}.
  *
  * @author Christian Schlichtherle
  */
@@ -30,5 +32,4 @@ public interface JmxStatisticsMXBean {
     long   getWriteKilobytesPerSecond();
     long   getWriteNanosecondsTotal();
     int    getWriteOperationsTotal();
-    void   close();
 }

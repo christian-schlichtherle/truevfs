@@ -12,16 +12,17 @@ import net.java.truevfs.ext.jmx.model.IoLogger;
 import net.java.truevfs.ext.jmx.model.IoStatistics;
 
 /**
- * Controls JMX I/O statistics.
+ * The combined JMX controller for an {@linkplain IoLogger I/O logger}
+ * and its {@linkplain IoStatistics I/O statistics}.
  * 
  * @author Christian Schlichtherle
  */
 @ThreadSafe
 public class JmxStatistics implements JmxColleague {
-    private static final String MAX_STATISTICS_PROPERTY_KEY =
-            JmxStatistics.class.getName() + ".maxStatistics";
-    private static final int MAX_STATISTICS =
-            Integer.getInteger(MAX_STATISTICS_PROPERTY_KEY, 10);
+    private static final String SIZE_PROPERTY_KEY =
+            JmxStatistics.class.getName() + ".size";
+    private static final int SIZE =
+            Integer.getInteger(SIZE_PROPERTY_KEY, 10);
 
     private final JmxMediator mediator;
     private final IoLogger logger;
@@ -31,37 +32,6 @@ public class JmxStatistics implements JmxColleague {
             final IoLogger logger) {
         this.mediator = Objects.requireNonNull(mediator);
         this.logger = Objects.requireNonNull(logger);
-    }
-
-    @Override
-    public void start() {
-        register(newView(), name());
-        rotate(MAX_STATISTICS);
-    }
-
-    protected void rotate(final int max) {
-        final IoLogger logger = mediator.getLogger();
-        final int maxDiscard = logger.getSequenceNumber() - max;
-        final ObjectName pattern = mediator.nameBuilder(IoStatistics.class)
-                .put("subject", getSubject())
-                .put("seqno", "*")
-                .get();
-        for (final ObjectName name : query(pattern)) {
-            final JmxStatisticsMXBean proxy =
-                    proxy(name, JmxStatisticsMXBean.class);
-            if (proxy.getSequenceNumber() <= maxDiscard) deregister(name);
-        }
-    }
-
-    protected JmxStatisticsMXBean newView() {
-        return new JmxStatisticsView(this);
-    }
-
-    private ObjectName name() {
-        return mediator.nameBuilder(IoStatistics.class)
-                .put("subject", getSubject())
-                .put("seqno", Integer.toString(getSequenceNumber()))
-                .get();
     }
 
     String getSubject() {
@@ -84,7 +54,35 @@ public class JmxStatistics implements JmxColleague {
         return logger.getWriteStats();
     }
 
-    void close() {
-        deregister(name());
+    @Override
+    public void start() {
+        register(newView(), name());
+        roll(SIZE);
+    }
+
+    protected JmxStatisticsMXBean newView() {
+        return new JmxStatisticsView(this);
+    }
+
+    private ObjectName name() {
+        return mediator.nameBuilder(IoStatistics.class)
+                .put("subject", getSubject())
+                .put("seqno", String.format("%08x", getSequenceNumber() & 0xffff_ffffL))
+                .get();
+    }
+
+    protected void roll(final int size) {
+        final int max = logger.getSequenceNumber();
+        final int min = max - size + 1;
+        final ObjectName pattern = mediator.nameBuilder(IoStatistics.class)
+                .put("subject", getSubject())
+                .put("seqno", "*")
+                .get();
+        for (final ObjectName name : query(pattern)) {
+            final JmxStatisticsMXBean bean =
+                    proxy(name, JmxStatisticsMXBean.class);
+            final int seqno = bean.getSequenceNumber();
+            if (seqno < min || max < seqno) deregister(name);
+        }
     }
 }

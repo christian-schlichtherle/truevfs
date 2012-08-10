@@ -20,19 +20,27 @@ public final class IoStatistics {
     private static final BigInteger VALUE_OF_1024 = valueOf(1024);
 
     /**
-     * Returns statistics with all properties set to zero.
+     * Returns I/O statistics with all properties set to zero.
      * 
-     * @return statistics with all properties set to zero.
+     * @return I/O statistics with all properties set to zero.
      */
     public static IoStatistics get() {
-        return new IoStatistics(0, 0, 0); // TODO: Consider caching.
+        try {
+            return new IoStatistics(0, 0, 0); // TODO: Consider caching.
+        } catch (IoOverflowException ex) {
+            throw new AssertionError(ex);
+        }
     }
 
     private final int seqno;
     private final long created = System.currentTimeMillis();
     private final long bytes, nanos;
 
-    private IoStatistics(final int seqno, final long bytes, final long nanos) {
+    private IoStatistics(final int seqno, final long bytes, final long nanos)
+    throws IoOverflowException {
+        if (0 > seqno) throw new IoOverflowException();
+        if (0 > bytes) throw new IoOverflowException();
+        if (0 > nanos) throw new IoOverflowException();
         this.seqno = seqno;
         this.bytes = bytes;
         this.nanos = nanos;
@@ -75,8 +83,12 @@ public final class IoStatistics {
      * @param  nanos the execution time in nanoseconds.
      * @return New I/O statistics with an incremented sequence number and
      *         updated properties to reflect the given metric data.
+     * @throws IllegalArgumentException if any parameter is negative.
+     * @throws IoOverflowException if any statistical property would overflow.
      */
-    public IoStatistics log(int bytes, long nanos) {
+    public IoStatistics log(int bytes, long nanos) throws IoOverflowException {
+        if (0 > bytes) throw new IllegalArgumentException();
+        if (0 > nanos) throw new IllegalArgumentException();
         return new IoStatistics(seqno + 1, this.bytes + bytes, this.nanos + nanos);
     }
 

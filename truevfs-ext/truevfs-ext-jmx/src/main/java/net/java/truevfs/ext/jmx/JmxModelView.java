@@ -22,7 +22,7 @@ import static net.java.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 
 /**
- * The MXBean implementation for a {@linkplain FsModel file system model}.
+ * The MXBean view for a {@linkplain FsModel file system model}.
  *
  * @author Christian Schlichtherle
  */
