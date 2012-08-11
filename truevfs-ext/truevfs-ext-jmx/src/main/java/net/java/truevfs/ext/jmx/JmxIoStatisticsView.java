@@ -58,14 +58,14 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
             return "The total number of read operations.";
         case "Subject":
             return "The subject of this log.";
+        case "TimeCreatedDate":
+            return "The time this log has been created.";
         case "TimeCreatedMillis":
             return "The time this log has been created in milliseconds.";
-        case "TimeCreatedString":
-            return "The time this log has been created.";
+        case "TimeUpdatedDate":
+            return "The last time this log has been updated.";
         case "TimeUpdatedMillis":
             return "The last time this log has been updated in milliseconds.";
-        case "TimeUpdatedString":
-            return "The last time this log has been updated.";
         case "WriteBytesPerOperation":
             return "The average number of bytes per write operation.";
         case "WriteBytesTotal":
@@ -127,13 +127,18 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
     }
 
     @Override
+    public String getTimeCreatedDate() {
+        return new Date(getTimeCreatedMillis()).toString();
+    }
+
+    @Override
     public long getTimeCreatedMillis() {
         return stats.getStats().getTimeMillis();
     }
 
     @Override
-    public String getTimeCreatedString() {
-        return new Date(getTimeCreatedMillis()).toString();
+    public String getTimeUpdatedDate() {
+        return new Date(getTimeUpdatedMillis()).toString();
     }
 
     @Override
@@ -141,11 +146,6 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
         return Math.max(
                 getReadStats().getTimeMillis(),
                 getWriteStats().getTimeMillis());
-    }
-
-    @Override
-    public String getTimeUpdatedString() {
-        return new Date(getTimeUpdatedMillis()).toString();
     }
 
     @Override

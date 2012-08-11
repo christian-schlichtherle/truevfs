@@ -47,12 +47,18 @@ extends StandardMBean implements JmxBufferMXBean {
             return "The data size of this buffer.";
         case "SizeOfStorage":
             return "The storage size of this buffer.";
-        case "TimeWritten":
-            return "The last write time of this buffer.";
-        case "TimeRead":
-            return "The last read or access time of this buffer.";
-        case "TimeCreated":
-            return "The creation time of this buffer.";
+        case "TimeCreatedDate":
+            return "The time this buffer has been created.";
+        case "TimeCreatedMillis":
+            return "The time this buffer has been created in milliseconds.";
+        case "TimeReadDate":
+            return "The last time this buffer has been read or accessed.";
+        case "TimeReadMillis":
+            return "The last time this buffer has been read or accessed in milliseconds.";
+        case "TimeWrittenDate":
+            return "The last time this buffer has been written.";
+        case "TimeWrittenMillis":
+            return "The last time this buffer has been written in milliseconds.";
         default:
             return null;
         }
@@ -74,20 +80,38 @@ extends StandardMBean implements JmxBufferMXBean {
     }
 
     @Override
-    public String getTimeWritten() {
-        final long time = buffer.getTime(WRITE);
+    public String getTimeCreatedDate() {
+        final long time = buffer.getTime(CREATE);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 
     @Override
-    public String getTimeRead() {
+    public Long getTimeCreatedMillis() {
+        final long time = buffer.getTime(CREATE);
+        return UNKNOWN == time ? null : time;
+    }
+
+    @Override
+    public String getTimeReadDate() {
         final long time = buffer.getTime(READ);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 
     @Override
-    public String getTimeCreated() {
-        final long time = buffer.getTime(CREATE);
+    public Long getTimeReadMillis() {
+        final long time = buffer.getTime(READ);
+        return UNKNOWN == time ? null : time;
+    }
+
+    @Override
+    public String getTimeWrittenDate() {
+        final long time = buffer.getTime(WRITE);
         return UNKNOWN == time ? null : new Date(time).toString();
+    }
+
+    @Override
+    public Long getTimeWrittenMillis() {
+        final long time = buffer.getTime(WRITE);
+        return UNKNOWN == time ? null : time;
     }
 }

@@ -52,14 +52,14 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
             return "The total execution time for sync operations.";
         case "SyncOperations":
             return "The total number of sync operations.";
+        case "TimeCreatedDate":
+            return "The time this log has been created.";
         case "TimeCreatedMillis":
             return "The time this log has been created in milliseconds.";
-        case "TimeCreatedString":
-            return "The time this log has been created.";
+        case "TimeUpdatedDate":
+            return "The last time this log has been updated.";
         case "TimeUpdatedMillis":
             return "The last time this log has been updated in milliseconds.";
-        case "TimeUpdatedString":
-            return "The last time this log has been updated.";
         default:
             return null;
         }
@@ -90,22 +90,22 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
     }
 
     @Override
+    public String getTimeCreatedDate() {
+        return new Date(getTimeCreatedMillis()).toString();
+    }
+
+    @Override
     public long getTimeCreatedMillis() {
         return stats.getStats().getTimeMillis();
     }
 
     @Override
-    public String getTimeCreatedString() {
-        return new Date(getTimeCreatedMillis()).toString();
+    public String getTimeUpdatedDate() {
+        return new Date(getTimeUpdatedMillis()).toString();
     }
 
     @Override
     public long getTimeUpdatedMillis() {
         return getSyncStats().getTimeMillis();
-    }
-
-    @Override
-    public String getTimeUpdatedString() {
-        return new Date(getTimeUpdatedMillis()).toString();
     }
 }
