@@ -38,13 +38,15 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
 @ThreadSafe
 public abstract class JmxMediator extends Mediator<JmxMediator> {
 
-    static final JmxMediator ROOT = new JmxSyncMediator("Sync Operations");
     private static final JmxMediator APPLICATION_IO = new JmxIoMediator("Application I/O");
     private static final JmxMediator BUFFER_IO = new JmxIoMediator("Buffer I/O");
     private static final JmxMediator KERNEL_IO = new JmxIoMediator("Kernel I/O");
+    private static final JmxMediator SYNC_OPS = new JmxSyncMediator("Sync Operations");
 
-    static JmxMediator[] mediators() {
-        return new JmxMediator[] { ROOT, APPLICATION_IO, KERNEL_IO, BUFFER_IO };
+    static JmxMediator get() { return SYNC_OPS; }
+
+    private static JmxMediator[] mediators() {
+        return new JmxMediator[] { SYNC_OPS, APPLICATION_IO, KERNEL_IO, BUFFER_IO };
     }
 
     private final FsLogger logger = new FsLogger();
@@ -71,23 +73,31 @@ public abstract class JmxMediator extends Mediator<JmxMediator> {
         return colleague;
     }
 
-    /**
-     * Returns a string representation of this object for debugging and logging
-     * purposes.
-     */
-    @Override
-    public String toString() {
-        return String.format("%s[subject=%s]",
-                getClass().getName(), getSubject());
-    }
-
     abstract JmxStatistics<?> newStatistics(int offset);
 
-    void startStatistics(int offset) { start(newStatistics(offset)); }
+    private void startStatistics(int offset) { start(newStatistics(offset)); }
+
+    void startStatistics() { startStatistics(0); }
+
+    final void startAllStatistics() {
+        for (JmxMediator mediator : mediators()) mediator.startStatistics();
+    }
+
+    void rotateStatistics() {
+        startStatistics(getLogger().rotate());
+    }
+
+    final void rotateAllStatistics() {
+        for (JmxMediator mediator : mediators()) mediator.rotateStatistics();
+    }
+
+    final void logSync(long nanos) {
+        getLogger().logSync(nanos);
+    }
 
     @Override
     public final FsManager instrument(FsManager object) {
-        return start(new JmxManager(ROOT, object)); // switch mediator!
+        return start(new JmxManager(SYNC_OPS, object)); // switch mediator!
     }
 
     @Override
@@ -191,4 +201,14 @@ public abstract class JmxMediator extends Mediator<JmxMediator> {
     }
 
     private Package getDomain() { return getClass().getPackage(); }
+
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
+    @Override
+    public String toString() {
+        return String.format("%s[subject=%s]",
+                getClass().getName(), getSubject());
+    }
 }
