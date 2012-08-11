@@ -37,28 +37,18 @@ extends InstrumentingManager<JmxMediator> implements JmxColleague {
         return new JmxManagerView(this);
     }
 
-    private void startStatistics() {
-        for (JmxMediator mediator : JmxMediator.mediators())
-            mediator.startStatistics(0);
-    }
-
     @Override
     public void start() {
         register(name(), newView());
-        startStatistics();
-    }
-
-    private void rotateStatistics() {
-        for (JmxMediator mediator : JmxMediator.mediators())
-            mediator.startStatistics(mediator.getLogger().rotate());
+        mediator.startAllStatistics();
     }
 
     @Override
     public void sync(BitField<FsSyncOption> options) throws FsSyncException {
         final long start = System.nanoTime();
         super.sync(options);
-        mediator.getLogger().logSync(System.nanoTime() - start);
-        rotateStatistics();
+        mediator.logSync(System.nanoTime() - start);
+        mediator.rotateAllStatistics();
     }
 
     void sync() throws FsSyncException {
