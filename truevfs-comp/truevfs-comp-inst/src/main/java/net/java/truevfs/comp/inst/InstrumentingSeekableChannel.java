@@ -16,6 +16,7 @@ import net.java.truecommons.io.DecoratingSeekableChannel;
 @Immutable
 public class InstrumentingSeekableChannel<M extends Mediator<M>>
 extends DecoratingSeekableChannel {
+
     protected final M mediator;
 
     public InstrumentingSeekableChannel(

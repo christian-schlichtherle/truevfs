@@ -20,6 +20,7 @@ import net.java.truevfs.kernel.spec.FsModel;
 @Immutable
 public class InstrumentingMetaDriver<M extends Mediator<M>>
 implements FsMetaDriver {
+
     protected final M mediator;
     protected final FsMetaDriver driver;
 

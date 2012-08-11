@@ -23,6 +23,7 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
 @ThreadSafe
 public class InstrumentingController<M extends Mediator<M>>
 extends FsDecoratingController {
+
     protected final M mediator;
 
     public InstrumentingController(

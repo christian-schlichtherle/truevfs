@@ -17,6 +17,7 @@ import net.java.truecommons.io.DecoratingOutputStream;
 @Immutable
 public class InstrumentingOutputStream<M extends Mediator<M>>
 extends DecoratingOutputStream {
+
     protected final M mediator;
 
     public InstrumentingOutputStream(

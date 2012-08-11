@@ -18,6 +18,7 @@ import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 @ThreadSafe
 public class InstrumentingBufferPool<M extends Mediator<M>>
 extends DecoratingIoBufferPool {
+
     protected final M mediator;
 
     public InstrumentingBufferPool(

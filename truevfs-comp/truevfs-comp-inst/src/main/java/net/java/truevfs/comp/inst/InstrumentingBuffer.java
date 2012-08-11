@@ -18,6 +18,7 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
 @ThreadSafe
 public class InstrumentingBuffer<M extends Mediator<M>>
 extends DecoratingIoBuffer {
+
     protected final M mediator;
 
     public InstrumentingBuffer(final M mediator, final IoBuffer entry) {
