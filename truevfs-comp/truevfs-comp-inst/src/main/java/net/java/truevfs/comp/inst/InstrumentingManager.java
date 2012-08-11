@@ -15,6 +15,7 @@ import net.java.truevfs.kernel.spec.*;
 @ThreadSafe
 public class InstrumentingManager<M extends Mediator<M>>
 extends FsDecoratingManager {
+
     protected final M mediator;
 
     public InstrumentingManager(

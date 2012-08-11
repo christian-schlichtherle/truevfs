@@ -16,6 +16,7 @@ import net.java.truevfs.kernel.spec.FsModel;
 @ThreadSafe
 public class InstrumentingModel<M extends Mediator<M>>
 extends FsDecoratingModel {
+
     protected final M mediator;
 
     public InstrumentingModel(

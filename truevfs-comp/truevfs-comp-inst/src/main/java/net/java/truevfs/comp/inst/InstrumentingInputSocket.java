@@ -27,6 +27,7 @@ public class InstrumentingInputSocket<
         M extends Mediator<M>,
         E extends Entry>
 extends DecoratingInputSocket<E> {
+
     protected final M mediator;
 
     public InstrumentingInputSocket(
