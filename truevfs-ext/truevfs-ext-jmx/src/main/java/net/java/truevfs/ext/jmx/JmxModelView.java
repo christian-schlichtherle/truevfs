@@ -55,12 +55,18 @@ extends StandardMBean implements JmxModelMXBean {
             return "The data size of this file system.";
         case "SizeOfStorage":
             return "The storage size of this file system.";
-        case "TimeWritten":
-            return "The last write time of this file system.";
-        case "TimeRead":
-            return "The last read or access time of this file system.";
-        case "TimeCreated":
-            return "The creation time of this file system.";
+        case "TimeCreatedDate":
+            return "The time this file system has been created.";
+        case "TimeCreatedMillis":
+            return "The time this file system has been created in milliseconds.";
+        case "TimeReadDate":
+            return "The last time this file system has been read or accessed.";
+        case "TimeReadMillis":
+            return "The last time this file system has been read or accessed in milliseconds.";
+        case "TimeWrittenDate":
+            return "The last time this file system has been written.";
+        case "TimeWrittenMillis":
+            return "The last time this file system has been written in milliseconds.";
         default:
             return null;
         }
@@ -112,24 +118,45 @@ extends StandardMBean implements JmxModelMXBean {
     }
 
     @Override
-    public String getTimeWritten() {
+    public String getTimeCreatedDate() {
         final FsNode node = model.stat();
-        final long time = null == node ? UNKNOWN : node.getTime(WRITE);
+        final long time = null == node ? UNKNOWN : node.getTime(CREATE);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 
     @Override
-    public String getTimeRead() {
+    public Long getTimeCreatedMillis() {
+        final FsNode node = model.stat();
+        final long time = null == node ? UNKNOWN : node.getTime(CREATE);
+        return UNKNOWN == time ? null : time;
+    }
+
+    @Override
+    public String getTimeReadDate() {
         final FsNode node = model.stat();
         final long time = null == node ? UNKNOWN : node.getTime(READ);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 
     @Override
-    public String getTimeCreated() {
+    public Long getTimeReadMillis() {
         final FsNode node = model.stat();
-        final long time = null == node ? UNKNOWN : node.getTime(CREATE);
+        final long time = null == node ? UNKNOWN : node.getTime(READ);
+        return UNKNOWN == time ? null : time;
+    }
+
+    @Override
+    public String getTimeWrittenDate() {
+        final FsNode node = model.stat();
+        final long time = null == node ? UNKNOWN : node.getTime(WRITE);
         return UNKNOWN == time ? null : new Date(time).toString();
+    }
+
+    @Override
+    public Long getTimeWrittenMillis() {
+        final FsNode node = model.stat();
+        final long time = null == node ? UNKNOWN : node.getTime(WRITE);
+        return UNKNOWN == time ? null : time;
     }
 
     @Override

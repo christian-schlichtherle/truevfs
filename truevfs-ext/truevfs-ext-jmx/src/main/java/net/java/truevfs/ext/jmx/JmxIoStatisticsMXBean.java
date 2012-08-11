@@ -21,10 +21,10 @@ public interface JmxIoStatisticsMXBean {
     long   getReadNanosecondsTotal();
     int    getReadOperations();
     String getSubject();
+    String getTimeCreatedDate();
     long   getTimeCreatedMillis();
-    String getTimeCreatedString();
+    String getTimeUpdatedDate();
     long   getTimeUpdatedMillis();
-    String getTimeUpdatedString();
     int    getWriteBytesPerOperation();
     long   getWriteBytesTotal();
     long   getWriteKilobytesPerSecond();

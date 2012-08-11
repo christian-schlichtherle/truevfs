@@ -18,8 +18,8 @@ public interface JmxSyncStatisticsMXBean {
     long   getSyncNanosecondsPerOperation();
     long   getSyncNanosecondsTotal();
     int    getSyncOperations();
+    String getTimeCreatedDate();
     long   getTimeCreatedMillis();
-    String getTimeCreatedString();
+    String getTimeUpdatedDate();
     long   getTimeUpdatedMillis();
-    String getTimeUpdatedString();
 }
