@@ -16,13 +16,17 @@ import net.java.truevfs.kernel.spec.FsSyncException;
  */
 @ThreadSafe
 public interface JmxModelMXBean {
-    boolean isMounted();
-    String getMountPoint();
-    String getMountPointOfParent();
-    long getSizeOfData();
-    long getSizeOfStorage();
-    @Nullable String getTimeWritten();
-    @Nullable String getTimeRead();
-    @Nullable String getTimeCreated();
+    boolean          isMounted();
+    String           getMountPoint();
+    String           getMountPointOfParent();
+    long             getSizeOfData();
+    long             getSizeOfStorage();
+    @Nullable String getTimeCreatedDate();
+    @Nullable Long   getTimeCreatedMillis();
+    @Nullable String getTimeReadDate();
+    @Nullable Long   getTimeReadMillis();
+    @Nullable String getTimeWrittenDate();
+    @Nullable Long   getTimeWrittenMillis();
+
     void sync() throws FsSyncException;
 }
