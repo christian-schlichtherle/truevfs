@@ -24,7 +24,7 @@ public final class IoStatistics {
      * 
      * @return I/O statistics with all properties set to zero.
      */
-    public static IoStatistics zero() {
+    public static IoStatistics create() {
         return new IoStatistics(0, 0, 0); // cannot cache because of time!
     }
 

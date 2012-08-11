@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.ext.jmx;
 
-import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import static net.java.truevfs.comp.jmx.JmxUtils.*;
@@ -18,44 +17,29 @@ import net.java.truevfs.ext.jmx.stats.IoStatistics;
  */
 @ThreadSafe
 public class JmxIoStatistics implements JmxColleague {
-    /*private static final String SIZE_PROPERTY_KEY =
-            JmxIoStatistics.class.getName() + ".size";
-    private static final int SIZE =
-            Integer.getInteger(SIZE_PROPERTY_KEY, 10);*/
 
-    private final long time = System.currentTimeMillis();
     private final JmxMediator mediator;
+    private final int offset;
 
-    public JmxIoStatistics(final JmxMediator mediator) {
-        this.mediator = Objects.requireNonNull(mediator);
-    }
-
-    long getTimeCreatedMillis() {
-        return time;
+    public JmxIoStatistics(final JmxMediator mediator, final int offset) {
+        if (offset < 0 || mediator.getLoggerSize() <= offset)
+            throw new IllegalArgumentException();
+        this.mediator = mediator;
+        this.offset = offset;
     }
 
     String getSubject() {
         return mediator.getSubject();
     }
 
-    IoStatistics getInputStats() {
-        return mediator.getReadStats();
-    }
-
-    IoStatistics getOutputStats() {
-        return mediator.getWriteStats();
-    }
-
-    @Override
-    public void start() {
-        register(name(), newView());
-        //roll(SIZE);
+    FsStatistics getStats() {
+        return mediator.getIoStats(offset);
     }
 
     private ObjectName name() {
         return mediator.nameBuilder(FsStatistics.class)
                 .put("subject", getSubject())
-                //.put("seqno", String.format("%08x", sequenceNumber() & 0xffff_ffffL))
+                .put("offset", mediator.formatLoggerOffset(offset))
                 .get();
     }
 
@@ -63,18 +47,8 @@ public class JmxIoStatistics implements JmxColleague {
         return new JmxIoStatisticsView(this);
     }
 
-    /*protected void roll(final int size) {
-        final int max = stats.sequenceNumber();
-        final int min = max - size + 1;
-        final ObjectName pattern = mediator.nameBuilder(FsStatistics.class)
-                .put("subject", getSubject())
-                .put("seqno", "*")
-                .stats();
-        for (final ObjectName name : query(pattern)) {
-            final JmxIoStatisticsMXBean bean =
-                    proxy(name, JmxIoStatisticsMXBean.class);
-            final int seqno = bean.sequenceNumber();
-            if (seqno < min || max < seqno) deregister(name);
-        }
-    }*/
+    @Override
+    public void start() {
+        register(name(), newView());
+    }
 }

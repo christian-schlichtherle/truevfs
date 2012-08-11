@@ -26,11 +26,6 @@ extends InstrumentingBuffer<JmxMediator> implements JmxColleague {
         super(director, entry);
     }
 
-    @Override
-    public void start() {
-        register(name(), newView());
-    }
-
     private ObjectName name() {
         return mediator.nameBuilder(IoBuffer.class)
                 .put("name", ObjectName.quote(getName()))
@@ -39,6 +34,11 @@ extends InstrumentingBuffer<JmxMediator> implements JmxColleague {
 
     protected JmxBufferMXBean newView() {
         return new JmxBufferView(this);
+    }
+
+    @Override
+    public void start() {
+        register(name(), newView());
     }
 
     @Override

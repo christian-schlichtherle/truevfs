@@ -16,7 +16,7 @@ public class SyncStatistics {
      * 
      * @return sync statistics with all properties set to zero.
      */
-    public static SyncStatistics zero() {
+    public static SyncStatistics create() {
         return new SyncStatistics(0, 0); // cannot cache because of time!
     }
 

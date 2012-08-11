@@ -20,6 +20,7 @@ import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 @ThreadSafe
 public class JmxSyncStatisticsView
 extends StandardMBean implements JmxSyncStatisticsMXBean {
+
     protected final JmxSyncStatistics stats;
 
     public JmxSyncStatisticsView(final JmxSyncStatistics stats) {
@@ -65,7 +66,7 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
     }
 
     private SyncStatistics getSyncStats() {
-        return stats.getSyncStats();
+        return stats.getStats().getSyncStats();
     }
 
     @Override
@@ -90,7 +91,7 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
 
     @Override
     public long getTimeCreatedMillis() {
-        return stats.getTimeCreatedMillis();
+        return stats.getStats().getTimeMillis();
     }
 
     @Override
