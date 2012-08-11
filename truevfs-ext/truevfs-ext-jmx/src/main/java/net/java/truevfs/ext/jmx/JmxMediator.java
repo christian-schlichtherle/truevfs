@@ -50,7 +50,7 @@ public abstract class JmxMediator extends Mediator<JmxMediator> {
     private final FsLogger logger = new FsLogger();
     private final String subject;
 
-    JmxMediator(final String subject) {
+    public JmxMediator(final String subject) {
         this.subject = Objects.requireNonNull(subject);
     }
 
