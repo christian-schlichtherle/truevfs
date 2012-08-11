@@ -9,7 +9,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.kernel.spec.cio.IoBuffer;
 
 /**
- * The MXBean interface for an {@linkplain IoBuffer I/O buffer}.
+ * An MXBean interface for an {@linkplain IoBuffer I/O buffer}.
  *
  * @author Christian Schlichtherle
  */

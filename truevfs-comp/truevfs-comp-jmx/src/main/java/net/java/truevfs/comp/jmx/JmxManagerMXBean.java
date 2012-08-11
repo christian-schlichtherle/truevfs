@@ -9,7 +9,7 @@ import net.java.truevfs.kernel.spec.FsSyncException;
 import net.java.truevfs.kernel.spec.FsSyncWarningException;
 
 /**
- * The MXBean interface for a {@linkplain FsManager file system manager}.
+ * An MXBean interface for a {@linkplain FsManager file system manager}.
  *
  * @author Christian Schlichtherle
  */
