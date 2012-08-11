@@ -44,11 +44,11 @@ public abstract class JmxMediator extends Mediator<JmxMediator> {
     private static final JmxMediator KERNEL_IO = new JmxIoMediator("Kernel I/O");
     private static final JmxMediator SYNC_OPS = new JmxSyncMediator("Sync Operations");
 
-    static JmxMediator get() { return SYNC_OPS; }
+    private static JmxMediator[] MEDIATORS = {
+        SYNC_OPS, APP_IO, KERNEL_IO, BUFFER_IO
+    };
 
-    private static JmxMediator[] mediators() {
-        return new JmxMediator[] { SYNC_OPS, APP_IO, KERNEL_IO, BUFFER_IO };
-    }
+    static JmxMediator get() { return SYNC_OPS; }
 
     private final String subject;
     private final FsLogger logger;
@@ -89,13 +89,13 @@ public abstract class JmxMediator extends Mediator<JmxMediator> {
     final void startStatistics() { startStatistics(0); }
 
     final void startAllStatistics() {
-        for (JmxMediator mediator : mediators()) mediator.startStatistics();
+        for (JmxMediator mediator : MEDIATORS) mediator.startStatistics();
     }
 
     void rotateStatistics() { startStatistics(logger.rotate()); }
 
     final void rotateAllStatistics() {
-        for (JmxMediator mediator : mediators()) mediator.rotateStatistics();
+        for (JmxMediator mediator : MEDIATORS) mediator.rotateStatistics();
     }
 
     final void logRead(long nanos, int bytes) { logger.logRead(nanos, bytes); }
