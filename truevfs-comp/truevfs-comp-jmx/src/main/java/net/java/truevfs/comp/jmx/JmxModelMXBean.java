@@ -10,7 +10,7 @@ import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsSyncException;
 
 /**
- * The MXBean interface for a {@linkplain FsModel file system model}.
+ * An MXBean interface for a {@linkplain FsModel file system model}.
  *
  * @author Christian Schlichtherle
  */
