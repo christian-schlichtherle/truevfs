@@ -13,11 +13,15 @@ import javax.annotation.concurrent.ThreadSafe;
 public class JmxSyncMediator extends JmxMediator {
 
     public JmxSyncMediator(String subject) {
-        super(subject);
+        super(subject, 1);
     }
 
     @Override
     protected JmxStatistics<?> newStatistics(int offset) {
         return new JmxSyncStatistics(this, offset);
+    }
+
+    @Override
+    void rotateStatistics() {
     }
 }

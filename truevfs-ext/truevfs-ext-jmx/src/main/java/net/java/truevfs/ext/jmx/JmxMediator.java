@@ -49,11 +49,21 @@ public abstract class JmxMediator extends Mediator<JmxMediator> {
         return new JmxMediator[] { SYNC_OPS, APPLICATION_IO, KERNEL_IO, BUFFER_IO };
     }
 
-    private final FsLogger logger = new FsLogger();
     private final String subject;
+    private final FsLogger logger;
 
     public JmxMediator(final String subject) {
+        this(subject, new FsLogger());
+    }
+
+    public JmxMediator(String subject, int logSize) {
+        this(subject, new FsLogger(logSize));
+    }
+
+    private JmxMediator(final String subject, final FsLogger logger) {
         this.subject = Objects.requireNonNull(subject);
+        assert null != logger;
+        this.logger = logger;
     }
 
     String getSubject() { return subject; }
