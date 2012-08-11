@@ -2,13 +2,12 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.ext.jmx;
+package net.java.truevfs.comp.jmx;
 
 import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.InstrumentingBuffer;
-import net.java.truevfs.comp.jmx.JmxBufferMXBean;
 import static net.java.truevfs.comp.jmx.JmxUtils.deregister;
 import static net.java.truevfs.comp.jmx.JmxUtils.register;
 import net.java.truevfs.kernel.spec.cio.IoBuffer;
@@ -16,13 +15,14 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
 /**
  * A controller for an {@linkplain IoBuffer I/O buffer}.
  * 
+ * @param  <M> the type of the JMX mediator.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxBuffer
-extends InstrumentingBuffer<JmxMediator> implements JmxColleague {
+public class JmxBuffer<M extends JmxMediator<M>>
+extends InstrumentingBuffer<M> implements JmxColleague {
 
-    public JmxBuffer(JmxMediator director, IoBuffer entry) {
+    public JmxBuffer(M director, IoBuffer entry) {
         super(director, entry);
     }
 
@@ -32,7 +32,7 @@ extends InstrumentingBuffer<JmxMediator> implements JmxColleague {
                 .get();
     }
 
-    protected JmxBufferMXBean newView() { return new JmxBufferView(this); }
+    protected JmxBufferMXBean newView() { return new JmxBufferView<>(this); }
 
     @Override
     public void start() { register(name(), newView()); }

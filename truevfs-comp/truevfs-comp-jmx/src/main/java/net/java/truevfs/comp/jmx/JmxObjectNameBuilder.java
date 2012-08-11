@@ -19,7 +19,7 @@ public final class JmxObjectNameBuilder implements Provider<ObjectName> {
 
     private final String domain;
 
-    public JmxObjectNameBuilder(Package domain) {
+    JmxObjectNameBuilder(final Package domain) {
         this.domain = domain.getName();
     }
 

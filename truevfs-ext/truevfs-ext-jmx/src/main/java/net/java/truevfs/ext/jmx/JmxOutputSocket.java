@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.ext.jmx;
 
+import net.java.truevfs.comp.jmx.JmxColleague;
 import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.comp.inst.InstrumentingOutputSocket;
 import net.java.truevfs.kernel.spec.cio.Entry;
