@@ -15,10 +15,13 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
  */
 @ThreadSafe
 public interface JmxBufferMXBean {
-    String getName();
-    long getSizeOfData();
-    long getSizeOfStorage();
-    @Nullable String getTimeWritten();
-    @Nullable String getTimeRead();
-    @Nullable String getTimeCreated();
+    String           getName();
+    long             getSizeOfData();
+    long             getSizeOfStorage();
+    @Nullable String getTimeCreatedDate();
+    @Nullable Long   getTimeCreatedMillis();
+    @Nullable String getTimeReadDate();
+    @Nullable Long   getTimeReadMillis();
+    @Nullable String getTimeWrittenDate();
+    @Nullable Long   getTimeWrittenMillis();
 }
