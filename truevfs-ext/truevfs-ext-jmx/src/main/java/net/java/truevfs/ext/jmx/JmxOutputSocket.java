@@ -23,12 +23,11 @@ extends InstrumentingOutputSocket<JmxMediator, E>
 implements JmxColleague {
 
     JmxOutputSocket(
-            final JmxMediator director,
-            final OutputSocket<? extends E> socket) {
+            JmxMediator director,
+            OutputSocket<? extends E> socket) {
         super(director, socket);
     }
 
     @Override
-    public void start() {
-    }
+    public void start() { }
 }

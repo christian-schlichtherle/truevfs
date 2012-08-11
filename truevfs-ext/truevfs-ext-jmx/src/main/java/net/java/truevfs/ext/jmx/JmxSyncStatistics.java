@@ -10,17 +10,16 @@ import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 /**
  * A controller for {@linkplain SyncStatistics sync statistics}.
  * 
+ * @see    JmxIoStatistics
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxSyncStatistics extends JmxStatistics<JmxSyncStatisticsMXBean> {
+final class JmxSyncStatistics extends JmxStatistics<JmxSyncStatisticsMXBean> {
 
-    public JmxSyncStatistics(JmxMediator mediator, int offset) {
+    JmxSyncStatistics(JmxMediator mediator, int offset) {
         super(mediator, offset);
     }
 
     @Override
-    protected JmxSyncStatisticsMXBean newView() {
-        return new JmxSyncStatisticsView(this);
-    }
+    JmxSyncStatisticsMXBean newView() { return new JmxSyncStatisticsView(this); }
 }

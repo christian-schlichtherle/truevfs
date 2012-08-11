@@ -7,49 +7,50 @@ package net.java.truevfs.ext.jmx;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import static net.java.truevfs.comp.jmx.JmxUtils.*;
-import net.java.truevfs.ext.jmx.stats.FsLogger;
 import net.java.truevfs.ext.jmx.stats.FsStatistics;
 
 /**
- * The JMX controller for statistics.
+ * A controller for statistics.
  * 
  * @param  <View> the type of the view to register with the platform MBean
  *         server.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class JmxStatistics<View> implements JmxColleague {
+abstract class JmxStatistics<View> implements JmxColleague {
 
     private final JmxMediator mediator;
-    private final FsLogger logger;
     private final int offset;
 
-    public JmxStatistics(final JmxMediator mediator, final int offset) {
-        logger = (this.mediator = mediator).getLogger();
-        if (offset < 0 || logger.size() <= offset)
-            throw new IllegalArgumentException();
+    JmxStatistics(final JmxMediator mediator, final int offset) {
+        assert 0 <= offset;
+        this.mediator = mediator;
         this.offset = offset;
     }
 
-    String getSubject() {
-        return mediator.getSubject();
-    }
+    String getSubject() { return mediator.getSubject(); }
 
-    FsStatistics getStats() {
-        return logger.getStats(offset);
-    }
+    FsStatistics getStats() { return mediator.stats(offset); }
 
     private ObjectName name() {
         return mediator.nameBuilder(FsStatistics.class)
                 .put("subject", getSubject())
-                .put("offset", logger.format(offset))
+                .put("offset", mediator.formatOffset(offset))
                 .get();
     }
 
-    protected abstract View newView();
+    abstract View newView();
 
     @Override
-    public void start() {
-        register(name(), newView());
+    public void start() { register(name(), newView()); }
+
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
+    @Override
+    public String toString() {
+        return String.format("%s[subject=%s, offset=%d, mediator=%s]",
+                getClass().getName(), getSubject(), offset, mediator);
     }
 }

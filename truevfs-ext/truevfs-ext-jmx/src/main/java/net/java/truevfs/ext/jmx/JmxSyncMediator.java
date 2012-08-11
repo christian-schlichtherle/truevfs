@@ -7,21 +7,19 @@ package net.java.truevfs.ext.jmx;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
+ * @see    JmxIoMediator
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxSyncMediator extends JmxMediator {
+final class JmxSyncMediator extends JmxMediator {
 
-    public JmxSyncMediator(String subject) {
-        super(subject, 1);
-    }
+    JmxSyncMediator(String subject) { super(subject, 1); }
 
     @Override
-    protected JmxStatistics<?> newStatistics(int offset) {
+    JmxStatistics<?> newStatistics(int offset) {
         return new JmxSyncStatistics(this, offset);
     }
 
     @Override
-    void rotateStatistics() {
-    }
+    void rotateStatistics() { }
 }

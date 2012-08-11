@@ -32,14 +32,10 @@ extends InstrumentingBuffer<JmxMediator> implements JmxColleague {
                 .get();
     }
 
-    protected JmxBufferMXBean newView() {
-        return new JmxBufferView(this);
-    }
+    protected JmxBufferMXBean newView() { return new JmxBufferView(this); }
 
     @Override
-    public void start() {
-        register(name(), newView());
-    }
+    public void start() { register(name(), newView()); }
 
     @Override
     public void release() throws IOException {

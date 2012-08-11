@@ -22,12 +22,11 @@ public class JmxInputSocket<E extends Entry>
 extends InstrumentingInputSocket<JmxMediator, E> implements JmxColleague {
 
     JmxInputSocket(
-            final JmxMediator director,
-            final InputSocket<? extends E> socket) {
+            JmxMediator director,
+            InputSocket<? extends E> socket) {
         super(director, socket);
     }
 
     @Override
-    public void start() {
-    }
+    public void start() { }
 }
