@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.ext.jmx;
 
+import net.java.truevfs.comp.jmx.JmxColleague;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;

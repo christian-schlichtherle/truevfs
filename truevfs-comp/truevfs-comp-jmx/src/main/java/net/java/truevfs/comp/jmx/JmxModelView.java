@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.ext.jmx;
+package net.java.truevfs.comp.jmx;
 
 import java.util.Date;
 import java.util.Objects;
@@ -11,10 +11,10 @@ import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.StandardMBean;
-import net.java.truevfs.comp.jmx.JmxModelMXBean;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsNode;
 import net.java.truevfs.kernel.spec.FsSyncException;
+import net.java.truevfs.kernel.spec.FsSyncWarningException;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
 import net.java.truevfs.kernel.spec.cio.Entry.Size;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
@@ -22,17 +22,18 @@ import static net.java.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 
 /**
- * The MXBean view for a {@linkplain FsModel file system model}.
+ * A view for a {@linkplain FsModel file system model}.
  *
+ * @param  <M> the type of the JMX mediator.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxModelView
+public class JmxModelView<M extends JmxMediator<M>>
 extends StandardMBean implements JmxModelMXBean {
 
-    protected final JmxModel model;
+    protected final JmxModel<M> model;
 
-    public JmxModelView(final JmxModel model) {
+    public JmxModelView(final JmxModel<M> model) {
         super(JmxModelMXBean.class, true);
         this.model = Objects.requireNonNull(model);
     }
@@ -160,7 +161,7 @@ extends StandardMBean implements JmxModelMXBean {
     }
 
     @Override
-    public void sync() throws FsSyncException {
+    public void sync() throws FsSyncWarningException, FsSyncException {
         model.sync();
     }
 }

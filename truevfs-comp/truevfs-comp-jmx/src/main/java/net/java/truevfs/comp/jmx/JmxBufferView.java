@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.ext.jmx;
+package net.java.truevfs.comp.jmx;
 
 import java.util.Date;
 import java.util.Objects;
@@ -10,7 +10,6 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.StandardMBean;
-import net.java.truevfs.comp.jmx.JmxBufferMXBean;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
@@ -20,15 +19,16 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
 /**
  * A view for an {@linkplain IoBuffer I/O buffer}.
  *
+ * @param  <M> the type of the JMX mediator.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxBufferView
+public class JmxBufferView<M extends JmxMediator<M>>
 extends StandardMBean implements JmxBufferMXBean {
 
-    protected final JmxBuffer buffer;
+    protected final JmxBuffer<M> buffer;
 
-    public JmxBufferView(final JmxBuffer buffer) {
+    public JmxBufferView(final JmxBuffer<M> buffer) {
         super(JmxBufferMXBean.class, true);
         this.buffer = Objects.requireNonNull(buffer);
     }

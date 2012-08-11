@@ -6,6 +6,7 @@ package net.java.truevfs.ext.jmx;
 
 import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.comp.inst.InstrumentingInputSocket;
+import net.java.truevfs.comp.jmx.JmxColleague;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
 

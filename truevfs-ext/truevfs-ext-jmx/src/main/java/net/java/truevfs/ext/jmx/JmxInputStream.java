@@ -9,6 +9,7 @@ import java.io.InputStream;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truevfs.comp.inst.InstrumentingInputStream;
+import net.java.truevfs.comp.jmx.JmxColleague;
 
 /**
  * A controller for an {@linkplain InputStream input stream}.

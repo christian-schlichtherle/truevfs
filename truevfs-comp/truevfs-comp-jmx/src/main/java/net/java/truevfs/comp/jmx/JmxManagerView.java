@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.ext.jmx;
+package net.java.truevfs.comp.jmx;
 
 import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
@@ -10,23 +10,23 @@ import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.StandardMBean;
-import net.java.truevfs.comp.jmx.JmxManagerMXBean;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsSyncException;
 
 /**
- * The MXBean view for a {@linkplain FsManager file system manager}.
+ * A view for a {@linkplain FsManager file system manager}.
  *
+ * @param  <M> the type of the JMX mediator.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxManagerView 
+public class JmxManagerView<M extends JmxMediator<M>>
 extends StandardMBean implements JmxManagerMXBean {
 
-    protected final JmxManager manager;
+    protected final JmxManager<M> manager;
 
-    public JmxManagerView(final JmxManager manager) {
+    public JmxManagerView(final JmxManager<M> manager) {
         super(JmxManagerMXBean.class, true);
         this.manager = Objects.requireNonNull(manager);
     }

@@ -16,8 +16,8 @@ import net.java.truevfs.comp.inst.InstrumentingInputSocket;
 import net.java.truevfs.comp.inst.InstrumentingManager;
 import net.java.truevfs.comp.inst.InstrumentingMetaDriver;
 import net.java.truevfs.comp.inst.InstrumentingOutputSocket;
-import net.java.truevfs.comp.inst.Mediator;
-import net.java.truevfs.comp.jmx.JmxObjectNameBuilder;
+import net.java.truevfs.comp.jmx.JmxBuffer;
+import net.java.truevfs.comp.jmx.JmxModel;
 import net.java.truevfs.ext.jmx.stats.FsLogger;
 import net.java.truevfs.ext.jmx.stats.FsStatistics;
 import net.java.truevfs.kernel.spec.FsController;
@@ -31,13 +31,12 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
 
 /**
  * A mediator for the instrumentation of the TrueVFS Kernel with JMX.
- * Each instance of this class manages its own
- * {@linkplain #stats() file system statistics}.
  * 
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class JmxMediator extends Mediator<JmxMediator> {
+abstract class JmxMediator
+extends net.java.truevfs.comp.jmx.JmxMediator<JmxMediator> {
 
     private static final JmxMediator APP_IO = new JmxIoMediator("Application I/O");
     private static final JmxMediator BUFFER_IO = new JmxIoMediator("Buffer I/O");
@@ -68,19 +67,6 @@ public abstract class JmxMediator extends Mediator<JmxMediator> {
     }
 
     String getSubject() { return subject; }
-
-    /**
-     * {@linkplain JmxColleague#start Starts} and returns the given
-     * {@code colleague}.
-     * 
-     * @param  <C> the type of the colleague to start.
-     * @param  colleague the colleague to start.
-     * @return The started colleague.
-     */
-    protected final <C extends JmxColleague> C start(C colleague) {
-        colleague.start();
-        return colleague;
-    }
 
     abstract JmxStatistics<?> newStatistics(int offset);
 
@@ -129,14 +115,14 @@ public abstract class JmxMediator extends Mediator<JmxMediator> {
     public final IoBuffer instrument(
             InstrumentingBufferPool<JmxMediator> origin,
             IoBuffer object) {
-        return start(new JmxBuffer(this, object));
+        return start(new JmxBuffer<>(this, object));
     }
 
     @Override
     public final FsModel instrument(
             InstrumentingMetaDriver<JmxMediator> origin,
             FsModel object) {
-        return start(new JmxModel(this, object));
+        return start(new JmxModel<>(this, object));
     }
 
     @Override
@@ -201,13 +187,6 @@ public abstract class JmxMediator extends Mediator<JmxMediator> {
             SeekableByteChannel object) {
         return start(new JmxSeekableChannel(this, object));
     }
-
-    public final JmxObjectNameBuilder nameBuilder(Class<?> type) {
-        return new JmxObjectNameBuilder(getDomain())
-                .put("type", type.getSimpleName());
-    }
-
-    private Package getDomain() { return getClass().getPackage(); }
 
     /**
      * Returns a string representation of this object for debugging and logging

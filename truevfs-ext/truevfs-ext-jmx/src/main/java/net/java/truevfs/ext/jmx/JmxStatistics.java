@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.ext.jmx;
 
+import net.java.truevfs.comp.jmx.JmxColleague;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import static net.java.truevfs.comp.jmx.JmxUtils.*;
