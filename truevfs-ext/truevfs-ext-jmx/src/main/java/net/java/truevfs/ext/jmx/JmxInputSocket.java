@@ -10,7 +10,7 @@ import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
 
 /**
- * The MXBean controller for an {@linkplain InputSocket input socket}.
+ * A controller for an {@linkplain InputSocket input socket}.
  * 
  * @param  <E> the type of the {@linkplain #target() target entry} for I/O
  *         operations.

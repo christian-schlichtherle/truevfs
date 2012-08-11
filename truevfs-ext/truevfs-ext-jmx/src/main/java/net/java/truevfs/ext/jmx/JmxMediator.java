@@ -19,13 +19,13 @@ import net.java.truevfs.comp.inst.InstrumentingOutputSocket;
 import net.java.truevfs.comp.inst.Mediator;
 import net.java.truevfs.comp.jmx.JmxObjectNameBuilder;
 import net.java.truevfs.ext.jmx.stats.FsLogger;
-import net.java.truevfs.ext.jmx.stats.FsStatistics;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
 import net.java.truevfs.kernel.spec.cio.IoBuffer;
+import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
 
 /**
@@ -36,24 +36,27 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxMediator extends Mediator<JmxMediator> {
+public abstract class JmxMediator extends Mediator<JmxMediator> {
 
-    public static final JmxMediator APPLICATION_IO = new JmxMediator("Application I/O");
-    public static final JmxMediator BUFFER_IO = new JmxMediator("Buffer I/O");
-    public static final JmxMediator KERNEL_IO = new JmxMediator("Kernel I/O");
+    static final JmxMediator ROOT = new JmxSyncMediator("Sync Operations");
+    private static final JmxMediator APPLICATION_IO = new JmxIoMediator("Application I/O");
+    private static final JmxMediator BUFFER_IO = new JmxIoMediator("Buffer I/O");
+    private static final JmxMediator KERNEL_IO = new JmxIoMediator("Kernel I/O");
+
+    static JmxMediator[] mediators() {
+        return new JmxMediator[] { ROOT, APPLICATION_IO, KERNEL_IO, BUFFER_IO };
+    }
 
     private final FsLogger logger = new FsLogger();
-    private String subject;
+    private final String subject;
 
-    protected JmxMediator(final String subject) {
+    JmxMediator(final String subject) {
         this.subject = Objects.requireNonNull(subject);
     }
 
-    public String getSubject() { return subject; }
+    String getSubject() { return subject; }
 
-    int getLoggerSize() { return logger.size(); }
-
-    String formatLoggerOffset(int offset) { return logger.format(offset); }
+    FsLogger getLogger() { return logger; }
 
     /**
      * {@linkplain JmxColleague#start Starts} and returns the given
@@ -78,86 +81,22 @@ public class JmxMediator extends Mediator<JmxMediator> {
                 getClass().getName(), getSubject());
     }
 
-    private FsLogger getIoLogger() { return logger; }
+    abstract JmxStatistics<?> newStatistics(int offset);
 
-    private FsLogger getSyncLogger() { return APPLICATION_IO.logger; }
-
-    public FsStatistics getIoStats(int offset) {
-        return getIoLogger().getStats(offset);
-    }
-
-    public FsStatistics getSyncStats(int offset) {
-        return getSyncLogger().getStats(offset);
-    }
-
-    /**
-     * Logs a read operation with the given sample data.
-     * 
-     * @param  nanos the execution time in nanoseconds.
-     * @param  bytes the number of bytes read.
-     * @throws IllegalArgumentException if any parameter value is negative.
-     */
-    public void logRead(long nanos, int bytes) {
-        getIoLogger().logRead(nanos, bytes);
-    }
-
-    /**
-     * Logs a write operation with the given sample data.
-     * 
-     * @param  nanos the execution time in nanoseconds.
-     * @param  bytes the number of bytes written.
-     * @throws IllegalArgumentException if any parameter is negative.
-     */
-    public void logWrite(long nanos, int bytes) {
-        getIoLogger().logWrite(nanos, bytes);
-    }
-
-    /**
-     * Logs a sync operation with the given sample data.
-     * 
-     * @param  nanos the execution time in nanoseconds.
-     * @throws IllegalArgumentException if any parameter value is negative.
-     */
-    public void logSync(long nanos) {
-        getSyncLogger().logSync(nanos);
-    }
-
-    protected JmxIoStatistics newIoStatistics(int offset) {
-        return new JmxIoStatistics(this, offset);
-    }
-
-    protected JmxSyncStatistics newSyncStatistics(int offset) {
-        return new JmxSyncStatistics(this, offset);
-    }
-    
-    private void startStatistics(final int offset) {
-        start(newIoStatistics(offset));
-        start(newSyncStatistics(offset));
-    }
-
-    protected JmxMediator[] allMediators() {
-        return new JmxMediator[] { APPLICATION_IO, KERNEL_IO, BUFFER_IO };
-    }
-
-    public void startStatistics() {
-        for (JmxMediator mediator : allMediators())
-            mediator.startStatistics(0);
-    }
-
-    private int rotateLogger() { return logger.rotate(); }
-
-    public void rotateStatistics() {
-        for (final JmxMediator mediator : allMediators())
-            mediator.startStatistics(mediator.rotateLogger());
-    }
+    void startStatistics(int offset) { start(newStatistics(offset)); }
 
     @Override
     public final FsManager instrument(FsManager object) {
-        return start(new JmxManager(this, object));
+        return start(new JmxManager(ROOT, object)); // switch mediator!
     }
 
     @Override
-    public FsController instrument(
+    public final IoBufferPool instrument(IoBufferPool object) {
+        return new InstrumentingBufferPool<>(BUFFER_IO, object); // switch mediator!
+    }
+
+    @Override
+    public final FsController instrument(
             InstrumentingManager<JmxMediator> origin,
             FsController object) {
         return start(new JmxController(APPLICATION_IO, object)); // switch mediator!
@@ -178,7 +117,7 @@ public class JmxMediator extends Mediator<JmxMediator> {
     }
 
     @Override
-    public FsController instrument(
+    public final FsController instrument(
             InstrumentingMetaDriver<JmxMediator> origin,
             FsController object) {
         return start(new JmxController(KERNEL_IO, object)); // switch mediator!

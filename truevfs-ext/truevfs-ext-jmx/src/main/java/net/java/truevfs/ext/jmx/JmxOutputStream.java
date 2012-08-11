@@ -9,9 +9,10 @@ import java.io.OutputStream;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truevfs.comp.inst.InstrumentingOutputStream;
+import net.java.truevfs.ext.jmx.stats.FsLogger;
 
 /**
- * The MXBean controller for an {@linkplain OutputStream output stream}.
+ * A controller for an {@linkplain OutputStream output stream}.
  * 
  * @author Christian Schlichtherle
  */
@@ -19,10 +20,13 @@ import net.java.truevfs.comp.inst.InstrumentingOutputStream;
 public class JmxOutputStream
 extends InstrumentingOutputStream<JmxMediator> implements JmxColleague {
 
+    private final FsLogger logger;
+
     JmxOutputStream(
             JmxMediator mediator,
             @WillCloseWhenClosed OutputStream out) {
         super(mediator, out);
+        logger = mediator.getLogger();
     }
 
     @Override
@@ -33,13 +37,13 @@ extends InstrumentingOutputStream<JmxMediator> implements JmxColleague {
     public void write(int b) throws IOException {
         final long start = System.nanoTime();
         out.write(b);
-        mediator.logWrite(System.nanoTime() - start, 1);
+        logger.logWrite(System.nanoTime() - start, 1);
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         final long start = System.nanoTime();
         out.write(b, off, len);
-        mediator.logWrite(System.nanoTime() - start, len);
+        logger.logWrite(System.nanoTime() - start, len);
     }    
 }

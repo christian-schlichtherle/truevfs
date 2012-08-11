@@ -19,6 +19,6 @@ import net.java.truevfs.kernel.spec.spi.FsManagerDecorator;
 public final class JmxManagerDecorator extends FsManagerDecorator {
     @Override
     public FsManager apply(FsManager manager) {
-        return JmxMediator.APPLICATION_IO.instrument(manager);
+        return JmxMediator.ROOT.instrument(manager);
     }
 }
