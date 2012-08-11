@@ -34,10 +34,6 @@ extends InstrumentingModel<JmxMediator> implements JmxColleague {
         this.name = name();
     }
 
-    @Override
-    public void start() {
-    }
-
     private ObjectName name() {
         return mediator.nameBuilder(FsModel.class)
                 .put("mountPoint", ObjectName.quote(
@@ -50,6 +46,10 @@ extends InstrumentingModel<JmxMediator> implements JmxColleague {
     }
 
     @Override
+    public void start() {
+    }
+
+    @Override
     public void setMounted(final boolean mounted) {
         try {
             model.setMounted(mounted);
@@ -59,7 +59,7 @@ extends InstrumentingModel<JmxMediator> implements JmxColleague {
         }
     }
 
-    public @CheckForNull FsNode stat() {
+    @CheckForNull FsNode stat() {
         final FsMountPoint mmp = model.getMountPoint();
         final FsMountPoint pmp = mmp.getParent();
         final FsMountPoint mp;

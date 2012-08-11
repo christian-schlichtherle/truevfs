@@ -25,6 +25,7 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
 @ThreadSafe
 public class JmxBufferView
 extends StandardMBean implements JmxBufferMXBean {
+
     protected final JmxBuffer buffer;
 
     public JmxBufferView(final JmxBuffer buffer) {

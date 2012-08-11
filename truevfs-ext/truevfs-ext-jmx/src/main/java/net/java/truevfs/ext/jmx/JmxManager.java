@@ -29,18 +29,18 @@ extends InstrumentingManager<JmxMediator> implements JmxColleague {
         super(mediator, manager);
     }
 
-    @Override
-    public void start() {
-        register(name(), newView());
-        mediator.rotateStatistics();
-    }
-
     private ObjectName name() {
         return mediator.nameBuilder(FsManager.class).get();
     }
 
     protected JmxManagerMXBean newView() {
         return new JmxManagerView(this);
+    }
+
+    @Override
+    public void start() {
+        register(name(), newView());
+        mediator.startStatistics();
     }
 
     @Override

@@ -20,6 +20,7 @@ import net.java.truevfs.ext.jmx.stats.IoStatistics;
 @ThreadSafe
 public class JmxIoStatisticsView
 extends StandardMBean implements JmxIoStatisticsMXBean {
+
     protected final JmxIoStatistics stats;
 
     public JmxIoStatisticsView(final JmxIoStatistics stats) {
@@ -82,42 +83,42 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
         }
     }
 
-    private IoStatistics getInputStats() {
-        return stats.getInputStats();
+    private IoStatistics getReadStats() {
+        return stats.getStats().getReadStats();
     }
 
-    private IoStatistics getOutputStats() {
-        return stats.getOutputStats();
+    private IoStatistics getWriteStats() {
+        return stats.getStats().getWriteStats();
     }
 
     @Override
     public int getReadBytesPerOperation() {
-        return getInputStats().getBytesPerOperation();
+        return getReadStats().getBytesPerOperation();
     }
 
     @Override
     public long getReadBytesTotal() {
-        return getInputStats().getBytesTotal();
+        return getReadStats().getBytesTotal();
     }
 
     @Override
     public long getReadKilobytesPerSecond() {
-        return getInputStats().getKilobytesPerSecond();
+        return getReadStats().getKilobytesPerSecond();
     }
 
     @Override
     public long getReadNanosecondsPerOperation() {
-        return getInputStats().getNanosecondsPerOperation();
+        return getReadStats().getNanosecondsPerOperation();
     }
 
     @Override
     public long getReadNanosecondsTotal() {
-        return getInputStats().getNanosecondsTotal();
+        return getReadStats().getNanosecondsTotal();
     }
 
     @Override
     public int getReadOperations() {
-        return getInputStats().getSequenceNumber();
+        return getReadStats().getSequenceNumber();
     }
 
     @Override
@@ -127,7 +128,7 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
 
     @Override
     public long getTimeCreatedMillis() {
-        return stats.getTimeCreatedMillis();
+        return stats.getStats().getTimeMillis();
     }
 
     @Override
@@ -138,8 +139,8 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
     @Override
     public long getTimeUpdatedMillis() {
         return Math.max(
-                getInputStats().getTimeMillis(),
-                getOutputStats().getTimeMillis());
+                getReadStats().getTimeMillis(),
+                getWriteStats().getTimeMillis());
     }
 
     @Override
@@ -149,31 +150,31 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
 
     @Override
     public int getWriteBytesPerOperation() {
-        return getOutputStats().getBytesPerOperation();
+        return getWriteStats().getBytesPerOperation();
     }
 
     @Override
     public long getWriteBytesTotal() {
-        return getOutputStats().getBytesTotal();
+        return getWriteStats().getBytesTotal();
     }
 
     @Override
     public long getWriteKilobytesPerSecond() {
-        return getOutputStats().getKilobytesPerSecond();
+        return getWriteStats().getKilobytesPerSecond();
     }
 
     @Override
     public long getWriteNanosecondsPerOperation() {
-        return getOutputStats().getNanosecondsPerOperation();
+        return getWriteStats().getNanosecondsPerOperation();
     }
 
     @Override
     public long getWriteNanosecondsTotal() {
-        return getOutputStats().getNanosecondsTotal();
+        return getWriteStats().getNanosecondsTotal();
     }
 
     @Override
     public int getWriteOperations() {
-        return getOutputStats().getSequenceNumber();
+        return getWriteStats().getSequenceNumber();
     }
 }

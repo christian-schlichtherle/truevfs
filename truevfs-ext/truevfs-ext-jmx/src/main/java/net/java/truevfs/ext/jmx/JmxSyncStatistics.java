@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.ext.jmx;
 
-import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import static net.java.truevfs.comp.jmx.JmxUtils.*;
@@ -19,37 +18,37 @@ import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 @ThreadSafe
 public class JmxSyncStatistics implements JmxColleague {
 
-    private final long time = System.currentTimeMillis();
     private final JmxMediator mediator;
+    private final int offset;
 
-    public JmxSyncStatistics(final JmxMediator mediator) {
-        this.mediator = Objects.requireNonNull(mediator);
-    }
-
-    long getTimeCreatedMillis() {
-        return time;
+    public JmxSyncStatistics(final JmxMediator mediator, final int offset) {
+        if (offset < 0 || mediator.getLoggerSize() <= offset)
+            throw new IllegalArgumentException();
+        this.mediator = mediator;
+        this.offset = offset;
     }
 
     String getSubject() {
         return "Sync Operations";
     }
 
-    SyncStatistics getSyncStats() {
-        return mediator.getSyncStats();
-    }
-
-    @Override
-    public void start() {
-        register(name(), newView());
+    FsStatistics getStats() {
+        return mediator.getSyncStats(offset);
     }
 
     private ObjectName name() {
         return mediator.nameBuilder(FsStatistics.class)
                 .put("subject", getSubject())
+                .put("offset", mediator.formatLoggerOffset(offset))
                 .get();
     }
 
     protected JmxSyncStatisticsMXBean newView() {
         return new JmxSyncStatisticsView(this);
+    }
+
+    @Override
+    public void start() {
+        register(name(), newView());
     }
 }
