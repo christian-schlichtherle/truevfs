@@ -35,7 +35,7 @@ extends StandardMBean implements JmxBufferMXBean {
 
     @Override
     protected String getDescription(MBeanInfo info) {
-        return "An I/O pool entry.";
+        return "An I/O buffer.";
     }
 
     @Override
