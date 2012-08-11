@@ -17,7 +17,7 @@ import net.java.truevfs.kernel.spec.FsSyncOptions;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 
 /**
- * The MXBean controller for a {@linkplain FsManager file system manager}.
+ * A controller for a {@linkplain FsManager file system manager}.
  * 
  * @author Christian Schlichtherle
  */
@@ -37,19 +37,28 @@ extends InstrumentingManager<JmxMediator> implements JmxColleague {
         return new JmxManagerView(this);
     }
 
+    private void startStatistics() {
+        for (JmxMediator mediator : JmxMediator.mediators())
+            mediator.startStatistics(0);
+    }
+
     @Override
     public void start() {
         register(name(), newView());
-        mediator.startStatistics();
+        startStatistics();
+    }
+
+    private void rotateStatistics() {
+        for (JmxMediator mediator : JmxMediator.mediators())
+            mediator.startStatistics(mediator.getLogger().rotate());
     }
 
     @Override
     public void sync(BitField<FsSyncOption> options) throws FsSyncException {
-        final JmxMediator mediator = this.mediator;
         final long start = System.nanoTime();
         super.sync(options);
-        mediator.logSync(System.nanoTime() - start);
-        mediator.rotateStatistics();
+        mediator.getLogger().logSync(System.nanoTime() - start);
+        rotateStatistics();
     }
 
     void sync() throws FsSyncException {

@@ -18,7 +18,7 @@ import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.java.truevfs.kernel.spec.cio.IoBuffer;
 
 /**
- * The MXBean view for an {@linkplain IoBuffer I/O buffer}.
+ * A view for an {@linkplain IoBuffer I/O buffer}.
  *
  * @author Christian Schlichtherle
  */

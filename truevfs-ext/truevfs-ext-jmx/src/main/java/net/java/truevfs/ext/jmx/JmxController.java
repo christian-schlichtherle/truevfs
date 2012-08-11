@@ -9,7 +9,7 @@ import net.java.truevfs.comp.inst.InstrumentingController;
 import net.java.truevfs.kernel.spec.FsController;
 
 /**
- * The MXBean controller for a {@linkplain FsController file system controller}.
+ * A controller for a {@linkplain FsController file system controller}.
  * 
  * @author Christian Schlichtherle
  */

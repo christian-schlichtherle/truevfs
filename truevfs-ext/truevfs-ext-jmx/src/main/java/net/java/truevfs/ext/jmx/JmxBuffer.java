@@ -14,7 +14,7 @@ import static net.java.truevfs.comp.jmx.JmxUtils.register;
 import net.java.truevfs.kernel.spec.cio.IoBuffer;
 
 /**
- * The MXBean controller for an {@linkplain IoBuffer I/O buffer}.
+ * A controller for an {@linkplain IoBuffer I/O buffer}.
  * 
  * @author Christian Schlichtherle
  */
