@@ -19,6 +19,7 @@ import net.java.truevfs.comp.inst.InstrumentingOutputSocket;
 import net.java.truevfs.comp.inst.Mediator;
 import net.java.truevfs.comp.jmx.JmxObjectNameBuilder;
 import net.java.truevfs.ext.jmx.stats.FsLogger;
+import net.java.truevfs.ext.jmx.stats.FsStatistics;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsModel;
@@ -31,14 +32,14 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
 /**
  * A mediator for the instrumentation of the TrueVFS Kernel with JMX.
  * Each instance of this class manages its own
- * {@linkplain #getStats() file system statistics}.
+ * {@linkplain #stats() file system statistics}.
  * 
  * @author Christian Schlichtherle
  */
 @ThreadSafe
 public abstract class JmxMediator extends Mediator<JmxMediator> {
 
-    private static final JmxMediator APPLICATION_IO = new JmxIoMediator("Application I/O");
+    private static final JmxMediator APP_IO = new JmxIoMediator("Application I/O");
     private static final JmxMediator BUFFER_IO = new JmxIoMediator("Buffer I/O");
     private static final JmxMediator KERNEL_IO = new JmxIoMediator("Kernel I/O");
     private static final JmxMediator SYNC_OPS = new JmxSyncMediator("Sync Operations");
@@ -46,17 +47,17 @@ public abstract class JmxMediator extends Mediator<JmxMediator> {
     static JmxMediator get() { return SYNC_OPS; }
 
     private static JmxMediator[] mediators() {
-        return new JmxMediator[] { SYNC_OPS, APPLICATION_IO, KERNEL_IO, BUFFER_IO };
+        return new JmxMediator[] { SYNC_OPS, APP_IO, KERNEL_IO, BUFFER_IO };
     }
 
     private final String subject;
     private final FsLogger logger;
 
-    public JmxMediator(final String subject) {
+    JmxMediator(String subject) {
         this(subject, new FsLogger());
     }
 
-    public JmxMediator(String subject, int logSize) {
+    JmxMediator(String subject, int logSize) {
         this(subject, new FsLogger(logSize));
     }
 
@@ -67,8 +68,6 @@ public abstract class JmxMediator extends Mediator<JmxMediator> {
     }
 
     String getSubject() { return subject; }
-
-    FsLogger getLogger() { return logger; }
 
     /**
      * {@linkplain JmxColleague#start Starts} and returns the given
@@ -87,23 +86,27 @@ public abstract class JmxMediator extends Mediator<JmxMediator> {
 
     private void startStatistics(int offset) { start(newStatistics(offset)); }
 
-    void startStatistics() { startStatistics(0); }
+    final void startStatistics() { startStatistics(0); }
 
     final void startAllStatistics() {
         for (JmxMediator mediator : mediators()) mediator.startStatistics();
     }
 
-    void rotateStatistics() {
-        startStatistics(getLogger().rotate());
-    }
+    void rotateStatistics() { startStatistics(logger.rotate()); }
 
     final void rotateAllStatistics() {
         for (JmxMediator mediator : mediators()) mediator.rotateStatistics();
     }
 
-    final void logSync(long nanos) {
-        getLogger().logSync(nanos);
-    }
+    final void logRead(long nanos, int bytes) { logger.logRead(nanos, bytes); }
+
+    final void logWrite(long nanos, int bytes) { logger.logWrite(nanos, bytes); }
+
+    final void logSync(long nanos) { logger.logSync(nanos); }
+
+    final FsStatistics stats(int offset) { return logger.stats(offset); }
+
+    final String formatOffset(int offset) { return logger.format(offset); }
 
     @Override
     public final FsManager instrument(FsManager object) {
@@ -119,7 +122,7 @@ public abstract class JmxMediator extends Mediator<JmxMediator> {
     public final FsController instrument(
             InstrumentingManager<JmxMediator> origin,
             FsController object) {
-        return start(new JmxController(APPLICATION_IO, object)); // switch mediator!
+        return start(new JmxController(APP_IO, object)); // switch mediator!
     }
 
     @Override
@@ -144,68 +147,62 @@ public abstract class JmxMediator extends Mediator<JmxMediator> {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <E extends Entry> InputSocket<E> instrument(
+    public final <E extends Entry> InputSocket<E> instrument(
             InstrumentingController<JmxMediator> origin,
             InputSocket<E> object) {
         return start(new JmxInputSocket<>(this, object));
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <E extends Entry> OutputSocket<E> instrument(
+    public final <E extends Entry> OutputSocket<E> instrument(
             InstrumentingController<JmxMediator> origin,
             OutputSocket<E> object) {
         return start(new JmxOutputSocket<>(this, object));
     }
 
     @Override
-    public <B extends IoBuffer> InputSocket<B> instrument(
+    public final <B extends IoBuffer> InputSocket<B> instrument(
             InstrumentingBuffer<JmxMediator> origin,
             InputSocket<B> object) {
         return start(new JmxInputSocket<>(this, object));
     }
 
     @Override
-    public <B extends IoBuffer> OutputSocket<B> instrument(
+    public final <B extends IoBuffer> OutputSocket<B> instrument(
             InstrumentingBuffer<JmxMediator> origin,
             OutputSocket<B> object) {
         return start(new JmxOutputSocket<>(this, object));
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <E extends Entry> InputStream instrument(
+    public final <E extends Entry> InputStream instrument(
             InstrumentingInputSocket<JmxMediator, E> origin,
             InputStream object) {
         return start(new JmxInputStream(this, object));
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <E extends Entry> SeekableByteChannel instrument(
+    public final <E extends Entry> SeekableByteChannel instrument(
             InstrumentingInputSocket<JmxMediator, E> origin,
             SeekableByteChannel object) {
         return start(new JmxSeekableChannel(this, object));
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <E extends Entry> OutputStream instrument(
+    public final <E extends Entry> OutputStream instrument(
             InstrumentingOutputSocket<JmxMediator, E> origin,
             OutputStream object) {
         return start(new JmxOutputStream(this, object));
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <E extends Entry> SeekableByteChannel instrument(
+    public final <E extends Entry> SeekableByteChannel instrument(
             InstrumentingOutputSocket<JmxMediator, E> origin,
             SeekableByteChannel object) {
         return start(new JmxSeekableChannel(this, object));
     }
 
-    public JmxObjectNameBuilder nameBuilder(Class<?> type) {
+    public final JmxObjectNameBuilder nameBuilder(Class<?> type) {
         return new JmxObjectNameBuilder(getDomain())
                 .put("type", type.getSimpleName());
     }

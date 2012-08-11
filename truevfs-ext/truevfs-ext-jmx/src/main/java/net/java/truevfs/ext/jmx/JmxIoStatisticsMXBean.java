@@ -8,7 +8,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.ext.jmx.stats.IoStatistics;
 
 /**
- * The MXBean interface for {@linkplain IoStatistics I/O statistics}.
+ * An interface for {@linkplain IoStatistics I/O statistics}.
  *
  * @author Christian Schlichtherle
  */

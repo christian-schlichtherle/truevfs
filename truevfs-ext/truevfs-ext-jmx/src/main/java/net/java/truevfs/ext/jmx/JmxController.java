@@ -22,6 +22,5 @@ extends InstrumentingController<JmxMediator> implements JmxColleague {
     }
 
     @Override
-    public void start() {
-    }
+    public void start() { }
 }

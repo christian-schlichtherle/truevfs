@@ -9,7 +9,6 @@ import java.io.InputStream;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truevfs.comp.inst.InstrumentingInputStream;
-import net.java.truevfs.ext.jmx.stats.FsLogger;
 
 /**
  * A controller for an {@linkplain InputStream input stream}.
@@ -20,24 +19,20 @@ import net.java.truevfs.ext.jmx.stats.FsLogger;
 public class JmxInputStream
 extends InstrumentingInputStream<JmxMediator> implements JmxColleague {
 
-    private final FsLogger logger;
-
     JmxInputStream(
             JmxMediator mediator,
             @WillCloseWhenClosed InputStream in) {
         super(mediator, in);
-        logger = mediator.getLogger();
     }
 
     @Override
-    public void start() {
-    }
+    public void start() { }
 
     @Override
     public int read() throws IOException {
         final long start = System.nanoTime();
         final int ret = in.read();
-        if (0 <= ret) logger.logRead(System.nanoTime() - start, 1);
+        if (0 <= ret) mediator.logRead(System.nanoTime() - start, 1);
         return ret;
     }
 
@@ -45,7 +40,7 @@ extends InstrumentingInputStream<JmxMediator> implements JmxColleague {
     public int read(byte[] b, int off, int len) throws IOException {
         final long start = System.nanoTime();
         final int ret = in.read(b, off, len);
-        if (0 <= ret) logger.logRead(System.nanoTime() - start, ret);
+        if (0 <= ret) mediator.logRead(System.nanoTime() - start, ret);
         return ret;
     }
 }

@@ -13,17 +13,17 @@ import javax.management.StandardMBean;
 import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 
 /**
- * The MXBean view for {@linkplain SyncStatistics sync statistics}.
+ * A view for {@linkplain SyncStatistics sync statistics}.
  *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxSyncStatisticsView
+final class JmxSyncStatisticsView
 extends StandardMBean implements JmxSyncStatisticsMXBean {
 
-    protected final JmxSyncStatistics stats;
+    private final JmxSyncStatistics stats;
 
-    public JmxSyncStatisticsView(final JmxSyncStatistics stats) {
+    JmxSyncStatisticsView(final JmxSyncStatistics stats) {
         super(JmxSyncStatisticsMXBean.class, true);
         this.stats = Objects.requireNonNull(stats);
     }

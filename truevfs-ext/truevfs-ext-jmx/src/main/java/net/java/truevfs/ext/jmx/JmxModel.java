@@ -46,8 +46,7 @@ extends InstrumentingModel<JmxMediator> implements JmxColleague {
     }
 
     @Override
-    public void start() {
-    }
+    public void start() { }
 
     @Override
     public void setMounted(final boolean mounted) {

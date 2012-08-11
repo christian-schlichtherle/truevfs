@@ -63,9 +63,9 @@ public final class FsLogger {
         return String.format(String.format("%%0%dd", length(max)), offset);
     }
 
-    public FsStatistics getStats(int offset) { return stats.get(index(offset)); }
+    public FsStatistics stats(int offset) { return stats.get(index(offset)); }
 
-    private FsStatistics current() { return getStats(0); }
+    private FsStatistics current() { return stats(0); }
 
     /**
      * Logs a read operation with the given sample data and returns a new
@@ -141,5 +141,15 @@ public final class FsLogger {
             if (size <= updated) updated -= size;
             if (position.compareAndSet(expected, updated)) return updated;
         }
+    }
+
+    /**
+     * Returns a string representation of this object for debugging and logging
+     * purposes.
+     */
+    @Override
+    public String toString() {
+        return String.format("%s[size=%d, position=%d]",
+                getClass().getName(), size(), position());
     }
 }

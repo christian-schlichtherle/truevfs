@@ -13,17 +13,17 @@ import javax.management.StandardMBean;
 import net.java.truevfs.ext.jmx.stats.IoStatistics;
 
 /**
- * The MXBean view for {@linkplain IoStatistics I/O statistics}.
+ * A view for {@linkplain IoStatistics I/O statistics}.
  *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxIoStatisticsView
+final class JmxIoStatisticsView
 extends StandardMBean implements JmxIoStatisticsMXBean {
 
-    protected final JmxIoStatistics stats;
+    private final JmxIoStatistics stats;
 
-    public JmxIoStatisticsView(final JmxIoStatistics stats) {
+    JmxIoStatisticsView(final JmxIoStatistics stats) {
         super(JmxIoStatisticsMXBean.class, true);
         this.stats = Objects.requireNonNull(stats);
     }
