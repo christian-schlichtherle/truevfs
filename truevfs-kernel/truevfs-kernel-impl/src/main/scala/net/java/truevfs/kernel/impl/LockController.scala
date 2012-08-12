@@ -84,8 +84,8 @@ private trait LockController extends Controller[LockModel] {
     new Output
   }: AnyOutputSocket
 
-  abstract override def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) =
-    timedLocked(writeLock)(super.mknod(options, name, tµpe, template))
+  abstract override def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) =
+    timedLocked(writeLock)(super.make(options, name, tµpe, template))
 
   abstract override def unlink(options: AccessOptions, name: FsNodeName) =
     timedLocked(writeLock)(super.unlink(options, name))

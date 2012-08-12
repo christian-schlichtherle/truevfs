@@ -73,8 +73,8 @@ extends FsDecoratingController(c) {
       apply(socket channel peer)
   }
 
-  override def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, @CheckForNull template: Entry) =
-    apply(c mknod (options, name, tµpe, template))
+  override def make(options: AccessOptions, name: FsNodeName, tµpe: Type, @CheckForNull template: Entry) =
+    apply(c make (options, name, tµpe, template))
 
   override def unlink(options: AccessOptions, name: FsNodeName) =
     apply(c unlink (options, name))

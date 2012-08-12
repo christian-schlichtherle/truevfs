@@ -317,7 +317,7 @@ extends FileSystemArchiveController[E] with TouchListener {
             } else {
               // The file system entry is a newly created
               // non-directory entry which hasn't received any
-              // content yet, e.g. as a result of mknod()
+              // content yet, e.g. as a result of make()
               // => output an empty file system entry.
               for (size <- ALL_SIZES)
                 ae.setSize(size, UNKNOWN)

@@ -93,13 +93,13 @@ public abstract class FsDecoratingController extends FsAbstractController {
     }
 
     @Override
-    public void mknod(
+    public void make(
             BitField<FsAccessOption> options,
             FsNodeName name,
             Type type,
             @CheckForNull Entry template)
     throws IOException {
-        controller.mknod(options, name, type, template);
+        controller.make(options, name, type, template);
     }
 
     @Override

@@ -2167,7 +2167,7 @@ public final class TFile extends File {
             // This is not really atomic, but should be OK in this case.
             if (null != controller.node(getAccessPreferences(), entryName))
                 return false;
-            controller.mknod(
+            controller.make(
                     getAccessPreferences().set(EXCLUSIVE), entryName,
                     FILE,
                     null);
@@ -2212,7 +2212,7 @@ public final class TFile extends File {
     public boolean mkdir() {
         if (null != innerArchive) {
             try {
-                innerArchive.getController().mknod(
+                innerArchive.getController().make(
                         getAccessPreferences(), getNodeName(),
                         DIRECTORY,
                         null);
@@ -2244,7 +2244,7 @@ public final class TFile extends File {
             final FsController controller = innerArchive.getController();
             final FsNodeName innerEntryName = getNodeName();
             try {
-                controller.mknod(
+                controller.make(
                         getAccessPreferences(), innerEntryName,
                         DIRECTORY,
                         null);

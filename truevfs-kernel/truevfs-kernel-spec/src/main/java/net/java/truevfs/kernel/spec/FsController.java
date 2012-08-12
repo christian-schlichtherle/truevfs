@@ -258,7 +258,7 @@ public interface FsController {
      *             {@code false}.
      *         </ul>
      */
-    void mknod(
+    void make(
             BitField<FsAccessOption> options,
             FsNodeName name,
             Type type,

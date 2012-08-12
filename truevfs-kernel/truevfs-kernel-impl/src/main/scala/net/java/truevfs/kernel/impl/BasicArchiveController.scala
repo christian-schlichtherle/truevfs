@@ -102,7 +102,7 @@ extends Controller[LockModel] with LockModelAspect {
 
     final class Output extends AbstractOutputSocket[FsArchiveEntry] {
       def target() = {
-        val ae = mknod().head.getEntry
+        val ae = make().head.getEntry
         if (options get APPEND) {
           // A proxy entry must get returned here in order to inhibit
           // a peer target to recognize the type of this entry and
@@ -115,7 +115,7 @@ extends Controller[LockModel] with LockModelAspect {
       }
 
       override def stream(peer: AnyInputSocket) = {
-        val tx = mknod()
+        val tx = make()
         val ae = tx.head.getEntry
         val in = append()
         var ex: Option[Throwable] = None
@@ -164,12 +164,12 @@ extends Controller[LockModel] with LockModelAspect {
         }
       }
 
-      def mknod() = {
+      def make() = {
         checkSync(options, name, WRITE)
         // Start creating or overwriting the archive entry.
         // This will fail if the entry already exists as a directory.
         autoMount(options, !name.isRoot && (options get CREATE_PARENTS))
-        .mknod(options, name, FILE, template)
+        .make(options, name, FILE, template)
       }
 
       def append(): Option[InputStream] = {
@@ -191,7 +191,7 @@ extends Controller[LockModel] with LockModelAspect {
 
   def output(options: AccessOptions, entry: E): OutputSocket[E]
 
-  def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) {
+  def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) {
     if (name.isRoot) { // TODO: Is this case differentiation still required?
       try {
         autoMount(options) // detect false positives!
@@ -207,7 +207,7 @@ extends Controller[LockModel] with LockModelAspect {
     } else {
       checkSync(options, name, CREATE)
       autoMount(options, options get CREATE_PARENTS)
-      .mknod(options, name, tµpe, template)
+      .make(options, name, tµpe, template)
       .commit()
     }
   }

@@ -92,9 +92,9 @@ private trait CacheController extends Controller[LockModel] {
     new Output
   }: AnyOutputSocket
 
-  abstract override def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) {
+  abstract override def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) {
     assert(writeLockedByCurrentThread)
-    super.mknod(options, name, tµpe, template)
+    super.make(options, name, tµpe, template)
     val cache = caches remove name
     if (null ne cache) cache clear ()
   }
@@ -262,18 +262,18 @@ private trait CacheController extends Controller[LockModel] {
           new Channel
         }
 
-        def preOutput() { mknod(_options, template) }
+        def preOutput() { make(_options, template) }
 
         def postOutput() {
-          mknod(_options clear EXCLUSIVE, template orElse Option(cache)) 
+          make(_options clear EXCLUSIVE, template orElse Option(cache)) 
           register()
         }
 
-        def mknod(options: AccessOptions, template: Option[Entry]) {
+        def make(options: AccessOptions, template: Option[Entry]) {
           var mknodOpts = options
           while (true) {
             try {
-              CacheController.super.mknod(mknodOpts, name, FILE, template)
+              CacheController.super.make(mknodOpts, name, FILE, template)
               return
             } catch {
               case mknodEx: NeedsSyncException =>
@@ -293,10 +293,10 @@ private trait CacheController extends Controller[LockModel] {
                 // Even if we were asked to create the entry
                 // EXCLUSIVEly, first we must try to get the cache in
                 // sync() with the virtual file system again and retry
-                // the mknod().
+                // the make().
                 try {
                   CacheController.super.sync(syncOpts)
-                  // sync() succeeded, now repeat the mknod()
+                  // sync() succeeded, now repeat the make()
                 } catch {
                   case syncEx: FsSyncException =>
                     syncEx addSuppressed mknodEx
@@ -319,7 +319,7 @@ private trait CacheController extends Controller[LockModel] {
                     // thread has acquired open I/O resources for the
                     // same target archive file.
                     // Normally, we would be expected to rethrow the
-                    // mknod exception to trigger another sync(), but
+                    // make exception to trigger another sync(), but
                     // this would fail for the same reason und create
                     // an endless loop, so we can't do this.
                     //throw mknodEx;
@@ -327,18 +327,18 @@ private trait CacheController extends Controller[LockModel] {
                     // Dito for mapping the exception.
                     //throw FsNeedsLockRetryException.get(getModel());
 
-                    // Check if we can retry the mknod with GROW set.
+                    // Check if we can retry the make with GROW set.
                     val oldMknodOpts = mknodOpts
                     mknodOpts = oldMknodOpts set GROW
                     if (mknodOpts eq oldMknodOpts) {
-                        // Finally, the mknod failed because the entry
+                        // Finally, the make failed because the entry
                         // has already been output to the target archive
                         // file - so what?!
                         // This should mark only a volatile issue because
                         // the next sync() will sort it out once all the
                         // I/O resources have been closed.
                         // Let's log the sync exception - mind that it has
-                        // suppressed the mknod exception - and continue
+                        // suppressed the make exception - and continue
                         // anyway...
                         logger debug ("ignoring", syncEx)
                         return

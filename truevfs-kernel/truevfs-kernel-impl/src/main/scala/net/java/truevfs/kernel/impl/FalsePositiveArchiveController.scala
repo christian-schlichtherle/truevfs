@@ -124,8 +124,8 @@ private final class FalsePositiveArchiveController(
     new Output
   }: AnyOutputSocket
 
-  override def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Entry) =
-    apply(name, (c, n) => c mknod (options, n, tµpe, template))
+  override def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Entry) =
+    apply(name, (c, n) => c make (options, n, tµpe, template))
 
   override def unlink(options: AccessOptions, name: FsNodeName) {
     val operation: Operation[Unit] = { (c, n) =>

@@ -173,7 +173,7 @@ extends Iterable[FsCovariantNode[E]] {
     *
     * To commit the transaction, you need to call
     * `commit` on the returned
-    * [[net.java.truevfs.kernel.impl.ArchiveFileSystem.Mknod]] object,
+    * [[net.java.truevfs.kernel.impl.ArchiveFileSystem.Make]] object,
     * which will mark this archive file system as touched and set the last
     * modification time of the created and linked archive file system entries
     * to the system's current time at the moment of the call to this method.
@@ -192,10 +192,10 @@ extends Iterable[FsCovariantNode[E]] {
     *         archive file system entries for the given path name which will
     *         be linked into this archive file system upon a call to the
     *         `commit` method of the returned
-    *         [[net.java.truevfs.kernel.impl.ArchiveFileSystem.Mknod]]
+    *         [[net.java.truevfs.kernel.impl.ArchiveFileSystem.Make]]
     *         object.
     */
-  def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) = {
+  def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) = {
     require(null ne tµpe)
     if (FILE.ne(tµpe) && DIRECTORY.ne(tµpe)) // TODO: Add support for other types.
       throw new FileSystemException(name.toString, null,
@@ -215,10 +215,10 @@ extends Iterable[FsCovariantNode[E]] {
       case Some(ce: FsCovariantNode[_]) => Some(ce.get(tµpe))
       case x => x
     }
-    new Mknod(options, path, tµpe, t)
+    new Make(options, path, tµpe, t)
   }
 
-  /** Represents an `mknod` transaction.
+  /** Represents a `make` transaction.
     * The transaction get committed by calling `commit`.
     * The state of the archive file system will not change until this method
     * gets called.
@@ -233,7 +233,7 @@ extends Iterable[FsCovariantNode[E]] {
     * To avoid this, the caller must not allow concurrent changes to this
     * archive file system.
     */
-  final class Mknod(options: AccessOptions, path: String, tµpe: Type, template: Option[Entry]) {
+  final class Make(options: AccessOptions, path: String, tµpe: Type, template: Option[Entry]) {
     private var time: Long = UNKNOWN
     private val segments = newSegments(path, tµpe, template)
 
@@ -301,7 +301,7 @@ extends Iterable[FsCovariantNode[E]] {
     }
 
     def head = segments.head.entry
-  } // Mknod
+  } // Make
 
   /** Tests the named file system entry and then - unless its the file system
     * root - notifies the listener and deletes the entry.
@@ -391,7 +391,7 @@ extends Iterable[FsCovariantNode[E]] {
     * @return A new entry for the given name.
     * @throws CharConversionException If the entry name contains characters
     *         which cannot get encoded.
-    * @see    #mknod
+    * @see    #make
     */
   private def newEntry(options: AccessOptions, name: String, tµpe: Type, template: Option[Entry]) = {
     assert(!isRoot(name))
@@ -543,7 +543,7 @@ private object ArchiveFileSystem {
   } // TouchListener
 
   /** A case class which represents a path segment for use by
-    * [[net.java.truevfs.kernel.impl.ArchiveFileSystem.Mknod]].
+    * [[net.java.truevfs.kernel.impl.ArchiveFileSystem.Make]].
     *
     * @param name the nullable member name for the covariant file system entry.
     * @param entry the covariant file system entry for the nullable member name.

@@ -154,7 +154,7 @@ final class FileController extends FsAbstractController {
     }
 
     @Override
-    public void mknod(
+    public void make(
             final BitField<FsAccessOption> options,
             final FsNodeName name,
             final Type type,

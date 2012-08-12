@@ -220,7 +220,7 @@ public abstract class ZipRaesDriver extends JarDriver {
         final JarDriverEntry entry
                 = super.newEntry(options.set(COMPRESS), name, type, template);
         // Fix for http://java.net/jira/browse/TRUEZIP-176 :
-        // Entry level encryption is enabled if mknod.getKeyManager(ENCRYPTED) is true
+        // Entry level encryption is enabled if make.getKeyManager(ENCRYPTED) is true
         // OR template is an instance of ZipEntry
         // AND ((ZipEntry) template).isEncrypted() is true.
         // Now switch off entry level encryption because encryption is already

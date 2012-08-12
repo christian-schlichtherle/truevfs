@@ -201,7 +201,7 @@ private trait Controller[+M <: FsModel] {
     * @throws FileSystemException on any file system error.
     * @throws IOException on any I/O error.
     */
-  def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry])
+  def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry])
 
   /** Removes the named file system entry from the file system.
     * If the named file system entry is a directory, it must be empty.
