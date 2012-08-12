@@ -352,7 +352,7 @@ extends FsDriver {
      * The implementation may change this name in order to form a valid
      * {@link Entry#getName() entry name} for their particular requirements.
      *
-     * @param  options when called from {@link FsController#mknod}, this is its
+     * @param  options when called from {@link FsController#make}, this is its
      *         {@code options} parameter, otherwise it's typically an empty set.
      * @param  name the entry name.
      * @param  type the entry type.

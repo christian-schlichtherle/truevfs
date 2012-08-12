@@ -338,7 +338,7 @@ public final class TFileSystem extends FileSystem {
         final FsNodeName name = path.getNodeName();
         final BitField<FsAccessOption> options = path.getAccessPreferences();
         try {
-            controller.mknod(
+            controller.make(
                     options, name,
                     DIRECTORY,
                     null);

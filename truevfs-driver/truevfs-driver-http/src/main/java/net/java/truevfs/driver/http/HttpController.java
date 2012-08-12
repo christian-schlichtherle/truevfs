@@ -108,7 +108,7 @@ public class HttpController extends FsAbstractController {
     }
 
     @Override
-    public void mknod(  final BitField<FsAccessOption> options, final FsNodeName name, final Type type, @CheckForNull
+    public void make(  final BitField<FsAccessOption> options, final FsNodeName name, final Type type, @CheckForNull
     final Entry template)
     throws IOException {
         throw new FsReadOnlyFileSystemException();

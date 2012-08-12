@@ -41,7 +41,7 @@ extends ArchiveFileSystem(driver, archive, rootTemplate) {
   override def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long) =
     throw new FsReadOnlyFileSystemException
 
-  override def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) =
+  override def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) =
     throw new FsReadOnlyFileSystemException
 
   override def unlink(options: AccessOptions, name: FsNodeName) =

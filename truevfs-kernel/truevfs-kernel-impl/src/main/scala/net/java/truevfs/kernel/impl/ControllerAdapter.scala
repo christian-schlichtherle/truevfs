@@ -30,8 +30,8 @@ private final class ControllerAdapter(
   def input(options: AccessOptions, name: FsNodeName) = c input (options, name)
   def output(options: AccessOptions, name: FsNodeName, template: Entry) =
     c output (options, name, Option(template))
-  override def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Entry) =
-    c mknod (options, name, tµpe, Option(template))
+  override def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Entry) =
+    c make (options, name, tµpe, Option(template))
   override def unlink(options: AccessOptions, name: FsNodeName) =
     c unlink (options, name)
   override def sync(options: SyncOptions) = c sync(options)

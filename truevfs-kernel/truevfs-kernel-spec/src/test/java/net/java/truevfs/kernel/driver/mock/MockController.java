@@ -209,7 +209,7 @@ extends FsAbstractController {
     }
 
     @Override
-    public void mknod(  BitField<FsAccessOption> options, FsNodeName name, Type type, Entry template)
+    public void make(  BitField<FsAccessOption> options, FsNodeName name, Type type, Entry template)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
