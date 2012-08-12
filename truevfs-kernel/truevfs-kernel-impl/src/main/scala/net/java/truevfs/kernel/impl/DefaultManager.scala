@@ -129,7 +129,7 @@ private final class DefaultManager private (
   }
 
   private def sortedControllers = {
-    readLocked (
+    readLocked(
       controllers
       .values
       .flatMap(l => Option(l.get))
