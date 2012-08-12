@@ -17,7 +17,10 @@ import net.java.truevfs.comp.inst.InstrumentingManager;
 import net.java.truevfs.comp.inst.InstrumentingMetaDriver;
 import net.java.truevfs.comp.inst.InstrumentingOutputSocket;
 import net.java.truevfs.comp.jmx.JmxBuffer;
+import net.java.truevfs.comp.jmx.JmxController;
+import net.java.truevfs.comp.jmx.JmxInputSocket;
 import net.java.truevfs.comp.jmx.JmxModel;
+import net.java.truevfs.comp.jmx.JmxOutputSocket;
 import net.java.truevfs.ext.jmx.stats.FsLogger;
 import net.java.truevfs.ext.jmx.stats.FsStatistics;
 import net.java.truevfs.kernel.spec.FsController;
@@ -108,7 +111,7 @@ extends net.java.truevfs.comp.jmx.JmxMediator<JmxMediator> {
     public final FsController instrument(
             InstrumentingManager<JmxMediator> origin,
             FsController object) {
-        return start(new JmxController(APP_IO, object)); // switch mediator!
+        return start(new JmxController<>(APP_IO, object)); // switch mediator!
     }
 
     @Override
@@ -129,7 +132,7 @@ extends net.java.truevfs.comp.jmx.JmxMediator<JmxMediator> {
     public final FsController instrument(
             InstrumentingMetaDriver<JmxMediator> origin,
             FsController object) {
-        return start(new JmxController(KERNEL_IO, object)); // switch mediator!
+        return start(new JmxController<>(KERNEL_IO, object)); // switch mediator!
     }
 
     @Override

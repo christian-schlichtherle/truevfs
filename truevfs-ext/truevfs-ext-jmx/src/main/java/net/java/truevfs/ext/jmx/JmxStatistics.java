@@ -4,9 +4,9 @@
  */
 package net.java.truevfs.ext.jmx;
 
-import net.java.truevfs.comp.jmx.JmxColleague;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
+import net.java.truevfs.comp.jmx.JmxColleague;
 import static net.java.truevfs.comp.jmx.JmxUtils.*;
 import net.java.truevfs.ext.jmx.stats.FsStatistics;
 

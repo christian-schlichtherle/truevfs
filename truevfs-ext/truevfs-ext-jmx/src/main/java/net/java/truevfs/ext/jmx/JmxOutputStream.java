@@ -4,12 +4,12 @@
  */
 package net.java.truevfs.ext.jmx;
 
-import net.java.truevfs.comp.jmx.JmxColleague;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truevfs.comp.inst.InstrumentingOutputStream;
+import net.java.truevfs.comp.jmx.JmxColleague;
 
 /**
  * A controller for an {@linkplain OutputStream output stream}.
@@ -17,7 +17,7 @@ import net.java.truevfs.comp.inst.InstrumentingOutputStream;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class JmxOutputStream
+final class JmxOutputStream
 extends InstrumentingOutputStream<JmxMediator> implements JmxColleague {
 
     JmxOutputStream(
