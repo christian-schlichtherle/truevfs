@@ -6,7 +6,7 @@ package net.java.truevfs.comp.jmx;
 
 import java.lang.management.ManagementFactory;
 import java.util.Set;
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.concurrent.Immutable;
 import javax.management.*;
 
 /**
@@ -14,7 +14,7 @@ import javax.management.*;
  * 
  * @author Christian Schlichtherle
  */
-@ThreadSafe
+@Immutable
 public final class JmxUtils {
     private static final MBeanServer mbs =
             ManagementFactory.getPlatformMBeanServer();
