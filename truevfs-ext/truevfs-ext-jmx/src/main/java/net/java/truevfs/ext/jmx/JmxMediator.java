@@ -17,14 +17,12 @@ import net.java.truevfs.comp.inst.InstrumentingManager;
 import net.java.truevfs.comp.inst.InstrumentingMetaDriver;
 import net.java.truevfs.comp.inst.InstrumentingOutputSocket;
 import net.java.truevfs.comp.jmx.JmxBuffer;
-import net.java.truevfs.comp.jmx.JmxController;
-import net.java.truevfs.comp.jmx.JmxInputSocket;
 import net.java.truevfs.comp.jmx.JmxModel;
-import net.java.truevfs.comp.jmx.JmxOutputSocket;
 import net.java.truevfs.ext.jmx.stats.FsLogger;
 import net.java.truevfs.ext.jmx.stats.FsStatistics;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
+import net.java.truevfs.kernel.spec.FsMetaDriver;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
@@ -108,10 +106,17 @@ extends net.java.truevfs.comp.jmx.JmxMediator<JmxMediator> {
     }
 
     @Override
+    public FsMetaDriver instrument(
+            InstrumentingManager<JmxMediator> origin,
+            FsMetaDriver object) {
+        return new InstrumentingMetaDriver<>(this, object);
+    }
+
+    @Override
     public final FsController instrument(
             InstrumentingManager<JmxMediator> origin,
             FsController object) {
-        return start(new JmxController<>(APP_IO, object)); // switch mediator!
+        return new InstrumentingController<>(APP_IO, object); // switch mediator!
     }
 
     @Override
@@ -132,35 +137,35 @@ extends net.java.truevfs.comp.jmx.JmxMediator<JmxMediator> {
     public final FsController instrument(
             InstrumentingMetaDriver<JmxMediator> origin,
             FsController object) {
-        return start(new JmxController<>(KERNEL_IO, object)); // switch mediator!
+        return new InstrumentingController<>(KERNEL_IO, object); // switch mediator!
     }
 
     @Override
     public final <E extends Entry> InputSocket<E> instrument(
             InstrumentingController<JmxMediator> origin,
             InputSocket<E> object) {
-        return start(new JmxInputSocket<>(this, object));
+        return new InstrumentingInputSocket<>(this, object);
     }
 
     @Override
     public final <E extends Entry> OutputSocket<E> instrument(
             InstrumentingController<JmxMediator> origin,
             OutputSocket<E> object) {
-        return start(new JmxOutputSocket<>(this, object));
+        return new InstrumentingOutputSocket<>(this, object);
     }
 
     @Override
     public final <B extends IoBuffer> InputSocket<B> instrument(
             InstrumentingBuffer<JmxMediator> origin,
             InputSocket<B> object) {
-        return start(new JmxInputSocket<>(this, object));
+        return new InstrumentingInputSocket<>(this, object);
     }
 
     @Override
     public final <B extends IoBuffer> OutputSocket<B> instrument(
             InstrumentingBuffer<JmxMediator> origin,
             OutputSocket<B> object) {
-        return start(new JmxOutputSocket<>(this, object));
+        return new InstrumentingOutputSocket<>(this, object);
     }
 
     @Override
