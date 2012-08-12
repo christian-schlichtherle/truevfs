@@ -7,7 +7,7 @@ package net.java.truevfs.ext.jmx;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import net.java.truevfs.comp.jmx.JmxColleague;
-import static net.java.truevfs.comp.jmx.JmxUtils.*;
+import static net.java.truevfs.comp.jmx.JmxUtils.register;
 import net.java.truevfs.ext.jmx.stats.FsStatistics;
 import net.java.truevfs.ext.jmx.stats.IoStatistics;
 import net.java.truevfs.ext.jmx.stats.SyncStatistics;
