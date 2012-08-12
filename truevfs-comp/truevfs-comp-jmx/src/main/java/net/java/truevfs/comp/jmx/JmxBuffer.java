@@ -22,8 +22,8 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
 public class JmxBuffer<M extends JmxMediator<M>>
 extends InstrumentingBuffer<M> implements JmxColleague {
 
-    public JmxBuffer(M director, IoBuffer entry) {
-        super(director, entry);
+    public JmxBuffer(M mediator, IoBuffer entry) {
+        super(mediator, entry);
     }
 
     private ObjectName name() {
