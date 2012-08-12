@@ -45,8 +45,8 @@ public final class JmxUtils {
         return mbs.queryNames(name, null);
     }
 
-    public static <T> T proxy(ObjectName name, Class<T> clazz) {
-        return JMX.newMBeanProxy(mbs, name, clazz);
+    public static <T> T proxy(ObjectName name, Class<T> type) {
+        return JMX.newMBeanProxy(mbs, name, type);
     }
 
     private JmxUtils() { }
