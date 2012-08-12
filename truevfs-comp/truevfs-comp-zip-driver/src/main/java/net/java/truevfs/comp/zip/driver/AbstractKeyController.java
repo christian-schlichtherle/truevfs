@@ -70,15 +70,15 @@ extends FsDecoratingController {
     }
 
     @Override
-    public final FsNode stat(
+    public final FsNode node(
             final BitField<FsAccessOption> options,
             final FsNodeName name)
     throws IOException {
         try {
-            return controller.stat(options, name);
+            return controller.node(options, name);
         } catch (final ControlFlowException ex) {
             if (!name.isRoot() || null == findKeyException(ex)) throw ex;
-            Entry node = getParent().stat(
+            Entry node = getParent().node(
                     options, getModel()
                                  .getMountPoint()
                                  .getPath()

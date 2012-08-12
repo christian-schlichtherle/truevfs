@@ -67,20 +67,20 @@ private final class FalsePositiveArchiveController(
 
   private lazy val path = getMountPoint.getPath
 
-  override def stat(options: AccessOptions, name: FsNodeName) =
-    apply(name, (c, n) => c.stat(options, n))
+  override def node(options: AccessOptions, name: FsNodeName) =
+    apply(name, (c, n) => c node (options, n))
 
   override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
-    apply(name, (c, n) => c.checkAccess(options, n, types))
+    apply(name, (c, n) => c checkAccess (options, n, types))
 
   override def setReadOnly(name: FsNodeName) =
-    apply(name, (c, n) => c.setReadOnly(n))
+    apply(name, (c, n) => c setReadOnly n)
 
   override def setTime(options: AccessOptions, name: FsNodeName, times: java.util.Map[Access, java.lang.Long]) =
-    apply(name, (c, n) => c.setTime(options, n, times))
+    apply(name, (c, n) => c setTime (options, n, times))
 
   override def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long) =
-    apply(name, (c, n) => c.setTime(options, n, types, value))
+    apply(name, (c, n) => c setTime (options, n, types, value))
 
   override def input(options: AccessOptions, name: FsNodeName) = {
     final class Input extends AbstractInputSocket[Entry] {
@@ -88,17 +88,17 @@ private final class FalsePositiveArchiveController(
       var _socket: AnyInputSocket = _
 
       def socket(c: FsController, n: FsNodeName) = {
-        if (_last ne c) { _last = c; _socket = c.input(options, n) }
+        if (_last ne c) { _last = c; _socket = c input (options, n) }
         _socket
       }
 
-      override def target() = apply(name, (c, n) => socket(c, n).target())
+      override def target() = apply(name, (c, n) => socket(c, n) target ())
 
       override def stream(peer: AnyOutputSocket) =
-        apply(name, (c, n) => socket(c, n).stream(peer))
+        apply(name, (c, n) => socket(c, n) stream (peer))
 
       override def channel(peer: AnyOutputSocket) =
-        apply(name, (c, n) => socket(c, n).channel(peer))
+        apply(name, (c, n) => socket(c, n) channel (peer))
     }
     new Input
   }: AnyInputSocket
@@ -109,32 +109,32 @@ private final class FalsePositiveArchiveController(
       var _socket: AnyOutputSocket = _
 
       def socket(c: FsController, n: FsNodeName) = {
-        if (_last ne c) { _last = c; _socket = c.output(options, n, template) }
+        if (_last ne c) { _last = c; _socket = c output (options, n, template) }
         _socket
       }
 
-      override def target() = apply(name, (c, n) => socket(c, n).target())
+      override def target() = apply(name, (c, n) => socket(c, n) target ())
 
       override def stream(peer: AnyInputSocket) =
-        apply(name, (c, n) => socket(c, n).stream(peer))
+        apply(name, (c, n) => socket(c, n) stream (peer))
 
       override def channel(peer: AnyInputSocket) =
-        apply(name, (c, n) => socket(c, n).channel(peer))
+        apply(name, (c, n) => socket(c, n) channel (peer))
     }
     new Output
   }: AnyOutputSocket
 
   override def mknod(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Entry) =
-    apply(name, (c, n) => c.mknod(options, n, tµpe, template))
+    apply(name, (c, n) => c mknod (options, n, tµpe, template))
 
   override def unlink(options: AccessOptions, name: FsNodeName) {
     val operation: Operation[Unit] = { (c, n) =>
-      c.unlink(options, n)
+      c unlink (options, n)
       if (n.isRoot) {
         assert (c eq controller)
         // Unlink target archive file from parent file system.
         // This operation isn't lock protected, so it's not atomic!
-        getParent.unlink(options, parent(n))
+        getParent unlink (options, parent(n))
       }
     }
     if (name.isRoot) {
@@ -154,13 +154,13 @@ private final class FalsePositiveArchiveController(
   override def sync(options: SyncOptions) {
     // HC SVNT DRACONES!
     try {
-      controller.sync(options)
+      controller sync (options)
     } catch {
       case ex: FsSyncException =>
-        assert(state.eq(TryChild))
+        assert(state eq TryChild)
         throw ex
       case ex: ControlFlowException =>
-        assert(state.eq(TryChild))
+        assert(state eq TryChild)
         throw ex
     }
     state = TryChild

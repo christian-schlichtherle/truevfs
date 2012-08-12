@@ -18,8 +18,8 @@ private final class ControllerAdapter(
   c: Controller[_ <: FsModel]
 ) extends FsAbstractController(c.model) {
 
-  override def stat(options: AccessOptions, name: FsNodeName) =
-    c stat (options, name) orNull
+  override def node(options: AccessOptions, name: FsNodeName) =
+    c node (options, name) orNull
   override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
     c checkAccess (options, name, types)
   override def setReadOnly(name: FsNodeName) = c setReadOnly (name)

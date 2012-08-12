@@ -39,8 +39,8 @@ import javax.annotation.concurrent._
 private trait LockController extends Controller[LockModel] {
   this: LockModelAspect =>
 
-  abstract override def stat(options: AccessOptions, name: FsNodeName) =
-    timedReadOrWriteLocked(super.stat(options, name))
+  abstract override def node(options: AccessOptions, name: FsNodeName) =
+    timedReadOrWriteLocked(super.node(options, name))
 
   abstract override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
     timedReadOrWriteLocked(super.checkAccess(options, name, types))

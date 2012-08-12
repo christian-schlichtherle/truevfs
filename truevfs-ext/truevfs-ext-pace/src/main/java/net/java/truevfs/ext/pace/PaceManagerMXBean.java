@@ -7,27 +7,21 @@ package net.java.truevfs.ext.pace;
 import net.java.truevfs.comp.jmx.JmxManagerMXBean;
 
 /**
- * The MXBean interface for a pace manager.
+ * An MXBean interface for a {@linkplain PaceManager pace manager}.
  * 
  * @author Christian Schlichtherle
  */
 public interface PaceManagerMXBean extends JmxManagerMXBean {
 
     /**
-     * The name of the property for the maximum number of file systems which
-     * may have been mounted at any time, which is {@value}.
-     */
-    String MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_NAME
-            = "maximumFileSystemsMounted";
-
-    /**
      * The key string for the system property which defines the value of the
      * constant {@link #MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE},
      * which is equivalent to the expression
-     * {@code PaceManagerMXBean.class.getName() + "." + MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_NAME}.
+     * {@code PaceManagerMXBean.class.getPackage().getName() + ".maximumFileSystemsMounted"}.
      */
-    String MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_KEY
-            = PaceManagerMXBean.class.getName() + "." + MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_NAME;
+    String MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_KEY =
+            PaceManagerMXBean.class.getPackage().getName() +
+            ".maximumFileSystemsMounted";
 
     /**
      * The minimum value for the maximum number of mounted file systems,

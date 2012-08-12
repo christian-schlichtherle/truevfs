@@ -16,9 +16,10 @@ import net.java.truevfs.kernel.spec.spi.FsManagerDecorator;
 @Deprecated
 @Immutable
 public final class PaceManagerDecorator extends FsManagerDecorator {
+
     @Override
     public FsManager apply(FsManager manager) {
-        return PaceManagerFactory.Lazy.view.decorate(manager);
+        return PaceMediator.SINGLETON.instrument(manager);
     }
 
     /** Returns 100. */

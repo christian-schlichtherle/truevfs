@@ -30,8 +30,8 @@ import javax.annotation.concurrent._
 private trait SyncController extends Controller[LockModel] {
   this: LockModelAspect =>
 
-  abstract override def stat(options: AccessOptions, name: FsNodeName) =
-    apply(super.stat(options, name))
+  abstract override def node(options: AccessOptions, name: FsNodeName) =
+    apply(super.node(options, name))
 
   abstract override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
     apply(super.checkAccess(options, name, types))

@@ -239,7 +239,7 @@ public final class TFileSystem extends FileSystem {
                         .channel(null);
             } catch (final IOException ex) {
                 // TODO: Filter FileAlreadyExistsException.
-                if (o.get(EXCLUSIVE) && null != controller.stat(o, name))
+                if (o.get(EXCLUSIVE) && null != controller.node(o, name))
                     throw (IOException) new FileAlreadyExistsException(path.toString())
                             .initCause(ex);
                 throw ex;
@@ -343,7 +343,7 @@ public final class TFileSystem extends FileSystem {
                     DIRECTORY,
                     null);
         } catch (IOException ex) {
-            if (null != controller.stat(options, name))
+            if (null != controller.node(options, name))
                 throw (IOException) new FileAlreadyExistsException(path.toString())
                         .initCause(ex);
             throw ex;
@@ -355,7 +355,7 @@ public final class TFileSystem extends FileSystem {
     }
 
     FsNode stat(TPath path) throws IOException {
-        return getController().stat(path.getAccessPreferences(), path.getNodeName());
+        return getController().node(path.getAccessPreferences(), path.getNodeName());
     }
 
     InputSocket<?> input(   TPath path,
@@ -458,7 +458,7 @@ public final class TFileSystem extends FileSystem {
 
         FsEntryAttributes(final TPath path) throws IOException {
             if (null == (entry = getController()
-                    .stat(path.getAccessPreferences(), path.getNodeName())))
+                    .node(path.getAccessPreferences(), path.getNodeName())))
                 throw new NoSuchFileException(path.toString());
         }
 

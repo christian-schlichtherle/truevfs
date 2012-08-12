@@ -119,7 +119,7 @@ extends Iterable[FsCovariantNode[E]] {
     * @return A covariant file system entry or `None` if no file system
     *         entry exists for the given name.
     */
-  def stat(options: AccessOptions, name: FsNodeName) = {
+  def node(options: AccessOptions, name: FsNodeName) = {
     master.get(name.getPath) match {
       case Some(ce) => Some(ce.clone(driver))
       case None => None

@@ -123,7 +123,7 @@ public interface FsController {
      *         exists for the given name.
      * @throws IOException on any I/O error.
      */
-    @CheckForNull FsNode stat(
+    @CheckForNull FsNode node(
             BitField<FsAccessOption> options,
             FsNodeName name)
     throws IOException;

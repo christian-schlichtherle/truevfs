@@ -30,8 +30,8 @@ extends FsDecoratingController(c) {
 
   private type AccessOptions = BitField[FsAccessOption]
 
-  override def stat(options: AccessOptions, name: FsNodeName) =
-    apply(c stat (options, name))
+  override def node(options: AccessOptions, name: FsNodeName) =
+    apply(c node (options, name))
 
   override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
     apply(c checkAccess (options, name, types))
