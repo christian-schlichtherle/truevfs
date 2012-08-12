@@ -45,14 +45,14 @@ extends StandardMBean implements JmxManagerMXBean {
     @Override
     protected String getDescription(MBeanAttributeInfo info) {
         switch (info.getName()) {
-        case "FileSystemsTotal":
-            return "The total number of file systems.";
         case "FileSystemsMounted":
             return "The number of file systems which have been mounted.";
-        case "TopLevelArchiveFileSystemsTotal":
-            return "The total number of top level archive file systems.";
+        case "FileSystemsTotal":
+            return "The total number of file systems.";
         case "TopLevelArchiveFileSystemsMounted":
             return "The number of top level archive file systems which have been mounted.";
+        case "TopLevelArchiveFileSystemsTotal":
+            return "The total number of top level archive file systems.";
         default:
             return null;
         }

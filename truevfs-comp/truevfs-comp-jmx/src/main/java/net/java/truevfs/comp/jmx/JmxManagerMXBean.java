@@ -16,13 +16,6 @@ import net.java.truevfs.kernel.spec.FsSyncWarningException;
 public interface JmxManagerMXBean {
 
     /**
-     * Returns the total number of file systems.
-     *
-     * @return The total number of file systems.
-     */
-    int getFileSystemsTotal();
-
-    /**
      * Returns the number of file systems which have been mounted.
      * <p>
      * Note that you should <em>not</em> use the returned value to synchronize
@@ -33,13 +26,11 @@ public interface JmxManagerMXBean {
     int getFileSystemsMounted();
 
     /**
-     * Returns the total number of <em>top level archive</em> file systems.
-     * The value of this property never exceeds
-     * {@link #getFileSystemsTotal()}.
+     * Returns the total number of file systems.
      *
-     * @return The total number of <em>top level archive</em> file systems.
+     * @return The total number of file systems.
      */
-    int getTopLevelArchiveFileSystemsTotal();
+    int getFileSystemsTotal();
 
     /**
      * Returns the number of <em>top level archive</em> file systems
@@ -53,6 +44,15 @@ public interface JmxManagerMXBean {
      * @return The number of mounted <em>top level archive</em> file systems.
      */
     int getTopLevelArchiveFileSystemsMounted();
+
+    /**
+     * Returns the total number of <em>top level archive</em> file systems.
+     * The value of this property never exceeds
+     * {@link #getFileSystemsTotal()}.
+     *
+     * @return The total number of <em>top level archive</em> file systems.
+     */
+    int getTopLevelArchiveFileSystemsTotal();
 
     /**
      * Synchronizes all file systems and eventually unmounts them.
