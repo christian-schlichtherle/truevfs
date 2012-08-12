@@ -9,10 +9,6 @@ import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.InstrumentingManager;
 import static net.java.truevfs.comp.jmx.JmxUtils.*;
 import net.java.truevfs.kernel.spec.FsManager;
-import net.java.truevfs.kernel.spec.FsSyncException;
-import net.java.truevfs.kernel.spec.FsSyncOptions;
-import net.java.truevfs.kernel.spec.FsSyncWarningException;
-import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 
 /**
  * A controller for a {@linkplain FsManager file system manager}.
@@ -36,8 +32,4 @@ extends InstrumentingManager<M> implements JmxColleague {
 
     @Override
     public void start() { register(name(), newView()); }
-
-    public void sync() throws FsSyncWarningException, FsSyncException {
-        FsManagerLocator.SINGLETON.get().sync(FsSyncOptions.NONE);
-    }
 }

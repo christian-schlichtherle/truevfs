@@ -13,6 +13,8 @@ import javax.management.StandardMBean;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsSyncException;
+import net.java.truevfs.kernel.spec.FsSyncOptions;
+import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 
 /**
  * A view for a {@linkplain FsManager file system manager}.
@@ -103,6 +105,6 @@ extends StandardMBean implements JmxManagerMXBean {
 
     @Override
     public void sync() throws FsSyncException {
-        manager.sync();
+        FsManagerLocator.SINGLETON.get().sync(FsSyncOptions.NONE);
     }
 }
