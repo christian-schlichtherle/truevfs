@@ -98,14 +98,10 @@ class FileNode extends FsNode implements IoBuffer {
     public final BitField<Type> getTypes() {
         try {
             final BasicFileAttributes attr = readBasicFileAttributes();
-            if (attr.isRegularFile())
-                return FILE_TYPE;
-            else if (attr.isDirectory())
-                return DIRECTORY_TYPE;
-            else if (attr.isSymbolicLink())
-                return SYMLINK_TYPE;
-            else if (attr.isOther())
-                return SPECIAL_TYPE;
+            if      (attr.isRegularFile())  return FILE_TYPE;
+            else if (attr.isDirectory())    return DIRECTORY_TYPE;
+            else if (attr.isSymbolicLink()) return SYMLINK_TYPE;
+            else if (attr.isOther())        return SPECIAL_TYPE;
         } catch (IOException ignore) {
             // This doesn't exist or may be inaccessible. In either case...
         }
@@ -116,14 +112,10 @@ class FileNode extends FsNode implements IoBuffer {
     public final boolean isType(final Type type) {
         try {
             switch (type) {
-            case FILE:
-                return readBasicFileAttributes().isRegularFile();
-            case DIRECTORY:
-                return readBasicFileAttributes().isDirectory();
-            case SYMLINK:
-                return readBasicFileAttributes().isSymbolicLink();
-            case SPECIAL:
-                return readBasicFileAttributes().isOther();
+            case FILE:      return readBasicFileAttributes().isRegularFile();
+            case DIRECTORY: return readBasicFileAttributes().isDirectory();
+            case SYMLINK:   return readBasicFileAttributes().isSymbolicLink();
+            case SPECIAL:   return readBasicFileAttributes().isOther();
             }
         } catch (IOException ignored) {
         }
@@ -145,12 +137,9 @@ class FileNode extends FsNode implements IoBuffer {
         try {
             final BasicFileAttributes attr = readBasicFileAttributes();
             switch (type) {
-                case CREATE:
-                    return attr.creationTime().toMillis();
-                case READ:
-                    return attr.lastAccessTime().toMillis();
-                case WRITE:
-                    return attr.lastModifiedTime().toMillis();
+            case CREATE: return attr.creationTime().toMillis();
+            case READ:   return attr.lastAccessTime().toMillis();
+            case WRITE:  return attr.lastModifiedTime().toMillis();
             }
         } catch (IOException ignore) {
             // This doesn't exist or may be inaccessible. In either case...
@@ -167,32 +156,23 @@ class FileNode extends FsNode implements IoBuffer {
             switch ((PosixEntity) entity) {
             case USER:
                 switch (type) {
-                    case READ:
-                        return permissions.contains(OWNER_READ);
-                    case WRITE:
-                        return permissions.contains(OWNER_WRITE);
-                    case EXECUTE:
-                        return permissions.contains(OWNER_EXECUTE);
+                case READ:    return permissions.contains(OWNER_READ);
+                case WRITE:   return permissions.contains(OWNER_WRITE);
+                case EXECUTE: return permissions.contains(OWNER_EXECUTE);
                 }
                 break;
             case GROUP:
                 switch (type) {
-                    case READ:
-                        return permissions.contains(GROUP_READ);
-                    case WRITE:
-                        return permissions.contains(GROUP_WRITE);
-                    case EXECUTE:
-                        return permissions.contains(GROUP_EXECUTE);
+                case READ:    return permissions.contains(GROUP_READ);
+                case WRITE:   return permissions.contains(GROUP_WRITE);
+                case EXECUTE: return permissions.contains(GROUP_EXECUTE);
                 }
                 break;
             case OTHER:
                 switch (type) {
-                    case READ:
-                        return permissions.contains(OTHERS_READ);
-                    case WRITE:
-                        return permissions.contains(OTHERS_WRITE);
-                    case EXECUTE:
-                        return permissions.contains(OTHERS_EXECUTE);
+                case READ:    return permissions.contains(OTHERS_READ);
+                case WRITE:   return permissions.contains(OTHERS_WRITE);
+                case EXECUTE: return permissions.contains(OTHERS_EXECUTE);
                 }
             }
         } catch (UnsupportedOperationException | IOException ignore) {
