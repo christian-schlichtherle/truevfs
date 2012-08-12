@@ -14,12 +14,12 @@ import net.java.truevfs.ext.jmx.stats.IoStatistics;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class JmxIoStatistics extends JmxStatistics<JmxIoStatisticsMXBean> {
+final class JmxIoStatistics extends JmxStatistics {
 
     JmxIoStatistics(JmxMediator mediator, int offset) {
         super(mediator, offset);
     }
 
     @Override
-    JmxIoStatisticsMXBean newView() { return new JmxIoStatisticsView(this); }
+    Object newView() { return new JmxIoStatisticsView(this); }
 }

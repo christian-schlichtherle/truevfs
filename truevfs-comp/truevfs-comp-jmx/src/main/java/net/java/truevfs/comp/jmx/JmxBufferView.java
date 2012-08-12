@@ -19,16 +19,16 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
 /**
  * A view for an {@linkplain IoBuffer I/O buffer}.
  *
- * @param  <M> the type of the JMX mediator.
+ * @param  <B> the type of the I/O buffer.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxBufferView<M extends JmxMediator<M>>
+public class JmxBufferView<B extends IoBuffer>
 extends StandardMBean implements JmxBufferMXBean {
 
-    protected final JmxBuffer<M> buffer;
+    protected final B buffer;
 
-    public JmxBufferView(final JmxBuffer<M> buffer) {
+    public JmxBufferView(final B buffer) {
         super(JmxBufferMXBean.class, true);
         this.buffer = Objects.requireNonNull(buffer);
     }

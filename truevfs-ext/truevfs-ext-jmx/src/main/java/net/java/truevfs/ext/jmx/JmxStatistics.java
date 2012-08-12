@@ -9,16 +9,16 @@ import javax.management.ObjectName;
 import net.java.truevfs.comp.jmx.JmxColleague;
 import static net.java.truevfs.comp.jmx.JmxUtils.*;
 import net.java.truevfs.ext.jmx.stats.FsStatistics;
+import net.java.truevfs.ext.jmx.stats.IoStatistics;
+import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 
 /**
  * A controller for statistics.
  * 
- * @param  <View> the type of the view to register with the platform MBean
- *         server.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-abstract class JmxStatistics<View> implements JmxColleague {
+abstract class JmxStatistics implements JmxColleague {
 
     private final JmxMediator mediator;
     private final int offset;
@@ -31,7 +31,15 @@ abstract class JmxStatistics<View> implements JmxColleague {
 
     String getSubject() { return mediator.getSubject(); }
 
-    FsStatistics getStats() { return mediator.stats(offset); }
+    private FsStatistics stats() { return mediator.stats(offset); }
+
+    long timeMillis() { return stats().getTimeMillis(); }
+
+    IoStatistics readStats() { return stats().getReadStats(); }
+
+    IoStatistics writeStats() { return stats().getWriteStats(); }
+
+    SyncStatistics syncStats() { return stats().getSyncStats(); }
 
     private ObjectName name() {
         return mediator.nameBuilder(FsStatistics.class)
@@ -40,7 +48,7 @@ abstract class JmxStatistics<View> implements JmxColleague {
                 .get();
     }
 
-    abstract View newView();
+    abstract Object newView();
 
     @Override
     public void start() { register(name(), newView()); }

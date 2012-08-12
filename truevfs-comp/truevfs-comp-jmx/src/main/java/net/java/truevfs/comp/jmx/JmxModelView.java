@@ -35,19 +35,19 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 /**
  * A view for a {@linkplain FsModel file system model}.
  *
- * @param  <M> the type of the JMX mediator.
+ * @param  <M> the type of the file system model.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxModelView<M extends JmxMediator<M>>
+public class JmxModelView<M extends FsModel>
 extends StandardMBean implements JmxModelMXBean {
 
     private static final FsMetaDriver
             DRIVER = new FsSimpleMetaDriver(FsDriverMapLocator.SINGLETON);
 
-    protected final JmxModel<M> model;
+    protected final M model;
 
-    public JmxModelView(final JmxModel<M> model) {
+    public JmxModelView(final M model) {
         super(JmxModelMXBean.class, true);
         this.model = Objects.requireNonNull(model);
     }
