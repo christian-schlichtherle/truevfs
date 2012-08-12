@@ -16,7 +16,7 @@ final class JmxIoMediator extends JmxMediator {
     JmxIoMediator(String subject) { super(subject); }
 
     @Override
-    JmxStatistics<?> newStatistics(int offset) {
+    JmxStatistics newStatistics(int offset) {
         return new JmxIoStatistics(this, offset);
     }
 }

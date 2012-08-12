@@ -16,7 +16,7 @@ final class JmxSyncMediator extends JmxMediator {
     JmxSyncMediator(String subject) { super(subject, 1); }
 
     @Override
-    JmxStatistics<?> newStatistics(int offset) {
+    JmxStatistics newStatistics(int offset) {
         return new JmxSyncStatistics(this, offset);
     }
 

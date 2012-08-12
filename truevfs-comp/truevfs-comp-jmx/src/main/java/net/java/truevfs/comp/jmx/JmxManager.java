@@ -28,7 +28,7 @@ extends InstrumentingManager<M> implements JmxColleague {
         return mediator.nameBuilder(FsManager.class).get();
     }
 
-    protected JmxManagerMXBean newView() { return new JmxManagerView<>(this); }
+    protected Object newView() { return new JmxManagerView<>(manager); }
 
     @Override
     public void start() { register(name(), newView()); }

@@ -19,16 +19,16 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 /**
  * A view for a {@linkplain FsManager file system manager}.
  *
- * @param  <M> the type of the JMX mediator.
+ * @param  <M> the type of the file system manager.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxManagerView<M extends JmxMediator<M>>
+public class JmxManagerView<M extends FsManager>
 extends StandardMBean implements JmxManagerMXBean {
 
-    protected final JmxManager<M> manager;
+    protected final M manager;
 
-    public JmxManagerView(final JmxManager<M> manager) {
+    public JmxManagerView(final M manager) {
         super(JmxManagerMXBean.class, true);
         this.manager = Objects.requireNonNull(manager);
     }

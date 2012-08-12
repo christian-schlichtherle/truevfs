@@ -21,9 +21,9 @@ import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 final class JmxSyncStatisticsView
 extends StandardMBean implements JmxSyncStatisticsMXBean {
 
-    private final JmxSyncStatistics stats;
+    private final JmxStatistics stats;
 
-    JmxSyncStatisticsView(final JmxSyncStatistics stats) {
+    JmxSyncStatisticsView(final JmxStatistics stats) {
         super(JmxSyncStatisticsMXBean.class, true);
         this.stats = Objects.requireNonNull(stats);
     }
@@ -65,8 +65,8 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
         }
     }
 
-    private SyncStatistics getSyncStats() {
-        return stats.getStats().getSyncStats();
+    private SyncStatistics syncStats() {
+        return stats.syncStats();
     }
 
     @Override
@@ -76,17 +76,17 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
 
     @Override
     public long getSyncNanosecondsPerOperation() {
-        return getSyncStats().getNanosecondsPerOperation();
+        return syncStats().getNanosecondsPerOperation();
     }
 
     @Override
     public long getSyncNanosecondsTotal() {
-        return getSyncStats().getNanosecondsTotal();
+        return syncStats().getNanosecondsTotal();
     }
 
     @Override
     public int getSyncOperations() {
-        return getSyncStats().getSequenceNumber();
+        return syncStats().getSequenceNumber();
     }
 
     @Override
@@ -96,7 +96,7 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
 
     @Override
     public long getTimeCreatedMillis() {
-        return stats.getStats().getTimeMillis();
+        return stats.timeMillis();
     }
 
     @Override
@@ -106,6 +106,6 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
 
     @Override
     public long getTimeUpdatedMillis() {
-        return getSyncStats().getTimeMillis();
+        return syncStats().getTimeMillis();
     }
 }

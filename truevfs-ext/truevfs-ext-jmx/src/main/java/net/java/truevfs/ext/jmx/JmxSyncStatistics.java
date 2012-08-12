@@ -14,12 +14,12 @@ import net.java.truevfs.ext.jmx.stats.SyncStatistics;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class JmxSyncStatistics extends JmxStatistics<JmxSyncStatisticsMXBean> {
+final class JmxSyncStatistics extends JmxStatistics {
 
     JmxSyncStatistics(JmxMediator mediator, int offset) {
         super(mediator, offset);
     }
 
     @Override
-    JmxSyncStatisticsMXBean newView() { return new JmxSyncStatisticsView(this); }
+    Object newView() { return new JmxSyncStatisticsView(this); }
 }

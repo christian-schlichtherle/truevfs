@@ -69,7 +69,7 @@ extends net.java.truevfs.comp.jmx.JmxMediator<JmxMediator> {
 
     String getSubject() { return subject; }
 
-    abstract JmxStatistics<?> newStatistics(int offset);
+    abstract JmxStatistics newStatistics(int offset);
 
     private void startStatistics(int offset) { start(newStatistics(offset)); }
 

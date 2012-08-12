@@ -32,7 +32,7 @@ extends InstrumentingBuffer<M> implements JmxColleague {
                 .get();
     }
 
-    protected JmxBufferMXBean newView() { return new JmxBufferView<>(this); }
+    protected Object newView() { return new JmxBufferView<>(entry); }
 
     @Override
     public void start() { register(name(), newView()); }

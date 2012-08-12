@@ -35,7 +35,7 @@ extends InstrumentingModel<M> implements JmxColleague {
                 .get();
     }
 
-    protected JmxModelMXBean newView() { return new JmxModelView<>(this); }
+    protected Object newView() { return new JmxModelView<>(model); }
 
     @Override
     public void start() { }
