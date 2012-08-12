@@ -12,14 +12,14 @@ import net.java.truevfs.comp.inst.*;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsMetaDriver;
-import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.cio.*;
 
 /**
  * @author Christian Schlichtherle
  */
 @Immutable
-final class LogMediator implements Mediator<LogMediator> {
+final class LogMediator extends Mediator<LogMediator> {
+
     static final LogMediator SINGLETON = new LogMediator();
 
     private LogMediator() { }
@@ -42,24 +42,10 @@ final class LogMediator implements Mediator<LogMediator> {
     }
 
     @Override
-    public FsController instrument(
-            InstrumentingManager<LogMediator> origin,
-            FsController object) {
-        return object;
-    }
-
-    @Override
     public IoBuffer instrument(
             InstrumentingBufferPool<LogMediator> origin,
             IoBuffer object) {
         return new LogBuffer(this, object);
-    }
-
-    @Override
-    public FsModel instrument(
-            InstrumentingMetaDriver<LogMediator> origin,
-            FsModel object) {
-        return object;
     }
 
     @Override
