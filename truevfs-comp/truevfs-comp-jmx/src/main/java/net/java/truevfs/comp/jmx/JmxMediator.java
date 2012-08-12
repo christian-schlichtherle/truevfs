@@ -15,7 +15,7 @@ import net.java.truevfs.comp.inst.Mediator;
  */
 @ThreadSafe
 public abstract class JmxMediator<This extends JmxMediator<This>>
-extends Mediator<This> {
+implements Mediator<This> {
 
     private Package getDomain() { return getClass().getPackage(); }
 

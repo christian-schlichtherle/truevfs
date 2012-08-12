@@ -17,17 +17,17 @@ import net.java.truevfs.kernel.spec.cio.*;
 /**
  * Implements the mediator role of the mediator pattern for instrumenting all
  * objects which are used by the TrueVFS Kernel.
- * When any of the instrumentation methods are called, subclasses are given the
- * choice to either return the given object as is or to decorate it with a
- * colleague for instrumentation.
+ * When any of the instrumentation methods are called, implementations are
+ * given the choice to either return the given object as is or to decorate it
+ * with a colleague for instrumentation.
  * <p>
- * Subclasses should be thread-safe.
+ * Implementations should be thread-safe.
  *
  * @param  <This> the type of this mediator.
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class Mediator<This extends Mediator<This>> {
+public interface Mediator<This extends Mediator<This>> {
 
     /**
      * Instruments the given {@code object}.
@@ -36,10 +36,7 @@ public abstract class Mediator<This extends Mediator<This>> {
      * @return An instrumenting object or {@code object} if the implementation
      *         does not want to instrument it.
      */
-    @SuppressWarnings("unchecked")
-    public FsManager instrument(FsManager object) {
-        return new InstrumentingManager<>((This) this, object);
-    }
+    public abstract FsManager instrument(FsManager object);
 
     /**
      * Instruments the given {@code object}.
@@ -48,10 +45,7 @@ public abstract class Mediator<This extends Mediator<This>> {
      * @return An instrumenting object or {@code object} if the implementation
      *         does not want to instrument it.
      */
-    @SuppressWarnings("unchecked")
-    public IoBufferPool instrument(IoBufferPool object) {
-        return new InstrumentingBufferPool<>((This) this, object);
-    }
+    public abstract IoBufferPool instrument(IoBufferPool object);
 
     /**
      * Instruments the given {@code object}.
@@ -62,12 +56,9 @@ public abstract class Mediator<This extends Mediator<This>> {
      *         does not want to instrument it.
      * @see    #instrument(FsManager)
      */
-    @SuppressWarnings("unchecked")
-    public FsMetaDriver instrument(
+    public abstract FsMetaDriver instrument(
             InstrumentingManager<This> origin,
-            FsMetaDriver object) {
-        return new InstrumentingMetaDriver<>((This) this, object);
-    }
+            FsMetaDriver object);
 
     /**
      * Instruments the given {@code object}.
@@ -78,11 +69,9 @@ public abstract class Mediator<This extends Mediator<This>> {
      *         does not want to instrument it.
      * @see    #instrument(FsManager)
      */
-    public FsController instrument(
+    public abstract FsController instrument(
             InstrumentingManager<This> origin,
-            FsController object) {
-        return object;
-    }
+            FsController object);
 
     /**
      * Instruments the given {@code object}.
@@ -93,12 +82,9 @@ public abstract class Mediator<This extends Mediator<This>> {
      *         does not want to instrument it.
      * @see    #instrument(IoBufferPool)
      */
-    @SuppressWarnings("unchecked")
-    public IoBuffer instrument(
+    public abstract IoBuffer instrument(
             InstrumentingBufferPool<This> origin,
-            IoBuffer object) {
-        return new InstrumentingBuffer<>((This) this, object);
-    }
+            IoBuffer object);
 
     /**
      * Instruments the given {@code object}.
@@ -109,11 +95,9 @@ public abstract class Mediator<This extends Mediator<This>> {
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingManager, FsMetaDriver)
      */
-    public FsModel instrument(
+    public abstract FsModel instrument(
             InstrumentingMetaDriver<This> origin,
-            FsModel object) {
-        return object;
-    }
+            FsModel object);
 
     /**
      * Instruments the given {@code object}.
@@ -124,12 +108,9 @@ public abstract class Mediator<This extends Mediator<This>> {
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingManager, FsMetaDriver)
      */
-    @SuppressWarnings("unchecked")
-    public FsController instrument(
+    public abstract FsController instrument(
             InstrumentingMetaDriver<This> origin,
-            FsController object) {
-        return new InstrumentingController<>((This) this, object);
-    }
+            FsController object);
 
     /**
      * Instruments the given {@code object}.
@@ -143,12 +124,9 @@ public abstract class Mediator<This extends Mediator<This>> {
      * @see    #instrument(InstrumentingManager, FsController)
      * @see    #instrument(InstrumentingMetaDriver, FsController)
      */
-    @SuppressWarnings("unchecked")
-    public <E extends Entry> InputSocket<E> instrument(
+    public abstract <E extends Entry> InputSocket<E> instrument(
             InstrumentingController<This> origin,
-            InputSocket<E> object) {
-        return new InstrumentingInputSocket<>((This) this, object);
-    }
+            InputSocket<E> object);
 
     /**
      * Instruments the given {@code object}.
@@ -162,12 +140,9 @@ public abstract class Mediator<This extends Mediator<This>> {
      * @see    #instrument(InstrumentingManager, FsController)
      * @see    #instrument(InstrumentingMetaDriver, FsController)
      */
-    @SuppressWarnings("unchecked")
-    public <E extends Entry> OutputSocket<E> instrument(
+    public abstract <E extends Entry> OutputSocket<E> instrument(
             InstrumentingController<This> origin,
-            OutputSocket<E> object) {
-        return new InstrumentingOutputSocket<>((This) this, object);
-    }
+            OutputSocket<E> object);
 
     /**
      * Instruments the given {@code object}.
@@ -180,12 +155,9 @@ public abstract class Mediator<This extends Mediator<This>> {
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingBufferPool, IoBuffer)
      */
-    @SuppressWarnings("unchecked")
-    public <B extends IoBuffer> InputSocket<B> instrument(
+    public abstract <B extends IoBuffer> InputSocket<B> instrument(
             InstrumentingBuffer<This> origin,
-            InputSocket<B> object) {
-        return new InstrumentingInputSocket<>((This) this, object);
-    }
+            InputSocket<B> object);
 
     /**
      * Instruments the given {@code object}.
@@ -198,12 +170,9 @@ public abstract class Mediator<This extends Mediator<This>> {
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingBufferPool, IoBuffer)
      */
-    @SuppressWarnings("unchecked")
-    public <B extends IoBuffer> OutputSocket<B> instrument(
+    public abstract <B extends IoBuffer> OutputSocket<B> instrument(
             InstrumentingBuffer<This> origin,
-            OutputSocket<B> object) {
-        return new InstrumentingOutputSocket<>((This) this, object);
-    }
+            OutputSocket<B> object);
 
     /**
      * Instruments the given {@code object}.
@@ -217,11 +186,9 @@ public abstract class Mediator<This extends Mediator<This>> {
      * @see    #instrument(InstrumentingController, InputSocket)
      * @see    #instrument(InstrumentingBuffer, InputSocket)
      */
-    public <E extends Entry> InputStream instrument(
+    public abstract <E extends Entry> InputStream instrument(
             InstrumentingInputSocket<This, E> origin,
-            InputStream object) {
-        return object;
-    }
+            InputStream object);
 
     /**
      * Instruments the given {@code object}.
@@ -235,11 +202,9 @@ public abstract class Mediator<This extends Mediator<This>> {
      * @see    #instrument(InstrumentingController, InputSocket)
      * @see    #instrument(InstrumentingBuffer, InputSocket)
      */
-    public <E extends Entry> SeekableByteChannel instrument(
+    public abstract <E extends Entry> SeekableByteChannel instrument(
             InstrumentingInputSocket<This, E> origin,
-            SeekableByteChannel object) {
-        return object;
-    }
+            SeekableByteChannel object);
 
     /**
      * Instruments the given {@code object}.
@@ -253,11 +218,9 @@ public abstract class Mediator<This extends Mediator<This>> {
      * @see    #instrument(InstrumentingController, OutputSocket)
      * @see    #instrument(InstrumentingBuffer, OutputSocket)
      */
-    public <E extends Entry> OutputStream instrument(
+    public abstract <E extends Entry> OutputStream instrument(
             InstrumentingOutputSocket<This, E> origin,
-            OutputStream object) {
-        return object;
-    }
+            OutputStream object);
 
     /**
      * Instruments the given {@code object}.
@@ -271,9 +234,7 @@ public abstract class Mediator<This extends Mediator<This>> {
      * @see    #instrument(InstrumentingController, OutputSocket)
      * @see    #instrument(InstrumentingBuffer, OutputSocket)
      */
-    public <E extends Entry> SeekableByteChannel instrument(
+    public abstract <E extends Entry> SeekableByteChannel instrument(
             InstrumentingOutputSocket<This, E> origin,
-            SeekableByteChannel object) {
-        return object;
-    }
+            SeekableByteChannel object);
 }
