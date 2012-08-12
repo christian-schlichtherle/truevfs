@@ -28,8 +28,12 @@ extends StandardMBean implements JmxManagerMXBean {
 
     protected final M manager;
 
-    public JmxManagerView(final M manager) {
-        super(JmxManagerMXBean.class, true);
+    public JmxManagerView(M manager) { this(JmxManagerMXBean.class, manager); }
+
+    protected JmxManagerView(
+            final Class<? extends JmxManagerMXBean> type,
+            final M manager) {
+        super(type, true);
         this.manager = Objects.requireNonNull(manager);
     }
 

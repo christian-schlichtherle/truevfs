@@ -47,8 +47,12 @@ extends StandardMBean implements JmxModelMXBean {
 
     protected final M model;
 
-    public JmxModelView(final M model) {
-        super(JmxModelMXBean.class, true);
+    public JmxModelView(M model) { this(JmxModelMXBean.class, model); }
+
+    protected JmxModelView(
+            final Class<? extends JmxModelMXBean> type,
+            final M model) {
+        super(type, true);
         this.model = Objects.requireNonNull(model);
     }
 
