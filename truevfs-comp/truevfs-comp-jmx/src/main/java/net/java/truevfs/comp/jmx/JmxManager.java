@@ -7,7 +7,7 @@ package net.java.truevfs.comp.jmx;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.InstrumentingManager;
-import static net.java.truevfs.comp.jmx.JmxUtils.*;
+import static net.java.truevfs.comp.jmx.JmxUtils.register;
 import net.java.truevfs.kernel.spec.FsManager;
 
 /**

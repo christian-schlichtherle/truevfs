@@ -9,7 +9,7 @@ import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.InstrumentingModel;
 import static net.java.truevfs.comp.jmx.JmxUtils.deregister;
 import static net.java.truevfs.comp.jmx.JmxUtils.register;
-import net.java.truevfs.kernel.spec.*;
+import net.java.truevfs.kernel.spec.FsModel;
 
 /**
  * A controller for a {@linkplain FsModel file system model}.
