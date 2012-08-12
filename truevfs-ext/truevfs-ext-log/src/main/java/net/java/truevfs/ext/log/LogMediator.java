@@ -8,23 +8,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.comp.inst.InstrumentingBuffer;
-import net.java.truevfs.comp.inst.InstrumentingBufferPool;
-import net.java.truevfs.comp.inst.InstrumentingController;
-import net.java.truevfs.comp.inst.InstrumentingInputSocket;
-import net.java.truevfs.comp.inst.InstrumentingManager;
-import net.java.truevfs.comp.inst.InstrumentingMetaDriver;
-import net.java.truevfs.comp.inst.InstrumentingOutputSocket;
-import net.java.truevfs.comp.inst.Mediator;
+import net.java.truevfs.comp.inst.*;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsMetaDriver;
 import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
+import net.java.truevfs.kernel.spec.cio.*;
 
 /**
  * @author Christian Schlichtherle
