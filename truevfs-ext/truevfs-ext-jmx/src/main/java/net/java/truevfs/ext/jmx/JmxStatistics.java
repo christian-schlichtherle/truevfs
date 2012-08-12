@@ -13,7 +13,7 @@ import net.java.truevfs.ext.jmx.stats.IoStatistics;
 import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 
 /**
- * A controller for statistics.
+ * A controller for {@linkplain FsStatistics file system statistics}.
  * 
  * @author Christian Schlichtherle
  */
