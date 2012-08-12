@@ -17,7 +17,7 @@ import net.java.truevfs.comp.jmx.JmxColleague;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class JmxInputStream
+final class JmxInputStream
 extends InstrumentingInputStream<JmxMediator> implements JmxColleague {
 
     JmxInputStream(

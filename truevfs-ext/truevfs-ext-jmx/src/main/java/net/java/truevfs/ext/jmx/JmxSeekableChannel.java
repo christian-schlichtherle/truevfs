@@ -4,13 +4,13 @@
  */
 package net.java.truevfs.ext.jmx;
 
-import net.java.truevfs.comp.jmx.JmxColleague;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truevfs.comp.inst.InstrumentingSeekableChannel;
+import net.java.truevfs.comp.jmx.JmxColleague;
 
 /**
  * A controller for a
@@ -19,7 +19,7 @@ import net.java.truevfs.comp.inst.InstrumentingSeekableChannel;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class JmxSeekableChannel
+final class JmxSeekableChannel
 extends InstrumentingSeekableChannel<JmxMediator> implements JmxColleague {
 
     JmxSeekableChannel(
