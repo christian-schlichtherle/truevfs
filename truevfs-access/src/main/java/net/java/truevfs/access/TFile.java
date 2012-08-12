@@ -1707,7 +1707,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 final FsNode entry = innerArchive.getController()
-                        .stat(getAccessPreferences(), getNodeName());
+                        .node(getAccessPreferences(), getNodeName());
                 return null != entry && entry.isType(FILE);
             } catch (IOException ex) {
                 return false;
@@ -1736,7 +1736,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 final FsNode entry = innerArchive.getController()
-                        .stat(getAccessPreferences(), getNodeName());
+                        .node(getAccessPreferences(), getNodeName());
                 return null != entry && entry.isType(DIRECTORY);
             } catch (IOException ex) {
                 return false;
@@ -1832,7 +1832,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getAccessPreferences(), getNodeName());
+                        .node(getAccessPreferences(), getNodeName());
             } catch (final IOException ex) {
                 return 0;
             }
@@ -1861,7 +1861,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getAccessPreferences(), getNodeName());
+                        .node(getAccessPreferences(), getNodeName());
             } catch (final IOException ex) {
                 return 0;
             }
@@ -1928,7 +1928,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getAccessPreferences(), getNodeName());
+                        .node(getAccessPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
@@ -1961,7 +1961,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getAccessPreferences(), getNodeName());
+                        .node(getAccessPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
@@ -2044,7 +2044,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getAccessPreferences(), getNodeName());
+                        .node(getAccessPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
@@ -2117,7 +2117,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .stat(getAccessPreferences(), getNodeName());
+                        .node(getAccessPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
@@ -2165,7 +2165,7 @@ public final class TFile extends File {
             final FsController controller = innerArchive.getController();
             final FsNodeName entryName = getNodeName();
             // This is not really atomic, but should be OK in this case.
-            if (null != controller.stat(getAccessPreferences(), entryName))
+            if (null != controller.node(getAccessPreferences(), entryName))
                 return false;
             controller.mknod(
                     getAccessPreferences().set(EXCLUSIVE), entryName,
@@ -2250,7 +2250,7 @@ public final class TFile extends File {
                         null);
             } catch (IOException ex) {
                 final FsNode entry = controller
-                        .stat(getAccessPreferences(), innerEntryName);
+                        .node(getAccessPreferences(), innerEntryName);
                 if (null == entry || !entry.isType(DIRECTORY))
                     throw ex;
             }

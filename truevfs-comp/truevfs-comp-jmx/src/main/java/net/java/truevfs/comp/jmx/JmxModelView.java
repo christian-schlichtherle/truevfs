@@ -5,19 +5,25 @@
 package net.java.truevfs.comp.jmx;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Objects;
-import javax.annotation.CheckForNull;
+import java.util.Set;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.StandardMBean;
+import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
+import net.java.truevfs.kernel.spec.cio.Entry;
+import net.java.truevfs.kernel.spec.cio.Entry.Access;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
+import net.java.truevfs.kernel.spec.cio.Entry.Entity;
 import net.java.truevfs.kernel.spec.cio.Entry.Size;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
+import net.java.truevfs.kernel.spec.cio.Entry.Type;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
@@ -122,53 +128,46 @@ extends StandardMBean implements JmxModelMXBean {
     }
 
     private long sizeOf(Size type) {
-        final FsNode node = stat();
-        return null == node ? UNKNOWN : node.getSize(type);
+        return node().getSize(type);
     }
 
     @Override
     public String getTimeCreatedDate() {
-        final FsNode node = stat();
-        final long time = null == node ? UNKNOWN : node.getTime(CREATE);
+        final long time = node().getTime(CREATE);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 
     @Override
     public Long getTimeCreatedMillis() {
-        final FsNode node = stat();
-        final long time = null == node ? UNKNOWN : node.getTime(CREATE);
+        final long time = node().getTime(CREATE);
         return UNKNOWN == time ? null : time;
     }
 
     @Override
     public String getTimeReadDate() {
-        final FsNode node = stat();
-        final long time = null == node ? UNKNOWN : node.getTime(READ);
+        final long time = node().getTime(READ);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 
     @Override
     public Long getTimeReadMillis() {
-        final FsNode node = stat();
-        final long time = null == node ? UNKNOWN : node.getTime(READ);
+        final long time = node().getTime(READ);
         return UNKNOWN == time ? null : time;
     }
 
     @Override
     public String getTimeWrittenDate() {
-        final FsNode node = stat();
-        final long time = null == node ? UNKNOWN : node.getTime(WRITE);
+        final long time = node().getTime(WRITE);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 
     @Override
     public Long getTimeWrittenMillis() {
-        final FsNode node = stat();
-        final long time = null == node ? UNKNOWN : node.getTime(WRITE);
+        final long time = node().getTime(WRITE);
         return UNKNOWN == time ? null : time;
     }
 
-    protected @CheckForNull FsNode stat() {
+    protected FsNode node() {
         final FsMountPoint mmp = model.getMountPoint();
         final FsMountPoint pmp = mmp.getParent();
         final FsMountPoint mp;
@@ -180,15 +179,48 @@ extends StandardMBean implements JmxModelMXBean {
             mp = mmp;
             en = FsNodeName.ROOT;
         }
+        FsNode node;
         try {
-            return FsManagerLocator
+            node = FsManagerLocator
                     .SINGLETON
                     .get()
                     .controller(DRIVER, mp)
-                    .stat(FsAccessOptions.NONE, en);
+                    .node(FsAccessOptions.NONE, en);
         } catch (IOException ex) {
-            return null;
+            node = null;
         }
+        if (null != node) return node;
+        return new FsNode() {
+            @Override
+            public String getName() {
+                return en.toString();
+            }
+
+            @Override
+            public BitField<Type> getTypes() {
+                return Entry.NO_TYPES;
+            }
+
+            @Override
+            public Set<String> getMembers() {
+                return Collections.emptySet();
+            }
+
+            @Override
+            public long getSize(Size type) {
+                return UNKNOWN;
+            }
+
+            @Override
+            public long getTime(Access type) {
+                return UNKNOWN;
+            }
+
+            @Override
+            public Boolean isPermitted(Access type, Entity entity) {
+                return null;
+            }
+        };
     }
 
     @Override

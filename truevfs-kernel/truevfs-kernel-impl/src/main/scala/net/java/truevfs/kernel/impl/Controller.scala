@@ -93,9 +93,9 @@ private trait Controller[+M <: FsModel] {
     */
   //def parent: Option[Controller[_ <: FsModel]]
 
-  /** Returns the file system entry for the given `name` or `null` if it
+  /** Returns the file system node for the given `name` or `null` if it
     * doesn't exist.
-    * Modifying the returned entry does not show any effect on the file system
+    * Modifying the returned node does not show any effect on the file system
     * and should result in an {@link UnsupportedOperationException}.
     * 
     * @param  options the options for accessing the file system entry.
@@ -105,7 +105,7 @@ private trait Controller[+M <: FsModel] {
     * @throws FileSystemException on any file system error.
     * @throws IOException on any I/O error.
     */
-  def stat(options: AccessOptions, name: FsNodeName): Option[FsNode]
+  def node(options: AccessOptions, name: FsNodeName): Option[FsNode]
 
   /** Checks if the file system entry for the given `name` exists when
     * constrained by the given access {@code options} and permits the given

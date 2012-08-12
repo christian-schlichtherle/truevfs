@@ -12,15 +12,15 @@ import net.java.truevfs.kernel.spec.cio._
 import net.java.truevfs.kernel.spec.cio.Entry._
 
 /**
-  * Calls back the given pace manager controller before and after each
-  * file system operation in order to sync the least recently accessed
-  * file systems which exceed the maximum number of mounted file systems
-  * and then register itself as the most recently accessed file system.
+  * Calls back the given pace manager before and after each file system
+  * operation in order to sync the least recently accessed file systems which
+  * exceed the maximum number of mounted file systems and then register itself
+  * as the most recently accessed file system.
   * 
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private final class PaceController(m: PaceManagerController, c: FsController)
+private final class PaceController(m: PaceManager, c: FsController)
 extends AspectController(c) {
 
   override def apply[V](operation: => V) = {

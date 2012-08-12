@@ -82,7 +82,7 @@ extends FsAbstractController {
     }
 
     @Override
-    public FsNode stat(
+    public FsNode node(
             BitField<FsAccessOption> options, FsNodeName name)
     throws IOException {
         checkAllExceptions(this);

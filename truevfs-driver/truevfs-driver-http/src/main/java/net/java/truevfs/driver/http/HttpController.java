@@ -65,7 +65,7 @@ public class HttpController extends FsAbstractController {
     }
 
     @Override
-    public HttpNode stat(
+    public HttpNode node(
             final BitField<FsAccessOption> options, final FsNodeName name)
     throws IOException {
         HttpNode entry = newEntry(name);

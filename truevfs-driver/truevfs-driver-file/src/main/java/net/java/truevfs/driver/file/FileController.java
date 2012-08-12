@@ -57,7 +57,7 @@ final class FileController extends FsAbstractController {
     }
 
     @Override
-    public FileNode stat(
+    public FileNode node(
             final BitField<FsAccessOption> options,
             final FsNodeName name)
     throws IOException {

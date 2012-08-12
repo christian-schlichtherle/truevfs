@@ -37,11 +37,11 @@ public abstract class FsDecoratingController extends FsAbstractController {
     }
 
     @Override
-    public @CheckForNull FsNode stat(
+    public @CheckForNull FsNode node(
             BitField<FsAccessOption> options,
             FsNodeName name)
     throws IOException {
-        return controller.stat(options, name);
+        return controller.node(options, name);
     }
 
     @Override

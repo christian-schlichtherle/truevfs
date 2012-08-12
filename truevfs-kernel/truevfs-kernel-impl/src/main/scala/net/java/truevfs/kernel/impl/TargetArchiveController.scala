@@ -118,7 +118,7 @@ extends FileSystemArchiveController[E] with TouchListener {
     // Check parent file system entry.
     val pe = {
       try {
-        parent.stat(options, name)
+        parent node (options, name)
       } catch {
         case ex: FalsePositiveArchiveException =>
           throw new AssertionError(ex)
@@ -147,12 +147,12 @@ extends FileSystemArchiveController[E] with TouchListener {
         val ro = isReadOnlyTarget()
         val is = {
           try {
-            driver.newInput(model, MOUNT_OPTIONS, parent, name);
+            driver newInput (model, MOUNT_OPTIONS, parent, name);
           } catch {
             case ex: FalsePositiveArchiveException =>
               throw new AssertionError(ex)
             case ex: IOException =>
-              if (pe.isType(SPECIAL)) throw new FalsePositiveArchiveException(ex)
+              if (pe isType SPECIAL) throw new FalsePositiveArchiveException(ex)
               throw new PersistentFalsePositiveArchiveException(ex)
           }
         }
@@ -170,7 +170,7 @@ extends FileSystemArchiveController[E] with TouchListener {
 
   private def isReadOnlyTarget() = {
     try {
-      parent.checkAccess(MOUNT_OPTIONS, name, WRITE_ACCESS);
+      parent checkAccess (MOUNT_OPTIONS, name, WRITE_ACCESS);
       false
     } catch {
       case ex: FalsePositiveArchiveException =>
@@ -198,7 +198,7 @@ extends FileSystemArchiveController[E] with TouchListener {
     val os = {
       try {
         driver newOutput (model,
-                          options.and(ACCESS_PREFERENCES_MASK).set(CACHE),
+                          options and ACCESS_PREFERENCES_MASK set CACHE,
                           parent, name, is)
       } catch {
         case ex: FalsePositiveArchiveException =>
@@ -218,28 +218,28 @@ extends FileSystemArchiveController[E] with TouchListener {
     final class Input extends AbstractInputSocket[E] {
       lazy val socket = inputArchive.get.input(name)
 
-      def target() = syncOn[ClosedInputException] { socket.target() }
+      def target() = syncOn[ClosedInputException] { socket target () }
 
       override def stream(peer: AnyOutputSocket) =
-        syncOn[ClosedInputException] { socket.stream(peer) }
+        syncOn[ClosedInputException] { socket stream peer }
 
       override def channel(peer: AnyOutputSocket) =
-        syncOn[ClosedInputException] { socket.channel(peer) }
+        syncOn[ClosedInputException] { socket channel peer }
     }
     new Input
   }
 
   def output(options: AccessOptions, entry: E) = {
     final class Output extends AbstractOutputSocket[E] {
-      lazy val socket = outputArchive(options).output(entry)
+      lazy val socket = outputArchive(options) output entry
 
       def target = entry
 
       override def stream(peer: AnyInputSocket) =
-        syncOn[ClosedOutputException] { socket.stream(peer) }
+        syncOn[ClosedOutputException] { socket stream peer }
 
       override def channel(peer: AnyInputSocket) =
-        syncOn[ClosedOutputException] { socket.channel(peer) }
+        syncOn[ClosedOutputException] { socket channel peer }
     }
     new Output
   }
@@ -261,10 +261,10 @@ extends FileSystemArchiveController[E] with TouchListener {
     assert(writeLockedByCurrentThread)
     try {
       val builder = new FsSyncExceptionBuilder
-      if (!options.get(ABORT_CHANGES))
+      if (!(options get ABORT_CHANGES))
         copy(builder)
       close(options, builder)
-      builder.check()
+      builder check ()
     } finally {
       assert(invariants)
     }
@@ -306,7 +306,7 @@ extends FileSystemArchiveController[E] with TouchListener {
     for (fse <- fileSystem.get) {
       for (ae <- fse.getEntries) {
         val aen = ae.getName
-        if (null eq os.entry(aen)) {
+        if (null eq (os entry aen)) {
           try {
             if (DIRECTORY eq ae.getType) {
               if (!fse.isRoot) // never output the root directory!
@@ -376,7 +376,7 @@ extends FileSystemArchiveController[E] with TouchListener {
       outputArchive = None
     }
     fileSystem = None
-    if (options.get(ABORT_CHANGES)) mounted = false
+    if (options get ABORT_CHANGES) mounted = false
   }
 
   def checkSync(options: AccessOptions, name: FsNodeName, intention: Access) {
@@ -405,7 +405,7 @@ extends FileSystemArchiveController[E] with TouchListener {
 
     // If the file system does not contain an entry with the given name,
     // then pass the test.
-    val fse = fs.stat(options, name) match {
+    val fse = fs node (options, name) match {
       case Some(fse) => fse
       case _ => return
     }
@@ -418,7 +418,7 @@ extends FileSystemArchiveController[E] with TouchListener {
     outputArchive match {
       case Some(oa) =>
         val aen = fse.getEntry.getName
-        if (null ne oa.entry(aen)) throw NeedsSyncException()
+        if (null ne (oa entry aen)) throw NeedsSyncException()
       case _ =>
     }
 
@@ -427,7 +427,7 @@ extends FileSystemArchiveController[E] with TouchListener {
     if (intention eq READ) inputArchive match {
       case Some(ia) =>
         val aen = fse.getEntry.getName
-        if (null eq ia.entry(aen)) throw NeedsSyncException()
+        if (null eq (ia entry aen)) throw NeedsSyncException()
       case _ =>
         throw NeedsSyncException()
     }

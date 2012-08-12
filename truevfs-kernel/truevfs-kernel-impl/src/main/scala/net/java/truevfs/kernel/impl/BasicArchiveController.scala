@@ -44,23 +44,23 @@ private abstract class BasicArchiveController[E <: FsArchiveEntry]
 extends Controller[LockModel] with LockModelAspect {
   import BasicArchiveController._
 
-  def stat(options: AccessOptions, name: FsNodeName): Option[FsNode] =
-    autoMount(options).stat(options, name)
+  def node(options: AccessOptions, name: FsNodeName): Option[FsNode] =
+    autoMount(options) node (options, name)
 
   def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
-    autoMount(options).checkAccess(options, name, types)
+    autoMount(options) checkAccess (options, name, types)
 
   def setReadOnly(name: FsNodeName) =
-    autoMount(NONE).setReadOnly(name)
+    autoMount(NONE) setReadOnly name
 
   def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]) = {
     checkSync(options, name, CREATE) // alias for UPDATE
-    autoMount(options).setTime(options, name, times)
+    autoMount(options) setTime (options, name, times)
   }
 
   def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long) = {
     checkSync(options, name, CREATE) // alias for UPDATE
-    autoMount(options).setTime(options, name, types, value)
+    autoMount(options) setTime (options, name, types, value)
   }
 
   def input(options: AccessOptions, name: FsNodeName) = {
@@ -70,9 +70,9 @@ extends Controller[LockModel] with LockModelAspect {
     final class Input extends AbstractInputSocket[E] {
       def target() = {
         checkSync(options, name, READ)
-        autoMount(options) stat (options, name) match {
+        autoMount(options) node (options, name) match {
           case Some(ce) =>
-            val ae = ce.get(FILE)
+            val ae = ce get FILE
             if (null eq ae)
               throw new FileSystemException(name.toString, null,
                                             "Expected a FILE entry, but is a " + ce.getTypes + " entry!");
@@ -127,7 +127,7 @@ extends Controller[LockModel] with LockModelAspect {
           })
           try {
             tx.commit()
-            in foreach (Streams.cat(_, out))
+            in foreach (Streams cat (_, out))
           } catch {
             case ex2: Throwable =>
               try {
@@ -146,7 +146,7 @@ extends Controller[LockModel] with LockModelAspect {
         } finally {
           in foreach { in =>
             try {
-              in.close()
+              in close ()
             } catch {
               case ex2: IOException =>
                 val ex3 = new InputException(ex2)
@@ -206,7 +206,7 @@ extends Controller[LockModel] with LockModelAspect {
                                            "Cannot replace a directory entry!");
     } else {
       checkSync(options, name, CREATE)
-      autoMount(options, options.get(CREATE_PARENTS))
+      autoMount(options, options get CREATE_PARENTS)
       .mknod(options, name, tµpe, template)
       .commit()
     }
@@ -259,9 +259,9 @@ private object BasicArchiveController {
   extends DecoratingEntry[FsArchiveEntry](entry) with FsArchiveEntry {
     def getType: Type = entry.getType
 
-    def setSize(tµpe: Size, value: Long) = entry.setSize(tµpe, value)
+    def setSize(tµpe: Size, value: Long) = entry setSize (tµpe, value)
 
-    def setTime(tµpe: Access, value: Long) = entry.setTime(tµpe, value)
+    def setTime(tµpe: Access, value: Long) = entry setTime (tµpe, value)
 
     def setPermitted(tµpe: Access, entity: Entity, value: java.lang.Boolean) =
       entry.setPermitted(tµpe, entity, value)
