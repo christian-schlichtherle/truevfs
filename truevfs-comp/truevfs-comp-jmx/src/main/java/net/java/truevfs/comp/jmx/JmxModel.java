@@ -4,16 +4,12 @@
  */
 package net.java.truevfs.comp.jmx;
 
-import java.io.IOException;
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.InstrumentingModel;
 import static net.java.truevfs.comp.jmx.JmxUtils.deregister;
 import static net.java.truevfs.comp.jmx.JmxUtils.register;
 import net.java.truevfs.kernel.spec.*;
-import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
-import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 
 /**
  * A controller for a {@linkplain FsModel file system model}.
@@ -24,8 +20,6 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 @ThreadSafe
 public class JmxModel<M extends JmxMediator<M>>
 extends InstrumentingModel<M> implements JmxColleague {
-    private static final FsMetaDriver
-            DRIVER = new FsSimpleMetaDriver(FsDriverMapLocator.SINGLETON);
 
     private final ObjectName name;
 
@@ -54,34 +48,5 @@ extends InstrumentingModel<M> implements JmxColleague {
             if (mounted) register(name, newView());
             else deregister(name);
         }
-    }
-
-    public @CheckForNull FsNode stat() {
-        final FsMountPoint mmp = model.getMountPoint();
-        final FsMountPoint pmp = mmp.getParent();
-        final FsMountPoint mp;
-        final FsNodeName en;
-        if (null != pmp) {
-            mp = pmp;
-            en = mmp.getPath().getNodeName();
-        } else {
-            mp = mmp;
-            en = FsNodeName.ROOT;
-        }
-        try {
-            return FsManagerLocator
-                    .SINGLETON
-                    .get()
-                    .controller(DRIVER, mp)
-                    .stat(FsAccessOptions.NONE, en);
-        } catch (IOException ex) {
-            return null;
-        }
-    }
-
-    public void sync() throws FsSyncWarningException, FsSyncException {
-        new FsFilteringManager( model.getMountPoint(),
-                                FsManagerLocator.SINGLETON.get())
-                .sync(FsSyncOptions.NONE);
     }
 }

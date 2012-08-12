@@ -4,22 +4,33 @@
  */
 package net.java.truevfs.comp.jmx;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Objects;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.StandardMBean;
+import net.java.truevfs.kernel.spec.FsAccessOptions;
+import net.java.truevfs.kernel.spec.FsFilteringManager;
+import net.java.truevfs.kernel.spec.FsMetaDriver;
 import net.java.truevfs.kernel.spec.FsModel;
+import net.java.truevfs.kernel.spec.FsMountPoint;
 import net.java.truevfs.kernel.spec.FsNode;
+import net.java.truevfs.kernel.spec.FsNodeName;
+import net.java.truevfs.kernel.spec.FsSimpleMetaDriver;
 import net.java.truevfs.kernel.spec.FsSyncException;
+import net.java.truevfs.kernel.spec.FsSyncOptions;
 import net.java.truevfs.kernel.spec.FsSyncWarningException;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
 import net.java.truevfs.kernel.spec.cio.Entry.Size;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
+import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
+import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 
 /**
  * A view for a {@linkplain FsModel file system model}.
@@ -30,6 +41,9 @@ import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 @ThreadSafe
 public class JmxModelView<M extends JmxMediator<M>>
 extends StandardMBean implements JmxModelMXBean {
+
+    private static final FsMetaDriver
+            DRIVER = new FsSimpleMetaDriver(FsDriverMapLocator.SINGLETON);
 
     protected final JmxModel<M> model;
 
@@ -114,54 +128,79 @@ extends StandardMBean implements JmxModelMXBean {
     }
 
     private long sizeOf(Size type) {
-        final FsNode node = model.stat();
+        final FsNode node = stat();
         return null == node ? UNKNOWN : node.getSize(type);
     }
 
     @Override
     public String getTimeCreatedDate() {
-        final FsNode node = model.stat();
+        final FsNode node = stat();
         final long time = null == node ? UNKNOWN : node.getTime(CREATE);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 
     @Override
     public Long getTimeCreatedMillis() {
-        final FsNode node = model.stat();
+        final FsNode node = stat();
         final long time = null == node ? UNKNOWN : node.getTime(CREATE);
         return UNKNOWN == time ? null : time;
     }
 
     @Override
     public String getTimeReadDate() {
-        final FsNode node = model.stat();
+        final FsNode node = stat();
         final long time = null == node ? UNKNOWN : node.getTime(READ);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 
     @Override
     public Long getTimeReadMillis() {
-        final FsNode node = model.stat();
+        final FsNode node = stat();
         final long time = null == node ? UNKNOWN : node.getTime(READ);
         return UNKNOWN == time ? null : time;
     }
 
     @Override
     public String getTimeWrittenDate() {
-        final FsNode node = model.stat();
+        final FsNode node = stat();
         final long time = null == node ? UNKNOWN : node.getTime(WRITE);
         return UNKNOWN == time ? null : new Date(time).toString();
     }
 
     @Override
     public Long getTimeWrittenMillis() {
-        final FsNode node = model.stat();
+        final FsNode node = stat();
         final long time = null == node ? UNKNOWN : node.getTime(WRITE);
         return UNKNOWN == time ? null : time;
     }
 
+    protected @CheckForNull FsNode stat() {
+        final FsMountPoint mmp = model.getMountPoint();
+        final FsMountPoint pmp = mmp.getParent();
+        final FsMountPoint mp;
+        final FsNodeName en;
+        if (null != pmp) {
+            mp = pmp;
+            en = mmp.getPath().getNodeName();
+        } else {
+            mp = mmp;
+            en = FsNodeName.ROOT;
+        }
+        try {
+            return FsManagerLocator
+                    .SINGLETON
+                    .get()
+                    .controller(DRIVER, mp)
+                    .stat(FsAccessOptions.NONE, en);
+        } catch (IOException ex) {
+            return null;
+        }
+    }
+
     @Override
     public void sync() throws FsSyncWarningException, FsSyncException {
-        model.sync();
+        new FsFilteringManager( model.getMountPoint(),
+                                FsManagerLocator.SINGLETON.get())
+                .sync(FsSyncOptions.NONE);
     }
 }
