@@ -23,8 +23,8 @@ extends InstrumentingModel<M> implements JmxColleague {
 
     private final ObjectName name;
 
-    public JmxModel(M director, FsModel model) {
-        super(director, model);
+    public JmxModel(M mediator, FsModel model) {
+        super(mediator, model);
         this.name = name();
     }
 
