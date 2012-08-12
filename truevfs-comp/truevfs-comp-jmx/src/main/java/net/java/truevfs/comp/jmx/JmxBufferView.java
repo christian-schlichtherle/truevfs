@@ -28,8 +28,12 @@ extends StandardMBean implements JmxBufferMXBean {
 
     protected final B buffer;
 
-    public JmxBufferView(final B buffer) {
-        super(JmxBufferMXBean.class, true);
+    public JmxBufferView(B buffer) { this(JmxBufferMXBean.class, buffer); }
+
+    protected JmxBufferView(
+            final Class<? extends JmxBufferMXBean> type,
+            final B buffer) {
+        super(type, true);
         this.buffer = Objects.requireNonNull(buffer);
     }
 
