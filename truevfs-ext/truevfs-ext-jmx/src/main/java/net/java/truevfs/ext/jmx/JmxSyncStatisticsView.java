@@ -96,7 +96,7 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
 
     @Override
     public long getTimeCreatedMillis() {
-        return stats.timeMillis();
+        return stats.timeCreated();
     }
 
     @Override

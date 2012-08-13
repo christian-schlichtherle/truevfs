@@ -40,13 +40,14 @@ public final class IoStatistics {
     }
 
     /**
-     * Returns the time these statistics have been created in milliseconds
+     * Returns the time these statistics have been updated in milliseconds
      * since the epoch.
+     * Note that this property gets updated whenever an operation gets logged.
      * 
-     * @return The time these statistics have been created in milliseconds
+     * @return The time these statistics have been updated in milliseconds
      *         since the epoch.
      */
-    public long getTimeMillis() {
+    public long getTimeUpdated() {
         return time;
     }
 

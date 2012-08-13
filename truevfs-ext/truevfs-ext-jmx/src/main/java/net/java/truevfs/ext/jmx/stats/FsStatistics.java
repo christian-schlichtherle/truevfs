@@ -47,13 +47,12 @@ public final class FsStatistics {
     /**
      * Returns the time these statistics have been originally created in
      * milliseconds since the epoch.
-     * Note that this property is <em>not</em> altered when an operation gets
-     * logged!
+     * Note that this property is not altered when an operation gets logged.
      * 
      * @return The time these statistics have been originally created in
      *         milliseconds since the epoch.
      */
-    public long getTimeMillis() {
+    public long getTimeCreated() {
         return time;
     }
 
