@@ -7,6 +7,7 @@ package de.schlichtherle.truezip.util;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
+import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -28,11 +29,11 @@ public final class InheritableThreadLocalStack<T> {
     private final Stacks<T> stacks = new Stacks<T>();
 
     public boolean isEmpty() {
-        return stacks.get().isEmpty();
+        return stacks.test().isEmpty();
     }
 
     public @Nullable T peek() {
-        return stacks.get().peek();
+        return stacks.test().peek();
     }
 
     /**
@@ -43,7 +44,7 @@ public final class InheritableThreadLocalStack<T> {
      * @return Returns the top element on this stack unless it's {@code null},
      *         in which case {@code elze} gets returned.
      */
-    public @Nullable T peekOrElse(final @Nullable T elze) {
+    public @Nullable T peekOrElse(final @CheckForNull T elze) {
         final T element = peek();
         return null != element ? element : elze;
     }
@@ -54,13 +55,13 @@ public final class InheritableThreadLocalStack<T> {
      * @param  element The element to push onto this stack.
      * @return {@code element}
      */
-    public @Nullable T push(final @Nullable T element) {
+    public @Nullable T push(final @CheckForNull T element) {
         stacks.get().push(element);
         return element;
     }
 
     public @Nullable T pop() {
-        final Deque<T> stack = stacks.get();
+        final Deque<T> stack = stacks.test(); // NOT stacks.get()!
         final T element = stack.pop();
         if (stack.isEmpty()) stacks.remove();
         return element;
@@ -74,9 +75,9 @@ public final class InheritableThreadLocalStack<T> {
      * @throws IllegalStateException If the given element is not the top
      *         element on this stack.
      */
-    public void popIf(final @Nullable T expected) {
+    public void popIf(final @CheckForNull T expected) {
         try {
-            final @Nullable T got = pop();
+            final @CheckForNull T got = pop();
             if (got != expected) {
                 push(got);
                 throw new IllegalStateException(got + " (expected " + expected + " as the top element of the inheritable thread local stack)");
@@ -96,10 +97,16 @@ public final class InheritableThreadLocalStack<T> {
 
         @Override
         protected Deque<T> childValue(final Deque<T> parent) {
-            final Deque<T> child = new LinkedList<T>();
+            final Deque<T> child = initialValue();
             final T element = parent.peek();
             if (null != element) child.push(element);
             return child;
+        }
+
+        Deque<T> test() {
+            final Deque<T> stack = super.get();
+            if (stack.isEmpty()) super.remove();
+            return stack;
         }
     } // Stacks
 }
