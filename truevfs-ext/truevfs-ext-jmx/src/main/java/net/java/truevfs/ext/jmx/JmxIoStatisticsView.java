@@ -83,42 +83,42 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
         }
     }
 
-    private IoStatistics readStats() {
-        return stats.readStats();
+    private IoStatistics getRead() {
+        return stats.getReadStats();
     }
 
-    private IoStatistics writeStats() {
-        return stats.writeStats();
+    private IoStatistics getWrite() {
+        return stats.getWriteStats();
     }
 
     @Override
     public int getReadBytesPerOperation() {
-        return readStats().getBytesPerOperation();
+        return getRead().getBytesPerOperation();
     }
 
     @Override
     public long getReadBytesTotal() {
-        return readStats().getBytesTotal();
+        return getRead().getBytesTotal();
     }
 
     @Override
     public long getReadKilobytesPerSecond() {
-        return readStats().getKilobytesPerSecond();
+        return getRead().getKilobytesPerSecond();
     }
 
     @Override
     public long getReadNanosecondsPerOperation() {
-        return readStats().getNanosecondsPerOperation();
+        return getRead().getNanosecondsPerOperation();
     }
 
     @Override
     public long getReadNanosecondsTotal() {
-        return readStats().getNanosecondsTotal();
+        return getRead().getNanosecondsTotal();
     }
 
     @Override
     public int getReadOperations() {
-        return readStats().getSequenceNumber();
+        return getRead().getSequenceNumber();
     }
 
     @Override
@@ -133,7 +133,7 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
 
     @Override
     public long getTimeCreatedMillis() {
-        return stats.timeCreated();
+        return stats.getTimeCreated();
     }
 
     @Override
@@ -144,37 +144,42 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
     @Override
     public long getTimeUpdatedMillis() {
         return Math.max(
-                readStats().getTimeUpdated(),
-                writeStats().getTimeUpdated());
+                getRead().getTimeUpdated(),
+                getWrite().getTimeUpdated());
     }
 
     @Override
     public int getWriteBytesPerOperation() {
-        return writeStats().getBytesPerOperation();
+        return getWrite().getBytesPerOperation();
     }
 
     @Override
     public long getWriteBytesTotal() {
-        return writeStats().getBytesTotal();
+        return getWrite().getBytesTotal();
     }
 
     @Override
     public long getWriteKilobytesPerSecond() {
-        return writeStats().getKilobytesPerSecond();
+        return getWrite().getKilobytesPerSecond();
     }
 
     @Override
     public long getWriteNanosecondsPerOperation() {
-        return writeStats().getNanosecondsPerOperation();
+        return getWrite().getNanosecondsPerOperation();
     }
 
     @Override
     public long getWriteNanosecondsTotal() {
-        return writeStats().getNanosecondsTotal();
+        return getWrite().getNanosecondsTotal();
     }
 
     @Override
     public int getWriteOperations() {
-        return writeStats().getSequenceNumber();
+        return getWrite().getSequenceNumber();
+    }
+
+    @Override
+    public void rotate() {
+        stats.rotate();
     }
 }

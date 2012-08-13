@@ -24,7 +24,7 @@ extends net.java.truevfs.comp.jmx.JmxManager<JmxMediator> {
     @Override
     public void start() {
         super.start();
-        mediator.startAllStatistics();
+        mediator.startAllStats(this);
     }
 
     @Override
@@ -32,6 +32,6 @@ extends net.java.truevfs.comp.jmx.JmxManager<JmxMediator> {
         final long start = System.nanoTime();
         super.sync(options);
         mediator.logSync(System.nanoTime() - start);
-        mediator.rotateAllStatistics();
+        mediator.rotateAllStats(this);
     }
 }

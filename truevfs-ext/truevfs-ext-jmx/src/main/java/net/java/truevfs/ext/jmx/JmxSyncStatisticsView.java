@@ -13,7 +13,7 @@ import javax.management.StandardMBean;
 import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 
 /**
- * A view for {@linkplain SyncStatistics sync statistics}.
+ * A view for {@linkplain SyncStatistics getSyncStats statistics}.
  *
  * @author Christian Schlichtherle
  */
@@ -65,8 +65,8 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
         }
     }
 
-    private SyncStatistics syncStats() {
-        return stats.syncStats();
+    private SyncStatistics getSync() {
+        return stats.getSyncStats();
     }
 
     @Override
@@ -76,17 +76,17 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
 
     @Override
     public long getSyncNanosecondsPerOperation() {
-        return syncStats().getNanosecondsPerOperation();
+        return getSync().getNanosecondsPerOperation();
     }
 
     @Override
     public long getSyncNanosecondsTotal() {
-        return syncStats().getNanosecondsTotal();
+        return getSync().getNanosecondsTotal();
     }
 
     @Override
     public int getSyncOperations() {
-        return syncStats().getSequenceNumber();
+        return getSync().getSequenceNumber();
     }
 
     @Override
@@ -96,7 +96,7 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
 
     @Override
     public long getTimeCreatedMillis() {
-        return stats.timeCreated();
+        return stats.getTimeCreated();
     }
 
     @Override
@@ -106,6 +106,11 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
 
     @Override
     public long getTimeUpdatedMillis() {
-        return syncStats().getTimeMillis();
+        return getSync().getTimeMillis();
+    }
+
+    @Override
+    public void rotate() {
+        stats.rotate();
     }
 }

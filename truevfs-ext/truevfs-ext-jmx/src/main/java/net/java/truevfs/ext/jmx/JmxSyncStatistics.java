@@ -8,7 +8,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 
 /**
- * A controller for {@linkplain SyncStatistics sync statistics}.
+ * A controller for {@linkplain SyncStatistics getSyncStats statistics}.
  * 
  * @see    JmxIoStatistics
  * @author Christian Schlichtherle
