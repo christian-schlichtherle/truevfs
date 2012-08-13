@@ -11,6 +11,7 @@ import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.comp.inst.*;
 import net.java.truevfs.comp.jmx.JmxBuffer;
+import net.java.truevfs.comp.jmx.JmxColleague;
 import net.java.truevfs.comp.jmx.JmxModel;
 import net.java.truevfs.ext.jmx.stats.FsLogger;
 import net.java.truevfs.ext.jmx.stats.FsStatistics;
@@ -41,38 +42,29 @@ extends net.java.truevfs.comp.jmx.JmxMediator<JmxMediator> {
     static JmxMediator get() { return SYNC_OPS; }
 
     private final String subject;
-    private final FsLogger logger;
+    private final FsLogger logger = new FsLogger();
 
-    JmxMediator(String subject) {
-        this(subject, new FsLogger());
-    }
-
-    JmxMediator(String subject, int logSize) {
-        this(subject, new FsLogger(logSize));
-    }
-
-    private JmxMediator(final String subject, final FsLogger logger) {
+    JmxMediator(final String subject) {
         this.subject = Objects.requireNonNull(subject);
         assert null != logger;
-        this.logger = logger;
     }
 
     String getSubject() { return subject; }
 
-    abstract JmxStatistics newStatistics(int offset);
+    abstract JmxStatistics newStats(int offset);
 
-    private void startStatistics(int offset) { start(newStatistics(offset)); }
+    private void startStats(int offset) { start(newStats(offset)); }
 
-    final void startStatistics() { startStatistics(0); }
+    void startStats(JmxColleague origin) { startStats(0); }
 
-    final void startAllStatistics() {
-        for (JmxMediator mediator : MEDIATORS) mediator.startStatistics();
+    final void startAllStats(JmxColleague origin) {
+        for (JmxMediator mediator : MEDIATORS) mediator.startStats(origin);
     }
 
-    void rotateStatistics() { startStatistics(logger.rotate()); }
+    void rotateStats(JmxColleague origin) { startStats(logger.rotate()); }
 
-    final void rotateAllStatistics() {
-        for (JmxMediator mediator : MEDIATORS) mediator.rotateStatistics();
+    final void rotateAllStats(JmxColleague origin) {
+        for (JmxMediator mediator : MEDIATORS) mediator.rotateStats(origin);
     }
 
     final void logRead(long nanos, int bytes) { logger.logRead(nanos, bytes); }
@@ -81,7 +73,7 @@ extends net.java.truevfs.comp.jmx.JmxMediator<JmxMediator> {
 
     final void logSync(long nanos) { logger.logSync(nanos); }
 
-    final FsStatistics stats(int offset) { return logger.stats(offset); }
+    final FsStatistics getStats(int offset) { return logger.stats(offset); }
 
     final String formatOffset(int offset) { return logger.format(offset); }
 

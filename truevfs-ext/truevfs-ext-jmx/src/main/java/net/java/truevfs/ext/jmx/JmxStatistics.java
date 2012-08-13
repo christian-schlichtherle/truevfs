@@ -31,17 +31,21 @@ abstract class JmxStatistics implements JmxColleague {
 
     String getSubject() { return mediator.getSubject(); }
 
-    private FsStatistics stats() { return mediator.stats(offset); }
+    private FsStatistics getStats() { return mediator.getStats(offset); }
 
-    long timeCreated() { return stats().getTimeCreated(); }
+    long getTimeCreated() { return getStats().getTimeCreated(); }
 
-    IoStatistics readStats() { return stats().getReadStats(); }
+    IoStatistics getReadStats() { return getStats().getReadStats(); }
 
-    IoStatistics writeStats() { return stats().getWriteStats(); }
+    IoStatistics getWriteStats() { return getStats().getWriteStats(); }
 
-    SyncStatistics syncStats() { return stats().getSyncStats(); }
+    SyncStatistics getSyncStats() { return getStats().getSyncStats(); }
 
-    private ObjectName name() {
+    void rotate() {
+        mediator.rotateStats(this);
+    }
+
+    private ObjectName getObjectName() {
         return mediator.nameBuilder(FsStatistics.class)
                 .put("subject", getSubject())
                 .put("offset", mediator.formatOffset(offset))
@@ -51,7 +55,7 @@ abstract class JmxStatistics implements JmxColleague {
     abstract Object newView();
 
     @Override
-    public void start() { register(name(), newView()); }
+    public void start() { register(getObjectName(), newView()); }
 
     /**
      * Returns a string representation of this object for debugging and logging
