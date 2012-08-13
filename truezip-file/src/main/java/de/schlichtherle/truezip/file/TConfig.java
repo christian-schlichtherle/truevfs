@@ -4,9 +4,9 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.FsInputOptions.INPUT_PREFERENCES_MASK;
 import static de.schlichtherle.truezip.fs.FsOutputOption.*;
-import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.FsOutputOptions.OUTPUT_PREFERENCES_MASK;
 import de.schlichtherle.truezip.fs.sl.FsManagerLocator;
 import de.schlichtherle.truezip.util.BitField;
