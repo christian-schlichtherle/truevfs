@@ -33,7 +33,7 @@ abstract class JmxStatistics implements JmxColleague {
 
     private FsStatistics stats() { return mediator.stats(offset); }
 
-    long timeMillis() { return stats().getTimeMillis(); }
+    long timeCreated() { return stats().getTimeCreated(); }
 
     IoStatistics readStats() { return stats().getReadStats(); }
 

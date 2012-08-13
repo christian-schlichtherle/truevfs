@@ -133,7 +133,7 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
 
     @Override
     public long getTimeCreatedMillis() {
-        return stats.timeMillis();
+        return stats.timeCreated();
     }
 
     @Override
@@ -144,8 +144,8 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
     @Override
     public long getTimeUpdatedMillis() {
         return Math.max(
-                readStats().getTimeMillis(),
-                writeStats().getTimeMillis());
+                readStats().getTimeUpdated(),
+                writeStats().getTimeUpdated());
     }
 
     @Override
