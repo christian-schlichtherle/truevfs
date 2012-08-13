@@ -25,10 +25,10 @@ extends InstrumentingModel<M> implements JmxColleague {
 
     public JmxModel(M mediator, FsModel model) {
         super(mediator, model);
-        this.name = name();
+        this.name = getObjectName();
     }
 
-    private ObjectName name() {
+    private ObjectName getObjectName() {
         return mediator.nameBuilder(FsModel.class)
                 .put("mountPoint", ObjectName.quote(
                     model.getMountPoint().toHierarchicalUri().toString()))
