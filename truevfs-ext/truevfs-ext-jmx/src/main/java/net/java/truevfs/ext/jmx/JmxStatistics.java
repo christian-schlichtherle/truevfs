@@ -9,7 +9,6 @@ import javax.management.ObjectName;
 import net.java.truevfs.comp.jmx.JmxColleague;
 import static net.java.truevfs.comp.jmx.JmxUtils.register;
 import net.java.truevfs.ext.jmx.stats.FsStatistics;
-import net.java.truevfs.ext.jmx.stats.IoStatistics;
 import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 
 /**
@@ -31,19 +30,9 @@ abstract class JmxStatistics implements JmxColleague {
 
     String getSubject() { return mediator.getSubject(); }
 
-    private FsStatistics getStats() { return mediator.getStats(offset); }
+    FsStatistics getStats() { return mediator.getStats(offset); }
 
-    long getTimeCreated() { return getStats().getTimeCreated(); }
-
-    IoStatistics getReadStats() { return getStats().getReadStats(); }
-
-    IoStatistics getWriteStats() { return getStats().getWriteStats(); }
-
-    SyncStatistics getSyncStats() { return getStats().getSyncStats(); }
-
-    void rotate() {
-        mediator.rotateStats(this);
-    }
+    void rotate() { mediator.rotateStats(this); }
 
     private ObjectName getObjectName() {
         return mediator.nameBuilder(FsStatistics.class)

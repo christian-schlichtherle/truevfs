@@ -23,5 +23,6 @@ public interface JmxSyncStatisticsMXBean {
     String getTimeUpdatedDate();
     long   getTimeUpdatedMillis();
 
+    //JmxSyncStatisticsMXBean snapshot();
     void rotate();
 }
