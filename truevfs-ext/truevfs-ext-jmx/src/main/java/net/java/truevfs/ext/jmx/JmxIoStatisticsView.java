@@ -4,13 +4,9 @@
  */
 package net.java.truevfs.ext.jmx;
 
-import java.util.Date;
-import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
-import javax.management.StandardMBean;
-import net.java.truevfs.ext.jmx.stats.FsStatistics;
 import net.java.truevfs.ext.jmx.stats.IoStatistics;
 
 /**
@@ -20,30 +16,19 @@ import net.java.truevfs.ext.jmx.stats.IoStatistics;
  */
 @ThreadSafe
 final class JmxIoStatisticsView
-extends StandardMBean implements JmxIoStatisticsMXBean {
+extends JmxStatisticsView implements JmxIoStatisticsMXBean {
 
-    private final JmxStatistics stats;
-
-    JmxIoStatisticsView(final JmxStatistics stats) {
-        super(JmxIoStatisticsMXBean.class, true);
-        this.stats = Objects.requireNonNull(stats);
+    JmxIoStatisticsView(JmxStatistics stats) {
+        super(JmxIoStatisticsMXBean.class, stats);
     }
 
-    /**
-     * Override customization hook:
-     * You can supply a customized description for MBeanInfo.getDescription()
-     */
     @Override
     protected String getDescription(MBeanInfo info) {
         return "A log of I/O statistics.";
     }
 
-    /**
-     * Override customization hook:
-     * You can supply a customized description for MBeanAttributeInfo.getDescription()
-     */
     @Override
-    protected String getDescription(MBeanAttributeInfo info) {
+    protected String getDescription(final MBeanAttributeInfo info) {
         switch (info.getName()) {
         case "ReadBytesPerOperation":
             return "The average number of bytes per read operation.";
@@ -57,16 +42,6 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
             return "The total execution time for read operations.";
         case "ReadOperations":
             return "The total number of read operations.";
-        case "Subject":
-            return "The subject of this log.";
-        case "TimeCreatedDate":
-            return "The time this log has been created.";
-        case "TimeCreatedMillis":
-            return "The time this log has been created in milliseconds.";
-        case "TimeUpdatedDate":
-            return "The last time this log has been updated.";
-        case "TimeUpdatedMillis":
-            return "The last time this log has been updated in milliseconds.";
         case "WriteBytesPerOperation":
             return "The average number of bytes per write operation.";
         case "WriteBytesTotal":
@@ -80,18 +55,8 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
         case "WriteOperations":
             return "The total number of write operations.";
         default:
-            return null;
+            return super.getDescription(info);
         }
-    }
-
-    FsStatistics getStats() { return stats.getStats(); }
-    
-    private IoStatistics getReadStats() {
-        return getStats().getReadStats();
-    }
-
-    private IoStatistics getWriteStats() {
-        return getStats().getWriteStats();
     }
 
     @Override
@@ -125,33 +90,6 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
     }
 
     @Override
-    public String getSubject() {
-        return stats.getSubject();
-    }
-
-    @Override
-    public String getTimeCreatedDate() {
-        return new Date(getTimeCreatedMillis()).toString();
-    }
-
-    @Override
-    public long getTimeCreatedMillis() {
-        return getStats().getTimeCreated();
-    }
-
-    @Override
-    public String getTimeUpdatedDate() {
-        return new Date(getTimeUpdatedMillis()).toString();
-    }
-
-    @Override
-    public long getTimeUpdatedMillis() {
-        return Math.max(
-                getReadStats().getTimeUpdated(),
-                getWriteStats().getTimeUpdated());
-    }
-
-    @Override
     public int getWriteBytesPerOperation() {
         return getWriteStats().getBytesPerOperation();
     }
@@ -181,8 +119,8 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
         return getWriteStats().getSequenceNumber();
     }
 
-    @Override
-    public void rotate() {
-        stats.rotate();
+    //@Override
+    public JmxIoStatisticsMXBean snapshot() {
+        return this;
     }
 }

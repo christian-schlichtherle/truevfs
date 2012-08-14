@@ -21,5 +21,5 @@ final class JmxSyncStatistics extends JmxStatistics {
     }
 
     @Override
-    Object newView() { return new JmxSyncStatisticsView(this); }
+    JmxStatisticsView newView() { return new JmxSyncStatisticsView(this); }
 }
