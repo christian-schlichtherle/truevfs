@@ -9,7 +9,6 @@ import javax.management.ObjectName;
 import net.java.truevfs.comp.jmx.JmxColleague;
 import static net.java.truevfs.comp.jmx.JmxUtils.register;
 import net.java.truevfs.ext.jmx.stats.FsStatistics;
-import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 
 /**
  * A controller for {@linkplain FsStatistics file system statistics}.
@@ -41,7 +40,7 @@ abstract class JmxStatistics implements JmxColleague {
                 .get();
     }
 
-    abstract Object newView();
+    abstract JmxStatisticsView newView();
 
     @Override
     public void start() { register(getObjectName(), newView()); }

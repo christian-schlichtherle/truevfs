@@ -21,5 +21,5 @@ final class JmxIoStatistics extends JmxStatistics {
     }
 
     @Override
-    Object newView() { return new JmxIoStatisticsView(this); }
+    JmxStatisticsView newView() { return new JmxIoStatisticsView(this); }
 }
