@@ -28,54 +28,74 @@ import javax.annotation.concurrent.ThreadSafe;
 public final class InheritableThreadLocalStack<T> {
     private final Stacks<T> stacks = new Stacks<T>();
 
+    /**
+     * Returns {@code true} if this stack is empty.
+     * 
+     * @return {@code true} if this stack is empty.
+     */
     public boolean isEmpty() {
-        return stacks.test().isEmpty();
-    }
-
-    public @Nullable T peek() {
-        return stacks.test().peek();
+        return stacks.probe().isEmpty();
     }
 
     /**
-     * Returns the top element on this stack unless it's {@code null}, in which
-     * case {@code elze} gets returned.
+     * Returns the top element on this stack or {@code null} if it's empty.
      * 
-     * @param  elze The default element.
-     * @return Returns the top element on this stack unless it's {@code null},
+     * @return The top element of this stack or {@code null} if it's empty.
+     */
+    public @Nullable T peek() {
+        return stacks.probe().peek();
+    }
+
+    /**
+     * Returns the nullable top element on this stack unless it's empty,
+     * in which case {@code elze} gets returned.
+     * 
+     * @param  elze the nullable default element.
+     * @return The nullable top element on this stack unless it's empty,
      *         in which case {@code elze} gets returned.
      */
     public @Nullable T peekOrElse(final @CheckForNull T elze) {
-        final T element = peek();
-        return null != element ? element : elze;
+        final Deque<T> stack = stacks.probe();
+        return stack.isEmpty() ? elze : stack.peek();
     }
 
     /**
      * Pushes the given element onto this stack.
      * 
-     * @param  element The element to push onto this stack.
-     * @return {@code element}
+     * @param  element the nullable element to push onto this stack.
+     * @return {@code element} - for fluent programming.
      */
     public @Nullable T push(final @CheckForNull T element) {
         stacks.get().push(element);
         return element;
     }
 
+    /**
+     * Removes and returns the nullable top element on this stack.
+     * 
+     * @return The (then no more) nullable top element on this stack.
+     * @throws NoSuchElementException if this stack is empty.
+     */
     public @Nullable T pop() {
-        final Deque<T> stack = stacks.test(); // NOT stacks.get()!
+        final Deque<T> stack = stacks.probe(); // NOT stacks.get()!
         final T element = stack.pop();
         if (stack.isEmpty()) stacks.remove();
         return element;
     }
 
+    /** @deprecated Since TrueZIP 7.6.1, use {@link #popIff} instead.*/
+    @Deprecated
+    public void popIf(final @CheckForNull T expected) { popIff(expected); }
+
     /**
-     * Pops the top element off this stack if its identical to the given
-     * element.
+     * Removes and returns the nullable top element on this stack
+     * if and only if its identical to the given element.
      * 
      * @param  expected The expected top element on this stack.
      * @throws IllegalStateException If the given element is not the top
      *         element on this stack.
      */
-    public void popIf(final @CheckForNull T expected) {
+    public void popIff(final @CheckForNull T expected) {
         try {
             final @CheckForNull T got = pop();
             if (got != expected) {
@@ -98,12 +118,11 @@ public final class InheritableThreadLocalStack<T> {
         @Override
         protected Deque<T> childValue(final Deque<T> parent) {
             final Deque<T> child = initialValue();
-            final T element = parent.peek();
-            if (null != element) child.push(element);
+            if (!parent.isEmpty()) child.push(parent.peek());
             return child;
         }
 
-        Deque<T> test() {
+        Deque<T> probe() {
             final Deque<T> stack = super.get();
             if (stack.isEmpty()) super.remove();
             return stack;

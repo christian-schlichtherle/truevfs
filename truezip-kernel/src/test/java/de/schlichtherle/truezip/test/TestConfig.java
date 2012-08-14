@@ -109,7 +109,7 @@ implements Closeable { // this could be AutoCloseable in JSE 7
      *         is the global configuration.
      */
     public static void pop() {
-        configs.popIf(get());
+        configs.popIff(get());
     }
 
     /** Default constructor for the global configuration. */
@@ -163,6 +163,6 @@ implements Closeable { // this could be AutoCloseable in JSE 7
 
     @Override
     protected void onClose() {
-        configs.popIf(this);
+        configs.popIff(this);
     }
 }
