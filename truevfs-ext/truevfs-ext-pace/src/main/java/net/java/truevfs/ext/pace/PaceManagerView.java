@@ -28,12 +28,13 @@ extends JmxManagerView<PaceManager> implements PaceManagerMXBean {
     }
 
     @Override
-    protected String getDescription(MBeanAttributeInfo info) {
+    protected String getDescription(final MBeanAttributeInfo info) {
         switch (info.getName()) {
         case "MaximumFileSystemsMounted":
             return "The maximum number of mounted file systems.";
+        default:
+            return super.getDescription(info);
         }
-        return super.getDescription(info);
     }
 
     @Override
