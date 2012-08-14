@@ -11,8 +11,8 @@ import java.util.Objects;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import static net.java.truevfs.comp.zip.ZipEntry.STORED;
-import net.java.truevfs.comp.zip.driver.JarDriverEntry;
-import net.java.truevfs.comp.zip.driver.ZipOutputService;
+import net.java.truevfs.comp.zipdriver.JarDriverEntry;
+import net.java.truevfs.comp.zipdriver.ZipOutputService;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.java.truevfs.kernel.spec.cio.*;
 

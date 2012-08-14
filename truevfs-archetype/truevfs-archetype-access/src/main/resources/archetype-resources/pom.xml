@@ -33,7 +33,7 @@
         <!-- Lets hurl the key prompting window when entering an invalid key. -->
         <dependency>
             <groupId>net.java.truevfs</groupId>
-            <artifactId>truevfs-key-swing-feedback-hurl</artifactId>
+            <artifactId>truevfs-key-hurlfb</artifactId>
             <version>${truevfs.version}</version>
             <scope>runtime</scope>
         </dependency>

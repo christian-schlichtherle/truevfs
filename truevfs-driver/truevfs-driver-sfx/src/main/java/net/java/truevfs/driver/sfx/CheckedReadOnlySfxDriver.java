@@ -5,8 +5,8 @@
 package net.java.truevfs.driver.sfx;
 
 import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.comp.zip.driver.ZipDriverEntry;
-import net.java.truevfs.comp.zip.driver.ZipInputService;
+import net.java.truevfs.comp.zipdriver.ZipDriverEntry;
+import net.java.truevfs.comp.zipdriver.ZipInputService;
 
 /**
  * An archive driver for SFX/EXE files which checks the CRC32 value for all

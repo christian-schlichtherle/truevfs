@@ -6,7 +6,7 @@ package net.java.truevfs.driver.zip.raes.sample;
 
 import net.java.truevfs.access.TArchiveDetector;
 import net.java.truevfs.access.TConfig;
-import net.java.truevfs.comp.zip.driver.KeyManagementITSuite;
+import net.java.truevfs.comp.zipdriver.KeyManagementITSuite;
 
 /**
  * @author Christian Schlichtherle

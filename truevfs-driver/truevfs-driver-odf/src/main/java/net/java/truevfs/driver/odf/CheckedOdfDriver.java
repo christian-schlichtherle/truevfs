@@ -5,8 +5,8 @@
 package net.java.truevfs.driver.odf;
 
 import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.comp.zip.driver.JarDriverEntry;
-import net.java.truevfs.comp.zip.driver.ZipInputService;
+import net.java.truevfs.comp.zipdriver.JarDriverEntry;
+import net.java.truevfs.comp.zipdriver.ZipInputService;
 
 /**
  * An archive driver for ODF files which checks the CRC32 value for all ZIP

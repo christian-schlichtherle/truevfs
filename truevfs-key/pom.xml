@@ -23,8 +23,8 @@
 
     <modules>
         <module>truevfs-key-console</module>
+        <module>truevfs-key-hurlfb</module>
         <module>truevfs-key-spec</module>
         <module>truevfs-key-swing</module>
-        <module>truevfs-key-swing-feedback-hurl</module>
     </modules>
 </project>

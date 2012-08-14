@@ -40,11 +40,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-comp-tar-driver</artifactId>
+            <artifactId>truevfs-comp-tardriver</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-comp-tar-driver</artifactId>
+            <artifactId>truevfs-comp-tardriver</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>

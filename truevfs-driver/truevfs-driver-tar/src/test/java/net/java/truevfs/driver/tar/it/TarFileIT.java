@@ -4,8 +4,8 @@
  */
 package net.java.truevfs.driver.tar.it;
 
-import net.java.truevfs.comp.tar.driver.TarDriver;
-import net.java.truevfs.comp.tar.driver.it.TarFileITSuite;
+import net.java.truevfs.comp.tardriver.TarDriver;
+import net.java.truevfs.comp.tardriver.it.TarFileITSuite;
 import net.java.truevfs.kernel.spec.TestConfig;
 import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 

@@ -5,7 +5,7 @@
 package net.java.truevfs.driver.zip.it;
 
 import net.java.truevfs.access.TPathITSuite;
-import net.java.truevfs.comp.zip.driver.ZipDriver;
+import net.java.truevfs.comp.zipdriver.ZipDriver;
 import net.java.truevfs.kernel.spec.TestConfig;
 import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 

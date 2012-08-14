@@ -30,7 +30,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-comp-zip-driver</artifactId>
+            <artifactId>truevfs-comp-zipdriver</artifactId>
         </dependency>
         <dependency>
             <groupId>net.java.truecommons</groupId>

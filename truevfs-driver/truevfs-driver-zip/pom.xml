@@ -44,11 +44,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-comp-zip-driver</artifactId>
+            <artifactId>truevfs-comp-zipdriver</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-comp-zip-driver</artifactId>
+            <artifactId>truevfs-comp-zipdriver</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>
