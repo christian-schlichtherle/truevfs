@@ -5,7 +5,7 @@
 package net.java.truevfs.driver.tar.bzip2;
 
 import net.java.truevfs.driver.tar.bzip2.TarBZip2Driver;
-import net.java.truevfs.comp.tar.driver.TarDriverEntry;
+import net.java.truevfs.comp.tardriver.TarDriverEntry;
 import net.java.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 
 /**

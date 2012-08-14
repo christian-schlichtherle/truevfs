@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.driver.zip.sample;
 
-import net.java.truevfs.comp.zip.driver.KeyManagementITSuite;
+import net.java.truevfs.comp.zipdriver.KeyManagementITSuite;
 import java.nio.charset.Charset;
 import net.java.truevfs.access.TArchiveDetector;
 import net.java.truevfs.access.TConfig;

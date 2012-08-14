@@ -51,7 +51,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-key-swing-feedback-hurl</artifactId>
+            <artifactId>truevfs-key-hurlfb</artifactId>
             <scope>runtime</scope>
         </dependency>
     </dependencies>

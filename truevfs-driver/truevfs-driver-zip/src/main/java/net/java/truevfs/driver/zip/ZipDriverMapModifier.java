@@ -6,7 +6,7 @@ package net.java.truevfs.driver.zip;
 
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.comp.zip.driver.ZipDriver;
+import net.java.truevfs.comp.zipdriver.ZipDriver;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;

@@ -6,7 +6,7 @@ package net.java.truevfs.driver.zip.raes;
 
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.comp.zip.driver.AbstractKeyController;
+import net.java.truevfs.comp.zipdriver.AbstractKeyController;
 import net.java.truevfs.driver.zip.raes.crypto.RaesKeyException;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.key.spec.param.AesPbeParameters;

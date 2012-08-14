@@ -148,12 +148,12 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-comp-tar-driver</artifactId>
+                <artifactId>truevfs-comp-tardriver</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-comp-tar-driver</artifactId>
+                <artifactId>truevfs-comp-tardriver</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
@@ -172,12 +172,12 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-comp-zip-driver</artifactId>
+                <artifactId>truevfs-comp-zipdriver</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-comp-zip-driver</artifactId>
+                <artifactId>truevfs-comp-zipdriver</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
@@ -293,7 +293,7 @@ system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-key-swing-feedback-hurl</artifactId>
+                <artifactId>truevfs-key-hurlfb</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

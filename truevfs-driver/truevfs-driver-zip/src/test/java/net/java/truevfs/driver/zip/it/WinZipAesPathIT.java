@@ -9,7 +9,7 @@ import static java.nio.file.Files.*;
 import net.java.truevfs.access.TConfig;
 import net.java.truevfs.access.TPath;
 import net.java.truevfs.access.TPathITSuite;
-import net.java.truevfs.comp.zip.driver.TestWinZipAesDriver;
+import net.java.truevfs.comp.zipdriver.TestWinZipAesDriver;
 import static net.java.truevfs.kernel.spec.FsAccessOption.ENCRYPT;
 import net.java.truevfs.key.spec.MockView;
 import static net.java.truevfs.key.spec.MockView.Action.CANCEL;

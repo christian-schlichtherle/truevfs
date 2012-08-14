@@ -5,7 +5,7 @@
 package net.java.truevfs.driver.tar.it;
 
 import net.java.truevfs.access.ConcurrentSyncITSuite;
-import net.java.truevfs.comp.tar.driver.TarDriver;
+import net.java.truevfs.comp.tardriver.TarDriver;
 import net.java.truevfs.kernel.spec.TestConfig;
 import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 
