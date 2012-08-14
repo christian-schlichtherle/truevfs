@@ -10,6 +10,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.StandardMBean;
+import net.java.truevfs.ext.jmx.stats.FsStatistics;
 import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 
 /**
@@ -65,8 +66,10 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
         }
     }
 
-    private SyncStatistics getSync() {
-        return stats.getSyncStats();
+    FsStatistics getStats() { return stats.getStats(); }
+
+    private SyncStatistics getSyncStats() {
+        return getStats().getSyncStats();
     }
 
     @Override
@@ -76,17 +79,17 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
 
     @Override
     public long getSyncNanosecondsPerOperation() {
-        return getSync().getNanosecondsPerOperation();
+        return getSyncStats().getNanosecondsPerOperation();
     }
 
     @Override
     public long getSyncNanosecondsTotal() {
-        return getSync().getNanosecondsTotal();
+        return getSyncStats().getNanosecondsTotal();
     }
 
     @Override
     public long getSyncOperations() {
-        return getSync().getSequenceNumber();
+        return getSyncStats().getSequenceNumber();
     }
 
     @Override
@@ -96,7 +99,7 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
 
     @Override
     public long getTimeCreatedMillis() {
-        return stats.getTimeCreated();
+        return getStats().getTimeCreated();
     }
 
     @Override
@@ -106,7 +109,7 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
 
     @Override
     public long getTimeUpdatedMillis() {
-        return getSync().getTimeMillis();
+        return getSyncStats().getTimeMillis();
     }
 
     @Override
