@@ -58,10 +58,6 @@ extends StandardMBean implements JmxManagerMXBean {
         }
     }
 
-    /**
-     * Override customization hook:
-     * You can supply a customized description for MBeanOperationInfo.getDescription()
-     */
     @Override
     protected String getDescription(MBeanOperationInfo info) {
         switch (info.getName()) {
