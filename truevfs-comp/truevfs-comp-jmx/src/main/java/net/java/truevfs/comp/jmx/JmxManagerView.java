@@ -43,7 +43,7 @@ extends StandardMBean implements JmxManagerMXBean {
     }
 
     @Override
-    protected String getDescription(MBeanAttributeInfo info) {
+    protected String getDescription(final MBeanAttributeInfo info) {
         switch (info.getName()) {
         case "FileSystemsMounted":
             return "The number of file systems which have been mounted.";
@@ -59,7 +59,7 @@ extends StandardMBean implements JmxManagerMXBean {
     }
 
     @Override
-    protected String getDescription(MBeanOperationInfo info) {
+    protected String getDescription(final MBeanOperationInfo info) {
         switch (info.getName()) {
         case "sync":
             return "Synchronizes all file systems and eventually unmounts them.";

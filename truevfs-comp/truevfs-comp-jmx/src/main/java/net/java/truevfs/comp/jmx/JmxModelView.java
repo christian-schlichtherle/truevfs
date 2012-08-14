@@ -58,7 +58,7 @@ extends StandardMBean implements JmxModelMXBean {
     }
 
     @Override
-    protected String getDescription(MBeanAttributeInfo info) {
+    protected String getDescription(final MBeanAttributeInfo info) {
         switch (info.getName()) {
         case "Mounted":
             return "Whether or not this file system is mounted.";
@@ -88,7 +88,7 @@ extends StandardMBean implements JmxModelMXBean {
     }
 
     @Override
-    protected String getDescription(MBeanOperationInfo info) {
+    protected String getDescription(final MBeanOperationInfo info) {
         switch (info.getName()) {
         case "sync":
             return "Synchronizes this file system and all enclosed file systems and eventually unmounts them.";
