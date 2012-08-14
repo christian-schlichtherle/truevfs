@@ -85,7 +85,7 @@ extends StandardMBean implements JmxSyncStatisticsMXBean {
     }
 
     @Override
-    public int getSyncOperations() {
+    public long getSyncOperations() {
         return getSync().getSequenceNumber();
     }
 
