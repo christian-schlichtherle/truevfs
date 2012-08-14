@@ -9,11 +9,10 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.kernel.spec.cio.ByteArrayIoBufferPool;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 import net.java.truecommons.shed.InheritableThreadLocalStack;
 import net.java.truecommons.shed.Resource;
+import net.java.truevfs.kernel.spec.cio.ByteArrayIoBufferPool;
+import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
  * A container for configuration options with global or inheritable thread
