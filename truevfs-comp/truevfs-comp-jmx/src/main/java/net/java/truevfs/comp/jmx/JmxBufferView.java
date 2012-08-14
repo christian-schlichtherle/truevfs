@@ -43,7 +43,7 @@ extends StandardMBean implements JmxBufferMXBean {
     }
 
     @Override
-    protected String getDescription(MBeanAttributeInfo info) {
+    protected String getDescription(final MBeanAttributeInfo info) {
         switch (info.getName()) {
         case "Name":
             return "The name of this buffer.";
