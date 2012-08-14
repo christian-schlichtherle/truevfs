@@ -4,14 +4,11 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truevfs.access.TFile;
-import net.java.truevfs.access.TArchiveDetector;
-import net.java.truevfs.access.TConfig;
 import java.util.NoSuchElementException;
+import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.driver.mock.MockArchiveDriver;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 import net.java.truevfs.kernel.spec.FsDriver;
-import net.java.truevfs.kernel.driver.mock.MockArchiveDriver;
-import net.java.truecommons.shed.BitField;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.*;
