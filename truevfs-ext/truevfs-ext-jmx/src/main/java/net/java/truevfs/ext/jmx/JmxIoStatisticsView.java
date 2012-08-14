@@ -117,7 +117,7 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
     }
 
     @Override
-    public int getReadOperations() {
+    public long getReadOperations() {
         return getRead().getSequenceNumber();
     }
 
@@ -174,7 +174,7 @@ extends StandardMBean implements JmxIoStatisticsMXBean {
     }
 
     @Override
-    public int getWriteOperations() {
+    public long getWriteOperations() {
         return getWrite().getSequenceNumber();
     }
 

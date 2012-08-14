@@ -29,10 +29,10 @@ public final class IoStatistics {
     }
 
     private final long time = System.currentTimeMillis();
-    private final int seqno;
+    private final long seqno;
     private final long nanos, bytes;
 
-    private IoStatistics(final int seqno, final long nanos, final long bytes) {
+    private IoStatistics(final long seqno, final long nanos, final long bytes) {
         if (0 > (seqno | nanos | bytes)) throw new ArithmeticException();
         this.seqno = seqno;
         this.nanos = nanos;
@@ -57,7 +57,7 @@ public final class IoStatistics {
      * 
      * @return The non-negative sequence number.
      */
-    public int getSequenceNumber() {
+    public long getSequenceNumber() {
         return seqno;
     }
 
@@ -66,7 +66,7 @@ public final class IoStatistics {
     }
 
     public long getNanosecondsPerOperation() {
-        final int seqno = this.seqno;
+        final long seqno = this.seqno;
         return 0 == seqno ? 0 : nanos / seqno;
     }
 
@@ -75,7 +75,7 @@ public final class IoStatistics {
     }
 
     public int getBytesPerOperation() {
-        final int seqno = this.seqno;
+        final long seqno = this.seqno;
         return 0 == seqno ? 0 : (int) (bytes / seqno);
     }
 

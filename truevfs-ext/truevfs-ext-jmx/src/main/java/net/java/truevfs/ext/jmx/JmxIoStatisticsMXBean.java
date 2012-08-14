@@ -19,7 +19,7 @@ public interface JmxIoStatisticsMXBean {
     long   getReadKilobytesPerSecond();
     long   getReadNanosecondsPerOperation();
     long   getReadNanosecondsTotal();
-    int    getReadOperations();
+    long   getReadOperations();
     String getSubject();
     String getTimeCreatedDate();
     long   getTimeCreatedMillis();
@@ -30,7 +30,7 @@ public interface JmxIoStatisticsMXBean {
     long   getWriteKilobytesPerSecond();
     long   getWriteNanosecondsPerOperation();
     long   getWriteNanosecondsTotal();
-    int    getWriteOperations();
+    long   getWriteOperations();
 
     void rotate();
 }

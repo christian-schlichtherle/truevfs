@@ -21,10 +21,10 @@ public class SyncStatistics {
     }
 
     private final long time = System.currentTimeMillis();
-    private final int seqno;
+    private final long seqno;
     private final long nanos;
     
-    private SyncStatistics(final int seqno, final long nanos) {
+    private SyncStatistics(final long seqno, final long nanos) {
         if (0 > (seqno | nanos)) throw new ArithmeticException();
         this.seqno = seqno;
         this.nanos = nanos;
@@ -47,7 +47,7 @@ public class SyncStatistics {
      * 
      * @return The non-negative sequence number.
      */
-    public int getSequenceNumber() {
+    public long getSequenceNumber() {
         return seqno;
     }
 
@@ -56,7 +56,7 @@ public class SyncStatistics {
     }
 
     public long getNanosecondsPerOperation() {
-        final int seqno = this.seqno;
+        final long seqno = this.seqno;
         return 0 == seqno ? 0 : nanos / seqno;
     }
 
