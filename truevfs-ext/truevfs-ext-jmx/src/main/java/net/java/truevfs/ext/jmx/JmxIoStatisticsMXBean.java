@@ -5,7 +5,7 @@
 package net.java.truevfs.ext.jmx;
 
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.ext.jmx.stats.IoStatistics;
+import net.java.truevfs.ext.jmx.model.IoStatistics;
 
 /**
  * An MXBean interface for {@linkplain IoStatistics I/O statistics}.

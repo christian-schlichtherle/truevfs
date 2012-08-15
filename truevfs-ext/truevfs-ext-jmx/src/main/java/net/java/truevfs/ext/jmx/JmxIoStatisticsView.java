@@ -7,8 +7,8 @@ package net.java.truevfs.ext.jmx;
 import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanInfo;
-import net.java.truevfs.ext.jmx.stats.FsStatistics;
-import net.java.truevfs.ext.jmx.stats.IoStatistics;
+import net.java.truevfs.ext.jmx.model.FsStatistics;
+import net.java.truevfs.ext.jmx.model.IoStatistics;
 
 /**
  * A view for {@linkplain IoStatistics I/O statistics}.

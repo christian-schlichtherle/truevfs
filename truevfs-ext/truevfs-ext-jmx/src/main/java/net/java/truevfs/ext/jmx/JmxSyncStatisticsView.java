@@ -7,8 +7,8 @@ package net.java.truevfs.ext.jmx;
 import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanInfo;
-import net.java.truevfs.ext.jmx.stats.FsStatistics;
-import net.java.truevfs.ext.jmx.stats.SyncStatistics;
+import net.java.truevfs.ext.jmx.model.FsStatistics;
+import net.java.truevfs.ext.jmx.model.SyncStatistics;
 
 /**
  * A view for {@linkplain SyncStatistics getSyncStats statistics}.
