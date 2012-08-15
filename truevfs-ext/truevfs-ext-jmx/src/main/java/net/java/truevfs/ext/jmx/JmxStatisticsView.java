@@ -9,9 +9,9 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.StandardMBean;
-import net.java.truevfs.ext.jmx.stats.FsStatistics;
-import net.java.truevfs.ext.jmx.stats.IoStatistics;
-import net.java.truevfs.ext.jmx.stats.SyncStatistics;
+import net.java.truevfs.ext.jmx.model.FsStatistics;
+import net.java.truevfs.ext.jmx.model.IoStatistics;
+import net.java.truevfs.ext.jmx.model.SyncStatistics;
 
 /**
  * A view for {@linkplain IoStatistics I/O statistics}.

@@ -5,7 +5,7 @@
 package net.java.truevfs.ext.jmx;
 
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.ext.jmx.stats.SyncStatistics;
+import net.java.truevfs.ext.jmx.model.SyncStatistics;
 
 /**
  * An MXBean interface for {@linkplain SyncStatistics sync statistics}.

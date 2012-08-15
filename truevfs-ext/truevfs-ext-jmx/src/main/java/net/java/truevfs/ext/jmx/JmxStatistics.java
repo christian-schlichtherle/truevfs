@@ -8,7 +8,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import net.java.truevfs.comp.jmx.JmxColleague;
 import static net.java.truevfs.comp.jmx.JmxUtils.register;
-import net.java.truevfs.ext.jmx.stats.FsStatistics;
+import net.java.truevfs.ext.jmx.model.FsStatistics;
 
 /**
  * A controller for {@linkplain FsStatistics file system statistics}.
