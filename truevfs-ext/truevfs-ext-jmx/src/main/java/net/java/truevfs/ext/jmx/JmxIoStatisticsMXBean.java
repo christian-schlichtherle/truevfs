@@ -32,6 +32,5 @@ public interface JmxIoStatisticsMXBean {
     long   getWriteNanosecondsTotal();
     long   getWriteOperations();
 
-    //JmxIoStatisticsMXBean snapshot();
     void rotate();
 }
