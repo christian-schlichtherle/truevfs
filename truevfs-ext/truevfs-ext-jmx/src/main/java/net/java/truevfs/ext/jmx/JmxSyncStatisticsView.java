@@ -4,9 +4,10 @@
  */
 package net.java.truevfs.ext.jmx;
 
+import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
-import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
+import net.java.truevfs.ext.jmx.stats.FsStatistics;
 import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 
 /**
@@ -18,8 +19,11 @@ import net.java.truevfs.ext.jmx.stats.SyncStatistics;
 final class JmxSyncStatisticsView
 extends JmxStatisticsView implements JmxSyncStatisticsMXBean {
 
+    private final JmxStatistics stats;
+
     JmxSyncStatisticsView(JmxStatistics stats) {
-        super(JmxSyncStatisticsMXBean.class, stats);
+        super(JmxSyncStatisticsMXBean.class, true);
+        this.stats = Objects.requireNonNull(stats);
     }
 
     @Override
@@ -28,18 +32,10 @@ extends JmxStatisticsView implements JmxSyncStatisticsMXBean {
     }
 
     @Override
-    protected String getDescription(final MBeanAttributeInfo info) {
-        switch (info.getName()) {
-        case "SyncNanosecondsPerOperation":
-            return "The average execution time per sync operation.";
-        case "SyncNanosecondsTotal":
-            return "The total execution time for sync operations.";
-        case "SyncOperations":
-            return "The total number of sync operations.";
-        default:
-            return super.getDescription(info);
-        }
-    }
+    FsStatistics getStats() { return stats.getStats(); }
+
+    @Override
+    public String getSubject() { return stats.getSubject(); }
 
     @Override
     public long getSyncNanosecondsPerOperation() {
@@ -56,8 +52,8 @@ extends JmxStatisticsView implements JmxSyncStatisticsMXBean {
         return getSyncStats().getSequenceNumber();
     }
 
-    //@Override
-    public JmxSyncStatisticsMXBean snapshot() {
-        return this;
+    @Override
+    public final void rotate() {
+        stats.rotate();
     }
 }

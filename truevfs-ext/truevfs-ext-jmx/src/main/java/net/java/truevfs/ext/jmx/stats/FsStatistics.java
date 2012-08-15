@@ -4,6 +4,9 @@
  */
 package net.java.truevfs.ext.jmx.stats;
 
+import java.beans.ConstructorProperties;
+import java.io.Serializable;
+import java.util.Objects;
 import javax.annotation.concurrent.Immutable;
 
 /**
@@ -12,7 +15,9 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class FsStatistics {
+public final class FsStatistics implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Returns file system statistics with all properties set to zero.
@@ -21,38 +26,37 @@ public final class FsStatistics {
      */
     public static FsStatistics create() {
         final IoStatistics io = IoStatistics.create();
-        return new FsStatistics(System.currentTimeMillis(),
-                io, io, SyncStatistics.create());
+        final SyncStatistics sync = SyncStatistics.create();
+        return new FsStatistics(System.currentTimeMillis(), io, io, sync);
     }
 
     private final long time;
     private final IoStatistics read, write;
     private final SyncStatistics sync;
 
-    private FsStatistics(
+    /** @deprecated Use {@link #create} instead. */
+    @Deprecated
+    @ConstructorProperties({ "timeMillis", "readStats", "writeStats", "syncStats" })
+    public FsStatistics(
             final long time,
             final IoStatistics read,
             final IoStatistics write,
             final SyncStatistics sync) {
-        assert 0 <= time;
-        assert null != read;
-        assert null != write;
-        assert null != sync;
-        this.time = time;
-        this.read = read;
-        this.write = write;
-        this.sync = sync;
+        if (0 > (this.time = time)) throw new IllegalArgumentException();
+        this.read = Objects.requireNonNull(read);
+        this.write = Objects.requireNonNull(write);
+        this.sync = Objects.requireNonNull(sync);
     }
 
     /**
-     * Returns the time these statistics have been originally created in
-     * milliseconds since the epoch.
-     * Note that this property is not altered when an operation gets logged.
+     * Returns the time these statistics have been created in milliseconds
+     * since the epoch.
+     * Note that this property remains unchanged when an operation gets logged.
      * 
-     * @return The time these statistics have been originally created in
-     *         milliseconds since the epoch.
+     * @return The time these statistics have been created in milliseconds
+     *         since the epoch.
      */
-    public long getTimeCreated() {
+    public long getTimeMillis() {
         return time;
     }
 
@@ -104,6 +108,27 @@ public final class FsStatistics {
      */
     public FsStatistics logSync(long nanos) {
         return new FsStatistics(time, read, write, sync.log(nanos));
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+        if (this == other) return true;
+        if (!(other instanceof FsStatistics)) return false;
+        final FsStatistics that = (FsStatistics) other;
+        return this.time == that.time
+                && this.read.equals(that.read)
+                && this.write.equals(that.write)
+                && this.sync.equals(that.sync);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 13 * hash + (int) (this.time ^ (this.time >>> 32));
+        hash = 13 * hash + Objects.hashCode(this.read);
+        hash = 13 * hash + Objects.hashCode(this.write);
+        hash = 13 * hash + Objects.hashCode(this.sync);
+        return hash;
     }
 
     /**

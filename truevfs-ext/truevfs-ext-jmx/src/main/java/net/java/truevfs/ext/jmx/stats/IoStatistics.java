@@ -4,6 +4,8 @@
  */
 package net.java.truevfs.ext.jmx.stats;
 
+import java.beans.ConstructorProperties;
+import java.io.Serializable;
 import java.math.BigInteger;
 import static java.math.BigInteger.TEN;
 import static java.math.BigInteger.valueOf;
@@ -15,7 +17,9 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class IoStatistics {
+public final class IoStatistics implements Serializable {
+
+    private static final long serialVersionUID = 1L;
     private static final BigInteger TEN_POW_NINE = TEN.pow(9);
     private static final BigInteger VALUE_OF_1024 = valueOf(1024);
 
@@ -28,26 +32,32 @@ public final class IoStatistics {
         return new IoStatistics(0, 0, 0); // cannot cache because of time!
     }
 
-    private final long time = System.currentTimeMillis();
-    private final long seqno;
-    private final long nanos, bytes;
+    private final long time, seqno, nanos, bytes;
 
-    private IoStatistics(final long seqno, final long nanos, final long bytes) {
-        if (0 > (seqno | nanos | bytes)) throw new ArithmeticException();
+    private IoStatistics(long seqno, long nanos, long bytes) {
+        this(System.currentTimeMillis(), seqno, nanos, bytes);
+    }
+
+    /** @deprecated Use {@link #create} instead. */
+    @Deprecated
+    @ConstructorProperties({ "timeMillis", "sequenceNumber", "nanosecondsTotal", "bytesTotal" })
+    public IoStatistics(final long time, final long seqno, final long nanos, final long bytes) {
+        if (0 > (time | seqno | nanos | bytes)) throw new IllegalArgumentException();
+        this.time = time;
         this.seqno = seqno;
         this.nanos = nanos;
         this.bytes = bytes;
     }
 
     /**
-     * Returns the time these statistics have been updated in milliseconds
+     * Returns the time these statistics have been created in milliseconds
      * since the epoch.
-     * Note that this property gets updated whenever an operation gets logged.
+     * Note that this property gets updated when an operation gets logged.
      * 
-     * @return The time these statistics have been updated in milliseconds
+     * @return The time these statistics have been created in milliseconds
      *         since the epoch.
      */
-    public long getTimeUpdated() {
+    public long getTimeMillis() {
         return time;
     }
 
@@ -106,9 +116,30 @@ public final class IoStatistics {
         if (0 > (nanos | bytes)) throw new IllegalArgumentException();
         try {
             return new IoStatistics(seqno + 1, this.nanos + nanos, this.bytes + bytes);
-        } catch (ArithmeticException overflow) {
+        } catch (IllegalArgumentException overflow) {
             return new IoStatistics(1, nanos, bytes);
         }
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+        if (this == other) return true;
+        if (!(other instanceof IoStatistics)) return false;
+        final IoStatistics that = (IoStatistics) other;
+        return this.time == that.time
+                && this.seqno == that.seqno
+                && this.nanos == that.nanos
+                && this.bytes == that.bytes;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 61 * hash + (int) (this.time ^ (this.time >>> 32));
+        hash = 61 * hash + (int) (this.seqno ^ (this.seqno >>> 32));
+        hash = 61 * hash + (int) (this.nanos ^ (this.nanos >>> 32));
+        hash = 61 * hash + (int) (this.bytes ^ (this.bytes >>> 32));
+        return hash;
     }
 
     /**

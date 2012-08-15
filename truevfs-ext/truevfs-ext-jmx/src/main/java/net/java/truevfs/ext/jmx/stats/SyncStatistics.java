@@ -4,12 +4,19 @@
  */
 package net.java.truevfs.ext.jmx.stats;
 
+import java.beans.ConstructorProperties;
+import java.io.Serializable;
+import javax.annotation.concurrent.Immutable;
+
 /**
- * Immutable statistics for file system sync operations.
+ * Immutable statistics for sync operations.
  * 
  * @author Christian Schlichtherle
  */
-public class SyncStatistics {
+@Immutable
+public final class SyncStatistics implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /**
      * Returns sync statistics with all properties set to zero.
@@ -20,12 +27,18 @@ public class SyncStatistics {
         return new SyncStatistics(0, 0); // cannot cache because of time!
     }
 
-    private final long time = System.currentTimeMillis();
-    private final long seqno;
-    private final long nanos;
-    
-    private SyncStatistics(final long seqno, final long nanos) {
-        if (0 > (seqno | nanos)) throw new ArithmeticException();
+    private final long time, seqno, nanos;
+
+    private SyncStatistics(long seqno, long nanos) {
+        this(System.currentTimeMillis(), seqno, nanos);
+    }
+
+    /** @deprecated Use {@link #create} instead. */
+    @Deprecated
+    @ConstructorProperties({ "timeMillis", "sequenceNumber", "nanosecondsTotal" })
+    public SyncStatistics(final long time, final long seqno, final long nanos) {
+        if (0 > (time | seqno | nanos)) throw new IllegalArgumentException();
+        this.time = time;
         this.seqno = seqno;
         this.nanos = nanos;
     }
@@ -33,6 +46,7 @@ public class SyncStatistics {
     /**
      * Returns the time these statistics have been created in milliseconds
      * since the epoch.
+     * Note that this property gets updated when an operation gets logged.
      * 
      * @return The time these statistics have been created in milliseconds
      *         since the epoch.
@@ -77,9 +91,28 @@ public class SyncStatistics {
         if (0 > nanos) throw new IllegalArgumentException();
         try {
             return new SyncStatistics(seqno + 1, this.nanos + nanos);
-        } catch (ArithmeticException overflow) {
+        } catch (IllegalArgumentException overflow) {
             return new SyncStatistics(1, nanos);
         }
+    }
+
+    @Override
+    public boolean equals(final Object other) {
+        if (this == other) return true;
+        if (!(other instanceof SyncStatistics)) return false;
+        final SyncStatistics that = (SyncStatistics) other;
+        return this.time == that.time
+                && this.seqno == that.seqno
+                && this.nanos == that.nanos;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 17 * hash + (int) (this.time ^ (this.time >>> 32));
+        hash = 17 * hash + (int) (this.seqno ^ (this.seqno >>> 32));
+        hash = 17 * hash + (int) (this.nanos ^ (this.nanos >>> 32));
+        return hash;
     }
 
     /**
