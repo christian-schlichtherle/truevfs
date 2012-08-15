@@ -38,21 +38,6 @@ extends JmxStatisticsView implements JmxSyncStatisticsMXBean {
     public String getSubject() { return stats.getSubject(); }
 
     @Override
-    public long getSyncNanosecondsPerOperation() {
-        return getSyncStats().getNanosecondsPerOperation();
-    }
-
-    @Override
-    public long getSyncNanosecondsTotal() {
-        return getSyncStats().getNanosecondsTotal();
-    }
-
-    @Override
-    public long getSyncOperations() {
-        return getSyncStats().getSequenceNumber();
-    }
-
-    @Override
     public final void rotate() {
         stats.rotate();
     }

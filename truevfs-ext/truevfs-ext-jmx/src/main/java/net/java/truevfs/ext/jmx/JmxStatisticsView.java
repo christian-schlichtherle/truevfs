@@ -40,6 +40,8 @@ abstract class JmxStatisticsView extends StandardMBean {
             return "The total execution time for read operations.";
         case "ReadOperations":
             return "The total number of read operations.";
+        case "ReadThreadsTotal":
+            return "The total number of reading threads.";
         case "Subject":
             return "The subject of this log.";
         case "SyncNanosecondsPerOperation":
@@ -48,6 +50,8 @@ abstract class JmxStatisticsView extends StandardMBean {
             return "The total execution time for sync operations.";
         case "SyncOperations":
             return "The total number of sync operations.";
+        case "SyncThreadsTotal":
+            return "The total number of syncing threads.";
         case "TimeCreatedDate":
             return "The time this log has been created.";
         case "TimeCreatedMillis":
@@ -68,6 +72,8 @@ abstract class JmxStatisticsView extends StandardMBean {
             return "The total execution time for write operations.";
         case "WriteOperations":
             return "The total number of write operations.";
+        case "WriteThreadsTotal":
+            return "The total number of writing threads.";
         default:
             return null;
         }
@@ -98,30 +104,50 @@ abstract class JmxStatisticsView extends StandardMBean {
     }
 
     public final int getReadBytesPerOperation() {
-        return getReadStats().getBytesPerOperation();
+        return getReadStats().bytesPerOperation();
     }
 
     public final long getReadBytesTotal() {
-        return getReadStats().getBytesTotal();
+        return getReadStats().bytesTotal();
     }
 
     public final long getReadKilobytesPerSecond() {
-        return getReadStats().getKilobytesPerSecond();
+        return getReadStats().kilobytesPerSecond();
     }
 
     public final long getReadNanosecondsPerOperation() {
-        return getReadStats().getNanosecondsPerOperation();
+        return getReadStats().nanosecondsPerOperation();
     }
 
     public final long getReadNanosecondsTotal() {
-        return getReadStats().getNanosecondsTotal();
+        return getReadStats().nanosecondsTotal();
     }
 
     public final long getReadOperations() {
-        return getReadStats().getSequenceNumber();
+        return getReadStats().sequenceNumber();
+    }
+
+    public int getReadThreadsTotal() {
+        return getReadStats().threadsTotal();
     }
 
     public abstract String getSubject();
+
+    public final long getSyncNanosecondsPerOperation() {
+        return getSyncStats().nanosecondsPerOperation();
+    }
+
+    public final long getSyncNanosecondsTotal() {
+        return getSyncStats().nanosecondsTotal();
+    }
+
+    public final long getSyncOperations() {
+        return getSyncStats().sequenceNumber();
+    }
+
+    public final int getSyncThreadsTotal() {
+        return getSyncStats().threadsTotal();
+    }
 
     public final String getTimeCreatedDate() {
         return new Date(getTimeCreatedMillis()).toString();
@@ -137,33 +163,39 @@ abstract class JmxStatisticsView extends StandardMBean {
 
     public final long getTimeUpdatedMillis() {
         return Math.max(
-                getReadStats().getTimeMillis(),
-                getWriteStats().getTimeMillis());
+                Math.max(
+                    getReadStats().timeMillis(),
+                    getWriteStats().timeMillis()),
+                getSyncStats().timeMillis());
     }
 
     public final int getWriteBytesPerOperation() {
-        return getWriteStats().getBytesPerOperation();
+        return getWriteStats().bytesPerOperation();
     }
 
     public final long getWriteBytesTotal() {
-        return getWriteStats().getBytesTotal();
+        return getWriteStats().bytesTotal();
     }
 
     public final long getWriteKilobytesPerSecond() {
-        return getWriteStats().getKilobytesPerSecond();
+        return getWriteStats().kilobytesPerSecond();
     }
 
     public final long getWriteNanosecondsPerOperation() {
-        return getWriteStats().getNanosecondsPerOperation();
+        return getWriteStats().nanosecondsPerOperation();
     }
 
     public final long getWriteNanosecondsTotal() {
-        return getWriteStats().getNanosecondsTotal();
+        return getWriteStats().nanosecondsTotal();
     }
 
     public final long getWriteOperations() {
-        return getWriteStats().getSequenceNumber();
+        return getWriteStats().sequenceNumber();
     }
-    
+
+    public int getWriteThreadsTotal() {
+        return getWriteStats().threadsTotal();
+    }
+
     public abstract void rotate();
 }

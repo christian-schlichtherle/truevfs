@@ -32,5 +32,9 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-comp-jmx</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+        </dependency>
     </dependencies>
 </project>
