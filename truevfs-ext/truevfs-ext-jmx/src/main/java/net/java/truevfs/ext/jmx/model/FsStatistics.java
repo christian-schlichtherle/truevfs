@@ -25,8 +25,8 @@ public final class FsStatistics implements Serializable {
      * @return File system statistics with all properties set to zero.
      */
     public static FsStatistics create() {
-        final IoStatistics io = IoStatistics.create();
-        final SyncStatistics sync = SyncStatistics.create();
+        final IoStatistics io = IoStatistics$.MODULE$.apply();
+        final SyncStatistics sync = SyncStatistics$.MODULE$.apply();
         return new FsStatistics(System.currentTimeMillis(), io, io, sync);
     }
 

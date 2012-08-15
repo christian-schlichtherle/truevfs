@@ -13,17 +13,25 @@ import java.beans._
 import java.io._
 import java.nio.charset._
 import net.java.truecommons.io.Loan._
+import org.slf4j.LoggerFactory
 
 /**
   * @author Christian Schlichtherle
   */
 @RunWith(classOf[JUnitRunner])
 class FsStatisticsSpec extends WordSpec with ShouldMatchers with PropertyChecks {
+  import FsStatisticsSpec._
+
+  val original = FsStatistics
+  .create
+  .logRead(1000*1000, 1024)
+  .logWrite(1000*1000, 1024)
+  .logSync(1000*1000*1000)
 
   "File system statics" should {
     "be serializable with Object(Out|In)putStream" in {
       def toArray(o: AnyRef) = {
-        val baos = new ByteArrayOutputStream(512)
+        val baos = new ByteArrayOutputStream(1024)
         loan (new ObjectOutputStream(baos)) to (_ writeObject o)
         baos.toByteArray
       }
@@ -33,31 +41,15 @@ class FsStatisticsSpec extends WordSpec with ShouldMatchers with PropertyChecks 
         .to(_ readObject)
       }
 
-      val original = FsStatistics.create()
       val array = toArray(original)
-      val clone = toObject(array)
-      clone should not be theSameInstanceAs (original)
-      clone should equal (original)
-    }
-
-    "be serializable with XML(En|De)coder" in {
-      def toArray(o: AnyRef) = {
-        val baos = new ByteArrayOutputStream(512)
-        loan (new XMLEncoder(baos)) to (_ writeObject o)
-        baos.toByteArray
-      }
-
-      def toObject(a: Array[Byte]) = {
-        loan (new XMLDecoder(new ByteArrayInputStream(a)))
-        .to(_ readObject)
-      }
-
-      val original = FsStatistics.create()
-      val array = toArray(original)
-      //println(new String(array, StandardCharsets.UTF_8))
+      logger.debug("Serialized byte stream length: {} bytes", array.length)
       val clone = toObject(array)
       clone should not be theSameInstanceAs (original)
       clone should equal (original)
     }
   }
+}
+
+object FsStatisticsSpec {
+  val logger = LoggerFactory.getLogger(classOf[FsStatisticsSpec])
 }
