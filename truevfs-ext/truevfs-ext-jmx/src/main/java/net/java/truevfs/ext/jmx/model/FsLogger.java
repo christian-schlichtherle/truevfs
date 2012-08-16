@@ -41,7 +41,7 @@ public final class FsLogger {
     public FsLogger(final int size) {
         final AtomicReferenceArray<FsStatistics> stats =
                 this.stats = new AtomicReferenceArray<>(size);
-        final FsStatistics fs = FsStatistics.create();
+        final FsStatistics fs = FsStatistics$.MODULE$.apply();
         for (int i = 0; i < size; i++) stats.set(i, fs);
     }
 
@@ -83,7 +83,7 @@ public final class FsLogger {
             final FsStatistics expected = current();
             final FsStatistics updated = expected.logRead(nanos, bytes);
             if (stats.weakCompareAndSet(position(), expected, updated))
-                return updated.getReadStats();
+                return updated.readStats();
         }
     }
 
@@ -103,7 +103,7 @@ public final class FsLogger {
             final FsStatistics expected = current();
             final FsStatistics updated = expected.logWrite(nanos, bytes);
             if (stats.weakCompareAndSet(position(), expected, updated))
-                return updated.getWriteStats();
+                return updated.writeStats();
         }
     }
 
@@ -122,13 +122,13 @@ public final class FsLogger {
             final FsStatistics expected = current();
             final FsStatistics updated = expected.logSync(nanos);
             if (stats.weakCompareAndSet(position(), expected, updated))
-                return updated.getSyncStats();
+                return updated.syncStats();
         }
     }
 
     public int rotate() {
         final int next = next();
-        stats.set(next, FsStatistics.create());
+        stats.set(next, FsStatistics$.MODULE$.apply());
         return next;
     }
 

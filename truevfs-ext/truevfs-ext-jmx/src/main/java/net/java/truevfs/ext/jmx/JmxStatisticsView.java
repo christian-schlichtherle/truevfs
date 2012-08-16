@@ -92,15 +92,15 @@ abstract class JmxStatisticsView extends StandardMBean {
     abstract FsStatistics getStats();
     
     final IoStatistics getReadStats() {
-        return getStats().getReadStats();
+        return getStats().readStats();
     }
 
     final IoStatistics getWriteStats() {
-        return getStats().getWriteStats();
+        return getStats().writeStats();
     }
 
     final SyncStatistics getSyncStats() {
-        return getStats().getSyncStats();
+        return getStats().syncStats();
     }
 
     public final int getReadBytesPerOperation() {
@@ -154,7 +154,7 @@ abstract class JmxStatisticsView extends StandardMBean {
     }
 
     public final long getTimeCreatedMillis() {
-        return getStats().getTimeMillis();
+        return getStats().timeMillis();
     }
 
     public final String getTimeUpdatedDate() {

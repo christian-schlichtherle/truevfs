@@ -22,11 +22,10 @@ import org.slf4j.LoggerFactory
 class FsStatisticsSpec extends WordSpec with ShouldMatchers with PropertyChecks {
   import FsStatisticsSpec._
 
-  val original = FsStatistics
-  .create
-  .logRead(1000*1000, 1024)
-  .logWrite(1000*1000, 1024)
-  .logSync(1000*1000*1000)
+  val original = FsStatistics()
+  .logRead(1000 * 1000, 1024)
+  .logWrite(1000 * 1000, 1024)
+  .logSync(1000 * 1000 * 1000)
 
   "File system statics" should {
     "be serializable with Object(Out|In)putStream" in {
