@@ -47,6 +47,12 @@ class FsLoggerSpec extends WordSpec with ShouldMatchers with PropertyChecks {
       }
     }
 
+    "formatting offsets" should {
+      "consider the size of the logger" in {
+        new FsLogger(100).format(0) should be ("00")
+      }
+    }
+
     "logging read operations" should {
       "reflect the update at the current position" in {
         val logger = create
