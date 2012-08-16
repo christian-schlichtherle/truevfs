@@ -10,7 +10,7 @@ About TrueVFS Extension
     The following sub-modules are available:
 
     * {{{./truevfs-ext-inst/index.html}TrueVFS Extension Instrumentation}}
-    * {{{./truevfs-ext-jmx-jul/index.html}TrueVFS Extension JMX/JUL}}
+    * {{{./truevfs-ext-insight-jul/index.html}TrueVFS Extension JMX/JUL}}
 
     []
 

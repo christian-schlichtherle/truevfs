@@ -26,8 +26,8 @@
     </description>
 
     <modules>
-        <module>truevfs-ext-jmx</module>
-        <module>truevfs-ext-log</module>
-        <module>truevfs-ext-pace</module>
+        <module>truevfs-ext-insight</module>
+        <module>truevfs-ext-logging</module>
+        <module>truevfs-ext-pacemanager</module>
     </modules>
 </project>

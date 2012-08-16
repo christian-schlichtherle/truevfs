@@ -38,30 +38,31 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- This runtime dependency adds some monitoring and management
-             for the TrueZIP Kernel. -->
+        <!-- This runtime dependency instruments the TrueVFS Kernel for
+             statistics monitoring via JMX. -->
         <!--dependency>
             <groupId>net.java.truevfs</groupId>
-            <artifactId>truevfs-ext-jmx</artifactId>
+            <artifactId>truevfs-ext-insight</artifactId>
             <version>${truevfs.version}</version>
             <scope>runtime</scope>
         </dependency-->
 
-        <!-- This runtime dependency adds some logging
-             for the TrueZIP Kernel. -->
+        <!-- This runtime dependency instruments the TrueVFS Kernel for
+             logging via SLF4J. -->
         <!--dependency>
             <groupId>net.java.truevfs</groupId>
-            <artifactId>truevfs-ext-log</artifactId>
+            <artifactId>truevfs-ext-logging</artifactId>
             <version>${truevfs.version}</version>
             <scope>runtime</scope>
         </dependency-->
 
         <!-- This runtime dependency constrains the number of concurrently
-             mounted archive file systems in the TrueZIP Kernel to save some
-             heap space. -->
+             mounted archive file systems in order to save some heap space.
+             This module provides a JMX interface for monitoring and
+             management. -->
         <!--dependency>
             <groupId>net.java.truevfs</groupId>
-            <artifactId>truevfs-ext-pace</artifactId>
+            <artifactId>truevfs-ext-pacemanager</artifactId>
             <version>${truevfs.version}</version>
             <scope>runtime</scope>
         </dependency-->
