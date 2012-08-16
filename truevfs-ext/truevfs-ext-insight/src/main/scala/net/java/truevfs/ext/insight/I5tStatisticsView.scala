@@ -4,11 +4,9 @@
  */
 package net.java.truevfs.ext.insight
 
-import java.util._
 import javax.annotation.concurrent._
 import javax.management._
 import net.java.truevfs.ext.insight.stats._
-import scala.math._
 
 /**
   * A view for [[net.java.truevfs.ext.insight.stats.FsStatistics]].
@@ -17,7 +15,7 @@ import scala.math._
   */
 @ThreadSafe
 private abstract class I5tStatisticsView(tµpe: Class[_], isMXBean: Boolean)
-extends StandardMBean(tµpe, isMXBean) {
+extends StandardMBean(tµpe, isMXBean) with FsStatisticsAspect {
 
   protected override def getDescription(info: MBeanAttributeInfo) = {
     info.getName match {
@@ -81,38 +79,7 @@ extends StandardMBean(tµpe, isMXBean) {
     }
   }
 
-  def stats: FsStatistics
-
-  final def readStats = stats.readStats
-  final def writeStats = stats.writeStats
-  final def syncStats = stats.syncStats
-
-  final def getReadBytesPerOperation = readStats.bytesPerOperation
-  final def getReadBytesTotal = readStats.bytesTotal
-  final def getReadKilobytesPerSecond = readStats.kilobytesPerSecond
-  final def getReadNanosecondsPerOperation = readStats.nanosecondsPerOperation
-  final def getReadNanosecondsTotal = readStats.nanosecondsTotal
-  final def getReadOperations = readStats.sequenceNumber
-  final def getReadThreadsTotal = readStats.threadsTotal
-
   def getSubject: String
-
-  final def getSyncNanosecondsPerOperation = syncStats.nanosecondsPerOperation
-  final def getSyncNanosecondsTotal = syncStats.nanosecondsTotal
-  final def getSyncOperations = syncStats.sequenceNumber
-  final def getSyncThreadsTotal = syncStats.threadsTotal
-  final def getTimeCreatedDate = new Date(getTimeCreatedMillis).toString
-  final def getTimeCreatedMillis = stats.timeMillis
-  final def getTimeUpdatedDate = new Date(getTimeUpdatedMillis).toString
-  final def getTimeUpdatedMillis =
-    max(max(readStats.timeMillis, writeStats.timeMillis), syncStats.timeMillis)
-  final def getWriteBytesPerOperation = writeStats.bytesPerOperation
-  final def getWriteBytesTotal = writeStats.bytesTotal
-  final def getWriteKilobytesPerSecond = writeStats.kilobytesPerSecond
-  final def getWriteNanosecondsPerOperation = writeStats.nanosecondsPerOperation
-  final def getWriteNanosecondsTotal = writeStats.nanosecondsTotal
-  final def getWriteOperations = writeStats.sequenceNumber
-  final def getWriteThreadsTotal = writeStats.threadsTotal
 
   def rotate()
 }
