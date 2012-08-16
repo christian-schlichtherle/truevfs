@@ -4,12 +4,6 @@
  */
 package net.java.truevfs.ext.jmx.model
 
-import java.beans._
-import java.io._
-import java.math._
-import javax.annotation.concurrent._
-import scala.reflect._
-
 /**
   * Immutable statistics for I/O operations.
   * 
@@ -18,11 +12,11 @@ import scala.reflect._
   * @author Christian Schlichtherle
   */
 final case class IoStatistics private (
-  sequenceNumber: Long = 0,
-  nanosecondsTotal: Long = 0,
-  bytesTotal: Long = 0,
+  sequenceNumber: Long,
+  nanosecondsTotal: Long,
+  bytesTotal: Long,
   timeMillis: Long = System.currentTimeMillis
-) (implicit threads: Set[Long] = Set(hash(Thread.currentThread))) {
+) (threads: Set[Long]) {
   require(0 <= (sequenceNumber | nanosecondsTotal | bytesTotal | timeMillis))
   require(null ne threads)
 
@@ -65,7 +59,7 @@ final case class IoStatistics private (
                        bytesTotal + bytes)(threads + hash(Thread.currentThread))
     } catch {
       case _: IllegalArgumentException =>
-        new IoStatistics(1, nanoseconds, bytes)
+        new IoStatistics(1, nanoseconds, bytes)(Set(hash(Thread.currentThread)))
     }
   }
 }
