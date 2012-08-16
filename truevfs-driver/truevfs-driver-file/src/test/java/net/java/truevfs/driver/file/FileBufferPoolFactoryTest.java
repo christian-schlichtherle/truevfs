@@ -10,7 +10,7 @@ import org.junit.Test;
 /**
  * @author Christian Schlichtherle
  */
-public final class FileIoBufferPoolFactoryTest {
+public class FileBufferPoolFactoryTest {
     @Test
     public void testPriority() {
         assertEquals(0, new FileBufferPoolFactory().getPriority());
