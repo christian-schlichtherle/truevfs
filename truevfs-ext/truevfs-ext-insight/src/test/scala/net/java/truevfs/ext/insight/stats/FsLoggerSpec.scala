@@ -56,7 +56,7 @@ class FsLoggerSpec extends WordSpec with ShouldMatchers with PropertyChecks {
     "logging read operations" should {
       "reflect the update at the current position" in {
         val logger = create
-        val expected = logger.current logRead (nanos, bytes)
+        val expected = logger.current logRead (nanos, bytes, 1)
         Thread sleep 1
         val readStats = logger logRead (nanos, bytes)
         val current = logger.current
@@ -71,7 +71,7 @@ class FsLoggerSpec extends WordSpec with ShouldMatchers with PropertyChecks {
     "logging write operations" should {
       "reflect the update at the current position" in {
         val logger = create
-        val expected = logger.current logWrite (nanos, bytes)
+        val expected = logger.current logWrite (nanos, bytes, 1)
         Thread sleep 1
         val writeStats = logger logWrite (nanos, bytes)
         val current = logger.current
@@ -86,7 +86,7 @@ class FsLoggerSpec extends WordSpec with ShouldMatchers with PropertyChecks {
     "logging sync operations" should {
       "reflect the update at the current position" in {
         val logger = create
-        val expected = logger.current logSync nanos
+        val expected = logger.current logSync (nanos, 1)
         Thread sleep 1
         val syncStats = logger logSync nanos
         val current = logger.current
