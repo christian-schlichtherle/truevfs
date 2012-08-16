@@ -12,5 +12,5 @@ import net.java.truevfs.kernel.spec.spi._
   */
 @deprecated("This class is reserved for exclusive use by the [[net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator.SINGLETON]]!", "1")
 final class I5tBufferPoolDecorator extends IoBufferPoolDecorator {
-  override def apply(pool: IoBufferPool) = I5tMediator.get.instrument(pool)
+  override def apply(pool: IoBufferPool): IoBufferPool = I5tMediator().instrument(pool)
 }
