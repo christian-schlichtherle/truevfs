@@ -4,9 +4,9 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import static net.java.truevfs.kernel.spec.FsAccessOption.*;
-import net.java.truecommons.shed.BitField;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.BitField;
+import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 
 /**
  * Provides common bit fields of access options for I/O operations.
