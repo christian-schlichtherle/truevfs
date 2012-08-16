@@ -8,9 +8,9 @@ import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.spi._
 
 /**
- * @author Christian Schlichtherle
- */
+  * @author Christian Schlichtherle
+  */
 @deprecated("This class is reserved for exclusive use by the [[net.java.truevfs.kernel.spec.sl.FsManagerLocator.SINGLETON]]!", "1")
 final class I5tManagerDecorator extends FsManagerDecorator {
-  def apply(manager: FsManager) = I5tMediator.get.instrument(manager)
+  def apply(manager: FsManager): FsManager = I5tMediator().instrument(manager)
 }
