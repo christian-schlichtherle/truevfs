@@ -15,7 +15,7 @@ import net.java.truevfs.ext.insight.stats._
   */
 @ThreadSafe
 private abstract class I5tStatisticsView(tµpe: Class[_], isMXBean: Boolean)
-extends StandardMBean(tµpe, isMXBean) with FsStatisticsAspect {
+extends StandardMBean(tµpe, isMXBean) with FsStatisticsView {
 
   protected override def getDescription(info: MBeanAttributeInfo) = {
     info.getName match {

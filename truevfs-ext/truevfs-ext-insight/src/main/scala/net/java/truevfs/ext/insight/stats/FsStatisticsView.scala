@@ -10,7 +10,7 @@ import scala.math._
 /**
  * @author Christian Schlichtherle
  */
-trait FsStatisticsAspect {
+trait FsStatisticsView {
 
   def stats: FsStatistics
 
