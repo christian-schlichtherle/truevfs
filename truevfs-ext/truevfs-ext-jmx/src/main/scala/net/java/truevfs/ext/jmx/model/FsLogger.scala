@@ -134,9 +134,10 @@ object FsLogger {
   )
 
   private def length(x: Int) = {
-    assert(0 >= x)
+    assert(0 <= x)
     var i = 0
-    while (x > maxValues(i)) i += 1
+    while (x > maxValues{ val j = i; i += 1; j }) {
+    }
     i
   }
 }
