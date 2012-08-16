@@ -10,7 +10,7 @@ import net.java.truevfs.kernel.spec.spi.FsDriverMapModifierTestSuite;
 /**
  * @author Christian Schlichtherle
  */
-public final class FileDriverMapModifierTest
+public class FileDriverMapModifierTest
 extends FsDriverMapModifierTestSuite {
     @Override
     protected String getExtensions() {

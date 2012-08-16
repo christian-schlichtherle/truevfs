@@ -11,7 +11,7 @@ import org.junit.Test;
 /**
  * @author Christian Schlichtherle
  */
-public final class IoBufferPoolLocatorTest {
+public class IoBufferPoolLocatorTest {
     @Test
     public void testIoPool() {
         assertTrue(IoBufferPoolLocator.SINGLETON.get() instanceof FileBufferPool);
