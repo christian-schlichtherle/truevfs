@@ -5,7 +5,7 @@
 package net.java.truevfs.ext.jmx.model
 
 /**
-  * Immutable statistics for file system operations.
+  * An immutable record of statistics for file system operations.
   * 
   * @throws IllegalArgumentException if any parameter value is negative.
   * @author Christian Schlichtherle
@@ -58,6 +58,11 @@ final case class FsStatistics private (
   @throws(classOf[IllegalArgumentException])
   def logSync(nanos: Long) =
     new FsStatistics(readStats, writeStats, syncStats.log(nanos), timeMillis)
+
+  def equalsIgnoreTime(that: FsStatistics) =
+    this.readStats.equalsIgnoreTime(that.readStats) &&
+      this.writeStats.equalsIgnoreTime(that.writeStats) &&
+      this.syncStats.equalsIgnoreTime(that.syncStats)
 }
 
 object FsStatistics {

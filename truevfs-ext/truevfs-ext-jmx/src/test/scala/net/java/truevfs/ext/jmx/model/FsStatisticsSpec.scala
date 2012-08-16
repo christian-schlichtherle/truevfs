@@ -9,9 +9,7 @@ import org.scalatest.junit._
 import org.scalatest.matchers._
 import org.scalatest.prop._
 import org.scalatest._
-import java.beans._
 import java.io._
-import java.nio.charset._
 import net.java.truecommons.io.Loan._
 import org.slf4j.LoggerFactory
 

@@ -5,7 +5,7 @@
 package net.java.truevfs.ext.jmx.model
 
 /**
-  * Immutable statistics for I/O operations.
+  * An immutable record of statistics for I/O operations.
   * 
   * @param  sequenceNumber the non-negative sequence number.
   * @throws IllegalArgumentException if any parameter value is negative.
@@ -15,20 +15,21 @@ final case class IoStatistics private (
   sequenceNumber: Long,
   nanosecondsTotal: Long,
   bytesTotal: Long,
+  threads: Set[Long],
   timeMillis: Long = System.currentTimeMillis
-) (threads: Set[Long]) {
+) {
   require(0 <= (sequenceNumber | nanosecondsTotal | bytesTotal | timeMillis))
   require(null ne threads)
 
   def nanosecondsPerOperation =
-    if (0 == sequenceNumber) 0 else nanosecondsTotal / sequenceNumber
+    if (0 == sequenceNumber) 0L else nanosecondsTotal / sequenceNumber
 
   def bytesPerOperation =
     if (0 == sequenceNumber) 0 else (bytesTotal / sequenceNumber).toInt
 
   def kilobytesPerSecond = {
     import IoStatistics._
-    if (0 == nanosecondsTotal) 0
+    if (0 == nanosecondsTotal) 0L
     else (BigInt(bytesTotal) * tenPowNine /
           (BigInt(nanosecondsTotal) * oneK)).toLong
   }
@@ -44,24 +45,31 @@ final case class IoStatistics private (
     * the given parameter values at the current system time.
     * In other words, the statistics would restart from fresh.
     * 
-    * @param  nanoseconds the execution time.
+    * @param  nanos the execution time.
     * @param  bytes the number of bytes read or written.
     * @return A new object which reflects the updated statistics at the
     *         current system time.
     * @throws IllegalArgumentException if any parameter value is negative.
     */
   @throws(classOf[IllegalArgumentException])
-  def log(nanoseconds: Long, bytes: Long) = {
-    require(0 <= (nanoseconds | bytes))
+  def log(nanos: Long, bytes: Long) = {
+    require(0 <= (nanos | bytes))
     try {
       new IoStatistics(sequenceNumber + 1,
-                       nanosecondsTotal + nanoseconds,
-                       bytesTotal + bytes)(threads + hash(Thread.currentThread))
+                       nanosecondsTotal + nanos,
+                       bytesTotal + bytes,
+                       threads + hash(Thread.currentThread))
     } catch {
       case _: IllegalArgumentException =>
-        new IoStatistics(1, nanoseconds, bytes)(Set(hash(Thread.currentThread)))
+        new IoStatistics(1, nanos, bytes, Set(hash(Thread.currentThread)))
     }
   }
+
+  def equalsIgnoreTime(that: IoStatistics) =
+    this.sequenceNumber == that.sequenceNumber &&
+      this.nanosecondsTotal == that.nanosecondsTotal &&
+      this.bytesTotal == that.bytesTotal &&
+      this.threads == that.threads
 }
 
 object IoStatistics {
@@ -69,5 +77,5 @@ object IoStatistics {
   private val oneK = BigInt(1024)
 
   /** Returns I/O statistics with all properties set to zero. */
-  def apply() = new IoStatistics(0, 0, 0)(Set()) // cannot cache because of timeMillis!
+  def apply() = new IoStatistics(0, 0, 0, Set()) // cannot cache because of timeMillis!
 }
