@@ -5,6 +5,8 @@
 package net.java.truevfs.ext.jmx
 
 /**
+  * Provides file system statistics for the TrueVFS Kernel.
+  * 
   * @author Christian Schlichtherle
   */
 package object model {
