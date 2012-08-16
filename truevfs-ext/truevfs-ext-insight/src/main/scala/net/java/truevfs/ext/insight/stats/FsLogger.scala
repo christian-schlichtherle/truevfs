@@ -8,7 +8,7 @@ import java.util.concurrent.atomic._
 import javax.annotation.concurrent._
 
 /**
- * A lock-free logger for [[net.java.truevfs.ext.jmx.model.FsStatistics]]
+ * A lock-free logger for [[net.java.truevfs.ext.insight.stats.FsStatistics]]
  * All operations get logged at offset zero.
  *
  * @author Christian Schlichtherle
