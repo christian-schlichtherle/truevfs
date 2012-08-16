@@ -46,7 +46,6 @@ extends net.java.truevfs.comp.jmx.JmxMediator<JmxMediator> {
 
     JmxMediator(final String subject) {
         this.subject = Objects.requireNonNull(subject);
-        assert null != logger;
     }
 
     String getSubject() { return subject; }
