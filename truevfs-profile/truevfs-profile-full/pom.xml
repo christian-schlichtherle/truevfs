@@ -36,17 +36,17 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-ext-jmx</artifactId>
+            <artifactId>truevfs-ext-insight</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-ext-log</artifactId>
+            <artifactId>truevfs-ext-logging</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-ext-pace</artifactId>
+            <artifactId>truevfs-ext-pacemanager</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
