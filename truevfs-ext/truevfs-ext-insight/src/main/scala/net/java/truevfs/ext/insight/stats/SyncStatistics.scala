@@ -14,16 +14,13 @@ package net.java.truevfs.ext.insight.stats
 final case class SyncStatistics private (
   sequenceNumber: Long,
   nanosecondsTotal: Long,
-  threads: Set[Long],
+  threadsTotal: Int,
   timeMillis: Long = System.currentTimeMillis
 ) {
-  require(0 <= (sequenceNumber | nanosecondsTotal | timeMillis))
-  require(null ne threads)
+  require(0 <= (sequenceNumber | nanosecondsTotal | threadsTotal | timeMillis))
 
   def nanosecondsPerOperation =
     if (0 == sequenceNumber) 0L else nanosecondsTotal / sequenceNumber
-
-  def threadsTotal = threads.size
 
   /**
     * Logs a sync operation with the given sample data and returns a new
@@ -34,31 +31,31 @@ final case class SyncStatistics private (
     * the given parameter values at the current system time.
     * In other words, the statistics would restart from fresh.
     * 
-    * @param  nanos the execution time.
+    * @param  nanosDelta the execution time.
     * @return A new object which reflects the updated statistics at the
     *         current system time.
     * @throws IllegalArgumentException if any parameter value is negative.
     */
   @throws(classOf[IllegalArgumentException])
-  def log(nanos: Long) = {
-    require(0 <= nanos)
+  def log(nanosDelta: Long, threadsTotal: Int) = {
+    require(0 <= (nanosDelta | threadsTotal))
     try {
       new SyncStatistics(sequenceNumber + 1,
-                         nanosecondsTotal + nanos,
-                         threads + hash(Thread.currentThread))
+                         nanosecondsTotal + nanosDelta,
+                         threadsTotal)
     } catch {
       case _: IllegalArgumentException =>
-        new SyncStatistics(1, nanos, Set(hash(Thread.currentThread)))
+        new SyncStatistics(1, nanosDelta, 1)
     }
   }
 
   def equalsIgnoreTime(that: SyncStatistics) =
     this.sequenceNumber == that.sequenceNumber &&
       this.nanosecondsTotal == that.nanosecondsTotal &&
-      this.threads == that.threads
+      this.threadsTotal == that.threadsTotal
 }
 
 object SyncStatistics {
   /** Returns sync statistics with all properties set to zero. */
-  def apply() = new SyncStatistics(0, 0, Set()) // cannot cache because of timeMillis!
+  def apply() = new SyncStatistics(0, 0, 0) // cannot cache because of timeMillis!
 }

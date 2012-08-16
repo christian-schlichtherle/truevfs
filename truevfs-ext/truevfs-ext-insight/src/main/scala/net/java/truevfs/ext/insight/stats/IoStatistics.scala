@@ -15,11 +15,10 @@ final case class IoStatistics private (
   sequenceNumber: Long,
   nanosecondsTotal: Long,
   bytesTotal: Long,
-  threads: Set[Long],
+  threadsTotal: Int,
   timeMillis: Long = System.currentTimeMillis
 ) {
-  require(0 <= (sequenceNumber | nanosecondsTotal | bytesTotal | timeMillis))
-  require(null ne threads)
+  require(0 <= (sequenceNumber | nanosecondsTotal | bytesTotal | threadsTotal | timeMillis))
 
   def nanosecondsPerOperation =
     if (0 == sequenceNumber) 0L else nanosecondsTotal / sequenceNumber
@@ -34,8 +33,6 @@ final case class IoStatistics private (
           (BigInt(nanosecondsTotal) * oneK)).toLong
   }
 
-  def threadsTotal = threads.size
-
   /**
     * Logs an I/O operation with the given sample data and returns a new
     * object to reflect the updated statistics at the current system time.
@@ -45,23 +42,23 @@ final case class IoStatistics private (
     * the given parameter values at the current system time.
     * In other words, the statistics would restart from fresh.
     * 
-    * @param  nanos the execution time.
-    * @param  bytes the number of bytes read or written.
+    * @param  nanosDelta the execution time.
+    * @param  bytesDelta the number of bytes read or written.
     * @return A new object which reflects the updated statistics at the
     *         current system time.
     * @throws IllegalArgumentException if any parameter value is negative.
     */
   @throws(classOf[IllegalArgumentException])
-  def log(nanos: Long, bytes: Long) = {
-    require(0 <= (nanos | bytes))
+  def log(nanosDelta: Long, bytesDelta: Long, threadsTotal: Int) = {
+    require(0 <= (nanosDelta | bytesDelta | threadsTotal))
     try {
       new IoStatistics(sequenceNumber + 1,
-                       nanosecondsTotal + nanos,
-                       bytesTotal + bytes,
-                       threads + hash(Thread.currentThread))
+                       nanosecondsTotal + nanosDelta,
+                       bytesTotal + bytesDelta,
+                       threadsTotal)
     } catch {
       case _: IllegalArgumentException =>
-        new IoStatistics(1, nanos, bytes, Set(hash(Thread.currentThread)))
+        new IoStatistics(1, nanosDelta, bytesDelta, 1)
     }
   }
 
@@ -69,7 +66,7 @@ final case class IoStatistics private (
     this.sequenceNumber == that.sequenceNumber &&
       this.nanosecondsTotal == that.nanosecondsTotal &&
       this.bytesTotal == that.bytesTotal &&
-      this.threads == that.threads
+      this.threadsTotal == that.threadsTotal
 }
 
 object IoStatistics {
@@ -77,5 +74,5 @@ object IoStatistics {
   private val oneK = BigInt(1024)
 
   /** Returns I/O statistics with all properties set to zero. */
-  def apply() = new IoStatistics(0, 0, 0, Set()) // cannot cache because of timeMillis!
+  def apply() = new IoStatistics(0, 0, 0, 0) // cannot cache because of timeMillis!
 }

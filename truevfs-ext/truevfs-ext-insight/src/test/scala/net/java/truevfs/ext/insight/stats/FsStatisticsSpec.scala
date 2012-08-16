@@ -21,9 +21,9 @@ class FsStatisticsSpec extends WordSpec with ShouldMatchers with PropertyChecks 
   import FsStatisticsSpec._
 
   val original = FsStatistics()
-  .logRead(1000 * 1000, 1024)
-  .logWrite(1000 * 1000, 1024)
-  .logSync(1000 * 1000 * 1000)
+  .logRead(1000 * 1000, 1024, 1)
+  .logWrite(1000 * 1000, 1024, 1)
+  .logSync(1000 * 1000 * 1000, 1)
 
   "File system statics" should {
     "be serializable with Object(Out|In)putStream" in {

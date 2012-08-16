@@ -6,6 +6,7 @@ package net.java.truevfs.ext.insight.stats
 
 import java.util.concurrent.atomic._
 import javax.annotation.concurrent._
+import FsLogger._
 
 /**
  * A lock-free logger for [[net.java.truevfs.ext.insight.stats.FsStatistics]]
@@ -16,14 +17,17 @@ import javax.annotation.concurrent._
 @ThreadSafe
 final class FsLogger(val size: Int) {
 
+  def this() = this(defaultSize)
+
   private[this] val _position = new AtomicInteger
   private[this] val _stats = {
     val s = new AtomicReferenceArray[FsStatistics](size)
     for (i <- 0 until size) s.set(i, FsStatistics())
     s
   }
-
-  def this() = this(FsLogger.defaultSize)
+  private[this] val readThreads = collection.mutable.Set[Long]()
+  private[this] val writeThreads = collection.mutable.Set[Long]()
+  private[this] val syncThreads = collection.mutable.Set[Long]()
 
   private def position = _position.get
 
@@ -37,11 +41,10 @@ final class FsLogger(val size: Int) {
   def format(offset: Int) = {
     val max = size - 1
     if (offset < 0 || max < offset) throw new IllegalArgumentException
-    "%%0%dd".format(FsLogger.length(max)).format(offset)
+    "%%0%dd".format(length(max)).format(offset)
   }
 
   def stats(offset: Int) = _stats.get(index(offset))
-
   def current = stats(0)
 
   /**
@@ -56,10 +59,11 @@ final class FsLogger(val size: Int) {
     * @throws IllegalArgumentException if any parameter value is negative.
     */
   def logRead(nanos: Long, bytes: Int): IoStatistics = {
+    readThreads += hash(Thread.currentThread)
     while (true) {
       val expected = current
-      val updated = expected.logRead(nanos, bytes)
-      if (_stats.weakCompareAndSet(position, expected, updated))
+      val updated = expected logRead (nanos, bytes, readThreads.size)
+      if (_stats weakCompareAndSet (position, expected, updated))
         return updated.readStats
     }
     throw new AssertionError
@@ -77,10 +81,11 @@ final class FsLogger(val size: Int) {
    * @throws IllegalArgumentException if any parameter is negative.
    */
   def logWrite(nanos: Long, bytes: Int): IoStatistics = {
+    writeThreads += hash(Thread.currentThread)
     while (true) {
       val expected = current
-      val updated = expected.logWrite(nanos, bytes)
-      if (_stats.weakCompareAndSet(position, expected, updated))
+      val updated = expected logWrite (nanos, bytes, writeThreads.size)
+      if (_stats weakCompareAndSet (position, expected, updated))
         return updated.writeStats
     }
     throw new AssertionError
@@ -97,10 +102,11 @@ final class FsLogger(val size: Int) {
    * @throws IllegalArgumentException if any parameter value is negative.
    */
   def logSync(nanos: Long): SyncStatistics = {
+    syncThreads += hash(Thread.currentThread)
     while (true) {
       val expected = current
-      val updated = expected.logSync(nanos)
-      if (_stats.weakCompareAndSet(position, expected, updated))
+      val updated = expected logSync (nanos, syncThreads.size)
+      if (_stats weakCompareAndSet (position, expected, updated))
         return updated.syncStats
     }
     throw new AssertionError
@@ -109,6 +115,9 @@ final class FsLogger(val size: Int) {
   def rotate() = {
     val n = next()
     _stats.set(n, FsStatistics())
+    readThreads clear ()
+    writeThreads clear ()
+    syncThreads clear ()
     n
   }
 
@@ -126,9 +135,9 @@ final class FsLogger(val size: Int) {
 @ThreadSafe
 object FsLogger {
 
-  private val defaultSizePropertyKey = classOf[FsLogger].getName + ".defaultSize"
+  private[this] val defaultSizePropertyKey = classOf[FsLogger].getName + ".defaultSize"
   private val defaultSize = Integer.getInteger(defaultSizePropertyKey, 10)
-  private val maxValues = Array(
+  private[this] val maxValues = Array(
     9, 99, 999, 9999, 99999, 999999, 9999999, 99999999, 999999999,
     Integer.MAX_VALUE
   )
@@ -139,5 +148,12 @@ object FsLogger {
     while (x > maxValues{ val j = i; i += 1; j }) {
     }
     i
+  }
+
+  private def hash(thread: Thread) = {
+    var hash = 17L;
+    hash = 31 * hash + System.identityHashCode(thread)
+    hash = 31 * hash + thread.getId
+    hash
   }
 }
