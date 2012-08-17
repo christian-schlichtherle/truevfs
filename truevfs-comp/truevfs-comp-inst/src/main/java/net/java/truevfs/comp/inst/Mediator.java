@@ -4,15 +4,16 @@
  */
 package net.java.truevfs.comp.inst;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.channels.SeekableByteChannel;
-import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsMetaDriver;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.cio.*;
+
+import javax.annotation.concurrent.Immutable;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
 
 /**
  * Implements the mediator role of the mediator pattern for instrumenting all
@@ -30,241 +31,233 @@ import net.java.truevfs.kernel.spec.cio.*;
 public abstract class Mediator<This extends Mediator<This>> {
 
     /**
-     * Instruments the given {@code object}.
+     * Instruments the given {@code subject}.
      * 
-     * @param  object the object to instrument.
-     * @return An instrumenting object or {@code object} if the implementation
+     * @param  subject the object to instrument.
+     * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      */
-    public FsManager instrument(FsManager object) {
-        return object;
+    public FsManager instrument(FsManager subject) {
+        return subject;
     }
 
     /**
-     * Instruments the given {@code object}.
+     * Instruments the given {@code subject}.
      * 
-     * @param  object the object to instrument.
-     * @return An instrumenting object or {@code object} if the implementation
+     * @param  subject the object to instrument.
+     * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      */
-    public IoBufferPool instrument(IoBufferPool object) {
-        return object;
+    public IoBufferPool instrument(IoBufferPool subject) {
+        return subject;
     }
 
     /**
-     * Instruments the given {@code object}.
+     * Instruments the given {@code subject}.
      * 
      * @param  origin the instrumenting object which called this method.
-     * @param  object the object to instrument.
-     * @return An instrumenting object or {@code object} if the implementation
+     * @param  subject the object to instrument.
+     * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(FsManager)
      */
     public FsMetaDriver instrument(
             InstrumentingManager<This> origin,
-            FsMetaDriver object) {
-        return object;
+            FsMetaDriver subject) {
+        return subject;
     }
 
     /**
-     * Instruments the given {@code object}.
+     * Instruments the given {@code subject}.
      * 
      * @param  origin the instrumenting object which called this method.
-     * @param  object the object to instrument.
-     * @return An instrumenting object or {@code object} if the implementation
+     * @param  subject the object to instrument.
+     * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(FsManager)
      */
     public FsController instrument(
             InstrumentingManager<This> origin,
-            FsController object) {
-        return object;
+            FsController subject) {
+        return subject;
     }
 
     /**
-     * Instruments the given {@code object}.
+     * Instruments the given {@code subject}.
      * 
      * @param  origin the instrumenting object which called this method.
-     * @param  object the object to instrument.
-     * @return An instrumenting object or {@code object} if the implementation
+     * @param  subject the object to instrument.
+     * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(IoBufferPool)
      */
     public IoBuffer instrument(
             InstrumentingBufferPool<This> origin,
-            IoBuffer object) {
-        return object;
+            IoBuffer subject) {
+        return subject;
     }
 
     /**
-     * Instruments the given {@code object}.
+     * Instruments the given {@code subject}.
      * 
      * @param  origin the instrumenting object which called this method.
-     * @param  object the object to instrument.
-     * @return An instrumenting object or {@code object} if the implementation
+     * @param  subject the object to instrument.
+     * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingManager, FsMetaDriver)
      */
     public FsModel instrument(
             InstrumentingMetaDriver<This> origin,
-            FsModel object) {
-        return object;
+            FsModel subject) {
+        return subject;
     }
 
     /**
-     * Instruments the given {@code object}.
+     * Instruments the given {@code subject}.
      * 
      * @param  origin the instrumenting object which called this method.
-     * @param  object the object to instrument.
-     * @return An instrumenting object or {@code object} if the implementation
+     * @param  subject the object to instrument.
+     * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingManager, FsMetaDriver)
      */
     public FsController instrument(
             InstrumentingMetaDriver<This> origin,
-            FsController object) {
-        return object;
+            FsController subject) {
+        return subject;
     }
 
     /**
-     * Instruments the given {@code object}.
+     * Instruments the given {@code subject}.
      * 
-     * @param  <E> the type of the {@linkplain #target() target entry} for I/O
-     *         operations.
+     * @param  <E> the type of the target entry for I/O operations.
      * @param  origin the instrumenting object which called this method.
-     * @param  object the object to instrument.
-     * @return An instrumenting object or {@code object} if the implementation
+     * @param  subject the object to instrument.
+     * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingManager, FsController)
      * @see    #instrument(InstrumentingMetaDriver, FsController)
      */
     public <E extends Entry> InputSocket<E> instrument(
             InstrumentingController<This> origin,
-            InputSocket<E> object) {
-        return object;
+            InputSocket<E> subject) {
+        return subject;
     }
 
     /**
-     * Instruments the given {@code object}.
-     * 
-     * @param  <E> the type of the {@linkplain #target() target entry} for I/O
-     *         operations.
+     * Instruments the given {@code subject}.
+     *
+     * @param  <E> the type of the target entry for I/O operations.
      * @param  origin the instrumenting object which called this method.
-     * @param  object the object to instrument.
-     * @return An instrumenting object or {@code object} if the implementation
+     * @param  subject the object to instrument.
+     * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingManager, FsController)
      * @see    #instrument(InstrumentingMetaDriver, FsController)
      */
     public <E extends Entry> OutputSocket<E> instrument(
             InstrumentingController<This> origin,
-            OutputSocket<E> object) {
-        return object;
+            OutputSocket<E> subject) {
+        return subject;
     }
 
     /**
-     * Instruments the given {@code object}.
-     * 
-     * @param  <B> the type of the {@linkplain #target() target entry} for I/O
-     *         operations.
+     * Instruments the given {@code subject}.
+     *
+     * @param  <B> the type of the target entry for I/O operations.
      * @param  origin the instrumenting object which called this method.
-     * @param  object the object to instrument.
-     * @return An instrumenting object or {@code object} if the implementation
+     * @param  subject the object to instrument.
+     * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingBufferPool, IoBuffer)
      */
     public <B extends IoBuffer> InputSocket<B> instrument(
             InstrumentingBuffer<This> origin,
-            InputSocket<B> object) {
-        return object;
+            InputSocket<B> subject) {
+        return subject;
     }
 
     /**
-     * Instruments the given {@code object}.
-     * 
-     * @param  <B> the type of the {@linkplain #target() target entry} for I/O
-     *         operations.
+     * Instruments the given {@code subject}.
+     *
+     * @param  <B> the type of the target entry for I/O operations.
      * @param  origin the instrumenting object which called this method.
-     * @param  object the object to instrument.
-     * @return An instrumenting object or {@code object} if the implementation
+     * @param  subject the object to instrument.
+     * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingBufferPool, IoBuffer)
      */
     public <B extends IoBuffer> OutputSocket<B> instrument(
             InstrumentingBuffer<This> origin,
-            OutputSocket<B> object) {
-        return object;
+            OutputSocket<B> subject) {
+        return subject;
     }
 
     /**
-     * Instruments the given {@code object}.
-     * 
-     * @param  <E> the type of the {@linkplain #target() target entry} for I/O
-     *         operations.
+     * Instruments the given {@code subject}.
+     *
+     * @param  <E> the type of the target entry for I/O operations.
      * @param  origin the instrumenting object which called this method.
-     * @param  object the object to instrument.
-     * @return An instrumenting object or {@code object} if the implementation
+     * @param  subject the object to instrument.
+     * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingController, InputSocket)
      * @see    #instrument(InstrumentingBuffer, InputSocket)
      */
     public <E extends Entry> InputStream instrument(
             InstrumentingInputSocket<This, E> origin,
-            InputStream object) {
-        return object;
+            InputStream subject) {
+        return subject;
     }
 
     /**
-     * Instruments the given {@code object}.
-     * 
-     * @param  <E> the type of the {@linkplain #target() target entry} for I/O
-     *         operations.
+     * Instruments the given {@code subject}.
+     *
+     * @param  <E> the type of the target entry for I/O operations.
      * @param  origin the instrumenting object which called this method.
-     * @param  object the object to instrument.
-     * @return An instrumenting object or {@code object} if the implementation
+     * @param  subject the object to instrument.
+     * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingController, InputSocket)
      * @see    #instrument(InstrumentingBuffer, InputSocket)
      */
     public <E extends Entry> SeekableByteChannel instrument(
             InstrumentingInputSocket<This, E> origin,
-            SeekableByteChannel object) {
-        return object;
+            SeekableByteChannel subject) {
+        return subject;
     }
 
     /**
-     * Instruments the given {@code object}.
-     * 
-     * @param  <E> the type of the {@linkplain #target() target entry} for I/O
-     *         operations.
+     * Instruments the given {@code subject}.
+     *
+     * @param  <E> the type of the target entry for I/O operations.
      * @param  origin the instrumenting object which called this method.
-     * @param  object the object to instrument.
-     * @return An instrumenting object or {@code object} if the implementation
+     * @param  subject the object to instrument.
+     * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingController, OutputSocket)
      * @see    #instrument(InstrumentingBuffer, OutputSocket)
      */
     public <E extends Entry> OutputStream instrument(
             InstrumentingOutputSocket<This, E> origin,
-            OutputStream object) {
-        return object;
+            OutputStream subject) {
+        return subject;
     }
 
     /**
-     * Instruments the given {@code object}.
-     * 
-     * @param  <E> the type of the {@linkplain #target() target entry} for I/O
-     *         operations.
+     * Instruments the given {@code subject}.
+     *
+     * @param  <E> the type of the target entry for I/O operations.
      * @param  origin the instrumenting object which called this method.
-     * @param  object the object to instrument.
-     * @return An instrumenting object or {@code object} if the implementation
+     * @param  subject the object to instrument.
+     * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingController, OutputSocket)
      * @see    #instrument(InstrumentingBuffer, OutputSocket)
      */
     public <E extends Entry> SeekableByteChannel instrument(
             InstrumentingOutputSocket<This, E> origin,
-            SeekableByteChannel object) {
-        return object;
+            SeekableByteChannel subject) {
+        return subject;
     }
 }
