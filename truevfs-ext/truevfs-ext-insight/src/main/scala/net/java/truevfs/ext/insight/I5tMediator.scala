@@ -19,9 +19,8 @@ import net.java.truevfs.kernel.spec.cio._
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-private abstract class I5tMediator(val subject: String) extends JmxMediator[I5tMediator] {
-
-  import I5tMediator._
+private abstract class I5tMediator(val subject: String)
+extends JmxMediator[I5tMediator] {
 
   assert(null ne subject)
 
@@ -51,16 +50,16 @@ private abstract class I5tMediator(val subject: String) extends JmxMediator[I5tM
   final def formatOffset(offset: Int) = { logger format offset }
 
   final override def instrument(subject: FsManager) =
-    start(new I5tManager(syncOps, subject))
+    start(new I5tManager(syncOperationsMediator, subject))
 
   final override def instrument(subject: IoBufferPool) =
-    new InstrumentingBufferPool[I5tMediator](bufferIo, subject)
+    new InstrumentingBufferPool[I5tMediator](bufferIoMediator, subject)
 
   final override def instrument(origin: InstrumentingManager[I5tMediator], subject: FsMetaDriver) =
     new InstrumentingMetaDriver[I5tMediator](this, subject)
 
   final override def instrument(origin: InstrumentingManager[I5tMediator], subject: FsController) =
-    new InstrumentingController[I5tMediator](appIo, subject)
+    new InstrumentingController[I5tMediator](applicationIoMediator, subject)
 
   final override def instrument(origin: InstrumentingBufferPool[I5tMediator], subject: IoBuffer) =
     start(new JmxBuffer[I5tMediator](this, subject))
@@ -69,7 +68,7 @@ private abstract class I5tMediator(val subject: String) extends JmxMediator[I5tM
     start(new JmxModel[I5tMediator](this, subject))
 
   final override def instrument(origin: InstrumentingMetaDriver[I5tMediator], subject: FsController) =
-    new InstrumentingController[I5tMediator](kernelIo, subject)
+    new InstrumentingController[I5tMediator](kernelIoMediator, subject)
 
   final override def instrument[E <: Entry](origin: InstrumentingController[I5tMediator], subject: InputSocket[E]) =
     new InstrumentingInputSocket[I5tMediator, E](this, subject)
@@ -96,16 +95,4 @@ private abstract class I5tMediator(val subject: String) extends JmxMediator[I5tM
     start(new I5tSeekableChannel(this, subject))
 
   override def toString: String = "%s[subject=%s]".format(getClass.getName, subject)
-}
-
-private object I5tMediator {
-
-  def apply() = syncOps
-
-  private val appIo = new I5tIoMediator("Application I/O")
-  private val bufferIo = new I5tIoMediator("Buffer I/O")
-  private val kernelIo = new I5tIoMediator("Kernel I/O")
-  private val syncOps = new I5tSyncMediator("Sync Operations")
-
-  private val mediators = Array(syncOps, appIo, kernelIo, bufferIo)
 }
