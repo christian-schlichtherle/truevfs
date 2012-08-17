@@ -85,6 +85,12 @@
             <version>2.0.0</version>
             <optional>true</optional>
         </dependency>
+
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>${scala.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
