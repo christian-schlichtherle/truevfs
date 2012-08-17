@@ -4,11 +4,9 @@
  */
 package net.java.truevfs.ext.pacemanager
 
-import javax.annotation.concurrent.ThreadSafe
-import net.java.truevfs.comp.inst.InstrumentingManager
-import net.java.truevfs.comp.jmx.JmxMediator
-import net.java.truevfs.kernel.spec.FsController
-import net.java.truevfs.kernel.spec.FsManager
+import net.java.truevfs.comp.inst._
+import net.java.truevfs.comp.jmx._
+import net.java.truevfs.kernel.spec._
 
 /**
   * A mediator for the instrumentation of the TrueVFS Kernel with a
@@ -16,13 +14,13 @@ import net.java.truevfs.kernel.spec.FsManager
   *
   * @author Christian Schlichtherle
   */
-@ThreadSafe
-private class PaceMediator extends JmxMediator[PaceMediator] {
+private class PaceMediator extends JmxMediator[PaceMediator] with Immutable {
 
-  override def instrument(obj: FsManager) = start(new PaceManager(this, obj))
+  override def instrument(subject: FsManager) =
+    start(new PaceManager(this, subject))
 
-  override def instrument(origin: InstrumentingManager[PaceMediator], obj: FsController) =
-    new PaceController(origin.asInstanceOf[PaceManager], obj)
+  override def instrument(origin: InstrumentingManager[PaceMediator], subject: FsController) =
+    new PaceController(origin.asInstanceOf[PaceManager], subject)
 }
 
 private object PaceMediator extends PaceMediator
