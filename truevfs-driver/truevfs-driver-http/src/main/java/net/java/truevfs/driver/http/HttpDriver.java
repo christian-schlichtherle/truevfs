@@ -16,6 +16,7 @@ import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.PoolingClientConnectionManager;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 
 /**
@@ -57,7 +58,7 @@ public class HttpDriver extends FsDriver {
      * @return A new http client.
      */
     protected HttpClient newClient() {
-        return new DefaultHttpClient(new ThreadSafeClientConnManager());
+        return new DefaultHttpClient(new PoolingClientConnectionManager());
     }
 
     /**
