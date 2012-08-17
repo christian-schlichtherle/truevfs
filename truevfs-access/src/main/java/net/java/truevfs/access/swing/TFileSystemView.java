@@ -4,8 +4,6 @@
  */
 package net.java.truevfs.access.swing;
 
-import net.java.truevfs.access.TArchiveDetector;
-import net.java.truevfs.access.TFile;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -16,6 +14,8 @@ import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileSystemView;
+import net.java.truevfs.access.TArchiveDetector;
+import net.java.truevfs.access.TFile;
 
 /**
  * A custom file system fsv required to browse archive files like (virtual)
@@ -90,6 +90,7 @@ public class TFileSystemView extends TDecoratingFileSystemView {
      * Ensures that the returned file object is an instance of {@link File},
      * not {@link TFile}.
      */
+    @SuppressWarnings("deprecation")
     protected File unwrap(final File file) {
         return file instanceof TFile ? ((TFile) file).getFile() : file;
     }
