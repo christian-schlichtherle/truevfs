@@ -5,7 +5,6 @@
 package net.java.truevfs.kernel.impl
 
 import net.java.truecommons.shed._
-import javax.annotation.concurrent._
 
 /** Indicates that all file system locks need to get released before the
   * operation can get retried.
@@ -13,9 +12,8 @@ import javax.annotation.concurrent._
   * @see    SyncController
   * @author Christian Schlichtherle
   */
-@Immutable
 private final class NeedsLockRetryException private ()
-extends ControlFlowException(false)
+extends ControlFlowException(false) with Immutable
 
 private object NeedsLockRetryException {
   import ControlFlowException._

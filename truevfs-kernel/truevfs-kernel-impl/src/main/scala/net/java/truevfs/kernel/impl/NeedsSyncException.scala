@@ -6,7 +6,6 @@ package net.java.truevfs.kernel.impl
 
 import net.java.truecommons.shed._
 import net.java.truecommons.shed._
-import javax.annotation.concurrent._
 
 /** Indicates that a file system controller needs to get `sync`ed before the
   * operation can get retried.
@@ -14,9 +13,8 @@ import javax.annotation.concurrent._
   * @see    FsSyncController
   * @author Christian Schlichtherle
   */
-@Immutable
 private final class NeedsSyncException private ()
-extends ControlFlowException(false)
+extends ControlFlowException(false) with Immutable
 
 private object NeedsSyncException {
   import ControlFlowException._

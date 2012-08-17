@@ -5,16 +5,14 @@
 package net.java.truevfs.kernel.impl
 
 import net.java.truecommons.shed._
-import javax.annotation.concurrent._
 
 /** Indicates that an operation needs to get write locked before it can get
   * retried.
   *
   * @author Christian Schlichtherle
   */
-@Immutable
 private final class NeedsWriteLockException private ()
-extends ControlFlowException(false)
+extends ControlFlowException(false) with Immutable
 
 private object NeedsWriteLockException {
   import ControlFlowException._

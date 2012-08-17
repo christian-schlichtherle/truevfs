@@ -10,7 +10,6 @@ import java.io._
 import java.nio.channels._
 import java.util.concurrent.locks._
 import javax.annotation._
-import javax.annotation.concurrent._
 import net.java.truevfs.kernel.spec.cio._
 
 /**
@@ -21,10 +20,9 @@ import net.java.truevfs.kernel.spec.cio._
   * @see    LockOutputService
   * @author Christian Schlichtherle
   */
-@Immutable
 private class LockInputService[E <: Entry]
 (@WillCloseWhenClosed input: InputService[E])
-extends DecoratingInputService[E](input) with LockAspect {
+extends DecoratingInputService[E](input) with LockAspect with Immutable {
 
   final override val lock = new ReentrantLock
 

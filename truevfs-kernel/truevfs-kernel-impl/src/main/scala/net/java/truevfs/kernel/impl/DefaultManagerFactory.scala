@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.kernel.impl
 
-import javax.annotation.concurrent._
 import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.spi._
 
@@ -12,7 +11,6 @@ import net.java.truevfs.kernel.spec.spi._
   * 
   * @author Christian Schlichtherle
   */
-@Immutable
-final class DefaultManagerFactory extends FsManagerFactory {
+final class DefaultManagerFactory extends FsManagerFactory with Immutable {
   override def get: FsManager = new DefaultManager
 }

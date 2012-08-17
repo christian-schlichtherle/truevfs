@@ -6,7 +6,6 @@ package net.java.truevfs.kernel.impl
 
 import net.java.truecommons.shed._
 import java.io._
-import javax.annotation.concurrent._
 
 /** Indicates that a file system is a false positive file system and that this
   * exception may get cached until the federated (archive) file system gets
@@ -18,6 +17,5 @@ import javax.annotation.concurrent._
   * 
   * @author Christian Schlichtherle
   */
-@Immutable
 private class PersistentFalsePositiveArchiveException(cause: IOException)
-extends FalsePositiveArchiveException(cause)
+extends FalsePositiveArchiveException(cause) with Immutable

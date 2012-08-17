@@ -6,7 +6,6 @@ package net.java.truevfs.kernel.impl
 
 import net.java.truecommons.shed._
 import java.io._
-import javax.annotation.concurrent._
 
 /** Indicates that a file system is a false positive file system.
   * 
@@ -17,8 +16,7 @@ import javax.annotation.concurrent._
   * @see    FalsePositiveArchiveController
   * @author Christian Schlichtherle
   */
-@Immutable
 private class FalsePositiveArchiveException(cause: IOException)
-extends ControlFlowException(cause) {
+extends ControlFlowException(cause) with Immutable {
   override def getCause() = super.getCause.asInstanceOf[IOException]
 }
