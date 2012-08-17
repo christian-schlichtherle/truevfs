@@ -4,13 +4,13 @@
  */
 package net.java.truevfs.access.sample;
 
+import java.io.IOException;
+import java.io.InputStream;
 import net.java.truevfs.access.TFile;
 import net.java.truevfs.access.TFileInputStream;
 import net.java.truevfs.access.TVFS;
 import net.java.truevfs.kernel.spec.FsSyncException;
 import net.java.truevfs.kernel.spec.FsSyncWarningException;
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * A collection of code snippets to demonstrate the usage of the API in the
