@@ -59,10 +59,10 @@ final class FsLogger(val size: Int) {
     * @throws IllegalArgumentException if any parameter value is negative.
     */
   def logRead(nanos: Long, bytes: Int): IoStatistics = {
-    readThreads += hash(Thread.currentThread)
+    val threads = log(readThreads)
     while (true) {
       val expected = current
-      val updated = expected logRead (nanos, bytes, readThreads.size)
+      val updated = expected logRead (nanos, bytes, threads)
       if (_stats weakCompareAndSet (position, expected, updated))
         return updated.readStats
     }
@@ -81,10 +81,10 @@ final class FsLogger(val size: Int) {
    * @throws IllegalArgumentException if any parameter is negative.
    */
   def logWrite(nanos: Long, bytes: Int): IoStatistics = {
-    writeThreads += hash(Thread.currentThread)
+    val threads = log(writeThreads)
     while (true) {
       val expected = current
-      val updated = expected logWrite (nanos, bytes, writeThreads.size)
+      val updated = expected logWrite (nanos, bytes, threads)
       if (_stats weakCompareAndSet (position, expected, updated))
         return updated.writeStats
     }
@@ -102,10 +102,10 @@ final class FsLogger(val size: Int) {
    * @throws IllegalArgumentException if any parameter value is negative.
    */
   def logSync(nanos: Long): SyncStatistics = {
-    syncThreads += hash(Thread.currentThread)
+    val threads = log(syncThreads)
     while (true) {
       val expected = current
-      val updated = expected logSync (nanos, syncThreads.size)
+      val updated = expected logSync (nanos, threads)
       if (_stats weakCompareAndSet (position, expected, updated))
         return updated.syncStats
     }
@@ -155,5 +155,16 @@ object FsLogger {
     hash = 31 * hash + System.identityHashCode(thread)
     hash = 31 * hash + thread.getId
     hash
+  }
+
+  /**
+   * Adds a fingerprint of the current thread to the given mutable set and returns its size.
+   *
+   * @param  set the mutable set to use for logging.
+   * @return the resulting size of the set
+   */
+  private def log(set: collection.mutable.Set[Long]) = {
+    set += hash(Thread.currentThread)
+    set.size
   }
 }
