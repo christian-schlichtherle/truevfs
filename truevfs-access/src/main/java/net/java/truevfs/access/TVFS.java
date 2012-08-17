@@ -7,8 +7,8 @@ package net.java.truevfs.access;
 import java.net.URI;
 import java.net.URISyntaxException;
 import net.java.truecommons.shed.BitField;
-import static net.java.truevfs.kernel.spec.FsSyncOptions.UMOUNT;
 import net.java.truevfs.kernel.spec.*;
+import static net.java.truevfs.kernel.spec.FsSyncOptions.UMOUNT;
 import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 
 /**
@@ -112,6 +112,7 @@ public final class TVFS {
      * @param  tree a file or directory in the (virtual) file system space.
      * @return A mount point for the given (virtual) directory tree.
      */
+    @SuppressWarnings("deprecation")
     static FsMountPoint mountPoint(final TFile tree) {
         if (tree.isArchive()) {
             return tree.getController().getModel().getMountPoint(); // fast path
