@@ -129,7 +129,7 @@ private object PaceManager {
 
     def add(controller: FsController) {
       val mp = controller.getModel.getMountPoint
-      locked(writeLock)(mounted.put(mp, controller))
+      locked(writeLock)(mounted put (mp, controller))
     }
 
     def mount(manager: FsManager) = {
@@ -137,7 +137,7 @@ private object PaceManager {
         mounted clear ()
         import scala.collection.JavaConversions._
         for (controller <- manager; model = controller.getModel)
-          if (model.isMounted) mounted.put(model.getMountPoint, controller)
+          if (model.isMounted) mounted put (model.getMountPoint, controller)
         mounted.size
       }
     }
