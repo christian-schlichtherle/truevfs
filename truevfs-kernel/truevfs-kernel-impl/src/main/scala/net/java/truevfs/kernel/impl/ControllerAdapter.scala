@@ -7,16 +7,14 @@ package net.java.truevfs.kernel.impl
 import net.java.truecommons.shed._
 import java.{lang => jl}
 import java.{util => ju}
-import javax.annotation.concurrent._
 import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.cio._
 import net.java.truevfs.kernel.spec.cio.Entry._
 
-@Immutable
 private final class ControllerAdapter(
   override val getParent: FsController,
   c: Controller[_ <: FsModel]
-) extends FsAbstractController(c.model) {
+) extends FsAbstractController(c.model) with Immutable {
 
   override def node(options: AccessOptions, name: FsNodeName) =
     c node (options, name) orNull
