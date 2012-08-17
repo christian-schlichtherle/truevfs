@@ -5,5 +5,5 @@
 /**
  * Demonstrates key management for WinZip AES encrypted ZIP entries.
  */
-@edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
+@javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truevfs.driver.zip.sample;

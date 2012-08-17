@@ -8,5 +8,5 @@
  * It's up to the client modules to inject these service locators into this
  * module if they want to.
  */
-@edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
+@javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truevfs.kernel.spec.sl;

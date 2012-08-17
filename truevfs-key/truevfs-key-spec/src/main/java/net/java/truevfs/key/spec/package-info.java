@@ -25,5 +25,5 @@
  * application is going to create or overwrite.
  * The key could be a password or a key file entered or selected by the user.
  */
-@edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
+@javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truevfs.key.spec;
