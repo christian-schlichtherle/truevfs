@@ -4,10 +4,10 @@
  */
 package net.java.truevfs.access.sample;
 
-import net.java.truecommons.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import net.java.truecommons.io.Streams;
 import net.java.truevfs.access.TPath;
 import net.java.truevfs.access.TVFS;
 import net.java.truevfs.kernel.spec.FsSyncException;
