@@ -50,7 +50,7 @@ extends FsDecoratingController(c) {
 
   protected class AspectInputSocket(socket: InputSocket[_ <: Entry])
   extends AbstractInputSocket[Entry] {
-    override def target() = apply(socket.target())
+    override def target() = apply(socket target ())
 
     override def stream(peer: OutputSocket[_ <: Entry]) =
       apply(socket stream peer)
@@ -64,7 +64,7 @@ extends FsDecoratingController(c) {
 
   protected class AspectOutputSocket(socket: OutputSocket[_ <: Entry])
   extends AbstractOutputSocket[Entry] {
-    override def target = apply(socket.target)
+    override def target() = apply(socket target ())
 
     override def stream(peer: InputSocket[_ <: Entry]) =
       apply(socket stream peer)
