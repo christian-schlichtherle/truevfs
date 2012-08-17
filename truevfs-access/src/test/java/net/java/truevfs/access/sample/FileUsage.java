@@ -13,17 +13,13 @@ import net.java.truevfs.kernel.spec.FsSyncException;
 import net.java.truevfs.kernel.spec.FsSyncWarningException;
 
 /**
- * A collection of code snippets to demonstrate the usage of the API in the
- * TrueVFS Access File* module.
- * Note that these code snippets are useless in isolation, so they should never
- * get called in application code.
+ * A collection of code snippets to demonstrate the usage of the TFile* classes.
  * 
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @SuppressWarnings("CallToThreadDumpStack")
 abstract class FileUsage {
 
-    /** Can't touch this - hammer time! */
     private FileUsage() { }
 
     void cat1(String path) throws IOException {

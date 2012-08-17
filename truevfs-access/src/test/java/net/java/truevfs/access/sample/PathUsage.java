@@ -14,19 +14,13 @@ import net.java.truevfs.kernel.spec.FsSyncException;
 import net.java.truevfs.kernel.spec.FsSyncWarningException;
 
 /**
- * A collection of code snippets to demonstrate the usage of the API in the
- * TrueVFS Access Path module.
+ * A collection of code snippets to demonstrate the usage of the TPath class.
  *
- * @deprecated This class contains code snippets which are useless in
- *             isolation, so it should not get used in applications.
- * @author     Christian Schlichtherle
- * @version    $Id$
+ * @author Christian Schlichtherle
  */
-@Deprecated
 @SuppressWarnings("CallToThreadDumpStack")
 abstract class PathUsage {
 
-    /** Can't touch this - hammer time! */
     private PathUsage() { }
 
     void cat1(String name) throws IOException {
