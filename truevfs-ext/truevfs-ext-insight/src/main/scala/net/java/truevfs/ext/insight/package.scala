@@ -11,10 +11,10 @@ package net.java.truevfs.ext
   */
 package object insight {
 
-  private[insight] object applicationIoMediator extends I5tIoMediator("Application I/O")
-  private[insight] object bufferIoMediator extends I5tIoMediator("Buffer I/O")
-  private[insight] object kernelIoMediator extends I5tIoMediator("Kernel I/O")
-  private[insight] object syncOperationsMediator extends I5tSyncMediator("Sync Operations")
+  private[insight] val applicationIoMediator = new I5tIoMediator("Application I/O")
+  private[insight] val bufferIoMediator = new I5tIoMediator("Buffer I/O")
+  private[insight] val kernelIoMediator = new I5tIoMediator("Kernel I/O")
+  private[insight] val syncOperationsMediator = new I5tSyncMediator("Sync Operations")
 
   private[insight] def mediators = Array(
     syncOperationsMediator, applicationIoMediator, kernelIoMediator,
