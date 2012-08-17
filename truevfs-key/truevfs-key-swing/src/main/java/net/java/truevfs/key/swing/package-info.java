@@ -9,5 +9,5 @@
  * file size must be 512 bytes or more, of which only the first 512 bytes are
  * used.
  */
-@edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
+@javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truevfs.key.swing;

@@ -4,6 +4,8 @@
  */
 /**
  * Sample code for the TrueVFS Access File* API.
+ * 
+ * @author Christian Schlichtherle
  */
-@edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
+@javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truevfs.samples.access;

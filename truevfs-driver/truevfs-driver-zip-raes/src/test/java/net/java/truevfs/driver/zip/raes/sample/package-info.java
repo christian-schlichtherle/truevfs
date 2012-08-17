@@ -5,5 +5,5 @@
 /**
  * Demonstrates key management for RAES encrypted ZIP files.
  */
-@edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
+@javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truevfs.driver.zip.raes.sample;

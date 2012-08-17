@@ -4,6 +4,8 @@
  */
 /**
  * Sample code for encryption and decryption with RAES.
+ * 
+ * @author Christian Schlichtherle
  */
-@edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
+@javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truevfs.samples.raes;

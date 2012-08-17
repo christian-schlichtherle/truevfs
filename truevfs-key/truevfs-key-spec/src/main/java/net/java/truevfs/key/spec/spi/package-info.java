@@ -5,5 +5,5 @@
 /**
  * Provides abstract classes for locatable service providers.
  */
-@edu.umd.cs.findbugs.annotations.DefaultAnnotation(edu.umd.cs.findbugs.annotations.NonNull.class)
+@javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truevfs.key.spec.spi;
