@@ -14,5 +14,5 @@ import net.java.truevfs.kernel.spec.spi._
 final class I5tManagerDecorator extends FsManagerDecorator {
 
   override def apply(manager: FsManager): FsManager =
-    I5tMediator().instrument(manager)
+    syncOperationsMediator.instrument(manager)
 }

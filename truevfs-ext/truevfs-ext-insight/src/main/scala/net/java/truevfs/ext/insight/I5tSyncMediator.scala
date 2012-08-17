@@ -11,7 +11,7 @@ import net.java.truevfs.comp.jmx.JmxColleague
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-private final class I5tSyncMediator(subject: String) extends I5tMediator(subject) {
+private class I5tSyncMediator(subject: String) extends I5tMediator(subject) {
 
   override def newStats(offset: Int) = new I5tSyncStatistics(this, offset)
 

@@ -10,7 +10,7 @@ import javax.annotation.concurrent._
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-private final class I5tIoMediator(subject: String) extends I5tMediator(subject) {
+private class I5tIoMediator(subject: String) extends I5tMediator(subject) {
 
   override def newStats(offset: Int) = new I5tIoStatistics(this, offset)
 }

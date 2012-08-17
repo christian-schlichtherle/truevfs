@@ -14,5 +14,5 @@ import net.java.truevfs.kernel.spec.spi._
 final class I5tBufferPoolDecorator extends IoBufferPoolDecorator {
 
   override def apply(pool: IoBufferPool): IoBufferPool =
-    I5tMediator().instrument(pool)
+    syncOperationsMediator.instrument(pool)
 }
