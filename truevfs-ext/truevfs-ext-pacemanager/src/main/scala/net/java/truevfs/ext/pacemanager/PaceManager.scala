@@ -12,6 +12,7 @@ import net.java.truecommons.shed._
 import net.java.truevfs.comp.jmx._
 import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.sl._
+import scala.math._
 import PaceManager._
 
 /**
@@ -30,7 +31,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
   def maximumFileSystemsMounted = mounted.max
 
   def maximumFileSystemsMounted_=(max: Int) {
-    if (max < PaceManagerMXBean.MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE)
+    if (max < maximumFileSystemsMountedMinimumValue)
       throw new IllegalArgumentException
     mounted.max = max
   }
@@ -93,8 +94,41 @@ extends JmxManager[PaceMediator](mediator, manager) {
 }
 
 private object PaceManager {
-  private val initialCapacity = HashMaps.initialCapacity(
-    PaceManagerMXBean.MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE + 1)
+
+  /**
+    * The key string for the system property which defines the value of the
+    * constant `MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE`,
+    * which is equivalent to the expression
+    * `PaceManager.class.getPackage().getName() + ".maximumFileSystemsMounted"`.
+    */
+  val maximumFileSystemsMountedPropertyKey =
+    classOf[PaceManager].getPackage.getName + ".maximumFileSystemsMounted"
+
+  /**
+    * The minimum value for the maximum number of mounted file systems,
+    * which is {@value}.
+    */
+  val maximumFileSystemsMountedMinimumValue = 2
+
+  /**
+    * The default value for the maximum number of mounted file systems.
+    * The value of this constant will be set to
+    * `MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE` unless a system
+    * property with the key string
+    * `MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_KEY`
+    * is set to a value which is greater than
+    * `MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE`.
+    *
+    * Mind you that this constant is initialized when this interface is loaded
+    * and cannot accurately reflect the value in a remote JVM instance.
+    */
+  val maximumFileSystemsMountedDefaultValue =
+    max(maximumFileSystemsMountedMinimumValue,
+        Integer getInteger (maximumFileSystemsMountedPropertyKey,
+                            maximumFileSystemsMountedMinimumValue))
+
+  private val initialCapacity =
+    HashMaps initialCapacity (maximumFileSystemsMountedDefaultValue + 1)
 
   private final class MountedControllerMap(evicted: ju.Collection[FsController])
   extends ju.LinkedHashMap[FsMountPoint, FsController](initialCapacity, 0.75f, true) {
@@ -103,7 +137,7 @@ private object PaceManager {
       if (size > max) evicted.add(entry.getValue) else false
 
     @volatile
-    var max = PaceManagerMXBean.MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE
+    var max = maximumFileSystemsMountedDefaultValue
   } // MountedControllerMap
 
   private final class AccessedControllerSet(
