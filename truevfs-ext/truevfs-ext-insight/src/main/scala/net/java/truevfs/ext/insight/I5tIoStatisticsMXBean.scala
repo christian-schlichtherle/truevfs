@@ -33,5 +33,6 @@ trait I5tIoStatisticsMXBean {
   def getWriteNanosecondsTotal: Long
   def getWriteOperations: Long
   def getWriteThreadsTotal: Int
-  def rotate
+
+  def rotate ()
 }
