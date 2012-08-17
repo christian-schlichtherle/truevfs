@@ -4,12 +4,9 @@
  */
 package net.java.truevfs.ext.pacemanager
 
-import javax.annotation._
 import javax.annotation.concurrent._
 import net.java.truecommons.shed._
 import net.java.truevfs.kernel.spec._
-import net.java.truevfs.kernel.spec.cio._
-import net.java.truevfs.kernel.spec.cio.Entry._
 
 /**
   * Calls back the given pace manager before and after each file system
