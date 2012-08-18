@@ -7,8 +7,6 @@ package net.java.truevfs.access.exp;
 import java.lang.ref.WeakReference;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.WeakHashMap;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -18,75 +16,65 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public class TConfigs {
 
-    private static final Node global = new Node(null, null, TConfig.DEFAULT);
-    private static final WeakHashMap<Thread, Node> nodes = new WeakHashMap<>();
-    private static final ReentrantReadWriteLock.ReadLock readLock;
-    private static final ReentrantReadWriteLock.WriteLock writeLock;
-    static {
-        final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-        readLock = lock.readLock();
-        writeLock = lock.writeLock();
-    }
+    private static final InheritableThreadLocalStack stack =
+            new InheritableThreadLocalStack();
+    
+    public static TConfig get() { return stack.get(); }
 
-    private static Node node() {
-        final Thread thread = Thread.currentThread();
-        readLock.lock();
-        try {
-            final Node node = nodes.get(thread);
-            return null != node ? node : global;
-        } finally {
-            readLock.unlock();
-        }
-    }
+    public static void set(TConfig config) { stack.set(config); }
 
-    public static TConfig get() { return node().config; }
+    public static void push(TConfig config) { stack.push(config); }
 
-    public static void set(final TConfig config) {
-        node().config = Objects.requireNonNull(config);
-    }
-
-    public static void push(final TConfig config) {
-        final Thread thread = Thread.currentThread();
-        writeLock.lock();
-        try {
-            final Node previous = nodes.get(thread);
-            final Node next = new Node(thread, previous, config);
-            nodes.put(thread, next);
-        } finally {
-            writeLock.unlock();
-        }
-    }
-
-    public static TConfig pop() {
-        final Thread thread = Thread.currentThread();
-        writeLock.lock();
-        try {
-            final Node node = nodes.get(thread);
-            if (null == node) throw new NoSuchElementException();
-            final Node previous = node.previous;
-            if (null != previous && thread.equals(previous.get()))
-                nodes.put(thread, previous);
-            else
-                nodes.remove(thread);
-            return node.config;
-        } finally {
-            writeLock.unlock();
-        }
-    }
+    public static TConfig pop() { return stack.pop(); }
 
     private TConfigs() { }
 
-    private static class Node extends WeakReference<Thread> {
-        final @CheckForNull Node previous;
+    @SuppressWarnings("PackageVisibleInnerClass")
+    static final class InheritableThreadLocalStack {
+        private final Node global = new Node(null, TConfig.DEFAULT);
+        private final InheritableThreadLocal<Node> nodes =
+                new InheritableThreadLocal<>();
 
-        TConfig config;
-
-        Node(   final @CheckForNull Thread owner,
-                final @CheckForNull Node previous,
-                final TConfig config) {
-            super(owner);
-            this.previous = previous;
-            this.config = config;
+        private Node node() {
+            final Node node = nodes.get();
+            return null != node ? node : global;
         }
-    }
+
+        public TConfig get() {
+            return node().config;
+        }
+
+        public void set(TConfig config) {
+            node().config = Objects.requireNonNull(config);
+        }
+
+        public void push(final TConfig config) {
+            final Node previous = nodes.get();
+            final Node next = new Node(previous, config);
+            nodes.set(next);
+        }
+
+        public TConfig pop() {
+            final Node node = nodes.get();
+            if (null == node || !Thread.currentThread().equals(node.get()))
+                throw new NoSuchElementException();
+            final Node previous = node.previous;
+            if (null != previous) nodes.set(previous);
+            else nodes.remove();
+            return node.config;
+        }
+
+        private static class Node extends WeakReference<Thread> {
+            final @CheckForNull Node previous;
+
+            TConfig config;
+
+            Node(   final @CheckForNull Node previous,
+                    final TConfig config) {
+                super(Thread.currentThread());
+                this.previous = previous;
+                this.config = config;
+            }
+        } // Node
+    } // InheritableThreadLocalStack
 }
