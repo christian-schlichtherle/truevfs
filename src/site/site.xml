@@ -27,7 +27,7 @@
     <skin>
         <groupId>net.java.truecommons</groupId>
         <artifactId>truecommons-skin</artifactId>
-        <version>${truecommons.version}</version>
+        <version>RELEASE</version>
      </skin>
     <body>
         <head>
@@ -63,10 +63,10 @@
             <item name="Glossary" href="glossary.html"/>
         </menu>
         <menu name="External Resources">
-            <item name="Road Map" href="http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:roadmap-panel"/>
-            <item name="Change Log" href="http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel"/>
+            <item name="Road Map" href="http://java.net/jira/browse/TRUEVFS#selectedTab=com.atlassian.jira.plugin.system.project:roadmap-panel"/>
+            <item name="Change Log" href="http://java.net/jira/browse/TRUEVFS#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel"/>
             <item name="Developer Site" href="http://java.net/projects/truevfs"/>
-            <item name="The TrueZIP Blog" href="http://truevfs.schlichtherle.de"/>
+            <item name="The TrueVFS Blog" href="http://truevfs.schlichtherle.de"/>
         </menu>
         <menu name="Reports" ref="reports" inherit="bottom"/>
         <menu name="Sub-Modules" ref="modules" inherit="bottom"/>
