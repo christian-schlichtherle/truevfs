@@ -4,18 +4,6 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truevfs.access.TPath;
-import net.java.truevfs.access.TFile;
-import net.java.truevfs.access.TVFS;
-import net.java.truevfs.access.TConfig;
-import net.java.truecommons.io.ClosedInputException;
-import net.java.truecommons.io.ClosedOutputException;
-import net.java.truecommons.io.Streams;
-import net.java.truecommons.shed.BitField;
-import static net.java.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
-import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
-import net.java.truecommons.shed.ConcurrencyUtils.TaskJoiner;
-import static net.java.truecommons.shed.ConcurrencyUtils.start;
 import java.io.*;
 import static java.io.File.separatorChar;
 import java.lang.ref.Reference;
@@ -27,6 +15,14 @@ import static java.nio.file.Files.*;
 import java.nio.file.attribute.FileTime;
 import java.util.*;
 import java.util.concurrent.Callable;
+import net.java.truecommons.io.ClosedInputException;
+import net.java.truecommons.io.ClosedOutputException;
+import net.java.truecommons.io.Streams;
+import net.java.truecommons.shed.BitField;
+import static net.java.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
+import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
+import net.java.truecommons.shed.ConcurrencyUtils.TaskJoiner;
+import static net.java.truecommons.shed.ConcurrencyUtils.start;
 import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsController;
@@ -112,13 +108,19 @@ extends ConfiguredClientTestBase<D> {
         return Files.createTempFile(TEMP_FILE_PREFIX, getExtension()).toRealPath();
     }
 
-    private void createTestFile(final TPath path) throws IOException {
-        final OutputStream out = newOutputStream(path);
-        try {
+    protected final void createTestFile(final TPath path) throws IOException {
+        try (final OutputStream out = newOutputStream(path)) {
             out.write(getData());
-        } finally {
-            out.close();
         }
+    }
+
+    protected final void verifyTestFile(final TPath path) throws IOException {
+        assertEquals(getDataLength(), size(path));
+        final byte[] array = new byte[getDataLength()];
+        try (final InputStream in = newInputStream(path)) {
+            new DataInputStream(in).readFully(array);
+        }
+        assertArrayEquals(getData(), array);
     }
 
     @Test
@@ -862,7 +864,7 @@ extends ConfiguredClientTestBase<D> {
         } finally {
             out.close();
         }
-        assertTrue(Arrays.equals(getData(), out.toByteArray()));
+        assertArrayEquals(getData(), out.toByteArray());
     }
 
     @Test
@@ -1017,12 +1019,7 @@ extends ConfiguredClientTestBase<D> {
                 "almd (" + almd + ") != blmd (" + blmd + ") && almu (" + almu + ") != blmu (" + blmu + ")",
                 almd == blmd || almu == blmu);
 
-        // Check result.
-        {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
-            copy(a, out);
-            assertTrue(Arrays.equals(getData(), out.toByteArray()));
-        }
+        verifyTestFile(a);
 
         // Cleanup.
         delete(a);
@@ -1181,7 +1178,7 @@ extends ConfiguredClientTestBase<D> {
         assertRenameTo(temp, archive);
         delete(archive3);
         delete(archive2);
-        assertOutput(archive1a);
+        verifyTestFile(archive1a);
         delete(archive1a);
         delete(archive);
     }
