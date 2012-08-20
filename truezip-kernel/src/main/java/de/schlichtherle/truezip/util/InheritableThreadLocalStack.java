@@ -4,8 +4,7 @@
  */
 package de.schlichtherle.truezip.util;
 
-import java.util.Deque;
-import java.util.LinkedList;
+import java.lang.ref.WeakReference;
 import java.util.NoSuchElementException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -16,9 +15,12 @@ import javax.annotation.concurrent.ThreadSafe;
  * This class works pretty much like a {@link java.util.Stack}, except that
  * each call is forwarded to a private {@link InheritableThreadLocal} object.
  * <p>
- * Whenever a child thread gets started, it will share the <em>same</em>
- * top level element of the parent's inheritable thread local stack unless the
- * parent's inheritable thread local stack is empty.
+ * Whenever a child thread gets started, it inherits the top level element
+ * of the parent's thread local stack unless the parent's thread local stack
+ * is empty.
+ * However, it's not possible to {@link #pop} this inherited top level element
+ * off the stack - any attempt to do so will result in a
+ * {@link NoSuchElementException}.
  * 
  * @param  <T> The type of the elements in the inheritable thread local stack.
  * @since  TrueZIP 7.5
@@ -26,7 +28,8 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public final class InheritableThreadLocalStack<T> {
-    private final Stacks<T> stacks = new Stacks<T>();
+    private final InheritableThreadLocal<Node<T>> nodes
+            = new InheritableThreadLocal<Node<T>>();
 
     /**
      * Returns {@code true} if this stack is empty.
@@ -34,7 +37,7 @@ public final class InheritableThreadLocalStack<T> {
      * @return {@code true} if this stack is empty.
      */
     public boolean isEmpty() {
-        return stacks.probe().isEmpty();
+        return null == nodes.get();
     }
 
     /**
@@ -43,7 +46,8 @@ public final class InheritableThreadLocalStack<T> {
      * @return The top element of this stack or {@code null} if it's empty.
      */
     public @Nullable T peek() {
-        return stacks.probe().peek();
+        final Node<T> node = nodes.get();
+        return null != node ? node.element : null;
     }
 
     /**
@@ -55,8 +59,8 @@ public final class InheritableThreadLocalStack<T> {
      *         in which case {@code elze} gets returned.
      */
     public @Nullable T peekOrElse(final @CheckForNull T elze) {
-        final Deque<T> stack = stacks.probe();
-        return stack.isEmpty() ? elze : stack.peek();
+        final Node<T> node = nodes.get();
+        return null != node ? node.element : elze;
     }
 
     /**
@@ -66,7 +70,9 @@ public final class InheritableThreadLocalStack<T> {
      * @return {@code element} - for fluent programming.
      */
     public @Nullable T push(final @CheckForNull T element) {
-        stacks.get().push(element);
+        final Node<T> previous = nodes.get();
+        final Node<T> next = new Node<T>(previous, element);
+        nodes.set(next);
         return element;
     }
 
@@ -77,15 +83,18 @@ public final class InheritableThreadLocalStack<T> {
      * @throws NoSuchElementException if this stack is empty.
      */
     public @Nullable T pop() {
-        final Deque<T> stack = stacks.probe(); // NOT stacks.get()!
-        final T element = stack.pop();
-        if (stack.isEmpty()) stacks.remove();
-        return element;
+        final Node<T> node = nodes.get();
+        if (null == node)
+            throw new NoSuchElementException();
+        if (!Thread.currentThread().equals(node.get()))
+            throw new NoSuchElementException();
+        nodes.set(node.previous); // may be null!
+        return node.element;
     }
 
     /**
      * Removes and returns the nullable top element on this stack
-     * if and only if its identical to the given element.
+     * if it's identical to the given element.
      * 
      * @param  expected The expected top element on this stack.
      * @throws IllegalStateException If the given element is not the top
@@ -103,25 +112,15 @@ public final class InheritableThreadLocalStack<T> {
         }
     }
 
-    private static final class Stacks<T>
-    extends InheritableThreadLocal<Deque<T>> {
+    private static class Node<T> extends WeakReference<Thread> {
+        final @CheckForNull Node<T> previous;
+        @CheckForNull T element;
 
-        @Override
-        protected Deque<T> initialValue() {
-            return new LinkedList<T>();
+        Node(   final @CheckForNull Node<T> previous,
+                final @CheckForNull T element) {
+            super(Thread.currentThread());
+            this.previous = previous;
+            this.element = element;
         }
-
-        @Override
-        protected Deque<T> childValue(final Deque<T> parent) {
-            final Deque<T> child = initialValue();
-            if (!parent.isEmpty()) child.push(parent.peek());
-            return child;
-        }
-
-        Deque<T> probe() {
-            final Deque<T> stack = super.get();
-            if (stack.isEmpty()) super.remove();
-            return stack;
-        }
-    } // Stacks
+    } // Node
 }
