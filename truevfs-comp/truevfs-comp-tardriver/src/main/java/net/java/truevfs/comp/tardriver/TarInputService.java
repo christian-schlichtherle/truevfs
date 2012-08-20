@@ -18,14 +18,13 @@ import net.java.truecommons.shed.ExceptionBuilder;
 import static net.java.truecommons.shed.HashMaps.OVERHEAD_SIZE;
 import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import net.java.truecommons.shed.SuppressedExceptionBuilder;
-import static net.java.truevfs.comp.tardriver.TarDriver.DEFAULT_BLKSIZE;
-import static net.java.truevfs.comp.tardriver.TarDriver.DEFAULT_RCDSIZE;
+import static net.java.truevfs.comp.tardriver.TarDriver.*;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsModel;
+import net.java.truevfs.kernel.spec.cio.*;
 import net.java.truevfs.kernel.spec.cio.Entry.Type;
 import static net.java.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
 import static net.java.truevfs.kernel.spec.cio.Entry.Type.FILE;
-import net.java.truevfs.kernel.spec.cio.*;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import static org.apache.commons.compress.archivers.tar.TarConstants.*;
@@ -81,12 +80,12 @@ implements InputService<TarDriverEntry> {
         }
     }
 
-    private void unpack(final @WillNotClose TarArchiveInputStream tin)
+    private void unpack(final @WillNotClose TarArchiveInputStream tain)
     throws IOException {
         final TarDriver driver = this.driver;
         final IoBufferPool pool = driver.getPool();
         for (   TarArchiveEntry tinEntry;
-                null != (tinEntry = tin.getNextTarEntry()); ) {
+                null != (tinEntry = tain.getNextTarEntry()); ) {
             final String name = name(tinEntry);
             TarDriverEntry entry = entries.get(name);
             if (null != entry)
@@ -96,8 +95,8 @@ implements InputService<TarDriverEntry> {
                 final IoBuffer buffer = pool.allocate();
                 entry.setBuffer(buffer);
                 try {
-                    try (final OutputStream out = buffer.output().stream(null)) {
-                        Streams.cat(tin, out);
+                    try (OutputStream out = buffer.output().stream(null)) {
+                        Streams.cat(tain, out);
                     }
                 } catch (final Throwable ex) {
                     try {
