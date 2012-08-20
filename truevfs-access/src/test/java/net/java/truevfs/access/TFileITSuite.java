@@ -4,24 +4,6 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truevfs.kernel.spec.FsSyncWarningException;
-import net.java.truevfs.kernel.spec.FsSyncException;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsResourceOpenException;
-import net.java.truevfs.kernel.spec.FsArchiveDriver;
-import net.java.truevfs.access.TFile;
-import net.java.truevfs.access.TFileOutputStream;
-import net.java.truevfs.access.TVFS;
-import net.java.truevfs.access.TConfig;
-import net.java.truevfs.access.TFileInputStream;
-import net.java.truecommons.io.ClosedInputException;
-import net.java.truecommons.io.ClosedOutputException;
-import net.java.truecommons.io.InputException;
-import net.java.truecommons.shed.BitField;
-import static net.java.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
-import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
-import net.java.truecommons.shed.ConcurrencyUtils.TaskJoiner;
-import static net.java.truecommons.shed.ConcurrencyUtils.start;
 import java.io.*;
 import static java.io.File.separatorChar;
 import java.lang.ref.Reference;
@@ -33,10 +15,23 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
+import net.java.truecommons.io.ClosedInputException;
+import net.java.truecommons.io.ClosedOutputException;
+import net.java.truecommons.io.InputException;
+import net.java.truecommons.shed.BitField;
+import static net.java.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
+import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
+import net.java.truecommons.shed.ConcurrencyUtils.TaskJoiner;
+import static net.java.truecommons.shed.ConcurrencyUtils.start;
 import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
+import net.java.truevfs.kernel.spec.FsArchiveDriver;
+import net.java.truevfs.kernel.spec.FsController;
+import net.java.truevfs.kernel.spec.FsResourceOpenException;
+import net.java.truevfs.kernel.spec.FsSyncException;
 import static net.java.truevfs.kernel.spec.FsSyncOption.CLEAR_CACHE;
 import static net.java.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
 import static net.java.truevfs.kernel.spec.FsSyncOptions.SYNC;
+import net.java.truevfs.kernel.spec.FsSyncWarningException;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -112,10 +107,19 @@ extends ConfiguredClientTestBase<D> {
         return File.createTempFile(TEMP_FILE_PREFIX, getExtension()).getCanonicalFile();
     }
 
-    private void createTestFile(final TFile file) throws IOException {
+    protected final void createTestFile(final TFile file) throws IOException {
         try (final OutputStream out = new TFileOutputStream(file)) {
             out.write(getData());
         }
+    }
+
+    protected final void verifyTestFile(final TFile file) throws IOException {
+        assertEquals(getDataLength(), file.length());
+        final byte[] array = new byte[getDataLength()];
+        try (final InputStream in = new TFileInputStream(file)) {
+            new DataInputStream(in).readFully(array);
+        }
+        assertArrayEquals(getData(), array);
     }
 
     @Test
@@ -776,7 +780,7 @@ extends ConfiguredClientTestBase<D> {
         } finally {
             out.close();
         }
-        assertTrue(Arrays.equals(getData(), out.toByteArray()));
+        assertArrayEquals(getData(), out.toByteArray());
     }
 
     @Test
@@ -931,12 +935,7 @@ extends ConfiguredClientTestBase<D> {
                 "almd (" + almd + ") != blmd (" + blmd + ") && almu (" + almu + ") != blmu (" + blmu + ")",
                 almd == blmd || almu == blmu);
 
-        // Check result.
-        {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
-            TFile.cp(a, out);
-            assertTrue(Arrays.equals(getData(), out.toByteArray()));
-        }
+        verifyTestFile(a);
 
         // Cleanup.
         a.rm();
@@ -1094,7 +1093,7 @@ extends ConfiguredClientTestBase<D> {
         assertRenameTo(temp, archive);
         archive3.rm();
         archive2.rm();
-        assertOutput(archive1a);
+        verifyTestFile(archive1a);
         archive1a.rm();
         archive.rm();
     }
