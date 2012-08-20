@@ -8,6 +8,7 @@ import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import de.schlichtherle.truezip.fs.FsCharsetArchiveDriver;
+import static de.schlichtherle.truezip.fs.archive.tar.TarDriver.*;
 import de.schlichtherle.truezip.io.SequentialIOException;
 import de.schlichtherle.truezip.io.SequentialIOExceptionBuilder;
 import de.schlichtherle.truezip.io.Streams;
@@ -49,12 +50,6 @@ import org.apache.commons.compress.archivers.tar.TarUtils;
 public class TarInputShop
 implements InputShop<TarDriverEntry> {
 
-    /** Default record size */
-    private static final int DEFAULT_RCDSIZE = 512;
-
-    /** Default block size */
-    public static final int DEFAULT_BLKSIZE = 20 * DEFAULT_RCDSIZE * 20;
-
     private static final byte[] NULL_RECORD = new byte[DEFAULT_RCDSIZE];
 
     private static final int CHECKSUM_OFFSET
@@ -85,25 +80,25 @@ implements InputShop<TarDriverEntry> {
         }
     }
 
-    private void unpack(final @WillNotClose TarArchiveInputStream tin)
+    private void unpack(final @WillNotClose TarArchiveInputStream tain)
     throws IOException {
         final TarDriver driver = this.driver;
         final IOPool<?> pool = driver.getPool();
         for (   TarArchiveEntry tinEntry;
-                null != (tinEntry = tin.getNextTarEntry()); ) {
+                null != (tinEntry = tain.getNextTarEntry()); ) {
             final String name = name(tinEntry);
             TarDriverEntry entry = entries.get(name);
             if (null != entry)
                 entry.release();
             entry = driver.newEntry(name, tinEntry);
             if (!tinEntry.isDirectory()) {
-                final Entry<?> temp = pool.allocate();
-                entry.setTemp(temp);
+                final Entry<?> buffer = pool.allocate();
+                entry.setTemp(buffer);
                 try {
-                    final OutputStream out = temp.getOutputSocket().newOutputStream();
+                    final OutputStream out = buffer.getOutputSocket().newOutputStream();
                     IOException ex = null;
                     try {
-                        Streams.cat(tin, out);
+                        Streams.cat(tain, out);
                     } catch (final IOException ex2) {
                         ex = ex2;
                         throw ex2;
@@ -111,14 +106,13 @@ implements InputShop<TarDriverEntry> {
                         try {
                             out.close();
                         } catch (final IOException ex2) {
-                            if (null == ex)
-                                throw ex2;
+                            if (null == ex) throw ex2;
                             if (JSE7.AVAILABLE) ex.addSuppressed(ex2);
                         }
                     }
                 } catch (final IOException ex) {
                     try {
-                        temp.release();
+                        buffer.release();
                     } catch (final IOException ex2) {
                         if (JSE7.AVAILABLE) ex.addSuppressed(ex2);
                     }
