@@ -24,10 +24,10 @@ import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskJoiner;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
-import static java.io.File.separatorChar;
 import java.io.*;
-import static java.nio.file.Files.*;
+import static java.io.File.separatorChar;
 import java.nio.file.*;
+import static java.nio.file.Files.*;
 import java.nio.file.attribute.FileTime;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -99,8 +99,7 @@ extends ConfiguredClientTestBase<D> {
 
     /** Unmounts the {@linkplain #getArchive() current archive file}. */
     protected final void umount() throws FsSyncException {
-        if (null != archive)
-            archive.getFileSystem().close();
+        if (null != archive) archive.getFileSystem().close();
     }
 
     private Path createTempFile() throws IOException {
@@ -109,13 +108,25 @@ extends ConfiguredClientTestBase<D> {
         return Files.createTempFile(TEMP_FILE_PREFIX, getSuffix()).toRealPath();
     }
 
-    private void createTestFile(final TPath path) throws IOException {
+    protected final void createTestFile(final TPath path) throws IOException {
         final OutputStream out = newOutputStream(path);
         try {
             out.write(getData());
         } finally {
             out.close();
         }
+    }
+
+    protected final void verifyTestFile(final TPath path) throws IOException {
+        assertEquals(getDataLength(), size(path));
+        final byte[] array = new byte[getDataLength()];
+        final InputStream in = newInputStream(path);
+        try {
+            new DataInputStream(in).readFully(array);
+        } finally {
+            in.close();
+        }
+        assertArrayEquals(getData(), array);
     }
 
     @Test
@@ -828,7 +839,7 @@ extends ConfiguredClientTestBase<D> {
         } finally {
             out.close();
         }
-        assertTrue(Arrays.equals(getData(), out.toByteArray()));
+        assertArrayEquals(getData(), out.toByteArray());
     }
 
     @Test
@@ -983,12 +994,7 @@ extends ConfiguredClientTestBase<D> {
                 "almd (" + almd + ") != blmd (" + blmd + ") && almu (" + almu + ") != blmu (" + blmu + ")",
                 almd == blmd || almu == blmu);
 
-        // Check result.
-        {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
-            copy(a, out);
-            assertTrue(Arrays.equals(getData(), out.toByteArray()));
-        }
+        verifyTestFile(a);
 
         // Cleanup.
         delete(a);
@@ -1162,7 +1168,7 @@ extends ConfiguredClientTestBase<D> {
         assertRenameTo(temp, archive);
         delete(archive3);
         delete(archive2);
-        assertOutput(archive1a);
+        verifyTestFile(archive1a);
         delete(archive1a);
         delete(archive);
     }

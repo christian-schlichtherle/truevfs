@@ -4,10 +4,10 @@
  */
 package de.schlichtherle.truezip.file;
 
+import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.SYNC;
-import de.schlichtherle.truezip.fs.*;
 import de.schlichtherle.truezip.io.InputClosedException;
 import de.schlichtherle.truezip.io.InputException;
 import de.schlichtherle.truezip.io.OutputClosedException;
@@ -17,8 +17,8 @@ import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskJoiner;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
-import static java.io.File.separatorChar;
 import java.io.*;
+import static java.io.File.separatorChar;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -94,8 +94,7 @@ extends ConfiguredClientTestBase<D> {
 
     /** Unmounts the {@linkplain #getArchive() current archive file}. */
     protected final void umount() throws FsSyncException {
-        if (null != archive)
-            TVFS.umount(archive);
+        if (null != archive) TVFS.umount(archive);
     }
 
     private File createTempFile() throws IOException {
@@ -104,13 +103,25 @@ extends ConfiguredClientTestBase<D> {
         return File.createTempFile(TEMP_FILE_PREFIX, getSuffix()).getCanonicalFile();
     }
 
-    private void createTestFile(final TFile file) throws IOException {
+    protected final void createTestFile(final TFile file) throws IOException {
         final OutputStream out = new TFileOutputStream(file);
         try {
             out.write(getData());
         } finally {
             out.close();
         }
+    }
+
+    protected final void verifyTestFile(final TFile file) throws IOException {
+        assertEquals(getDataLength(), file.length());
+        final byte[] array = new byte[getDataLength()];
+        final InputStream in = new TFileInputStream(file);
+        try {
+            new DataInputStream(in).readFully(array);
+        } finally {
+            in.close();
+        }
+        assertArrayEquals(getData(), array);
     }
 
     @Test
@@ -803,7 +814,7 @@ extends ConfiguredClientTestBase<D> {
         } finally {
             out.close();
         }
-        assertTrue(Arrays.equals(getData(), out.toByteArray()));
+        assertArrayEquals(getData(), out.toByteArray());
     }
 
     @Test
@@ -958,12 +969,7 @@ extends ConfiguredClientTestBase<D> {
                 "almd (" + almd + ") != blmd (" + blmd + ") && almu (" + almu + ") != blmu (" + blmu + ")",
                 almd == blmd || almu == blmu);
 
-        // Check result.
-        {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
-            TFile.cp(a, out);
-            assertTrue(Arrays.equals(getData(), out.toByteArray()));
-        }
+        verifyTestFile(a);
 
         // Cleanup.
         a.rm();
@@ -1139,7 +1145,7 @@ extends ConfiguredClientTestBase<D> {
         assertRenameTo(temp, archive);
         archive3.rm();
         archive2.rm();
-        assertOutput(archive1a);
+        verifyTestFile(archive1a);
         archive1a.rm();
         archive.rm();
     }
