@@ -17,12 +17,11 @@ import net.java.truecommons.io.*;
 import static net.java.truecommons.shed.HashMaps.OVERHEAD_SIZE;
 import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import net.java.truecommons.shed.SuppressedExceptionBuilder;
-import static net.java.truevfs.comp.tardriver.TarDriver.DEFAULT_BLKSIZE;
-import static net.java.truevfs.comp.tardriver.TarDriver.DEFAULT_RCDSIZE;
+import static net.java.truevfs.comp.tardriver.TarDriver.*;
 import net.java.truevfs.kernel.spec.FsModel;
+import net.java.truevfs.kernel.spec.cio.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.java.truevfs.kernel.spec.cio.*;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**
@@ -50,7 +49,7 @@ implements OutputService<TarDriverEntry> {
     private final Map<String, TarDriverEntry>
             entries = new LinkedHashMap<>(initialCapacity(OVERHEAD_SIZE));
 
-    private final TarArchiveOutputStream tos;
+    private final TarArchiveOutputStream taos;
     private final TarDriver driver;
     private boolean busy;
 
@@ -65,9 +64,9 @@ implements OutputService<TarDriverEntry> {
         final OutputStream out = sink.stream();
         try {
             final TarArchiveOutputStream
-                    tos = this.tos = new TarArchiveOutputStream(out,
+                    taos = this.taos = new TarArchiveOutputStream(out,
                         DEFAULT_BLKSIZE, DEFAULT_RCDSIZE, driver.getEncoding());
-            tos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
+            taos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
         } catch (final Throwable ex) {
             try {
                 out.close();
@@ -170,7 +169,7 @@ implements OutputService<TarDriverEntry> {
 
     @Override
     public void close() throws IOException {
-        tos.close();
+        taos.close();
     }
 
     /**
@@ -187,8 +186,8 @@ implements OutputService<TarDriverEntry> {
         @CreatesObligation
         EntryOutputStream(final TarDriverEntry local)
         throws IOException {
-            super(tos);
-            tos.putArchiveEntry(local);
+            super(taos);
+            taos.putArchiveEntry(local);
             entries.put(local.getName(), local);
             busy = true;
         }
@@ -204,7 +203,7 @@ implements OutputService<TarDriverEntry> {
             if (closed) return;
             closed = true;
             busy = false;
-            tos.closeArchiveEntry();
+            taos.closeArchiveEntry();
         }
     } // EntryOutputStream
 
@@ -255,7 +254,7 @@ implements OutputService<TarDriverEntry> {
             final SuppressedExceptionBuilder<IOException>
                     builder = new SuppressedExceptionBuilder<>();
             try (final InputStream in = buffer.input().stream(null)) {
-                final TarArchiveOutputStream taos = TarOutputService.this.tos;
+                final TarArchiveOutputStream taos = TarOutputService.this.taos;
                 taos.putArchiveEntry(local);
                 try {
                     Streams.cat(in, taos);
