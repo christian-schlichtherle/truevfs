@@ -23,6 +23,8 @@ import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import net.java.truevfs.kernel.spec.cio.Entry.Type;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+import org.apache.commons.compress.archivers.tar.TarConstants;
 
 /**
  * An archive driver for Tape Archive files (TAR).
@@ -62,6 +64,19 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
 
     final String getEncoding() {
         return getCharset().name();
+    }
+
+    /**
+     * Returns the method to use for encoding entry names with
+     * {@link TarConstants#NAMELEN} or more characters.
+     * The implementation in {@link TarDriver} returns
+     * {@link TarArchiveOutputStream#LONGFILE_GNU}.
+     * 
+     * @return The method to use for encoding entry names with
+     *         {@link TarConstants#NAMELEN} or more characters.
+     */
+    public int getLongFileMode() {
+        return TarArchiveOutputStream.LONGFILE_GNU;
     }
 
     /**
