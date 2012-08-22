@@ -54,6 +54,13 @@ public abstract class FsDriver {
             FsModel model,
             @CheckForNull FsController parent);
 
+    @Override
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    public final boolean equals(Object that) { return this == that; }
+
+    @Override
+    public final int hashCode() { return super.hashCode(); }
+
     /**
      * Returns a string representation of this object for debugging and logging
      * purposes.
