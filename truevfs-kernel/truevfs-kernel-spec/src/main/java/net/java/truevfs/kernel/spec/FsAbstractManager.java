@@ -33,6 +33,13 @@ public abstract class FsAbstractManager implements FsManager {
         builder.check();
     }
 
+    @Override
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
+    public final boolean equals(Object obj) { return this == obj; }
+
+    @Override
+    public final int hashCode() { return System.identityHashCode(this); }
+
     /**
      * Returns a string representation of this object for debugging and logging
      * purposes.
