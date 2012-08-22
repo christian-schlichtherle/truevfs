@@ -22,6 +22,15 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public enum FsAccessOption {
 
+    /** Whether or not a file system node must be exclusively created. */
+    EXCLUSIVE,
+
+    /**
+     * Whether or not the contents of an existing file system node shall get
+     * kept for appending rather than replaced for overwriting.
+     */
+    APPEND,
+
     /**
      * Whether or not the entry data shall get cached for subsequent access.
      * As a desired side effect, caching allows a federated file system (i.e.
@@ -36,15 +45,6 @@ public enum FsAccessOption {
      * automatically with an undefined last modification time.
      */
     CREATE_PARENTS,
-
-    /** Whether or not an entry must be exclusively created. */
-    EXCLUSIVE,
-
-    /**
-     * Whether or not the new entry contents shall get appended to the existing
-     * entry contents rather than replacing them entirely.
-     */
-    APPEND,
 
     /**
      * Expresses a preference to allow an archive file to grow by appending any
