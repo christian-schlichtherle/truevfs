@@ -12,8 +12,6 @@ import java.nio.charset.CharsetEncoder;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.io.Sink;
-import net.java.truecommons.io.Source;
 import net.java.truecommons.shed.BitField;
 import static net.java.truecommons.shed.Paths.cutTrailingSeparators;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
