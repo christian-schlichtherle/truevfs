@@ -6,6 +6,7 @@ package net.java.truevfs.kernel.spec;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.UniqueObject;
 
 /**
  * An abstract factory for components required to access a file system.
@@ -16,7 +17,7 @@ import javax.annotation.concurrent.Immutable;
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class FsDriver {
+public abstract class FsDriver extends UniqueObject {
 
     /**
      * Returns {@code true} iff this is an archive driver, i.e. if file systems
@@ -27,9 +28,7 @@ public abstract class FsDriver {
      * @return {@code true} iff this is an archive driver, i.e. if file systems
      *         of this type must be a member of a parent file system.
      */
-    public boolean isArchiveDriver() {
-        return false;
-    }
+    public boolean isArchiveDriver() { return false; }
 
     /**
      * Returns a new thread-safe file system controller for the mount point of
@@ -53,24 +52,6 @@ public abstract class FsDriver {
             FsManager manager,
             FsModel model,
             @CheckForNull FsController parent);
-
-    /**
-     * Returns {@code this == obj}.
-     * 
-     * @param obj the object to compare
-     * @return {@code this == obj}.
-     */
-    @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public final boolean equals(Object obj) { return this == obj; }
-
-    /**
-     * Returns {@code System.identityHashCode(this)}.
-     * 
-     * @return {@code System.identityHashCode(this)}.
-     */
-    @Override
-    public final int hashCode() { return System.identityHashCode(this); }
 
     /**
      * Returns a string representation of this object for debugging and logging

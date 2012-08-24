@@ -7,6 +7,7 @@ package net.java.truevfs.kernel.spec;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.shed.UniqueObject;
 
 /**
  * An abstract file system model which does <em>not</em> implement the property
@@ -17,7 +18,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class FsAbstractModel implements FsModel {
+public abstract class FsAbstractModel
+extends UniqueObject implements FsModel {
 
     private final FsMountPoint mountPoint;
     private @CheckForNull final FsModel parent;

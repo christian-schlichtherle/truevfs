@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.UniqueObject;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
 
 /**
@@ -20,7 +21,8 @@ import net.java.truevfs.kernel.spec.cio.Entry.Access;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class FsAbstractController implements FsController {
+public abstract class FsAbstractController
+extends UniqueObject implements FsController {
 
     private final FsModel model;
 
