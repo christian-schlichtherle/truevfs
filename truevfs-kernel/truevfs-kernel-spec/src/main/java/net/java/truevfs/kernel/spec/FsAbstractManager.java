@@ -6,6 +6,7 @@ package net.java.truevfs.kernel.spec;
 
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.UniqueObject;
 import static net.java.truevfs.kernel.spec.FsSyncOption.ABORT_CHANGES;
 
 /**
@@ -16,7 +17,8 @@ import static net.java.truevfs.kernel.spec.FsSyncOption.ABORT_CHANGES;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class FsAbstractManager implements FsManager {
+public abstract class FsAbstractManager
+extends UniqueObject implements FsManager {
 
     @Override
     public void sync(final BitField<FsSyncOption> options)
@@ -32,13 +34,6 @@ public abstract class FsAbstractManager implements FsManager {
         }
         builder.check();
     }
-
-    @Override
-    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public final boolean equals(Object obj) { return this == obj; }
-
-    @Override
-    public final int hashCode() { return System.identityHashCode(this); }
 
     /**
      * Returns a string representation of this object for debugging and logging
