@@ -44,9 +44,7 @@ extends FsDriver {
      * {@code true}.
      */
     @Override
-    public final boolean isArchiveDriver() {
-        return true;
-    }
+    public final boolean isArchiveDriver() { return true; }
 
     /**
      * {@inheritDoc}
@@ -77,9 +75,7 @@ extends FsDriver {
      * @return The decorated file system controller or simply
      *         {@code controller}.
      */
-    public FsController decorate(FsController controller) {
-        return controller;
-    }
+    public FsController decorate(FsController controller) { return controller; }
 
     /**
      * Returns the character set to use for encoding character based meta data
@@ -142,9 +138,7 @@ extends FsDriver {
      * @return The implementation in the class {@link FsArchiveDriver} returns
      *         {@code false} for backwards compatibility.
      */
-    public boolean getRedundantContentSupport() {
-        return false;
-    }
+    public boolean getRedundantContentSupport() { return false; }
 
     /**
      * Returns {@code true} if and only if the archive files produced by this
@@ -161,9 +155,7 @@ extends FsDriver {
      * @return The implementation in the class {@link FsArchiveDriver} returns
      *         {@code false} for backwards compatibility.
      */
-    public boolean getRedundantMetaDataSupport() {
-        return false;
-    }
+    public boolean getRedundantMetaDataSupport() { return false; }
 
     /**
      * This method gets called by an archive controller in order to create a
