@@ -186,37 +186,28 @@ extends StandardMBean implements JmxModelMXBean {
             node = null;
         }
         if (null != node) return node;
-        return new FsNode() {
+        final class DummyNode extends FsNode {
             @Override
-            public String getName() {
-                return en.toString();
-            }
+            public String getName() { return en.toString(); }
 
             @Override
-            public BitField<Type> getTypes() {
-                return Entry.NO_TYPES;
-            }
+            public BitField<Type> getTypes() { return Entry.NO_TYPES; }
 
             @Override
-            public Set<String> getMembers() {
-                return Collections.emptySet();
-            }
+            public Set<String> getMembers() { return Collections.emptySet(); }
 
             @Override
-            public long getSize(Size type) {
-                return UNKNOWN;
-            }
+            public long getSize(Size type) { return UNKNOWN; }
 
             @Override
-            public long getTime(Access type) {
-                return UNKNOWN;
-            }
+            public long getTime(Access type) { return UNKNOWN; }
 
             @Override
             public Boolean isPermitted(Access type, Entity entity) {
                 return null;
             }
-        };
+        }
+        return new DummyNode();
     }
 
     @Override
