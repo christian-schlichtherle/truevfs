@@ -52,9 +52,7 @@ public abstract class FsNode implements Entry {
      *         the given type.
      * @see    #getTypes()
      */
-    public boolean isType(Type type) {
-        return getTypes().is(type);
-    }
+    public boolean isType(Type type) { return getTypes().is(type); }
 
     /**
      * Returns a set of strings with the base names of the members of this
@@ -78,16 +76,14 @@ public abstract class FsNode implements Entry {
         final StringBuilder s = new StringBuilder(256);
         final Formatter f = new Formatter(s).format("%s[name=%s, types=%s",
                 getClass().getName(), getName(), getTypes());
-        for (Size type : ALL_SIZES) {
+        for (final Size type : ALL_SIZES) {
             final long size = getSize(type);
-            if (UNKNOWN != size)
-                f.format(", size(%s)=%d", type, size);
+            if (UNKNOWN != size) f.format(", size(%s)=%d", type, size);
         }
-        for (Access type : ALL_ACCESS) {
+        for (final Access type : ALL_ACCESS) {
             final long time = getTime(type);
-            if (UNKNOWN != time)
-                f.format(", time(%s)=%tc", type, time);
+            if (UNKNOWN != time) f.format(", time(%s)=%tc", type, time);
         }
-        return f.format(",members=%s]", getMembers()).toString();
+        return f.format(", members=%s]", getMembers()).toString();
     }
 }
