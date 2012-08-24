@@ -87,21 +87,4 @@ public interface FsManager extends Iterable<FsController> {
      */
     void sync(final BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException;
-
-    /**
-     * Returns {@code this == obj}.
-     * 
-     * @param obj the object to compare
-     * @return {@code this == obj}.
-     */
-    @Override
-    boolean equals(Object obj);
-
-    /**
-     * Returns {@code System.identityHashCode(this)}.
-     * 
-     * @return {@code System.identityHashCode(this)}.
-     */
-    @Override
-    int hashCode();
 }
