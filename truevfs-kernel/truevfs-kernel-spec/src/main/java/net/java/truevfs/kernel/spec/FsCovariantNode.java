@@ -22,8 +22,7 @@ import static net.java.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
  */
 @NotThreadSafe
 public final class FsCovariantNode<E extends FsArchiveEntry>
-extends FsNode
-implements Cloneable {
+extends FsNode implements Cloneable {
 
     private final String name;
     private EnumMap<Type, E> map = new EnumMap<>(Type.class);
@@ -35,9 +34,7 @@ implements Cloneable {
      * 
      * @param path the file system path.
      */
-    public FsCovariantNode(String path) {
-        name = path.toString();
-    }
+    public FsCovariantNode(String path) { name = path.toString(); }
 
     /**
      * Returns a deep clone of this covariant file system node.
@@ -67,9 +64,7 @@ implements Cloneable {
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
     /**
      * Returns {@code true} if and only if the name of this covariant node
@@ -78,9 +73,7 @@ implements Cloneable {
      * @return {@code true} if and only if the name of this covariant node
      *         identifies it as a root node.
      */
-    public boolean isRoot() {
-        return name.isEmpty();
-    }
+    public boolean isRoot() { return name.isEmpty(); }
 
     /**
      * Returns the type of the file system node to which calls to
@@ -95,9 +88,7 @@ implements Cloneable {
      *         {@link #getEntry()}, {@link #getSize(Size)},
      *         {@link #getTime(Access)} et al shall get forwarded.
      */
-    public @Nullable Type getKey() {
-        return key;
-    }
+    public @Nullable Type getKey() { return key; }
 
     /**
      * Selects the type of the file system node to which calls to
@@ -111,9 +102,7 @@ implements Cloneable {
      *        {@link #getEntry()}, {@link #getSize(Size)},
      *        {@link #getTime(Access)} et al shall get forwarded.
      */
-    public void setKey(final @Nullable Type type) {
-        key = type;
-    }
+    public void setKey(final @Nullable Type type) { key = type; }
 
     /**
      * Maps the given type to the given archive entry.
@@ -134,9 +123,7 @@ implements Cloneable {
      * @param type the type to remove.
      * @return The previously mapped archive entry.
      */
-    public @Nullable E remove(Type type) {
-        return map.remove(type);
-    }
+    public @Nullable E remove(Type type) { return map.remove(type); }
 
     /**
      * Returns the archive entry for the given type.
@@ -144,18 +131,14 @@ implements Cloneable {
      * @param type the type of the archive entry to lookup.
      * @return The archive entry for the given type.
      */
-    public @Nullable E get(Type type) {
-        return map.get(type);
-    }
+    public @Nullable E get(Type type) { return map.get(type); }
 
     /**
      * Returns the archive entry mapped for the {@link #getKey() key} property.
      *
      * @return the archive entry mapped for the {@link #getKey() key} property.
      */
-    public @Nullable E getEntry() {
-        return map.get(this.key);
-    }
+    public @Nullable E getEntry() { return map.get(this.key); }
 
     /**
      * A collection of the mapped entries.
@@ -164,9 +147,7 @@ implements Cloneable {
      * 
      * @return a collection of the mapped entries
      */
-    public Collection<E> getEntries() {
-        return map.values();
-    }
+    public Collection<E> getEntries() { return map.values(); }
 
     /**
      * Returns a set of the mapped types.
@@ -174,18 +155,14 @@ implements Cloneable {
      * vice versa.
      */
     @Override
-    public BitField<Type> getTypes() {
-        return BitField.copyOf(map.keySet());
-    }
+    public BitField<Type> getTypes() { return BitField.copyOf(map.keySet()); }
 
     /**
      * Returns {@code true} if and only if there is an archive entry mapped for
      * the given type.
      */
     @Override
-    public boolean isType(final Type type) {
-        return map.containsKey(type);
-    }
+    public boolean isType(final Type type) { return map.containsKey(type); }
 
     /**
      * Returns the size mapped for the {@link #getKey() key} property.
@@ -200,9 +177,7 @@ implements Cloneable {
      * Returns the access time mapped for the {@link #getKey() key} property.
      */
     @Override
-    public long getTime(Access type) {
-        return map.get(key).getTime(type);
-    }
+    public long getTime(Access type) { return map.get(key).getTime(type); }
 
     /**
      * Returns the permission mapped for the {@link #getKey() key} property.
@@ -235,9 +210,7 @@ implements Cloneable {
      * @throws NullPointerException if this covariant file system node does
      *         not implement a directory.
      */
-    public boolean add(String member) {
-        return getMembers().add(member);
-    }
+    public boolean add(String member) { return getMembers().add(member); }
 
     /**
      * Removes the given base path from the set of members of this directory
@@ -249,7 +222,5 @@ implements Cloneable {
      * @throws NullPointerException if this covariant file system node does
      *         not implement a directory.
      */
-    public boolean remove(String member) {
-        return getMembers().remove(member);
-    }
+    public boolean remove(String member) { return getMembers().remove(member); }
 }
