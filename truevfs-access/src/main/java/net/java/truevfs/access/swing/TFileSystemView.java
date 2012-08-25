@@ -15,6 +15,7 @@ import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileSystemView;
 import net.java.truevfs.access.TArchiveDetector;
+import net.java.truevfs.access.TConfig;
 import net.java.truevfs.access.TFile;
 
 /**
@@ -43,7 +44,7 @@ import net.java.truevfs.access.TFile;
 public class TFileSystemView extends TDecoratingFileSystemView {
 
     /** Maybe null - uses default then. **/
-    private @CheckForNull TArchiveDetector archiveDetector;
+    private @CheckForNull TArchiveDetector detector;
 
     public TFileSystemView() {
         this(FileSystemView.getFileSystemView(), null);
@@ -56,23 +57,29 @@ public class TFileSystemView extends TDecoratingFileSystemView {
     public TFileSystemView( FileSystemView fileSystemView,
                             @CheckForNull TArchiveDetector archiveDetector) {
         super(fileSystemView);
-        this.archiveDetector = archiveDetector;
+        this.detector = archiveDetector;
     }
 
     /**
-     * Returns the archive detector to use.
+     * Returns the nullable archive detector to use.
+     * 
+     * @return The nullable archive detector to use.
      */
-    public @CheckForNull TArchiveDetector getArchiveDetector() {
-        return archiveDetector;
+    public @CheckForNull TArchiveDetector getDetector() {
+        return detector;
+    }
+
+    TArchiveDetector detector() {
+        return null != detector ? detector : TConfig.get().getDetector();
     }
 
     /**
      * Sets the archive detector to use.
      *
-     * @param archiveDetector the archive detector to use.
+     * @param detector the archive detector to use.
      */
-    public void setArchiveDetector(@CheckForNull TArchiveDetector archiveDetector) {
-        this.archiveDetector = archiveDetector;
+    public void setDetector(@CheckForNull TArchiveDetector detector) {
+        this.detector = detector;
     }
 
     /**
@@ -83,7 +90,7 @@ public class TFileSystemView extends TDecoratingFileSystemView {
             return null;
         return file instanceof TFile
                 ? (TFile) file
-                : new TFile(file, getArchiveDetector());
+                : detector().newFile(file);
     }
 
     /**
@@ -165,24 +172,22 @@ public class TFileSystemView extends TDecoratingFileSystemView {
     throws IOException {
         final TFile wParent = wrap(parent);
         if (wParent.isArchive() || wParent.isEntry()) {
-            TFile folder = new TFile(
+            TFile folder = detector().newFile(
                     wParent,
                     UIManager.getString(TFile.separatorChar == '\\'
                             ? "FileChooser.win32.newFolder"
-                            : "FileChooser.other.newFolder"),
-                    getArchiveDetector());
+                            : "FileChooser.other.newFolder"));
 
             for (int i = 2; !folder.mkdirs(); i++) {
                 if (i > 100)
                     throw new IOException(wParent + ": Could not create new directory entry!");
-                folder = new TFile(
+                folder = detector().newFile(
                         wParent,
                         MessageFormat.format(
                             UIManager.getString(TFile.separatorChar == '\\'
                                 ? "FileChooser.win32.newFolder.subsequent"
                                 : "FileChooser.other.newFolder.subsequent"),
-                            new Object[] { Integer.valueOf(i) }),
-                        getArchiveDetector());
+                            new Object[] { Integer.valueOf(i) }));
             }
 
             return folder;

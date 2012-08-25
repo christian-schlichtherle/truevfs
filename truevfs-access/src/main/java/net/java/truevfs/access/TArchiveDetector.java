@@ -5,6 +5,7 @@
 package net.java.truevfs.access;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import javax.annotation.CheckForNull;
@@ -16,12 +17,13 @@ import net.java.truecommons.shed.HashMaps;
 import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import net.java.truevfs.kernel.spec.FsAbstractMetaDriver;
 import net.java.truevfs.kernel.spec.FsDriver;
+import net.java.truevfs.kernel.spec.FsNodePath;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
 
 /**
  * Detects a <em>prospective</em> archive file and declares its file system
- * type by mapping its file name extension to an archive driver.
+ * scheme by mapping its file name extension to an archive driver.
  * Note that this class does <em>not</em> access any file system!
   * <p>
  * The map of detectable archive file name extensions and corresponding archive
@@ -64,11 +66,46 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
     public static final TArchiveDetector NULL = new TArchiveDetector("");
 
     /**
-     * This instance recognizes all archive types for which an archive driver
-     * can be found by the file system driver service locator singleton
-     * {@link FsDriverMapLocator#SINGLETON}.
+     * This instance recognizes all archive file name extensions for which an
+     * archive driver can get located on the class path by the file system
+     * driver map locator singleton {@link FsDriverMapLocator#SINGLETON}.
      */
     public static final TArchiveDetector ALL = new TArchiveDetector(null);
+
+    private static Map<FsScheme, FsDriver> newMap(final Object[][] config) {
+        final Map<FsScheme, FsDriver> drivers = new HashMap<>(
+                HashMaps.initialCapacity(config.length) * 2); // heuristics
+        for (final Object[] param : config) {
+            final Collection<FsScheme> schemes = toSchemes(param[0]);
+            if (schemes.isEmpty())
+                throw new IllegalArgumentException("No file system schemes!");
+            final FsDriver driver = Loader.promote(param[1], FsDriver.class);
+            for (final FsScheme scheme : schemes)
+                drivers.put(scheme, driver);
+        }
+        return Collections.unmodifiableMap(drivers);
+    }
+
+    private static Collection<FsScheme> toSchemes(final Object o) {
+        final Collection<FsScheme> set = new TreeSet<>();
+        try {
+            if (o instanceof Collection<?>)
+                for (final Object p : (Collection<?>) o)
+                    if (p instanceof FsScheme)
+                        set.add((FsScheme) p);
+                    else
+                        for (final String q : new ExtensionSet(p.toString()))
+                            set.add(new FsScheme(q));
+            else if (o instanceof FsScheme)
+                set.add((FsScheme) o);
+            else
+                for (final String p : new ExtensionSet(o.toString()))
+                    set.add(new FsScheme(p));
+        } catch (final URISyntaxException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+        return set;
+    }
 
     private final Map<FsScheme, FsDriver> drivers;
 
@@ -252,16 +289,38 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
         this.extensions = outExtensions.toString();
     }
 
+    /**
+     * Returns the <i>canonical extension list</i> for all archive file system
+     * schemes recognized by this {@code TArchiveDetector}.
+     *
+     * @return Either {@code ""} to indicate an empty set or
+     *         a string of the form {@code "extension[|extension]*"},
+     *         where {@code extension} is a combination of lower case
+     *         letters which does <em>not</em> start with a dot.
+     *         The string never contains empty or duplicated extensions and the
+     *         extensions are sorted in natural order.
+     * @see    #TArchiveDetector(String)
+     * @see    ExtensionSet Syntax constraints for extension lists.
+     */
+    public String getExtensions() { return extensions; }
+
+    /**
+     * Returns the immutable map of file system drivers.
+     * This is equivalent to {@link #get()}.
+     * 
+     * @return the immutable map of file system drivers.
+     */
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
+    public Map<FsScheme, FsDriver> getDrivers() { return drivers; }
+
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<FsScheme, FsDriver> get() {
-        return drivers;
-    }
+    public Map<FsScheme, FsDriver> get() { return drivers; }
 
     /**
      * Detects whether the given {@code path} name identifies a prospective
-     * archive file by matching its file name extensions against the set of file
-     * system schemes in the archive driver map.
+     * archive file by matching its file name extension against the set of
+     * file system schemes in the file system driver map.
      * If a match is found, the file name extension gets converted to a file
      * system scheme and returned.
      * Otherwise, {@code null} is returned.
@@ -294,78 +353,44 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
         return null;
     }
 
-    /**
-     * Returns the <i>canonical extension list</i> for all federated file system
-     * types recognized by this {@code TArchiveDetector}.
-     *
-     * @return Either {@code ""} to indicate an empty set or
-     *         a string of the form {@code "extension[|extension]*"},
-     *         where {@code extension} is a combination of lower case
-     *         letters which does <em>not</em> start with a dot.
-     *         The string never contains empty or duplicated extensions and the
-     *         extensions are sorted in natural order.
-     * @see    #TArchiveDetector(String)
-     * @see    ExtensionSet Syntax constraints for extension lists.
-     */
+    public TFile newFile(File file) { return new TFile(file, this); }
+
+    public TFile newFile(String path) { return new TFile(path, this); }
+
+    public TFile newFile(File parent, String member) {
+        return new TFile(parent, member, this);
+    }
+
+    public TFile newFile(String parent, String member) {
+        return new TFile(parent, member, this);
+    }
+
+    public TFile newFile(URI uri) { return new TFile(uri, this); }
+
+    public TFile newFile(FsNodePath path) { return new TFile(path, this); }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) return true;
+        if (!(other instanceof TArchiveDetector)) return false;
+        final TArchiveDetector that = (TArchiveDetector) other;
+        return this.extensions.equals(that.getExtensions())
+                && this.drivers.equals(that.getDrivers());
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 59 * hash + extensions.hashCode();
+        hash = 59 * hash + drivers.hashCode();
+        return hash;
+    }
+
     @Override
     public String toString() {
-        return extensions;
-    }
-
-    /**
-     * Creates an unmodifiable file system driver map which is constructed from
-     * the given configuration.
-     *
-     * @param  config an array of key-value pair arrays.
-     *         The first element of each inner array must either be a
-     *         {@link FsScheme file system scheme}, an object {@code o} which
-     *         is convertable to a set of file name extensions by calling
-     *         <code>new {@link ExtensionSet#ExtensionSet(String) ExtensionSet}(o.toString())</code>
-     *         or a {@link Collection collection} of these.
-     *         The second element of each inner array must either be a
-     *         {@link FsDriver file system driver instance}, a
-     *         {@link Class file system driver class}, a
-     *         {@link String fully qualified name of a file system driver class},
-     *         or {@code null}.
-     * @return The file system driver map created from the given configuration.
-     * @throws NullPointerException if a required configuration element is
-     *         {@code null}.
-     * @throws IllegalArgumentException if any other parameter precondition
-     *         does not hold.
-     * @see    ExtensionSet Syntax contraints for extension lists.
-     */
-    private static Map<FsScheme, FsDriver> newMap(final Object[][] config) {
-        final Map<FsScheme, FsDriver> drivers = new HashMap<>(
-                HashMaps.initialCapacity(config.length) * 2); // heuristics
-        for (final Object[] param : config) {
-            final Collection<FsScheme> schemes = toSchemes(param[0]);
-            if (schemes.isEmpty())
-                throw new IllegalArgumentException("No file system schemes!");
-            final FsDriver driver = Loader.promote(param[1], FsDriver.class);
-            for (final FsScheme scheme : schemes)
-                drivers.put(scheme, driver);
-        }
-        return Collections.unmodifiableMap(drivers);
-    }
-
-    private static Collection<FsScheme> toSchemes(final Object o) {
-        final Collection<FsScheme> set = new TreeSet<>();
-        try {
-            if (o instanceof Collection<?>)
-                for (final Object p : (Collection<?>) o)
-                    if (p instanceof FsScheme)
-                        set.add((FsScheme) p);
-                    else
-                        for (final String q : new ExtensionSet(p.toString()))
-                            set.add(new FsScheme(q));
-            else if (o instanceof FsScheme)
-                set.add((FsScheme) o);
-            else
-                for (final String p : new ExtensionSet(o.toString()))
-                    set.add(new FsScheme(p));
-        } catch (final URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
-        }
-        return set;
+        return String.format("%s[extensions=%s, drivers=%s]",
+                getClass().getName(),
+                extensions,
+                drivers);
     }
 }

@@ -4,10 +4,11 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truecommons.io.DecoratingInputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.io.DecoratingInputStream;
+import net.java.truevfs.kernel.spec.FsAccessOptions;
 
 /**
  * A replacement for the class {@link FileInputStream} for reading plain old
@@ -93,6 +94,6 @@ public final class TFileInputStream extends DecoratingInputStream {
     @CreatesObligation
     private static InputStream newInputStream(final File src)
     throws IOException {
-        return TBIO.input(TConfig.get().getAccessPreferences(), src).stream(null);
+        return TBIO.input(TConfig.get().getPreferences(), src).stream(null);
     }
 }

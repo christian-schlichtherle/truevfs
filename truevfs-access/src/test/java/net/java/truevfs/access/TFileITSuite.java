@@ -23,7 +23,7 @@ import static net.java.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskJoiner;
 import static net.java.truecommons.shed.ConcurrencyUtils.start;
-import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
+import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsResourceOpenException;
@@ -308,7 +308,7 @@ extends ConfiguredClientTestBase<D> {
     private void assertCreateNewEnhancedFile() throws IOException {
         final File file1 = new TFile(archive, "test.txt");
         final File file2 = new TFile(file1, "test.txt");
-        try (final TConfig config = TConfig.push()) {
+        try (final TConfig config = TConfig.open()) {
             config.setLenient(false);
             try {
                 file1.createNewFile();
@@ -421,7 +421,7 @@ extends ConfiguredClientTestBase<D> {
     @Test
     public void testStrictFileOutputStream() throws IOException {
         TFile file = new TFile(archive, "test.txt");
-        try (final TConfig config = TConfig.push()) {
+        try (final TConfig config = TConfig.open()) {
             config.setLenient(false);
             try {
                 assertFileOutputStream(file);
@@ -433,7 +433,7 @@ extends ConfiguredClientTestBase<D> {
             archive.rm();
         }
     }
-    
+
     @Test
     public void testLenientFileOutputStream() throws IOException {
         TFile file = new TFile(archive, "dir/inner" + getExtension() + "/dir/test.txt");
@@ -676,7 +676,7 @@ extends ConfiguredClientTestBase<D> {
         dir2.rm();
         dir1.rm();
 
-        try (final TConfig config = TConfig.push()) {
+        try (final TConfig config = TConfig.open()) {
             config.setLenient(false);
 
             assertFalse(dir6.mkdir());
@@ -1155,14 +1155,14 @@ extends ConfiguredClientTestBase<D> {
             assertNull(file.list());
             assertNull(file.list(null));
             assertNull(file.listFiles());
-            assertNull(file.listFiles(file.getArchiveDetector()));
+            assertNull(file.listFiles(file.getDetector()));
             assertNull(file.listFiles((FileFilter) null));
             assertNull(file.listFiles((FilenameFilter) null));
-            assertNull(file.listFiles((FileFilter) null, file.getArchiveDetector()));
-            assertNull(file.listFiles((FilenameFilter) null, file.getArchiveDetector()));
+            assertNull(file.listFiles((FileFilter) null, file.getDetector()));
+            assertNull(file.listFiles((FilenameFilter) null, file.getDetector()));
         }
     }
-    
+
     @Test
     public void testMultithreadedSingleArchiveMultipleEntriesReading()
     throws Exception {
@@ -1405,9 +1405,8 @@ extends ConfiguredClientTestBase<D> {
         final TFile entry1 = new TFile(archive, "entry1");
         final TFile entry2 = new TFile(archive, "entry2");
 
-        TConfig config = TConfig.push();
-        try {
-            config.setAccessPreferences(config.getAccessPreferences().set(GROW));
+        try (final TConfig config = TConfig.open()) {
+            config.setPreference(GROW, true);
 
             createTestFile(entry1);
             createTestFile(entry2);
@@ -1429,20 +1428,15 @@ extends ConfiguredClientTestBase<D> {
 
             umount();
             assertTrue(file.length() > 6 * getDataLength()); // six entries plus two central directories
-        } finally {
-            config.close();
         }
 
         assertThat(archive.list().length, is(0));
 
-        config = TConfig.push();
-        try {
-            config.setAccessPreferences(config.getAccessPreferences().set(GROW));
+        try (final TConfig config = TConfig.open()) {
+            config.setPreference(GROW, true);
 
             archive.rm();
             umount();
-        } finally {
-            config.close();
         }
 
         assertNull(archive.list());

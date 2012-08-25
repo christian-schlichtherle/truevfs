@@ -28,7 +28,6 @@ public final class WinZipAesConcurrentSyncIT extends ConcurrentSyncITSuite<TestW
     @Override
     public void setUp() throws IOException {
         super.setUp();
-        final TConfig config = TConfig.get();
-        config.setAccessPreferences(config.getAccessPreferences().set(ENCRYPT));
+        TConfig.get().setPreference(ENCRYPT, true);
     }
 }

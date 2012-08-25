@@ -4,31 +4,33 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truevfs.kernel.spec.FsSyncWarningException;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsNodeName;
-import net.java.truevfs.kernel.spec.FsNode;
-import net.java.truevfs.kernel.spec.FsSyncOption;
-import net.java.truevfs.kernel.spec.FsSyncException;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsAccessOption;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.*;
+import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.attribute.*;
 import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.FilteringIterator;
+import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOption.CACHE;
 import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
+import net.java.truevfs.kernel.spec.FsController;
+import net.java.truevfs.kernel.spec.FsMountPoint;
+import net.java.truevfs.kernel.spec.FsNode;
+import net.java.truevfs.kernel.spec.FsNodeName;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
+import net.java.truevfs.kernel.spec.FsSyncException;
+import net.java.truevfs.kernel.spec.FsSyncOption;
 import static net.java.truevfs.kernel.spec.FsSyncOptions.UMOUNT;
+import net.java.truevfs.kernel.spec.FsSyncWarningException;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
@@ -37,8 +39,6 @@ import static net.java.truevfs.kernel.spec.cio.Entry.Type.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truecommons.shed.BitField;
-import net.java.truecommons.shed.FilteringIterator;
 
 /**
  * A {@link FileSystem} implementation based on the TrueVFS Kernel module.
@@ -54,8 +54,10 @@ public final class TFileSystem extends FileSystem {
     @SuppressWarnings("deprecation")
     TFileSystem(final TPath path) {
         assert null != path;
-        this.controller = TConfig.get().getManager().controller(
-                path.getArchiveDetector(), path.getMountPoint());
+        this.controller = TConfig
+                .get()
+                .getManager()
+                .controller(path.getDetector(), path.getMountPoint());
         this.provider = TFileSystemProvider.get(path.getName());
 
         assert invariants();
@@ -184,7 +186,7 @@ public final class TFileSystem extends FileSystem {
      * <p>
      * This method scans the {@link TPath#toString() path name} resulting
      * from the segment parameters to detect prospective archive files using
-     * the {@link TPath#getDefaultArchiveDetector() default archive detector}.
+     * the default archive detector.
      * <p>
      * The supported path name separators are "{@link File#separator}" and
      * "{@code /}".
@@ -336,7 +338,7 @@ public final class TFileSystem extends FileSystem {
             throw new UnsupportedOperationException();
         final FsController controller = getController();
         final FsNodeName name = path.getNodeName();
-        final BitField<FsAccessOption> options = path.getAccessPreferences();
+        final BitField<FsAccessOption> options = path.getPreferences();
         try {
             controller.make(
                     options, name,
@@ -351,11 +353,11 @@ public final class TFileSystem extends FileSystem {
     }
 
     void delete(TPath path) throws IOException {
-        getController().unlink(path.getAccessPreferences(), path.getNodeName());
+        getController().unlink(path.getPreferences(), path.getNodeName());
     }
 
     FsNode stat(TPath path) throws IOException {
-        return getController().node(path.getAccessPreferences(), path.getNodeName());
+        return getController().node(path.getPreferences(), path.getNodeName());
     }
 
     InputSocket<?> input(   TPath path,
@@ -372,7 +374,7 @@ public final class TFileSystem extends FileSystem {
     void checkAccess(final TPath path, final AccessMode... modes)
     throws IOException {
         final FsNodeName name = path.getNodeName();
-        final BitField<FsAccessOption> options = path.getAccessPreferences();
+        final BitField<FsAccessOption> options = path.getPreferences();
         final BitField<Access> types = types(modes);
         getController().checkAccess(options, name, types);
     }
@@ -447,7 +449,7 @@ public final class TFileSystem extends FileSystem {
             if (null != createTime)
                 times.put(CREATE, createTime.toMillis());
             controller.setTime(
-                    path.getAccessPreferences(), path.getNodeName(),
+                    path.getPreferences(), path.getNodeName(),
                     times);
         }
     } // FsEntryAttributeView
@@ -458,7 +460,7 @@ public final class TFileSystem extends FileSystem {
 
         FsEntryAttributes(final TPath path) throws IOException {
             if (null == (entry = getController()
-                    .node(path.getAccessPreferences(), path.getNodeName())))
+                    .node(path.getPreferences(), path.getNodeName())))
                 throw new NoSuchFileException(path.toString());
         }
 

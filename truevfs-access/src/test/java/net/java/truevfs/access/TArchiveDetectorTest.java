@@ -4,19 +4,17 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truevfs.access.TArchiveDetector;
 import java.io.File;
 import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nullable;
+import net.java.truecommons.shed.ExtensionSet;
+import net.java.truevfs.kernel.driver.mock.MockArchiveDriver;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
-import net.java.truevfs.kernel.driver.mock.MockArchiveDriver;
-import net.java.truecommons.shed.ExtensionSet;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -24,22 +22,17 @@ import org.junit.Test;
  */
 public final class TArchiveDetectorTest {
 
-    private FsArchiveDriver<?> driver;
-    private TArchiveDetector ALL, NIL, MOK;
-
-    @Before
-    public void setUp() {
-        driver = new MockArchiveDriver();
-        ALL = new TArchiveDetector("tar.gz|zip", driver);
-        NIL = new TArchiveDetector(ALL, ""); // test decoration
-        MOK = new TArchiveDetector(NIL, "nil", driver); // test decoration
-    }
+    private final FsArchiveDriver<?> driver = new MockArchiveDriver();
+    private final TArchiveDetector
+            ALL  = new TArchiveDetector("tar.gz|zip", driver),
+            NULL = new TArchiveDetector(ALL, ""), // test decoration
+            MOK  = new TArchiveDetector(NULL, "mok", driver); // test decoration
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testIllegalConstructors() throws Throwable {
         for (TArchiveDetector delegate : new TArchiveDetector[] {
-            NIL,
+            NULL,
             ALL,
         }) {
             try {
@@ -61,14 +54,14 @@ public final class TArchiveDetectorTest {
                     { null, null, driver },
                     { null, "xyz", null },
                     { null, "xyz", driver },
-                    { NIL, null, null },
-                    { NIL, null, driver },
+                    { NULL, null, null },
+                    { NULL, null, driver },
                     //{ TArchiveDetector.NULL, "xyz", null },
                     { null, new Object[][] {{ "xyz", MockArchiveDriver.class }} },
-                    { NIL, null },
-                    { NIL, new Object[][] {{ null, null }} },
-                    { NIL, new Object[][] {{ null, "" }} },
-                    { NIL, new Object[][] {{ null, "xyz" }} },
+                    { NULL, null },
+                    { NULL, new Object[][] {{ null, null }} },
+                    { NULL, new Object[][] {{ null, "" }} },
+                    { NULL, new Object[][] {{ null, "xyz" }} },
                     //{ TArchiveDetector.NULL, new Object[] { "xyz", null } },
                });
 
@@ -87,28 +80,28 @@ public final class TArchiveDetectorTest {
                     { "||.", driver }, // empty extension set
                     { "|.|", driver }, // empty extension set
                     { "|.|.", driver }, // empty extension set
-                    { NIL, "", driver }, // empty extension set
-                    { NIL, ".", driver }, // empty extension set
-                    { NIL, "|", driver }, // empty extension set
-                    { NIL, "|.", driver }, // empty extension set
-                    { NIL, "||", driver }, // empty extension set
-                    { NIL, "||.", driver }, // empty extension set
-                    { NIL, "|.|", driver }, // empty extension set
-                    { NIL, "|.|.", driver }, // empty extension set
-                    { NIL, new Object[][] {{ "", driver }} }, // empty extension set
-                    { NIL, new Object[][] {{ ".", driver }} }, // empty extension set
-                    { NIL, new Object[][] {{ "|", driver }} }, // empty extension set
-                    { NIL, new Object[][] {{ "|.", driver }} }, // empty extension set
-                    { NIL, new Object[][] {{ "||", driver }} }, // empty extension set
-                    { NIL, new Object[][] {{ "||.", driver }} }, // empty extension set
-                    { NIL, new Object[][] {{ "|.|", driver }} }, // empty extension set
-                    { NIL, new Object[][] {{ "|.|.", driver }} }, // empty extension set
-                    { NIL, new Object[][] {{ "anyExtension", "" }} }, // empty class name
-                    { NIL, new Object[][] {{ "anyExtension", "xyz" }} }, // not a class name
-                    { NIL, new Object[][] {{ MockArchiveDriver.class, driver }} }, // not a extension list
-                    { NIL, new Object[][] {{ driver, driver }} }, // not a extension list
-                    { NIL, new Object[][] {{ "anyExtension", new Object() }} }, // not an archive driver
-                    { NIL, new Object[][] {{ "anyExtension", Object.class }} }, // not an archive driver class
+                    { NULL, "", driver }, // empty extension set
+                    { NULL, ".", driver }, // empty extension set
+                    { NULL, "|", driver }, // empty extension set
+                    { NULL, "|.", driver }, // empty extension set
+                    { NULL, "||", driver }, // empty extension set
+                    { NULL, "||.", driver }, // empty extension set
+                    { NULL, "|.|", driver }, // empty extension set
+                    { NULL, "|.|.", driver }, // empty extension set
+                    { NULL, new Object[][] {{ "", driver }} }, // empty extension set
+                    { NULL, new Object[][] {{ ".", driver }} }, // empty extension set
+                    { NULL, new Object[][] {{ "|", driver }} }, // empty extension set
+                    { NULL, new Object[][] {{ "|.", driver }} }, // empty extension set
+                    { NULL, new Object[][] {{ "||", driver }} }, // empty extension set
+                    { NULL, new Object[][] {{ "||.", driver }} }, // empty extension set
+                    { NULL, new Object[][] {{ "|.|", driver }} }, // empty extension set
+                    { NULL, new Object[][] {{ "|.|.", driver }} }, // empty extension set
+                    { NULL, new Object[][] {{ "anyExtension", "" }} }, // empty class name
+                    { NULL, new Object[][] {{ "anyExtension", "xyz" }} }, // not a class name
+                    { NULL, new Object[][] {{ MockArchiveDriver.class, driver }} }, // not a extension list
+                    { NULL, new Object[][] {{ driver, driver }} }, // not a extension list
+                    { NULL, new Object[][] {{ "anyExtension", new Object() }} }, // not an archive driver
+                    { NULL, new Object[][] {{ "anyExtension", Object.class }} }, // not an archive driver class
                 });
     }
 
@@ -278,26 +271,26 @@ public final class TArchiveDetectorTest {
             final String extensions = args[i++];
             TArchiveDetector
             detector = new TArchiveDetector(extensions, driver);
-            assertEquals(result, detector.toString());
-            detector = new TArchiveDetector(NIL, extensions, driver);
-            assertEquals(result, detector.toString());
-            detector = new TArchiveDetector(NIL, new Object[][] {{ extensions, driver }});
-            assertEquals(result, detector.toString());
+            assertEquals(result, detector.getExtensions());
+            detector = new TArchiveDetector(NULL, extensions, driver);
+            assertEquals(result, detector.getExtensions());
+            detector = new TArchiveDetector(NULL, new Object[][] {{ extensions, driver }});
+            assertEquals(result, detector.getExtensions());
         }
     }
 
     @Test
     public void testNullMapping() {
         for (TArchiveDetector delegate : new TArchiveDetector[] {
-            NIL,
+            NULL,
             ALL,
         }) {
             TArchiveDetector detector = new TArchiveDetector(
                     delegate, "zip", null); // remove zip extension
-            assertFalse(new ExtensionSet(detector.toString()).contains("zip"));
+            assertFalse(new ExtensionSet(detector.getExtensions()).contains("zip"));
             detector = new TArchiveDetector(
                     delegate, ".ZIP", null); // remove zip extension
-            assertFalse(new ExtensionSet(detector.toString()).contains("zip"));
+            assertFalse(new ExtensionSet(detector.getExtensions()).contains("zip"));
         }
     }
 
@@ -319,14 +312,14 @@ public final class TArchiveDetectorTest {
             { null, "test.default" },
             { null, "test.null" },
             { null, "test.z" },
-        }, NIL, MOK, ALL);
+        }, NULL, MOK, ALL);
 
         assertScheme(new String[][] {
             { null, ".tar.gz" },
             { null, ".zip" },
             { null, "test.tar.gz" },
             { null, "test.zip" },
-        }, NIL, MOK);
+        }, NULL, MOK);
 
         assertScheme(new String[][] {
             { "tar.gz", ".tar.gz" },

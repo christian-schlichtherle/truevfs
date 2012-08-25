@@ -23,7 +23,7 @@ import static net.java.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskJoiner;
 import static net.java.truecommons.shed.ConcurrencyUtils.start;
-import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
+import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsResourceOpenException;
@@ -317,7 +317,7 @@ extends ConfiguredClientTestBase<D> {
     private void assertCreateNewEnhancedFile() throws IOException {
         final TPath file1 = archive.resolve("test.txt");
         final TPath file2 = file1.resolve("test.txt");
-        try (final TConfig config = TConfig.push()) {
+        try (final TConfig config = TConfig.open()) {
             config.setLenient(false);
             try {
                 createFile(file1);
@@ -438,7 +438,7 @@ extends ConfiguredClientTestBase<D> {
     @Test
     public void testStrictFileOutputStream() throws IOException {
         TPath file = archive.resolve("test.txt");
-        try (final TConfig config = TConfig.push()) {
+        try (final TConfig config = TConfig.open()) {
             config.setLenient(false);
             try {
                 assertFileOutputStream(file);
@@ -718,7 +718,7 @@ extends ConfiguredClientTestBase<D> {
         delete(dir2);
         delete(dir1);
 
-        try (final TConfig config = TConfig.push()) {
+        try (final TConfig config = TConfig.open()) {
             config.setLenient(false);
 
             try {
@@ -1485,9 +1485,8 @@ extends ConfiguredClientTestBase<D> {
         final TPath entry1 = archive.resolve("entry1");
         final TPath entry2 = archive.resolve("entry2");
 
-        TConfig config = TConfig.push();
-        try {
-            config.setAccessPreferences(config.getAccessPreferences().set(GROW));
+        try (final TConfig config = TConfig.open()) {
+            config.setPreference(GROW, true);
 
             createTestFile(entry1);
             createTestFile(entry2);
@@ -1506,20 +1505,15 @@ extends ConfiguredClientTestBase<D> {
 
             umount();
             assertTrue(size(path) > 6 * getDataLength()); // six entries plus two central directories
-        } finally {
-            config.close();
         }
 
         assertThat(listFiles(archive).length, is(0));
 
-        config = TConfig.push();
-        try {
-            config.setAccessPreferences(config.getAccessPreferences().set(GROW));
+        try (final TConfig config = TConfig.open()) {
+            config.setPreference(GROW, true);
 
             delete(archive);
             umount();
-        } finally {
-            config.close();
         }
 
         assertNull(listFiles(archive));

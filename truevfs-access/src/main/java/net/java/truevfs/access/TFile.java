@@ -166,7 +166,7 @@ import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
  * depending upon an archive file's path and its <i>true state</i> in the
  * first parent file system where it actually exists.
  * <p>
- * <table border=1 cellpadding=5 summary="">
+ * <table border=1>
  * <thead>
  * <tr>
  *   <th>Path</th>
@@ -380,7 +380,9 @@ public final class TFile extends File {
      */
     private transient File file;
 
+    /** The configuration to use. */
     private transient TArchiveDetector detector;
+
     private transient @CheckForNull TFile innerArchive;
     private transient @CheckForNull TFile enclArchive;
     private transient @CheckForNull FsNodeName nodeName;
@@ -395,274 +397,98 @@ public final class TFile extends File {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private transient volatile @CheckForNull FsController controller;
 
-    /**
-     * Copy constructor.
-     * Equivalent to {@link #TFile(File, TArchiveDetector)
-     * new TFile(template, (TArchiveDetector) null)}.
-     * 
-     * @param file the file object to decorate.
-     */
-    public TFile(File file) {
-        this(file, (TArchiveDetector) null);
-    }
+    public TFile(File file) { this(file, (TArchiveDetector) null); }
 
-    /**
-     * Constructs a new {@code TFile} instance which may use the given archive
-     * detector to scan the path name for prospective archive files.
-     * 
-     * @param file the file object to decorate.
-     *        If this is an instance of this class, its fields are copied and
-     *        the {@code detector} parameter is ignored.
-     * @param detector the archive detector to use for scanning the path name
-     *        for prospective archive files.
-     *        This parameter is ignored if and only if {@code file} is an
-     *        instance of this class.
-     *        Otherwise, if this parameter is {@code null}, then the
-     *        {@linkplain TConfig#getArchiveDetector default archive detector}
-     *        is used instead.
-     */
-    public TFile(   final File file,
-                    final @CheckForNull TArchiveDetector detector) {
+    TFile(final File file, final @CheckForNull TArchiveDetector detector) {
         super(file.getPath());
-
         if (file instanceof TFile) {
-            final TFile tfile = (TFile) file;
-            this.file = tfile.file;
-            this.detector = tfile.detector;
-            this.enclArchive = tfile.enclArchive;
-            this.nodeName = tfile.nodeName;
-            this.innerArchive = tfile.isArchive() ? this : tfile.innerArchive;
-            this.controller = tfile.controller;
+            final TFile that = (TFile) file;
+            this.file = that.file;
+            this.detector = that.detector;
+            if (null == detector || this.detector.equals(detector)) {
+                this.enclArchive = that.getEnclArchive();
+                this.nodeName = that.nodeName;
+                this.innerArchive = that.isArchive() ? this : that.innerArchive;
+                this.controller = that.controller;
+            } else {
+                this.detector = detector;
+                scan(null);
+            }
         } else {
             this.file = file;
-            this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
+            this.detector = null != detector ? detector : TConfig.get().getDetector();
             scan(null);
         }
-
         assert invariants();
     }
 
-    /**
-     * Equivalent to {@link #TFile(String, TArchiveDetector)
-     * new TFile(path, (TArchiveDetector) null)}.
-     * <p>
-     * The {@linkplain TConfig#getArchiveDetector default archive detector}
-     * is used to scan the path name for prospective archive files.
-     * 
-     * @param path the path name.
-     */
-    public TFile(String path) {
-        this(path, (TArchiveDetector) null);
-    }
+    public TFile(String path) { this(path, (TArchiveDetector) null); }
 
-    /**
-     * Constructs a new {@code TFile} instance which may use the given
-     * {@link TArchiveDetector} to scan its path name for prospective archive
-     * files.
-     *
-     * @param path the path name.
-     * @param detector the archive detector to use for scanning the path name
-     *        for prospective archive files.
-     *        If this parameter is {@code null}, then the
-     *        {@linkplain TConfig#getArchiveDetector default archive detector}
-     *        is used instead.
-     */
-    public TFile(   final String path,
-                    final @CheckForNull TArchiveDetector detector) {
+    TFile(final String path, final @CheckForNull TArchiveDetector detector) {
         super(path);
-
         this.file = new File(path);
-        this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
+        this.detector = null != detector ? detector : TConfig.get().getDetector();
         scan(null);
-
         assert invariants();
     }
 
-    /**
-     * Equivalent to {@link #TFile(String, String, TArchiveDetector)
-     * new TFile(parent, child, null)}.
-     * <p>
-     * The {@linkplain TConfig#getArchiveDetector default archive detector}
-     * is used to scan the <em>entire path name</em> for prospective archive
-     * files.
-     *
-     * @param parent the parent directory.
-     * @param member the member path name.
-     */
-    public TFile(@CheckForNull String parent, String member) {
-        this(parent, member, null);
-    }
-
-    /**
-     * Constructs a new {@code TFile} instance which may use the given archive
-     * detector to scan the <em>entire path name</em> for prospective archive
-     * files.
-     *
-     * @param parent the parent directory.
-     * @param member the member path name.
-     * @param detector the archive detector to use for scanning the path name
-     *        for prospective archive files.
-     *        If this parameter is {@code null}, then the
-     *        {@linkplain TConfig#getArchiveDetector default archive detector}
-     *        is used instead.
-     */
-    public TFile(   final @CheckForNull String parent,
-                    final String member,
-                    final @CheckForNull TArchiveDetector detector) {
-        super(parent, member);
-
-        this.file = new File(parent, member);
-        this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
-        scan(null);
-
-        assert invariants();
-    }
-
-    /**
-     * Equivalent to {@link #TFile(File, String, TArchiveDetector)
-     * new TFile(parent, child, null)}.
-     *
-     * @param parent the parent directory.
-     *        If this parameter is an instance of this class, its archive
-     *        detector is used to scan only the <em>member path name</em>
-     *        for prospective archive files.
-     *        Otherwise, the
-     *        {@linkplain TConfig#getArchiveDetector default archive detector}
-     *        is used to to scan the <em>entire path name</em>
-     *        for prospective archive files.
-     * @param member the member path name.
-     */
     public TFile(@CheckForNull File parent, String member) {
         this(parent, member, null);
     }
 
-    /**
-     * Constructs a new {@code TFile} instance which may use the given archive
-     * detector to scan the path name for prospective archive files.
-     * <p>
-     * If {@code parent} is an instance of this class,
-     * then {@code detector} is used to scan only the <em>member path name</em>
-     * for prospective archive files.
-     * If {@code detector} is {@code null}, then the
-     * parent's archive detector
-     * is used instead.
-     * <p>
-     * Otherwise, if {@code parent} is not an instance of this class,
-     * then {@code detector} is used to scan the <em>entire path name</em>
-     * for prospective archive files.
-     * If {@code detector} is {@code null}, then the
-     * {@linkplain TConfig#getArchiveDetector default archive detector}
-     * is used instead.
-     * 
-     * @param parent the parent directory.
-     * @param member the member path name.
-     * @param detector the archive detector to use for scanning the path name
-     *        for prospective archive files.
-     *        If this parameter is {@code null}, then the
-     *        {@linkplain TConfig#getArchiveDetector default archive detector}
-     *        is used instead.
-     */
-    public TFile(   final @CheckForNull File parent,
-                    final String member,
-                    final @CheckForNull TArchiveDetector detector) {
+    TFile(  final @CheckForNull File parent,
+            final String member,
+            final @CheckForNull TArchiveDetector detector) {
         super(parent, member);
-
         this.file = new File(parent, member);
         if (parent instanceof TFile) {
-            final TFile p = (TFile) parent;
-            this.detector = null != detector ? detector : p.detector;
-            scan(p);
+            final TFile tparent = (TFile) parent;
+            this.detector = null != detector ? detector : tparent.detector;
+            scan(tparent);
         } else {
-            this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
+            this.detector = null != detector ? detector : TConfig.get().getDetector();
             scan(null);
         }
-
         assert invariants();
     }
 
-    /**
-     * Constructs a new {@code TFile} instance from the given {@code uri}.
-     * This constructor is equivalent to
-     * <code>new {@link #TFile(FsNodePath, TArchiveDetector) TFile(FsNodePath.create(uri, CANONICALIZE), null))}</code>,
-     *
-     * @param  uri an absolute URI which has a scheme component which is
-     *         known by the
-     *         {@linkplain TConfig#getArchiveDetector default archive detector}.
-     * @throws IllegalArgumentException if the given URI does not conform to
-     *         the syntax constraints for {@link FsNodePath}s or
-     *         {@link File#File(URI)}.
-     * @see    #toURI()
-     * @see    #TFile(FsNodePath)
-     */
+    public TFile(@CheckForNull String parent, String member) {
+        this(parent, member, null);
+    }
+
+    TFile(  final @CheckForNull String parent,
+            final String member,
+            final @CheckForNull TArchiveDetector detector) {
+        super(parent, member);
+        this.file = new File(parent, member);
+        this.detector = null != detector ? detector : TConfig.get().getDetector();
+        scan(null);
+        assert invariants();
+    }
+
     public TFile(URI uri) {
-        this(FsNodePath.create(uri, CANONICALIZE), null);
+        this(uri, null);
     }
 
-    /**
-     * Constructs a new {@code TFile} instance from the given {@code path}.
-     * This constructor is equivalent to
-     * <code>new {@link #TFile(FsNodePath, TArchiveDetector) TFile(path, null)}</code>
-     *
-     * @param  path a path with an absolute
-     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} which has a
-     *         scheme component which is known by the
-     *         {@linkplain TConfig#getArchiveDetector default archive detector}.
-     * @throws IllegalArgumentException if the
-     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} of the given
-     *         path does not conform to the syntax constraints for
-     *         {@link File#File(URI)}.
-     * @see    #toNodePath()
-     * @see    #TFile(URI)
-     */
-    public TFile(FsNodePath path) {
-        this(path, null);
+    TFile(URI uri, @CheckForNull TArchiveDetector detector) {
+        this(FsNodePath.create(uri, CANONICALIZE), detector);
     }
 
-    /**
-     * Constructs a new {@code TFile} instance for the given {@code path} and
-     * {@code detector}.
-     * <p>
-     * This constructor is a super set of the super class constructor
-     * {@link File#File(URI)} with the following additional features:
-     * If the given URI is opaque, it must match the pattern
-     * {@code <scheme>:<uri>!/<entry>}.
-     * The constructed file object then parses the URI to address an entry in
-     * a federated file system (i.e. prospective archive file) with the name
-     * {@code <entry>} in the prospective archive file addressed by
-     * {@code <uri>} which is of the type identified by {@code <scheme>}  .
-     * This is recursively applied to access entries within other prospective
-     * archive files until {@code <uri>} is a hierarchical URI.
-     * The scheme component of this hierarchical URI must be {@code file}.
-     *
-     * @param  path a path with an absolute
-     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} which has a
-     *         scheme component which is known by the given {@code detector}.
-     * @param  detector the archive detector to look up archive file system
-     *         drivers for the named URI scheme components.
-     *         If this parameter is {@code null}, then the
-     *         {@linkplain TConfig#getArchiveDetector default archive detector}.
-     *         is used instead.
-     * @throws IllegalArgumentException if the
-     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} of the given
-     *         path does not conform to the syntax constraints for
-     *         {@link File#File(URI)}.
-     * @see    #toNodePath()
-     */
-    public TFile(   final FsNodePath path,
-                    final @CheckForNull TArchiveDetector detector) {
+    public TFile(FsNodePath path) { this(path, null); }
+
+    TFile(final FsNodePath path, final @CheckForNull TArchiveDetector detector) {
         super(path.toHierarchicalUri());
-        parse(path, null != detector ? detector : TConfig.get().getArchiveDetector());
+        parse(path, null != detector ? detector : TConfig.get().getDetector());
     }
 
-    private void parse( final FsNodePath path,
-                        final TArchiveDetector detector) {
+    private void parse(
+            final FsNodePath path,
+            final TArchiveDetector detector) {
         this.file = new File(super.getPath());
         this.detector = detector;
-
         final FsMountPoint mp = path.getMountPoint();
         final FsNodePath mpp = mp.getPath();
         final FsNodeName nn;
-
         if (null == mpp) {
             assert !path.toUri().isOpaque();
             this.enclArchive = null;
@@ -691,13 +517,12 @@ public final class TFile extends File {
     }
 
     @SuppressWarnings("LeakingThisInConstructor")
-    private TFile(  final FsMountPoint mountPoint,
-                    final TArchiveDetector detector) {
+    private TFile(
+            final FsMountPoint mountPoint,
+            final TArchiveDetector detector) {
         super(mountPoint.toHierarchicalUri());
-
         this.file = new File(super.getPath());
         this.detector = detector;
-
         final FsNodePath mpp = mountPoint.getPath();
         if (null == mpp) {
             assert !mountPoint.toUri().isOpaque();
@@ -707,8 +532,7 @@ public final class TFile extends File {
         } else {
             assert mountPoint.toUri().isOpaque();
             if (mpp.toUri().isOpaque()) {
-                this.enclArchive
-                        = new TFile(mpp.getMountPoint(), detector);
+                this.enclArchive = new TFile(mpp.getMountPoint(), detector);
                 this.nodeName = mpp.getNodeName();
             } else {
                 this.enclArchive = null;
@@ -717,18 +541,16 @@ public final class TFile extends File {
             this.innerArchive = this;
             this.controller = getController(mountPoint);
         }
-
         assert invariants();
     }
 
     @SuppressWarnings("LeakingThisInConstructor")
-    private TFile(  final File file,
-                    final @CheckForNull TFile innerArchive,
-                    final TArchiveDetector detector) {
+    private TFile(
+            final File file,
+            final @CheckForNull TFile innerArchive,
+            final TArchiveDetector detector) {
         super(file.getPath());
-
         this.file = file;
-
         final String path = file.getPath();
         if (null != innerArchive) {
             final int iapl = innerArchive.getPath().length();
@@ -756,7 +578,6 @@ public final class TFile extends File {
         } else {
             this.detector = detector;
         }
-
         assert invariants();
     }
 
@@ -764,7 +585,7 @@ public final class TFile extends File {
      * Initialize this file object by scanning its path for archive
      * files, using the given {@code ancestor} file (i.e. a direct or
      * indirect parent file) if any.
-     * {@code file} and {@code detector} must already be initialized!
+     * {@code file} and {@code config} must already be initialized!
      * Must not be called to re-initialize this object!
      */
     private void scan(final @CheckForNull TFile ancestor) {
@@ -772,9 +593,8 @@ public final class TFile extends File {
         assert ancestor == null || path.startsWith(ancestor.getPath());
         assert file.getPath().equals(path);
         assert null != detector;
-
         final StringBuilder nodeNameBuf = new StringBuilder(path.length());
-        scan(ancestor, detector, 0, path, nodeNameBuf, new PathSplitter(separatorChar, false));
+        scan(detector, ancestor, 0, path, nodeNameBuf, new PathSplitter(separatorChar, false));
         try {
             nodeName = 0 >= nodeNameBuf.length()
                     ? null
@@ -787,8 +607,8 @@ public final class TFile extends File {
     }
 
     private void scan(
-            @CheckForNull TFile ancestor,
             TArchiveDetector detector,
+            @CheckForNull TFile ancestor,
             int skip,
             final String path,
             final StringBuilder enclEntryNameBuf,
@@ -849,7 +669,7 @@ public final class TFile extends File {
                         innerArchive = enclArchive;
                     return;
                 } else if (pathLen < ancestorPathLen) {
-                    detector = ancestor.detector;
+                    detector = ancestor.getDetector();
                     ancestor = ancestor.enclArchive;
                 }
             }
@@ -857,7 +677,7 @@ public final class TFile extends File {
             final boolean isArchive = null != detector.scheme(path);
             if (0 < enclEntryNameBuf.length()) {
                 if (isArchive) {
-                    enclArchive = new TFile(path, detector); // use the same detector for the parent directory
+                    enclArchive = detector.newFile(path); // use the same configuration for the parent directory
                     if (innerArchive != this)
                         innerArchive = enclArchive;
                     return;
@@ -871,7 +691,7 @@ public final class TFile extends File {
             }
         }
 
-        scan(ancestor, detector, skip, parent, enclEntryNameBuf, splitter);
+        scan(detector, ancestor, skip, parent, enclEntryNameBuf, splitter);
     }
 
     private Object writeReplace() throws ObjectStreamException {
@@ -885,8 +705,7 @@ public final class TFile extends File {
 
     private void readObject(ObjectInputStream in)
     throws IOException, ClassNotFoundException {
-        parse(  FsNodePath.create((URI) in.readObject(), CANONICALIZE),
-                TConfig.get().getArchiveDetector());
+        parse(  FsNodePath.create((URI) in.readObject(), CANONICALIZE), TConfig.get().getDetector());
     }
 
     /**
@@ -929,6 +748,17 @@ public final class TFile extends File {
     }
 
     /**
+     * Returns the {@link TArchiveDetector} which was used to detect any
+     * archive files in the path of this file object at construction time.
+     * This method forwards the call to {@link #getConfig()}.
+     * 
+     * @return The {@link TArchiveDetector} which was used to detect any
+     *         archive files in the path of this file object at construction
+     *         time.
+     */
+    TArchiveDetector getDetector() { return detector; }
+
+    /**
      * Returns a file object for the same path name, but does not detect any
      * archive file name patterns in the last path name segment.
      * The parent file object is unaffected by this transformation, so the
@@ -945,9 +775,8 @@ public final class TFile extends File {
      * @see    TVFS#umount(TFile)
      */
     public TFile toNonArchiveFile() {
-        return isArchive()
-                ? new TFile(getParentFile(), getName(), TArchiveDetector.NULL)
-                : this;
+        if (!isArchive()) return this;
+        return TArchiveDetector.NULL.newFile(getParentFile(), getName());
     }
 
     /**
@@ -985,15 +814,14 @@ public final class TFile extends File {
 
         // This is not only called for performance reasons, but also in order
         // to prevent the parent path from being rescanned for archive files
-        // with a different detector, which could trigger an update and
-        // reconfiguration of the respective file system controller!
-        return new TFile(parent, enclArchive, detector);
+        // with a different detector, which is nonsense.
+        return new TFile(parent, enclArchive, getDetector());
     }
 
     @Override
     public TFile getAbsoluteFile() {
         final String p = getAbsolutePath();
-        return p.equals(getPath()) ? this : new TFile(p, detector);
+        return p.equals(getPath()) ? this : getDetector().newFile(p);
     }
 
     @Override
@@ -1017,7 +845,7 @@ public final class TFile extends File {
      */
     public TFile getNormalizedAbsoluteFile() {
         final String p = getNormalizedAbsolutePath();
-        return p.equals(getPath()) ? this : new TFile(p, detector);
+        return p.equals(getPath()) ? this : getDetector().newFile(p);
     }
 
     /**
@@ -1046,7 +874,7 @@ public final class TFile extends File {
      */
     public TFile getNormalizedFile() {
         final String p = getNormalizedPath();
-        return p.equals(getPath()) ? this : new TFile(p, detector);
+        return p.equals(getPath()) ? this : getDetector().newFile(p);
     }
 
     /**
@@ -1063,7 +891,7 @@ public final class TFile extends File {
     @Override
     public TFile getCanonicalFile() throws IOException {
         final String p = getCanonicalPath();
-        return p.equals(getPath()) ? this : new TFile(p, detector);
+        return p.equals(getPath()) ? this : getDetector().newFile(p);
     }
 
     @Override
@@ -1081,7 +909,7 @@ public final class TFile extends File {
      */
     public TFile getCanOrAbsFile() {
         final String p = getCanOrAbsPath();
-        return p.equals(getPath()) ? this : new TFile(p, detector);
+        return p.equals(getPath()) ? this : getDetector().newFile(p);
     }
 
     /**
@@ -1108,17 +936,6 @@ public final class TFile extends File {
     @Override
     public String getName() {
         return file.getName();
-    }
-
-    /**
-     * Returns the {@link TArchiveDetector} that was used to detect any archive
-     * files in the path of this file object at construction time.
-     * 
-     * @return The {@link TArchiveDetector} that was used to detect any archive
-     *         files in the path of this file object at construction time.
-     */
-    public TArchiveDetector getArchiveDetector() {
-        return detector;
     }
 
     /**
@@ -1307,7 +1124,7 @@ public final class TFile extends File {
             return controller;
         final File file = this.file;
         final String path = Paths.normalize(file.getPath(), separatorChar);
-        final FsScheme scheme = detector.scheme(path);
+        final FsScheme scheme = getDetector().scheme(path);
         // See http://java.net/jira/browse/TRUEZIP-154 .
         if (null == scheme)
             throw new ServiceConfigurationError(
@@ -1331,9 +1148,11 @@ public final class TFile extends File {
         return this.controller = getController(mountPoint);
     }
 
-    @SuppressWarnings("deprecation")
     private FsController getController(FsMountPoint mountPoint) {
-        return TConfig.get().getManager().controller(detector, mountPoint);
+        return TConfig
+                .get()
+                .getManager()
+                .controller(getDetector(), mountPoint);
     }
 
     /**
@@ -1390,9 +1209,7 @@ public final class TFile extends File {
      *         {@code file}
      * @throws NullPointerException If the parameter is {@code null}.
      */
-    public boolean contains(File file) {
-        return contains(this, file);
-    }
+    public boolean contains(File file) { return contains(this, file); }
 
     /**
      * Returns {@code true} if and only if the path represented
@@ -1437,9 +1254,7 @@ public final class TFile extends File {
      * 
      * @return {@code true} if and only if this file denotes a UNC.
      */
-    public boolean isUNC() {
-        return isUNC(getCanOrAbsPath());
-    }
+    public boolean isUNC() { return isUNC(getCanOrAbsPath()); }
 
     /**
      * Returns {@code true} if and only if this file denotes a UNC.
@@ -1461,9 +1276,7 @@ public final class TFile extends File {
      * @see #equals(Object)
      */
     @Override
-    public int hashCode() {
-        return file.hashCode();
-    }
+    public int hashCode() { return file.hashCode(); }
 
     /**
      * {@inheritDoc}
@@ -1494,9 +1307,7 @@ public final class TFile extends File {
      */
     @Override
     @SuppressWarnings({"EqualsWhichDoesntCheckParameterClass"})
-    public boolean equals(Object that) {
-        return file.equals(that);
-    }
+    public boolean equals(Object that) { return file.equals(that); }
 
     /**
      * {@inheritDoc }
@@ -1525,14 +1336,10 @@ public final class TFile extends File {
      * @see   #equals(Object)
      */
     @Override
-    public int compareTo(File that) {
-        return file.compareTo(that);
-    }
+    public int compareTo(File that) { return file.compareTo(that); }
 
     @Override
-    public String toString() {
-        return file.toString();
-    }
+    public String toString() { return file.toString(); }
 
     @Deprecated
     @Override
@@ -1644,12 +1451,11 @@ public final class TFile extends File {
     }
 
     private @Nullable FsScheme getScheme() {
-        if (this != innerArchive)
-            return null;
+        if (this != innerArchive) return null;
         final FsController controller = this.controller;
         if (null != controller)
             return controller.getModel().getMountPoint().getScheme();
-        return detector.scheme(file.getPath());
+        return getDetector().scheme(file.getPath());
     }
 
     /**
@@ -1658,12 +1464,10 @@ public final class TFile extends File {
      * @return {@code new TPath(this)}.
      */
     @Override
-    public TPath toPath() {
-        return new TPath(this);
-    }
+    public TPath toPath() { return new TPath(this); }
 
-    private static BitField<FsAccessOption> getAccessPreferences() {
-        return TConfig.get().getAccessPreferences();
+    private static BitField<FsAccessOption> getPreferences() {
+        return TConfig.get().getPreferences();
     }
 
     /**
@@ -1679,7 +1483,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().checkAccess(
-                        getAccessPreferences(), getNodeName(),
+                        getPreferences(), getNodeName(),
                         NO_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1707,7 +1511,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 final FsNode entry = innerArchive.getController()
-                        .node(getAccessPreferences(), getNodeName());
+                        .node(getPreferences(), getNodeName());
                 return null != entry && entry.isType(FILE);
             } catch (IOException ex) {
                 return false;
@@ -1736,7 +1540,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 final FsNode entry = innerArchive.getController()
-                        .node(getAccessPreferences(), getNodeName());
+                        .node(getPreferences(), getNodeName());
                 return null != entry && entry.isType(DIRECTORY);
             } catch (IOException ex) {
                 return false;
@@ -1750,7 +1554,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().checkAccess(
-                        getAccessPreferences(), getNodeName(),
+                        getPreferences(), getNodeName(),
                         READ_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1765,7 +1569,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().checkAccess(
-                        getAccessPreferences(), getNodeName(),
+                        getPreferences(), getNodeName(),
                         WRITE_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1780,7 +1584,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().checkAccess(
-                        getAccessPreferences(), getNodeName(),
+                        getPreferences(), getNodeName(),
                         EXECUTE_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1832,7 +1636,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .node(getAccessPreferences(), getNodeName());
+                        .node(getPreferences(), getNodeName());
             } catch (final IOException ex) {
                 return 0;
             }
@@ -1861,7 +1665,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .node(getAccessPreferences(), getNodeName());
+                        .node(getPreferences(), getNodeName());
             } catch (final IOException ex) {
                 return 0;
             }
@@ -1895,7 +1699,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().setTime(
-                        getAccessPreferences(), getNodeName(),
+                        getPreferences(), getNodeName(),
                         WRITE_ACCESS,
                         time);
                 return true;
@@ -1928,7 +1732,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .node(getAccessPreferences(), getNodeName());
+                        .node(getPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
@@ -1961,7 +1765,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .node(getAccessPreferences(), getNodeName());
+                        .node(getPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
@@ -1981,11 +1785,11 @@ public final class TFile extends File {
 
     /**
      * Equivalent to {@link #listFiles(FilenameFilter, TArchiveDetector)
-     * listFiles((FilenameFilter) null, getArchiveDetector())}.
+     * listFiles((FilenameFilter) null, getDetector())}.
      */
     @Override
     public @Nullable TFile[] listFiles() {
-        return listFiles((FilenameFilter) null, detector);
+        return listFiles((FilenameFilter) null, getDetector());
     }
 
     /**
@@ -2011,11 +1815,11 @@ public final class TFile extends File {
 
     /**
      * Equivalent to {@link #listFiles(FilenameFilter, TArchiveDetector)
-     * listFiles(filenameFilter, getArchiveDetector())}.
+     * listFiles(filenameFilter, getDetector())}.
      */
     @Override
     public @Nullable TFile[] listFiles(@CheckForNull FilenameFilter filter) {
-        return listFiles(filter, detector);
+        return listFiles(filter, getDetector());
     }
 
     /**
@@ -2044,7 +1848,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .node(getAccessPreferences(), getNodeName());
+                        .node(getPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
@@ -2072,24 +1876,24 @@ public final class TFile extends File {
             final Collection<TFile> accepted = new ArrayList<>(members.size());
             for (final String member : members)
                 if (filter.accept(this, member))
-                    accepted.add(new TFile(this, member, detector));
+                    accepted.add(detector.newFile(this, member));
             return accepted.toArray(new TFile[accepted.size()]);
         } else {
             final TFile[] accepted = new TFile[members.size()];
             int i = 0;
             for (final String member : members)
-                accepted[i++] = new TFile(this, member, detector);
+                accepted[i++] = detector.newFile(this, member);
             return accepted;
         }
     }
 
     /**
      * Equivalent to {@link #listFiles(FileFilter, TArchiveDetector)
-     * listFiles(fileFilter, getArchiveDetector())}.
+     * listFiles(fileFilter, getDetector())}.
      */
     @Override
     public @Nullable TFile[] listFiles(@CheckForNull FileFilter filter) {
-        return listFiles(filter, detector);
+        return listFiles(filter, getDetector());
     }
 
     /**
@@ -2117,7 +1921,7 @@ public final class TFile extends File {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .node(getAccessPreferences(), getNodeName());
+                        .node(getPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
@@ -2136,7 +1940,7 @@ public final class TFile extends File {
         if (null != filter) {
             final Collection<TFile> accepted = new ArrayList<>(members.size());
             for (final String member : members) {
-                final TFile file = new TFile(this, member, detector);
+                final TFile file = detector.newFile(this, member);
                 if (filter.accept(file))
                     accepted.add(file);
             }
@@ -2145,7 +1949,7 @@ public final class TFile extends File {
             final TFile[] accepted = new TFile[members.size()];
             int i = 0;
             for (final String member : members)
-                accepted[i++] = new TFile(this, member, detector);
+                accepted[i++] = detector.newFile(this, member);
             return accepted;
         }
     }
@@ -2165,10 +1969,10 @@ public final class TFile extends File {
             final FsController controller = innerArchive.getController();
             final FsNodeName entryName = getNodeName();
             // This is not really atomic, but should be OK in this case.
-            if (null != controller.node(getAccessPreferences(), entryName))
+            if (null != controller.node(getPreferences(), entryName))
                 return false;
             controller.make(
-                    getAccessPreferences().set(EXCLUSIVE), entryName,
+                    getPreferences().set(EXCLUSIVE), entryName,
                     FILE,
                     null);
             return true;
@@ -2213,7 +2017,7 @@ public final class TFile extends File {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().make(
-                        getAccessPreferences(), getNodeName(),
+                        getPreferences(), getNodeName(),
                         DIRECTORY,
                         null);
                 return true;
@@ -2244,13 +2048,11 @@ public final class TFile extends File {
             final FsController controller = innerArchive.getController();
             final FsNodeName innerEntryName = getNodeName();
             try {
-                controller.make(
-                        getAccessPreferences(), innerEntryName,
-                        DIRECTORY,
-                        null);
+                controller.make(    getPreferences(), innerEntryName,
+                                    DIRECTORY, null);
             } catch (IOException ex) {
                 final FsNode entry = controller
-                        .node(getAccessPreferences(), innerEntryName);
+                        .node(getPreferences(), innerEntryName);
                 if (null == entry || !entry.isType(DIRECTORY))
                     throw ex;
             }
@@ -2298,25 +2100,25 @@ public final class TFile extends File {
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
-     * @param  node the file or directory.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
+     * @param  file the file or directory.
+     *         Note that although this just needs to be a plain {@code File}
+     *         object, archive files and entries are only supported for
+     *         instances of {@code TFile}.
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    public static void rm(File node) throws IOException {
-        if (node instanceof TFile) {
-            TFile file = (TFile) node;
-            if (null != file.innerArchive) {
-                file.innerArchive.getController().unlink(
-                        getAccessPreferences(), file.getNodeName());
+    public static void rm(File file) throws IOException {
+        if (file instanceof TFile) {
+            TFile tfile = (TFile) file;
+            if (null != tfile.innerArchive) {
+                tfile.innerArchive.getController().unlink(
+                        getPreferences(), tfile.getNodeName());
                 return;
             }
-            node = file.file;
+            file = tfile.file;
         }
-        if (!node.delete())
-            throw new FileSystemException(node.getPath(), null, "Cannot delete!");
+        if (!file.delete())
+            throw new FileSystemException(file.getPath(), null, "Cannot delete!");
     }
 
     /**
@@ -2328,7 +2130,7 @@ public final class TFile extends File {
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
     public TFile rm_r() throws IOException {
-        TBIO.rm_r(this, detector);
+        TBIO.rm_r(this, getDetector());
         return this;
     }
 
@@ -2336,7 +2138,7 @@ public final class TFile extends File {
      * Recursively deletes the given file or directory tree.
      * <p>
      * If {@code node} is an instance of this
-     * class, its {@link #getArchiveDetector() archive detector}
+     * class, its {@link #getDetector() archive detector}
      * is used to detect prospective archive files in the directory tree.
      * Otherwise,
      * {@link TArchiveDetector#NULL}
@@ -2344,7 +2146,7 @@ public final class TFile extends File {
      * <p>
      * This file system operation is <em>not</em> atomic.
      * 
-     * @param  node the file or directory tree.
+     * @param  file the file or directory tree.
      *         Note that although this just needs to be a plain {@code File},
      *         archive files and entries are only supported for instances of
      *         this class.
@@ -2352,10 +2154,10 @@ public final class TFile extends File {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
-    public static void rm_r(File node) throws IOException {
-        TBIO.rm_r(node,
-                node instanceof TFile
-                    ? ((TFile) node).detector
+    public static void rm_r(File file) throws IOException {
+        TBIO.rm_r(file,
+                file instanceof TFile
+                    ? ((TFile) file).getDetector()
                     : TArchiveDetector.NULL);
     }
 
@@ -2386,7 +2188,7 @@ public final class TFile extends File {
     @Override
     public boolean renameTo(final File dst) {
         try {
-            mv(this, dst, detector);
+            mv(this, dst, getDetector());
             return true;
         } catch (IOException ex) {
             return false;
@@ -2394,7 +2196,7 @@ public final class TFile extends File {
     }
 
     /**
-     * Equivalent to {@link #mv(File, File, TArchiveDetector) mv(this, dst, getArchiveDetector())}.
+     * Equivalent to {@link #mv(File, File, TArchiveDetector) mv(this, dst, getDetector())}.
      * 
      * @param  dst the destination file or directory tree.
      *         Note that although this just needs to be a plain {@code File},
@@ -2436,11 +2238,12 @@ public final class TFile extends File {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
-    public static void mv(  final File src,
-                            final File dst,
-                            final TArchiveDetector detector)
+    public static void mv(
+            final File src,
+            final File dst,
+            final TArchiveDetector detector)
     throws IOException {
-        if (detector.toString().isEmpty()) {
+        if (detector.getExtensions().isEmpty()) {
             final boolean srcArchived;
             final File srcDelegate;
             if (src instanceof TFile) {
@@ -2848,8 +2651,8 @@ public final class TFile extends File {
      * to the file or directory {@code dst}.
      * <p>
      * This version calls {@link #cp_r(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, srcDetector, dstDetector)},
-     * where {@code srcDetector} is {@code this.getArchiveDetector} and
-     * {@code dstDetector} is {@code dst.getArchiveDetector()} if and only if
+     * where {@code srcDetector} is {@code this.getDetector()} and
+     * {@code dstDetector} is {@code dst.getDetector()} if and only if
      * {@code dst} is an instance of this class or {@link TArchiveDetector#NULL}
      * otherwise.
      * 
@@ -2863,9 +2666,9 @@ public final class TFile extends File {
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
     public TFile cp_r(final File dst) throws IOException {
-        final TArchiveDetector srcDetector = detector;
+        final TArchiveDetector srcDetector = getDetector();
         final TArchiveDetector dstDetector = dst instanceof TFile
-                ? ((TFile) dst).detector
+                ? ((TFile) dst).getDetector()
                 : TArchiveDetector.NULL;
         TBIO.cp_r(false, this, dst, srcDetector, dstDetector);
         return this;
@@ -2934,9 +2737,11 @@ public final class TFile extends File {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
-    public static void cp_r(File src, File dst,
-                            TArchiveDetector srcDetector,
-                            TArchiveDetector dstDetector)
+    public static void cp_r(
+            File src,
+            File dst,
+            TArchiveDetector srcDetector,
+            TArchiveDetector dstDetector)
     throws IOException {
         TBIO.cp_r(false, src, dst, srcDetector, dstDetector);
     }
@@ -2947,8 +2752,8 @@ public final class TFile extends File {
      * source file to the destination file, too.
      * <p>
      * This version calls {@link #cp_rp(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, srcDetector, dstDetector)},
-     * where {@code srcDetector} is {@code this.getArchiveDetector} and
-     * {@code dstDetector} is {@code dst.getArchiveDetector()} if and only if
+     * where {@code srcDetector} is {@code this.getDetector()} and
+     * {@code dstDetector} is {@code dst.getDetector()} if and only if
      * {@code dst} is an instance of this class or {@link TArchiveDetector#NULL}
      * otherwise.
      * 
@@ -2962,9 +2767,9 @@ public final class TFile extends File {
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
     public TFile cp_rp(final File dst) throws IOException {
-        final TArchiveDetector srcDetector = detector;
+        final TArchiveDetector srcDetector = getDetector();
         final TArchiveDetector dstDetector = dst instanceof TFile
-                ? ((TFile) dst).detector
+                ? ((TFile) dst).getDetector()
                 : TArchiveDetector.NULL;
         TBIO.cp_r(true, this, dst, srcDetector, dstDetector);
         return this;
@@ -3046,9 +2851,11 @@ public final class TFile extends File {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
-    public static void cp_rp(File src, File dst,
-                             TArchiveDetector srcDetector,
-                             TArchiveDetector dstDetector)
+    public static void cp_rp(
+            File src,
+            File dst,
+            TArchiveDetector srcDetector,
+            TArchiveDetector dstDetector)
     throws IOException {
         TBIO.cp_r(true, src, dst, srcDetector, dstDetector);
     }
@@ -3243,6 +3050,55 @@ public final class TFile extends File {
         Streams.cat(in, out);
     }
 
+    private static File parent(final File file) {
+        final File parent = file.getParentFile();
+        return null != parent ? parent : CURRENT_DIRECTORY;
+    }
+
+    private static @Nullable String extension(final TFile file) {
+        final FsScheme scheme = file.getScheme();
+        return null != scheme ? "." + scheme : null;
+    }
+
+    private static boolean move(File src, File dst) {
+        return src.exists()
+                && (!dst.exists() || dst.delete())
+                && src.renameTo(dst);
+    }
+
+    private static void compact(TFile grown) throws IOException {
+        grown = grown.getNormalizedFile();
+        assert grown.isArchive();
+
+        final File dir = parent(grown);
+        final @Nullable String extension = extension(grown);
+        try (final TConfig config = TConfig.open()) {
+            config.setPreference(GROW, false);
+
+            // Create temp file.
+            final TFile compact = new TFile(createTempFile("tzp", extension, dir));
+            compact.rm();
+            try {
+                // Make a structural copy of the grown archive file, thereby
+                // compacting it.
+                grown.cp_rp(compact);
+
+                // Unmount both archive files so we can delete and move them
+                // safely and fast like regular files.
+                TVFS.umount(grown);
+                TVFS.umount(compact);
+
+                // Move the compacted archive file over to the grown archive
+                // file like a regular file.
+                if (!move(compact.toNonArchiveFile(), grown.toNonArchiveFile()))
+                    throw new FileSystemException(compact.getPath(), grown.getPath(), "Cannot move!");
+            } catch (final IOException ex) {
+                compact.rm();
+                throw ex;
+            }
+        }
+    }
+
     /**
      * Compacts this archive file by removing any redundant archive entry
      * contents and meta data, including central directories.
@@ -3252,7 +3108,7 @@ public final class TFile extends File {
      * <p>
      * This operation is intended to compact archive files which have been
      * frequently updated with {@link FsAccessOption#GROW} or similar means.
-     * If this output option preference is set and an archive file is updated
+     * If this access preference is set and an archive file is updated
      * frequently, then over time a lot of redundant artifacts such as archive
      * entry contents and meta data, including central directories may be
      * physically present in the archive file, even if all its entries have
@@ -3289,60 +3145,8 @@ public final class TFile extends File {
      * @see    FsAccessOption#GROW
      */
     public TFile compact() throws IOException {
-        if (isTopLevelArchive()) // see http://java.net/jira/browse/TRUEZIP-205
-            compact(this);
+        // See http://java.net/jira/browse/TRUEZIP-205 .
+        if (isTopLevelArchive()) compact(this);
         return this;
-    }
-
-    private static void compact(TFile grown) throws IOException {
-        assert grown.isArchive();
-        grown = grown.getNormalizedFile();
-        assert grown.isArchive();
-
-        final File dir = getParent(grown);
-        final String extension = getExtension(grown);
-        try (final TConfig config = TConfig.push()) {
-            // Switch off FsAccessOption.GROW.
-            config.setAccessPreferences(
-                    config.getAccessPreferences().clear(GROW));
-
-            // Create temp file.
-            final TFile compact = new TFile(createTempFile("tzp", extension, dir));
-            compact.rm();
-            try {
-                // Make a structural copy of the grown archive file, thereby
-                // compacting it.
-                grown.cp_rp(compact);
-
-                // Unmount both archive files so we can delete and move them
-                // safely and fast like regular files.
-                TVFS.umount(grown);
-                TVFS.umount(compact);
-
-                // Move the compacted archive file over to the grown archive
-                // file like a regular file.
-                if (!move(compact.toNonArchiveFile(), grown.toNonArchiveFile()))
-                    throw new FileSystemException(compact.getPath(), grown.getPath(), "Cannot move!");
-            } catch (final IOException ex) {
-                compact.rm();
-                throw ex;
-            }
-        }
-    }
-
-    private static File getParent(final File file) {
-        final File parent = file.getParentFile();
-        return null != parent ? parent : CURRENT_DIRECTORY;
-    }
-
-    private static @Nullable String getExtension(final TFile file) {
-        final FsScheme scheme = file.getScheme();
-        return null != scheme ? "." + scheme : null;
-    }
-
-    private static boolean move(File src, File dst) {
-        return src.exists()
-                && (!dst.exists() || dst.delete())
-                && src.renameTo(dst);
     }
 }
