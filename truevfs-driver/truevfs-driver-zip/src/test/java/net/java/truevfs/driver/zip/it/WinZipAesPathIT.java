@@ -35,8 +35,7 @@ public final class WinZipAesPathIT extends TPathITSuite<TestWinZipAesDriver> {
     @Override
     public void setUp() throws IOException {
         super.setUp();
-        final TConfig config = TConfig.get();
-        config.setAccessPreferences(config.getAccessPreferences().set(ENCRYPT));
+        TConfig.get().setPreference(ENCRYPT, true);
     }
 
     private void setAction(MockView.Action action) {

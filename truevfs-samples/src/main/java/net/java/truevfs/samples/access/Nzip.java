@@ -4,11 +4,6 @@
  */
 package net.java.truevfs.samples.access;
 
-import net.java.truevfs.access.TConfig;
-import net.java.truevfs.access.TArchiveDetector;
-import net.java.truevfs.access.TFileInputStream;
-import net.java.truevfs.access.TFile;
-import net.java.truevfs.access.TFileComparator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -20,6 +15,11 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truevfs.access.TArchiveDetector;
+import net.java.truevfs.access.TConfig;
+import net.java.truevfs.access.TFile;
+import net.java.truevfs.access.TFileComparator;
+import net.java.truevfs.access.TFileInputStream;
 import net.java.truevfs.comp.tardriver.TarDriver;
 import net.java.truevfs.comp.zipdriver.CheckedJarDriver;
 import net.java.truevfs.comp.zipdriver.CheckedZipDriver;
@@ -153,9 +153,8 @@ public class Nzip extends Application {
         if (1 > args.length) throw new IllegalUsageException();
         final String cmd = args[0].toLowerCase(Locale.ROOT);
         args = lshift(args);
-        try {
-            // Install custom archive detector.
-            TConfig.push().setArchiveDetector(newArchiveDetector());
+        try (final TConfig config = TConfig.open()) {
+            config.setDetector(newArchiveDetector());
             switch (cmd) {
             case "ls":
                 ls(args, false, false);
@@ -206,8 +205,6 @@ public class Nzip extends Application {
             default:
                 throw new IllegalUsageException();
             }
-        } finally {
-            TConfig.pop();
         }
         return 0;
     }
@@ -372,41 +369,41 @@ public class Nzip extends Application {
                 throw new IllegalUsageException();
             }
         }
-
-        final TArchiveDetector srcDetector;
-        if (cp437in)
-            srcDetector = newArchiveDetector(Charset.forName("IBM437"));
-        else if (utf8in)
-            srcDetector = newArchiveDetector(Charset.forName("UTF-8"));
-        else
-            srcDetector = TConfig.get().getArchiveDetector();
-
-        final TArchiveDetector dstDetector;
-        if (unzip)
-            dstDetector = TArchiveDetector.NULL;
-        else if (cp437out)
-            dstDetector = newArchiveDetector(Charset.forName("IBM437"));
-        else if (utf8out)
-            dstDetector = newArchiveDetector(Charset.forName("UTF-8"));
-        else
-            dstDetector = TConfig.get().getArchiveDetector();
-
-        final int dstI = args.length - 1;
-        final TFile dst = new TFile(args[dstI], dstDetector);
-        if (dstI - srcI < 1 || (dstI - srcI > 1
-                && !dst.isArchive() && !dst.isDirectory()))
-            throw new IllegalUsageException();
-        try (final TConfig config = TConfig.push()) {
-            config.setAccessPreferences(config.getAccessPreferences()
+        try (final TConfig config = TConfig.open()) {
+            config.setPreferences(config.getPreferences()
                     .set(STORE, store)
                     .set(COMPRESS, compress)
                     .set(GROW, grow)
                     .set(ENCRYPT, encrypt));
 
+            TArchiveDetector srcDetector;
+            if (cp437in)
+                srcDetector = newArchiveDetector(Charset.forName("IBM437"));
+            else if (utf8in)
+                srcDetector = newArchiveDetector(Charset.forName("UTF-8"));
+            else
+                srcDetector = config.getDetector();
+
+            TArchiveDetector dstDetector;
+            if (unzip)
+                dstDetector = TArchiveDetector.NULL;
+            else if (cp437out)
+                dstDetector = newArchiveDetector(Charset.forName("IBM437"));
+            else if (utf8out)
+                dstDetector = newArchiveDetector(Charset.forName("UTF-8"));
+            else
+                dstDetector = config.getDetector();
+
+            final int dstI = args.length - 1;
+            final TFile dst = dstDetector.newFile(args[dstI]);
+            if (dstI - srcI < 1 || (dstI - srcI > 1
+                    && !dst.isArchive() && !dst.isDirectory()))
+                throw new IllegalUsageException();
+
             for (int i = srcI; i < dstI; i++) {
-                final TFile src = new TFile(args[i], srcDetector);
+                final TFile src = srcDetector.newFile(args[i]);
                 final TFile tmp = dstI - srcI > 1 || dst.isDirectory()
-                        ? new TFile(dst, src.getName(), dstDetector)
+                        ? dstDetector.newFile(dst, src.getName())
                         : dst;
                 if (mv) {
                     try {

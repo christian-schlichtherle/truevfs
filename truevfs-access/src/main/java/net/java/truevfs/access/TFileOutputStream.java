@@ -4,11 +4,12 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truecommons.io.DecoratingOutputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.io.DecoratingOutputStream;
 import static net.java.truevfs.kernel.spec.FsAccessOption.APPEND;
+import net.java.truevfs.kernel.spec.FsAccessOptions;
 
 /**
  * A replacement for the class {@link FileOutputStream} for writing plain old
@@ -127,6 +128,6 @@ public final class TFileOutputStream extends DecoratingOutputStream {
     private static OutputStream newOutputStream(final File dst,
                                                 final boolean append)
     throws IOException {
-        return TBIO.output(TConfig.get().getAccessPreferences().set(APPEND, append), dst, null).stream(null);
+        return TBIO.output(TConfig.get().getPreferences().set(APPEND, append), dst, null).stream(null);
     }
 }

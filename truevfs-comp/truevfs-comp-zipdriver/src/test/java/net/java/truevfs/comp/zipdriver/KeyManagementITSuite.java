@@ -4,14 +4,14 @@
  */
 package net.java.truevfs.comp.zipdriver;
 
-import net.java.truevfs.access.TArchiveDetector;
-import net.java.truevfs.access.TVFS;
-import net.java.truevfs.access.TFileOutputStream;
-import net.java.truevfs.access.TFileInputStream;
-import net.java.truevfs.access.TFile;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Random;
+import net.java.truevfs.access.TArchiveDetector;
+import net.java.truevfs.access.TFile;
+import net.java.truevfs.access.TFileInputStream;
+import net.java.truevfs.access.TFileOutputStream;
+import net.java.truevfs.access.TVFS;
 import net.java.truevfs.kernel.spec.FsSyncException;
 import org.junit.After;
 import static org.junit.Assert.assertTrue;
@@ -82,7 +82,7 @@ public abstract class KeyManagementITSuite {
 
     @Test
     public void testSetPasswords1() throws IOException {
-        archive = new TFile(temp, newArchiveDetector1(EXTENSION, PASSWORD));
+        archive = newArchiveDetector1(EXTENSION, PASSWORD).newFile(temp);
         roundTrip();
     }
 
@@ -91,7 +91,7 @@ public abstract class KeyManagementITSuite {
 
     @Test
     public void testSetPasswords2() throws IOException {
-        archive = new TFile(temp, newArchiveDetector2(EXTENSION, PASSWORD));
+        archive = newArchiveDetector2(EXTENSION, PASSWORD).newFile(temp);
         roundTrip();
     }
 

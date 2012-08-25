@@ -10,6 +10,7 @@ import static java.io.File.separatorChar;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.SeekableByteChannel;
@@ -32,6 +33,7 @@ import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.access.TPathScanner.*;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
+import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsMountPoint;
 import net.java.truevfs.kernel.spec.FsNode;
 import net.java.truevfs.kernel.spec.FsNodeName;
@@ -62,9 +64,9 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  * <p>
  * Unless otherwise noted, when an instance of this class is created, the
  * resulting path name gets scanned for prospective archive files using the
- * {@linkplain TConfig#getArchiveDetector default archive detector}.
+ * {@linkplain TConfig#getDetector default archive detector}.
  * To change this, wrap the object creation in a code block which
- * {@link TConfig#push() pushes} a temporary configuration on the inheritbale
+ * {@link TConfig#open() pushes} a temporary configuration on the inheritbale
  * thread local stack of configurations as follows:
  * </p>
  * <pre><code>
@@ -75,16 +77,16 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  * // class path.
  * TPath archive = directory.resolve("archive.zip");
  * TPath file;
- * try (TConfig config = TConfig.push()) {
- *     config.setArchiveDetector(TArchiveDetector.NULL);
+ * try (TConfig config = TConfig.open()) {
+ *     config.setDetector(TArchiveDetector.NULL);
  *     // Ignore prospective archive file here.
  *     file = directory.resolve("archive.zip");
  * }
  * // Once created, the prospective archive file detection does not change
  * // because a TPath is immutable.
- * assert archive.getArchiveDetector() == TArchiveDetector.ALL;
+ * assert archive.getDetector() == TArchiveDetector.ALL;
  * assert archive.isArchive();
- * assert file.getArchiveDetector() == TArchiveDetector.NULL;
+ * assert file.getDetector() == TArchiveDetector.NULL;
  * assert !file.isArchive();
  * </code></pre>
  * <p>
@@ -97,7 +99,7 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  */
 @Immutable
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
-public final class TPath implements Path {
+public final class TPath implements Path, Serializable {
 
     private static final TPathComparator COMPARATOR = '\\' == separatorChar
             ? new WindowsTPathComparator()
@@ -120,7 +122,7 @@ public final class TPath implements Path {
      * <p>
      * This constructor scans the {@linkplain TPath#toString() path name} resulting
      * from the segment parameters to detect prospective archive files using
-     * the {@linkplain TConfig#getArchiveDetector default archive detector}.
+     * the {@linkplain TConfig#getDetector default archive detector}.
      * 
      * <h3>Examples</h3>
 <p>On all platforms:</p>
@@ -162,7 +164,7 @@ public final class TPath implements Path {
      * <p>
      * This constructor scans the {@linkplain TPath#toString() path name} resulting
      * from the segment parameters to detect prospective archive files using
-     * the {@linkplain TConfig#getArchiveDetector default archive detector}.
+     * the {@linkplain TConfig#getDetector default archive detector}.
      * 
      * @param fileSystem the file system to access.
      * @param first the first sub path string.
@@ -171,7 +173,7 @@ public final class TPath implements Path {
     TPath(final TFileSystem fileSystem, String first, final String... more) {
         final URI name = name(cutLeadingSeparators(first), more);
         this.name = name;
-        final TArchiveDetector detector = getDefaultArchiveDetector();
+        final TArchiveDetector detector = TConfig.get().getDetector();
         this.detector = detector;
         this.nodePath = new TPathScanner(detector).scan(
                 new FsNodePath(fileSystem.getMountPoint(), ROOT),
@@ -194,7 +196,7 @@ public final class TPath implements Path {
      * <p>
      * This constructor scans the {@linkplain URI#getPath() path component} of
      * the URI to detect prospective archive files using the
-     * {@linkplain TConfig#getArchiveDetector default archive detector}.
+     * {@linkplain TConfig#getDetector default archive detector}.
      * 
      * <h3>Examples</h3>
 <p>On all platforms:</p>
@@ -241,13 +243,13 @@ public final class TPath implements Path {
      * class because it does not support {@link TFile#toPath()}.
      * <p>
      * If {@code file} is an instance of {@link TFile}, its
-     * {@linkplain TFile#getArchiveDetector() archive detector} and
+     * {@linkplain TFile#getDetector() archive detector} and
      * {@linkplain TFile#toNodePath() file system node path} get shared with
      * this instance.
      * <p>
      * Otherwise, this constructor scans the {@linkplain File#getPath() path name}
      * of the file to detect prospective archive files using the
-     * {@linkplain TConfig#getArchiveDetector default archive detector}.
+     * {@linkplain TConfig#getDetector default archive detector}.
      * 
      * <h3>Examples</h3>
 <p>On all platforms:</p>
@@ -272,7 +274,7 @@ public final class TPath implements Path {
      * 
      * @param file a file.
      *        If this is an instance of {@link TFile}, its
-     *        {@linkplain TFile#getArchiveDetector() archive detector} and
+     *        {@linkplain TFile#getDetector() archive detector} and
      *        {@linkplain TFile#toNodePath() file system node path} get shared
      *        with this instance.
      */
@@ -280,11 +282,11 @@ public final class TPath implements Path {
         final URI name = name(file.getPath());
         this.name = name;
         if (file instanceof TFile) {
-            final TFile f = (TFile) file;
-            this.detector = f.getArchiveDetector();
-            this.nodePath = f.toNodePath();
+            final TFile tfile = (TFile) file;
+            this.detector = tfile.getDetector();
+            this.nodePath = tfile.toNodePath();
         } else {
-            final TArchiveDetector detector = getDefaultArchiveDetector();
+            final TArchiveDetector detector = TConfig.get().getDetector();
             this.detector = detector;
             this.nodePath = nodePath(name, detector);
         }
@@ -297,7 +299,7 @@ public final class TPath implements Path {
      * <p>
      * This constructor scans the {@link Path#toString() path name} of the
      * given path to detect prospective archive files using the
-     * {@linkplain TConfig#getArchiveDetector default archive detector}.
+     * {@linkplain TConfig#getDetector default archive detector}.
      * 
      * <h3>Examples</h3>
 <p>On all platforms:</p>
@@ -325,7 +327,7 @@ public final class TPath implements Path {
             final @CheckForNull FsNodePath nodePath) {
         this.name = name = name(name);
         if (null == detector)
-            detector = getDefaultArchiveDetector();
+            detector = TConfig.get().getDetector();
         this.detector = detector;
         this.nodePath = null != nodePath ? nodePath : nodePath(name, detector);
 
@@ -423,8 +425,8 @@ public final class TPath implements Path {
         return Paths.prefixLength(p, SEPARATOR_CHAR, true);
     }
 
-    private static FsNodePath nodePath(URI name, TArchiveDetector detector) {
-        return new TPathScanner(detector).scan(
+    private static FsNodePath nodePath(URI name, TArchiveDetector archiveDetector) {
+        return new TPathScanner(archiveDetector).scan(
                 TFileSystemProvider.get(name).getRoot(),
                 name);
     }
@@ -449,25 +451,9 @@ public final class TPath implements Path {
      */
     private boolean invariants() {
         assert null != getName();
-        assert null != getArchiveDetector();
+        assert null != getDetector();
         assert null != getNodePath();
         return true;
-    }
-
-    /**
-     * Equivalent to
-     * {@link TConfig#getArchiveDetector TConfig.get().getArchiveDetector()}.
-     */
-    public static TArchiveDetector getDefaultArchiveDetector() {
-        return TConfig.get().getArchiveDetector();
-    }
-
-    /**
-     * Equivalent to
-     * {@link TConfig#setArchiveDetector TConfig.get().setArchiveDetector(detector)}.
-     */
-    public static void setDefaultArchiveDetector(TArchiveDetector detector) {
-        TConfig.get().setArchiveDetector(detector);
     }
 
     /**
@@ -482,9 +468,9 @@ public final class TPath implements Path {
      * @see    #isEntry
      */
     public boolean isArchive() {
-        final FsNodePath address = getNodePath();
-        final boolean root = address.getNodeName().isRoot();
-        final FsMountPoint parent = address.getMountPoint().getParent();
+        final FsNodePath nodePath = getNodePath();
+        final boolean root = nodePath.getNodeName().isRoot();
+        final FsMountPoint parent = nodePath.getMountPoint().getParent();
         return root && null != parent;
     }
 
@@ -500,9 +486,9 @@ public final class TPath implements Path {
      * @see #isArchive
      */
     public boolean isEntry() {
-        final FsNodePath address = getNodePath();
-        final boolean root = address.getNodeName().isRoot();
-        final FsMountPoint parent = address.getMountPoint().getParent();
+        final FsNodePath nodePath = getNodePath();
+        final boolean root = nodePath.getNodeName().isRoot();
+        final FsMountPoint parent = nodePath.getMountPoint().getParent();
         return !root    ? null != parent
                         : null != parent && null != parent.getParent();
     }
@@ -513,9 +499,7 @@ public final class TPath implements Path {
      * 
      * @return the name of this path as a {@code URI}.
      */
-    URI getName() {
-        return this.name;
-    }
+    URI getName() { return name; }
 
     /**
      * Returns the {@code TArchiveDetector} used for scanning this path's
@@ -527,18 +511,14 @@ public final class TPath implements Path {
      *         {@link #toString() name} for prospective archive files at
      *         construction time.
      */
-    TArchiveDetector getArchiveDetector() {
-        return detector;
-    }
+    TArchiveDetector getDetector() { return detector; }
 
     /**
      * Returns the file system path for this path with an absolute URI.
      * 
      * @return The file system path for this path with an absolute URI.
      */
-    private FsNodePath getNodePath() {
-        return this.nodePath;
-    }
+    private FsNodePath getNodePath() { return nodePath; }
 
     /**
      * Returns the file system mount point for this path.
@@ -596,10 +576,9 @@ public final class TPath implements Path {
      * @see    TVFS#umount()
      */
     public TPath toNonArchivePath() {
-        if (!isArchive())
-            return this;
-        try (final TConfig config = TConfig.push()) {
-            config.setArchiveDetector(TArchiveDetector.NULL);
+        if (!isArchive()) return this;
+        try (final TConfig config = TConfig.open()) {
+            config.setDetector(TArchiveDetector.NULL);
             final TPath fileName = getFileName();
             assert null != fileName : "an archive file must not have an empty path name!";
             return resolveSibling(fileName);
@@ -611,18 +590,16 @@ public final class TPath implements Path {
         final URI n = getName();
         final String ssp = n.getSchemeSpecificPart();
         final int l = prefixLength(ssp);
-        if (l <= 0 || SEPARATOR_CHAR != ssp.charAt(l - 1))
-            return null;
-        return new TPath(name(ssp.substring(0, l)), getArchiveDetector(), null);
+        if (l <= 0 || SEPARATOR_CHAR != ssp.charAt(l - 1)) return null;
+        return new TPath(name(ssp.substring(0, l)), getDetector(), null);
     }
 
     @Override
     public @Nullable TPath getFileName() {
         final List<String> elements = getElements();
         final int l = elements.size();
-        if (l <= 0)
-            return null;
-        return new TPath(name(elements.get(l - 1)), getArchiveDetector(), null);
+        if (l <= 0) return null;
+        return new TPath(name(elements.get(l - 1)), getDetector(), null);
     }
 
     @Override
@@ -631,13 +608,12 @@ public final class TPath implements Path {
         {
             final int l = n.getPath().length();
             final int pl = pathPrefixLength(n);
-            if (l <= pl)
-                return null;
+            if (l <= pl) return null;
         }
         final URI p = n.resolve(DOT_URI);
         return p.getPath().isEmpty()
                 ? null
-                : new TPath(p, getArchiveDetector(), null);
+                : new TPath(p, getDetector(), null);
     }
 
     /**
@@ -717,18 +693,16 @@ public final class TPath implements Path {
 
     @Override
     public TPath normalize() {
-        return new TPath(getName().normalize(), getArchiveDetector(), getNodePath());
+        return new TPath(getName().normalize(), getDetector(), getNodePath());
     }
 
     @Override
     public TPath resolve(Path other) {
         if (other instanceof TPath) {
-            final TPath o = (TPath) other;
-            if (o.isAbsolute())
-                return o;
-            if (o.toString().isEmpty())
-                return this;
-            return resolve(o.getName());
+            final TPath that = (TPath) other;
+            if (that.isAbsolute()) return that;
+            if (that.toString().isEmpty()) return this;
+            return resolve(that.getName());
         } else {
             return resolve(other.toString().replace(
                     other.getFileSystem().getSeparator(),
@@ -757,7 +731,7 @@ public final class TPath implements Path {
                 throw new AssertionError(ex);
             }
         }
-        final TArchiveDetector d = getDefaultArchiveDetector();
+        final TArchiveDetector d = TConfig.get().getDetector();
         final FsNodePath a = new TPathScanner(d).scan(
                 TPathScanner.isAbsolute(m)
                     ? TFileSystemProvider.get(getName()).getRoot()
@@ -802,13 +776,13 @@ public final class TPath implements Path {
 
     @Override
     public TPath toAbsolutePath() {
-        return new TPath(toUri(), getArchiveDetector(), getNodePath());
+        return new TPath(toUri(), getDetector(), getNodePath());
     }
 
     @Override
     public TPath toRealPath(LinkOption... options) throws IOException {
         // TODO: scan symlinks!
-        return new TPath(toUri(), getArchiveDetector(), getNodePath());
+        return new TPath(toUri(), getDetector(), getNodePath());
     }
 
     /**
@@ -827,8 +801,8 @@ public final class TPath implements Path {
     public TFile toFile() {
         try {
             return getName().isAbsolute()
-                    ? new TFile(getNodePath(), getArchiveDetector())
-                    : new TFile(toString(), getArchiveDetector());
+                    ? getDetector().newFile(getNodePath())
+                    : getDetector().newFile(toString());
         } catch (IllegalArgumentException ex) {
             throw new UnsupportedOperationException(ex);
         }
@@ -880,8 +854,8 @@ public final class TPath implements Path {
      * On Windows, case is ignored when comparing the path names.
      */
     @Override
-    public int compareTo(Path that) {
-        return COMPARATOR.compare(this, (TPath) that);
+    public int compareTo(Path other) {
+        return COMPARATOR.compare(this, (TPath) other);
     }
 
     /**
@@ -895,10 +869,10 @@ public final class TPath implements Path {
      * On Windows, case is ignored when comparing the path names.
      */
     @Override
-    public boolean equals(final Object that) {
-        return this == that
-                || that instanceof TPath
-                    && COMPARATOR.equals(this, (TPath) that);
+    public boolean equals(final Object other) {
+        return this == other
+                || other instanceof TPath
+                    && COMPARATOR.equals(this, (TPath) other);
     }
 
     /**
@@ -907,9 +881,7 @@ public final class TPath implements Path {
      * @return A hash code which is consistent with {@link #equals(Object)}.
      */
     @Override
-    public int hashCode() {
-        return COMPARATOR.hashCode(this);
-    }
+    public int hashCode() { return COMPARATOR.hashCode(this); }
 
     @Override
     public String toString() {
@@ -997,7 +969,7 @@ public final class TPath implements Path {
     BitField<FsAccessOption> inputOptions(final Set<? extends OpenOption> options) {
         final int s = options.size();
         if (0 == s || 1 == s && options.contains(StandardOpenOption.READ))
-            return getAccessPreferences();
+            return getPreferences();
         throw new IllegalArgumentException(options.toString());
     }
 
@@ -1030,16 +1002,15 @@ public final class TPath implements Path {
                     throw new UnsupportedOperationException(option.toString());
             }
         }
-        final BitField<FsAccessOption> prefs = getAccessPreferences();
+        final BitField<FsAccessOption> prefs = getPreferences();
         return set.isEmpty() ? prefs : prefs.or(BitField.copyOf(set));
     }
 
-    BitField<FsAccessOption> getAccessPreferences() {
-        final BitField<FsAccessOption>
-                prefs = TConfig.get().getAccessPreferences();
+    BitField<FsAccessOption> getPreferences() {
+        final BitField<FsAccessOption> ap = TConfig.get().getPreferences();
         return null != getMountPoint().getParent()
-                ? prefs
-                : prefs.clear(CREATE_PARENTS);
+                ? ap
+                : ap.clear(CREATE_PARENTS);
     }
 
     /**

@@ -445,16 +445,16 @@ public class TPathTest extends MockArchiveDriverTestBase {
         // This is how you would detect a prospective archive file.
         TPath archive = directory.resolve("archive.mok");
         TPath file;
-        try (final TConfig config = TConfig.push()) {
-            config.setArchiveDetector(TArchiveDetector.NULL);
+        try (final TConfig config = TConfig.open()) {
+            config.setDetector(TArchiveDetector.NULL);
             // Ignore prospective archive file here.
             file = directory.resolve("archive.mok");
         }
         // Once created, the prospective archive file detection does not change
         // because a TPath is immutable.
-        assert archive.getArchiveDetector() == getArchiveDetector();
+        assert archive.getDetector() == getDetector();
         assert archive.isArchive();
-        assert file.getArchiveDetector() == TArchiveDetector.NULL;
+        assert file.getDetector() == TArchiveDetector.NULL;
         assert !file.isArchive();
     }
 }

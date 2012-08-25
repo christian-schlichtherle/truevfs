@@ -35,9 +35,6 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
 @Immutable
 final class TBIO {
 
-    /* Can't touch this - hammer time! */
-    private TBIO() { }
-
     /**
      * Moves the source file or directory tree to the destination file or
      * directory tree by performing a recursive cp-then-delete operation.
@@ -87,8 +84,8 @@ final class TBIO {
                 Arrays.sort(members);
             }
             for (final String member : members)
-                mv0(    new TFile(src, member, detector),
-                        new TFile(dst, member, detector),
+                mv0(    detector.newFile(src, member),
+                        detector.newFile(dst, member),
                         detector);
             if (!srcIsGhost)
                 if (!dst.setLastModified(srcLastModified))
@@ -170,8 +167,8 @@ final class TBIO {
             }
             for (final String member : members)
                 cp_r0(  preserve,
-                        new TFile(src, member, srcDetector),
-                        new TFile(dst, member, dstDetector),
+                        srcDetector.newFile(src, member),
+                        dstDetector.newFile(dst, member),
                         srcDetector, dstDetector);
             if (preserve && !srcIsGhost)
                 if (!dst.setLastModified(srcLastModified))
@@ -215,8 +212,8 @@ final class TBIO {
     private static void
     cp0(final boolean preserve, final File src, final File dst)
     throws IOException {
-        final TConfig config = TConfig.get();
-        BitField<FsAccessOption> preferences = config.getAccessPreferences();
+        final BitField<FsAccessOption> preferences =
+                TConfig.get().getPreferences();
         final InputSocket<?> input = input(preferences, src);
         final OutputSocket<?> output = output(preferences, dst,
                 preserve ? input.target() : null);
@@ -226,19 +223,19 @@ final class TBIO {
     /**
      * Recursively deletes the given file or directory tree.
      *
-     * @param  node the file or directory tree to delete recursively.
+     * @param  file the file or directory tree to delete recursively.
      * @throws IOException if an elementary operation fails for any reason.
      */
-    static void rm_r(final File node, final TArchiveDetector detector)
+    static void rm_r(final File file, final TArchiveDetector detector)
     throws IOException {
-        if (node.isDirectory()) {
-            final String[] members = node.list();
+        if (file.isDirectory()) {
+            final String[] members = file.list();
             if (null == members)
-                throw new FileSystemException(node.getPath(), null, "Cannot list directory!");
+                throw new FileSystemException(file.getPath(), null, "Cannot list directory!");
             for (final String member : members)
-                rm_r(new TFile(node, member, detector), detector);
+                rm_r(detector.newFile(file, member), detector);
         }
-        TFile.rm(node);
+        TFile.rm(file);
     }
 
     /**
@@ -260,62 +257,68 @@ final class TBIO {
             throw new FileSystemException(a.getPath(), b.getPath(), "First path contains second path!");
     }
 
+    private static TArchiveDetector detector(File file) {
+        return file instanceof TFile
+                ? ((TFile) file).getDetector()
+                : TConfig.get().getDetector();
+    }
+
     /**
      * Returns an input socket for the given file.
      * 
-     * @param  src the file to read.
+     * @param  file the file to read.
      * @param  options the options for accessing the file.
      * @return An input socket for the given file.
      */
-    @SuppressWarnings("deprecation")
     static InputSocket<?> input(
             final BitField<FsAccessOption> options,
-            final File src) {
-        if (src instanceof TFile) {
-            final TFile tsrc = (TFile) src;
-            final TFile archive = tsrc.getInnerArchive();
+            final File file) {
+        if (file instanceof TFile) {
+            final TFile tfile=  (TFile) file;
+            final TFile archive = tfile.getInnerArchive();
             if (null != archive)
                 return archive.getController()
-                        .input(options, tsrc.getNodeName());
+                        .input(options, tfile.getNodeName());
         }
-        final FsNodePath path = new FsNodePath(src);
-        return  TConfig.get()
+        final FsNodePath path = new FsNodePath(file);
+        return  TConfig
+                .get()
                 .getManager()
-                .controller(getDetector(src), path.getMountPoint())
+                .controller(detector(file), path.getMountPoint())
                 .input(options, path.getNodeName());
     }
 
     /**
      * Returns an output socket for the given file.
      * 
-     * @param  dst the file to write.
+     * @param  file the file to write.
      * @param  options the options for accessing the file.
      * @param  template a nullable template from which file attributes shall
      *         get copied.
      * @return An output socket for the given file.
      */
-    @SuppressWarnings("deprecation")
     static OutputSocket<?> output(
             final BitField<FsAccessOption> options,
-            final File dst,
+            final File file,
             final @CheckForNull Entry template) {
-        if (dst instanceof TFile) {
-            final TFile tdst = (TFile) dst;
-            final TFile archive = tdst.getInnerArchive();
+        if (file instanceof TFile) {
+            final TFile tfile = (TFile) file;
+            final TFile archive = tfile.getInnerArchive();
             if (null != archive)
                 return archive.getController()
-                        .output(options, tdst.getNodeName(), template);
+                        .output(    options,
+                                    tfile.getNodeName(),
+                                    template);
         }
-        final FsNodePath path = new FsNodePath(dst);
-        return TConfig.get()
+        final FsNodePath path = new FsNodePath(file);
+        return TConfig
+                .get()
                 .getManager()
-                .controller(getDetector(dst), path.getMountPoint())
-                .output(options.clear(CREATE_PARENTS), path.getNodeName(), template);
+                .controller(detector(file), path.getMountPoint())
+                .output(    options.clear(CREATE_PARENTS),
+                            path.getNodeName(),
+                            template);
     }
 
-    private static TArchiveDetector getDetector(File file) {
-        return file instanceof TFile
-                ? ((TFile) file).getArchiveDetector()
-                : TConfig.get().getArchiveDetector();
-    }
+    private TBIO() { }
 }

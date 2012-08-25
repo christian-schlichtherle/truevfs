@@ -12,8 +12,8 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.*;
+import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
@@ -23,18 +23,18 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
+import net.java.truevfs.kernel.spec.FsMountPoint;
 import net.java.truevfs.kernel.spec.FsNode;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
-import net.java.truevfs.kernel.spec.FsMountPoint;
 import net.java.truevfs.kernel.spec.FsNodePath;
 import static net.java.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
 import static net.java.truevfs.kernel.spec.cio.Entry.Type.FILE;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
 import net.java.truevfs.kernel.spec.cio.IoSockets;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truecommons.shed.BitField;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -116,25 +116,20 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * @return the default scheme of this provider.
      */
     @Override
-    public String getScheme() {
-        return scheme;
-    }
+    public String getScheme() { return scheme; }
 
     /**
      * Returns the root mount point of this provider.
      * 
      * @return The root mount point of this provider.
      */
-    public FsNodePath getRoot() {
-        return root;
-    }
+    public FsNodePath getRoot() { return root; }
 
-    private static TConfig push(Map<String, ?> env) {
-        final TArchiveDetector detector = (TArchiveDetector) env.get(
-                Parameter.ARCHIVE_DETECTOR);
-        final TConfig config = TConfig.push();
-        if (null != detector)
-            config.setArchiveDetector(detector);
+    private static TConfig open(Map<String, ?> env) {
+        final TConfig config = TConfig.open();
+        final TArchiveDetector detector =
+                (TArchiveDetector) env.get(Parameter.ARCHIVE_DETECTOR);
+        if (null != detector) config.setDetector(detector);
         return config;
     }
 
@@ -166,7 +161,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public TFileSystem newFileSystem(Path path, Map<String, ?> configuration) {
-        try (final TConfig config = push(configuration)) {
+        try (final TConfig config = open(configuration)) {
             final TPath p = new TPath(path);
             if (null == p.getMountPoint().getParent())
                 throw new UnsupportedOperationException("No prospective archive file detected."); // don't be greedy!
@@ -198,7 +193,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public TFileSystem newFileSystem(URI uri, Map<String, ?> configuration) {
-        try (final TConfig config = push(configuration)) {
+        try (final TConfig config = open(configuration)) {
             return getFileSystem(uri);
         }
     }
@@ -313,7 +308,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
         if (isSameFile0(src, dst))
             throw new FileSystemException(src.toString(), dst.toString(), "Source and destination are the same file!");
         boolean preserve = false;
-        BitField<FsAccessOption> o = dst.getAccessPreferences().set(EXCLUSIVE);
+        BitField<FsAccessOption> o = dst.getPreferences().set(EXCLUSIVE);
         for (final CopyOption option : options) {
             if (!(option instanceof StandardCopyOption))
                 throw new UnsupportedOperationException(option.toString());
@@ -353,7 +348,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
                 }
             }
         }
-        final InputSocket<?> input = src.input(src.getAccessPreferences());
+        final InputSocket<?> input = src.input(src.getPreferences());
         final OutputSocket<?> output = dst.output(o,
                 preserve ? input.target() : null);
         IoSockets.copy(input, output);

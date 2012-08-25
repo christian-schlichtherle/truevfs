@@ -13,7 +13,6 @@ import static java.io.File.separatorChar;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URI;
 import java.util.ServiceConfigurationError;
-import static net.java.truevfs.access.TArchiveDetector.NULL;
 import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
 import net.java.truevfs.kernel.spec.FsNodePath;
 import static org.hamcrest.CoreMatchers.*;
@@ -69,14 +68,11 @@ public final class TFileTest extends MockArchiveDriverTestBase {
             assertPathConstructor(
                     new TFile(FsNodePath.create(URI.create(params[0]))),
                     params);
-            assertPathConstructor(
-                    new TFile(FsNodePath.create(URI.create(params[0])), null),
-                    params);
         }
     }
 
     private static void assertPathConstructor(final TFile file, final String[] params) {
-        assertThat(file.getArchiveDetector(), is(TConfig.get().getArchiveDetector()));
+        assertThat(file.getDetector(), is(sameInstance(TConfig.get().getDetector())));
         assertThat(file.getPath(), equalTo(params[1].replace('/', separatorChar)));
         if (null != params[2]) {
             assertThat(file.getInnerArchive().getPath(), equalTo(params[2].replace('/', separatorChar)));
@@ -326,7 +322,7 @@ public final class TFileTest extends MockArchiveDriverTestBase {
                 c.getEnclEntryName());
 
         b = new TFile("../removed.dir/removed.dir/../../dir/./inner.mok");
-        c = new TFile(a, b.getPath(), NULL);
+        c = TArchiveDetector.NULL.newFile(a, b.getPath());
         assertFalse(c.isArchive());
         assertTrue(c.isEntry());
         assertEquals("outer.mok",

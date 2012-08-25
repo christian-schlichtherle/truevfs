@@ -9,12 +9,17 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
+import net.java.truecommons.services.Factory;
+import net.java.truecommons.services.Locator;
 import net.java.truecommons.shed.ExtensionSet;
-import net.java.truevfs.kernel.impl.DefaultManagerFactory;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsArchiveDriverTestBase;
+import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsMountPoint;
 import net.java.truevfs.kernel.spec.FsScheme;
+import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
+import net.java.truevfs.kernel.spec.spi.FsManagerDecorator;
+import net.java.truevfs.kernel.spec.spi.FsManagerFactory;
 
 /**
  * @param  <D> the type of the archive driver.
@@ -31,15 +36,24 @@ extends FsArchiveDriverTestBase<D> {
     protected static final String[] NO_STRINGS = new String[0];
     private static final String ARCHIVE_DETECTOR = "archiveDetector";
 
-    private TArchiveDetector detector;
+    private static volatile Factory<FsManager> managerFactory;
+
+    private static FsManager newManager() {
+        final Factory<FsManager> f =
+                ConfiguredClientTestBase.managerFactory;
+        return (null != f ? f : (ConfiguredClientTestBase.managerFactory =
+                    new Locator(FsManagerLocator.class)
+                       .factory(FsManagerFactory.class, FsManagerDecorator.class))
+                ).get();
+    }
+
+    private TConfig config;
     private Map<String, ?> environment;
 
     @Override
     public void setUp() throws IOException {
         super.setUp();
-        detector = new TArchiveDetector(getExtensionList(), getArchiveDriver());
-        environment = Collections.singletonMap(ARCHIVE_DETECTOR, detector);
-        final TConfig config = TConfig.push();
+        config = TConfig.open();
         // Using a private file system manager would normally violate the third
         // party access constraints, but in this context it's safe because no
         // two test methods should ever access the same archive file(s) except
@@ -50,16 +64,17 @@ extends FsArchiveDriverTestBase<D> {
         // So the default value 'false' helps to identify potential isolation
         // issues in case this invariant is not met.
         // See http://truevfs.java.net/truevfs-access/usage.html#Third_Party_Access
-        if (ISOLATE_FS_MANAGER)
-            config.setManager(new DefaultManagerFactory().get());
+        if (ISOLATE_FS_MANAGER) config.setManager(newManager());
+        final TArchiveDetector detector = new TArchiveDetector(getExtensionList(), getArchiveDriver());
+        environment = Collections.singletonMap(ARCHIVE_DETECTOR, detector);
+        config.setDetector(detector);
         config.setLenient(true);
-        config.setArchiveDetector(detector);
     }
 
     @Override
     public void tearDown() {
         try {
-            TConfig.pop();
+            config.close();
         } finally {
             super.tearDown();
         }
@@ -71,16 +86,12 @@ extends FsArchiveDriverTestBase<D> {
         return FsScheme.create(new ExtensionSet(getExtensionList()).iterator().next());
     }
 
-    protected final String getExtension() {
-        return "." + getScheme();
-    }
+    protected final String getExtension() { return "." + getScheme(); }
 
-    protected final TArchiveDetector getArchiveDetector() {
-        return detector;
+    protected final TArchiveDetector getDetector() {
+        return config.getDetector();
     }
 
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    protected final Map<String, ?> getEnvironment() {
-        return environment;
-    }
+    protected final Map<String, ?> getEnvironment() { return environment; }
 }

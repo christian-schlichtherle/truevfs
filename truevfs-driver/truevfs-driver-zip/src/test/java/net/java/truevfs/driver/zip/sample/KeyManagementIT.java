@@ -4,10 +4,10 @@
  */
 package net.java.truevfs.driver.zip.sample;
 
-import net.java.truevfs.comp.zipdriver.KeyManagementITSuite;
 import java.nio.charset.Charset;
 import net.java.truevfs.access.TArchiveDetector;
 import net.java.truevfs.access.TConfig;
+import net.java.truevfs.comp.zipdriver.KeyManagementITSuite;
 
 /**
  * @author Christian Schlichtherle
@@ -19,7 +19,7 @@ public final class KeyManagementIT extends KeyManagementITSuite {
     @Override
     protected TArchiveDetector newArchiveDetector1(String extension, String password) {
         return KeyManagement.newArchiveDetector1(
-                TConfig.get().getArchiveDetector(),
+                TConfig.get().getDetector(),
                 extension,
                 password.getBytes(US_ASCII));
     }
@@ -27,7 +27,7 @@ public final class KeyManagementIT extends KeyManagementITSuite {
     @Override
     protected TArchiveDetector newArchiveDetector2(String extension, String password) {
         return KeyManagement.newArchiveDetector2(
-                TConfig.get().getArchiveDetector(),
+                TConfig.get().getDetector(),
                 extension,
                 password.toCharArray());
     }
