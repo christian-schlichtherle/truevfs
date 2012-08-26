@@ -89,8 +89,7 @@ final class TPathScanner {
                         .path(mp.substring(3))
                         .getUri();
             }
-            if ("..".equals(mp))
-                return parent(parent);
+            if ("..".equals(mp)) return parent(parent);
             final int mpl = pathPrefixLength(member);
             if (0 < mpl) {
                 final URI pu = parent.toHierarchicalUri().resolve(SEPARATOR_URI);
