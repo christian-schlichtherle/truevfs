@@ -638,9 +638,7 @@ public final class TPath implements Path {
     }
 
     @Override
-    public int getNameCount() {
-        return getElements().size();
-    }
+    public int getNameCount() { return getElements().size(); }
 
     @Override
     public TPath getName(int index) {
@@ -713,29 +711,28 @@ public final class TPath implements Path {
         return resolve(name(other));
     }
 
-    private TPath resolve(final URI m) {
-        URI n;
-        final String np;
-        if (TPathScanner.isAbsolute(m) || (n = getName()).toString().isEmpty()) {
-            n = m;
-        } else if (m.toString().isEmpty()) {
-            n = getName();
-        } else if ((np = n.getPath()).endsWith(SEPARATOR)) {
-            n = n.resolve(m);
+    private TPath resolve(final URI other) {
+        URI name;
+        final String namePath;
+        if (TPathScanner.isAbsolute(other) || (name = getName()).toString().isEmpty()) {
+            name = other;
+        } else if (other.toString().isEmpty()) {
+            name = getName();
+        } else if ((namePath = name.getPath()).endsWith(SEPARATOR)) {
+            name = name.resolve(other);
         } else {
-            try {
-                n = new UriBuilder(n).path(np + SEPARATOR_CHAR).getUri().resolve(m);
-            } catch (URISyntaxException ex) {
-                throw new AssertionError(ex);
-            }
+            name = new UriBuilder(name)
+                    .path(namePath + SEPARATOR_CHAR)
+                    .toUri()
+                    .resolve(other);
         }
-        final TArchiveDetector d = TConfig.get().getDetector();
-        final FsNodePath a = new TPathScanner(d).scan(
-                TPathScanner.isAbsolute(m)
+        final TArchiveDetector detector = TConfig.get().getDetector();
+        final FsNodePath path = new TPathScanner(detector).scan(
+                TPathScanner.isAbsolute(other)
                     ? TFileSystemProvider.get(getName()).getRoot()
                     : getNodePath(),
-                m);
-        return new TPath(n, d, a);
+                other);
+        return new TPath(name, detector, path);
     }
 
     @Override
