@@ -99,7 +99,7 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  */
 @Immutable
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
-public final class TPath implements Path, Serializable {
+public final class TPath implements Path {
 
     private static final TPathComparator COMPARATOR = '\\' == separatorChar
             ? new WindowsTPathComparator()

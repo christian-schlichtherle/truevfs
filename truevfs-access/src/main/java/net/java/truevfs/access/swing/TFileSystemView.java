@@ -54,10 +54,10 @@ public class TFileSystemView extends TDecoratingFileSystemView {
         this(fileSystemView, null);
     }
 
-    public TFileSystemView( FileSystemView fileSystemView,
-                            @CheckForNull TArchiveDetector archiveDetector) {
+    public TFileSystemView( final FileSystemView fileSystemView,
+                            final @CheckForNull TArchiveDetector detector) {
         super(fileSystemView);
-        this.detector = archiveDetector;
+        this.detector = detector;
     }
 
     /**
@@ -86,11 +86,7 @@ public class TFileSystemView extends TDecoratingFileSystemView {
      * Ensures that the returned file object is an instance of {@link TFile}.
      */
     protected TFile wrap(final File file) {
-        if (null == file)
-            return null;
-        return file instanceof TFile
-                ? (TFile) file
-                : detector().newFile(file);
+        return file instanceof TFile ? (TFile) file : detector().newFile(file);
     }
 
     /**
@@ -98,7 +94,7 @@ public class TFileSystemView extends TDecoratingFileSystemView {
      * not {@link TFile}.
      */
     @SuppressWarnings("deprecation")
-    protected File unwrap(final File file) {
+    protected File unwrap(File file) {
         return file instanceof TFile ? ((TFile) file).getFile() : file;
     }
 
@@ -107,17 +103,10 @@ public class TFileSystemView extends TDecoratingFileSystemView {
     //
 
     @Override
-    public boolean isRoot(File file) {
-        return fsv.isRoot(unwrap(file));
-    }
+    public boolean isRoot(File file) { return fsv.isRoot(unwrap(file)); }
 
     @Override
-    public Boolean isTraversable(File file) {
-        final TFile tfile = wrap(file);
-        return null != tfile
-                ? Boolean.valueOf(tfile.isDirectory())
-                : fsv.isTraversable(unwrap(file));
-    }
+    public Boolean isTraversable(File file) { return wrap(file).isDirectory(); }
 
     @Override
     public String getSystemDisplayName(File file) {

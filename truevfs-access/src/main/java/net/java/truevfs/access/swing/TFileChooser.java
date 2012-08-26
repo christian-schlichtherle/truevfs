@@ -79,12 +79,10 @@ public final class TFileChooser extends JFileChooser {
     @Override
     public @Nullable TFile[] getSelectedFiles() {
         final File files[] = super.getSelectedFiles();
-        if (null == files)
-            return null; // no directory
+        final TFile[] tfiles = new TFile[files.length];
         final TFileSystemView fsv = getFileSystemView();
-        final TFile[] results = new TFile[files.length];
         for (int i = files.length; 0 <= --i; )
-            results[i] = fsv.wrap(files[i]);
-        return results;
+            tfiles[i] = fsv.wrap(files[i]);
+        return tfiles;
     }
 }
