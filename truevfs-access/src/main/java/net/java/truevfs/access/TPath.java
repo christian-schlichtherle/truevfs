@@ -10,7 +10,6 @@ import static java.io.File.separatorChar;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.channels.SeekableByteChannel;
@@ -326,14 +325,14 @@ public final class TPath implements Path {
             @CheckForNull TArchiveDetector detector,
             final @CheckForNull FsNodePath nodePath) {
         this.name = name = name(name);
-        if (null == detector)
-            detector = TConfig.get().getDetector();
+        if (null == detector) detector = TConfig.get().getDetector();
         this.detector = detector;
         this.nodePath = null != nodePath ? nodePath : nodePath(name, detector);
 
         assert invariants();
     }
 
+    @SuppressWarnings("AssignmentToForLoopParameter")
     private static URI name(final String first, final String... more) {
         final StringBuilder b;
         {
@@ -395,9 +394,8 @@ public final class TPath implements Path {
             final int pl = pathPrefixLength(uri);
             final String q = uri.getPath();
             final String p = cutTrailingSeparators(q, pl);
-            if (p != q) // mind contract of cutTrailingSeparators(String, int)
-                return new UriBuilder(uri).path(p).getUri();
-            return uri;
+            // Mind contract of cutTrailingSeparators(String, int).
+            return p == q ? uri : new UriBuilder(uri).path(p).getUri();
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
