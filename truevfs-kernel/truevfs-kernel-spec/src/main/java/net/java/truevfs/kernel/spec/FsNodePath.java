@@ -219,8 +219,9 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
      * @throws URISyntaxException if the composed path URI would not conform
      *         to the syntax constraints for paths.
      */
-    public FsNodePath(  final @CheckForNull FsMountPoint mountPoint,
-                    final FsNodeName nodeName) {
+    public FsNodePath(
+            final @CheckForNull FsMountPoint mountPoint,
+            final FsNodeName nodeName) {
         URI mpu;
         if (null == mountPoint) {
             this.uri = nodeName.toUri();
