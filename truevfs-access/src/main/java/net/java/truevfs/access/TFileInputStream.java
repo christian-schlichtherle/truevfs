@@ -8,7 +8,6 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.io.DecoratingInputStream;
-import net.java.truevfs.kernel.spec.FsAccessOptions;
 
 /**
  * A replacement for the class {@link FileInputStream} for reading plain old

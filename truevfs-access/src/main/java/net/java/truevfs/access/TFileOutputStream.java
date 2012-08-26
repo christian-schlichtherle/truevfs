@@ -9,7 +9,6 @@ import java.io.*;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.io.DecoratingOutputStream;
 import static net.java.truevfs.kernel.spec.FsAccessOption.APPEND;
-import net.java.truevfs.kernel.spec.FsAccessOptions;
 
 /**
  * A replacement for the class {@link FileOutputStream} for writing plain old
