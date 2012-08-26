@@ -14,8 +14,10 @@ import net.java.truecommons.services.Locator;
 import net.java.truecommons.shed.ExtensionSet;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsArchiveDriverTestBase;
+import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsMountPoint;
+import net.java.truevfs.kernel.spec.FsNodePath;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 import net.java.truevfs.kernel.spec.spi.FsManagerDecorator;
@@ -88,10 +90,16 @@ extends FsArchiveDriverTestBase<D> {
 
     protected final String getExtension() { return "." + getScheme(); }
 
-    protected final TArchiveDetector getDetector() {
-        return config.getDetector();
-    }
+    protected final TConfig getConfig() { return config; }
 
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
     protected final Map<String, ?> getEnvironment() { return environment; }
+
+    protected final FsController controller(FsNodePath nodePath) {
+        return getConfig()
+                .getManager()
+                .controller(
+                    getConfig().getDetector(),
+                    nodePath.getMountPoint());
+    }
 }

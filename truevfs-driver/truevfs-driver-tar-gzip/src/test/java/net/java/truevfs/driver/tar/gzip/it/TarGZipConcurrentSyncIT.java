@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.driver.tar.gzip.it;
 
-import net.java.truevfs.access.ConcurrentSyncITSuite;
+import net.java.truevfs.access.it.ConcurrentSyncITSuite;
 import net.java.truevfs.driver.tar.gzip.TarGZipDriver;
 import net.java.truevfs.driver.tar.gzip.TestTarGZipDriver;
 

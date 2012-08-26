@@ -7,7 +7,7 @@ package net.java.truevfs.driver.zip.it;
 import java.io.IOException;
 import net.java.truevfs.access.TConfig;
 import net.java.truevfs.access.TFile;
-import net.java.truevfs.access.TFileITSuite;
+import net.java.truevfs.access.it.TFileITSuite;
 import net.java.truevfs.comp.zipdriver.TestWinZipAesDriver;
 import static net.java.truevfs.kernel.spec.FsAccessOption.ENCRYPT;
 import net.java.truevfs.key.spec.MockView.Action;

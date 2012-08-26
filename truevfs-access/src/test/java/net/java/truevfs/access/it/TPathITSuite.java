@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.access;
+package net.java.truevfs.access.it;
 
 import java.io.*;
 import static java.io.File.separatorChar;
@@ -23,6 +23,11 @@ import static net.java.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskJoiner;
 import static net.java.truecommons.shed.ConcurrencyUtils.start;
+import net.java.truevfs.access.ConfiguredClientTestBase;
+import net.java.truevfs.access.TConfig;
+import net.java.truevfs.access.TFile;
+import net.java.truevfs.access.TPath;
+import net.java.truevfs.access.TVFS;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsController;
@@ -163,14 +168,14 @@ extends ConfiguredClientTestBase<D> {
         try (final Closeable resource = factory.create(entry)) {
             queue = new ReferenceQueue<>();
             expected = new WeakReference<>(
-                         new TFile(entry).getInnerArchive().getController(), queue);
+                    controller(new TPath(entry).toNodePath()), queue);
             System.gc();
             assertNull(queue.remove(TIMEOUT_MILLIS));
-            assertSame(expected.get(), new TFile(entry).getInnerArchive().getController());
+            assertSame(expected.get(), controller(new TPath(entry).toNodePath()));
         }
         System.gc();
         assertNull(queue.remove(TIMEOUT_MILLIS));
-        assertSame(expected.get(), new TFile(entry).getInnerArchive().getController());
+        assertSame(expected.get(), controller(new TPath(entry).toNodePath()));
         TVFS.umount(new TFile(entry).getTopLevelArchive());
         Reference<? extends FsController> got;
         do {
@@ -821,11 +826,10 @@ extends ConfiguredClientTestBase<D> {
         try {
             try (final DirectoryStream<Path> stream = newDirectoryStream(dir)) {
                 final List<Path> list = new LinkedList<>();
-                for (Path path : stream)
-                    list.add(path);
+                for (final Path path : stream) list.add(path);
                 return list.toArray(new Path[list.size()]);
             }
-        } catch (NotDirectoryException ex) {
+        } catch (final NotDirectoryException ex) {
             return null;
         }
     }
@@ -1234,11 +1238,11 @@ extends ConfiguredClientTestBase<D> {
         Arrays.sort(got);
         assertEquals(expected.length, got.length);
         for (int i = 0, l = expected.length; i < l; i++) {
-            final Path e = expected[i];
-            final TPath g = (TPath) got[i];
-            assertTrue(!(e instanceof TPath));
-            assertEquals(e.toString(), g.toString());
-            assertNull(listFiles(g));
+            final Path path = expected[i];
+            final TPath tpath = (TPath) got[i];
+            assertTrue(!(path instanceof TPath));
+            assertEquals(path.toString(), tpath.toString());
+            assertNull(listFiles(tpath));
         }
     }
     
@@ -1333,7 +1337,7 @@ extends ConfiguredClientTestBase<D> {
                         final TPath entry = archive.resolve("" + threadNum);
                         createTestFile(entry);
                         try {
-                            TVFS.sync(archive.getFileSystem().getMountPoint(),
+                            TVFS.sync(archive.toNodePath().getMountPoint(),
                                     BitField.of(CLEAR_CACHE)
                                             .set(WAIT_CLOSE_IO, wait));
                         } catch (final FsSyncException ex) {

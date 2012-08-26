@@ -6,7 +6,7 @@ package net.java.truevfs.driver.zip.raes.it;
 
 import java.io.IOException;
 import net.java.truevfs.access.TFile;
-import net.java.truevfs.access.TFileITSuite;
+import net.java.truevfs.access.it.TFileITSuite;
 import net.java.truevfs.driver.zip.raes.TestZipRaesDriver;
 import net.java.truevfs.key.spec.MockView.Action;
 import static net.java.truevfs.key.spec.MockView.Action.CANCEL;

@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.comp.tardriver.it;
 
-import net.java.truevfs.access.TPathITSuite;
+import net.java.truevfs.access.it.TPathITSuite;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 
 /**

@@ -756,7 +756,7 @@ public final class TFile extends File {
      *         archive files in the path of this file object at construction
      *         time.
      */
-    TArchiveDetector getDetector() { return detector; }
+    public TArchiveDetector getDetector() { return detector; }
 
     /**
      * Returns a file object for the same path name, but does not detect any
@@ -1809,7 +1809,7 @@ public final class TFile extends File {
      *         (virtual) directory or if the virtual directory is inaccessible
      *         due to an I/O error.
      */
-    public @Nullable TFile[] listFiles(TArchiveDetector detector) {
+    @Nullable TFile[] listFiles(TArchiveDetector detector) {
         return listFiles((FilenameFilter) null, detector);
     }
 
@@ -1841,7 +1841,7 @@ public final class TFile extends File {
      *         (virtual) directory or if the virtual directory is inaccessible
      *         due to an I/O error.
      */
-    public @Nullable TFile[] listFiles(
+    @Nullable TFile[] listFiles(
             final @CheckForNull FilenameFilter filter,
             final TArchiveDetector detector) {
         if (null != innerArchive) {
@@ -1914,7 +1914,7 @@ public final class TFile extends File {
      *         (virtual) directory or if the virtual directory is inaccessible
      *         due to an I/O error.
      */
-    public @Nullable TFile[] listFiles(
+    @Nullable TFile[] listFiles(
             final @CheckForNull FileFilter filter,
             final TArchiveDetector detector) {
         if (null != innerArchive) {

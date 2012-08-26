@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.access;
+package net.java.truevfs.access.it;
 
 import java.io.*;
 import static java.io.File.separatorChar;
@@ -23,6 +23,12 @@ import static net.java.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskJoiner;
 import static net.java.truecommons.shed.ConcurrencyUtils.start;
+import net.java.truevfs.access.ConfiguredClientTestBase;
+import net.java.truevfs.access.TConfig;
+import net.java.truevfs.access.TFile;
+import net.java.truevfs.access.TFileInputStream;
+import net.java.truevfs.access.TFileOutputStream;
+import net.java.truevfs.access.TVFS;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsController;
@@ -162,14 +168,14 @@ extends ConfiguredClientTestBase<D> {
         try (final Closeable resource = factory.create(entry)) {
             queue = new ReferenceQueue<>();
             expected = new WeakReference<>(
-                         new TFile(entry).getInnerArchive().getController(), queue);
+                         controller(new TFile(entry).toNodePath()), queue);
             System.gc();
             assertNull(queue.remove(TIMEOUT_MILLIS));
-            assertSame(expected.get(), new TFile(entry).getInnerArchive().getController());
+            assertSame(expected.get(), controller(new TFile(entry).toNodePath()));
         }
         System.gc();
         assertNull(queue.remove(TIMEOUT_MILLIS));
-        assertSame(expected.get(), new TFile(entry).getInnerArchive().getController());
+        assertSame(expected.get(), controller(new TFile(entry).toNodePath()));
         TVFS.umount(new TFile(entry).getTopLevelArchive());
         Reference<? extends FsController> got;
         do {
@@ -1148,18 +1154,18 @@ extends ConfiguredClientTestBase<D> {
         Arrays.sort(got);
         assertEquals(expected.length, got.length);
         for (int i = 0, l = expected.length; i < l; i++) {
-            final File ref = expected[i];
-            final TFile file = got[i];
-            assertTrue(!(ref instanceof TFile));
-            assertEquals(ref.getPath(), file.getPath());
-            assertNull(file.list());
-            assertNull(file.list(null));
-            assertNull(file.listFiles());
-            assertNull(file.listFiles(file.getDetector()));
-            assertNull(file.listFiles((FileFilter) null));
-            assertNull(file.listFiles((FilenameFilter) null));
-            assertNull(file.listFiles((FileFilter) null, file.getDetector()));
-            assertNull(file.listFiles((FilenameFilter) null, file.getDetector()));
+            final File file = expected[i];
+            final TFile tfile = got[i];
+            assertTrue(!(file instanceof TFile));
+            assertEquals(file.getPath(), tfile.getPath());
+            assertNull(tfile.list());
+            assertNull(tfile.list(null));
+            assertNull(tfile.listFiles());
+            //assertNull(file.listFiles(file.getDetector()));
+            assertNull(tfile.listFiles((FileFilter) null));
+            assertNull(tfile.listFiles((FilenameFilter) null));
+            //assertNull(file.listFiles((FileFilter) null, file.getDetector()));
+            //assertNull(file.listFiles((FilenameFilter) null, file.getDetector()));
         }
     }
 
