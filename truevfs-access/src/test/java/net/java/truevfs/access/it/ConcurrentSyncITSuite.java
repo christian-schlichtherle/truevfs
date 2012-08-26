@@ -2,11 +2,8 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.access;
+package net.java.truevfs.access.it;
 
-import net.java.truevfs.access.TFile;
-import net.java.truevfs.access.TFileOutputStream;
-import net.java.truevfs.access.TVFS;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +14,10 @@ import java.util.concurrent.ExecutionException;
 import static net.java.truecommons.shed.ConcurrencyUtils.*;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskJoiner;
+import net.java.truevfs.access.ConfiguredClientTestBase;
+import net.java.truevfs.access.TFile;
+import net.java.truevfs.access.TFileOutputStream;
+import net.java.truevfs.access.TVFS;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import static net.java.truevfs.kernel.spec.FsSyncOptions.SYNC;
 import static org.junit.Assert.assertEquals;

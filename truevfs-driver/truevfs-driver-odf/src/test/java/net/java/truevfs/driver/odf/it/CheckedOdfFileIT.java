@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.driver.odf.it;
 
-import net.java.truevfs.access.TFileITSuite;
+import net.java.truevfs.access.it.TFileITSuite;
 import net.java.truevfs.driver.odf.CheckedOdfDriver;
 import net.java.truevfs.kernel.spec.TestConfig;
 import net.java.truevfs.kernel.spec.cio.IoBufferPool;

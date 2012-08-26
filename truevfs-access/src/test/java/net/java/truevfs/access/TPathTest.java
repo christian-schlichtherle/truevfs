@@ -452,7 +452,7 @@ public class TPathTest extends MockArchiveDriverTestBase {
         }
         // Once created, the prospective archive file detection does not change
         // because a TPath is immutable.
-        assert archive.getDetector() == getDetector();
+        assert archive.getDetector() == getConfig().getDetector();
         assert archive.isArchive();
         assert file.getDetector() == TArchiveDetector.NULL;
         assert !file.isArchive();

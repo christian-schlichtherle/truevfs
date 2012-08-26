@@ -277,7 +277,8 @@ final class TBIO {
             final TFile tfile=  (TFile) file;
             final TFile archive = tfile.getInnerArchive();
             if (null != archive)
-                return archive.getController()
+                return archive
+                        .getController()
                         .input(options, tfile.getNodeName());
         }
         final FsNodePath path = new FsNodePath(file);
@@ -305,7 +306,8 @@ final class TBIO {
             final TFile tfile = (TFile) file;
             final TFile archive = tfile.getInnerArchive();
             if (null != archive)
-                return archive.getController()
+                return archive
+                        .getController()
                         .output(    options,
                                     tfile.getNodeName(),
                                     template);

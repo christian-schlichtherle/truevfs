@@ -69,9 +69,7 @@ public final class TFileSystem extends FileSystem {
         return true;
     }
 
-    private FsController getController() {
-        return controller;
-    }
+    private FsController getController() { return controller; }
 
     FsMountPoint getMountPoint() {
         return getController().getModel().getMountPoint();

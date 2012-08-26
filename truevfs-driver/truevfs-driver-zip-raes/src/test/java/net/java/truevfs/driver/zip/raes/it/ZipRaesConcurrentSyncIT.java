@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.driver.zip.raes.it;
 
-import net.java.truevfs.access.ConcurrentSyncITSuite;
+import net.java.truevfs.access.it.ConcurrentSyncITSuite;
 import net.java.truevfs.driver.zip.raes.TestZipRaesDriver;
 
 /**

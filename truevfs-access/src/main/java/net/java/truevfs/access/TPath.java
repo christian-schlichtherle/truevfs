@@ -450,7 +450,7 @@ public final class TPath implements Path {
     private boolean invariants() {
         assert null != getName();
         assert null != getDetector();
-        assert null != getNodePath();
+        assert null != toNodePath();
         return true;
     }
 
@@ -466,7 +466,7 @@ public final class TPath implements Path {
      * @see    #isEntry
      */
     public boolean isArchive() {
-        final FsNodePath nodePath = getNodePath();
+        final FsNodePath nodePath = toNodePath();
         final boolean root = nodePath.getNodeName().isRoot();
         final FsMountPoint parent = nodePath.getMountPoint().getParent();
         return root && null != parent;
@@ -484,7 +484,7 @@ public final class TPath implements Path {
      * @see #isArchive
      */
     public boolean isEntry() {
-        final FsNodePath nodePath = getNodePath();
+        final FsNodePath nodePath = toNodePath();
         final boolean root = nodePath.getNodeName().isRoot();
         final FsMountPoint parent = nodePath.getMountPoint().getParent();
         return !root    ? null != parent
@@ -512,11 +512,11 @@ public final class TPath implements Path {
     TArchiveDetector getDetector() { return detector; }
 
     /**
-     * Returns the file system path for this path with an absolute URI.
+     * Returns a file system node path with an absolute URI.
      * 
-     * @return The file system path for this path with an absolute URI.
+     * @return A file system node path with an absolute URI.
      */
-    private FsNodePath getNodePath() { return nodePath; }
+    public FsNodePath toNodePath() { return nodePath; }
 
     /**
      * Returns the file system mount point for this path.
@@ -524,7 +524,7 @@ public final class TPath implements Path {
      * @return The file system mount point for this path.
      */
     FsMountPoint getMountPoint() {
-        return getNodePath().getMountPoint();
+        return toNodePath().getMountPoint();
     }
 
     /**
@@ -533,7 +533,7 @@ public final class TPath implements Path {
      * @return The file system entry name for this path.
      */
     FsNodeName getNodeName() {
-        return getNodePath().getNodeName();
+        return toNodePath().getNodeName();
     }
 
     /**
@@ -689,7 +689,7 @@ public final class TPath implements Path {
 
     @Override
     public TPath normalize() {
-        return new TPath(getName().normalize(), getDetector(), getNodePath());
+        return new TPath(getName().normalize(), getDetector(), toNodePath());
     }
 
     @Override
@@ -730,7 +730,7 @@ public final class TPath implements Path {
         final FsNodePath path = new TPathScanner(detector).scan(
                 TPathScanner.isAbsolute(other)
                     ? TFileSystemProvider.get(getName()).getRoot()
-                    : getNodePath(),
+                    : toNodePath(),
                 other);
         return new TPath(name, detector, path);
     }
@@ -764,20 +764,20 @@ public final class TPath implements Path {
     public URI toUri() {
         URI n = getName();
         String s = n.getScheme();
-        return new UriBuilder(getNodePath().toHierarchicalUri())
+        return new UriBuilder(toNodePath().toHierarchicalUri())
                 .scheme(null != s ? s : TFileSystemProvider.get(n).getScheme())
                 .toUri();
     }
 
     @Override
     public TPath toAbsolutePath() {
-        return new TPath(toUri(), getDetector(), getNodePath());
+        return new TPath(toUri(), getDetector(), toNodePath());
     }
 
     @Override
     public TPath toRealPath(LinkOption... options) throws IOException {
         // TODO: scan symlinks!
-        return new TPath(toUri(), getDetector(), getNodePath());
+        return new TPath(toUri(), getDetector(), toNodePath());
     }
 
     /**
@@ -796,7 +796,7 @@ public final class TPath implements Path {
     public TFile toFile() {
         try {
             return getName().isAbsolute()
-                    ? getDetector().newFile(getNodePath())
+                    ? getDetector().newFile(toNodePath())
                     : getDetector().newFile(toString());
         } catch (IllegalArgumentException ex) {
             throw new UnsupportedOperationException(ex);
@@ -1010,7 +1010,7 @@ public final class TPath implements Path {
 
     /**
      * The methods in this class use
-     * {@link TPath#getNodePath()}.{@link FsNodePath#getMountPoint()} as an
+     * {@link TPath#toNodePath()}.{@link FsNodePath#getMountPoint()} as an
      * identifier for the file system in order to avoid creating the
      * {@link TFileSystem} object for a {@code TPath}.
      * Creating the file system object usually creates an {@link FsController}
@@ -1027,7 +1027,7 @@ public final class TPath implements Path {
         }
 
         boolean equals(TPath p1, TPath p2) {
-            return p1.getNodePath().getMountPoint().equals(p2.getNodePath().getMountPoint())
+            return p1.toNodePath().getMountPoint().equals(p2.toNodePath().getMountPoint())
                     && p1.toString().equals(p2.toString());
         }
         
@@ -1035,7 +1035,7 @@ public final class TPath implements Path {
             final Integer hashCode = p.hashCode;
             if (null != hashCode) return hashCode;
             int result = 17;
-            result = 37 * result + p.getNodePath().getMountPoint().hashCode();
+            result = 37 * result + p.toNodePath().getMountPoint().hashCode();
             result = 37 * result + p.toString().hashCode();
             return p.hashCode = result;
         }
@@ -1043,7 +1043,7 @@ public final class TPath implements Path {
 
     /**
      * The methods in this class use
-     * {@link TPath#getNodePath()}.{@link FsNodePath#getMountPoint()} as an
+     * {@link TPath#toNodePath()}.{@link FsNodePath#getMountPoint()} as an
      * identifier for the file system in order to avoid creating the
      * {@link TFileSystem} object for a {@code TPath}.
      * Creating the file system object usually creates an {@link FsController}
@@ -1061,7 +1061,7 @@ public final class TPath implements Path {
 
         @Override
         boolean equals(TPath p1, TPath p2) {
-            return p1.getNodePath().getMountPoint().equals(p2.getNodePath().getMountPoint())
+            return p1.toNodePath().getMountPoint().equals(p2.toNodePath().getMountPoint())
                     && p1.toString().equalsIgnoreCase(p2.toString());
         }
 
@@ -1070,7 +1070,7 @@ public final class TPath implements Path {
             final Integer hashCode = p.hashCode;
             if (null != hashCode) return hashCode;
             int result = 17;
-            result = 37 * result + p.getNodePath().getMountPoint().hashCode();
+            result = 37 * result + p.toNodePath().getMountPoint().hashCode();
             result = 37 * result + p.toString().toLowerCase(Locale.getDefault()).hashCode();
             return p.hashCode = result;
         }
