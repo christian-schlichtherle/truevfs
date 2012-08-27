@@ -64,7 +64,7 @@ class MyApplication extends TApplication<IOException> {
         // This should obtain the global configuration.
         TConfig config = TConfig.get();
         // Configure custom application file format.
-        config.setDetector(new TArchiveDetector("aff",
+        config.setArchiveDetector(new TArchiveDetector("aff",
                 new JarDriver(IOPoolLocator.SINGLETON)));
         // Set FsAccessOption.GROW for appending-to rather than reassembling
         // existing archive files.
@@ -88,7 +88,7 @@ assert !file1.isArchive();
 // stack.
 try (TConfig config = TConfig.open()) {
     // Configure custom application file format "aff".
-    config.setDetector(new TArchiveDetector("aff",
+    config.setArchiveDetector(new TArchiveDetector("aff",
             new JarDriver(IOPoolLocator.SINGLETON)));
 
     // Now use the current configuration.
@@ -174,7 +174,7 @@ public class AppTest {
     public void setUp() {
         config = TConfig.open();
         // Let's just recognize ZIP files.
-        config.setDetector(new TArchiveDetector("zip"));
+        config.setArchiveDetector(new TArchiveDetector("zip"));
     }
 
     \@After
@@ -247,7 +247,7 @@ public final class TConfig extends Resource<IllegalStateException> {
     /** Copy constructor for inheritable thread local configurations. */
     private TConfig(final TConfig template) {
         this.manager = template.getManager();
-        this.detector = template.getDetector();
+        this.detector = template.getArchiveDetector();
         this.preferences = template.getPreferences();
     }
 
@@ -284,9 +284,9 @@ public final class TConfig extends Resource<IllegalStateException> {
      *
      * @return The {@link TArchiveDetector} to use for scanning path names for
      *         prospective archive files.
-     * @see #getDetector
+     * @see #getArchiveDetector
      */
-    public TArchiveDetector getDetector() {
+    public TArchiveDetector getArchiveDetector() {
         checkOpen();
         return detector;
     }
@@ -299,9 +299,9 @@ public final class TConfig extends Resource<IllegalStateException> {
      *
      * @param detector the default {@link TArchiveDetector} to use for
      *        scanning path names for prospective archive files.
-     * @see   #getDetector()
+     * @see   #getArchiveDetector()
      */
-    public void setDetector(final TArchiveDetector detector) {
+    public void setArchiveDetector(final TArchiveDetector detector) {
         checkOpen();
         this.detector = Objects.requireNonNull(detector);
     }
@@ -446,7 +446,7 @@ public final class TConfig extends Resource<IllegalStateException> {
         if (!(other instanceof TConfig)) return false;
         final TConfig that = (TConfig) other;
         return this.manager.equals(that.getManager())
-                && this.detector.equals(that.getDetector())
+                && this.detector.equals(that.getArchiveDetector())
                 && this.preferences.equals(that.getPreferences());
     }
 

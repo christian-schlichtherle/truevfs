@@ -154,7 +154,7 @@ public class Nzip extends Application {
         final String cmd = args[0].toLowerCase(Locale.ROOT);
         args = lshift(args);
         try (final TConfig config = TConfig.open()) {
-            config.setDetector(newArchiveDetector());
+            config.setArchiveDetector(newArchiveDetector());
             switch (cmd) {
             case "ls":
                 ls(args, false, false);
@@ -382,7 +382,7 @@ public class Nzip extends Application {
             else if (utf8in)
                 srcDetector = newArchiveDetector(Charset.forName("UTF-8"));
             else
-                srcDetector = config.getDetector();
+                srcDetector = config.getArchiveDetector();
 
             TArchiveDetector dstDetector;
             if (unzip)
@@ -392,7 +392,7 @@ public class Nzip extends Application {
             else if (utf8out)
                 dstDetector = newArchiveDetector(Charset.forName("UTF-8"));
             else
-                dstDetector = config.getDetector();
+                dstDetector = config.getArchiveDetector();
 
             final int dstI = args.length - 1;
             final TFile dst = dstDetector.newFile(args[dstI]);

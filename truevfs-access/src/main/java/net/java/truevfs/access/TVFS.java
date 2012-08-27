@@ -116,7 +116,7 @@ public final class TVFS {
     static FsMountPoint mountPoint(final TFile tree) {
         if (tree.isArchive()) {
             return tree.getController().getModel().getMountPoint(); // fast path
-            //return tree.toNodePath().getMountPoint(); // slow path
+            //return tree.getNodePath().getMountPoint(); // slow path
         }
         try {
             return new FsMountPoint(new URI(tree.getFile().toURI() + "/"),

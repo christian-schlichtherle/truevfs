@@ -168,14 +168,14 @@ extends ConfiguredClientTestBase<D> {
         try (final Closeable resource = factory.create(entry)) {
             queue = new ReferenceQueue<>();
             expected = new WeakReference<>(
-                    controller(new TPath(entry).toNodePath()), queue);
+                    controller(new TPath(entry).getNodePath()), queue);
             System.gc();
             assertNull(queue.remove(TIMEOUT_MILLIS));
-            assertSame(expected.get(), controller(new TPath(entry).toNodePath()));
+            assertSame(expected.get(), controller(new TPath(entry).getNodePath()));
         }
         System.gc();
         assertNull(queue.remove(TIMEOUT_MILLIS));
-        assertSame(expected.get(), controller(new TPath(entry).toNodePath()));
+        assertSame(expected.get(), controller(new TPath(entry).getNodePath()));
         TVFS.umount(new TFile(entry).getTopLevelArchive());
         Reference<? extends FsController> got;
         do {
@@ -1337,7 +1337,7 @@ extends ConfiguredClientTestBase<D> {
                         final TPath entry = archive.resolve("" + threadNum);
                         createTestFile(entry);
                         try {
-                            TVFS.sync(archive.toNodePath().getMountPoint(),
+                            TVFS.sync(archive.getNodePath().getMountPoint(),
                                     BitField.of(CLEAR_CACHE)
                                             .set(WAIT_CLOSE_IO, wait));
                         } catch (final FsSyncException ex) {

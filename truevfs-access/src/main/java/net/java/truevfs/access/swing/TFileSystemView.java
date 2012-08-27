@@ -70,7 +70,7 @@ public class TFileSystemView extends TDecoratingFileSystemView {
     }
 
     TArchiveDetector detector() {
-        return null != detector ? detector : TConfig.get().getDetector();
+        return null != detector ? detector : TConfig.get().getArchiveDetector();
     }
 
     /**

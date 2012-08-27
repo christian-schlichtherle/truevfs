@@ -168,14 +168,14 @@ extends ConfiguredClientTestBase<D> {
         try (final Closeable resource = factory.create(entry)) {
             queue = new ReferenceQueue<>();
             expected = new WeakReference<>(
-                         controller(new TFile(entry).toNodePath()), queue);
+                         controller(new TFile(entry).getNodePath()), queue);
             System.gc();
             assertNull(queue.remove(TIMEOUT_MILLIS));
-            assertSame(expected.get(), controller(new TFile(entry).toNodePath()));
+            assertSame(expected.get(), controller(new TFile(entry).getNodePath()));
         }
         System.gc();
         assertNull(queue.remove(TIMEOUT_MILLIS));
-        assertSame(expected.get(), controller(new TFile(entry).toNodePath()));
+        assertSame(expected.get(), controller(new TFile(entry).getNodePath()));
         TVFS.umount(new TFile(entry).getTopLevelArchive());
         Reference<? extends FsController> got;
         do {
@@ -1161,11 +1161,11 @@ extends ConfiguredClientTestBase<D> {
             assertNull(tfile.list());
             assertNull(tfile.list(null));
             assertNull(tfile.listFiles());
-            //assertNull(file.listFiles(file.getDetector()));
+            //assertNull(file.listFiles(file.getArchiveDetector()));
             assertNull(tfile.listFiles((FileFilter) null));
             assertNull(tfile.listFiles((FilenameFilter) null));
-            //assertNull(file.listFiles((FileFilter) null, file.getDetector()));
-            //assertNull(file.listFiles((FilenameFilter) null, file.getDetector()));
+            //assertNull(file.listFiles((FileFilter) null, file.getArchiveDetector()));
+            //assertNull(file.listFiles((FilenameFilter) null, file.getArchiveDetector()));
         }
     }
 
