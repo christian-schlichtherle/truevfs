@@ -698,14 +698,14 @@ public final class TFile extends File implements TRex {
         return getAbsoluteFile();
     }
 
-    private void writeObject(ObjectOutputStream out)
-    throws IOException {
-        out.writeObject(toURI());
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        out.writeObject(toUri());
     }
 
     private void readObject(ObjectInputStream in)
     throws IOException, ClassNotFoundException {
-        parse(  FsNodePath.create((URI) in.readObject(), CANONICALIZE), TConfig.get().getArchiveDetector());
+        parse(  FsNodePath.create((URI) in.readObject(), CANONICALIZE),
+                TConfig.get().getArchiveDetector());
     }
 
     /**
@@ -1742,8 +1742,7 @@ public final class TFile extends File implements TRex {
             } catch (IOException ex) {
                 return null;
             }
-            if (null == entry)
-                return null;
+            if (null == entry) return null;
             final Set<String> members = entry.getMembers();
             return null == members ? null : members.toArray(new String[members.size()]);
         }
@@ -1795,61 +1794,20 @@ public final class TFile extends File implements TRex {
      */
     @Override
     public @Nullable TFile[] listFiles() {
-        return listFiles((FilenameFilter) null, getArchiveDetector());
+        return listFiles((FilenameFilter) null);
     }
 
     /**
-     * Returns {@code TFile} objects for the members in this directory
-     * in a newly created array.
-     * The returned array is <em>not</em> sorted.
+     * {@inheritDoc}
      * <p>
      * Note that archive entries with absolute paths are ignored by this
      * method and are never returned.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
-     *
-     * @param  detector The archive detector to detect any archives files in
-     *         the member file names.
-     * @return A possibly empty array with the members of this (virtual)
-     *         directory or {@code null} if this instance does not refer to a
-     *         (virtual) directory or if the virtual directory is inaccessible
-     *         due to an I/O error.
-     */
-    @Nullable TFile[] listFiles(TArchiveDetector detector) {
-        return listFiles((FilenameFilter) null, detector);
-    }
-
-    /**
-     * Equivalent to {@link #listFiles(FilenameFilter, TArchiveDetector)
-     * listFiles(filenameFilter, getArchiveDetector())}.
      */
     @Override
-    public @Nullable TFile[] listFiles(@CheckForNull FilenameFilter filter) {
-        return listFiles(filter, getArchiveDetector());
-    }
-
-    /**
-     * Returns {@code TFile} objects for the members in this directory
-     * which are accepted by {@code filenameFilter} in a newly created
-     * array.
-     * The returned array is <em>not</em> sorted.
-     * <p>
-     * Note that archive entries with absolute paths are ignored by this
-     * method and are never returned.
-     * <p>
-     * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
-     *
-     * @param  filter the file filter.
-     * @param  detector the archive detector to detect any archives files in
-     *         the member file names.
-     * @return A possibly empty array with the members of this (virtual)
-     *         directory or {@code null} if this instance does not refer to a
-     *         (virtual) directory or if the virtual directory is inaccessible
-     *         due to an I/O error.
-     */
-    @Nullable TFile[] listFiles(
-            final @CheckForNull FilenameFilter filter,
-            final TArchiveDetector detector) {
+    public @Nullable TFile[] listFiles(
+            final @CheckForNull FilenameFilter filter) {
         if (null != innerArchive) {
             final FsNode entry;
             try {
@@ -1858,9 +1816,9 @@ public final class TFile extends File implements TRex {
             } catch (IOException ex) {
                 return null;
             }
-            return filter(members(entry), filter, detector);
+            return filter(members(entry), filter);
         } else {
-            return filter(list(file.list(filter)), (FilenameFilter) null, detector);
+            return filter(list(file.list(filter)), (FilenameFilter) null);
         }
     }
 
@@ -1874,10 +1832,9 @@ public final class TFile extends File implements TRex {
 
     private @Nullable TFile[] filter(
             final @CheckForNull Collection<String> members,
-            final @CheckForNull FilenameFilter filter,
-            final TArchiveDetector detector) {
-        if (null == members)
-            return null;
+            final @CheckForNull FilenameFilter filter) {
+        if (null == members) return null;
+        final TArchiveDetector detector = TConfig.get().getArchiveDetector();
         if (null != filter) {
             final Collection<TFile> accepted = new ArrayList<>(members.size());
             for (final String member : members)
@@ -1894,35 +1851,15 @@ public final class TFile extends File implements TRex {
     }
 
     /**
-     * Equivalent to {@link #listFiles(FileFilter, TArchiveDetector)
-     * listFiles(fileFilter, getArchiveDetector())}.
-     */
-    @Override
-    public @Nullable TFile[] listFiles(@CheckForNull FileFilter filter) {
-        return listFiles(filter, getArchiveDetector());
-    }
-
-    /**
-     * Returns {@code TFile} objects for the members in this directory
-     * which are accepted by {@code fileFilter} in a newly created array.
-     * The returned array is <em>not</em> sorted.
+     * {@inheritDoc}
      * <p>
      * Note that archive entries with absolute paths are ignored by this
      * method and are never returned.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
-     *
-     * @param  filter the file filter.
-     * @param  detector The archive detector to detect any archives files in
-     *         the member file names.
-     * @return A possibly empty array with the members of this (virtual)
-     *         directory or {@code null} if this instance does not refer to a
-     *         (virtual) directory or if the virtual directory is inaccessible
-     *         due to an I/O error.
      */
-    @Nullable TFile[] listFiles(
-            final @CheckForNull FileFilter filter,
-            final TArchiveDetector detector) {
+    @Override
+    public @Nullable TFile[] listFiles(final @CheckForNull FileFilter filter) {
         if (null != innerArchive) {
             final FsNode entry;
             try {
@@ -1931,18 +1868,17 @@ public final class TFile extends File implements TRex {
             } catch (IOException ex) {
                 return null;
             }
-            return filter(members(entry), filter, detector);
+            return filter(members(entry), filter);
         } else {
-            return filter(list(file.list()), filter, detector);
+            return filter(list(file.list()), filter);
         }
     }
 
     private @Nullable TFile[] filter(
             final @CheckForNull Collection<String> members,
-            final @CheckForNull FileFilter filter,
-            final TArchiveDetector detector) {
-        if (null == members)
-            return null;
+            final @CheckForNull FileFilter filter) {
+        if (null == members) return null;
+        final TArchiveDetector detector = TConfig.get().getArchiveDetector();
         if (null != filter) {
             final Collection<TFile> accepted = new ArrayList<>(members.size());
             for (final String member : members) {
