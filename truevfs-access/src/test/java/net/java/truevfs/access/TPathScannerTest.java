@@ -73,7 +73,7 @@ public class TPathScannerTest extends MockArchiveDriverTestBase {
                 ? null
                 : new FsMountPoint(new URI(params[3]));
         final FsNodePath result = new TPathScanner(
-                    TConfig.get().getDetector())
+                    TConfig.get().getArchiveDetector())
                 .scan(parent, member);
         assertThat(result, equalTo(path));
         assertThat(result.getMountPoint(), is(mountPoint));

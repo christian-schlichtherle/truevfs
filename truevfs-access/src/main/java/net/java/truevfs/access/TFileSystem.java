@@ -57,7 +57,7 @@ public final class TFileSystem extends FileSystem {
         this.controller = TConfig
                 .get()
                 .getManager()
-                .controller(path.getDetector(), path.getMountPoint());
+                .controller(path.getArchiveDetector(), path.getMountPoint());
         this.provider = TFileSystemProvider.get(path.getName());
 
         assert invariants();

@@ -69,7 +69,7 @@ extends FsArchiveDriverTestBase<D> {
         if (ISOLATE_FS_MANAGER) config.setManager(newManager());
         final TArchiveDetector detector = new TArchiveDetector(getExtensionList(), getArchiveDriver());
         environment = Collections.singletonMap(ARCHIVE_DETECTOR, detector);
-        config.setDetector(detector);
+        config.setArchiveDetector(detector);
         config.setLenient(true);
     }
 
@@ -99,7 +99,7 @@ extends FsArchiveDriverTestBase<D> {
         return getConfig()
                 .getManager()
                 .controller(
-                    getConfig().getDetector(),
+                    getConfig().getArchiveDetector(),
                     nodePath.getMountPoint());
     }
 }

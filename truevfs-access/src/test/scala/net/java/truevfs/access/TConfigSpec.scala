@@ -87,7 +87,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
     "be setup correctly" in {
       val config = GLOBAL
       config.getManager should be theSameInstanceAs (FsManagerLocator.SINGLETON.get)
-      config.getDetector should be theSameInstanceAs (TArchiveDetector.ALL)
+      config.getArchiveDetector should be theSameInstanceAs (TArchiveDetector.ALL)
       config.getPreferences should equal (BitField.of(CREATE_PARENTS))
     }
   }
@@ -107,11 +107,11 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
 
     "update its mutable property for an archive detector" in {
       loan(open()) to { config =>
-        intercept[NullPointerException] { config setDetector null }
-        config.getDetector should be theSameInstanceAs (TArchiveDetector.ALL)
+        intercept[NullPointerException] { config setArchiveDetector null }
+        config.getArchiveDetector should be theSameInstanceAs (TArchiveDetector.ALL)
         val detector = new TArchiveDetector("mok", new MockArchiveDriver())
-        config setDetector detector
-        config.getDetector should be theSameInstanceAs (detector)
+        config setArchiveDetector detector
+        config.getArchiveDetector should be theSameInstanceAs (detector)
       }
     }
 

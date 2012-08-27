@@ -129,7 +129,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
         final TConfig config = TConfig.open();
         final TArchiveDetector detector =
                 (TArchiveDetector) env.get(Parameter.ARCHIVE_DETECTOR);
-        if (null != detector) config.setDetector(detector);
+        if (null != detector) config.setArchiveDetector(detector);
         return config;
     }
 

@@ -44,7 +44,7 @@ public final class PathCat extends TApplication<IOException> {
      * Copies the contents of the parameter resource to the standard output.
      * <p>
      * The set of archive file extensions detected by this method is determined
-     * by the {@linkplain TConfig#getDetector default archive detector}
+     * by the {@linkplain TConfig#getArchiveDetector default archive detector}
      * and the respective file system driver providers on the class path.
      *
      * @param  resource the path name string of the resource to copy.
