@@ -68,7 +68,7 @@ class MyApplication extends TApplication<IOException> {
                 new JarDriver(IOPoolLocator.SINGLETON)));
         // Set FsAccessOption.GROW for appending-to rather than reassembling
         // existing archive files.
-        config.setPreference(FsAccessOption.GROW, true);
+        config.setAccessPreference(FsAccessOption.GROW, true);
     }
 
     ...
@@ -133,7 +133,7 @@ TFile file = new TFile("archive.zip/entry");
 try (TConfig config = TConfig.open()) {
     // Set FsAccessOption.GROW for appending-to rather than reassembling
     // existing archive files.
-    config.setPreference(FsAccessOption.GROW, true);
+    config.setAccessPreference(FsAccessOption.GROW, true);
 
     // Now use the current configuration and append the entry to the archive
     // file even if it's already present.
@@ -248,7 +248,7 @@ public final class TConfig extends Resource<IllegalStateException> {
     private TConfig(final TConfig template) {
         this.manager = template.getManager();
         this.detector = template.getArchiveDetector();
-        this.preferences = template.getPreferences();
+        this.preferences = template.getAccessPreferences();
     }
 
     private void checkOpen() {
@@ -311,7 +311,7 @@ public final class TConfig extends Resource<IllegalStateException> {
      * 
      * @return The access preferences to apply for file system operations.
      */
-    public BitField<FsAccessOption> getPreferences() {
+    public BitField<FsAccessOption> getAccessPreferences() {
         checkOpen();
         return preferences;
     }
@@ -328,7 +328,7 @@ public final class TConfig extends Resource<IllegalStateException> {
      *         {@link FsAccessOption#STORE} and
      *         {@link FsAccessOption#COMPRESS} have been set.
      */
-    public void setPreferences(final BitField<FsAccessOption> preferences) {
+    public void setAccessPreferences(final BitField<FsAccessOption> preferences) {
         checkOpen();
         if (preferences.equals(this.preferences)) return;
         final BitField<FsAccessOption>
@@ -348,8 +348,8 @@ public final class TConfig extends Resource<IllegalStateException> {
      * @return {@code true} if and only if the given access option is set in
      *         the access preferences.
      */
-    public boolean getPreference(FsAccessOption option) {
-        return getPreferences().get(option);
+    public boolean getAccessPreference(FsAccessOption option) {
+        return getAccessPreferences().get(option);
     }
 
     /**
@@ -361,14 +361,14 @@ public final class TConfig extends Resource<IllegalStateException> {
      * @param set {@code true} if you want the option to be set or
      *        {@code false} if you want it to be cleared.
      */
-    public void setPreference(FsAccessOption option, boolean set) {
-        setPreferences(getPreferences().set(option, set));
+    public void setAccessPreference(FsAccessOption option, boolean set) {
+        setAccessPreferences(getAccessPreferences().set(option, set));
     }
 
     /**
      * Returns the value of the property {@code lenient}, which is {@code true}
      * if and only if the access preference {@link FsAccessOption#CREATE_PARENTS}
-     * is set in the {@linkplain #getPreferences() access accessPreferences}.
+     * is set in the {@linkplain #getAccessPreferences() access accessPreferences}.
      * This property controls whether archive files and their member
      * directories get automatically created whenever required.
      * <p>
@@ -411,9 +411,9 @@ public final class TConfig extends Resource<IllegalStateException> {
      * @return The value of the property {@code lenient}, which is {@code true}
      *         if and only if the access preference
      *         {@link FsAccessOption#CREATE_PARENTS} is set in the
-     *         {@linkplain #getPreferences() access accessPreferences}.
+     *         {@linkplain #getAccessPreferences() access accessPreferences}.
      */
-    public boolean isLenient() { return getPreference(CREATE_PARENTS); }
+    public boolean isLenient() { return getAccessPreference(CREATE_PARENTS); }
 
     /**
      * Sets the value of the property {@code lenient}.
@@ -423,7 +423,7 @@ public final class TConfig extends Resource<IllegalStateException> {
      * @param lenient the value of the property {@code lenient}.
      */
     public void setLenient(final boolean lenient) {
-        setPreference(CREATE_PARENTS, lenient);
+        setAccessPreference(CREATE_PARENTS, lenient);
     }
 
     @Override
@@ -447,7 +447,7 @@ public final class TConfig extends Resource<IllegalStateException> {
         final TConfig that = (TConfig) other;
         return this.manager.equals(that.getManager())
                 && this.detector.equals(that.getArchiveDetector())
-                && this.preferences.equals(that.getPreferences());
+                && this.preferences.equals(that.getAccessPreferences());
     }
 
     @Override

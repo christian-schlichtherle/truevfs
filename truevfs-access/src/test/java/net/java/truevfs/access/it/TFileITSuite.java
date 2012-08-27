@@ -1412,7 +1412,7 @@ extends ConfiguredClientTestBase<D> {
         final TFile entry2 = new TFile(archive, "entry2");
 
         try (final TConfig config = TConfig.open()) {
-            config.setPreference(GROW, true);
+            config.setAccessPreference(GROW, true);
 
             createTestFile(entry1);
             createTestFile(entry2);
@@ -1439,7 +1439,7 @@ extends ConfiguredClientTestBase<D> {
         assertThat(archive.list().length, is(0));
 
         try (final TConfig config = TConfig.open()) {
-            config.setPreference(GROW, true);
+            config.setAccessPreference(GROW, true);
 
             archive.rm();
             umount();

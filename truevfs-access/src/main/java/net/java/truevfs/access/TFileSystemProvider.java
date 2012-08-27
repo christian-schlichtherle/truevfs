@@ -308,7 +308,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
         if (isSameFile0(src, dst))
             throw new FileSystemException(src.toString(), dst.toString(), "Source and destination are the same file!");
         boolean preserve = false;
-        BitField<FsAccessOption> o = dst.getPreferences().set(EXCLUSIVE);
+        BitField<FsAccessOption> o = dst.getAccessPreferences().set(EXCLUSIVE);
         for (final CopyOption option : options) {
             if (!(option instanceof StandardCopyOption))
                 throw new UnsupportedOperationException(option.toString());
@@ -348,7 +348,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
                 }
             }
         }
-        final InputSocket<?> input = src.input(src.getPreferences());
+        final InputSocket<?> input = src.input(src.getAccessPreferences());
         final OutputSocket<?> output = dst.output(o,
                 preserve ? input.target() : null);
         IoSockets.copy(input, output);

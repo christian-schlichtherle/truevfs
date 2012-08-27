@@ -946,7 +946,7 @@ public final class TPath implements Path, TRex {
     BitField<FsAccessOption> inputOptions(final Set<? extends OpenOption> options) {
         final int s = options.size();
         if (0 == s || 1 == s && options.contains(StandardOpenOption.READ))
-            return getPreferences();
+            return getAccessPreferences();
         throw new IllegalArgumentException(options.toString());
     }
 
@@ -979,15 +979,16 @@ public final class TPath implements Path, TRex {
                     throw new UnsupportedOperationException(option.toString());
             }
         }
-        final BitField<FsAccessOption> prefs = getPreferences();
+        final BitField<FsAccessOption> prefs = getAccessPreferences();
         return set.isEmpty() ? prefs : prefs.or(BitField.copyOf(set));
     }
 
-    BitField<FsAccessOption> getPreferences() {
-        final BitField<FsAccessOption> ap = TConfig.get().getPreferences();
+    BitField<FsAccessOption> getAccessPreferences() {
+        final BitField<FsAccessOption> preferences =
+                TConfig.get().getAccessPreferences();
         return null != getMountPoint().getParent()
-                ? ap
-                : ap.clear(CREATE_PARENTS);
+                ? preferences
+                : preferences.clear(CREATE_PARENTS);
     }
 
     /**

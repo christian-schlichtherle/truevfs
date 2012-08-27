@@ -5,8 +5,8 @@
 package net.java.truevfs.driver.zip.it;
 
 import java.io.IOException;
-import net.java.truevfs.access.it.ConcurrentSyncITSuite;
 import net.java.truevfs.access.TConfig;
+import net.java.truevfs.access.it.ConcurrentSyncITSuite;
 import net.java.truevfs.comp.zipdriver.TestWinZipAesDriver;
 import static net.java.truevfs.kernel.spec.FsAccessOption.ENCRYPT;
 
@@ -28,6 +28,6 @@ public final class WinZipAesConcurrentSyncIT extends ConcurrentSyncITSuite<TestW
     @Override
     public void setUp() throws IOException {
         super.setUp();
-        TConfig.get().setPreference(ENCRYPT, true);
+        TConfig.get().setAccessPreference(ENCRYPT, true);
     }
 }
