@@ -336,7 +336,7 @@ public final class TFileSystem extends FileSystem {
             throw new UnsupportedOperationException();
         final FsController controller = getController();
         final FsNodeName name = path.getNodeName();
-        final BitField<FsAccessOption> options = path.getPreferences();
+        final BitField<FsAccessOption> options = path.getAccessPreferences();
         try {
             controller.make(
                     options, name,
@@ -351,11 +351,11 @@ public final class TFileSystem extends FileSystem {
     }
 
     void delete(TPath path) throws IOException {
-        getController().unlink(path.getPreferences(), path.getNodeName());
+        getController().unlink(path.getAccessPreferences(), path.getNodeName());
     }
 
     FsNode stat(TPath path) throws IOException {
-        return getController().node(path.getPreferences(), path.getNodeName());
+        return getController().node(path.getAccessPreferences(), path.getNodeName());
     }
 
     InputSocket<?> input(   TPath path,
@@ -372,7 +372,7 @@ public final class TFileSystem extends FileSystem {
     void checkAccess(final TPath path, final AccessMode... modes)
     throws IOException {
         final FsNodeName name = path.getNodeName();
-        final BitField<FsAccessOption> options = path.getPreferences();
+        final BitField<FsAccessOption> options = path.getAccessPreferences();
         final BitField<Access> types = types(modes);
         getController().checkAccess(options, name, types);
     }
@@ -447,7 +447,7 @@ public final class TFileSystem extends FileSystem {
             if (null != createTime)
                 times.put(CREATE, createTime.toMillis());
             controller.setTime(
-                    path.getPreferences(), path.getNodeName(),
+                    path.getAccessPreferences(), path.getNodeName(),
                     times);
         }
     } // FsEntryAttributeView
@@ -458,7 +458,7 @@ public final class TFileSystem extends FileSystem {
 
         FsEntryAttributes(final TPath path) throws IOException {
             if (null == (entry = getController()
-                    .node(path.getPreferences(), path.getNodeName())))
+                    .node(path.getAccessPreferences(), path.getNodeName())))
                 throw new NoSuchFileException(path.toString());
         }
 

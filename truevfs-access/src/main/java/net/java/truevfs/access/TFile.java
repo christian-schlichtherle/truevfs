@@ -1472,8 +1472,8 @@ public final class TFile extends File implements TRex {
     @Override
     public TPath toPath() { return new TPath(this); }
 
-    private static BitField<FsAccessOption> getPreferences() {
-        return TConfig.get().getPreferences();
+    private static BitField<FsAccessOption> getAccessPreferences() {
+        return TConfig.get().getAccessPreferences();
     }
 
     /**
@@ -1489,7 +1489,7 @@ public final class TFile extends File implements TRex {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().checkAccess(
-                        getPreferences(), getNodeName(),
+                        getAccessPreferences(), getNodeName(),
                         NO_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1517,7 +1517,7 @@ public final class TFile extends File implements TRex {
         if (null != innerArchive) {
             try {
                 final FsNode entry = innerArchive.getController()
-                        .node(getPreferences(), getNodeName());
+                        .node(getAccessPreferences(), getNodeName());
                 return null != entry && entry.isType(FILE);
             } catch (IOException ex) {
                 return false;
@@ -1546,7 +1546,7 @@ public final class TFile extends File implements TRex {
         if (null != innerArchive) {
             try {
                 final FsNode entry = innerArchive.getController()
-                        .node(getPreferences(), getNodeName());
+                        .node(getAccessPreferences(), getNodeName());
                 return null != entry && entry.isType(DIRECTORY);
             } catch (IOException ex) {
                 return false;
@@ -1560,7 +1560,7 @@ public final class TFile extends File implements TRex {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().checkAccess(
-                        getPreferences(), getNodeName(),
+                        getAccessPreferences(), getNodeName(),
                         READ_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1575,7 +1575,7 @@ public final class TFile extends File implements TRex {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().checkAccess(
-                        getPreferences(), getNodeName(),
+                        getAccessPreferences(), getNodeName(),
                         WRITE_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1590,7 +1590,7 @@ public final class TFile extends File implements TRex {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().checkAccess(
-                        getPreferences(), getNodeName(),
+                        getAccessPreferences(), getNodeName(),
                         EXECUTE_ACCESS);
                 return true;
             } catch (IOException ex) {
@@ -1642,7 +1642,7 @@ public final class TFile extends File implements TRex {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .node(getPreferences(), getNodeName());
+                        .node(getAccessPreferences(), getNodeName());
             } catch (final IOException ex) {
                 return 0;
             }
@@ -1671,7 +1671,7 @@ public final class TFile extends File implements TRex {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .node(getPreferences(), getNodeName());
+                        .node(getAccessPreferences(), getNodeName());
             } catch (final IOException ex) {
                 return 0;
             }
@@ -1705,7 +1705,7 @@ public final class TFile extends File implements TRex {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().setTime(
-                        getPreferences(), getNodeName(),
+                        getAccessPreferences(), getNodeName(),
                         WRITE_ACCESS,
                         time);
                 return true;
@@ -1738,7 +1738,7 @@ public final class TFile extends File implements TRex {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .node(getPreferences(), getNodeName());
+                        .node(getAccessPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
@@ -1771,7 +1771,7 @@ public final class TFile extends File implements TRex {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .node(getPreferences(), getNodeName());
+                        .node(getAccessPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
@@ -1854,7 +1854,7 @@ public final class TFile extends File implements TRex {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .node(getPreferences(), getNodeName());
+                        .node(getAccessPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
@@ -1927,7 +1927,7 @@ public final class TFile extends File implements TRex {
             final FsNode entry;
             try {
                 entry = innerArchive.getController()
-                        .node(getPreferences(), getNodeName());
+                        .node(getAccessPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
@@ -1975,10 +1975,10 @@ public final class TFile extends File implements TRex {
             final FsController controller = innerArchive.getController();
             final FsNodeName entryName = getNodeName();
             // This is not really atomic, but should be OK in this case.
-            if (null != controller.node(getPreferences(), entryName))
+            if (null != controller.node(getAccessPreferences(), entryName))
                 return false;
             controller.make(
-                    getPreferences().set(EXCLUSIVE), entryName,
+                    getAccessPreferences().set(EXCLUSIVE), entryName,
                     FILE,
                     null);
             return true;
@@ -2023,7 +2023,7 @@ public final class TFile extends File implements TRex {
         if (null != innerArchive) {
             try {
                 innerArchive.getController().make(
-                        getPreferences(), getNodeName(),
+                        getAccessPreferences(), getNodeName(),
                         DIRECTORY,
                         null);
                 return true;
@@ -2054,11 +2054,11 @@ public final class TFile extends File implements TRex {
             final FsController controller = innerArchive.getController();
             final FsNodeName innerEntryName = getNodeName();
             try {
-                controller.make(    getPreferences(), innerEntryName,
+                controller.make(    getAccessPreferences(), innerEntryName,
                                     DIRECTORY, null);
             } catch (IOException ex) {
                 final FsNode entry = controller
-                        .node(getPreferences(), innerEntryName);
+                        .node(getAccessPreferences(), innerEntryName);
                 if (null == entry || !entry.isType(DIRECTORY))
                     throw ex;
             }
@@ -2118,7 +2118,7 @@ public final class TFile extends File implements TRex {
             TFile tfile = (TFile) file;
             if (null != tfile.innerArchive) {
                 tfile.innerArchive.getController().unlink(
-                        getPreferences(), tfile.getNodeName());
+                        getAccessPreferences(), tfile.getNodeName());
                 return;
             }
             file = tfile.file;
@@ -3079,7 +3079,7 @@ public final class TFile extends File implements TRex {
         final File dir = parent(grown);
         final @Nullable String extension = extension(grown);
         try (final TConfig config = TConfig.open()) {
-            config.setPreference(GROW, false);
+            config.setAccessPreference(GROW, false);
 
             // Create temp file.
             final TFile compact = new TFile(createTempFile("tzp", extension, dir));

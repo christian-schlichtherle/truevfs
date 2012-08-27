@@ -213,7 +213,7 @@ final class TBIO {
     cp0(final boolean preserve, final File src, final File dst)
     throws IOException {
         final BitField<FsAccessOption> preferences =
-                TConfig.get().getPreferences();
+                TConfig.get().getAccessPreferences();
         final InputSocket<?> input = input(preferences, src);
         final OutputSocket<?> output = output(preferences, dst,
                 preserve ? input.target() : null);

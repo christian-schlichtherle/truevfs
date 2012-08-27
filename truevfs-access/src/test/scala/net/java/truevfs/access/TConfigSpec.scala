@@ -7,9 +7,9 @@ package net.java.truevfs.access
 import collection.JavaConverters._
 import java.util.concurrent._
 import net.java.truecommons.io.Loan._
-import net.java.truecommons.services.Locator
+import net.java.truecommons.services._
 import net.java.truecommons.shed._
-import net.java.truevfs.kernel.driver.mock.MockArchiveDriver
+import net.java.truevfs.kernel.driver.mock._
 import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.FsAccessOption._
 import net.java.truevfs.kernel.spec.FsAccessOptions._
@@ -88,7 +88,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
       val config = GLOBAL
       config.getManager should be theSameInstanceAs (FsManagerLocator.SINGLETON.get)
       config.getArchiveDetector should be theSameInstanceAs (TArchiveDetector.ALL)
-      config.getPreferences should equal (BitField.of(CREATE_PARENTS))
+      config.getAccessPreferences should equal (BitField.of(CREATE_PARENTS))
     }
   }
 
@@ -117,18 +117,18 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
 
     "update its mutable property for access preferences" in {
       loan(open()) to { config =>
-        intercept[NullPointerException] { config setPreferences null }
-        config.getPreferences should equal (BitField.of(CREATE_PARENTS))
+        intercept[NullPointerException] { config setAccessPreferences null }
+        config.getAccessPreferences should equal (BitField.of(CREATE_PARENTS))
         val preferences = BitField.of(CACHE)
-        config setPreferences preferences
-        config.getPreferences should be theSameInstanceAs (preferences)
+        config setAccessPreferences preferences
+        config.getAccessPreferences should be theSameInstanceAs (preferences)
       }
     }
 
     "provide the correct default value of its property for access preferences" in {
       loan(open()) to { config =>
-        intercept[NullPointerException] { config setPreferences null }
-        config.getPreferences should equal (BitField.of(CREATE_PARENTS))
+        intercept[NullPointerException] { config setAccessPreferences null }
+        config.getAccessPreferences should equal (BitField.of(CREATE_PARENTS))
       }
     }
 
@@ -144,14 +144,14 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
           (BitField.of(ENCRYPT))
         );
         forAll(legal) { preferences =>
-          config setPreferences preferences
-          config.getPreferences should be theSameInstanceAs (preferences)
+          config setAccessPreferences preferences
+          config.getAccessPreferences should be theSameInstanceAs (preferences)
           for (preference <- preferences.asScala) {
-            config.setPreference(preference, false)
-            config.getPreferences should equal (preferences.clear(preference))
-            config.setPreference(preference, true)
-            config.getPreferences should equal (preferences)
-            config.getPreferences should not be theSameInstanceAs (preferences)
+            config.setAccessPreference(preference, false)
+            config.getAccessPreferences should equal (preferences.clear(preference))
+            config.setAccessPreference(preference, true)
+            config.getAccessPreferences should equal (preferences)
+            config.getAccessPreferences should not be theSameInstanceAs (preferences)
           }
         }
       }
@@ -167,12 +167,12 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
         );
         forAll(illegal) { preferences =>
           intercept[IllegalArgumentException] {
-            config.setPreferences(preferences)
+            config.setAccessPreferences(preferences)
           }
           if (1 == preferences.cardinality) {
             for (preference <- preferences.asScala) {
               intercept[IllegalArgumentException] {
-                config.setPreference(preference, true)
+                config.setAccessPreference(preference, true)
               }
             }
           }
