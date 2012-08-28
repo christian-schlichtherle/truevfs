@@ -32,7 +32,6 @@ import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.access.TPathScanner.*;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
-import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsMountPoint;
 import net.java.truevfs.kernel.spec.FsNode;
 import net.java.truevfs.kernel.spec.FsNodeName;
@@ -775,8 +774,8 @@ public final class TPath implements Path, TRex {
     public TFile toFile() {
         try {
             return getName().isAbsolute()
-                    ? getArchiveDetector().newFile(getNodePath())
-                    : getArchiveDetector().newFile(toString());
+                    ? new TFile(getNodePath(), getArchiveDetector())
+                    : new TFile(toString(), getArchiveDetector());
         } catch (IllegalArgumentException ex) {
             throw new UnsupportedOperationException(ex);
         }

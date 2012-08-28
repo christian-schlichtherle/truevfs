@@ -82,7 +82,7 @@ public abstract class KeyManagementITSuite {
 
     @Test
     public void testSetPasswords1() throws IOException {
-        archive = newArchiveDetector1(EXTENSION, PASSWORD).newFile(temp);
+        archive = new TFile(temp, newArchiveDetector1(EXTENSION, PASSWORD));
         roundTrip();
     }
 
@@ -91,7 +91,7 @@ public abstract class KeyManagementITSuite {
 
     @Test
     public void testSetPasswords2() throws IOException {
-        archive = newArchiveDetector2(EXTENSION, PASSWORD).newFile(temp);
+        archive = new TFile(temp, newArchiveDetector2(EXTENSION, PASSWORD));
         roundTrip();
     }
 
@@ -100,19 +100,13 @@ public abstract class KeyManagementITSuite {
 
     private void roundTrip() throws IOException {
         final TFile file = new TFile(archive, "entry");
-        final OutputStream os = new TFileOutputStream(file);
-        try {
+        try (final OutputStream os = new TFileOutputStream(file)) {
             os.write(data);
-        } finally {
-            os.close();
         }
-        final ByteArrayOutputStream
-                baos = new ByteArrayOutputStream(data.length);
-        final InputStream is = new TFileInputStream(file);
-        try {
+        final ByteArrayOutputStream baos =
+                new ByteArrayOutputStream(data.length);
+        try (final InputStream is = new TFileInputStream(file)) {
             TFile.cat(is, baos);
-        } finally {
-            is.close();
         }
         Arrays.equals(data, baos.toByteArray());
     }

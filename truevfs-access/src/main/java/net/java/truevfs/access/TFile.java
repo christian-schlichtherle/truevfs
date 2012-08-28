@@ -397,9 +397,36 @@ public final class TFile extends File implements TRex {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private transient volatile @CheckForNull FsController controller;
 
+    /**
+     * Constructs a new {@code TFile} instance which wraps the given
+     * {@code file}.
+     * If {@code file} is an instance of this class, then this method behaves
+     * like a copy constructor, otherwise the default archive detector gets
+     * resolved by calling {@code TConfig.get().getArchiveDetector()} in order
+     * to scan the entire path name for prospective archive files.
+     * 
+     * @param file the file object to decorate.
+     *        If this is an instance of this class, most of its fields get
+     *        copied.
+     */
     public TFile(File file) { this(file, (TArchiveDetector) null); }
 
-    TFile(final File file, final @CheckForNull TArchiveDetector detector) {
+    /**
+     * Constructs a new {@code TFile} instance which uses the given archive
+     * detector to scan its path name for prospective archive files.
+     * 
+     * @param file the file object to decorate.
+     *        If this is an instance of this class, most of its fields get
+     *        copied.
+     * @param detector the archive detector to use for scanning the path name
+     *        for prospective archive files.
+     *        If this parameter is {@code null} and {@code file} is
+     *        an instance of this class, then its archive detector gets used.
+     *        If this parameter is {@code null} and {@code file} is <em>not</em>
+     *        an instance of this class, then the default archive detector gets
+     *        resolved by calling {@code TConfig.get().getArchiveDetector()}.
+     */
+    public TFile(final File file, final @CheckForNull TArchiveDetector detector) {
         super(file.getPath());
         if (file instanceof TFile) {
             final TFile that = (TFile) file;
@@ -422,9 +449,27 @@ public final class TFile extends File implements TRex {
         assert invariants();
     }
 
+    /**
+     * Constructs a new {@code TFile} instance which scans its path name for
+     * prospective archive files using the default archive detector by calling
+     * {@code TConfig.get().getArchiveDetector()}.
+     * 
+     * @param path the path name.
+     */
     public TFile(String path) { this(path, (TArchiveDetector) null); }
 
-    TFile(final String path, final @CheckForNull TArchiveDetector detector) {
+    /**
+     * Constructs a new {@code TFile} instance which uses the given archive
+     * detector to scan its path name for prospective archive files.
+     *
+     * @param path the path name.
+     * @param detector the archive detector to use for scanning the path name
+     *        for prospective archive files.
+     *        If this parameter is {@code null}, then the default archive
+     *        detector gets resolved by calling
+     *        {@code TConfig.get().getArchiveDetector()}.
+     */
+    public TFile(final String path, final @CheckForNull TArchiveDetector detector) {
         super(path);
         this.file = new File(path);
         this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
@@ -432,51 +477,181 @@ public final class TFile extends File implements TRex {
         assert invariants();
     }
 
-    public TFile(@CheckForNull File parent, String member) {
-        this(parent, member, null);
+    /**
+     * Constructs a new {@code TFile} instance which scans its path name for
+     * prospective archive files using the default archive detector by calling
+     * {@code TConfig.get().getArchiveDetector()}.
+     *
+     * @param parent the parent directory.
+     *        If this is an instance of this class, then only the child path
+     *        name gets scanned for prospective archive files, otherwise the
+     *        entire path name.
+     * @param child the child path name.
+     */
+    public TFile(@CheckForNull File parent, String child) {
+        this(parent, child, null);
     }
 
-    TFile(  final @CheckForNull File parent,
-            final String member,
+    /**
+     * Constructs a new {@code TFile} instance which uses the given archive
+     * detector to scan its path name for prospective archive files.
+     *
+     * @param parent the parent directory.
+     *        If this is an instance of this class, then only the child path
+     *        name gets scanned for prospective archive files, otherwise the
+     *        entire path name.
+     * @param child the child path name.
+     * @param detector the archive detector to use for scanning the path name
+     *        for prospective archive files.
+     *        If this parameter is {@code null}, then the default archive
+     *        detector gets resolved by calling
+     *        {@code TConfig.get().getArchiveDetector()}.
+     */
+    public TFile(
+            final @CheckForNull File parent,
+            final String child,
             final @CheckForNull TArchiveDetector detector) {
-        super(parent, member);
-        this.file = new File(parent, member);
-        if (parent instanceof TFile) {
-            final TFile tparent = (TFile) parent;
-            this.detector = null != detector ? detector : tparent.detector;
-            scan(tparent);
-        } else {
-            this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
-            scan(null);
-        }
+        super(parent, child);
+        this.file = new File(parent, child);
+        this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
+        if (parent instanceof TFile) scan((TFile) parent);
+        else scan(null);
         assert invariants();
     }
 
-    public TFile(@CheckForNull String parent, String member) {
-        this(parent, member, null);
+    /**
+     * Constructs a new {@code TFile} instance which scans its path name for
+     * prospective archive files using the default archive detector by calling
+     * {@code TConfig.get().getArchiveDetector()}.
+     *
+     * @param parent the parent directory.
+     *        If this is an instance of this class, then only the child path
+     *        name gets scanned for prospective archive files, otherwise the
+     *        entire path name.
+     * @param child the child path name.
+     */
+    public TFile(@CheckForNull String parent, String child) {
+        this(parent, child, null);
     }
 
-    TFile(  final @CheckForNull String parent,
-            final String member,
+    /**
+     * Constructs a new {@code TFile} instance which uses the given archive
+     * detector to scan its path name for prospective archive files.
+     *
+     * @param parent the parent directory.
+     * @param child the child path name.
+     * @param detector the archive detector to use for scanning the path name
+     *        for prospective archive files.
+     *        If this parameter is {@code null}, then the default archive
+     *        detector gets resolved by calling
+     *        {@code TConfig.get().getArchiveDetector()}.
+     */
+    public TFile(
+            final @CheckForNull String parent,
+            final String child,
             final @CheckForNull TArchiveDetector detector) {
-        super(parent, member);
-        this.file = new File(parent, member);
+        super(parent, child);
+        this.file = new File(parent, child);
         this.detector = null != detector ? detector : TConfig.get().getArchiveDetector();
         scan(null);
         assert invariants();
     }
 
+    /**
+     * Constructs a new {@code TFile} instance for the given {@code uri}.
+     * This constructor is equivalent to
+     * <code>new {@link #TFile(FsNodePath, TArchiveDetector) TFile(FsNodePath.create(uri, CANONICALIZE), null))}</code>,
+     *
+     * @param  uri an absolute URI which has a scheme component which is
+     *         known by the default archive detector.
+     * @throws IllegalArgumentException if the given URI does not conform to
+     *         the syntax constraints for {@link FsNodePath}s or
+     *         {@link File#File(URI)}.
+     * @see    #toUri()
+     */
     public TFile(URI uri) {
         this(uri, null);
     }
 
-    TFile(URI uri, @CheckForNull TArchiveDetector detector) {
+    /**
+     * Constructs a new {@code TFile} instance for the given {@code uri} and
+     * {@code detector}.
+     * This constructor is a super set of the super class constructor
+     * {@link File#File(URI)} with the following additional features:
+     * If the given URI is opaque, it must match the pattern
+     * {@code <scheme>:<uri>!/<entry>}.
+     * The constructed file object then parses the URI to address an entry in
+     * a federated file system (i.e. prospective archive file) with the name
+     * {@code <entry>} in the prospective archive file addressed by
+     * {@code <uri>} which is of the type identified by {@code <scheme>}  .
+     * This is recursively applied to access entries within other prospective
+     * archive files until {@code <uri>} is a hierarchical URI.
+     * Note that the scheme component of this hierarchical URI must be
+     * {@code file} in order to maintain interoperability with the super class!
+     *
+     * @param  uri an absolute URI which has a scheme component which is
+     *         known by the given {@code detector}.
+     * @param  detector the archive detector to look up archive file system
+     *         drivers for the named URI scheme components.
+     *         If this parameter is {@code null}, then the default archive
+     *         detector gets resolved by calling
+     *         {@code TConfig.get().getArchiveDetector()}.
+     * @throws IllegalArgumentException if the given URI does not conform to
+     *         the syntax constraints for {@link File#File(URI)}.
+     * @see    #toNodePath()
+     */
+    public TFile(URI uri, @CheckForNull TArchiveDetector detector) {
         this(FsNodePath.create(uri, CANONICALIZE), detector);
     }
 
+    /**
+     * Constructs a new {@code TFile} instance for the given {@code path}.
+     * This constructor is equivalent to
+     * <code>new {@link #TFile(FsNodePath, TArchiveDetector) TFile(path, null)}</code>
+     *
+     * @param  path a node path with an absolute
+     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} which has a
+     *         scheme component which is known by the default archive detector.
+     * @throws IllegalArgumentException if the
+     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} of the
+     *         given node path does not conform to the syntax constraints for
+     *         {@link File#File(URI)}.
+     * @see    #toNodePath()
+     */
     public TFile(FsNodePath path) { this(path, null); }
 
-    TFile(final FsNodePath path, final @CheckForNull TArchiveDetector detector) {
+    /**
+     * Constructs a new {@code TFile} instance for the given {@code path} and
+     * {@code detector}.
+     * This constructor is a super set of the super class constructor
+     * {@link File#File(URI)} with the following additional features:
+     * If the URI of the given node path is opaque, it must match the pattern
+     * {@code <scheme>:<uri>!/<entry>}.
+     * The constructed file object then parses the URI to address an entry in
+     * a federated file system (i.e. prospective archive file) with the name
+     * {@code <entry>} in the prospective archive file addressed by
+     * {@code <uri>} which is of the type identified by {@code <scheme>}  .
+     * This is recursively applied to access entries within other prospective
+     * archive files until {@code <uri>} is a hierarchical URI.
+     * Note that the scheme component of this hierarchical URI must be
+     * {@code file} in order to maintain interoperability with the super class!
+     *
+     * @param  path a path with an absolute
+     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} which
+     *         has a scheme component which is known by the given
+     *         {@code detector}.
+     * @param  detector the archive detector to look up archive file system
+     *         drivers for the named URI scheme components.
+     *         If this parameter is {@code null}, then the default archive
+     *         detector gets resolved by calling
+     *         {@code TConfig.get().getArchiveDetector()}.
+     * @throws IllegalArgumentException if the
+     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} of the
+     *         given node path does not conform to the syntax constraints for
+     *         {@link File#File(URI)}.
+     * @see    #toNodePath()
+     */
+    public TFile(final FsNodePath path, final @CheckForNull TArchiveDetector detector) {
         super(path.toHierarchicalUri());
         parse(path, null != detector ? detector : TConfig.get().getArchiveDetector());
     }
@@ -677,7 +852,7 @@ public final class TFile extends File implements TRex {
             final boolean isArchive = null != detector.scheme(path);
             if (0 < enclEntryNameBuf.length()) {
                 if (isArchive) {
-                    enclArchive = detector.newFile(path); // use the same configuration for the parent directory
+                    enclArchive = new TFile(path, detector); // use the same configuration for the parent directory
                     if (innerArchive != this)
                         innerArchive = enclArchive;
                     return;
@@ -768,7 +943,7 @@ public final class TFile extends File implements TRex {
      */
     public TFile toNonArchiveFile() {
         if (!isArchive()) return this;
-        return TArchiveDetector.NULL.newFile(getParentFile(), getName());
+        return new TFile(getParentFile(), getName(), TArchiveDetector.NULL);
     }
 
     /**
@@ -813,7 +988,7 @@ public final class TFile extends File implements TRex {
     @Override
     public TFile getAbsoluteFile() {
         final String p = getAbsolutePath();
-        return p.equals(getPath()) ? this : getArchiveDetector().newFile(p);
+        return p.equals(getPath()) ? this : new TFile(p, getArchiveDetector());
     }
 
     @Override
@@ -837,7 +1012,7 @@ public final class TFile extends File implements TRex {
      */
     public TFile getNormalizedAbsoluteFile() {
         final String p = getNormalizedAbsolutePath();
-        return p.equals(getPath()) ? this : getArchiveDetector().newFile(p);
+        return p.equals(getPath()) ? this : new TFile(p, getArchiveDetector());
     }
 
     /**
@@ -866,7 +1041,7 @@ public final class TFile extends File implements TRex {
      */
     public TFile getNormalizedFile() {
         final String p = getNormalizedPath();
-        return p.equals(getPath()) ? this : getArchiveDetector().newFile(p);
+        return p.equals(getPath()) ? this : new TFile(p, getArchiveDetector());
     }
 
     /**
@@ -883,7 +1058,7 @@ public final class TFile extends File implements TRex {
     @Override
     public TFile getCanonicalFile() throws IOException {
         final String p = getCanonicalPath();
-        return p.equals(getPath()) ? this : getArchiveDetector().newFile(p);
+        return p.equals(getPath()) ? this : new TFile(p, getArchiveDetector());
     }
 
     @Override
@@ -901,7 +1076,7 @@ public final class TFile extends File implements TRex {
      */
     public TFile getCanOrAbsFile() {
         final String p = getCanOrAbsPath();
-        return p.equals(getPath()) ? this : getArchiveDetector().newFile(p);
+        return p.equals(getPath()) ? this : new TFile(p, getArchiveDetector());
     }
 
     /**
@@ -1839,13 +2014,13 @@ public final class TFile extends File implements TRex {
             final Collection<TFile> accepted = new ArrayList<>(members.size());
             for (final String member : members)
                 if (filter.accept(this, member))
-                    accepted.add(detector.newFile(this, member));
+                    accepted.add(new TFile(this, member, detector));
             return accepted.toArray(new TFile[accepted.size()]);
         } else {
             final TFile[] accepted = new TFile[members.size()];
             int i = 0;
             for (final String member : members)
-                accepted[i++] = detector.newFile(this, member);
+                accepted[i++] = new TFile(this, member, detector);
             return accepted;
         }
     }
@@ -1882,7 +2057,7 @@ public final class TFile extends File implements TRex {
         if (null != filter) {
             final Collection<TFile> accepted = new ArrayList<>(members.size());
             for (final String member : members) {
-                final TFile file = detector.newFile(this, member);
+                final TFile file = new TFile(this, member, detector);
                 if (filter.accept(file))
                     accepted.add(file);
             }
@@ -1891,7 +2066,7 @@ public final class TFile extends File implements TRex {
             final TFile[] accepted = new TFile[members.size()];
             int i = 0;
             for (final String member : members)
-                accepted[i++] = detector.newFile(this, member);
+                accepted[i++] = new TFile(this, member, detector);
             return accepted;
         }
     }
