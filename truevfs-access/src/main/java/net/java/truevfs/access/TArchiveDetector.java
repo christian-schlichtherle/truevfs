@@ -5,7 +5,6 @@
 package net.java.truevfs.access;
 
 import java.io.File;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import javax.annotation.CheckForNull;
@@ -17,7 +16,6 @@ import net.java.truecommons.shed.HashMaps;
 import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import net.java.truevfs.kernel.spec.FsAbstractMetaDriver;
 import net.java.truevfs.kernel.spec.FsDriver;
-import net.java.truevfs.kernel.spec.FsNodePath;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
 
@@ -352,22 +350,6 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
         }
         return null;
     }
-
-    public TFile newFile(File file) { return new TFile(file, this); }
-
-    public TFile newFile(String path) { return new TFile(path, this); }
-
-    public TFile newFile(File parent, String member) {
-        return new TFile(parent, member, this);
-    }
-
-    public TFile newFile(String parent, String member) {
-        return new TFile(parent, member, this);
-    }
-
-    public TFile newFile(URI uri) { return new TFile(uri, this); }
-
-    public TFile newFile(FsNodePath path) { return new TFile(path, this); }
 
     @Override
     public boolean equals(Object other) {

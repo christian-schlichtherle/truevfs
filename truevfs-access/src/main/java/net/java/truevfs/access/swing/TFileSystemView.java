@@ -9,13 +9,11 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.text.MessageFormat;
 import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import javax.swing.Icon;
 import javax.swing.JFileChooser;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileSystemView;
 import net.java.truevfs.access.TArchiveDetector;
-import net.java.truevfs.access.TConfig;
 import net.java.truevfs.access.TFile;
 
 /**
@@ -65,13 +63,7 @@ public class TFileSystemView extends TDecoratingFileSystemView {
      * 
      * @return The nullable archive detector to use.
      */
-    public @CheckForNull TArchiveDetector getDetector() {
-        return detector;
-    }
-
-    TArchiveDetector detector() {
-        return null != detector ? detector : TConfig.get().getArchiveDetector();
-    }
+    public @CheckForNull TArchiveDetector getDetector() { return detector; }
 
     /**
      * Sets the archive detector to use.
@@ -84,14 +76,24 @@ public class TFileSystemView extends TDecoratingFileSystemView {
 
     /**
      * Ensures that the returned file object is an instance of {@link TFile}.
+     * 
+     * @param  file the file to wrap.
+     * @return {@code file} if it's already a {@link TFile} or a new
+     *         {@code TFile} which wraps it.
      */
     protected TFile wrap(final File file) {
-        return file instanceof TFile ? (TFile) file : detector().newFile(file);
+        return file instanceof TFile
+                ? (TFile) file
+                : new TFile(file, getDetector());
     }
 
     /**
      * Ensures that the returned file object is an instance of {@link File},
      * not {@link TFile}.
+     * 
+     * @param  file the file to unwrap.
+     * @return the originally wrapped file if {@code file} is an instance of
+     *         {@code TFile} or {@code file} otherwise.
      */
     @SuppressWarnings("deprecation")
     protected File unwrap(File file) {
@@ -161,22 +163,22 @@ public class TFileSystemView extends TDecoratingFileSystemView {
     throws IOException {
         final TFile wParent = wrap(parent);
         if (wParent.isArchive() || wParent.isEntry()) {
-            TFile folder = detector().newFile(
-                    wParent,
+            TFile folder = new TFile(wParent,
                     UIManager.getString(TFile.separatorChar == '\\'
                             ? "FileChooser.win32.newFolder"
-                            : "FileChooser.other.newFolder"));
+                            : "FileChooser.other.newFolder"),
+                    getDetector());
 
             for (int i = 2; !folder.mkdirs(); i++) {
                 if (i > 100)
                     throw new IOException(wParent + ": Could not create new directory entry!");
-                folder = detector().newFile(
-                        wParent,
+                folder = new TFile(wParent,
                         MessageFormat.format(
                             UIManager.getString(TFile.separatorChar == '\\'
                                 ? "FileChooser.win32.newFolder.subsequent"
                                 : "FileChooser.other.newFolder.subsequent"),
-                            new Object[] { Integer.valueOf(i) }));
+                            new Object[] { Integer.valueOf(i) }),
+                        getDetector());
             }
 
             return folder;
@@ -209,40 +211,33 @@ public class TFileSystemView extends TDecoratingFileSystemView {
         return fsv.isComputerNode(unwrap(file));
     }
 
-    /**
-     * Creates a ZIP enabled file where necessary only,
-     * otherwise the file system fsv fsv is used to create the file.
-     */
     @Override
-    public File createFileObject(File dir, String str) {
-        return createFileObject(fsv.createFileObject(dir, str));
+    public File createFileObject(File dir, String filename) {
+        return createFileObject(fsv.createFileObject(dir, filename));
+    }
+
+    @Override
+    public File createFileObject(String path) {
+        return createFileObject(fsv.createFileObject(path));
     }
 
     /**
-     * Creates a ZIP enabled file where necessary only,
-     * otherwise the file system fsv fsv is used to create the file.
+     * Wraps the given {@code file} in a {@link TFile} if its an archive file
+     * or an archive entry.
+     * Otherwise returns the given {@code file}.
+     * 
+     * @param  file the file to wrap.
+     * @return {@code file} if it's not an archive file and not an archive
+     *         entry, otherwise a {@link TFile} which wraps the given
+     *         {@code file}.
      */
-    @Override
-    public File createFileObject(String str) {
-        return createFileObject(fsv.createFileObject(str));
-    }
-
-    /**
-     * Creates a ZIP enabled file where necessary only,
-     * otherwise the file is simply returned.
-     */
-    public @Nullable File createFileObject(final @CheckForNull File file) {
-        if (null == file)
-            return null;
+    public File createFileObject(final File file) {
         final TFile tfile = wrap(file);
-        return tfile.isArchive() || tfile.isEntry()
-                ? tfile
-                : unwrap(file);
+        return tfile.isArchive() || tfile.isEntry() ? tfile : unwrap(file);
     }
 
     @Override
-    public File[] getFiles( final File dir,
-                            final boolean useFileHiding) {
+    public File[] getFiles(final File dir, final boolean useFileHiding) {
         final TFile smartDir = wrap(dir);
         if (smartDir.isArchive() || smartDir.isEntry()) {
             // dir is a ZIP file or an entry in a ZIP file.
@@ -265,8 +260,8 @@ public class TFileSystemView extends TDecoratingFileSystemView {
     @Override
     public File getParentDirectory(File file) {
         final TFile tfile = wrap(file);
-        if (tfile.isEntry())
-            return createFileObject(tfile.getParentFile());
-        return createFileObject(fsv.getParentDirectory(unwrap(file)));
+        if (tfile.isEntry()) return createFileObject(tfile.getParentFile());
+        final @CheckForNull File dir = fsv.getParentDirectory(unwrap(file));
+        return null == dir ? dir : createFileObject(dir);
     }
 }

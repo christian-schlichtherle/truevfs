@@ -84,8 +84,8 @@ final class TBIO {
                 Arrays.sort(members);
             }
             for (final String member : members)
-                mv0(    detector.newFile(src, member),
-                        detector.newFile(dst, member),
+                mv0(    new TFile(src, member, detector),
+                        new TFile(dst, member, detector),
                         detector);
             if (!srcIsGhost)
                 if (!dst.setLastModified(srcLastModified))
@@ -167,8 +167,8 @@ final class TBIO {
             }
             for (final String member : members)
                 cp_r0(  preserve,
-                        srcDetector.newFile(src, member),
-                        dstDetector.newFile(dst, member),
+                        new TFile(src, member, srcDetector),
+                        new TFile(dst, member, dstDetector),
                         srcDetector, dstDetector);
             if (preserve && !srcIsGhost)
                 if (!dst.setLastModified(srcLastModified))
@@ -233,7 +233,7 @@ final class TBIO {
             if (null == members)
                 throw new FileSystemException(file.getPath(), null, "Cannot list directory!");
             for (final String member : members)
-                rm_r(detector.newFile(file, member), detector);
+                rm_r(new TFile(file, member, detector), detector);
         }
         TFile.rm(file);
     }

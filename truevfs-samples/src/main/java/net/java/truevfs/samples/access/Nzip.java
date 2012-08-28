@@ -395,15 +395,15 @@ public class Nzip extends Application {
                 dstDetector = config.getArchiveDetector();
 
             final int dstI = args.length - 1;
-            final TFile dst = dstDetector.newFile(args[dstI]);
+            final TFile dst = new TFile(args[dstI], dstDetector);
             if (dstI - srcI < 1 || (dstI - srcI > 1
                     && !dst.isArchive() && !dst.isDirectory()))
                 throw new IllegalUsageException();
 
             for (int i = srcI; i < dstI; i++) {
-                final TFile src = srcDetector.newFile(args[i]);
+                final TFile src = new TFile(args[i], srcDetector);
                 final TFile tmp = dstI - srcI > 1 || dst.isDirectory()
-                        ? dstDetector.newFile(dst, src.getName())
+                        ? new TFile(dst, src.getName(), dstDetector)
                         : dst;
                 if (mv) {
                     try {
