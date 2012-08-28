@@ -21,7 +21,7 @@
     </properties>
 
     <dependencies>
-        <!-- Depending on the TrueZIP Profile Default is a good starting point.
+        <!-- Depending on the TrueVFS Profile Default is a good starting point.
              Typical applications will need nothing else. -->
         <dependency>
             <groupId>net.java.truevfs</groupId>

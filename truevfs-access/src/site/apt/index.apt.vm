@@ -15,7 +15,7 @@ Introduction
     {{{../truevfs-kernel/index.html}TrueVFS Kernel}} so that you can exploit
     its features via a simple, yet powerful API.
     As an implication, no file system state is managed by this module - this is
-    the job of the TrueZIP Kernel module.
+    the job of the TrueVFS Kernel modules.
 
 The <<<TFile>>>* Classes
 

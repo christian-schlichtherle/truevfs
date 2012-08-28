@@ -19,10 +19,10 @@
 
     <name>TrueVFS Driver</name>
     <description>
-        Drivers provide services to extend the TrueZIP Kernel with support for
+        Drivers provide services to extend the TrueVFS Kernel with support for
         a particular type of file system.
         Drivers advertise their services on the class path in order to make
-        them locatable by the TrueZIP Kernel at runtime.
+        them locatable by the TrueVFS Kernel at runtime.
     </description>
 
     <modules>
@@ -40,7 +40,7 @@
     </modules>
 
     <dependencies>
-        <!-- All drivers depend on the TrueZIP Kernel and its test suite for
+        <!-- All drivers depend on the TrueVFS Kernel and its test suite for
              integration testing. -->
         <dependency>
             <groupId>${project.groupId}</groupId>

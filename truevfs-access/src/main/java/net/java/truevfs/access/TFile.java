@@ -1258,11 +1258,11 @@ public final class TFile extends File implements TRex {
      * the decorated file object may be an instance of a sibling class, i.e.
      * another sub-class of {@link File}.
      *
-     * @return An instance of the {@link File File} class or any of its
-     *         sub-classes, but never an instance of this class and never
-     *         {@code null}.
+     * @return     An instance of the {@link File File} class or any of its
+     *             sub-classes, but never an instance of this class and never
+     *             {@code null}.
      * @deprecated Using the resulting {@link File} object for file system
-     *             access would compete with the TrueZIP Kernel for I/O and may
+     *             access would compete with the TrueVFS Kernel for I/O and may
      *             easily corrupt the state of the (virtual) file system space,
      *             including loss of data!
      */

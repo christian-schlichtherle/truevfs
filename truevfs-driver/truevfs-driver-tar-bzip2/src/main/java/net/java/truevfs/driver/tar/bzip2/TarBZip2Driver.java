@@ -145,7 +145,7 @@ public class TarBZip2Driver extends TarDriver {
         public void close() throws IOException {
             // Workaround for super class implementation which fails to close
             // the decorated stream on a subsequent call if the initial attempt
-            // failed with an IOException.
+            // failed with a throwable.
             // See http://java.net/jira/browse/TRUEZIP-234
             out.setIgnoreClose(true);
             super.close();

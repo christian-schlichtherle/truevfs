@@ -144,10 +144,8 @@ public class TarXZDriver extends TarDriver {
         public void close() throws IOException {
             // Workaround for super class implementation which remembers and
             // rethrows any IOException thrown by the decorated output stream.
-            // Unfortunately, this doesn't work with TrueZIP's
-            // FsControllerException, which is an IOException.
             // TODO: Remove all this in TrueVFS. TrueVFS uses a
-            // ControlFlowException instead, which is a RuntimeException and
+            // ControlFlowException instead, which is an Error class (!) and
             // should not interfere with the super class implementation in this
             // way.
             out.setIgnoreClose(true);
