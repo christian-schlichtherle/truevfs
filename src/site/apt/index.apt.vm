@@ -63,11 +63,9 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
     As a framework, TrueVFS provides the interfaces and classes to
     write file system drivers which plug-in to its federated file
     system space.
-    The module
-    {{{./truezip-kernel/index.html}TrueVFS&#160;Kernel}}
-    provides federating, multithreading, multiplexing, caching and accounting
-    so that archive file system drivers do not need to take care of these
-    aspects of a virtual file system.
+    The module TrueVFS&#160;Kernel modules provide federating, multithreading,
+    multiplexing, caching and accounting so that archive file system drivers do
+    not need to take care of these aspects of a virtual file system.
 
     Unfortunately, there is no tutorial for how to write a file system driver,
     but there's comprehensive Javadoc and sample code:
