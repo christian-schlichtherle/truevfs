@@ -22,11 +22,8 @@ import scala.annotation._
 import ArchiveFileSystem._
 
 /** A read/write virtual file system for archive entries.
-  * Have a look at the online [[http://truezip.java.net/faq.html FAQ]]
-  * to get the concept of how this works.
   * 
   * @tparam E the type of the archive entries.
-  * @see    <a href="http://truezip.java.net/faq.html">Frequently Asked Questions</a>
   * @author Christian Schlichtherle
   */
 @NotThreadSafe

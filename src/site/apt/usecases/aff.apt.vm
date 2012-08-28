@@ -20,7 +20,7 @@ Application File Format
 * Accessing Application File Formats
 
     Thanks to the client API of the module
-    {{{../truezip-access/truevfs-access/index.html}TrueVFS Access}},
+    {{{../truevfs-access/index.html}TrueVFS Access}},
     here's your relief:
     The
     {{{../apidocs/net/truevfs/file/TFile.html}<<<TFile>>>}},
