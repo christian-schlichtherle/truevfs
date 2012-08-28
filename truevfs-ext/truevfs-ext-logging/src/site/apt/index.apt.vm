@@ -41,7 +41,7 @@ About TrueVFS Extension Logging
 
 * The Log Records
 
-    The instrumented TrueZIP Kernel records a message each time it accesses a
+    The instrumented TrueVS Kernel records a message each time it accesses a
     (virtual) file system or a temporary I/O buffer.
     This is useful for post-mortem analysis of issues like
     left-over-temporary-files or out-of-file-descriptors.

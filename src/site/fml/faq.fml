@@ -609,7 +609,7 @@ long size = Files.size(path);
                     applications or the implications of not changing it are
                     considered to be unacceptable.</li>
                 <li>This issue is documented as a ticket in the project's
-                    <a href="http://java.net/jira/browse/TRUEZIP">Issue Tracking System</a>
+                    <a href="http://java.net/jira/browse/TRUEVFS">Issue Tracking System</a>
                     (ITS) with the tag <code>binary-compatibility</code>.</li>
                 <li>A workaround is explained in the ITS ticket.</li>
                 <li>The ITS ticket is referenced in the Release Notes.</li>
@@ -618,7 +618,7 @@ long size = Files.size(path);
                     In case your client application is affected by a change and
                     the documented workaround is unacceptable for any reason,
                     please address this using the ITS at
-                    <a href="http://java.net/jira/browse/TRUEZIP">http://java.net/jira/browse/TRUEZIP</a>.
+                    <a href="http://java.net/jira/browse/TRUEVFS">http://java.net/jira/browse/TRUEVFS</a>.
                 </p>
             </answer>
         </faq>
@@ -786,7 +786,7 @@ long size = Files.size(path);
                     Once your question or issue has been approved as a bug
                     report, improvement request, feature request or task
                     request it gets tracked in
-                    <a href="http://java.net/jira/browse/TRUEZIP">JIRA</a>.
+                    <a href="http://java.net/jira/browse/TRUEVFS">JIRA</a>.
                     You can then use JIRA to monitor and discuss its progress,
                     vote for it, add file attachments to it etc.
                     JIRA is now also used to schedule new TrueVFS versions and

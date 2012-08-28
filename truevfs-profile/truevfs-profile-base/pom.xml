@@ -17,7 +17,7 @@
     <name>TrueVFS Profile Base</name>
     <description>
         Designed to support the most prominent use case with minimum dependencies.
-        Only provides the file system module TrueZIP Driver ZIP.
+        Only provides the file system module TrueVFS Driver ZIP.
     </description>
 
     <dependencies>

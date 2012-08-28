@@ -19,10 +19,10 @@
 
     <name>TrueVFS Extension</name>
     <description>
-        Extensions provide services to extend the TrueZIP Kernel with some
+        Extensions provide services to extend the TrueVFS Kernel with some
         functionality OTHER than supporting a particular type of file system.
         Extensions advertise their services on the class path in order to make
-        them locatable by the TrueZIP Kernel at runtime.
+        them locatable by the TrueVFS Kernel at runtime.
     </description>
 
     <modules>

@@ -19,7 +19,7 @@
         Designed for testing purposes only and should not be used in production
         environments because of its negative performance impact.
         Depends on the default configuration profile and adds the modules
-        TrueZIP Driver SFX, TrueZIP Extension JMX/JUL and TrueZIP Samples.
+        TrueVFS Driver SFX, TrueVFS Extension JMX/JUL and TrueVFS Samples.
         The main class of this executable JAR is net.truevfs.samples.access.Nzip.
     </description>
 
