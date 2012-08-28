@@ -4,8 +4,8 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truecommons.io.Streams;
 import java.nio.charset.Charset;
+import net.java.truecommons.io.Streams;
 
 /**
  * A package private class with some constants for ZIP files.
