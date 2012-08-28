@@ -4,38 +4,38 @@
     Christian Schlichtherle
     -----------------------
 
-The TFile* Classes
+Introduction
 
-    The <<<TFile*>>> classes provide simple, uniform, transparent, thread-safe,
-    read/write access to archive files as if they were virtual directories in a
-    file system path.
+    This is the primary API for TrueVFS applications.
+    It provides simple, uniform, transparent, thread-safe, read/write access to
+    archive files as if they were just virtual directories in a file system
+    path.
 
-    This is the primary API for JSE&#160;6 compliant TrueVFS applications:
-    Like the API of the module {{{../truevfs-access/index.html}TrueVFS Access Path}},
-    this API is just a facade for the module
-    {{{../truevfs-kernel/index.html}TrueVFS Kernel}}.
-    In contrast to the TrueVFS Access Path API however, this API is limited
-    to access the platform file system and any archive files within
+    Technically, this module is just a facade for the module
+    {{{../truevfs-kernel/index.html}TrueVFS Kernel}} so that you can exploit
+    its features via a simple, yet powerful API.
+    As an implication, no file system state is managed by this module - this is
+    the job of the TrueZIP Kernel module.
+
+The <<<TFile>>>* Classes
+
+    The <<<TFile>>>* classes mimick or extend the <<<File>>>* classes of the
+    package <<<java.io>>>, so that you can use them with a minimal learning
+    curve or - where they actually extend a <<<File>>>* class - even use them
+    as polymorphic replacements for their super class.
+
+    In contrast to the <<<TPath>>> class however (see below), these classes are
+    constrained to access the platform file system and any archive files within
     the platform file system.
-    In contrast to the TrueVFS Kernel API, both APIs are designed to be
-    easy to learn and convenient to use while providing a great level
-    of flexibility.
-    Because all virtual file system state is managed by the TrueVFS
-    Kernel module, this module can concurrently access the same file
-    systems than the TrueVFS Access Path module.
 
-    For example, an application could access an entry within an archive
-    file using a
-    {{{./apidocs/net/truevfs/file/TFile.html}<<<TFile>>>}}
+    For example, an application could access an entry within an archive file
+    using a {{{./apidocs/net/truevfs/access/TFile.html}<<<TFile>>>}}
     like this:
 
 +--+
 File entry = new TFile("archive.zip/dir/HälloWörld.txt");
-Writer writer = new TFileWriter(entry);
-try {
+try (Writer writer = new TFileWriter(entry)) {
     writer.write("Hello world!\n");
-} finally {
-    writer.close();
 }
 +--+
 
@@ -43,55 +43,31 @@ try {
     {{{../truevfs-driver/truevfs-driver-file/index.html}TrueVFS Driver FILE}}
     and
     {{{../truevfs-driver/truevfs-driver-zip/index.html}TrueVFS Driver ZIP}}
-    are present on the run time class path.
-
-    For more examples, please use the Maven archetype for TrueVFS Access File* module
-    applications as described in the
-    {{{../kick-start/index.html}Kick-Starting TrueVFS}} section.
-    You might also want to
-    {{{http://repo1.maven.org/maven2/net/java/truevfs/truevfs-samples/${project.version}/truevfs-samples-${project.version}-sources.jar}download}}
-    the source code of the module
-    {{{../truevfs-samples/index.html}TrueVFS Samples}}.
+    are present on the class path at run time.
 
     For the API documentation, please refer to the Javadoc of the package
-    {{{./apidocs/net/truevfs/file/package-summary.html}<<<net.truevfs.file>>>}}
+    {{{./apidocs/net/truevfs/access/package-summary.html}<<<net.truevfs.access>>>}}
 
-* Swing GUI
+The <<<TPath>>> Class and its Companions
 
-    This module also provides Swing GUI classes for viewing file trees
-    and choosing entries in archive files.
-
-    For the API documentation, please refer to the Javadoc of the package
-    {{{./apidocs/net/truevfs/file/swing/package-summary.html}<<<net.truevfs.file.swing>>>}}
-
-The TPath Class and its Companions
-
-    Like the TFile* classes, the
-    {{{./apidocs/net/truevfs/path/TPath.html}<<<TPath>>>}} class
+    Like the <<<TFile>>>* classes, the
+    {{{./apidocs/net/truevfs/access/TPath.html}<<<TPath>>>}} class
     provides simple, uniform, transparent, thread-safe, read/write access to
     archive files as if they were virtual directories in a file system path.
-    It also provides the
+    It's accompanied by the
+    {{{./apidocs/net/truevfs/path/TFileSystem.html}<<<TFileSystem>>>}}
+    and
     {{{./apidocs/net/truevfs/path/TFileSystemProvider.html}<<<TFileSystemProvider>>>}}
-    class to implement a file system provider for the NIO.2 API (JSR 203) in
+    classes to implement a file system provider for the NIO.2 API (JSR 203) of
     JSE&#160;7.
 
-    This is the primary API for JSE&#160;7 compliant TrueVFS applications:
-    Like the API of the module {{{../truevfs-access/index.html}TrueVFS Access File*}},
-    this API is just a facade for the module
-    {{{../truevfs-kernel/index.html}TrueVFS Kernel}}.
-    In contrast to the TrueVFS Access File* API however, this API can access
-    any (virtual) file system, not just the platform file system and
-    any archive files within the platform file system.
-    In contrast to the TrueVFS Kernel API, both APIs are designed to be
-    easy to learn and convenient to use while providing a great level
-    of flexibility.
-    Because all virtual file system state is managed by the TrueVFS
-    Kernel module, this module can concurrently access the same file
-    systems than the TrueVFS Access File* module.
+    In contrast to the <<<TFile>>>* classes however, the <<<TPath>>> class can
+    get used to access any (virtual) file system, not just the platform file
+    system and any archive files within the platform file system.
 
     For example, an application could access an entry within an archive
     file which is located at a web site using a
-    {{{./apidocs/net/truevfs/path/TPath.html}<<<TPath>>>}}
+    {{{./apidocs/net/truevfs/access/TPath.html}<<<TPath>>>}}
     like this:
 
 +--+
@@ -106,15 +82,25 @@ try (InputStream in = Files.newInputStream(path)) {
     {{{../truevfs-driver/truevfs-driver-http/index.html}TrueVFS Driver HTTP(S)}}
     and
     {{{../truevfs-driver/truevfs-driver-tar/index.html}TrueVFS Driver TAR}}
-    are present on the run time class path.
+    are present on the class path at run time.
 
-    For more examples, please use the Maven archetype for TrueVFS Access Path module
+    For the API documentation, please refer to the Javadoc of the package
+    {{{./apidocs/net/truevfs/path/package-summary.html}<<<net.truevfs.path>>>}}
+
+Swing GUI
+
+    This module also provides Swing GUI classes for viewing file trees
+    and choosing entries in archive files.
+
+    For the API documentation, please refer to the Javadoc of the package
+    {{{./apidocs/net/truevfs/access/swing/package-summary.html}<<<net.truevfs.access.swing>>>}}
+
+More Examples
+
+    For more examples, please use the Maven archetype for TrueVFS Access
     applications as described in the
     {{{../kick-start/index.html}Kick-Starting TrueVFS}} section.
     You might also want to
     {{{http://repo1.maven.org/maven2/net/java/truevfs/truevfs-samples/${project.version}/truevfs-samples-${project.version}-sources.jar}download}}
     the source code of the module
     {{{../truevfs-samples/index.html}TrueVFS Samples}}.
-
-    For the API documentation, please refer to the Javadoc of the package
-    {{{./apidocs/net/truevfs/path/package-summary.html}<<<net.truevfs.path>>>}}
