@@ -92,7 +92,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>net.truevfs.samples.access.Nzip</mainClass>
+                            <mainClass>net.java.truevfs.samples.access.Nzip</mainClass>
                             <!-- Setting up the class path like this enables to
                                  run the JAR directly from its directory in the
                                  local Maven repository. -->
