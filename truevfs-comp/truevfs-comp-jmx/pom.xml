@@ -11,7 +11,7 @@
     <parent>
         <groupId>net.java.truevfs</groupId>
         <artifactId>truevfs-comp</artifactId>
-        <version>1-SNAPSHOT</version>
+        <version>1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>truevfs-comp-jmx</artifactId>
