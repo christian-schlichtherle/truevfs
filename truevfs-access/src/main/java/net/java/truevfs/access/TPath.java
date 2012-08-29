@@ -735,11 +735,11 @@ public final class TPath implements Path, TRex {
 
     @Override
     public TPath relativize(Path other) {
-        return new TPath(toUri().relativize(other.toUri()));
+        return new TPath(getUri().relativize(other.toUri()));
     }
 
     @Override
-    public URI toUri() {
+    public URI getUri() {
         URI n = getName();
         String s = n.getScheme();
         return new UriBuilder(getNodePath().toHierarchicalUri())
@@ -748,14 +748,17 @@ public final class TPath implements Path, TRex {
     }
 
     @Override
+    public URI toUri() { return getUri(); }
+
+    @Override
     public TPath toAbsolutePath() {
-        return new TPath(toUri(), getArchiveDetector(), getNodePath());
+        return new TPath(getUri(), getArchiveDetector(), getNodePath());
     }
 
     @Override
     public TPath toRealPath(LinkOption... options) throws IOException {
         // TODO: scan symlinks!
-        return new TPath(toUri(), getArchiveDetector(), getNodePath());
+        return new TPath(getUri(), getArchiveDetector(), getNodePath());
     }
 
     /**
@@ -767,7 +770,7 @@ public final class TPath implements Path, TRex {
      * 
      * @return A {@code TFile} object for this path.
      * @throws UnsupportedOperationException if this path is not file based,
-     *         i.e. if the scheme component of the {@link #toUri() URI} of
+     *         i.e. if the scheme component of the {@link #getUri() URI} of
      *         this path is not {@code file}.
      */
     @Override
