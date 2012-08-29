@@ -3,7 +3,7 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Sample code for the TrueVFS Access File* API.
+ * Sample code for the TrueVFS Access API.
  * 
  * @author Christian Schlichtherle
  */
