@@ -110,11 +110,9 @@ final class TBIO {
      * @param preserve If {@code true}, then a best effort approach is used to
      *        copy as much properties of any source files to the destination
      *        files as possible.
-     *        With JSE&npsb;6, only the last modification time is copied.
-     *        With JSE&nbsp;7, the last access time and the creation time is
-     *        copied, too.
-     *        Note that this property set may get extended over time as the
-     *        underlying Java APIs improve.
+     *        Which attributes are actually copied is specific to the
+     *        destination file system driver implementation, but the minimum
+     *        guarantee is to copy the last modification time.
      * @param  src the source directory tree or file.
      *         This file system entity needs to exist.
      * @param  dst the destination directory tree or file.
@@ -186,8 +184,6 @@ final class TBIO {
 
     /**
      * Copies a single source file to a destination file.
-     * The name of this method is inspired by the Unix command line utility
-     * {@code cp}.
      *
      * @param  preserve if an elementary cp operation shall cp as much
      *         properties of the source file to the destination file, too.
