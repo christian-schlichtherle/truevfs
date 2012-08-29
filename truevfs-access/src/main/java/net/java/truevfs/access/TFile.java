@@ -163,7 +163,7 @@ import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
  * depending upon an archive file's path and its <i>true state</i> in the
  * first parent file system where it actually exists.
  * <p>
- * <table border=1>
+ * <table border="1">
  * <thead>
  * <tr>
  *   <th>Path</th>
@@ -2300,7 +2300,8 @@ public final class TFile extends File implements TRex {
     }
 
     /**
-     * Equivalent to {@link #mv(File, File, TArchiveDetector) mv(this, dst, getArchiveDetector())}.
+     * Equivalent to {@link #mv(File, File, TArchiveDetector) mv(this, dst, detector)},
+     * where {@code detector} is {@code TConfig.get().getArchiveDetector()}.
      * 
      * @param  dst the destination file or directory tree.
      *         Note that although this just needs to be a plain {@code File},
@@ -2312,6 +2313,7 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
     public TFile mv(File dst) throws IOException {
+        final TArchiveDetector detector = TConfig.get().getArchiveDetector();
         mv(this, dst, detector);
         return this;
     }
@@ -2337,7 +2339,8 @@ public final class TFile extends File implements TRex {
      *         archive files and entries are only supported for instances of
      *         this class.
      * @param  detector the archive detector to use for detecting any archive
-     *         files in the source directory tree.
+     *         files <em>within</em> the source and destination directory
+     *         trees.
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
@@ -2386,7 +2389,7 @@ public final class TFile extends File implements TRex {
      * the current thread.
      * It performs best when used with <em>unbuffered</em> streams.
      * <p>
-     * <table border=1 cellpadding=5 summary="">
+     * <table border="1">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2445,7 +2448,7 @@ public final class TFile extends File implements TRex {
      * Copies the input stream {@code in} to the file {@code dst} and
      * closes the stream - even if an exception occurs.
      * <p>
-     * <table border=1 cellpadding=5 summary="">
+     * <table border="1">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2520,7 +2523,7 @@ public final class TFile extends File implements TRex {
      * Copies the file {@code src} to the output stream {@code out} and
      * closes the stream - even if an exception occurs.
      * <p>
-     * <table border=1 cellpadding=5 summary="">
+     * <table border="1">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2603,7 +2606,7 @@ public final class TFile extends File implements TRex {
     /**
      * Copies the file {@code src} to the file {@code dst}.
      * <p>
-     * <table border=1 cellpadding=5 summary="">
+     * <table border="1">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2692,7 +2695,7 @@ public final class TFile extends File implements TRex {
      * <li>the TrueVFS Driver FILE module is used.
      * </ol>
      * <p>
-     * <table border=1 cellpadding=5 summary="">
+     * <table border="1">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2751,14 +2754,9 @@ public final class TFile extends File implements TRex {
     }
 
     /**
-     * Recursively copies the file or directory {@code src}
-     * to the file or directory {@code dst}.
-     * <p>
-     * This version calls {@link #cp_r(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, srcDetector, dstDetector)},
-     * where {@code srcDetector} is {@code this.getArchiveDetector()} and
-     * {@code dstDetector} is {@code dst.getArchiveDetector()} if and only if
-     * {@code dst} is an instance of this class or {@link TArchiveDetector#NULL}
-     * otherwise.
+     * Equivalent to
+     * {@link #cp_r(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, detector, detector)},
+     * where {@code detector} is {@code TConfig.get().getArchiveDetector()}.
      * 
      * @param  dst the destination file or directory tree.
      *         Note that although this just needs to be a plain {@code File},
@@ -2769,20 +2767,42 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
-    public TFile cp_r(final File dst) throws IOException {
-        final TArchiveDetector srcDetector = getArchiveDetector();
-        final TArchiveDetector dstDetector = dst instanceof TFile
-                ? ((TFile) dst).getArchiveDetector()
-                : TArchiveDetector.NULL;
-        TBIO.cp_r(false, this, dst, srcDetector, dstDetector);
+    public TFile cp_r(File dst) throws IOException {
+        final TArchiveDetector detector = TConfig.get().getArchiveDetector();
+        TBIO.cp_r(false, this, dst, detector, detector);
         return this;
+    }
+
+    /**
+     * Equivalent to
+     * {@link #cp_r(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, detector, detector)}.
+     * 
+     * @param  src the source file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
+     * @param  dst the destination file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
+     * @param  detector the archive detector to use for detecting any archive
+     *         files <em>within</em> the source and destination directory
+     *         trees.
+     * @throws IOException if any I/O error occurs.
+     * @since  TrueZIP 7.2
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see    <a href="#traversal">Traversing Directory Trees</a>
+     */
+    public static void cp_r(File src, File dst, TArchiveDetector detector)
+    throws IOException {
+        TBIO.cp_r(false, src, dst, detector, detector);
     }
 
     /**
      * Recursively copies the file or directory {@code src}
      * to the file or directory {@code dst}.
      * <p>
-     * <table border=1 cellpadding=5 summary="">
+     * <table border="1">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2851,15 +2871,9 @@ public final class TFile extends File implements TRex {
     }
 
     /**
-     * Recursively copies the file or directory {@code src} to the file or
-     * directory {@code dst} and attempts to copy all attributes of each
-     * source file to the destination file, too.
-     * <p>
-     * This version calls {@link #cp_rp(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, srcDetector, dstDetector)},
-     * where {@code srcDetector} is {@code this.getArchiveDetector()} and
-     * {@code dstDetector} is {@code dst.getArchiveDetector()} if and only if
-     * {@code dst} is an instance of this class or {@link TArchiveDetector#NULL}
-     * otherwise.
+     * Equivalent to
+     * {@link #cp_rp(File, File, TArchiveDetector, TArchiveDetector) cp_rp(this, dst, detector, detector)},
+     * where {@code detector} is {@code TConfig.get().getArchiveDetector()}.
      * 
      * @param  dst the destination file or directory tree.
      *         Note that although this just needs to be a plain {@code File},
@@ -2870,13 +2884,35 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
-    public TFile cp_rp(final File dst) throws IOException {
-        final TArchiveDetector srcDetector = getArchiveDetector();
-        final TArchiveDetector dstDetector = dst instanceof TFile
-                ? ((TFile) dst).getArchiveDetector()
-                : TArchiveDetector.NULL;
-        TBIO.cp_r(true, this, dst, srcDetector, dstDetector);
+    public TFile cp_rp(File dst) throws IOException {
+        final TArchiveDetector detector = TConfig.get().getArchiveDetector();
+        TBIO.cp_r(true, this, dst, detector, detector);
         return this;
+    }
+
+    /**
+     * Equivalent to
+     * {@link #cp_rp(File, File, TArchiveDetector, TArchiveDetector) cp_rp(this, dst, detector, detector)}.
+     * 
+     * @param  src the source file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
+     * @param  dst the destination file or directory tree.
+     *         Note that although this just needs to be a plain {@code File},
+     *         archive files and entries are only supported for instances of
+     *         this class.
+     * @param  detector the archive detector to use for detecting any archive
+     *         files <em>within</em> the source and destination directory
+     *         trees.
+     * @throws IOException if any I/O error occurs.
+     * @since  TrueZIP 7.2
+     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see    <a href="#traversal">Traversing Directory Trees</a>
+     */
+    public static void cp_rp(File src, File dst, TArchiveDetector detector)
+    throws IOException {
+        TBIO.cp_r(true, src, dst, detector, detector);
     }
 
     /**
@@ -2885,18 +2921,10 @@ public final class TFile extends File implements TRex {
      * source file to the destination file, too.
      * Which attributes are actually copied is specific to the source and
      * destination file system driver implementations, but the minimum
-     * guarantee is to copy the last modification time.
-     * For example, starting with TrueVFS 7.2, the last modification, last
-     * access and creation times are copied if all of the following are true:
+     * guarantee is to copy the last modification time, the last access time
+     * and the creation time.
      * <p>
-     * <ol>
-     * <li>Both parameters refer to the platform file system
-     *     (even if any one is only a {@code java.io.File}), and
-     * <li>the JVM complies to JSE&nbsp;7, and
-     * <li>the TrueVFS Driver FILE module is used.
-     * </ol>
-     * <p>
-     * <table border=1 cellpadding=5 summary="">
+     * <table border="1">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2969,7 +2997,7 @@ public final class TFile extends File implements TRex {
      * file
      * <em>without</em> closing the stream.
      * <p>
-     * <table border=1 cellpadding=5 summary="">
+     * <table border="1">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -3033,7 +3061,7 @@ public final class TFile extends File implements TRex {
      * {@code out}
      * <em>without</em> closing the stream.
      * <p>
-     * <table border=1 cellpadding=5 summary="">
+     * <table border="1">
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -3099,7 +3127,7 @@ public final class TFile extends File implements TRex {
      * the current thread.
      * It performs best when used with <em>unbuffered</em> streams.
      * <p>
-     * <table border=1 cellpadding=5 summary="">
+     * <table border="1">
      * <thead>
      * <tr>
      *   <th>Feature</th>
