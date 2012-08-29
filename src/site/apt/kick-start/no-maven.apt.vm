@@ -15,59 +15,34 @@ Getting started without Maven
     However, as the name implies, it includes all sample code which bloats the
     code size of the application.
     More importantly, this will also initially set up the TrueVFS&#160;Access
-    API to detect all canonical file extensions of all supported archive file
-    types in TrueVFS&#160;${project.version} - see the table at the end of this
-    page.
-    This may produce some unwanted side effects on an unintended access to an
-    archive file:
+    API to detect <all> canonical file extensions of <all> supported archive
+    file types in TrueVFS&#160;${project.version}.
+    Because the virtual file system of an archive file gets automatically
+    mounted upon first access, this may produce some unwanted side effects:
 
-    * The virtual file system of an archive file is automatically mounted.
+    * All archive files will behave like virtual directories instead of
+      regular files.
+      This may confuse the application if not needed.
 
-        * This may confuse the application because the archive file
-          unexpectedly behaves like a directory instead of a file.
+    * In case of TAR files, the driver will unpack the entire TAR file into a
+      temporary directory first because the TAR file format doesn't provide a
+      central directory for fast random access.
+      This may seriously degrade performance if not needed, however.
 
-	* In case of TAR files, this can be considerably slow because this file
-          format doesn't provide a central directory and thus the driver will
-          unpack the entire TAR file into a temporary directory first.
+    * In case of an EXE file, the driver will attempt to locate the central
+      directory of a self extracting ZIP file which will cause the entire
+      file to be read if its actually a plain EXE file.
+      Again, this may seriously degrade performance if not needed.
 
-        * In case of a plain EXE file, an attempt is made to locate the central
-          directory of a self extracting ZIP file which will cause the entire
-          file to be read.
-
-    * A Swing or console based dialog prompts the user for a password to access
-      a RAES encrypted ZIP file.
+    * In case of a ZIP.RAES file, a Swing or console based dialog will prompt
+      the user for a password to access its encrypted contents.
+      This may confuse the user if not needed.
 
     []
 
     To avoid these unwanted side effects, you should <always> configure the
     TrueVFS&#160;Access API to detect exactly only the file suffixes of the
     archive types required to access.
-    {{{../usecases/aff.html}Here}} is a sample available for this task.
-    For further information, please refer to the Javadoc for the class
-    {{{../apidocs/net/java/truevfs/access/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
-
-* Initial Setup
-
-    Following are the canonical archive file extensions which will be detected
-    by an application using the TrueVFS Access API according to the initial set
-    up of the all-in-one JAR <<<truevfs-samples-${project.version}-jar-with-dependencies.jar>>>:
-
-*--*--*
-||Canonical File Extensions||File System Driver Class|
-*--+--+
-|<<<ear>>>, <<<jar>>>, <<<war>>>|{{{../apidocs/net/truevfs/driver/zip/JarDriver.html}<<<JarDriver>>>}}|
-*--+--+
-|<<<exe>>>|{{{../apidocs/net/truevfs/driver/zip/ReadOnlySfxDriver.html}<<<ReadOnlySfxDriver>>>}}|
-*--+--+
-|<<<odt>>>, <<<ott>>>, <<<odg>>>, <<<otg>>>, <<<odp>>>, <<<otp>>>, <<<ods>>>, <<<ots>>>, <<<odc>>>, <<<otc>>>, <<<odi>>>, <<<oti>>>, <<<odf>>>, <<<otf>>>, <<<odm>>>, <<<oth>>>, <<<odb>>>|{{{./apidocs/net/truevfs/driver/zip/OdfDriver.html}<<<OdfDriver>>>}}|
-*--+--+
-|<<<tar>>>|{{{../apidocs/net/truevfs/driver/tar/TarDriver.html}<<<TarDriver>>>}}|
-*--+--+
-|<<<tar.bz2>>>, <<<tb2>>>, <<<tbz>>>|{{{../apidocs/net/truevfs/driver/tar/TarBZip2Driver.html}<<<TarBZip2Driver>>>}}|
-*--+--+
-|<<<tar.gz>>>, <<<tgz>>>|{{{../apidocs/net/truevfs/driver/tar/TarGZipDriver.html}<<<TarGZipDriver>>>}}|
-*--+--+
-|<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{../apidocs/net/truevfs/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}|
-*--+--+
-|<<<zip>>>|{{{../apidocs/net/truevfs/driver/zip/ZipDriver.html}<<<ZipDriver>>>}}|
-*--+--+
+    You can simply do so by adding only the required driver modules to run time
+    class path or apply the following {{{../usecases/aff.html}sample}} for
+    explicit configuration.

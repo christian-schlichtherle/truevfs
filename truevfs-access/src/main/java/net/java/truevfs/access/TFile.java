@@ -81,9 +81,6 @@ import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
  *
  * <a name="directDataCopying"/><a name="RDC"/><h4>Raw Data Copying (RDC)</h4>
  * <p>
- * <i>[Note that this feature has been renamed from Direct Data Copying (DDC)
- *    to Raw Data Copying (RDC) in TrueVFS 7.5]</i>
- * <p>
  * If data is copied from an archive file to another archive file of the
  * same type, some of the copy methods support a feature called <i>Raw Data
  * Copying</i> (RDC) to achieve best performance:</a>

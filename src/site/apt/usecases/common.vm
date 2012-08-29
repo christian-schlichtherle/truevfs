@@ -17,6 +17,8 @@ $title
 
     * TAR.BZ2
 
+    * TAR.XZ
+
     * ZIP
 
     * JAR
@@ -46,7 +48,7 @@ $title
     {{{../truevfs-access/index.html}TrueVFS Access}},
     here's your relief:
     The
-    {{{../apidocs/net/truevfs/file/TFile.html}<<<TFile>>>}}
+    {{{../apidocs/net/java/truevfs/access/TFile.html}<<<TFile>>>}}
     class extends the <<<java.io.File>>> class in order to add the
     required functionality.
 

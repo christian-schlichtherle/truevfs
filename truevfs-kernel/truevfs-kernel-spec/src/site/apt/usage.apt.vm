@@ -16,13 +16,13 @@ TrueVFS Kernel Usage
     In contrast to the module {{{../truevfs-access/index.html}TrueVFS Access}},
     the API of this module is more complex to use, yet very extensible because
     it relies on Dependency Injection for the resolution of
-    {{{./apidocs/net/truevfs/kernel/FsDriver.html}file system drivers}}
+    {{{./apidocs/net/java/truevfs/kernel/FsDriver.html}file system drivers}}
     and
-    {{{./apidocs/net/truevfs/kernel/cio/IOPool.html}I/O entry pools}}.
+    {{{./apidocs/net/java/truevfs/kernel/cio/IOPool.html}I/O entry pools}}.
     It also provides service locators for
-    {{{./apidocs/net/truevfs/kernel/sl/FsDriverLocator.html}file system driver providers}}
+    {{{./apidocs/net/java/truevfs/kernel/sl/FsDriverLocator.html}file system driver providers}}
     and
-    {{{./apidocs/net/truevfs/kernel/sl/IOPoolLocator.html}I/O entry pool providers}}
+    {{{./apidocs/net/java/truevfs/kernel/sl/IOPoolLocator.html}I/O entry pool providers}}
     in order to enable applications to resolve these dependencies easily at
     runtime.
 
@@ -73,7 +73,7 @@ $ cat fileA fileB
     Here's how to copy the contents of the path name parameter <<<resource>>>
     to the standard output using the API of the module TrueVFS Access File*:
 
-%{snippet|id=cat|file=${project.basedir}/../truevfs-access/src/test/java/net/truevfs/access/sample/PathCat.java}
+%{snippet|id=cat|file=${project.basedir}/../truevfs-access/src/test/java/net/java/truevfs/access/sample/PathCat.java}
 
     Suppose that the modules TrueVFS Driver ZIP
     (Maven artifactId <<<truevfs-driver-zip>>>) and TrueVFS Driver File
@@ -96,7 +96,7 @@ $ cat fileA fileB
     If an application needs to address URIs, too, then the following code
     could be used instead:
 
-%{snippet|id=cat|file=${project.basedir}/../truevfs-access/src/test/java/net/truevfs/access/sample/UriCat.java}
+%{snippet|id=cat|file=${project.basedir}/../truevfs-access/src/test/java/net/java/truevfs/access/sample/UriCat.java}
 
     Using the same configuration like before, the following URIs could now be
     addressed with the code above:
@@ -123,7 +123,7 @@ $ cat fileA fileB
     Now for comparison, let's implement the same functionality using the API
     of the module TrueVFS Kernel.
 
-%{snippet|id=cat|file=${project.build.testSourceDirectory}/net/truevfs/kernel/sample/Cat.java}
+%{snippet|id=cat|file=${project.build.testSourceDirectory}/net/java/truevfs/kernel/sample/Cat.java}
 
     Using the same configuration like before, this code could access the same
     URIs than before.

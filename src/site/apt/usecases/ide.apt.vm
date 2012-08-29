@@ -17,11 +17,8 @@ TFile[] entries = new TFile("archive.jar").listFiles();
     this:
 
 +--+
-Writer writer = new TFileWriter("archive.jar/META-INF/MANIFEST.MF");
-try {
+try (Writer writer = new TFileWriter("archive.jar/META-INF/MANIFEST.MF")) {
     ...;
-} finally {
-    writer.close(); // ALWAYS close the resource here!
 }
 +--+
 
@@ -30,11 +27,8 @@ try {
     application:
 
 +--+
-Reader reader = new TFileReader("app.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF");
-try {
+try (Reader reader = new TFileReader("app.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF")) {
     ...;
-} finally {
-    reader.close(); // ALWAYS close the resource here!
 }
 +--+
 
