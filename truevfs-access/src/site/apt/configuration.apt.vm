@@ -182,7 +182,7 @@ src.cp_rp(dst); // copy "archive.zip" as a plain old file!
 
 * The class <<<TConfig>>>
 
-    With the advent of TrueVFS 7.2, some more options were necessary to control
+    With the advent of TrueZIP 7.2, some more options were necessary to control
     new features.
     However, injecting them as parameters to each method call would mess up the
     API and break binary compatibility to applications of older versions.

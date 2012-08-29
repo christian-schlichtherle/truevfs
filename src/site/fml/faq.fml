@@ -278,7 +278,7 @@ TConfig.get().setArchiveDetector(
 <source>
 // Note that the actual path may refer to anything, even a nested archive file.
 TFile inner = new TFile("outer.zip/inner.zip");
-TFile file = inner.toNonArchiveFile(); // convert - since TrueVFS 7.5
+TFile file = inner.toNonArchiveFile(); // convert
 ... // there may be some I/O here
 TVFS.umount(inner); // unmount potential archive file
 // Now you can safely do any I/O to $file.
@@ -526,7 +526,7 @@ TFile.cp(src.toFile(), dst.toFile());
                 </p>
 <source>
 TPath inner = new TPath("outer.zip/inner.zip");
-TPath path = inner.toNonArchivePath(); // convert - since TrueVFS 7.5
+TPath path = inner.toNonArchivePath(); // convert
 ... // there may be some I/O here
 inner.getFileSystem().close(); // unmount potential archive file
 // Now you can safely do any I/O to $path.
@@ -632,7 +632,7 @@ long size = Files.size(path);
                     With the advent of release 7.1, TrueVFS implements a new
                     strategy to avoid compressing already compressed archive
                     files in an enclosing archive file again.
-                    In contrast, the old stragegy of TrueVFS 7.0 and earlier
+                    In contrast, the old stragegy of TrueZIP 7.0 and earlier
                     was to compress everything - even if it was already
                     compressed.
                 </p>
@@ -733,7 +733,7 @@ long size = Files.size(path);
             </question>
             <answer>
                 <p>
-                    When mounting an archive file system, TrueVFS 7.1 and later
+                    When mounting an archive file system, TrueZIP 7.1 and later
                     use <i>covariant file system entries</i> in order to enable
                     an application to access archive entries of different types
                     (FILE, DIRECTORY, SYMLINK or SPECIAL) which share the same
