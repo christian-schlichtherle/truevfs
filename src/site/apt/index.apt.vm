@@ -25,9 +25,8 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
 
     TrueVFS&#160;1 is the successor to
     {{{http://truezip.java.net}TrueZIP&#160;7}}.
-    TrueVFS&#160;1.0&#160;Beta&#160;1 has been developed from the TrueZIP code
-    base by a long chain of refactorings and reflects the latest changes up to
-    TrueZIP&#160;7.6.1.
+    TrueVFS&#160;1.0&#160;Beta&#160;1 has been developed by refactoring the
+    TrueZIP code and reflects the latest changes up to TrueZIP&#160;7.6.1.
     While refactoring, the original suite of unit and integration tests has
     been maintained and extended so that you can easily put the same faith into
     this beta version than you could put into TrueZIP&#160;7.6.1.

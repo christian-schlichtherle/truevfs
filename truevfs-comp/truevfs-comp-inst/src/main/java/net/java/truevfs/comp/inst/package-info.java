@@ -3,7 +3,9 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Provides core functionality for instrumenting TrueVFS at runtime.
+ * Provides basic functionality for instrumenting the TrueVFS Kernel at runtime.
+ * 
+ * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truevfs.comp.inst;

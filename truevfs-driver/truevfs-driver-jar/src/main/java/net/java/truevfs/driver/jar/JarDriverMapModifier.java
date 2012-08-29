@@ -13,8 +13,8 @@ import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
 
 /**
- * Creates maps with drivers for the ZIP file format.
- * The maps created by this factory consist of the following entries:
+ * Maps a file system driver for accessing the JAR file format.
+ * The modified map will contain the following entries:
  * <p>
 <table border=1 cellpadding=5 summary="">
 <thead>
@@ -30,9 +30,6 @@ import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
 </tr>
 </tbody>
 </table>
- * <p>
- * Note that the regular expression is actually decomposed into separate
- * {@link FsScheme} objects which drivers mapped individually.
  *
  * @see     <a href="http://docs.oasis-open.org/office/v1.2/OpenDocument-v1.2-part1.pdf">Open Document Format for Office Applications (OpenDocument) Version 1.2; Part 1: OpenDocument Schema; Appendix C: MIME Types and File Name Extensions (Non Normative)</a>
  * @author  Christian Schlichtherle

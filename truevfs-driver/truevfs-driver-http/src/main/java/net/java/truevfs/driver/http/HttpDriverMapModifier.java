@@ -12,9 +12,8 @@ import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
 
 /**
- * Creates maps with drivers for accessing the {@code http} and {@code https}
- * schemes.
- * The maps created by this factory consist of the following entries:
+ * Maps a file system driver for read-only access to the web.
+ * The modified map will contain the following entries:
  * <p>
 <table border=1 cellpadding=5 summary="">
 <thead>

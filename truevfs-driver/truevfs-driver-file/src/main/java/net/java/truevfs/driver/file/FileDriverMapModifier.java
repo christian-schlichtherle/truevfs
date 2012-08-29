@@ -11,8 +11,8 @@ import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
 
 /**
- * Creates maps with a driver for accessing the {@code file} scheme.
- * The maps created by this factory consist of the following entries:
+ * Maps a file system driver for accessing the platform file system.
+ * The modified map will contain the following entry:
  * <p>
 <table border=1 cellpadding=5 summary="">
 <thead>

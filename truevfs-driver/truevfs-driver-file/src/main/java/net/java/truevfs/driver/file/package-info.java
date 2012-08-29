@@ -3,7 +3,7 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Implements the {@code file} scheme for accessing the platform file system.
+ * Provides a file system driver for accessing the platform file system.
  * 
  * @author Christian Schlichtherle
  */

@@ -12,8 +12,8 @@ import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
 
 /**
- * Creates maps with drivers for the TAR file format.
- * The maps created by this factory consist of the following entries:
+ * Maps a file system driver for accessing the GZIP compressed TAR file format.
+ * The modified map will contain the following entries:
  * <p>
 <table border=1 cellpadding=5 summary="">
 <thead>
