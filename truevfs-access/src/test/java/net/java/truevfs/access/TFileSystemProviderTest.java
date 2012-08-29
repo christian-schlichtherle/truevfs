@@ -4,16 +4,12 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truevfs.access.TPath;
-import net.java.truevfs.access.TFileSystemProvider;
-import net.java.truevfs.access.TFileSystem;
-import net.java.truevfs.access.MockArchiveDriverTestBase;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import net.java.truevfs.kernel.spec.FsMountPoint;
+import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
@@ -138,7 +134,7 @@ public class TFileSystemProviderTest extends MockArchiveDriverTestBase {
                 return;
             }
             assertThat(path.getFileSystem().provider(), sameInstance(provider));
-            assertThat(path.toUri().getScheme(), is(provider.getScheme()));
+            assertThat(path.getUri().getScheme(), is(provider.getScheme()));
         }
     }
 }

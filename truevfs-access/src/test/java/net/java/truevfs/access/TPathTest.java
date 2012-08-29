@@ -111,7 +111,7 @@ public class TPathTest extends MockArchiveDriverTestBase {
             final String scheme = params[1].toString();
             final boolean succeeds = (Boolean) params[2];
             final TPath path = new TPath(uri);
-            final URI result = path.toUri();
+            final URI result = path.getUri();
             assertThat(result.getScheme(), is(scheme));
             assert !result.isOpaque();
             try {

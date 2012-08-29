@@ -567,7 +567,7 @@ public final class TFile extends File implements TRex {
      * @throws IllegalArgumentException if the given URI does not conform to
      *         the syntax constraints for {@link FsNodePath}s or
      *         {@link File#File(URI)}.
-     * @see    #toUri()
+     * @see    #getUri()
      */
     public TFile(URI uri) {
         this(uri, null);
@@ -598,7 +598,7 @@ public final class TFile extends File implements TRex {
      *         {@code TConfig.get().getArchiveDetector()}.
      * @throws IllegalArgumentException if the given URI does not conform to
      *         the syntax constraints for {@link File#File(URI)}.
-     * @see    #toNodePath()
+     * @see    #getNodePath()
      */
     public TFile(URI uri, @CheckForNull TArchiveDetector detector) {
         this(FsNodePath.create(uri, CANONICALIZE), detector);
@@ -616,7 +616,7 @@ public final class TFile extends File implements TRex {
      *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} of the
      *         given node path does not conform to the syntax constraints for
      *         {@link File#File(URI)}.
-     * @see    #toNodePath()
+     * @see    #getNodePath()
      */
     public TFile(FsNodePath path) { this(path, null); }
 
@@ -649,7 +649,7 @@ public final class TFile extends File implements TRex {
      *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} of the
      *         given node path does not conform to the syntax constraints for
      *         {@link File#File(URI)}.
-     * @see    #toNodePath()
+     * @see    #getNodePath()
      */
     public TFile(final FsNodePath path, final @CheckForNull TArchiveDetector detector) {
         super(path.toHierarchicalUri());
@@ -874,7 +874,7 @@ public final class TFile extends File implements TRex {
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
-        out.writeObject(toUri());
+        out.writeObject(getUri());
     }
 
     private void readObject(ObjectInputStream in)
@@ -1559,20 +1559,10 @@ public final class TFile extends File implements TRex {
         return getArchiveDetector().scheme(file.getPath());
     }
 
-    @Override
-    public String toString() { return file.toString(); }
-
-    @Deprecated
-    @Override
-    @SuppressWarnings("deprecation")
-    public URL toURL() throws MalformedURLException {
-        return null != innerArchive ? toURI().toURL() : file.toURL();
-    }
-
     /**
      * In case no prospective archive file has been detected in the path name
-     * at construction time, this method behaves like its super class
-     * implementation.
+     * at construction time, this method behaves like the super class method
+     * {@link File#toURI()}.
      * <p>
      * Otherwise, an opaque URI of the form {@code <scheme>:<uri>!/<entry>} is
      * returned, where {@code <scheme>} is the URI scheme component identifying
@@ -1602,11 +1592,10 @@ public final class TFile extends File implements TRex {
      * </ul>
      * 
      * @return A URI for this file object.
-     * @see    #TFile(URI)
      * @see    #getNodePath()
      */
     @Override
-    public URI toUri() {
+    public URI getUri() {
         try {
             if (this == innerArchive) {
                 final FsScheme scheme = getScheme();
@@ -1634,18 +1623,23 @@ public final class TFile extends File implements TRex {
     }
 
     @Override
-    public URI toURI() { return toUri(); }
+    public URI toURI() { return getUri(); }
+
+    @Deprecated
+    @Override
+    @SuppressWarnings("deprecation")
+    public URL toURL() throws MalformedURLException {
+        return null != innerArchive ? toURI().toURL() : file.toURL();
+    }
 
     @Override
     public TFile toFile() { return this; }
 
-    /**
-     * Returns {@code new TPath(this)}.
-     * 
-     * @return {@code new TPath(this)}.
-     */
     @Override
     public TPath toPath() { return new TPath(this); }
+
+    @Override
+    public String toString() { return file.toString(); }
 
     private static BitField<FsAccessOption> getAccessPreferences() {
         return TConfig.get().getAccessPreferences();
@@ -1963,10 +1957,6 @@ public final class TFile extends File implements TRex {
         return file.list(filter);
     }
 
-    /**
-     * Equivalent to {@link #listFiles(FilenameFilter, TArchiveDetector)
-     * listFiles((FilenameFilter) null, getArchiveDetector())}.
-     */
     @Override
     public @Nullable TFile[] listFiles() {
         return listFiles((FilenameFilter) null);

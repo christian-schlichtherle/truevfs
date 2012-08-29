@@ -87,7 +87,7 @@ public final class TFileTest extends MockArchiveDriverTestBase {
             assertThat(file.getEnclEntryName(), nullValue());
         }
         assertThat(new TFile(file.getNodePath()), equalTo(file.getNormalizedAbsoluteFile()));
-        assertThat(new TFile(file.toUri()), equalTo(file.getAbsoluteFile()));
+        assertThat(new TFile(file.getUri()), equalTo(file.getAbsoluteFile()));
     }
 
     @Test
@@ -439,15 +439,15 @@ public final class TFileTest extends MockArchiveDriverTestBase {
             assertThat(new TFile(name), equalTo(file));
             assertThat(new TFile(uri), equalTo(file));
             assertThat(new TFile(path), equalTo(file));
-            assertThat(new TFile(name).toUri(), equalTo(file.toUri()));
-            assertThat(new TFile(uri).toUri(), equalTo(file.toUri()));
-            assertThat(new TFile(path).toUri(), equalTo(file.toUri()));
+            assertThat(new TFile(name).getUri(), equalTo(file.getUri()));
+            assertThat(new TFile(uri).getUri(), equalTo(file.getUri()));
+            assertThat(new TFile(path).getUri(), equalTo(file.getUri()));
             assertThat(new TFile(name).getNodePath(), equalTo(file.getNodePath()));
             assertThat(new TFile(uri).getNodePath(), equalTo(file.getNodePath()));
             assertThat(new TFile(path).getNodePath(), equalTo(file.getNodePath()));
-            assertThat(new TFile(new TFile(name).toUri()), equalTo(file.getAbsoluteFile()));
-            assertThat(new TFile(new TFile(uri).toUri()), equalTo(file.getAbsoluteFile()));
-            assertThat(new TFile(new TFile(path).toUri()), equalTo(file.getAbsoluteFile()));
+            assertThat(new TFile(new TFile(name).getUri()), equalTo(file.getAbsoluteFile()));
+            assertThat(new TFile(new TFile(uri).getUri()), equalTo(file.getAbsoluteFile()));
+            assertThat(new TFile(new TFile(path).getUri()), equalTo(file.getAbsoluteFile()));
             assertThat(new TFile(new TFile(name).getNodePath()), equalTo(file.getAbsoluteFile()));
             assertThat(new TFile(new TFile(uri).getNodePath()), equalTo(file.getAbsoluteFile()));
             assertThat(new TFile(new TFile(path).getNodePath()), equalTo(file.getAbsoluteFile()));

@@ -63,16 +63,16 @@ public interface TRex {
      */
     FsNodeName getNodeName();
 
+    /**
+     * Returns the absolute URI for this object.
+     * 
+     * @return the absolute URI for this object.
+     */
+    URI getUri();
+
     //
     // Conversions.
     //
-
-    /**
-     * Returns a URI representation of this object.
-     * 
-     * @return A URI representation of this object.
-     */
-    URI toUri();
 
     /**
      * Returns a file representation of this object.
