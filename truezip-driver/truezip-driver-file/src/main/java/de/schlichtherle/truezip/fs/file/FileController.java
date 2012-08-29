@@ -10,8 +10,8 @@ import static de.schlichtherle.truezip.entry.Entry.Access.WRITE;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
-import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
 import de.schlichtherle.truezip.fs.*;
+import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
@@ -41,8 +41,7 @@ final class FileController extends FsAbstractController<FsModel>  {
 
     FileController(final FsModel model) {
         super(model);
-        if (null != model.getParent())
-            throw new IllegalArgumentException();
+        if (null != model.getParent()) throw new IllegalArgumentException();
         URI uri = model.getMountPoint().toUri();
         if ('\\' == separatorChar && null != uri.getRawAuthority()) {
             try {
@@ -54,6 +53,7 @@ final class FileController extends FsAbstractController<FsModel>  {
                 // being equal to the original value again.
                 // Note that the use of the buggy URI constructor is authorized
                 // for this case!
+                // See http://java.net/jira/browse/TRUEZIP-288 .
                 uri = new URI(  uri.getScheme(), "",
                                 TWO_SEPARATORS + uri.getAuthority() + uri.getPath(),
                                 uri.getQuery(), uri.getFragment());

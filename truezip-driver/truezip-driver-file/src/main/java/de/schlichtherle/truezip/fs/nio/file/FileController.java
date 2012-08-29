@@ -4,19 +4,23 @@
  */
 package de.schlichtherle.truezip.fs.nio.file;
 
-import de.schlichtherle.truezip.util.ControlFlowException;
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Access;
 import static de.schlichtherle.truezip.entry.Entry.Access.*;
 import de.schlichtherle.truezip.entry.Entry.Type;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
-import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
+import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR;
 import de.schlichtherle.truezip.fs.*;
+import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
 import de.schlichtherle.truezip.socket.InputSocket;
 import de.schlichtherle.truezip.socket.OutputSocket;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.ControlFlowException;
+import static java.io.File.separatorChar;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import static java.nio.file.Files.*;
@@ -40,13 +44,33 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 final class FileController extends FsAbstractController<FsModel>  {
 
+    private static final String TWO_SEPARATORS = SEPARATOR + SEPARATOR;
+
     private final Path target;
 
     FileController(final FsModel model) {
         super(model);
-        if (null != model.getParent())
-            throw new IllegalArgumentException();
-        this.target = Paths.get(model.getMountPoint().toUri());
+        if (null != model.getParent()) throw new IllegalArgumentException();
+        URI uri = model.getMountPoint().toUri();
+        if ('\\' == separatorChar && null != uri.getRawAuthority()) {
+            try {
+                // Postfix: Move Windows UNC host from authority to path
+                // component because the File class can't deal with this.
+                // Note that the authority parameter must not be null and that
+                // you cannot use the UriBuilder class - using either of these
+                // would result in the authority property of the new URI object
+                // being equal to the original value again.
+                // Note that the use of the buggy URI constructor is authorized
+                // for this case!
+                // See http://java.net/jira/browse/TRUEZIP-288 .
+                uri = new URI(  uri.getScheme(), "",
+                                TWO_SEPARATORS + uri.getAuthority() + uri.getPath(),
+                                uri.getQuery(), uri.getFragment());
+            } catch (URISyntaxException ex) {
+                throw new AssertionError(ex);
+            }
+        }
+        this.target = Paths.get(uri);
     }
 
     private BasicFileAttributeView getBasicFileAttributeView(Path file) {
