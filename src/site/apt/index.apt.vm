@@ -38,37 +38,36 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
 
     If you are interested in the plans for this project, please have a look
     at its
-    {{{http://java.net/jira/browse/TRUEVFS#selectedTab=com.atlassian.jira.plugin.system.project%3Aroadmap-panel}road map on JIRA}}
-    or subscribe to the {{{./mail-list.html}users mailing list}} for discussion.
+    {{{http://java.net/jira/browse/TRUEVFS#selectedTab=com.atlassian.jira.plugin.system.project%3Aroadmap-panel}Road Map}}
+    on JIRA or subscribe to its {{{./mail-lists.html}Users Mailing List}} for discussion.
 
     Developing TrueVFS is a serious effort which requires a lot of time.
     So any sponsors or donations are most welcome.
-    Just click the <Donate> button in the navigation bar on the left
-    or {{{./team-list.html}contact me}} personally.
+    Just click the <Donate> button in the navigation bar on the left side or
+    {{{./team-list.html}contact me}} personally.
     <<Any donation will help to speed up the development process and ensure the
     future of this project!>>
 
 * Supported File System Types
 
-    TrueVFS ships with the following pluggable file system driver modules:
+    TrueVFS&#160;${project.version} ships with pluggable driver modules for
+    {{{./truevfs-driver/truevfs-driver-file/index.html}FILE}},
+    {{{./truevfs-driver/truevfs-driver-http/index.html}HTTP(S)}},
+    {{{./truevfs-driver/truevfs-driver-jar/index.html}JAR}},
+    {{{./truevfs-driver/truevfs-driver-odf/index.html}ODF}},
+    {{{./truevfs-driver/truevfs-driver-sfx/index.html}SFX}},
+    {{{./truevfs-driver/truevfs-driver-tar/index.html}TAR}},
+    {{{./truevfs-driver/truevfs-driver-tar-bzip2/index.html}TAR.BZIP2}},
+    {{{./truevfs-driver/truevfs-driver-tar-gzip/index.html}TAR.GZIP}},
+    {{{./truevfs-driver/truevfs-driver-tar-xz/index.html}TAR.XZ}},
+    {{{./truevfs-driver/truevfs-driver-zip/index.html}ZIP}}
+    and
+    {{{./truevfs-driver/truevfs-driver-tzp/index.html}ZIP.RAES (TZP)}}
+    file system schemes. For the final release, there will be more.
 
-*--*--*
-|| Module || Description
-*--+--+
-| {{{./truevfs-driver/truevfs-driver-file/index.html}TrueVFS Driver FILE}} | Provides read/write access to the platform file system.
-*--+--+
-| {{{./truevfs-driver/truevfs-driver-http/index.html}TrueVFS Driver HTTP(S)}} | Provides read-only access to HTTP(S) URLs.
-*--+--+
-| {{{./truevfs-driver/truevfs-driver-tar/index.html}TrueVFS Driver TAR}} | Provides read/write access to TAR, TAR.BZ2, TAR.GZ and TAR.XZ files.
-*--+--+
-| {{{./truevfs-driver/truevfs-driver-zip/index.html}TrueVFS Driver ZIP}} | Provides read/write access to ZIP, JAR, EAR, WAR etc. Supports appending to existing ZIP files, recovery of lost ZIP entries, WinZip AES encryption, BZIP2 compression, selectable character sets, external file attributes and ZIP64 extensions.
-*--+--+
-| {{{./truevfs-driver/truevfs-driver-tzp/index.html}TrueVFS Driver ZIP.RAES (TZP)}} | Provides read/write access to JAR files which are entirely wrapped in an envelope with AES-256/CTR encryption, SHA-256 authentication and PKCS #12 V1 PBKDF.
-*--+--+
-
-    Add the JAR artifact of these modules to the run time class path to
-    make their file system drivers available for service location in the client
-    API modules - see below.
+    Simply add the JAR artifact of these driver modules to the run time class
+    path to make their file system drivers available for service location in
+    the client API module - see below.
 
 * Using TrueVFS
 
@@ -80,28 +79,28 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
     with the client facade API for convenient access to its (federated virtual)
     file system space.
 
-    Writing an application for this API is really easy:
+    Writing an application for this API is really simple:
     Please have a look at the page {{{./kick-start/index.html}Getting Started}}
     to learn how to generate a TrueVFS client application from a Maven
-    archetype in about ten minutes.
+    archetype in about ten minutes or have a look at the
+    {{{./kick-start/tutorial.html}tutorial}}.
 
 * Extending TrueVFS
 
-    As a framework, TrueVFS provides the interfaces and classes to
-    write file system drivers which plug-in to its federated file
-    system space.
-    The module TrueVFS&#160;Kernel modules provide federating, multithreading,
-    multiplexing, caching and accounting so that archive file system drivers do
-    not need to take care of these aspects of a virtual file system.
+    As a framework, TrueVFS provides the API to write file system drivers which
+    plug-in to its federated file system space.
+    The module TrueVFS&#160;Kernel modules features federating, multithreading,
+    multiplexing, caching and accounting so that (archive) file system drivers
+    do not need to take care of these aspects of a (virtual) file system.
 
-    Unfortunately, there is no tutorial for how to write a file system driver,
-    but there's comprehensive Javadoc and sample code:
+    While there is no tutorial for how to write a file system driver, there's
+    comprehensive Javadoc and sample code:
 
-    * If you are going to write a federated file system driver
-      (i.e. archive driver), please consult the Javadoc for
+    * If you are going to write an archive file system driver,
+      please consult the Javadoc for
       {{{./apidocs/net/java/truevfs/kernel/spec/FsArchiveDriver.html}<<<net.java.truevfs.kernel.spec.FsArchiveDriver>>>}}.
 
-    * If you are going to write a non-federated file system driver,
+    * If you are going to write a plain file system driver,
       please consult the Javadoc for
       {{{./apidocs/net/java/truevfs/kernel/spec/FsDriver.html}<<<net.java.truevfs.kernel.spec.FsDriver>>>}}.
 

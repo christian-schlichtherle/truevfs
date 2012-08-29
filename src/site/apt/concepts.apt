@@ -28,11 +28,13 @@ Basic Concepts
           It also provides multiplexing, caching and buffering for
           multithreaded environments so that the driver tier does not need to
           take care of this.
-          This tier solely consists of the module
-          {{{./truevfs-kernel/index.html}TrueVFS&#160;Kernel}}.
+          This tier consists of the modules
+          {{{./truevfs-kernel/index.html}TrueVFS&#160;Kernel&#160;Specification}}
+          and
+          {{{./truevfs-kernel/index.html}TrueVFS&#160;Kernel&#160;Implementation}}.
 
     [[1]] The <Driver Tier> implements the I/O operations for their respective
-          (federated) file system type.
+          (archive) file system type.
           This tier consists of all file system driver modules, e.g.
           {{{./truevfs-driver/truevfs-driver-file/index.html}TrueVFS&#160;Driver&#160;FILE}},
           {{{./truevfs-driver/truevfs-driver-zip/index.html}TrueVFS&#160;Driver&#160;ZIP}}
@@ -42,10 +44,10 @@ Basic Concepts
 
 * Design Paradigms
 
-    The TrueVFS project employs several high level design paradigms which have
+    The TrueVFS project employs some fundamental design paradigms which have
     proven to be beneficial.
-    However, these are only guidelines - not rules - so they should get applied
-    with some care.
+    However, these are only guidelines - not rules - so they get applied with
+    care.
 
 ** Convention Over Configuration
 
@@ -57,15 +59,10 @@ Basic Concepts
     extension for the archive files supported by the respective file system
     driver modules - no configuration file editing is required.
 
-    The application can simply accept this
-    {{{./apidocs/net/truevfs/access/TArchiveDetector.html#ALL}initial setup}}
-    of the
-    {{{./apidocs/net/truevfs/access/TConfig.html#getArchiveDetector()}archive detection}}
-    in its 
-    {{{./apidocs/net/truevfs/access/TConfig.html#get()}current configuration}}
-    or it can
-    {{{./apidocs/net/truevfs/access/TConfig.html#setArchiveDetector(net.truevfs.file.TArchiveDetector)}explicitly override}}
-    it.
+    The application can simply accept this initial setup of its
+    {{{./apidocs/net/java/truevfs/access/TConfig.html#get()}current configuration}}
+    or it can change it, e.g. update its
+    {{{./apidocs/net/java/truevfs/access/TConfig.html#setArchiveDetector(net.truevfs.file.TArchiveDetector)}archive detection}}.
     Check the {{{./faq.html#file}FAQ}} for the
     {{{./truevfs-access/index.html}TrueVFS Access}}
     API for a discussion of some options to adapt the archive detection to your
@@ -77,11 +74,11 @@ Basic Concepts
     the
     {{{./truevfs-kernel/index.html}TrueVFS Kernel}}
     module provides service locator singletons for the
-    {{{./apidocs/net/truevfs/kernel/sl/FsManagerLocator.html}file system manager}},
+    {{{./apidocs/net/java/truevfs/kernel/spec/sl/FsManagerLocator.html}file system manager}},
     the
-    {{{./apidocs/net/truevfs/kernel/sl/FsDriverLocator.html}file system drivers}}
+    {{{./apidocs/net/java/truevfs/kernel/spec/sl/FsDriverMapLocator.html}file system driver map}}
     and the
-    {{{./apidocs/net/truevfs/kernel/sl/IoPoolLocator.html}temporary I/O buffer pool}}.
+    {{{./apidocs/net/java/truevfs/kernel/spec/sl/IoBufferPoolLocator.html}I/O buffer pool}}.
 
 ** Dependency Injection
 
@@ -113,10 +110,10 @@ Basic Concepts
     which is a key requirement for most TrueVFS Kernel classes.
 
     For example, the classes
-    {{{./apidocs/net/truevfs/kernel/FsPath.html}<<<FsPath>>>}},
-    {{{./apidocs/net/truevfs/kernel/FsMountPoint.html}<<<FsMountPoint>>>}}
+    {{{./apidocs/net/java/truevfs/kernel/spec/FsNodePath.html}<<<FsNodePath>>>}},
+    {{{./apidocs/net/java/truevfs/kernel/spec/FsMountPoint.html}<<<FsMountPoint>>>}}
     and
-    {{{./apidocs/net/truevfs/kernel/FsEntryName.html}<<<FsEntryName>>>}}
+    {{{./apidocs/net/java/truevfs/kernel/spec/FsNodeName.html}<<<FsNodeName>>>}}
     are immutable so that their instances can get safely shared among many
     objects and threads.
 
@@ -126,9 +123,9 @@ Basic Concepts
     implementation classes in order to ease exchanging implementation classes.
 
     For example, the abstract classes
-    {{{./apidocs/net/truevfs/kernel/FsModel.html}<<<FsModel>>>}}
+    {{{./apidocs/net/java/truevfs/kernel/spec/FsModel.html}<<<FsModel>>>}}
     and
-    {{{./apidocs/net/truevfs/kernel/FsController.html}<<<FsController>>>}}
+    {{{./apidocs/net/java/truevfs/kernel/spec/FsController.html}<<<FsController>>>}}
     participate in a variant of the MVC design pattern which is known as the
     Front Controller design pattern.
     The numerous implementation classes participate in the different file
@@ -161,10 +158,10 @@ Basic Concepts
     The set of overridable public methods of abstract classes and interfaces is
     reduced as much as reasonable in order to ease implementation classes.
 
-    For example, the abstract class
-    {{{./apidocs/net/truevfs/kernel/FsDriver.html}<<<FsDriver>>>}}
+    For example, the class
+    {{{./apidocs/net/java/truevfs/kernel/spec/FsDriver.html}<<<FsDriver>>>}}
     consists of only one abstract method
-    {{{./apidocs/net/truevfs/kernel/FsDriver.html#newController(net.truevfs.kernel.spec.FsModel,net.truevfs.kernel.spec.FsController)}<<<FsDriver.newController(FsModel, FsController)>>>}}
+    {{{./apidocs/net/java/truevfs/kernel/spec/FsDriver.html#newController(net.truevfs.kernel.spec.FsManager,net.truevfs.kernel.spec.FsModel,net.truevfs.kernel.spec.FsController)}<<<FsDriver.newController(FsModel, FsController)>>>}}
     which needs to get implemented in any file system driver module.    
 
 ** Composition Over Inheritance

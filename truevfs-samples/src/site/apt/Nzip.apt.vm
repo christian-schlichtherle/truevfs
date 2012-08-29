@@ -7,7 +7,7 @@
 Nzip - a Comprehensive Command Line Utility
 
     The Nzip command line utility implemented by the class
-    {{{./apidocs/net/truevfs/sample/Nzip.html}<<<net.truevfs.samples.Nzip>>>}}
+    {{{./apidocs/net/java/truevfs/sample/Nzip.html}<<<net.truevfs.samples.Nzip>>>}}
     showcases the power of the {{{../truevfs-access/index.html}TrueVFS Access File*}} API.
 
     This is a comprehensive command line utility which allows you to work with
@@ -71,9 +71,9 @@ java %PROPS% -jar "%JAR%" %*
 *--+--+
 |<<<nzip.cmd llr truevfs-${project.version}-jar-with-dependencies.jar>>>|Prints a recursive long listing of the contents of the root directory of the JAR file from which the tool is actually running.|
 *--+--+
-|<<<nzip.cmd cp truevfs-${project.version}-jar-with-dependencies.jar/net/truevfs/sample/Nzip.class archive.zip>>>|Copies the file entry <<<net/truevfs/sample/Nzip.class>>> from the distribution JAR into the ZIP file <<<archive.zip>>>.|
+|<<<nzip.cmd cp truevfs-${project.version}-jar-with-dependencies.jar/net/java/truevfs/sample/Nzip.class archive.zip>>>|Copies the file entry <<<net/java/truevfs/sample/Nzip.class>>> from the distribution JAR into the ZIP file <<<archive.zip>>>.|
 *--+--+
-|<<<nzip.cmd rm archive.zip/net/truevfs/sample/Nzip.class>>>|Removes the file entry <<<Nzip.class>>> from <<<archive.zip/net/truevfs/samples>>>.|
+|<<<nzip.cmd rm archive.zip/net/java/truevfs/sample/Nzip.class>>>|Removes the file entry <<<Nzip.class>>> from <<<archive.zip/net/java/truevfs/samples>>>.|
 *--+--+
 |<<<nzip.cmd rmr archive.zip/de>>>|Recursively removes the directory entry <<<de>>> from <<<archive.zip>>>.|
 *--+--+

@@ -23,10 +23,10 @@ Application File Format
     {{{../truevfs-access/index.html}TrueVFS Access}},
     here's your relief:
     The
-    {{{../apidocs/net/truevfs/file/TFile.html}<<<TFile>>>}},
-    {{{../apidocs/net/truevfs/file/TFileInputStream.html}<<<TFileInputStream>>>}}
+    {{{../apidocs/net/java/truevfs/access/TFile.html}<<<TFile>>>}},
+    {{{../apidocs/net/java/truevfs/access/TFileInputStream.html}<<<TFileInputStream>>>}}
     and
-    {{{../apidocs/net/truevfs/file/TFileOutputStream.html}<<<TFileOutputStream>>>}}
+    {{{../apidocs/net/java/truevfs/access/TFileOutputStream.html}<<<TFileOutputStream>>>}}
     classes can read and write entries within an
     archive file as if they were plain files in regular directories in the file
     system.
@@ -36,9 +36,7 @@ Application File Format
 
 +--+
 TConfig.get().setArchiveDetector(
-    new TArchiveDetector(
-        "foo|bar",
-        new JarDriver(IOPoolLocator.SINGLETON)));
+    new TArchiveDetector("foo|bar", new JarDriver()));
 +--+
 
     Once this has been called, any new <<<TFile>>> object will recognize the
@@ -50,7 +48,7 @@ TConfig.get().setArchiveDetector(
     use the extensions of your custom application file format.
 
     Please also note the usage of the class
-    {{{../apidocs/net/truevfs/driver/zip/JarDriver.html}<<<JarDriver>>>}}
+    {{{../apidocs/net/java/truevfs/driver/zip/JarDriver.html}<<<JarDriver>>>}}
     for accessing the JAR file format.
     The JAR file format is typically the best choice for custom application
     file formats because it supports compression, fast access and UTF-8 encoded
@@ -61,30 +59,24 @@ TConfig.get().setArchiveDetector(
     file format like this:
 
 +--+
-OutputStream out = new TFileOutputStream("file.foo/contents.xml");
-try {
+try (OutputStream out = new TFileOutputStream("file.foo/contents.xml")) {
     ...;
-} finally {
-    out.close(); // ALWAYS close the resource here!
 }
 +--+
 
     Alternatively, you could use a 
-    {{{../apidocs/net/truevfs/file/TFileWriter.html}<<<TFileWriter>>>}}.
+    {{{../apidocs/net/java/truevfs/access/TFileWriter.html}<<<TFileWriter>>>}}.
 
     This is how you could read the entry again:
 
 +--+
-InputStream in = new TFileInputStream("file.foo/contents.xml");
-try {
+try (InputStream in = new TFileInputStream("file.foo/contents.xml")) {
     ...;
-} finally {
-    in.close(); // ALWAYS close the resource here!
 }
 +--+
 
     Alternatively, you could use a 
-    {{{../apidocs/net/truevfs/file/TFileReader.html}<<<TFileReader>>>}}.
+    {{{../apidocs/net/java/truevfs/access/TFileReader.html}<<<TFileReader>>>}}.
 
     And finally, to delete a virtual directory tree - in this case your custom
     application file - you could use this:
