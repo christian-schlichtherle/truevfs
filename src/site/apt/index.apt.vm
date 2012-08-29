@@ -21,6 +21,33 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
     The most recent version is TrueVFS&#160;${project.version} - see
     {{{http://java.net/jira/browse/TRUEVFS#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel}Change Log}}.
 
+* State Of Affairs
+
+    TrueVFS&#160;1 is the successor to
+    {{{http://truezip.java.net}TrueZIP&#160;7}}.
+    TrueVFS&#160;1.0&#160;Beta&#160;1 has been developed from the TrueZIP code
+    base by a long chain of refactorings and reflects the latest changes up to
+    TrueZIP&#160;7.6.1.
+    While refactoring, the original suite of unit and integration tests has
+    been maintained and extended so that you can easily put the same faith into
+    this beta version than you could put into TrueZIP&#160;7.6.1.
+    Yet this is a beta version because chances are that there will be backwards
+    incompatible changes to the API before the final release of
+    TrueVFS&#160;1.0.
+    This is unlikely to happen in the client API, however.
+
+    If you are interested in the plans for this project, please have a look
+    at its
+    {{{http://java.net/jira/browse/TRUEVFS#selectedTab=com.atlassian.jira.plugin.system.project%3Aroadmap-panel}road map on JIRA}}
+    or subscribe to the {{{./mail-list.html}users mailing list}} for discussion.
+
+    Developing TrueVFS is a serious effort which requires a lot of time.
+    So any sponsors or donations are most welcome.
+    Just click the <Donate> button in the navigation bar on the left
+    or {{{./team-list.html}contact me}} personally.
+    <<Any donation will help to speed up the development process and ensure the
+    future of this project!>>
+
 * Supported File System Types
 
     TrueVFS ships with the following pluggable file system driver modules:
@@ -72,10 +99,10 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
 
     * If you are going to write a federated file system driver
       (i.e. archive driver), please consult the Javadoc for
-      {{{./apidocs/net/truevfs/kernel/FsArchiveDriver.html}<<<net.truevfs.kernel.FsArchiveDriver>>>}}.
+      {{{./apidocs/net/java/truevfs/kernel/spec/FsArchiveDriver.html}<<<net.java.truevfs.kernel.spec.FsArchiveDriver>>>}}.
 
     * If you are going to write a non-federated file system driver,
       please consult the Javadoc for
-      {{{./apidocs/net/truevfs/kernel/FsDriver.html}<<<net.truevfs.kernel.FsDriver>>>}}.
+      {{{./apidocs/net/java/truevfs/kernel/spec/FsDriver.html}<<<net.java.truevfs.kernel.spec.FsDriver>>>}}.
 
     []
