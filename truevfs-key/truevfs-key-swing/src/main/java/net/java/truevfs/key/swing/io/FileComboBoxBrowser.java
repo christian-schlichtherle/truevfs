@@ -167,8 +167,8 @@ public class FileComboBoxBrowser extends AbstractComboBoxBrowser<String> {
             File node = getFileSystemView().createFileObject(initials);
             if (node.isAbsolute()) {
                 final boolean dirPath = node.getPath().length() < initials.length();
-                // TODO: Evaluate why this was needed in TrueVFS 6 and if it's
-                // still required in TrueVFS 7.
+                // TODO: Evaluate why this was needed in TrueZIP 6 & 7 and if
+                // it's still required in TrueVFS.
                 /*if (dirPath)
                     PromptingKeyManager.resetCancelledPrompts();*/
                 // The test order is important here because isDirectory() may
@@ -198,8 +198,8 @@ public class FileComboBoxBrowser extends AbstractComboBoxBrowser<String> {
                 node = getFileSystemView().createFileObject(directory, initials); // copies archive detector from directory
                 final boolean dirPath = node.getPath().length()
                         < (directory.getPath() + File.separator + initials).length();
-                // TODO: Evaluate why this was needed in TrueVFS 6 and if it's
-                // still required in TrueVFS 7.
+                // TODO: Evaluate why this was needed in TrueZIP 6 & 7 and if
+                // it's still required in TrueVFS.
                 /*if (dirPath)
                     PromptingKeyManager.resetCancelledPrompts();*/
                 // The test order is important here because isDirectory() may

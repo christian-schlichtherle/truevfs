@@ -45,8 +45,8 @@ public abstract class ZipRaesDriver extends JarDriver {
     /**
      * {@inheritDoc}
      * <p>
-     * Since TrueVFS 7.3, the implementation in the class {@link ZipRaesDriver}
-     * returns {@code true} for future use.
+     * The implementation in the class {@link ZipRaesDriver} returns
+     * {@code true} for future use.
      * 
      * @return {@code true}
      */

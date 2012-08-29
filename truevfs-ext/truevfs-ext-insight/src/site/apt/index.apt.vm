@@ -176,9 +176,9 @@ protected void sync() throws FsSyncException {
 
     I need to add a few points, though:
 
-    * If <<<umount>>> gets called on an <<<FsModel>>> MXBean with TrueVFS 7.1.3
-      or later, then the federated file system for the respective archive file
-      and <all enclosed> federated file systems get unmounted.
+    * If <<<umount>>> gets called on an <<<FsModel>>> MXBean, then the virtual
+      file system for the respective archive file and <all enclosed> archive
+      files get unmounted.
       So if called on <<<test.jar>>>, then <<<archive.tar>>>,
       <<<archive.tar.gz>>>, <<<archive.zip>>> and
       <<<the-password-is-test1234.tzp>>> get unmounted, too.

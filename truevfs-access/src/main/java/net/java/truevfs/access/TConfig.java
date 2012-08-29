@@ -150,7 +150,7 @@ try (TConfig config = TConfig.open()) {
  * to the default strategy of performing a full archive update whenever
  * required to avoid writing redundant archive entry data.
  * <p>
- * As of TrueVFS 7.5, the support is like this:
+ * As of TrueVFS 1.0 Beta 1, the support is like this:
  * <ul>
  * <li>The drivers of the module TrueVFS Driver ZIP fully support this output
  *     option preference, so it's available for EAR, JAR, WAR, ZIP etc.</li>

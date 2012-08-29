@@ -2269,8 +2269,8 @@ public final class TFile extends File implements TRex {
     public void deleteOnExit() {
         if (innerArchive != null) {
             // Support for this operation for archive files and entries has been
-            // removed in TrueVFS 7 because using a shutdown hook uncautiously
-            // introduces a memory leak in dynamic class loader environments.
+            // removed because using a shutdown hook uncautiously introduces a
+            // memory leak in dynamic class loader environments.
             throw new UnsupportedOperationException();
         }
         file.deleteOnExit();
@@ -2684,16 +2684,8 @@ public final class TFile extends File implements TRex {
      * copy all attributes of the source file to the destination file, too.
      * Which attributes are actually copied is specific to the source and
      * destination file system driver implementations, but the minimum
-     * guarantee is to copy the last modification time.
-     * For example, starting with TrueVFS 7.2, the last modification, last
-     * access and creation times are copied if all of the following are true:
-     * <p>
-     * <ol>
-     * <li>Both parameters refer to the platform file system
-     *     (even if any one is only a {@code java.io.File}), and
-     * <li>the JVM complies to JSE&nbsp;7, and
-     * <li>the TrueVFS Driver FILE module is used.
-     * </ol>
+     * guarantee is to copy the last modification time, the last access time
+     * and the creation time.
      * <p>
      * <table border="1">
      * <thead>
