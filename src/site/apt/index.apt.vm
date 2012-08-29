@@ -23,10 +23,9 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
 
 * State Of Affairs
 
-    TrueVFS&#160;1 is the successor to
-    {{{http://truezip.java.net}TrueZIP&#160;7}}.
+    TrueVFS is the successor to {{{http://truezip.java.net}TrueZIP}}.
     TrueVFS&#160;1.0&#160;Beta&#160;1 has been developed by refactoring the
-    TrueZIP code and reflects the latest changes up to TrueZIP&#160;7.6.2.
+    TrueZIP code base and reflects the latest changes up to TrueZIP&#160;7.6.2.
     While refactoring, the original suite of unit and integration tests has
     been maintained and extended so that you can easily put the same faith into
     this beta version than you could put into TrueZIP&#160;7.6.2.
@@ -41,11 +40,13 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
     on JIRA or subscribe to its {{{./mail-lists.html}Users Mailing List}} for discussion.
 
     Developing TrueVFS is a serious effort which requires a lot of time.
-    So any sponsors or donations are most welcome.
-    Just click the <Donate> button in the navigation bar on the left side or
-    {{{./team-list.html}contact me}} personally.
-    <<Any donation will help to speed up the development process and ensure the
-    future of this project!>>
+    If TrueVFS has helped you or your organization to save some valuable
+    development time or enable new features in your application, then please
+    consider making a donation.
+    To make a donation, just click the <Donate> button in the navigation bar on
+    the left side or {{{./team-list.html}contact me}} personally.
+    Any donation contributes to the ongoing development and support of the
+    TrueVFS project - thank you very much for your consideration!
 
 * Supported File System Types
 
