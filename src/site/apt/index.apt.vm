@@ -21,6 +21,20 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
     The most recent version is TrueZIP&#160;${project.version} - see
     {{{http://java.net/jira/browse/TRUEZIP#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel}Change Log}}.
 
+* State Of Affairs
+
+    {{{http://truevfs.java.net}TrueVFS&#160;1.0&#160;Beta&#160;1}}, the
+    successor to this project, is available now!
+
+    Developing TrueZIP is a serious effort which requires a lot of time.
+    If TrueZIP has helped you or your organization to save some valuable
+    development time or enable new features in your application, then please
+    consider making a donation.
+    To make a donation, just click the <Donate> button in the navigation bar on
+    the left side or {{{./team-list.html}contact me}} personally.
+    Any donation contributes to the ongoing development and support of the
+    TrueZIP project - thank you very much for your consideration!
+
 * Supported File System Types
 
     TrueZIP ships with the following pluggable file system driver modules:
