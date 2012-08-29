@@ -4,7 +4,10 @@
  */
 package net.java.truevfs.driver.file;
 
+import static java.io.File.separatorChar;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.*;
 import static java.nio.file.Files.*;
 import java.nio.file.attribute.BasicFileAttributeView;
@@ -18,6 +21,7 @@ import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
@@ -35,13 +39,33 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
 @Immutable
 final class FileController extends FsAbstractController {
 
+    private static final String TWO_SEPARATORS = SEPARATOR + SEPARATOR;
+
     private final Path target;
 
     FileController(final FsModel model) {
         super(model);
-        if (null != model.getParent())
-            throw new IllegalArgumentException();
-        this.target = Paths.get(model.getMountPoint().toUri());
+        if (null != model.getParent()) throw new IllegalArgumentException();
+        URI uri = model.getMountPoint().toUri();
+        if ('\\' == separatorChar && null != uri.getRawAuthority()) {
+            try {
+                // Postfix: Move Windows UNC host from authority to path
+                // component because the File class can't deal with this.
+                // Note that the authority parameter must not be null and that
+                // you cannot use the UriBuilder class - using either of these
+                // would result in the authority property of the new URI object
+                // being equal to the original value again.
+                // Note that the use of the buggy URI constructor is authorized
+                // for this case!
+                // See http://java.net/jira/browse/TRUEZIP-288 .
+                uri = new URI(  uri.getScheme(), "",
+                                TWO_SEPARATORS + uri.getAuthority() + uri.getPath(),
+                                uri.getQuery(), uri.getFragment());
+            } catch (URISyntaxException ex) {
+                throw new AssertionError(ex);
+            }
+        }
+        this.target = Paths.get(uri);
     }
 
     private BasicFileAttributeView getBasicFileAttributeView(Path file) {
