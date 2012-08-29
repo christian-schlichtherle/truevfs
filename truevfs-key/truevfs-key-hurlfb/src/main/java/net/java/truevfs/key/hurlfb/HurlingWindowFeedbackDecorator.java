@@ -17,6 +17,7 @@ import net.java.truevfs.key.swing.spi.InvalidKeyFeedbackDecorator;
 @Immutable
 public final class HurlingWindowFeedbackDecorator
 extends InvalidKeyFeedbackDecorator {
+
     @Override
     public Feedback apply(Feedback feedback) {
         return new HurlingWindowFeedback(feedback);

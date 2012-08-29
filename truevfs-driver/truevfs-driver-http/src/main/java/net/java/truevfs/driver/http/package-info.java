@@ -3,7 +3,7 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Implements the {@code http(s)} scheme for read-only access to the web.
+ * Provides a file system driver for read-only access to the web.
  * 
  * @author Christian Schlichtherle
  */

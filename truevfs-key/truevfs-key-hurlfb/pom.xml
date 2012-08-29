@@ -19,9 +19,7 @@
 
     <name>TrueVFS KeyManager HurlingWindowFeedback</name>
     <description>
-        Provides feedback by hurling the containing window for 1.5 seconds
-        when prompting for a key again after an invalid key has been provided
-        before.
+        Provides hurling window feedback when entering a wrong password.
     </description>
 
     <dependencies>

@@ -18,8 +18,7 @@
 
     <name>TrueVFS Driver TAR</name>
     <description>
-        The file system driver for TAR files.
-        Files of this type typically have the extension .tar.
+        Provides a file system driver for accessing the TAR file format.
 
         Add the JAR artifact of this module to the run time class path to
         make its file system drivers available for service location in the
