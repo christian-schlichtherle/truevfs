@@ -23,8 +23,8 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
 
 * State Of Affairs
 
-    {{{http://truevfs.java.net}TrueVFS&#160;1.0&#160;Beta&#160;1}}, the
-    successor to this project, is available now!
+    {{{http://truevfs.java.net}TrueVFS, the successor to this project, is
+    available now!
 
     Developing TrueZIP is a serious effort which requires a lot of time.
     If TrueZIP has helped you or your organization to save some valuable
