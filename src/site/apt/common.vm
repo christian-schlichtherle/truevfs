@@ -14,7 +14,7 @@
     You can do this by adding the Maven artifactId $artifactId as a dependency
     to the POM of your Maven build.
 
-    For more information about configuring the client APIs, please refer to the
+    For more information about configuring the client API, please refer to the
     article
     {{{../truevfs-access/configuration.html}Configuring TrueVFS Access}}.
 
