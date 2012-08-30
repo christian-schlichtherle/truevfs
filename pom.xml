@@ -104,7 +104,7 @@ system space.
             &lt;b&gt;${project.name} ${project.version}&lt;/b&gt;
         </header>
 
-        <truecommons.version>1.0.4</truecommons.version>
+        <truecommons.version>1.0.5</truecommons.version>
     </properties>
 
     <modules>
