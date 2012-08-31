@@ -229,8 +229,9 @@ public class AppTest {
  * {@code shutDown()} will just pop the top configuration off the inheritable
  * thread local configuration stack.
  * <p>
- * The most important feature of this code is that it's thread-safe, which
- * enables you to run your unit tests in parallel!
+ * <b>Disclaimer</b>: Although this classes internally uses an
+ * {@link InheritableThreadLocal}, it does not leak memory in multi class
+ * loader environments when used appropriately.
  * 
  * @since  TrueZIP 7.2
  * @author Christian Schlichtherle
