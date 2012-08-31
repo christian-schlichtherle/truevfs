@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.ext.pacemanager
+package net.java.truevfs.ext.pace
 
 import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.spi._

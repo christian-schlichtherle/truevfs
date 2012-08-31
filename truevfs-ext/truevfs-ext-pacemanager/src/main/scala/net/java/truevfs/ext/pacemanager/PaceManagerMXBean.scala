@@ -2,12 +2,12 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.ext.pacemanager
+package net.java.truevfs.ext.pace
 
 import net.java.truevfs.comp.jmx.JmxManagerMXBean
 
 /**
-  * An MXBean interface for a [[net.java.truevfs.ext.pacemanager.PaceManager]].
+  * An MXBean interface for a [[net.java.truevfs.ext.pace.PaceManager]].
   *
   * @author Christian Schlichtherle
   */

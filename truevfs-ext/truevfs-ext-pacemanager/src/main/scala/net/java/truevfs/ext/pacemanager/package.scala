@@ -9,4 +9,4 @@
   *
   * @author Christian Schlichtherle
   */
-package net.java.truevfs.ext.pacemanager
+package net.java.truevfs.ext.pace
