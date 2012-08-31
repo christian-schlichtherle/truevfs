@@ -22,6 +22,6 @@ About TrueVFS Kernel
     incompatible changes to its API may appear anytime in order to improve it.
     An application developer should never use the API of this module directly,
     but instead use the API of the client facade module
-    {{{../truevfs-access/index.html}TrueVFS&#160;Access}}.
+    {{{../../truevfs-access/index.html}TrueVFS&#160;Access}}.
     The API of this module provides all of the functionality of the
     TrueVFS&#160;Kernel and more with ease and comfort.
