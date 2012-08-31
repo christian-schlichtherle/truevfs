@@ -190,7 +190,7 @@ public class AppTest {
  * <p>
  * <b>Disclaimer</b>: Although this classes internally uses an
  * {@link InheritableThreadLocal}, it does not leak memory in multi class
- * loader environments.
+ * loader environments when used appropriately.
  * 
  * @author Christian Schlichtherle
  */
