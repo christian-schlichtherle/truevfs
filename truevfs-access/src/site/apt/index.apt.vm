@@ -17,7 +17,7 @@ Introduction
     As an implication, no file system state is managed by this module - this is
     the job of the TrueVFS Kernel modules.
 
-The <<<TFile>>>* Classes
+* The TFile* classes
 
     The <<<TFile>>>* classes mimick or extend the <<<File>>>* classes of the
     package <<<java.io>>>, so that you can use them with a minimal learning
@@ -48,7 +48,7 @@ try (Writer writer = new TFileWriter(entry)) {
     For the API documentation, please refer to the Javadoc of the package
     {{{./apidocs/net/java/truevfs/access/package-summary.html}<<<net.truevfs.access>>>}}
 
-The <<<TPath>>> Class et al
+* The TPath class et al
 
     Like the <<<TFile>>>* classes, the
     {{{./apidocs/net/java/truevfs/access/TPath.html}<<<TPath>>>}} class
@@ -87,7 +87,7 @@ try (InputStream in = Files.newInputStream(path)) {
     For the API documentation, please refer to the Javadoc of the package
     {{{./apidocs/net/java/truevfs/access/package-summary.html}<<<net.truevfs.access>>>}}
 
-Swing GUI
+* Swing GUI
 
     This module also provides Swing GUI classes for viewing file trees
     and choosing entries in archive files.
@@ -95,7 +95,7 @@ Swing GUI
     For the API documentation, please refer to the Javadoc of the package
     {{{./apidocs/net/java/truevfs/access/swing/package-summary.html}<<<net.truevfs.access.swing>>>}}
 
-More Examples
+* More Examples
 
     For more examples, please use the Maven archetype for TrueVFS Access
     applications as described in the
