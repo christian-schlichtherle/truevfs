@@ -3,8 +3,7 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * A drop-in replacement for the package {@link java.util.zip} for reading and
- * writing ZIP files.
+ * Provides classes for reading and writing ZIP files.
  * <p>
  * The classes in this package read and write ZIP files according to a subset
  * of PKWARE's
