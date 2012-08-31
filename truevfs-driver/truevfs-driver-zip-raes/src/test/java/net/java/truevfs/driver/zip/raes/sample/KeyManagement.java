@@ -40,7 +40,7 @@ public final class KeyManagement {
 
     static void install(TArchiveDetector detector) {
 // START SNIPPET: install
-        TConfig.get().setArchiveDetector(detector);
+        TConfig.current().setArchiveDetector(detector);
 // END SNIPPET: install
     }
 
