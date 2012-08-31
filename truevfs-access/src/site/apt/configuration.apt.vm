@@ -86,7 +86,7 @@ Configuring TrueVFS Access
 
     <<Disclaimer>>: Although this classes internally uses a
     <<<java.lang.InheritableThreadLocal>>>, it does not leak memory in multi
-    class loader environments!
+    class loader environments when used appropriately.
 
     Given these properties, there are two canonical use cases:
 
