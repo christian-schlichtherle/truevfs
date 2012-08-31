@@ -21,6 +21,10 @@ import javax.annotation.concurrent.ThreadSafe;
  * However, it's not possible to {@link #pop} this inherited top level element
  * off the stack - any attempt to do so will result in a
  * {@link NoSuchElementException}.
+ * <p>
+ * <b>Disclaimer</b>: Although this classes internally uses an
+ * {@link InheritableThreadLocal}, it does not leak memory in multi class
+ * loader environments when used appropriately.
  * 
  * @param  <T> The type of the elements in the inheritable thread local stack.
  * @since  TrueZIP 7.5
