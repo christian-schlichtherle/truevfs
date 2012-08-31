@@ -32,10 +32,8 @@ abstract class FileUsage {
 
     void cat2(String path) {
 // START SNIPPET: cat2
-        try {
-            try (InputStream in = new TFileInputStream(path)) {
-                TFile.cat(in, System.out);
-            }
+        try (InputStream in = new TFileInputStream(path)) {
+            TFile.cat(in, System.out);
         } catch (IOException ouch) {
             ouch.printStackTrace();
         }
@@ -79,7 +77,7 @@ abstract class FileUsage {
             entry.createNewFile(); // O(1)
             TVFS.umount(); // O(i + 1) !!
         }
-        // Overall: O(n*n) !!!
+        // Overall: O(n * n) !!!
 // END SNIPPET: performance1
     }
 
@@ -105,7 +103,7 @@ abstract class FileUsage {
             entry.createNewFile(); // First modification: O(1)
             entry.createNewFile(); // Second modification triggers remount: O(i + 1) !!
         }
-        // Overall: O(n*n) !!!
+        // Overall: O(n * n) !!!
 // END SNIPPET: performance3
     }
 
@@ -119,7 +117,7 @@ abstract class FileUsage {
             entry.createNewFile(); // First modification: O(1)
             entry.setLastModified(time); // Second modification triggers remount: O(i + 1) !!
         }
-        // Overall: O(n*n) !!!
+        // Overall: O(n * n) !!!
 // END SNIPPET: performance4
     }
 }

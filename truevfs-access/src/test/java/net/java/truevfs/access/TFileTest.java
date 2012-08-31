@@ -72,7 +72,7 @@ public final class TFileTest extends MockArchiveDriverTestBase {
     }
 
     private static void assertPathConstructor(final TFile file, final String[] params) {
-        assertThat(file.getArchiveDetector(), is(sameInstance(TConfig.get().getArchiveDetector())));
+        assertThat(file.getArchiveDetector(), is(sameInstance(TConfig.current().getArchiveDetector())));
         assertThat(file.getPath(), equalTo(params[1].replace('/', separatorChar)));
         if (null != params[2]) {
             assertThat(file.getInnerArchive().getPath(), equalTo(params[2].replace('/', separatorChar)));

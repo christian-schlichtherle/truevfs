@@ -19,10 +19,15 @@ Using TrueVFS Access File*
     {{{../apidocs/net/java/truevfs/access/TFile.html#delete()}<<<TFile.delete()>>>}}.
     Like a plain old directory, this is only possible if the archive file is
     empty.
+    Unfortunately, this method can only return <<<false>>> on error, leaving
+    you with no indication of failure.
     Alternatively, an application could call
-    {{{../apidocs/net/java/truevfs/access/TFile.html#deleteAll()}<<<TFile.deleteAll()>>>}}
-    in order to delete the (virtual) directory in one go, regardless of its
-    contents.
+    {{{../apidocs/net/java/truevfs/access/TFile.html#rm()}<<<TFile.rm()>>>}}
+    or 
+    {{{../apidocs/net/java/truevfs/access/TFile.html#rm_r()}<<<TFile.rm_r()>>>}}
+    in order to delete a file or an entire (virtual) directory tree
+    respectively.
+    These methods will fail with an <<<IOException>>>.
 
     To read an archive <entry>, an application can simply create a
     {{{../apidocs/net/java/truevfs/access/TFileInputStream.html}<<<TFileInputStream>>>}}
@@ -85,17 +90,15 @@ Using TrueVFS Access File*
     depending on the parameters, TrueVFS may choose to force the closing of
     any open entry streams or not.
     If the entry streams are <not> forced to close, the archive file cannot
-    get unmounted and an
-    {{{../apidocs/net/java/truevfs/kernel/FsSyncException.html}<<<FsSyncException>>>}}
+    get unmounted and ab
+    {{{../apidocs/net/java/truevfs/kernel/spec/FsSyncException.html}<<<FsSyncException>>>}}
     is thrown.
     If the entry streams are forced to close however, the archive file is
     unmounted and an
-    {{{../apidocs/net/java/truevfs/kernel/FsSyncWarningException.html}<<<FsSyncWarningException>>>}}
+    {{{../apidocs/net/java/truevfs/kernel/spec/FsSyncWarningException.html}<<<FsSyncWarningException>>>}}
     is thrown to indicate that any subsequent I/O operations on these entry
-    streams other than <<<(In|Out)putStream.close()>>> will fail with an
-    {{{../apidocs/net/java/truevfs/kernel/io/InputClosedException.html}<<<InputClosedException>>>}}
-    or
-    {{{../apidocs/net/java/truevfs/kernel/io/OutputClosedException.html}<<<OutputClosedException>>>}}.
+    streams other than <<<(In|Out)putStream.close()>>> will fail with a
+    <<<net.java.truecommons.io.Closed(In|Out)putException>>> respectively.
 
     In order to prevent these exceptions, TrueVFS automatically closes entry
     streams when they are garbage collected.
@@ -226,7 +229,7 @@ Using TrueVFS Access File*
     However, an <<<IOException>>> may occur for each archive file.
     Hence, the TrueVFS Kernel assembles all I/O exceptions which occur
     during the processing into a single I/O exception by using a
-    {{{../apidocs/net/java/truevfs/kernel/util/PriorityExceptionBuilder.html}<<<PriorityExceptionBuilder>>>}}.
+    <<<net.java.truecommons.shed.PriorityExceptionBuilder>>>.
     The priority exception builder suppresses all but the first input exception
     with the highest priority by using <exception suppressing>, which is a new
     feature in JSE&#160;7 (see <<<Throwable.addSuppressed(Throwable)>>>).

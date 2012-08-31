@@ -681,7 +681,7 @@ extends ConfiguredClientTestBase<D> {
         final TPath dir5 = dir4.resolve("nuts" + getExtension());
         final TPath dir6 = dir5.resolve("dir");
         
-        assert TConfig.get().isLenient();
+        assert TConfig.current().isLenient();
 
         createDirectory(dir6); // create all at once! note archive is in current directory!
 
@@ -1191,7 +1191,7 @@ extends ConfiguredClientTestBase<D> {
         assertTrue(exists(src));
         assertFalse(exists(dst));
         assertFalse(exists(dst.toNonArchivePath()));
-        assert TConfig.get().isLenient();
+        assert TConfig.current().isLenient();
         src.toFile().mv(dst.toFile());
         assertFalse(exists(src));
         assertFalse(exists(src.toNonArchivePath()));
@@ -1326,7 +1326,7 @@ extends ConfiguredClientTestBase<D> {
     private void assertMultithreadedSingleArchiveMultipleEntriesWriting(
             final boolean wait)
     throws Exception {
-        assert TConfig.get().isLenient();
+        assert TConfig.current().isLenient();
 
         class WriteFactory implements TaskFactory {
             @Override
@@ -1380,7 +1380,7 @@ extends ConfiguredClientTestBase<D> {
     private void assertMultithreadedMultipleArchivesSingleEntryWriting(
             final boolean syncIndividually)
     throws Exception {
-        assert TConfig.get().isLenient();
+        assert TConfig.current().isLenient();
 
         class Write implements Callable<Void> {
             @Override
@@ -1430,7 +1430,7 @@ extends ConfiguredClientTestBase<D> {
     /** Test for http://java.net/jira/browse/TRUEZIP-192 . */
     @Test
     public void testMultithreadedMutualArchiveCopying() throws Exception {
-        assert TConfig.get().isLenient();
+        assert TConfig.current().isLenient();
 
         class CopyFactory implements TaskFactory {
             final TPath src, dst;

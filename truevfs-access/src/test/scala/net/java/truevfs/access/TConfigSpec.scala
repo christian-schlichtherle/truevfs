@@ -51,35 +51,35 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
 
   "The TConfig class" should {
     "have the global configuration as its current configuration by default" in {
-      get should be theSameInstanceAs (GLOBAL)
+      current should be theSameInstanceAs (GLOBAL)
     }
 
     "throw IllegalStateException when popping without a prior push" in {
-      intercept[IllegalStateException] { get close () }
+      intercept[IllegalStateException] { current close () }
     }
 
-    "correctly implement get/open/close" in {
-      val c1 = get
+    "correctly implement current/open/close" in {
+      val c1 = current
       loan(open()) to { c2 =>
         c2 should not be theSameInstanceAs (c1)
         c2 should equal (c1)
-        get should be theSameInstanceAs (c2)
+        current should be theSameInstanceAs (c2)
         inNewChild {
-          get should be theSameInstanceAs (c2)
-          intercept[IllegalStateException] { get close () }
+          current should be theSameInstanceAs (c2)
+          intercept[IllegalStateException] { current close () }
         }
         loan(open()) to { c3 =>
           c3 should not be theSameInstanceAs (c2)
           c3 should equal (c2)
-          get should be theSameInstanceAs (c3)
+          current should be theSameInstanceAs (c3)
           inNewChild {
-            get should be theSameInstanceAs (c3)
-            intercept[IllegalStateException] { get close () }
+            current should be theSameInstanceAs (c3)
+            intercept[IllegalStateException] { current close () }
           }
         }
-        get should be theSameInstanceAs (c2)
+        current should be theSameInstanceAs (c2)
       }
-      get should be theSameInstanceAs (c1)
+      current should be theSameInstanceAs (c1)
     }
   }
 

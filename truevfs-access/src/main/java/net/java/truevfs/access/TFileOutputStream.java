@@ -8,7 +8,9 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.io.DecoratingOutputStream;
-import static net.java.truevfs.kernel.spec.FsAccessOption.APPEND;
+import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.FsAccessOption;
+import net.java.truevfs.kernel.spec.FsAccessOptions;
 
 /**
  * A replacement for the class {@link FileOutputStream} for writing plain old
@@ -68,65 +70,100 @@ public final class TFileOutputStream extends DecoratingOutputStream {
     /**
      * Constructs a new output stream for writing plain old files or entries
      * in an archive file.
-     * This constructor calls {@link TFile#TFile(String) new TFile(path)} for
-     * the given path.
      *
-     * @param  path the path of the plain old file or entry in an archive file
-     *         to write.
+     * @param  path the path of the file or archive entry.
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
     public TFileOutputStream(String path) throws IOException {
-        super(newOutputStream(new TFile(path), false));
+        this(path, false);
     }
 
     /**
      * Constructs a new output stream for writing plain old files or entries
      * in an archive file.
-     * This constructor calls {@link TFile#TFile(String) new TFile(path)} for
-     * the given path.
      *
-     * @param  path the path of the plain old file or entry in an archive file
-     *         to write.
-     * @param  append if the data shall get appended to the file rather than
-     *         replacing it.
+     * @param  path the path of the file or archive entry.
+     * @param  append if the data shall get appended to the file or archive
+     *         entry rather than replacing it.
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
     public TFileOutputStream(String path, boolean append) throws IOException {
-        super(newOutputStream(new TFile(path), append));
+        this(new TFile(path), append);
     }
 
     /**
      * Constructs a new output stream for writing plain old files or entries
      * in an archive file.
      *
-     * @param  file the plain old file or entry in an archive file to write.
+     * @param  path the path of the file or archive entry.
+     * @param  options additional options for accessing the file or archive
+     *         entry.
+     * @throws IOException on any I/O error.
+     */
+    @CreatesObligation
+    public TFileOutputStream(String path, FsAccessOption... options)
+    throws IOException {
+        this(new TFile(path), options);
+    }
+
+    /**
+     * Constructs a new output stream for writing plain old files or entries
+     * in an archive file.
+     *
+     * @param  file the file or archive entry.
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
     public TFileOutputStream(File file) throws IOException {
-        super(newOutputStream(file, false));
+        this(file, false);
     }
 
     /**
      * Constructs a new output stream for writing plain old files or entries
      * in an archive file.
      *
-     * @param  file the plain old file or entry in an archive file to write.
-     * @param  append if the data shall get appended to the file rather than
-     *         replacing it.
+     * @param  file the file or archive entry.
+     * @param  append if the data shall get appended to the file or archive
+     *         entry rather than replacing it.
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
     public TFileOutputStream(File file, boolean append) throws IOException {
-        super(newOutputStream(file, append));
+        this(file, FsAccessOptions.NONE.set(FsAccessOption.APPEND, append));
     }
 
+    /**
+     * Constructs a new output stream for writing plain old files or entries
+     * in an archive file.
+     *
+     * @param  file the file or archive entry.
+     * @param  options additional options for accessing the file or archive
+     *         entry.
+     * @throws IOException on any I/O error.
+     */
     @CreatesObligation
-    private static OutputStream newOutputStream(final File dst,
-                                                final boolean append)
+    public TFileOutputStream(File file, FsAccessOption... options)
     throws IOException {
-        return TBIO.output(TConfig.get().getAccessPreferences().set(APPEND, append), dst, null).stream(null);
+        this(file, FsAccessOptions.of(options));
+    }
+
+    /**
+     * Constructs a new output stream for writing plain old files or entries
+     * in an archive file.
+     *
+     * @param  file the file or archive entry.
+     * @param  options additional options for accessing the file or archive
+     *         entry.
+     * @throws IOException on any I/O error.
+     */
+    @CreatesObligation
+    public TFileOutputStream(File file, BitField<FsAccessOption> options)
+    throws IOException {
+        super(TBIO.output(
+                TConfig.current().getAccessPreferences().or(options),
+                file,
+                null).stream(null));
     }
 }

@@ -72,7 +72,7 @@ final class TBIO {
                     && null != ((TFile) dst).getInnerArchive();
             final boolean srcIsGhost = srcIsArchived
                     && 0 >= srcLastModified;
-            if (!srcIsGhost || !dstIsArchived || !TConfig.get().isLenient())
+            if (!srcIsGhost || !dstIsArchived || !TConfig.current().isLenient())
                 if (!dst.mkdir() && !dst.isDirectory())
                     throw new NotDirectoryException(dst.getPath());
             final String[] members = src.list();
@@ -151,7 +151,7 @@ final class TBIO {
             final boolean dstArchived = dst instanceof TFile
                     && null != ((TFile) dst).getInnerArchive();
             final boolean srcIsGhost = srcArchived && 0 >= srcLastModified;
-            if (!srcIsGhost || !dstArchived || !TConfig.get().isLenient())
+            if (!srcIsGhost || !dstArchived || !TConfig.current().isLenient())
                 if (!dst.mkdir() && !dst.isDirectory())
                     throw new NotDirectoryException(dst.getPath());
             final String[] members = src.list();
@@ -209,7 +209,7 @@ final class TBIO {
     cp0(final boolean preserve, final File src, final File dst)
     throws IOException {
         final BitField<FsAccessOption> preferences =
-                TConfig.get().getAccessPreferences();
+                TConfig.current().getAccessPreferences();
         final InputSocket<?> input = input(preferences, src);
         final OutputSocket<?> output = output(preferences, dst,
                 preserve ? input.target() : null);
@@ -256,7 +256,7 @@ final class TBIO {
     private static TArchiveDetector detector(File file) {
         return file instanceof TFile
                 ? ((TFile) file).getArchiveDetector()
-                : TConfig.get().getArchiveDetector();
+                : TConfig.current().getArchiveDetector();
     }
 
     /**
@@ -279,7 +279,7 @@ final class TBIO {
         }
         final FsNodePath path = new FsNodePath(file);
         return  TConfig
-                .get()
+                .current()
                 .getManager()
                 .controller(detector(file), path.getMountPoint())
                 .input(options, path.getNodeName());
@@ -310,7 +310,7 @@ final class TBIO {
         }
         final FsNodePath path = new FsNodePath(file);
         return TConfig
-                .get()
+                .current()
                 .getManager()
                 .controller(detector(file), path.getMountPoint())
                 .output(    options.clear(CREATE_PARENTS),

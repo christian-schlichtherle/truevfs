@@ -48,7 +48,7 @@ try (Writer writer = new TFileWriter(entry)) {
     For the API documentation, please refer to the Javadoc of the package
     {{{./apidocs/net/java/truevfs/access/package-summary.html}<<<net.truevfs.access>>>}}
 
-The <<<TPath>>> Class and its Companions
+The <<<TPath>>> Class et al
 
     Like the <<<TFile>>>* classes, the
     {{{./apidocs/net/java/truevfs/access/TPath.html}<<<TPath>>>}} class
@@ -85,7 +85,7 @@ try (InputStream in = Files.newInputStream(path)) {
     are present on the class path at run time.
 
     For the API documentation, please refer to the Javadoc of the package
-    {{{./apidocs/net/java/truevfs/access/package-summary.html}<<<net.truevfs.path>>>}}
+    {{{./apidocs/net/java/truevfs/access/package-summary.html}<<<net.truevfs.access>>>}}
 
 Swing GUI
 

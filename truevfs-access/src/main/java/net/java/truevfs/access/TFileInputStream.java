@@ -8,6 +8,9 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.*;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.io.DecoratingInputStream;
+import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.FsAccessOption;
+import net.java.truevfs.kernel.spec.FsAccessOptions;
 
 /**
  * A replacement for the class {@link FileInputStream} for reading plain old
@@ -66,33 +69,71 @@ public final class TFileInputStream extends DecoratingInputStream {
     /**
      * Constructs a new input stream for reading plain old files or entries
      * in an archive file.
-     * This constructor calls {@link TFile#TFile(String) new TFile(path)} for
-     * the given path.
      *
-     * @param  path the path of the plain old file or entry in an archive file
-     *         to read.
+     * @param  path the path of the file or archive entry.
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
     public TFileInputStream(String path) throws IOException {
-        super(newInputStream(new TFile(path)));
+        this(new TFile(path));
     }
 
     /**
      * Constructs a new input stream for reading plain old files or entries
      * in an archive file.
      *
-     * @param  file the plain old file or entry in an archive file to read.
+     * @param  path the path of the file or archive entry.
+     * @param  options additional options for accessing the file or archive
+     *         entry.
+     * @throws IOException on any I/O error.
+     */
+    @CreatesObligation
+    public TFileInputStream(String path, FsAccessOption... options)
+    throws IOException {
+        this(new TFile(path), options);
+    }
+
+    /**
+     * Constructs a new input stream for reading plain old files or entries
+     * in an archive file.
+     *
+     * @param  file the file or archive entry.
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
     public TFileInputStream(File file) throws IOException {
-        super(newInputStream(file));
+        this(file, FsAccessOptions.NONE);
     }
 
+    /**
+     * Constructs a new input stream for reading plain old files or entries
+     * in an archive file.
+     *
+     * @param  file the file or archive entry.
+     * @param  options additional options for accessing the file or archive
+     *         entry.
+     * @throws IOException on any I/O error.
+     */
     @CreatesObligation
-    private static InputStream newInputStream(final File src)
+    public TFileInputStream(File file, FsAccessOption... options)
     throws IOException {
-        return TBIO.input(TConfig.get().getAccessPreferences(), src).stream(null);
+        this(file, FsAccessOptions.of(options));
+    }
+
+    /**
+     * Constructs a new input stream for reading plain old files or entries
+     * in an archive file.
+     *
+     * @param  file the file or archive entry.
+     * @param  options additional options for accessing the file or archive
+     *         entry.
+     * @throws IOException on any I/O error.
+     */
+    @CreatesObligation
+    public TFileInputStream(File file, BitField<FsAccessOption> options)
+    throws IOException {
+        super(TBIO.input(
+                TConfig.current().getAccessPreferences().or(options),
+                file).stream(null));
     }
 }

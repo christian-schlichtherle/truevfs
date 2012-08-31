@@ -55,7 +55,7 @@ public final class TFileSystem extends FileSystem {
     TFileSystem(final TPath path) {
         assert null != path;
         this.controller = TConfig
-                .get()
+                .current()
                 .getManager()
                 .controller(path.getArchiveDetector(), path.getMountPoint());
         this.provider = TFileSystemProvider.get(path.getName());
@@ -184,11 +184,12 @@ public final class TFileSystem extends FileSystem {
      * <p>
      * This method scans the {@link TPath#toString() path name} resulting
      * from the segment parameters to detect prospective archive files using
-     * the default archive detector.
+     * the current archive detector
+     * {@code TConfig.current().getArchiveDetector()}.
      * <p>
      * The supported path name separators are "{@link File#separator}" and
      * "{@code /}".
-     * Any leading and trailing separators in the resulting path name get
+     * Any leading and trailing separators in the resulting path name current
      * discarded.
      * 
      * @param first the first sub path string.
