@@ -40,7 +40,7 @@ public class Copy extends Application<IOException> {
 
         // TFile  doesn't do path name completion, so we do it manually in
         // order to emulate the behavior of many copy command line utilities.
-        if (TConfig.get().isLenient() && dst.isArchive() || Files.isDirectory(dst))
+        if (TConfig.current().isLenient() && dst.isArchive() || Files.isDirectory(dst))
             dst = dst.resolve(src.getFileName());
 
         // If TConfig.get().setLenient(false) is never called in your
