@@ -16,7 +16,7 @@
 
     <groupId>net.java.truevfs</groupId>
     <artifactId>truevfs</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.9-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>TrueVFS</name>
@@ -105,6 +105,9 @@ system space.
         </header>
 
         <truecommons.version>1.0.6</truecommons.version>
+
+        <!-- for documentation purposes only -->
+        <truezip-version>7.6.3</truezip-version>
     </properties>
 
     <modules>
