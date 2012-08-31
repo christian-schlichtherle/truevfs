@@ -22,12 +22,12 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  * A container for configuration options with global or inheritable thread
  * local scope.
  * <p>
- * A thread can call {@link #get()} to get access to the
+ * A thread can call {@link #current()} to current access to the
  * <i>current configuration</i> at any time .
  * If no configuration has been pushed onto the inheritable thread local
  * configuration stack before, this will return the <i>global configuration</i>
  * which is shared by all threads (hence its name).
- * Mind that access to the global configuration is <em>not</em> synchronized.
+ * Note that accessing the global configuration is not thread-safe!
  * <p>
  * To create an <i>inheritable thread local configuration</i>, a thread can
  * simply call {@link #open()}.
@@ -53,7 +53,7 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  * <p>
  * If the thread local configuration stack is empty, i.e. no {@link #open()}
  * without a corresponding {@link #close()} has been called before, then the
- * {@link #get()} method will return the global configuration.
+ * {@link #current()} method will return the global configuration.
  * This feature is intended to get used during the application setup to change
  * some configuration options with global scope like this:
  * <pre>{@code
@@ -62,10 +62,9 @@ class MyApplication extends TApplication<IOException> {
     \@Override
     protected void setup() {
         // This should obtain the global configuration.
-        TConfig config = TConfig.get();
+        TConfig config = TConfig.current();
         // Configure custom application file format.
-        config.setArchiveDetector(new TArchiveDetector("aff",
-                new JarDriver(IOPoolLocator.SINGLETON)));
+        config.setArchiveDetector(new TArchiveDetector("aff", new JarDriver()));
         // Set FsAccessOption.GROW for appending-to rather than reassembling
         // existing archive files.
         config.setAccessPreference(FsAccessOption.GROW, true);
@@ -88,8 +87,7 @@ assert !file1.isArchive();
 // stack.
 try (TConfig config = TConfig.open()) {
     // Configure custom application file format "aff".
-    config.setArchiveDetector(new TArchiveDetector("aff",
-            new JarDriver(IOPoolLocator.SINGLETON)));
+    config.setArchiveDetector(new TArchiveDetector("aff", new JarDriver()));
 
     // Now use the current configuration.
     TFile file2 = new TFile("file.aff");
@@ -189,6 +187,10 @@ public class AppTest {
     }
 }
  * }</pre>
+ * <p>
+ * <b>Disclaimer</b>: Although this classes internally uses an
+ * {@link InheritableThreadLocal}, it does not leak memory in multi class
+ * loader environments.
  * 
  * @author Christian Schlichtherle
  */
@@ -208,13 +210,13 @@ public final class TConfig extends Resource<IllegalStateException> {
      * First, this method peeks the inheritable thread local configuration
      * stack.
      * If no configuration has been {@link #open() pushed} yet, the global
-     * configuration is returned.
-     * Mind that the global configuration is shared by all threads.
+     * configuration gets returned.
+     * Note that accessing the global configuration is not thread-safe!
      * 
      * @return The current configuration.
      * @see    #open()
      */
-    public static TConfig get() { return stack.peekOrElse(GLOBAL); }
+    public static TConfig current() { return stack.peekOrElse(GLOBAL); }
 
     /**
      * Creates a new current configuration by copying the current configuration
@@ -222,10 +224,10 @@ public final class TConfig extends Resource<IllegalStateException> {
      * stack.
      * 
      * @return The new current configuration.
-     * @see    #get()
+     * @see    #current()
      */
     @CreatesObligation
-    public static TConfig open() { return stack.push(new TConfig(get())); }
+    public static TConfig open() { return stack.push(new TConfig(current())); }
 
     // I don't think these fields should be volatile.
     // This would make a difference if and only if two threads were changing
@@ -434,7 +436,7 @@ public final class TConfig extends Resource<IllegalStateException> {
      * thread local configuration stack.
      * 
      * @throws IllegalStateException If this configuration is not the
-     *         {@linkplain #get() current configuration}.
+     *         {@linkplain #current() current configuration}.
      */
     @Override
     @DischargesObligation

@@ -140,9 +140,9 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * {@link UnsupportedOperationException} if no prospective archive file is
      * detected.
      * <p>
-     * First, the {@code configuration} {@link Parameter}s get enumerated.
+     * First, the {@code configuration} {@link Parameter}s current enumerated.
      * If no value is set for a parameter key, the respective value of the
-     * {@link TConfig#get() current configuration} gets used.
+     * {@link TConfig#current() current configuration} gets used.
      * <p>
      * Next, the {@code path} is scanned for prospective archive files using
      * the configuration resulting from the first step.
@@ -157,7 +157,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * @throws UnsupportedOperationException if no prospective archive file has
      *         been detected according to the configuration resulting from
      *         merging the given {@code configuration} with the
-     *         {@link TConfig#get() current configuration}.
+     *         {@link TConfig#current() current configuration}.
      */
     @Override
     public TFileSystem newFileSystem(Path path, Map<String, ?> configuration) {
@@ -173,13 +173,13 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * Returns a file system for the given hierarchical {@link TPath}
      * {@code uri}.
      * <p>
-     * First, the {@code configuration} {@link Parameter}s get enumerated.
+     * First, the {@code configuration} {@link Parameter}s current enumerated.
      * If no value is set for a parameter key, the respective value of the
-     * {@link TConfig#get() current configuration} gets used.
+     * {@link TConfig#current() current configuration} gets used.
      * <p>
      * Next, the {@code uri} is scanned for prospective archive files using
      * the configuration resulting from the first step.
-     * Any trailing separators in {@code uri} get discarded.
+     * Any trailing separators in {@code uri} current discarded.
      * If one or more prospective archive files are found, the file system for
      * the innermost prospective archive file is returned.
      * Otherwise, the file system for the innermost directory is returned.
@@ -203,8 +203,8 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * {@code uri}.
      * <p>
      * The {@code uri} is scanned for prospective archive files using the
-     * {@link TConfig#get() current configuration}.
-     * Any trailing separators in {@code uri} get discarded.
+     * {@link TConfig#current() current configuration}.
+     * Any trailing separators in {@code uri} current discarded.
      * If one or more prospective archive files are found, the file system for
      * the innermost prospective archive file is returned.
      * Otherwise, the file system for the innermost directory is returned.
@@ -244,8 +244,8 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * Returns a {@code TPath} for the given hierarchical {@code name}.
      * <p>
      * The URI path component is scanned for prospective archive files using
-     * the {@link TConfig#get() current configuration}.
-     * Any trailing separators in {@code name} get discarded.
+     * the {@link TConfig#current() current configuration}.
+     * Any trailing separators in {@code name} current discarded.
      * 
      * @param  name the uri to return a {@link TPath} for.
      * @return the {@link TPath}

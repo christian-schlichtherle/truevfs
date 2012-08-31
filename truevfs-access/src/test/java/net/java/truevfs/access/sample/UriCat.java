@@ -46,7 +46,8 @@ public final class UriCat extends TApplication<Exception> {
      * Copies the contents of the parameter resource to the standard output.
      * <p>
      * The set of archive file extensions detected by this method is determined
-     * by the {@linkplain TConfig#getArchiveDetector default archive detector}
+     * by the current archive detector
+     * {@code TConfig.current().getArchiveDetector()}
      * and the respective file system driver providers on the class path.
      *
      * @param  resource the URI string of the resource to copy.

@@ -62,7 +62,7 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
  * <p>
  * Unless otherwise noted, when an instance of this class is created, the
  * resulting path name gets scanned for prospective archive files using the
- * {@linkplain TConfig#getArchiveDetector default archive detector}.
+ * current archive detector {@code TConfig.current().getArchiveDetector()}.
  * To change this, wrap the object creation in a code block which
  * {@link TConfig#open() pushes} a temporary configuration on the inheritbale
  * thread local stack of configurations as follows:
@@ -116,11 +116,11 @@ public final class TPath implements Path, TRex {
      * <p>
      * The supported path name separators are "{@link File#separator}" and
      * "{@code /}".
-     * Any trailing separators in the resulting path name get discarded.
+     * Any trailing separators in the resulting path name current discarded.
      * <p>
      * This constructor scans the {@linkplain TPath#toString() path name} resulting
      * from the segment parameters to detect prospective archive files using
-     * the {@linkplain TConfig#getArchiveDetector default archive detector}.
+     * the current archive detector {@code TConfig.current().getArchiveDetector()}.
      * 
      * <h3>Examples</h3>
 <p>On all platforms:</p>
@@ -157,12 +157,12 @@ public final class TPath implements Path, TRex {
      * <p>
      * The supported path name separators are "{@link File#separator}" and
      * "{@code /}".
-     * Any leading and trailing separators in the resulting path name get
+     * Any leading and trailing separators in the resulting path name current
      * discarded.
      * <p>
      * This constructor scans the {@linkplain TPath#toString() path name} resulting
      * from the segment parameters to detect prospective archive files using
-     * the {@linkplain TConfig#getArchiveDetector default archive detector}.
+     * the current archive detector {@code TConfig.current().getArchiveDetector()}.
      * 
      * @param fileSystem the file system to access.
      * @param first the first sub path string.
@@ -171,7 +171,7 @@ public final class TPath implements Path, TRex {
     TPath(final TFileSystem fileSystem, String first, final String... more) {
         final URI name = name(cutLeadingSeparators(first), more);
         this.name = name;
-        final TArchiveDetector detector = TConfig.get().getArchiveDetector();
+        final TArchiveDetector detector = TConfig.current().getArchiveDetector();
         this.detector = detector;
         this.nodePath = new TPathScanner(detector).scan(
                 new FsNodePath(fileSystem.getMountPoint(), ROOT),
@@ -194,7 +194,7 @@ public final class TPath implements Path, TRex {
      * <p>
      * This constructor scans the {@linkplain URI#getPath() path component} of
      * the URI to detect prospective archive files using the
-     * {@linkplain TConfig#getArchiveDetector default archive detector}.
+     * current archive detector {@code TConfig.current().getArchiveDetector()}.
      * 
      * <h3>Examples</h3>
 <p>On all platforms:</p>
@@ -226,7 +226,7 @@ public final class TPath implements Path, TRex {
      * @param  name the path name.
      *         This must be a hierarchical URI with an undefined fragment
      *         component.
-     *         Any trailing separators in the path component get discarded.
+     *         Any trailing separators in the path component current discarded.
      * @throws IllegalArgumentException if the preconditions for the parameter
      *         do not hold.
      */
@@ -242,12 +242,12 @@ public final class TPath implements Path, TRex {
      * <p>
      * If {@code file} is an instance of {@link TFile}, its
      * {@linkplain TFile#getArchiveDetector() archive detector} and
-     * {@linkplain TFile#getNodePath() file system node path} get shared with
+     * {@linkplain TFile#getNodePath() file system node path} current shared with
      * this instance.
      * <p>
      * Otherwise, this constructor scans the {@linkplain File#getPath() path name}
      * of the file to detect prospective archive files using the
-     * {@linkplain TConfig#getArchiveDetector default archive detector}.
+     * current archive detector {@code TConfig.current().getArchiveDetector()}.
      * 
      * <h3>Examples</h3>
 <p>On all platforms:</p>
@@ -273,7 +273,7 @@ public final class TPath implements Path, TRex {
      * @param file a file.
      *        If this is an instance of {@link TFile}, its
      *        {@linkplain TFile#getArchiveDetector() archive detector} and
-     *        {@linkplain TFile#getNodePath() file system node path} get shared
+     *        {@linkplain TFile#getNodePath() file system node path} current shared
      *        with this instance.
      */
     public TPath(File file) {
@@ -284,7 +284,7 @@ public final class TPath implements Path, TRex {
             this.detector = tfile.getArchiveDetector();
             this.nodePath = tfile.getNodePath();
         } else {
-            final TArchiveDetector detector = TConfig.get().getArchiveDetector();
+            final TArchiveDetector detector = TConfig.current().getArchiveDetector();
             this.detector = detector;
             this.nodePath = nodePath(name, detector);
         }
@@ -297,13 +297,13 @@ public final class TPath implements Path, TRex {
      * <p>
      * This constructor scans the {@link Path#toString() path name} of the
      * given path to detect prospective archive files using the
-     * {@linkplain TConfig#getArchiveDetector default archive detector}.
+     * current archive detector {@code TConfig.current().getArchiveDetector()}.
      * 
      * <h3>Examples</h3>
 <p>On all platforms:</p>
 <dl>
     <dt>Relative path name:</dt>
-    <dd><code>Path path = new TPath(Paths.get("app.war/WEB-INF/lib", "lib.jar/META-INF/MANIFEST.MF"));</code></dd>
+    <dd><code>Path path = new TPath(Paths.current("app.war/WEB-INF/lib", "lib.jar/META-INF/MANIFEST.MF"));</code></dd>
 </dl>
      * 
      * @param path a path.
@@ -324,7 +324,7 @@ public final class TPath implements Path, TRex {
             @CheckForNull TArchiveDetector detector,
             final @CheckForNull FsNodePath nodePath) {
         this.name = name = name(name);
-        if (null == detector) detector = TConfig.get().getArchiveDetector();
+        if (null == detector) detector = TConfig.current().getArchiveDetector();
         this.detector = detector;
         this.nodePath = null != nodePath ? nodePath : nodePath(name, detector);
 
@@ -704,7 +704,7 @@ public final class TPath implements Path, TRex {
                     .toUri()
                     .resolve(other);
         }
-        final TArchiveDetector detector = TConfig.get().getArchiveDetector();
+        final TArchiveDetector detector = TConfig.current().getArchiveDetector();
         final FsNodePath path = new TPathScanner(detector).scan(
                 TPathScanner.isAbsolute(other)
                     ? TFileSystemProvider.get(getName()).getRoot()
@@ -871,7 +871,7 @@ public final class TPath implements Path, TRex {
     private String toString0() {
         final URI name = getName();
         // If name is not absolute, we must call name.getSchemeSpecificPart(),
-        // not just name.toString() in order to get the *decoded* URI!
+        // not just name.toString() in order to current the *decoded* URI!
         return name.isAbsolute()
                 ? name.toString()
                 : name.getSchemeSpecificPart().replace(SEPARATOR_CHAR, separatorChar);
@@ -987,7 +987,7 @@ public final class TPath implements Path, TRex {
 
     BitField<FsAccessOption> getAccessPreferences() {
         final BitField<FsAccessOption> preferences =
-                TConfig.get().getAccessPreferences();
+                TConfig.current().getAccessPreferences();
         return null != getMountPoint().getParent()
                 ? preferences
                 : preferences.clear(CREATE_PARENTS);
