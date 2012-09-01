@@ -29,8 +29,8 @@ Getting Started
 
 * Manual Download
 
-    If you do not want to use Maven then you can easily download the TrueVFS
-    artifacts from Maven Central when following this guide:
+    If you do not want to use Maven then you can download the TrueVFS artifacts
+    from Maven Central according to this guide:
 
     * {{{./no-maven.html}Getting started without Maven}}.
 
