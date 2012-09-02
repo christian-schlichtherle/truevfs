@@ -1,0 +1,33 @@
+    --------------------------
+    About TrueVFS Profile Full
+    --------------------------
+    Christian Schlichtherle
+    --------------------------
+
+About TrueVFS Profile Full
+
+    Profiles bundle some other TrueVFS modules so that you can use them as
+    a single all-in-one dependency - they do not provide any additional
+    functionality.
+    For a complete list of included modules, please refer to the
+    {{{./dependencies.html}Dependencies}} report.
+
+    When using Maven, note that you should use the type <<<pom>>> in the
+    dependency declaration of your POM.
+    The following sample snippet assumes you would want to exclude the SFX
+    driver when dependending on this profile:
+
++--+
+<dependency>
+    <groupId>${project.groupId}</groupId>
+    <artifactId>${project.artifactId}</artifactId>
+    <version>${project.version}</version>
+    <type>pom</type>
+    <exclusions>
+        <exclusion>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-driver-sfx</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
++--+
