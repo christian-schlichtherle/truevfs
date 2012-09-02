@@ -1,41 +1,16 @@
-    -----------------------
+#parse("common.vm")
+    -----------------------------
     Getting started with NetBeans
-    -----------------------
+    -----------------------------
     Christian Schlichtherle
-    -----------------------
+    -----------------------------
 
 Getting started with NetBeans
 
     This guide shows how to kick-start a TrueVFS application in NetBeans
     with the help of a Maven archetype.
-    If you are using Eclipse, then please read the guide for
-    {{{./eclipse.html}Eclipse}}
-    instead.
-    If you are using none of these, then please read the guide for the
-    {{{./shell.html}Command Line Shell}}
-    instead.
 
-* Motivation
-
-    A typical issue for beginners is understanding the dependency of TrueVFS on
-    {{{../../truevfs-driver/index.html}file system driver modules}} at run time:
-    The module {{{../../truevfs-access/index.html}TrueVFS Access}} uses a
-    {{{../../apidocs/net/java/truevfs/kernel/spec/sl/FsDriverMapLocator.html#SINGLETON}file system driver map service locator singleton}}
-    which scans the class path for
-    {{{../../apidocs/net/java/truevfs/kernel/spec/spi/FsDriverMapModifier.html}file system driver map modifier services}}.
-    These file system driver map modifier services are contained in
-    {{{../../truevfs-driver/index.html}file system driver modules}}.
-    By adding the JAR artifacts of the file system driver modules to the run
-    time class path of your application, you trigger the module TrueVFS Access
-    to add their mapped file system drivers to the
-    {{{../../apidocs/net/java/truevfs/access/TConfig.html#get()}current configuration}}.
-
-    Although it's straightforward, setting up the class path can be a daunting
-    task for TrueVFS beginners, so a Maven archetype is provided as a template
-    for TrueVFS applications.
-    This archetype shows how to setup the run time dependencies and, as an
-    alternative, how to avoid using the service locator by using dependency
-    injection instead.
+#motivation()
 
 * Prerequisites
 
@@ -43,7 +18,7 @@ Getting started with NetBeans
 
     * {{{http://www.netbeans.org}NetBeans&#160;7.0}} or later.
 
-    * JSE&#160;7 for applications using the TrueVFS&#160;Access API.
+    * JSE&#160;7.
 
     []
 

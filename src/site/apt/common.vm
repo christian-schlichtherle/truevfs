@@ -1,6 +1,6 @@
 ## This file contains macros for common use within this directory.
-#macro(configuring $extension $file $modules_need $artifactId)
-* Configuring Archive Detection
+#macro(configuration $extension $file $modules_need $artifactId)
+* Customizing the Initial Configuration
 
     You may be wondering how TrueVFS gets configured to treat a file name with
     a $extension extension as a $file file instead of a plain old file.
@@ -29,8 +29,7 @@
     their true state, that is, like a plain file or directory.
     This finding will be remembered until the next call to <<<TVFS.umount()>>>,
     so the performance impact is minimal.
-
-#end ## configuring
+#end ## configuration
 #macro(cleaningUp)
 * Committing Changes / Cleaning Up
 
@@ -67,5 +66,4 @@ TVFS.umount();
 
     For more information, please refer to the Javadoc for
     {{{../apidocs/net/java/truevfs/access/TVFS.html#umount()}<<<TVFS.umount()>>>}}.
-
 #end ## cleaningUp
