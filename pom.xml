@@ -107,7 +107,7 @@ system space.
         <truecommons.version>1.0.7</truecommons.version>
 
         <!-- for documentation purposes only -->
-        <truezip-version>7.6.3</truezip-version>
+        <truezip-version>7.6.4</truezip-version>
     </properties>
 
     <modules>
