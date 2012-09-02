@@ -19,9 +19,9 @@
 
     <name>TrueVFS Profile</name>
     <description>
-        Profiles bundle some other TrueVFS modules to enable using them as a
-        single all-in-one dependency of client applications.
-        Profiles do NOT provide any additional functionality.
+        Profiles bundle some other TrueVFS modules so that you can use them as
+        a single all-in-one dependency - they do not provide any additional
+        functionality.
     </description>
 
     <modules>
