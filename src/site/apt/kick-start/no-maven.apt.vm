@@ -18,16 +18,16 @@ Getting started without Maven
 
 * Side effects
 
-    A profile is no more than an aggregate which references other modules as
-    its dependencies.
-    Some of these modules advertise services so that the client module
-    {{{../truevfs-access/index.html}TrueVFS&#160;Access}}
-    can locate them on the class path at runtime.
-    While this is required to follow the convention-over-configuration
-    paradigm, it may produce some unwanted side effects:
+    Profiles bundle some other TrueVFS modules so that you can use them as a
+    single all-in-one dependency (they do not provide any additional
+    functionality).
+    While using the default profile is very convenient, it may provide some
+    unwanted side effects:
 
-    * The client module TrueVFS Access will detect all mapped file extensions
-      for all file system drivers referenced by the profile.
+    * File system driver modules advertise services on the class path so that
+      the client module
+      {{{../truevfs-access/index.html}TrueVFS&#160;Access}} can detect all
+      canonical file extensions for all their file system driver classes.
       This may confuse an application if it doesn't expect an archive file to
       behave like a virtual directory.
 
