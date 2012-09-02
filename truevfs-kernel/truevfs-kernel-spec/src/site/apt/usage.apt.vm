@@ -9,7 +9,7 @@ TrueVFS Kernel Usage
 * Abstract
 
     This article showcases the TrueVFS&#160;Kernel API in contrast to the
-    {{{../truevfs-access/index.html}TrueVFS Access}} API.
+    {{{../../truevfs-access/index.html}TrueVFS Access}} API.
 
 * Design
 
@@ -123,7 +123,7 @@ $ cat fileA fileB
     Now for comparison, let's implement the same functionality using the API
     of the module TrueVFS Kernel.
 
-%{snippet|id=cat|file=${project.build.testSourceDirectory}/net/java/truevfs/kernel/sample/Cat.java}
+%{snippet|id=cat|file=${project.build.testSourceDirectory}/net/java/truevfs/kernel/spec/sample/Cat.java}
 
     Using the same configuration like before, this code could access the same
     URIs than before.
