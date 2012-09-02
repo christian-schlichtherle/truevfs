@@ -1,0 +1,20 @@
+## This file contains macros for common use within this directory.
+#macro(motivation)
+* Motivation
+
+    A typical issue for beginners is understanding the dependency of TrueVFS on
+    {{{../../truevfs-driver/index.html}file system driver modules}} at run time:
+    The module {{{../../truevfs-access/index.html}TrueVFS Access}} scans the
+    class path for
+    {{{../../truevfs-driver/index.html}file system driver}}
+    modules in order to set up the initial
+    {{{../../apidocs/net/java/truevfs/access/TConfig.html}configuration}}.
+
+    Although it's straightforward, setting up the class path can be a daunting
+    task for beginners, so a Maven archetype is provided as a template for
+    TrueVFS applications.
+    This archetype shows how to setup the run time dependencies and, as an
+    alternative, how to
+    {{{../../truevfs-access/configuration.html}customize the initial configuration}}
+    in code (here's a {{{../../usecases/aff.html}sample}}).
+#end ## motivation

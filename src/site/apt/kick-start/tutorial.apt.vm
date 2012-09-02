@@ -237,7 +237,7 @@ new TFile("archive.zip").rm_r();    // remove recursively
 new TFile("archive.tar.gz").rm_r(); // dito
 +--+
 
-#configuring("<<<tar.gz>>> or <<<zip>>>",
+#configuration("<<<tar.gz>>> or <<<zip>>>",
   "TAR.GZ or ZIP",
   "modules
    {{{../truevfs-driver/truevfs-driver-tar/index.html}TrueVFS Driver TAR}}

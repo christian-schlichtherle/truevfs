@@ -51,7 +51,7 @@ new TFile("archive.zip").cp_rp(new TFile("directory"));
 new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
 +--+
 
-#configuring("<<<tar.gz>>> or <<<zip>>>",
+#configuration("<<<tar.gz>>> or <<<zip>>>",
   "TAR.GZ or ZIP",
   "modules
    {{{../truevfs-driver/truevfs-driver-tar/index.html}TrueVFS Driver TAR}}
@@ -59,4 +59,5 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
    {{{../truevfs-driver/truevfs-driver-zip/index.html}TrueVFS Driver ZIP}}
    need",
   "<<<truevfs-driver-tar>>> and <<<truevfs-driver-zip>>>")
+
 #cleaningUp()

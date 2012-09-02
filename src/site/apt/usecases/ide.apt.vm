@@ -38,10 +38,11 @@ try (Reader reader = new TFileReader("app.war/WEB-INF/lib/lib.jar/META-INF/MANIF
 new TFile("archive.jar/META-INF/MANIFEST.MF").rm();
 +--+
 
-#configuring("<<<jar>>> or <<<war>>>",
+#configuration("<<<jar>>> or <<<war>>>",
   "JAR or WAR",
   "module
    {{{../truevfs-driver/truevfs-driver-zip/index.html}TrueVFS Driver ZIP}}
    needs",
   "<<<truevfs-driver-zip>>>")
+
 #cleaningUp()

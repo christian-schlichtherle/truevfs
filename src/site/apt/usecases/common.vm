@@ -51,6 +51,5 @@ $title
     {{{../apidocs/net/java/truevfs/access/TFile.html}<<<TFile>>>}}
     class extends the <<<java.io.File>>> class in order to add the
     required functionality.
-
 #end ## leadIn
 #parse("../common.vm")
