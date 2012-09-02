@@ -46,7 +46,8 @@ cp -rp archive.zip archive.tar.gz
     TrueZIP&#160;${truezip-version}.
     However, the TrueVFS version is not yet at 1.0 because chances are that
     there will be backwards incompatible changes to the API of internal modules.
-    This is unlikely to happen to the API of the client module TrueVFS Access.
+    This is unlikely to happen to the API of the client module
+    {{{./truevfs-access/index.html}TrueVFS&#160;Access}}.
 
     If you are interested in the plans for this project, please have a look
     at its
@@ -88,10 +89,10 @@ cp -rp archive.zip archive.tar.gz
     As a library, TrueVFS provides simple, uniform, transparent,
     thread-safe, read/write access to archive files as if they were
     virtual directories in a file system path.
-    TrueVFS provides the module
+    TrueVFS provides the client module
     {{{./truevfs-access/index.html}TrueVFS&#160;Access}}
-    with the client facade API for convenient access to its (federated virtual)
-    file system space.
+    with the API for convenient access to its (federated virtual) file system
+    space.
 
     Writing an application for this API is really simple:
     Please have a look at the page {{{./kick-start/index.html}Getting Started}}

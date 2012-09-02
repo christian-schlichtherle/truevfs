@@ -6,43 +6,57 @@
 
 Getting started without Maven
 
-    If you do not want to use Maven then you can easily
-    {{{http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22de.schlichtherle.truevfs%22%20AND%20v%3A%22${project.version}%22}<<download individual TrueVFS artifacts>>}}
+    If you do not want to use Maven then you can easily download
+    {{{http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22net.java.truevfs%22%20AND%20v%3A%22${project.version}%22}<<individual TrueVFS artifacts>>}}
     from Maven Central.
-    You can also directly {{{http://repo1.maven.org/maven2/net/java/truevfs/truevfs-samples/${project.version}/truevfs-samples-${project.version}-jar-with-dependencies.jar}<<download the all-in-one JAR>>}}.
 
-    The all-in-one JAR saves you from grabbing the module JARs individually.
-    However, as the name implies, it includes all sample code which bloats the
-    code size of the application.
-    More importantly, this will also initially set up the TrueVFS&#160;Access
-    API to detect <all> canonical file extensions of <all> supported archive
-    file types in TrueVFS&#160;${project.version}.
-    Because the virtual file system of an archive file gets automatically
-    mounted upon first access, this may produce some unwanted side effects:
+    You can also directly download the {{{http://repo1.maven.org/maven2/net/java/truevfs/truevfs-profile-default/${project.version}/truevfs-profile-default-${project.version}-shaded.jar}<<shaded JAR for the default profile>>}}.
+    This shaded JAR saves you from grabbing the JARs for the modules referenced
+    by the
+    {{{../truevfs-profile/truevfs-profile-default/index.html}default profile}}
+    individually.
 
-    * All archive files will behave like virtual directories instead of
-      regular files.
-      This may confuse the application if not needed.
+* Side effects
 
-    * In case of TAR files, the driver will unpack the entire TAR file into a
-      temporary directory first because the TAR file format doesn't provide a
-      central directory for fast random access.
-      This may seriously degrade performance if not needed, however.
+    A profile is no more than an aggregate which references other modules as
+    its dependencies.
+    Some of these modules advertise services so that the client module
+    {{{../truevfs-access/index.html}TrueVFS&#160;Access}}
+    can locate them on the class path at runtime.
+    While this is required to follow the convention-over-configuration
+    paradigm, it may produce some unwanted side effects:
 
-    * In case of an EXE file, the driver will attempt to locate the central
-      directory of a self extracting ZIP file which will cause the entire
-      file to be read if its actually a plain EXE file.
-      Again, this may seriously degrade performance if not needed.
+    * The client module TrueVFS Access will detect all mapped file extensions
+      for all file system drivers referenced by the profile.
+      This may confuse an application if it doesn't expect an archive file to
+      behave like a virtual directory.
 
-    * In case of a ZIP.RAES file, a Swing or console based dialog will prompt
-      the user for a password to access its encrypted contents.
+    * In case of TAR files, the driver module
+      {{{../truevfs-driver/truevfs-driver-tar/index.html}TrueVFS&#160;Driver&#160;TAR}}
+      will unpack the entire TAR file into a temporary directory first because
+      the TAR file format lacks a central directory for fast random access.
+      This may seriously degrade performance if not needed.
+
+    * In case of ZIP.RAES files, the driver module
+      {{{../truevfs-driver/truevfs-driver-zip-raes/index.html}TrueVFS&#160;Driver&#160;ZIP.RAES}}
+      will prompt the user with a Swing or Console based dialog to enter a
+      password in order to access the encrypted file contents.
       This may confuse the user if not needed.
 
     []
 
-    To avoid these unwanted side effects, you should <always> configure the
-    TrueVFS&#160;Access API to detect exactly only the file suffixes of the
-    archive types required to access.
-    You can simply do so by adding only the required driver modules to run time
-    class path or apply the following {{{../usecases/aff.html}sample}} for
-    explicit configuration.
+* Remedy
+
+    To avoid unwanted side effects, you could either...
+
+    [[a]] {{{../truevfs-access/configuration.html}customize the initial configuration}}
+          in code (here's a {{{../usecases/aff.html}sample}}), or...
+
+    [[a]] switch to Maven and simply exclude the unwanted modules from the
+          profile, or...
+
+    [[a]] manually add the JARs for only the desired modules.
+
+    []
+
+    The last resolution is the most cumbersome and so is generally discouraged.
