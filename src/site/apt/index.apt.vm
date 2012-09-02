@@ -10,11 +10,24 @@ About
     applications to perform CRUD (Create, Read, Update, Delete) operations on
     archive files as if they were virtual directories, even with nested archive
     files in multithreaded environments - see {{{./features.html}Key Features}}.
-    With TrueVFS, creating a TAR.GZ file from a ZIP file is as easy as calling:
+    For example, creating a TAR.GZ file from a ZIP file is as easy as calling:
 
 +--+
 new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
 +--+
+
+    The semantics of this example are roughly equivalent to the GNU command...
+
++--+
+cp -rp archive.zip archive.tar.gz
++--+
+
+    ... if only the <<<cp>>> command would let you access ZIP files and TAR.GZ
+    files as if they were directories.
+
+    Note that the high abstraction level of the client API enables optimization
+    of I/O access, so that this example operation doesn't even require
+    buffering to temporary files.
 
     TrueVFS is Open Source Software and is covered by the
     {{{./license.html}Eclipse Public License, Version 1.0}}.
@@ -32,8 +45,8 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
     TrueVFS&#160;${project.version} than you could put into
     TrueZIP&#160;${truezip-version}.
     However, the TrueVFS version is not yet at 1.0 because chances are that
-    there will be backwards incompatible changes to its API.
-    This is unlikely to happen to the client API, however.
+    there will be backwards incompatible changes to the API of internal modules.
+    This is unlikely to happen to the API of the client module TrueVFS Access.
 
     If you are interested in the plans for this project, please have a look
     at its
@@ -47,7 +60,7 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
     To make a donation, just click the <Donate> button in the navigation bar on
     the left side or {{{./team-list.html}contact me}} personally.
     Any donation contributes to the ongoing development and support of the
-    TrueVFS project - thank you very much for your consideration!
+    TrueVFS project. Thank you very much for your consideration!
 
 * Supported File System Types
 
@@ -64,7 +77,7 @@ new TFile("archive.zip").cp_rp(new TFile("archive.tar.gz"));
     {{{./truevfs-driver/truevfs-driver-zip/index.html}ZIP}}
     and
     {{{./truevfs-driver/truevfs-driver-tzp/index.html}ZIP.RAES (TZP)}}
-    file system schemes. For the final release, there will be more.
+    file system schemes. For the 1.0 release, there will be more.
 
     Simply add the JAR artifact of these driver modules to the run time class
     path to make their file system drivers available for service location in
