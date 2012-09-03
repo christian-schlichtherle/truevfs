@@ -12,7 +12,7 @@
     <parent>
         <groupId>net.java.truecommons</groupId>
         <artifactId>truecommons-parent</artifactId>
-        <version>12</version>
+        <version>13</version>
     </parent>
 
     <groupId>de.schlichtherle.truezip</groupId>
