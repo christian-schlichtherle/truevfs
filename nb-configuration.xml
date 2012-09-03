@@ -8,7 +8,6 @@ Without this configuration present, some functionality in the IDE may be limited
 -->
     <config-data xmlns="http://www.netbeans.org/ns/maven-config-data/1">
         <configurations>
-            <configuration id="integration-test" profiles="integration-test"/>
             <configuration id="sonatype-oss-release" profiles="sonatype-oss-release"/>
         </configurations>
     </config-data>
