@@ -18,7 +18,7 @@ import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
 
 /**
  * Pretty-prints a map of file system drivers to an HTML table.
- * you can use the main method of this utility class to diagnose the class path
+ * You can use the main method of this utility class to diagnose the class path
  * setup or test custom file system driver implementations.
  * 
  * @param  <O> The type of the resource for output - typically a
