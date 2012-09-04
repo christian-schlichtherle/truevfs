@@ -35,6 +35,7 @@ public abstract class DecoratingIoBufferPool extends IoBufferPool {
      */
     @Override
     public String toString() {
-        return String.format("%s[pool=%s]", getClass().getName(), pool);
+        return String.format("%s@%x[pool=%s]",
+                getClass().getName(), hashCode(), pool);
     }
 }

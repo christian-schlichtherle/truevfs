@@ -118,8 +118,9 @@ public abstract class FsDecoratingController extends FsAbstractController {
 
     @Override
     public String toString() {
-        return String.format("%s[controller=%s]",
+        return String.format("%s@%x[controller=%s]",
                 getClass().getName(),
+                hashCode(),
                 controller);
     }
 }

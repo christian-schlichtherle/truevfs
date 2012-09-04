@@ -50,8 +50,9 @@ extends UniqueObject implements FsModel {
      */
     @Override
     public String toString() {
-        return String.format("%s[mountPoint=%s, parent=%s, mounted=%b]",
+        return String.format("%s@%x[mountPoint=%s, parent=%s, mounted=%b]",
                 getClass().getName(),
+                hashCode(),
                 mountPoint,
                 parent,
                 isMounted());

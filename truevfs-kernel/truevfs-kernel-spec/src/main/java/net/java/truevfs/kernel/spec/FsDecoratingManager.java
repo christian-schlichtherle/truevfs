@@ -55,8 +55,9 @@ public abstract class FsDecoratingManager extends FsAbstractManager {
      */
     @Override
     public String toString() {
-        return String.format("%s[manager=%s]",
+        return String.format("%s@%x[manager=%s]",
                 getClass().getName(),
+                hashCode(),
                 manager);
     }
 }

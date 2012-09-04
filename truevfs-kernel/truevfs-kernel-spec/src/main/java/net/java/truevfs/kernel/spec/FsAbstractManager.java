@@ -41,8 +41,9 @@ extends UniqueObject implements FsManager {
      */
     @Override
     public String toString() {
-        return String.format("%s[size=%d]",
+        return String.format("%s@%x[size=%d]",
                 getClass().getName(),
+                hashCode(),
                 size());
     }
 }
