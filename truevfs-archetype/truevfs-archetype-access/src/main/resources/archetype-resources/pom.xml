@@ -28,6 +28,14 @@
             <artifactId>truevfs-profile-default</artifactId>
             <version>${truevfs.version}</version>
             <type>pom</type>
+            <!-- Uncomment this to exclude a particular driver module from the
+                 profile. -->
+            <!--exclusions>
+                <exclusion>
+                    <groupId>net.java.truevfs</groupId>
+                    <artifactId>truevfs-driver-odf</artifactId>
+                </exclusion>
+            </exclusions-->
         </dependency>
 
         <!-- Lets hurl the key prompting window when entering an invalid key. -->
