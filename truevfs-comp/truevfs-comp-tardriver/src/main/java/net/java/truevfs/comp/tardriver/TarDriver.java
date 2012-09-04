@@ -82,8 +82,8 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in the class {@link FsArchiveDriver} calls the
-     * equally named method on the {@link IoBufferPoolLocator#SINGLETON}.
+     * The implementation in the class {@link TarDriver} calls
+     * {@code IoBufferPoolLocator.SINGLETON.get()}.
      */
     @Override
     public IoBufferPool getPool() {
