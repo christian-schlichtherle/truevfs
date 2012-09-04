@@ -19,7 +19,7 @@ import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
 /**
  * Pretty-prints a map of file system drivers to an HTML table.
  * You can use the main method of this utility class to diagnose the class path
- * setup or test custom file system driver implementations.
+ * setup or test custom file system driver map modifier implementations.
  * 
  * @param  <O> The type of the resource for output - typically a
  *         {@link PrintStream} or a {@link PrintWriter}.
@@ -65,15 +65,18 @@ implements Callable<O> {
     /**
      * Constructs a new instance and pretty-prints the file system driver map.
      * <p>
-     * If no parameters are provided to this method, the file system drivers
-     * are located on the class path.
+     * If no parameters are provided to this method, all file system driver
+     * mappings which result from locating and applying all file system driver
+     * map modifiers on the class path.
      * You can use this feature to diagnose your class path setup.
      * <p>
      * Alternatively, if parameters are provided to this method, they are
-     * interpreted as class names of {@link FsDriverMapModifier} implementations.
-     * These will be instantiated and applied to an empty file system driver map
-     * in order.
-     * You can use this feature to document a file system driver implementation.
+     * interpreted as class names of {@link FsDriverMapModifier}
+     * implementations.
+     * These will be instantiated and applied to an empty file system driver
+     * map in order.
+     * You can use this feature to document custom file system driver map
+     * modifier implementations.
      * 
      * @param  args a may-be-empty array of {@link FsDriverMapModifier}
      *         implementation classes.
