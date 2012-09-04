@@ -6,6 +6,7 @@ package net.java.truevfs.kernel.spec.cio;
 
 import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.UniqueObject;
 
 /**
  * Abstract base class for I/O sockets.
@@ -18,7 +19,7 @@ import javax.annotation.concurrent.Immutable;
  */
 @Immutable
 public abstract class AbstractIoSocket<E extends Entry>
-implements IoSocket<E> {
+extends UniqueObject implements IoSocket<E> {
 
     /**
      * Returns a string representation of this object for debugging and logging
@@ -32,6 +33,7 @@ implements IoSocket<E> {
         } catch (final IOException ex) {
             target = ex;
         }
-        return String.format("%s[target=%s]", getClass().getName(), target);
+        return String.format("%s@%x[target=%s]", 
+                getClass().getName(), hashCode(), target);
     }
 }

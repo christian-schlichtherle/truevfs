@@ -59,8 +59,9 @@ public abstract class FsDriver extends UniqueObject {
      */
     @Override
     public String toString() {
-        return String.format("%s[archiveDriver=%b]",
+        return String.format("%s@%x[archiveDriver=%b]",
                 getClass().getName(),
+                hashCode(),
                 isArchiveDriver());
     }
 }

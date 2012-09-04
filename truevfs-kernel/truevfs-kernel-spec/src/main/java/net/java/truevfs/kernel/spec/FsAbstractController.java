@@ -96,8 +96,9 @@ extends UniqueObject implements FsController {
      */
     @Override
     public String toString() {
-        return String.format("%s[model=%s]",
+        return String.format("%s@%x[model=%s]",
                 getClass().getName(),
+                hashCode(),
                 getModel());
     }
 }

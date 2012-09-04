@@ -28,8 +28,8 @@ public final class FsArchiveEntries {
     public static String toString(final FsArchiveEntry e) {
         final StringBuilder s = new StringBuilder(256);
         final Formatter f = new Formatter(s)
-                .format("%s[name=%s, type=%s",
-                    e.getClass().getName(), e.getName(), e.getType());
+                .format("%s@%x[name=%s, type=%s",
+                    e.getClass().getName(), e.hashCode(), e.getName(), e.getType());
         for (Size type : ALL_SIZES) {
             final long size = e.getSize(type);
             if (UNKNOWN != size)

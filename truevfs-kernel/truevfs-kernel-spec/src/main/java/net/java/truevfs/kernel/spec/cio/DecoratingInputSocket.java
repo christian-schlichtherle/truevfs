@@ -43,8 +43,9 @@ extends DelegatingInputSocket<E> {
      */
     @Override
     public String toString() {
-        return String.format("%s[socket=%s]",
+        return String.format("%s@%x[socket=%s]",
                 getClass().getName(),
+                hashCode(),
                 socket);
     }
 }

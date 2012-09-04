@@ -8,6 +8,7 @@ import java.util.Formatter;
 import java.util.Set;
 import javax.annotation.Nullable;
 import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.UniqueObject;
 import net.java.truevfs.kernel.spec.cio.Entry;
 
 /**
@@ -16,7 +17,8 @@ import net.java.truevfs.kernel.spec.cio.Entry;
  *
  * @author Christian Schlichtherle
  */
-public abstract class FsNode implements Entry {
+public abstract class FsNode
+extends UniqueObject implements Entry {
 
     /**
      * Returns a string representation of the
@@ -74,8 +76,8 @@ public abstract class FsNode implements Entry {
     @Override
     public String toString() {
         final StringBuilder s = new StringBuilder(256);
-        final Formatter f = new Formatter(s).format("%s[name=%s, types=%s",
-                getClass().getName(), getName(), getTypes());
+        final Formatter f = new Formatter(s).format("%s@%x[name=%s, types=%s",
+                getClass().getName(), hashCode(), getName(), getTypes());
         for (final Size type : ALL_SIZES) {
             final long size = getSize(type);
             if (UNKNOWN != size) f.format(", size(%s)=%d", type, size);

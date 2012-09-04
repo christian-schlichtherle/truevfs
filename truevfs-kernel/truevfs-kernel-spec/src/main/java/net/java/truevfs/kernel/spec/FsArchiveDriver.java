@@ -116,16 +116,6 @@ extends FsDriver {
     private final ThreadLocal<CharsetEncoder> encoder = new ThreadLocal<>();
 
     /**
-     * Returns the pool for allocating temporary I/O buffers.
-     * <p>
-     * This is an immutable property - multiple calls must return the same
-     * object.
-     *
-     * @return The pool to use for allocating temporary I/O buffers.
-     */
-    public abstract IoBufferPool getPool();
-
-    /**
      * Returns {@code true} if and only if the archive files produced by this
      * archive driver may contain redundant archive entry contents.
      * If the return value is {@code true}, then an archive file may contain
@@ -156,6 +146,16 @@ extends FsDriver {
      *         {@code false} for backwards compatibility.
      */
     public boolean getRedundantMetaDataSupport() { return false; }
+
+    /**
+     * Returns the pool for allocating temporary I/O buffers.
+     * <p>
+     * This is an immutable property - multiple calls must return the same
+     * object.
+     *
+     * @return The pool to use for allocating temporary I/O buffers.
+     */
+    public abstract IoBufferPool getPool();
 
     /**
      * This method gets called by an archive controller in order to create a
@@ -380,9 +380,13 @@ extends FsDriver {
      */
     @Override
     public String toString() {
-        return String.format("%s[archiveDriver=%b, charset=%s]",
+        return String.format("%s@%x[archiveDriver=%b, charset=%s, redundantContentSupport=%b, redundantMetaDataSupport=%b, pool=%s]",
                 getClass().getName(),
+                hashCode(),
                 isArchiveDriver(),
-                getCharset());
+                getCharset(),
+                getRedundantContentSupport(),
+                getRedundantMetaDataSupport(),
+                getPool());
     }
 }

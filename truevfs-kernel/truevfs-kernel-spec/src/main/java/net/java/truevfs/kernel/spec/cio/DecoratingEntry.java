@@ -7,6 +7,7 @@ package net.java.truevfs.kernel.spec.cio;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.shed.UniqueObject;
 
 /**
  * An abstract decorator for an entry.
@@ -15,7 +16,8 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class DecoratingEntry<E extends Entry> implements Entry {
+public abstract class DecoratingEntry<E extends Entry>
+extends UniqueObject implements Entry {
 
     /** The nullable decorated entry. */
     protected @Nullable E entry;
@@ -52,6 +54,7 @@ public abstract class DecoratingEntry<E extends Entry> implements Entry {
      */
     @Override
     public String toString() {
-        return String.format("%s[entry=%s]", getClass().getName(), entry);
+        return String.format("%s@%x[entry=%s]",
+                getClass().getName(), hashCode(), entry);
     }
 }

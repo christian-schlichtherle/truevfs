@@ -7,6 +7,7 @@ package net.java.truevfs.kernel.spec.cio;
 import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.Pool;
+import net.java.truecommons.shed.UniqueObject;
 
 /**
  * An abstract pool for allocating I/O buffers, which can get used as a
@@ -20,7 +21,7 @@ import net.java.truecommons.shed.Pool;
  */
 @ThreadSafe
 public abstract class IoBufferPool
-implements Pool<IoBuffer, IOException> {
+extends UniqueObject implements Pool<IoBuffer, IOException> {
 
     @Override
     public final void release(IoBuffer buffer) throws IOException {

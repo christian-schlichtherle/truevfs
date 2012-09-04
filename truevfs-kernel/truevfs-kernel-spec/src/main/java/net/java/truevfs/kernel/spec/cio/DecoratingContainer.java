@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
+import net.java.truecommons.shed.UniqueObject;
 
 /**
  * An abstract decorator for an entry container.
@@ -19,7 +20,7 @@ import javax.annotation.Nullable;
 public abstract class DecoratingContainer<
         E extends Entry,
         C extends Container<E>>
-implements Container<E> {
+extends UniqueObject implements Container<E> {
 
     /** The nullable decorated entry container. */
     protected @Nullable C container;
@@ -51,8 +52,9 @@ implements Container<E> {
      */
     @Override
     public String toString() {
-        return String.format("%s[container=%s]",
+        return String.format("%s@%x[container=%s]",
                 getClass().getName(),
+                hashCode(),
                 container);
     }
 }
