@@ -16,7 +16,7 @@
     <packaging>maven-archetype</packaging>
 
     <name>TrueVFS Archetype Access</name>
-    <description>Showcases the client API of the module TrueVFS Access - requires JSE 7.</description>
+    <description>Showcases the client API of the module TrueVFS Access.</description>
 
     <dependencies>
         <dependency>
