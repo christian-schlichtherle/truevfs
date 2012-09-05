@@ -1,14 +1,14 @@
-    -----------------------
+    ------------------------
     About TrueVFS Driver ZIP
-    -----------------------
+    ------------------------
     Christian Schlichtherle
-    -----------------------
+    ------------------------
 
-About TrueVFS Driver ZIP
+About
 
-    This module contains the file system driver service class
-    {{{./apidocs/net/java/truevfs/driver/zip/ZipDriverService.html}ZipDriverService}}
-    which provides the following map of file system drivers:
+    This module provides the file system driver map modifier class
+    {{{./apidocs/net/java/truevfs/driver/zip/ZipDriverMapModifier.html}<<<ZipDriverMapModifier>>>}}
+    which provides the following file system driver mappings:
 
 *--*--*
 ||URI Schemes / Archive File Extensions||File System Driver Class|
@@ -18,7 +18,7 @@ About TrueVFS Driver ZIP
 
     Add the JAR artifact of this module to the run time class path to
     make its file system drivers available for service location in the
-    client API modules.
+    client API module.
     The URI schemes will then get recognized as default archive file extensions
     by the class
     {{{../../apidocs/net/java/truevfs/access/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
@@ -29,9 +29,9 @@ About TrueVFS Driver ZIP
         New ZIP entries can get appended to existing JAR files.
 
         To use this feature with the client API, set
-        {{{./apidocs/net/java/truevfs/kernel/spec/FsAccessOption.html#GROW}<<<FsAccessOption.GROW>>>}},
+        {{{../../apidocs/net/java/truevfs/kernel/spec/FsAccessOption.html#GROW}<<<FsAccessOption.GROW>>>}},
         e.g. in
-        {{{./apidocs/net/java/truevfs/access/TConfig.html#setAccessPreferences(net.truevfs.kernel.spec.util.BitField)}<<<TConfig.setAccessPreferences(BitField)>>>}}.
+        {{{../../apidocs/net/java/truevfs/access/TConfig.html#setAccessPreferences(net.truevfs.kernel.spec.util.BitField)}<<<TConfig.setAccessPreferences(BitField)>>>}}.
 
     [Recovery Of Lost ZIP Entries]
         When reading truncated ZIP files, lost entries can get recovered.
@@ -46,20 +46,20 @@ About TrueVFS Driver ZIP
         {{{http://www.winzip.com/win/en/aes_info.htm}WinZip AES specification}}.
 
         To use this feature with the client API, set
-        {{{./apidocs/net/java/truevfs/kernel/spec/FsAccessOption.html#ENCRYPT}<<<FsAccessOption.ENCRYPT>>>}},
+        {{{../../apidocs/net/java/truevfs/kernel/spec/FsAccessOption.html#ENCRYPT}<<<FsAccessOption.ENCRYPT>>>}},
         e.g. in
-        {{{./apidocs/net/java/truevfs/access/TConfig.html#setAccessPreferences(net.truevfs.kernel.spec.util.BitField)}<<<TConfig.setAccessPreferences(BitField)>>>}},
+        {{{../../apidocs/net/java/truevfs/access/TConfig.html#setAccessPreferences(net.truevfs.kernel.spec.util.BitField)}<<<TConfig.setAccessPreferences(BitField)>>>}},
         or
         {{{../../faq.html#installDriverFile}install a custom file system driver}}
         which sets this option before calling its super-class implementation in
-        {{{./apidocs/net/java/truevfs/driver/zip/ZipDriver.html#newEntry(java.lang.String,net.truevfs.kernel.spec.cio.Entry.Type,net.truevfs.kernel.spec.cio.Entry,net.truevfs.kernel.spec.util.BitField)}<<<ZipDriver.newEntry(String, Entry.Type, Entry, BitField)>>>}}.
+        {{{../../apidocs/net/java/truevfs/driver/zip/ZipDriver.html#newEntry(java.lang.String,net.truevfs.kernel.spec.cio.Entry.Type,net.truevfs.kernel.spec.cio.Entry,net.truevfs.kernel.spec.util.BitField)}<<<ZipDriver.newEntry(String, Entry.Type, Entry, BitField)>>>}}.
         In either case, if you don't want to use the built-in
-        {{{./apidocs/net/java/truevfs/driver/zip/core/KeyManagerZipCryptoParameters.html}<<<KeyManagerZipCryptoParameters>>>}}
+        {{{../../apidocs/net/java/truevfs/driver/zip/core/KeyManagerZipCryptoParameters.html}<<<KeyManagerZipCryptoParameters>>>}}
         for prompting the user for a password using a Swing GUI or the console,
         then you should override
-        {{{./apidocs/net/java/truevfs/driver/zip/ZipDriver.html#zipCryptoParameters(net.truevfs.kernel.FsModel,java.nio.charset.Charset)}<<<ZipDriver.zipCryptoParameters(FsModel, Charset)>>>}}
+        {{{../../apidocs/net/java/truevfs/driver/zip/ZipDriver.html#zipCryptoParameters(net.truevfs.kernel.FsModel,java.nio.charset.Charset)}<<<ZipDriver.zipCryptoParameters(FsModel, Charset)>>>}}
         in order to provide custom
-        {{{./apidocs/net/java/truevfs/driver/zip/core/io/WinZipAesParameters.html}<<<WinZipAesParameters>>>}},
+        {{{../../apidocs/net/java/truevfs/driver/zip/core/io/WinZipAesParameters.html}<<<WinZipAesParameters>>>}},
         too.
 
         Note that the WinZip AES encryption scheme does <not> encrypt and <not>
@@ -78,7 +78,7 @@ About TrueVFS Driver ZIP
         the client API,
         {{{../../faq.html#installDriverFile}install a custom file system driver}}
         which overrides
-        {{{./apidocs/net/java/truevfs/driver/zip/ZipDriver.html#getMethod()}<<<ZipDriver.getMethod()>>>}}.
+        {{{../../apidocs/net/java/truevfs/driver/zip/ZipDriver.html#getMethod()}<<<ZipDriver.getMethod()>>>}}.
 
     [Selectable Character Sets]
         The character set for reading and writing ZIP comments and ZIP entry
@@ -88,7 +88,7 @@ About TrueVFS Driver ZIP
         To use this feature with the client API,
         {{{../../faq.html#installDriverFile}install a custom file system driver}}
         which overrides
-        {{{./apidocs/net/java/truevfs/driver/zip/ZipDriver.html#getCharset()}<<<ZipDriver.getCharset()>>>}}.
+        {{{../../apidocs/net/java/truevfs/driver/zip/ZipDriver.html#getCharset()}<<<ZipDriver.getCharset()>>>}}.
 
     [ZIP64 Extensions]
         ZIP64 extensions are automatically and transparently activated when

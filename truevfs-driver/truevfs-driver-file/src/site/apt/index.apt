@@ -1,15 +1,14 @@
-    -----------------------
+    -------------------------
     About TrueVFS Driver FILE
-    -----------------------
+    -------------------------
     Christian Schlichtherle
-    -----------------------
+    -------------------------
 
-About TrueVFS Driver FILE
+About
 
-    This module contains the file system driver service class
-    {{{./apidocs/net/java/truevfs/driver/file/FileDriverService.html}<<<net.truevfs.driver.file.FileDriverService>>>}},
-    which provides the following map of file system drivers based on the
-    NIO.2 API for JSE&#160;7 and later:
+    This module provides the file system driver map modifier class
+    {{{./apidocs/net/java/truevfs/driver/file/FileDriverMapModifier.html}<<<FileDriverMapModifier>>>}}
+    which provides the following file system driver mappings:
 
 *--*--*
 ||URI Schemes||File System Driver Class|
@@ -19,11 +18,4 @@ About TrueVFS Driver FILE
 
     Add the JAR artifact of this module to the run time class path to
     make its file system drivers available for service location in the
-    client API modules.
-
-    When using service location, one of the two file system drivers is
-    automatically selected based on its priority:
-    In a JSE&#160;6 compliant JVM, the file system driver based on the
-    java.io.File*&#160;API is preferred.
-    In a JSE&#160;7 compliant JVM, the file system driver based on the
-    NIO.2&#160;API is preferred.
+    client API module.

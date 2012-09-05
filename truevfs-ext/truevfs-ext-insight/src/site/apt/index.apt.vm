@@ -1,10 +1,10 @@
-    -----------------------
-    About TrueVFS Extension JMX
-    -----------------------
+    -------------------------------
+    About TrueVFS Extension Insight
+    -------------------------------
     Christian Schlichtherle
-    -----------------------
+    -------------------------------
 
-About TrueVFS Extension JMX
+About
 
     This module instruments the TrueVFS Kernel for managing and monitoring
     via JMX.

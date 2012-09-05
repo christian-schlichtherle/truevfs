@@ -1,10 +1,10 @@
-    -----------------------
-    About TrueVFS Kernel
-    -----------------------
+    ----------------------------------
+    About TrueVFS Kernel Specification
+    ----------------------------------
     Christian Schlichtherle
-    -----------------------
+    ----------------------------------
 
-About TrueVFS Kernel
+About
 
     This module implements virtual file systems (VFS) from arbitrary resources,
     manages their state and commits unsynchronized changes if required or

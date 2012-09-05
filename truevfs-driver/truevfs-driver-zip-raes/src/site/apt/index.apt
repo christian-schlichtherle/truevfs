@@ -1,14 +1,14 @@
-    -----------------------
-    About TrueVFS Driver ZIP.RAES (TZP)
-    -----------------------
+    -----------------------------
+    About TrueVFS Driver ZIP.RAES
+    -----------------------------
     Christian Schlichtherle
-    -----------------------
+    -----------------------------
 
-About TrueVFS Driver ZIP.RAES (TZP)
+About
 
-    This module contains the file system driver service class
-    {{{./apidocs/net/java/truevfs/driver/zip/raes/ZipRaesDriverService.html}ZipRaesDriverService}}
-    which provides the following map of file system drivers:
+    This module provides the file system driver map modifier class
+    {{{./apidocs/net/java/truevfs/driver/zip/raes/ZipRaesDriverMapModifier.html}<<<ZipRaesDriverMapModifier>>>}}
+    which provides the following file system driver mappings:
 
 *--*--*
 ||URI Schemes / Archive File Extension||File System Driver Class|

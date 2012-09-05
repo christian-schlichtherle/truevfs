@@ -1,30 +1,24 @@
-    -----------------------
-    About TrueVFS Driver TAR
-    -----------------------
+    -----------------------------
+    About TrueVFS Driver TAR.GZIP
+    -----------------------------
     Christian Schlichtherle
-    -----------------------
+    -----------------------------
 
-About TrueVFS Driver TAR
+About
 
-    This module contains the file system driver service class
-    {{{./apidocs/net/java/truevfs/driver/tar/TarDriverService.html}TarDriverService}}
-    which provides the following map of file system drivers:
+    This module provides the file system driver map modifier class
+    {{{./apidocs/net/java/truevfs/driver/tar/gzip/TarGZipDriverMapModifier.html}<<<TarGZipDriverMapModifier>>>}}
+    which provides the following file system driver mappings:
 
 *--*--*
 ||URI Schemes / Archive File Extensions||File System Driver Class|
 *--+--+
-|<<<tar>>>|{{{./apidocs/net/java/truevfs/driver/tar/TarDriver.html}<<<TarDriver>>>}}|
-*--+--+
-|<<<tar.bz2>>>, <<<tb2>>>, <<<tbz>>>, <<<tbz2>>>|{{{./apidocs/net/java/truevfs/driver/tar/TarBZip2Driver.html}<<<TarBZip2Driver>>>}}|
-*--+--+
-|<<<tar.gz>>>, <<<tgz>>>|{{{./apidocs/net/java/truevfs/driver/tar/TarGZipDriver.html}<<<TarGZipDriver>>>}}|
-*--+--+
-|<<<tar.xz>>>, <<<txz>>>|{{{./apidocs/net/java/truevfs/driver/tar/TarXZDriver.html}<<<TarXZDriver>>>}}|
+|<<<tar.gz>>>, <<<tgz>>>|{{{./apidocs/net/java/truevfs/driver/tar/gzip/TarGZipDriver.html}<<<TarGZipDriver>>>}}|
 *--+--+
 
     Add the JAR artifact of this module to the run time class path to
     make its file system drivers available for service location in the
-    client API modules.
+    client API module.
     The URI schemes will then get recognized as default archive file extensions
     by the class
     {{{../../apidocs/net/java/truevfs/access/TArchiveDetector.html}<<<TArchiveDetector>>>}}.

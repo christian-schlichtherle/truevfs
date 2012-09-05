@@ -45,15 +45,19 @@ cp -rp archive.zip archive.tar.gz
     TrueVFS&#160;${project.version} than you could put into
     TrueZIP&#160;${truezip-version}.
 
+    If you are interested in the plans for this project, please have a look
+    at its
+    {{{http://java.net/jira/browse/TRUEVFS#selectedTab=com.atlassian.jira.plugin.system.project%3Aroadmap-panel}Road Map}}
+    on JIRA or subscribe to its {{{./mail-lists.html}Users Mailing List}} for
+    discussion.
+    As of now, TrueVFS and TrueZIP share the same mailing lists, so if you are
+    already subscribed to any TrueZIP mailing list, then you don’t need to
+    change anything.
+
     Note that the TrueVFS version is not yet at 1.0 because chances are that
     there will be backwards incompatible changes to the API of internal modules.
     This is unlikely to happen to the API of the client module
     {{{./truevfs-access/index.html}TrueVFS&#160;Access}}, however.
-
-    If you are interested in the plans for this project, please have a look
-    at its
-    {{{http://java.net/jira/browse/TRUEVFS#selectedTab=com.atlassian.jira.plugin.system.project%3Aroadmap-panel}Road Map}}
-    on JIRA or subscribe to its {{{./mail-lists.html}Users Mailing List}} for discussion.
 
     Developing TrueVFS is a serious effort which requires a lot of time.
     If TrueVFS has helped you or your organization to save some valuable

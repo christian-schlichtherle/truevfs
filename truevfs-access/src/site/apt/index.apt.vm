@@ -4,9 +4,9 @@
     Christian Schlichtherle
     -----------------------
 
-Introduction
+About
 
-    This is the primary API for TrueVFS applications.
+    TrueVFS Access features the primary API for TrueVFS applications.
     It provides simple, uniform, transparent, thread-safe, read/write access to
     archive files as if they were just virtual directories in a file system
     path.
