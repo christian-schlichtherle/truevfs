@@ -1,10 +1,10 @@
-    -----------------------
-    About TrueVFS Driver ZIP Core
-    -----------------------
+    ---------------------------------
+    About TrueVFS Component ZipDriver
+    ---------------------------------
     Christian Schlichtherle
-    -----------------------
+    ---------------------------------
 
-About TrueVFS Driver ZIP Core
+About
 
     Provides core functionality for the ZIP file format driver family.
 

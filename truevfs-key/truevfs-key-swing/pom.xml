@@ -16,7 +16,7 @@
 
     <name>TrueVFS KeyManager Swing</name>
     <description>
-Swing based implementation of the KeyManager Specification.
+        Swing based implementation of the KeyManager Specification.
     </description>
 
     <dependencies>

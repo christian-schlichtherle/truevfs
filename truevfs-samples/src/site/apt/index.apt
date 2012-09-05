@@ -4,10 +4,9 @@
     Christian Schlichtherle
     -----------------------
 
-About TrueVFS Samples
+About
 
-    Sample applications to demonstrate the usage of various TrueVFS module
-    APIs.
+    Sample applications to demonstrate the usage of various TrueVFS APIs.
 
     Note that some of these samples use rather advanced or exotic features
     which makes them more complex than necessary for a typical application.

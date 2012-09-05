@@ -1,10 +1,10 @@
-    -----------------------
+    -------------------------------
     About TrueVFS Extension Logging
-    -----------------------
+    -------------------------------
     Christian Schlichtherle
-    -----------------------
+    -------------------------------
 
-About TrueVFS Extension Logging
+About
 
     Instruments the TrueVFS Kernel for monitoring via SLF4J.
 

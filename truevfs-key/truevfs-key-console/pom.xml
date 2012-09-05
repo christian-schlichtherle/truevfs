@@ -16,7 +16,7 @@
 
     <name>TrueVFS KeyManager Console</name>
     <description>
-Console based implementation of the KeyManager Specification.
+        Console based implementation of the KeyManager Specification.
     </description>
 
     <dependencies>

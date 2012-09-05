@@ -4,7 +4,7 @@
     Christian Schlichtherle
     --------------------------
 
-About TrueVFS Profile Base
+About
 
     Profiles bundle some other TrueVFS modules so that you can use them as
     a single all-in-one dependency - they do not provide any additional

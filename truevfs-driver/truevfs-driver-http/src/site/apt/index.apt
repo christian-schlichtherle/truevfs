@@ -1,14 +1,14 @@
-    -----------------------
+    ----------------------------
     About TrueVFS Driver HTTP(S)
-    -----------------------
+    ----------------------------
     Christian Schlichtherle
-    -----------------------
+    ----------------------------
 
-About TrueVFS Driver HTTP(S)
+About
 
-    This module contains the file system driver service class
-    {{{./apidocs/net/java/truevfs/driver/http/HttpDriverService.html}HttpDriverServive}}
-    which provides the following map of file system drivers:
+    This module provides the file system driver map modifier class
+    {{{./apidocs/net/java/truevfs/driver/http/HttpDriverMapModifier.html}<<<HttpDriverMapModifier>>>}}
+    which provides the following file system driver mappings:
 
 *--*--*
 ||URI Schemes||File System Driver Class|
