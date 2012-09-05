@@ -6,5 +6,4 @@
 
 About
 
-    Implements the TrueVFS KeyManager Specification to prompt the user for
-    passwords via the console, if available.
+    Prompts the user for passwords via a console based dialog, if available.

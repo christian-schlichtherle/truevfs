@@ -16,7 +16,7 @@
 
     <name>TrueVFS KeyManager Swing</name>
     <description>
-        Swing based implementation of the KeyManager Specification.
+        Prompts the user for passwords via a Swing based dialog, if available.
     </description>
 
     <dependencies>
