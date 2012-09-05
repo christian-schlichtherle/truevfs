@@ -6,15 +6,10 @@
 
 About
 
-    This module implements virtual file systems (VFS) from arbitrary resources,
-    manages their state and commits unsynchronized changes if required or
-    requested.
-    The TrueVFS Kernel uses
-    {{{./apidocs/net/java/truevfs/kernel/FsDriver.html}file system drivers}} to access
-    these resources.
-    It provides federating, multithreading, multiplexing, caching and
-    accounting so that archive file system drivers do not need to take care of
-    these aspects of a virtual file system.
+    Specifies the API for accessing the federated virtual file system space.
+    Most noteably, the specification contains a service provider API for a
+    singleton file system manager, an I/O buffer pool and a map of file
+    system drivers.
 
 * Disclaimer
 
