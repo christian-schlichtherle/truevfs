@@ -6,7 +6,6 @@
 
 About
 
-    Extends the module TrueVFS KeyManager Swing to provide visible and audible
-    feedback by hurling the Swing based dialog whenever the users enters a
-    wrong password.
+    Provides visible and audible feedback by hurling the Swing based dialog
+    whenever the users enters a wrong password.
     Enjoy the fun!

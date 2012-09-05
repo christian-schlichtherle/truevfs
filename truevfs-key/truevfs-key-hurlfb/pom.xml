@@ -16,7 +16,8 @@
 
     <name>TrueVFS KeyManager HurlingWindowFeedback</name>
     <description>
-        Provides hurling window feedback when entering a wrong password.
+        Provides visible and audible feedback by hurling the Swing based dialog
+        whenever the users enters a wrong password.
     </description>
 
     <dependencies>
