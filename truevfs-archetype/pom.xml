@@ -16,7 +16,9 @@
     <packaging>pom</packaging>
 
     <name>TrueVFS Archetype</name>
-    <description>Parent POM for Maven archetypes.</description>
+    <description>
+        Archetype modules generate sample code for using or extending TrueVFS.
+    </description>
 
     <modules>
         <module>truevfs-archetype-access</module>

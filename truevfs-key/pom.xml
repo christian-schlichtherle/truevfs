@@ -16,7 +16,7 @@
     <packaging>pom</packaging>
 
     <name>TrueVFS KeyManager</name>
-    <description>Parent POM for the KeyManager API.</description>
+    <description>KeyManager modules provide secret key management.</description>
 
     <modules>
         <module>truevfs-key-console</module>
