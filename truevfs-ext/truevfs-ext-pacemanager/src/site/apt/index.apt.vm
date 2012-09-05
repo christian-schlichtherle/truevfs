@@ -8,7 +8,7 @@ About
 
     Constrains the number of concurrently mounted archive file systems in
     order to save some heap space.
-    This module provides a JMX interface for management and monitoring.
+    This module provides a JMX interface for monitoring and management.
 
 * Usage
 
