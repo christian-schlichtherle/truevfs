@@ -36,7 +36,7 @@ cp -rp archive.zip archive.tar.gz
 
 * State Of Affairs
 
-    TrueVFS is the successor to {{{http://truezip.java.net}TrueZIP}}.
+    TrueVFS is the successor of {{{http://truezip.java.net}TrueZIP}}.
     TrueVFS&#160;${project.version} has been developed by refactoring the
     TrueZIP code base and reflects the latest changes up to
     TrueZIP&#160;${truezip-version}.
