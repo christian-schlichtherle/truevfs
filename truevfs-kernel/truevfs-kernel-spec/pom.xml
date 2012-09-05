@@ -18,8 +18,8 @@
     <description>
         Specifies the API for accessing the federated virtual file system space.
         Most noteably, the specification contains a service provider API for a
-        singleton file system manager, an I/O buffer pool and a map of file
-        system drivers.
+        singleton file system manager, an I/O buffer pool and a file system
+        driver map.
     </description>
 
     <dependencies>

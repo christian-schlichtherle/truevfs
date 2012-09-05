@@ -18,7 +18,8 @@
     <description>
         Implements the API for accessing the federated virtual file system space.
         This reference implementation can get overridden by providing another
-        implementation with a higher priority on the class path.
+        file system manager factory implementation with a higher priority on
+        the class path.
     </description>
 
     <dependencies>
