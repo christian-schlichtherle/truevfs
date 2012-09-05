@@ -16,10 +16,10 @@
 
     <name>TrueVFS Kernel Specification</name>
     <description>
-        Specifies services for virtual file systems from arbitrary resources.
-        The TrueVFS Kernel uses file system drivers to access these resources.
-        It provides multithreading, multiplexing, caching and buffering so that
-        the file system drivers do not need to take care of this.
+        Specifies the API for accessing the federated virtual file system space.
+        Most noteably, the specification contains a service provider API for a
+        singleton file system manager, an I/O buffer pool and a map of file
+        system drivers.
     </description>
 
     <dependencies>

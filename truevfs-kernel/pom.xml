@@ -17,7 +17,8 @@
 
     <name>TrueVFS Kernel</name>
     <description>
-        Kernel modules provide access to virtual file systems.
+        Kernel modules specify and implement the API for accessing the
+        federated virtual file system space.
     </description>
 
     <modules>
