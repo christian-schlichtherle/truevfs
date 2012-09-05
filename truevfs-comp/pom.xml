@@ -17,10 +17,11 @@
 
     <name>TrueVFS Component</name>
     <description>
-        Components provide some functionality to serve as a building block for
-        other modules.
-        Unlike TrueVFS Driver or TrueVFS Extension modules, components do NOT
-        advertise services for use by the TrueVFS Kernel on the class path.
+        Component modules provide some functionality to serve as a building
+        block for other modules.
+        Unlike TrueVFS Driver or TrueVFS Extension modules, component modules
+        do NOT advertise services for use by the TrueVFS Kernel on the class
+        path.
     </description>
 
     <modules>

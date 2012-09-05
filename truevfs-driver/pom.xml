@@ -17,10 +17,10 @@
 
     <name>TrueVFS Driver</name>
     <description>
-        Drivers provide services to extend the TrueVFS Kernel with support for
-        a particular type of file system.
-        Drivers advertise their services on the class path in order to make
-        them locatable by the TrueVFS Kernel at runtime.
+        Driver modules provide services to extend the TrueVFS Kernel with
+        support for a particular type of file system.
+        Driver modules advertise their services on the class path in order to
+        make them locatable by the TrueVFS Kernel at runtime.
     </description>
 
     <modules>

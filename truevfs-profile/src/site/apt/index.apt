@@ -1,0 +1,11 @@
+    -----------------------
+    About TrueVFS Profile
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+About
+
+    Profile modules bundle some other modules so that you can use them as
+    a single all-in-one dependency - they do not provide any additional
+    functionality.

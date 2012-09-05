@@ -16,7 +16,9 @@
     <packaging>pom</packaging>
 
     <name>TrueVFS Kernel</name>
-    <description>Parent POM for the kernel.</description>
+    <description>
+        Kernel modules provide access to virtual file systems.
+    </description>
 
     <modules>
         <module>truevfs-kernel-impl</module>
