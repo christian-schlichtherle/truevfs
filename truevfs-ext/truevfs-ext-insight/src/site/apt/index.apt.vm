@@ -6,8 +6,7 @@
 
 About
 
-    This module instruments the TrueVFS Kernel for managing and monitoring
-    via JMX.
+    Instruments the TrueVFS Kernel for statistics monitoring via JMX.
 
 * Usage
 

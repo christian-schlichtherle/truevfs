@@ -10,7 +10,7 @@ About
 
 * Warning
 
-    The tracing level should <not> be used in production environments
+    The tracing level should <not> be logged in production environments
     because of its performance impact due to excessive stack trace logging.
     Use for temporary testing and debugging only!
 
