@@ -44,10 +44,11 @@ cp -rp archive.zip archive.tar.gz
     and extended so that you can easily put the same faith into
     TrueVFS&#160;${project.version} than you could put into
     TrueZIP&#160;${truezip-version}.
-    However, the TrueVFS version is not yet at 1.0 because chances are that
+
+    Note that the TrueVFS version is not yet at 1.0 because chances are that
     there will be backwards incompatible changes to the API of internal modules.
     This is unlikely to happen to the API of the client module
-    {{{./truevfs-access/index.html}TrueVFS&#160;Access}}.
+    {{{./truevfs-access/index.html}TrueVFS&#160;Access}}, however.
 
     If you are interested in the plans for this project, please have a look
     at its
