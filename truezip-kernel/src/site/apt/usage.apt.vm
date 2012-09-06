@@ -19,13 +19,13 @@ TrueZIP Kernel Usage
     {{{../truezip-file/index.html}TrueZIP File*}},
     the API of this module is more complex to use, yet very extensible because
     it relies on Dependency Injection for the resolution of
-    {{{./apidocs/de/schlichtherle/truezip/fs/FsDriver.html}file system drivers}}
+    {{{../apidocs/de/schlichtherle/truezip/fs/FsDriver.html}file system drivers}}
     and
-    {{{./apidocs/de/schlichtherle/truezip/socket/IOPool.html}I/O entry pools}}.
+    {{{../apidocs/de/schlichtherle/truezip/socket/IOPool.html}I/O entry pools}}.
     It also provides service locators for
-    {{{./apidocs/de/schlichtherle/truezip/fs/sl/FsDriverLocator.html}file system driver providers}}
+    {{{../apidocs/de/schlichtherle/truezip/fs/sl/FsDriverLocator.html}file system driver providers}}
     and
-    {{{./apidocs/de/schlichtherle/truezip/socket/sl/IOPoolLocator.html}I/O entry pool providers}}
+    {{{../apidocs/de/schlichtherle/truezip/socket/sl/IOPoolLocator.html}I/O entry pool providers}}
     in order to enable applications to resolve these dependencies easily at
     runtime.
 
