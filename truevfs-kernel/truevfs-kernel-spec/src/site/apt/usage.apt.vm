@@ -16,13 +16,13 @@ TrueVFS Kernel Usage
     In contrast to the module {{{../truevfs-access/index.html}TrueVFS Access}},
     the API of this module is more complex to use, yet very extensible because
     it relies on Dependency Injection for the resolution of
-    {{{./apidocs/net/java/truevfs/kernel/FsDriver.html}file system drivers}}
+    {{{../../apidocs/net/java/truevfs/kernel/FsDriver.html}file system drivers}}
     and
-    {{{./apidocs/net/java/truevfs/kernel/cio/IOPool.html}I/O entry pools}}.
+    {{{../../apidocs/net/java/truevfs/kernel/cio/IOPool.html}I/O entry pools}}.
     It also provides service locators for
-    {{{./apidocs/net/java/truevfs/kernel/sl/FsDriverLocator.html}file system driver providers}}
+    {{{../../apidocs/net/java/truevfs/kernel/sl/FsDriverLocator.html}file system driver providers}}
     and
-    {{{./apidocs/net/java/truevfs/kernel/sl/IOPoolLocator.html}I/O entry pool providers}}
+    {{{../../apidocs/net/java/truevfs/kernel/sl/IOPoolLocator.html}I/O entry pool providers}}
     in order to enable applications to resolve these dependencies easily at
     runtime.
 

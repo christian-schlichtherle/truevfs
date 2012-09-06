@@ -7,7 +7,7 @@
 Nzip - a Comprehensive Command Line Utility
 
     The Nzip command line utility implemented by the class
-    {{{./apidocs/net/java/truevfs/sample/Nzip.html}<<<net.truevfs.samples.Nzip>>>}}
+    {{{../apidocs/net/java/truevfs/sample/Nzip.html}<<<net.truevfs.samples.Nzip>>>}}
     showcases the power of the {{{../truevfs-access/index.html}TrueVFS Access File*}} API.
 
     This is a comprehensive command line utility which allows you to work with

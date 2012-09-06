@@ -14,13 +14,13 @@ About
         New ZIP entries can get appended to existing ZIP files.
 
         To use this feature with the ZIP API, call
-        {{{./apidocs/net/java/truevfs/driver/zip/core/io/ZipOutputStream.html#ZipOutputStream(java.io.OutputStream,net.truevfs.driver.zip.core.io.ZipFile)}<<<ZipOutputStream(OutputStream, ZipFile)>>>}}.
+        {{{../../apidocs/net/java/truevfs/driver/zip/core/io/ZipOutputStream.html#ZipOutputStream(java.io.OutputStream,net.truevfs.driver.zip.core.io.ZipFile)}<<<ZipOutputStream(OutputStream, ZipFile)>>>}}.
 
     [Recovery Of Lost ZIP Entries]
         When reading truncated ZIP files, lost entries can get recovered.
 
         To use this feature with the ZIP API, call
-        {{{./apidocs/net/java/truevfs/driver/zip/core/io/ZipFile.html#recoverLostEntries()}<<<ZipFile.recoverLostEntries()>>>}}.
+        {{{../../apidocs/net/java/truevfs/driver/zip/core/io/ZipFile.html#recoverLostEntries()}<<<ZipFile.recoverLostEntries()>>>}}.
 
     [WinZip AES Specification]
         When reading or writing a ZIP file, ZIP entry data can get encrypted
@@ -28,12 +28,12 @@ About
         {{{http://www.winzip.com/win/en/aes_info.htm}WinZip AES specification}}.
 
         To use this feature with the ZIP API, call
-        {{{./apidocs/net/java/truevfs/driver/zip/core/io/ZipEntry.html#setEncrypted(boolean)}<<<ZipEntry.setEncrypted(boolean)>>>}}
+        {{{../../apidocs/net/java/truevfs/driver/zip/core/io/ZipEntry.html#setEncrypted(boolean)}<<<ZipEntry.setEncrypted(boolean)>>>}}
         first.
         Then call
-        {{{./apidocs/net/java/truevfs/driver/zip/core/io/ZipFile.html#setCryptoParameters(net.truevfs.driver.zip.io.ZipCryptoParameters)}<<<ZipFile.setCryptoParameters(ZipCryptoParameters)>>>}}
+        {{{../../apidocs/net/java/truevfs/driver/zip/core/io/ZipFile.html#setCryptoParameters(net.truevfs.driver.zip.io.ZipCryptoParameters)}<<<ZipFile.setCryptoParameters(ZipCryptoParameters)>>>}}
         or
-        {{{./apidocs/net/java/truevfs/driver/zip/core/io/ZipOutputStream.html#setCryptoParameters(net.truevfs.driver.zip.io.ZipCryptoParameters)}<<<ZipOutputStream.setCryptoParameters(ZipCryptoParameters)>>>}}
+        {{{../../apidocs/net/java/truevfs/driver/zip/core/io/ZipOutputStream.html#setCryptoParameters(net.truevfs.driver.zip.io.ZipCryptoParameters)}<<<ZipOutputStream.setCryptoParameters(ZipCryptoParameters)>>>}}
         respectively.
 
         Note that the WinZip AES encryption scheme does <not> encrypt and <not>
@@ -50,7 +50,7 @@ About
 
         To use this feature for writing a BZIP2 compressed ZIP entry with
         the ZIP API, call
-        {{{./apidocs/net/java/truevfs/driver/zip/core/io/ZipEntry.html#setMethod(int)}<<<ZipEntry.setMethod(int)>>>}}
+        {{{../../apidocs/net/java/truevfs/driver/zip/core/io/ZipEntry.html#setMethod(int)}<<<ZipEntry.setMethod(int)>>>}}
 
     [Selectable Character Sets]
         The character set for reading and writing ZIP comments and ZIP entry
@@ -58,16 +58,16 @@ About
         directly.
 
         To use this feature with the ZIP API, call
-        {{{./apidocs/net/java/truevfs/driver/zip/core/io/ZipOutputStream.html#ZipOutputStream(java.io.OutputStream,java.nio.charset.Charset)}<<<ZipOutputStream(OutputStream, Charset)>>>}}
+        {{{../../apidocs/net/java/truevfs/driver/zip/core/io/ZipOutputStream.html#ZipOutputStream(java.io.OutputStream,java.nio.charset.Charset)}<<<ZipOutputStream(OutputStream, Charset)>>>}}
         or
-        {{{./apidocs/net/java/truevfs/driver/zip/core/io/ZipFile.html#ZipFile(java.io.File,java.nio.charset.Charset)}<<<ZipFile(File, Charset)>>>}}.
+        {{{../../apidocs/net/java/truevfs/driver/zip/core/io/ZipFile.html#ZipFile(java.io.File,java.nio.charset.Charset)}<<<ZipFile(File, Charset)>>>}}.
 
     [External File Attributes]
         External file attributes can get used to set executable bits for third
         party tools, etc.
 
         To use this feature with the ZIP API, call
-        {{{./apidocs/net/java/truevfs/driver/zip/core/io/ZipEntry.html#setExternalAttributes(long)}<<<ZipEntry.setExternalAttributes(long)>>>}}.
+        {{{../../apidocs/net/java/truevfs/driver/zip/core/io/ZipEntry.html#setExternalAttributes(long)}<<<ZipEntry.setExternalAttributes(long)>>>}}.
 
     [ZIP64 Extensions]
         ZIP64 extensions are automatically and transparently read and written

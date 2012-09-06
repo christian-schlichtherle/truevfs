@@ -29,7 +29,7 @@ About
     the platform file system.
 
     For example, an application could access an entry within an archive file
-    using a {{{./apidocs/net/java/truevfs/access/TFile.html}<<<TFile>>>}}
+    using a {{{../apidocs/net/java/truevfs/access/TFile.html}<<<TFile>>>}}
     like this:
 
 +--+
@@ -46,18 +46,18 @@ try (Writer writer = new TFileWriter(entry)) {
     are present on the class path at run time.
 
     For the API documentation, please refer to the Javadoc of the package
-    {{{./apidocs/net/java/truevfs/access/package-summary.html}<<<net.truevfs.access>>>}}
+    {{{../apidocs/net/java/truevfs/access/package-summary.html}<<<net.truevfs.access>>>}}
 
 * The TPath class et al
 
     Like the <<<TFile>>>* classes, the
-    {{{./apidocs/net/java/truevfs/access/TPath.html}<<<TPath>>>}} class
+    {{{../apidocs/net/java/truevfs/access/TPath.html}<<<TPath>>>}} class
     provides simple, uniform, transparent, thread-safe, read/write access to
     archive files as if they were virtual directories in a file system path.
     It's accompanied by the
-    {{{./apidocs/net/java/truevfs/access/TFileSystem.html}<<<TFileSystem>>>}}
+    {{{../apidocs/net/java/truevfs/access/TFileSystem.html}<<<TFileSystem>>>}}
     and
-    {{{./apidocs/net/java/truevfs/access/TFileSystemProvider.html}<<<TFileSystemProvider>>>}}
+    {{{../apidocs/net/java/truevfs/access/TFileSystemProvider.html}<<<TFileSystemProvider>>>}}
     classes to implement a file system provider for the NIO.2 API (JSR 203) of
     JSE&#160;7.
 
@@ -67,7 +67,7 @@ try (Writer writer = new TFileWriter(entry)) {
 
     For example, an application could access an entry within an archive
     file which is located at a web site using a
-    {{{./apidocs/net/java/truevfs/access/TPath.html}<<<TPath>>>}}
+    {{{../apidocs/net/java/truevfs/access/TPath.html}<<<TPath>>>}}
     like this:
 
 +--+
@@ -85,7 +85,7 @@ try (InputStream in = Files.newInputStream(path)) {
     are present on the class path at run time.
 
     For the API documentation, please refer to the Javadoc of the package
-    {{{./apidocs/net/java/truevfs/access/package-summary.html}<<<net.truevfs.access>>>}}
+    {{{../apidocs/net/java/truevfs/access/package-summary.html}<<<net.truevfs.access>>>}}
 
 * Swing GUI
 
@@ -93,7 +93,7 @@ try (InputStream in = Files.newInputStream(path)) {
     and choosing entries in archive files.
 
     For the API documentation, please refer to the Javadoc of the package
-    {{{./apidocs/net/java/truevfs/access/swing/package-summary.html}<<<net.truevfs.access.swing>>>}}
+    {{{../apidocs/net/java/truevfs/access/swing/package-summary.html}<<<net.truevfs.access.swing>>>}}
 
 * More Examples
 
