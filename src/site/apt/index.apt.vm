@@ -117,11 +117,11 @@ cp -rp archive.zip archive.tar.gz
     comprehensive Javadoc and sample code:
 
     * If you are going to write an archive file system driver,
-      please consult the Javadoc for
+      please consult the Javadoc for the abstract class
       {{{./apidocs/net/java/truevfs/kernel/spec/FsArchiveDriver.html}<<<FsArchiveDriver>>>}}.
 
     * If you are going to write a plain file system driver,
-      please consult the Javadoc for
+      please consult the Javadoc for the abstract class
       {{{./apidocs/net/java/truevfs/kernel/spec/FsDriver.html}<<<FsDriver>>>}}.
 
     []
