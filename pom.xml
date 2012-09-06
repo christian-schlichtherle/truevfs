@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.java.truecommons</groupId>
         <artifactId>truecommons-parent</artifactId>
-        <version>13</version>
+        <version>14</version>
     </parent>
 
     <groupId>net.java.truevfs</groupId>
@@ -381,6 +381,40 @@ plug-in to its federated file system space.
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <configuration>
+                        <reportPlugins combine.children="append">
+                            <plugin>
+                                <artifactId>maven-javadoc-plugin</artifactId>
+                                <reports>
+                                    <report>aggregate</report>
+                                </reports>
+                                <configuration>
+                                    <links>
+                                        <link>http://www.bouncycastle.org/docs/docs1.6/</link>
+                                        <link>http://commons.apache.org/compress/apidocs/</link>
+                                        <link>http://findbugs.sourceforge.net/api/</link>
+                                    </links>
+                                </configuration>
+                            </plugin>
+                            <plugin>
+                                <artifactId>maven-jxr-plugin</artifactId>
+                                <reports>
+                                    <report>aggregate</report>
+                                </reports>
+                            </plugin>
+                            <plugin>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>jdepend-maven-plugin</artifactId>
+                            </plugin>
+                            <plugin>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>findbugs-maven-plugin</artifactId>
+                            </plugin>
+                        </reportPlugins>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
