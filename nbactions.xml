@@ -94,6 +94,9 @@
         <goals>
             <goal>release:perform</goal>
         </goals>
+        <properties>
+            <localCheckout>true</localCheckout>
+        </properties>
     </action>
     <action>
         <actionName>CUSTOM-release:rollback</actionName>
