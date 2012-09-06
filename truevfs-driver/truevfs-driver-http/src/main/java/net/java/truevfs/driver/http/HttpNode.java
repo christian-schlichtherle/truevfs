@@ -49,7 +49,7 @@ public class HttpNode extends FsNode implements IoEntry<HttpNode> {
         assert null != controller;
         this.controller = controller;
         this.name = name.toString();
-        this.uri = controller.resolve(name).toUri();
+        this.uri = controller.resolve(name).getUri();
     }
 
     final IoBufferPool getPool() {

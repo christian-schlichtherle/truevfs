@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.kernel.spec;
 
+import java.beans.ConstructorProperties;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -47,7 +48,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_NAME;
  * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
- *   <th>{@link #toUri() uri} property</th>
+ *   <th>{@link #getUri() uri} property</th>
  *   <th>{@link #getPath() path} property</th>
  *   <th>{@link #getQuery() query} property</th>
  *   <th>{@link #getFragment() fragment} property</th>
@@ -116,7 +117,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_NAME;
  * <h3><a name="identities"/>Identities</h3>
  * <p>
  * For any node name {@code e}, it's generally true that
- * {@code new FsNodeName(e.toUri()).equals(e)}.
+ * {@code new FsNodeName(e.getUri()).equals(e)}.
  * 
  * <h3><a name="serialization"/>Serialization</h3>
  * <p>
@@ -176,7 +177,7 @@ implements Serializable, Comparable<FsNodeName> {
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
-     * @param  uri the {@link #toUri() URI}.
+     * @param  uri the {@link #getUri() URI}.
      * @throws NullPointerException if {@code uri} is {@code null}.
      * @throws IllegalArgumentException if {@code uri} does not conform to the
      *         syntax constraints for file system node names.
@@ -195,7 +196,7 @@ implements Serializable, Comparable<FsNodeName> {
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
-     * @param  uri the {@link #toUri() URI}.
+     * @param  uri the {@link #getUri() URI}.
      * @param  modifier the URI modifier.
      * @throws NullPointerException if {@code uri} or {@code modifier} are
      *         {@code null}.
@@ -218,11 +219,12 @@ implements Serializable, Comparable<FsNodeName> {
     /**
      * Constructs a new file system node name by parsing the given URI.
      *
-     * @param  uri the {@link #toUri() URI}.
+     * @param  uri the {@link #getUri() URI}.
      * @throws NullPointerException if {@code uri} is {@code null}.
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for file system node names.
      */
+    @ConstructorProperties("uri")
     public FsNodeName(URI uri) throws URISyntaxException {
         this(uri, NULL);
     }
@@ -231,7 +233,7 @@ implements Serializable, Comparable<FsNodeName> {
      * Constructs a new file system node name by parsing the given URI
      * after applying the given URI modifier.
      *
-     * @param  uri the {@link #toUri() URI}.
+     * @param  uri the {@link #getUri() URI}.
      * @param  modifier the URI modifier.
      * @throws NullPointerException if {@code uri} or {@code modifier} are
      *         {@code null}.
@@ -322,13 +324,13 @@ implements Serializable, Comparable<FsNodeName> {
     }
 
     private boolean invariants() {
-        assert null != toUri();
-        assert !toUri().isAbsolute();
-        assert null == toUri().getRawAuthority();
-        assert null != toUri().getRawPath();
-        assert null == toUri().getRawFragment();
-        assert toUri().normalize() == toUri();
-        String p = toUri().getRawPath();
+        assert null != getUri();
+        assert !getUri().isAbsolute();
+        assert null == getUri().getRawAuthority();
+        assert null != getUri().getRawPath();
+        assert null == getUri().getRawFragment();
+        assert getUri().normalize() == getUri();
+        String p = getUri().getRawPath();
         assert !"..".equals(p);
         assert !p.startsWith(SEPARATOR);
         assert !p.startsWith("." + SEPARATOR);
@@ -345,8 +347,8 @@ implements Serializable, Comparable<FsNodeName> {
      *         system node name is empty and no query component is defined.
      */
     public boolean isRoot() {
-        //return toUri().toString().isEmpty();
-        final URI uri = toUri();
+        //return getUri().toString().isEmpty();
+        final URI uri = getUri();
         final String path = uri.getRawPath();
         if (null != path && !path.isEmpty())
             return false;
@@ -361,13 +363,13 @@ implements Serializable, Comparable<FsNodeName> {
      *
      * @return The URI for this node name.
      */
-    public URI toUri() {
+    public URI getUri() {
         return uri;
     }
 
     /**
      * Returns the path of this node name.
-     * Equivalent to {@link #toUri() toUri()}{@code .getPath()}.
+     * Equivalent to {@link #getUri() getUri()}{@code .getPath()}.
      *
      * @return The path of this node name.
      */
@@ -377,7 +379,7 @@ implements Serializable, Comparable<FsNodeName> {
 
     /**
      * Returns the query of this node name.
-     * Equivalent to {@link #toUri() toUri()}{@code .getQuery()}.
+     * Equivalent to {@link #getUri() getUri()}{@code .getQuery()}.
      *
      * @return The query of this node name.
      */
@@ -387,7 +389,7 @@ implements Serializable, Comparable<FsNodeName> {
 
     /**
      * Returns the fragment of this node name.
-     * Equivalent to {@link #toUri() toUri()}{@code .getFragment()}.
+     * Equivalent to {@link #getUri() getUri()}{@code .getFragment()}.
      *
      * @return The fragment of this node name.
      */
@@ -428,7 +430,7 @@ implements Serializable, Comparable<FsNodeName> {
     }
 
     /**
-     * Equivalent to calling {@link URI#toString()} on {@link #toUri()}.
+     * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
      */
     @Override
     public String toString() {

@@ -165,7 +165,7 @@ public final class TFileSystem extends FileSystem {
     @Override
     public Iterable<Path> getRootDirectories() {
         return Collections.singleton((Path)
-                new TPath(getMountPoint().toHierarchicalUri().resolve(SEPARATOR)));
+                new TPath(getMountPoint().getHierarchicalUri().resolve(SEPARATOR)));
     }
 
     /** @throws UnsupportedOperationException always */

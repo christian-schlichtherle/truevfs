@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.kernel.spec;
 
+import java.beans.ConstructorProperties;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -57,7 +58,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
  * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
- *   <th>{@link #toUri() uri} property</th>
+ *   <th>{@link #getUri() uri} property</th>
  *   <th>{@link #getMountPoint() mountPoint} URI</th>
  *   <th>{@link #getNodeName() nodeName} URI</th>
  * </tr>
@@ -117,7 +118,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
  * <h3><a name="identities"/>Identities</h3>
  * <p>
  * For any path {@code p}, it's generally true that
- * {@code new FsNodePath(p.toUri()).equals(p)}.
+ * {@code new FsNodePath(p.getUri()).equals(p)}.
  * <p>
  * Furthermore, it's generally true that
  * {@code new FsNodePath(p.getMountPoint(), p.getNodeName()).equals(p)}.
@@ -163,7 +164,7 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
-     * @param  uri the {@link #toUri() URI}.
+     * @param  uri the {@link #getUri() URI}.
      * @param  modifier the URI modifier.
      * @throws IllegalArgumentException if {@code uri} does not conform to the
      *         syntax constraints for paths.
@@ -193,6 +194,7 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
     /**
      * Equivalent to {@link #FsNodePath(URI, FsUriModifier) new FsNodePath(uri, FsUriModifier.NULL)}.
      */
+    @ConstructorProperties("uri")
     public FsNodePath(URI uri) throws URISyntaxException {
         parse(uri, NULL);
     }
@@ -200,7 +202,7 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
     /**
      * Constructs a new path by parsing the given URI.
      *
-     * @param  uri the non-{@code null} {@link #toUri() URI}.
+     * @param  uri the non-{@code null} {@link #getUri() URI}.
      * @param  modifier the URI modifier.
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for paths.
@@ -224,16 +226,16 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
             final FsNodeName nodeName) {
         URI mpu;
         if (null == mountPoint) {
-            this.uri = nodeName.toUri();
+            this.uri = nodeName.getUri();
         } else if (nodeName.isRoot()) {
-            this.uri = mountPoint.toUri();
-        } else if ((mpu = mountPoint.toUri()).isOpaque()) {
+            this.uri = mountPoint.getUri();
+        } else if ((mpu = mountPoint.getUri()).isOpaque()) {
             try {
                 // Compute mountPoint + nodeName, but ensure that all URI
                 // components are properly quoted.
                 final String mpussp = mpu.getRawSchemeSpecificPart();
                 final int mpusspl = mpussp.length();
-                final URI enu = nodeName.toUri();
+                final URI enu = nodeName.getUri();
                 final String enup = enu.getRawPath();
                 final int enupl = enup.length();
                 final String enuq = enu.getRawQuery();
@@ -253,7 +255,7 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
                 throw new AssertionError(ex);
             }
         } else {
-            this.uri = mpu.resolve(nodeName.toUri());
+            this.uri = mpu.resolve(nodeName.getUri());
         }
         this.mountPoint = mountPoint;
         this.nodeName = nodeName;
@@ -300,19 +302,19 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
                      .toUri(),
                     modifier);
             if (NULL != modifier) {
-                URI mpu = mountPoint.toUri();
-                URI nuri = new URI(mpu.getScheme() + ':' + mpu.getRawSchemeSpecificPart() + nodeName.toUri());
+                URI mpu = mountPoint.getUri();
+                URI nuri = new URI(mpu.getScheme() + ':' + mpu.getRawSchemeSpecificPart() + nodeName.getUri());
                 if (!uri.equals(nuri))
                     uri = nuri;
             }
         } else if (uri.isAbsolute()) {
             mountPoint = new FsMountPoint(uri.resolve(DOT), modifier);
-            nodeName = new FsNodeName(mountPoint.toUri().relativize(uri), modifier);
+            nodeName = new FsNodeName(mountPoint.getUri().relativize(uri), modifier);
         } else {
             mountPoint = null;
             nodeName = new FsNodeName(uri, modifier);
             if (NULL != modifier)
-                uri = nodeName.toUri();
+                uri = nodeName.getUri();
         }
         this.uri = uri;
 
@@ -320,23 +322,23 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
     }
 
     private boolean invariants() {
-        assert null != toUri();
-        assert null == toUri().getRawFragment();
-        assert (null != getMountPoint()) == toUri().isAbsolute();
+        assert null != getUri();
+        assert null == getUri().getRawFragment();
+        assert (null != getMountPoint()) == getUri().isAbsolute();
         assert null != getNodeName();
-        if (toUri().isOpaque()) {
-            assert toUri().getRawSchemeSpecificPart().contains(FsMountPoint.SEPARATOR);
+        if (getUri().isOpaque()) {
+            assert getUri().getRawSchemeSpecificPart().contains(FsMountPoint.SEPARATOR);
             /*try {
-                assert toUri().equals(new URI(getMountPoint().toUri().getScheme(), getMountPoint().toUri().getSchemeSpecificPart() + toDecodedUri(getNodeName()), null));
+                assert getUri().equals(new URI(getMountPoint().getUri().getScheme(), getMountPoint().getUri().getSchemeSpecificPart() + toDecodedUri(getNodeName()), null));
             } catch (URISyntaxException ex) {
                 throw new AssertionError(ex);
             }*/
-        } else if (toUri().isAbsolute()) {
-            assert toUri().normalize() == toUri();
-            assert toUri().equals(getMountPoint().toUri().resolve(getNodeName().toUri()));
+        } else if (getUri().isAbsolute()) {
+            assert getUri().normalize() == getUri();
+            assert getUri().equals(getMountPoint().getUri().resolve(getNodeName().getUri()));
         } else {
-            assert toUri().normalize() == toUri();
-            assert getNodeName().toUri() == toUri();
+            assert getUri().normalize() == getUri();
+            assert getNodeName().getUri() == getUri();
         }
         return true;
     }
@@ -346,7 +348,7 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
      *
      * @return The URI for this path.
      */
-    public URI toUri() {
+    public URI getUri() {
         return uri;
     }
 
@@ -363,13 +365,13 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
      * @return A URI which is recursively transformed from the URI of this
      *         path so that it's absolute and hierarchical.
      */
-    public URI toHierarchicalUri() {
+    public URI getHierarchicalUri() {
         final URI hierarchical = this.hierarchical;
         if (null != hierarchical)
             return hierarchical;
         if (uri.isOpaque()) {
-            final URI mpu = mountPoint.toHierarchicalUri();
-            final URI enu = nodeName.toUri();
+            final URI mpu = mountPoint.getHierarchicalUri();
+            final URI enu = nodeName.getUri();
             try {
                 return this.hierarchical = enu.toString().isEmpty()
                         ? mpu
@@ -387,7 +389,7 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
 
     /**
      * Returns the mount point component or {@code null} iff this path's
-     * {@link #toUri() URI} is not absolute.
+     * {@link #getUri() URI} is not absolute.
      *
      * @return The nullable mount point.
      */
@@ -450,7 +452,7 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
     }
 
     /**
-     * Equivalent to calling {@link URI#toString()} on {@link #toUri()}.
+     * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
      */
     @Override
     public String toString() {

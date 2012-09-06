@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.kernel.spec;
 
+import java.beans.ConstructorProperties;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -47,7 +48,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
  * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
- *   <th>{@link #toUri() uri} property</th>
+ *   <th>{@link #getUri() uri} property</th>
  *   <th>{@link #getScheme() scheme} property</th>
  *   <th>{@link #getPath() path} URI</th>
  *   <th>{@link #getParent() parent} URI</th>
@@ -113,7 +114,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
  * <h3><a name="identities"/>Identities</h3>
  * <p>
  * For any mount point {@code m}, it's generally true that
- * {@code new FsMountPoint(m.toUri()).equals(m)}.
+ * {@code new FsMountPoint(m.getUri()).equals(m)}.
  * <p>
  * For any mount point {@code m} with an opaque URI, it's generally true that
  * {@code new FsMountPoint(m.getScheme(), m.getPath()).equals(m)}.
@@ -166,7 +167,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
-     * @param  uri the {@link #toUri() URI}.
+     * @param  uri the {@link #getUri() URI}.
      * @param  modifier the URI modifier.
      * @throws IllegalArgumentException if {@code uri} does not conform to the
      *         syntax constraints for mount points.
@@ -207,6 +208,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     /**
      * Equivalent to {@link #FsMountPoint(URI, FsUriModifier) new FsMountPoint(uri, FsUriModifier.NULL)}.
      */
+    @ConstructorProperties("uri")
     public FsMountPoint(URI uri) throws URISyntaxException {
         parse(uri, NULL);
     }
@@ -214,7 +216,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     /**
      * Constructs a new mount point by parsing the given URI.
      *
-     * @param  uri the {@link #toUri() URI}.
+     * @param  uri the {@link #getUri() URI}.
      * @param  modifier the URI modifier.
      * @throws URISyntaxException if {@code uri} does not conform to the
      *         syntax constraints for mount points.
@@ -236,10 +238,10 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     public FsMountPoint(final FsScheme scheme,
                         final FsNodePath path)
     throws URISyntaxException {
-        final URI pu = path.toUri();
+        final URI pu = path.getUri();
         if (!pu.isAbsolute())
             throw new QuotedUriSyntaxException(pu, "Path not absolute");
-        final String penup = path.getNodeName().toUri().getPath();
+        final String penup = path.getNodeName().getUri().getPath();
         if (0 == penup.length())
             throw new QuotedUriSyntaxException(pu, "Empty node name");
         this.uri = new UriBuilder(true)
@@ -285,7 +287,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
                 throw new QuotedUriSyntaxException(uri,
                         "Doesn't end with mount point separator \"" + SEPARATOR + '"');
             path = new FsNodePath(new URI(ssp.substring(0, i)), modifier);
-            final URI pu = path.toUri();
+            final URI pu = path.getUri();
             if (!pu.isAbsolute())
                 throw new QuotedUriSyntaxException(uri, "Path not absolute");
             if (0 == path.getNodeName().getPath().length())
@@ -316,19 +318,19 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     }
 
     private boolean invariants() {
-        assert null != toUri();
-        assert toUri().isAbsolute();
-        assert null == toUri().getRawQuery();
-        assert null == toUri().getRawFragment();
-        if (toUri().isOpaque()) {
-            assert toUri().getRawSchemeSpecificPart().endsWith(SEPARATOR);
+        assert null != getUri();
+        assert getUri().isAbsolute();
+        assert null == getUri().getRawQuery();
+        assert null == getUri().getRawFragment();
+        if (getUri().isOpaque()) {
+            assert getUri().getRawSchemeSpecificPart().endsWith(SEPARATOR);
             assert null != getPath();
-            assert getPath().toUri().isAbsolute();
-            assert null == getPath().toUri().getRawFragment();
-            assert 0 != getPath().getNodeName().toUri().getRawPath().length();
+            assert getPath().getUri().isAbsolute();
+            assert null == getPath().getUri().getRawFragment();
+            assert 0 != getPath().getNodeName().getUri().getRawPath().length();
         } else {
-            assert toUri().normalize() == toUri();
-            assert toUri().getRawPath().endsWith(FsNodeName.SEPARATOR);
+            assert getUri().normalize() == getUri();
+            assert getUri().getRawPath().endsWith(FsNodeName.SEPARATOR);
             assert null == getPath();
         }
         return true;
@@ -339,7 +341,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      *
      * @return The URI for this mount point.
      */
-    public URI toUri() {
+    public URI getUri() {
         return uri;
     }
 
@@ -356,12 +358,12 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * @return A URI which is recursively transformed from the URI of this
      *         mount point so that it's absolute and hierarchical.
      */
-    public URI toHierarchicalUri() {
+    public URI getHierarchicalUri() {
         final URI hierarchical = this.hierarchical;
         return null != hierarchical
                 ? hierarchical
                 : (this.hierarchical = uri.isOpaque()
-                    ? path.toHierarchicalUri()
+                    ? path.getHierarchicalUri()
                     : uri);
     }
 
@@ -379,7 +381,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
 
     /**
      * Returns the path component
-     * or {@code null} iff this mount point's {@link #toUri URI} doesn't name
+     * or {@code null} iff this mount point's {@link #getUri URI} doesn't name
      * a parent mount point, that is if and only if it's hierarchical.
      *
      * @return The nullable path component.
@@ -391,7 +393,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     /**
      * Returns the parent component, that is the mount point of the parent file
      * system,
-     * or {@code null} iff this mount point's {@link #toUri URI} doesn't name
+     * or {@code null} iff this mount point's {@link #getUri URI} doesn't name
      * a parent mount point, that is if and only if it's hierarchical.
      * 
      * @return The nullable parent component.
@@ -442,7 +444,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     }
 
     /**
-     * Equivalent to calling {@link URI#toString()} on {@link #toUri()}.
+     * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
      */
     @Override
     public String toString() {

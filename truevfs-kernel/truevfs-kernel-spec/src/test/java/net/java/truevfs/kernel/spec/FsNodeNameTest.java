@@ -195,8 +195,8 @@ public class FsNodeNameTest {
             final FsNodeName parent = FsNodeName.create(URI.create(params[0]));
             final FsNodeName member = FsNodeName.create(URI.create(params[1]));
             final FsNodeName result = new FsNodeName(parent, member);
-            assertThat(result.toUri(), equalTo(URI.create(params[2])));
-            assertThat(FsNodeName.create(result.toUri()), equalTo(result));
+            assertThat(result.getUri(), equalTo(URI.create(params[2])));
+            assertThat(FsNodeName.create(result.getUri()), equalTo(result));
         }
     }
 
@@ -213,7 +213,7 @@ public class FsNodeNameTest {
             final URI uri = URI.create(params[0]);
             final URI expected = URI.create(params[1]);
             final FsNodeName name = FsNodeName.create(uri, CANONICALIZE);
-            final URI result = name.toUri();
+            final URI result = name.getUri();
             assertThat(result, equalTo(expected));
         }
     }

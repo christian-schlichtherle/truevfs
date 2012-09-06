@@ -110,16 +110,16 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * with the given model.
      * <p>
      * The implementation in the class {@link ZipDriver} returns the
-     * expression {@code model.getMountPoint().toHierarchicalUri()}
+     * expression {@code model.getMountPoint().getHierarchicalUri()}
      * in order to improve the readability of the URI in comparison to the
-     * expression {@code model.getMountPoint().toUri()}.
+     * expression {@code model.getMountPoint().getUri()}.
      * 
      * @param  model the file system model.
      * @return The URI which represents the file system model's mount point.
      * @see    <a href="http://java.net/jira/browse/TRUEZIP-72">#TRUEZIP-72</a>
      */
     public URI mountPointUri(FsModel model) {
-        return model.getMountPoint().toHierarchicalUri();
+        return model.getMountPoint().getHierarchicalUri();
     }
 
     /**

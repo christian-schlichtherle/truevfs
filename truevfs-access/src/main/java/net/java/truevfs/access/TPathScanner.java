@@ -92,7 +92,7 @@ final class TPathScanner {
             if ("..".equals(mp)) return parent(parent);
             final int mpl = pathPrefixLength(member);
             if (0 < mpl) {
-                final URI pu = parent.toHierarchicalUri().resolve(SEPARATOR_URI);
+                final URI pu = parent.getHierarchicalUri().resolve(SEPARATOR_URI);
                 final String ma = member.getAuthority();
                 final String p = null != ma || mp.startsWith(SEPARATOR)
                         ? mp.substring(0, mpl)
@@ -132,7 +132,7 @@ final class TPathScanner {
         }
         URI ppu;
         FsNodePath mp;
-        if (men.isRoot() || (ppu = pp.toUri()).isOpaque() || !ppu.isAbsolute()) {
+        if (men.isRoot() || (ppu = pp.getUri()).isOpaque() || !ppu.isAbsolute()) {
             mp = pp.resolve(men);
         } else {
             final String pup = ppu.getPath();
@@ -204,13 +204,13 @@ final class TPathScanner {
             path = mp.getPath();
             if (null != path)
                 return parent(path);
-            URI mpu = mp.toUri();
+            URI mpu = mp.getUri();
             URI pu = mpu.resolve(DOT_DOT_URI);
             if (mpu.getRawPath().length() <= pu.getRawPath().length())
                 return null;
             return new FsNodePath(pu);
         } else {
-            URI pu = en.toUri().resolve(DOT_URI);
+            URI pu = en.getUri().resolve(DOT_URI);
             en = new FsNodeName(pu, CANONICALIZE);
             return new FsNodePath(mp, en);
         }

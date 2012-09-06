@@ -531,7 +531,7 @@ public final class TFileTest extends MockArchiveDriverTestBase {
             FsNodePath path = FsNodePath.create(URI.create(param));
             try {
                 assertIssue154(new TFile(path));
-                assertIssue154(new TFile(path.toUri()));
+                assertIssue154(new TFile(path.getUri()));
             } catch (ServiceConfigurationError error) {
                 throw new AssertionError(param, error);
             }

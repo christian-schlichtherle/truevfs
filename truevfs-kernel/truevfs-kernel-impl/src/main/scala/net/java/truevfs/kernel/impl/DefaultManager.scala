@@ -178,7 +178,7 @@ private object DefaultManager {
    */
   private object ReverseControllerOrdering extends Ordering[FsController] {
     override def compare(a: FsController, b: FsController) =
-      b.getModel.getMountPoint.toHierarchicalUri compareTo
-        a.getModel.getMountPoint.toHierarchicalUri
+      b.getModel.getMountPoint.getHierarchicalUri compareTo
+        a.getModel.getMountPoint.getHierarchicalUri
   }
 }

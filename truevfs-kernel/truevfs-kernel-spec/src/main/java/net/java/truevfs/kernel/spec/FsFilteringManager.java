@@ -34,7 +34,7 @@ public final class FsFilteringManager extends FsDecoratingManager {
             final FsMountPoint prefix,
             final FsManager manager) {
         super(manager);
-        this.prefix = prefix.toHierarchicalUri();
+        this.prefix = prefix.getHierarchicalUri();
     }
 
     @Override
@@ -63,7 +63,7 @@ public final class FsFilteringManager extends FsDecoratingManager {
         @Override
         protected boolean accept(final FsController controller) {
             assert null != controller : "null elements are not allowed in this collection!";
-            final URI mp = controller.getModel().getMountPoint().toHierarchicalUri();
+            final URI mp = controller.getModel().getMountPoint().getHierarchicalUri();
             final String mpp;
             return mp.getScheme().equals(ps)
                     && (mpp = mp.getPath()).startsWith(pp)
