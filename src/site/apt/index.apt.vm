@@ -118,10 +118,10 @@ cp -rp archive.zip archive.tar.gz
 
     * If you are going to write an archive file system driver,
       please consult the Javadoc for
-      {{{./apidocs/net/java/truevfs/kernel/spec/FsArchiveDriver.html}<<<net.java.truevfs.kernel.spec.FsArchiveDriver>>>}}.
+      {{{./apidocs/net/java/truevfs/kernel/spec/FsArchiveDriver.html}<<<FsArchiveDriver>>>}}.
 
     * If you are going to write a plain file system driver,
       please consult the Javadoc for
-      {{{./apidocs/net/java/truevfs/kernel/spec/FsDriver.html}<<<net.java.truevfs.kernel.spec.FsDriver>>>}}.
+      {{{./apidocs/net/java/truevfs/kernel/spec/FsDriver.html}<<<FsDriver>>>}}.
 
     []

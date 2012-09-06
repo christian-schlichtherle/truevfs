@@ -7,13 +7,13 @@
 About
 
     This module provides the file system driver map modifier class
-    {{{./apidocs/net/java/truevfs/driver/tar/gzip/TarGZipDriverMapModifier.html}<<<TarGZipDriverMapModifier>>>}}
+    {{{../../apidocs/net/java/truevfs/driver/tar/gzip/TarGZipDriverMapModifier.html}<<<TarGZipDriverMapModifier>>>}}
     which provides the following file system driver mappings:
 
 *--*--*
 ||URI Schemes / Archive File Extensions||File System Driver Class|
 *--+--+
-|<<<tar.gz>>>, <<<tgz>>>|{{{./apidocs/net/java/truevfs/driver/tar/gzip/TarGZipDriver.html}<<<TarGZipDriver>>>}}|
+|<<<tar.gz>>>, <<<tgz>>>|{{{../../apidocs/net/java/truevfs/driver/tar/gzip/TarGZipDriver.html}<<<TarGZipDriver>>>}}|
 *--+--+
 
     Add the JAR artifact of this module to the run time class path to
