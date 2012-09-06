@@ -7,13 +7,13 @@
 About
 
     This module provides the file system driver map modifier class
-    {{{./apidocs/net/java/truevfs/driver/tar/TarDriverMapModifier.html}<<<TarDriverMapModifier>>>}}
+    {{{../../apidocs/net/java/truevfs/driver/tar/TarDriverMapModifier.html}<<<TarDriverMapModifier>>>}}
     which provides the following file system driver mappings:
 
 *--*--*
 ||URI Schemes / Archive File Extensions||File System Driver Class|
 *--+--+
-|<<<tar>>>|{{{./apidocs/net/java/truevfs/driver/tar/TarDriver.html}<<<TarDriver>>>}}|
+|<<<tar>>>|{{{../../apidocs/net/java/truevfs/driver/tar/TarDriver.html}<<<TarDriver>>>}}|
 *--+--+
 
     Add the JAR artifact of this module to the run time class path to

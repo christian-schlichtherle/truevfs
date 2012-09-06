@@ -7,7 +7,7 @@
 About
 
     This module provides the file system driver map modifier class
-    {{{./apidocs/net/java/truevfs/driver/zip/ZipDriverMapModifier.html}<<<ZipDriverMapModifier>>>}}
+    {{{../../apidocs/net/java/truevfs/driver/zip/ZipDriverMapModifier.html}<<<ZipDriverMapModifier>>>}}
     which provides the following file system driver mappings:
 
 *--*--*

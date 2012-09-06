@@ -7,13 +7,13 @@
 About
 
     This module provides the file system driver map modifier class
-    {{{./apidocs/net/java/truevfs/driver/odf/OdfDriverMapModifier.html}<<<OdfDriverMapModifier>>>}}
+    {{{../../apidocs/net/java/truevfs/driver/odf/OdfDriverMapModifier.html}<<<OdfDriverMapModifier>>>}}
     which provides the following file system driver mappings:
 
 *--*--*
 ||URI Schemes / Archive File Extensions||File System Driver Class|
 *--+--+
-|<<<odt>>>, <<<ott>>>, <<<odg>>>, <<<otg>>>, <<<odp>>>, <<<otp>>>, <<<ods>>>, <<<ots>>>, <<<odc>>>, <<<otc>>>, <<<odi>>>, <<<oti>>>, <<<odf>>>, <<<otf>>>, <<<odm>>>, <<<oth>>>, <<<odb>>>|{{{./apidocs/net/java/truevfs/driver/odf/OdfDriver.html}<<<OdfDriver>>>}}|
+|<<<odt>>>, <<<ott>>>, <<<odg>>>, <<<otg>>>, <<<odp>>>, <<<otp>>>, <<<ods>>>, <<<ots>>>, <<<odc>>>, <<<otc>>>, <<<odi>>>, <<<oti>>>, <<<odf>>>, <<<otf>>>, <<<odm>>>, <<<oth>>>, <<<odb>>>|{{{../../apidocs/net/java/truevfs/driver/odf/OdfDriver.html}<<<OdfDriver>>>}}|
 *--+--+
 
     Add the JAR artifact of this module to the run time class path to
