@@ -742,7 +742,7 @@ public final class TPath implements Path, TRex {
     public URI getUri() {
         URI n = getName();
         String s = n.getScheme();
-        return new UriBuilder(getNodePath().toHierarchicalUri())
+        return new UriBuilder(getNodePath().getHierarchicalUri())
                 .scheme(null != s ? s : TFileSystemProvider.get(n).getScheme())
                 .toUri();
     }

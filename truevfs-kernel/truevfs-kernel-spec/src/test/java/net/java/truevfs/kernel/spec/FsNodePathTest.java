@@ -317,9 +317,9 @@ public class FsNodePathTest {
         else
             assertThat(path.getMountPoint(), nullValue());
         assertThat(path.getNodeName(), equalTo(entryName));
-        assertThat(path.toString(), equalTo(path.toUri().toString()));
-        assertThat(FsNodePath.create(path.toUri()), equalTo(path));
-        assertThat(FsNodePath.create(path.toUri()).hashCode(), equalTo(path.hashCode()));
+        assertThat(path.toString(), equalTo(path.getUri().toString()));
+        assertThat(FsNodePath.create(path.getUri()), equalTo(path));
+        assertThat(FsNodePath.create(path.getUri()).hashCode(), equalTo(path.hashCode()));
     }
 
     @Test
@@ -360,7 +360,7 @@ public class FsNodePathTest {
             { "bar", "bar" },
         }) {
             final FsNodePath path = FsNodePath.create(URI.create(params[0]));
-            final URI hierarchical = path.toHierarchicalUri();
+            final URI hierarchical = path.getHierarchicalUri();
             assertThat(hierarchical, equalTo(URI.create(params[1])));
         }
     }

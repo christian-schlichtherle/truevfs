@@ -31,7 +31,7 @@ extends InstrumentingModel<M> implements JmxColleague {
     private ObjectName getObjectName() {
         return mediator.nameBuilder(FsModel.class)
                 .put("mountPoint", ObjectName.quote(
-                    model.getMountPoint().toHierarchicalUri().toString()))
+                    model.getMountPoint().getHierarchicalUri().toString()))
                 .get();
     }
 
