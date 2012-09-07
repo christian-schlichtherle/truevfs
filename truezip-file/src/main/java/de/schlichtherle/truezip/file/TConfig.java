@@ -71,7 +71,7 @@ class MyApplication extends TApplication<IOException> {
         // Set FsOutputOption.GROW for appending-to rather than reassembling
         // existing archive files.
         config.setOutputPreferences(
-                config.getOutputPreferences.set(FsOutputOption.GROW));
+                config.getOutputPreferences().set(FsOutputOption.GROW));
     }
 
     ...
@@ -162,7 +162,7 @@ try {
     // Set FsOutputOption.GROW for appending-to rather than reassembling
     // existing archive files.
     config.setOutputPreferences(
-            config.getOutputPreferences.set(FsOutputOption.GROW));
+            config.getOutputPreferences().set(FsOutputOption.GROW));
 
     // Now use the current configuration and append the entry to the archive
     // file even if it's already present.
