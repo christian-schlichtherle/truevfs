@@ -28,7 +28,7 @@ import ArchiveFileSystem._
   */
 @NotThreadSafe
 private class ArchiveFileSystem[E <: FsArchiveEntry] private(
-  driver: FsArchiveDriver[E],
+  controller: Callback[E],
   master: EntryTable[E])
 extends Iterable[FsCovariantNode[E]] {
 
@@ -37,10 +37,8 @@ extends Iterable[FsCovariantNode[E]] {
   /** Whether or not this file system has been modified. */
   private var touched: Boolean = _
 
-  private var _touchListener: Option[TouchListener] = None
-
-  def this(driver: FsArchiveDriver[E]) {
-    this(driver, new EntryTable(OVERHEAD_SIZE))
+  def this(controller: Callback[E]) {
+    this(controller, new EntryTable(OVERHEAD_SIZE))
     val root = newEntry(RootPath, DIRECTORY, None)
     val time = System.currentTimeMillis()
     for (access <- ALL_ACCESS)
@@ -49,9 +47,9 @@ extends Iterable[FsCovariantNode[E]] {
     touched = true
   }
 
-  def this(driver: FsArchiveDriver[E], archive: Container[E], rootTemplate: Option[Entry]) {
+  def this(controller: Callback[E], archive: Container[E], rootTemplate: Option[Entry]) {
     // Allocate some extra capacity to create missing parent directories.
-    this(driver, new EntryTable(archive.size + OVERHEAD_SIZE))
+    this(controller, new EntryTable(archive.size + OVERHEAD_SIZE))
     // Load entries from source archive.
     var paths = List[String]()
     val normalizer = new PathNormalizer(SEPARATOR_CHAR)
@@ -73,6 +71,8 @@ extends Iterable[FsCovariantNode[E]] {
     // separately!
     for (path <- paths) fix(path)
   }
+
+  private def driver = controller.driver
 
   /** Called from a constructor in order to fix the parent directories of the
     * file system entry identified by `name`, ensuring that all parent
@@ -197,8 +197,8 @@ extends Iterable[FsCovariantNode[E]] {
     if (FILE.ne(tµpe) && DIRECTORY.ne(tµpe)) // TODO: Add support for other types.
       throw new FileSystemException(name.toString, null,
                                     "Can only create file or directory entries, but not a " + typeName(tµpe) + " entry!")
-    val path = name.getPath
-    master.get(path).foreach { ce =>
+    val np = name.getPath
+    master.get(np).foreach { ce =>
       if (!ce.isType(FILE))
         throw new FileAlreadyExistsException(name.toString, null,
                                             "Cannot replace a " + typeName(ce) + " entry!")
@@ -212,7 +212,7 @@ extends Iterable[FsCovariantNode[E]] {
       case Some(ce: FsCovariantNode[_]) => Some(ce.get(tµpe))
       case x => x
     }
-    new Make(options, path, tµpe, t)
+    new Make(options, np, tµpe, t)
   }
 
   /** Represents a `make` transaction.
@@ -312,8 +312,8 @@ extends Iterable[FsCovariantNode[E]] {
     */
   def unlink(options: AccessOptions, name: FsNodeName) {
     // Test.
-    val path = name.getPath
-    val mce = master.get(path) match {
+    val np = name.getPath
+    val mce = master.get(np) match {
       case Some(mce) => mce
       case _ => throw new NoSuchFileException(name.toString)
     }
@@ -330,7 +330,7 @@ extends Iterable[FsCovariantNode[E]] {
 
     // Notify listener and modify.
     touch(options)
-    master.remove(path);
+    master.remove(np);
     {
       // See http://java.net/jira/browse/TRUEZIP-144 :
       // This is used to signal to the driver that the entry should not
@@ -344,7 +344,7 @@ extends Iterable[FsCovariantNode[E]] {
       for (tµpe <- ALL_ACCESS)
           mae.setTime(tµpe, UNKNOWN)
     }
-    splitter.split(path)
+    splitter.split(np)
     val pp = splitter.getParentPath
     val pce = master.get(pp).get
     val ok = pce.remove(splitter.getMemberName)
@@ -392,6 +392,7 @@ extends Iterable[FsCovariantNode[E]] {
     */
   private def newEntry(options: AccessOptions, name: String, tµpe: Type, template: Option[Entry]) = {
     assert(!isRoot(name))
+    val driver = this.driver
     driver.checkEncodable(name)
     driver.newEntry(options, name, tµpe, template.orNull)
   }
@@ -404,24 +405,9 @@ extends Iterable[FsCovariantNode[E]] {
     */
   private def touch(options: AccessOptions) {
     if (!touched) {
-      _touchListener.foreach(_.preTouch(options))
+      controller.preTouch(options)
       touched = true
     }
-  }
-
-  /** Gets the archive file system touch listener. */
-  final def touchListener = _touchListener
-
-  /** Sets the archive file system touch listener.
-    *
-    * @param  listener the touch listener.
-    * @throws IllegalStateException if `listener` is not null and the
-    *         touch listener has already been set.
-    */
-  final def touchListener_=(listener: Option[TouchListener]) {
-    if (listener.isDefined && _touchListener.isDefined)
-      throw new IllegalStateException("The touch listener has already been set!")
-    _touchListener = listener
   }
 } // ArchiveFileSystem
 
@@ -437,8 +423,8 @@ private object ArchiveFileSystem {
     * @param  driver the archive driver to use.
     * @return A new archive file system.
     */
-  def apply[E <: FsArchiveEntry](driver: FsArchiveDriver[E]) =
-    new ArchiveFileSystem(driver)
+  def apply[E <: FsArchiveEntry](controller: Callback[E]) =
+    new ArchiveFileSystem(controller)
 
   /** Returns a new archive file system which populates its entries from
     * the given `archive` and ensures its integrity.
@@ -467,9 +453,9 @@ private object ArchiveFileSystem {
     *         [[net.java.truevfs.kernel.impl.FsReadOnlyFileSystemException]].
     *@return A new archive file system.
     */
-  def apply[E <: FsArchiveEntry](driver: FsArchiveDriver[E], archive: Container[E], rootTemplate: Option[Entry], readOnly: Boolean) = {
-    if (readOnly) new ReadOnlyArchiveFileSystem(driver, archive, rootTemplate)
-    else new ArchiveFileSystem(driver, archive, rootTemplate)
+  def apply[E <: FsArchiveEntry](controller: Callback[E], archive: Container[E], rootTemplate: Option[Entry], readOnly: Boolean) = {
+    if (readOnly) new ReadOnlyArchiveFileSystem[E](controller, archive, rootTemplate)
+    else new ArchiveFileSystem(controller, archive, rootTemplate)
   }
 
   private def typeName(entry: FsCovariantNode[_ <: Entry]): String = {
@@ -527,8 +513,14 @@ private object ArchiveFileSystem {
     }
   } // Splitter
 
-  /** Used to notify implementations of an event in this file system. */
-  trait TouchListener {
+  /**
+    * Used to provide an archive driver and notify the implementation of an
+    * event in this file system.
+    */
+  trait Callback[E <: FsArchiveEntry] {
+
+    def driver: FsArchiveDriver[E]
+
     /** Called immediately before the source archive file system is going to
       * get modified (touched) for the first time.
       * If this method throws an [[java.io.IOException]], then the modification
@@ -537,7 +529,7 @@ private object ArchiveFileSystem {
       * @throws IOException at the discretion of the implementation.
       */
     def preTouch(options: AccessOptions)
-  } // TouchListener
+  } // Callback
 
   /** A case class which represents a path segment for use by
     * [[net.java.truevfs.kernel.impl.ArchiveFileSystem.Make]].
