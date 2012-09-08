@@ -22,4 +22,8 @@ public class FsReadOnlyFileSystemException extends FileSystemException {
     public FsReadOnlyFileSystemException() {
         super(null);
     }
+
+    public FsReadOnlyFileSystemException(FsMountPoint mountPoint) {
+        super(mountPoint.toString());
+    }
 }

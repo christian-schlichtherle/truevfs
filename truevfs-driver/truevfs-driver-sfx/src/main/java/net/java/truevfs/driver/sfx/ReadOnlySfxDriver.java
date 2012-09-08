@@ -65,6 +65,6 @@ public class ReadOnlySfxDriver extends ZipDriver {
             FsNodeName name,
             @CheckForNull @WillNotClose InputService<ZipDriverEntry> input)
     throws IOException {
-        throw new FsReadOnlyFileSystemException();
+        throw new FsReadOnlyFileSystemException(model.getMountPoint());
     }
 }
