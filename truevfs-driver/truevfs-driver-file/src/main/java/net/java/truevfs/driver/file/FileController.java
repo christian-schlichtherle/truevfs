@@ -191,8 +191,10 @@ final class FileController extends FsAbstractController {
                 else                        newOutputStream(file).close();
                 break;
             case DIRECTORY:
-                if (options.get(CREATE_PARENTS)) createDirectories(file);
-                else                             createDirectory(file);
+                /*if (options.get(CREATE_PARENTS))
+                    createDirectories(file);
+                else*/
+                    createDirectory(file);
                 break;
             default:
                 throw new IOException(file + " (entry type not supported: " + type + ")");
