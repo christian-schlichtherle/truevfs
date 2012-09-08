@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.access;
 
+import java.beans.ConstructorProperties;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -617,6 +618,7 @@ public final class TFile extends File implements TRex {
      *         {@link File#File(URI)}.
      * @see    #getNodePath()
      */
+    //@ConstructorProperties("nodePath")
     public TFile(FsNodePath path) { this(path, null); }
 
     /**
