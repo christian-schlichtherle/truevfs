@@ -9,11 +9,11 @@ import net.java.truevfs.kernel.spec._
 
 /** A generic mixin which provides some features of its associated `model`.
   *
-  * @tparam M the type of the file system model.
+  * @tparam M the type of the generic file system model.
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private trait GenModelAspect[+M <: FsModel] {
+private trait GenModelAspect[+M <: GenModel] {
 
   /** The model with the features to provide as an aspect. */
   def model: M
@@ -41,5 +41,5 @@ private trait GenModelAspect[+M <: FsModel] {
     * 
     * @param name the node name.
     */
-  def path(name: FsNodeName) = new FsNodePath(mountPoint, name)
+  final def path(name: FsNodeName) = model path name
 }

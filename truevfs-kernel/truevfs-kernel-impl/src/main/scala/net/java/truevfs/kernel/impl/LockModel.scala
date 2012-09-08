@@ -15,6 +15,6 @@ import net.java.truevfs.kernel.spec._
   */
 @ThreadSafe
 private final class LockModel(model: FsModel)
-extends FsDecoratingModel(model) with ReentrantReadWriteLockAspect {
+extends FsDecoratingModel(model) with GenModel with ReentrantReadWriteLockAspect {
   val lock = new ReentrantReadWriteLock
 }

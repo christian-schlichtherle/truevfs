@@ -161,13 +161,16 @@ private object DefaultManager {
   // The ResourceController extends the TargetArchiveController so that
   // trying to sync the file system while any stream or channel to the
   // latter is open gets detected and properly dealt with.
-  private final class BackController[E <: FsArchiveEntry]
-  (driver: FsArchiveDriver[E], model: LockModel, parent: FsController)
-  extends TargetArchiveController(driver, model, parent)
+  private final class BackController[E <: FsArchiveEntry](
+    override val driver: FsArchiveDriver[E],
+    override val model: LockModel,
+    parent: FsController
+  ) extends TargetArchiveController[E](parent)
   with ResourceController
   with CacheController
   with SyncController
-  with LockController {
+  with LockController
+  with LockModelAspect {
     val pool = driver.getPool
     require(null ne pool)
   }

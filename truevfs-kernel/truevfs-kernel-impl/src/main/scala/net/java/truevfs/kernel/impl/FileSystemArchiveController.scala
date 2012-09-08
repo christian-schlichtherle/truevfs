@@ -27,6 +27,7 @@ import net.java.truevfs.kernel.spec.cio.Entry._;
 @NotThreadSafe
 private abstract class FileSystemArchiveController[E <: FsArchiveEntry]
 extends BasicArchiveController[E] with MountState[E] {
+  this: LockModelAspect =>
 
   /** The mount state of the archive file system. */
   private[this] var mountState: MountState[E] = new ResetFileSystem
@@ -95,5 +96,6 @@ extends BasicArchiveController[E] with MountState[E] {
 /** Represents the mount state of the archive file system. */
 private sealed trait MountState[E <: FsArchiveEntry] {
   def autoMount(options: AccessOptions, autoCreate: Boolean): ArchiveFileSystem[E]
-  var fileSystem: Option[ArchiveFileSystem[E]]
+  def fileSystem: Option[ArchiveFileSystem[E]]
+  def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]])
 } // MountState

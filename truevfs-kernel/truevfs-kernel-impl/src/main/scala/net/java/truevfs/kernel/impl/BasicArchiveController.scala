@@ -41,7 +41,9 @@ import net.java.truevfs.kernel.spec.cio.Entry.Type._;
   */
 @NotThreadSafe
 private abstract class BasicArchiveController[E <: FsArchiveEntry]
-extends Controller[LockModel] with LockModelAspect {
+extends Controller[LockModel] {
+  this: GenModelAspect[_] =>
+
   import BasicArchiveController._
 
   private def fullPath(name: FsNodeName) = path(name).toString
