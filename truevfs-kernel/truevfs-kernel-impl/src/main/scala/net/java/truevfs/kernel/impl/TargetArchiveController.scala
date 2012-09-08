@@ -38,7 +38,7 @@ private class TargetArchiveController[E <: FsArchiveEntry](
   override final val driver: FsArchiveDriver[E],
   override final val model: LockModel,
   parent: FsController)
-extends FileSystemArchiveController[E] with ArchiveFileSystem.Callback[E] {
+extends FileSystemArchiveController[E] with ArchiveFileSystem.Controller[E] {
   import TargetArchiveController._
 
   /** The entry name of the target archive file in the parent file system. */

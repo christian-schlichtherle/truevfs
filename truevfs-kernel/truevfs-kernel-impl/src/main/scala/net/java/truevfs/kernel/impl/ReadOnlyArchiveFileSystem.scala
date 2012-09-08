@@ -21,31 +21,33 @@ import net.java.truevfs.kernel.spec.cio.Entry.Access._
   */
 @NotThreadSafe
 private final class ReadOnlyArchiveFileSystem[E <: FsArchiveEntry](
-  controller: ArchiveFileSystem.Callback[E],
+  controller: ArchiveFileSystem.Controller[E],
   archive: Container[E],
   rootTemplate: Option[Entry])
 extends ArchiveFileSystem(controller, archive, rootTemplate) {
   import ReadOnlyArchiveFileSystem._
 
+  private def mountPoint = controller.mountPoint
+
   override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) {
     if (!types.isEmpty && READ_ONLY != types)
-        throw new FsReadOnlyFileSystemException();
+        throw new FsReadOnlyFileSystemException(mountPoint)
     super.checkAccess(options, name, types)
   }
 
   override def setReadOnly(name: FsNodeName) { }
 
   override def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]) =
-    throw new FsReadOnlyFileSystemException
+    throw new FsReadOnlyFileSystemException(mountPoint)
 
   override def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long) =
-    throw new FsReadOnlyFileSystemException
+    throw new FsReadOnlyFileSystemException(mountPoint)
 
   override def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) =
-    throw new FsReadOnlyFileSystemException
+    throw new FsReadOnlyFileSystemException(mountPoint)
 
   override def unlink(options: AccessOptions, name: FsNodeName) =
-    throw new FsReadOnlyFileSystemException
+    throw new FsReadOnlyFileSystemException(mountPoint)
 }
 
 private object ReadOnlyArchiveFileSystem {
