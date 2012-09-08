@@ -74,6 +74,16 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-profile-full</artifactId>
             <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>truevfs-ext-insight</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>truevfs-ext-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
