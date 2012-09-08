@@ -35,7 +35,7 @@ public class TFileBeanInfo extends SimpleBeanInfo {
                     file.getClass(),
                     "new", // NOI18N
                     new Object[] {
-                        file.toURI(),
+                        file.getNodePath(),
                     });
             }
         };
