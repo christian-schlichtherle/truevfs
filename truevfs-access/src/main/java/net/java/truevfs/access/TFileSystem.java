@@ -402,7 +402,7 @@ public final class TFileSystem extends FileSystem {
             Class<V> type,
             LinkOption... options) {
         if (type.isAssignableFrom(BasicFileAttributeView.class))
-            return type.cast(new FsEntryAttributeView(path));
+            return type.cast(new FsNodeAttributeView(path));
         return null;
     }
 
@@ -412,15 +412,14 @@ public final class TFileSystem extends FileSystem {
             LinkOption... options)
     throws IOException {
         if (type.isAssignableFrom(BasicFileAttributes.class))
-            return type.cast(new FsEntryAttributes(path));
+            return type.cast(new FsNodeAttributes(path));
         throw new UnsupportedOperationException();
     }
 
-    private final class FsEntryAttributeView
-    implements BasicFileAttributeView {
+    private final class FsNodeAttributeView implements BasicFileAttributeView {
         private final TPath path;
 
-        FsEntryAttributeView(final TPath path) {
+        FsNodeAttributeView(final TPath path) {
             this.path = path;
         }
 
@@ -431,7 +430,7 @@ public final class TFileSystem extends FileSystem {
 
         @Override
         public BasicFileAttributes readAttributes() throws IOException {
-            return new FsEntryAttributes(path);
+            return new FsNodeAttributes(path);
         }
 
         @Override
@@ -451,13 +450,12 @@ public final class TFileSystem extends FileSystem {
                     path.getAccessPreferences(), path.getNodeName(),
                     times);
         }
-    } // FsEntryAttributeView
+    } // FsNodeAttributeView
 
-    private final class FsEntryAttributes
-    implements BasicFileAttributes {
+    private final class FsNodeAttributes implements BasicFileAttributes {
         private final FsNode entry;
 
-        FsEntryAttributes(final TPath path) throws IOException {
+        FsNodeAttributes(final TPath path) throws IOException {
             if (null == (entry = getController()
                     .node(path.getAccessPreferences(), path.getNodeName())))
                 throw new NoSuchFileException(path.toString());
@@ -509,5 +507,5 @@ public final class TFileSystem extends FileSystem {
         public Object fileKey() {
             throw new UnsupportedOperationException("Not supported yet.");
         }
-    } // FsEntryAttributes
+    } // FsNodeAttributes
 }
