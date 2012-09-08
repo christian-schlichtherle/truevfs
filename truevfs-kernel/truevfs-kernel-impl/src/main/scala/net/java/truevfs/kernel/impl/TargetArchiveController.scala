@@ -15,10 +15,10 @@ import net.java.truevfs.kernel.spec.FsAccessOption._
 import net.java.truevfs.kernel.spec.FsAccessOptions._
 import net.java.truevfs.kernel.spec.FsSyncOption._
 import net.java.truevfs.kernel.spec.cio._
-import net.java.truevfs.kernel.spec.cio.Entry._;
-import net.java.truevfs.kernel.spec.cio.Entry.Access._;
-import net.java.truevfs.kernel.spec.cio.Entry.Size._;
-import net.java.truevfs.kernel.spec.cio.Entry.Type._;
+import net.java.truevfs.kernel.spec.cio.Entry._
+import net.java.truevfs.kernel.spec.cio.Entry.Access._
+import net.java.truevfs.kernel.spec.cio.Entry.Size._
+import net.java.truevfs.kernel.spec.cio.Entry.Type._
 import ArchiveFileSystem._
 
 /** Manages I/O to the entry which represents the target archive file in its
@@ -36,10 +36,10 @@ import ArchiveFileSystem._
   */
 @NotThreadSafe
 private class TargetArchiveController[E <: FsArchiveEntry](
-  driver: FsArchiveDriver[E],
-  final override val model: LockModel,
+  override final val driver: FsArchiveDriver[E],
+  override final val model: LockModel,
   parent: FsController)
-extends FileSystemArchiveController[E] with TouchListener {
+extends FileSystemArchiveController[E] with Callback[E] {
   import TargetArchiveController._
 
   /** The entry name of the target archive file in the parent file system. */
@@ -135,7 +135,7 @@ extends FileSystemArchiveController[E] with TouchListener {
           // This may fail e.g. if the container file is an RAES
           // encrypted ZIP file and the user cancels password prompting.
           outputArchive(options)
-          ArchiveFileSystem(driver)
+          ArchiveFileSystem(this)
         } else {
           throw new FalsePositiveArchiveException(
             new NoSuchFileException(name.toString))
@@ -156,7 +156,7 @@ extends FileSystemArchiveController[E] with TouchListener {
               throw new PersistentFalsePositiveArchiveException(ex)
           }
         }
-        val fs = ArchiveFileSystem(driver, is, Option(pe), ro);
+        val fs = ArchiveFileSystem(this, is, Option(pe), ro);
         inputArchive = Some(new InputArchive(is))
         assert(mounted)
         fs
@@ -164,7 +164,6 @@ extends FileSystemArchiveController[E] with TouchListener {
     }
 
     // Register file system.
-    fs.touchListener = Some(this)
     fileSystem = Some(fs)
   }
 

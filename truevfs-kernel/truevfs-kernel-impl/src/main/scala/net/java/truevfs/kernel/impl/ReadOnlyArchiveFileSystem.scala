@@ -8,8 +8,8 @@ import net.java.truecommons.shed._
 import javax.annotation.concurrent._
 import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.cio._
-import net.java.truevfs.kernel.spec.cio.Entry._;
-import net.java.truevfs.kernel.spec.cio.Entry.Access._;
+import net.java.truevfs.kernel.spec.cio.Entry._
+import net.java.truevfs.kernel.spec.cio.Entry.Access._
 
 /** A read-only virtual file system for archive entries.
   * 
@@ -21,10 +21,10 @@ import net.java.truevfs.kernel.spec.cio.Entry.Access._;
   */
 @NotThreadSafe
 private final class ReadOnlyArchiveFileSystem[E <: FsArchiveEntry](
-  driver: FsArchiveDriver[E],
+  controller: ArchiveFileSystem.Callback[E],
   archive: Container[E],
   rootTemplate: Option[Entry])
-extends ArchiveFileSystem(driver, archive, rootTemplate) {
+extends ArchiveFileSystem(controller, archive, rootTemplate) {
   import ReadOnlyArchiveFileSystem._
 
   override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) {
