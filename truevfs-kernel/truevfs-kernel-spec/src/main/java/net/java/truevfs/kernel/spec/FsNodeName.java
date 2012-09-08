@@ -363,9 +363,7 @@ implements Serializable, Comparable<FsNodeName> {
      *
      * @return The URI for this node name.
      */
-    public URI getUri() {
-        return uri;
-    }
+    public URI getUri() { return uri; }
 
     /**
      * Returns the path of this node name.
@@ -373,9 +371,7 @@ implements Serializable, Comparable<FsNodeName> {
      *
      * @return The path of this node name.
      */
-    public String getPath() {
-        return uri.getPath();
-    }
+    public String getPath() { return uri.getPath(); }
 
     /**
      * Returns the query of this node name.
@@ -383,9 +379,7 @@ implements Serializable, Comparable<FsNodeName> {
      *
      * @return The query of this node name.
      */
-    public @CheckForNull String getQuery() {
-        return uri.getQuery();
-    }
+    public @CheckForNull String getQuery() { return uri.getQuery(); }
 
     /**
      * Returns the fragment of this node name.
@@ -393,9 +387,7 @@ implements Serializable, Comparable<FsNodeName> {
      *
      * @return The fragment of this node name.
      */
-    public @CheckForNull String getFragment() {
-        return uri.getFragment();
-    }
+    public @CheckForNull String getFragment() { return uri.getFragment(); }
 
     /**
      * Implements a natural ordering which is consistent with
@@ -425,15 +417,11 @@ implements Serializable, Comparable<FsNodeName> {
      * Returns a hash code which is consistent with {@link #equals(Object)}.
      */
     @Override
-    public int hashCode() {
-        return uri.hashCode();
-    }
+    public int hashCode() { return uri.hashCode(); }
 
     /**
      * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
      */
     @Override
-    public String toString() {
-        return uri.toString();
-    }
+    public String toString() { return uri.toString(); }
 }

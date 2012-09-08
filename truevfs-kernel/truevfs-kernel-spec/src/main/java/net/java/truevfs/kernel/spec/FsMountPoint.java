@@ -341,9 +341,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      *
      * @return The URI for this mount point.
      */
-    public URI getUri() {
-        return uri;
-    }
+    public URI getUri() { return uri; }
 
     /**
      * Returns a URI which is recursively transformed from the URI of this
@@ -386,9 +384,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      *
      * @return The nullable path component.
      */
-    public @Nullable FsNodePath getPath() {
-        return path;
-    }
+    public @Nullable FsNodePath getPath() { return path; }
 
     /**
      * Returns the parent component, that is the mount point of the parent file
@@ -409,8 +405,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * @param  name a node name relative to this mount point.
      * @return A new path with an absolute URI.
      */
-    public FsNodePath
-    resolve(FsNodeName name) {
+    public FsNodePath resolve(FsNodeName name) {
         return new FsNodePath(this, name);
     }
 
@@ -439,15 +434,11 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
      * Returns a hash code which is consistent with {@link #equals(Object)}.
      */
     @Override
-    public int hashCode() {
-        return uri.hashCode();
-    }
+    public int hashCode() { return uri.hashCode(); }
 
     /**
      * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
      */
     @Override
-    public String toString() {
-        return uri.toString();
-    }
+    public String toString() { return uri.toString(); }
 }
