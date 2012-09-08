@@ -35,4 +35,11 @@ private trait GenModelAspect[+M <: FsModel] {
     * @param touched the `touched` property of the (federated virtual) file system.
     */
   final def mounted_=(mounted: Boolean) { model setMounted mounted }
+
+  /** Composes the node path from the mountpoint of this model and the given
+    * node name.
+    * 
+    * @param name the node name.
+    */
+  def path(name: FsNodeName) = new FsNodePath(mountPoint, name)
 }

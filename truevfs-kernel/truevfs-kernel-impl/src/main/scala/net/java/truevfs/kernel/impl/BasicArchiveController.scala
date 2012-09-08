@@ -44,6 +44,8 @@ private abstract class BasicArchiveController[E <: FsArchiveEntry]
 extends Controller[LockModel] with LockModelAspect {
   import BasicArchiveController._
 
+  private def fullPath(name: FsNodeName) = path(name).toString
+
   def node(options: AccessOptions, name: FsNodeName): Option[FsNode] =
     autoMount(options) node (options, name)
 
@@ -74,10 +76,10 @@ extends Controller[LockModel] with LockModelAspect {
           case Some(ce) =>
             val ae = ce get FILE
             if (null eq ae)
-              throw new FileSystemException(name.toString, null,
+              throw new FileSystemException(fullPath(name), null,
                                             "Expected a FILE entry, but is a " + ce.getTypes + " entry!");
             ae
-          case _ => throw new NoSuchFileException(name.toString)
+          case _ => throw new NoSuchFileException(fullPath(name))
         }
       }
 
@@ -202,7 +204,7 @@ extends Controller[LockModel] with LockModelAspect {
           autoMount(options, true);
           return
       }
-      throw new FileAlreadyExistsException(name.toString, null,
+      throw new FileAlreadyExistsException(fullPath(name), null,
                                            "Cannot replace a directory entry!");
     } else {
       checkSync(options, name, CREATE)
