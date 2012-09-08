@@ -7,6 +7,7 @@ package net.java.truevfs.kernel.impl
 import net.java.truecommons.shed._
 import net.java.truecommons.shed.HashMaps._
 import net.java.truecommons.shed.Paths._
+import java.net._
 import java.nio.file._
 import java.util.Locale
 import javax.annotation.concurrent._
@@ -30,7 +31,7 @@ import ArchiveFileSystem._
 private class ArchiveFileSystem[E <: FsArchiveEntry] private(
   controller: ArchiveFileSystem.Controller[E],
   master: EntryTable[E])
-extends Iterable[FsCovariantNode[E]] {
+extends Iterable[FsCovariantNode[E]] { fs =>
 
   private val splitter = new Splitter
 
@@ -73,6 +74,10 @@ extends Iterable[FsCovariantNode[E]] {
   }
 
   private def driver = controller.driver
+  private def mountPoint = controller.mountPoint
+
+  private def fullPath(name: FsNodeName) =
+    new FsNodePath(mountPoint, name).toString
 
   /** Called from a constructor in order to fix the parent directories of the
     * file system entry identified by `name`, ensuring that all parent
@@ -93,11 +98,11 @@ extends Iterable[FsCovariantNode[E]] {
       splitter.split(name)
       val pp = splitter.getParentPath
       val mn = splitter.getMemberName
-      val pce = master.get(pp) match {
-        case Some(pce) if pce.isType(DIRECTORY) => pce
+      val pcn = master.get(pp) match {
+        case Some(pcn) if pcn.isType(DIRECTORY) => pcn
         case _ => master.add(pp, newEntry(pp, DIRECTORY, None))
       }
-      pce.add(mn)
+      pcn.add(mn)
       fix(pp)
     }
   }
@@ -118,29 +123,29 @@ extends Iterable[FsCovariantNode[E]] {
     */
   def node(options: AccessOptions, name: FsNodeName) = {
     master.get(name.getPath) match {
-      case Some(ce) => Some(ce.clone(driver))
+      case Some(cn) => Some(cn.clone(driver))
       case None => None
     }
   }
 
   def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) {
     if (master.get(name.getPath).isEmpty)
-      throw new NoSuchFileException(name.toString)
+      throw new NoSuchFileException(fullPath(name))
   }
 
   def setReadOnly(name: FsNodeName) {
-    throw new FileSystemException(name.toString, null,
+    throw new FileSystemException(fullPath(name), null,
         "Cannot set read-only state!")
   }
 
   def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]) = {
-    val ce = master.get(name.getPath) match {
-      case Some(ce) => ce
-      case _ => throw new NoSuchFileException(name.toString)
+    val cn = master.get(name.getPath) match {
+      case Some(cn) => cn
+      case _ => throw new NoSuchFileException(fullPath(name))
     }
     // HC SVNT DRACONES!
     touch(options)
-    val ae = ce.getEntry
+    val ae = cn.getEntry
     var ok = true
     for ((access, value) <- times)
         ok &= 0 <= value && ae.setTime(access, value)
@@ -149,15 +154,15 @@ extends Iterable[FsCovariantNode[E]] {
 
   def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long) = {
     if (0 > value)
-      throw new IllegalArgumentException(name.toString
+      throw new IllegalArgumentException(fullPath(name)
                                          + " (negative access time)")
-    val ce = master.get(name.getPath) match {
+    val cn = master.get(name.getPath) match {
       case Some(ce) => ce
-      case _ => throw new NoSuchFileException(name.toString)
+      case _ => throw new NoSuchFileException(fullPath(name))
     }
     // HC SVNT DRACONES!
     touch(options)
-    val ae = ce.getEntry
+    val ae = cn.getEntry
     var ok = true
     for (tµpe <- types)
         ok &= ae.setTime(tµpe, value)
@@ -195,21 +200,21 @@ extends Iterable[FsCovariantNode[E]] {
   def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) = {
     require(null ne tµpe)
     if (FILE.ne(tµpe) && DIRECTORY.ne(tµpe)) // TODO: Add support for other types.
-      throw new FileSystemException(name.toString, null,
+      throw new FileSystemException(fullPath(name), null,
                                     "Can only create file or directory entries, but not a " + typeName(tµpe) + " entry!")
     val np = name.getPath
     master.get(np).foreach { ce =>
       if (!ce.isType(FILE))
-        throw new FileAlreadyExistsException(name.toString, null,
+        throw new FileAlreadyExistsException(fullPath(name), null,
                                             "Cannot replace a " + typeName(ce) + " entry!")
       if (FILE ne tµpe)
-        throw new FileAlreadyExistsException(name.toString, null,
+        throw new FileAlreadyExistsException(fullPath(name), null,
                                             "Can only replace a file entry with a file entry, but not a " + typeName(tµpe) + " entry!")
       if (options.get(EXCLUSIVE))
-        throw new FileAlreadyExistsException(name.toString)
+        throw new FileAlreadyExistsException(fullPath(name))
     }
     val t = template match {
-      case Some(ce: FsCovariantNode[_]) => Some(ce.get(tµpe))
+      case Some(cn: FsCovariantNode[_]) => Some(cn.get(tµpe))
       case x => x
     }
     new Make(options, np, tµpe, t)
@@ -234,6 +239,9 @@ extends Iterable[FsCovariantNode[E]] {
     private var time: Long = UNKNOWN
     private val segments = newSegments(path, tµpe, template)
 
+    private def fullPath(path: String) =
+      fs.fullPath(FsNodeName.create(URI.create(path)))
+
     private def newSegments(path: String, tµpe: Type, template: Option[Entry]): List[Segment[E]] = {
       splitter.split(path)
       val pp = splitter.getParentPath // may equal ROOT_PATH
@@ -241,24 +249,24 @@ extends Iterable[FsCovariantNode[E]] {
 
       // Lookup parent entry, creating it if necessary and allowed.
       master.get(pp) match {
-        case Some(pce) =>
-          if (!pce.isType(DIRECTORY))
-            throw new NotDirectoryException(path)
+        case Some(pcn) =>
+          if (!pcn.isType(DIRECTORY))
+            throw new NotDirectoryException(fullPath(path))
           var segments = List[Segment[E]]()
-          segments ::= Segment(None, pce)
-          val mce = new FsCovariantNode[E](path)
-          mce.put(tµpe, newEntry(options, path, tµpe, template))
-          segments ::= Segment(Some(mn), mce)
+          segments ::= Segment(None, pcn)
+          val mcn = new FsCovariantNode[E](path)
+          mcn.put(tµpe, newEntry(options, path, tµpe, template))
+          segments ::= Segment(Some(mn), mcn)
           segments
         case _ =>
           if (options.get(CREATE_PARENTS)) {
             var segments = newSegments(pp, DIRECTORY, None)
-            val mce = new FsCovariantNode[E](path)
-            mce.put(tµpe, newEntry(options, path, tµpe, template))
-            segments ::= Segment(Some(mn), mce)
+            val mcn = new FsCovariantNode[E](path)
+            mcn.put(tµpe, newEntry(options, path, tµpe, template))
+            segments ::= Segment(Some(mn), mcn)
             segments
           } else {
-            throw new NoSuchFileException(path, null,
+            throw new NoSuchFileException(fullPath(path), null,
                                           "Missing parent directory entry!")
           }
       }
@@ -275,14 +283,14 @@ extends Iterable[FsCovariantNode[E]] {
 
     private def commit(segments: List[Segment[E]]): Int = {
       segments match {
-        case Segment(mn, mce) :: parentSegments =>
+        case Segment(mn, mcn) :: parentSegments =>
           val parentSize = commit(parentSegments)
           if (0 < parentSize) {
-            val pce = parentSegments.head.entry
-            val pae = pce.get(DIRECTORY)
-            val mae = mce.getEntry
-            master.add(mce.getName, mae)
-            if (master.get(pce.getName).get.add(mn.get)
+            val pcn = parentSegments.head.entry
+            val pae = pcn.get(DIRECTORY)
+            val mae = mcn.getEntry
+            master.add(mcn.getName, mae)
+            if (master.get(pcn.getName).get.add(mn.get)
                 && UNKNOWN != pae.getTime(WRITE)) // never touch ghost directories!
                   pae.setTime(WRITE, getTimeMillis)
           }
@@ -313,14 +321,13 @@ extends Iterable[FsCovariantNode[E]] {
   def unlink(options: AccessOptions, name: FsNodeName) {
     // Test.
     val np = name.getPath
-    val mce = master.get(np) match {
-      case Some(mce) => mce
-      case _ => throw new NoSuchFileException(name.toString)
+    val mcn = master.get(np) match {
+      case Some(mcn) => mcn
+      case _ => throw new NoSuchFileException(fullPath(name))
     }
-    if (mce.isType(DIRECTORY)) {
-        val size = mce.getMembers.size
-        if (0 != size)
-          throw new DirectoryNotEmptyException(name.toString)
+    if (mcn.isType(DIRECTORY)) {
+        val size = mcn.getMembers.size
+        if (0 != size) throw new DirectoryNotEmptyException(fullPath(name))
     }
     if (name.isRoot) {
       // Removing the root entry MUST get silently ignored in order to
@@ -338,19 +345,17 @@ extends Iterable[FsCovariantNode[E]] {
       // already physically present in the archive file (ZIP).
       // This signal will be ignored by drivers which do no support a
       // central directory (TAR).
-      val mae = mce.getEntry
-      for (tµpe <- ALL_SIZES)
-          mae.setSize(tµpe, UNKNOWN)
-      for (tµpe <- ALL_ACCESS)
-          mae.setTime(tµpe, UNKNOWN)
+      val mae = mcn.getEntry
+      for (tµpe <- ALL_SIZES) mae.setSize(tµpe, UNKNOWN)
+      for (tµpe <- ALL_ACCESS) mae.setTime(tµpe, UNKNOWN)
     }
     splitter.split(np)
     val pp = splitter.getParentPath
-    val pce = master.get(pp).get
-    val ok = pce.remove(splitter.getMemberName)
-    assert(ok, "The parent directory of \"" + name.toString
+    val pcn = master.get(pp).get
+    val ok = pcn.remove(splitter.getMemberName)
+    assert(ok, "The parent directory of \"" + fullPath(name)
                 + "\" does not contain this entry - archive file system is corrupted!")
-    val pae = pce.get(DIRECTORY)
+    val pae = pcn.get(DIRECTORY)
     if (UNKNOWN != pae.getTime(WRITE)) // never touch ghost directories!
         pae.setTime(WRITE, System.currentTimeMillis)
   }
@@ -490,15 +495,15 @@ private object ArchiveFileSystem {
     override def iterator = map.values.iterator
 
     def add(name: String, ae: E) = {
-      val ce = map.get(name) match {
-        case Some(ce) => ce
+      val cn = map.get(name) match {
+        case Some(cn) => cn
         case _ =>
-          val ce = new FsCovariantNode[E](name)
-          map.put(name, ce)
-          ce
+          val cn = new FsCovariantNode[E](name)
+          map.put(name, cn)
+          cn
       }
-      ce.put(ae.getType, ae)
-      ce
+      cn.put(ae.getType, ae)
+      cn
     }
 
     def get(name: String) = map.get(name)
