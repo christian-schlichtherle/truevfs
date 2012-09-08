@@ -28,7 +28,7 @@ import ArchiveFileSystem._
   */
 @NotThreadSafe
 private class ArchiveFileSystem[E <: FsArchiveEntry] private(
-  controller: Callback[E],
+  controller: ArchiveFileSystem.Controller[E],
   master: EntryTable[E])
 extends Iterable[FsCovariantNode[E]] {
 
@@ -37,7 +37,7 @@ extends Iterable[FsCovariantNode[E]] {
   /** Whether or not this file system has been modified. */
   private var touched: Boolean = _
 
-  def this(controller: Callback[E]) {
+  def this(controller: ArchiveFileSystem.Controller[E]) {
     this(controller, new EntryTable(OVERHEAD_SIZE))
     val root = newEntry(RootPath, DIRECTORY, None)
     val time = System.currentTimeMillis()
@@ -47,7 +47,7 @@ extends Iterable[FsCovariantNode[E]] {
     touched = true
   }
 
-  def this(controller: Callback[E], archive: Container[E], rootTemplate: Option[Entry]) {
+  def this(controller: ArchiveFileSystem.Controller[E], archive: Container[E], rootTemplate: Option[Entry]) {
     // Allocate some extra capacity to create missing parent directories.
     this(controller, new EntryTable(archive.size + OVERHEAD_SIZE))
     // Load entries from source archive.
@@ -423,7 +423,7 @@ private object ArchiveFileSystem {
     * @param  driver the archive driver to use.
     * @return A new archive file system.
     */
-  def apply[E <: FsArchiveEntry](controller: Callback[E]) =
+  def apply[E <: FsArchiveEntry](controller: Controller[E]) =
     new ArchiveFileSystem(controller)
 
   /** Returns a new archive file system which populates its entries from
@@ -453,8 +453,8 @@ private object ArchiveFileSystem {
     *         [[net.java.truevfs.kernel.impl.FsReadOnlyFileSystemException]].
     *@return A new archive file system.
     */
-  def apply[E <: FsArchiveEntry](controller: Callback[E], archive: Container[E], rootTemplate: Option[Entry], readOnly: Boolean) = {
-    if (readOnly) new ReadOnlyArchiveFileSystem[E](controller, archive, rootTemplate)
+  def apply[E <: FsArchiveEntry](controller: ArchiveFileSystem.Controller[E], archive: Container[E], rootTemplate: Option[Entry], readOnly: Boolean) = {
+    if (readOnly) new ReadOnlyArchiveFileSystem(controller, archive, rootTemplate)
     else new ArchiveFileSystem(controller, archive, rootTemplate)
   }
 
@@ -514,12 +514,19 @@ private object ArchiveFileSystem {
   } // Splitter
 
   /**
-    * Used to provide an archive driver and notify the implementation of an
-    * event in this file system.
+    * Introduced to decouple the
+    * [[net.java.truevfs.kernel.impl.TargetArchiveController]] from
+    * this archive file system.
     */
-  trait Callback[E <: FsArchiveEntry] {
+  trait Controller[E <: FsArchiveEntry] {
 
     def driver: FsArchiveDriver[E]
+
+    /** Returns the mount point of the (federated virtual) file system.
+      *
+      * @return The mount point of the (federated virtual) file system.
+      */
+    def mountPoint: FsMountPoint
 
     /** Called immediately before the source archive file system is going to
       * get modified (touched) for the first time.
