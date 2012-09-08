@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
-import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
+import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
 import net.java.truevfs.kernel.spec.cio.Entry;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
@@ -187,13 +187,12 @@ final class FileController extends FsAbstractController {
         final Path file = target.resolve(name.getPath());
         switch (type) {
             case FILE:
-                if (options.get(EXCLUSIVE))
-                    createFile(file);
-                else
-                    newOutputStream(file).close();
+                if (options.get(EXCLUSIVE)) createFile(file);
+                else                        newOutputStream(file).close();
                 break;
             case DIRECTORY:
-                createDirectory(file);
+                if (options.get(CREATE_PARENTS)) createDirectories(file);
+                else                             createDirectory(file);
                 break;
             default:
                 throw new IOException(file + " (entry type not supported: " + type + ")");
