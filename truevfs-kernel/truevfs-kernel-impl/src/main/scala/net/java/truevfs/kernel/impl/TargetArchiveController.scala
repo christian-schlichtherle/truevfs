@@ -34,11 +34,11 @@ import net.java.truevfs.kernel.spec.cio.Entry.Type._
   * @author Christian Schlichtherle
   */
 @NotThreadSafe
-private class TargetArchiveController[E <: FsArchiveEntry](
-  override final val driver: FsArchiveDriver[E],
-  override final val model: LockModel,
-  parent: FsController)
+private abstract class TargetArchiveController[E <: FsArchiveEntry]
+(parent: FsController)
 extends FileSystemArchiveController[E] with ArchiveFileSystem.Controller[E] {
+  this: LockModelAspect =>
+
   import TargetArchiveController._
 
   /** The entry name of the target archive file in the parent file system. */
@@ -101,7 +101,7 @@ extends FileSystemArchiveController[E] with ArchiveFileSystem.Controller[E] {
     _outputArchive = oa
   }
 
-  def preTouch(options: AccessOptions) { outputArchive(options) }
+  override def preTouch(options: AccessOptions) { outputArchive(options) }
 
   def mount(options: AccessOptions, autoCreate: Boolean) {
     try {
@@ -115,7 +115,7 @@ extends FileSystemArchiveController[E] with ArchiveFileSystem.Controller[E] {
     // HC SVNT DRACONES!
 
     // Check parent file system entry.
-    val pe = {
+    val pn = {
       try {
         parent node (options, name)
       } catch {
@@ -129,7 +129,7 @@ extends FileSystemArchiveController[E] with ArchiveFileSystem.Controller[E] {
 
     // Obtain file system by creating or loading it from the parent entry.
     val fs = {
-      if (null eq pe) {
+      if (null eq pn) {
         if (autoCreate) {
           // This may fail e.g. if the container file is an RAES
           // encrypted ZIP file and the user cancels password prompting.
@@ -151,11 +151,11 @@ extends FileSystemArchiveController[E] with ArchiveFileSystem.Controller[E] {
             case ex: FalsePositiveArchiveException =>
               throw new AssertionError(ex)
             case ex: IOException =>
-              if (pe isType SPECIAL) throw new FalsePositiveArchiveException(ex)
+              if (pn isType SPECIAL) throw new FalsePositiveArchiveException(ex)
               throw new PersistentFalsePositiveArchiveException(ex)
           }
         }
-        val fs = ArchiveFileSystem(this, is, Option(pe), ro);
+        val fs = ArchiveFileSystem(this, is, Option(pn), ro);
         inputArchive = Some(new InputArchive(is))
         assert(mounted)
         fs
@@ -256,7 +256,6 @@ extends FileSystemArchiveController[E] with ArchiveFileSystem.Controller[E] {
   }
 
   def sync(options: SyncOptions) {
-    assert(writeLockedByCurrentThread)
     try {
       val builder = new FsSyncExceptionBuilder
       if (!(options get ABORT_CHANGES))
@@ -301,13 +300,13 @@ extends FileSystemArchiveController[E] with ArchiveFileSystem.Controller[E] {
     }
 
     var warning: Option[IOException] = None
-    for (fse <- fileSystem.get) {
-      for (ae <- fse.getEntries) {
+    for (cn <- fileSystem.get) {
+      for (ae <- cn.getEntries) {
         val aen = ae.getName
         if (null eq (os entry aen)) {
           try {
             if (DIRECTORY eq ae.getType) {
-              if (!fse.isRoot) // never output the root directory!
+              if (!cn.isRoot) // never output the root directory!
                 if (UNKNOWN != ae.getTime(WRITE)) // never output a ghost directory!
                   os.output(ae).stream(null).close()
             } else if (null ne is.entry(aen)) {
@@ -403,8 +402,8 @@ extends FileSystemArchiveController[E] with ArchiveFileSystem.Controller[E] {
 
     // If the file system does not contain an entry with the given name,
     // then pass the test.
-    val fse = fs node (options, name) match {
-      case Some(fse) => fse
+    val cn = fs node (options, name) match {
+      case Some(cn) => cn
       case _ => return
     }
 
@@ -415,7 +414,7 @@ extends FileSystemArchiveController[E] with ArchiveFileSystem.Controller[E] {
     // Check if the entry is already written to the output archive.
     outputArchive match {
       case Some(oa) =>
-        val aen = fse.getEntry.getName
+        val aen = cn.getEntry.getName
         if (null ne (oa entry aen)) throw NeedsSyncException()
       case _ =>
     }
@@ -424,7 +423,7 @@ extends FileSystemArchiveController[E] with ArchiveFileSystem.Controller[E] {
     // input archive.
     if (intention eq READ) inputArchive match {
       case Some(ia) =>
-        val aen = fse.getEntry.getName
+        val aen = cn.getEntry.getName
         if (null eq (ia entry aen)) throw NeedsSyncException()
       case _ =>
         throw NeedsSyncException()

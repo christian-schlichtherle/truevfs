@@ -74,10 +74,8 @@ extends Iterable[FsCovariantNode[E]] { fs =>
   }
 
   private def driver = controller.driver
-  private def mountPoint = controller.mountPoint
 
-  private def fullPath(name: FsNodeName) =
-    new FsNodePath(mountPoint, name).toString
+  private def fullPath(name: FsNodeName) = controller.path(name).toString
 
   /** Called from a constructor in order to fix the parent directories of the
     * file system entry identified by `name`, ensuring that all parent
@@ -523,25 +521,20 @@ private object ArchiveFileSystem {
     * [[net.java.truevfs.kernel.impl.TargetArchiveController]] from
     * this archive file system.
     */
-  trait Controller[E <: FsArchiveEntry] {
+  trait Controller[E <: FsArchiveEntry] extends GenModelAspect[GenModel] {
 
     def driver: FsArchiveDriver[E]
-
-    /** Returns the mount point of the (federated virtual) file system.
-      *
-      * @return The mount point of the (federated virtual) file system.
-      */
-    def mountPoint: FsMountPoint
 
     /** Called immediately before the source archive file system is going to
       * get modified (touched) for the first time.
       * If this method throws an [[java.io.IOException]], then the modification
       * is effectively vetoed.
       *
-      * @throws IOException at the discretion of the implementation.
+      * @param  options the access options provided to the archive file system.
+      * @throws IOException on any I/O error.
       */
     def preTouch(options: AccessOptions)
-  } // Callback
+  } // Controller
 
   /** A case class which represents a path segment for use by
     * [[net.java.truevfs.kernel.impl.ArchiveFileSystem.Make]].
