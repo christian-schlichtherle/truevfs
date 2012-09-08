@@ -19,7 +19,6 @@ import net.java.truevfs.kernel.spec.cio.Entry._
 import net.java.truevfs.kernel.spec.cio.Entry.Access._
 import net.java.truevfs.kernel.spec.cio.Entry.Size._
 import net.java.truevfs.kernel.spec.cio.Entry.Type._
-import ArchiveFileSystem._
 
 /** Manages I/O to the entry which represents the target archive file in its
   * parent file system, detects archive entry collisions and implements a sync
@@ -39,7 +38,7 @@ private class TargetArchiveController[E <: FsArchiveEntry](
   override final val driver: FsArchiveDriver[E],
   override final val model: LockModel,
   parent: FsController)
-extends FileSystemArchiveController[E] with Callback[E] {
+extends FileSystemArchiveController[E] with ArchiveFileSystem.Callback[E] {
   import TargetArchiveController._
 
   /** The entry name of the target archive file in the parent file system. */
