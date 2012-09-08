@@ -348,9 +348,7 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
      *
      * @return The URI for this path.
      */
-    public URI getUri() {
-        return uri;
-    }
+    public URI getUri() { return uri; }
 
     /**
      * Returns a URI which is recursively transformed from the URI of this
@@ -393,9 +391,7 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
      *
      * @return The nullable mount point.
      */
-    public @Nullable FsMountPoint getMountPoint() {
-        return mountPoint;
-    }
+    public @Nullable FsMountPoint getMountPoint() { return mountPoint; }
 
     /**
      * Returns the node name component.
@@ -403,9 +399,7 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
      *
      * @return The node name component.
      */
-    public FsNodeName getNodeName() {
-        return nodeName;
-    }
+    public FsNodeName getNodeName() { return nodeName; }
 
     /**
      * Resolves the given node name against this path.
@@ -447,15 +441,11 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
      * Returns a hash code which is consistent with {@link #equals(Object)}.
      */
     @Override
-    public int hashCode() {
-        return uri.hashCode();
-    }
+    public int hashCode() { return uri.hashCode(); }
 
     /**
      * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
      */
     @Override
-    public String toString() {
-        return uri.toString();
-    }
+    public String toString() { return uri.toString(); }
 }
