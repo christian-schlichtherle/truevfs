@@ -17,8 +17,8 @@ import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
-import net.java.truevfs.kernel.spec.FsNodeName;
 import net.java.truevfs.kernel.spec.FsNode;
+import net.java.truevfs.kernel.spec.FsNodeName;
 import net.java.truevfs.kernel.spec.FsReadOnlyFileSystemException;
 import net.java.truevfs.kernel.spec.cio.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.Access.READ;
@@ -44,7 +44,7 @@ public class HttpNode extends FsNode implements IoEntry<HttpNode> {
     private final String name;
     protected final URI uri;
 
-    HttpNode(  final HttpController controller,
+    HttpNode(   final HttpController controller,
                 final FsNodeName name) {
         assert null != controller;
         this.controller = controller;
@@ -86,7 +86,7 @@ public class HttpNode extends FsNode implements IoEntry<HttpNode> {
     }
 
     protected OutputStream newOutputStream() throws IOException {
-        throw new FsReadOnlyFileSystemException();
+        throw new FsReadOnlyFileSystemException(controller.getMountPoint());
     }
 
     @Override

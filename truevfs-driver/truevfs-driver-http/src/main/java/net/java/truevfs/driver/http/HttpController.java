@@ -77,7 +77,7 @@ public class HttpController extends FsAbstractController {
             final BitField<FsAccessOption> options, final FsNodeName name, final BitField<Access> types)
     throws IOException {
         if (!types.isEmpty() && !READ_ONLY.equals(types))
-            throw new FsReadOnlyFileSystemException();
+            throw new FsReadOnlyFileSystemException(getMountPoint());
         executeHead(newEntry(name));
     }
 
@@ -89,7 +89,7 @@ public class HttpController extends FsAbstractController {
     public boolean setTime(
             BitField<FsAccessOption> options, FsNodeName name, BitField<Access> types, long value)
     throws IOException {
-        throw new FsReadOnlyFileSystemException();
+        throw new FsReadOnlyFileSystemException(getMountPoint());
     }
 
     @Override
@@ -111,13 +111,13 @@ public class HttpController extends FsAbstractController {
     public void make(  final BitField<FsAccessOption> options, final FsNodeName name, final Type type, @CheckForNull
     final Entry template)
     throws IOException {
-        throw new FsReadOnlyFileSystemException();
+        throw new FsReadOnlyFileSystemException(getMountPoint());
     }
 
     @Override
     public void unlink(BitField<FsAccessOption> options, FsNodeName name)
     throws IOException {
-        throw new FsReadOnlyFileSystemException();
+        throw new FsReadOnlyFileSystemException(getMountPoint());
     }
 
     @Override
