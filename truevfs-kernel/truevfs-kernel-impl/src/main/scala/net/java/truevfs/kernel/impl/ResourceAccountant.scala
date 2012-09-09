@@ -30,7 +30,7 @@ import scala.util.control._
   */
 @ThreadSafe
 private final class ResourceAccountant(override val lock: Lock)
-extends LockAspect {
+extends LockAspect[Lock] {
   import ResourceAccountant._
 
   private[this] val condition = lock.newCondition

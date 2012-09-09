@@ -14,7 +14,7 @@ import javax.annotation.concurrent._
   */
 @ThreadSafe
 private trait ReentrantReadWriteLockAspect
-extends GenReadWriteLockAspect[ReentrantReadWriteLock] {
+extends ReadWriteLockAspect[ReentrantReadWriteLock] {
 
   /** Returns `true` if and only if the read lock is held by the
     * current thread.

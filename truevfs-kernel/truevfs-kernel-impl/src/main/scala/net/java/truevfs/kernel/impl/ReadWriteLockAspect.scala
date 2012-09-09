@@ -12,7 +12,7 @@ import javax.annotation.concurrent._
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private trait GenReadWriteLockAspect[+L <: ReadWriteLock] {
+private trait ReadWriteLockAspect[+L <: ReadWriteLock] {
 
   /** The read/write lock with the features to provide as an aspect. */
   def lock: L
