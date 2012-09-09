@@ -35,9 +35,9 @@ import net.java.truevfs.kernel.spec.cio.Entry.Type._
   */
 @NotThreadSafe
 private abstract class TargetArchiveController[E <: FsArchiveEntry]
-(parent: FsController)
-extends FileSystemArchiveController[E] with ArchiveFileSystem.Controller[E] {
-  this: LockModelAspect =>
+(driver: FsArchiveDriver[E], parent: FsController)
+extends FileSystemArchiveController[E] {
+  controller: LockModelAspect =>
 
   import TargetArchiveController._
 
@@ -101,8 +101,6 @@ extends FileSystemArchiveController[E] with ArchiveFileSystem.Controller[E] {
     _outputArchive = oa
   }
 
-  override def preTouch(options: AccessOptions) { outputArchive(options) }
-
   def mount(options: AccessOptions, autoCreate: Boolean) {
     try {
       mount0(options, autoCreate)
@@ -134,7 +132,7 @@ extends FileSystemArchiveController[E] with ArchiveFileSystem.Controller[E] {
           // This may fail e.g. if the container file is an RAES
           // encrypted ZIP file and the user cancels password prompting.
           outputArchive(options)
-          ArchiveFileSystem(this)
+          ArchiveFileSystem(new TargetArchiveModel)
         } else {
           throw new FalsePositiveArchiveException(
             new NoSuchFileException(name.toString))
@@ -155,7 +153,7 @@ extends FileSystemArchiveController[E] with ArchiveFileSystem.Controller[E] {
               throw new PersistentFalsePositiveArchiveException(ex)
           }
         }
-        val fs = ArchiveFileSystem(this, is, Option(pn), ro);
+        val fs = ArchiveFileSystem(new TargetArchiveModel, is, Option(pn), ro)
         inputArchive = Some(new InputArchive(is))
         assert(mounted)
         fs
@@ -429,7 +427,13 @@ extends FileSystemArchiveController[E] with ArchiveFileSystem.Controller[E] {
         throw NeedsSyncException()
     }
   }
-}
+
+  private class TargetArchiveModel
+  extends FsDecoratingModel(model) with DriverModel[E] {
+    override def driver = controller.driver
+    override def touch(options: AccessOptions) { outputArchive(options) }
+  }
+} // TargetArchiveController
 
 private object TargetArchiveController {
   private val MOUNT_OPTIONS = BitField.of(CACHE)
@@ -458,4 +462,4 @@ private object TargetArchiveController {
     override def input(name: String) = throw new AssertionError
     override def close() = throw new AssertionError
   }
-}
+} // TargetArchiveController

@@ -162,10 +162,10 @@ private object DefaultManager {
   // trying to sync the file system while any stream or channel to the
   // latter is open gets detected and properly dealt with.
   private final class BackController[E <: FsArchiveEntry](
-    override val driver: FsArchiveDriver[E],
+    driver: FsArchiveDriver[E],
     override val model: LockModel,
     parent: FsController
-  ) extends TargetArchiveController[E](parent)
+  ) extends TargetArchiveController[E](driver, parent)
   with ResourceController
   with CacheController
   with SyncController

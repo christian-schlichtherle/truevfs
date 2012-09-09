@@ -21,13 +21,13 @@ import net.java.truevfs.kernel.spec.cio.Entry.Access._
   */
 @NotThreadSafe
 private final class ReadOnlyArchiveFileSystem[E <: FsArchiveEntry](
-  controller: ArchiveFileSystem.Controller[E],
+  model: DriverModel[E],
   archive: Container[E],
   rootTemplate: Option[Entry])
-extends ArchiveFileSystem(controller, archive, rootTemplate) {
+extends ArchiveFileSystem(model, archive, rootTemplate) {
   import ReadOnlyArchiveFileSystem._
 
-  private def mountPoint = controller.mountPoint
+  private def mountPoint = model.getMountPoint
 
   override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) {
     if (!types.isEmpty && READ_ONLY != types)
