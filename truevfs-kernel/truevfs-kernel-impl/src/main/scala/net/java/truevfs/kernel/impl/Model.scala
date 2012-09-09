@@ -9,7 +9,7 @@ import net.java.truevfs.kernel.spec._
 /**
   * @author Christian Schlichtherle
   */
-trait Model extends FsModel {
+private trait Model extends FsModel {
 
   /** Composes the node path from the mountpoint of this model and the given
     * node name.
