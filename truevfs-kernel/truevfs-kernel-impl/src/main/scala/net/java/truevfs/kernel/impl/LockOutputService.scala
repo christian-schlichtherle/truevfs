@@ -22,7 +22,7 @@ import net.java.truevfs.kernel.spec.cio._
   */
 private class LockOutputService[E <: Entry]
 (@WillCloseWhenClosed output: OutputService[E])
-extends DecoratingOutputService[E](output) with LockAspect with Immutable {
+extends DecoratingOutputService[E](output) with LockAspect[Lock] with Immutable {
 
   final override val lock = new ReentrantLock
 

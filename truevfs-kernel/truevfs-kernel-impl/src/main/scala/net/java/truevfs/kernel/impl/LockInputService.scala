@@ -22,7 +22,7 @@ import net.java.truevfs.kernel.spec.cio._
   */
 private class LockInputService[E <: Entry]
 (@WillCloseWhenClosed input: InputService[E])
-extends DecoratingInputService[E](input) with LockAspect with Immutable {
+extends DecoratingInputService[E](input) with LockAspect[Lock] with Immutable {
 
   final override val lock = new ReentrantLock
 
