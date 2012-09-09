@@ -169,8 +169,7 @@ private object DefaultManager {
   with ResourceController[E]
   with CacheController[E]
   with SyncController[E]
-  with LockController[E]
-  with ArchiveModelAspect[E] {
+  with LockController[E] {
     override val pool = driver.getPool
     require(null ne pool)
   }
