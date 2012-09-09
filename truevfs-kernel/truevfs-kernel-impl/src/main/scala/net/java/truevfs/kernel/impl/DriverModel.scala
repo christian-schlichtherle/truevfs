@@ -9,7 +9,7 @@ import net.java.truevfs.kernel.spec._
 /**
   * @author Christian Schlichtherle
   */
-trait DriverModel[E <: FsArchiveEntry] extends Model {
+private trait DriverModel[E <: FsArchiveEntry] extends Model {
   def driver: FsArchiveDriver[E]
   def touch(options: AccessOptions)
 }
