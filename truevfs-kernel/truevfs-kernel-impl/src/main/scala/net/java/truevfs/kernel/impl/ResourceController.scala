@@ -22,8 +22,8 @@ import ResourceAccountant.Resources
   * @author Christian Schlichtherle
   */
 @NotThreadSafe
-private trait ResourceController extends Controller[LockModel] {
-  this: LockModelAspect =>
+private trait ResourceController[E <: FsArchiveEntry]
+extends ArchiveController[E] {
 
   import ResourceController._
 

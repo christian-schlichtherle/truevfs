@@ -11,78 +11,12 @@ import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.cio._
 import net.java.truevfs.kernel.spec.cio.Entry._
 
-/** Provides read/write access to a file system.
-  * 
-  * === General Properties ===
-  * The [[FsModel#getMountPoint() mount point]] of the
-  * [[#model file system model]]
-  * addresses the file system accessed by this controller.
-  * Where the methods of this abstract class accept a
-  * {@link FsNodeName file system entry name} as a parameter, this MUST get
-  * resolved against the {@link FsModel#getMountPoint() mount point} URI of this
-  * controller's {@link #getModel() file system model}.
-  * 
-  * === Transaction Support ===
-  * Even on modern computers, I/O operations are inherently unreliable: They
-  * can fail on hardware errors, network timeouts, third party interactions etc.
-  * In an ideal world, we would like all file system operations to be truly
-  * transactional like some relational database services.
-  * However, file system have to cope with really big data, much more than most
-  * relational databases will ever see.
-  * Its not uncommon these days to store some gigabytes of data in a single
-  * file, for example a video file.
-  * However, buffering gigabytes of data just for an eventual rollback of a
-  * transaction is still not a realistic option and considering the fact that
-  * faster computers have always been used to store even bigger data then its
-  * getting clear that it never will be.
-  * Therefore, the contract of this abstract class strives for only limited
-  * transactional support as follows.
-  * 
-  * 1. Generally all file system operations may fail with either a
-  *    {@link RuntimeException} or an {@link IOException} to respectively
-  *    indicate wrong input parameters or a file system operation failure.
-  *    Where the following terms consider a failure, the term equally applies
-  *    to both exception types.
-  * 2. With the exception of {@link #sync}, all file system operations SHOULD
-  *    be ''atomic'', that is they either succeed or fail completely as if they
-  *    had not been called.
-  * 3. All file system operations MUST be ''consistent'', that is they MUST
-  *    leave their resources in a state so that they can get retried, even
-  *    after a failure.
-  * 4. All file system operations SHOULD be ''isolated'' with respect to any
-  *    threads which share the same definition of the implementing class, that
-  *    is two such threads SHOULD NOT interfere with each other's file system
-  *    operations in any other way than the operation's defined side effect on
-  *    the stored data.
-  *    In general, this simply means that file system operations SHOULD be
-  *    thread-safe.
-  *    Note that some factory methods declare this as a MUST requirement for
-  *    their generated file system controllers, for example
-  *    {@link FsDriver#newController} and {@link FsCompositeDriver#newController}.
-  * 5. All file system operations SHOULD be ''durable'', that is their side
-  *    effect on the stored data SHOULD be permanent in the parent file system
-  *    or storage system.
-  * 6. Once a call to {@link #sync} has succeeded, all previous file system
-  *    operations MUST be durable.
-  *    Furthermore, any changes to the stored data in the parent file system or
-  *    storage system which have been made by third parties up to this point in
-  *    time MUST be visible to the users of this class.
-  *    This enables file system operations to use I/O buffers most of the time
-  *    and eventually synchronize their contents with the parent file system or
-  *    storage system upon a call to {@code sync}.
-  * 
-  * @tparam M the type of the file system model.
-  * @see    FsManager
-  * @see    <a href="http://www.ietf.org/rfc/rfc2119.txt">RFC 2119: Key words for use in RFCs to Indicate Requirement Levels</a>
+/** Provides read/write access to an archive file system.
+  *
   * @author Christian Schlichtherle
   */
-private trait Controller[+M <: FsModel] {
-
-  /** Returns the file system model.
-    *
-    * @return The file system model.
-    */
-  def model: M
+private trait ArchiveController[E <: FsArchiveEntry]
+extends ArchiveModelAspect[E] {
 
   /** Returns the controller for the parent file system or `null` if and only
     * if this file system is not federated, i.e. not a member of another file
@@ -247,7 +181,7 @@ private trait Controller[+M <: FsModel] {
     * @return A hash code which is consistent with `equals`.
     * @see    Object#hashCode
     */
-  final override def hashCode = super.hashCode
+   final override def hashCode = System.identityHashCode(this)
 
   /** Returns a string representation of this object for debugging and logging
     * purposes.
@@ -255,5 +189,6 @@ private trait Controller[+M <: FsModel] {
     * @return A string representation of this object for debugging and logging
     *         purposes.
     */
-  override def toString = "%s[model=%s]".format(getClass.getName, model);
+  final override def toString =
+    "%s@%x[model=%s]".format(getClass.getName, hashCode, model)
 }

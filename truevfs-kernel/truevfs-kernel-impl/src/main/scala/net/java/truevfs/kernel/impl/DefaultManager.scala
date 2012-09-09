@@ -42,7 +42,7 @@ private final class DefaultManager private (
 
   override def newController
   (driver: AnyArchiveDriver, model: FsModel, parent: FsController) = {
-    assert(!model.isInstanceOf[LockModel])
+    assert(!model.isInstanceOf[ArchiveModel[_]])
     // HC SVNT DRACONES!
     // The FalsePositiveArchiveController decorates the FrontController
     // so that the decorated controller (chain) does not need to resolve
@@ -51,7 +51,7 @@ private final class DefaultManager private (
       new FrontController(
         driver decorate 
           new ControllerAdapter(parent,
-            new BackController(driver, new LockModel(model), parent))))
+            new BackController(driver, model, parent))))
   }
 
   override def controller(d: FsMetaDriver, mp: FsMountPoint): FsController = {
@@ -163,15 +163,14 @@ private object DefaultManager {
   // latter is open gets detected and properly dealt with.
   private final class BackController[E <: FsArchiveEntry](
     driver: FsArchiveDriver[E],
-    override val model: LockModel,
+    model: FsModel,
     parent: FsController
-  ) extends TargetArchiveController[E](driver, parent)
-  with ResourceController
-  with CacheController
-  with SyncController
-  with LockController
-  with LockModelAspect {
-    val pool = driver.getPool
+  ) extends TargetArchiveController(driver, model, parent)
+  with ResourceController[E]
+  with CacheController[E]
+  with SyncController[E]
+  with LockController[E] {
+    override val pool = driver.getPool
     require(null ne pool)
   }
 

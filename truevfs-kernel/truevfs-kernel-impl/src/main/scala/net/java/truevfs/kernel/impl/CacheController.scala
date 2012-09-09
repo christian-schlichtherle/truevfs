@@ -49,8 +49,8 @@ import net.java.truevfs.kernel.spec.cio.Entry.Type._;
   * @author Christian Schlichtherle
   */
 @NotThreadSafe
-private trait CacheController extends Controller[LockModel] {
-  this: LockModelAspect =>
+private trait CacheController[E <: FsArchiveEntry]
+extends ArchiveController[E] {
 
   import CacheController._
 
@@ -354,5 +354,5 @@ private trait CacheController extends Controller[LockModel] {
 }
 
 private object CacheController {
-  private val logger = new LocalizedLogger(classOf[CacheController]);
+  private val logger = new LocalizedLogger(classOf[CacheController[_]]);
 }
