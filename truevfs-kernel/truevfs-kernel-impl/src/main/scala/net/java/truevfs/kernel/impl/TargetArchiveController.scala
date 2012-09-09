@@ -36,11 +36,18 @@ import net.java.truevfs.kernel.spec.cio.Entry.Type._
   */
 @NotThreadSafe
 private abstract class TargetArchiveController[E <: FsArchiveEntry]
-(driver: FsArchiveDriver[E], _model: FsModel, parent: FsController)
+(_driver: FsArchiveDriver[E], _model: FsModel, parent: FsController)
 extends FileSystemArchiveController[E] {
-  controller =>
+  controller: ArchiveModelAspect[E] =>
 
   import TargetArchiveController._
+
+  private final class TargetArchiveModel(model: FsModel)
+  extends FsDecoratingModel(model) with ArchiveModel[E] {
+    override val lock = new ReentrantReadWriteLock
+    override def driver = controller._driver
+    override def touch(options: AccessOptions) { outputArchive(options) }
+  }
 
   final override val model: ArchiveModel[E] = new TargetArchiveModel(_model)
 
@@ -65,7 +72,6 @@ extends FileSystemArchiveController[E] {
   assert(invariants)
 
   private def invariants = {
-    assert(null ne driver)
     assert(null ne parent)
     assert(null ne name)
     val fs = fileSystem
@@ -429,13 +435,6 @@ extends FileSystemArchiveController[E] {
       case _ =>
         throw NeedsSyncException()
     }
-  }
-
-  private final class TargetArchiveModel(model: FsModel)
-  extends FsDecoratingModel(model) with ArchiveModel[E] {
-    override val lock = new ReentrantReadWriteLock
-    override def driver = controller.driver
-    override def touch(options: AccessOptions) { outputArchive(options) }
   }
 } // TargetArchiveController
 

@@ -51,6 +51,7 @@ import net.java.truevfs.kernel.spec.cio.Entry.Type._;
 @NotThreadSafe
 private trait CacheController[E <: FsArchiveEntry]
 extends ArchiveController[E] {
+  controller: ArchiveModelAspect[E] =>
 
   import CacheController._
 

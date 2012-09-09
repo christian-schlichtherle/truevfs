@@ -165,11 +165,12 @@ private object DefaultManager {
     driver: FsArchiveDriver[E],
     model: FsModel,
     parent: FsController
-  ) extends TargetArchiveController(driver, model, parent)
+  ) extends TargetArchiveController[E](driver, model, parent)
   with ResourceController[E]
   with CacheController[E]
   with SyncController[E]
-  with LockController[E] {
+  with LockController[E]
+  with ArchiveModelAspect[E] {
     override val pool = driver.getPool
     require(null ne pool)
   }

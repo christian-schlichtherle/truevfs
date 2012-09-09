@@ -24,6 +24,7 @@ import ResourceAccountant.Resources
 @NotThreadSafe
 private trait ResourceController[E <: FsArchiveEntry]
 extends ArchiveController[E] {
+  controller: ArchiveModelAspect[E] =>
 
   import ResourceController._
 
