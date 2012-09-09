@@ -29,7 +29,7 @@ import ArchiveFileSystem._
   */
 @NotThreadSafe
 private class ArchiveFileSystem[E <: FsArchiveEntry] private(
-  controller: ArchiveFileSystem.Controller[E],
+  model: DriverModel[E],
   master: EntryTable[E])
 extends Iterable[FsCovariantNode[E]] { fs =>
 
@@ -38,8 +38,8 @@ extends Iterable[FsCovariantNode[E]] { fs =>
   /** Whether or not this file system has been modified. */
   private var touched: Boolean = _
 
-  def this(controller: ArchiveFileSystem.Controller[E]) {
-    this(controller, new EntryTable(OVERHEAD_SIZE))
+  def this(model: DriverModel[E]) {
+    this(model, new EntryTable(OVERHEAD_SIZE))
     val root = newEntry(RootPath, DIRECTORY, None)
     val time = System.currentTimeMillis()
     for (access <- ALL_ACCESS)
@@ -48,9 +48,9 @@ extends Iterable[FsCovariantNode[E]] { fs =>
     touched = true
   }
 
-  def this(controller: ArchiveFileSystem.Controller[E], archive: Container[E], rootTemplate: Option[Entry]) {
+  def this(model: DriverModel[E], archive: Container[E], rootTemplate: Option[Entry]) {
     // Allocate some extra capacity to create missing parent directories.
-    this(controller, new EntryTable(archive.size + OVERHEAD_SIZE))
+    this(model, new EntryTable(archive.size + OVERHEAD_SIZE))
     // Load entries from source archive.
     var paths = List[String]()
     val normalizer = new PathNormalizer(SEPARATOR_CHAR)
@@ -73,9 +73,9 @@ extends Iterable[FsCovariantNode[E]] { fs =>
     for (path <- paths) fix(path)
   }
 
-  private def driver = controller.driver
-
-  private def fullPath(name: FsNodeName) = controller.path(name).toString
+  private val driver = model.driver
+  private def fullPath(name: FsNodeName) = (model path name).toString
+  private def touch(options: AccessOptions) = model touch options
 
   /** Called from a constructor in order to fix the parent directories of the
     * file system entry identified by `name`, ensuring that all parent
@@ -399,19 +399,6 @@ extends Iterable[FsCovariantNode[E]] { fs =>
     driver.checkEncodable(name)
     driver.newEntry(options, name, tµpe, template.orNull)
   }
-
-  /** Marks this (virtual) archive file system as touched and notifies the
-    * listener if and only if the touch status is changing.
-    *
-    * @throws IOException If the listener's preTouch implementation vetoed
-    *         the operation for any reason.
-    */
-  private def touch(options: AccessOptions) {
-    if (!touched) {
-      controller.preTouch(options)
-      touched = true
-    }
-  }
 } // ArchiveFileSystem
 
 private object ArchiveFileSystem {
@@ -426,8 +413,8 @@ private object ArchiveFileSystem {
     * @param  driver the archive driver to use.
     * @return A new archive file system.
     */
-  def apply[E <: FsArchiveEntry](controller: Controller[E]) =
-    new ArchiveFileSystem(controller)
+  def apply[E <: FsArchiveEntry](model: DriverModel[E]) =
+    new ArchiveFileSystem(model)
 
   /** Returns a new archive file system which populates its entries from
     * the given `archive` and ensures its integrity.
@@ -456,9 +443,9 @@ private object ArchiveFileSystem {
     *         [[net.java.truevfs.kernel.impl.FsReadOnlyFileSystemException]].
     *@return A new archive file system.
     */
-  def apply[E <: FsArchiveEntry](controller: ArchiveFileSystem.Controller[E], archive: Container[E], rootTemplate: Option[Entry], readOnly: Boolean) = {
-    if (readOnly) new ReadOnlyArchiveFileSystem(controller, archive, rootTemplate)
-    else new ArchiveFileSystem(controller, archive, rootTemplate)
+  def apply[E <: FsArchiveEntry](model: DriverModel[E], archive: Container[E], rootTemplate: Option[Entry], readOnly: Boolean) = {
+    if (readOnly) new ReadOnlyArchiveFileSystem(model, archive, rootTemplate)
+    else new ArchiveFileSystem(model, archive, rootTemplate)
   }
 
   private def typeName(entry: FsCovariantNode[_ <: Entry]): String = {
@@ -515,26 +502,6 @@ private object ArchiveFileSystem {
       if (null ne path) path else RootPath
     }
   } // Splitter
-
-  /**
-    * Introduced to decouple the
-    * [[net.java.truevfs.kernel.impl.TargetArchiveController]] from
-    * this archive file system.
-    */
-  trait Controller[E <: FsArchiveEntry] extends GenModelAspect[GenModel] {
-
-    def driver: FsArchiveDriver[E]
-
-    /** Called immediately before the source archive file system is going to
-      * get modified (touched) for the first time.
-      * If this method throws an [[java.io.IOException]], then the modification
-      * is effectively vetoed.
-      *
-      * @param  options the access options provided to the archive file system.
-      * @throws IOException on any I/O error.
-      */
-    def preTouch(options: AccessOptions)
-  } // Controller
 
   /** A case class which represents a path segment for use by
     * [[net.java.truevfs.kernel.impl.ArchiveFileSystem.Make]].
