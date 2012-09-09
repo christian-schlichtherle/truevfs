@@ -38,6 +38,7 @@ import javax.annotation.concurrent._
 @ThreadSafe
 private trait LockController[E <: FsArchiveEntry]
 extends ArchiveController[E] {
+  controller: ArchiveModelAspect[E] =>
 
   abstract override def node(options: AccessOptions, name: FsNodeName) =
     timedReadOrWriteLocked(super.node(options, name))

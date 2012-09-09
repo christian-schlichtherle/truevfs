@@ -29,6 +29,7 @@ import javax.annotation.concurrent._
 @ThreadSafe
 private trait SyncController[E <: FsArchiveEntry]
 extends ArchiveController[E] {
+  controller: ArchiveModelAspect[E] =>
 
   abstract override def node(options: AccessOptions, name: FsNodeName) =
     apply(super.node(options, name))

@@ -27,6 +27,7 @@ import net.java.truevfs.kernel.spec.cio.Entry._;
 @NotThreadSafe
 private abstract class FileSystemArchiveController[E <: FsArchiveEntry]
 extends BasicArchiveController[E] with MountState[E] {
+  controller: ArchiveModelAspect[E] =>
 
   /** The mount state of the archive file system. */
   private[this] var mountState: MountState[E] = new ResetFileSystem

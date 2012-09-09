@@ -15,8 +15,13 @@ import net.java.truevfs.kernel.spec.cio.Entry._
   *
   * @author Christian Schlichtherle
   */
-private trait ArchiveController[E <: FsArchiveEntry]
-extends ArchiveModelAspect[E] {
+private trait ArchiveController[E <: FsArchiveEntry] {
+
+  /** Returns the archive model.
+    *
+    * @return The archive model.
+    */
+  def model: ArchiveModel[E]
 
   /** Returns the controller for the parent file system or `null` if and only
     * if this file system is not federated, i.e. not a member of another file
