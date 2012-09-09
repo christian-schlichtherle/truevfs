@@ -42,7 +42,7 @@ import net.java.truevfs.kernel.spec.cio.Entry.Type._;
 @NotThreadSafe
 private abstract class BasicArchiveController[E <: FsArchiveEntry]
 extends Controller[LockModel] {
-  this: GenModelAspect[_] =>
+  this: ModelAspect[_] =>
 
   import BasicArchiveController._
 

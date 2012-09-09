@@ -13,6 +13,6 @@ import javax.annotation.concurrent._
   */
 @ThreadSafe
 private trait LockModelAspect
-extends GenModelAspect[LockModel] with ReentrantReadWriteLockAspect {
+extends ModelAspect[LockModel] with ReentrantReadWriteLockAspect {
   final override def lock = model.lock
 }
