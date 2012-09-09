@@ -9,6 +9,7 @@ import net.java.truecommons.shed._
 import java.io._
 import java.nio.channels._
 import java.nio.file._
+import java.util.concurrent.locks._
 import javax.annotation.concurrent._
 import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.FsAccessOption._
@@ -35,11 +36,13 @@ import net.java.truevfs.kernel.spec.cio.Entry.Type._
   */
 @NotThreadSafe
 private abstract class TargetArchiveController[E <: FsArchiveEntry]
-(driver: FsArchiveDriver[E], parent: FsController)
+(driver: FsArchiveDriver[E], _model: FsModel, parent: FsController)
 extends FileSystemArchiveController[E] {
-  controller: LockModelAspect =>
+  controller =>
 
   import TargetArchiveController._
+
+  final override val model: ArchiveModel[E] = new TargetArchiveModel(_model)
 
   /** The entry name of the target archive file in the parent file system. */
   private[this] val name = mountPoint.getPath.getNodeName
@@ -132,7 +135,7 @@ extends FileSystemArchiveController[E] {
           // This may fail e.g. if the container file is an RAES
           // encrypted ZIP file and the user cancels password prompting.
           outputArchive(options)
-          ArchiveFileSystem(new TargetArchiveModel)
+          ArchiveFileSystem(model)
         } else {
           throw new FalsePositiveArchiveException(
             new NoSuchFileException(name.toString))
@@ -153,7 +156,7 @@ extends FileSystemArchiveController[E] {
               throw new PersistentFalsePositiveArchiveException(ex)
           }
         }
-        val fs = ArchiveFileSystem(new TargetArchiveModel, is, Option(pn), ro)
+        val fs = ArchiveFileSystem(model, is, Option(pn), ro)
         inputArchive = Some(new InputArchive(is))
         assert(mounted)
         fs
@@ -428,8 +431,9 @@ extends FileSystemArchiveController[E] {
     }
   }
 
-  private class TargetArchiveModel
-  extends FsDecoratingModel(model) with DriverModel[E] {
+  private final class TargetArchiveModel(model: FsModel)
+  extends FsDecoratingModel(model) with ArchiveModel[E] {
+    override val lock = new ReentrantReadWriteLock
     override def driver = controller.driver
     override def touch(options: AccessOptions) { outputArchive(options) }
   }

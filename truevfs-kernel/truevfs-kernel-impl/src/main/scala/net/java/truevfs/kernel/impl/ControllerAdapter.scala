@@ -13,7 +13,7 @@ import net.java.truevfs.kernel.spec.cio.Entry._
 
 private final class ControllerAdapter(
   override val getParent: FsController,
-  c: Controller[_ <: FsModel]
+  c: ArchiveController[_]
 ) extends FsAbstractController(c.model) with Immutable {
 
   override def node(options: AccessOptions, name: FsNodeName) =

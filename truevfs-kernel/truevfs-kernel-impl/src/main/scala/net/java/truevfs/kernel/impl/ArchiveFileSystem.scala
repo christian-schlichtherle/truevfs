@@ -29,16 +29,16 @@ import ArchiveFileSystem._
   */
 @NotThreadSafe
 private class ArchiveFileSystem[E <: FsArchiveEntry] private(
-  model: DriverModel[E],
+  final override val model: ArchiveModel[E],
   master: EntryTable[E])
-extends Iterable[FsCovariantNode[E]] { fs =>
+extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
 
   private val splitter = new Splitter
 
   /** Whether or not this file system has been modified. */
   private var touched: Boolean = _
 
-  def this(model: DriverModel[E]) {
+  def this(model: ArchiveModel[E]) {
     this(model, new EntryTable(OVERHEAD_SIZE))
     val root = newEntry(RootPath, DIRECTORY, None)
     val time = System.currentTimeMillis()
@@ -48,7 +48,7 @@ extends Iterable[FsCovariantNode[E]] { fs =>
     touched = true
   }
 
-  def this(model: DriverModel[E], archive: Container[E], rootTemplate: Option[Entry]) {
+  def this(model: ArchiveModel[E], archive: Container[E], rootTemplate: Option[Entry]) {
     // Allocate some extra capacity to create missing parent directories.
     this(model, new EntryTable(archive.size + OVERHEAD_SIZE))
     // Load entries from source archive.
@@ -73,9 +73,7 @@ extends Iterable[FsCovariantNode[E]] { fs =>
     for (path <- paths) fix(path)
   }
 
-  private val driver = model.driver
-  private def fullPath(name: FsNodeName) = (model path name).toString
-  private def touch(options: AccessOptions) = model touch options
+  private def fullPath(name: FsNodeName) = path(name).toString
 
   /** Called from a constructor in order to fix the parent directories of the
     * file system entry identified by `name`, ensuring that all parent
@@ -413,7 +411,7 @@ private object ArchiveFileSystem {
     * @param  driver the archive driver to use.
     * @return A new archive file system.
     */
-  def apply[E <: FsArchiveEntry](model: DriverModel[E]) =
+  def apply[E <: FsArchiveEntry](model: ArchiveModel[E]) =
     new ArchiveFileSystem(model)
 
   /** Returns a new archive file system which populates its entries from
@@ -443,7 +441,7 @@ private object ArchiveFileSystem {
     *         [[net.java.truevfs.kernel.impl.FsReadOnlyFileSystemException]].
     *@return A new archive file system.
     */
-  def apply[E <: FsArchiveEntry](model: DriverModel[E], archive: Container[E], rootTemplate: Option[Entry], readOnly: Boolean) = {
+  def apply[E <: FsArchiveEntry](model: ArchiveModel[E], archive: Container[E], rootTemplate: Option[Entry], readOnly: Boolean) = {
     if (readOnly) new ReadOnlyArchiveFileSystem(model, archive, rootTemplate)
     else new ArchiveFileSystem(model, archive, rootTemplate)
   }

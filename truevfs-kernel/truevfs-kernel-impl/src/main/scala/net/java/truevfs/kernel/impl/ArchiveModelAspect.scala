@@ -4,19 +4,22 @@
  */
 package net.java.truevfs.kernel.impl
 
-import javax.annotation.concurrent._
 import net.java.truevfs.kernel.spec._
 
 /** A generic mixin which provides some features of its associated `model`.
   *
-  * @tparam M the type of the generic file system model.
   * @author Christian Schlichtherle
   */
-@ThreadSafe
-private trait ModelAspect[+M <: Model] {
+private trait ArchiveModelAspect[E <: FsArchiveEntry]
+extends ReentrantReadWriteLockAspect {
 
-  /** The model with the features to provide as an aspect. */
-  def model: M
+  final override def lock = model.lock
+
+  /** Returns the archive model with the features to provide as an aspect.
+    *
+    * @return The archive model with the features to provide as an aspect.
+    */
+  def model: ArchiveModel[E]
 
   /** Returns the mount point of the (federated virtual) file system.
     *
@@ -36,10 +39,14 @@ private trait ModelAspect[+M <: Model] {
     */
   final def mounted_=(mounted: Boolean) { model setMounted mounted }
 
+  final def driver = model.driver
+
   /** Composes the node path from the mountpoint of this model and the given
     * node name.
     * 
     * @param name the node name.
     */
   final def path(name: FsNodeName) = model path name
+
+  final def touch(options: AccessOptions) = model touch options
 }

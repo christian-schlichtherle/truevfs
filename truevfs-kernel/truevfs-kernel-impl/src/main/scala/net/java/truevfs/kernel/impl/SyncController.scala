@@ -27,8 +27,8 @@ import javax.annotation.concurrent._
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private trait SyncController extends Controller[LockModel] {
-  this: LockModelAspect =>
+private trait SyncController[E <: FsArchiveEntry]
+extends ArchiveController[E] {
 
   abstract override def node(options: AccessOptions, name: FsNodeName) =
     apply(super.node(options, name))
