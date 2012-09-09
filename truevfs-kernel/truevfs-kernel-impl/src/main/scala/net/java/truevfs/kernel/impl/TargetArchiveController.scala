@@ -38,8 +38,7 @@ import TargetArchiveController._
 @NotThreadSafe
 private abstract class TargetArchiveController[E <: FsArchiveEntry]
 (_driver: FsArchiveDriver[E], _model: FsModel, parent: FsController)
-extends FileSystemArchiveController[E] {
-  controller: ArchiveModelAspect[E] =>
+extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
 
   assert(null ne parent)
 
