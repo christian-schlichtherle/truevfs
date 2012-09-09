@@ -20,6 +20,7 @@ import net.java.truevfs.kernel.spec.cio.Entry._
 import net.java.truevfs.kernel.spec.cio.Entry.Access._
 import net.java.truevfs.kernel.spec.cio.Entry.Size._
 import net.java.truevfs.kernel.spec.cio.Entry.Type._
+import TargetArchiveController._
 
 /** Manages I/O to the entry which represents the target archive file in its
   * parent file system, detects archive entry collisions and implements a sync
@@ -40,19 +41,15 @@ private abstract class TargetArchiveController[E <: FsArchiveEntry]
 extends FileSystemArchiveController[E] {
   controller: ArchiveModelAspect[E] =>
 
-  import TargetArchiveController._
+  assert(null ne parent)
 
-  private final class TargetArchiveModel(model: FsModel)
-  extends FsDecoratingModel(model) with ArchiveModel[E] {
-    override val lock = new ReentrantReadWriteLock
-    override def driver = controller._driver
-    override def touch(options: AccessOptions) { outputArchive(options) }
-  }
-
-  final override val model: ArchiveModel[E] = new TargetArchiveModel(_model)
+  final override val model: ArchiveModel[E] =
+    new TargetArchiveModel(_driver, _model)
+  require(model.getParent eq parent.getModel, "Parent/member mismatch!")
 
   /** The entry name of the target archive file in the parent file system. */
   private[this] val name = mountPoint.getPath.getNodeName
+  assert(null ne name)
 
   /**
    * The (possibly cached) {@link InputArchive} which is used to mount the
@@ -67,13 +64,9 @@ extends FileSystemArchiveController[E] {
    */
   private[this] var _outputArchive: Option[OutputArchive[E]] = None
 
-  require(null ne driver)
-  require(model.getParent eq parent.getModel, "Parent/member mismatch!")
   assert(invariants)
 
   private def invariants = {
-    assert(null ne parent)
-    assert(null ne name)
     val fs = fileSystem
     assert(_inputArchive.isEmpty || fs.isDefined)
     assert(_outputArchive.isEmpty || fs.isDefined)
@@ -435,6 +428,11 @@ extends FileSystemArchiveController[E] {
       case _ =>
         throw NeedsSyncException()
     }
+  }
+
+  private class TargetArchiveModel(driver: FsArchiveDriver[E], model: FsModel)
+  extends ArchiveModel(driver, model) {
+    override def touch(options: AccessOptions) { outputArchive(options) }
   }
 } // TargetArchiveController
 

@@ -4,15 +4,17 @@
  */
 package net.java.truevfs.kernel.impl
 
+import java.util.concurrent.locks._
 import net.java.truevfs.kernel.spec._
 
 /**
   * @author Christian Schlichtherle
   */
-private trait ArchiveModel[E <: FsArchiveEntry]
-extends FsModel with ReentrantReadWriteLockAspect {
+private abstract class ArchiveModel[E <: FsArchiveEntry]
+(val driver: FsArchiveDriver[E], model: FsModel)
+extends FsDecoratingModel(model) with ReentrantReadWriteLockAspect {
 
-  def driver: FsArchiveDriver[E]
+  final override val lock = new ReentrantReadWriteLock
 
   /** Composes the node path from the mountpoint of this model and the given
     * node name.
