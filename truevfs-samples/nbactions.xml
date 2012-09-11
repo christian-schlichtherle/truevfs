@@ -12,7 +12,7 @@
         <properties>
             <exec.classpathScope>runtime</exec.classpathScope>
             <exec.workingdir></exec.workingdir>
-            <exec.args>-ea -classpath %classpath net.java.truevfs.samples.Nzip llr test.zip</exec.args>
+            <exec.args>-ea -classpath %classpath net.java.truevfs.samples.access.TrueVFS</exec.args>
             <exec.executable>java</exec.executable>
         </properties>
     </action>
@@ -25,7 +25,7 @@
         <properties>
             <exec.classpathScope>runtime</exec.classpathScope>
             <exec.workingdir></exec.workingdir>
-            <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -ea -classpath %classpath net.java.truevfs.samples.Nzip llr test.zip</exec.args>
+            <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -ea -classpath %classpath net.java.truevfs.samples.access.TrueVFS</exec.args>
             <jpda.listen>true</jpda.listen>
             <exec.executable>java</exec.executable>
         </properties>
@@ -37,7 +37,7 @@
             <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
         </goals>
         <properties>
-            <exec.args>${profiler.args} -ea -classpath %classpath net.java.truevfs.samples.Nzip llr test.zip</exec.args>
+            <exec.args>${profiler.args} -ea -classpath %classpath net.java.truevfs.samples.access.TrueVFS</exec.args>
             <exec.workingdir></exec.workingdir>
             <profiler.action>profile</profiler.action>
             <exec.executable>${profiler.java}</exec.executable>
