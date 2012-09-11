@@ -4,12 +4,8 @@
  */
 package net.java.truevfs.samples.raes;
 
-import net.java.truevfs.kernel.spec.FsSyncException;
-import net.java.truevfs.access.TPath;
-import net.java.truevfs.samples.access.Application;
-import net.java.truevfs.samples.access.IllegalUsageException;
 import java.io.IOException;
-import java.util.ResourceBundle;
+import net.java.truevfs.access.TPath;
 
 /**
  * Decrypts the contents of the RAES file provided as the first argument
@@ -17,7 +13,8 @@ import java.util.ResourceBundle;
  * <p>
  * Please note that you should not use this utility to decrypt an RAES
  * encrypted ZIP file (usually a file with a {@code ".tzp"} or
- * {@code ".zip.rae"} extension) back to a plain ZIP file.
+ * {@code ".zip.rae"} or {@code ".zip.raes"} extension) back to a plain ZIP
+ * file.
  * This is because RAES encrypted ZIP files use the &quot;UTF-8&quot;
  * as their character set, whereas plain ZIP files use &quot;IBM437&quot;,
  * a.k.a. &quot;CP437&quot;.
@@ -25,24 +22,16 @@ import java.util.ResourceBundle;
  * @author Christian Schlichtherle
  */
 public class Decrypt extends Application {
-
-    private static final String CLASS_NAME = Decrypt.class.getName();
-    private static final ResourceBundle resources
-            = ResourceBundle.getBundle(CLASS_NAME);
-
-    /** Equivalent to {@code System.exit(new Decrypt().run(args));}. */
-    public static void main(final String[] args) throws FsSyncException {
+    
+    public static void main(String[] args) throws IOException {
         System.exit(new Decrypt().run(args));
     }
 
     @Override
-    protected int runChecked(final String[] args)
-    throws IllegalUsageException, IOException {
-        if (args.length != 2)
-            throw new IllegalUsageException(resources.getString("usage"));
+    void runChecked(final String[] args) throws IOException {
+        if (args.length != 2) throw new IllegalArgumentException();
         Raes.decrypt(   new TPath(args[0]).toNonArchivePath(),
                         new TPath(args[1]).toNonArchivePath(),
                         true);
-        return 0;
     }
 }
