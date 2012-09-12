@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.BitField;
@@ -57,8 +58,8 @@ extends FsDriver {
     public final FsController newController(
             FsManager manager,
             FsModel model,
-            @CheckForNull FsController parent) {
-        assert parent.getModel().equals(model.getParent());
+            @Nonnull FsController parent) {
+        assert model.getParent().equals(parent.getModel());
         return manager.newController(this, model, parent);
     }
 
