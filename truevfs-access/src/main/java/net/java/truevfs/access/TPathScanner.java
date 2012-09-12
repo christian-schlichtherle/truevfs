@@ -23,10 +23,6 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
 /**
  * Scans hierarchical {@link URI}s for prospective archive files with the help
  * of a {@link TArchiveDetector}.
- * <p>
- * Note that this class has no dependencies on other classes in this package,
- * so it could get published as a member of the package
- * {@code net.truevfs.file} instead if required.
  * 
  * @author Christian Schlichtherle
  */
@@ -55,8 +51,8 @@ final class TPathScanner {
     }
 
     /**
-     * Constructs a new {@link FsNodePath} from the given {@code parent} and scans
-     * the given {@code member} for prospective archive files.
+     * Constructs a new {@link FsNodePath} from the given {@code parent} and
+     * scans the given {@code member} for prospective archive files.
      * <p>
      * {@code member} must not be opaque and must not define a fragment
      * component.
@@ -141,8 +137,7 @@ final class TPathScanner {
             mp = new FsNodePath(new FsMountPoint(ppu), men);
         }
         final FsScheme s = detector.scheme(men.toString());
-        if (null != s)
-            mp = new FsNodePath(new FsMountPoint(s, mp), ROOT);
+        if (null != s) mp = new FsNodePath(new FsMountPoint(s, mp), ROOT);
         return mp;
     }
 
@@ -176,12 +171,12 @@ final class TPathScanner {
     }
 
     /**
-     * Returns whether or not the given path is absolute.
-     * <p>
-     * A path is absolute if it doesn't need to be combined with other path
-     * information in order to locate a file.
+     * Returns whether or not the given {@code uri} represents an absolute path.
+     * A URI represents an absolute path if it doesn't need to be combined with
+     * other path information in order to locate a file.
      *
-     * @return Whether or not the given path is absolute.
+     * @param  uri the URI to check.
+     * @return Whether or not the given URI represents an absolute path.
      */
     static boolean isAbsolute(URI uri) {
         return uri.isAbsolute() || Paths.isAbsolute(
@@ -199,11 +194,9 @@ final class TPathScanner {
         FsMountPoint mp = path.getMountPoint();
         FsNodeName  en = path.getNodeName();
         if (en.isRoot()) {
-            if (null == mp)
-                return null;
+            if (null == mp) return null;
             path = mp.getPath();
-            if (null != path)
-                return parent(path);
+            if (null != path) return parent(path);
             URI mpu = mp.getUri();
             URI pu = mpu.resolve(DOT_DOT_URI);
             if (mpu.getRawPath().length() <= pu.getRawPath().length())

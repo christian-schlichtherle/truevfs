@@ -411,8 +411,7 @@ public final class TPath implements Path, TRex {
             final String p,
             final int o) {
         int i = p.length();
-        if (o >= i || SEPARATOR_CHAR != p.charAt(--i))
-            return p;
+        if (o >= i || SEPARATOR_CHAR != p.charAt(--i)) return p;
         while (o <= i && SEPARATOR_CHAR == p.charAt(--i)) {
         }
         return p.substring(0, ++i);
