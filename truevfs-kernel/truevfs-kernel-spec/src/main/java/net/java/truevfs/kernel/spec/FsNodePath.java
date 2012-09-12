@@ -409,8 +409,7 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
      */
     public FsNodePath
     resolve(final FsNodeName nodeName) {
-        if (nodeName.isRoot() && null == this.uri.getQuery())
-            return this;
+        if (nodeName.isRoot() && null == this.uri.getQuery()) return this;
         return new FsNodePath(
                 this.mountPoint,
                 new FsNodeName(this.nodeName, nodeName));
