@@ -4,8 +4,6 @@
  */
 package net.java.truevfs.kernel.spec.cio;
 
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
-import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
 import java.io.IOException;
 import java.util.Iterator;
 import net.java.truevfs.kernel.driver.mock.MockArchive;
@@ -39,8 +37,7 @@ public class MultiplexingOutputServiceTest {
         }
         assertThat(service.size(), is(names.length));
         final Iterator<MockArchiveDriverEntry> it = service.iterator();
-        for (final String name : names) {
+        for (final String name : names)
             assertThat(it.next().getName(), equalTo(name));
-        }
     }
 }

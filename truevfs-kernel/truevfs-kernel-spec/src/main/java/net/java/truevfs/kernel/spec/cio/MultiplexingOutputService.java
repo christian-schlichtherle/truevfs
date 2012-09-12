@@ -113,9 +113,7 @@ extends DecoratingOutputService<E> {
             Output() { super(container.output(local)); }
 
             @Override
-            public E target() {
-                return local;
-            }
+            public E target() { return local; }
 
             @Override
             public OutputStream stream(InputSocket<? extends Entry> peer)
@@ -178,12 +176,10 @@ extends DecoratingOutputService<E> {
     } // IOExceptionComparator
 
     /** This entry output stream writes directly to this output service. */
-    @CleanupObligation
     private final class EntryOutputStream extends DecoratingOutputStream {
         boolean closed;
 
-        @CreatesObligation
-        EntryOutputStream(final OutputStream out) {
+        EntryOutputStream(final @WillCloseWhenClosed OutputStream out) {
             super(out);
             busy = true;
         }
@@ -229,30 +225,22 @@ extends DecoratingOutputService<E> {
                 InputProxy() { super(buffer.input()); }
 
                 @Override
-                public Entry target() {
-                    return peer;
-                }
+                public Entry target() { return peer; }
             } // InputProxy
             try {
                 this.input = new InputProxy();
                 this.out = buffer.output().stream(null);
             } catch (final Throwable ex) {
-                try {
-                    buffer.release();
-                } catch (final Throwable ex2) {
-                    ex.addSuppressed(ex2);
-                }
+                try { buffer.release(); }
+                catch (final Throwable ex2) { ex.addSuppressed(ex2); }
                 throw ex;
             }
             buffers.put(local.getName(), this);
         }
 
         E getTarget() {
-            try {
-                return output.target();
-            } catch (final IOException ex) {
-                throw new AssertionError(ex);
-            }
+            try { return output.target(); }
+            catch (final IOException ex) { throw new AssertionError(ex); }
         }
 
         @Override
