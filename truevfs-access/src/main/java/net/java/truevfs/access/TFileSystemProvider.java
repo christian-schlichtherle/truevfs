@@ -72,12 +72,10 @@ public final class TFileSystemProvider extends FileSystemProvider {
     static synchronized TFileSystemProvider get(URI name) {
         if (!TPathScanner.isAbsolute(name))
             return Holder.CURRENT_DIRECTORY_PROVIDER;
-        if (!name.isAbsolute())
-            name = DEFAULT_ROOT_MOUNT_POINT_URI;
+        if (!name.isAbsolute()) name = DEFAULT_ROOT_MOUNT_POINT_URI;
         String scheme = name.getScheme();
         TFileSystemProvider provider = providers.get(scheme);
-        if (null != provider)
-            return provider;
+        if (null != provider) return provider;
         provider = new TFileSystemProvider(scheme, name.resolve(SEPARATOR));
         providers.put(scheme, provider);
         return provider;
