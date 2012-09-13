@@ -42,14 +42,6 @@ final class TUriHelper {
             throw new QuotedUriSyntaxException(uri, "Opaque URI");
         if (null != uri.getFragment())
             throw new QuotedUriSyntaxException(uri, "Fragment component defined");
-        return fixChecked(uri);
-    }
-
-    /*static URI fixUnchecked(final URI uri) {
-        return uri.isOpaque() ? uri : fixChecked(uri);
-    }*/
-
-    private static URI fixChecked(final URI uri) {
         final String ssp = uri.getSchemeSpecificPart();
         final String a = uri.getAuthority();
         if (null == ssp // URI bug: null == new URI("foo").resolve(new URI("..")).getRawSchemeSpecificPart()
