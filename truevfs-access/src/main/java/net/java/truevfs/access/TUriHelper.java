@@ -38,8 +38,6 @@ final class TUriHelper {
     }
 
     static URI check(final URI uri) throws URISyntaxException {
-        if (uri.isOpaque())
-            throw new QuotedUriSyntaxException(uri, "Opaque URI");
         if (null != uri.getFragment())
             throw new QuotedUriSyntaxException(uri, "Fragment component defined");
         return uri;

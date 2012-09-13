@@ -23,17 +23,6 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
 
   "Checking a URI" should {
     "result in a URISyntaxException" when {
-      "providing an opaque URI" in {
-        val table = Table(
-          ("uri"),
-          ("foo:bar")
-        )
-        forAll(table) { _uri =>
-          val uri = new URI(_uri)
-          intercept[URISyntaxException] (check(uri))
-        }
-      }
-
       "providing a URI with a fragment component" in {
         val table = Table(
           ("uri"),

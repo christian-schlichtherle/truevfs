@@ -57,7 +57,6 @@ extends WordSpec with ShouldMatchers with PropertyChecks with MockitoSugar {
         (null, "foo"),
 
         ("file:/", null),
-        ("file:/", "mok:/bar"),
         ("file:/", "bar#baz"),
         ("file:/", "..")
       )
@@ -109,6 +108,8 @@ extends WordSpec with ShouldMatchers with PropertyChecks with MockitoSugar {
           ("mok:mok:scheme:/foo.mok!/x/bar.mok!/y", "../..", "mok:scheme:/foo.mok!/x"),
           ("mok:mok:scheme:/foo.mok!/x/bar.mok!/y", "../../..", "mok:scheme:/foo.mok!/"),
           ("mok:mok:scheme:/foo.mok!/x/bar.mok!/y", "../../../..", "scheme:/"),
+
+          ("file:/foo", "mok:/bar", "mok:/bar"),
 
           ("file:/foo", "/bar", "file:/bar"),
           ("file:/foo", "/bar/", "file:/bar"),
