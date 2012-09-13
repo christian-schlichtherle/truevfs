@@ -152,7 +152,7 @@ implements Serializable, Comparable<FsNodeName> {
      */
     public static final char SEPARATOR_CHAR = '/';
 
-    private static final String ILLEGAL_PREFIX = ".." + SEPARATOR;
+    private static final String DOT_DOT_SEPARATOR = ".." + SEPARATOR;
 
     /**
      * The file system node name of the root directory,
@@ -275,8 +275,8 @@ implements Serializable, Comparable<FsNodeName> {
         if (p.startsWith(SEPARATOR))
             throw new QuotedUriSyntaxException(uri,
                     "Illegal start of URI path component");
-        if (!p.isEmpty() && ILLEGAL_PREFIX.startsWith(p.substring(0,
-                Math.min(p.length(), ILLEGAL_PREFIX.length()))))
+        if (!p.isEmpty() && DOT_DOT_SEPARATOR.startsWith(p.substring(0,
+                Math.min(p.length(), DOT_DOT_SEPARATOR.length()))))
             throw new QuotedUriSyntaxException(uri,
                     "Illegal start of URI path component");
         if (p.endsWith(SEPARATOR))
