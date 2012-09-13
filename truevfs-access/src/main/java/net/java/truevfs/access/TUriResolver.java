@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.shed.PathSplitter;
+import net.java.truecommons.shed.QuotedUriSyntaxException;
 import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.access.TUriHelper.*;
 import net.java.truevfs.kernel.spec.FsMountPoint;
@@ -50,7 +51,8 @@ final class TUriResolver {
      * it against the given {@code base} file system node path.
      * <p>
      * {@code uri} must not be opaque and must not define a fragment component.
-     * A scheme component gets ignored.
+     * If it defines a scheme component, it must match the scheme component of
+     * the hierarchical URI of {@code base}.
      * If an authority component or an absolute path is present, the authority
      * and path components of {@code base} get discarded.
      * An authority component gets copied to the result.
@@ -60,6 +62,7 @@ final class TUriResolver {
      * {@code ".."} segments at the beginning of the normalized path component
      * are resolved against the scheme specific part of {@code base}
      * according to the syntax constraints for file system node paths.
+     * No {@code ".."} segments may remain after resolving.
      * A query component is copied to the result.
      * 
      * @param  base the base file system node path for resolving.
@@ -70,16 +73,24 @@ final class TUriResolver {
      * @throws IllegalArgumentException if any precondition is violated.
      */
     FsNodePath resolve(FsNodePath base, URI uri) {
+        if (uri.isAbsolute())
+            if (!uri.getScheme().equals(base.getHierarchicalUri().getScheme()))
+                throw new IllegalArgumentException();
         try {
             uri = checkAndFix(uri.normalize());
-            String path;
-            while ((path = uri.getPath()).startsWith(DOT_DOT_SEPARATOR)) {
+            String path = uri.getPath();
+            for (   int max;
+                    1 < (max = Math.min(path.length(), DOT_DOT_SEPARATOR.length())) &&
+                    DOT_DOT_SEPARATOR.startsWith(path.substring(0, max));
+                    ) {
                 base = parent(base);
                 uri = new UriBuilder(uri)
-                        .path(path.substring(3))
+                        .path(path = path.substring(max))
                         .getUri();
+                if (null == base)
+                    throw new QuotedUriSyntaxException(uri,
+                            "Illegal start of path component");
             }
-            if ("..".equals(path)) return parent(base);
             final int ppl = pathPrefixLength(uri);
             if (0 < ppl) {
                 final URI baseUri = base.getHierarchicalUri().resolve(SEPARATOR_URI);
