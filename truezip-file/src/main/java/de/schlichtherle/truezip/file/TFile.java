@@ -10,10 +10,10 @@ import static de.schlichtherle.truezip.entry.Entry.Type.DIRECTORY;
 import static de.schlichtherle.truezip.entry.Entry.Type.FILE;
 import static de.schlichtherle.truezip.entry.Entry.UNKNOWN;
 import static de.schlichtherle.truezip.entry.EntryName.SEPARATOR_CHAR;
+import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.FsEntryName.ROOT;
 import static de.schlichtherle.truezip.fs.FsOutputOption.EXCLUSIVE;
 import static de.schlichtherle.truezip.fs.FsOutputOption.GROW;
-import de.schlichtherle.truezip.fs.*;
 import static de.schlichtherle.truezip.fs.FsSyncOption.*;
 import static de.schlichtherle.truezip.fs.FsSyncOptions.UMOUNT;
 import static de.schlichtherle.truezip.fs.FsUriModifier.CANONICALIZE;
@@ -21,6 +21,7 @@ import de.schlichtherle.truezip.io.Paths;
 import de.schlichtherle.truezip.io.Paths.Splitter;
 import de.schlichtherle.truezip.io.Streams;
 import de.schlichtherle.truezip.util.BitField;
+import de.schlichtherle.truezip.util.JSE7;
 import de.schlichtherle.truezip.util.UriBuilder;
 import java.io.*;
 import java.net.MalformedURLException;
@@ -3599,8 +3600,12 @@ public final class TFile extends File {
                 // file like a regular file.
                 if (!move(compact.toNonArchiveFile(), grown.toNonArchiveFile()))
                     throw new IOException(compact + " (cannot move to " + grown + ")");
-            } catch (IOException ex) {
-                compact.rm();
+            } catch (final IOException ex) {
+                try {
+                    compact.rm();
+                } catch (final IOException ex2) {
+                    if (JSE7.AVAILABLE) ex.addSuppressed(ex2);
+                }
                 throw ex;
             }
         } finally {
