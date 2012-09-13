@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.access;
 
-import java.beans.ConstructorProperties;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -3219,7 +3218,11 @@ public final class TFile extends File implements TRex {
                 if (!move(compact.toNonArchiveFile(), grown.toNonArchiveFile()))
                     throw new FileSystemException(compact.getPath(), grown.getPath(), "Cannot move!");
             } catch (final IOException ex) {
-                compact.rm();
+                try {
+                    compact.rm();
+                } catch (final IOException ex2) {
+                    ex.addSuppressed(ex2);
+                }
                 throw ex;
             }
         }
