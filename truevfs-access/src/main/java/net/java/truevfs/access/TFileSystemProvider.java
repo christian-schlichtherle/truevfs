@@ -24,6 +24,7 @@ import java.util.WeakHashMap;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.BitField;
+import static net.java.truevfs.access.TUriHelper.*;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
 import net.java.truevfs.kernel.spec.FsMountPoint;
@@ -70,7 +71,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * @return A file system provider.
      */
     static synchronized TFileSystemProvider get(URI name) {
-        if (!TPathScanner.isAbsolute(name))
+        if (!isAbsolutePath(name))
             return Holder.CURRENT_DIRECTORY_PROVIDER;
         if (!name.isAbsolute()) name = DEFAULT_ROOT_MOUNT_POINT_URI;
         String scheme = name.getScheme();
@@ -379,7 +380,6 @@ public final class TFileSystemProvider extends FileSystemProvider {
         return promote(path).getFileName().toString().startsWith(".");
     }
 
-    /** @throws UnsupportedOperationException always */
     @Override
     public FileStore getFileStore(Path path) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -408,13 +408,11 @@ public final class TFileSystemProvider extends FileSystemProvider {
         return promote(path).readAttributes(type, options);
     }
 
-    /** @throws UnsupportedOperationException always */
     @Override
     public Map<String, Object> readAttributes(Path path, String attributes, LinkOption... options) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    /** @throws UnsupportedOperationException always */
     @Override
     public void setAttribute(Path path, String attribute, Object value, LinkOption... options) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -438,11 +436,9 @@ public final class TFileSystemProvider extends FileSystemProvider {
     }
 
     private static final class Holder {
-        static final TFileSystemProvider
-            CURRENT_DIRECTORY_PROVIDER = new TFileSystemProvider(
-                "file", new File("").toURI());
+        static final TFileSystemProvider CURRENT_DIRECTORY_PROVIDER =
+                new TFileSystemProvider("file", new File("").toURI());
 
-        private Holder() {
-        }
+        private Holder() { }
     }
 }

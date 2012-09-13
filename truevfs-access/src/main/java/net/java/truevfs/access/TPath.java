@@ -29,7 +29,7 @@ import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import net.java.truecommons.shed.Paths;
 import net.java.truecommons.shed.QuotedUriSyntaxException;
 import net.java.truecommons.shed.UriBuilder;
-import static net.java.truevfs.access.TPathScanner.*;
+import static net.java.truevfs.access.TUriHelper.*;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 import net.java.truevfs.kernel.spec.FsMountPoint;
@@ -173,7 +173,7 @@ public final class TPath implements Path, TRex {
         this.name = name;
         final TArchiveDetector detector = TConfig.current().getArchiveDetector();
         this.detector = detector;
-        this.nodePath = new TPathScanner(detector).scan(
+        this.nodePath = new TUriScanner(detector).scan(
                 new FsNodePath(fileSystem.getMountPoint(), ROOT),
                 name);
         this.fileSystem = fileSystem;
@@ -422,7 +422,7 @@ public final class TPath implements Path, TRex {
     }
 
     private static FsNodePath nodePath(URI name, TArchiveDetector detector) {
-        return new TPathScanner(detector).scan(
+        return new TUriScanner(detector).scan(
                 TFileSystemProvider.get(name).getRoot(),
                 name);
     }
@@ -530,9 +530,7 @@ public final class TPath implements Path, TRex {
     }
 
     @Override
-    public boolean isAbsolute() {
-        return TPathScanner.isAbsolute(getName());
-    }
+    public boolean isAbsolute() { return isAbsolutePath(getName()); }
 
     /**
      * Returns a path object for the same path name, but does not detect any
@@ -691,7 +689,7 @@ public final class TPath implements Path, TRex {
     private TPath resolve(final URI other) {
         URI name;
         final String namePath;
-        if (TPathScanner.isAbsolute(other) || (name = getName()).toString().isEmpty()) {
+        if (isAbsolutePath(other) || (name = getName()).toString().isEmpty()) {
             name = other;
         } else if (other.toString().isEmpty()) {
             name = getName();
@@ -704,8 +702,8 @@ public final class TPath implements Path, TRex {
                     .resolve(other);
         }
         final TArchiveDetector detector = TConfig.current().getArchiveDetector();
-        final FsNodePath path = new TPathScanner(detector).scan(
-                TPathScanner.isAbsolute(other)
+        final FsNodePath path = new TUriScanner(detector).scan(
+                isAbsolutePath(other)
                     ? TFileSystemProvider.get(getName()).getRoot()
                     : getNodePath(),
                 other);

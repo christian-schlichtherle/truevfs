@@ -6,32 +6,25 @@ package net.java.truevfs.access;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.shed.PathSplitter;
-import net.java.truecommons.shed.Paths;
-import net.java.truecommons.shed.QuotedUriSyntaxException;
 import net.java.truecommons.shed.UriBuilder;
+import static net.java.truevfs.access.TUriHelper.*;
 import net.java.truevfs.kernel.spec.FsMountPoint;
 import net.java.truevfs.kernel.spec.FsNodeName;
 import static net.java.truevfs.kernel.spec.FsNodeName.*;
 import net.java.truevfs.kernel.spec.FsNodePath;
 import net.java.truevfs.kernel.spec.FsScheme;
-import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
-import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
+import static net.java.truevfs.kernel.spec.FsUriModifier.*;
 
 /**
- * Scans hierarchical {@link URI}s for prospective archive files with the help
- * of a {@link TArchiveDetector}.
+ * Scans a {@link URI} for prospective archive files and resolves it against a
+ * base {@link FsNodePath}.
  * 
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-final class TPathScanner {
-    static final URI SEPARATOR_URI = URI.create(SEPARATOR);
-    static final URI DOT_URI = URI.create(".");
-    static final URI DOT_DOT_URI = URI.create("..");
-    static final String DOT_DOT_SEPARATOR = ".." + SEPARATOR_CHAR;
+final class TUriScanner {
 
     private final TArchiveDetector detector;
     private final PathSplitter splitter = new PathSplitter(SEPARATOR_CHAR, false);
@@ -45,7 +38,7 @@ final class TPathScanner {
      * 
      * @param detector the archive detector to use.
      */
-    TPathScanner(TArchiveDetector detector) {
+    TUriScanner(TArchiveDetector detector) {
         assert null != detector;
         this.detector = detector;
     }
@@ -139,73 +132,5 @@ final class TPathScanner {
         final FsScheme s = detector.scheme(men.toString());
         if (null != s) mp = new FsNodePath(new FsMountPoint(s, mp), ROOT);
         return mp;
-    }
-
-    static int pathPrefixLength(final URI uri) {
-        final String ssp = uri.getSchemeSpecificPart();
-        final String a = uri.getAuthority();
-        final int al = null == a ? 0 : 2 + a.length();
-        final int pl = Paths.prefixLength(ssp, SEPARATOR_CHAR, true) - al;
-        return pl >= 0 ? pl : Paths.prefixLength(uri.getPath(), SEPARATOR_CHAR, false);
-    }
-
-    static URI checkFix(final URI uri) throws URISyntaxException {
-        if (uri.isOpaque())
-            throw new QuotedUriSyntaxException(uri, "Opaque URI");
-        if (null != uri.getFragment())
-            throw new QuotedUriSyntaxException(uri, "Fragment component defined");
-        return fixChecked(uri);
-    }
-
-    static URI fixUnchecked(final URI uri) {
-        return uri.isOpaque() ? uri : fixChecked(uri);
-    }
-
-    private static URI fixChecked(final URI uri) {
-        final String ssp = uri.getSchemeSpecificPart();
-        final String a = uri.getAuthority();
-        if (null == ssp // URI bug: null == new URI("foo").resolve(new URI("..")).getRawSchemeSpecificPart()
-                || null == a && ssp.startsWith(SEPARATOR + SEPARATOR)) // empty authority
-            return new UriBuilder(uri).toUri();
-        return uri;
-    }
-
-    /**
-     * Returns whether or not the given {@code uri} represents an absolute path.
-     * A URI represents an absolute path if it doesn't need to be combined with
-     * other path information in order to locate a file.
-     *
-     * @param  uri the URI to check.
-     * @return Whether or not the given URI represents an absolute path.
-     */
-    static boolean isAbsolute(URI uri) {
-        return uri.isAbsolute() || Paths.isAbsolute(
-                uri.getSchemeSpecificPart(), SEPARATOR_CHAR);
-    }
-
-    /**
-     * Returns the parent of the given file system path.
-     * 
-     * @param  path a file system path.
-     * @return The parent file system path.
-     * @throws URISyntaxException 
-     */
-    static @Nullable FsNodePath parent(FsNodePath path) throws URISyntaxException {
-        FsMountPoint mp = path.getMountPoint();
-        FsNodeName  en = path.getNodeName();
-        if (en.isRoot()) {
-            if (null == mp) return null;
-            path = mp.getPath();
-            if (null != path) return parent(path);
-            URI mpu = mp.getUri();
-            URI pu = mpu.resolve(DOT_DOT_URI);
-            if (mpu.getRawPath().length() <= pu.getRawPath().length())
-                return null;
-            return new FsNodePath(pu);
-        } else {
-            URI pu = en.getUri().resolve(DOT_URI);
-            en = new FsNodeName(pu, CANONICALIZE);
-            return new FsNodePath(mp, en);
-        }
     }
 }
