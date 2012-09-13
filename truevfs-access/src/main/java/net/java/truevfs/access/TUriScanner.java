@@ -87,7 +87,7 @@ final class TUriScanner {
                 final String rootPath = null != authority || path.startsWith(SEPARATOR)
                         ? path.substring(0, ppl)
                         : baseUri.getPath() + path.substring(0, ppl);
-                this.root = new FsNodePath(
+                root = new FsNodePath(
                         new UriBuilder()
                             .scheme(baseUri.getScheme())
                             .authority(authority)
@@ -95,9 +95,9 @@ final class TUriScanner {
                             .getUri());
                 path = path.substring(ppl);
             } else {
-                this.root = base;
+                root = base;
             }
-            this.memberQuery = uri.getQuery();
+            memberQuery = uri.getQuery();
             return scan(path);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
