@@ -73,11 +73,9 @@ final class TUriResolver {
      * @throws IllegalArgumentException if any precondition is violated.
      */
     FsNodePath resolve(FsNodePath base, URI uri) {
-        if (uri.isAbsolute())
-            if (!uri.getScheme().equals(base.getHierarchicalUri().getScheme()))
-                throw new IllegalArgumentException();
         try {
             uri = fix(check(uri).normalize());
+            if (uri.isAbsolute()) return new FsNodePath(uri, CANONICALIZE);
             String path = uri.getPath();
             for (   int max;
                     1 < (max = Math.min(path.length(), DOT_DOT_SEPARATOR.length())) &&
