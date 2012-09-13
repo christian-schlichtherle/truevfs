@@ -19,8 +19,8 @@ import net.java.truevfs.kernel.spec.FsScheme;
 import static net.java.truevfs.kernel.spec.FsUriModifier.*;
 
 /**
- * Scans a {@link URI} for prospective archive files and resolves it against a
- * base {@link FsNodePath}.
+ * Scans {@link URI}s for prospective archive files and resolves them against
+ * base {@link FsNodePath}s.
  * 
  * @author Christian Schlichtherle
  */
@@ -46,60 +46,59 @@ final class TUriScanner {
     }
 
     /**
-     * Constructs a new {@link FsNodePath} from the given {@code parent} and
-     * scans the given {@code member} for prospective archive files.
+     * Scans the given {@code uri} for prospective archive files and resolves
+     * it against the given {@code base} file system node path.
      * <p>
-     * {@code member} must not be opaque and must not define a fragment
-     * component.
+     * {@code uri} must not be opaque and must not define a fragment component.
      * A scheme component gets ignored.
      * If an authority component or an absolute path is present, the authority
-     * and path components of {@code parent} get discarded.
+     * and path components of {@code base} get discarded.
      * An authority component gets copied to the result.
      * A path component gets normalized and scanned for prospective archive
      * files using the {@link TArchiveDetector} provided to the constructor and
      * rewritten according to the syntax constraints for an {@link FsNodePath}.
      * {@code ".."} segments at the beginning of the normalized path component
-     * are resolved against the scheme specific part of {@code parent}
-     * according to the syntax constraints for an {@link FsNodePath}.
+     * are resolved against the scheme specific part of {@code base}
+     * according to the syntax constraints for file system node paths.
      * A query component is copied to the result.
      * 
-     * @param  parent the file system path to use as the parent.
-     * @param  member the URI to scan for prospective archive files.
-     * @return the file system path combined from the given {@code parent} and
-     *         {@code member}, possibly decorated as an opaque URI to address
+     * @param  base the base file system node path for resolving.
+     * @param  uri the URI to scan for prospective archive files.
+     * @return the file system node path combined from the given {@code base}
+     *         and {@code uri}, possibly decorated as an opaque URI to address
      *         prospective archive files.
      * @throws IllegalArgumentException if any precondition is violated.
      */
-    FsNodePath scan(FsNodePath parent, URI member) {
+    FsNodePath scan(FsNodePath base, URI uri) {
         try {
-            member = checkAndFix(member.normalize());
-            String mp;
-            while ((mp = member.getPath()).startsWith(DOT_DOT_SEPARATOR)) {
-                parent = parent(parent);
-                member = new UriBuilder(member)
-                        .path(mp.substring(3))
+            uri = checkAndFix(uri.normalize());
+            String path;
+            while ((path = uri.getPath()).startsWith(DOT_DOT_SEPARATOR)) {
+                base = parent(base);
+                uri = new UriBuilder(uri)
+                        .path(path.substring(3))
                         .getUri();
             }
-            if ("..".equals(mp)) return parent(parent);
-            final int mpl = pathPrefixLength(member);
-            if (0 < mpl) {
-                final URI pu = parent.getHierarchicalUri().resolve(SEPARATOR_URI);
-                final String ma = member.getAuthority();
-                final String p = null != ma || mp.startsWith(SEPARATOR)
-                        ? mp.substring(0, mpl)
-                        : pu.getPath() + mp.substring(0, mpl);
+            if ("..".equals(path)) return parent(base);
+            final int ppl = pathPrefixLength(uri);
+            if (0 < ppl) {
+                final URI baseUri = base.getHierarchicalUri().resolve(SEPARATOR_URI);
+                final String authority = uri.getAuthority();
+                final String rootPath = null != authority || path.startsWith(SEPARATOR)
+                        ? path.substring(0, ppl)
+                        : baseUri.getPath() + path.substring(0, ppl);
                 this.root = new FsNodePath(
                         new UriBuilder()
-                            .scheme(pu.getScheme())
-                            .authority(ma)
-                            .path(p)
+                            .scheme(baseUri.getScheme())
+                            .authority(authority)
+                            .path(rootPath)
                             .getUri());
-                mp = mp.substring(mpl);
+                path = path.substring(ppl);
             } else {
-                this.root = parent;
+                this.root = base;
             }
-            this.memberQuery = member.getQuery();
-            return scan(mp);
+            this.memberQuery = uri.getQuery();
+            return scan(path);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
