@@ -71,7 +71,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * @return A file system provider.
      */
     static TFileSystemProvider get(URI name) {
-        if (!isAbsolutePath(name))
+        if (!hasAbsolutePath(name))
             return Lazy.CURRENT_DIRECTORY_PROVIDER;
         if (!name.isAbsolute()) name = DEFAULT_ROOT_MOUNT_POINT_URI;
         String scheme = name.getScheme();
