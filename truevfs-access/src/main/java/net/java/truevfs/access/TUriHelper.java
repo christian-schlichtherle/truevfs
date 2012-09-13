@@ -12,16 +12,11 @@ package net.java.truevfs.access;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.Paths;
 import net.java.truecommons.shed.QuotedUriSyntaxException;
 import net.java.truecommons.shed.UriBuilder;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsNodeName;
 import static net.java.truevfs.kernel.spec.FsNodeName.*;
-import net.java.truevfs.kernel.spec.FsNodePath;
-import static net.java.truevfs.kernel.spec.FsUriModifier.*;
 
 /**
  * Utility methods for {@link URI}s which represent file system path names.
@@ -33,7 +28,6 @@ final class TUriHelper {
     static final URI SEPARATOR_URI = URI.create(SEPARATOR);
     static final URI DOT_URI = URI.create(".");
     static final URI DOT_DOT_URI = URI.create("..");
-    static final String DOT_DOT_SEPARATOR = ".." + SEPARATOR_CHAR;
 
     static int pathPrefixLength(final URI uri) {
         final String ssp = uri.getSchemeSpecificPart();
@@ -75,32 +69,6 @@ final class TUriHelper {
     static boolean isAbsolutePath(URI uri) {
         return uri.isAbsolute() || Paths.isAbsolute(
                 uri.getSchemeSpecificPart(), SEPARATOR_CHAR);
-    }
-
-    /**
-     * Returns the parent of the given file system path.
-     * 
-     * @param  path a file system path.
-     * @return The parent file system path.
-     * @throws URISyntaxException 
-     */
-    static @Nullable FsNodePath parent(FsNodePath path) throws URISyntaxException {
-        FsMountPoint mp = path.getMountPoint();
-        FsNodeName  en = path.getNodeName();
-        if (en.isRoot()) {
-            if (null == mp) return null;
-            path = mp.getPath();
-            if (null != path) return parent(path);
-            URI mpu = mp.getUri();
-            URI pu = mpu.resolve(DOT_DOT_URI);
-            if (mpu.getRawPath().length() <= pu.getRawPath().length())
-                return null;
-            return new FsNodePath(pu);
-        } else {
-            URI pu = en.getUri().resolve(DOT_URI);
-            en = new FsNodeName(pu, CANONICALIZE);
-            return new FsNodePath(mp, en);
-        }
     }
 
     private TUriHelper() { }

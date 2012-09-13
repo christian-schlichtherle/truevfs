@@ -6,6 +6,7 @@ package net.java.truevfs.access;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.shed.PathSplitter;
 import net.java.truecommons.shed.UriBuilder;
@@ -25,6 +26,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.*;
  */
 @NotThreadSafe
 final class TUriScanner {
+    private static final String DOT_DOT_SEPARATOR = ".." + SEPARATOR_CHAR;
 
     private final TArchiveDetector detector;
     private final PathSplitter splitter = new PathSplitter(SEPARATOR_CHAR, false);
@@ -132,5 +134,32 @@ final class TUriScanner {
         final FsScheme s = detector.scheme(men.toString());
         if (null != s) mp = new FsNodePath(new FsMountPoint(s, mp), ROOT);
         return mp;
+    }
+
+    /**
+     * Returns the parent of the given file system node path.
+     * 
+     * @param  path a file system node path.
+     * @return The parent file system node path.
+     * @throws URISyntaxException 
+     */
+    static @Nullable FsNodePath parent(FsNodePath path)
+    throws URISyntaxException {
+        FsMountPoint mp = path.getMountPoint();
+        FsNodeName  en = path.getNodeName();
+        if (en.isRoot()) {
+            if (null == mp) return null;
+            path = mp.getPath();
+            if (null != path) return parent(path);
+            URI mpu = mp.getUri();
+            URI pu = mpu.resolve(DOT_DOT_URI);
+            if (mpu.getRawPath().length() <= pu.getRawPath().length())
+                return null;
+            return new FsNodePath(pu);
+        } else {
+            URI pu = en.getUri().resolve(DOT_URI);
+            en = new FsNodeName(pu, CANONICALIZE);
+            return new FsNodePath(mp, en);
+        }
     }
 }
