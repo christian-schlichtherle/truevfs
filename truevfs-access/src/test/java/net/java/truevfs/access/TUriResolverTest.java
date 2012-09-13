@@ -18,7 +18,7 @@ import org.junit.Test;
 /**
  * @author Christian Schlichtherle
  */
-public class TUriScannerTest extends MockArchiveDriverTestBase {
+public class TUriResolverTest extends MockArchiveDriverTestBase {
 
     @Test
     public void testParent() throws URISyntaxException {
