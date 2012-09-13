@@ -7,7 +7,7 @@ package net.java.truevfs.access;
 import static java.io.File.separatorChar;
 import java.net.URI;
 import java.net.URISyntaxException;
-import static net.java.truevfs.access.TUriScanner.*;
+import static net.java.truevfs.access.TUriResolver.*;
 import net.java.truevfs.kernel.spec.FsMountPoint;
 import net.java.truevfs.kernel.spec.FsNodePath;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -97,9 +97,9 @@ public class TUriScannerTest extends MockArchiveDriverTestBase {
         final FsMountPoint mountPoint = null == params[3]
                 ? null
                 : new FsMountPoint(new URI(params[3]));
-        final FsNodePath result = new TUriScanner(
+        final FsNodePath result = new TUriResolver(
                     TConfig.current().getArchiveDetector())
-                .scan(parent, member);
+                .resolve(parent, member);
         assertThat(result, equalTo(path));
         assertThat(result.getMountPoint(), is(mountPoint));
     }

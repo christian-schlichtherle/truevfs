@@ -173,7 +173,7 @@ public final class TPath implements Path, TRex {
         this.name = name;
         final TArchiveDetector detector = TConfig.current().getArchiveDetector();
         this.detector = detector;
-        this.nodePath = new TUriScanner(detector).scan(
+        this.nodePath = new TUriResolver(detector).resolve(
                 new FsNodePath(fileSystem.getMountPoint(), ROOT),
                 name);
         this.fileSystem = fileSystem;
@@ -422,7 +422,7 @@ public final class TPath implements Path, TRex {
     }
 
     private static FsNodePath nodePath(URI name, TArchiveDetector detector) {
-        return new TUriScanner(detector).scan(
+        return new TUriResolver(detector).resolve(
                 TFileSystemProvider.get(name).getRoot(),
                 name);
     }
@@ -702,7 +702,7 @@ public final class TPath implements Path, TRex {
                     .resolve(other);
         }
         final TArchiveDetector detector = TConfig.current().getArchiveDetector();
-        final FsNodePath path = new TUriScanner(detector).scan(
+        final FsNodePath path = new TUriResolver(detector).resolve(
                 isAbsolutePath(other)
                     ? TFileSystemProvider.get(getName()).getRoot()
                     : getNodePath(),
@@ -754,7 +754,7 @@ public final class TPath implements Path, TRex {
 
     @Override
     public TPath toRealPath(LinkOption... options) throws IOException {
-        // TODO: scan symlinks!
+        // TODO: resolve symlinks!
         return new TPath(getUri(), getArchiveDetector(), getNodePath());
     }
 

@@ -25,22 +25,22 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.*;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-final class TUriScanner {
+final class TUriResolver {
     private static final String DOT_DOT_SEPARATOR = ".." + SEPARATOR_CHAR;
 
     private final TArchiveDetector detector;
     private final PathSplitter splitter = new PathSplitter(SEPARATOR_CHAR, false);
     private FsNodePath root;
     private String memberQuery;
-    private final UriBuilder uri = new UriBuilder();
+    private final UriBuilder builder = new UriBuilder();
 
     /**
-     * Constructs a new URI scanner which uses the given
-     * {@link TArchiveDetector}.
+     * Constructs a new URI resolver which uses the given
+     * {@link TArchiveDetector} to resolve for archive files.
      * 
-     * @param detector the archive detector to use.
+     * @param detector the archive detector to use for scanning.
      */
-    TUriScanner(TArchiveDetector detector) {
+    TUriResolver(TArchiveDetector detector) {
         assert null != detector;
         this.detector = detector;
     }
@@ -63,13 +63,13 @@ final class TUriScanner {
      * A query component is copied to the result.
      * 
      * @param  base the base file system node path for resolving.
-     * @param  uri the URI to scan for prospective archive files.
+     * @param  uri the URI to resolve for prospective archive files.
      * @return the file system node path combined from the given {@code base}
      *         and {@code uri}, possibly decorated as an opaque URI to address
      *         prospective archive files.
      * @throws IllegalArgumentException if any precondition is violated.
      */
-    FsNodePath scan(FsNodePath base, URI uri) {
+    FsNodePath resolve(FsNodePath base, URI uri) {
         try {
             uri = checkAndFix(uri.normalize());
             String path;
@@ -98,41 +98,41 @@ final class TUriScanner {
                 root = base;
             }
             memberQuery = uri.getQuery();
-            return scan(path);
+            return resolve(path);
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
     }
 
-    private FsNodePath scan(final String path) throws URISyntaxException {
+    private FsNodePath resolve(final String path) throws URISyntaxException {
         splitter.split(path);
-        final String ps = splitter.getParentPath();
+        final String pp = splitter.getParentPath();
         final FsNodeName men;
-        final FsNodePath pp;
-        if (null != ps) {
+        final FsNodePath np;
+        if (null != pp) {
             men = new FsNodeName(
-                    uri.path(splitter.getMemberName()).getUri(),
+                    builder.path(splitter.getMemberName()).getUri(),
                     NULL);
-            pp = scan(ps);
+            np = resolve(pp);
         } else {
             men = new FsNodeName(
-                    uri.path(path).query(memberQuery).getUri(),
+                    builder.path(path).query(memberQuery).getUri(),
                     CANONICALIZE);
-            pp = root;
+            np = root;
         }
-        URI ppu;
-        FsNodePath mp;
-        if (men.isRoot() || (ppu = pp.getUri()).isOpaque() || !ppu.isAbsolute()) {
-            mp = pp.resolve(men);
+        URI npu;
+        FsNodePath mnp;
+        if (men.isRoot() || (npu = np.getUri()).isOpaque() || !npu.isAbsolute()) {
+            mnp = np.resolve(men);
         } else {
-            final String pup = ppu.getPath();
+            final String pup = npu.getPath();
             if (!pup.endsWith(SEPARATOR))
-                ppu = new UriBuilder(ppu).path(pup + SEPARATOR_CHAR).getUri();
-            mp = new FsNodePath(new FsMountPoint(ppu), men);
+                npu = new UriBuilder(npu).path(pup + SEPARATOR_CHAR).getUri();
+            mnp = new FsNodePath(new FsMountPoint(npu), men);
         }
         final FsScheme s = detector.scheme(men.toString());
-        if (null != s) mp = new FsNodePath(new FsMountPoint(s, mp), ROOT);
-        return mp;
+        if (null != s) mnp = new FsNodePath(new FsMountPoint(s, mnp), ROOT);
+        return mnp;
     }
 
     /**
