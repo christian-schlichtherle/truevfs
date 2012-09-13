@@ -19,7 +19,7 @@ import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.kernel.spec.FsNodeName.*;
 
 /**
- * Utility methods for {@link URI}s which represent file system path names.
+ * Utility functions for {@link URI}s which represent file system path names.
  * 
  * @author Christian Schlichtherle
  */
@@ -37,7 +37,7 @@ final class TUriHelper {
         return pl >= 0 ? pl : Paths.prefixLength(uri.getPath(), SEPARATOR_CHAR, false);
     }
 
-    static URI checkFix(final URI uri) throws URISyntaxException {
+    static URI checkAndFix(final URI uri) throws URISyntaxException {
         if (uri.isOpaque())
             throw new QuotedUriSyntaxException(uri, "Opaque URI");
         if (null != uri.getFragment())
@@ -45,9 +45,9 @@ final class TUriHelper {
         return fixChecked(uri);
     }
 
-    static URI fixUnchecked(final URI uri) {
+    /*static URI fixUnchecked(final URI uri) {
         return uri.isOpaque() ? uri : fixChecked(uri);
-    }
+    }*/
 
     private static URI fixChecked(final URI uri) {
         final String ssp = uri.getSchemeSpecificPart();
