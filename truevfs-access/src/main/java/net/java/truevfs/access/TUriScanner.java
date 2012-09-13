@@ -72,7 +72,7 @@ final class TUriScanner {
      */
     FsNodePath scan(FsNodePath parent, URI member) {
         try {
-            member = checkFix(member.normalize());
+            member = checkAndFix(member.normalize());
             String mp;
             while ((mp = member.getPath()).startsWith(DOT_DOT_SEPARATOR)) {
                 parent = parent(parent);

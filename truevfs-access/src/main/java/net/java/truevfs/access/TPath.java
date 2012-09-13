@@ -389,7 +389,7 @@ public final class TPath implements Path, TRex {
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
     private static URI name(URI uri) {
         try {
-            uri = checkFix(uri);
+            uri = checkAndFix(uri);
             final int pl = pathPrefixLength(uri);
             final String q = uri.getPath();
             final String p = cutTrailingSeparators(q, pl);
