@@ -531,7 +531,7 @@ public final class TPath implements Path, TRex {
     }
 
     @Override
-    public boolean isAbsolute() { return isAbsolutePath(getName()); }
+    public boolean isAbsolute() { return hasAbsolutePath(getName()); }
 
     /**
      * Returns a path object for the same path name, but does not detect any
@@ -690,7 +690,7 @@ public final class TPath implements Path, TRex {
     private TPath resolve(final URI other) {
         URI name;
         final String namePath;
-        if (isAbsolutePath(other) || (name = getName()).toString().isEmpty()) {
+        if (hasAbsolutePath(other) || (name = getName()).toString().isEmpty()) {
             name = other;
         } else if (other.toString().isEmpty()) {
             name = getName();
@@ -704,7 +704,7 @@ public final class TPath implements Path, TRex {
         }
         final TArchiveDetector detector = TConfig.current().getArchiveDetector();
         final FsNodePath path = new TUriResolver(detector).resolve(
-                isAbsolutePath(other)
+                hasAbsolutePath(other)
                     ? TFileSystemProvider.get(getName()).getRoot()
                     : getNodePath(),
                 other);

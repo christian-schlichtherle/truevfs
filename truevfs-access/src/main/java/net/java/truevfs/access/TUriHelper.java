@@ -67,15 +67,15 @@ final class TUriHelper {
     }
 
     /**
-     * Returns whether or not the given {@code uri} represents an absolute path.
-     * A URI represents an absolute path if it doesn't need to be combined with
+     * Returns whether or not the given {@code uri} has an absolute path.
+     * A URI has an absolute path if it doesn't need to be combined with
      * other path information in order to locate a file.
      *
-     * @param  uri the URI to check.
-     * @return Whether or not the given URI represents an absolute path.
+     * @param  uri the URI to test.
+     * @return Whether or not the given URI has an absolute path.
      */
-    static boolean isAbsolutePath(URI uri) {
-        return uri.isAbsolute() || Paths.isAbsolute(
+    static boolean hasAbsolutePath(URI uri) {
+        return !uri.isOpaque() && Paths.isAbsolute(
                 uri.getSchemeSpecificPart(), SEPARATOR_CHAR);
     }
 
