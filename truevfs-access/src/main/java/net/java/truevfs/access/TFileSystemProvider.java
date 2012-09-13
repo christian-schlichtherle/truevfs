@@ -39,8 +39,7 @@ import net.java.truevfs.kernel.spec.cio.OutputSocket;
 import org.slf4j.LoggerFactory;
 
 /**
- * A {@link FileSystemProvider} implementation
- * based on the TrueVFS Kernel module.
+ * A {@link FileSystemProvider} implementation for use with NIO.2.
  * 
  * @author Christian Schlichtherle
  */

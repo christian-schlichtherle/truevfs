@@ -41,7 +41,7 @@ import net.java.truevfs.kernel.spec.cio.InputSocket;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
 
 /**
- * A {@link FileSystem} implementation based on the TrueVFS Kernel module.
+ * A {@link FileSystem} implementation for use with NIO.2.
  * 
  * @author Christian Schlichtherle
  */

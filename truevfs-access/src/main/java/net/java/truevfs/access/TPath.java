@@ -42,7 +42,7 @@ import net.java.truevfs.kernel.spec.cio.InputSocket;
 import net.java.truevfs.kernel.spec.cio.OutputSocket;
 
 /**
- * A {@link Path} implementation based on the TrueVFS Kernel module.
+ * A {@link Path} implementation for use with NIO.2.
  * Applications should directly instantiate this class to overcome the
  * <a href="package-summary.html#fspsl">restrictions</a> of the file system
  * provider service location in the NIO.2 API for JSE&nbsp;7.
