@@ -286,7 +286,7 @@ public final class TPath implements Path, TRex {
         } else {
             final TArchiveDetector detector = TConfig.current().getArchiveDetector();
             this.detector = detector;
-            this.nodePath = nodePath(name, detector);
+            this.nodePath = nodePath(detector, name);
         }
 
         assert invariants();
@@ -326,7 +326,7 @@ public final class TPath implements Path, TRex {
         this.name = name = name(name);
         if (null == detector) detector = TConfig.current().getArchiveDetector();
         this.detector = detector;
-        this.nodePath = null != nodePath ? nodePath : nodePath(name, detector);
+        this.nodePath = null != nodePath ? nodePath : nodePath(detector, name);
 
         assert invariants();
     }
@@ -421,10 +421,11 @@ public final class TPath implements Path, TRex {
         return Paths.prefixLength(p, SEPARATOR_CHAR, true);
     }
 
-    private static FsNodePath nodePath(URI name, TArchiveDetector detector) {
+    private static FsNodePath nodePath(TArchiveDetector detector, URI name) {
+        TFileSystemProvider provider = TFileSystemProvider.get(name);
         return new TUriResolver(detector).resolve(
-                TFileSystemProvider.get(name).getRoot(),
-                name);
+                provider.getRoot(),
+                provider.relativize(name));
     }
 
     /**

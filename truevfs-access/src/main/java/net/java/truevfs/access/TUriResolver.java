@@ -118,32 +118,32 @@ final class TUriResolver {
     private FsNodePath resolve(final String path) throws URISyntaxException {
         splitter.split(path);
         final String pp = splitter.getParentPath();
-        final FsNodeName men;
+        final FsNodeName nn;
         final FsNodePath np;
         if (null != pp) {
-            men = new FsNodeName(
+            nn = new FsNodeName(
                     builder.path(splitter.getMemberName()).getUri(),
                     NULL);
             np = resolve(pp);
         } else {
-            men = new FsNodeName(
+            nn = new FsNodeName(
                     builder.path(path).query(memberQuery).getUri(),
                     CANONICALIZE);
             np = root;
         }
         URI npu;
-        FsNodePath mnp;
-        if (men.isRoot() || (npu = np.getUri()).isOpaque() || !npu.isAbsolute()) {
-            mnp = np.resolve(men);
+        FsNodePath rnp;
+        if (nn.isRoot() || (npu = np.getUri()).isOpaque() || !npu.isAbsolute()) {
+            rnp = np.resolve(nn);
         } else {
-            final String pup = npu.getPath();
-            if (!pup.endsWith(SEPARATOR))
-                npu = new UriBuilder(npu).path(pup + SEPARATOR_CHAR).getUri();
-            mnp = new FsNodePath(new FsMountPoint(npu), men);
+            final String npup = npu.getPath();
+            if (!npup.endsWith(SEPARATOR))
+                npu = new UriBuilder(npu).path(npup + SEPARATOR_CHAR).getUri();
+            rnp = new FsNodePath(new FsMountPoint(npu), nn);
         }
-        final FsScheme s = detector.scheme(men.toString());
-        if (null != s) mnp = new FsNodePath(new FsMountPoint(s, mnp), ROOT);
-        return mnp;
+        final FsScheme s = detector.scheme(nn.toString());
+        if (null != s) rnp = new FsNodePath(new FsMountPoint(s, rnp), ROOT);
+        return rnp;
     }
 
     /**
