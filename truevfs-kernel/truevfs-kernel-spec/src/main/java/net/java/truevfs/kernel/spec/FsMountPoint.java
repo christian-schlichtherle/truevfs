@@ -277,9 +277,9 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
     throws URISyntaxException {
         uri = modifier.modify(uri, MOUNT_POINT);
         if (null != uri.getRawQuery())
-            throw new QuotedUriSyntaxException(uri, "Query not allowed");
+            throw new QuotedUriSyntaxException(uri, "Query component not allowed");
         if (null != uri.getRawFragment())
-            throw new QuotedUriSyntaxException(uri, "Fragment not allowed");
+            throw new QuotedUriSyntaxException(uri, "Fragment component not allowed");
         if (uri.isOpaque()) {
             final String ssp = uri.getRawSchemeSpecificPart();
             final int i = ssp.lastIndexOf(SEPARATOR);
@@ -291,7 +291,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
             if (!pu.isAbsolute())
                 throw new QuotedUriSyntaxException(uri, "Path not absolute");
             if (0 == path.getNodeName().getPath().length())
-                throw new QuotedUriSyntaxException(uri, "Empty URI path of node name of path");
+                throw new QuotedUriSyntaxException(uri, "Empty URI path of node name of node path");
             if (NULL != modifier) {
                 URI nuri = new UriBuilder(true)
                         .scheme(uri.getScheme())
@@ -309,7 +309,7 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
                 throw new QuotedUriSyntaxException(uri, "Not absolute");
             if (!uri.getRawPath().endsWith(FsNodeName.SEPARATOR))
                 throw new QuotedUriSyntaxException(uri,
-                        "URI path doesn't end with separator \"" + FsNodeName.SEPARATOR + '"');
+                        "Path component doesn't end with separator \"" + FsNodeName.SEPARATOR + '"');
             path = null;
         }
         this.uri = uri;

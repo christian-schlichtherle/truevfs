@@ -282,7 +282,7 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
     throws URISyntaxException {
         uri = modifier.modify(uri, NODE_PATH);
         if (null != uri.getRawFragment())
-            throw new QuotedUriSyntaxException(uri, "Fragment not allowed");
+            throw new QuotedUriSyntaxException(uri, "Fragment component not allowed");
         if (uri.isOpaque()) {
             final String ssp = uri.getRawSchemeSpecificPart();
             final int i = ssp.lastIndexOf(FsMountPoint.SEPARATOR);

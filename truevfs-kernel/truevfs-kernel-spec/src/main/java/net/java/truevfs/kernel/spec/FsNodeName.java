@@ -263,25 +263,25 @@ implements Serializable, Comparable<FsNodeName> {
 
     private void parse(final URI uri) throws URISyntaxException {
         if (uri.isAbsolute())
-            throw new QuotedUriSyntaxException(uri, "Scheme component defined.");
+            throw new QuotedUriSyntaxException(uri, "Scheme component defined");
         if (null != uri.getRawAuthority())
-            throw new QuotedUriSyntaxException(uri, "Authority component defined.");
+            throw new QuotedUriSyntaxException(uri, "Authority component defined");
         if (null == uri.getRawPath())
-            throw new QuotedUriSyntaxException(uri, "Path component undefined.");
+            throw new QuotedUriSyntaxException(uri, "Path component undefined");
         if (null != uri.getRawFragment())
-            throw new QuotedUriSyntaxException(uri, "Fragment component defined.");
+            throw new QuotedUriSyntaxException(uri, "Fragment component defined");
         this.uri = uri;
         final String p = uri.getRawPath();
         if (p.startsWith(SEPARATOR))
             throw new QuotedUriSyntaxException(uri,
-                    "Illegal start of URI path component");
+                    "Illegal start of path component");
         if (!p.isEmpty() && DOT_DOT_SEPARATOR.startsWith(p.substring(0,
                 Math.min(p.length(), DOT_DOT_SEPARATOR.length()))))
             throw new QuotedUriSyntaxException(uri,
-                    "Illegal start of URI path component");
+                    "Illegal start of path component");
         if (p.endsWith(SEPARATOR))
             throw new QuotedUriSyntaxException(uri,
-                    "Illegal separator \"" + SEPARATOR + "\" at end of URI path");
+                    "Illegal separator \"" + SEPARATOR + "\" at end of path component");
 
         assert invariants();
     }
