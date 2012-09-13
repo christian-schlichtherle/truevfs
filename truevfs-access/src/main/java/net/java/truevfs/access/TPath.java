@@ -395,7 +395,7 @@ public final class TPath implements Path, TRex {
             final String p = cutTrailingSeparators(q, pl);
             // Mind contract of cutTrailingSeparators(String, int).
             return p == q ? uri : new UriBuilder(uri).path(p).getUri();
-        } catch (URISyntaxException ex) {
+        } catch (final URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
     }
