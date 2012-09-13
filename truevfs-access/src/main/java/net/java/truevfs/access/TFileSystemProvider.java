@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
 public final class TFileSystemProvider extends FileSystemProvider {
 
     /** The scheme of the provider for the public no-arg constructor. */
-    public  static final String DEFAULT_SCHEME = "tpath";
+    public static final String DEFAULT_SCHEME = "tpath";
 
     /** The root mount point of the provider for the public no-arg constructor. */
     public static final String DEFAULT_ROOT_MOUNT_POINT = "file:/";
