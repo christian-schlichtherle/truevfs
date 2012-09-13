@@ -10,9 +10,7 @@ import net.java.truecommons.io.Loan._
 import net.java.truecommons.services._
 import net.java.truecommons.shed._
 import net.java.truevfs.kernel.driver.mock._
-import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.FsAccessOption._
-import net.java.truevfs.kernel.spec.FsAccessOptions._
 import net.java.truevfs.kernel.spec.sl._
 import net.java.truevfs.kernel.spec.spi._
 import org.junit.runner._
@@ -20,7 +18,6 @@ import org.scalatest._
 import org.scalatest.junit._
 import org.scalatest.matchers._
 import org.scalatest.prop._
-import org.slf4j._
 
 /**
   * DO NOT MODIFY THE GLOBAL CONFIGURATION IN THESE TESTS!
