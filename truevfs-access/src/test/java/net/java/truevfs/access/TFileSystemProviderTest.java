@@ -52,8 +52,7 @@ public class TFileSystemProviderTest extends MockArchiveDriverTestBase {
                     : FsMountPoint.create(URI.create(params[2].toString()), CANONICALIZE);
             try {
                 final TFileSystem fs = provider.newFileSystem(path, getEnvironment());
-                if (null == mountPoint)
-                    fail();
+                if (null == mountPoint) fail();
                 assertThat(fs.getMountPoint(), is(mountPoint));
                 for (final String entry : new String[] {
                     "",
@@ -63,9 +62,8 @@ public class TFileSystemProviderTest extends MockArchiveDriverTestBase {
                 }) {
                     assertThat(fs.getPath(entry).getFileSystem(), sameInstance(fs));
                 }
-            } catch (UnsupportedOperationException ex) {
-                if (null != mountPoint)
-                    throw ex;
+            } catch (final UnsupportedOperationException ex) {
+                if (null != mountPoint) throw ex;
             }
         }
     }
@@ -94,8 +92,7 @@ public class TFileSystemProviderTest extends MockArchiveDriverTestBase {
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[1]));
             try {
                 final TFileSystem fs = provider.newFileSystem(uri, getEnvironment());
-                if (null == mountPoint)
-                    fail();
+                if (null == mountPoint) fail();
                 assertThat(fs.getMountPoint(), is(mountPoint));
                 for (final String entry : new String[] {
                     "",
@@ -105,9 +102,8 @@ public class TFileSystemProviderTest extends MockArchiveDriverTestBase {
                 }) {
                     assertThat(fs.getPath(entry).getFileSystem(), sameInstance(fs));
                 }
-            } catch (UnsupportedOperationException ex) {
-                if (null != mountPoint)
-                    throw ex;
+            } catch (final UnsupportedOperationException ex) {
+                if (null != mountPoint) throw ex;
             }
         }
     }

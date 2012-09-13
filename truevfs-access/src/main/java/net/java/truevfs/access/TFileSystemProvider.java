@@ -24,6 +24,7 @@ import java.util.WeakHashMap;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.access.TUriHelper.*;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
@@ -69,16 +70,19 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * @param  name a {@link TPath} URI.
      * @return A file system provider.
      */
-    static synchronized TFileSystemProvider get(URI name) {
+    static TFileSystemProvider get(URI name) {
         if (!isAbsolutePath(name))
-            return Holder.CURRENT_DIRECTORY_PROVIDER;
+            return Lazy.CURRENT_DIRECTORY_PROVIDER;
         if (!name.isAbsolute()) name = DEFAULT_ROOT_MOUNT_POINT_URI;
         String scheme = name.getScheme();
-        TFileSystemProvider provider = providers.get(scheme);
-        if (null != provider) return provider;
-        provider = new TFileSystemProvider(scheme, name.resolve(SEPARATOR));
-        providers.put(scheme, provider);
-        return provider;
+        synchronized (TFileSystemProvider.class) {
+            TFileSystemProvider provider = providers.get(scheme);
+            if (null == provider) {
+                provider = new TFileSystemProvider(scheme, name.resolve(SEPARATOR));
+                providers.put(scheme, provider);
+            }
+            return provider;
+        }
     }
 
     /**
@@ -121,7 +125,13 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * 
      * @return The root mount point of this provider.
      */
-    public FsNodePath getRoot() { return root; }
+    FsNodePath getRoot() { return root; }
+
+    URI relativize(URI name) {
+        return name.isAbsolute()
+                ? new UriBuilder(name).scheme(null).toUri()
+                : name;
+    }
 
     private static TConfig open(Map<String, ?> env) {
         final TConfig config = TConfig.open();
@@ -214,6 +224,8 @@ public final class TFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public TFileSystem getFileSystem(URI uri) {
+        assert uri.isAbsolute();
+        assert !uri.isOpaque();
         return getPath(uri).getFileSystem();
     }
 
@@ -434,10 +446,10 @@ public final class TFileSystemProvider extends FileSystemProvider {
         String ARCHIVE_DETECTOR = "archiveDetector";
     }
 
-    private static final class Holder {
+    private static final class Lazy {
         static final TFileSystemProvider CURRENT_DIRECTORY_PROVIDER =
                 new TFileSystemProvider("file", new File("").toURI());
 
-        private Holder() { }
+        private Lazy() { }
     }
 }
