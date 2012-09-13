@@ -136,10 +136,11 @@ final class TUriResolver {
     }
 
     /**
-     * Returns the parent of the given file system node path.
+     * Returns the nullable parent of the given file system node path.
      * 
      * @param  path a file system node path.
-     * @return The parent file system node path.
+     * @return The parent file system node path or null if {@code path} does
+     *         not name a parent.
      * @throws URISyntaxException 
      */
     static @Nullable FsNodePath parent(FsNodePath path)
