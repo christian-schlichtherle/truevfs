@@ -77,7 +77,7 @@ final class TUriResolver {
             if (!uri.getScheme().equals(base.getHierarchicalUri().getScheme()))
                 throw new IllegalArgumentException();
         try {
-            uri = checkAndFix(uri.normalize());
+            uri = fix(check(uri).normalize());
             String path = uri.getPath();
             for (   int max;
                     1 < (max = Math.min(path.length(), DOT_DOT_SEPARATOR.length())) &&

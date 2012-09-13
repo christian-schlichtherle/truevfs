@@ -37,14 +37,30 @@ final class TUriHelper {
         return pl >= 0 ? pl : Paths.prefixLength(uri.getPath(), SEPARATOR_CHAR, false);
     }
 
-    static URI checkAndFix(final URI uri) throws URISyntaxException {
+    static URI check(final URI uri) throws URISyntaxException {
         if (uri.isOpaque())
             throw new QuotedUriSyntaxException(uri, "Opaque URI");
         if (null != uri.getFragment())
             throw new QuotedUriSyntaxException(uri, "Fragment component defined");
+        return uri;
+    }
+
+    /**
+     * Eventually recreates the given URI to work around
+     * <a href="http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7198297">http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7198297</a>:
+     * <pre>
+     * {@code assert null == new URI("x/").resolve("..").getSchemeSpecificPart();}
+     * </pre>
+     * 
+     * @param  uri the URI to fix.
+     * @return A fixed URI or {@code uri} if it doesn't need fixing.
+     */
+    static URI fix(final URI uri) {
         final String ssp = uri.getSchemeSpecificPart();
         final String a = uri.getAuthority();
-        if (null == ssp // URI bug: null == new URI("foo").resolve(new URI("..")).getRawSchemeSpecificPart()
+        // Workaround for http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7198297 :
+        // assert null == new URI("foo/").resolve(new URI("..")).getRawSchemeSpecificPart();
+        if (null == ssp
                 || null == a && ssp.startsWith(SEPARATOR + SEPARATOR)) // empty authority
             return new UriBuilder(uri).toUri();
         return uri;
