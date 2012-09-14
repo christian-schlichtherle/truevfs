@@ -50,7 +50,7 @@ private final class DefaultManager private (
     new FalsePositiveArchiveController(
       new FrontController(
         driver decorate 
-          new ControllerAdapter(parent,
+          new ArchiveControllerAdapter(parent,
             new BackController(driver, model, parent))))
   }
 

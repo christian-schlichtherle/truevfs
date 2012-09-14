@@ -11,7 +11,7 @@ import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.cio._
 import net.java.truevfs.kernel.spec.cio.Entry._
 
-private final class ControllerAdapter(
+private final class ArchiveControllerAdapter(
   override val getParent: FsController,
   c: ArchiveController[_]
 ) extends FsAbstractController(c.model) with Immutable {
