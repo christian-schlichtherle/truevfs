@@ -60,13 +60,15 @@ extends WordSpec with ShouldMatchers with PropertyChecks with MockitoSugar {
         ("file:/", "bar#baz"),
         ("file:/", "..")
       )
-      forAll(table) { (_base, _uri) =>
-          val base = Option(_base) map (s => new FsNodePath(new URI(s)))
-          val uri = Option(_uri) map (s => new URI(s))
-          if (base.isEmpty || uri.isEmpty)
-            intercept[NullPointerException] (apply(_.resolve(base.orNull, uri.orNull)))
-          else
-            intercept[IllegalArgumentException] (apply(_.resolve(base.get, uri.get)))
+      apply { resolver =>
+        forAll(table) { (_base, _uri) =>
+            val base = Option(_base) map (s => new FsNodePath(new URI(s)))
+            val uri = Option(_uri) map (s => new URI(s))
+            if (base.isEmpty || uri.isEmpty)
+              intercept[NullPointerException] (resolver.resolve(base.orNull, uri.orNull))
+            else
+              intercept[IllegalArgumentException] (resolver.resolve(base.get, uri.get))
+        }
       }
     }
 
@@ -152,11 +154,13 @@ extends WordSpec with ShouldMatchers with PropertyChecks with MockitoSugar {
         ))
 
       def test(table: TableFor3[String, String, String]) {
-        forAll(table) { (_base, _uri, _expected) =>
-          val base = new FsNodePath(new URI(_base))
-          val uri = new URI(_uri)
-          val expected = new FsNodePath(new URI(_expected))
-          apply(_.resolve(base, uri) should equal (expected))
+        apply { resolver =>
+          forAll(table) { (_base, _uri, _expected) =>
+            val base = new FsNodePath(new URI(_base))
+            val uri = new URI(_uri)
+            val expected = new FsNodePath(new URI(_expected))
+            resolver resolve (base, uri) should equal (expected)
+          }
         }
       }
     }
