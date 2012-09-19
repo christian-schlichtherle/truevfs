@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import static java.lang.Boolean.TRUE;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.*;
 import static java.nio.file.Files.*;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
 import java.util.Collections;
@@ -66,9 +66,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
     }
 
     @Override
-    public FileNode target() {
-        return node;
-    }
+    public FileNode target() { return node; }
 
     private FileNode begin() throws IOException {
         final FileNode buffer;
@@ -93,8 +91,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
         }
         if (options.get(CREATE_PARENTS) && !TRUE.equals(exists)) {
             final Path parentFile = entryFile.getParent();
-            if (null != parentFile)
-                createDirectories(parentFile);
+            if (null != parentFile) createDirectories(parentFile);
         }
         return buffer;
     }
@@ -217,8 +214,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
 
             @Override
             public void close() throws IOException {
-                if (closed)
-                    return;
+                if (closed) return;
                 super.close();
                 closed = true;
                 close(buffer, null == exception);
