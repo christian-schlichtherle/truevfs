@@ -6,10 +6,10 @@ package de.schlichtherle.truezip.fs.archive.mock;
 
 import de.schlichtherle.truezip.entry.Entry;
 import de.schlichtherle.truezip.entry.Entry.Type;
+import de.schlichtherle.truezip.fs.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.fs.FsModel;
 import de.schlichtherle.truezip.fs.FsMountPoint;
 import de.schlichtherle.truezip.fs.FsOutputOption;
-import de.schlichtherle.truezip.fs.FsCharsetArchiveDriver;
 import de.schlichtherle.truezip.socket.*;
 import de.schlichtherle.truezip.test.TestConfig;
 import de.schlichtherle.truezip.util.BitField;
