@@ -18,9 +18,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import static java.lang.Boolean.TRUE;
 import java.nio.channels.SeekableByteChannel;
+import java.nio.file.*;
 import static java.nio.file.Files.*;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
 import java.util.Collections;
@@ -66,9 +66,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
     }
 
     @Override
-    public FileEntry getLocalTarget() {
-        return entry;
-    }
+    public FileEntry getLocalTarget() { return entry; }
 
     private FileEntry begin() throws IOException {
         final FileEntry temp;
@@ -93,8 +91,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
         }
         if (options.get(CREATE_PARENTS) && !TRUE.equals(exists)) {
             final Path parentFile = entryFile.getParent();
-            if (null != parentFile)
-                createDirectories(parentFile);
+            if (null != parentFile) createDirectories(parentFile);
         }
         return temp;
     }
@@ -188,8 +185,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
 
             @Override
             public void close() throws IOException {
-                if (closed)
-                    return;
+                if (closed) return;
                 super.close();
                 closed = true;
                 close(temp, null == exception);
@@ -221,8 +217,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
 
             @Override
             public void close() throws IOException {
-                if (closed)
-                    return;
+                if (closed) return;
                 super.close();
                 closed = true;
                 close(temp, null == exception);
