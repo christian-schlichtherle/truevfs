@@ -105,8 +105,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
 
     private void copyAttributes(final File file) throws IOException {
         final Entry template = this.template;
-        if (null == template)
-            return;
+        if (null == template) return;
         final long time = template.getTime(WRITE);
         if (UNKNOWN != time && !file.setLastModified(time))
             throw new IOException(file + " (cannot preserve last modification time)");
@@ -146,8 +145,7 @@ final class FileOutputSocket extends OutputSocket<FileEntry> {
 
             @Override
             public void close() throws IOException {
-                if (closed)
-                    return;
+                if (closed) return;
                 super.close();
                 closed = true;
                 close(temp, null == exception);
