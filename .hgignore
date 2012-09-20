@@ -9,3 +9,4 @@ glob:target/
 glob:*.lck
 glob:*.log
 glob:*.log.xml
+glob:.DS_Store
