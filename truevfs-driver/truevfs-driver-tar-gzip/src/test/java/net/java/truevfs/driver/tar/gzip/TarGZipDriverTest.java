@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.driver.tar.gzip;
 
-import net.java.truevfs.driver.tar.gzip.TarGZipDriver;
 import net.java.truevfs.comp.tardriver.TarDriverEntry;
 import net.java.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 
@@ -13,6 +12,7 @@ import net.java.truevfs.kernel.spec.FsArchiveDriverTestSuite;
  */
 public final class TarGZipDriverTest
 extends FsArchiveDriverTestSuite<TarDriverEntry, TarGZipDriver> {
+
     @Override
     protected TarGZipDriver newArchiveDriver() {
         return new TestTarGZipDriver();
