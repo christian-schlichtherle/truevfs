@@ -4,8 +4,6 @@
  */
 package de.schlichtherle.truezip.fs;
 
-import de.schlichtherle.truezip.fs.FsCharsetArchiveDriver;
-import de.schlichtherle.truezip.fs.FsArchiveEntry;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.NUM_IO_THREADS;
 import de.schlichtherle.truezip.util.ConcurrencyUtils.TaskFactory;
 import static de.schlichtherle.truezip.util.ConcurrencyUtils.runConcurrent;
