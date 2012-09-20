@@ -1,0 +1,514 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2012 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>net.java.truecommons</groupId>
+        <artifactId>truecommons-parent</artifactId>
+        <version>16</version>
+    </parent>
+
+    <groupId>net.java.truevfs</groupId>
+    <artifactId>truevfs</artifactId>
+    <version>0.9.3</version>
+    <packaging>pom</packaging>
+
+    <name>TrueVFS</name>
+    <description>
+TrueVFS is a virtual file system (VFS) for Java 7 which enables client
+applications to perform CRUD (Create, Read, Update, Delete) operations on
+archive files as if they were virtual directories, even with nested archive
+files in multithreaded environments.
+
+As a library, TrueVFS provides simple, uniform, transparent,
+thread-safe, read/write access to archive files as if they were
+virtual directories in a file system path.
+
+As a framework, TrueVFS provides the API to write file system drivers which
+plug-in to its federated file system space.
+    </description>
+    <url>http://truevfs.java.net</url>
+    <inceptionYear>2005</inceptionYear>
+    <licenses>
+        <license>
+            <name>Eclipse Public License, Version 1.0</name>
+            <url>http://www.eclipse.org/legal/epl-v10.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <mailingLists>
+        <mailingList>
+            <name>Announce Mailing List</name>
+            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20announce</subscribe>
+            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20announce</unsubscribe>
+            <archive>http://java.net/projects/truezip/lists/announce/archive</archive>
+        </mailingList>
+        <mailingList>
+            <name>Users Mailing List</name>
+            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20users</subscribe>
+            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20users</unsubscribe>
+            <post>users@truezip.java.net</post>
+            <archive>http://java.net/projects/truezip/lists/users/archive</archive>
+        </mailingList>
+        <mailingList>
+            <name>Developers Mailing List</name>
+            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20dev</subscribe>
+            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20dev</unsubscribe>
+            <post>dev@truezip.java.net</post>
+            <archive>http://java.net/projects/truezip/lists/dev/archive</archive>
+        </mailingList>
+    </mailingLists>
+    <issueManagement>
+        <system>JIRA</system>
+        <url>http://java.net/jira/browse/TRUEVFS</url>
+    </issueManagement>
+    <scm>
+        <connection>scm:hg:https://hg.java.net/hg/truevfs~v1</connection>
+        <developerConnection>scm:hg:ssh://hg.java.net/truevfs~v1</developerConnection>
+        <url>http://java.net/projects/truevfs/sources/v1/show</url>
+        <tag>truevfs-0.9.3</tag>
+    </scm>
+
+    <properties>
+        <netbeans.hint.jdkPlatform>JDK_1.7</netbeans.hint.jdkPlatform>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
+        <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
+
+        <!-- maven-antrun-plugin && maven-failsafe-plugin -->
+        <java.io.tmpdir.it>${project.build.directory}/it</java.io.tmpdir.it>
+
+        <!-- maven-javadoc-plugin -->
+        <google.analytics.accountId>UA-25500668-1</google.analytics.accountId>
+        <header>
+            <!-- Google Analytics -->
+            &lt;script type="text/javascript"&gt;
+                var _gaq = _gaq || [];
+                _gaq.push(['_setAccount', '${google.analytics.accountId}']);
+                _gaq.push(['_trackPageview']);
+                (function() {
+                    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                })();
+            &lt;/script&gt;
+            <!-- Header text -->
+            &lt;b&gt;${project.name} ${project.version}&lt;/b&gt;
+        </header>
+
+        <truecommons.version>1.0.10</truecommons.version>
+
+        <!-- for documentation purposes only - mind the dash! -->
+        <truezip-version>7.6.5</truezip-version>
+    </properties>
+
+    <modules>
+        <module>truevfs-access</module>
+        <module>truevfs-archetype</module>
+        <module>truevfs-comp</module>
+        <module>truevfs-driver</module>
+        <module>truevfs-ext</module>
+        <module>truevfs-kernel</module>
+        <module>truevfs-key</module>
+        <module>truevfs-profile</module>
+        <module>truevfs-samples</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-access</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-access</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-comp-ibm437</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-comp-inst</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-comp-jmx</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-comp-tardriver</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-comp-tardriver</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-comp-zip</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-comp-zip</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-comp-zipdriver</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-comp-zipdriver</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-file</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-http</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-jar</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-odf</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-sfx</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-tar</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-tar-bzip2</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-tar-gzip</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-tar-xz</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-zip</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-driver-zip-raes</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-ext-insight</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-ext-logging</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-ext-pacemanager</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-kernel-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-kernel-spec</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-kernel-spec</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-key-console</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-key-spec</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-key-spec</artifactId>
+                <type>test-jar</type>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-key-swing</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-key-hurlfb</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-profile-base</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-profile-default</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-profile-full</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>truevfs-samples</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.truecommons</groupId>
+                <artifactId>truecommons-io</artifactId>
+                <version>${truecommons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.truecommons</groupId>
+                <artifactId>truecommons-io</artifactId>
+                <type>test-jar</type>
+                <version>${truecommons.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.java.truecommons</groupId>
+                <artifactId>truecommons-logging</artifactId>
+                <version>${truecommons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.truecommons</groupId>
+                <artifactId>truecommons-services</artifactId>
+                <version>${truecommons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.truecommons</groupId>
+                <artifactId>truecommons-shed</artifactId>
+                <version>${truecommons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.truecommons</groupId>
+                <artifactId>truecommons-shed</artifactId>
+                <type>test-jar</type>
+                <version>${truecommons.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>scala-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>scala-compile-first</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>scala-test-compile</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                                <goal>testCompile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <configuration>
+                        <reportPlugins combine.children="append">
+                            <plugin>
+                                <artifactId>maven-javadoc-plugin</artifactId>
+                                <reports>
+                                    <report>aggregate</report>
+                                </reports>
+                                <configuration>
+                                    <links>
+                                        <link>http://www.bouncycastle.org/docs/docs1.6/</link>
+                                        <link>http://commons.apache.org/compress/apidocs/</link>
+                                        <link>http://findbugs.sourceforge.net/api/</link>
+                                    </links>
+                                </configuration>
+                            </plugin>
+                            <plugin>
+                                <artifactId>maven-jxr-plugin</artifactId>
+                                <reports>
+                                    <report>aggregate</report>
+                                </reports>
+                            </plugin>
+                            <plugin>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>jdepend-maven-plugin</artifactId>
+                            </plugin>
+                            <plugin>
+                                <groupId>org.codehaus.mojo</groupId>
+                                <artifactId>findbugs-maven-plugin</artifactId>
+                            </plugin>
+                        </reportPlugins>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <net.java.truecommons.shed.ControlFlowException.traceable>true</net.java.truecommons.shed.ControlFlowException.traceable>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <configuration>
+                        <!-- Consider 90% blocking factor for I/O. -->
+                        <threadCount>10</threadCount>
+                        <!-- The server VM is expected to be less tolerant
+                             against multithreading bugs when running the tests.
+                             Setting -XX:+DisableExplicitGC would trigger an
+                             endless loop because some tests check if the
+                             garbage collection and the finalization kicked
+                             in to close() open I/O resources (streams,
+                             channels etc).
+                             See http://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html .
+                             See http://www.oracle.com/technetwork/java/tuning-139912.html#section4.2.5 .
+                             -->
+                        <argLine>-server -Xmx650m</argLine>
+                        <systemPropertyVariables>
+                            <!-- While running the tests with isolated
+                                 file system managers yields better performance
+                                 it would also conceal any multithreading bugs
+                                 in the classes under test, so it's generally
+                                 discouraged. -->
+                            <net.truevfs.kernel.spec.FsManager.isolate>false</net.truevfs.kernel.spec.FsManager.isolate>
+                            <net.java.truecommons.shed.ControlFlowException.traceable>true</net.java.truecommons.shed.ControlFlowException.traceable>
+                            <net.truevfs.driver.zip.io.forceZip64Ext>false</net.truevfs.driver.zip.io.forceZip64Ext>
+                            <java.io.tmpdir>${java.io.tmpdir.it}</java.io.tmpdir>
+                        </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>non-transitive-test-source-dependencies</id>
+            <activation>
+                <file>
+                    <exists>src/test</exists>
+                </file>
+            </activation>
+            <dependencies>
+                <!--dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                    <scope>test</scope>
+                </dependency-->
+                <dependency>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>integration-test</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>create-it-directory</id>
+                                <phase>pre-integration-test</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target name="create-it-directory">
+                                        <mkdir dir="${java.io.tmpdir.it}" />
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <distributionManagement>
+        <site>
+            <id>truevfs-website</id>
+            <name>TrueVFS Website</name>
+            <url>file:/Users/christian/Projects/truevfs~web</url>
+        </site>
+    </distributionManagement>
+</project>

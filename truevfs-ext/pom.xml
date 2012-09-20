@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2012 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>net.java.truevfs</groupId>
+        <artifactId>truevfs</artifactId>
+        <version>0.9.3</version>
+    </parent>
+
+    <artifactId>truevfs-ext</artifactId>
+    <packaging>pom</packaging>
+
+    <name>TrueVFS Extension</name>
+    <description>
+        Extension modules provide services to extend the TrueVFS Kernel with
+        some functionality OTHER than supporting a particular type of file
+        system.
+        Extension modules advertise their services on the class path in order
+        to make them locatable by the TrueVFS Kernel at runtime.
+    </description>
+
+    <modules>
+        <module>truevfs-ext-insight</module>
+        <module>truevfs-ext-logging</module>
+        <module>truevfs-ext-pacemanager</module>
+    </modules>
+</project>
