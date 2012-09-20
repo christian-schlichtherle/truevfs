@@ -19,6 +19,6 @@ extends FsCharsetArchiveDriverTestSuite<TarDriverEntry, TarBZip2Driver> {
 
     @Override
     protected String getUnencodableName() {
-        return "\u0080";
+        return null;
     }
 }
