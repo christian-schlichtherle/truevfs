@@ -508,7 +508,7 @@ plug-in to its federated file system space.
         <site>
             <id>truevfs-website</id>
             <name>TrueVFS Website</name>
-            <url>file:/C:/Users/christian/Documents/Schlichtherle_IT_Services/Projekte/truevfs~web</url>
+            <url>file:/Users/christian/Projects/truevfs~web</url>
         </site>
     </distributionManagement>
 </project>
