@@ -104,7 +104,7 @@ plug-in to its federated file system space.
         <truecommons.version>1.0.10</truecommons.version>
 
         <!-- for documentation purposes only - mind the dash! -->
-        <truezip-version>7.6.6</truezip-version>
+        <truezip-version>7.6.7</truezip-version>
     </properties>
 
     <modules>
