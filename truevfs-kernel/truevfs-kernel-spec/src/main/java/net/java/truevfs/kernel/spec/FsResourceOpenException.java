@@ -29,6 +29,10 @@ public class FsResourceOpenException extends IOException {
         this.total = total;
     }
 
+    public int getLocal() { return local; }
+
+    public int getTotal() { return total; }
+
     @Override
     public String getMessage() {
         return String.format(super.getMessage(), local, total);
