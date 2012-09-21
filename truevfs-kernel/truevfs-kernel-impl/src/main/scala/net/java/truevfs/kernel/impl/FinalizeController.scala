@@ -68,11 +68,11 @@ private object FinalizeController {
       try {
         ioException match {
           case Some(ex) => logger trace ("closeFailed", ex)
-          case None => logger trace "closeCleared"
+          case None => logger trace ("closeCleared", this)
           case _ =>
             try {
               super.close()
-              logger info "finalizeCleared"
+              logger info ("finalizeCleared", this)
             } catch {
               case ex: ControlFlowException => // log and swallow!
                 logger error ("finalizeFailed",
