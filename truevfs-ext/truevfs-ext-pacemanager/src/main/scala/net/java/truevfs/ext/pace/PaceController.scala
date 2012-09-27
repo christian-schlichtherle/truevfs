@@ -17,15 +17,15 @@ import net.java.truevfs.kernel.spec._
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private final class PaceController(m: PaceManager, c: FsController)
-extends AspectController(c) {
+private final class PaceController(manager: PaceManager, controller: FsController)
+extends AspectController(controller) {
 
   override def apply[V](operation: => V) = {
-    m retain c
-    val r = operation
-    m accessed c
-    r
+    manager retain controller
+    val result = operation
+    manager accessed controller
+    result
   }
 
-  override def sync(options: BitField[FsSyncOption]) = c sync options // skip apply!
+  override def sync(options: BitField[FsSyncOption]) = controller sync options // skip apply!
 }
