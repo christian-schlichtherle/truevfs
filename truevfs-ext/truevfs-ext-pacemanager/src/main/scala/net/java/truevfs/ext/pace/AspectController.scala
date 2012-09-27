@@ -17,8 +17,8 @@ import net.java.truevfs.kernel.spec.cio.Entry._
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private abstract class AspectController(c: FsController)
-extends FsDecoratingController(c) {
+private abstract class AspectController(controller: FsController)
+extends FsDecoratingController(controller) {
 
   /**
     * Applies an aspect to the given file system operation.
@@ -31,22 +31,22 @@ extends FsDecoratingController(c) {
   private type AccessOptions = BitField[FsAccessOption]
 
   override def node(options: AccessOptions, name: FsNodeName) =
-    apply(c node (options, name))
+    apply(controller node (options, name))
 
   override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
-    apply(c checkAccess (options, name, types))
+    apply(controller checkAccess (options, name, types))
 
   override def setReadOnly(name: FsNodeName) =
-    apply(c setReadOnly (name))
+    apply(controller setReadOnly (name))
 
   override def setTime(options: AccessOptions, name: FsNodeName, times: java.util.Map[Access, java.lang.Long]) =
-    apply(c setTime (options, name, times))
+    apply(controller setTime (options, name, times))
 
   override def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long) =
-    apply(c setTime (options, name, types, value))
+    apply(controller setTime (options, name, types, value))
 
   override def input(options: AccessOptions, name: FsNodeName) =
-    new AspectInputSocket(c input (options, name))
+    new AspectInputSocket(controller input (options, name))
 
   protected class AspectInputSocket(socket: InputSocket[_ <: Entry])
   extends AbstractInputSocket[Entry] {
@@ -60,7 +60,7 @@ extends FsDecoratingController(c) {
   }
 
   override def output(options: AccessOptions, name: FsNodeName, @CheckForNull template: Entry) =
-    new AspectOutputSocket(c output (options, name, template))
+    new AspectOutputSocket(controller output (options, name, template))
 
   protected class AspectOutputSocket(socket: OutputSocket[_ <: Entry])
   extends AbstractOutputSocket[Entry] {
@@ -74,11 +74,11 @@ extends FsDecoratingController(c) {
   }
 
   override def make(options: AccessOptions, name: FsNodeName, tµpe: Type, @CheckForNull template: Entry) =
-    apply(c make (options, name, tµpe, template))
+    apply(controller make (options, name, tµpe, template))
 
   override def unlink(options: AccessOptions, name: FsNodeName) =
-    apply(c unlink (options, name))
+    apply(controller unlink (options, name))
 
   override def sync(options: BitField[FsSyncOption]) =
-    apply(c sync options)
+    apply(controller sync options)
 }
