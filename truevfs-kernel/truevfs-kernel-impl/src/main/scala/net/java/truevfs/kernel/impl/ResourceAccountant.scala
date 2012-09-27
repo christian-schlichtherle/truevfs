@@ -147,8 +147,11 @@ extends LockAspect[Lock] {
         }
       }
     } finally {
-      condition signalAll ()
-      lock unlock ()
+      try {
+        condition signalAll ()
+      } finally {
+        lock unlock ()
+      }
     }
   }
 }
