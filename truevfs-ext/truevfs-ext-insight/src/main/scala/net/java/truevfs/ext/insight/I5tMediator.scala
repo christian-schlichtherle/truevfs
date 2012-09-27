@@ -30,7 +30,7 @@ extends JmxMediator[I5tMediator] {
 
   private def startStats(offset: Int) { start(newStats(offset)) }
 
-  def startStats(origin: JmxColleague) { startStats(0) }
+  final def startStats(origin: JmxColleague) { startStats(0) }
 
   final def startAllStats(origin: JmxColleague) {
     for (mediator <- mediators) mediator startStats origin
@@ -48,6 +48,8 @@ extends JmxMediator[I5tMediator] {
   final def stats(offset: Int) = { logger stats offset }
 
   final def formatOffset(offset: Int) = { logger format offset }
+
+  final override def toString = "%s[subject=%s]".format(getClass.getName, subject)
 
   final override def instrument(subject: FsManager) =
     start(new I5tManager(syncOperationsMediator, subject))
@@ -93,6 +95,4 @@ extends JmxMediator[I5tMediator] {
 
   final override def instrument[E <: Entry](origin: InstrumentingOutputSocket[I5tMediator, E], subject: SeekableByteChannel) =
     start(new I5tSeekableChannel(this, subject))
-
-  override def toString: String = "%s[subject=%s]".format(getClass.getName, subject)
 }
