@@ -8,6 +8,7 @@ import java.{util => ju}
 import java.util.concurrent._
 import java.util.concurrent.locks._
 import javax.annotation.concurrent._
+import net.java.truecommons.logging._
 import net.java.truecommons.shed._
 import net.java.truevfs.comp.jmx._
 import net.java.truevfs.kernel.spec._
@@ -25,16 +26,10 @@ private final class PaceManager(mediator: PaceMediator, manager: FsManager)
 extends JmxManager[PaceMediator](mediator, manager) {
 
   private[this] val evicted = new ConcurrentLinkedQueue[FsController]
-  private[this] val mounted = new MountedControllerMap(evicted)
-  private[this] val accessed = new AccessedControllerSet(mounted)
+  private[this] val mounted = new MountedControllerSet(evicted)
 
-  def maximumFileSystemsMounted = mounted.max
-
-  def maximumFileSystemsMounted_=(max: Int) {
-    if (max < maximumFileSystemsMountedMinimumValue)
-      throw new IllegalArgumentException
-    mounted.max = max
-  }
+  def max = mounted.max
+  def max_=(max: Int) { mounted.max = max }
 
   protected override def newView = new PaceManagerView(this)
 
@@ -47,28 +42,40 @@ extends JmxManager[PaceMediator](mediator, manager) {
    *                    for subsequent access.
    */
   def retain(controller: FsController) {
-    val it = evicted.iterator
-    if (!it.hasNext) return
-    val manager = FsManagerLocator.SINGLETON.get
+    val i = evicted.iterator
+    if (!i.hasNext) return
+    //val manager = FsManagerLocator.SINGLETON.get
     val mp = controller.getModel.getMountPoint
-    while (it.hasNext) {
-      val ec = it.next
+    while (i.hasNext) {
+      val ec = i.next
       val emp = ec.getModel.getMountPoint
       val fm = new FsFilteringManager(emp, manager)
       def sync(): Boolean = {
         import collection.JavaConversions._
         for (fc <- fm) {
           val fmp = fc.getModel.getMountPoint
-          if (mp == fmp || (accessed contains fmp)) {
-            if (emp == fmp || (accessed contains emp)) it remove ()
+          if (mp == fmp || (mounted contains fmp)) {
+            if (emp == fmp || (mounted contains emp)) i remove ()
             return false
           }
         }
         true
       }
       if (sync()) {
-        it remove () // even if subsequent sync fails!
-        fm sync FsSyncOptions.SYNC
+        try {
+          fm sync FsSyncOptions.SYNC
+          i remove ()
+        } catch {
+          case ex: FsSyncException =>
+            ex.getCause match {
+              case ex2: FsResourceOpenException =>
+                assert(ex2.getLocal == ex2.getTotal)
+                logger debug ("ignoring", ex)
+              case ex2 =>
+                i remove ()
+                throw ex;
+            }
+        }
       }
     }
   }
@@ -80,7 +87,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
    * @param controller the controller for the most recently used file system.
    */
   def accessed(controller: FsController) {
-    if (controller.getModel.isMounted) accessed add controller
+    if (controller.getModel.isMounted) mounted add controller
   }
 
   override def sync(options: BitField[FsSyncOption]) {
@@ -88,12 +95,14 @@ extends JmxManager[PaceMediator](mediator, manager) {
     try {
       manager sync options
     } finally {
-      accessed mount manager
+      mounted mount manager
     }
   }
 }
 
 private object PaceManager {
+
+  val logger = new LocalizedLogger(classOf[PaceManager])
 
   /**
     * The key string for the system property which defines the value of the
@@ -130,50 +139,57 @@ private object PaceManager {
   private val initialCapacity =
     HashMaps initialCapacity (maximumFileSystemsMountedDefaultValue + 1)
 
-  private final class MountedControllerMap(evicted: ju.Collection[FsController])
+  private[this] final class MountedControllerMap(evicted: ju.Collection[FsController])
   extends ju.LinkedHashMap[FsMountPoint, FsController](initialCapacity, 0.75f, true) {
 
     override def removeEldestEntry(entry: ju.Map.Entry[FsMountPoint, FsController]) =
       if (size > max) evicted.add(entry.getValue) else false
 
     @volatile
-    var max = maximumFileSystemsMountedDefaultValue
+    private var _max = maximumFileSystemsMountedDefaultValue
+
+    def max = _max
+    def max_=(max: Int) {
+      if (max < maximumFileSystemsMountedMinimumValue)
+        throw new IllegalArgumentException
+      _max = max
+    }
   } // MountedControllerMap
 
-  private final class AccessedControllerSet(
-    mounted: ju.Map[FsMountPoint, FsController],
-    lock: ReentrantReadWriteLock = new ReentrantReadWriteLock
-  ) {
+  private final class MountedControllerSet
+  (evicted: ju.Collection[FsController])
+  (implicit lock: ReentrantReadWriteLock = new ReentrantReadWriteLock) {
 
-    assert (null ne mounted)
+    assert (null ne map)
 
+    private[this] val map = new MountedControllerMap(evicted)
     private[this] val readLock = lock.readLock
     private[this] val writeLock = lock.writeLock
 
+    def max = map.max
+    def max_=(max: Int) { map.max = max }
+
     private def locked[V](lock: Lock)(operation: => V) = {
       lock lock ()
-      try {
-        operation
-      } finally {
-        lock unlock ()
-      }
+      try { operation }
+      finally { lock unlock () }
     }
 
-    def contains(key: FsMountPoint) = locked(readLock)(mounted containsKey key)
+    def contains(key: FsMountPoint) = locked(readLock)(map containsKey key)
 
     def add(controller: FsController) {
       val mp = controller.getModel.getMountPoint
-      locked(writeLock)(mounted put (mp, controller))
+      locked(writeLock)(map put (mp, controller))
     }
 
     def mount(manager: FsManager) = {
       locked(writeLock) {
-        mounted clear ()
+        map clear ()
         import scala.collection.JavaConversions._
         for (controller <- manager; model = controller.getModel)
-          if (model.isMounted) mounted put (model.getMountPoint, controller)
-        mounted.size
+          if (model.isMounted) map put (model.getMountPoint, controller)
+        map.size
       }
     }
-  } // AccessedControllerSet
+  } // MountedControllerSet
 }
