@@ -4,16 +4,15 @@
  */
 package net.java.truevfs.comp.inst;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
+import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsMetaDriver;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.cio.*;
-
-import javax.annotation.concurrent.Immutable;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.channels.SeekableByteChannel;
 
 /**
  * Implements the mediator role of the mediator pattern for instrumenting all
