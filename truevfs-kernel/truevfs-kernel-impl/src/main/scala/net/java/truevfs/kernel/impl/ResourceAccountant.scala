@@ -164,10 +164,9 @@ private object ResourceAccountant {
     * map resize threshold.
     */
   private val accounts = {
-    val initialCapacity =
-      HashMaps.initialCapacity(Runtime.getRuntime.availableProcessors() * 10);
-    new ConcurrentHashMap[Closeable, Account](
-      initialCapacity, 0.75f, initialCapacity).asScala
+    val threads = Runtime.getRuntime.availableProcessors() * 10
+    val initialCapacity = HashMaps.initialCapacity(threads)
+    new ConcurrentHashMap[Closeable, Account](initialCapacity, 0.75f, threads).asScala
   }
 
   private final case class Account(accountant: ResourceAccountant) {
