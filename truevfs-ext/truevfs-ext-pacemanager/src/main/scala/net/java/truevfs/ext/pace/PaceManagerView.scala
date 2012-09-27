@@ -28,8 +28,6 @@ with PaceManagerMXBean {
     }
   }
 
-  override def getMaximumFileSystemsMounted = manager.maximumFileSystemsMounted
-  override def setMaximumFileSystemsMounted(max: Int) {
-    manager.maximumFileSystemsMounted = max
-  }
+  override def getMaximumFileSystemsMounted = manager.max
+  override def setMaximumFileSystemsMounted(max: Int) { manager.max = max }
 }
