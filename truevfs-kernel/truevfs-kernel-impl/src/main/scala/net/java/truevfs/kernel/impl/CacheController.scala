@@ -108,49 +108,14 @@ extends ArchiveController[E] {
   }
 
   abstract override def sync(options: SyncOptions) {
-    assert(writeLockedByCurrentThread)
-    var preSyncEx: NeedsSyncException = null
-    do {
-      preSyncEx = null
-      try {
-          preSync(options)
-      } catch {
-        case invalidState: NeedsSyncException =>
-          // The target archive controller is in an invalid state because
-          // it reports to need a sync() while the current thread is
-          // actually doing a sync().
-          // This is expected to be a volatile event which may have been
-          // caused by the following scenario:
-          // Another thread attempted to sync() the nested target archive
-          // file but initially failed because the parent file system
-          // controller has thrown an FsNeedsLockRetryException when
-          // trying to close() the input or output resources for the
-          // target archive file.
-          // The other thread has then released all its file system write
-          // locks and is now retrying the operation but lost the race
-          // for the file system write lock against this thread which has
-          // now detected the invalid state.
-
-          // In an attempt to recover from this invalid state, the
-          // current thread could just step back in order to give the
-          // other thread a chance to complete its sync().
-          //throw FsNeedsLockRetryException.get(getModel());
-
-          // However, this would unnecessarily defer the current thread
-          // and might result in yet another thread to discover the
-          // invalid state, which reduces the overall performance.
-          // So instead, the current thread will now attempt to resolve
-          // the invalid state by sync()ing the target archive controller
-          // before preSync()ing the cache again.
-          logger debug ("recovering", invalidState)
-          preSyncEx = invalidState // trigger another iteration
-      }
-      super.sync(options.clear(CLEAR_CACHE))
-    } while (null ne preSyncEx)
+    syncCacheEntries(options)
+    super.sync(options.clear(CLEAR_CACHE))
     if (caches.isEmpty) mounted = false
   }
 
-  private def preSync(options: SyncOptions) {
+  private def syncCacheEntries(options: SyncOptions) {
+    assert(writeLockedByCurrentThread)
+    // HC SVNT DRACONES!
     if (0 >= caches.size()) return
     val flush = !(options get ABORT_CHANGES)
     val clear = !flush || (options get CLEAR_CACHE)
@@ -271,13 +236,13 @@ extends ArchiveController[E] {
         }
 
         def make(options: AccessOptions, template: Option[Entry]) {
-          var mknodOpts = options
+          var makeOpts = options
           while (true) {
             try {
-              CacheController.super.make(mknodOpts, name, FILE, template)
+              CacheController.super.make(makeOpts, name, FILE, template)
               return
             } catch {
-              case mknodEx: NeedsSyncException =>
+              case makeEx: NeedsSyncException =>
                 // In this context, this exception means that the entry
                 // has already been written to the output archive for
                 // the target archive file.
@@ -286,9 +251,9 @@ extends ArchiveController[E] {
                 // resolve the issue locally, that is if we were asked
                 // to create the entry exclusively or this is a
                 // non-recursive file system operation.
-                if (mknodOpts get EXCLUSIVE) throw mknodEx
+                if (makeOpts get EXCLUSIVE) throw makeEx
                 val syncOpts = SyncController modify SYNC
-                if (SYNC eq syncOpts) throw mknodEx
+                if (SYNC eq syncOpts) throw makeEx
 
                 // Try to resolve the issue locally.
                 // Even if we were asked to create the entry
@@ -300,7 +265,7 @@ extends ArchiveController[E] {
                   // sync() succeeded, now repeat the make()
                 } catch {
                   case syncEx: FsSyncException =>
-                    syncEx addSuppressed mknodEx
+                    syncEx addSuppressed makeEx
 
                     // sync() failed, maybe just because the current
                     // thread has already acquired some open I/O
@@ -329,9 +294,9 @@ extends ArchiveController[E] {
                     //throw FsNeedsLockRetryException.get(getModel());
 
                     // Check if we can retry the make with GROW set.
-                    val oldMknodOpts = mknodOpts
-                    mknodOpts = oldMknodOpts set GROW
-                    if (mknodOpts eq oldMknodOpts) {
+                    val oldMknodOpts = makeOpts
+                    makeOpts = oldMknodOpts set GROW
+                    if (makeOpts eq oldMknodOpts) {
                         // Finally, the make failed because the entry
                         // has already been output to the target archive
                         // file - so what?!
@@ -347,6 +312,7 @@ extends ArchiveController[E] {
                 }
             }
           }
+          assert(false)
         }
       } // Output
       new Output

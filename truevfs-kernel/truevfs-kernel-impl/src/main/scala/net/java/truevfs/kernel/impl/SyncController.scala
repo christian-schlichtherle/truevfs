@@ -102,32 +102,6 @@ extends ArchiveController[E] {
       if (name.isRoot) super.sync(RESET)
     }
 
-  abstract override def sync(options: SyncOptions) = safeSync(options)
-
-  /**
-   * Modifies the sync options so that no dead lock can appear due to waiting
-   * for I/O resources in a recursive file system operation.
-   * 
-   * @param  options the sync options
-   * @return the potentially modified sync options.
-   */
-  private def safeSync(options: SyncOptions) {
-    val modified = SyncController.modify(options)
-    try {
-      super.sync(modified)
-    } catch {
-      case ex: FsSyncWarningException => throw ex // may be FORCE_CLOSE_IO was set, too?
-      case ex: FsSyncException =>
-        if (modified ne options) {
-          ex.getCause match {
-            case _: FsResourceOpenException => throw NeedsLockRetryException()
-            case _ =>
-          }
-        }
-        throw ex
-    }
-  }
-
   /**
    * Applies the given file system operation and syncs the decorated controller
    * when appropriate.
@@ -147,7 +121,7 @@ extends ArchiveController[E] {
         case opEx: NeedsSyncException =>
           checkWriteLockedByCurrentThread
           try {
-            safeSync(SYNC)
+            doSync(SYNC)
           } catch {
             case syncEx: FsSyncException =>
               syncEx addSuppressed opEx
@@ -155,7 +129,62 @@ extends ArchiveController[E] {
           }
       }
     }
-    throw new AssertionError("dead code")
+    throw new AssertionError("unreachable statement")
+  }
+
+  abstract override def sync(options: SyncOptions) { doSync(options) }
+
+  /**
+   * Modifies the sync options so that no dead lock can appear due to waiting
+   * for I/O resources in a recursive file system operationa and restarts the
+   * sync operation if required.
+   * 
+   * @param  options the sync options
+   * @return the potentially modified sync options.
+   */
+  private def doSync(options: SyncOptions) {
+    // HC SVNT DRACONES!
+    val modified = SyncController modify options
+    val builder = new FsSyncExceptionBuilder;
+    {
+      var break = false
+      while (!break) {
+        try {
+          super.sync(modified)
+          break = true
+        } catch {
+          case ex: FsSyncWarningException =>
+            ex.getCause match {
+              case _: FsResourceOpenException if (modified get FORCE_CLOSE_IO) =>
+                // This exception was thrown by the resource controller in
+                // order to indicate that the state of the virtual file system
+                // may have completely changed as a side effect of temporarily
+                // releasing its write lock.
+                // We need to remember this exception for later rethrowing
+                // and restart the sync operation.
+                builder warn ex
+              case _ =>
+                throw builder fail ex
+            }
+          case ex: FsSyncException =>
+            ex.getCause match {
+              case _: FsResourceOpenException if (modified ne options) =>
+                // Swallow ex.
+                builder check ()
+                throw NeedsLockRetryException()
+              case _ =>
+                throw builder fail ex
+            }
+          case yeahIKnow_IWasActuallyDoingThat: NeedsSyncException =>
+            // This exception was thrown by the resource controller in
+            // order to indicate that the state of the virtual file system
+            // may have completely changed as a side effect of temporarily
+            // releasing its write lock.
+            // We need to restart the sync operation.
+        }
+      }
+    }
+    builder check ()
   }
 }
 

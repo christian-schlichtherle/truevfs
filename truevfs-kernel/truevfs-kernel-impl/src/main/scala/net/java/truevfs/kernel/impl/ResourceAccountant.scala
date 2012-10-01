@@ -77,21 +77,16 @@ extends LockAspect[Lock] {
     *        threads once the lock has been acquired.
     *        If this is non-positive, then there is no timeout for waiting.
     */
-  def waitOtherThreads(timeout: Long) {
+  def awaitClosingOfOtherThreadsResources(timeout: Long) {
     locked {
       try {
-        var toWait = TimeUnit.MILLISECONDS toNanos timeout
-        val mybreaks = new Breaks
-        import mybreaks.{break, breakable}
-        breakable {
-          while (resources.isBusy) {
-            if (0 < timeout) {
-              if (0 >= toWait) break
-              toWait = condition awaitNanos toWait
-            } else {
-              condition await()
-            }
-          }
+        if (0 < timeout) {
+          var toWait = TimeUnit.MILLISECONDS toNanos timeout;
+          while (0 < toWait && resources.needsWaiting)
+            toWait = condition awaitNanos toWait
+        } else {
+          while (resources.needsWaiting)
+            condition await ()
         }
       } catch {
         case _: InterruptedException =>
@@ -154,7 +149,7 @@ extends LockAspect[Lock] {
       }
     }
   }
-}
+} // class ResourceAccountant
 
 private object ResourceAccountant {
 
@@ -174,6 +169,6 @@ private object ResourceAccountant {
   }
 
   final case class Resources(local: Int, total: Int) {
-    def isBusy = local < total
+    def needsWaiting = local < total
   }
-}
+} // object ResourceAccountant
