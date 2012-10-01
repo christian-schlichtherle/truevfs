@@ -1049,23 +1049,18 @@ extends ConfiguredClientTestBase<D> {
             } catch (IOException expected) {
             }
             out1.write(getData());
-            try {
-                archive.toFile().rm_r();
-                fail();
-            } catch (IOException expected) {
-            }
-        }
-        try (final OutputStream out2 = newOutputStream(entry2)) {
-            try {
-                delete(entry2);
-                fail();
-            } catch (IOException expected) {
-            }
-            out2.write(getData());
-            try {
-                archive.toFile().rm_r();
-                fail();
-            } catch (IOException expected) {
+            try (final OutputStream out2 = newOutputStream(entry2)) {
+                try {
+                    delete(entry2);
+                    fail();
+                } catch (IOException expected) {
+                }
+                out2.write(getData());
+                try {
+                    archive.toFile().rm_r();
+                    fail();
+                } catch (IOException expected) {
+                }
             }
         }
         try (final InputStream in1 = newInputStream(entry1)) {
