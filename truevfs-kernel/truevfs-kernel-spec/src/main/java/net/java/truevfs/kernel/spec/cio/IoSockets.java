@@ -4,15 +4,15 @@
  */
 package net.java.truevfs.kernel.spec.cio;
 
-import net.java.truecommons.io.InputException;
-import net.java.truecommons.io.Sink;
-import net.java.truecommons.io.Source;
-import net.java.truecommons.io.Streams;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.io.InputException;
+import net.java.truecommons.io.Sink;
+import net.java.truecommons.io.Source;
+import net.java.truecommons.io.Streams;
 
 /**
  * Provides utility methods for {@link IoSocket}s.
