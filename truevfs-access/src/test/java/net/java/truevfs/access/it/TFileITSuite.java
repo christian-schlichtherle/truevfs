@@ -960,23 +960,18 @@ extends ConfiguredClientTestBase<D> {
             } catch (IOException expected) {
             }
             out1.write(getData());
-            try {
-                archive.rm_r();
-                fail();
-            } catch (IOException expected) {
-            }
-        }
-        try (final OutputStream out2 = new TFileOutputStream(entry2)) {
-            try {
-                entry2.rm();
-                fail();
-            } catch (IOException expected) {
-            }
-            out2.write(getData());
-            try {
-                archive.rm_r();
-                fail();
-            } catch (IOException expected) {
+            try (final OutputStream out2 = new TFileOutputStream(entry2)) {
+                try {
+                    entry2.rm();
+                    fail();
+                } catch (IOException expected) {
+                }
+                out2.write(getData());
+                try {
+                    archive.rm_r();
+                    fail();
+                } catch (IOException expected) {
+                }
             }
         }
         try (final InputStream in1 = new TFileInputStream(entry1)) {
