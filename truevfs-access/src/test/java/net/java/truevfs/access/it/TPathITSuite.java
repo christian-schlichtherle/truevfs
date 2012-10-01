@@ -530,7 +530,14 @@ extends ConfiguredClientTestBase<D> {
         createFile(file2); // uses FsAccessOption.CACHE!
         final InputStream in1 = newInputStream(file1);
         try {
-            copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
+            try {
+                // This operation may fail if the file system gets concurrently
+                // synced and hence the cache gets flushed.
+                copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
+            } catch (final FsSyncException ex) {
+                if (!(ex.getCause() instanceof FsResourceOpenException))
+                    throw ex;
+            }
 
             // in1 is still open!
             try {
