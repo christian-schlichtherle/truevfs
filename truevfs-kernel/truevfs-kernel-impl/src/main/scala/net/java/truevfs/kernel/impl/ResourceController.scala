@@ -14,7 +14,6 @@ import net.java.truevfs.kernel.spec.cio.Entry._;
 import java.io._
 import java.nio.channels._
 import javax.annotation.concurrent._
-import ResourceAccountant.Resources
 
 /** Accounts input and output resources returned by its decorated controller.
   * 
@@ -57,38 +56,41 @@ extends ArchiveController[E] {
   }: AnyOutputSocket
 
   abstract override def sync(options: SyncOptions) {
+    syncResources(options)
+    super.sync(options)
+  }
+
+  private def syncResources(options: SyncOptions) {
     assert(writeLockedByCurrentThread)
-    val builder = new FsSyncExceptionBuilder
-    waitIdle(options, builder)
-    closeAll(builder)
-    try { super.sync(options) }
-    catch { case ex: FsSyncException => builder warn ex }
-    builder check();
-  }
-
-  private def waitIdle(options: SyncOptions, builder: FsSyncExceptionBuilder) {
-    try {
-      waitIdle(options)
-    } catch {
-      case ex: FsResourceOpenException =>
-        if (!(options get FORCE_CLOSE_IO))
-            throw builder fail new FsSyncException(mountPoint, ex)
-        builder warn new FsSyncWarningException(mountPoint, ex)
-    }
-  }
-
-  private def waitIdle(options: SyncOptions) {
+    assert(!readLockedByCurrentThread)
     // HC SVNT DRACONES!
+    val beforeWait = accountant.resources
+    if (0 == beforeWait.total) return
     {
-      val Resources(local, total) = accountant.resources
-      if (0 != local && !(options get FORCE_CLOSE_IO))
-          throw new FsResourceOpenException(local, total)
+      val builder = new FsSyncExceptionBuilder
+      try {
+        if (0 != beforeWait.local && !(options get FORCE_CLOSE_IO))
+          throw new FsResourceOpenException(beforeWait.local, beforeWait.total)
+        accountant awaitClosingOfOtherThreadsResources
+        (if (options get WAIT_CLOSE_IO) 0 else waitTimeoutMillis)
+        val afterWait = accountant.resources
+        if (0 != afterWait.total)
+          throw new FsResourceOpenException(afterWait.local, afterWait.total)
+      } catch {
+        case ex: FsResourceOpenException =>
+          if (!(options get FORCE_CLOSE_IO))
+            throw builder fail new FsSyncException(mountPoint, ex)
+          builder warn new FsSyncWarningException(mountPoint, ex)
+      }
+      closeResources(builder)
+      builder check ()
     }
-    val wait = options get WAIT_CLOSE_IO
-    accountant waitOtherThreads (if (wait) 0 else waitTimeoutMillis);
-    {
-      val Resources(local, total) = accountant.resources
-      if (0 != total) throw new FsResourceOpenException(local, total)
+    if (beforeWait.needsWaiting) {
+      // waitOtherThreads(*) has temporarily released the write
+      // lock, so the state of the virtual file system may have
+      // completely changed and thus we need to restart the sync
+      // operation.
+      throw NeedsSyncException()
     }
   }
 
@@ -96,7 +98,7 @@ extends ArchiveController[E] {
     * 
     * @param builder the exception handling strategy.
     */
-  private def closeAll(builder: FsSyncExceptionBuilder) {
+  private def closeResources(builder: FsSyncExceptionBuilder) {
     final class IOExceptionHandler
     extends ExceptionHandler[IOException, RuntimeException] {
       def fail(ex: IOException) = throw new AssertionError(ex)
