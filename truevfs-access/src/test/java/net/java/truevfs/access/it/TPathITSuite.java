@@ -31,7 +31,7 @@ import net.java.truevfs.access.TVFS;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsResourceOpenException;
+import net.java.truevfs.kernel.spec.FsOpenIoResourceException;
 import net.java.truevfs.kernel.spec.FsSyncException;
 import static net.java.truevfs.kernel.spec.FsSyncOption.CLEAR_CACHE;
 import static net.java.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
@@ -535,7 +535,7 @@ extends ConfiguredClientTestBase<D> {
                 // synced and hence the cache gets flushed.
                 copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
             } catch (final FsSyncException ex) {
-                if (!(ex.getCause() instanceof FsResourceOpenException))
+                if (!(ex.getCause() instanceof FsOpenIoResourceException))
                     throw ex;
             }
 
@@ -544,7 +544,7 @@ extends ConfiguredClientTestBase<D> {
                 umount(); // forces closing of in1
                 fail();
             } catch (final FsSyncWarningException ex) {
-                if (!(ex.getCause() instanceof FsResourceOpenException))
+                if (!(ex.getCause() instanceof FsOpenIoResourceException))
                     throw ex;
             }
             assertTrue(isRegularFile(file2));
@@ -563,7 +563,7 @@ extends ConfiguredClientTestBase<D> {
                 umount(); // allow external modifications!
             } catch (final FsSyncWarningException ex) {
                 // It may fail once if a stream was busy!
-                if (!(ex.getCause() instanceof FsResourceOpenException))
+                if (!(ex.getCause() instanceof FsOpenIoResourceException))
                     throw ex;
             }
             umount(); // It must not fail twice for the same reason!
@@ -619,7 +619,7 @@ extends ConfiguredClientTestBase<D> {
             newOutputStream(file1).close();
             fail();
         } catch (final FsSyncException ex) {
-            if (!(ex.getCause() instanceof FsResourceOpenException))
+            if (!(ex.getCause() instanceof FsOpenIoResourceException))
                 throw ex;
         }
 
@@ -627,7 +627,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             newOutputStream(file2).close();
         } catch (final FsSyncException ex) {
-            if (!(ex.getCause() instanceof FsResourceOpenException))
+            if (!(ex.getCause() instanceof FsOpenIoResourceException))
                 throw ex;
             logger.info(
                     getArchiveDriver().getClass()
@@ -643,7 +643,7 @@ extends ConfiguredClientTestBase<D> {
             umount(); // forces closing of all streams
             fail();
         } catch (final FsSyncWarningException ex) {
-            if (!(ex.getCause() instanceof FsResourceOpenException))
+            if (!(ex.getCause() instanceof FsOpenIoResourceException))
                 throw ex;
         }
 
@@ -667,7 +667,7 @@ extends ConfiguredClientTestBase<D> {
             umount(); // allow external modifications!
         } catch (final FsSyncWarningException ex) {
             // It may fail once if a stream was busy!
-            if (!(ex.getCause() instanceof FsResourceOpenException))
+            if (!(ex.getCause() instanceof FsOpenIoResourceException))
                 throw ex;
         }
         umount(); // It must not fail twice for the same reason!
@@ -1343,7 +1343,7 @@ extends ConfiguredClientTestBase<D> {
                                     BitField.of(CLEAR_CACHE)
                                             .set(WAIT_CLOSE_IO, wait));
                         } catch (final FsSyncException ex) {
-                            if (!(ex.getCause() instanceof FsResourceOpenException))
+                            if (!(ex.getCause() instanceof FsOpenIoResourceException))
                                 throw ex;
                             // Some other thread is busy updating an archive.
                             // If we are waiting, then this could never happen.
@@ -1398,7 +1398,7 @@ extends ConfiguredClientTestBase<D> {
                         else
                             TVFS.sync(SYNC); // DON'T clear the cache!
                     } catch (final FsSyncWarningException ex) {
-                        if (!(ex.getCause() instanceof FsResourceOpenException))
+                        if (!(ex.getCause() instanceof FsOpenIoResourceException))
                             throw ex;
                         // Some other thread is busy updating an archive.
                         // If we are updating individually, then this

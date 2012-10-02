@@ -18,13 +18,13 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class FsResourceOpenException extends IOException {
+public class FsOpenIoResourceException extends IOException {
     private static final long serialVersionUID = 1L;
 
     final int local, total;
 
-    public FsResourceOpenException(int local, int total) {
-        super("Thread-local / total number of open I/O resources (streams, channels etc): %d / %d");
+    public FsOpenIoResourceException(int local, int total) {
+        super("Thread-local / total number of open I/O resources (e.g. streams or channels): %d / %d");
         this.local = local;
         this.total = total;
     }

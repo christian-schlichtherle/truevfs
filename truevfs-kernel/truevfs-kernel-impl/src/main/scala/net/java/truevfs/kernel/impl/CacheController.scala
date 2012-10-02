@@ -274,7 +274,7 @@ extends ArchiveController[E] {
                     // is an artifact of an attempt to acquire the
                     // output stream for a child file system.
                     syncEx.getCause match {
-                      case _: FsResourceOpenException =>
+                      case _: FsOpenIoResourceException =>
                       // Too bad, sync() failed because of a more
                       // serious issue than just some open resources.
                       // Let's rethrow the sync exception.
