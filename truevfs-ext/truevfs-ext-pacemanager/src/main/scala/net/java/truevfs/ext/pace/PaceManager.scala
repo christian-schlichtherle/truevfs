@@ -63,13 +63,12 @@ extends JmxManager[PaceMediator](mediator, manager) {
       }
       if (sync()) {
         try {
-          fm sync FsSyncOptions.SYNC
+          fm sync FsSyncOptions.NONE
           i remove ()
         } catch {
           case ex: FsSyncException =>
             ex.getCause match {
               case ex2: FsOpenIoResourceException =>
-                assert(ex2.getLocal == ex2.getTotal)
                 logger debug ("ignoring", ex)
               case ex2 =>
                 i remove ()
