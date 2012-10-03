@@ -257,7 +257,7 @@ extends ArchiveController[E] {
 
                 // Try to resolve the issue locally.
                 // Even if we were asked to create the entry
-                // EXCLUSIVEly, first we must try to get the cache in
+                // EXCLUSIVEly, we first need to try to get the cache in
                 // sync() with the virtual file system again and retry
                 // the make().
                 try {
