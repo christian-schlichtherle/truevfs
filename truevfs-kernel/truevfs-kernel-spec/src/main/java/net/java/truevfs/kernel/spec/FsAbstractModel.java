@@ -35,14 +35,10 @@ extends UniqueObject implements FsModel {
     }
 
     @Override
-    public final FsMountPoint getMountPoint() {
-        return mountPoint;
-    }
+    public final FsMountPoint getMountPoint() { return mountPoint; }
 
     @Override
-    public final @CheckForNull FsModel getParent() {
-        return parent;
-    }
+    public final @CheckForNull FsModel getParent() { return parent; }
 
     /**
      * Returns a string representation of this object for debugging and logging
