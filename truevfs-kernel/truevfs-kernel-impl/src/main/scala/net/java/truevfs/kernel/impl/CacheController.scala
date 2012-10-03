@@ -274,39 +274,39 @@ extends ArchiveController[E] {
                     // output stream for a child file system.
                     syncEx.getCause match {
                       case _: FsOpenIoResourceException =>
-                      // Too bad, sync() failed because of a more
-                      // serious issue than just some open resources.
-                      // Let's rethrow the sync exception.
-                      case _ => throw syncEx
-                    }
+                        // OK, we couldn't sync() because the current
+                        // thread has acquired open I/O resources for the
+                        // same target archive file.
+                        // Normally, we would be expected to rethrow the
+                        // make exception to trigger another sync(), but
+                        // this would fail for the same reason und create
+                        // an endless loop, so we can't do this.
+                        //throw mknodEx;
 
-                    // OK, we couldn't sync() because the current
-                    // thread has acquired open I/O resources for the
-                    // same target archive file.
-                    // Normally, we would be expected to rethrow the
-                    // make exception to trigger another sync(), but
-                    // this would fail for the same reason und create
-                    // an endless loop, so we can't do this.
-                    //throw mknodEx;
+                        // Dito for mapping the exception.
+                        //throw FsNeedsLockRetryException.get(getModel());
 
-                    // Dito for mapping the exception.
-                    //throw FsNeedsLockRetryException.get(getModel());
-
-                    // Check if we can retry the make with GROW set.
-                    val oldMknodOpts = makeOpts
-                    makeOpts = oldMknodOpts set GROW
-                    if (makeOpts eq oldMknodOpts) {
-                        // Finally, the make failed because the entry
-                        // has already been output to the target archive
-                        // file - so what?!
-                        // This should mark only a volatile issue because
-                        // the next sync() will sort it out once all the
-                        // I/O resources have been closed.
-                        // Let's log the sync exception - mind that it has
-                        // suppressed the make exception - and continue
-                        // anyway...
-                        logger debug ("ignoring", syncEx)
-                        return
+                        // Check if we can retry the make with GROW set.
+                        val oldMknodOpts = makeOpts
+                        makeOpts = oldMknodOpts set GROW
+                        if (makeOpts eq oldMknodOpts) {
+                            // Finally, the make failed because the entry
+                            // has already been output to the target archive
+                            // file - so what?!
+                            // This should mark only a volatile issue because
+                            // the next sync() will sort it out once all the
+                            // I/O resources have been closed.
+                            // Let's log the sync exception - mind that it has
+                            // suppressed the make exception - and continue
+                            // anyway...
+                            logger debug ("ignoring", syncEx)
+                            return
+                        }
+                      case _ =>
+                        // Too bad, sync() failed because of a more
+                        // serious issue than just some open resources.
+                        // Let's rethrow the sync exception.
+                        throw syncEx
                     }
                 }
             }
