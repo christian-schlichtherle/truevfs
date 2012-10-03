@@ -120,7 +120,7 @@ private object LockingStrategy {
     }
   }
 
-  def lockCount = accounts.get lockCount
+  def lockCount = accounts.get.lockCount
 
   /** Acquires the given lock using `Lock.tryLock()`. */
   object fastLocked extends LockingStrategy {
