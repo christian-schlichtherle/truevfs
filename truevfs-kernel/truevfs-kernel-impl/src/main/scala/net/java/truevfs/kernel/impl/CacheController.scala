@@ -256,10 +256,9 @@ extends ArchiveController[E] {
                 if (SYNC eq syncOpts) throw makeEx
 
                 // Try to resolve the issue locally.
-                // Even if we were asked to create the entry
-                // EXCLUSIVEly, we first need to try to get the cache in
-                // sync() with the virtual file system again and retry
-                // the make().
+                // Even if we were asked to create the entry EXCLUSIVEly, we
+                // first need to try to get the cache in sync() with the
+                // virtual file system again and retry the make().
                 try {
                   CacheController.super.sync(syncOpts)
                   // sync() succeeded, now repeat the make()
