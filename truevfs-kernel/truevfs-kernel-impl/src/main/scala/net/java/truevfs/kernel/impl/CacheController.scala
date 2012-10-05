@@ -53,8 +53,6 @@ private trait CacheController[E <: FsArchiveEntry]
 extends ArchiveController[E] {
   controller: ArchiveModelAspect[E] =>
 
-  import CacheController._
-
   protected def pool: IoBufferPool
 
   private[this] val caches = new java.util.HashMap[FsNodeName, EntryCache]
@@ -236,89 +234,10 @@ extends ArchiveController[E] {
         }
 
         def make(options: AccessOptions, template: Option[Entry]) {
-          var makeOpts = options
-          while (true) {
-            try {
-              CacheController.super.make(makeOpts, name, FILE, template)
-              return
-            } catch {
-              case makeEx: NeedsSyncException =>
-                // In this context, this exception means that the entry
-                // has already been written to the output archive for
-                // the target archive file.
-
-                // Pass on the exception if there is no means to
-                // resolve the issue locally, that is if we were asked
-                // to create the entry exclusively or this is a
-                // non-recursive file system operation.
-                if (makeOpts get EXCLUSIVE) throw makeEx
-                val syncOpts = SyncController modify SYNC
-                if (SYNC eq syncOpts) throw makeEx
-
-                // Try to resolve the issue locally.
-                // Even if we were asked to create the entry EXCLUSIVEly, we
-                // first need to try to get the cache in sync() with the
-                // virtual file system again and retry the make().
-                try {
-                  CacheController.super.sync(syncOpts)
-                  // sync() succeeded, now repeat the make()
-                } catch {
-                  case syncEx: FsSyncException =>
-                    syncEx addSuppressed makeEx
-
-                    // sync() failed, maybe just because the current
-                    // thread has already acquired some open I/O
-                    // resources for the same target archive file, e.g.
-                    // an input stream for a copy operation and this
-                    // is an artifact of an attempt to acquire the
-                    // output stream for a child file system.
-                    syncEx.getCause match {
-                      case _: FsOpenIoResourceException =>
-                        // OK, we couldn't sync() because the current
-                        // thread has acquired open I/O resources for the
-                        // same target archive file.
-                        // Normally, we would be expected to rethrow the
-                        // make exception to trigger another sync(), but
-                        // this would fail for the same reason und create
-                        // an endless loop, so we can't do this.
-                        //throw mknodEx;
-
-                        // Dito for mapping the exception.
-                        //throw FsNeedsLockRetryException.get(getModel());
-
-                        // Check if we can retry the make with GROW set.
-                        val oldMknodOpts = makeOpts
-                        makeOpts = oldMknodOpts set GROW
-                        if (makeOpts eq oldMknodOpts) {
-                            // Finally, the make failed because the entry
-                            // has already been output to the target archive
-                            // file - so what?!
-                            // This should mark only a volatile issue because
-                            // the next sync() will sort it out once all the
-                            // I/O resources have been closed.
-                            // Let's log the sync exception - mind that it has
-                            // suppressed the make exception - and continue
-                            // anyway...
-                            logger debug ("ignoring", syncEx)
-                            return
-                        }
-                      case _ =>
-                        // Too bad, sync() failed because of a more
-                        // serious issue than just some open resources.
-                        // Let's rethrow the sync exception.
-                        throw syncEx
-                    }
-                }
-            }
-          }
-          assert(false)
+          CacheController.super.make(options, name, FILE, template)
         }
       } // Output
       new Output
     }
   } // EntryCache
-}
-
-private object CacheController {
-  private val logger = new LocalizedLogger(classOf[CacheController[_]]);
 }
