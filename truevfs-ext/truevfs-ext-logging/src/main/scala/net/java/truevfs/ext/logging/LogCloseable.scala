@@ -9,20 +9,21 @@ import net.java.truevfs.kernel.spec.cio._
 
 private trait LogCloseable extends Closeable with LogResource {
 
-  def origin: IoSocket[_ <: Entry]
-
-  def log(message: String) {
-    val entry = {
-      try { origin target () }
-      catch { case _: IOException => null }
-    }
-    log(message, entry)
-  }
-
   log("Opened {}")
 
   abstract override def close {
     log("Closing {}")
     super.close
   }
+
+  def log(message: String) {
+    try {
+      log(message, origin target ())
+    } catch {
+      case ex: IOException =>
+        logger debug ("Couldn't resolve resource target: ", ex)
+    }
+  }
+
+  def origin: IoSocket[_ <: Entry]
 }
