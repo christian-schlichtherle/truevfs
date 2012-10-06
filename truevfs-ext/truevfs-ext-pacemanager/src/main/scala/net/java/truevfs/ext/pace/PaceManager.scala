@@ -159,8 +159,6 @@ private object PaceManager {
   (evicted: ju.Collection[FsController])
   (implicit lock: ReentrantReadWriteLock = new ReentrantReadWriteLock) {
 
-    assert (null ne map)
-
     private[this] val map = new MountedControllerMap(evicted)
     private[this] val readLock = lock.readLock
     private[this] val writeLock = lock.writeLock
