@@ -4,9 +4,10 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.util.Iterator;
 import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.Filter;
 
 /**
  * An abstract decorator for a file system manager.
@@ -40,13 +41,16 @@ public abstract class FsDecoratingManager extends FsAbstractManager {
     }
 
     @Override
-    public int size() {
-        return manager.size();
+    public FsControllerStream controllers(Filter<? super FsController> filter) {
+        return manager.controllers(filter);
     }
 
     @Override
-    public Iterator<FsController> iterator() {
-        return manager.iterator();
+    public void sync(
+            BitField<FsSyncOption> options,
+            Filter<? super FsController> filter)
+    throws FsSyncWarningException, FsSyncException {
+        manager.sync(options, filter);
     }
 
     /**

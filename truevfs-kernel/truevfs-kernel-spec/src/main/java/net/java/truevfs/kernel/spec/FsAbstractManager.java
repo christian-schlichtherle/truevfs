@@ -6,6 +6,7 @@ package net.java.truevfs.kernel.spec;
 
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.Filter;
 import net.java.truecommons.shed.UniqueObject;
 import static net.java.truevfs.kernel.spec.FsSyncOption.ABORT_CHANGES;
 
@@ -21,15 +22,19 @@ public abstract class FsAbstractManager
 extends UniqueObject implements FsManager {
 
     @Override
-    public void sync(final BitField<FsSyncOption> options)
+    public void sync(
+            final BitField<FsSyncOption> options,
+            final Filter<? super FsController> filter)
     throws FsSyncWarningException, FsSyncException {
         if (options.get(ABORT_CHANGES)) throw new IllegalArgumentException();
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
-        for (final FsController controller : this) {
-            try {
-                controller.sync(options);
-            } catch (final FsSyncException ex) {
-                builder.warn(ex);
+        try (final FsControllerStream stream = controllers(filter)) {
+            for (final FsController controller : stream) {
+                try {
+                    controller.sync(options);
+                } catch (final FsSyncException ex) {
+                    builder.warn(ex);
+                }
             }
         }
         builder.check();
@@ -41,9 +46,8 @@ extends UniqueObject implements FsManager {
      */
     @Override
     public String toString() {
-        return String.format("%s@%x[size=%d]",
+        return String.format("%s@%x",
                 getClass().getName(),
-                hashCode(),
-                size());
+                hashCode());
     }
 }

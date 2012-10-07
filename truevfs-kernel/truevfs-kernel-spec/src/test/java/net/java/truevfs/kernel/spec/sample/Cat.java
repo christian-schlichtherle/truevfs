@@ -11,6 +11,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import net.java.truecommons.io.Streams;
 import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.Filter;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsMetaDriver;
@@ -87,7 +88,7 @@ public final class Cat {
             // Commit all unsynchronized changes to the contents of federated
             // file systems, if any were accessed, and clean up temporary files
             // used for caching.
-            manager.sync(FsSyncOptions.UMOUNT);
+            manager.sync(FsSyncOptions.UMOUNT, Filter.ACCEPT_ANY);
         }
     }
 // END SNIPPET: cat

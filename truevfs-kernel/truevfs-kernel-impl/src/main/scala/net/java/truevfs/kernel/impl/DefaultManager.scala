@@ -4,34 +4,24 @@
  */
 package net.java.truevfs.kernel.impl
 
+import collection.mutable.WeakHashMap
 import net.java.truecommons.shed._
-import net.java.truecommons.shed.Link._
 import net.java.truecommons.shed.Link.Type._
-import net.java.truecommons.shed.Links._
 import java.util.concurrent.locks._
-import java.util.concurrent.locks.ReentrantReadWriteLock._
 import javax.annotation.concurrent._
 import net.java.truevfs.kernel.spec._
-import scala.collection.mutable.WeakHashMap
 
 /** The default implementation of a file system manager.
   *
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private final class DefaultManager private (
-  optionalScheduleType: Type,
-  override val lock: ReentrantReadWriteLock
-) extends FsAbstractManager with ReentrantReadWriteLockAspect {
+private final class DefaultManager
+extends FsAbstractManager with ReentrantReadWriteLockAspect {
 
-  private[impl] def this(optionalScheduleType: Type)
-  = this(optionalScheduleType, new ReentrantReadWriteLock)
-
-  def this() = this(WEAK)
+  override val lock = new ReentrantReadWriteLock
 
   import DefaultManager._
-
-  assert(null ne optionalScheduleType)
 
   /**
    * The map of all schedulers for composite file system controllers,
@@ -117,30 +107,31 @@ private final class DefaultManager private (
     def schedule(mandatory: Boolean) {
       assert(writeLockedByCurrentThread)
       controllers += getMountPoint ->
-        ((if (mandatory) STRONG else optionalScheduleType) newLink _controller)
+        ((if (mandatory) STRONG else WEAK) newLink _controller)
     }
   } // ManagedModel
 
-  override def size = readLocked(controllers.size)
-
-  override def iterator = {
-    import collection.JavaConverters._
-    sortedControllers.iterator.asJava
-  }
-
-  private def sortedControllers = {
-    readLocked(
+  override def controllers(filter: Filter[_ >: FsController]) = {
+    val iseq = readLocked(
       controllers
       .values
       .flatMap(l => Option(l.get))
+      .filter(filter accept _)
       .toIndexedSeq
-      .sorted(ReverseControllerOrdering)
     )
+    import collection.JavaConverters._
+    final class Stream extends FsControllerStream {
+      var list = iseq.sorted(ReverseControllerOrdering).asJava
+      override def size = list.size
+      override def iterator = list.iterator
+      override def close() { list = null }
+    }
+    new Stream
   }
 
-  override def sync(options: SyncOptions) {
+  override def sync(options: SyncOptions, filter: Filter[_ >: FsController]) {
     SyncShutdownHook cancel ()
-    super.sync(options)
+    super.sync(options, filter)
   }
 }
 
@@ -174,13 +165,6 @@ private object DefaultManager {
     require(null ne pool)
   }
 
-  /**
-   * Orders file system controllers so that all file systems appear before
-   * any of their parent file systems.
-   */
-  private object ReverseControllerOrdering extends Ordering[FsController] {
-    override def compare(a: FsController, b: FsController) =
-      b.getModel.getMountPoint.getHierarchicalUri compareTo
-        a.getModel.getMountPoint.getHierarchicalUri
-  }
+  private object ReverseControllerOrdering
+  extends FsControllerComparator with Ordering[FsController]
 }

@@ -4,15 +4,12 @@
  */
 package net.java.truevfs.ext.insight
 
-import javax.annotation.concurrent.ThreadSafe
-import net.java.truecommons.shed.BitField
-import net.java.truevfs.comp.jmx.JmxManager
-import net.java.truevfs.kernel.spec.FsManager
-import net.java.truevfs.kernel.spec.FsSyncOption
+import javax.annotation.concurrent._
+import net.java.truecommons.shed._
+import net.java.truevfs.comp.jmx._
+import net.java.truevfs.kernel.spec._
 
-/**
-  * @author Christian Schlichtherle
-  */
+/** @author Christian Schlichtherle */
 @ThreadSafe
 private final class I5tManager(mediator: I5tMediator, manager: FsManager)
 extends JmxManager(mediator, manager) {
@@ -22,9 +19,9 @@ extends JmxManager(mediator, manager) {
     mediator startAllStats this
   }
 
-  override def sync(options: BitField[FsSyncOption]) {
+  override def sync(options: BitField[FsSyncOption], filter: Filter[_ >: FsController]) {
     val start = System.nanoTime
-    super.sync(options)
+    super.sync(options, filter)
     mediator logSync (System.nanoTime - start)
     mediator rotateAllStats this
   }
