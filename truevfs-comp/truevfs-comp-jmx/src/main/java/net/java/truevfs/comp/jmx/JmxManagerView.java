@@ -10,7 +10,9 @@ import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.StandardMBean;
+import net.java.truecommons.shed.Filter;
 import net.java.truevfs.kernel.spec.FsController;
+import net.java.truevfs.kernel.spec.FsControllerStream;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsSyncException;
 import net.java.truevfs.kernel.spec.FsSyncOptions;
@@ -70,32 +72,49 @@ extends StandardMBean implements JmxManagerMXBean {
 
     @Override
     public int getFileSystemsTotal() {
-        return manager.size();
+        return count(Filter.ACCEPT_ANY);
     }
 
     @Override
     public int getFileSystemsMounted() {
-        int mounted = 0;
-        for (final FsController controller : manager)
-            if (controller.getModel().isMounted()) mounted++;
-        return mounted;
+        class FileSystemsMounted implements Filter<FsController> {
+            @Override
+            public boolean accept(FsController controller) {
+                return controller.getModel().isMounted();
+            }
+        }
+        return count(new FileSystemsMounted());
     }
 
     @Override
     public int getTopLevelArchiveFileSystemsTotal() {
-        int total = 0;
-        for (final FsController controller : manager)
-            if (isTopLevelArchive(controller)) total++;
-        return total;
+        class TopLevelArchiveFileSystemsTotal implements Filter<FsController> {
+            @Override
+            public boolean accept(FsController controller) {
+                return isTopLevelArchive(controller);
+            }
+        }
+        return count(new TopLevelArchiveFileSystemsTotal());
     }
 
     @Override
     public int getTopLevelArchiveFileSystemsMounted() {
-        int mounted = 0;
-        for (final FsController controller : manager)
-            if (isTopLevelArchive(controller))
-                if (controller.getModel().isMounted()) mounted++;
-        return mounted;
+        class TopLevelArchiveFileSystemsMounted implements Filter<FsController> {
+            @Override
+            public boolean accept(FsController controller) {
+                return isTopLevelArchive(controller)
+                        && controller.getModel().isMounted();
+            }
+        }
+        return count(new TopLevelArchiveFileSystemsMounted());
+    }
+
+    private int count(final Filter<? super FsController> filter) {
+        int count = 0;
+        try (final FsControllerStream stream = manager.controllers(filter)) {
+            for (final FsController _ : stream) count++;
+        }
+        return count;
     }
 
     private boolean isTopLevelArchive(final FsController controller) {
@@ -105,6 +124,9 @@ extends StandardMBean implements JmxManagerMXBean {
 
     @Override
     public void sync() throws FsSyncException {
-        FsManagerLocator.SINGLETON.get().sync(FsSyncOptions.NONE);
+        FsManagerLocator
+                .SINGLETON
+                .get()
+                .sync(FsSyncOptions.NONE, Filter.ACCEPT_ANY);
     }
 }

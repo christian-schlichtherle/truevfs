@@ -4,8 +4,9 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.util.Iterator;
+import java.io.Closeable;
 import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.Filter;
 
 /**
  * A container which creates {@linkplain FsController} file system controllers
@@ -17,7 +18,7 @@ import net.java.truecommons.shed.BitField;
  * @see    FsModel
  * @author Christian Schlichtherle
  */
-public interface FsManager extends Iterable<FsController> {
+public interface FsManager {
 
     /**
      * Returns a new thread-safe archive file system controller.
@@ -47,44 +48,42 @@ public interface FsManager extends Iterable<FsController> {
     FsController controller(FsMetaDriver driver, FsMountPoint mountPoint);
 
     /**
-     * Returns the number of managed file system controllers.
-     *
-     * @return The number of managed file system controllers.
+     * Returns a new stream which represents a snapshot of the managed file
+     * system controllers.
+     * 
+     * @param  filter the file system controller filter to apply.
+     * @return A new stream which represents a snapshot of the managed file
+     *         system controllers.
      */
-    int size();
+    FsControllerStream controllers(Filter<? super FsController> filter);
 
     /**
-     * Returns an ordered iterator for the managed file system controllers.
-     * The iterated file system controllers are ordered so that all file
-     * systems appear before any of their parent file systems.
-     * Last, but not least: The iterator must be consistent in multithreaded
-     * environments!
-     *
-     * @return An ordered iterator for the managed file system controllers.
-     */
-    @Override
-    Iterator<FsController> iterator();
-
-    /**
-     * Calls {@link FsController#sync(BitField)} on all managed file system
-     * controllers.
-     * If sync()ing a file system controller fails with an
+     * Calls {@link FsController#sync} on all managed file system controllers.
+     * If {@code sync()}ing a file system controller fails with an
      * {@link FsSyncException}, then the exception gets remembered and the loop
-     * continues with sync()ing the remaining file system controllers.
-     * After the loop, the exception(s) get processed for (re)throwing based
-     * on their type and order of appearance.
+     * continues with {@code sync()}ing the remaining file system controllers.
+     * Once the loop has completed, the exception(s) get processed for
+     * (re)throwing based on their type and order of appearance.
+     * <p>
+     * Call this method instead of manually iterating over a
+     * {@linkplain #controllers stream} for {@code sync()}ing in order to
+     * support processing of additional aspects such as controlling a shutdown
+     * hook, logging statistics et al.
      *
      * @param  options the options for synchronizing the file system.
+     * @param  filter the file system controller filter to apply.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective file system controller has been
-     *         synchronized with constraints, e.g. if an unclosed archive entry
-     *         stream gets forcibly closed.
+     *         {@link FsController#sync sync()}ed with constraints, e.g. if an
+     *         open archive entry stream or channel gets forcibly
+     *         {@link Closeable#close close()}d.
      * @throws FsSyncException if any error conditions apply.
      * @throws IllegalArgumentException if the combination of synchronization
      *         options is illegal, e.g. if {@link FsSyncOption#ABORT_CHANGES}
      *         is set.
      */
-    void sync(final BitField<FsSyncOption> options)
+    void sync(  BitField<FsSyncOption> options,
+                Filter<? super FsController> filter)
     throws FsSyncWarningException, FsSyncException;
 }

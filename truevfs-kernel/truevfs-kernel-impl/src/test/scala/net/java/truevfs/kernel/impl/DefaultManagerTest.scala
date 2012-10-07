@@ -4,12 +4,11 @@
  */
 package net.java.truevfs.kernel.impl
 
-import net.java.truecommons.shed.Link._
 import net.java.truevfs.kernel.spec._
 
 /**
   * @author Christian Schlichtherle
   */
 class DefaultManagerTest extends FsManagerTestSuite {
-  override def newManager(tµpe: Type): FsManager = new DefaultManager(tµpe)
+  override def newManager(): FsManager = new DefaultManager
 }

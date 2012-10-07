@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.kernel.impl
 
+import net.java.truecommons.shed._
 import net.java.truevfs.kernel.spec._
 import javax.annotation.concurrent._
 
@@ -69,7 +70,7 @@ private object SyncShutdownHook extends Thread {
     _manager foreach { manager =>
       _manager = None // MUST reset to void calls to cancel() during the sync()!
       try {
-        manager sync FsSyncOptions.UMOUNT // may call cancel()!
+        manager sync (FsSyncOptions.UMOUNT, Filter.ACCEPT_ANY) // may call cancel()!
       } catch {
         // Logging doesn't work in a shutdown hook!
         case ex => ex printStackTrace()

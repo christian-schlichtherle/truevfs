@@ -7,6 +7,7 @@ package net.java.truevfs.access;
 import java.net.URI;
 import java.net.URISyntaxException;
 import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.Filter;
 import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsSyncOptions.UMOUNT;
 import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
@@ -20,7 +21,6 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
  */
 public final class TVFS {
 
-    /* Can't touch this - hammer time! */
     private TVFS() { }
 
     /**
@@ -163,10 +163,9 @@ public final class TVFS {
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
-    @SuppressWarnings("deprecation")
     public static void sync(BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        TConfig.current().getManager().sync(options);
+        sync(options, Filter.ACCEPT_ANY);
     }
 
     /**
@@ -256,9 +255,15 @@ public final class TVFS {
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
-    @SuppressWarnings("deprecation")
     public static void sync(FsMountPoint tree, BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        new FsFilteringManager(tree, TConfig.current().getManager()).sync(options);
+        sync(options, new FsControllerFilter(tree));
+    }
+
+    private static void sync(
+            BitField<FsSyncOption> options,
+            Filter<? super FsController> filter)
+    throws FsSyncException {
+        TConfig.current().getManager().sync(options, filter);
     }
 }

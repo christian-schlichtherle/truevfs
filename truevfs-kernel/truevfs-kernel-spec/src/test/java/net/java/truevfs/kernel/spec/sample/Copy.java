@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.Filter;
 import static net.java.truevfs.kernel.spec.FsAccessOption.CREATE_PARENTS;
 import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
 import net.java.truevfs.kernel.spec.cio.InputSocket;
@@ -92,7 +93,7 @@ public final class Copy {
             // Commit all unsynchronized changes to the contents of federated
             // file systems, if any were accessed, and clean up temporary files
             // used for caching.
-            manager.sync(FsSyncOptions.UMOUNT);
+            manager.sync(FsSyncOptions.UMOUNT, Filter.ACCEPT_ANY);
         }
     }
 // END SNIPPET: copy

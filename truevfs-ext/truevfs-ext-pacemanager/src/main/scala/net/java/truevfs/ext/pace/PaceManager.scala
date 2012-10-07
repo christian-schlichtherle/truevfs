@@ -4,10 +4,12 @@
  */
 package net.java.truevfs.ext.pace
 
+import collection.JavaConverters._
 import java.{util => ju}
 import java.util.concurrent._
 import java.util.concurrent.locks._
 import javax.annotation.concurrent._
+import net.java.truecommons.io.Loan._
 import net.java.truecommons.logging._
 import net.java.truecommons.shed._
 import net.java.truevfs.comp.jmx._
@@ -49,21 +51,22 @@ extends JmxManager[PaceMediator](mediator, manager) {
     while (i.hasNext) {
       val ec = i.next
       val emp = ec.getModel.getMountPoint
-      val fm = new FsFilteringManager(emp, manager)
+      val filter = new FsControllerFilter(emp)
       def sync(): Boolean = {
-        import collection.JavaConversions._
-        for (fc <- fm) {
-          val fmp = fc.getModel.getMountPoint
-          if (mp == fmp || (mounted contains fmp)) {
-            if (emp == fmp || (mounted contains emp)) i remove ()
-            return false
+        loan(manager controllers filter) to { stream =>
+          for (fc <- stream.asScala) {
+            val fmp = fc.getModel.getMountPoint
+            if (mp == fmp || (mounted contains fmp)) {
+              if (emp == fmp || (mounted contains emp)) i remove ()
+              return false
+            }
           }
         }
         true
       }
       if (sync()) {
         try {
-          fm sync FsSyncOptions.NONE
+          manager sync (FsSyncOptions.NONE, filter)
           i remove ()
         } catch {
           case ex: FsSyncException =>
@@ -89,13 +92,12 @@ extends JmxManager[PaceMediator](mediator, manager) {
     if (controller.getModel.isMounted) mounted add controller
   }
 
-  override def sync(options: BitField[FsSyncOption]) {
-    evicted clear ()
-    try {
-      manager sync options
-    } finally {
-      mounted mount manager
+  override def sync(options: BitField[FsSyncOption], filter: Filter[_ >: FsController]) {
+    {
+      val i = evicted.iterator
+      while (i.hasNext) if (filter accept i.next) i remove ()
     }
+    mounted sync (manager, options, filter)
   }
 }
 
@@ -138,6 +140,17 @@ private object PaceManager {
   private val initialCapacity =
     HashMaps initialCapacity (maximumFileSystemsMountedDefaultValue + 1)
 
+  private def locked[V](lock: Lock)(operation: => V) = {
+    lock lock ()
+    try { operation }
+    finally { lock unlock () }
+  }
+
+  implicit private def function2filter(function: FsController => Boolean) =
+    new Filter[FsController] {
+      def accept(controller: FsController) = function(controller)
+    }
+
   private[this] final class MountedControllerMap(evicted: ju.Collection[FsController])
   extends ju.LinkedHashMap[FsMountPoint, FsController](initialCapacity, 0.75f, true) {
 
@@ -166,12 +179,6 @@ private object PaceManager {
     def max = map.max
     def max_=(max: Int) { map.max = max }
 
-    private def locked[V](lock: Lock)(operation: => V) = {
-      lock lock ()
-      try { operation }
-      finally { lock unlock () }
-    }
-
     def contains(key: FsMountPoint) = locked(readLock)(map containsKey key)
 
     def add(controller: FsController) {
@@ -179,12 +186,24 @@ private object PaceManager {
       locked(writeLock)(map put (mp, controller))
     }
 
-    def mount(manager: FsManager) = {
+    def sync(manager: FsManager, options: BitField[FsSyncOption], filter: Filter[_ >: FsController]) = {
       locked(writeLock) {
-        map clear ()
-        import scala.collection.JavaConversions._
-        for (controller <- manager; model = controller.getModel)
-          if (model.isMounted) map put (model.getMountPoint, controller)
+        try {
+          manager sync (options, { controller: FsController =>
+              val accepted = filter accept controller
+              if (accepted) map remove controller.getModel.getMountPoint
+              accepted
+            }
+          )
+        } finally {
+          loan(manager controllers filter) to { stream =>
+            for (controller <- stream.asScala;
+                 model = controller.getModel;
+                 mountPoint = model.getMountPoint) {
+              if (model.isMounted) map put (mountPoint, controller)
+            }
+          }
+        }
         map.size
       }
     }
