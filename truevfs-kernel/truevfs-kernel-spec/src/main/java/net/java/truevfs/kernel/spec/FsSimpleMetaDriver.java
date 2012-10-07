@@ -17,17 +17,18 @@ import net.java.truecommons.services.Container;
  */
 @Immutable
 public final class FsSimpleMetaDriver extends FsAbstractMetaDriver {
+
     private final Container<Map<FsScheme, FsDriver>> container;
 
     /**
-     * Constructs a new simple composite driver which will query the given
+     * Constructs a new simple meta driver which will query the given
      * {@code provider} for an appropriate file system driver for the scheme
      * of a given mount point.
      * 
-     * @param provider the driver map provider.
+     * @param container the driver map container.
      */
-    public FsSimpleMetaDriver(final Container<Map<FsScheme, FsDriver>> provider) {
-        this.container = Objects.requireNonNull(provider);
+    public FsSimpleMetaDriver(final Container<Map<FsScheme, FsDriver>> container) {
+        this.container = Objects.requireNonNull(container);
     }
 
     @Override
