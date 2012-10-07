@@ -163,27 +163,36 @@ extends ConfiguredClientTestBase<D> {
         archive = null;
         assertTrue(new TFile(entry).createNewFile());
         TVFS.umount(new TFile(entry).getTopLevelArchive());
-        final ReferenceQueue<FsController> queue;
-        final Reference<FsController> expected;
-        try (final Closeable resource = factory.create(entry)) {
-            queue = new ReferenceQueue<>();
-            expected = new WeakReference<>(
-                         controller(new TFile(entry).getNodePath()), queue);
-            System.gc();
-            assertNull(queue.remove(TIMEOUT_MILLIS));
-            assertSame(expected.get(), controller(new TFile(entry).getNodePath()));
-        }
+        final ReferenceQueue<FsController> queue = new ReferenceQueue<>();
+        final Reference<FsController> reference =
+                assertReferenceForResource(factory, entry, queue);
         System.gc();
         assertNull(queue.remove(TIMEOUT_MILLIS));
-        assertSame(expected.get(), controller(new TFile(entry).getNodePath()));
+        assertSame(reference.get(), controller(new TFile(entry).getNodePath()));
         TVFS.umount(new TFile(entry).getTopLevelArchive());
         Reference<? extends FsController> got;
         do {
             // triggering GC in a loop seems to help with concurrency!
             System.gc();
         } while (null == (got = queue.remove(TIMEOUT_MILLIS)));
-        assert expected == got;
-        assert null == expected.get();
+        assert reference == got;
+        assert null == reference.get();
+    }
+
+    private Reference<FsController> assertReferenceForResource(
+            final Factory<? extends Closeable, ? super String, ? extends IOException> factory,
+            final String entry,
+            final ReferenceQueue<FsController> queue)
+    throws IOException, InterruptedException {
+        final Reference<FsController> reference;
+        try (final Closeable resource = factory.create(entry)) {
+            reference = new WeakReference<>(
+                         controller(new TFile(entry).getNodePath()), queue);
+            System.gc();
+            assertNull(queue.remove(TIMEOUT_MILLIS));
+            assertSame(reference.get(), controller(new TFile(entry).getNodePath()));
+        }
+        return reference;
     }
 
     @Test
