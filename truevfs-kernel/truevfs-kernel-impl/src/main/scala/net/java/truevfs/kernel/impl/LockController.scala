@@ -59,13 +59,13 @@ extends ArchiveController[E] {
     final class Input extends AbstractInputSocket[Entry] {
       private[this] val socket = LockController.super.input(options, name)
 
-      override def target() = fastLocked(writeLock)(socket.target())
+      override def target() = fastLocked(writeLock)(socket target ())
 
       override def stream(peer: AnyOutputSocket) =
-        timedLocked(writeLock)(new LockInputStream(socket.stream(peer)))
+        timedLocked(writeLock)(new LockInputStream(socket stream peer))
 
       override def channel(peer: AnyOutputSocket) =
-        timedLocked(writeLock)(new LockSeekableChannel(socket.channel(peer)))
+        timedLocked(writeLock)(new LockSeekableChannel(socket channel peer))
     }
     new Input
   }: AnyInputSocket
@@ -74,13 +74,13 @@ extends ArchiveController[E] {
     final class Output extends AbstractOutputSocket[Entry] {
       private[this] val socket = LockController.super.output(options, name, template)
 
-      override def target() = fastLocked(writeLock)(socket.target())
+      override def target() = fastLocked(writeLock)(socket target ())
 
       override def stream(peer: AnyInputSocket) =
-        timedLocked(writeLock)(new LockOutputStream(socket.stream(peer)))
+        timedLocked(writeLock)(new LockOutputStream(socket stream peer))
 
       override def channel(peer: AnyInputSocket) =
-        timedLocked(writeLock)(new LockSeekableChannel(socket.channel(peer)))
+        timedLocked(writeLock)(new LockSeekableChannel(socket channel peer))
     }
     new Output
   }: AnyOutputSocket
