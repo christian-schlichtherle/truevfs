@@ -70,14 +70,14 @@ extends ArchiveController[E] {
       val builder = new FsSyncExceptionBuilder
       try {
         if (0 != beforeWait.local && !(options get FORCE_CLOSE_IO))
-          throw new FsOpenIoResourceException(beforeWait.local, beforeWait.total)
+          throw new FsOpenResourceException(beforeWait.local, beforeWait.total)
         accountant awaitClosingOfOtherThreadsResources
         (if (options get WAIT_CLOSE_IO) 0 else waitTimeoutMillis)
         val afterWait = accountant.resources
         if (0 != afterWait.total)
-          throw new FsOpenIoResourceException(afterWait.local, afterWait.total)
+          throw new FsOpenResourceException(afterWait.local, afterWait.total)
       } catch {
-        case ex: FsOpenIoResourceException =>
+        case ex: FsOpenResourceException =>
           if (!(options get FORCE_CLOSE_IO))
             throw builder fail new FsSyncException(mountPoint, ex)
           builder warn new FsSyncWarningException(mountPoint, ex)
