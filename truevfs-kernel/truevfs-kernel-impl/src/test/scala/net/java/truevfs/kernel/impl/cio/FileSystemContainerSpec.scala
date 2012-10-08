@@ -6,15 +6,13 @@ package net.java.truevfs.kernel.impl.cio
 
 import net.java.truevfs.kernel.spec.cio._
 import net.java.truevfs.kernel.spec.cio.Entry._
-import org.junit.runner.RunWith
-import org.scalatest.WordSpec
-import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.prop.PropertyChecks
+import org.junit.runner._
+import org.scalatest._
+import org.scalatest.junit._
+import org.scalatest.matchers._
+import org.scalatest.prop._
 
-/**
-  * @author Christian Schlichtherle
-  */
+/** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])
 class FileSystemContainerSpec
 extends WordSpec with ShouldMatchers with PropertyChecks {
