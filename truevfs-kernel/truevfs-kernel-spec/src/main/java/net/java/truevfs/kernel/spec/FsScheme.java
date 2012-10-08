@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.kernel.spec;
 
+import java.beans.*;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.Locale;
@@ -60,10 +61,23 @@ public final class FsScheme implements Serializable, Comparable<FsScheme> {
      * @throws URISyntaxException if {@code scheme} does not conform to the
      *         syntax constraints for URI schemes.
      */
+    @ConstructorProperties("scheme")
     public FsScheme(final String scheme) throws URISyntaxException {
         UriBuilder.validateScheme(scheme);
         this.scheme = scheme;
     }
+
+    /**
+     * Returns the scheme as a string.
+     * 
+     * @return The scheme as a string.
+     * @since  TrueVFS 0.9.4
+     * @deprecated This method is solely provided to support
+     *             {@link XMLEncoder}/{@link XMLDecoder}.
+     *             Applications should call {@link #toString()} instead.
+     */
+    @Deprecated
+    public String getScheme() { return scheme; }
 
     @Override
     public boolean equals(Object that) {
@@ -82,8 +96,11 @@ public final class FsScheme implements Serializable, Comparable<FsScheme> {
         return scheme.toLowerCase(Locale.ROOT).hashCode();
     }
 
+    /**
+     * Returns the scheme as a string.
+     * 
+     * @return The scheme as a string.
+     */
     @Override
-    public String toString() {
-        return scheme;
-    }
+    public String toString() { return scheme; }
 }

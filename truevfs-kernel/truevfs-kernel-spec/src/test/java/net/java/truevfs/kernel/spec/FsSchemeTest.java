@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import net.java.truevfs.kernel.spec.FsScheme;
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
