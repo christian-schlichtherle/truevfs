@@ -35,8 +35,7 @@ implements Container<MockArchiveDriverEntry> {
     private @CheckForNull ThrowManager control;
 
     public static MockArchive create(@CheckForNull TestConfig config) {
-        if (null == config)
-            config = TestConfig.get();
+        if (null == config) config = TestConfig.get();
         return new MockArchive(
                 new LinkedHashMap<String, MockArchiveDriverEntry>(
                     HashMaps.initialCapacity(config.getNumEntries())),
@@ -61,6 +60,7 @@ implements Container<MockArchiveDriverEntry> {
     }
 
     public IoBufferPool getPool() {
+        checkUndeclaredExceptions();
         return config.getPool();
     }
 
@@ -94,6 +94,11 @@ implements Container<MockArchiveDriverEntry> {
         return new ThrowingOutputService<>(
                 new MockOutputService(entries, config),
                 config);
+    }
+
+    @Override
+    public void close() throws IOException {
+        getThrowControl().trigger(new IllegalStateException());
     }
 
     private static final class MockInputService

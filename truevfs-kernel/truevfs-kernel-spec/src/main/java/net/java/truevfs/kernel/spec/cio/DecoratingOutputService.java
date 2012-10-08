@@ -25,13 +25,9 @@ extends DecoratingContainer<E, OutputService<E>> implements OutputService<E> {
     }
 
     @Override
-    public OutputSocket<E> output(E entry) {
-        return container.output(entry);
-    }
+    public OutputSocket<E> output(E entry) { return container.output(entry); }
 
     @Override
     @DischargesObligation
-    public void close() throws IOException {
-        container.close();
-    }
+    public void close() throws IOException { container.close(); }
 }

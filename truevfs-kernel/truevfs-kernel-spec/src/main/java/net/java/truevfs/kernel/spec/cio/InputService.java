@@ -4,11 +4,7 @@
  */
 package net.java.truevfs.kernel.spec.cio;
 
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.Closeable;
-import java.io.IOException;
-import java.util.Iterator;
 
 /**
  * A service for reading entries from this container.
@@ -17,17 +13,8 @@ import java.util.Iterator;
  * @see    OutputService
  * @author Christian Schlichtherle
  */
-@CleanupObligation
 public interface InputService<E extends Entry>
 extends Closeable, Container<E> {
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Note that the iterator returned by this method must be unmodifiable.
-     */
-    @Override
-    Iterator<E> iterator();
 
     /**
      * Returns an input socket for reading from the entry with the given name.
@@ -36,8 +23,4 @@ extends Closeable, Container<E> {
      * @return An input socket for reading from the entry with the given name.
      */
     InputSocket<E> input(String name);
-
-    @Override
-    @DischargesObligation
-    void close() throws IOException;
 }
