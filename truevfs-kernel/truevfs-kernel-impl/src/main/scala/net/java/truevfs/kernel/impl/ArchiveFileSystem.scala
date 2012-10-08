@@ -107,15 +107,15 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
 
   def iterator = master.iterator
 
-  /** Returns a covariant file system entry or `None` if no file system
-    * entry exists for the given name.
+  /** Returns a covariant file system node or `None` if no file system
+    * node exists for the given name.
     * Modifying the returned object graph is either not supported (i.e. throws
-    * an [[java.lang.UnsupportedOperationException]] or does not show any effect
-    * on this file system.
+    * an [[java.lang.UnsupportedOperationException]] or does not have any
+    * visible side effect on this file system.
     *
     * @param  name the name of the file system entry to look up.
-    * @return A covariant file system entry or `None` if no file system
-    *         entry exists for the given name.
+    * @return A covariant file system node or `None` if no file system
+    *         node exists for the given name.
     */
   def node(options: AccessOptions, name: FsNodeName) = {
     master.get(name.getPath) match {
