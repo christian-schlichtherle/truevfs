@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.kernel.impl
 
-import org.junit._
 import org.junit.runner._
 import org.scalatest._
 import org.scalatest.junit._
@@ -16,7 +15,7 @@ import org.scalatest.prop._
   */
 @RunWith(classOf[JUnitRunner])
 class DefaultManagerFactorySpec
-extends WordSpec with ShouldMatchers with PropertyChecks {
+extends WordSpec with ShouldMatchers {
 
   "A default file system manager factory" should {
     val service = new DefaultManagerFactory
