@@ -17,11 +17,11 @@ import net.java.truecommons.io.DecoratingOutputStream;
 import net.java.truecommons.shed.HashMaps;
 import net.java.truevfs.kernel.spec.TestConfig;
 import net.java.truevfs.kernel.spec.ThrowManager;
+import net.java.truevfs.kernel.spec.cio.*;
 import static net.java.truevfs.kernel.spec.cio.Entry.ALL_ACCESS;
 import static net.java.truevfs.kernel.spec.cio.Entry.ALL_SIZES;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
 import net.java.truevfs.kernel.spec.cio.Entry.Size;
-import net.java.truevfs.kernel.spec.cio.*;
 
 /**
  * @author Christian Schlichtherle
