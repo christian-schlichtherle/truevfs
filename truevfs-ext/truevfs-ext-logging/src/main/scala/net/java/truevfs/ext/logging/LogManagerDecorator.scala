@@ -14,7 +14,7 @@ import net.java.truevfs.kernel.spec.spi._
 final class LogManagerDecorator extends FsManagerDecorator with Immutable {
 
   override def apply(manager: FsManager): FsManager =
-    LogMediator.instrument(manager)
+    LogMediator instrument manager
 
   /** Returns -100. */
   override def getPriority = -100
