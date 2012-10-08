@@ -155,7 +155,7 @@ extends ArchiveController[E] {
         } catch {
           case ex: FsSyncWarningException =>
             ex.getCause match {
-              case _: FsOpenIoResourceException if (modified get FORCE_CLOSE_IO) =>
+              case _: FsOpenResourceException if (modified get FORCE_CLOSE_IO) =>
                 // This exception was thrown by the resource controller in
                 // order to indicate that the state of the virtual file system
                 // may have completely changed as a side effect of temporarily
@@ -168,7 +168,7 @@ extends ArchiveController[E] {
             }
           case ex: FsSyncException =>
             ex.getCause match {
-              case _: FsOpenIoResourceException if (modified ne options) =>
+              case _: FsOpenResourceException if (modified ne options) =>
                 // Swallow ex.
                 builder check ()
                 throw NeedsLockRetryException()
