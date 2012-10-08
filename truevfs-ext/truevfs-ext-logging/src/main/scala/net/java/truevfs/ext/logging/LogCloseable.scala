@@ -21,7 +21,7 @@ private trait LogCloseable extends Closeable with LogResource {
       log(message, origin target ())
     } catch {
       case ex: IOException =>
-        logger debug ("Couldn't resolve resource target: ", ex)
+        logger trace ("Couldn't resolve resource target: ", ex)
     }
   }
 
