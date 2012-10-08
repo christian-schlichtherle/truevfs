@@ -9,7 +9,7 @@ import net.java.truecommons.shed.Filter;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 
 /**
- * Filters {@linplain FsController file system controllers} so that the
+ * Filters {@linkplain FsController file system controllers} so that the
  * {@linkplain FsMountPoint#getHierarchicalUri() hierarchical URI}
  * of the {@linkplain FsModel#getMountPoint() mount point} of their
  * {@linkplain FsController#getModel() file system model} must match the given
