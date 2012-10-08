@@ -42,14 +42,14 @@ public interface FsControllerStream extends Stream<FsController> {
     @Override Iterator<FsController> iterator();
 
     /**
-     * Closes this stream.
-     * It is an error to call any other method once this method has terminated
-     * without an exception and any violation may result in a
-     * {@link RuntimeException}.
+     * {@inheritDoc}
      * <p>
-     * Implementations are strongly encouraged to clear their references to the
+     * Implementations should clear their references to the
      * controllers enumerated by this stream in order to support garbage
      * collection.
+     * <p>
+     * This method is idempotent, that is calling it multiple times has no
+     * visible side effect.
      */
     @Override void close();
 }
