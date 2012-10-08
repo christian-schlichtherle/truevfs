@@ -213,7 +213,7 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
 
   def input(name: String) = {
     final class Input extends AbstractInputSocket[E] {
-      lazy val socket = inputArchive.get.input(name)
+      lazy val socket = inputArchive.get input name
 
       def target() = syncOn[ClosedInputException] { socket target () }
 
