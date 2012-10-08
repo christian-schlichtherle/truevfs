@@ -4,9 +4,7 @@
  */
 package net.java.truevfs.access;
 
-import edu.umd.cs.findbugs.annotations.DefaultAnnotation;
 import java.beans.*;
-import javax.annotation.Nullable;
 
 /**
  * Provides a persistence delegate to support
@@ -14,7 +12,7 @@ import javax.annotation.Nullable;
  *
  * @author Christian Schlichtherle
  */
-@DefaultAnnotation(Nullable.class)
+@javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 public class TFileBeanInfo extends SimpleBeanInfo {
 
     // Bean descriptor//GEN-FIRST:BeanDescriptor
