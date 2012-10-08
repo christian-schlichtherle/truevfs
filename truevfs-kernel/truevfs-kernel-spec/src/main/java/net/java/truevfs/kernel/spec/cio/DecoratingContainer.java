@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.kernel.spec.cio;
 
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.util.Iterator;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
@@ -32,19 +33,17 @@ extends UniqueObject implements Container<E> {
     }
 
     @Override
-    public int size() {
-        return container.size();
-    }
+    public int size() { return container.size(); }
 
     @Override
-    public Iterator<E> iterator() {
-        return container.iterator();
-    }
+    public Iterator<E> iterator() { return container.iterator(); }
 
     @Override
-    public @CheckForNull E entry(String name) {
-        return container.entry(name);
-    }
+    public @CheckForNull E entry(String name) { return container.entry(name); }
+
+    @Override
+    @DischargesObligation
+    public void close() throws Exception { container.close(); }
 
     /**
      * Returns a string representation of this object for debugging and logging

@@ -25,13 +25,9 @@ extends DecoratingContainer<E, InputService<E>> implements InputService<E> {
     }
 
     @Override
-    public InputSocket<E> input(String name) {
-        return container.input(name);
-    }
+    public InputSocket<E> input(String name) { return container.input(name); }
 
     @Override
     @DischargesObligation
-    public void close() throws IOException {
-        container.close();
-    }
+    public void close() throws IOException { container.close(); }
 }

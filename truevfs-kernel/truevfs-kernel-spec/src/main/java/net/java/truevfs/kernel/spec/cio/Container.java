@@ -4,8 +4,9 @@
  */
 package net.java.truevfs.kernel.spec.cio;
 
-import java.util.Iterator;
+import java.util.*;
 import javax.annotation.CheckForNull;
+import net.java.truecommons.shed.*;
 
 /**
  * An iterable container for entries.
@@ -13,7 +14,7 @@ import javax.annotation.CheckForNull;
  * @param  <E> the type of the entries in this container.
  * @author Christian Schlichtherle
  */
-public interface Container<E extends Entry> extends Iterable<E> {
+public interface Container<E extends Entry> extends Stream<E> {
 
     /**
      * Returns the number of entries in this container.
@@ -23,7 +24,8 @@ public interface Container<E extends Entry> extends Iterable<E> {
     int size();
 
     /**
-     * Returns a new iterator for all entries in this container.
+     * Returns a new <em>unmodifiable</em> iterator for all entries in this
+     * container.
      * <p>
      * First, the iteration <em>must</em> be consistent: Multiple iterators
      * must iterate the same entries in the same order again unless the set
