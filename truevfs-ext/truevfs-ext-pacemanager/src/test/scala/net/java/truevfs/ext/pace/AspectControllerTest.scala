@@ -22,112 +22,112 @@ class AspectControllerTest extends WordSpec with ShouldMatchers with MockitoSuga
   def calling = afterWord("calling")
 
   "An AspectController" should {
-    val back = mock[FsController]
-    when(back.getModel) thenReturn mock[FsModel]
-    val front = spy(new TestController(back))
+    val delegate = mock[FsController]
+    when(delegate.getModel) thenReturn mock[FsModel]
+    val controller = spy(new TestController(delegate))
 
     "apply its aspect" when calling {
 
       "node(**)" in {
-        front node (null, null)
-        verify(front) apply any()
-        verify(back) node (null, null)
+        controller node (null, null)
+        verify(controller) apply any()
+        verify(delegate) node (null, null)
       }
 
       "checkAccess(**)" in {
-        front checkAccess (null, null, null)
-        verify(front) apply any()
-        verify(back) checkAccess (null, null, null)
+        controller checkAccess (null, null, null)
+        verify(controller) apply any()
+        verify(delegate) checkAccess (null, null, null)
       }
 
       "setReadOnly(*)" in {
-        front setReadOnly null
-        verify(front) apply any()
-        verify(back) setReadOnly null
+        controller setReadOnly null
+        verify(controller) apply any()
+        verify(delegate) setReadOnly null
       }
 
       "setTime(*, *, *)" in {
-        front setTime (null, null, null)
-        verify(front) apply any()
-        verify(back) setTime (null, null, null)
+        controller setTime (null, null, null)
+        verify(controller) apply any()
+        verify(delegate) setTime (null, null, null)
       }
 
       "setTime(*, *, *, *)" in {
-        front setTime (null, null, null, 0)
-        verify(front) apply any()
-        verify(back) setTime (null, null, null, 0)
+        controller setTime (null, null, null, 0)
+        verify(controller) apply any()
+        verify(delegate) setTime (null, null, null, 0)
       }
 
       "input(**)" when calling {
-        val backSocket = mock[InputSocket[Entry]]
-        when((back input(null, null)).asInstanceOf[InputSocket[Entry]])
-        .thenReturn(backSocket)
+        val delegateSocket = mock[InputSocket[Entry]]
+        when((delegate input(null, null)).asInstanceOf[InputSocket[Entry]])
+        .thenReturn(delegateSocket)
 
-        val frontSocket = front input (null, null)
-        verify(back) input (null, null)
+        val socket = controller input (null, null)
+        verify(delegate) input (null, null)
 
         "target()" in {
-          frontSocket target ()
-          verify(front) apply any()
-          verify(backSocket) target ()
+          socket target ()
+          verify(controller) apply any()
+          verify(delegateSocket) target ()
         }
 
         "stream(*)" in {
-          frontSocket stream (null)
-          verify(front) apply any()
-          verify(backSocket) stream (null)
+          socket stream (null)
+          verify(controller) apply any()
+          verify(delegateSocket) stream (null)
         }
 
         "channel(*)" in {
-          frontSocket channel (null)
-          verify(front) apply any()
-          verify(backSocket) channel (null)
+          socket channel (null)
+          verify(controller) apply any()
+          verify(delegateSocket) channel (null)
         }
       }
 
       "output(**)" when calling {
-        val backSocket = mock[OutputSocket[Entry]]
-        when((back output (null, null, null)).asInstanceOf[OutputSocket[Entry]])
-        .thenReturn(backSocket)
+        val delegateSocket = mock[OutputSocket[Entry]]
+        when((delegate output (null, null, null)).asInstanceOf[OutputSocket[Entry]])
+        .thenReturn(delegateSocket)
 
-        val frontSocket = front output (null, null, null)
-        verify(back) output (null, null, null)
+        val socket = controller output (null, null, null)
+        verify(delegate) output (null, null, null)
 
         "target()" in {
-          frontSocket target ()
-          verify(front) apply any()
-          verify(backSocket) target ()
+          socket target ()
+          verify(controller) apply any()
+          verify(delegateSocket) target ()
         }
 
         "stream(*)" in {
-          frontSocket stream (null)
-          verify(front) apply any()
-          verify(backSocket) stream (null)
+          socket stream (null)
+          verify(controller) apply any()
+          verify(delegateSocket) stream (null)
         }
 
         "channel(*)" in {
-          frontSocket channel (null)
-          verify(front) apply any()
-          verify(backSocket) channel (null)
+          socket channel (null)
+          verify(controller) apply any()
+          verify(delegateSocket) channel (null)
         }
       }
 
       "make(**)" in {
-        front make (null, null, null, null)
-        verify(front) apply any()
-        verify(back) make (null, null, null, null)
+        controller make (null, null, null, null)
+        verify(controller) apply any()
+        verify(delegate) make (null, null, null, null)
       }
 
       "unlink(**)" in {
-        front unlink (null, null)
-        verify(front) apply any()
-        verify(back) unlink (null, null)
+        controller unlink (null, null)
+        verify(controller) apply any()
+        verify(delegate) unlink (null, null)
       }
 
       "sync(*)" in {
-        front sync (null)
-        verify(front) apply any()
-        verify(back) sync null
+        controller sync (null)
+        verify(controller) apply any()
+        verify(delegate) sync null
       }
     }
   }
