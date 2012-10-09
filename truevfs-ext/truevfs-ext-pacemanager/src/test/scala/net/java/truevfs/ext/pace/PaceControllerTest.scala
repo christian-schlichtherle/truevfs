@@ -22,38 +22,38 @@ class PaceControllerTest extends WordSpec with ShouldMatchers with MockitoSugar 
 
   "A PaceController" when {
     val manager = mock[PaceManager]
-    val back = mock[FsController]
-    when(back.getModel) thenReturn mock[FsModel]
-    val front = spy(new PaceController(manager, back))
+    val delegate = mock[FsController]
+    when(delegate.getModel) thenReturn mock[FsModel]
+    val controller = spy(new PaceController(manager, delegate))
 
     "apply()ing its aspect" should {
       "call only PaceManager.retain(*) if the operation fails" in {
         intercept[ControlFlowException] {
-          front apply (() => throw new ControlFlowException)
+          controller apply (() => throw new ControlFlowException)
         }
-        verify(manager) retain back
+        verify(manager) retain delegate
         verifyNoMoreInteractions(manager)
       }
 
       "call only PaceManager.retain(*) and .accessed(*) if the operation succeeded" in {
         val result = new AnyRef
-        front apply (() => result) should be theSameInstanceAs (result)
-        verify(manager) retain back
-        verify(manager) accessed back
+        controller apply (() => result) should be theSameInstanceAs (result)
+        verify(manager) retain delegate
+        verify(manager) accessed delegate
         verifyNoMoreInteractions(manager)
       }
     }
 
     "calling sync(*)" should {
       "not apply() its aspect" in {
-        front sync null
-        verify(front, never()) apply any()
+        controller sync null
+        verify(controller, never()) apply any()
         ()
       }
 
       "forward the call to the decorated controller" in {
-        front sync null
-        verify(back) sync null
+        controller sync null
+        verify(delegate) sync null
       }
     }
   }
