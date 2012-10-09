@@ -47,6 +47,7 @@ import java.io.IOException;
  * @author Christian Schlichtherle
  */
 public interface IoSocket<E extends Entry> {
+
     /**
      * Resolves the <i>target</i> for I/O operations.
      * <p>
