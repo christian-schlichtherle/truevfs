@@ -22,113 +22,112 @@ class AspectControllerTest extends WordSpec with ShouldMatchers with MockitoSuga
   def calling = afterWord("calling")
 
   "An AspectController" should {
-    val model = mock[FsModel]
     val back = mock[FsController]
-    when(back.getModel) thenReturn model
+    when(back.getModel) thenReturn mock[FsModel]
     val front = spy(new TestController(back))
 
     "apply its aspect" when calling {
 
       "node(**)" in {
-        front.node(null, null)
-        verify(front).apply(any())
-        verify(back).node(null, null)
+        front node (null, null)
+        verify(front) apply any()
+        verify(back) node (null, null)
       }
 
       "checkAccess(**)" in {
-        front.checkAccess(null, null, null)
-        verify(front).apply(any())
-        verify(back).checkAccess(null, null, null)
+        front checkAccess (null, null, null)
+        verify(front) apply any()
+        verify(back) checkAccess (null, null, null)
       }
 
       "setReadOnly(*)" in {
-        front.setReadOnly(null)
-        verify(front).apply(any())
-        verify(back).setReadOnly(null)
+        front setReadOnly null
+        verify(front) apply any()
+        verify(back) setReadOnly null
       }
 
       "setTime(*, *, *)" in {
-        front.setTime(null, null, null)
-        verify(front).apply(any())
-        verify(back).setTime(null, null, null)
+        front setTime (null, null, null)
+        verify(front) apply any()
+        verify(back) setTime (null, null, null)
       }
 
       "setTime(*, *, *, *)" in {
-        front.setTime(null, null, null, 0)
-        verify(front).apply(any())
-        verify(back).setTime(null, null, null, 0)
+        front setTime (null, null, null, 0)
+        verify(front) apply any()
+        verify(back) setTime (null, null, null, 0)
       }
 
       "input(**)" when calling {
         val backSocket = mock[InputSocket[Entry]]
-        when(back.input(null, null).asInstanceOf[InputSocket[Entry]])
+        when((back input(null, null)).asInstanceOf[InputSocket[Entry]])
         .thenReturn(backSocket)
 
-        val frontSocket = front.input(null, null)
-        verify(back).input(null, null)
+        val frontSocket = front input (null, null)
+        verify(back) input (null, null)
 
         "target()" in {
           frontSocket target ()
-          verify(front).apply(any())
+          verify(front) apply any()
           verify(backSocket) target ()
         }
 
         "stream(*)" in {
           frontSocket stream (null)
-          verify(front).apply(any())
+          verify(front) apply any()
           verify(backSocket) stream (null)
         }
 
         "channel(*)" in {
           frontSocket channel (null)
-          verify(front).apply(any())
+          verify(front) apply any()
           verify(backSocket) channel (null)
         }
       }
 
       "output(**)" when calling {
         val backSocket = mock[OutputSocket[Entry]]
-        when(back.output(null, null, null).asInstanceOf[OutputSocket[Entry]])
+        when((back output (null, null, null)).asInstanceOf[OutputSocket[Entry]])
         .thenReturn(backSocket)
 
-        val frontSocket = front.output(null, null, null)
-        verify(back).output(null, null, null)
+        val frontSocket = front output (null, null, null)
+        verify(back) output (null, null, null)
 
         "target()" in {
           frontSocket target ()
-          verify(front).apply(any())
+          verify(front) apply any()
           verify(backSocket) target ()
         }
 
         "stream(*)" in {
           frontSocket stream (null)
-          verify(front).apply(any())
+          verify(front) apply any()
           verify(backSocket) stream (null)
         }
 
         "channel(*)" in {
           frontSocket channel (null)
-          verify(front).apply(any())
+          verify(front) apply any()
           verify(backSocket) channel (null)
         }
       }
 
       "make(**)" in {
-        front.make(null, null, null, null)
-        verify(front).apply(any())
-        verify(back).make(null, null, null, null)
+        front make (null, null, null, null)
+        verify(front) apply any()
+        verify(back) make (null, null, null, null)
       }
 
       "unlink(**)" in {
-        front.unlink(null, null)
-        verify(front).apply(any())
-        verify(back).unlink(null, null)
+        front unlink (null, null)
+        verify(front) apply any()
+        verify(back) unlink (null, null)
       }
 
       "sync(*)" in {
-        front.sync(null)
-        verify(front).apply(any())
-        verify(back).sync(null)
+        front sync (null)
+        verify(front) apply any()
+        verify(back) sync null
       }
     }
   }
