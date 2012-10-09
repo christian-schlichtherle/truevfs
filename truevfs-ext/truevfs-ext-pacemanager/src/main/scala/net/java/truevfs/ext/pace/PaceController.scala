@@ -20,9 +20,9 @@ import net.java.truevfs.kernel.spec._
 private final class PaceController(manager: PaceManager, controller: FsController)
 extends AspectController(controller) {
 
-  override def apply[V](operation: => V) = {
+  override def apply[V](operation: () => V) = {
     manager retain controller
-    val result = operation
+    val result = operation()
     manager accessed controller
     result
   }
