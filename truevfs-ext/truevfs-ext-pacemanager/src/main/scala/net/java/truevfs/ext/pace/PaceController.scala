@@ -17,7 +17,7 @@ import net.java.truevfs.kernel.spec._
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private final class PaceController(manager: PaceManager, controller: FsController)
+private class PaceController(manager: PaceManager, controller: FsController)
 extends AspectController(controller) {
 
   override def apply[V](operation: () => V) = {

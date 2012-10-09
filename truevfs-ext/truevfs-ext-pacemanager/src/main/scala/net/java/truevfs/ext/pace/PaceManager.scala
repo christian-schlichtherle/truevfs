@@ -24,7 +24,7 @@ import PaceManager._
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-private final class PaceManager(mediator: PaceMediator, manager: FsManager)
+private class PaceManager(mediator: PaceMediator, manager: FsManager)
 extends JmxManager[PaceMediator](mediator, manager) {
 
   private[this] val evicted = new ConcurrentLinkedQueue[FsController]
