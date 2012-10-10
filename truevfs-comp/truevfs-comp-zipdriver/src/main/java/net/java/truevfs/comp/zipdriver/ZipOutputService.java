@@ -13,7 +13,6 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
@@ -25,16 +24,17 @@ import net.java.truecommons.io.Streams;
 import net.java.truecommons.shed.CompoundIterator;
 import net.java.truecommons.shed.SuppressedExceptionBuilder;
 import net.java.truevfs.comp.zip.AbstractZipOutputStream;
+import net.java.truevfs.comp.zip.Crc32OutputStream;
 import net.java.truevfs.comp.zip.ZipCryptoParameters;
 import static net.java.truevfs.comp.zip.ZipEntry.STORED;
 import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsOutputSocketSink;
+import net.java.truevfs.kernel.spec.cio.*;
 import net.java.truevfs.kernel.spec.cio.Entry.Access;
 import net.java.truevfs.kernel.spec.cio.Entry.Size;
 import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.java.truevfs.kernel.spec.cio.*;
 
 /**
  * An output service for writing ZIP files.
@@ -335,9 +335,7 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
             this.local = local;
             final IoBuffer buffer = this.buffer = getPool().allocate();
             try {
-                this.out = new CheckedOutputStream(
-                        buffer.output().stream(null),
-                        new CRC32());
+                this.out = new Crc32OutputStream(buffer.output().stream(null));
             } catch (final Throwable ex) {
                 try {
                     buffer.release();
