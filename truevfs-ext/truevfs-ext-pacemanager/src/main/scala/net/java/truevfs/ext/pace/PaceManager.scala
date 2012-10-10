@@ -46,7 +46,6 @@ extends JmxManager[PaceMediator](mediator, manager) {
   def retain(controller: FsController) {
     val it = evicted.iterator
     if (!it.hasNext) return
-    //val manager = FsManagerLocator.SINGLETON.get
     val mp = controller.getModel.getMountPoint
     while (it.hasNext) {
       val ec = it.next
