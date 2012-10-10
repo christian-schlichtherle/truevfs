@@ -5,6 +5,7 @@
 package net.java.truevfs.comp.jmx;
 
 import javax.annotation.concurrent.ThreadSafe;
+import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.Mediator;
 
 /**
@@ -35,5 +36,13 @@ extends Mediator<This> {
     protected final <C extends JmxColleague> C start(C colleague) {
         colleague.start();
         return colleague;
+    }
+
+    public boolean register(ObjectName name, Object mbean) {
+        return JmxUtils.register(name, mbean);
+    }
+
+    public boolean deregister(ObjectName name) {
+        return JmxUtils.deregister(name);
     }
 }

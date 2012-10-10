@@ -7,8 +7,6 @@ package net.java.truevfs.comp.jmx;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.InstrumentingModel;
-import static net.java.truevfs.comp.jmx.JmxUtils.deregister;
-import static net.java.truevfs.comp.jmx.JmxUtils.register;
 import net.java.truevfs.kernel.spec.FsModel;
 
 /**
@@ -45,8 +43,8 @@ extends InstrumentingModel<M> implements JmxColleague {
         try {
             model.setMounted(mounted);
         } finally {
-            if (mounted) register(name, newView());
-            else deregister(name);
+            if (mounted) mediator.register(name, newView());
+            else mediator.deregister(name);
         }
     }
 }

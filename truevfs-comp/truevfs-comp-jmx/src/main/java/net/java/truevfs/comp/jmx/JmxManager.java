@@ -7,7 +7,6 @@ package net.java.truevfs.comp.jmx;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.InstrumentingManager;
-import static net.java.truevfs.comp.jmx.JmxUtils.register;
 import net.java.truevfs.kernel.spec.FsManager;
 
 /**
@@ -31,5 +30,5 @@ extends InstrumentingManager<M> implements JmxColleague {
     protected Object newView() { return new JmxManagerView<>(manager); }
 
     @Override
-    public void start() { register(getObjectName(), newView()); }
+    public void start() { mediator.register(getObjectName(), newView()); }
 }
