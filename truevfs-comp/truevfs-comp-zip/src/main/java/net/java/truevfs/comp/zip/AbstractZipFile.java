@@ -4,13 +4,6 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truecommons.io.PowerBuffer;
-import net.java.truecommons.io.Source;
-import net.java.truecommons.io.BufferedReadOnlyChannel;
-import net.java.truecommons.io.ChannelInputStream;
-import net.java.truecommons.io.ReadOnlyChannel;
-import net.java.truecommons.io.IntervalReadOnlyChannel;
-import net.java.truecommons.shed.HashMaps;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
@@ -30,6 +23,13 @@ import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.io.BufferedReadOnlyChannel;
+import net.java.truecommons.io.ChannelInputStream;
+import net.java.truecommons.io.IntervalReadOnlyChannel;
+import net.java.truecommons.io.PowerBuffer;
+import net.java.truecommons.io.ReadOnlyChannel;
+import net.java.truecommons.io.Source;
+import net.java.truecommons.shed.HashMaps;
 import static net.java.truevfs.comp.zip.Constants.*;
 import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
 import static net.java.truevfs.comp.zip.WinZipAesEntryExtraField.VV_AE_2;
@@ -614,8 +614,7 @@ implements Closeable, Iterable<E> {
                             throw new AssertionError();
                     }
                 }
-                if (null != field)
-                    pos += overhead(field.getKeyStrength());
+                if (null != field) pos += overhead(field.getKeyStrength());
                 entry.setRawCompressedSize(pos - start);
 
                 // We have reconstituted all meta data for the entry.
@@ -1014,8 +1013,7 @@ implements Closeable, Iterable<E> {
                             + method
                             + " is not supported)");
             }
-            if (check)
-                in = new Crc32InputStream(in, entry, bufSize);
+            if (check) in = new Crc32InputStream(in, bufSize, entry);
             return in;
         } catch (final Throwable ex) {
             try {
@@ -1046,7 +1044,7 @@ implements Closeable, Iterable<E> {
 
     /**
      * Closes the file.
-     * This closes any allocate input streams reading from this ZIP file.
+     * This closes any allocated input streams reading from this ZIP file.
      *
      * @throws IOException if an error occurs closing the file.
      */
@@ -1054,10 +1052,10 @@ implements Closeable, Iterable<E> {
     @DischargesObligation
     public void close() throws IOException {
         final SeekableByteChannel channel = this.channel;
-        if (null == channel)
-            return;
-        channel.close();
-        this.channel = null;
+        if (null != channel) {
+            channel.close();
+            this.channel = null;
+        }
     }
 
     /**
