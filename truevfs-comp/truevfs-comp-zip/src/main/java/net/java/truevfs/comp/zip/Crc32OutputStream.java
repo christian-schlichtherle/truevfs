@@ -12,8 +12,6 @@ import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * An output stream which updates a CRC-32 checksum.
- * <p>
- * Implementations cannot be thread-safe.
  *
  * @author Christian Schlichtherle
  */
