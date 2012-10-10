@@ -16,8 +16,8 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class Crc32OutputStream extends CheckedOutputStream {
-    public Crc32OutputStream(@CheckForNull OutputStream out) {
+final class Crc32OutputStream extends CheckedOutputStream {
+    Crc32OutputStream(@CheckForNull OutputStream out) {
         super(out, new CRC32());
     }
 }

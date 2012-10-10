@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
@@ -24,7 +25,6 @@ import net.java.truecommons.io.Streams;
 import net.java.truecommons.shed.CompoundIterator;
 import net.java.truecommons.shed.SuppressedExceptionBuilder;
 import net.java.truevfs.comp.zip.AbstractZipOutputStream;
-import net.java.truevfs.comp.zip.Crc32OutputStream;
 import net.java.truevfs.comp.zip.ZipCryptoParameters;
 import static net.java.truevfs.comp.zip.ZipEntry.STORED;
 import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
@@ -335,7 +335,8 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
             this.local = local;
             final IoBuffer buffer = this.buffer = getPool().allocate();
             try {
-                this.out = new Crc32OutputStream(buffer.output().stream(null));
+                this.out = new CheckedOutputStream(
+                        buffer.output().stream(null), new CRC32());
             } catch (final Throwable ex) {
                 try {
                     buffer.release();
