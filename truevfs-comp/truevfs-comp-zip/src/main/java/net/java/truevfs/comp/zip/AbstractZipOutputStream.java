@@ -4,10 +4,6 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truecommons.io.DecoratingOutputStream;
-import net.java.truecommons.io.LittleEndianOutputStream;
-import net.java.truecommons.io.Sink;
-import net.java.truecommons.shed.HashMaps;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -23,6 +19,10 @@ import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.io.DecoratingOutputStream;
+import net.java.truecommons.io.LittleEndianOutputStream;
+import net.java.truecommons.io.Sink;
+import net.java.truecommons.shed.HashMaps;
 import static net.java.truevfs.comp.zip.Constants.*;
 import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
 import static net.java.truevfs.comp.zip.WinZipAesEntryExtraField.VV_AE_1;
