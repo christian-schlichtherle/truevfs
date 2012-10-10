@@ -44,12 +44,12 @@ extends JmxManager[PaceMediator](mediator, manager) {
    *                    for subsequent access.
    */
   def retain(controller: FsController) {
-    val i = evicted.iterator
-    if (!i.hasNext) return
+    val it = evicted.iterator
+    if (!it.hasNext) return
     //val manager = FsManagerLocator.SINGLETON.get
     val mp = controller.getModel.getMountPoint
-    while (i.hasNext) {
-      val ec = i.next
+    while (it.hasNext) {
+      val ec = it.next
       val emp = ec.getModel.getMountPoint
       val filter = new FsControllerFilter(emp)
       def sync(): Boolean = {
@@ -57,7 +57,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
           for (fc <- stream.asScala) {
             val fmp = fc.getModel.getMountPoint
             if (mp == fmp || (mounted contains fmp)) {
-              if (emp == fmp || (mounted contains emp)) i remove ()
+              if (emp == fmp || (mounted contains emp)) it remove ()
               return false
             }
           }
@@ -67,14 +67,14 @@ extends JmxManager[PaceMediator](mediator, manager) {
       if (sync()) {
         try {
           manager sync (FsSyncOptions.NONE, filter)
-          i remove ()
+          it remove ()
         } catch {
           case ex: FsSyncException =>
             ex.getCause match {
               case ex2: FsOpenResourceException =>
                 logger debug ("ignoring", ex)
               case ex2 =>
-                i remove ()
+                it remove ()
                 throw ex;
             }
         }
