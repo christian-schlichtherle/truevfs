@@ -319,7 +319,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
         try {
             zis.recoverLostEntries();
         } catch (final IOException ex) {
-            logger.warn("junkInTheTrunk.warning", 
+            logger.warn("junkInTheTrunk.warn", 
                 mountPointUri(model),
                 zis.getPostambleLength());
             logger.debug("junkInTheTrunk.debug", ex);
