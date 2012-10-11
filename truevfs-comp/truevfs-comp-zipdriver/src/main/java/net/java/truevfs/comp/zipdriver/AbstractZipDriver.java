@@ -322,7 +322,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
             logger.warn("junkInTheTrunk.warn", 
                 mountPointUri(model),
                 zis.getPostambleLength());
-            logger.debug("junkInTheTrunk.debug", ex);
+            logger.trace("junkInTheTrunk.trace", ex);
         }
         return zis;
     }
