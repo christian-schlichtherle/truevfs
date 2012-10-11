@@ -1012,12 +1012,15 @@ implements Iterable<E> {
 
         @Override
         public void finish() throws IOException {
-            this.out.finish();
             final Deflater deflater = this.out.getDeflater();
-            final ZipEntry entry = this.entry;
-            //entry.setRawCompressedSize(deflater.getBytesWritten());
-            entry.setRawSize(deflater.getBytesRead());
-            deflater.end();
+            try {
+                this.out.finish();
+                final ZipEntry entry = this.entry;
+                //entry.setRawCompressedSize(deflater.getBytesWritten());
+                entry.setRawSize(deflater.getBytesRead());
+            } finally {
+                deflater.end();
+            }
             this.method.finish();
         }
     } // DeflaterOutputMethod
