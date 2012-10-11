@@ -7,7 +7,6 @@ package net.java.truevfs.comp.zip;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.Deflater;
-import static java.util.zip.Deflater.DEFAULT_COMPRESSION;
 import java.util.zip.DeflaterOutputStream;
 
 /**
@@ -19,8 +18,7 @@ import java.util.zip.DeflaterOutputStream;
 final class ZipDeflaterOutputStream extends DeflaterOutputStream {
 
     ZipDeflaterOutputStream(OutputStream out, int level, int size) {
-        super(out, new Deflater(DEFAULT_COMPRESSION, true), size);
-        def.setLevel(level);
+        super(out, new Deflater(level, true), size);
     }
 
     Deflater getDeflater() {
