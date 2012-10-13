@@ -46,7 +46,9 @@ extends JmxManager[PaceMediator](mediator, manager) {
   def postAccess(ac: FsController) {
     if (ac.getModel.isMounted) mounted add ac
     val it = evicted.iterator
-    while (it.hasNext) {
+    if (!it.hasNext) return
+    val builder = new FsSyncExceptionBuilder
+    do {
       val ec = it.next // evicted controller
       val emp = ec.getModel.getMountPoint // evicted mount point
       val ef = new FsControllerFilter(emp) // evicted filter
@@ -58,16 +60,26 @@ extends JmxManager[PaceMediator](mediator, manager) {
           case ex: FsSyncException =>
             ex.getCause match {
               case _: FsOpenResourceException =>
+                // Do NOT remove evicted controller - the sync shall get
+                // retried at the call to this method!
+                //it remove ()
+
+                // This is pretty much a normal situation, so just log the
+                // exception at the TRACE level.
                 logger trace ("ignoring", ex)
               case _ =>
                 // Prevent retrying this operation - it would most likely yield
                 // the same result.
                 it remove ()
-                throw ex;
+
+                // Mark the exception for subsequent rethrowing at the end of
+                // this method.
+                builder warn ex
             }
         }
       }
-    }
+    } while (it.hasNext)
+    builder check ()
   }
 
   override def sync(options: BitField[FsSyncOption], filter: Filter[_ >: FsController]) {
