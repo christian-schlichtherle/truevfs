@@ -6,6 +6,7 @@ package net.java.truevfs.ext.pace
 
 import collection.JavaConverters._
 import java.net._
+import net.java.truecommons.shed._
 import net.java.truecommons.shed.Filter
 import net.java.truevfs.kernel.spec._
 import org.junit.runner._
@@ -62,48 +63,63 @@ extends WordSpec
       }
       delegate.controllers = controllers.values
       manager sync (FsSyncOptions.SYNC, Filter.ACCEPT_ANY)
+
       val actions = {
-        val none = Set.empty[String]
-        Table(
-          ("access", "sync"),
-          ("p:/", Set("a:p:/1!/", "a:a:p:/1!/a!/", "a:a:p:/1!/b!/", "a:a:p:/1!/c!/", "a:p:/2!/", "a:a:p:/2!/a!/", "a:a:p:/2!/b!/", "a:a:p:/2!/c!/", "a:a:p:/3!/a!/")),
-          ("a:p:/1!/", Set("a:a:p:/3!/b!/")),
-          ("a:a:p:/1!/a!/", Set("a:p:/3!/", "a:a:p:/3!/a!/", "a:a:p:/3!/b!/", "a:a:p:/3!/c!/")),
-          ("a:a:p:/1!/b!/", none),
-          ("a:a:p:/1!/c!/", Set("a:a:p:/1!/a!/")),
-          ("a:p:/2!/", Set("a:a:p:/1!/b!/")),
-          ("a:a:p:/2!/a!/", Set("a:p:/1!/", "a:a:p:/1!/a!/", "a:a:p:/1!/b!/", "a:a:p:/1!/c!/")),
-          ("a:a:p:/2!/b!/", none),
-          ("a:a:p:/2!/c!/", Set("a:a:p:/2!/a!/")),
-          ("a:p:/3!/", Set("a:a:p:/2!/b!/")),
-          ("a:a:p:/3!/a!/", Set("a:p:/2!/", "a:a:p:/2!/a!/", "a:a:p:/2!/b!/", "a:a:p:/2!/c!/")),
-          ("a:a:p:/3!/b!/", none),
-          ("a:a:p:/3!/c!/", Set("a:a:p:/3!/a!/")),
+        Table[String, Expectation](
+          ("access", "expectation"),
+          ("p:/", Synced("a:p:/1!/", "a:a:p:/1!/a!/", "a:a:p:/1!/b!/", "a:a:p:/1!/c!/", "a:p:/2!/", "a:a:p:/2!/a!/", "a:a:p:/2!/b!/", "a:a:p:/2!/c!/", "a:a:p:/3!/a!/")),
+          ("a:p:/1!/", Synced("a:a:p:/3!/b!/")),
+          ("a:a:p:/1!/a!/", Synced("a:p:/3!/", "a:a:p:/3!/a!/", "a:a:p:/3!/b!/", "a:a:p:/3!/c!/")),
+          ("a:a:p:/1!/b!/", Synced()),
+          ("a:a:p:/1!/c!/", Synced("a:a:p:/1!/a!/")),
+          ("a:p:/2!/", Synced("a:a:p:/1!/b!/")),
+          ("a:a:p:/2!/a!/", Synced("a:p:/1!/", "a:a:p:/1!/a!/", "a:a:p:/1!/b!/", "a:a:p:/1!/c!/")),
+          ("a:a:p:/2!/b!/", Synced()),
+          ("a:a:p:/2!/c!/", Synced("a:a:p:/2!/a!/")),
+          ("a:p:/3!/", Synced("a:a:p:/2!/b!/")),
+          ("a:a:p:/3!/a!/", Synced("a:p:/2!/", "a:a:p:/2!/a!/", "a:a:p:/2!/b!/", "a:a:p:/2!/c!/")),
+          ("a:a:p:/3!/b!/", Synced()),
+          ("a:a:p:/3!/c!/", Synced("a:a:p:/3!/a!/")),
           
           // Test obeying to access order, not insertion-order!
-          ("a:a:p:/3!/b!/", none),
-          ("a:a:p:/3!/a!/", Set("a:a:p:/3!/c!/"))
+          ("a:a:p:/3!/b!/", Synced()),
+          ("a:a:p:/3!/a!/", Shelved("a:a:p:/3!/c!/")),
+          ("a:a:p:/3!/a!/", Discarded("a:a:p:/3!/c!/")),
+          ("a:a:p:/3!/a!/", Synced())
         )
       }
-      forAll(actions) { (access, sync) =>
-        // Stub controllers.
-        controllers.values foreach { controller =>
+      forAll(actions) { (access, expectation) =>
+        // Reset controllers and stub their behavior according to the expected
+        // result.
+        controllers.values foreach
+        { controller =>
           val model = controller.getModel // backup
           reset(controller)
           when(controller.getModel) thenReturn model
         }
+        controllers.values filter expectation foreach (expectation stub _)
 
         // Register access to the controller as if some file system operation
         // had been successfully completed.
-        manager postAccess controllers(access)
+        expectation match {
+          case Synced(_*) | Shelved(_*) => 
+            manager postAccess controllers(access)
 
-        // Verify sync()ing of managed controllers.
-        forAll(Table(("mountPoint", "controller"), controllers.toSeq: _*)) {
-          (mountPoint, controller) =>
-          if (sync contains mountPoint)
+          case Discarded(_*) =>
+            intercept[FsSyncException] {
+              manager postAccess controllers(access)
+            }
+        }
+
+        // Verify sync() attempts on managed controllers.
+        forAll(Table(("mountPoint", "controller"), controllers.toSeq: _*))
+        { (mountPoint, controller) =>
+          if (expectation contains mountPoint)
             verify(controller, atLeastOnce()) sync FsSyncOptions.NONE
           else
             verify(controller, never()) sync any()
+          verify(controller, atLeast(0)).getModel
+          verifyNoMoreInteractions(controller)
         }
       }
     }
@@ -139,6 +155,36 @@ object PaceManagerTest {
         override def iterator = filtered.iterator.asJava
         override def close() { filtered = null }
       }
+    }
+  }
+
+  private sealed abstract class Expectation(mountPoints: String*)
+  extends Function[FsController, Boolean] {
+    private[this] val set = mountPoints.toSet
+    def contains(mountPoint: String) = set contains mountPoint
+    override def apply(controller: FsController) =
+      contains(controller.getModel.getMountPoint.toString)
+    def stub(controller: FsController)
+  }
+
+  private case class Synced(mountPoints: String*)
+  extends Expectation(mountPoints: _*) {
+    override def stub(controller: FsController) { }
+  }
+
+  private case class Shelved(mountPoints: String*)
+  extends Expectation(mountPoints: _*) {
+    override def stub(controller: FsController) {
+      doThrow(new FsSyncException(controller.getModel.getMountPoint, new FsOpenResourceException(1, 1)))
+      .when(controller) sync any()
+    }
+  }
+
+  private case class Discarded(mountPoints: String*)
+  extends Expectation(mountPoints: _*) {
+    override def stub(controller: FsController) {
+      doThrow(new FsSyncException(controller.getModel.getMountPoint, new Exception))
+      .when(controller) sync any()
     }
   }
 }
