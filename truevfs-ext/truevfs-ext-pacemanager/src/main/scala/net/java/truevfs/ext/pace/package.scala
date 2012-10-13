@@ -9,15 +9,4 @@
   *
   * @author Christian Schlichtherle
   */
-package net.java.truevfs.ext
-
-import net.java.truecommons.shed._
-import net.java.truevfs.kernel.spec._
-
-package object pace {
-
-  implicit private[pace] def function2filter(function: FsController => Boolean) =
-    new Filter[FsController] {
-      def accept(controller: FsController) = function(controller)
-    }
-}
+package net.java.truevfs.ext.pace

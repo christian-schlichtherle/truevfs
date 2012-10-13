@@ -38,42 +38,30 @@ extends JmxManager[PaceMediator](mediator, manager) {
   /**
    * Registers access to the given controller and eventually sync()s some
    * recently accessed archive files which exceed the maximum number of mounted
-   * archive files unless they are the parent of a most recently accessed
+   * archive files unless they are the parent of some most recently accessed
    * archive files.
    * 
    * @param controller the file system controller to access.
    */
-  def postAccess(controller: FsController) {
-    if (controller.getModel.isMounted) mounted add controller
+  def postAccess(ac: FsController) {
+    if (ac.getModel.isMounted) mounted add ac
     val it = evicted.iterator
-    if (!it.hasNext) return
-    val mp = controller.getModel.getMountPoint
     while (it.hasNext) {
-      val ec = it.next
-      val emp = ec.getModel.getMountPoint
-      val filter = new FsControllerFilter(emp)
-      def sync(): Boolean = {
-        loan(manager controllers filter) to { stream =>
-          for (fc <- stream.asScala) {
-            val fmp = fc.getModel.getMountPoint
-            if (mp == fmp || (mounted contains fmp)) {
-              if (emp == fmp || (mounted contains emp)) it remove ()
-              return false
-            }
-          }
-        }
-        true
-      }
-      if (sync()) {
+      val ec = it.next // evicted controller
+      val emp = ec.getModel.getMountPoint // evicted mount point
+      val ef = new FsControllerFilter(emp) // evicted filter
+      if (!(mounted exists ef)) {
         try {
-          manager sync (FsSyncOptions.NONE, filter)
+          manager sync (FsSyncOptions.NONE, ef)
           it remove ()
         } catch {
           case ex: FsSyncException =>
             ex.getCause match {
-              case ex2: FsOpenResourceException =>
-                logger debug ("ignoring", ex)
-              case ex2 =>
+              case _: FsOpenResourceException =>
+                logger trace ("ignoring", ex)
+              case _ =>
+                // Prevent retrying this operation - it would most likely yield
+                // the same result.
                 it remove ()
                 throw ex;
             }
@@ -84,8 +72,8 @@ extends JmxManager[PaceMediator](mediator, manager) {
 
   override def sync(options: BitField[FsSyncOption], filter: Filter[_ >: FsController]) {
     {
-      val i = evicted.iterator
-      while (i.hasNext) if (filter accept i.next) i remove ()
+      val it = evicted.iterator
+      while (it.hasNext) if (filter accept it.next) it remove ()
     }
     mounted sync (manager, options, filter)
   }
@@ -156,6 +144,12 @@ private object PaceManager {
         throw new IllegalArgumentException
       _max = max
     }
+
+    def exists(filter: Filter[FsController]): Boolean = {
+      val it = values.iterator
+      while (it.hasNext) if (filter accept it.next) return true
+      false
+    }
   } // MountedControllerMap
 
   private final class MountedControllerSet
@@ -169,14 +163,15 @@ private object PaceManager {
     def max = map.max
     def max_=(max: Int) { map.max = max }
 
-    def contains(key: FsMountPoint) = locked(readLock)(map containsKey key)
+    def exists(filter: Filter[FsController]) =
+      locked(readLock)(map exists filter)
 
     def add(controller: FsController) {
       val mp = controller.getModel.getMountPoint
       locked(writeLock)(map put (mp, controller))
     }
 
-    def sync(manager: FsManager, options: BitField[FsSyncOption], filter: Filter[_ >: FsController]) = {
+    def sync(manager: FsManager, options: BitField[FsSyncOption], filter: Filter[_ >: FsController]) {
       locked(writeLock) {
         try {
           manager sync (options, { controller: FsController =>
@@ -187,13 +182,10 @@ private object PaceManager {
           )
         } finally {
           loan(manager controllers filter) to { stream =>
-            for (controller <- stream.asScala;
-                 model = controller.getModel;
-                 mountPoint = model.getMountPoint)
-                   if (model.isMounted) map put (mountPoint, controller)
+            for (controller <- stream.asScala; model = controller.getModel)
+              if (model.isMounted) map put (model.getMountPoint, controller)
           }
         }
-        map.size
       }
     }
   } // MountedControllerSet
