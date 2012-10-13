@@ -36,14 +36,16 @@ extends JmxManager[PaceMediator](mediator, manager) {
   protected override def newView = new PaceManagerView(this)
 
   /**
-   * If the number of mounted archive files exceeds `maximumFileSystemsMounted`,
-   * then this method `sync`s the least recently used (LRU) archive files which
-   * exceed this value.
-   *
-   * @param  controller the controller for the file system to retain mounted
-   *                    for subsequent access.
+   * @param controller the file system controller to access.
    */
-  def retain(controller: FsController) {
+  def preAccess(controller: FsController) {
+  }
+
+  /**
+   * @param controller the file system controller to access.
+   */
+  def postAccess(controller: FsController) {
+    if (controller.getModel.isMounted) mounted add controller
     val it = evicted.iterator
     if (!it.hasNext) return
     val mp = controller.getModel.getMountPoint
@@ -79,16 +81,6 @@ extends JmxManager[PaceMediator](mediator, manager) {
         }
       }
     }
-  }
-
-  /**
-   * Registers the archive file system of the given controller as the most
-   * recently used (MRU).
-   *
-   * @param controller the controller for the most recently used file system.
-   */
-  def accessed(controller: FsController) {
-    if (controller.getModel.isMounted) mounted add controller
   }
 
   override def sync(options: BitField[FsSyncOption], filter: Filter[_ >: FsController]) {
@@ -150,7 +142,7 @@ private object PaceManager {
       def accept(controller: FsController) = function(controller)
     }
 
-  private[this] final class MountedControllerMap(evicted: ju.Collection[FsController])
+  private final class MountedControllerMap(evicted: ju.Collection[FsController])
   extends ju.LinkedHashMap[FsMountPoint, FsController](initialCapacity, 0.75f, true) {
 
     override def removeEldestEntry(entry: ju.Map.Entry[FsMountPoint, FsController]) =
@@ -198,9 +190,8 @@ private object PaceManager {
           loan(manager controllers filter) to { stream =>
             for (controller <- stream.asScala;
                  model = controller.getModel;
-                 mountPoint = model.getMountPoint) {
-              if (model.isMounted) map put (mountPoint, controller)
-            }
+                 mountPoint = model.getMountPoint)
+                   if (model.isMounted) map put (mountPoint, controller)
           }
         }
         map.size

@@ -18,7 +18,11 @@ import org.scalatest.mock._
 
 /** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])
-class PaceControllerTest extends WordSpec with ShouldMatchers with MockitoSugar with OneInstancePerTest {
+class PaceControllerTest
+extends WordSpec
+   with ShouldMatchers
+   with MockitoSugar
+   with OneInstancePerTest {
 
   "A PaceController" when {
     val manager = mock[PaceManager]
@@ -31,15 +35,15 @@ class PaceControllerTest extends WordSpec with ShouldMatchers with MockitoSugar 
         intercept[ControlFlowException] {
           controller apply (() => throw new ControlFlowException)
         }
-        verify(manager) retain delegate
+        verify(manager) preAccess delegate
         verifyNoMoreInteractions(manager)
       }
 
       "call only PaceManager.retain(*) and .accessed(*) if the operation succeeded" in {
         val result = new AnyRef
         controller apply (() => result) should be theSameInstanceAs (result)
-        verify(manager) retain delegate
-        verify(manager) accessed delegate
+        verify(manager) preAccess delegate
+        verify(manager) postAccess delegate
         verifyNoMoreInteractions(manager)
       }
     }
