@@ -78,7 +78,11 @@ extends WordSpec
           ("a:p:/3!/", Set("a:a:p:/2!/b!/")),
           ("a:a:p:/3!/a!/", Set("a:p:/2!/", "a:a:p:/2!/a!/", "a:a:p:/2!/b!/", "a:a:p:/2!/c!/")),
           ("a:a:p:/3!/b!/", none),
-          ("a:a:p:/3!/c!/", Set("a:a:p:/3!/a!/"))
+          ("a:a:p:/3!/c!/", Set("a:a:p:/3!/a!/")),
+          
+          // Test obeying to access order, not insertion-order!
+          ("a:a:p:/3!/b!/", none),
+          ("a:a:p:/3!/a!/", Set("a:a:p:/3!/c!/"))
         )
       }
       forAll(actions) { (access, sync) =>
@@ -89,12 +93,11 @@ extends WordSpec
           when(controller.getModel) thenReturn model
         }
 
-        // Perform access
-        val controller = controllers(access)
-        // (you would normally access the controller here)
-        manager postAccess controller
+        // Register access to the controller as if some file system operation
+        // had been successfully completed.
+        manager postAccess controllers(access)
 
-        // Verify behavior.
+        // Verify sync()ing of managed controllers.
         forAll(Table(("mountPoint", "controller"), controllers.toSeq: _*)) {
           (mountPoint, controller) =>
           if (sync contains mountPoint)
