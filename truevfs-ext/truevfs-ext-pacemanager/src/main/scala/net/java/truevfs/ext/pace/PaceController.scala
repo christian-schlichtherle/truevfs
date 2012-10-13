@@ -21,7 +21,6 @@ private class PaceController(manager: PaceManager, controller: FsController)
 extends AspectController(controller) {
 
   override def apply[V](operation: () => V) = {
-    manager preAccess controller
     val result = operation()
     manager postAccess controller
     result

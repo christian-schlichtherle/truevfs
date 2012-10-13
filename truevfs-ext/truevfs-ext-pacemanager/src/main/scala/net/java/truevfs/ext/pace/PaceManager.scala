@@ -36,12 +36,11 @@ extends JmxManager[PaceMediator](mediator, manager) {
   protected override def newView = new PaceManagerView(this)
 
   /**
-   * @param controller the file system controller to access.
-   */
-  def preAccess(controller: FsController) {
-  }
-
-  /**
+   * Registers access to the given controller and eventually sync()s some
+   * recently accessed archive files which exceed the maximum number of mounted
+   * archive files unless they are the parent of a most recently accessed
+   * archive files.
+   * 
    * @param controller the file system controller to access.
    */
   def postAccess(controller: FsController) {

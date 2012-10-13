@@ -91,7 +91,6 @@ extends WordSpec
 
         // Perform access
         val controller = controllers(access)
-        manager preAccess controller
         // (you would normally access the controller here)
         manager postAccess controller
 

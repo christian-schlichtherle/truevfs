@@ -35,14 +35,12 @@ extends WordSpec
         intercept[ControlFlowException] {
           controller apply (() => throw new ControlFlowException)
         }
-        verify(manager) preAccess delegate
         verifyNoMoreInteractions(manager)
       }
 
       "call only PaceManager.retain(*) and .accessed(*) if the operation succeeded" in {
         val result = new AnyRef
         controller apply (() => result) should be theSameInstanceAs (result)
-        verify(manager) preAccess delegate
         verify(manager) postAccess delegate
         verifyNoMoreInteractions(manager)
       }
