@@ -9,12 +9,12 @@ package net.java.truevfs.comp.jmx;
  * 
  * @author Christian Schlichtherle
  */
-public interface JmxColleague {
+public interface JmxComponent {
 
     /**
-     * Starts this colleague.
+     * Activates this component.
      * This hook gets called by the {@link JmxMediator} once after construction
      * of this object in order to enable it to perform startup operations.
      */
-    void start();
+    void activate();
 }

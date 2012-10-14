@@ -19,9 +19,9 @@ import net.java.truevfs.comp.jmx._
 @NotThreadSafe
 private final class I5tSeekableChannel(
   mediator: I5tMediator, @WillCloseWhenClosed channel: SeekableByteChannel
-) extends InstrumentingSeekableChannel(mediator, channel) with JmxColleague {
+) extends InstrumentingSeekableChannel(mediator, channel) with JmxComponent {
 
-  override def start() { }
+  override def activate() { }
 
   override def read(buf: ByteBuffer) = {
     val start = System.nanoTime

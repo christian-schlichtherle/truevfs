@@ -28,17 +28,17 @@ extends JmxMediator[I5tMediator] {
 
   def newStats(offset: Int): I5tStatistics
 
-  private def startStats(offset: Int) { start(newStats(offset)) }
+  private def activateStats(offset: Int) { activate(newStats(offset)) }
 
-  final def startStats(origin: JmxColleague) { startStats(0) }
+  final def activateStats(origin: JmxComponent) { activateStats(0) }
 
-  final def startAllStats(origin: JmxColleague) {
-    for (mediator <- mediators) mediator startStats origin
+  final def activateAllStats(origin: JmxComponent) {
+    for (mediator <- mediators) mediator activateStats origin
   }
 
-  def rotateStats(origin: JmxColleague) { startStats(logger rotate ()) }
+  def rotateStats(origin: JmxComponent) { activateStats(logger rotate ()) }
 
-  final def rotateAllStats(origin: JmxColleague) {
+  final def rotateAllStats(origin: JmxComponent) {
     for (mediator <- mediators) mediator rotateStats origin
   }
 
@@ -52,7 +52,7 @@ extends JmxMediator[I5tMediator] {
   final override def toString = "%s[subject=%s]".format(getClass.getName, subject)
 
   final override def instrument(subject: FsManager) =
-    start(new I5tManager(syncOperationsMediator, subject))
+    activate(new I5tManager(syncOperationsMediator, subject))
 
   final override def instrument(subject: IoBufferPool) =
     new InstrumentingBufferPool[I5tMediator](bufferIoMediator, subject)
@@ -64,10 +64,10 @@ extends JmxMediator[I5tMediator] {
     new InstrumentingController[I5tMediator](applicationIoMediator, subject)
 
   final override def instrument(origin: InstrumentingBufferPool[I5tMediator], subject: IoBuffer) =
-    start(new JmxBuffer[I5tMediator](this, subject))
+    activate(new JmxBuffer[I5tMediator](this, subject))
 
   final override def instrument(origin: InstrumentingMetaDriver[I5tMediator], subject: FsModel) =
-    start(new JmxModel[I5tMediator](this, subject))
+    activate(new JmxModel[I5tMediator](this, subject))
 
   final override def instrument(origin: InstrumentingMetaDriver[I5tMediator], subject: FsController) =
     new InstrumentingController[I5tMediator](kernelIoMediator, subject)
@@ -85,14 +85,14 @@ extends JmxMediator[I5tMediator] {
     new InstrumentingOutputSocket[I5tMediator, B](this, subject)
 
   final override def instrument[E <: Entry](origin: InstrumentingInputSocket[I5tMediator, E], subject: InputStream) =
-    start(new I5tInputStream(this, subject))
+    activate(new I5tInputStream(this, subject))
 
   final override def instrument[E <: Entry](origin: InstrumentingInputSocket[I5tMediator, E], subject: SeekableByteChannel) =
-    start(new I5tSeekableChannel(this, subject))
+    activate(new I5tSeekableChannel(this, subject))
 
   final override def instrument[E <: Entry](origin: InstrumentingOutputSocket[I5tMediator, E], subject: OutputStream) =
-    start(new I5tOutputStream(this, subject))
+    activate(new I5tOutputStream(this, subject))
 
   final override def instrument[E <: Entry](origin: InstrumentingOutputSocket[I5tMediator, E], subject: SeekableByteChannel) =
-    start(new I5tSeekableChannel(this, subject))
+    activate(new I5tSeekableChannel(this, subject))
 }

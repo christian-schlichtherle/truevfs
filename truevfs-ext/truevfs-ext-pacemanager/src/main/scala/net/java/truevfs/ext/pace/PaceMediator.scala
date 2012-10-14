@@ -17,7 +17,7 @@ import net.java.truevfs.kernel.spec._
 private class PaceMediator extends JmxMediator[PaceMediator] with Immutable {
 
   override def instrument(subject: FsManager) =
-    start(new PaceManager(this, subject))
+    activate(new PaceManager(this, subject))
 
   override def instrument(origin: InstrumentingManager[PaceMediator], subject: FsController) =
     new PaceController(origin.asInstanceOf[PaceManager], subject)

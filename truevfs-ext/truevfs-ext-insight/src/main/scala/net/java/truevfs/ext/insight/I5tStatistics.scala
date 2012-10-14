@@ -15,7 +15,8 @@ import net.java.truevfs.ext.insight.stats._
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-private abstract class I5tStatistics(mediator: I5tMediator, offset: Int) extends JmxColleague {
+private abstract class I5tStatistics(mediator: I5tMediator, offset: Int)
+extends JmxComponent {
 
   assert(0 <= offset)
 
@@ -31,7 +32,7 @@ private abstract class I5tStatistics(mediator: I5tMediator, offset: Int) extends
 
   def newView: I5tStatisticsView
 
-  override def start() { mediator register (objectName, newView) }
+  override def activate() { mediator register (objectName, newView) }
 
   override def toString =
     "%s[subject=%s, offset=%d, mediator=%s]".format(getClass.getName, subject, offset, mediator)
