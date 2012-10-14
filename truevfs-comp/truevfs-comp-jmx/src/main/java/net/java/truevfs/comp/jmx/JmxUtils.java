@@ -6,6 +6,7 @@ package net.java.truevfs.comp.jmx;
 
 import java.lang.management.ManagementFactory;
 import java.util.Set;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import javax.management.*;
 
@@ -19,7 +20,7 @@ public final class JmxUtils {
     private static final MBeanServer mbs =
             ManagementFactory.getPlatformMBeanServer();
 
-    public static boolean register(final ObjectName name, final Object mbean) {
+    public static boolean register(final @CheckForNull ObjectName name, final Object mbean) {
         try {
             mbs.registerMBean(mbean, name);
             return true;
