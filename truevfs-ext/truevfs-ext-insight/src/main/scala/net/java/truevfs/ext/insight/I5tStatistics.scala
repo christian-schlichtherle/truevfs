@@ -23,7 +23,7 @@ private abstract class I5tStatistics(mediator: I5tMediator, offset: Int) extends
   def stats = mediator stats offset
   def rotate { mediator rotateStats this }
 
-  private def getObjectName = mediator
+  private def objectName = mediator
     .nameBuilder(classOf[FsStatistics])
     .put("subject", subject)
     .put("offset", mediator.formatOffset(offset))
@@ -31,7 +31,7 @@ private abstract class I5tStatistics(mediator: I5tMediator, offset: Int) extends
 
   def newView: I5tStatisticsView
 
-  override def start { register(getObjectName, newView) }
+  override def start() { mediator register (objectName, newView) }
 
   override def toString =
     "%s[subject=%s, offset=%d, mediator=%s]".format(getClass.getName, subject, offset, mediator)
