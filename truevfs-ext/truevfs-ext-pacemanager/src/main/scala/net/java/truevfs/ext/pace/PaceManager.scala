@@ -148,12 +148,11 @@ private object PaceManager {
       if (size > max) evicted.add(entry.getValue) else false
 
     @volatile
-    private var _max = maximumFileSystemsMountedDefaultValue
+    private[this] var _max = maximumFileSystemsMountedDefaultValue
 
     def max = _max
     def max_=(max: Int) {
-      if (max < maximumFileSystemsMountedMinimumValue)
-        throw new IllegalArgumentException
+      require (max >= maximumFileSystemsMountedMinimumValue)
       _max = max
     }
 
