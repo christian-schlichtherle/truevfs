@@ -4,11 +4,11 @@
  */
 package net.java.truevfs.comp.jmx;
 
-import java.lang.management.ManagementFactory;
 import java.util.Set;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import javax.management.*;
+import net.java.truevfs.comp.jmx.sl.MBeanServerLocator;
 
 /**
  * Provides utility methods for JMX.
@@ -17,8 +17,7 @@ import javax.management.*;
  */
 @Immutable
 public final class JmxUtils {
-    private static final MBeanServer mbs =
-            ManagementFactory.getPlatformMBeanServer();
+    private static final MBeanServer mbs = MBeanServerLocator.SINGLETON.get();
 
     public static boolean register(final @CheckForNull ObjectName name, final Object mbean) {
         try {
