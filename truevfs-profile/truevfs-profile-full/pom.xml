@@ -46,7 +46,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-ext-pacemanager</artifactId>
+            <artifactId>truevfs-ext-pacemaker</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
