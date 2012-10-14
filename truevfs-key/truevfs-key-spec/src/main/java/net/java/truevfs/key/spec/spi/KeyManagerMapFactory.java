@@ -4,10 +4,10 @@
  */
 package net.java.truevfs.key.spec.spi;
 
-import net.java.truecommons.services.FactoryService;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.services.FactoryService;
 import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.sl.KeyManagerMapLocator;
 
