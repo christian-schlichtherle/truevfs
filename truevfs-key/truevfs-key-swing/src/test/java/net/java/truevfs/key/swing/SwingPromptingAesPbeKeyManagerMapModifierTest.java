@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.key.swing;
 
-import net.java.truevfs.key.swing.SwingPromptingAesPbeKeyManagerMapModifier;
 import java.util.Arrays;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
 import net.java.truevfs.key.spec.spi.KeyManagerMapModifier;
@@ -15,6 +14,7 @@ import net.java.truevfs.key.spec.spi.KeyManagerMapModifierTestSuite;
  */
 public class SwingPromptingAesPbeKeyManagerMapModifierTest
 extends KeyManagerMapModifierTestSuite {
+
     @Override
     @SuppressWarnings("unchecked")
     protected Iterable<Class<?>> getClasses() {
