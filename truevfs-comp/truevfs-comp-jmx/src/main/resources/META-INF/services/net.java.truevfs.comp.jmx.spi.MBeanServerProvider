@@ -1,1 +1,1 @@
-net.java.truevfs.comp.jmx.JmxPlatformMBeanServerContainer
+net.java.truevfs.comp.jmx.spi.MBeanServerProvider
