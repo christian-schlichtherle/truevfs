@@ -14,8 +14,8 @@ import net.java.truevfs.kernel.spec._
 private final class I5tManager(mediator: I5tMediator, manager: FsManager)
 extends JmxManager(mediator, manager) {
 
-  override def start {
-    super.start
+  override def start() {
+    super.start()
     mediator startAllStats this
   }
 

@@ -21,7 +21,7 @@ private final class I5tSeekableChannel(
   mediator: I5tMediator, @WillCloseWhenClosed channel: SeekableByteChannel
 ) extends InstrumentingSeekableChannel(mediator, channel) with JmxColleague {
 
-  override def start { }
+  override def start() { }
 
   override def read(buf: ByteBuffer) = {
     val start = System.nanoTime
