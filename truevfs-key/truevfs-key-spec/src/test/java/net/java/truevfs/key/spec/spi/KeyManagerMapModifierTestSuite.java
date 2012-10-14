@@ -4,8 +4,6 @@
  */
 package net.java.truevfs.key.spec.spi;
 
-import net.java.truevfs.key.spec.spi.KeyManagerMapFactory;
-import net.java.truevfs.key.spec.spi.KeyManagerMapModifier;
 import java.util.Map;
 import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.sl.KeyManagerMapLocator;
@@ -17,6 +15,7 @@ import org.junit.Test;
  * @author Christian Schlichtherle
  */
 public abstract class KeyManagerMapModifierTestSuite {
+
     protected abstract Iterable<Class<?>> getClasses();
     protected abstract KeyManagerMapModifier newModifier();
 
