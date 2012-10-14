@@ -71,7 +71,7 @@
              management. -->
         <!--dependency>
             <groupId>net.java.truevfs</groupId>
-            <artifactId>truevfs-ext-pacemanager</artifactId>
+            <artifactId>truevfs-ext-pacemaker</artifactId>
             <version>${truevfs.version}</version>
             <scope>runtime</scope>
         </dependency-->
