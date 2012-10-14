@@ -16,6 +16,7 @@ import net.java.truevfs.key.swing.spi.InvalidKeyFeedbackDecorator;
 @Immutable
 public final class TemporarilyDisableDefaultButtonFeedbackDecorator
 extends InvalidKeyFeedbackDecorator {
+
     @Override
     public Feedback apply(Feedback feedback) {
         return new TemporarilyDisableDefaultButtonFeedback(feedback);
@@ -23,7 +24,5 @@ extends InvalidKeyFeedbackDecorator {
 
     /** Returns -200. */
     @Override
-    public int getPriority() {
-        return -200;
-    }
+    public int getPriority() { return -200; }
 }
