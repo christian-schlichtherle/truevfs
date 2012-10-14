@@ -20,7 +20,7 @@ private final class I5tOutputStream(
   mediator: I5tMediator, @WillCloseWhenClosed out: OutputStream
 ) extends InstrumentingOutputStream(mediator, out) with JmxColleague {
 
-  override def start { }
+  override def start() { }
 
   override def write(b: Int) {
     val start = System.nanoTime
