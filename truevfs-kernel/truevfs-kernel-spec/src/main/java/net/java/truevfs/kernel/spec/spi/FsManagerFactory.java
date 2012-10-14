@@ -13,6 +13,7 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  * An abstract service for creating file system managers.
  * Factory services are subject to service location by the
  * {@link FsManagerLocator#SINGLETON}.
+ * <p>
  * If multiple factory services are locatable on the class path at run time,
  * the service with the greatest {@linkplain #getPriority() priority} gets
  * selected.

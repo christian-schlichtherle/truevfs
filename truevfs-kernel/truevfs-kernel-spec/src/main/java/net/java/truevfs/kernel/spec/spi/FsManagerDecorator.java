@@ -13,6 +13,7 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  * An abstract service for decorating file system managers.
  * Decorator services are subject to service location by the
  * {@link FsManagerLocator#SINGLETON}.
+ * <p>
  * If multiple decorator services are locatable on the class path at run time,
  * they are applied in ascending order of their
  * {@linkplain #getPriority() priority} so that the product of the decorator

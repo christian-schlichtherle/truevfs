@@ -16,6 +16,7 @@ import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
  * system drivers.
  * Modifier services are subject to service location by the
  * {@link FsDriverMapLocator#SINGLETON}.
+ * <p>
  * If multiple modifier services are locatable on the class path at run
  * time, they are applied in ascending order of their
  * {@linkplain #getPriority() priority} so that the result of the modifier

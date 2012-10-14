@@ -13,6 +13,7 @@ import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
  * An abstract service for decorating I/O buffer pools.
  * Decorator services are subject to service location by the
  * {@link IoBufferPoolLocator#SINGLETON}.
+ * <p>
  * If multiple decorator services are locatable on the class path at run time,
  * they are applied in ascending order of their
  * {@linkplain #getPriority() priority} so that the product of the decorator
