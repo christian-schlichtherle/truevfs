@@ -35,9 +35,7 @@ implements Container<Map<FsScheme, FsDriver>> {
     private FsDriverMapLocator() { }
 
     @Override
-    public Map<FsScheme, FsDriver> get() {
-        return Lazy.drivers;
-    }
+    public Map<FsScheme, FsDriver> get() { return Lazy.drivers; }
 
     /** A static data utility class used for lazy initialization. */
     private static final class Lazy {
