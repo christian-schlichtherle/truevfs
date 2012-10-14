@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.comp.jmx;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.Mediator;
@@ -38,7 +39,7 @@ extends Mediator<This> {
         return colleague;
     }
 
-    public boolean register(ObjectName name, Object mbean) {
+    public boolean register(@CheckForNull ObjectName name, Object mbean) {
         return JmxUtils.register(name, mbean);
     }
 
