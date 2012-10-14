@@ -254,7 +254,7 @@ public final class TConfig extends Resource<IllegalStateException> {
     }
 
     private void checkOpen() {
-        if (!isOpen()) throw new IllegalStateException();
+        if (!isOpen()) throw new IllegalStateException("TConfig has been close()d.");
     }
 
     /**
