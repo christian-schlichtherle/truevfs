@@ -19,7 +19,9 @@ import net.java.truevfs.comp.jmx.sl.MBeanServerLocator;
 public final class JmxUtils {
     private static final MBeanServer mbs = MBeanServerLocator.SINGLETON.get();
 
-    public static boolean register(final @CheckForNull ObjectName name, final Object mbean) {
+    public static boolean register(
+            final @CheckForNull ObjectName name,
+            final Object mbean) {
         try {
             mbs.registerMBean(mbean, name);
             return true;
@@ -41,8 +43,10 @@ public final class JmxUtils {
         }
     }
 
-    public static Set<ObjectName> query(ObjectName name) {
-        return mbs.queryNames(name, null);
+    public static Set<ObjectName> query(
+            @CheckForNull ObjectName name,
+            @CheckForNull QueryExp query) {
+        return mbs.queryNames(name, query);
     }
 
     public static <T> T proxy(ObjectName name, Class<T> type) {
