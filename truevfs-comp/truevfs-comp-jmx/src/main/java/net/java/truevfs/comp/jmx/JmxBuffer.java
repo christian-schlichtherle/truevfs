@@ -24,7 +24,7 @@ extends InstrumentingBuffer<M> implements JmxColleague {
         super(mediator, entry);
     }
 
-    private ObjectName getObjectName() {
+    private ObjectName objectName() {
         return mediator.nameBuilder(IoBuffer.class)
                 .put("name", ObjectName.quote(getName()))
                 .get();
@@ -33,14 +33,14 @@ extends InstrumentingBuffer<M> implements JmxColleague {
     protected Object newView() { return new JmxBufferView<>(entry); }
 
     @Override
-    public void start() { mediator.register(getObjectName(), newView()); }
+    public void start() { mediator.register(objectName(), newView()); }
 
     @Override
     public void release() throws IOException {
         try {
             entry.release();
         } finally {
-            mediator.deregister(getObjectName());
+            mediator.deregister(objectName());
         }
     }
 }

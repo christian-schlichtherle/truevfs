@@ -23,12 +23,12 @@ extends InstrumentingManager<M> implements JmxColleague {
         super(mediator, manager);
     }
 
-    private ObjectName getObjectName() {
+    private ObjectName objectName() {
         return mediator.nameBuilder(FsManager.class).get();
     }
 
     protected Object newView() { return new JmxManagerView<>(manager); }
 
     @Override
-    public void start() { mediator.register(getObjectName(), newView()); }
+    public void start() { mediator.register(objectName(), newView()); }
 }

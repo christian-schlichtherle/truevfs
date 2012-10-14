@@ -19,14 +19,14 @@ import net.java.truevfs.kernel.spec.FsModel;
 public class JmxModel<M extends JmxMediator<M>>
 extends InstrumentingModel<M> implements JmxColleague {
 
-    private final ObjectName name;
+    private final ObjectName objectName;
 
     public JmxModel(M mediator, FsModel model) {
         super(mediator, model);
-        this.name = getObjectName();
+        this.objectName = objectName();
     }
 
-    private ObjectName getObjectName() {
+    private ObjectName objectName() {
         return mediator.nameBuilder(FsModel.class)
                 .put("mountPoint", ObjectName.quote(
                     model.getMountPoint().getHierarchicalUri().toString()))
@@ -43,8 +43,8 @@ extends InstrumentingModel<M> implements JmxColleague {
         try {
             model.setMounted(mounted);
         } finally {
-            if (mounted) mediator.register(name, newView());
-            else mediator.deregister(name);
+            if (mounted) mediator.register(objectName, newView());
+            else mediator.deregister(objectName);
         }
     }
 }
