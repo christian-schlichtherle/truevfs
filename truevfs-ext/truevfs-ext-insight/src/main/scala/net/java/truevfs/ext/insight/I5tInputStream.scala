@@ -18,9 +18,9 @@ import net.java.truevfs.comp.jmx._
 @NotThreadSafe
 private final class I5tInputStream(
   mediator: I5tMediator, @WillCloseWhenClosed in: InputStream
-) extends InstrumentingInputStream(mediator, in) with JmxColleague {
+) extends InstrumentingInputStream(mediator, in) with JmxComponent {
 
-  override def start() { }
+  override def activate() { }
 
   override def read() = {
     val start = System.nanoTime

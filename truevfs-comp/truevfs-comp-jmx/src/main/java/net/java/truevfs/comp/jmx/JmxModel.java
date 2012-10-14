@@ -17,7 +17,7 @@ import net.java.truevfs.kernel.spec.FsModel;
  */
 @ThreadSafe
 public class JmxModel<M extends JmxMediator<M>>
-extends InstrumentingModel<M> implements JmxColleague {
+extends InstrumentingModel<M> implements JmxComponent {
 
     private final ObjectName objectName;
 
@@ -36,7 +36,7 @@ extends InstrumentingModel<M> implements JmxColleague {
     protected Object newView() { return new JmxModelView<>(model); }
 
     @Override
-    public void start() { }
+    public void activate() { }
 
     @Override
     public void setMounted(final boolean mounted) {

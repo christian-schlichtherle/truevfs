@@ -18,7 +18,7 @@ import net.java.truevfs.kernel.spec.cio.IoBuffer;
  */
 @ThreadSafe
 public class JmxBuffer<M extends JmxMediator<M>>
-extends InstrumentingBuffer<M> implements JmxColleague {
+extends InstrumentingBuffer<M> implements JmxComponent {
 
     public JmxBuffer(M mediator, IoBuffer entry) {
         super(mediator, entry);
@@ -33,7 +33,7 @@ extends InstrumentingBuffer<M> implements JmxColleague {
     protected Object newView() { return new JmxBufferView<>(entry); }
 
     @Override
-    public void start() { mediator.register(objectName(), newView()); }
+    public void activate() { mediator.register(objectName(), newView()); }
 
     @Override
     public void release() throws IOException {

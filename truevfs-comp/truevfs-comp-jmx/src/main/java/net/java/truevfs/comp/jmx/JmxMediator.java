@@ -27,16 +27,16 @@ extends Mediator<This> {
     }
 
     /**
-     * {@linkplain JmxColleague#start Starts} and returns the given
-     * {@code colleague}.
+     * {@linkplain JmxComponent#activate Activates} and returns the given
+     * {@code component}.
      * 
-     * @param  <C> the type of the colleague to start.
-     * @param  colleague the colleague to start.
-     * @return The started colleague.
+     * @param  <C> the type of the component to activate.
+     * @param  component the component to activate.
+     * @return The activated component.
      */
-    protected final <C extends JmxColleague> C start(C colleague) {
-        colleague.start();
-        return colleague;
+    protected final <C extends JmxComponent> C activate(C component) {
+        component.activate();
+        return component;
     }
 
     public boolean register(@CheckForNull ObjectName name, Object mbean) {

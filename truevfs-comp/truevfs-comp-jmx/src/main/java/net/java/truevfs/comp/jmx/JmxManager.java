@@ -17,7 +17,7 @@ import net.java.truevfs.kernel.spec.FsManager;
  */
 @ThreadSafe
 public class JmxManager<M extends JmxMediator<M>>
-extends InstrumentingManager<M> implements JmxColleague {
+extends InstrumentingManager<M> implements JmxComponent {
 
     public JmxManager(M mediator, FsManager manager) {
         super(mediator, manager);
@@ -30,5 +30,5 @@ extends InstrumentingManager<M> implements JmxColleague {
     protected Object newView() { return new JmxManagerView<>(manager); }
 
     @Override
-    public void start() { mediator.register(objectName(), newView()); }
+    public void activate() { mediator.register(objectName(), newView()); }
 }
