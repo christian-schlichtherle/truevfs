@@ -2,14 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.kernel.sl
+package net.java.truevfs.kernel.spec.sl
 
-import net.java.truevfs.kernel.spec.sl._
-import org.junit._
 import org.junit.runner._
 import org.scalatest.junit._
 import org.scalatest.matchers._
-import org.scalatest.prop._
 import org.scalatest._
 
 /**
@@ -20,7 +17,7 @@ import org.scalatest._
   */
 @RunWith(classOf[JUnitRunner])
 class FsManagerLocatorSpec
-extends WordSpec with ShouldMatchers with PropertyChecks {
+extends WordSpec with ShouldMatchers {
 
   "The file system manager locator singleton" should {
     "provide a file system manager" in {
