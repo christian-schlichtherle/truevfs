@@ -19,7 +19,7 @@ private final class PaceManagerView(manager: PaceManager)
 extends JmxManagerView[PaceManager](classOf[PaceManagerMXBean], manager)
 with PaceManagerMXBean {
 
-  protected override def getDescription(info: MBeanInfo) = "A pace manager"
+  protected override def getDescription(info: MBeanInfo) = "A pace maker for the file system manager."
 
   protected override def getDescription(info: MBeanAttributeInfo) = {
     info.getName match {
