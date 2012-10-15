@@ -25,7 +25,5 @@ public class FsSyncException extends IOException {
     }
 
     /** @return {@code 0}. */
-    public int getPriority() {
-        return 0;
-    }
+    public int getPriority() { return 0; }
 }
