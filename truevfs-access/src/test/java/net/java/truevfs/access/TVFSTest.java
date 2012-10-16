@@ -4,11 +4,9 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truevfs.access.TFile;
-import static net.java.truevfs.access.TVFS.mountPoint;
-import net.java.truevfs.kernel.spec.FsMountPoint;
 import java.net.URI;
 import java.net.URISyntaxException;
+import net.java.truevfs.kernel.spec.FsMountPoint;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;
@@ -30,7 +28,7 @@ public final class TVFSTest extends MockArchiveDriverTestBase {
         }) {
             final TFile file = new TFile(params[0]);
             final FsMountPoint mountPoint = new FsMountPoint(new URI(params[1]));
-            assertThat(mountPoint(file), is(mountPoint));
+            assertThat(TVFS.mountPoint(file), is(mountPoint));
         }
     }
 }
