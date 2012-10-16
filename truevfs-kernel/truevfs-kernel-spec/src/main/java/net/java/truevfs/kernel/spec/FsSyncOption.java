@@ -61,7 +61,8 @@ public enum FsSyncOption {
     /**
      * If this option is set, all pending changes are aborted.
      * This option is only meaningful immediately before the federated file
-     * system itself gets deleted.
+     * system itself gets deleted and should not of used by client
+     * applications.
      */
     ABORT_CHANGES,
 
