@@ -159,7 +159,7 @@ object PaceManagerTest {
   }
 
   private sealed abstract class Expectation(mountPoints: String*)
-  extends Function[FsController, Boolean] {
+  extends (FsController => Boolean) {
     private[this] val set = mountPoints.toSet
     def contains(mountPoint: String) = set contains mountPoint
     override def apply(controller: FsController) =
