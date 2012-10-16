@@ -18,6 +18,7 @@ import org.scalatest._
 import org.scalatest.junit._
 import org.scalatest.matchers._
 import org.scalatest.prop._
+import TConfig._
 
 /**
   * DO NOT MODIFY THE GLOBAL CONFIGURATION IN THESE TESTS!
@@ -44,18 +45,16 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
     if (null != ex) throw new ExecutionException(ex)
   }
 
-  import TConfig._
-
   "The TConfig class" should {
-    "have the global configuration as its current configuration by default" in {
+    "have the GLOBAL configuration as its current() configuration by default" in {
       current should be theSameInstanceAs (GLOBAL)
     }
 
-    "throw IllegalStateException when popping without a prior push" in {
+    "throw an  IllegalStateException when calling close() without a prior call to open()" in {
       intercept[IllegalStateException] { current close () }
     }
 
-    "correctly implement current/open/close" in {
+    "correctly implement current()/open()/close()" in {
       val c1 = current
       loan(open()) to { c2 =>
         c2 should not be theSameInstanceAs (c1)
@@ -80,12 +79,23 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
     }
   }
 
-  "The global configuration" should {
-    "be setup correctly" in {
-      val config = GLOBAL
-      config.getManager should be theSameInstanceAs (FsManagerLocator.SINGLETON.get)
-      config.getArchiveDetector should be theSameInstanceAs (TArchiveDetector.ALL)
-      config.getAccessPreferences should equal (BitField.of(CREATE_PARENTS))
+  "The GLOBAL configuration" should {
+    "be correctly initialized" in {
+      GLOBAL.getManager should be theSameInstanceAs (FsManagerLocator.SINGLETON.get)
+      GLOBAL.getArchiveDetector should be theSameInstanceAs (TArchiveDetector.ALL)
+      GLOBAL.getAccessPreferences should equal (BitField.of(CREATE_PARENTS))
+    }
+
+    "throw an IllegalStateException" when {
+      "calling close()" in {
+        intercept[IllegalStateException] { GLOBAL close () }
+      }
+
+      "calling close() in an open()/close() block" in {
+        intercept[IllegalStateException] {
+          loan(open()) to { _ => GLOBAL close () }
+        }
+      }
     }
   }
 
