@@ -54,7 +54,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
       val ef = new FsControllerFilter(emp) // evicted filter
       if (!(mounted exists ef)) {
         try {
-          manager sync (FsSyncOptions.NONE, ef)
+          manager sync new FsDefaultSyncControllerVisitor(FsSyncOptions.NONE, ef)
           it remove ()
         } catch {
           case ex: FsSyncException =>
@@ -82,12 +82,11 @@ extends JmxManager[PaceMediator](mediator, manager) {
     builder check ()
   }
 
-  override def sync(options: BitField[FsSyncOption], filter: Filter[_ >: FsController]) {
-    {
-      val it = evicted.iterator
-      while (it.hasNext) if (filter accept it.next) it remove ()
-    }
-    mounted sync (manager, options, filter)
+  override def sync(visitor: FsSyncControllerVisitor) {
+    val filter = visitor.filter
+    val it = evicted.iterator
+    while (it.hasNext) if (filter accept it.next) it remove ()
+    mounted sync (manager, visitor)
   }
 }
 
@@ -136,11 +135,6 @@ private object PaceManager {
     finally { lock unlock () }
   }
 
-  implicit private def function2filter(function: FsController => Boolean) =
-    new Filter[FsController] {
-      def accept(controller: FsController) = function(controller)
-    }
-
   private final class MountedControllerMap(evicted: ju.Collection[FsController])
   extends ju.LinkedHashMap[FsMountPoint, FsController](initialCapacity, 0.75f, true) {
 
@@ -182,20 +176,40 @@ private object PaceManager {
       locked(writeLock)(map put (mp, controller))
     }
 
-    def sync(manager: FsManager, options: BitField[FsSyncOption], filter: Filter[_ >: FsController]) {
-      locked(writeLock) {
-        try {
-          manager sync (options, { controller: FsController =>
-              val accepted = filter accept controller
-              if (accepted) map remove controller.getModel.getMountPoint
+    def sync(manager: FsManager, visitor: FsSyncControllerVisitor) {
+      manager sync new FsSyncControllerVisitor {
+
+        override def filter =
+          new Filter[FsController] {
+            override def accept(controller: FsController) = {
+              val accepted = visitor.filter accept controller
+              if (accepted) {
+                locked(writeLock) {
+                  map remove controller.getModel.getMountPoint
+                }
+              }
               accepted
             }
-          )
-        } finally {
-          loan(manager controllers filter) to { stream =>
-            for (controller <- stream.asScala; model = controller.getModel)
-              if (model.isMounted) map put (model.getMountPoint, controller)
           }
+
+        override def builder = visitor.builder
+
+        override def visit(controller: FsController) {
+          try {
+            visitor visit controller
+          } finally {
+            val model = controller.getModel
+            if (model.isMounted) {
+              locked(writeLock) {
+                map put (model.getMountPoint, controller)
+              }
+            }
+          }
+        }
+
+        override def options(controller: FsController) = {
+          assert(false)
+          visitor options controller
         }
       }
     }

@@ -5,11 +5,15 @@
 package net.java.truevfs.kernel.impl
 
 import collection.mutable.WeakHashMap
+import collection.JavaConverters._
+import net.java.truecommons.io.Loan._
 import net.java.truecommons.shed._
 import net.java.truecommons.shed.Link.Type._
+import net.java.truevfs.kernel.spec._
+import java.io._
 import java.util.concurrent.locks._
 import javax.annotation.concurrent._
-import net.java.truevfs.kernel.spec._
+import DefaultManager._
 
 /** The default implementation of a file system manager.
   *
@@ -20,8 +24,6 @@ private final class DefaultManager
 extends FsAbstractManager with ReentrantReadWriteLockAspect {
 
   override val lock = new ReentrantReadWriteLock
-
-  import DefaultManager._
 
   /**
    * The map of all schedulers for composite file system controllers,
@@ -44,18 +46,18 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
             new BackController(driver, model, parent))))
   }
 
-  override def controller(d: FsMetaDriver, mp: FsMountPoint): FsController = {
+  override def controller(driver: FsMetaDriver, mountPoint: FsMountPoint): FsController = {
     try {
-      readLocked(controller0(d, mp))
+      readLocked(controller0(driver, mountPoint))
     } catch {
       case ex: NeedsWriteLockException =>
         if (readLockedByCurrentThread) throw ex;
-        writeLocked(controller0(d, mp))
+        writeLocked(controller0(driver, mountPoint))
     }
   }
 
   private def controller0(d: FsMetaDriver, mp: FsMountPoint): FsController = {
-    controllers.get(mp).flatMap(l => Option(l.get)) match {
+    controllers get mp flatMap (l => Option(l.get)) match {
       case Some(c) => c
       case None =>
         checkWriteLockedByCurrentThread
@@ -111,7 +113,17 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
     }
   } // ManagedModel
 
-  override def controllers(filter: Filter[_ >: FsController]) = {
+  override def sync(visitor: FsSyncControllerVisitor) {
+    SyncShutdownHook cancel ()
+    visit(visitor)
+  }
+
+  /** Returns a new stream which represents a snapshot of the managed file
+    * system controllers.
+    * 
+    * @param filter the file system controller filter to apply.
+    */
+  override def stream(filter: Filter[_ >: FsController]) = {
     val iseq = readLocked(
       controllers
       .values
@@ -119,7 +131,6 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
       .filter(filter accept _)
       .toIndexedSeq
     )
-    import collection.JavaConverters._
     final class Stream extends FsControllerStream {
       var list = iseq.sorted(ReverseControllerOrdering).asJava
       override def size = list.size
@@ -127,11 +138,6 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
       override def close() { list = null }
     }
     new Stream
-  }
-
-  override def sync(options: SyncOptions, filter: Filter[_ >: FsController]) {
-    SyncShutdownHook cancel ()
-    super.sync(options, filter)
   }
 }
 

@@ -5,9 +5,14 @@
 package net.java.truevfs.kernel.spec;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.Filter;
 import static net.java.truecommons.shed.Filter.*;
 import net.java.truevfs.kernel.driver.mock.MockDriverMapContainer;
 import static org.hamcrest.CoreMatchers.*;
@@ -64,12 +69,8 @@ public abstract class FsManagerTestSuite {
                     assertThat(controller.getParent(), sameInstance((Object) parent));
                 parent = controller;
             }
-            try (final FsControllerStream stream = manager.controllers(ACCEPT_ANY)) {
-                assertThat(stream.size(), is(params.length));
-            }
-            try (final FsControllerStream stream = manager.controllers(ACCEPT_NONE)) {
-                assertThat(stream.size(), is(0));
-            }
+            assertThat(sync(new TestVisitor(ACCEPT_ANY)).visited, is(params.length));
+            assertThat(sync(new TestVisitor(ACCEPT_NONE)).visited, is(0));
             parent = null;
             waitForAllManagersToGetGarbageCollected();
         }
@@ -103,22 +104,24 @@ public abstract class FsManagerTestSuite {
                 member = controller;
                 if (null == top) top = controller;
             }
-            try (final FsControllerStream stream = manager.controllers(ACCEPT_ANY)) {
-                Iterator<FsController> i = stream.iterator();
-                for (final String param : params) {
+
+            final Iterator<String> it = Arrays.asList(params).iterator();
+            class ControllerVisitor extends TestVisitor {
+                ControllerVisitor() { super(ACCEPT_ANY); }
+
+                @Override
+                public void visit(FsController controller)
+                throws FsSyncException {
                     final FsMountPoint mountPoint
-                            = FsMountPoint.create(URI.create(param));
-                    assertThat(i.next().getModel().getMountPoint(), equalTo(mountPoint));
+                            = FsMountPoint.create(URI.create(it.next()));
+                    assertThat(controller.getModel().getMountPoint(), equalTo(mountPoint));
+                    
+                    super.visit(controller);
                 }
-                assertThat(i.hasNext(), is(false));
-                assertThat(stream.size(), is(params.length));
-                // The iterator must be set to null because otherwise it will
-                // prevent the iterated controllers to be garbage collected
-                // because the JVM bytecode still references it even though the
-                // local variable falls out of scope after the
-                // try-with-resources statement (verified with heap dump).
-                i = null;
             }
+            assertThat(sync(new ControllerVisitor()).visited, is(params.length));
+            assertThat(it.hasNext(), is(false));
+
             member = null;
             top = null;
             waitForAllManagersToGetGarbageCollected();
@@ -126,13 +129,9 @@ public abstract class FsManagerTestSuite {
     }
 
     private void waitForAllManagersToGetGarbageCollected() {
-        int size;
         do {
             System.gc(); // triggering GC in a loop seems to help with concurrency!
-            try (final FsControllerStream stream = manager.controllers(ACCEPT_ANY)) {
-                size = stream.size();
-            }
-        } while (0 < size);
+        } while (0 < sync(new TestVisitor(ACCEPT_ANY)).visited);
     }
 
     @Test
@@ -151,7 +150,7 @@ public abstract class FsManagerTestSuite {
 
             // Create controllers and add them to a set in order to prevent
             // them from getting garbage collected.
-            final FsManager manager = newManager();
+            manager = newManager();
             final Set<FsController> input = new HashSet<>();
             for (final String param : params[1]) {
                 final FsMountPoint mountPoint = FsMountPoint.create(URI.create(param));
@@ -159,11 +158,17 @@ public abstract class FsManagerTestSuite {
             }
 
             // Assert that the manager has all input controllers mapped.
-            try (final FsControllerStream stream = manager.controllers(ACCEPT_ANY)) {
-                assertThat(stream.size(), is(params[1].length));
-                for (final FsController controller : stream)
+            class InputVisitor extends TestVisitor {
+                InputVisitor() { super(ACCEPT_ANY); }
+
+                @Override
+                public void visit(FsController controller)
+                throws FsSyncException {
                     assertTrue(input.contains(controller));
+                    super.visit(controller);
+                }
             }
+            assertThat(sync(new InputVisitor()).visited, is(params[1].length));
 
             final Set<FsMountPoint> output = new HashSet<>();
             for (final String param : params[2]) {
@@ -171,14 +176,51 @@ public abstract class FsManagerTestSuite {
                 output.add(mountPoint);
             }
 
-            final FsMountPoint filter = FsMountPoint.create(URI.create(params[0][0]));
-            try (final FsControllerStream stream = manager.controllers(new FsControllerFilter(filter))) {
-                assertThat(stream.size(), is(params[2].length));
-                for (final FsController controller : stream)
+            final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[0][0]));
+            class FilterVisitor extends TestVisitor {
+                FilterVisitor() { super(new FsControllerFilter(mountPoint)); }
+
+                @Override
+                public void visit(FsController controller)
+                throws FsSyncException {
                     assertTrue(output.remove(controller.getModel().getMountPoint()));
+                    super.visit(controller);
+                }
             }
+            assertThat(sync(new FilterVisitor()).visited, is(params[2].length));
 
             assertTrue(output.isEmpty());
         }
     }
+
+    private TestVisitor sync(final TestVisitor visitor) {
+        try {
+            manager.sync(visitor);
+        } catch (FsSyncException ex) {
+            throw new AssertionError(ex);
+        }
+        return visitor;
+    }
+
+    private static class TestVisitor extends FsSyncControllerVisitor {
+        final Filter<? super FsController> filter;
+        int visited;
+
+        TestVisitor(final Filter<? super FsController> filter) {
+            this.filter = filter;
+        }
+
+        @Override
+        public Filter<? super FsController> filter() { return filter; }
+
+        @Override
+        public void visit(FsController controller) throws FsSyncException {
+            visited++;
+        }
+
+        @Override
+        public BitField<FsSyncOption> options(FsController controller) {
+            throw new UnsupportedOperationException();
+        }
+    } // TestVisitor
 }

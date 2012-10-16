@@ -5,8 +5,7 @@
 package net.java.truevfs.kernel.spec;
 
 import java.io.Closeable;
-import net.java.truecommons.shed.BitField;
-import net.java.truecommons.shed.Filter;
+import java.io.IOException;
 
 /**
  * A container which creates {@linkplain FsController} file system controllers
@@ -48,30 +47,22 @@ public interface FsManager {
     FsController controller(FsMetaDriver driver, FsMountPoint mountPoint);
 
     /**
-     * Returns a new stream which represents a snapshot of the managed file
-     * system controllers.
-     * 
-     * @param  filter the file system controller filter to apply.
-     * @return A new stream which represents a snapshot of the managed file
-     *         system controllers.
-     */
-    FsControllerStream controllers(Filter<? super FsController> filter);
-
-    /**
-     * Calls {@link FsController#sync} on all managed file system controllers.
+     * Uses the given visitor to {@link FsController#sync sync()} all managed
+     * file system controllers.
      * If {@code sync()}ing a file system controller fails with an
      * {@link FsSyncException}, then the exception gets remembered and the loop
      * continues with {@code sync()}ing the remaining file system controllers.
      * Once the loop has completed, the exception(s) get processed for
      * (re)throwing based on their type and order of appearance.
      * <p>
-     * Call this method instead of manually iterating over a
-     * {@linkplain #controllers stream} for {@code sync()}ing in order to
-     * support processing of additional aspects such as controlling a shutdown
-     * hook, logging statistics et al.
+     * Call this method instead of {@link #visit} for {@code sync()}ing in
+     * order to support processing of additional aspects such as controlling a
+     * shutdown hook, logging statistics et al.
      *
-     * @param  options the options for synchronizing the file system.
-     * @param  filter the file system controller filter to apply.
+     * @param  visitor the visitor for
+     *         {@linkplain FsSyncControllerVisitor#filter filtering} and
+     *         {@linkplain FsSyncControllerVisitor#visit syncing}
+     *         the managed file system controllers.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective file system controller has been
@@ -79,11 +70,9 @@ public interface FsManager {
      *         open archive entry stream or channel gets forcibly
      *         {@link Closeable#close close()}d.
      * @throws FsSyncException if any error conditions apply.
-     * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if {@link FsSyncOption#ABORT_CHANGES}
-     *         is set.
      */
-    void sync(  BitField<FsSyncOption> options,
-                Filter<? super FsController> filter)
+    void sync(FsSyncControllerVisitor visitor)
     throws FsSyncWarningException, FsSyncException;
+
+    <X extends IOException> void visit(FsControllerVisitor<X> visitor) throws X;
 }
