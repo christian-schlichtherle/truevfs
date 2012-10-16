@@ -4,7 +4,11 @@
  */
 package net.java.truevfs.kernel.spec;
 
+import java.io.IOException;
+import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.inject.Provider;
+import net.java.truecommons.shed.AbstractExceptionBuilder;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.Filter;
 import net.java.truecommons.shed.UniqueObject;
@@ -23,21 +27,86 @@ extends UniqueObject implements FsManager {
 
     @Override
     public void sync(
-            final BitField<FsSyncOption> options,
-            final Filter<? super FsController> filter)
+            BitField<FsSyncOption> options,
+            Filter<? super FsController> filter)
     throws FsSyncWarningException, FsSyncException {
-        if (options.get(ABORT_CHANGES)) throw new IllegalArgumentException();
-        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
-        try (final FsControllerStream stream = controllers(filter)) {
+        sync(new DefaultSyncVisitor(options, filter));
+    }
+
+    private void sync(final SyncVisitor visitor)
+    throws FsSyncException {
+        if (visitor.getOptions().get(ABORT_CHANGES))
+            throw new IllegalArgumentException();
+        visit(visitor);
+    }
+
+    private <X extends IOException> void visit(
+            final ControllerVisitor<X> visitor)
+    throws X {
+        try (final FsControllerStream stream = controllers(visitor)) {
+            final AbstractExceptionBuilder<X, X> builder = visitor.get();
             for (final FsController controller : stream) {
                 try {
-                    controller.sync(options);
-                } catch (final FsSyncException ex) {
-                    builder.warn(ex);
+                    visitor.visit(controller);
+                } catch (final IOException ex) {
+                    builder.warn((X) ex);
                 }
             }
+            builder.check();
         }
-        builder.check();
+    }
+
+    private static class DefaultSyncVisitor
+    extends SyncVisitor {
+        private final BitField<FsSyncOption> options;
+        private final Filter<? super FsController> filter;
+
+        public DefaultSyncVisitor() {
+            this(FsSyncOptions.SYNC, Filter.ACCEPT_ANY);
+        }
+
+        public DefaultSyncVisitor(
+                final BitField<FsSyncOption> options) {
+            this(options, Filter.ACCEPT_ANY);
+        }
+
+        public DefaultSyncVisitor(
+                final BitField<FsSyncOption> options,
+                final Filter<? super FsController> filter) {
+            this.options = Objects.requireNonNull(options);
+            this.filter = Objects.requireNonNull(filter);
+        }
+
+        @Override
+        public boolean accept(FsController controller) {
+            return filter.accept(controller);
+        }
+
+        @Override
+        public BitField<FsSyncOption> getOptions() {
+            return options;
+        }
+    }
+
+    private static abstract class SyncVisitor
+    implements ControllerVisitor<FsSyncException> {
+
+        @Override
+        public AbstractExceptionBuilder<FsSyncException, FsSyncException> get() {
+            return new FsSyncExceptionBuilder();
+        }
+
+        @Override
+        public void visit(FsController controller) throws FsSyncException {
+            controller.sync(getOptions());
+        }
+
+        public abstract BitField<FsSyncOption> getOptions();
+    }
+
+    private interface ControllerVisitor<X extends IOException>
+    extends Filter<FsController>, Provider<AbstractExceptionBuilder<X, X>> {
+        void visit(FsController controller) throws X;
     }
 
     /**
