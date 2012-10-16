@@ -264,6 +264,7 @@ public final class TVFS {
             BitField<FsSyncOption> options,
             Filter<? super FsController> filter)
     throws FsSyncException {
-        TConfig.current().getManager().sync(options, filter);
+        TConfig.current().getManager().sync(
+                new FsDefaultSyncControllerVisitor(options, filter));
     }
 }

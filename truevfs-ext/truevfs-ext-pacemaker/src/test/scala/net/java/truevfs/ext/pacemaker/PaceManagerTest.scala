@@ -62,7 +62,8 @@ extends WordSpec
         )
       }
       delegate.controllers = controllers.values
-      manager sync (FsSyncOptions.SYNC, Filter.ACCEPT_ANY)
+      manager sync new FsDefaultSyncControllerVisitor(
+        FsSyncOptions.SYNC, Filter.ACCEPT_ANY)
 
       val actions = {
         Table[String, Expectation](
@@ -148,7 +149,7 @@ object PaceManagerTest {
     override def controller(driver: FsMetaDriver, mountPoint: FsMountPoint) =
       throw new UnsupportedOperationException
 
-    override def controllers(filter: Filter[_ >: FsController]) = {
+    override def stream(filter: Filter[_ >: FsController]) = {
       var filtered = controllers filter (filter accept _)
       new FsControllerStream() {
         override def size() = filtered.size

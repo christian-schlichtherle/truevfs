@@ -4,15 +4,21 @@
  */
 package net.java.truevfs.comp.jmx;
 
+import java.io.IOException;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.StandardMBean;
+import net.java.truecommons.shed.AbstractExceptionBuilder;
 import net.java.truecommons.shed.Filter;
+import net.java.truecommons.shed.SuppressedExceptionBuilder;
 import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsControllerStream;
+import net.java.truevfs.kernel.spec.FsControllerVisitor;
+import net.java.truevfs.kernel.spec.FsDefaultSyncControllerVisitor;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsSyncException;
 import net.java.truevfs.kernel.spec.FsSyncOptions;
@@ -110,11 +116,29 @@ extends StandardMBean implements JmxManagerMXBean {
     }
 
     private int count(final Filter<? super FsController> filter) {
-        int count = 0;
-        try (final FsControllerStream stream = manager.controllers(filter)) {
-            for (final FsController _ : stream) count++;
+
+        class Visitor implements FsControllerVisitor<IOException> {
+            int count = 0;
+
+            @Override
+            public Filter<? super FsController> filter() { return filter; }
+
+            @Override
+            public AbstractExceptionBuilder<IOException, IOException> builder() {
+                return new SuppressedExceptionBuilder<>();
+            }
+
+            @Override
+            public void visit(FsController controller) { count++; }
         }
-        return count;
+
+        final Visitor visitor = new Visitor();
+        try {
+            manager.visit(visitor);
+        } catch (IOException ex) {
+            throw new AssertionError(ex);
+        }
+        return visitor.count;
     }
 
     private boolean isTopLevelArchive(final FsController controller) {
@@ -127,6 +151,6 @@ extends StandardMBean implements JmxManagerMXBean {
         FsManagerLocator
                 .SINGLETON
                 .get()
-                .sync(FsSyncOptions.NONE, Filter.ACCEPT_ANY);
+                .sync(new FsDefaultSyncControllerVisitor(FsSyncOptions.NONE));
     }
 }
