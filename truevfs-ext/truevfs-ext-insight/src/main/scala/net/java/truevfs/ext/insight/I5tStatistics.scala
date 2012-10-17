@@ -6,7 +6,6 @@ package net.java.truevfs.ext.insight
 
 import javax.annotation.concurrent._
 import net.java.truevfs.comp.jmx._
-import net.java.truevfs.comp.jmx.JmxUtils._
 import net.java.truevfs.ext.insight.stats._
 
 /**
@@ -27,7 +26,7 @@ extends JmxComponent {
   private def objectName = mediator
     .nameBuilder(classOf[FsStatistics])
     .put("subject", subject)
-    .put("offset", mediator.formatOffset(offset))
+    .put("offset", mediator formatOffset offset)
     .get
 
   def newView: I5tStatisticsView
@@ -35,5 +34,5 @@ extends JmxComponent {
   override def activate() { mediator register (objectName, newView) }
 
   override def toString =
-    "%s[subject=%s, offset=%d, mediator=%s]".format(getClass.getName, subject, offset, mediator)
+    "%s[subject=%s, offset=%d, mediator=%s]" format (getClass.getName, subject, offset, mediator)
 }
