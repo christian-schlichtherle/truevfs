@@ -40,7 +40,7 @@ public abstract class FsDecoratingManager implements FsManager {
     }
 
     @Override
-    public void sync(FsSyncControllerVisitor visitor) throws FsSyncException {
+    public void sync(FsControllerSyncVisitor visitor) throws FsSyncException {
         manager.sync(visitor);
     }
 

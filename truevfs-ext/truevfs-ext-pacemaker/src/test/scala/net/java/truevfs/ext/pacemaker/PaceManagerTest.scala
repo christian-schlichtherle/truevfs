@@ -62,8 +62,8 @@ extends WordSpec
         )
       }
       delegate.controllers = controllers.values
-      manager sync new FsDefaultSyncControllerVisitor(
-        FsSyncOptions.SYNC, Filter.ACCEPT_ANY)
+      manager sync new FsSimpleControllerSyncVisitor(
+        Filter.ACCEPT_ANY, FsSyncOptions.SYNC)
 
       val actions = {
         Table[String, Expectation](

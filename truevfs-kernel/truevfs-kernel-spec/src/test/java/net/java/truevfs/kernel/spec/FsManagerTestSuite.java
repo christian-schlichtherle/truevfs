@@ -4,16 +4,17 @@
  */
 package net.java.truevfs.kernel.spec;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import net.java.truecommons.shed.BitField;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.Filter;
 import static net.java.truecommons.shed.Filter.*;
+import net.java.truecommons.shed.SuppressedExceptionBuilder;
 import net.java.truevfs.kernel.driver.mock.MockDriverMapContainer;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -69,8 +70,8 @@ public abstract class FsManagerTestSuite {
                     assertThat(controller.getParent(), sameInstance((Object) parent));
                 parent = controller;
             }
-            assertThat(sync(new TestVisitor(ACCEPT_ANY)).visited, is(params.length));
-            assertThat(sync(new TestVisitor(ACCEPT_NONE)).visited, is(0));
+            assertThat(count(new VisitCounter(ACCEPT_ANY)), is(params.length));
+            assertThat(count(new VisitCounter(ACCEPT_NONE)), is(0));
             parent = null;
             waitForAllManagersToGetGarbageCollected();
         }
@@ -106,20 +107,18 @@ public abstract class FsManagerTestSuite {
             }
 
             final Iterator<String> it = Arrays.asList(params).iterator();
-            class ControllerVisitor extends TestVisitor {
+            class ControllerVisitor extends VisitCounter {
                 ControllerVisitor() { super(ACCEPT_ANY); }
 
                 @Override
-                public void visit(FsController controller)
-                throws FsSyncException {
+                public void visit(FsController controller) {
                     final FsMountPoint mountPoint
                             = FsMountPoint.create(URI.create(it.next()));
                     assertThat(controller.getModel().getMountPoint(), equalTo(mountPoint));
-                    
                     super.visit(controller);
                 }
             }
-            assertThat(sync(new ControllerVisitor()).visited, is(params.length));
+            assertThat(count(new ControllerVisitor()), is(params.length));
             assertThat(it.hasNext(), is(false));
 
             member = null;
@@ -131,7 +130,7 @@ public abstract class FsManagerTestSuite {
     private void waitForAllManagersToGetGarbageCollected() {
         do {
             System.gc(); // triggering GC in a loop seems to help with concurrency!
-        } while (0 < sync(new TestVisitor(ACCEPT_ANY)).visited);
+        } while (0 < count(new VisitCounter(ACCEPT_ANY)));
     }
 
     @Test
@@ -158,17 +157,16 @@ public abstract class FsManagerTestSuite {
             }
 
             // Assert that the manager has all input controllers mapped.
-            class InputVisitor extends TestVisitor {
+            class InputVisitor extends VisitCounter {
                 InputVisitor() { super(ACCEPT_ANY); }
 
                 @Override
-                public void visit(FsController controller)
-                throws FsSyncException {
+                public void visit(FsController controller) {
                     assertTrue(input.contains(controller));
                     super.visit(controller);
                 }
             }
-            assertThat(sync(new InputVisitor()).visited, is(params[1].length));
+            assertThat(count(new InputVisitor()), is(params[1].length));
 
             final Set<FsMountPoint> output = new HashSet<>();
             for (final String param : params[2]) {
@@ -177,36 +175,37 @@ public abstract class FsManagerTestSuite {
             }
 
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[0][0]));
-            class FilterVisitor extends TestVisitor {
+            class FilterVisitor extends VisitCounter {
                 FilterVisitor() { super(new FsControllerFilter(mountPoint)); }
 
                 @Override
-                public void visit(FsController controller)
-                throws FsSyncException {
+                public void visit(FsController controller) {
                     assertTrue(output.remove(controller.getModel().getMountPoint()));
                     super.visit(controller);
                 }
             }
-            assertThat(sync(new FilterVisitor()).visited, is(params[2].length));
+            assertThat(count(new FilterVisitor()), is(params[2].length));
 
             assertTrue(output.isEmpty());
         }
     }
 
-    private TestVisitor sync(final TestVisitor visitor) {
+    private int count(final VisitCounter counter) {
         try {
-            manager.sync(visitor);
-        } catch (FsSyncException ex) {
+            manager.visit(counter);
+        } catch (IOException ex) {
             throw new AssertionError(ex);
         }
-        return visitor;
+        return counter.get();
     }
 
-    private static class TestVisitor extends FsSyncControllerVisitor {
+    @ThreadSafe
+    private static class VisitCounter
+    extends AtomicInteger implements FsControllerVisitor<IOException> {
         final Filter<? super FsController> filter;
-        int visited;
 
-        TestVisitor(final Filter<? super FsController> filter) {
+        VisitCounter(final Filter<? super FsController> filter) {
+            assert null != filter;
             this.filter = filter;
         }
 
@@ -214,13 +213,14 @@ public abstract class FsManagerTestSuite {
         public Filter<? super FsController> filter() { return filter; }
 
         @Override
-        public void visit(FsController controller) throws FsSyncException {
-            visited++;
+        public final SuppressedExceptionBuilder<IOException> builder() {
+            return new SuppressedExceptionBuilder<>();
         }
 
         @Override
-        public BitField<FsSyncOption> options(FsController controller) {
-            throw new UnsupportedOperationException();
+        public void visit(FsController controller) {
+            assertThat(controller, not(is((FsController) null)));
+            incrementAndGet();
         }
     } // TestVisitor
 }

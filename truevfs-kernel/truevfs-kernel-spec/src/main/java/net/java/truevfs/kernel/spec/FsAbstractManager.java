@@ -6,7 +6,7 @@ package net.java.truevfs.kernel.spec;
 
 import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.shed.AbstractExceptionBuilder;
+import net.java.truecommons.shed.ExceptionBuilder;
 import net.java.truecommons.shed.Filter;
 import net.java.truecommons.shed.UniqueObject;
 
@@ -22,8 +22,7 @@ public abstract class FsAbstractManager
 extends UniqueObject implements FsManager {
 
     @Override
-    public void sync(final FsSyncControllerVisitor visitor)
-    throws FsSyncException {
+    public void sync(FsControllerSyncVisitor visitor) throws FsSyncException {
         visit(visitor);
     }
 
@@ -32,7 +31,7 @@ extends UniqueObject implements FsManager {
             final FsControllerVisitor<X> visitor)
     throws X {
         try (final FsControllerStream stream = stream(visitor.filter())) {
-            final AbstractExceptionBuilder<X, X> builder = visitor.builder();
+            final ExceptionBuilder<X, X> builder = visitor.builder();
             for (final FsController controller : stream) {
                 try {
                     visitor.visit(controller);
@@ -44,6 +43,19 @@ extends UniqueObject implements FsManager {
         }
     }
 
+    /**
+     * Returns a file system controller stream which results from filtering
+     * and sorting the managed file system controllers so that any child file
+     * systems appear <em>before</em> their respective parent file system in
+     * the stream.
+     * This ensures that when calling {@link #sync}, all file system changes
+     * have been processed upon successful termination.
+     * 
+     * @param  filter the filter to apply to the managed file system
+     *         controllers.
+     * @return A filtered stream of managed file system controllers in reverse
+     *         order of their {@link FsMountPoint} mount point.
+     */
     protected abstract FsControllerStream stream(Filter<? super FsController> filter);
 
     /**
