@@ -15,7 +15,7 @@ import net.java.truevfs.comp.jmx.spi.MBeanServerProvider;
  * A container of the singleton MBean server.
  * The MBean server is created by using a {@link Locator} to search for
  * advertised implementations of the factory service specification class
- * {@link MBeanServerContainer}
+ * {@link MBeanServerProvider}
  * and the decorator service specification class
  * {@link MBeanServerDecorator}.
  *
