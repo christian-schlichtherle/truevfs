@@ -70,8 +70,8 @@ private object SyncShutdownHook extends Thread {
     _manager foreach { manager =>
       _manager = None // MUST reset to void calls to cancel() during the sync()!
       try {
-        manager sync new FsDefaultSyncControllerVisitor(
-          FsSyncOptions.UMOUNT, Filter.ACCEPT_ANY) // may call cancel()!
+        manager sync new FsSimpleControllerSyncVisitor(
+          Filter.ACCEPT_ANY, FsSyncOptions.UMOUNT) // may call cancel()!
       } catch {
         // Logging doesn't work in a shutdown hook!
         case ex => ex printStackTrace()

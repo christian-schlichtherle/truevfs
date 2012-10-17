@@ -54,7 +54,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
       val ef = new FsControllerFilter(emp) // evicted filter
       if (!(mounted exists ef)) {
         try {
-          manager sync new FsDefaultSyncControllerVisitor(FsSyncOptions.NONE, ef)
+          manager sync new FsSimpleControllerSyncVisitor(ef, FsSyncOptions.NONE)
           it remove ()
         } catch {
           case ex: FsSyncException =>
@@ -82,7 +82,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
     builder check ()
   }
 
-  override def sync(visitor: FsSyncControllerVisitor) {
+  override def sync(visitor: FsControllerSyncVisitor) {
     val filter = visitor.filter
     val it = evicted.iterator
     while (it.hasNext) if (filter accept it.next) it remove ()
@@ -176,8 +176,8 @@ private object PaceManager {
       locked(writeLock)(map put (mp, controller))
     }
 
-    def sync(manager: FsManager, visitor: FsSyncControllerVisitor) {
-      manager sync new FsSyncControllerVisitor {
+    def sync(manager: FsManager, visitor: FsControllerSyncVisitor) {
+      manager sync new FsControllerSyncVisitor {
 
         override def filter =
           new Filter[FsController] {
@@ -191,8 +191,6 @@ private object PaceManager {
               accepted
             }
           }
-
-        override def builder = visitor.builder
 
         override def visit(controller: FsController) {
           try {

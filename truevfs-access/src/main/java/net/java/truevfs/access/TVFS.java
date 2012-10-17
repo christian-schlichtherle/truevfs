@@ -165,7 +165,7 @@ public final class TVFS {
      */
     public static void sync(BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        sync(options, Filter.ACCEPT_ANY);
+        sync(Filter.ACCEPT_ANY, options);
     }
 
     /**
@@ -257,14 +257,14 @@ public final class TVFS {
      */
     public static void sync(FsMountPoint tree, BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        sync(options, new FsControllerFilter(tree));
+        sync(new FsControllerFilter(tree), options);
     }
 
     private static void sync(
-            BitField<FsSyncOption> options,
-            Filter<? super FsController> filter)
+            Filter<? super FsController> filter,
+            BitField<FsSyncOption> options)
     throws FsSyncException {
         TConfig.current().getManager().sync(
-                new FsDefaultSyncControllerVisitor(options, filter));
+                new FsSimpleControllerSyncVisitor(filter, options));
     }
 }

@@ -18,27 +18,27 @@ import net.java.truecommons.shed.Filter;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class FsDefaultSyncControllerVisitor extends FsSyncControllerVisitor {
-    final BitField<FsSyncOption> options;
+public class FsSimpleControllerSyncVisitor extends FsControllerSyncVisitor {
     final Filter<? super FsController> filter;
+    final BitField<FsSyncOption> options;
 
-    public FsDefaultSyncControllerVisitor() {
-        this(FsSyncOptions.SYNC, Filter.ACCEPT_ANY);
+    public FsSimpleControllerSyncVisitor() {
+        this(Filter.ACCEPT_ANY, FsSyncOptions.SYNC);
     }
 
-    public FsDefaultSyncControllerVisitor(BitField<FsSyncOption> options) {
-        this(options, Filter.ACCEPT_ANY);
+    public FsSimpleControllerSyncVisitor(BitField<FsSyncOption> options) {
+        this(Filter.ACCEPT_ANY, options);
     }
 
-    public FsDefaultSyncControllerVisitor(Filter<? super FsController> filter) {
-        this(FsSyncOptions.SYNC, filter);
+    public FsSimpleControllerSyncVisitor(Filter<? super FsController> filter) {
+        this(filter, FsSyncOptions.SYNC);
     }
 
-    public FsDefaultSyncControllerVisitor(
-            final BitField<FsSyncOption> options,
-            final Filter<? super FsController> filter) {
-        this.options = Objects.requireNonNull(options);
+    public FsSimpleControllerSyncVisitor(
+            final Filter<? super FsController> filter,
+            final BitField<FsSyncOption> options) {
         this.filter = Objects.requireNonNull(filter);
+        this.options = Objects.requireNonNull(options);
     }
 
     @Override

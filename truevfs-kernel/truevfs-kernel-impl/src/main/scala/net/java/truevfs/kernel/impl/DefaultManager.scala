@@ -113,7 +113,7 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
     }
   } // ManagedModel
 
-  override def sync(visitor: FsSyncControllerVisitor) {
+  override def sync(visitor: FsControllerSyncVisitor) {
     SyncShutdownHook cancel ()
     visit(visitor)
   }

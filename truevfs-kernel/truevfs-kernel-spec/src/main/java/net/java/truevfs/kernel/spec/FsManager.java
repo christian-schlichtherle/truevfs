@@ -48,20 +48,20 @@ public interface FsManager {
 
     /**
      * Uses the given visitor to {@link FsController#sync sync()} all managed
-     * file system controllers.
-     * If {@code sync()}ing a file system controller fails with an
-     * {@link FsSyncException}, then the exception gets remembered and the loop
-     * continues with {@code sync()}ing the remaining file system controllers.
-     * Once the loop has completed, the exception(s) get processed for
-     * (re)throwing based on their type and order of appearance.
+     * file system controllers which get accepted by the visitor's
+     * {@link FsControllerSyncVisitor#filter}.
+     * The visitor's
+     * {@linkplain FsControllerSyncVisitor#builder sync exception builder}
+     * gets used to process any {@link FsSyncException}s while iterating over
+     * all managed file system controllers.
      * <p>
      * Call this method instead of {@link #visit} for {@code sync()}ing in
      * order to support processing of additional aspects such as controlling a
      * shutdown hook, logging statistics et al.
      *
      * @param  visitor the visitor for
-     *         {@linkplain FsSyncControllerVisitor#filter filtering} and
-     *         {@linkplain FsSyncControllerVisitor#visit syncing}
+     *         {@linkplain FsControllerSyncVisitor#filter filtering} and
+     *         {@linkplain FsControllerSyncVisitor#visit syncing}
      *         the managed file system controllers.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
@@ -71,8 +71,31 @@ public interface FsManager {
      *         {@link Closeable#close close()}d.
      * @throws FsSyncException if any error conditions apply.
      */
-    void sync(FsSyncControllerVisitor visitor)
+    void sync(FsControllerSyncVisitor visitor)
     throws FsSyncWarningException, FsSyncException;
 
+    /**
+     * Uses the given visitor to call an operation on all managed
+     * file system controllers which get accepted by the visitor's
+     * {@link FsControllerVisitor#filter}.
+     * The visitor's
+     * {@linkplain FsControllerVisitor#builder exception builder}
+     * gets used to process any {@link IOException}s while iterating over
+     * all managed file system controllers.
+     * <p>
+     * This is the engine for calls to {@link #sync}.
+     *
+     * @param  visitor the visitor for
+     *         {@linkplain FsControllerVisitor#filter filtering} and
+     *         {@linkplain FsControllerVisitor#visit syncing}
+     *         the managed file system controllers.
+     * @throws FsSyncWarningException if <em>only</em> warning conditions
+     *         apply.
+     *         This implies that the respective file system controller has been
+     *         {@link FsController#sync sync()}ed with constraints, e.g. if an
+     *         open archive entry stream or channel gets forcibly
+     *         {@link Closeable#close close()}d.
+     * @throws FsSyncException if any error conditions apply.
+     */
     <X extends IOException> void visit(FsControllerVisitor<X> visitor) throws X;
 }

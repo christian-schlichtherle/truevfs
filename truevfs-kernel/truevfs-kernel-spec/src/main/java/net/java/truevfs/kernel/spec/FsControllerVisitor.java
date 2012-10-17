@@ -6,7 +6,7 @@ package net.java.truevfs.kernel.spec;
 
 import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.shed.AbstractExceptionBuilder;
+import net.java.truecommons.shed.ExceptionBuilder;
 import net.java.truecommons.shed.Filter;
 
 /**
@@ -20,23 +20,15 @@ import net.java.truecommons.shed.Filter;
 @ThreadSafe
 public interface FsControllerVisitor<X extends IOException> {
 
-    /**
-     * Returns a filter for file system controllers.
-     * 
-     * @return A filter for file system controllers.
-     */
+    /** Returns a filter for file system controllers. */
     Filter<? super FsController> filter();
 
     /**
-     * Returns an abstract exception builder for gathering any exceptions
-     * resulting from {@link #visit visit()}ing the file system controllers
-     * which have been accepted by the {@link #filter}.
-     * 
-     * @return An abstract exception builder for gathering any exceptions
-     * resulting from {@link #visit visit()}ing the file system controllers
-     * which have been accepted by the {@link #filter}.
+     * Returns an exception builder for gathering any exceptions resulting
+     * from {@link #visit visit()}ing the file system controllers which have
+     * been accepted by the {@link #filter}.
      */
-    AbstractExceptionBuilder<X, X> builder();
+    ExceptionBuilder<X, X> builder();
 
     /**
      * Visits the given file system controller.

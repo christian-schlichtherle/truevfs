@@ -5,7 +5,6 @@
 package net.java.truevfs.kernel.spec;
 
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.shed.AbstractExceptionBuilder;
 import net.java.truecommons.shed.BitField;
 
 /**
@@ -17,7 +16,7 @@ import net.java.truecommons.shed.BitField;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class FsSyncControllerVisitor
+public abstract class FsControllerSyncVisitor
 implements FsControllerVisitor<FsSyncException> {
 
     /**
@@ -26,7 +25,7 @@ implements FsControllerVisitor<FsSyncException> {
      * @return A new {@link FsSyncExceptionBuilder}.
      */
     @Override
-    public AbstractExceptionBuilder<FsSyncException, FsSyncException> builder() {
+    public final FsSyncExceptionBuilder builder() {
         return new FsSyncExceptionBuilder();
     }
 
