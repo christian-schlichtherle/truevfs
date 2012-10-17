@@ -178,7 +178,6 @@ private object PaceManager {
 
     def sync(manager: FsManager, visitor: FsControllerSyncVisitor) {
       manager sync new FsControllerSyncVisitor {
-
         override def filter =
           new Filter[FsController] {
             override def accept(controller: FsController) = {
