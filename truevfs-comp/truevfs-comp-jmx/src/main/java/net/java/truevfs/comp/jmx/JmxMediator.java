@@ -7,7 +7,9 @@ package net.java.truevfs.comp.jmx;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
+import net.java.truecommons.logging.LocalizedLogger;
 import net.java.truevfs.comp.inst.Mediator;
+import org.slf4j.Logger;
 
 /**
  * A mediator for the instrumentation of the TrueVFS Kernel with JMX.
@@ -18,6 +20,12 @@ import net.java.truevfs.comp.inst.Mediator;
 @ThreadSafe
 public abstract class JmxMediator<This extends JmxMediator<This>>
 extends Mediator<This> {
+
+    /**
+     * The localized logger to use.
+     * This field is available for unit testing purposes only!
+     */ 
+    Logger logger = new LocalizedLogger(JmxMediator.class);
 
     private Package getDomain() { return getClass().getPackage(); }
 
@@ -39,11 +47,13 @@ extends Mediator<This> {
         return component;
     }
 
-    public boolean register(@CheckForNull ObjectName name, Object mbean) {
-        return JmxUtils.register(name, mbean);
+    public void register(@CheckForNull ObjectName name, Object mbean) {
+        if (!JmxUtils.register(name, mbean))
+            logger.warn("mbeanAlreadyRegistered", name);
     }
 
-    public boolean deregister(ObjectName name) {
-        return JmxUtils.deregister(name);
+    public void deregister(ObjectName name) {
+        if (!JmxUtils.deregister(name))
+            logger.warn("mbeanNotRegistered", name);
     }
 }
