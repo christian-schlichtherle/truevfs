@@ -33,4 +33,18 @@ public class MBeanServerProvider extends ProviderService<MBeanServer> {
     public MBeanServer get() {
         return ManagementFactory.getPlatformMBeanServer();
     }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link MBeanServerProvider} returns
+     * {@code -100} if and only if it equals its
+     * {@linkplain #getClass() runtime class} or zero otherwise.
+     * In simple terms, if this method gets called on an object of a subclass
+     * then it will return zero unless it has been overridden.
+     */
+    @Override
+    public int getPriority() {
+        return MBeanServerProvider.class.equals(getClass()) ? -100 : 0;
+    }
 }
