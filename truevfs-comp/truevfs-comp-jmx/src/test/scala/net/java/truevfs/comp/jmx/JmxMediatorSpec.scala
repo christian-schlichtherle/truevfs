@@ -60,8 +60,12 @@ extends WordSpec with ShouldMatchers with OneInstancePerTest {
 }
 
 private object JmxMediatorSpec {
+  private[this] val mbs = MBeanServerFactory.newMBeanServer
+  
   private class TestMediator extends JmxMediator[TestMediator] {
     logger = mock[Logger]
+
+    override def getMBeanServer = mbs
   }
 
   trait MessengerMXBean { def getMessage: String }
