@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.comp.jmx.sl
 
+import java.lang.management.ManagementFactory
 import org.junit.runner._
 import org.scalatest.junit._
 import org.scalatest.matchers._
@@ -21,6 +22,10 @@ class MBeanServerLocatorSpec extends WordSpec with ShouldMatchers {
   "The MBean server locator singleton" should {
     "provide an MBean server" in {
       MBeanServerLocator.SINGLETON.get should not be (null)
+    }
+
+    "not provide the platform MBean server when running the test suite" in {
+      MBeanServerLocator.SINGLETON.get should not be theSameInstanceAs (ManagementFactory.getPlatformMBeanServer)
     }
   }
 }
