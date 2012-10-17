@@ -6,9 +6,14 @@ package net.java.truevfs.comp.jmx;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
+import javax.management.JMException;
+import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import net.java.truecommons.logging.LocalizedLogger;
 import net.java.truevfs.comp.inst.Mediator;
+import net.java.truevfs.comp.jmx.sl.MBeanServerLocator;
 import org.slf4j.Logger;
 
 /**
@@ -35,6 +40,18 @@ extends Mediator<This> {
     }
 
     /**
+     * Returns the MBean server for registering the MBeans.
+     * <p>
+     * The implementation in the class {@link JmxMediator} returns
+     * {@code MBeanServerLocator.SINGLETON.get()}.
+     * 
+     * @return the MBean server for registering the MBeans.
+     */
+    public MBeanServer getMBeanServer() {
+        return MBeanServerLocator.SINGLETON.get();
+    }
+
+    /**
      * {@linkplain JmxComponent#activate Activates} and returns the given
      * {@code component}.
      * 
@@ -47,13 +64,56 @@ extends Mediator<This> {
         return component;
     }
 
-    public void register(@CheckForNull ObjectName name, Object mbean) {
-        if (!JmxUtils.register(name, mbean))
-            logger.warn("mbeanAlreadyRegistered", name);
+    /**
+     * Maps the given object {@code name} to the given {@code mbean}
+     * in the {@linkplain #getMBeanServer MBean server}.
+     * 
+     * @param  name the object name.
+     * @param  mbean the MBean.
+     * @return {@code true} if the MBean has been successfully registered
+     *         with the given {@code name}.
+     *         {@code false} if any MBean was already registered
+     *         with the given {@code name}.
+     * @throws IllegalArgumentException if registering the MBean failed with an
+     *         {@link JMException}.
+     */
+    public boolean register(
+            final @CheckForNull ObjectName name,
+            final Object mbean) {
+        try {
+            getMBeanServer().registerMBean(mbean, name);
+            return true;
+        } catch (final InstanceAlreadyExistsException ex) {
+            logger.warn("instanceAlreadyExists.warn", name);
+            logger.trace("instanceAlreadyExists.trace", ex);
+            return false;
+        } catch (final JMException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
 
-    public void deregister(ObjectName name) {
-        if (!JmxUtils.deregister(name))
-            logger.warn("mbeanNotRegistered", name);
+    /**
+     * Removes any MBean with the given object {@code name}
+     * in the configured MBean server.
+     * 
+     * @param  name the object name.
+     * @return {@code true} if any MBean has been successfully removed
+     *         with the given {@code name}.
+     *         {@code false} if no MBean was registered
+     *         with the given {@code name}.
+     * @throws IllegalArgumentException if removing an MBean failed with an
+     *         {@link JMException}.
+     */
+    public boolean deregister(final ObjectName name) {
+        try {
+            getMBeanServer().unregisterMBean(name);
+            return true;
+        } catch (final InstanceNotFoundException ex) {
+            logger.warn("instanceNotFound.warn", name);
+            logger.trace("instanceNotFound.trace", ex);
+            return false;
+        } catch (final JMException ex) {
+            throw new IllegalArgumentException(ex);
+        }
     }
 }
