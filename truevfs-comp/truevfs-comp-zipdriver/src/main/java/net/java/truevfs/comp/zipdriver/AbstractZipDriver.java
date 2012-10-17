@@ -53,7 +53,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in the class {@link AbstractZipDriver} calls
+     * The implementation in the class {@link AbstractZipDriver} returns
      * {@code IoBufferPoolLocator.SINGLETON.get()}.
      */
     @Override
