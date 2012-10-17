@@ -30,7 +30,7 @@ extends Mediator<This> {
      * The localized logger to use.
      * This field is available for unit testing purposes only!
      */ 
-    Logger logger = new LocalizedLogger(JmxMediator.class);
+    private static final Logger logger = new LocalizedLogger(JmxMediator.class);
 
     private Package getDomain() { return getClass().getPackage(); }
 
@@ -67,6 +67,8 @@ extends Mediator<This> {
     /**
      * Maps the given object {@code name} to the given {@code mbean}
      * in the {@linkplain #getMBeanServer MBean server}.
+     * <p>
+     * Note that this method may log some messages on failure!
      * 
      * @param  name the object name.
      * @param  mbean the MBean.
@@ -95,6 +97,8 @@ extends Mediator<This> {
     /**
      * Removes any MBean with the given object {@code name}
      * in the configured MBean server.
+     * <p>
+     * Note that this method may log some messages on failure!
      * 
      * @param  name the object name.
      * @return {@code true} if any MBean has been successfully removed
