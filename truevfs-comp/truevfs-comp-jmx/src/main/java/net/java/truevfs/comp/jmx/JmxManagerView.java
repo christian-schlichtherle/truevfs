@@ -12,7 +12,6 @@ import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.StandardMBean;
-import net.java.truecommons.shed.ExceptionBuilder;
 import net.java.truecommons.shed.Filter;
 import net.java.truecommons.shed.SuppressedExceptionBuilder;
 import net.java.truevfs.kernel.spec.FsController;
