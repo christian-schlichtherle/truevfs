@@ -24,37 +24,26 @@ extends WordSpec with ShouldMatchers with OneInstancePerTest {
 
   "A JmxMediator" should {
     val mediator = new TestMediator
-    val logger = mediator.logger
     def name = mediator.nameBuilder(classOf[Messenger]).get
-    val exception = ArgumentCaptor forClass classOf[JMException]
 
     "build the correct object name" in {
       name should equal (new ObjectName(mediator.getClass.getPackage.getName + ":type=" + classOf[Messenger].getSimpleName))
     }
 
     "succeed to register an MBean for the object name" in {
-      mediator register (name, new Messenger)
-      verifyNoMoreInteractions(logger)
+      mediator register (name, new Messenger) should be (true)
     }
 
     "fail to register another MBean for an equal object name" in {
-      mediator register (name, new Messenger)
-      verify(logger) warn (anyString(), meq(name))
-      verify(logger) trace (anyString(), exception.capture)
-      verifyNoMoreInteractions(logger)
+      mediator register (name, new Messenger) should be (false)
     }
 
     "succeed to deregister the MBean for an equal object name" in {
-      mediator deregister name
-      verifyNoMoreInteractions(logger)
+      mediator deregister name should be (true)
     }
 
     "fail to deregister an MBean for any other object name" in {
-      val name = new ObjectName(":type=unknown")
-      mediator deregister name
-      verify(logger) warn (anyString(), meq(name))
-      verify(logger) trace (anyString(), exception.capture)
-      verifyNoMoreInteractions(logger)
+      mediator deregister new ObjectName(":type=unknown") should be (false)
     }
   }
 }
@@ -63,8 +52,6 @@ private object JmxMediatorSpec {
   private[this] val mbs = MBeanServerFactory.newMBeanServer
   
   private class TestMediator extends JmxMediator[TestMediator] {
-    logger = mock[Logger]
-
     override def getMBeanServer = mbs
   }
 
