@@ -85,15 +85,7 @@ try (InputStream in = Files.newInputStream(path)) {
     are present on the class path at run time.
 
     For the API documentation, please refer to the Javadoc of the package
-    {{{../apidocs/net/java/truevfs/access/package-summary.html}<<<net.truevfs.access>>>}}
-
-* Swing GUI
-
-    This module also provides Swing GUI classes for viewing file trees
-    and choosing entries in archive files.
-
-    For the API documentation, please refer to the Javadoc of the package
-    {{{../apidocs/net/java/truevfs/access/swing/package-summary.html}<<<net.truevfs.access.swing>>>}}
+    {{{../apidocs/net/java/truevfs/access/package-summary.html}<<<net.java.truevfs.access>>>}}
 
 * More Examples
 

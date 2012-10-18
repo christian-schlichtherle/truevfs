@@ -111,6 +111,7 @@ plug-in to its federated file system space.
 
     <modules>
         <module>truevfs-access</module>
+        <module>truevfs-access-swing</module>
         <module>truevfs-archetype</module>
         <module>truevfs-comp</module>
         <module>truevfs-driver</module>
@@ -134,6 +135,11 @@ plug-in to its federated file system space.
                 <type>test-jar</type>
                 <version>${truevfs.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.java.truevfs</groupId>
+                <artifactId>truevfs-access-swing</artifactId>
+                <version>${truevfs.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.java.truevfs</groupId>

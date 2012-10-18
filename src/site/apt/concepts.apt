@@ -56,13 +56,13 @@ Basic Concepts
     by simply putting the JARs of the required file system driver modules on
     the run time class path.
     This will cause the application to automatically detect the canonical file
-    extension for the archive files supported by the respective file system
-    driver modules - no configuration file editing is required.
+    extensions for the archive files supported by the respective file system
+    driver module - no configuration file editing is required!
 
     The application can simply accept this initial setup of its
-    {{{./apidocs/net/java/truevfs/access/TConfig.html#get()}current configuration}}
+    {{{./apidocs/net/java/truevfs/access/TConfig.html#current()}current configuration}}
     or it can change it, e.g. update its
-    {{{./apidocs/net/java/truevfs/access/TConfig.html#setArchiveDetector(net.truevfs.file.TArchiveDetector)}archive detection}}.
+    {{{./apidocs/net/java/truevfs/access/TConfig.html#setArchiveDetector(net.java.truevfs.access.TArchiveDetector)}archive detection}}.
     Check the {{{./faq.html#file}FAQ}} for the
     {{{./truevfs-access/index.html}TrueVFS Access}}
     API for a discussion of some options to adapt the archive detection to your
@@ -161,7 +161,7 @@ Basic Concepts
     For example, the class
     {{{./apidocs/net/java/truevfs/kernel/spec/FsDriver.html}<<<FsDriver>>>}}
     consists of only one abstract method
-    {{{./apidocs/net/java/truevfs/kernel/spec/FsDriver.html#newController(net.truevfs.kernel.spec.FsManager,net.truevfs.kernel.spec.FsModel,net.truevfs.kernel.spec.FsController)}<<<FsDriver.newController(FsModel, FsController)>>>}}
+    {{{./apidocs/net/java/truevfs/kernel/spec/FsDriver.html#newController(net.java.truevfs.kernel.spec.FsManager,net.java.truevfs.kernel.spec.FsModel,net.java.truevfs.kernel.spec.FsController)}<<<FsDriver.newController(FsManager, FsModel, FsController)>>>}}
     which needs to get implemented in any file system driver module.    
 
 ** Composition Over Inheritance
