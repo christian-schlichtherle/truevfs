@@ -7,7 +7,7 @@ package net.java.truevfs.comp.jmx.spi;
 import java.lang.management.ManagementFactory;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanServer;
-import net.java.truecommons.services.ProviderService;
+import net.java.truecommons.services.LocatableProvider;
 import net.java.truevfs.comp.jmx.sl.MBeanServerLocator;
 
 /**
@@ -23,11 +23,11 @@ import net.java.truevfs.comp.jmx.sl.MBeanServerLocator;
  * {@linkplain ManagementFactory#getPlatformMBeanServer() platform MBean server}.
  * <p>
  * Implementations should be thread-safe.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class MBeanServerProvider extends ProviderService<MBeanServer> {
+public class MBeanServerProvider extends LocatableProvider<MBeanServer> {
 
     @Override
     public MBeanServer get() {

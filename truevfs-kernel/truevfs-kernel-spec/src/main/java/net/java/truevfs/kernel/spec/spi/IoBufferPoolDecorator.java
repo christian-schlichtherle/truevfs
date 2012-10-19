@@ -5,7 +5,7 @@
 package net.java.truevfs.kernel.spec.spi;
 
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.services.DecoratorService;
+import net.java.truecommons.services.LocatableDecorator;
 import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 
@@ -24,5 +24,5 @@ import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
  */
 @ThreadSafe
 public abstract class IoBufferPoolDecorator
-extends DecoratorService<IoBufferPool> {
+extends LocatableDecorator<IoBufferPool> {
 }

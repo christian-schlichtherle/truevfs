@@ -6,7 +6,7 @@ package net.java.truevfs.key.spec.spi;
 
 import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.services.ModifierService;
+import net.java.truecommons.services.LocatableModifier;
 import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.sl.KeyManagerMapLocator;
 
@@ -21,10 +21,10 @@ import net.java.truevfs.key.spec.sl.KeyManagerMapLocator;
  * modifier chain.
  * <p>
  * Implementations should be thread-safe.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
 public abstract class KeyManagerMapModifier
-extends ModifierService<Map<Class<?>, KeyManager<?>>> {
+extends LocatableModifier<Map<Class<?>, KeyManager<?>>> {
 }

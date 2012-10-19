@@ -5,7 +5,7 @@
 package net.java.truevfs.key.swing.spi;
 
 import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.services.FactoryService;
+import net.java.truecommons.services.LocatableFactory;
 import net.java.truevfs.key.swing.feedback.BeepFeedback;
 import net.java.truevfs.key.swing.feedback.Feedback;
 
@@ -21,7 +21,7 @@ import net.java.truevfs.key.swing.feedback.Feedback;
  */
 @Immutable
 public final class FeedbackFactory
-extends FactoryService<Feedback> {
+extends LocatableFactory<Feedback> {
 
     /**
      * Returns a new {@link BeepFeedback}.

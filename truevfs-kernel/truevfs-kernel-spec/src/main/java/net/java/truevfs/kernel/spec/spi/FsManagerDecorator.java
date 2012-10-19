@@ -5,7 +5,7 @@
 package net.java.truevfs.kernel.spec.spi;
 
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.services.DecoratorService;
+import net.java.truecommons.services.LocatableDecorator;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 
@@ -21,9 +21,10 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  * chain.
  * <p>
  * Implementations should be thread-safe.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class FsManagerDecorator extends DecoratorService<FsManager> {
+public abstract class FsManagerDecorator
+extends LocatableDecorator<FsManager> {
 }

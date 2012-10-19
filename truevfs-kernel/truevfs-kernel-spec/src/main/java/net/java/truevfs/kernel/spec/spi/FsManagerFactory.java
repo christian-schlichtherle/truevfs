@@ -5,7 +5,7 @@
 package net.java.truevfs.kernel.spec.spi;
 
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.services.FactoryService;
+import net.java.truecommons.services.LocatableFactory;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 
@@ -19,9 +19,10 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  * selected.
  * <p>
  * Implementations should be thread-safe.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class FsManagerFactory extends FactoryService<FsManager> {
+public abstract class FsManagerFactory
+extends LocatableFactory<FsManager> {
 }
