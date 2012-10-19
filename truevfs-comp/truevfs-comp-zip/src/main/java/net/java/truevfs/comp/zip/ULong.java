@@ -10,7 +10,7 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * Provides constants and static utility methods for unsigned long integer
  * values ({@value SIZE} bits).
- * 
+ *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
@@ -34,13 +34,11 @@ final class ULong {
      */
     public static final int SIZE = 63;
 
-    /** This class cannot get instantiated. */
-    private ULong() {
-    }
+    private ULong() { }
 
     /**
      * Checks the parameter range.
-     * 
+     *
      * @param  l The long integer to check to be in the range of an unsigned
      *         long integer ({@value SIZE} bits).
      * @param  subject The subject of the exception message
@@ -80,7 +78,7 @@ final class ULong {
 
     /**
      * Checks the parameter range.
-     * 
+     *
      * @param  l The long integer to check to be in the range of an unsigned
      *         long integer ({@value SIZE} bits).
      * @return {@code true}
