@@ -17,12 +17,12 @@ import java.nio.channels._
 import javax.annotation.concurrent._
 
 /** Performs a `sync` operation if required.
-  * 
+  *
   * This controller is a barrier for
   * [[net.java.truevfs.kernel.impl.NeedsSyncException]]s:
   * Whenever the decorated controller chain throws a `NeedsSyncException`,
   * the file system gets `sync`ed before the operation gets retried.
-  * 
+  *
   * @see    NeedsSyncException
   * @author Christian Schlichtherle
   */
@@ -105,7 +105,7 @@ extends ArchiveController[E] {
   /**
    * Applies the given file system operation and syncs the decorated controller
    * when appropriate.
-   * 
+   *
    * @throws FsSyncWarningException if <em>only</em> warning conditions
    *         apply.
    *         This implies that the respective parent file system has been
@@ -138,7 +138,7 @@ extends ArchiveController[E] {
    * Modifies the sync options so that no dead lock can appear due to waiting
    * for I/O resources in a recursive file system operationa and restarts the
    * sync operation if required.
-   * 
+   *
    * @param  options the sync options
    * @return the potentially modified sync options.
    */
@@ -146,42 +146,40 @@ extends ArchiveController[E] {
     // HC SVNT DRACONES!
     val modified = SyncController modify options
     val builder = new FsSyncExceptionBuilder;
-    {
-      var break = false
-      while (!break) {
-        try {
-          super.sync(modified)
-          break = true
-        } catch {
-          case ex: FsSyncWarningException =>
-            ex.getCause match {
-              case _: FsOpenResourceException if (modified get FORCE_CLOSE_IO) =>
-                // This exception was thrown by the resource controller in
-                // order to indicate that the state of the virtual file system
-                // may have completely changed as a side effect of temporarily
-                // releasing its write lock.
-                // We need to remember this exception for later rethrowing
-                // and restart the sync operation.
-                builder warn ex
-              case _ =>
-                throw builder fail ex
-            }
-          case ex: FsSyncException =>
-            ex.getCause match {
-              case _: FsOpenResourceException if (modified ne options) =>
-                // Swallow ex.
-                builder check ()
-                throw NeedsLockRetryException()
-              case _ =>
-                throw builder fail ex
-            }
-          case yeahIKnow_IWasActuallyDoingThat: NeedsSyncException =>
-            // This exception was thrown by the resource controller in
-            // order to indicate that the state of the virtual file system
-            // may have completely changed as a side effect of temporarily
-            // releasing its write lock.
-            // We need to restart the sync operation.
-        }
+    var done = false
+    while (!done) {
+      try {
+        super.sync(modified)
+        done = true
+      } catch {
+        case ex: FsSyncWarningException =>
+          ex.getCause match {
+            case _: FsOpenResourceException if (modified get FORCE_CLOSE_IO) =>
+              // This exception was thrown by the resource controller in
+              // order to indicate that the state of the virtual file system
+              // may have completely changed as a side effect of temporarily
+              // releasing its write lock.
+              // We need to remember this exception for later rethrowing
+              // and restart the sync operation.
+              builder warn ex
+            case _ =>
+              throw builder fail ex
+          }
+        case ex: FsSyncException =>
+          ex.getCause match {
+            case _: FsOpenResourceException if (modified ne options) =>
+              // Swallow ex.
+              builder check ()
+              throw NeedsLockRetryException()
+            case _ =>
+              throw builder fail ex
+          }
+        case yeahIKnow_IWasActuallyDoingThat: NeedsSyncException =>
+          // This exception was thrown by the resource controller in
+          // order to indicate that the state of the virtual file system
+          // may have completely changed as a side effect of temporarily
+          // releasing its write lock.
+          // We need to repeat the sync operation.
       }
     }
     builder check ()
