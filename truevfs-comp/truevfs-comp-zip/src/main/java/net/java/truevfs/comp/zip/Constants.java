@@ -14,9 +14,6 @@ import net.java.truecommons.io.Streams;
  */
 final class Constants {
 
-    /* Can't touch this - hammer time! */
-    private Constants() { }
-
     /**
      * This boolean field is set by the system property
      * {@code net.truevfs.driver.zip.io.forceZip64Ext}.
@@ -35,10 +32,10 @@ final class Constants {
 
     /** Local File Header signature. */
     static final int LFH_SIG = 0x04034B50;
-    
+
     /** Data Descriptor signature. */
     static final int DD_SIG = 0x08074B50;
-    
+
     /** Central File Header signature. */
     static final int CFH_SIG = 0x02014B50;
 
@@ -157,4 +154,6 @@ final class Constants {
 
     /** An empty byte array. */
     static final byte[] EMPTY = new byte[0];
+
+    private Constants() { }
 }
