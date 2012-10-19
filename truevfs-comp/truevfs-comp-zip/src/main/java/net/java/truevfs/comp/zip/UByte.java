@@ -10,7 +10,7 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * Provides constants and static utility methods for unsigned byte integer
  * values ({@value SIZE} bits).
- * 
+ *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
@@ -34,13 +34,11 @@ final class UByte {
      */
     public static final int SIZE = 8;
 
-    /** This class cannot get instantiated. */
-    private UByte() {
-    }
+    private UByte() { }
 
     /**
      * Checks the parameter range.
-     * 
+     *
      * @param  i The integer to check to be in the range of an unsigned byte
      *         integer ({@value SIZE} bits).
      * @param  subject The subject of the exception message
@@ -80,7 +78,7 @@ final class UByte {
 
     /**
      * Checks the parameter range.
-     * 
+     *
      * @param  i The integer to check to be in the range of an unsigned byte
      *         integer ({@value SIZE} bits).
      * @return {@code true}

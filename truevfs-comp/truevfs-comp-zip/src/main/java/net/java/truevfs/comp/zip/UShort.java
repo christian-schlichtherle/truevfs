@@ -10,7 +10,7 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * Provides constants and static utility methods for unsigned short integer
  * values ({@value SIZE} bits).
- * 
+ *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
@@ -34,13 +34,11 @@ final class UShort {
      */
     public static final int SIZE = 16;
 
-    /** This class cannot get instantiated. */
-    private UShort() {
-    }
+    private UShort() { }
 
     /**
      * Checks the parameter range.
-     * 
+     *
      * @param  i The integer to check to be in the range of an unsigned short
      *         integer ({@value SIZE} bits).
      * @param  subject The subject of the exception message
@@ -80,7 +78,7 @@ final class UShort {
 
     /**
      * Checks the parameter range.
-     * 
+     *
      * @param  i The integer to check to be in the range of an unsigned short
      *         integer ({@value SIZE} bits).
      * @return {@code true}
