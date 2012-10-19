@@ -6,7 +6,7 @@ package net.java.truevfs.kernel.spec.spi;
 
 import java.util.Map;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.services.ModifierService;
+import net.java.truecommons.services.LocatableModifier;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
@@ -24,10 +24,10 @@ import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
  * modifier chain.
  * <p>
  * Implementations should be thread-safe.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
 public abstract class FsDriverMapModifier
-extends ModifierService<Map<FsScheme, FsDriver>> {
+extends LocatableModifier<Map<FsScheme, FsDriver>> {
 }

@@ -5,7 +5,7 @@
 package net.java.truevfs.key.swing.spi;
 
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.services.DecoratorService;
+import net.java.truecommons.services.LocatableDecorator;
 import net.java.truevfs.key.swing.feedback.Feedback;
 import net.java.truevfs.key.swing.sl.InvalidKeyFeedbackLocator;
 
@@ -22,12 +22,12 @@ import net.java.truevfs.key.swing.sl.InvalidKeyFeedbackLocator;
  * chain.
  * <p>
  * Implementations should be thread-safe.
- * 
+ *
  * @see    FeedbackFactory
  * @see    UnknownKeyFeedbackDecorator
  * @author Christian Schlichtherle
  */
 @ThreadSafe
 public abstract class InvalidKeyFeedbackDecorator
-extends DecoratorService<Feedback> {
+extends LocatableDecorator<Feedback> {
 }

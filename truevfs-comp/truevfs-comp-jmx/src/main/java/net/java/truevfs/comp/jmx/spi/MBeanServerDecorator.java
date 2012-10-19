@@ -6,7 +6,7 @@ package net.java.truevfs.comp.jmx.spi;
 
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanServer;
-import net.java.truecommons.services.DecoratorService;
+import net.java.truecommons.services.LocatableDecorator;
 import net.java.truevfs.comp.jmx.sl.MBeanServerLocator;
 
 /**
@@ -21,10 +21,10 @@ import net.java.truevfs.comp.jmx.sl.MBeanServerLocator;
  * chain.
  * <p>
  * Implementations should be thread-safe.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
 public abstract class MBeanServerDecorator
-extends DecoratorService<MBeanServer> {
+extends LocatableDecorator<MBeanServer> {
 }
