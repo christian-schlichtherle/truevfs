@@ -55,26 +55,19 @@ final class UByte {
             final int i,
             final @CheckForNull String subject,
             final @CheckForNull String error) {
-        if (MIN_VALUE <= i && i <= MAX_VALUE)
-            return true;
-
+        if (MIN_VALUE <= i && i <= MAX_VALUE) return true;
         final StringBuilder message = new StringBuilder();
-        if (null != subject) {
-            message.append(subject);
-            message.append(": ");
-        }
-        if (null != error) {
-            message.append(error);
-            message.append(": ");
-        }
-        message.append(i);
-        message.append(" is not within ");
-        message.append(MIN_VALUE);
-        message.append(" and ");
-        message.append(MAX_VALUE);
-        message.append(" inclusive.");
-        throw new IllegalArgumentException(message.toString());
-    }
+        if (null != subject) message.append(subject).append(": ");
+        if (null != error) message.append(error).append(": ");
+        throw new IllegalArgumentException(message
+                .append(i)
+                .append(" is not within ")
+                .append(MIN_VALUE)
+                .append(" and ")
+                .append(MAX_VALUE)
+                .append(" inclusive.")
+                .toString());
+   }
 
     /**
      * Checks the parameter range.
