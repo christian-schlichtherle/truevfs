@@ -147,7 +147,7 @@ extends ArchiveController[E] {
     val modified = SyncController modify options
     val builder = new FsSyncExceptionBuilder;
     var done = false
-    while (!done) {
+    do {
       try {
         super.sync(modified)
         done = true
@@ -181,7 +181,7 @@ extends ArchiveController[E] {
           // releasing its write lock.
           // We need to repeat the sync operation.
       }
-    }
+    } while (!done)
     builder check ()
   }
 }
