@@ -544,10 +544,12 @@ public class ZipEntry implements Cloneable {
      */
     public final void setExtra(final @CheckForNull byte[] buf)
     throws IllegalArgumentException {
-        if (null != buf)
+        if (null != buf) {
             UShort.check(buf.length, "Extra Fields too large", null);
-        if (null == buf || 0 >= buf.length) this.fields = null;
-        else setExtraFields(buf, false);
+            setExtraFields(buf, false);
+        } else {
+            this.fields = null;
+        }
     }
 
     /**
@@ -569,8 +571,6 @@ public class ZipEntry implements Cloneable {
      */
     final void setRawExtraFields(final byte[] buf)
     throws IllegalArgumentException {
-        assert 0 < buf.length;
-        assert UShort.check(buf.length);
         setExtraFields(buf, true);
     }
 
@@ -594,18 +594,18 @@ public class ZipEntry implements Cloneable {
      */
     private void setExtraFields(final byte[] buf, final boolean zip64)
     throws IllegalArgumentException {
-        ExtraFields fields = this.fields;
-        if (null == fields) this.fields = fields = new ExtraFields();
-        fields.readFrom(buf, 0, buf.length);
-        try {
-            if (zip64) parseZip64ExtraField();
-        } catch (final IndexOutOfBoundsException ex) {
-            throw new IllegalArgumentException(ex);
-        }
-        assert fields == this.fields;
-        fields.remove(ZIP64_HEADER_ID);
-        if (0 >= fields.size()) {
-            assert 0 == fields.size();
+        assert UShort.check(buf.length);
+        if (0 < buf.length) {
+            final ExtraFields fields = new ExtraFields();
+            fields.readFrom(buf, 0, buf.length);
+            try {
+                if (zip64) parseZip64ExtraField(fields);
+            } catch (final IndexOutOfBoundsException ex) {
+                throw new IllegalArgumentException(ex);
+            }
+            fields.remove(ZIP64_HEADER_ID);
+            this.fields = 0 < fields.size() ? fields : null;
+        } else {
             this.fields = null;
         }
     }
@@ -653,9 +653,8 @@ public class ZipEntry implements Cloneable {
      * extra field, if present.
      * The ZIP64 Extended Information extra field is <em>not</em> removed.
      */
-    private void parseZip64ExtraField() throws IndexOutOfBoundsException {
-        final ExtraFields fields = this.fields;
-        if (null == fields) return;
+    private void parseZip64ExtraField(final ExtraFields fields)
+    throws IndexOutOfBoundsException {
         final ExtraField ef = fields.get(ZIP64_HEADER_ID);
         if (null == ef) return;
         final byte[] data = ef.getDataBlock();
