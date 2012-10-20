@@ -4,56 +4,55 @@
  */
 package net.java.truevfs.comp.zip;
 
+import java.util.Map;
+import java.util.TreeMap;
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.NotThreadSafe;
 import static net.java.truevfs.comp.zip.Constants.EMPTY;
 import static net.java.truevfs.comp.zip.LittleEndian.readUShort;
 import static net.java.truevfs.comp.zip.LittleEndian.writeShort;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import java.util.Map;
-import java.util.TreeMap;
-import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * Represents a collection of {@link ExtraField Extra Fields} as they may
+ * Represents a collection of {@link ExtraField extra fields} as they may
  * be present at several locations in ZIP files.
- * 
+ *
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
 final class ExtraFields implements Cloneable {
 
     /**
-     * The map of Extra Fields.
-     * Maps from Header ID [{@link Integer}] to Extra Field [{@link ExtraField}].
-     * Must not be {@code null}, but may be empty if no Extra Fields are used.
+     * The map of extra fields.
+     * Maps from Header ID [{@link Integer}] to extra field [{@link ExtraField}].
+     * Must not be {@code null}, but may be empty if no extra fields are used.
      * The map is sorted by Header IDs in ascending order.
      */
-    private Map<Integer, ExtraField> extra = new TreeMap<Integer, ExtraField>();
+    private Map<Integer, ExtraField> extra = new TreeMap<>();
 
     /** Returns a shallow clone of this collection. */
     @Override
+    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     public ExtraFields clone() {
         try {
             final ExtraFields clone = (ExtraFields) super.clone();
-            clone.extra = new TreeMap<Integer, ExtraField>(extra);
+            clone.extra = new TreeMap<>(extra);
             return clone;
         } catch (CloneNotSupportedException cannotHappen) {
             throw new AssertionError(cannotHappen);
         }
     }
 
-    /** Returns the number of Extra Fields in this collection. */
-    int size() {
-        return extra.size();
-    }
+    /** Returns the number of extra fields in this collection. */
+    int size() { return extra.size(); }
 
     /**
-     * Returns the Extra Field with the given Header ID or {@code null}
-     * if no such Extra Field exists.
-     * 
+     * Returns the extra field with the given Header ID or {@code null}
+     * if no such extra field exists.
+     *
      * @param headerId The requested Header ID.
-     * @return The Extra Field with the given Header ID or {@code null}
-     *         if no such Extra Field exists.
+     * @return The extra field with the given Header ID or {@code null}
+     *         if no such extra field exists.
      * @throws IllegalArgumentException If {@code headerID} is not in
      *         the range of {@code 0} to {@link UShort#MAX_VALUE}
      *         ({@value net.truevfs.driver.zip.io.UShort#MAX_VALUE}).
@@ -66,12 +65,12 @@ final class ExtraFields implements Cloneable {
     }
 
     /**
-     * Stores the given Extra Field in this collection.
-     * 
-     * @param ef The Extra Field to store in this collection.
-     * @return The Extra Field previously associated with the Header ID of
-     *         of the given Extra Field or {@code null} if no such
-     *         Extra Field existed.
+     * Stores the given extra field in this collection.
+     *
+     * @param ef The extra field to store in this collection.
+     * @return The extra field previously associated with the Header ID of
+     *         of the given extra field or {@code null} if no such
+     *         extra field existed.
      * @throws NullPointerException If {@code ef} is {@code null}.
      * @throws IllegalArgumentException If the Header ID of the given Extra
      *         Field is not in the range of {@code 0} to
@@ -85,11 +84,11 @@ final class ExtraFields implements Cloneable {
     }
 
     /**
-     * Removes the Extra Field with the given Header ID.
-     * 
+     * Removes the extra field with the given Header ID.
+     *
      * @param headerId The requested Header ID.
-     * @return The Extra Field with the given Header ID or {@code null}
-     *         if no such Extra Field exists.
+     * @return The extra field with the given Header ID or {@code null}
+     *         if no such extra field exists.
      * @throws IllegalArgumentException If {@code headerID} is not in
      *         the range of {@code 0} to {@link UShort#MAX_VALUE}
      *         ({@value net.truevfs.driver.zip.io.UShort#MAX_VALUE}).
@@ -102,68 +101,70 @@ final class ExtraFields implements Cloneable {
     }
 
     /**
-     * Returns the number of bytes required to hold the Extra Fields.
-     * 
-     * @return The length of the Extra Fields in bytes.
+     * Returns the number of bytes required to hold the extra fields.
+     *
+     * @return The length of the extra fields in bytes.
      *         May be {@code 0}.
-     * @see #getExtra
+     * @see #getDataBlock
      */
-    int getExtraLength() {
+    int getDataSize() {
         final Map<Integer, ExtraField> extra = this.extra;
-        if (extra.isEmpty())
-            return 0;
+        if (extra.isEmpty()) return 0;
         int l = 0;
-        for (ExtraField ef : extra.values())
-            l += 4 + ef.getDataSize();
+        for (ExtraField ef : extra.values()) l += 4 + ef.getDataSize();
         return l;
     }
 
     /**
-     * Returns a protective copy of the Extra Fields.
+     * Returns a protective copy of the extra fields.
      * {@code null} is never returned.
-     * 
-     * @see #getExtraLength
+     *
+     * @see #getDataSize
      */
-    byte[] getExtra() {
-        final int size = getExtraLength();
+    byte[] getDataBlock() {
+        final int size = getDataSize();
         assert UShort.check(size);
-        if (0 == size)
-            return EMPTY;
+        if (0 == size) return EMPTY;
         final byte[] data = new byte[size];
         writeTo(data, 0);
         return data;
     }
 
     /**
-     * Initializes this collection by deserializing a list of Extra Fields
-     * of {@code size} bytes from the byte array {@code data} at the zero
-     * based offset {@code off}.
-     * After return, this collection does not access {@code data} anymore
-     * and {@link #getExtraLength} equals {@code size}.
+     * Deserializes this collection of extra fields from
+     * the data block starting at the zero based offset {@code off} with
+     * {@code len} bytes length in the byte array {@code buf}.
+     * After return, this collection does not access {@code buf} anymore
+     * and {@link #getDataSize} equals {@code len}.
      *
-     * @param  data The byte array to read the list of Extra Fields from.
+     * @param  buf The byte array to read the data block from.
      * @param  off The zero based offset in the byte array where the first byte
-     *         of the list of Extra Fields is read from.
-     * @param  size The length of the list of Extra Fields in bytes.
+     *         of the data block is read from.
+     * @param  len The length of the data block in bytes.
      * @throws IndexOutOfBoundsException If the byte array
-     *         {@code data} does not hold at least {@code size}
+     *         {@code buf} does not hold at least {@code len}
      *         bytes at the zero based offset {@code off}.
-     * @throws RuntimeException If {@code size} is illegal or the
-     *         deserialized list of Extra Fields contains illegal data.
-     * @see    #getExtraLength
+     * @throws IllegalArgumentException If the data block does not conform to
+     *         the ZIP File Format Specification.
+     * @see    #getDataSize
      */
-    void readFrom(final byte[] data, int off, final int size) {
-        assert UShort.check(size);
-        final Map<Integer, ExtraField> map = new TreeMap<Integer, ExtraField>();
-        if (null != data && 0 < size) {
-            final int end = off + size;
+    void readFrom(final byte[] buf, int off, final int len)
+    throws IndexOutOfBoundsException, IllegalArgumentException {
+        assert UShort.check(len);
+        final Map<Integer, ExtraField> map = new TreeMap<>();
+        if (null != buf && 0 < len) {
+            final int end = off + len;
             while (off < end) {
-                final int headerId = readUShort(data, off);
+                final int headerId = readUShort(buf, off);
                 off += 2;
-                final int dataSize = readUShort(data, off);
+                final int dataSize = readUShort(buf, off);
                 off += 2;
                 final ExtraField ef = ExtraField.create(headerId);
-                ef.readFrom(data, off, dataSize);
+                try {
+                    ef.readFrom(buf, off, dataSize);
+                } catch (final IndexOutOfBoundsException ex) {
+                    throw new IllegalArgumentException(ex);
+                }
                 off += dataSize;
                 map.put(headerId, ef);
             }
@@ -173,26 +174,28 @@ final class ExtraFields implements Cloneable {
     }
 
     /**
-     * Serializes a list of Extra Fields of {@link #getExtraLength} bytes to the
-     * byte array {@code data} at the zero based offset {@code off}.
+     * Serializes this collection of extra fields to
+     * the data block starting at the zero based offset {@code off} with
+     * {@link #getDataSize} bytes length in the byte array {@code buf}.
      * Upon return, this collection shall not access {@code data}
      * subsequently.
      *
-     * @param  data The byte array to write the list of Extra Fields to.
+     * @param  buf The byte array to write the data block to.
      * @param  off The zero based offset in the byte array where the first byte
-     *         of the list of Extra Fields is written to.
+     *         of the data block is written to.
      * @throws IndexOutOfBoundsException If the byte array
-     *         {@code data} does not hold at least {@link #getExtraLength}
+     *         {@code buf} does not hold at least {@link #getDataSize}
      *         bytes at the zero based offset {@code off}.
-     * @see    #getExtraLength
+     * @see    #getDataSize
      */
-    void writeTo(final byte[] data, int off) {
+    void writeTo(final byte[] buf, int off)
+    throws IndexOutOfBoundsException {
        for (final ExtraField ef : extra.values()) {
-            writeShort(ef.getHeaderId(), data, off);
+            writeShort(ef.getHeaderId(), buf, off);
             off += 2;
-            writeShort(ef.getDataSize(), data, off);
+            writeShort(ef.getDataSize(), buf, off);
             off += 2;
-            ef.writeTo(data, off);
+            ef.writeTo(buf, off);
             off += ef.getDataSize();
         }
     }

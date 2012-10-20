@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.comp.zip.crypto;
+package net.java.truevfs.comp.zip.crypto.it;
 
 import net.java.truevfs.comp.zip.crypto.SeekableBlockCipher;
 import net.java.truevfs.comp.zip.crypto.CipherReadOnlyChannel;
@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import net.java.truevfs.comp.zip.crypto.CipherReadOnlyChannel;
+import net.java.truevfs.comp.zip.crypto.SeekableBlockCipher;
 import org.bouncycastle.crypto.engines.NullEngine;
 
 /**

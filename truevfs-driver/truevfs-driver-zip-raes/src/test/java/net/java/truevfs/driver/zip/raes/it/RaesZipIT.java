@@ -2,11 +2,8 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.driver.zip.raes.zip;
+package net.java.truevfs.driver.zip.raes.it;
 
-import net.java.truecommons.io.AbstractSource;
-import net.java.truecommons.io.OneTimeSink;
-import net.java.truecommons.io.OneTimeSource;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -14,24 +11,27 @@ import java.nio.charset.Charset;
 import static java.nio.file.Files.newByteChannel;
 import java.nio.file.Path;
 import java.util.Objects;
+import net.java.truecommons.io.AbstractSource;
+import net.java.truecommons.io.OneTimeSink;
+import net.java.truecommons.io.OneTimeSource;
 import net.java.truevfs.comp.zip.ZipFile;
 import net.java.truevfs.comp.zip.ZipOutputStream;
-import net.java.truevfs.comp.zip.ZipTestSuite;
+import net.java.truevfs.comp.zip.it.ZipITSuite;
 import net.java.truevfs.driver.zip.raes.crypto.MockType0RaesParameters;
 import net.java.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import net.java.truevfs.driver.zip.raes.crypto.RaesParameters;
 import net.java.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
-        
+
 /**
  * Tests compression and encryption of data.
- * 
+ *
  * @author Christian Schlichtherle
  */
-public final class RaesZipIT extends ZipTestSuite {
+public final class RaesZipIT extends ZipITSuite {
 
     /** Cipher text shorter than this gets authenticated. */
     private static int AUTHENTICATION_TRIGGER = 512 * 1024;
-    
+
     // Must not be static to enable parallel testing!
     private final RaesParameters raesParameters = new MockType0RaesParameters();
 

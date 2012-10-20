@@ -2,16 +2,8 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.comp.zip;
+package net.java.truevfs.comp.zip.it;
 
-import net.java.truevfs.comp.zip.Crc32Exception;
-import net.java.truevfs.comp.zip.ZipFile;
-import net.java.truevfs.comp.zip.ZipEntry;
-import net.java.truevfs.comp.zip.ZipEntryFactory;
-import net.java.truevfs.comp.zip.ZipOutputStream;
-import static net.java.truecommons.shed.ConcurrencyUtils.*;
-import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
-import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
@@ -22,7 +14,14 @@ import static java.nio.file.StandardOpenOption.APPEND;
 import static java.nio.file.StandardOpenOption.WRITE;
 import java.util.*;
 import java.util.concurrent.Callable;
-import static net.java.truevfs.comp.zip.Constants.FORCE_ZIP64_EXT;
+import static net.java.truecommons.shed.ConcurrencyUtils.*;
+import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
+import static net.java.truecommons.shed.HashMaps.initialCapacity;
+import net.java.truevfs.comp.zip.Crc32Exception;
+import net.java.truevfs.comp.zip.ZipEntry;
+import net.java.truevfs.comp.zip.ZipEntryFactory;
+import net.java.truevfs.comp.zip.ZipFile;
+import net.java.truevfs.comp.zip.ZipOutputStream;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -35,10 +34,13 @@ import org.slf4j.LoggerFactory;
  *
  * @author Christian Schlichtherle
  */
-public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
+public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
 
     private static final Logger
-            logger = LoggerFactory.getLogger(ZipTestSuite.class);
+            logger = LoggerFactory.getLogger(ZipITSuite.class);
+
+    private static final boolean FORCE_ZIP64_EXT = Boolean.getBoolean(
+            ZipEntry.class.getPackage().getName() + ".forceZip64Ext");
 
     protected static final String TEMP_FILE_PREFIX = "tzp";
 
@@ -64,7 +66,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
      * to be zipped.
      * It must also finally call this superclass implementation to create
      * the temporary file to be used as a ZIP file.
-     * 
+     *
      * @throws IOException On any I/O error.
      */
     @Before
@@ -422,7 +424,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
      * Note that this is a hack which works with plain ZIP files only (e.g. not
      * with RAES encrypted ZIP files) and may easily break if the
      * ZipOutputStream class changes its implementation!
-     * 
+     *
      * @throws IOException On any I/O error.
      */
     @Test
@@ -495,7 +497,7 @@ public abstract class ZipTestSuite implements ZipEntryFactory<ZipEntry> {
      * <p>
      * Note that this may work with plain ZIP files only (e.g. not
      * with RAES encrypted ZIP files).
-     * 
+     *
      * @throws IOException On any I/O error.
      */
     @Test

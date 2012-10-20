@@ -4,15 +4,12 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truevfs.comp.zip.ExtraField;
-import net.java.truevfs.comp.zip.DefaultExtraField;
-import net.java.truevfs.comp.zip.UShort;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
  * A test case for the {@link ExtraField} class.
- * 
+ *
  * @author Christian Schlichtherle
  */
 public final class ExtraFieldTest {
@@ -36,7 +33,7 @@ public final class ExtraFieldTest {
             fail();
         } catch (IllegalArgumentException expected) {
         }
-        
+
         ExtraField.register(NullExtraField.class);
     }
 
@@ -98,14 +95,16 @@ public final class ExtraFieldTest {
         }
     }
 
-    private static class TooSmallHeaderIDExtraField extends NullExtraField {
+    private static final class TooSmallHeaderIDExtraField
+    extends NullExtraField {
         @Override
         public int getHeaderId() {
             return UShort.MIN_VALUE - 1; // illegal return value
         }
     }
 
-    private static class TooLargeHeaderIDExtraField extends NullExtraField {
+    private static final class TooLargeHeaderIDExtraField
+    extends NullExtraField {
         @Override
         public int getHeaderId() {
             return UShort.MAX_VALUE + 1; // illegal return value

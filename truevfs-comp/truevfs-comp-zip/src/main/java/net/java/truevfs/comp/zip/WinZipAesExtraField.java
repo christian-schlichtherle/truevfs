@@ -4,11 +4,11 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truevfs.key.spec.param.AesKeyStrength;
-import static net.java.truevfs.key.spec.param.AesKeyStrength.BITS_128;
+import javax.annotation.concurrent.NotThreadSafe;
 import static net.java.truevfs.comp.zip.LittleEndian.readUShort;
 import static net.java.truevfs.comp.zip.LittleEndian.writeShort;
-import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truevfs.key.spec.param.AesKeyStrength;
+import static net.java.truevfs.key.spec.param.AesKeyStrength.BITS_128;
 
 /**
  * WinZip AES Extra Field.
@@ -19,7 +19,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
-final class WinZipAesEntryExtraField extends ExtraField {
+final class WinZipAesExtraField extends ExtraField {
 
     private static final int DATA_SIZE = 7;
     private static final int VENDOR_ID = 'A' | ('E' << 8);
@@ -43,12 +43,6 @@ final class WinZipAesEntryExtraField extends ExtraField {
     private byte encryptionStrength = encryptionStrength(BITS_128);
     private short method;
 
-    /**
-     * Constructs a new WinZip AES Extra Field.
-     */
-    WinZipAesEntryExtraField() {
-    }
-
     private static byte encryptionStrength(AesKeyStrength keyStrength) {
         return (byte) (keyStrength.ordinal() + 1);
     }
@@ -58,28 +52,22 @@ final class WinZipAesEntryExtraField extends ExtraField {
     }
 
     @Override
-    int getHeaderId() {
-        return WINZIP_AES_ID;
-    }
+    int getHeaderId() { return WINZIP_AES_ID; }
 
     @Override
-    int getDataSize() {
-        return DATA_SIZE;
-    }
+    int getDataSize() { return DATA_SIZE; }
 
     /**
      * Returns the vendor version.
-     * 
+     *
      * @see #VV_AE_1
      * @see #VV_AE_2
      */
-    int getVendorVersion() {
-        return vendorVersion & UShort.MAX_VALUE;
-    }
+    int getVendorVersion() { return vendorVersion & UShort.MAX_VALUE; }
 
     /**
      * Sets the vendor version.
-     * 
+     *
      * @see    #VV_AE_1
      * @see    #VV_AE_2
      * @param  vendorVersion the vendor version.
@@ -91,9 +79,7 @@ final class WinZipAesEntryExtraField extends ExtraField {
         this.vendorVersion = (short) vendorVersion;
     }
 
-    int getVendorId() {
-        return VENDOR_ID;
-    }
+    int getVendorId() { return VENDOR_ID; }
 
     AesKeyStrength getKeyStrength() {
         return keyStrength(this.encryptionStrength);
@@ -103,9 +89,7 @@ final class WinZipAesEntryExtraField extends ExtraField {
         this.encryptionStrength = encryptionStrength(keyStrength);
     }
 
-    int getMethod() {
-        return method & UShort.MAX_VALUE;
-    }
+    int getMethod() { return method & UShort.MAX_VALUE; }
 
     void setMethod(final int compressionMethod) {
         assert UShort.check(compressionMethod);
@@ -113,30 +97,28 @@ final class WinZipAesEntryExtraField extends ExtraField {
     }
 
     @Override
-    void readFrom(final byte[] src, int off, final int size) {
-        if (DATA_SIZE != size)
-            throw new IllegalArgumentException();
-        setVendorVersion(readUShort(src, off));
+    void readFrom(final byte[] buf, int off, final int len) {
+        if (DATA_SIZE != len) throw new IllegalArgumentException();
+        setVendorVersion(readUShort(buf, off));
         off += 2;
-        final int vendorId = (short) readUShort(src, off);
+        final int vendorId = (short) readUShort(buf, off);
         off += 2;
-        if (VENDOR_ID != vendorId)
-            throw new IllegalArgumentException();
-        setKeyStrength(keyStrength(src[off])); // checked
+        if (VENDOR_ID != vendorId) throw new IllegalArgumentException();
+        setKeyStrength(keyStrength(buf[off])); // checked
         off += 1;
-        setMethod(readUShort(src, off));
+        setMethod(readUShort(buf, off));
         // off += 2;
     }
 
     @Override
-    void writeTo(byte[] dst, int off) {
-        writeShort(this.vendorVersion, dst, off);
+    void writeTo(byte[] buf, int off) {
+        writeShort(this.vendorVersion, buf, off);
         off += 2;
-        writeShort(VENDOR_ID, dst, off);
+        writeShort(VENDOR_ID, buf, off);
         off += 2;
-        dst[off] = this.encryptionStrength;
+        buf[off] = this.encryptionStrength;
         off += 1;
-        writeShort(this.method, dst, off);
+        writeShort(this.method, buf, off);
         // off += 2;
     }
 }

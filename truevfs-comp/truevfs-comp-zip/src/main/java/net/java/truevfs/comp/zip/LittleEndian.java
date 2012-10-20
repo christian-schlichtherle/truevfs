@@ -9,15 +9,13 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * Provides static utility methods for reading and writing integer values in
  * little endian format from or to byte arrays.
- * 
+ *
  * @author  Christian Schlichtherle
  */
 @ThreadSafe
 final class LittleEndian {
 
-    /** This class cannot get instantiated. */
-    private LittleEndian() {
-    }
+    private LittleEndian() { }
 
     /**
      * Reads a signed byte integer value from the byte array
@@ -27,6 +25,7 @@ final class LittleEndian {
      * @param  off The zero based offset in the byte array where the signed
      *         byte integer value is read from.
      * @return The signed byte integer value read from the byte array.
+     * @throws IndexOutOfBoundsException
      */
     static byte readByte(final byte[] buf, final int off) {
         return buf[off];
@@ -45,6 +44,7 @@ final class LittleEndian {
      *         Java does not provide {@code unsigned short} as a primitive
      *         type, hence an {@code int} is returned which's three most
      *         significant bytes are zero.
+     * @throws IndexOutOfBoundsException
      */
     static int readUByte(final byte[] buf, final int off) {
         return buf[off] & UByte.MAX_VALUE;
@@ -59,6 +59,7 @@ final class LittleEndian {
      * @param  off The zero based offset in the byte array where the first byte
      *         of the signed short integer value is read from.
      * @return The signed short integer value read from the byte array.
+     * @throws IndexOutOfBoundsException
      */
     static int readShort(final byte[] buf, final int off) {
         return (buf[off + 1] << 8) | (buf[off] & UByte.MAX_VALUE);
@@ -78,6 +79,7 @@ final class LittleEndian {
      *         Java does not provide {@code unsigned short} as a primitive
      *         type, hence an {@code int} is returned which's two most
      *         significant bytes are zero.
+     * @throws IndexOutOfBoundsException
      */
     static int readUShort(final byte[] buf, final int off) {
         return ((buf[off + 1] & UByte.MAX_VALUE) << 8) | (buf[off] & UByte.MAX_VALUE);
@@ -92,6 +94,7 @@ final class LittleEndian {
      * @param  off The zero based offset in the byte array where the first byte
      *         of the signed integer value is read from.
      * @return The signed integer value read from the byte array.
+     * @throws IndexOutOfBoundsException
      */
     static int readInt(final byte[] buf, int off) {
         off += 3;
@@ -119,6 +122,7 @@ final class LittleEndian {
      *         Java does not provide {@code unsigned int} as a primitive
      *         type, hence a {@code long} is returned which's four most
      *         significant bytes are zero.
+     * @throws IndexOutOfBoundsException
      */
     static long readUInt(final byte[] buf, int off) {
         return readInt(buf, off) & UInt.MAX_VALUE;
@@ -133,6 +137,7 @@ final class LittleEndian {
      * @param  off The zero based offset in the byte array where the first byte
      *         of the (signed) long integer value is read from.
      * @return The (signed) long integer value read from the byte array.
+     * @throws IndexOutOfBoundsException
      */
     static long readLong(final byte[] buf, int off) {
         off += 7;
@@ -160,10 +165,11 @@ final class LittleEndian {
      * as one byte.
      * The most significant three bytes of the integer value are ignored.
      *
-     * @param b The integer value to be written.
-     * @param buf The byte array to write the integer value to.
-     * @param off The zero based offset in the byte array where the byte
-     *        of the integer value is written to.
+     * @param  b The integer value to be written.
+     * @param  buf The byte array to write the integer value to.
+     * @param  off The zero based offset in the byte array where the byte
+     *         of the integer value is written to.
+     * @throws IndexOutOfBoundsException
      */
     static void writeByte(int b, byte[] buf, int off) {
         buf[off] = (byte) b;
@@ -175,10 +181,11 @@ final class LittleEndian {
      * as two bytes, low byte first.
      * The most significant two bytes of the integer value are ignored.
      *
-     * @param s The integer value to be written.
-     * @param buf The byte array to write the integer value to.
-     * @param off The zero based offset in the byte array where the first byte
-     *        of the integer value is written to.
+     * @param  s The integer value to be written.
+     * @param  buf The byte array to write the integer value to.
+     * @param  off The zero based offset in the byte array where the first byte
+     *         of the integer value is written to.
+     * @throws IndexOutOfBoundsException
      */
     static void writeShort(int s, final byte[] buf, final int off) {
         buf[off] = (byte) s;
@@ -191,10 +198,11 @@ final class LittleEndian {
      * {@code buf} at the zero based offset {@code off}
      * as four bytes, low byte first.
      *
-     * @param i The integer value to be written.
-     * @param buf The byte array to write the integer value to.
-     * @param off The zero based offset in the byte array where the first byte
-     *        of the integer value is written to.
+     * @param  i The integer value to be written.
+     * @param  buf The byte array to write the integer value to.
+     * @param  off The zero based offset in the byte array where the first byte
+     *         of the integer value is written to.
+     * @throws IndexOutOfBoundsException
      */
     static void writeInt(int i, final byte[] buf, final int off) {
         buf[off] = (byte) i;
@@ -211,10 +219,11 @@ final class LittleEndian {
      * {@code buf} at the zero based offset {@code off}
      * as eight bytes, low byte first.
      *
-     * @param l The long integer value to be written.
-     * @param buf The byte array to write the long integer value to.
-     * @param off The zero based offset in the byte array where the first byte
-     *        of the long integer value is written to.
+     * @param  l The long integer value to be written.
+     * @param  buf The byte array to write the long integer value to.
+     * @param  off The zero based offset in the byte array where the first byte
+     *         of the long integer value is written to.
+     * @throws IndexOutOfBoundsException
      */
     static void writeLong(long l, final byte[] buf, final int off) {
         buf[off] = (byte) l;

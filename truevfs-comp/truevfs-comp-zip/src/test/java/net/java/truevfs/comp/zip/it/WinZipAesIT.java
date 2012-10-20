@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.comp.zip;
+package net.java.truevfs.comp.zip.it;
 
 import net.java.truevfs.comp.zip.ZipEntry;
 import net.java.truevfs.comp.zip.ZipKeyException;
@@ -15,12 +15,17 @@ import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import net.java.truevfs.comp.zip.WinZipAesParameters;
+import net.java.truevfs.comp.zip.ZipEntry;
+import net.java.truevfs.comp.zip.ZipFile;
+import net.java.truevfs.comp.zip.ZipKeyException;
+import net.java.truevfs.comp.zip.ZipOutputStream;
 import static org.junit.Assert.assertSame;
 
 /**
  * @author Christian Schlichtherle
  */
-public final class WinZipAesIT extends ZipTestSuite {
+public final class WinZipAesIT extends ZipITSuite {
 
     @Override
     public ZipEntry newEntry(String name) {
