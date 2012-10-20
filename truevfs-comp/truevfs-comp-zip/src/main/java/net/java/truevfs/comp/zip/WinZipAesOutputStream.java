@@ -24,7 +24,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 
 /**
  * Encrypts ZIP entry contents according the WinZip AES specification.
- * 
+ *
  * @see     <a href="http://www.winzip.com/win/en/aes_info.htm">AES Encryption Information: Encryption Specification AE-1 and AE-2 (WinZip Computing, S.L.)</a>
  * @see     <a href="http://www.winzip.com/win/en/aes_tips.htm">AES Coding Tips for Developers (WinZip Computing, S.L.)</a>
  * @see     <a href="http://www.gladman.me.uk/cryptography_technology/fileencrypt/">A Password Based File Encyption Utility (Dr. Gladman)</a>
@@ -33,7 +33,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
-final class WinZipAesEntryOutputStream extends DecoratingOutputStream {
+final class WinZipAesOutputStream extends DecoratingOutputStream {
 
     /**
      * The iteration count for the derived keys of the cipher, KLAC and MAC.
@@ -59,7 +59,7 @@ final class WinZipAesEntryOutputStream extends DecoratingOutputStream {
      **/
     private LittleEndianOutputStream leos;
 
-    WinZipAesEntryOutputStream(
+    WinZipAesOutputStream(
             final WinZipAesEntryParameters param,
             final LittleEndianOutputStream leos)
     throws IOException {

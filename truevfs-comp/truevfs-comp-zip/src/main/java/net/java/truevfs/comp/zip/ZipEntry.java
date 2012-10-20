@@ -52,21 +52,21 @@ public class ZipEntry implements Cloneable {
 
     /**
      * Method for <em>Stored</em> (uncompressed) entries.
-     * 
+     *
      * @see   #setMethod(int)
      */
     public static final int STORED = 0;
 
     /**
      * Method for <em>Deflated</em> compressed entries.
-     * 
+     *
      * @see   #setMethod(int)
      */
     public static final int DEFLATED = 8;
 
     /**
      * Method for <em>BZIP2</em> compressed entries.
-     * 
+     *
      * @see   #setMethod(int)
      */
     public static final int BZIP2 = 12;
@@ -109,9 +109,9 @@ public class ZipEntry implements Cloneable {
     private long offset = UNKNOWN;     // 63 bits unsigned integer (ULong)
 
     /**
-     * The map of Extra Fields.
-     * Maps from Header ID [Integer] to Extra Field [ExtraField].
-     * Should be {@code null} or may be empty if no Extra Fields are used.
+     * The map of extra fields.
+     * Maps from Header ID [Integer] to extra field [ExtraField].
+     * Should be {@code null} or may be empty if no extra fields are used.
      */
     private @CheckForNull ExtraFields fields;
 
@@ -128,6 +128,7 @@ public class ZipEntry implements Cloneable {
      * Constructs a new ZIP entry with the given name and all other properties
      * copied from the given template.
      */
+    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     protected ZipEntry(final String name, final ZipEntry template) {
         UShort.check(name.length());
         this.init = template.init;
@@ -147,6 +148,7 @@ public class ZipEntry implements Cloneable {
     }
 
     @Override
+    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     public ZipEntry clone() {
         final ZipEntry entry;
         try {
@@ -159,9 +161,7 @@ public class ZipEntry implements Cloneable {
         return entry;
     }
 
-    private boolean isInit(final int mask) {
-        return 0 != (init & mask);
-    }
+    private boolean isInit(final int mask) { return 0 != (init & mask); }
 
     private void setInit(final int mask, final boolean init) {
         if (init)
@@ -171,17 +171,13 @@ public class ZipEntry implements Cloneable {
     }
 
     /** Returns the ZIP entry name. */
-    public final String getName() {
-        return name;
-    }
+    public final String getName() { return name; }
 
     /**
      * Returns true if and only if this ZIP entry represents a directory entry
      * (i.e. end with {@code '/'}).
      */
-    public final boolean isDirectory() {
-        return name.endsWith("/");
-    }
+    public final boolean isDirectory() { return name.endsWith("/"); }
 
     public final int getPlatform() {
         return isInit(PLATFORM) ? platform & UByte.MAX_VALUE : UNKNOWN;
@@ -198,9 +194,7 @@ public class ZipEntry implements Cloneable {
         setInit(PLATFORM, known);
     }
 
-    final int getRawPlatform() {
-        return platform & UByte.MAX_VALUE;
-    }
+    final int getRawPlatform() { return platform & UByte.MAX_VALUE; }
 
     final void setRawPlatform(final int platform) {
         assert UByte.check(platform);
@@ -246,7 +240,7 @@ public class ZipEntry implements Cloneable {
     /**
      * Returns {@code true} if and only if this ZIP entry is encrypted.
      * Note that only WinZip AES encryption is currently supported.
-     * 
+     *
      * @return {@code true} if and only if this ZIP entry is encrypted.
      */
     public final boolean isEncrypted() {
@@ -260,7 +254,7 @@ public class ZipEntry implements Cloneable {
      * <p>
      * Note that only {@link WinZipAesParameters WinZip AES encryption} is
      * currently supported.
-     * 
+     *
      * @param encrypted whether or not this ZIP entry should get encrypted.
      */
     public final void setEncrypted(boolean encrypted) {
@@ -274,8 +268,8 @@ public class ZipEntry implements Cloneable {
      */
     public final void clearEncryption() {
         setEncrypted(false);
-        final WinZipAesEntryExtraField field
-                = (WinZipAesEntryExtraField) removeExtraField(WINZIP_AES_ID);
+        final WinZipAesExtraField field
+                = (WinZipAesExtraField) removeExtraField(WINZIP_AES_ID);
         if (WINZIP_AES == getRawMethod())
             setRawMethod(null == field ? UNKNOWN : field.getMethod());
     }
@@ -320,9 +314,7 @@ public class ZipEntry implements Cloneable {
         }
     }
 
-    final int getRawMethod() {
-        return method & UShort.MAX_VALUE;
-    }
+    final int getRawMethod() { return method & UShort.MAX_VALUE; }
 
     final void setRawMethod(final int method) {
         assert UShort.check(method);
@@ -345,9 +337,7 @@ public class ZipEntry implements Cloneable {
         setInit(DTIME, known);
     }
 
-    final long getRawTime() {
-        return dtime & UInt.MAX_VALUE;
-    }
+    final long getRawTime() { return dtime & UInt.MAX_VALUE; }
 
     final void setRawTime(final long dtime) {
         assert UInt.check(dtime);
@@ -384,9 +374,7 @@ public class ZipEntry implements Cloneable {
         setInit(CRC, known);
     }
 
-    final long getRawCrc() {
-        return crc & UInt.MAX_VALUE;
-    }
+    final long getRawCrc() { return crc & UInt.MAX_VALUE; }
 
     final void setRawCrc(final long crc) {
         assert UInt.check(crc);
@@ -399,9 +387,7 @@ public class ZipEntry implements Cloneable {
      *
      * @see #setCompressedSize
      */
-    public final long getCompressedSize() {
-        return csize;
-    }
+    public final long getCompressedSize() { return csize; }
 
     /**
      * Sets the compressed size of this entry.
@@ -436,9 +422,7 @@ public class ZipEntry implements Cloneable {
      *
      * @see #setCompressedSize
      */
-    public final long getSize() {
-        return size;
-    }
+    public final long getSize() { return size; }
 
     /**
      * Sets the uncompressed size of this entry.
@@ -470,7 +454,7 @@ public class ZipEntry implements Cloneable {
 
     /**
      * Returns the external file attributes.
-     * 
+     *
      * @return The external file attributes.
      */
     public final long getExternalAttributes() {
@@ -479,7 +463,7 @@ public class ZipEntry implements Cloneable {
 
     /**
      * Sets the external file attributes.
-     * 
+     *
      * @param eattr the external file attributes.
      */
     public final void setExternalAttributes(final long eattr) {
@@ -504,9 +488,7 @@ public class ZipEntry implements Cloneable {
         setInit(EATTR, true);
     }
 
-    final long getOffset() {
-        return offset;
-    }
+    final long getOffset() { return offset; }
 
     final long getRawOffset() {
         final long offset = this.offset;
@@ -539,56 +521,57 @@ public class ZipEntry implements Cloneable {
     }
 
     /**
-     * Returns a protective copy of the serialized Extra Fields.
-     * Note that unlike its template {@link java.util.zip.ZipEntry#getExtra()},
+     * Returns a protective copy of the serialized extra fields.
+     * Note that unlike its template {@link java.util.zip.ZipEntry#getDataBlock()},
      * this method never returns {@code null}.
      *
-     * @return A new byte array holding the serialized Extra Fields.
+     * @return A new byte array holding the serialized extra fields.
      *         {@code null} is never returned.
      */
-    public final byte[] getExtra() {
-        return getExtraFields(false);
-    }
+    public final byte[] getExtra() { return getExtraFields(false); }
 
     /**
-     * Sets the serialized Extra Fields by making a protective copy.
-     * Note that this method parses the serialized Extra Fields according to
+     * Sets the serialized extra fields by making a protective copy.
+     * Note that this method parses the serialized extra fields according to
      * the ZIP File Format Specification and limits its size to 64 KB.
      * Therefore, this property cannot not be used to hold arbitrary
      * (application) data.
      * Consider storing such data in a separate entry instead.
      *
-     * @param  data The byte array holding the serialized Extra Fields.
-     * @throws RuntimeException if the serialized Extra Fields exceed 64 KB
-     *         or do not conform to the ZIP File Format Specification
+     * @param  buf The byte array holding the serialized extra fields.
+     * @throws IllegalArgumentException if the serialized extra fields exceed
+     *         64 KB or do not conform to the ZIP File Format Specification.
      */
-    public final void setExtra(final @CheckForNull byte[] data) {
-        if (null != data)
-            UShort.check(data.length, "Extra Fields too large", null);
-        if (null == data || data.length <= 0) this.fields = null;
-        else setExtraFields(data, false);
+    public final void setExtra(final @CheckForNull byte[] buf)
+    throws IllegalArgumentException {
+        if (null != buf)
+            UShort.check(buf.length, "Extra Fields too large", null);
+        if (null == buf || 0 >= buf.length) this.fields = null;
+        else setExtraFields(buf, false);
     }
 
     /**
-     * Returns a protective copy of the serialized Extra Fields.
+     * Returns a protective copy of the serialized extra fields.
      *
-     * @return A new byte array holding the serialized Extra Fields.
+     * @return A new byte array holding the serialized extra fields.
      *         {@code null} is never returned.
      * @see    #getRawExtraFields()
      */
-    final byte[] getRawExtraFields() {
-        return getExtraFields(true);
-    }
+    final byte[] getRawExtraFields() { return getExtraFields(true); }
 
     /**
      * Sets extra fields and parses ZIP64 extra field.
      * This method <em>must not</em> get called before the uncompressed size,
      * compressed size and offset have been initialized!
+     *
+     * @throws IllegalArgumentException If the data block does not conform to
+     *         the ZIP File Format Specification.
      */
-    final void setRawExtraFields(final byte[] data) {
-        assert 0 < data.length;
-        assert UShort.check(data.length);
-        setExtraFields(data, true);
+    final void setRawExtraFields(final byte[] buf)
+    throws IllegalArgumentException {
+        assert 0 < buf.length;
+        assert UShort.check(buf.length);
+        setExtraFields(buf, true);
     }
 
     private byte[] getExtraFields(final boolean zip64) {
@@ -602,27 +585,36 @@ public class ZipEntry implements Cloneable {
         } else {
             assert null == fields || null == fields.get(ZIP64_HEADER_ID);
         }
-        return null == fields ? EMPTY : fields.getExtra();
+        return null == fields ? EMPTY : fields.getDataBlock();
     }
 
-    private void setExtraFields(final byte[] data, final boolean zip64) {
+    /**
+     * @throws IllegalArgumentException If the data block does not conform to
+     *         the ZIP File Format Specification.
+     */
+    private void setExtraFields(final byte[] buf, final boolean zip64)
+    throws IllegalArgumentException {
         ExtraFields fields = this.fields;
         if (null == fields) this.fields = fields = new ExtraFields();
-        fields.readFrom(data, 0, data.length);
-        if (zip64) parseZip64ExtraField();
+        fields.readFrom(buf, 0, buf.length);
+        try {
+            if (zip64) parseZip64ExtraField();
+        } catch (final IndexOutOfBoundsException ex) {
+            throw new IllegalArgumentException(ex);
+        }
         assert fields == this.fields;
         fields.remove(ZIP64_HEADER_ID);
-        if (fields.size() <= 0) {
+        if (0 >= fields.size()) {
             assert 0 == fields.size();
             this.fields = null;
         }
     }
 
     /**
-     * Composes a ZIP64 Extended Information Extra Field from the properties
+     * Composes a ZIP64 Extended Information extra field from the properties
      * of this entry.
-     * If no ZIP64 Extended Information Extra Field is required it is removed
-     * from the collection of Extra Fields.
+     * If no ZIP64 Extended Information extra field is required it is removed
+     * from the collection of extra fields.
      */
     private @CheckForNull ExtraField composeZip64ExtraField() {
         final byte[] data = new byte[3 * 8]; // maximum size
@@ -645,7 +637,7 @@ public class ZipEntry implements Cloneable {
             writeLong(offset, data, off);
             off += 8;
         }
-        // Create ZIP64 Extended Information Extra Field from serialized data.
+        // Create ZIP64 Extended Information extra field from serialized data.
         final ExtraField field;
         if (off > 0) {
             field = new DefaultExtraField(ZIP64_HEADER_ID);
@@ -658,10 +650,10 @@ public class ZipEntry implements Cloneable {
 
     /**
      * Parses the properties of this entry from the ZIP64 Extended Information
-     * Extra Field, if present.
-     * The ZIP64 Extended Information Extra Field is <em>not</em> removed.
+     * extra field, if present.
+     * The ZIP64 Extended Information extra field is <em>not</em> removed.
      */
-    private void parseZip64ExtraField() {
+    private void parseZip64ExtraField() throws IndexOutOfBoundsException {
         final ExtraFields fields = this.fields;
         if (null == fields) return;
         final ExtraField ef = fields.get(ZIP64_HEADER_ID);
@@ -691,9 +683,7 @@ public class ZipEntry implements Cloneable {
         }
     }
 
-    public final @CheckForNull String getComment() {
-        return comment;
-    }
+    public final @CheckForNull String getComment() { return comment; }
 
     /**
      * Sets the entry comment.

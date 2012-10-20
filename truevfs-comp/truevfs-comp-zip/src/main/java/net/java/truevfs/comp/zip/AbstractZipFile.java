@@ -32,7 +32,7 @@ import net.java.truecommons.io.Source;
 import net.java.truecommons.shed.HashMaps;
 import static net.java.truevfs.comp.zip.Constants.*;
 import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
-import static net.java.truevfs.comp.zip.WinZipAesEntryExtraField.VV_AE_2;
+import static net.java.truevfs.comp.zip.WinZipAesExtraField.VV_AE_2;
 import static net.java.truevfs.comp.zip.WinZipAesUtils.overhead;
 import static net.java.truevfs.comp.zip.ZipEntry.*;
 import static net.java.truevfs.comp.zip.ZipParametersUtils.parameters;
@@ -137,8 +137,7 @@ implements Closeable, Iterable<E> {
             charset = param.getCharset();
             final @WillNotClose SeekableByteChannel
                     bchannel = new SafeBufferedReadOnlyChannel(channel, length);
-            if (!param.getPreambled())
-                checkZipFileSignature(bchannel);
+            if (!param.getPreambled()) checkZipFileSignature(bchannel);
             final int numEntries = findCentralDirectory(bchannel, param.getPostambled());
             mountCentralDirectory(bchannel, numEntries);
             if (preamble + postamble >= length) {
@@ -174,7 +173,7 @@ implements Closeable, Iterable<E> {
                   && ZIP64_EOCDR_SIG != sig
                   && EOCDR_SIG != sig)
             throw new ZipException(
-                    "Expected Local File Header or (ZIP64) End Of Central Directory Record!");
+                    "Expected local file header or (ZIP64) end of central directory record!");
     }
 
     /**
@@ -210,8 +209,7 @@ implements Closeable, Iterable<E> {
         for (long eocdrPos = max; eocdrPos >= min; eocdrPos--) {
             eocdr.rewind().limit(4).load(channel.position(eocdrPos));
             // end of central dir signature    4 bytes  (0x06054b50)
-            if (EOCDR_SIG != eocdr.getUInt())
-                continue;
+            if (EOCDR_SIG != eocdr.getUInt()) continue;
 
             // Process End Of Central Directory Record.
             eocdr.limit(EOCDR_MIN_LEN).load(channel);
@@ -251,7 +249,7 @@ implements Closeable, Iterable<E> {
             final PowerBuffer zip64eocdl = PowerBuffer
                 .allocate(ZIP64_EOCDL_LEN)
                 .littleEndian();
-            // zip64 end of central dir locator 
+            // zip64 end of central dir locator
             // signature                       4 bytes  (0x07064b50)
             if (0 > eocdlPos || ZIP64_EOCDL_SIG != zip64eocdl
                     .load(channel.position(eocdlPos))
@@ -260,13 +258,12 @@ implements Closeable, Iterable<E> {
                 long offset = eocdrPos - cdSize;
                 channel.position(offset);
                 offset -= cdPos;
-                if (0 != offset)
-                    mapper = new OffsetPositionMapper(offset);
+                if (0 != offset) mapper = new OffsetPositionMapper(offset);
                 return (int) cdEntries;
             }
 
             // number of the disk with the
-            // start of the zip64 end of 
+            // start of the zip64 end of
             // central directory               4 bytes
             final long zip64eocdrDisk = zip64eocdl.getUInt();
             // relative offset of the zip64
@@ -283,11 +280,11 @@ implements Closeable, Iterable<E> {
                     .allocate(ZIP64_EOCDR_MIN_LEN)
                     .littleEndian()
                     .load(channel.position(zip64eocdrPos));
-            // zip64 end of central dir 
+            // zip64 end of central dir
             // signature                       4 bytes  (0x06064b50)
             if (ZIP64_EOCDR_SIG != zip64eocdr.getUInt())
                 throw new ZipException(
-                        "Expected ZIP64 End Of Central Directory Record!");
+                        "Expected ZIP64 end of central directory record!");
             // size of zip64 end of central
             // directory record                8 bytes
             // version made by                 2 bytes
@@ -295,7 +292,7 @@ implements Closeable, Iterable<E> {
             zip64eocdr.skip(8 + 2 + 2);
             // number of this disk             4 bytes
             diskNo = zip64eocdr.getUInt();
-            // number of the disk with the 
+            // number of the disk with the
             // start of the central directory  4 bytes
             cdDiskNo = zip64eocdr.getUInt();
             // total number of entries in the
@@ -309,7 +306,7 @@ implements Closeable, Iterable<E> {
                         "ZIP file spanning/splitting is not supported!");
             if (cdEntries < 0 || Integer.MAX_VALUE < cdEntries)
                 throw new ZipException(
-                        "Total Number Of Entries In The Central Directory out of range!");
+                        "Total number of entries in the central directory out of range!");
             // size of the central directory   8 bytes
             //cdSize = zip64eocdr.getLong();
             zip64eocdr.skip(8);
@@ -364,8 +361,7 @@ implements Closeable, Iterable<E> {
         for (; ; numEntries--) {
             cfh.rewind().limit(4).load(channel);
             // central file header signature   4 bytes  (0x02014b50)
-            if (CFH_SIG != cfh.getUInt())
-                break;
+            if (CFH_SIG != cfh.getUInt()) break;
             cfh.limit(CFH_MIN_LEN).load(channel);
             final int gpbf = cfh.position(8).getUShort();
             final int nameLen = cfh.position(28).getUShort();
@@ -374,8 +370,7 @@ implements Closeable, Iterable<E> {
                     .load(channel);
             // See appendix D of PKWARE's ZIP File Format Specification.
             final boolean utf8 = 0 != (gpbf & GPBF_UTF8);
-            if (utf8)
-                charset = UTF8;
+            if (utf8) charset = UTF8;
             final E entry = param.newEntry(decode(name.array()));
             try {
                 // central file header signature   4 bytes  (0x02014b50)
@@ -428,13 +423,10 @@ implements Closeable, Iterable<E> {
                 // Extra Field may have been parsed, map it to the real
                 // offset and conditionally update the preamble size from it.
                 lfhOff = mapper.map(entry.getOffset());
-                if (lfhOff < preamble)
-                    preamble = lfhOff;
-            } catch (IllegalArgumentException cause) {
-                final ZipException ex = new ZipException(entry.getName()
-                        + " (invalid ZIP entry)");
-                ex.initCause(cause);
-                throw ex;
+                if (lfhOff < preamble) preamble = lfhOff;
+            } catch (final IllegalArgumentException cause) {
+                throw (ZipException) new ZipException(entry.getName()
+                        + " (invalid meta data)").initCause(cause);
             }
 
             // Map the entry using the name that has been determined
@@ -459,7 +451,7 @@ implements Closeable, Iterable<E> {
                     "Expected " +
                     Math.abs(numEntries) +
                     (numEntries > 0 ? " more" : " less") +
-                    " entries in the Central Directory!");
+                    " entries in the central directory!");
 
         // Commit map of entries.
         this.entries = entries;
@@ -471,7 +463,7 @@ implements Closeable, Iterable<E> {
      * This method should be called immediately after the constructor.
      * It requires a fully initialized object, hence it's not part of the
      * constructor.
-     * For example, to recoverLostEntries encrypted entries, it may require
+     * For example, to recover encrypted entries, it may require
      * {@link #getCryptoParameters() crypto parameters}.
      * <p>
      * This method starts parsing entries at the start of the postamble and
@@ -484,10 +476,10 @@ implements Closeable, Iterable<E> {
      * entries.
      * Therefore it may be a good idea to log or silently ignore any exception
      * thrown by this method.
-     * If an exception is thrown, you can check and recoverLostEntries the remaining
+     * If an exception is thrown, you can check and recover the remaining
      * postamble for post-mortem analysis by calling
      * {@link #getPostambleLength()} and {@link #getPostambleInputStream()}.
-     * 
+     *
      * @return {@code this}
      * @throws ZipException if an invalid entry is found.
      * @throws EOFException on unexpected end-of-file.
@@ -505,163 +497,166 @@ implements Closeable, Iterable<E> {
                     .littleEndian()
                     .load(channel.position(pos));
             if (LFH_SIG != lfh.getUInt())
-                throw new ZipException("Expected Local File Header!");
+                throw new ZipException("Expected local file header!");
             final int gpbf = lfh.position(6).getUShort();
             final int nameLen = lfh.position(26).getUShort();
             // See appendix D of PKWARE's ZIP File Format Specification.
-            if (0 != (gpbf & GPBF_UTF8))
-                charset = UTF8;
+            if (0 != (gpbf & GPBF_UTF8)) charset = UTF8;
             final E entry = param.newEntry(decode(PowerBuffer
                     .allocate(nameLen)
                     .load(channel)
                     .array()));
-            // local file header signature     4 bytes  (0x04034b50)
-            // version needed to extract       2 bytes
-            // general purpose bit flag        2 bytes
-            entry.setGeneralPurposeBitFlags(gpbf);
-            lfh.position(8);
-            // compression method              2 bytes
-            entry.setRawMethod(lfh.getUShort());
-            // last mod file time              2 bytes
-            // last mod file date              2 bytes
-            entry.setRawTime(lfh.getUInt());
-            // crc-32                          4 bytes
-            entry.setRawCrc(lfh.getUInt());
-            // compressed size                 4 bytes
-            entry.setRawCompressedSize(lfh.getUInt());
-            // uncompressed size               4 bytes
-            entry.setRawSize(lfh.getUInt());
-            // file name length                2 bytes
-            lfh.skip(2);
-            // extra field length              2 bytes
-            final int extraLen = lfh.getUShort();
-            entry.setRawOffset(mapper.unmap(pos));
-            // extra field (variable size)
-            if (0 < extraLen)
-                entry.setRawExtraFields(PowerBuffer
-                        .allocate(extraLen)
-                        .load(channel)
-                        .array());
+            try {
+                // local file header signature     4 bytes  (0x04034b50)
+                // version needed to extract       2 bytes
+                // general purpose bit flag        2 bytes
+                entry.setGeneralPurposeBitFlags(gpbf);
+                lfh.position(8);
+                // compression method              2 bytes
+                entry.setRawMethod(lfh.getUShort());
+                // last mod file time              2 bytes
+                // last mod file date              2 bytes
+                entry.setRawTime(lfh.getUInt());
+                // crc-32                          4 bytes
+                entry.setRawCrc(lfh.getUInt());
+                // compressed size                 4 bytes
+                entry.setRawCompressedSize(lfh.getUInt());
+                // uncompressed size               4 bytes
+                entry.setRawSize(lfh.getUInt());
+                // file name length                2 bytes
+                lfh.skip(2);
+                // extra field length              2 bytes
+                final int extraLen = lfh.getUShort();
+                entry.setRawOffset(mapper.unmap(pos));
+                // extra field (variable size)
+                if (0 < extraLen)
+                    entry.setRawExtraFields(PowerBuffer
+                            .allocate(extraLen)
+                            .load(channel)
+                            .array());
 
-            // Process entry contents.
-            if (entry.getGeneralPurposeBitFlag(GPBF_DATA_DESCRIPTOR)) {
-                // HC SVNT DRACONES!
-                // This is the tough one.
-                // We need to process the entry as if we were unzipping
-                // it because the CRC-32, the compressed size and the
-                // uncompressed size are unknown.
-                // Once we have done this, we compare our findings to
-                // the Data Descriptor which comes next.
-                final long start = pos = channel.position();
-                SeekableByteChannel echannel = new IntervalReadOnlyChannel(
-                        channel, pos, length - pos);
-                WinZipAesEntryExtraField field = null;
-                int method = entry.getMethod();
-                if (entry.isEncrypted()) {
-                    if (WINZIP_AES != method)
-                        throw new ZipException(entry.getName()
-                                + " (encrypted compression method "
-                                + method
-                                + " is not supported)");
-                    echannel = new WinZipAesEntryReadOnlyChannel(echannel,
-                            new WinZipAesEntryParameters(
-                                parameters(
-                                    WinZipAesParameters.class,
-                                    getCryptoParameters()),
-                                entry));
-                    field = (WinZipAesEntryExtraField)
-                            entry.getExtraField(WINZIP_AES_ID);
-                    method = field.getMethod();
-                }
-                final int bufSize = getBufferSize(entry);
-                CountingInputStream din = null;
-                InputStream in;
-                switch (method) {
-                    case DEFLATED:
-                        in = new ZipInflaterInputStream(
-                                new DummyByteChannelInputStream(echannel),
-                                bufSize);
-                        break;
-                    case BZIP2:
-                        din = new CountingInputStream(
-                                new ChannelInputStream(echannel));
-                        in = new BZip2CompressorInputStream(din);
-                        break;
-                    default:
-                        throw new ZipException(entry.getName()
-                                + " (compression method "
-                                + method
-                                + " is not supported)");
-                }
-                try (final CheckedInputStream cin = new CheckedInputStream(in, new CRC32())) {
-                    entry.setRawSize(cin.skip(Long.MAX_VALUE));
-                    if (null != field && field.getVendorVersion() == VV_AE_2)
-                        entry.setRawCrc(0);
-                    else
-                        entry.setRawCrc(cin.getChecksum().getValue());
-                    // Sync file pointer on deflated input again.
+                // Process entry contents.
+                if (entry.getGeneralPurposeBitFlag(GPBF_DATA_DESCRIPTOR)) {
+                    // HC SVNT DRACONES!
+                    // This is the tough one.
+                    // We need to process the entry as if we were unzipping
+                    // it because the CRC-32, the compressed size and the
+                    // uncompressed size are unknown.
+                    // Once we have done this, we compare our findings to
+                    // the Data Descriptor which comes next.
+                    final long start = pos = channel.position();
+                    SeekableByteChannel echannel = new IntervalReadOnlyChannel(
+                            channel, pos, length - pos);
+                    WinZipAesExtraField field = null;
+                    int method = entry.getMethod();
+                    if (entry.isEncrypted()) {
+                        if (WINZIP_AES != method)
+                            throw new ZipException(entry.getName()
+                                    + " (encrypted compression method "
+                                    + method
+                                    + " is not supported)");
+                        echannel = new WinZipAesReadOnlyChannel(echannel,
+                                new WinZipAesEntryParameters(
+                                    parameters(
+                                        WinZipAesParameters.class,
+                                        getCryptoParameters()),
+                                    entry));
+                        field = (WinZipAesExtraField)
+                                entry.getExtraField(WINZIP_AES_ID);
+                        method = field.getMethod();
+                    }
+                    final int bufSize = getBufferSize(entry);
+                    CountingInputStream din = null;
+                    InputStream in;
                     switch (method) {
                         case DEFLATED:
-                            final Inflater inf = ((ZipInflaterInputStream) in)
-                                    .getInflater();
-                            assert inf.finished();
-                            pos += inf.getBytesRead();
+                            in = new ZipInflaterInputStream(
+                                    new DummyByteChannelInputStream(echannel),
+                                    bufSize);
                             break;
                         case BZIP2:
-                            pos += din.getBytesRead();
+                            din = new CountingInputStream(
+                                    new ChannelInputStream(echannel));
+                            in = new BZip2CompressorInputStream(din);
                             break;
                         default:
-                            throw new AssertionError();
+                            throw new ZipException(entry.getName()
+                                    + " (compression method "
+                                    + method
+                                    + " is not supported)");
                     }
-                }
-                if (null != field) pos += overhead(field.getKeyStrength());
-                entry.setRawCompressedSize(pos - start);
+                    try (final CheckedInputStream cin = new CheckedInputStream(in, new CRC32())) {
+                        entry.setRawSize(cin.skip(Long.MAX_VALUE));
+                        if (null != field && field.getVendorVersion() == VV_AE_2)
+                            entry.setRawCrc(0);
+                        else
+                            entry.setRawCrc(cin.getChecksum().getValue());
+                        // Sync file pointer on deflated input again.
+                        switch (method) {
+                            case DEFLATED:
+                                final Inflater inf = ((ZipInflaterInputStream) in)
+                                        .getInflater();
+                                assert inf.finished();
+                                pos += inf.getBytesRead();
+                                break;
+                            case BZIP2:
+                                pos += din.getBytesRead();
+                                break;
+                            default:
+                                throw new AssertionError();
+                        }
+                    }
+                    if (null != field) pos += overhead(field.getKeyStrength());
+                    entry.setRawCompressedSize(pos - start);
 
-                // We have reconstituted all meta data for the entry.
-                // Next comes the Data Descriptor.
-                // Let's parse and check it.
-                final PowerBuffer dd = PowerBuffer
-                        .allocate(entry.isZip64ExtensionsRequired()
-                            ? 4 + 8 + 8
-                            : 4 + 4 + 4)
-                        .littleEndian()
-                        .limit(4)
-                        .load(channel.position(pos));
-                long crc = dd.getUInt();
-                // Note the Data Descriptor's Signature is optional:
-                // All newer apps should write it (and so does TrueVFS),
-                // but older apps might not.
-                if (DD_SIG == crc)
-                    dd.rewind();
-                dd.limit(dd.capacity()).load(channel);
-                crc = dd.position(0).getUInt();
-                final long csize;
-                final long size;
-                if (entry.isZip64ExtensionsRequired()) {
-                    csize = dd.getLong();
-                    size  = dd.getLong();
+                    // We have reconstituted all meta data for the entry.
+                    // Next comes the Data Descriptor.
+                    // Let's parse and check it.
+                    final PowerBuffer dd = PowerBuffer
+                            .allocate(entry.isZip64ExtensionsRequired()
+                                ? 4 + 8 + 8
+                                : 4 + 4 + 4)
+                            .littleEndian()
+                            .limit(4)
+                            .load(channel.position(pos));
+                    long crc = dd.getUInt();
+                    // Note the Data Descriptor's Signature is optional:
+                    // All newer apps should write it (and so does TrueVFS),
+                    // but older apps might not.
+                    if (DD_SIG == crc) dd.rewind();
+                    dd.limit(dd.capacity()).load(channel);
+                    crc = dd.position(0).getUInt();
+                    final long csize;
+                    final long size;
+                    if (entry.isZip64ExtensionsRequired()) {
+                        csize = dd.getLong();
+                        size  = dd.getLong();
+                    } else {
+                        csize = dd.getUInt();
+                        size  = dd.getUInt();
+                    }
+                    if (entry.getCrc() != crc)
+                        throw new Crc32Exception(entry.getName(),
+                                entry.getCrc(), crc);
+                    if (entry.getCompressedSize() != csize)
+                        throw new ZipException(entry.getName()
+                                + " (invalid compressed size in data descriptor)");
+                    if (entry.getSize() != size)
+                        throw new ZipException(entry.getName()
+                                + " (invalid uncompressed size in data descriptor)");
                 } else {
-                    csize = dd.getUInt();
-                    size  = dd.getUInt();
+                    // This is the easy one.
+                    // The entry is not using a Data Descriptor, so we can
+                    // use the properties parsed from the Local File Header.
+                    pos += entry.getCompressedSize();
+                    channel.position(pos - 1);
+                    if (pos > length || channel.position() >= channel.size())
+                        throw new ZipException(entry.getName()
+                                + " (truncated entry data)");
                 }
-                if (entry.getCrc() != crc)
-                    throw new Crc32Exception(entry.getName(),
-                            entry.getCrc(), crc);
-                if (entry.getCompressedSize() != csize)
-                    throw new ZipException(entry.getName()
-                            + " (invalid compressed size in Data Descriptor)");
-                if (entry.getSize() != size)
-                    throw new ZipException(entry.getName()
-                            + " (invalid uncompressed size in Data Descriptor)");
-            } else {
-                // This is the easy one.
-                // The entry is not using a Data Descriptor, so we can
-                // use the properties parsed from the Local File Header.
-                pos += entry.getCompressedSize();
-                channel.position(pos - 1);
-                if (pos > length || channel.position() >= channel.size())
-                    throw new ZipException(entry.getName()
-                            + " (truncated ZIP entry)");
+            } catch (final IllegalArgumentException ex) {
+                throw (ZipException) new ZipException(entry.getName()
+                        + " (invalid meta data)").initCause(ex);
             }
 
             // Entry is almost recovered. Update the postamble length.
@@ -676,22 +671,19 @@ implements Closeable, Iterable<E> {
         return this;
     }
 
-    final Map<String, E> getRawEntries() {
-        return entries;
-    }
+    @SuppressWarnings("ReturnOfCollectionOrArrayField")
+    final Map<String, E> getRawEntries() { return entries; }
 
     private String decode(byte[] buffer) {
         return new String(buffer, charset);
     }
 
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    @CheckForNull final byte[] getRawComment() {
-        return this.comment;
-    }
+    @CheckForNull final byte[] getRawComment() { return this.comment; }
 
     /**
      * Returns the file comment.
-     * 
+     *
      * @return The file comment.
      */
     public @Nullable String getComment() {
@@ -703,9 +695,7 @@ implements Closeable, Iterable<E> {
      * Returns {@code true} if and only if this ZIP file is busy reading
      * one or more entries.
      */
-    public boolean busy() {
-        return 0 < open;
-    }
+    public boolean busy() { return 0 < open; }
 
     /**
      * Returns the character set which is effectively used for
@@ -713,9 +703,7 @@ implements Closeable, Iterable<E> {
      * Depending on the ZIP file contents, this may differ from the character
      * set provided to the constructor.
      */
-    public Charset getRawCharset() {
-        return charset;
-    }
+    public Charset getRawCharset() { return charset; }
 
     /**
      * Returns the name of the character set which is effectively used for
@@ -723,16 +711,12 @@ implements Closeable, Iterable<E> {
      * Depending on the ZIP file contents, this may differ from the character
      * set provided to the constructor.
      */
-    public String getCharset() {
-        return charset.name();
-    }
+    public String getCharset() { return charset.name(); }
 
     /**
      * Returns the number of entries in this ZIP file.
      */
-    public int size() {
-        return entries.size();
-    }
+    public int size() { return entries.size(); }
 
     /**
      * Returns an iteration of all entries in this ZIP file.
@@ -754,16 +738,12 @@ implements Closeable, Iterable<E> {
      * @return The entry for the given {@code name} or {@code null} if no entry
      *         with this name exists in this ZIP file.
      */
-    public E entry(String name) {
-        return entries.get(name);
-    }
+    public E entry(String name) { return entries.get(name); }
 
     /**
      * Returns the file length of this ZIP file in bytes.
      */
-    public long length() {
-        return length;
-    }
+    public long length() { return length; }
 
     /**
      * Returns the size of the preamble of this ZIP file in bytes.
@@ -771,9 +751,7 @@ implements Closeable, Iterable<E> {
      * @return A positive value or zero to indicate that this ZIP file does
      *         not have a preamble.
      */
-    public long getPreambleLength() {
-        return preamble;
-    }
+    public long getPreambleLength() { return preamble; }
 
     /**
      * Returns an {@link InputStream} to load the preamble of this ZIP file.
@@ -801,9 +779,7 @@ implements Closeable, Iterable<E> {
      * @return A positive value or zero to indicate that this ZIP file does
      *         not have a postamble.
      */
-    public long getPostambleLength() {
-        return postamble;
-    }
+    public long getPostambleLength() { return postamble; }
 
     /**
      * Returns an {@link InputStream} to load the postamble of this ZIP file.
@@ -826,9 +802,7 @@ implements Closeable, Iterable<E> {
                 new EntryReadOnlyChannel(length - postamble, postamble));
     }
 
-    final PositionMapper getOffsetMapper() {
-        return mapper;
-    }
+    final PositionMapper getOffsetMapper() { return mapper; }
 
     /**
      * Returns {@code true} if and only if the offsets in this ZIP file
@@ -844,7 +818,7 @@ implements Closeable, Iterable<E> {
 
     /**
      * Returns the parameters for encryption or authentication of entries.
-     * 
+     *
      * Returns The parameters for encryption or authentication of entries.
      */
     protected abstract @CheckForNull ZipCryptoParameters getCryptoParameters();
@@ -931,7 +905,7 @@ implements Closeable, Iterable<E> {
                 .littleEndian()
                 .load(channel.position(pos));
         if (LFH_SIG != lfh.getUInt())
-            throw new ZipException(name + " (expected Local File Header)");
+            throw new ZipException(name + " (expected local file header)");
         lfh.position(LFH_FILE_NAME_LENGTH_POS);
         pos += LFH_MIN_LEN
                 + lfh.getUShort() // file name length
@@ -952,8 +926,8 @@ implements Closeable, Iterable<E> {
                             + " (encrypted compression method "
                             + method
                             + " is not supported)");
-                final WinZipAesEntryReadOnlyChannel
-                        eechannel = new WinZipAesEntryReadOnlyChannel(echannel,
+                final WinZipAesReadOnlyChannel
+                        eechannel = new WinZipAesReadOnlyChannel(echannel,
                                 new WinZipAesEntryParameters(
                                     parameters(
                                         WinZipAesParameters.class,
@@ -965,8 +939,8 @@ implements Closeable, Iterable<E> {
                     // Disable redundant CRC-32 check.
                     check = false;
                 }
-                final WinZipAesEntryExtraField field
-                        = (WinZipAesEntryExtraField) entry.getExtraField(WINZIP_AES_ID);
+                final WinZipAesExtraField field
+                        = (WinZipAesExtraField) entry.getExtraField(WINZIP_AES_ID);
                 method = field.getMethod();
             }
             if (check) {
@@ -1038,7 +1012,7 @@ implements Closeable, Iterable<E> {
     private SeekableByteChannel channel() throws ZipException {
         final SeekableByteChannel channel = this.channel;
         if (null == channel)
-            throw new ZipException("ZIP file closed!");
+            throw new ZipException("File closed!");
         return channel;
     }
 

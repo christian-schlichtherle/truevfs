@@ -4,15 +4,15 @@
  */
 package net.java.truevfs.comp.zip;
 
-import javax.annotation.CheckForNull;
 import static java.lang.System.arraycopy;
+import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * Default implementation for an Extra Field in a Local or Central Header of a
  * ZIP file.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
 final class DefaultExtraField extends ExtraField {
@@ -22,7 +22,7 @@ final class DefaultExtraField extends ExtraField {
 
     /**
      * Constructs a new Extra Field.
-     * 
+     *
      * @param  headerId an unsigned short integer (two bytes) indicating the
      *         type of the Extra Field.
      */
@@ -43,15 +43,14 @@ final class DefaultExtraField extends ExtraField {
     }
 
     @Override
-    void readFrom(final byte[] src, final int off, final int size) {
-        assert UShort.check(size);
-        arraycopy(src, off, this.data = new byte[size], 0, size);
+    void readFrom(final byte[] buf, final int off, final int len) {
+        assert UShort.check(len);
+        arraycopy(buf, off, this.data = new byte[len], 0, len);
     }
 
     @Override
-    void writeTo(byte[] dst, int off) {
+    void writeTo(byte[] buf, int off) {
         final byte[] src = this.data;
-        if (null != src)
-            arraycopy(src, 0, dst, off, src.length);
+        if (null != src) arraycopy(src, 0, buf, off, src.length);
     }
 }

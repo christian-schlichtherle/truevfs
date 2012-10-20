@@ -25,8 +25,8 @@ import net.java.truecommons.io.Sink;
 import net.java.truecommons.shed.HashMaps;
 import static net.java.truevfs.comp.zip.Constants.*;
 import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
-import static net.java.truevfs.comp.zip.WinZipAesEntryExtraField.VV_AE_1;
-import static net.java.truevfs.comp.zip.WinZipAesEntryExtraField.VV_AE_2;
+import static net.java.truevfs.comp.zip.WinZipAesExtraField.VV_AE_1;
+import static net.java.truevfs.comp.zip.WinZipAesExtraField.VV_AE_2;
 import static net.java.truevfs.comp.zip.WinZipAesUtils.overhead;
 import static net.java.truevfs.comp.zip.ZipEntry.*;
 import static net.java.truevfs.comp.zip.ZipParametersUtils.parameters;
@@ -185,7 +185,7 @@ implements Iterable<E> {
 
     /**
      * Returns the file comment.
-     * 
+     *
      * @return The file comment.
      */
     public @Nullable String getComment() {
@@ -196,7 +196,7 @@ implements Iterable<E> {
 
     /**
      * Sets the file comment.
-     * 
+     *
      * @param  comment the file comment.
      * @throws IllegalArgumentException if the encoded comment is longer than
      *         {@link UShort#MAX_VALUE} bytes.
@@ -250,7 +250,7 @@ implements Iterable<E> {
      * Returns the compression level for entries.
      * This property is only used if the effective compression method is
      * {@link ZipEntry#DEFLATED} or {@link ZipEntry#BZIP2}.
-     * 
+     *
      * @return The compression level for entries.
      * @see    #setLevel
      */
@@ -264,7 +264,7 @@ implements Iterable<E> {
      * {@link ZipEntry#DEFLATED} or {@link ZipEntry#BZIP2}.
      * Legal values are {@link Deflater#DEFAULT_COMPRESSION} or range from
      * {@code Deflater#BEST_SPEED} to {@code Deflater#BEST_COMPRESSION}.
-     * 
+     *
      * @param  level the compression level for entries.
      * @throws IllegalArgumentException if the compression level is invalid.
      * @see    #getLevel
@@ -282,7 +282,7 @@ implements Iterable<E> {
 
     /**
      * Returns the parameters for encryption or authentication of entries.
-     * 
+     *
      * Returns The parameters for encryption or authentication of entries.
      */
     protected abstract @CheckForNull ZipCryptoParameters getCryptoParameters();
@@ -373,7 +373,7 @@ implements Iterable<E> {
             ZipCryptoParameters param = getCryptoParameters();
             if (WINZIP_AES == method) {
                 param = parameters(WinZipAesParameters.class, param);
-                final WinZipAesEntryExtraField field = (WinZipAesEntryExtraField)
+                final WinZipAesExtraField field = (WinZipAesExtraField)
                         entry.getExtraField(WINZIP_AES_ID);
                 if (null != field) {
                     method = field.getMethod();
@@ -594,7 +594,7 @@ implements Iterable<E> {
         if (zip64) {
             final long zip64eocdOffset // relative offset of the zip64 end of central directory record
                     = leos.size();
-            // zip64 end of central dir 
+            // zip64 end of central dir
             // signature                       4 bytes  (0x06064b50)
             leos.writeInt(ZIP64_EOCDR_SIG);
             // size of zip64 end of central
@@ -606,7 +606,7 @@ implements Iterable<E> {
             leos.writeShort(46); // due to potential use of BZIP2 compression
             // number of this disk             4 bytes
             leos.writeInt(0);
-            // number of the disk with the 
+            // number of the disk with the
             // start of the central directory  4 bytes
             leos.writeInt(0);
             // total number of entries in the
@@ -623,11 +623,11 @@ implements Iterable<E> {
             leos.writeLong(cdOffset);
             // zip64 extensible data sector    (variable size)
             //
-            // zip64 end of central dir locator 
+            // zip64 end of central dir locator
             // signature                       4 bytes  (0x07064b50)
             leos.writeInt(ZIP64_EOCDL_SIG);
             // number of the disk with the
-            // start of the zip64 end of 
+            // start of the zip64 end of
             // central directory               4 bytes
             leos.writeInt(0);
             // relative offset of the zip64
@@ -840,7 +840,7 @@ implements Iterable<E> {
         final WinZipAesParameters generalParam;
         boolean suppressCrc;
         @Nullable WinZipAesEntryParameters entryParam;
-        @Nullable WinZipAesEntryOutputStream out;
+        @Nullable WinZipAesOutputStream out;
         @Nullable ZipEntry entry;
 
         WinZipAesOutputMethod(
@@ -858,11 +858,11 @@ implements Iterable<E> {
                     = new WinZipAesEntryParameters(this.generalParam, entry);
             final AesKeyStrength keyStrength = entryParam.getKeyStrength();
             this.entryParam = entryParam;
-            WinZipAesEntryExtraField field = null;
+            WinZipAesExtraField field = null;
             int method = entry.getMethod();
             long csize = entry.getCompressedSize();
             if (WINZIP_AES == method) {
-                field = (WinZipAesEntryExtraField) entry.getExtraField(
+                field = (WinZipAesExtraField) entry.getExtraField(
                         WINZIP_AES_ID);
                 if (null != field) {
                     method = field.getMethod();
@@ -872,7 +872,7 @@ implements Iterable<E> {
                 }
             }
             if (null == field)
-                field = new WinZipAesEntryExtraField();
+                field = new WinZipAesExtraField();
             field.setKeyStrength(keyStrength);
             field.setMethod(method);
             final long size = entry.getSize();
@@ -910,11 +910,11 @@ implements Iterable<E> {
             if (suppressCrc) {
                 final long crc = entry.getCrc();
                 entry.setRawCrc(0);
-                this.out = new WinZipAesEntryOutputStream(entryParam,
+                this.out = new WinZipAesOutputStream(entryParam,
                         (LittleEndianOutputStream) method.start());
                 entry.setCrc(crc);
             } else {
-                this.out = new WinZipAesEntryOutputStream(entryParam,
+                this.out = new WinZipAesOutputStream(entryParam,
                         (LittleEndianOutputStream) method.start());
             }
             return this.out;

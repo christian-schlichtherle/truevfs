@@ -18,7 +18,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truevfs.comp.zip.crypto.CipherReadOnlyChannel;
 import net.java.truevfs.comp.zip.crypto.SeekableBlockCipher;
 import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
-import static net.java.truevfs.comp.zip.WinZipAesEntryOutputStream.*;
+import static net.java.truevfs.comp.zip.WinZipAesOutputStream.*;
 import net.java.truevfs.key.spec.param.AesKeyStrength;
 import net.java.truevfs.key.spec.util.SuspensionPenalty;
 import org.bouncycastle.crypto.Mac;
@@ -33,7 +33,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * Decrypts ZIP entry contents according the WinZip AES specification.
  * <p>
  * Note that this channel implements its own virtual position.
- * 
+ *
  * @see     <a href="http://www.winzip.com/win/en/aes_info.htm">AES Encryption Information: Encryption Specification AE-1 and AE-2 (WinZip Computing, S.L.)</a>
  * @see     <a href="http://www.winzip.com/win/en/aes_tips.htm">AES Coding Tips for Developers (WinZip Computing, S.L.)</a>
  * @see     <a href="http://www.gladman.me.uk/cryptography_technology/fileencrypt/">A Password Based File Encyption Utility (Dr. Gladman)</a>
@@ -42,7 +42,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
-final class WinZipAesEntryReadOnlyChannel extends ReadOnlyChannel {
+final class WinZipAesReadOnlyChannel extends ReadOnlyChannel {
 
     private final ByteBuffer authenticationCode;
 
@@ -55,7 +55,7 @@ final class WinZipAesEntryReadOnlyChannel extends ReadOnlyChannel {
     private final ZipEntry entry;
 
     @CreatesObligation
-    WinZipAesEntryReadOnlyChannel(
+    WinZipAesReadOnlyChannel(
             final @WillCloseWhenClosed SeekableByteChannel channel,
             final WinZipAesEntryParameters param)
     throws IOException {
@@ -64,8 +64,8 @@ final class WinZipAesEntryReadOnlyChannel extends ReadOnlyChannel {
         // Init WinZip AES extra field.
         final ZipEntry entry = param.getEntry();
         assert entry.isEncrypted();
-        final WinZipAesEntryExtraField
-                field = (WinZipAesEntryExtraField) entry.getExtraField(WINZIP_AES_ID);
+        final WinZipAesExtraField
+                field = (WinZipAesExtraField) entry.getExtraField(WINZIP_AES_ID);
         if (null == field)
             throw new ZipCryptoException(entry.getName() + " (missing extra field for WinZip AES entry)");
 
@@ -79,7 +79,7 @@ final class WinZipAesEntryReadOnlyChannel extends ReadOnlyChannel {
                 .allocate(keyStrengthBytes / 2)
                 .load(channel.position(0))
                 .buffer();
-        
+
         // Load password verification value.
         final ByteBuffer passwdVerifier = PowerBuffer
                 .allocate(PWD_VERIFIER_BITS / 8)
