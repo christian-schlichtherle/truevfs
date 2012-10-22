@@ -4,9 +4,6 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truecommons.io.IntervalReadOnlyChannel;
-import net.java.truecommons.io.PowerBuffer;
-import net.java.truecommons.io.ReadOnlyChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.EOFException;
 import java.io.IOException;
@@ -15,10 +12,12 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.io.IntervalReadOnlyChannel;
+import net.java.truecommons.io.PowerBuffer;
+import net.java.truecommons.io.ReadOnlyChannel;
+import static net.java.truevfs.comp.zip.WinZipAesOutputStream.*;
 import net.java.truevfs.comp.zip.crypto.CipherReadOnlyChannel;
 import net.java.truevfs.comp.zip.crypto.SeekableBlockCipher;
-import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
-import static net.java.truevfs.comp.zip.WinZipAesOutputStream.*;
 import net.java.truevfs.key.spec.param.AesKeyStrength;
 import net.java.truevfs.key.spec.util.SuspensionPenalty;
 import org.bouncycastle.crypto.Mac;
@@ -65,7 +64,7 @@ final class WinZipAesReadOnlyChannel extends ReadOnlyChannel {
         final ZipEntry entry = param.getEntry();
         assert entry.isEncrypted();
         final WinZipAesExtraField
-                field = (WinZipAesExtraField) entry.getExtraField(WINZIP_AES_ID);
+                field = (WinZipAesExtraField) entry.getExtraField(WinZipAesExtraField.HEADER_ID);
         if (null == field)
             throw new ZipCryptoException(entry.getName() + " (missing extra field for WinZip AES entry)");
 

@@ -4,13 +4,9 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truevfs.comp.zip.DateTimeConverter;
-import net.java.truevfs.comp.zip.UInt;
-import net.java.truevfs.comp.zip.ZipEntry;
-import net.java.truevfs.comp.zip.UByte;
-import net.java.truevfs.comp.zip.ULong;
-import net.java.truevfs.comp.zip.UShort;
 import java.util.Arrays;
+import java.util.zip.ZipException;
+import net.java.truecommons.io.MutableBuffer;
 import static net.java.truevfs.comp.zip.ZipEntry.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -490,7 +486,7 @@ public final class ZipEntryTest {
     }
 
     @Test
-    public void testExtra() {
+    public void testExtra() throws ZipException {
         assertEquals(0, entry.getExtra().length);
 
         // Serialized Extra Fields in little endian order.
@@ -512,7 +508,7 @@ public final class ZipEntryTest {
         entry.setRawSize(UInt.MAX_VALUE);
         entry.setRawCompressedSize(UInt.MAX_VALUE);
         entry.setRawOffset(UInt.MAX_VALUE);
-        entry.setRawExtraFields(set); // this must be last in the sequence!
+        entry.setRawExtraFields(MutableBuffer.wrap(set.clone()).littleEndian().asReadOnlyBuffer().asImmutableBuffer()); // this must be last in the sequence!
         assertEquals(0x0fedcba987654321L, entry.getSize());
         assertEquals(UInt.MAX_VALUE, entry.getRawSize());
         assertEquals(0x0fedcba987654322L, entry.getCompressedSize());
