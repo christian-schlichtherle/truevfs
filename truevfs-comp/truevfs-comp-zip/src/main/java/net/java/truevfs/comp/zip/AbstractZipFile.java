@@ -413,7 +413,6 @@ implements Closeable, Iterable<E> {
                             .allocateDirect(extraLen)
                             .littleEndian()
                             .load(channel)
-                            .asReadOnlyBuffer()
                             .asImmutableBuffer());
                 // file comment (variable size)
                 if (0 < commentLen)
@@ -537,7 +536,6 @@ implements Closeable, Iterable<E> {
                             .allocateDirect(extraLen)
                             .littleEndian()
                             .load(channel)
-                            .asReadOnlyBuffer()
                             .asImmutableBuffer());
 
                 // Process entry contents.

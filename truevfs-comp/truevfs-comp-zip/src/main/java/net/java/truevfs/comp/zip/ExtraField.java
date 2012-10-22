@@ -14,11 +14,6 @@ import net.java.truecommons.io.MutableBuffer;
 interface ExtraField {
 
     /**
-     * Returns the Total Size of this Extra Field.
-     */
-    int getTotalSize();
-
-    /**
      * Returns the Header Id of this Extra Field.
      * The Header Id is an unsigned short integer (two bytes)
      * which indicates the type of this Extra Field.
@@ -33,22 +28,29 @@ interface ExtraField {
     int getDataSize();
 
     /**
-     * Returns a new mutable buffer for read-only access to the Header Id,
-     * Data Size and Data Block.
-     * The returned buffer's position is zero, its mark is undefined and its
-     * limit and capacity are set past the end of the Data Block.
+     * Returns a new mutable buffer for accessing the Data Block.
+     * The returned buffer's position and limit are set so that the interval
+     * fits the Data Block.
+     * The buffer's mark and capacity are undefined.
      *
-     * @return A new mutable buffer for read-only access to the Header Id,
-     *         Data Size and Data Block.
-     */
-    MutableBuffer totalBlock();
-
-    /**
-     * Returns a new mutable buffer for read-only access to the Data Block.
-     * The returned buffer's position is zero, its mark is undefined and its
-     * limit and capacity are set past the end of the Data Block.
-     *
-     * @return A new mutable buffer for read-only access to the Data Block.
+     * @return A new mutable buffer for accessing the Data Block.
      */
     MutableBuffer dataBlock();
+
+    /**
+     * Returns the Total Size of this Extra Field.
+     */
+    int getTotalSize();
+
+    /**
+     * Returns a new mutable buffer for accessing the Header Id, Data Size and
+     * Data Block.
+     * The returned buffer's position and limit are set so that the interval
+     * fits the Header Id, Data Size and Data Block.
+     * The buffer's mark and capacity are undefined.
+     *
+     * @return A new mutable buffer for accessing the Header Id, Data Size and
+     *         Data Block.
+     */
+    MutableBuffer totalBlock();
 }

@@ -27,7 +27,9 @@ class ExtraFieldsSpec extends WordSpec with ShouldMatchers with ParallelTestExec
       do {
         rnd.nextBytes(buf)
         intercept[ZipException] {
-          fields parse (MutableBuffer wrap buf).littleEndian.asImmutableBuffer
+          fields parse ((MutableBuffer wrap buf)
+                        .littleEndian
+                        .asImmutableBuffer)
           retry = true
         }
       } while (retry)

@@ -12,7 +12,7 @@ import org.scalatest.junit._
 
 /** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])
-class DefaultExtraFieldSpec
+class BufferedExtraFieldSpec
 extends WordSpec with ShouldMatchers with ParallelTestExecution {
 
   "A default extra field" when {
@@ -83,12 +83,8 @@ extends WordSpec with ShouldMatchers with ParallelTestExecution {
     }
 
     "constructed with a valid immutable buffer" should {
-      val buffer = (MutableBuffer allocate 4).littleEndian
+      val buffer = (MutableBuffer allocate 4).littleEndian.asImmutableBuffer
       val field = new BufferedExtraField(buffer)
-
-      "advance the position of the buffer" in {
-        buffer.position should be (4)
-      }
 
       "return the correct Total Size" in {
         field.getTotalSize should be (4)

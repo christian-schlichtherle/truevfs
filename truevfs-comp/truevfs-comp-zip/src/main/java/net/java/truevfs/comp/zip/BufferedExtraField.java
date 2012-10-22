@@ -4,12 +4,12 @@
  */
 package net.java.truevfs.comp.zip;
 
-import java.nio.ByteOrder;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.io.ImmutableBuffer;
 import net.java.truecommons.io.MutableBuffer;
 
 /**
- * Default implementation of an Extra Field.
+ * An Extra Field which uses a byte buffer to hold its data.
  *
  * @author Christian Schlichtherle
  */
@@ -17,20 +17,31 @@ import net.java.truecommons.io.MutableBuffer;
 class BufferedExtraField implements ExtraField {
 
     /**
-     * A mutable mb which holds the Header Id, Data Size and Data Block.
-     * The buffer is initialized with its position set to zero, an undefined
-     * mark and its limit set to its capacity.
-     * These properties are not used by the methods in the class
-     * {@link BufferedExtraField}, so a subclass may freely use them.
+     * A mutable buffer which holds the data of this Extra Field.
+     * The buffer is initialized with its position set to zero and its limit
+     * set so that the interval fits the Header Id, Data Size and Data Block.
+     * The buffer's mark and capacity are undefined.
+     * The buffer's byte order is little-endian.
      */
     protected final MutableBuffer mb;
 
-    BufferedExtraField(final MutableBuffer mb) {
-        assert mb.order() == ByteOrder.LITTLE_ENDIAN;
-        final MutableBuffer b = mb.asReadOnlyBuffer().slice();
-        final int totalSize = 4 + b.getUShort(2);
+    /**
+     * Constructs a new buffered extra field which shares the Header Id,
+     * Data Size and Data Block with given immutable buffer.
+     *
+     * @param  ib the immutable buffer with the shared Header Id, Data Size and
+     *         Data Block.
+     * @throws RuntimeException if the buffer's content does not conform to the
+     *         ZIP File Format Specification.
+     */
+    BufferedExtraField(final ImmutableBuffer ib) {
+        final MutableBuffer mb = ib
+                .asMutableBuffer()
+                .slice()
+                .littleEndian();
+        final int totalSize = 4 + mb.getUShort(2);
         UShort.check(totalSize);
-        this.mb = b.limit(totalSize).slice();
+        this.mb = mb.limit(totalSize);
         mb.position(mb.position() + totalSize);
     }
 
@@ -47,23 +58,19 @@ class BufferedExtraField implements ExtraField {
     }
 
     @Override
-    public int getTotalSize() { return 4 + getDataSize(); }
-
-    @Override
     public int getHeaderId() { return mb.getUShort(0); }
 
     @Override
-    public int getDataSize() { return mb.getUShort(2); }
+    public int getDataSize() { return getTotalSize() - 4; }
 
     @Override
-    public MutableBuffer totalBlock() {
-        return mb.asReadOnlyBuffer().clear();
-    }
+    public MutableBuffer dataBlock() { return mb.clone().position(4); }
 
     @Override
-    public MutableBuffer dataBlock() {
-        return totalBlock().position(4).slice();
-    }
+    public int getTotalSize() { return mb.limit(); }
+
+    @Override
+    public MutableBuffer totalBlock() { return mb.clone().position(0); }
 
     protected boolean requireHeaderId(int headerId) {
         return validate(getHeaderId() == headerId, "%d (invalid Header Id)", headerId);
@@ -88,8 +95,8 @@ class BufferedExtraField implements ExtraField {
     @SuppressWarnings("PackageVisibleInnerClass")
     static final class Factory extends AbstractExtraFieldFactory {
         @Override
-        protected ExtraField newExtraFieldUnchecked(MutableBuffer buf) {
-            return new BufferedExtraField(buf);
+        protected ExtraField newExtraFieldUnchecked(ImmutableBuffer ib) {
+            return new BufferedExtraField(ib);
         }
     } // Factory
 }
