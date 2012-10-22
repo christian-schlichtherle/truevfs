@@ -24,7 +24,6 @@ import net.java.truecommons.io.LittleEndianOutputStream;
 import net.java.truecommons.io.Sink;
 import net.java.truecommons.shed.HashMaps;
 import static net.java.truevfs.comp.zip.Constants.*;
-import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
 import static net.java.truevfs.comp.zip.WinZipAesExtraField.VV_AE_1;
 import static net.java.truevfs.comp.zip.WinZipAesExtraField.VV_AE_2;
 import static net.java.truevfs.comp.zip.WinZipAesUtils.overhead;
@@ -374,7 +373,7 @@ implements Iterable<E> {
             if (WINZIP_AES == method) {
                 param = parameters(WinZipAesParameters.class, param);
                 final WinZipAesExtraField field = (WinZipAesExtraField)
-                        entry.getExtraField(WINZIP_AES_ID);
+                        entry.getExtraField(WinZipAesExtraField.HEADER_ID);
                 if (null != field) {
                     method = field.getMethod();
                     if (VV_AE_2 == field.getVendorVersion())
@@ -863,7 +862,7 @@ implements Iterable<E> {
             long csize = entry.getCompressedSize();
             if (WINZIP_AES == method) {
                 field = (WinZipAesExtraField) entry.getExtraField(
-                        WINZIP_AES_ID);
+                        WinZipAesExtraField.HEADER_ID);
                 if (null != field) {
                     method = field.getMethod();
                     if (UNKNOWN != csize)
@@ -871,8 +870,7 @@ implements Iterable<E> {
                     entry.setRawMethod(method); // restore for out.init(*)
                 }
             }
-            if (null == field)
-                field = new WinZipAesExtraField();
+            if (null == field) field = new WinZipAesExtraField();
             field.setKeyStrength(keyStrength);
             field.setMethod(method);
             final long size = entry.getSize();

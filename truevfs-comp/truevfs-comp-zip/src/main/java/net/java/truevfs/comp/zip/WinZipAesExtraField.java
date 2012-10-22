@@ -5,8 +5,7 @@
 package net.java.truevfs.comp.zip;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import static net.java.truevfs.comp.zip.LittleEndian.readUShort;
-import static net.java.truevfs.comp.zip.LittleEndian.writeShort;
+import net.java.truecommons.io.MutableBuffer;
 import net.java.truevfs.key.spec.param.AesKeyStrength;
 import static net.java.truevfs.key.spec.param.AesKeyStrength.BITS_128;
 
@@ -19,7 +18,10 @@ import static net.java.truevfs.key.spec.param.AesKeyStrength.BITS_128;
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
-final class WinZipAesExtraField extends ExtraField {
+final class WinZipAesExtraField extends DefaultExtraField {
+
+    /** The Header Id for a WinZip AES extra field. */
+    public static final int HEADER_ID = 0x9901;
 
     private static final int DATA_SIZE = 7;
     private static final int VENDOR_ID = 'A' | ('E' << 8);
@@ -30,32 +32,31 @@ final class WinZipAesExtraField extends ExtraField {
      * value.
      * For use with {@link #setVendorVersion(int)}/{@link #getVendorVersion()}.
      */
-    static final int VV_AE_1 = 1;
+    public static final int VV_AE_1 = 1;
 
     /**
      * Entries of this type do <em>not</em> include the standard ZIP CRC-32
      * value.
      * For use with {@link #setVendorVersion(int)}/{@link #getVendorVersion()}.
      */
-    static final int VV_AE_2 = 2;
+    public static final int VV_AE_2 = 2;
 
-    private short vendorVersion = VV_AE_1;
-    private byte encryptionStrength = encryptionStrength(BITS_128);
-    private short method;
-
-    private static byte encryptionStrength(AesKeyStrength keyStrength) {
-        return (byte) (keyStrength.ordinal() + 1);
+    WinZipAesExtraField(final MutableBuffer buf) {
+        super(buf);
+        requireHeaderId(HEADER_ID);
+        requireDataSize(DATA_SIZE);
+        validateVendorVersion(getVendorVersion());
+        validateVendorId(getVendorId());
+        validateEncryptionStrength(getEncryptionStrength());
+        validateMethod(getMethod());
     }
 
-    private static AesKeyStrength keyStrength(int encryptionStrength) {
-        return KEY_STRENGTHS[(encryptionStrength - 1) & UByte.MAX_VALUE];
+    WinZipAesExtraField() {
+        super(HEADER_ID, DATA_SIZE);
+        setVendorVersion(VV_AE_1);
+        setVendorId(VENDOR_ID);
+        setKeyStrength(BITS_128);
     }
-
-    @Override
-    int getHeaderId() { return WINZIP_AES_ID; }
-
-    @Override
-    int getDataSize() { return DATA_SIZE; }
 
     /**
      * Returns the vendor version.
@@ -63,7 +64,7 @@ final class WinZipAesExtraField extends ExtraField {
      * @see #VV_AE_1
      * @see #VV_AE_2
      */
-    int getVendorVersion() { return vendorVersion & UShort.MAX_VALUE; }
+    public int getVendorVersion() { return mb.getUShort(4); }
 
     /**
      * Sets the vendor version.
@@ -73,52 +74,70 @@ final class WinZipAesExtraField extends ExtraField {
      * @param  vendorVersion the vendor version.
      * @throws IllegalArgumentException
      */
-    void setVendorVersion(final int vendorVersion) {
-        if (vendorVersion < VV_AE_1 || VV_AE_2 < vendorVersion)
-            throw new IllegalArgumentException("" + vendorVersion);
-        this.vendorVersion = (short) vendorVersion;
+    public void setVendorVersion(int vendorVersion) {
+        mb.putShort(4, (short) validateVendorVersion(vendorVersion));
     }
 
-    int getVendorId() { return VENDOR_ID; }
-
-    AesKeyStrength getKeyStrength() {
-        return keyStrength(this.encryptionStrength);
+    private static int validateVendorVersion(final int vendorVersion) {
+        validate(VV_AE_1 <= vendorVersion && vendorVersion <= VV_AE_2,
+                "%d (invalid Vendor Version)", vendorVersion);
+        return vendorVersion;
     }
 
-    void setKeyStrength(final AesKeyStrength keyStrength) {
-        this.encryptionStrength = encryptionStrength(keyStrength);
+    public int getVendorId() { return mb.getUShort(6); }
+
+    private void setVendorId(int vendorId) {
+        mb.putShort(6, (short) validateVendorId(vendorId));
     }
 
-    int getMethod() { return method & UShort.MAX_VALUE; }
-
-    void setMethod(final int compressionMethod) {
-        assert UShort.check(compressionMethod);
-        this.method = (short) compressionMethod;
+    private static int validateVendorId(final int vendorId) {
+        validate(VENDOR_ID == vendorId, "%d (invalid Vendor Id)", vendorId);
+        return vendorId;
     }
 
-    @Override
-    void readFrom(final byte[] buf, int off, final int len) {
-        if (DATA_SIZE != len) throw new IllegalArgumentException();
-        setVendorVersion(readUShort(buf, off));
-        off += 2;
-        final int vendorId = (short) readUShort(buf, off);
-        off += 2;
-        if (VENDOR_ID != vendorId) throw new IllegalArgumentException();
-        setKeyStrength(keyStrength(buf[off])); // checked
-        off += 1;
-        setMethod(readUShort(buf, off));
-        // off += 2;
+    private int getEncryptionStrength() { return mb.getUByte(8); }
+
+    private static int validateEncryptionStrength(final int encryptionStrength) {
+        keyStrength(encryptionStrength);
+        return encryptionStrength;
     }
 
-    @Override
-    void writeTo(byte[] buf, int off) {
-        writeShort(this.vendorVersion, buf, off);
-        off += 2;
-        writeShort(VENDOR_ID, buf, off);
-        off += 2;
-        buf[off] = this.encryptionStrength;
-        off += 1;
-        writeShort(this.method, buf, off);
-        // off += 2;
+    public AesKeyStrength getKeyStrength() {
+        return keyStrength(getEncryptionStrength());
     }
+
+    public void setKeyStrength(AesKeyStrength keyStrength) {
+        mb.put(8, (byte) encryptionStrength(keyStrength));
+    }
+
+    private static int encryptionStrength(AesKeyStrength keyStrength) {
+        return keyStrength.ordinal() + 1;
+    }
+
+    private static AesKeyStrength keyStrength(final int encryptionStrength) {
+        try {
+            return KEY_STRENGTHS[encryptionStrength - 1];
+        } catch (final IndexOutOfBoundsException ex) {
+            throw new IllegalArgumentException(encryptionStrength + " (invalid Key Strength)", ex);
+        }
+    }
+
+    public int getMethod() { return mb.getUShort(9); }
+
+    public void setMethod(int method) {
+        mb.putShort(9, (short) validateMethod(method));
+    }
+
+    private static int validateMethod(final int method) {
+        UShort.check(method);
+        return method;
+    }
+
+    @SuppressWarnings("PackageVisibleInnerClass")
+    static final class Factory extends AbstractExtraFieldFactory {
+        @Override
+        protected ExtraField newExtraFieldUnchecked(MutableBuffer buf) {
+            return new WinZipAesExtraField(buf);
+        }
+    } // Factory
 }

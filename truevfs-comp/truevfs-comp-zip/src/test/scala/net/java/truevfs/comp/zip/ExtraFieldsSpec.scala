@@ -4,6 +4,8 @@
  */
 package net.java.truevfs.comp.zip
 
+import java.util.zip._
+import net.java.truecommons.io._
 import org.junit.runner._
 import org.scalatest._
 import org.scalatest.junit._
@@ -24,8 +26,8 @@ class ExtraFieldsSpec extends WordSpec with ShouldMatchers with ParallelTestExec
       var retry = false
       do {
         rnd.nextBytes(buf)
-        intercept[IllegalArgumentException] {
-          fields.readFrom(buf, 0, buf.size)
+        intercept[ZipException] {
+          fields parse (MutableBuffer wrap buf).littleEndian.asImmutableBuffer
           retry = true
         }
       } while (retry)

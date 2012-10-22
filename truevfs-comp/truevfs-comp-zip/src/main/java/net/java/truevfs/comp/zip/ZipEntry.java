@@ -4,16 +4,18 @@
  */
 package net.java.truevfs.comp.zip;
 
+import java.nio.BufferUnderflowException;
 import java.util.Formatter;
+import java.util.zip.ZipException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.io.ImmutableBuffer;
+import net.java.truecommons.io.MutableBuffer;
+import net.java.truecommons.io.PowerBuffer;
 import static net.java.truevfs.comp.zip.Constants.EMPTY;
 import static net.java.truevfs.comp.zip.Constants.FORCE_ZIP64_EXT;
-import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
-import static net.java.truevfs.comp.zip.ExtraField.ZIP64_HEADER_ID;
-import static net.java.truevfs.comp.zip.LittleEndian.readLong;
-import static net.java.truevfs.comp.zip.LittleEndian.writeLong;
+import static net.java.truevfs.comp.zip.ExtraFields.ZIP64_HEADER_ID;
 
 /**
  * Replacement for {@link java.util.zip.ZipEntry java.util.zip.ZipEntry}.
@@ -268,10 +270,10 @@ public class ZipEntry implements Cloneable {
      */
     public final void clearEncryption() {
         setEncrypted(false);
-        final WinZipAesExtraField field
-                = (WinZipAesExtraField) removeExtraField(WINZIP_AES_ID);
+        final WinZipAesExtraField ef
+                = (WinZipAesExtraField) removeExtraField(WinZipAesExtraField.HEADER_ID);
         if (WINZIP_AES == getRawMethod())
-            setRawMethod(null == field ? UNKNOWN : field.getMethod());
+            setRawMethod(null == ef ? UNKNOWN : ef.getMethod());
     }
 
     /**
@@ -508,11 +510,11 @@ public class ZipEntry implements Cloneable {
         return fields == null ? null : fields.get(headerId);
     }
 
-    final @Nullable ExtraField addExtraField(final ExtraField field) {
-        assert null != field;
+    final @Nullable ExtraField addExtraField(final ExtraField ef) {
+        assert null != ef;
         ExtraFields fields = this.fields;
         if (null == fields) this.fields = fields = new ExtraFields();
-        return fields.add(field);
+        return fields.add(ef);
     }
 
     final @Nullable ExtraField removeExtraField(final int headerId) {
@@ -522,7 +524,7 @@ public class ZipEntry implements Cloneable {
 
     /**
      * Returns a protective copy of the serialized extra fields.
-     * Note that unlike its template {@link java.util.zip.ZipEntry#getDataBlock()},
+     * Note that unlike its template {@link java.util.zip.ZipEntry#dataBlock()},
      * this method never returns {@code null}.
      *
      * @return A new byte array holding the serialized extra fields.
@@ -545,8 +547,20 @@ public class ZipEntry implements Cloneable {
     public final void setExtra(final @CheckForNull byte[] buf)
     throws IllegalArgumentException {
         if (null != buf) {
-            UShort.check(buf.length, "Extra Fields too large", null);
-            setExtraFields(buf, false);
+            final int len = buf.length;
+            UShort.check(len, "Extra Fields too large", null);
+            final ImmutableBuffer ib = PowerBuffer
+                    .allocateDirect(len)
+                    .put(buf)
+                    .rewind()
+                    .littleEndian()
+                    .asReadOnlyBuffer()
+                    .asImmutableBuffer();
+            try {
+                setExtraFields(ib, false);
+            } catch (final ZipException ex) {
+                throw new IllegalArgumentException(ex);
+            }
         } else {
             this.fields = null;
         }
@@ -569,39 +583,46 @@ public class ZipEntry implements Cloneable {
      * @throws IllegalArgumentException If the data block does not conform to
      *         the ZIP File Format Specification.
      */
-    final void setRawExtraFields(final byte[] buf)
-    throws IllegalArgumentException {
-        setExtraFields(buf, true);
+    final void setRawExtraFields(final ImmutableBuffer ib) throws ZipException {
+        if (!ib.isReadOnly()) throw new IllegalArgumentException();
+        setExtraFields(ib, true);
     }
 
     private byte[] getExtraFields(final boolean zip64) {
         ExtraFields fields = this.fields;
         if (zip64) {
-            final ExtraField field = composeZip64ExtraField();
-            if (null != field) {
+            final ExtraField ef = composeZip64ExtraField();
+            if (null != ef) {
                 fields = null != fields ? fields.clone() : new ExtraFields();
-                fields.add(field);
+                fields.add(ef);
             }
         } else {
             assert null == fields || null == fields.get(ZIP64_HEADER_ID);
         }
-        return null == fields ? EMPTY : fields.getDataBlock();
+        if (null == fields) return EMPTY;
+        final MutableBuffer mb = MutableBuffer
+                .allocate(fields.getTotalSize())
+                .littleEndian();
+        fields.compose(mb);
+        return mb.array();
     }
 
     /**
      * @throws IllegalArgumentException If the data block does not conform to
      *         the ZIP File Format Specification.
      */
-    private void setExtraFields(final byte[] buf, final boolean zip64)
-    throws IllegalArgumentException {
-        assert UShort.check(buf.length);
-        if (0 < buf.length) {
+    private void setExtraFields(final ImmutableBuffer ib, final boolean zip64)
+    throws ZipException {
+        assert ib.isReadOnly();
+        assert UShort.check(ib.remaining());
+        if (0 < ib.remaining()) {
             final ExtraFields fields = new ExtraFields();
-            fields.readFrom(buf, 0, buf.length);
+            fields.parse(ib);
             try {
                 if (zip64) parseZip64ExtraField(fields);
-            } catch (final IndexOutOfBoundsException ex) {
-                throw new IllegalArgumentException(ex);
+            } catch (final BufferUnderflowException ex) {
+                throw (ZipException) new ZipException("Invalid ZIP64 Extra Field data")
+                        .initCause(ex);
             }
             fields.remove(ZIP64_HEADER_ID);
             this.fields = 0 < fields.size() ? fields : null;
@@ -617,35 +638,31 @@ public class ZipEntry implements Cloneable {
      * from the collection of extra fields.
      */
     private @CheckForNull ExtraField composeZip64ExtraField() {
-        final byte[] data = new byte[3 * 8]; // maximum size
-        int off = 0;
+        final MutableBuffer mb = MutableBuffer
+                .allocateDirect(4 + 3 * 8) // maximum size
+                .littleEndian()
+                .position(4); // defer header writing
         // Write out Uncompressed Size.
         final long size = getSize();
-        if (FORCE_ZIP64_EXT && UNKNOWN != size || UInt.MAX_VALUE <= size) {
-            writeLong(size, data, off);
-            off += 8;
-        }
+        if (FORCE_ZIP64_EXT && UNKNOWN != size || UInt.MAX_VALUE <= size)
+            mb.putLong(size);
         // Write out Compressed Size.
         final long csize = getCompressedSize();
-        if (FORCE_ZIP64_EXT && UNKNOWN != csize || UInt.MAX_VALUE <= csize) {
-            writeLong(csize, data, off);
-            off += 8;
-        }
+        if (FORCE_ZIP64_EXT && UNKNOWN != csize || UInt.MAX_VALUE <= csize)
+            mb.putLong(csize);
         // Write out Relative Header Offset.
         final long offset = getOffset();
-        if (FORCE_ZIP64_EXT && UNKNOWN != offset || UInt.MAX_VALUE <= offset) {
-            writeLong(offset, data, off);
-            off += 8;
-        }
-        // Create ZIP64 Extended Information extra field from serialized data.
-        final ExtraField field;
-        if (off > 0) {
-            field = new DefaultExtraField(ZIP64_HEADER_ID);
-            field.readFrom(data, 0, off);
+        if (FORCE_ZIP64_EXT && UNKNOWN != offset || UInt.MAX_VALUE <= offset)
+            mb.putLong(offset);
+        final int dataSize = mb.position() - 4;
+        if (0 < dataSize) {
+            return new DefaultExtraField(mb
+                    .flip()
+                    .putShort(0, (short) ZIP64_HEADER_ID)
+                    .putShort(2, (short) dataSize));
         } else {
-            field = null;
+            return null;
         }
-        return field;
     }
 
     /**
@@ -654,31 +671,32 @@ public class ZipEntry implements Cloneable {
      * The ZIP64 Extended Information extra field is <em>not</em> removed.
      */
     private void parseZip64ExtraField(final ExtraFields fields)
-    throws IndexOutOfBoundsException {
+    throws ZipException {
         final ExtraField ef = fields.get(ZIP64_HEADER_ID);
         if (null == ef) return;
-        final byte[] data = ef.getDataBlock();
-        int off = 0;
-        // Read in Uncompressed Size.
-        final long size = getRawSize();
-        if (UInt.MAX_VALUE <= size) {
-            assert UInt.MAX_VALUE == size;
-            setRawSize(readLong(data, off));
-            off += 8;
-        }
-        // Read in Compressed Size.
-        final long csize = getRawCompressedSize();
-        if (UInt.MAX_VALUE <= csize) {
-            assert UInt.MAX_VALUE == csize;
-            setRawCompressedSize(readLong(data, off));
-            off += 8;
-        }
-        // Read in Relative Header Offset.
-        final long offset = getRawOffset();
-        if (UInt.MAX_VALUE <= offset) {
-            assert UInt.MAX_VALUE == offset;
-            setRawOffset(readLong(data, off));
-            //off += 8;
+        final MutableBuffer mb = ef.dataBlock();
+        try {
+            // Read in Uncompressed Size.
+            final long size = getRawSize();
+            if (UInt.MAX_VALUE <= size) {
+                assert UInt.MAX_VALUE == size;
+                setRawSize(mb.getLong());
+            }
+            // Read in Compressed Size.
+            final long csize = getRawCompressedSize();
+            if (UInt.MAX_VALUE <= csize) {
+                assert UInt.MAX_VALUE == csize;
+                setRawCompressedSize(mb.getLong());
+            }
+            // Read in Relative Header Offset.
+            final long offset = getRawOffset();
+            if (UInt.MAX_VALUE <= offset) {
+                assert UInt.MAX_VALUE == offset;
+                setRawOffset(mb.getLong());
+            }
+        } catch (final BufferUnderflowException ex) {
+            throw (ZipException) new ZipException("Invalid ZIP64 Extra Field data!")
+                    .initCause(ex);
         }
     }
 
