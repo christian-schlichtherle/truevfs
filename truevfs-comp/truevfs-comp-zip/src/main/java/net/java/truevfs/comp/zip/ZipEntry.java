@@ -549,15 +549,13 @@ public class ZipEntry implements Cloneable {
         if (null != buf) {
             final int len = buf.length;
             UShort.check(len, "Extra Fields too large", null);
-            final ImmutableBuffer ib = PowerBuffer
-                    .allocateDirect(len)
-                    .put(buf)
-                    .rewind()
-                    .littleEndian()
-                    .asReadOnlyBuffer()
-                    .asImmutableBuffer();
             try {
-                setExtraFields(ib, false);
+                setExtraFields(PowerBuffer
+                        .allocateDirect(len)
+                        .put(buf)
+                        .rewind()
+                        .asImmutableBuffer(),
+                        false);
             } catch (final ZipException ex) {
                 throw new IllegalArgumentException(ex);
             }
@@ -584,7 +582,10 @@ public class ZipEntry implements Cloneable {
      *         the ZIP File Format Specification.
      */
     final void setRawExtraFields(final ImmutableBuffer ib) throws ZipException {
-        if (!ib.isReadOnly()) throw new IllegalArgumentException();
+        // TODO: A read-only buffer could not get passed over from a ZipFile to
+        // a ZipOutputStream - which is required by the
+        // TrueVFS Kernel Implementation as of TrueVFS 0.9.3.
+        assert !ib.isReadOnly();
         setExtraFields(ib, true);
     }
 
@@ -613,8 +614,6 @@ public class ZipEntry implements Cloneable {
      */
     private void setExtraFields(final ImmutableBuffer ib, final boolean zip64)
     throws ZipException {
-        assert ib.isReadOnly();
-        assert UShort.check(ib.remaining());
         if (0 < ib.remaining()) {
             final ExtraFields fields = new ExtraFields();
             fields.parse(ib);
@@ -659,7 +658,8 @@ public class ZipEntry implements Cloneable {
             return new BufferedExtraField(mb
                     .flip()
                     .putShort(0, (short) ZIP64_HEADER_ID)
-                    .putShort(2, (short) dataSize));
+                    .putShort(2, (short) dataSize)
+                    .asImmutableBuffer());
         } else {
             return null;
         }

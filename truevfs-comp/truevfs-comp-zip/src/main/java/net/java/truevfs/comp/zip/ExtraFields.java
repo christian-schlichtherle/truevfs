@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.comp.zip;
 
-import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -84,7 +83,7 @@ final class ExtraFields implements Cloneable {
     }
 
     /**
-     * Stores the given extra field in this collection.
+     * Adds the given extra field to this collection.
      *
      * @param ef The extra field to store in this collection.
      * @return The extra field previously associated with the Header HEADER_ID of
@@ -138,29 +137,22 @@ final class ExtraFields implements Cloneable {
      * buffer {@code ib}.
      */
     void parse(final ImmutableBuffer ib) throws ZipException {
-        assert ib.order() == ByteOrder.LITTLE_ENDIAN;
-        UShort.check(ib.remaining());
-        final MutableBuffer mb = ib.asReadOnlyBuffer().asMutableBuffer();
+        assert UShort.check(ib.remaining());
+        final MutableBuffer mb = ib.asMutableBuffer().littleEndian();
         final Map<Integer, ExtraField> map = new TreeMap<>();
         while (0 < mb.remaining()) {
-            final ExtraField ef = extraField(mb);
+            final int headerId = mb.getUShort(mb.position()); // peek
+            ExtraFieldFactory eff = registry.get(headerId);
+            if (null == eff) eff = new BufferedExtraField.Factory();
+            final ExtraField ef = eff.newExtraField(mb.asImmutableBuffer());
+            mb.skip(ef.getTotalSize());
+            assert headerId == ef.getHeaderId();
             map.put(ef.getHeaderId(), ef);
         }
         fields = map;
     }
 
-    private static ExtraField extraField(final MutableBuffer buf)
-    throws ZipException {
-        final int headerId = buf.getUShort(buf.position()); // peek
-        ExtraFieldFactory eff = registry.get(headerId);
-        if (null == eff) eff = new BufferedExtraField.Factory();
-        final ExtraField ef = eff.newExtraField(buf); // advances position
-        assert headerId == ef.getHeaderId();
-        return ef;
-    }
-
-    void compose(final MutableBuffer mb) {
-        assert mb.order() == ByteOrder.LITTLE_ENDIAN;
-        for (final ExtraField ef : fields.values()) mb.put(ef.totalBlock());
+    void compose(MutableBuffer mb) {
+        for (ExtraField ef : fields.values()) mb.put(ef.totalBlock());
     }
 }

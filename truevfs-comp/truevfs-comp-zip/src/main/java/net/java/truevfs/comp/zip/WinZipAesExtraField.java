@@ -5,7 +5,7 @@
 package net.java.truevfs.comp.zip;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truecommons.io.MutableBuffer;
+import net.java.truecommons.io.ImmutableBuffer;
 import net.java.truevfs.key.spec.param.AesKeyStrength;
 import static net.java.truevfs.key.spec.param.AesKeyStrength.BITS_128;
 
@@ -41,8 +41,8 @@ final class WinZipAesExtraField extends BufferedExtraField {
      */
     public static final int VV_AE_2 = 2;
 
-    WinZipAesExtraField(final MutableBuffer buf) {
-        super(buf);
+    WinZipAesExtraField(final ImmutableBuffer ib) {
+        super(ib);
         requireHeaderId(HEADER_ID);
         requireDataSize(DATA_SIZE);
         validateVendorVersion(getVendorVersion());
@@ -136,8 +136,8 @@ final class WinZipAesExtraField extends BufferedExtraField {
     @SuppressWarnings("PackageVisibleInnerClass")
     static final class Factory extends AbstractExtraFieldFactory {
         @Override
-        protected ExtraField newExtraFieldUnchecked(MutableBuffer buf) {
-            return new WinZipAesExtraField(buf);
+        protected ExtraField newExtraFieldUnchecked(ImmutableBuffer ib) {
+            return new WinZipAesExtraField(ib);
         }
     } // Factory
 }

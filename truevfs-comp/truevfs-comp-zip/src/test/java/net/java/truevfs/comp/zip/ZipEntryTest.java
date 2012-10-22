@@ -508,7 +508,11 @@ public final class ZipEntryTest {
         entry.setRawSize(UInt.MAX_VALUE);
         entry.setRawCompressedSize(UInt.MAX_VALUE);
         entry.setRawOffset(UInt.MAX_VALUE);
-        entry.setRawExtraFields(MutableBuffer.wrap(set.clone()).littleEndian().asReadOnlyBuffer().asImmutableBuffer()); // this must be last in the sequence!
+        // TODO: This must be the last in the sequence of calls on entry!
+        entry.setRawExtraFields(MutableBuffer
+                .wrap(set.clone())
+                .littleEndian()
+                .asImmutableBuffer());
         assertEquals(0x0fedcba987654321L, entry.getSize());
         assertEquals(UInt.MAX_VALUE, entry.getRawSize());
         assertEquals(0x0fedcba987654322L, entry.getCompressedSize());
