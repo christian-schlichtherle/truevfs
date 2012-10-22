@@ -656,7 +656,7 @@ public class ZipEntry implements Cloneable {
             mb.putLong(offset);
         final int dataSize = mb.position() - 4;
         if (0 < dataSize) {
-            return new DefaultExtraField(mb
+            return new BufferedExtraField(mb
                     .flip()
                     .putShort(0, (short) ZIP64_HEADER_ID)
                     .putShort(2, (short) dataSize));

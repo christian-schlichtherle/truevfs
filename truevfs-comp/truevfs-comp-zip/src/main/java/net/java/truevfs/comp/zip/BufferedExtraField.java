@@ -14,18 +14,18 @@ import net.java.truecommons.io.MutableBuffer;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-class DefaultExtraField implements ExtraField {
+class BufferedExtraField implements ExtraField {
 
     /**
      * A mutable mb which holds the Header Id, Data Size and Data Block.
      * The buffer is initialized with its position set to zero, an undefined
      * mark and its limit set to its capacity.
      * These properties are not used by the methods in the class
-     * {@link DefaultExtraField}, so a subclass may freely use them.
+     * {@link BufferedExtraField}, so a subclass may freely use them.
      */
     protected final MutableBuffer mb;
 
-    DefaultExtraField(final MutableBuffer mb) {
+    BufferedExtraField(final MutableBuffer mb) {
         assert mb.order() == ByteOrder.LITTLE_ENDIAN;
         final MutableBuffer b = mb.asReadOnlyBuffer().slice();
         final int totalSize = 4 + b.getUShort(2);
@@ -34,7 +34,7 @@ class DefaultExtraField implements ExtraField {
         mb.position(mb.position() + totalSize);
     }
 
-    DefaultExtraField(final int headerId, final int dataSize) {
+    BufferedExtraField(final int headerId, final int dataSize) {
         UShort.check(headerId);
         UShort.check(dataSize);
         final int totalSize = 4 + dataSize;
@@ -89,7 +89,7 @@ class DefaultExtraField implements ExtraField {
     static final class Factory extends AbstractExtraFieldFactory {
         @Override
         protected ExtraField newExtraFieldUnchecked(MutableBuffer buf) {
-            return new DefaultExtraField(buf);
+            return new BufferedExtraField(buf);
         }
     } // Factory
 }

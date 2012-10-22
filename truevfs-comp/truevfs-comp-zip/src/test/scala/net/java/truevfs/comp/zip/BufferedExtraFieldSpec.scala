@@ -19,31 +19,31 @@ extends WordSpec with ShouldMatchers with ParallelTestExecution {
     "constructed with wrong parameters" should {
       "throw an IllegalArgumentException 1" in {
         intercept[IllegalArgumentException] {
-          new DefaultExtraField(UShort.MIN_VALUE - 1, 0)
+          new BufferedExtraField(UShort.MIN_VALUE - 1, 0)
         }
       }
 
       "throw an IllegalArgumentException 2" in {
         intercept[IllegalArgumentException] {
-          new DefaultExtraField(UShort.MAX_VALUE + 1, 0)
+          new BufferedExtraField(UShort.MAX_VALUE + 1, 0)
         }
       }
 
       "throw an IllegalArgumentException 3" in {
         intercept[IllegalArgumentException] {
-          new DefaultExtraField(0, UShort.MIN_VALUE - 1)
+          new BufferedExtraField(0, UShort.MIN_VALUE - 1)
         }
       }
 
       "throw an IllegalArgumentException 4" in {
         intercept[IllegalArgumentException] {
-          new DefaultExtraField(0, UShort.MAX_VALUE + 1)
+          new BufferedExtraField(0, UShort.MAX_VALUE + 1)
         }
       }
     }
 
     "constructed with correct parameters" should {
-      val field = new DefaultExtraField(UShort.MAX_VALUE, UShort.MAX_VALUE - 4)
+      val field = new BufferedExtraField(UShort.MAX_VALUE, UShort.MAX_VALUE - 4)
 
       "return the correct Total Size" in {
         field.getTotalSize should be (UShort.MAX_VALUE)
@@ -84,7 +84,7 @@ extends WordSpec with ShouldMatchers with ParallelTestExecution {
 
     "constructed with a valid immutable buffer" should {
       val buffer = (MutableBuffer allocate 4).littleEndian
-      val field = new DefaultExtraField(buffer)
+      val field = new BufferedExtraField(buffer)
 
       "advance the position of the buffer" in {
         buffer.position should be (4)
