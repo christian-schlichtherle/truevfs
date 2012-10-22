@@ -153,7 +153,7 @@ final class ExtraFields implements Cloneable {
     throws ZipException {
         final int headerId = buf.getUShort(buf.position()); // peek
         ExtraFieldFactory eff = registry.get(headerId);
-        if (null == eff) eff = new DefaultExtraField.Factory();
+        if (null == eff) eff = new BufferedExtraField.Factory();
         final ExtraField ef = eff.newExtraField(buf); // advances position
         assert headerId == ef.getHeaderId();
         return ef;

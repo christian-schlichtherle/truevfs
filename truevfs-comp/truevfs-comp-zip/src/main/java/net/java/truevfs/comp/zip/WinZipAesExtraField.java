@@ -18,7 +18,7 @@ import static net.java.truevfs.key.spec.param.AesKeyStrength.BITS_128;
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
-final class WinZipAesExtraField extends DefaultExtraField {
+final class WinZipAesExtraField extends BufferedExtraField {
 
     /** The Header Id for a WinZip AES extra field. */
     public static final int HEADER_ID = 0x9901;

@@ -47,7 +47,7 @@ public final class ExtraFieldsTest {
     @Test
     public void testCollection2() throws ZipException {
         assertEquals(0, fields.getTotalSize());
-        final ExtraField ef = new DefaultExtraField(ExtraFields.ZIP64_HEADER_ID, 0);
+        final ExtraField ef = new BufferedExtraField(ExtraFields.ZIP64_HEADER_ID, 0);
         assertNull(fields.get(ExtraFields.ZIP64_HEADER_ID));
         assertNull(fields.add(ef));
         assertEquals(ef.getTotalSize(), fields.getTotalSize());
