@@ -25,15 +25,20 @@ import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
 import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 
 /**
- * Decorates another output service to support a virtually unlimited number of
- * entries which may be written concurrently while actually at most one entry
- * is written concurrently to the decorated output service.
- * If there is more than one entry to be written concurrently, the additional
- * entries are buffered to an I/O entry allocated from an I/O pool and copied
- * to the decorated output service upon a call to their
- * {@link OutputStream#close()} method.
- * Note that this implies that the {@code close()} method may fail with
- * an {@link IOException}.
+ * Decorates another output service to enable concurrent writing of multiple
+ * entries to the decorated container.
+ * Whenever an attempt is made to write more than one entry concurrently to
+ * this container, all but the first entry is transparently redirected to an
+ * I/O buffer.
+ * Whenever a redirected entry is {@code close()}d then, another attempt is
+ * made to copy the I/O buffer into the decorated container.
+ * If this container is still busy with writing an entry to the decorated
+ * container, then the copying is deferred until either another I/O buffer
+ * gets {@code close()}d or this container gets {@code close()}d,
+ * whatever happens first.
+ * <p>
+ * Note that this implies that {@code close()}ing an entry or this container
+ * may fail with an {@link IOException}.
  *
  * @param  <E> the type of the mutable entries.
  * @author Christian Schlichtherle
@@ -56,7 +61,7 @@ extends DecoratingOutputService<E> {
 
     /**
      * Constructs a new multiplexed output service.
-     * 
+     *
      * @param output the decorated output service.
      * @param pool the pool for buffering entry data.
      */
@@ -128,7 +133,7 @@ extends DecoratingOutputService<E> {
     /**
      * Returns whether the container output archive is busy writing an archive
      * entry or not.
-     * 
+     *
      * @return Whether the container output archive is busy writing an archive
      *         entry or not.
      */
