@@ -4,9 +4,9 @@
  */
 package net.java.truevfs.kernel.impl.cio
 
-import net.java.truevfs.kernel.spec.cio.Entry._
-import net.java.truevfs.kernel.spec.cio.Entry.Access._
-import net.java.truevfs.kernel.spec.cio.Entry.Size._
+import net.java.truecommons.cio.Entry._
+import net.java.truecommons.cio.Entry.Access._
+import net.java.truecommons.cio.Entry.Size._
 
 /**
   * @author Christian Schlichtherle

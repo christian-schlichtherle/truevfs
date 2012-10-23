@@ -15,10 +15,10 @@ import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.FsAccessOption._
 import net.java.truevfs.kernel.spec.FsAccessOptions._
 import net.java.truevfs.kernel.spec.FsNodeName._
-import net.java.truevfs.kernel.spec.cio._
-import net.java.truevfs.kernel.spec.cio.Entry._
-import net.java.truevfs.kernel.spec.cio.Entry.Access._
-import net.java.truevfs.kernel.spec.cio.Entry.Type._
+import net.java.truecommons.cio._
+import net.java.truecommons.cio.Entry._
+import net.java.truecommons.cio.Entry.Access._
+import net.java.truecommons.cio.Entry.Type._
 import scala.annotation._
 import ArchiveFileSystem._
 

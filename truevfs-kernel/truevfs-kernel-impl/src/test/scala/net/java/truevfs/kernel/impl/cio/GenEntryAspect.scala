@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.kernel.impl.cio
 
-import net.java.truevfs.kernel.spec.cio.Entry
+import net.java.truecommons.cio.Entry
 
 /**
   * @author Christian Schlichtherle

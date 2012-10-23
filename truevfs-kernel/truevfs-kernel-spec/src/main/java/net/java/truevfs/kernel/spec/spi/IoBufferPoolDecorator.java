@@ -5,8 +5,8 @@
 package net.java.truevfs.kernel.spec.spi;
 
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.cio.IoBufferPool;
 import net.java.truecommons.services.LocatableDecorator;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 
 /**

@@ -9,7 +9,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.UniqueObject;
-import net.java.truevfs.kernel.spec.cio.Entry;
+import net.java.truecommons.cio.Entry;
 
 /**
  * An abstract file system node is a node which can implement multiple types

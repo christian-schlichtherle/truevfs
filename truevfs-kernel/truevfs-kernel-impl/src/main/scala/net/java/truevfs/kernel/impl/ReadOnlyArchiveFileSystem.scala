@@ -7,9 +7,9 @@ package net.java.truevfs.kernel.impl
 import net.java.truecommons.shed._
 import javax.annotation.concurrent._
 import net.java.truevfs.kernel.spec._
-import net.java.truevfs.kernel.spec.cio._
-import net.java.truevfs.kernel.spec.cio.Entry._
-import net.java.truevfs.kernel.spec.cio.Entry.Access._
+import net.java.truecommons.cio._
+import net.java.truecommons.cio.Entry._
+import net.java.truecommons.cio.Entry.Access._
 
 /** A read-only virtual file system for archive entries.
   * 

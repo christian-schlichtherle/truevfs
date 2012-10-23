@@ -18,7 +18,7 @@ import java.util.Set;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
+import net.java.truecommons.cio.IoBufferPool;
 
 /**
  * This I/O pool creates and deletes temporary files as {@link FileNode}s.

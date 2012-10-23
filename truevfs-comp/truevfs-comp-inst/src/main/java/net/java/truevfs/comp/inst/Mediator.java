@@ -12,7 +12,7 @@ import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsMetaDriver;
 import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.cio.*;
+import net.java.truecommons.cio.*;
 
 /**
  * Implements the mediator role of the mediator pattern for instrumenting all

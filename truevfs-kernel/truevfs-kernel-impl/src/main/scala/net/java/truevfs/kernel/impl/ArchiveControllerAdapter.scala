@@ -8,8 +8,8 @@ import net.java.truecommons.shed._
 import java.{lang => jl}
 import java.{util => ju}
 import net.java.truevfs.kernel.spec._
-import net.java.truevfs.kernel.spec.cio._
-import net.java.truevfs.kernel.spec.cio.Entry._
+import net.java.truecommons.cio._
+import net.java.truecommons.cio.Entry._
 
 private final class ArchiveControllerAdapter(
   override val getParent: FsController,

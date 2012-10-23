@@ -10,9 +10,9 @@ import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truevfs.kernel.spec.cio.AbstractOutputSocket;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
+import net.java.truecommons.cio.AbstractOutputSocket;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.InputSocket;
 
 /**
  * An output socket for HTTP(S) entries.

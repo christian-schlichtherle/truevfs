@@ -13,8 +13,9 @@ import javax.annotation.concurrent.NotThreadSafe;
 import static net.java.truevfs.comp.zip.ZipEntry.STORED;
 import net.java.truevfs.comp.zipdriver.JarDriverEntry;
 import net.java.truevfs.comp.zipdriver.ZipOutputService;
-import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.java.truevfs.kernel.spec.cio.*;
+import static net.java.truecommons.cio.Entry.UNKNOWN;
+import net.java.truecommons.cio.*;
+import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
 
 /**
  * Created by {@link OdfDriver} to meet the special requirements of
@@ -33,7 +34,7 @@ public class OdfOutputService extends MultiplexingOutputService<JarDriverEntry> 
 
     /**
      * Constructs a new ODF output service.
-     * 
+     *
      * @param output the decorated output service.
      * @param pool the pool for buffering entry data.
      */

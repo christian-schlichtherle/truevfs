@@ -9,10 +9,10 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.cio.IoBufferPool;
 import net.java.truecommons.shed.InheritableThreadLocalStack;
 import net.java.truecommons.shed.Resource;
 import net.java.truevfs.kernel.spec.cio.ByteArrayIoBufferPool;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
  * A container for configuration options with global or inheritable thread
@@ -44,7 +44,7 @@ import net.java.truevfs.kernel.spec.cio.IoBufferPool;
  * with its parent.
  * As an implication, {@link #pop()} or {@link #close()} can be called at most
  * once in the child thread.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
@@ -77,7 +77,7 @@ public final class TestConfig extends Resource<RuntimeException> {
      * If no configuration has been {@link #push() pushed} yet, the global
      * configuration is returned.
      * Mind that the global configuration is shared by all threads.
-     * 
+     *
      * @return The current configuration.
      * @see    #push()
      */
@@ -89,7 +89,7 @@ public final class TestConfig extends Resource<RuntimeException> {
      * Creates a new current configuration by copying the current configuration
      * and pushing the copy onto the inheritable thread local configuration
      * stack.
-     * 
+     *
      * @return The new current configuration.
      * @see    #ioBufferPool()
      */
@@ -101,7 +101,7 @@ public final class TestConfig extends Resource<RuntimeException> {
     /**
      * Pops the {@link #ioBufferPool() current configuration} off the inheritable thread
      * local configuration stack.
-     * 
+     *
      * @throws IllegalStateException If the {@link #ioBufferPool() current configuration}
      *         is the global configuration.
      */

@@ -32,11 +32,11 @@ import net.java.truevfs.kernel.spec.FsMountPoint;
 import net.java.truevfs.kernel.spec.FsNode;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
 import net.java.truevfs.kernel.spec.FsNodePath;
-import static net.java.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
-import static net.java.truevfs.kernel.spec.cio.Entry.Type.FILE;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.IoSockets;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
+import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
+import static net.java.truecommons.cio.Entry.Type.FILE;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.IoSockets;
+import net.java.truecommons.cio.OutputSocket;
 import org.slf4j.LoggerFactory;
 
 /**

@@ -10,7 +10,7 @@ import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.UniqueObject;
-import net.java.truevfs.kernel.spec.cio.Entry.Access;
+import net.java.truecommons.cio.Entry.Access;
 
 /**
  * An abstract file system controller which implements the {@link #getModel()}

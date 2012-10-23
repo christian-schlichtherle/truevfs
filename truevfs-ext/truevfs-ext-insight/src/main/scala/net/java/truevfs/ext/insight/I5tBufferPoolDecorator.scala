@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.ext.insight
 
-import net.java.truevfs.kernel.spec.cio._
+import net.java.truecommons.cio._
 import net.java.truevfs.kernel.spec.spi._
 
 /**

@@ -20,9 +20,9 @@ import net.java.truevfs.comp.tardriver.TarInputService;
 import net.java.truevfs.comp.tardriver.TarOutputService;
 import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsAccessOption.STORE;
-import net.java.truevfs.kernel.spec.cio.InputService;
+import net.java.truecommons.cio.InputService;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
-import net.java.truevfs.kernel.spec.cio.OutputService;
+import net.java.truecommons.cio.OutputService;
 import org.tukaani.xz.LZMA2Options;
 import org.tukaani.xz.XZInputStream;
 import org.tukaani.xz.XZOutputStream;
@@ -31,7 +31,7 @@ import org.tukaani.xz.XZOutputStream;
  * An archive driver for XZ compressed TAR files (TAR.XZ).
  * <p>
  * Subclasses must be thread-safe and should be immutable!
- * 
+ *
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -53,7 +53,7 @@ public class TarXZDriver extends TarDriver {
      * <p>
      * The implementation in the class {@link TarXZDriver} returns
      * {@link LZMA2Options#PRESET_DEFAULT}.
-     * 
+     *
      * @return The compression level to use when writing a XZ output stream.
      */
     public int getPreset() {

@@ -9,8 +9,8 @@ import java.io._
 import java.nio.channels._
 import javax.annotation.concurrent._
 import net.java.truevfs.kernel.spec._
-import net.java.truevfs.kernel.spec.cio._
-import net.java.truevfs.kernel.spec.cio.Entry._;
+import net.java.truecommons.cio._
+import net.java.truecommons.cio.Entry._;
 
 /** This abstract archive controller controls the mount state transition.
   * It is up to the sub-class to implement the actual mounting/unmounting

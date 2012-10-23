@@ -8,7 +8,7 @@ import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.InstrumentingBuffer;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
+import net.java.truecommons.cio.IoBuffer;
 
 /**
  * A controller for an {@linkplain IoBuffer I/O buffer}.

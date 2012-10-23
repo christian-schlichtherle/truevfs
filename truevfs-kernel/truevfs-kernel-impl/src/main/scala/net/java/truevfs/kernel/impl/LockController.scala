@@ -8,8 +8,8 @@ import net.java.truecommons.io._
 import net.java.truecommons.shed._
 import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec._
-import net.java.truevfs.kernel.spec.cio._
-import net.java.truevfs.kernel.spec.cio.Entry._;
+import net.java.truecommons.cio._
+import net.java.truecommons.cio.Entry._;
 import net.java.truevfs.kernel.impl.LockingStrategy._
 import java.io._
 import java.nio.channels._

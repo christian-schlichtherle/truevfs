@@ -25,15 +25,15 @@ import net.java.truevfs.kernel.spec.FsInputSocketSource;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsNodeName;
 import net.java.truevfs.kernel.spec.FsOutputSocketSink;
-import net.java.truevfs.kernel.spec.cio.InputService;
+import net.java.truecommons.cio.InputService;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
-import net.java.truevfs.kernel.spec.cio.OutputService;
+import net.java.truecommons.cio.OutputService;
 
 /**
  * An archive driver for GZIP compressed TAR files (TAR.GZIP).
  * <p>
  * Subclasses must be thread-safe and should be immutable!
- * 
+ *
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -56,7 +56,7 @@ public class TarGZipDriver extends TarDriver {
      * <p>
      * The implementation in the class {@link TarGZipDriver} returns
      * {@link Deflater#BEST_COMPRESSION}.
-     * 
+     *
      * @return The compression level to use when writing a GZIP sink stream.
      */
     public int getLevel() {

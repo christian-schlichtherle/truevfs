@@ -13,7 +13,7 @@ import net.java.truevfs.comp.zipdriver.ZipInputService;
 import net.java.truevfs.comp.zipdriver.ZipOutputService;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsOutputSocketSink;
-import net.java.truevfs.kernel.spec.cio.InputService;
+import net.java.truecommons.cio.InputService;
 
 /**
  * A paranoid archive driver for RAES encrypted ZIP files.

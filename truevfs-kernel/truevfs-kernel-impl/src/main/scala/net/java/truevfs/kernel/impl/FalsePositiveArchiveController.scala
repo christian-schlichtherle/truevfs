@@ -9,8 +9,8 @@ import java.io._
 import javax.annotation.concurrent._
 import net.java.truevfs.kernel.spec.FsNodeName._;
 import net.java.truevfs.kernel.spec._
-import net.java.truevfs.kernel.spec.cio._
-import net.java.truevfs.kernel.spec.cio.Entry._;
+import net.java.truecommons.cio._
+import net.java.truecommons.cio.Entry._;
 
 /** Implements a chain of responsibility for resolving
   * [[net.java.truevfs.kernel.impl.FalsePositiveArchiveException]]s which

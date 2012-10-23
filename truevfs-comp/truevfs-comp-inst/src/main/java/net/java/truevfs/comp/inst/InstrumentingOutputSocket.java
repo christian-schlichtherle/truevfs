@@ -10,10 +10,10 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.kernel.spec.cio.DecoratingOutputSocket;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
+import net.java.truecommons.cio.DecoratingOutputSocket;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.OutputSocket;
 
 /**
  * @param  <M> the type of the mediator.

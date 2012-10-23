@@ -5,7 +5,7 @@
 package net.java.truevfs.driver.tar.xz;
 
 import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
+import net.java.truecommons.cio.IoBufferPool;
 import org.tukaani.xz.LZMA2Options;
 
 /**

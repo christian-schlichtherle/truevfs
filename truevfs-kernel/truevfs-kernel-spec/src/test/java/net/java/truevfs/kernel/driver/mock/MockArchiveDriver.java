@@ -12,11 +12,12 @@ import java.util.concurrent.ConcurrentMap;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.cio.*;
+import net.java.truecommons.cio.Entry.Type;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.HashMaps;
 import net.java.truevfs.kernel.spec.*;
-import net.java.truevfs.kernel.spec.cio.Entry.Type;
-import net.java.truevfs.kernel.spec.cio.*;
+import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
 
 /**
  * @author Christian Schlichtherle
@@ -38,7 +39,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @return {@link #MOCK_CHARSET}.
      */
     @Override

@@ -4,8 +4,8 @@
  */
 package net.java.truevfs.kernel.impl.cio
 
-import net.java.truevfs.kernel.spec.cio._
-import net.java.truevfs.kernel.spec.cio.Entry._
+import net.java.truecommons.cio._
+import net.java.truecommons.cio.Entry._
 import org.junit.runner._
 import org.scalatest._
 import org.scalatest.junit._

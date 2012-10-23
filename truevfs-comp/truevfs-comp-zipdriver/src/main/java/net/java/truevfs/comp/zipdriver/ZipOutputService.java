@@ -30,11 +30,11 @@ import static net.java.truevfs.comp.zip.ZipEntry.STORED;
 import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsOutputSocketSink;
-import net.java.truevfs.kernel.spec.cio.*;
-import net.java.truevfs.kernel.spec.cio.Entry.Access;
-import net.java.truevfs.kernel.spec.cio.Entry.Size;
-import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
-import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
+import net.java.truecommons.cio.*;
+import net.java.truecommons.cio.Entry.Access;
+import net.java.truecommons.cio.Entry.Size;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import static net.java.truecommons.cio.Entry.UNKNOWN;
 
 /**
  * An output service for writing ZIP files.

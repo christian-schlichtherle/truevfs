@@ -6,7 +6,7 @@ package net.java.truevfs.driver.zip.raes;
 
 import net.java.truevfs.comp.zipdriver.TestKeyManagerContainer;
 import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
+import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.key.spec.MockView;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
 

@@ -14,10 +14,10 @@ import javax.annotation.concurrent._
 import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.FsAccessOption._
 import net.java.truevfs.kernel.spec.FsAccessOptions._
-import net.java.truevfs.kernel.spec.cio._
-import net.java.truevfs.kernel.spec.cio.Entry._;
-import net.java.truevfs.kernel.spec.cio.Entry.Access._;
-import net.java.truevfs.kernel.spec.cio.Entry.Type._;
+import net.java.truecommons.cio._
+import net.java.truecommons.cio.Entry._;
+import net.java.truecommons.cio.Entry.Access._;
+import net.java.truecommons.cio.Entry.Type._;
 
 /** An abstract base class for any archive file system controller which
   * provide all the essential services required for accessing a prospective

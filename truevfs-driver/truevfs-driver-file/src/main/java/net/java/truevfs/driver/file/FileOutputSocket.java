@@ -24,12 +24,12 @@ import net.java.truecommons.shed.BitField;
 import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
-import net.java.truevfs.kernel.spec.cio.AbstractOutputSocket;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
-import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.IoSockets;
+import net.java.truecommons.cio.AbstractOutputSocket;
+import net.java.truecommons.cio.Entry;
+import static net.java.truecommons.cio.Entry.Access.*;
+import static net.java.truecommons.cio.Entry.UNKNOWN;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.IoSockets;
 
 /**
  * An output socket for a file entry.

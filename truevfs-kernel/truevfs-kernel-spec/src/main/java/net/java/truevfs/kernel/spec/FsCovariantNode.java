@@ -8,7 +8,7 @@ import java.util.*;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.shed.BitField;
-import static net.java.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
+import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
 
 /**
  * A covariant file system node maintains a map of

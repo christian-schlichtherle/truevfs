@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import net.java.truevfs.kernel.spec.cio.MutableEntry;
+import net.java.truecommons.cio.MutableEntry;
 
 /**
  * Represents an entry in an archive file.

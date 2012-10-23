@@ -8,7 +8,7 @@ import net.java.truevfs.access.it.TPathITSuite;
 import net.java.truevfs.comp.zipdriver.CheckedJarDriver;
 import net.java.truevfs.comp.zipdriver.JarDriver;
 import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
+import net.java.truecommons.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle

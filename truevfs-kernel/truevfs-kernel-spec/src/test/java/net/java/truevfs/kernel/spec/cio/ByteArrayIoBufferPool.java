@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.cio.IoBuffer;
+import net.java.truecommons.cio.IoBufferPool;
 
 /**
  * A pool of byte array I/O buffers.

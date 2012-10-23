@@ -37,9 +37,9 @@ import net.java.truevfs.kernel.spec.FsNode;
 import net.java.truevfs.kernel.spec.FsNodeName;
 import static net.java.truevfs.kernel.spec.FsNodeName.*;
 import net.java.truevfs.kernel.spec.FsNodePath;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.OutputSocket;
 
 /**
  * A {@link Path} implementation for use with NIO.2.

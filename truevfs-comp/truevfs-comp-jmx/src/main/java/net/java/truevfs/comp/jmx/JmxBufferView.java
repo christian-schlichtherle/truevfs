@@ -10,11 +10,11 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.StandardMBean;
-import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
-import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
-import static net.java.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
-import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
+import static net.java.truecommons.cio.Entry.Access.*;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import static net.java.truecommons.cio.Entry.Size.STORAGE;
+import static net.java.truecommons.cio.Entry.UNKNOWN;
+import net.java.truecommons.cio.IoBuffer;
 
 /**
  * A view for an {@linkplain IoBuffer I/O buffer}.

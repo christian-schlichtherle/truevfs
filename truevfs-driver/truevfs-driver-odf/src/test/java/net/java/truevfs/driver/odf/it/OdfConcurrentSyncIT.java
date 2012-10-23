@@ -7,7 +7,7 @@ package net.java.truevfs.driver.odf.it;
 import net.java.truevfs.access.it.ConcurrentSyncITSuite;
 import net.java.truevfs.driver.odf.OdfDriver;
 import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
+import net.java.truecommons.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle

@@ -5,7 +5,7 @@
 package net.java.truevfs.ext.logging
 
 import net.java.truevfs.comp.inst._
-import net.java.truevfs.kernel.spec.cio._
+import net.java.truecommons.cio._
 import org.slf4j._
 
 /**

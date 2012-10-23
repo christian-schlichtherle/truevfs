@@ -20,9 +20,9 @@ import net.java.truevfs.comp.tardriver.TarInputService;
 import net.java.truevfs.comp.tardriver.TarOutputService;
 import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsAccessOption.STORE;
-import net.java.truevfs.kernel.spec.cio.InputService;
+import net.java.truecommons.cio.InputService;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
-import net.java.truevfs.kernel.spec.cio.OutputService;
+import net.java.truecommons.cio.OutputService;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
@@ -30,7 +30,7 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
  * An archive driver for BZIP2 compressed TAR files (TAR.BZIP2).
  * <p>
  * Subclasses must be thread-safe and should be immutable!
- * 
+ *
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -53,7 +53,7 @@ public class TarBZip2Driver extends TarDriver {
      * <p>
      * The implementation in the class {@link TarBZip2Driver} returns
      * {@link org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream#MAX_BLOCKSIZE}.
-     * 
+     *
      * @return The compression level to use when writing a BZIP2 sink stream.
      */
     public int getLevel() {

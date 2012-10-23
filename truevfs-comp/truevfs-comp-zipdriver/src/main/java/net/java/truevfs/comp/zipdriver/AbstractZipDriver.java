@@ -23,11 +23,12 @@ import net.java.truevfs.comp.zip.ZipFileParameters;
 import net.java.truevfs.comp.zip.ZipOutputStreamParameters;
 import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
-import net.java.truevfs.kernel.spec.cio.*;
-import static net.java.truevfs.kernel.spec.cio.Entry.Access.WRITE;
-import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
-import net.java.truevfs.kernel.spec.cio.Entry.Type;
-import static net.java.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
+import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
+import net.java.truecommons.cio.*;
+import static net.java.truecommons.cio.Entry.Access.WRITE;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import net.java.truecommons.cio.Entry.Type;
+import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import net.java.truevfs.key.spec.KeyManagerContainer;
 import net.java.truevfs.key.spec.KeyProvider;
@@ -67,7 +68,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * <p>
      * This is an immutable property - multiple calls must return the same
      * object.
-     * 
+     *
      * @return {@link KeyManagerMapLocator#SINGLETON}, as by the implementation
      *         in the class {@link ZipDriver}.
      */
@@ -91,7 +92,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * <p>
      * The implementation in the class {@link ZipDriver} returns
      * {@code new KeyManagerZipCryptoParameters(this, model, charset)}.
-     * 
+     *
      * @param  model the file system model.
      * @param  charset charset the character set used for encoding entry names
      *         and the file comment in the ZIP file.
@@ -113,7 +114,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * expression {@code model.getMountPoint().getHierarchicalUri()}
      * in order to improve the readability of the URI in comparison to the
      * expression {@code model.getMountPoint().getUri()}.
-     * 
+     *
      * @param  model the file system model.
      * @return The URI which represents the file system model's mount point.
      * @see    <a href="http://java.net/jira/browse/TRUEZIP-72">#TRUEZIP-72</a>
@@ -133,7 +134,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * <p>
      * An alternative implementation in a sub-class could return the expression
      * {@code mountPointUri(model).resolve("/" + name)} instead.
-     * 
+     *
      * @param  model the file system model.
      * @param  name the entry name.
      * @return The URI for looking up a {@link KeyProvider}.
@@ -178,7 +179,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * checked/authenticated when reading it.
      * If this method returns {@code true} and the check fails, then an
      * {@link IOException} gets thrown.
-     * 
+     *
      * @param local the entry to test.
      * @param input the origin of the entry.
      * @return {@code entry.isEncrypted()}.
@@ -217,7 +218,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * {@code !local.isEncrypted() && !remote.isEncrypted()} in order to cover
      * the typical case that the cipher keys of both targets are not the same.
      * Note that there is no secure way to explicitly test for this.
-     * 
+     *
      * @param  input the input target entry for copying the contents.
      * @param  output the output target entry for copying the contents.
      * @return Whether the content to get copied from the input target entry
@@ -233,7 +234,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * <p>
      * The implementation in the class {@link ZipDriver}
      * returns {@code false}.
-     * 
+     *
      * @return {@code false}
      */
     @Override
@@ -246,7 +247,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * <p>
      * The implementation in the class {@link ZipDriver}
      * returns {@code false}.
-     * 
+     *
      * @return {@code false}
      */
     @Override
@@ -259,7 +260,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * <p>
      * The implementation in the class {@link ZipDriver}
      * returns {@code Maps#OVERHEAD_SIZE}.
-     * 
+     *
      * @return {@code Maps#OVERHEAD_SIZE}
      */
     @Override
@@ -272,7 +273,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * <p>
      * The implementation in the class {@link ZipDriver}
      * returns {@code ZipEntry#DEFLATED}.
-     * 
+     *
      * @return {@code ZipEntry#DEFLATED}
      */
     @Override
@@ -285,7 +286,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * <p>
      * The implementation in the class {@link ZipDriver}
      * returns {@code Deflater#BEST_COMPRESSION}.
-     * 
+     *
      * @return {@code Deflater#BEST_COMPRESSION}
      */
     @Override
@@ -319,7 +320,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
         try {
             zis.recoverLostEntries();
         } catch (final IOException ex) {
-            logger.warn("junkInTheTrunk.warn", 
+            logger.warn("junkInTheTrunk.warn",
                 mountPointUri(model),
                 zis.getPostambleLength());
             logger.trace("junkInTheTrunk.trace", ex);

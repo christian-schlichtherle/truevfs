@@ -8,11 +8,11 @@ import net.java.truevfs.comp.zip.DateTimeConverter;
 import net.java.truevfs.comp.zip.ZipEntry;
 import net.java.truevfs.kernel.spec.FsArchiveEntries;
 import net.java.truevfs.kernel.spec.FsArchiveEntry;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import static net.java.truevfs.kernel.spec.cio.Entry.Access.WRITE;
-import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
-import static net.java.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
-import static net.java.truevfs.kernel.spec.cio.Entry.Type.FILE;
+import net.java.truecommons.cio.Entry;
+import static net.java.truecommons.cio.Entry.Access.WRITE;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
+import static net.java.truecommons.cio.Entry.Type.FILE;
 
 /**
  * ZIP archive entries apply the date/time conversion rules as defined by

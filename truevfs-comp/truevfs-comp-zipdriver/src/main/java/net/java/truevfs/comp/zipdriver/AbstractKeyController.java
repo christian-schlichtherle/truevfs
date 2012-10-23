@@ -13,9 +13,9 @@ import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.ControlFlowException;
 import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.Entry.Access;
-import static net.java.truevfs.kernel.spec.cio.Entry.Type.SPECIAL;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.Entry.Access;
+import static net.java.truecommons.cio.Entry.Type.SPECIAL;
 import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.KeyManagerContainer;
 

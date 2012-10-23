@@ -10,7 +10,7 @@ import java.io._
 import java.nio.channels._
 import javax.annotation._
 import javax.annotation.concurrent._
-import net.java.truevfs.kernel.spec.cio._
+import net.java.truecommons.cio._
 
 /**
   * Decorates another input service in order to disconnect any resources when

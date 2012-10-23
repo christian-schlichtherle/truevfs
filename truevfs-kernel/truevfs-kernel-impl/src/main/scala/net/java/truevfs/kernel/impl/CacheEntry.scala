@@ -10,8 +10,8 @@ import edu.umd.cs.findbugs.annotations._
 import java.io._
 import java.nio.channels._
 import javax.annotation.concurrent._
-import net.java.truevfs.kernel.spec.cio.Entry._
-import net.java.truevfs.kernel.spec.cio._
+import net.java.truecommons.cio.Entry._
+import net.java.truecommons.cio._
 import CacheEntry._
 
 /** Provides caching services for input and output sockets with the following
