@@ -120,7 +120,7 @@ public class ZipEntry implements Cloneable {
 
     /** Constructs a new ZIP entry with the given name. */
     public ZipEntry(final String name) {
-        UShort.check(name.length());
+        UShort.validate(name.length());
         this.name = name;
     }
 
@@ -130,7 +130,7 @@ public class ZipEntry implements Cloneable {
      */
     @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     protected ZipEntry(final String name, final ZipEntry template) {
-        UShort.check(name.length());
+        UShort.validate(name.length());
         this.init = template.init;
         this.name = name;
         this.platform = template.platform;
@@ -185,19 +185,16 @@ public class ZipEntry implements Cloneable {
 
     public final void setPlatform(final int platform) {
         final boolean known = UNKNOWN != platform;
-        if (known) {
-            UByte.check(platform, name, "Platform out of range");
-            this.platform = (byte) platform;
-        } else {
-            this.platform = 0;
-        }
+        this.platform = known
+                ? (byte) UByte.validate(platform, name, "Platform out of range")
+                : 0;
         setInit(PLATFORM, known);
     }
 
     final int getRawPlatform() { return platform & UByte.MAX_VALUE; }
 
     final void setRawPlatform(final int platform) {
-        assert UByte.check(platform);
+        assert 0 <= UByte.validate(platform);
         this.platform = (byte) platform;
         setInit(PLATFORM, true);
     }
@@ -220,7 +217,7 @@ public class ZipEntry implements Cloneable {
 
     /** Sets the General Purpose Bit Flags. */
     final void setGeneralPurposeBitFlags(final int general) {
-        assert UShort.check(general);
+        assert 0 <= UShort.validate(general);
         this.general = (short) general;
     }
 
@@ -317,7 +314,7 @@ public class ZipEntry implements Cloneable {
     final int getRawMethod() { return method & UShort.MAX_VALUE; }
 
     final void setRawMethod(final int method) {
-        assert UShort.check(method);
+        assert 0 <= UShort.validate(method);
         this.method = (short) method;
         setInit(METHOD, true);
     }
@@ -340,7 +337,7 @@ public class ZipEntry implements Cloneable {
     final long getRawTime() { return dtime & UInt.MAX_VALUE; }
 
     final void setRawTime(final long dtime) {
-        assert UInt.check(dtime);
+        assert 0 <= UInt.validate(dtime);
         this.dtime = (int) dtime;
         setInit(DTIME, true);
     }
@@ -365,19 +362,16 @@ public class ZipEntry implements Cloneable {
 
     public final void setCrc(final long crc) {
         final boolean known = UNKNOWN != crc;
-        if (known) {
-            UInt.check(crc, name, "CRC-32 out of range");
-            this.crc = (int) crc;
-        } else {
-            this.crc = 0;
-        }
+        this.crc = known
+                ? (int) UInt.validate(crc, name, "CRC-32 out of range")
+                : 0;
         setInit(CRC, known);
     }
 
     final long getRawCrc() { return crc & UInt.MAX_VALUE; }
 
     final void setRawCrc(final long crc) {
-        assert UInt.check(crc);
+        assert 0 <= UInt.validate(crc);
         this.crc = (int) crc;
         setInit(CRC, true);
     }
@@ -400,7 +394,7 @@ public class ZipEntry implements Cloneable {
      */
     public final void setCompressedSize(final long csize) {
         if (UNKNOWN != csize)
-            ULong.check(csize, name, "Compressed Size out of range");
+            ULong.validate(csize, name, "Compressed Size out of range");
         this.csize = csize;
     }
 
@@ -413,7 +407,7 @@ public class ZipEntry implements Cloneable {
     }
 
     final void setRawCompressedSize(final long csize) {
-        assert ULong.check(csize);
+        assert 0 <= ULong.check(csize);
         this.csize = csize;
     }
 
@@ -435,7 +429,7 @@ public class ZipEntry implements Cloneable {
      */
     public final void setSize(final long size) {
         if (UNKNOWN != size)
-            ULong.check(size, name, "Uncompressed Size out of range");
+            ULong.validate(size, name, "Uncompressed Size out of range");
         this.size = size;
     }
 
@@ -448,7 +442,7 @@ public class ZipEntry implements Cloneable {
     }
 
     final void setRawSize(final long size) {
-        assert ULong.check(size);
+        assert 0 <= ULong.check(size);
         this.size = size;
     }
 
@@ -468,12 +462,9 @@ public class ZipEntry implements Cloneable {
      */
     public final void setExternalAttributes(final long eattr) {
         final boolean known = UNKNOWN != eattr;
-        if (known) {
-            UInt.check(eattr, name, "external file attributes out of range");
-            this.eattr = (int) eattr;
-        } else {
-            this.eattr = 0;
-        }
+        this.eattr = known
+                ? (int) UInt.validate(eattr, name, "external file attributes out of range")
+                : 0;
         setInit(EATTR, known);
     }
 
@@ -483,7 +474,7 @@ public class ZipEntry implements Cloneable {
     }
 
     final void setRawExternalAttributes(final long eattr) {
-        assert UInt.check(eattr);
+        assert 0 <= UInt.validate(eattr);
         this.eattr = (int) eattr;
         setInit(EATTR, true);
     }
@@ -499,7 +490,7 @@ public class ZipEntry implements Cloneable {
     }
 
     final void setRawOffset(final long offset) {
-        assert ULong.check(offset);
+        assert 0 <= ULong.check(offset);
         this.offset = offset;
     }
 
@@ -545,11 +536,9 @@ public class ZipEntry implements Cloneable {
     public final void setExtra(final @CheckForNull byte[] buf)
     throws IllegalArgumentException {
         if (null != buf) {
-            final int len = buf.length;
-            UShort.check(len, "Extra Fields too large", null);
             try {
                 setExtraFields(MutableBuffer
-                        .allocateDirect(len)
+                        .allocateDirect(UShort.validate(buf.length, "Extra Fields too large", null))
                         .put(buf)
                         .rewind(),
                         false);
@@ -711,7 +700,7 @@ public class ZipEntry implements Cloneable {
      */
     public final void setComment(final @CheckForNull String comment) {
         if (null != comment)
-            UShort.check(comment.length(), name, "Comment too long");
+            UShort.validate(comment.length(), name, "Comment too long");
         this.comment = comment;
     }
 
@@ -721,7 +710,7 @@ public class ZipEntry implements Cloneable {
     }
 
     final void setRawComment(final String comment) {
-        assert UShort.check(comment.length());
+        assert 0 <= UShort.validate(comment.length());
         this.comment = comment;
     }
 

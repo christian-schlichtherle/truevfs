@@ -203,7 +203,7 @@ implements Iterable<E> {
     public void setComment(final @CheckForNull String comment) {
         if (null != comment && !comment.isEmpty()) {
             final byte[] bytes = encode(comment);
-            UShort.check(bytes.length);
+            UShort.validate(bytes.length);
             this.comment = bytes;
         } else {
             this.comment = null;
@@ -928,7 +928,7 @@ implements Iterable<E> {
                 entry.setRawCrc(0);
                 this.method.finish();
                 // Set to UNKNOWN in order to signal to
-                // Crc32CheckingOutputMethod that it should not check it and
+                // Crc32CheckingOutputMethod that it should not validate it and
                 // signal to writeCentralFileHeader() that it should write 0.
                 entry.setCrc(UNKNOWN);
             } else {

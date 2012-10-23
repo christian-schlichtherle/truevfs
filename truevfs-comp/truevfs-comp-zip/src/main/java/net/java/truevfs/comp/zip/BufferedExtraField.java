@@ -38,17 +38,14 @@ class BufferedExtraField implements ExtraField {
     BufferedExtraField(final ImmutableBuffer ib) {
         final MutableBuffer mb = ib.asMutableBuffer().slice().littleEndian();
         final int totalSize = 4 + mb.getUShort(2);
-        UShort.check(totalSize);
-        this.mb = mb.limit(totalSize);
+        this.mb = mb.limit(UShort.validate(totalSize));
     }
 
     BufferedExtraField(final int headerId, final int dataSize) {
-        UShort.check(headerId);
-        UShort.check(dataSize);
-        final int totalSize = 4 + dataSize;
-        UShort.check(totalSize);
+        UShort.validate(headerId);
+        final int totalSize = 4 + UShort.validate(dataSize);
         this.mb = MutableBuffer
-                .allocateDirect(totalSize)
+                .allocateDirect(UShort.validate(totalSize))
                 .littleEndian()
                 .putShort((short) headerId)
                 .putShort((short) dataSize);

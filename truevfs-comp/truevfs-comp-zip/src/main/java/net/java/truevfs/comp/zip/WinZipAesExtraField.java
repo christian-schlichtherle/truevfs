@@ -128,9 +128,8 @@ final class WinZipAesExtraField extends BufferedExtraField {
         mb.putShort(9, (short) validateMethod(method));
     }
 
-    private static int validateMethod(final int method) {
-        UShort.check(method);
-        return method;
+    private static int validateMethod(int method) {
+        return UShort.validate(method);
     }
 
     @SuppressWarnings("PackageVisibleInnerClass")

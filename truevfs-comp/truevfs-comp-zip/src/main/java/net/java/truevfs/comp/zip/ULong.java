@@ -37,9 +37,9 @@ final class ULong {
     private ULong() { }
 
     /**
-     * Checks the parameter range.
+     * Validates the parameter range.
      *
-     * @param  l The long integer to check to be in the range of an unsigned
+     * @param  l The long integer to validate to be in the range of an unsigned
      *         long integer ({@value SIZE} bits).
      * @param  subject The subject of the exception message
      *         - may be {@code null}.
@@ -47,15 +47,15 @@ final class ULong {
      * @param  error First sentence of the exception message
      *         - may be {@code null}.
      *         This should not end with a punctuation character.
-     * @return {@code true}
+     * @return {@code l}
      * @throws IllegalArgumentException If {@code l} is less than
      *         {@link #MIN_VALUE} or greater than {@link #MAX_VALUE}.
      */
-    public static boolean check(
+    public static long validate(
             final long l,
             final @CheckForNull String subject,
             final @CheckForNull String error) {
-        if (MIN_VALUE <= l) return true;
+        if (MIN_VALUE <= l) return l;
         final StringBuilder message = new StringBuilder();
         if (null != subject) message.append(subject).append(": ");
         if (null != error) message.append(error).append(": ");
@@ -70,15 +70,15 @@ final class ULong {
     }
 
     /**
-     * Checks the parameter range.
+     * Validates the parameter range.
      *
-     * @param  l The long integer to check to be in the range of an unsigned
+     * @param  l The long integer to validate to be in the range of an unsigned
      *         long integer ({@value SIZE} bits).
-     * @return {@code true}
+     * @return {@code l}
      * @throws IllegalArgumentException If {@code l} is less than
      *         {@link #MIN_VALUE} or greater than {@link #MAX_VALUE}.
      */
-    public static boolean check(final long l) {
-        return check(l, "Long integer out of range", null);
+    public static long check(final long l) {
+        return validate(l, "Long integer out of range", null);
     }
 }
