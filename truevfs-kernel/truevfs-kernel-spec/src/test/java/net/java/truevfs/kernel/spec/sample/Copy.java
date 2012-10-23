@@ -29,7 +29,7 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  * A poor man's blend of the cp(1) or curl(1) command line utilities
  * for copying the contents of the first parameter URI to the second parameter
  * URI.
- * 
+ *
  * @deprecated Use the Maven archetype for the module TrueVFS Access instead.
  *             Its group ID is {@code net.java.truevfs}.
  *             Its artifact ID is {@code truevfs-archetype-access}.
@@ -95,7 +95,7 @@ public final class Copy {
             // file systems, if any were accessed, and clean up temporary files
             // used for caching.
             manager.sync(new FsSimpleControllerSyncVisitor(
-                    Filter.ACCEPT_ANY, FsSyncOptions.UMOUNT));
+                    FsSyncOptions.UMOUNT));
         }
     }
 // END SNIPPET: copy

@@ -40,7 +40,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
    * recently accessed archive files which exceed the maximum number of mounted
    * archive files unless they are the parent of some most recently accessed
    * archive files.
-   * 
+   *
    * @param controller the file system controller to access.
    */
   def postAccess(ac: FsController) {
@@ -54,7 +54,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
       val ef = new FsControllerFilter(emp) // evicted filter
       if (!(mounted exists ef)) {
         try {
-          manager sync new FsSimpleControllerSyncVisitor(ef, FsSyncOptions.NONE)
+          manager sync new FsSimpleControllerSyncVisitor(FsSyncOptions.NONE, ef)
           it remove ()
         } catch {
           case ex: FsSyncException =>
