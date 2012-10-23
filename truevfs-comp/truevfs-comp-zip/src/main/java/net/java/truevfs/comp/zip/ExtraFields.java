@@ -11,7 +11,6 @@ import java.util.zip.ZipException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truecommons.io.ImmutableBuffer;
 import net.java.truecommons.io.MutableBuffer;
 
 /**
@@ -36,8 +35,7 @@ final class ExtraFields implements Cloneable {
     private static void register(
             final int headerId,
             final ExtraFieldFactory factory) {
-        UShort.check(headerId);
-        registry.put(headerId, factory);
+        registry.put(UShort.validate(headerId), factory);
     }
 
     /**
@@ -76,7 +74,7 @@ final class ExtraFields implements Cloneable {
      *         ({@value net.truevfs.driver.zip.io.UShort#MAX_VALUE}).
      */
     @CheckForNull ExtraField get(final int headerId) {
-        assert UShort.check(headerId);
+        assert 0 <= UShort.validate(headerId);
         final ExtraField ef = fields.get(headerId);
         assert null == ef || ef.getHeaderId() == headerId;
         return ef;
@@ -97,7 +95,7 @@ final class ExtraFields implements Cloneable {
      */
     @Nullable ExtraField add(final ExtraField ef) {
         final int headerId = ef.getHeaderId();
-        assert UShort.check(headerId);
+        assert 0 <= UShort.validate(headerId);
         return fields.put(headerId, ef);
     }
 
@@ -112,7 +110,7 @@ final class ExtraFields implements Cloneable {
      *         ({@value net.truevfs.driver.zip.io.UShort#MAX_VALUE}).
      */
     @Nullable ExtraField remove(final int headerId) {
-        assert UShort.check(headerId);
+        assert 0 <= UShort.validate(headerId);
         final ExtraField ef = fields.remove(headerId);
         assert null == ef || ef.getHeaderId() == headerId;
         return ef;
@@ -137,7 +135,7 @@ final class ExtraFields implements Cloneable {
      * buffer {@code ib}.
      */
     void parse(final MutableBuffer mb) throws ZipException {
-        assert UShort.check(mb.remaining());
+        assert 0 <= UShort.validate(mb.remaining());
         mb.littleEndian();
         final Map<Integer, ExtraField> map = new TreeMap<>();
         while (0 < mb.remaining()) {
