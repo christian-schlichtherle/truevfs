@@ -15,11 +15,12 @@ import java.util.concurrent.ConcurrentMap;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.cio.*;
+import net.java.truecommons.cio.Entry.Access;
+import net.java.truecommons.cio.Entry.Type;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
-import net.java.truevfs.kernel.spec.cio.*;
-import net.java.truevfs.kernel.spec.cio.Entry.Access;
-import net.java.truevfs.kernel.spec.cio.Entry.Type;
+import net.java.truevfs.kernel.spec.cio.ByteArrayIoBuffer;
 import net.java.truevfs.kernel.spec.io.ThrowingInputStream;
 import net.java.truevfs.kernel.spec.io.ThrowingOutputStream;
 import net.java.truevfs.kernel.spec.io.ThrowingSeekableChannel;
@@ -44,7 +45,7 @@ extends FsAbstractController {
 
     /**
      * Constructs a new mock controller.
-     * 
+     *
      * @param model The file system model.
      * @param parent The parent file system controller.
      * @param config The mocking configuration.

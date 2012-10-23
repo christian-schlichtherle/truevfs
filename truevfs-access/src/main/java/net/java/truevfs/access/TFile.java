@@ -28,12 +28,12 @@ import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
 import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
-import net.java.truevfs.kernel.spec.cio.Entry.Access;
-import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
-import net.java.truevfs.kernel.spec.cio.Entry.Size;
-import static net.java.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
-import static net.java.truevfs.kernel.spec.cio.Entry.Type.FILE;
-import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
+import net.java.truecommons.cio.Entry.Access;
+import static net.java.truecommons.cio.Entry.Access.*;
+import net.java.truecommons.cio.Entry.Size;
+import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
+import static net.java.truecommons.cio.Entry.Type.FILE;
+import static net.java.truecommons.cio.Entry.UNKNOWN;
 
 /**
  * A replacement for the class {@link File} which provides transparent

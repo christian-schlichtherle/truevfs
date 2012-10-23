@@ -14,16 +14,22 @@ import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.cio.AbstractInputSocket;
+import net.java.truecommons.cio.AbstractOutputSocket;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.Entry.Access;
+import static net.java.truecommons.cio.Entry.Access.READ;
+import static net.java.truecommons.cio.Entry.Access.WRITE;
+import net.java.truecommons.cio.Entry.Entity;
+import net.java.truecommons.cio.Entry.Size;
+import static net.java.truecommons.cio.Entry.UNKNOWN;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.IoBuffer;
+import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.io.ByteBufferChannel;
 import net.java.truecommons.io.DisconnectingInputStream;
 import net.java.truecommons.io.DisconnectingOutputStream;
 import net.java.truecommons.io.DisconnectingSeekableChannel;
-import net.java.truevfs.kernel.spec.cio.Entry.Access;
-import static net.java.truevfs.kernel.spec.cio.Entry.Access.READ;
-import static net.java.truevfs.kernel.spec.cio.Entry.Access.WRITE;
-import net.java.truevfs.kernel.spec.cio.Entry.Entity;
-import net.java.truevfs.kernel.spec.cio.Entry.Size;
-import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 
 /**
  * An I/O buffer which is backed by a byte array.
@@ -36,7 +42,7 @@ import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
  * It can also get explicitly set by calling the constructor
  * {@link #ByteArrayIoBuffer(String, byte[])} or the method
  * {@link #setData(byte[])}.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
@@ -87,7 +93,7 @@ public class ByteArrayIoBuffer implements IoBuffer {
     /**
      * Returns the initial capacity of the next backing array to allocate when
      * starting output to this I/O buffer.
-     * 
+     *
      * @return The initial capacity of the next backing array to allocate when
      *         starting output to this I/O buffer.
      */

@@ -13,8 +13,8 @@ import net.java.truecommons.shed.BitField;
 import net.java.truevfs.comp.zipdriver.ZipDriver;
 import net.java.truevfs.comp.zipdriver.ZipDriverEntry;
 import net.java.truevfs.kernel.spec.*;
-import net.java.truevfs.kernel.spec.cio.InputService;
-import net.java.truevfs.kernel.spec.cio.OutputService;
+import net.java.truecommons.cio.InputService;
+import net.java.truecommons.cio.OutputService;
 
 /**
  * An archive driver which reads Self Executable (SFX/EXE) ZIP files,

@@ -5,7 +5,7 @@
 package net.java.truevfs.kernel.spec;
 
 import java.util.Formatter;
-import static net.java.truevfs.kernel.spec.cio.Entry.*;
+import static net.java.truecommons.cio.Entry.*;
 
 /**
  * Static utility methods for {@link FsArchiveEntry} objects.

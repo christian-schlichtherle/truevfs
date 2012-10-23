@@ -5,7 +5,7 @@
 package net.java.truevfs.driver.tar.bzip2;
 
 import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
+import net.java.truecommons.cio.IoBufferPool;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**

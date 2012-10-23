@@ -15,10 +15,10 @@ import net.java.truevfs.comp.zipdriver.ZipOutputService;
 import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsOutputSocketSink;
-import net.java.truevfs.kernel.spec.cio.InputService;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
+import net.java.truecommons.cio.InputService;
+import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
-import net.java.truevfs.kernel.spec.cio.OutputService;
+import net.java.truecommons.cio.OutputService;
 
 /**
  * An archive driver for application archive files according to the Open

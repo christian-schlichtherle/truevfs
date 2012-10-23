@@ -31,14 +31,14 @@ import net.java.truevfs.kernel.spec.FsSyncException;
 import net.java.truevfs.kernel.spec.FsSyncOption;
 import static net.java.truevfs.kernel.spec.FsSyncOptions.UMOUNT;
 import net.java.truevfs.kernel.spec.FsSyncWarningException;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.Entry.Access;
-import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
-import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
-import static net.java.truevfs.kernel.spec.cio.Entry.Type.*;
-import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.Entry.Access;
+import static net.java.truecommons.cio.Entry.Access.*;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import static net.java.truecommons.cio.Entry.Type.*;
+import static net.java.truecommons.cio.Entry.UNKNOWN;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.OutputSocket;
 
 /**
  * A {@link FileSystem} implementation for use with NIO.2.

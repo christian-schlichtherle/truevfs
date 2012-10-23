@@ -14,9 +14,9 @@ import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.FsAccessOption._
 import net.java.truevfs.kernel.spec.FsSyncOption._
 import net.java.truevfs.kernel.spec.FsSyncOptions._
-import net.java.truevfs.kernel.spec.cio._
-import net.java.truevfs.kernel.spec.cio.Entry._;
-import net.java.truevfs.kernel.spec.cio.Entry.Type._;
+import net.java.truecommons.cio._
+import net.java.truecommons.cio.Entry._;
+import net.java.truecommons.cio.Entry.Type._;
 
 /** A selective cache for file system entries.
   * Decorating a file system controller with this class has the following

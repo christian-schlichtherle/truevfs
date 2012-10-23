@@ -6,9 +6,10 @@ package net.java.truevfs.kernel.spec.cio;
 
 import java.io.IOException;
 import java.util.Iterator;
+import static net.java.truecommons.cio.Entry.Type.FILE;
+import net.java.truecommons.cio.OutputSocket;
 import net.java.truevfs.kernel.driver.mock.MockArchive;
 import net.java.truevfs.kernel.driver.mock.MockArchiveDriverEntry;
-import static net.java.truevfs.kernel.spec.cio.Entry.Type.FILE;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import org.junit.Test;

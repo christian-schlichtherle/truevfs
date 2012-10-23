@@ -6,7 +6,7 @@ package net.java.truevfs.comp.jmx;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
+import net.java.truecommons.cio.IoBuffer;
 
 /**
  * An MXBean interface for an {@linkplain IoBuffer I/O buffer}.

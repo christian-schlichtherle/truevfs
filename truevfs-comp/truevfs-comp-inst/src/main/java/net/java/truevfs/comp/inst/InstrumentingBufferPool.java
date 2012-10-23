@@ -7,9 +7,9 @@ package net.java.truevfs.comp.inst;
 import java.io.IOException;
 import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.kernel.spec.cio.DecoratingIoBufferPool;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
+import net.java.truecommons.cio.DecoratingIoBufferPool;
+import net.java.truecommons.cio.IoBuffer;
+import net.java.truecommons.cio.IoBufferPool;
 
 /**
  * @param  <M> the type of the mediator.

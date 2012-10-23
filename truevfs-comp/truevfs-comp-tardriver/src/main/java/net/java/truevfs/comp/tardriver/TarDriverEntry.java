@@ -11,12 +11,12 @@ import javax.annotation.Nullable;
 import net.java.truecommons.shed.Releasable;
 import net.java.truevfs.kernel.spec.FsArchiveEntries;
 import net.java.truevfs.kernel.spec.FsArchiveEntry;
-import static net.java.truevfs.kernel.spec.cio.Entry.Access.WRITE;
-import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
-import static net.java.truevfs.kernel.spec.cio.Entry.Size.STORAGE;
-import static net.java.truevfs.kernel.spec.cio.Entry.Type.DIRECTORY;
-import static net.java.truevfs.kernel.spec.cio.Entry.Type.FILE;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
+import static net.java.truecommons.cio.Entry.Access.WRITE;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import static net.java.truecommons.cio.Entry.Size.STORAGE;
+import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
+import static net.java.truecommons.cio.Entry.Type.FILE;
+import net.java.truecommons.cio.IoBuffer;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**

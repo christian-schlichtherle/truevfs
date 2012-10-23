@@ -8,8 +8,8 @@ import net.java.truecommons.io.Sink;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.shed.BitField;
 
 /**

@@ -14,7 +14,7 @@ import net.java.truevfs.comp.zip.AbstractZipFile;
 import net.java.truevfs.comp.zip.ZipCryptoParameters;
 import net.java.truevfs.kernel.spec.FsInputSocketSource;
 import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.cio.*;
+import net.java.truecommons.cio.*;
 
 /**
  * An input service for reading ZIP files.

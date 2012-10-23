@@ -22,13 +22,13 @@ import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.Entry.Access;
-import static net.java.truevfs.kernel.spec.cio.Entry.Access.*;
-import net.java.truevfs.kernel.spec.cio.Entry.Type;
-import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.Entry.Access;
+import static net.java.truecommons.cio.Entry.Access.*;
+import net.java.truecommons.cio.Entry.Type;
+import static net.java.truecommons.cio.Entry.UNKNOWN;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.OutputSocket;
 
 /**
  * A file system controller with a prospective directory in the platform file

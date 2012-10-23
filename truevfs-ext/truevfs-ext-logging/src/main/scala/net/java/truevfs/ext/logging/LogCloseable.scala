@@ -5,7 +5,7 @@
 package net.java.truevfs.ext.logging
 
 import java.io._
-import net.java.truevfs.kernel.spec.cio._
+import net.java.truecommons.cio._
 
 private trait LogCloseable extends Closeable with LogResource {
 

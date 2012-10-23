@@ -25,18 +25,18 @@ import net.java.truevfs.kernel.spec.FsInputSocketSource;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsNodeName;
 import net.java.truevfs.kernel.spec.FsOutputSocketSink;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.Entry.Type;
-import net.java.truevfs.kernel.spec.cio.InputService;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.Entry.Type;
+import net.java.truecommons.cio.InputService;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
-import net.java.truevfs.kernel.spec.cio.OutputService;
+import net.java.truecommons.cio.OutputService;
 
 /**
  * An abstract archive driver for RAES encrypted ZIP files which optionally
  * authenticates the cipher data of the input archive files presented to it.
  * <p>
  * Sub-classes must be thread-safe and should be immutable!
- * 
+ *
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -47,7 +47,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      * <p>
      * The implementation in the class {@link ZipRaesDriver} returns
      * {@code true} for future use.
-     * 
+     *
      * @return {@code true}
      */
     @Override
@@ -60,7 +60,7 @@ public abstract class ZipRaesDriver extends JarDriver {
      * <p>
      * The implementation in the class {@link ZipRaesDriver} returns
      * {@code new KeyManagerRaesParameters(getKeyManagerContainer().getKeyManager(AesPbeParameters.class), mountPointUri(model))}.
-     * 
+     *
      * @param  model the file system model.
      * @return The RAES parameters for the given file system model.
      */

@@ -12,7 +12,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.io.ReadOnlyChannel;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truevfs.kernel.spec.cio.*;
+import net.java.truecommons.cio.*;
 
 /**
  * An input socket for HTTP(S) entries.

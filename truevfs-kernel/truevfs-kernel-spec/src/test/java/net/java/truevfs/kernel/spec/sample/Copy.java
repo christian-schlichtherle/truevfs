@@ -19,9 +19,9 @@ import net.java.truevfs.kernel.spec.FsSimpleControllerSyncVisitor;
 import net.java.truevfs.kernel.spec.FsSimpleMetaDriver;
 import net.java.truevfs.kernel.spec.FsSyncOptions;
 import net.java.truevfs.kernel.spec.FsUriModifier;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.IoSockets;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.IoSockets;
+import net.java.truecommons.cio.OutputSocket;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 

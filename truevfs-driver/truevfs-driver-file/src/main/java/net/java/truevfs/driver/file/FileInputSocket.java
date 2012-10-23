@@ -12,9 +12,9 @@ import static java.nio.file.Files.newInputStream;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truevfs.kernel.spec.cio.AbstractInputSocket;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
+import net.java.truecommons.cio.AbstractInputSocket;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.OutputSocket;
 
 /**
  * An input socket for a file entry.

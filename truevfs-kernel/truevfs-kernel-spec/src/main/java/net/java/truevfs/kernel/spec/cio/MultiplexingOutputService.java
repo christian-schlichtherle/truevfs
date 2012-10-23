@@ -13,16 +13,27 @@ import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.cio.DecoratingInputSocket;
+import net.java.truecommons.cio.DecoratingOutputService;
+import net.java.truecommons.cio.DecoratingOutputSocket;
+import net.java.truecommons.cio.Entry;
+import static net.java.truecommons.cio.Entry.ALL_ACCESS;
+import net.java.truecommons.cio.Entry.Access;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import static net.java.truecommons.cio.Entry.UNKNOWN;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.IoBuffer;
+import net.java.truecommons.cio.IoBufferPool;
+import net.java.truecommons.cio.IoSockets;
+import net.java.truecommons.cio.MutableEntry;
+import net.java.truecommons.cio.OutputService;
+import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.io.DecoratingOutputStream;
 import net.java.truecommons.io.InputException;
 import net.java.truecommons.shed.CompoundIterator;
 import net.java.truecommons.shed.ExceptionBuilder;
 import net.java.truecommons.shed.PriorityExceptionBuilder;
 import net.java.truecommons.shed.SuppressedExceptionBuilder;
-import static net.java.truevfs.kernel.spec.cio.Entry.ALL_ACCESS;
-import net.java.truevfs.kernel.spec.cio.Entry.Access;
-import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
-import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
 
 /**
  * Decorates another output service to enable concurrent writing of multiple

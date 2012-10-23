@@ -8,8 +8,8 @@ import net.java.truecommons.shed._
 import java.io._
 import java.nio.file._
 import net.java.truevfs.kernel.spec._
-import net.java.truevfs.kernel.spec.cio._
-import net.java.truevfs.kernel.spec.cio.Entry._
+import net.java.truecommons.cio._
+import net.java.truecommons.cio.Entry._
 
 /** Provides read/write access to an archive file system.
   *

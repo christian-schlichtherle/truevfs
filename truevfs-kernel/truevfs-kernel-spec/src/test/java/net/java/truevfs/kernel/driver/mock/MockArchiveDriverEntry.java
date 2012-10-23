@@ -8,16 +8,16 @@ import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.Entry.Access;
+import net.java.truecommons.cio.Entry.Entity;
+import net.java.truecommons.cio.Entry.PosixEntity;
+import net.java.truecommons.cio.Entry.Size;
+import net.java.truecommons.cio.Entry.Type;
+import net.java.truecommons.cio.IoBuffer;
+import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.FsArchiveEntries;
 import net.java.truevfs.kernel.spec.FsArchiveEntry;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.Entry.Access;
-import net.java.truevfs.kernel.spec.cio.Entry.Entity;
-import net.java.truevfs.kernel.spec.cio.Entry.PosixEntity;
-import net.java.truevfs.kernel.spec.cio.Entry.Size;
-import net.java.truevfs.kernel.spec.cio.Entry.Type;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle
@@ -114,7 +114,7 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
         permissions[type.ordinal()][((PosixEntity) entity).ordinal()] = value;
         return true;
     }
-    
+
     /**
      * Returns a string representation of this object for debugging and logging
      * purposes.

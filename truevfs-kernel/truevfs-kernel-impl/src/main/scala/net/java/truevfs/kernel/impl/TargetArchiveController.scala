@@ -15,11 +15,11 @@ import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.FsAccessOption._
 import net.java.truevfs.kernel.spec.FsAccessOptions._
 import net.java.truevfs.kernel.spec.FsSyncOption._
-import net.java.truevfs.kernel.spec.cio._
-import net.java.truevfs.kernel.spec.cio.Entry._
-import net.java.truevfs.kernel.spec.cio.Entry.Access._
-import net.java.truevfs.kernel.spec.cio.Entry.Size._
-import net.java.truevfs.kernel.spec.cio.Entry.Type._
+import net.java.truecommons.cio._
+import net.java.truecommons.cio.Entry._
+import net.java.truecommons.cio.Entry.Access._
+import net.java.truecommons.cio.Entry.Size._
+import net.java.truecommons.cio.Entry.Type._
 import TargetArchiveController._
 
 /** Manages I/O to the entry which represents the target archive file in its

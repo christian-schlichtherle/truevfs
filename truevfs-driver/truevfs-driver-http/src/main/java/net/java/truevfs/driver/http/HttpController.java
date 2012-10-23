@@ -9,14 +9,14 @@ import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.Entry.Access;
-import static net.java.truevfs.kernel.spec.cio.Entry.Access.READ;
-import net.java.truevfs.kernel.spec.cio.Entry.Type;
-import static net.java.truevfs.kernel.spec.cio.Entry.Type.FILE;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.Entry.Access;
+import static net.java.truecommons.cio.Entry.Access.READ;
+import net.java.truecommons.cio.Entry.Type;
+import static net.java.truecommons.cio.Entry.Type.FILE;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.IoBufferPool;
+import net.java.truecommons.cio.OutputSocket;
 import org.apache.http.HttpResponse;
 
 /**

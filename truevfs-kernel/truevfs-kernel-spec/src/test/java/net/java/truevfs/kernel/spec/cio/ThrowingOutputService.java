@@ -10,6 +10,10 @@ import java.util.Iterator;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.cio.DecoratingOutputService;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.OutputService;
+import net.java.truecommons.cio.OutputSocket;
 import net.java.truevfs.kernel.spec.TestConfig;
 import net.java.truevfs.kernel.spec.ThrowManager;
 

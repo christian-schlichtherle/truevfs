@@ -8,7 +8,7 @@ import net.java.truevfs.comp.zipdriver.ZipDriverEntry;
 import net.java.truevfs.comp.zipdriver.CheckedZipDriver;
 import net.java.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truevfs.kernel.spec.cio.IoBufferPool;
+import net.java.truecommons.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle

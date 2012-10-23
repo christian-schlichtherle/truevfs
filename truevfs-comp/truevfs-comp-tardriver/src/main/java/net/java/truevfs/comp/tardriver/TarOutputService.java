@@ -19,9 +19,9 @@ import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import net.java.truecommons.shed.SuppressedExceptionBuilder;
 import static net.java.truevfs.comp.tardriver.TarDriver.*;
 import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.cio.*;
-import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
-import static net.java.truevfs.kernel.spec.cio.Entry.UNKNOWN;
+import net.java.truecommons.cio.*;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import static net.java.truecommons.cio.Entry.UNKNOWN;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**

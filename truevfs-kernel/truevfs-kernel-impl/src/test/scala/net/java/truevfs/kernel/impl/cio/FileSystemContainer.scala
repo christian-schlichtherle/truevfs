@@ -5,7 +5,7 @@
 package net.java.truevfs.kernel.impl.cio
 
 import collection.JavaConverters._
-import net.java.truevfs.kernel.spec.cio._
+import net.java.truecommons.cio._
 import net.java.truevfs.kernel.impl.util._
 
 /**

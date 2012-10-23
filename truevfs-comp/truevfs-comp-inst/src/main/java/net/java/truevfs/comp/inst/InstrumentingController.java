@@ -12,9 +12,9 @@ import net.java.truevfs.kernel.spec.FsAccessOption;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsDecoratingController;
 import net.java.truevfs.kernel.spec.FsNodeName;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.OutputSocket;
 
 /**
  * @param  <M> the type of the mediator.

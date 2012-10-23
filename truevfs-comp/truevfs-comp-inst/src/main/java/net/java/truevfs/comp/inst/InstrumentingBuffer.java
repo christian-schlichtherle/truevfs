@@ -6,10 +6,10 @@ package net.java.truevfs.comp.inst;
 
 import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.kernel.spec.cio.DecoratingIoBuffer;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
+import net.java.truecommons.cio.DecoratingIoBuffer;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.IoBuffer;
+import net.java.truecommons.cio.OutputSocket;
 
 /**
  * @param  <M> the type of the mediator.

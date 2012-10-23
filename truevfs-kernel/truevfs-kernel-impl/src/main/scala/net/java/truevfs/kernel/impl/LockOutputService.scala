@@ -10,7 +10,7 @@ import java.io._
 import java.nio.channels._
 import java.util.concurrent.locks._
 import javax.annotation._
-import net.java.truevfs.kernel.spec.cio._
+import net.java.truecommons.cio._
 
 /**
   * Decorates another output service to allow concurrent access which is

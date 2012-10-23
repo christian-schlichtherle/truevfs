@@ -18,10 +18,10 @@ import net.java.truecommons.shed.Paths;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOption.CREATE_PARENTS;
 import net.java.truevfs.kernel.spec.FsNodePath;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.IoSockets;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.IoSockets;
+import net.java.truecommons.cio.OutputSocket;
 
 /**
  * Provides fast bulk I/O operations for {@link File}s and {@link TFile}s.

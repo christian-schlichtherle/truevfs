@@ -13,18 +13,19 @@ import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsAccessOption.CACHE;
 import static net.java.truevfs.kernel.spec.FsAccessOption.COMPRESS;
-import net.java.truevfs.kernel.spec.cio.*;
-import static net.java.truevfs.kernel.spec.cio.Entry.ALL_POSIX_ACCESS;
-import static net.java.truevfs.kernel.spec.cio.Entry.ALL_POSIX_ENTITIES;
-import net.java.truevfs.kernel.spec.cio.Entry.Access;
-import static net.java.truevfs.kernel.spec.cio.Entry.Access.WRITE;
-import net.java.truevfs.kernel.spec.cio.Entry.PosixEntity;
-import static net.java.truevfs.kernel.spec.cio.Entry.Size.DATA;
-import net.java.truevfs.kernel.spec.cio.Entry.Type;
+import net.java.truecommons.cio.*;
+import static net.java.truecommons.cio.Entry.ALL_POSIX_ACCESS;
+import static net.java.truecommons.cio.Entry.ALL_POSIX_ENTITIES;
+import net.java.truecommons.cio.Entry.Access;
+import static net.java.truecommons.cio.Entry.Access.WRITE;
+import net.java.truecommons.cio.Entry.PosixEntity;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import net.java.truecommons.cio.Entry.Type;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.archivers.tar.TarConstants;
+import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
 
 /**
  * An archive driver for Tape Archive files (TAR).
@@ -34,7 +35,7 @@ import org.apache.commons.compress.archivers.tar.TarConstants;
  * format to North American countries.
  * <p>
  * Subclasses must be thread-safe and should be immutable!
- * 
+ *
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -54,7 +55,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @return {@link #TAR_CHARSET}.
      */
     @Override
@@ -71,7 +72,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      * {@link TarConstants#NAMELEN} or more characters.
      * The implementation in {@link TarDriver} returns
      * {@link TarArchiveOutputStream#LONGFILE_GNU}.
-     * 
+     *
      * @return The method to use for encoding entry names with
      *         {@link TarConstants#NAMELEN} or more characters.
      */

@@ -24,11 +24,11 @@ import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
 import net.java.truevfs.kernel.spec.FsNode;
 import net.java.truevfs.kernel.spec.FsNodeName;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
-import net.java.truevfs.kernel.spec.cio.Entry;
-import static net.java.truevfs.kernel.spec.cio.Entry.PosixEntity.*;
-import net.java.truevfs.kernel.spec.cio.InputSocket;
-import net.java.truevfs.kernel.spec.cio.IoBuffer;
-import net.java.truevfs.kernel.spec.cio.OutputSocket;
+import net.java.truecommons.cio.Entry;
+import static net.java.truecommons.cio.Entry.PosixEntity.*;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.IoBuffer;
+import net.java.truecommons.cio.OutputSocket;
 
 /**
  * Adapts a {@link Path} instance to a {@link FsNode}.

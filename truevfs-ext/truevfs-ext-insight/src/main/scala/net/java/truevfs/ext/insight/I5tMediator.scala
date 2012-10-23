@@ -11,7 +11,7 @@ import net.java.truevfs.comp.inst._
 import net.java.truevfs.comp.jmx._
 import net.java.truevfs.ext.insight.stats._
 import net.java.truevfs.kernel.spec._
-import net.java.truevfs.kernel.spec.cio._
+import net.java.truecommons.cio._
 
 /**
  * A mediator for the instrumentation of the TrueVFS Kernel with JMX.
