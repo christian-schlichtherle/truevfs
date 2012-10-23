@@ -214,7 +214,7 @@ extends StandardMBean implements JmxModelMXBean {
     public void sync() throws FsSyncWarningException, FsSyncException {
         FsManagerLocator.SINGLETON.get().sync(
                 new FsSimpleControllerSyncVisitor(
-                    new FsControllerFilter(model.getMountPoint()),
-                    FsSyncOptions.NONE));
+                    FsSyncOptions.NONE,
+                    new FsControllerFilter(model.getMountPoint())));
     }
 }

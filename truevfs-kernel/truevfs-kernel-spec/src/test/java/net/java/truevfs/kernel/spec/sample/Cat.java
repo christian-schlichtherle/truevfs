@@ -90,7 +90,7 @@ public final class Cat {
             // file systems, if any were accessed, and clean up temporary files
             // used for caching.
             manager.sync(new FsSimpleControllerSyncVisitor(
-                    Filter.ACCEPT_ANY, FsSyncOptions.UMOUNT));
+                    FsSyncOptions.UMOUNT));
         }
     }
 // END SNIPPET: cat
