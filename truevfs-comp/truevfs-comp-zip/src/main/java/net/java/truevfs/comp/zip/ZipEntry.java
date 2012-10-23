@@ -10,9 +10,7 @@ import java.util.zip.ZipException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truecommons.io.ImmutableBuffer;
 import net.java.truecommons.io.MutableBuffer;
-import net.java.truecommons.io.PowerBuffer;
 import static net.java.truevfs.comp.zip.Constants.EMPTY;
 import static net.java.truevfs.comp.zip.Constants.FORCE_ZIP64_EXT;
 import static net.java.truevfs.comp.zip.ExtraFields.ZIP64_HEADER_ID;
@@ -550,11 +548,10 @@ public class ZipEntry implements Cloneable {
             final int len = buf.length;
             UShort.check(len, "Extra Fields too large", null);
             try {
-                setExtraFields(PowerBuffer
+                setExtraFields(MutableBuffer
                         .allocateDirect(len)
                         .put(buf)
-                        .rewind()
-                        .asImmutableBuffer(),
+                        .rewind(),
                         false);
             } catch (final ZipException ex) {
                 throw new IllegalArgumentException(ex);
@@ -581,12 +578,12 @@ public class ZipEntry implements Cloneable {
      * @throws IllegalArgumentException If the data block does not conform to
      *         the ZIP File Format Specification.
      */
-    final void setRawExtraFields(final ImmutableBuffer ib) throws ZipException {
+    final void setRawExtraFields(final MutableBuffer mb) throws ZipException {
         // TODO: A read-only buffer could not get passed over from a ZipFile to
         // a ZipOutputStream - which is required by the
         // TrueVFS Kernel Implementation as of TrueVFS 0.9.3.
-        assert !ib.isReadOnly();
-        setExtraFields(ib, true);
+        assert !mb.isReadOnly();
+        setExtraFields(mb, true);
     }
 
     private byte[] getExtraFields(final boolean zip64) {
@@ -612,11 +609,11 @@ public class ZipEntry implements Cloneable {
      * @throws IllegalArgumentException If the data block does not conform to
      *         the ZIP File Format Specification.
      */
-    private void setExtraFields(final ImmutableBuffer ib, final boolean zip64)
+    private void setExtraFields(final MutableBuffer mb, final boolean zip64)
     throws ZipException {
-        if (0 < ib.remaining()) {
+        if (0 < mb.remaining()) {
             final ExtraFields fields = new ExtraFields();
-            fields.parse(ib);
+            fields.parse(mb);
             try {
                 if (zip64) parseZip64ExtraField(fields);
             } catch (final BufferUnderflowException ex) {

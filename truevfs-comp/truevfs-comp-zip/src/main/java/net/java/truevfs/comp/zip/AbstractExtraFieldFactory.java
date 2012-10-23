@@ -32,8 +32,9 @@ abstract class AbstractExtraFieldFactory implements ExtraFieldFactory {
      * This is semantically the same as {@link #newExtraField(PowerBuffer)} but
      * throws a {@link RuntimeException} instead of a {@link ZipException}.
      *
-     * @param  ib a byte buffer with the shared content possibly holding the
-     *         Header Id, Data Size and Data Block for the Extra Field.
+     * @param  ib the immutable buffer with the shared content supposedly
+     *         holding the Header Id, Data Size and Data Block for the
+     *         Extra Field.
      * @return a new Extra Field.
      * @throws RuntimeException if the buffer's content does not conform to the
      *         ZIP File Format Specification.

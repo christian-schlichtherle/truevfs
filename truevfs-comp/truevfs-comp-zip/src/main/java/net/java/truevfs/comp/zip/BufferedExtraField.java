@@ -27,22 +27,19 @@ class BufferedExtraField implements ExtraField {
 
     /**
      * Constructs a new buffered extra field which shares the Header Id,
-     * Data Size and Data Block with given immutable buffer.
+     * Data Size and Data Block with the given immutable buffer.
      *
-     * @param  ib the immutable buffer with the shared Header Id, Data Size and
-     *         Data Block.
+     * @param  ib the immutable buffer with the shared content supposedly
+     *         holding the Header Id, Data Size and Data Block for the
+     *         Extra Field.
      * @throws RuntimeException if the buffer's content does not conform to the
      *         ZIP File Format Specification.
      */
     BufferedExtraField(final ImmutableBuffer ib) {
-        final MutableBuffer mb = ib
-                .asMutableBuffer()
-                .slice()
-                .littleEndian();
+        final MutableBuffer mb = ib.asMutableBuffer().slice().littleEndian();
         final int totalSize = 4 + mb.getUShort(2);
         UShort.check(totalSize);
         this.mb = mb.limit(totalSize);
-        mb.position(mb.position() + totalSize);
     }
 
     BufferedExtraField(final int headerId, final int dataSize) {

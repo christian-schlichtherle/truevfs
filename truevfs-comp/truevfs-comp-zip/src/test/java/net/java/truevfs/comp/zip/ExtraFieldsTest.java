@@ -36,10 +36,7 @@ public final class ExtraFieldsTest {
 
     @Test
     public void testCollection1() throws ZipException {
-        fields.parse(MutableBuffer
-                .wrap(serialized)
-                .littleEndian()
-                .asImmutableBuffer());
+        fields.parse(MutableBuffer.wrap(serialized));
         final ExtraField ef = fields.get(ExtraFields.ZIP64_HEADER_ID);
         assertNotNull(ef);
         assertSame(ef, fields.remove(ExtraFields.ZIP64_HEADER_ID));
