@@ -6,6 +6,7 @@ package net.java.truevfs.kernel.spec;
 
 import java.io.Closeable;
 import java.io.IOException;
+import net.java.truecommons.shed.Filter;
 
 /**
  * A container which creates {@linkplain FsController} file system controllers
@@ -50,6 +51,12 @@ public interface FsManager {
      * Uses the given visitor to {@link FsController#sync sync()} all managed
      * file system controllers which get accepted by the visitor's
      * {@link FsControllerSyncVisitor#filter}.
+     * <p>
+     * If possible, clients should set the visitor's
+     * {@linkplain FsControllerSyncVisitor#filter filter}
+     * to {@link Filter#ACCEPT_ANY} in order to enable the implementation to
+     * perform additional cleanup operations, e.g. removing a shutdown hook.
+     * <p>
      * The visitor's
      * {@linkplain FsControllerSyncVisitor#builder sync exception builder}
      * gets used to process any {@link FsSyncException}s while iterating over
@@ -78,12 +85,12 @@ public interface FsManager {
      * Uses the given visitor to call an operation on all managed
      * file system controllers which get accepted by the visitor's
      * {@link FsControllerVisitor#filter}.
+     * This is the engine for calls to {@link #sync}.
+     * <p>
      * The visitor's
      * {@linkplain FsControllerVisitor#builder exception builder}
      * gets used to process any {@link IOException}s while iterating over
      * all managed file system controllers.
-     * <p>
-     * This is the engine for calls to {@link #sync}.
      *
      * @param  visitor the visitor for
      *         {@linkplain FsControllerVisitor#filter filtering} and

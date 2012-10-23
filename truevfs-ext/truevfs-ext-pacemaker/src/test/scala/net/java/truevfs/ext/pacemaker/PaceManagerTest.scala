@@ -62,8 +62,7 @@ extends WordSpec
         )
       }
       delegate.controllers = controllers.values
-      manager sync new FsSimpleControllerSyncVisitor(
-        Filter.ACCEPT_ANY, FsSyncOptions.SYNC)
+      manager sync new FsSimpleControllerSyncVisitor(FsSyncOptions.SYNC)
 
       val actions = {
         Table[String, Expectation](
@@ -81,7 +80,7 @@ extends WordSpec
           ("a:a:p:/3!/a!/", Synced("a:p:/2!/", "a:a:p:/2!/a!/", "a:a:p:/2!/b!/", "a:a:p:/2!/c!/")),
           ("a:a:p:/3!/b!/", Synced()),
           ("a:a:p:/3!/c!/", Synced("a:a:p:/3!/a!/")),
-          
+
           // Test obeying to access order, not insertion-order!
           ("a:a:p:/3!/b!/", Synced()),
           ("a:a:p:/3!/a!/", Shelved("a:a:p:/3!/c!/")),
@@ -103,7 +102,7 @@ extends WordSpec
         // Register access to the controller as if some file system operation
         // had been successfully completed.
         expectation match {
-          case Synced(_*) | Shelved(_*) => 
+          case Synced(_*) | Shelved(_*) =>
             manager postAccess controllers(access)
 
           case Discarded(_*) =>

@@ -16,7 +16,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
  * Static utility methods for virtual file system operations with global scope.
  * If you are not sure which method you should use, try {@link #umount()} -
  * it does the right thing for most use cases.
- * 
+ *
  * @author Christian Schlichtherle
  */
 public final class TVFS {
@@ -108,7 +108,7 @@ public final class TVFS {
      * point.
      * Note that making up an artificial mount point like this will only work
      * with the {@link FsFilteringManager}!
-     * 
+     *
      * @param  tree a file or directory in the (virtual) file system space.
      * @return A mount point for the given (virtual) directory tree.
      */
@@ -265,6 +265,6 @@ public final class TVFS {
             BitField<FsSyncOption> options)
     throws FsSyncException {
         TConfig.current().getManager().sync(
-                new FsSimpleControllerSyncVisitor(filter, options));
+                new FsSimpleControllerSyncVisitor(options, filter));
     }
 }

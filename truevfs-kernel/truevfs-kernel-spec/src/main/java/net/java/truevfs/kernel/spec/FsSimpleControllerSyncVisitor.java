@@ -22,21 +22,13 @@ public class FsSimpleControllerSyncVisitor extends FsControllerSyncVisitor {
     final Filter<? super FsController> filter;
     final BitField<FsSyncOption> options;
 
-    public FsSimpleControllerSyncVisitor() {
-        this(Filter.ACCEPT_ANY, FsSyncOptions.SYNC);
-    }
-
     public FsSimpleControllerSyncVisitor(BitField<FsSyncOption> options) {
-        this(Filter.ACCEPT_ANY, options);
-    }
-
-    public FsSimpleControllerSyncVisitor(Filter<? super FsController> filter) {
-        this(filter, FsSyncOptions.SYNC);
+        this(options, Filter.ACCEPT_ANY);
     }
 
     public FsSimpleControllerSyncVisitor(
-            final Filter<? super FsController> filter,
-            final BitField<FsSyncOption> options) {
+            final BitField<FsSyncOption> options,
+            final Filter<? super FsController> filter) {
         this.filter = Objects.requireNonNull(filter);
         this.options = Objects.requireNonNull(options);
     }
