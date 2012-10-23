@@ -99,7 +99,7 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
     override def setMounted(mounted: Boolean) {
       writeLocked {
         if (_mounted != mounted) {
-          if (mounted) SyncShutdownHook add DefaultManager.this
+          if (mounted) SyncShutdownHook register DefaultManager.this
           schedule(mounted)
           _mounted = mounted
         }

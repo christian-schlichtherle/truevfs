@@ -22,14 +22,14 @@ private object SyncShutdownHook extends Thread {
   @volatile
   private var _manager: Option[FsManager] = None
 
-  /** Adds the given file system `manager` for `sync`hronization when the
+  /** Registers the given file system `manager` for `sync`hronization when the
     * shutdown hook is `run`.
     *
     * @param manager the file system manager to `sync` when the shutdown hook is
     *        `run`.
     * @see   #cancel
     */
-  def add(manager: FsManager) {
+  def register(manager: FsManager) {
     if (_manager.orNull != manager) {
       synchronized {
         if (_manager.orNull != manager) {
