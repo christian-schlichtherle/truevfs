@@ -4,18 +4,15 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truevfs.comp.zip.ZipFile;
-import net.java.truevfs.comp.zip.ZipEntry;
-import net.java.truevfs.comp.zip.ZipOutputStream;
-import net.java.truecommons.io.ByteBufferChannel;
-import net.java.truecommons.io.ChannelOutputStream;
-import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashSet;
+import net.java.truecommons.io.ByteBufferChannel;
+import net.java.truecommons.io.ChannelOutputStream;
+import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import static net.java.truevfs.comp.zip.ZipEntry.STORED;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -40,7 +37,7 @@ public final class ManySmallEntriesTest {
     @Test
     public void testRoundTripPersistence() throws IOException {
         final byte[] data = DATA_STRING.getBytes(DATA_CHARSET);
-        ByteBuffer bb = ByteBuffer.allocate(ZIP_SIZE);
+        ByteBuffer bb = ByteBuffer.allocateDirect(ZIP_SIZE);
         final HashSet<String> set = new HashSet<>(initialCapacity(NUM_ENTRIES));
 
         final ByteBufferChannel bbc = new ByteBufferChannel(bb);
