@@ -41,7 +41,7 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
     // operations on false positive archive files.
     new FalsePositiveArchiveController(
       new FrontController(
-        driver decorate 
+        driver decorate
           new ArchiveControllerAdapter(parent,
             new BackController(driver, model, parent))))
   }
@@ -114,13 +114,13 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
   } // ManagedModel
 
   override def sync(visitor: FsControllerSyncVisitor) {
-    SyncShutdownHook cancel ()
+    if (visitor.filter == Filter.ACCEPT_ANY) SyncShutdownHook remove ()
     visit(visitor)
   }
 
   /** Returns a new stream which represents a snapshot of the managed file
     * system controllers.
-    * 
+    *
     * @param filter the file system controller filter to apply.
     */
   override def stream(filter: Filter[_ >: FsController]) = {

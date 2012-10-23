@@ -12,7 +12,7 @@ import javax.annotation.concurrent._
   * when it's `run`.
   * This is to protect an application from loss of data if the manager isn't
   * explicitly asked to `sync` before the JVM terminates.
-  * 
+  *
   * @author Christian Schlichtherle
   */
 @ThreadSafe
@@ -24,11 +24,11 @@ private object SyncShutdownHook extends Thread {
 
   /** Registers the given file system `manager` for `sync`hronization when the
     * shutdown hook is `run`.
-   * 
-   * @param manager the file system manager to `sync` when the shutdown hook is
-   *        `run`.
-   * @see   #cancel
-   */
+    *
+    * @param manager the file system manager to `sync` when the shutdown hook is
+    *        `run`.
+    * @see   #cancel
+    */
   def register(manager: FsManager) {
     if (_manager.orNull != manager) {
       synchronized {
@@ -40,11 +40,11 @@ private object SyncShutdownHook extends Thread {
     }
   }
 
-  /** De-registers any previously registered file system manager.
-    * 
+  /** Removes any previously registered file system manager.
+    *
     * @see #register
     */
-  def cancel() {
+  def remove() {
     if (_manager isDefined) {
       synchronized {
         if (_manager isDefined) {
@@ -57,11 +57,11 @@ private object SyncShutdownHook extends Thread {
   }
 
   /** `sync`s any `register`ed file system manager.
-    * 
+    *
     * If any exception occurs within the shutdown hook, its stacktrace gets
     * printed to standard error because logging doesn't work in a shutdown
     * hook.
-    * 
+    *
     * @deprecated Do '''not''' call this method directly!
     * @see #register
     */
