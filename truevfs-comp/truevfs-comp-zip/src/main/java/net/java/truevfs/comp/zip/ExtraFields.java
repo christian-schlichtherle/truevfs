@@ -136,9 +136,9 @@ final class ExtraFields implements Cloneable {
      * Deserializes this collection of extra fields from the given immutable
      * buffer {@code ib}.
      */
-    void parse(final ImmutableBuffer ib) throws ZipException {
-        assert UShort.check(ib.remaining());
-        final MutableBuffer mb = ib.asMutableBuffer().littleEndian();
+    void parse(final MutableBuffer mb) throws ZipException {
+        assert UShort.check(mb.remaining());
+        mb.littleEndian();
         final Map<Integer, ExtraField> map = new TreeMap<>();
         while (0 < mb.remaining()) {
             final int headerId = mb.getUShort(mb.position()); // peek

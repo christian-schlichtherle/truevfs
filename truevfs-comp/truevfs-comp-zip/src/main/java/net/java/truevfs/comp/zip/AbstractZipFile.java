@@ -409,11 +409,9 @@ implements Closeable, Iterable<E> {
                 entry.setRawOffset(lfhOff); // must be unmapped!
                 // extra field (variable size)
                 if (0 < extraLen)
-                    entry.setRawExtraFields(PowerBuffer
+                    entry.setRawExtraFields(MutableBuffer
                             .allocateDirect(extraLen)
-                            .littleEndian()
-                            .load(channel)
-                            .asImmutableBuffer());
+                            .load(channel));
                 // file comment (variable size)
                 if (0 < commentLen)
                     entry.setRawComment(decode(PowerBuffer
@@ -532,11 +530,9 @@ implements Closeable, Iterable<E> {
                 entry.setRawOffset(mapper.unmap(pos));
                 // extra field (variable size)
                 if (0 < extraLen)
-                    entry.setRawExtraFields(PowerBuffer
+                    entry.setRawExtraFields(MutableBuffer
                             .allocateDirect(extraLen)
-                            .littleEndian()
-                            .load(channel)
-                            .asImmutableBuffer());
+                            .load(channel));
 
                 // Process entry contents.
                 if (entry.getGeneralPurposeBitFlag(GPBF_DATA_DESCRIPTOR)) {
