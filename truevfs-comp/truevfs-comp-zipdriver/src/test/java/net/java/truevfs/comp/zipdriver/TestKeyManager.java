@@ -26,7 +26,6 @@ extends PromptingKeyManager<K> {
     @Override
     public synchronized void unlock(URI resource) {
         final PromptingKeyProvider<K> provider = get(resource);
-        if (null != provider)
-            provider.resetUnconditionally();
+        if (null != provider) provider.resetUnconditionally();
     }
 }
