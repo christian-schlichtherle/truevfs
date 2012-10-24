@@ -6,7 +6,6 @@ package net.java.truevfs.driver.zip.raes;
 
 import java.net.URI;
 import java.util.Objects;
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.driver.zip.raes.crypto.RaesKeyException;
 import net.java.truevfs.driver.zip.raes.crypto.RaesParameters;
@@ -57,7 +56,7 @@ implements RaesParametersProvider {
      * @param  raes the resource URI of the RAES file.
      */
     public KeyManagerRaesParameters(
-            final @CheckForNull KeyManager<AesPbeParameters> manager,
+            final KeyManager<AesPbeParameters> manager,
             final URI raes) {
         this.manager = Objects.requireNonNull(manager);
         this.raes = Objects.requireNonNull(raes);

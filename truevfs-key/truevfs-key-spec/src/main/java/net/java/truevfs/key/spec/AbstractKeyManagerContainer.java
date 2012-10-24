@@ -5,6 +5,7 @@
 package net.java.truevfs.key.spec;
 
 import java.util.Map;
+import java.util.ServiceConfigurationError;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.services.Container;
@@ -22,7 +23,10 @@ implements KeyManagerContainer, Container<Map<Class<?>, KeyManager<?>>> {
     @Override
     @SuppressWarnings("unchecked")
     public final @CheckForNull <K> KeyManager<K> keyManager(final Class<K> type) {
-        return (KeyManager<K>) get().get(type);
+        final KeyManager<?> m = get().get(type);
+        if (null == m)
+            throw new ServiceConfigurationError("No key manager available for " + type + ".");
+        return (KeyManager<K>) m;
     }
 
     /**

@@ -45,6 +45,14 @@
                 </exclusion-->
                 <!--exclusion>
                     <groupId>net.java.truevfs</groupId>
+                    <artifactId>truevfs-key-console</artifactId>
+                </exclusion-->
+                <!--exclusion>
+                    <groupId>net.java.truevfs</groupId>
+                    <artifactId>truevfs-key-impl</artifactId>
+                </exclusion-->
+                <!--exclusion>
+                    <groupId>net.java.truevfs</groupId>
                     <artifactId>truevfs-key-swing</artifactId>
                 </exclusion-->
             </exclusions>
@@ -52,20 +60,12 @@
 
         <!-- Uncomment WANTED modules. Note that this list is NOT complete. -->
 
-        <!-- Lets hurl the key prompting dialog when entering an invalid
-             key... -->
+        <!-- Lets hurl the key prompting dialog when entering an invalid key. -->
         <dependency>
             <groupId>net.java.truevfs</groupId>
             <artifactId>truevfs-key-hurlfb</artifactId>
             <scope>runtime</scope>
         </dependency>
-
-        <!-- ... or uncomment this in order to disable all key prompting! -->
-        <!--dependency>
-            <groupId>net.java.truevfs</groupId>
-            <artifactId>truevfs-key-disabled</artifactId>
-            <scope>runtime</scope>
-        </dependency-->
 
         <!-- This runtime dependency instruments the TrueVFS Kernel for
              statistics monitoring via JMX. -->

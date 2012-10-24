@@ -1,0 +1,12 @@
+    --------------------------------
+    About
+    --------------------------------
+    Christian Schlichtherle
+    --------------------------------
+
+About
+
+    The default KeyManager implementation in this module fails to resolve any
+    encryption keys.
+    Its priority is set to <<<Integer.MIN_VALUE>>>, so any other KeyManager
+    module on the class path will take precedence.

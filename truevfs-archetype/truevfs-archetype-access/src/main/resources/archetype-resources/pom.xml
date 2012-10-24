@@ -15,6 +15,7 @@
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
+        <netbeans.compile.on.save>none</netbeans.compile.on.save>
         <netbeans.hint.jdkPlatform>JDK_1.7</netbeans.hint.jdkPlatform>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <scala.version>${scala-version}</scala.version>
@@ -42,6 +43,14 @@
                 </exclusion-->
                 <!--exclusion>
                     <groupId>net.java.truevfs</groupId>
+                    <artifactId>truevfs-key-console</artifactId>
+                </exclusion-->
+                <!--exclusion>
+                    <groupId>net.java.truevfs</groupId>
+                    <artifactId>truevfs-key-impl</artifactId>
+                </exclusion-->
+                <!--exclusion>
+                    <groupId>net.java.truevfs</groupId>
                     <artifactId>truevfs-key-swing</artifactId>
                 </exclusion-->
             </exclusions>
@@ -49,22 +58,13 @@
 
         <!-- Uncomment WANTED modules. Note that this list is NOT complete. -->
 
-        <!-- Lets hurl the key prompting dialog when entering an invalid
-             key... -->
+        <!-- Lets hurl the key prompting dialog when entering an invalid key. -->
         <dependency>
             <groupId>net.java.truevfs</groupId>
             <artifactId>truevfs-key-hurlfb</artifactId>
             <version>${truevfs.version}</version>
             <scope>runtime</scope>
         </dependency>
-
-        <!-- ... or uncomment this in order to disable all key prompting! -->
-        <!--dependency>
-            <groupId>net.java.truevfs</groupId>
-            <artifactId>truevfs-key-disabled</artifactId>
-            <version>${truevfs.version}</version>
-            <scope>runtime</scope>
-        </dependency-->
 
         <!-- This runtime dependency instruments the TrueVFS Kernel for
              statistics monitoring via JMX. -->
