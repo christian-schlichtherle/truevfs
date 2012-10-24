@@ -4,8 +4,6 @@
  */
 package net.java.truevfs.key.spec;
 
-import net.java.truevfs.key.spec.PromptingKeyProvider;
-import net.java.truevfs.key.spec.PromptingKeyManager;
 import java.net.URI;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
@@ -16,6 +14,7 @@ import org.junit.Test;
  */
 public abstract class PromptingKeyManagerTestSuite
 extends KeyManagerTestSuite<PromptingKeyManager<?>> {
+
     @Test
     public void testMakePromptingKeyProvider() {
         URI id = URI.create("a");
