@@ -9,20 +9,20 @@ import java.net.URI;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.Entry.Access;
+import static net.java.truecommons.cio.Entry.Type.SPECIAL;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.ControlFlowException;
 import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
-import net.java.truecommons.cio.Entry;
-import net.java.truecommons.cio.Entry.Access;
-import static net.java.truecommons.cio.Entry.Type.SPECIAL;
 import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.KeyManagerContainer;
 
 /**
  * This file system controller decorates another file system controller in
  * order to manage the keys required for accessing encrypted ZIP files.
- * 
+ *
  * @param  <D> the type of the ZIP driver.
  * @author Christian Schlichtherle
  */
@@ -140,8 +140,7 @@ extends FsDecoratingController {
         final URI fsu = driver.fileSystemUri(model, name.toString());
         if (!fsu.equals(mpu) || name.isRoot()) {
             final KeyManager<?> keyManager = getKeyManager();
-            if (null != keyManager)
-                keyManager.delete(fsu);
+            if (null != keyManager) keyManager.delete(fsu);
         }
     }
 
