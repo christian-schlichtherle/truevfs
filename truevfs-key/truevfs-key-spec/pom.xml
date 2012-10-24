@@ -24,6 +24,10 @@
             <groupId>net.java.truecommons</groupId>
             <artifactId>truecommons-services</artifactId>
         </dependency>
+        <dependency>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-shed</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
