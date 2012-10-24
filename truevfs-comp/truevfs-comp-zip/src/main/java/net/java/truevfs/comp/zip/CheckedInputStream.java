@@ -23,7 +23,7 @@ class CheckedInputStream extends java.util.zip.CheckedInputStream {
     /**
      * Constructs an input stream using the specified checksum and skip buffer
      * size.
-     * 
+     *
      * @param in the input stream
      * @param cksum the checksum
      * @param skipBufferSize the skip buffer size
@@ -38,11 +38,11 @@ class CheckedInputStream extends java.util.zip.CheckedInputStream {
 
     @Override
     public long skip(long n) throws IOException {
-        long total = 0;
         final byte[] buf = new byte[skipBufferSize];
-        for (long len; (len = n - total) > 0; total += len) {
+        long total = 0;
+        for (long len; 0 < (len = n - total); total += len) {
             len = read(buf, 0, len < buf.length ? (int) len : buf.length);
-            if (len < 0) break;
+            if (0 > len) break;
         }
         return total;
     }
