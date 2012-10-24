@@ -4,10 +4,10 @@
  */
 package net.java.truevfs.key.spec;
 
-import net.java.truecommons.services.Container;
 import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.services.Container;
 
 /**
  * An abstract provider for an immutable map of secret key classes to nullable
@@ -31,7 +31,7 @@ implements KeyManagerContainer, Container<Map<Class<?>, KeyManager<?>>> {
      * <p>
      * This is an immutable property - multiple calls must return the same
      * object.
-     * 
+     *
      * @return An immutable map of secret key classes to nullable key managers.
      */
     @Override
