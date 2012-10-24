@@ -21,7 +21,7 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public abstract class SafeKeyManager<   K extends SafeKey<K>,
                                         P extends SafeKeyProvider<K>>
-extends KeyManager<K> {
+extends AbstractKeyManager<K> {
 
     private final Map<URI, P> providers = new HashMap<>();
 
@@ -30,7 +30,7 @@ extends KeyManager<K> {
 
     /**
      * Returns a new key provider.
-     * 
+     *
      * @return A new key provider.
      */
     protected abstract P newKeyProvider();
@@ -54,10 +54,8 @@ extends KeyManager<K> {
         if (oldResource.equals(Objects.requireNonNull(newResource)))
             throw new IllegalArgumentException();
         final P provider = providers.remove(oldResource);
-        if (null != provider)
-            return providers.put(newResource, provider);
-        else
-            return providers.remove(newResource);
+        if (null != provider) return providers.put(newResource, provider);
+        else return providers.remove(newResource);
     }
 
     /**
@@ -69,8 +67,7 @@ extends KeyManager<K> {
     @Override
     public synchronized @CheckForNull P delete(final URI resource) {
         final P provider = providers.remove(Objects.requireNonNull(resource));
-        if (null != provider)
-            provider.setKey(null);
+        if (null != provider) provider.setKey(null);
         return provider;
     }
 }
