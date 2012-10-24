@@ -32,13 +32,11 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
         this.view = Objects.requireNonNull(view);
     }
 
-    final View<K> getView() {
-        return view;
-    }
+    final View<K> getView() { return view; }
 
     /**
      * Returns a new prompting key provider.
-     * 
+     *
      * @return A new prompting key provider.
      */
     @Override
@@ -56,8 +54,7 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
     @Override
     public final synchronized @CheckForNull PromptingKeyProvider<K> get(final URI resource) {
         final PromptingKeyProvider<K> provider = super.get(resource);
-        if (null != provider)
-            provider.setResource(resource);
+        if (null != provider) provider.setResource(resource);
         return provider;
     }
 
@@ -65,28 +62,23 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
     public final synchronized @CheckForNull PromptingKeyProvider<K> move(URI oldResource, URI newResource) {
         final PromptingKeyProvider<K>
                 oldProvider = super.move(oldResource, newResource);
-        if (null != oldProvider)
-            oldProvider.setResource(null);
-        final PromptingKeyProvider<K>
-                newProvider = super.get(newResource);
-        if (null != newProvider)
-            newProvider.setResource(newResource);
+        if (null != oldProvider) oldProvider.setResource(null);
+        final PromptingKeyProvider<K> newProvider = super.get(newResource);
+        if (null != newProvider) newProvider.setResource(newResource);
         return oldProvider;
     }
 
     @Override
     public final synchronized @CheckForNull PromptingKeyProvider<K> delete(URI resource) {
         final PromptingKeyProvider<K> provider = super.delete(resource);
-        if (null != provider)
-            provider.setResource(null);
+        if (null != provider) provider.setResource(null);
         return provider;
     }
 
     @Override
     public synchronized void unlock(URI resource) {
         final PromptingKeyProvider<K> provider = get(resource);
-        if (null != provider)
-            provider.resetCancelledKey();
+        if (null != provider) provider.resetCancelledKey();
     }
 
     /**

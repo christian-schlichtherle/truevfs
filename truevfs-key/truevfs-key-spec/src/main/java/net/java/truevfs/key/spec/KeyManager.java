@@ -13,11 +13,11 @@ import javax.annotation.concurrent.ThreadSafe;
  * <p>
  * Implementations must be thread-safe.
  *
- * @param   <K> The type of the secret keys.
- * @author  Christian Schlichtherle
+ * @param  <K> The type of the secret keys.
+ * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class KeyManager<K> {
+public interface KeyManager<K> {
 
     /**
      * Returns the mapped key provider for the given protected resource.
@@ -27,7 +27,7 @@ public abstract class KeyManager<K> {
      * @param  resource the URI of the protected resource.
      * @return The mapped key provider for the given protected resource.
      */
-    public abstract KeyProvider<K> make(URI resource);
+    KeyProvider<K> make(URI resource);
 
     /**
      * Returns the mapped key provider for the given protected resource or
@@ -37,12 +37,12 @@ public abstract class KeyManager<K> {
      * @return The mapped key provider for the given protected resource or
      *         {@code null} if no key provider is mapped yet.
      */
-    @CheckForNull public abstract KeyProvider<K> get(URI resource);
+    @CheckForNull KeyProvider<K> get(URI resource);
 
     /**
      * Moves the mapped key provider from the URI {@code oldResource} to
      * {@code newResource}.
-     * 
+     *
      * @param  oldResource the old URI of the protected resource.
      * @param  newResource the new URI of the protected resource.
      * @return The key provider which was previously mapped for the protected
@@ -50,8 +50,7 @@ public abstract class KeyManager<K> {
      * @throws IllegalArgumentException if {@code oldResource} compares
      *         {@link URI#equals(Object) equal} to {@code newResource}.
      */
-    @CheckForNull public abstract KeyProvider<K>
-    move(URI oldResource, URI newResource);
+    @CheckForNull KeyProvider<K> move(URI oldResource, URI newResource);
 
     /**
      * Deletes the mapped key provider for the given protected resource.
@@ -61,8 +60,7 @@ public abstract class KeyManager<K> {
      * @return The key provider which was previously mapped for the protected
      *         resource.
      */
-    @CheckForNull public abstract KeyProvider<K>
-    delete(URI resource);
+    @CheckForNull KeyProvider<K> delete(URI resource);
 
     /**
      * If and only if this key manager prompts users for keys, e.g. a password,
@@ -76,17 +74,8 @@ public abstract class KeyManager<K> {
      * order to give the user a chance to enter the key the next time the file
      * system will get accessed again.
      * Otherwise the key provider would forever stay in its cancelled state.
-     * 
-     * @param resource 
+     *
+     * @param resource
      */
-    public abstract void unlock(URI resource);
-
-    /**
-     * Returns a string representation of this object for debugging and logging
-     * purposes.
-     */
-    @Override
-    public String toString() {
-        return String.format("%s", getClass().getName());
-    }
+    void unlock(URI resource);
 }
