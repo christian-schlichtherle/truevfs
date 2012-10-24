@@ -18,25 +18,25 @@ Key Management
 
     At runtime, all WinZip AES encrypted ZIP entries are managed by an instance
     of a sub-class of the abstract archive driver implementation class
-    {{{../../apidocs/net/java/truevfs/driver/zip/ZipDriver.html}<<<ZipDriver>>>}}.
+    {{{../../apidocs/net/java/truevfs/comp/zipdriver/ZipDriver.html}<<<ZipDriver>>>}}.
     For custom encrypted application file formats, this should be an instance
     of the class
-    {{{../../apidocs/net/java/truevfs/driver/zip/JarDriver.html}<<<JarDriver>>>}}
+    {{{../../apidocs/net/java/truevfs/comp/zipdriver/JarDriver.html}<<<JarDriver>>>}}
 
     Whenever this archive driver class reads or writes a WinZip AES encrypted
     ZIP entry, it uses an instance of the interface
-    {{{../../apidocs/net/java/truevfs/key/KeyManagerProvider.html}<<<KeyManagerProvider>>>}}
+    {{{../../apidocs/net/java/truevfs/key/spec/KeyManagerContainer.html}<<<KeyManagerContainer>>>}}
     in order to obtain an instance of the interface
-    {{{../../apidocs/net/java/truevfs/key/KeyManager.html}<<<KeyManager>>>}}
+    {{{../../apidocs/net/java/truevfs/key/spec/KeyManager.html}<<<KeyManager>>>}}
     for the interface
-    {{{../../apidocs/net/java/truevfs/key/param/AesPbeParameters.html}<<<AesPbeParameters>>>}}
+    {{{../../apidocs/net/java/truevfs/key/spec/param/AesPbeParameters.html}<<<AesPbeParameters>>>}}
     and finally obtain an instance of the interface
-    {{{../../apidocs/net/java/truevfs/key/KeyProvider.html}<<<KeyProvider>>>}}
+    {{{../../apidocs/net/java/truevfs/key/spec/KeyProvider.html}<<<KeyProvider>>>}}
     for the prospective archive file.
 
     Because dependency injection is used all over the place in order to resolve
     the implementation classes of the interfaces
-    <<<KeyManagerProvider>>>, <<<KeyManager>>> and <<<KeyProvider>>>, this
+    <<<KeyManagerContainer>>>, <<<KeyManager>>> and <<<KeyProvider>>>, this
     architecture provides several ways to set passwords programmatically.
     In order to set a common password for all WinZip AES encrypted ZIP entries
     you need a custom
@@ -50,7 +50,7 @@ Key Management
 * Setting Passwords For All WinZip AES Entries By Implementing A Custom Driver
 
     This option bypasses the key manager by subclassing
-    {{{../../apidocs/net/java/truevfs/driver/zip/JarDriver.html}<<<JarDriver>>>}}
+    {{{../../apidocs/net/java/truevfs/comp/zipdriver/JarDriver.html}<<<JarDriver>>>}}
     and overriding the relevant methods for dealing with WinZip AES parameters.
 
 %{snippet|id=newArchiveDetector1|file=${project.build.testSourceDirectory}/net/java/truevfs/driver/zip/sample/KeyManagement.java}
@@ -58,7 +58,7 @@ Key Management
 * Setting Passwords For All WinZip AES Entries By Implementing A Custom View
 
     Another option is to use a prompting key manager by instantiating the class
-    {{{../../apidocs/net/java/truevfs/key/PromptingKeyManagerProvider.html}<<<PromptingKeyManagerProvider>>>}}
+    {{{../../apidocs/net/java/truevfs/key/spec/PromptingKeyManagerContainer.html}<<<PromptingKeyManagerContainer>>>}}
     which applies the Model-View-Controller pattern to manage its key providers.
     Here I simply substitute the default view class with a custom
     implementation.
