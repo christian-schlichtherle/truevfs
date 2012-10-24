@@ -25,18 +25,18 @@ Key Management
 
     Whenever this archive driver class reads or writes a RAES encrypted ZIP
     file, it uses an instance of the interface
-    {{{../../apidocs/net/java/truevfs/key/KeyManagerProvider.html}<<<KeyManagerProvider>>>}}
+    {{{../../apidocs/net/java/truevfs/key/spec/KeyManagerContainer.html}<<<KeyManagerContainer>>>}}
     in order to obtain an instance of the interface
-    {{{../../apidocs/net/java/truevfs/key/KeyManager.html}<<<KeyManager>>>}}
+    {{{../../apidocs/net/java/truevfs/key/spec/KeyManager.html}<<<KeyManager>>>}}
     for the interface
-    {{{../../apidocs/net/java/truevfs/key/param/AesPbeParameters.html}<<<AesPbeParameters>>>}}
+    {{{../../apidocs/net/java/truevfs/key/spec/param/AesPbeParameters.html}<<<AesPbeParameters>>>}}
     and finally obtain an instance of the interface
-    {{{../../apidocs/net/java/truevfs/key/KeyProvider.html}<<<KeyProvider>>>}}
+    {{{../../apidocs/net/java/truevfs/key/spec/KeyProvider.html}<<<KeyProvider>>>}}
     for the prospective archive file.
 
     Because dependency injection is used all over the place in order to resolve
     the implementation classes of the interfaces
-    <<<KeyManagerProvider>>>, <<<KeyManager>>> and <<<KeyProvider>>>, this
+    <<<KeyManagerContainer>>>, <<<KeyManager>>> and <<<KeyProvider>>>, this
     architecture provides several ways to set passwords programmatically.
     In order to set a common password for all RAES encrypted ZIP files
     you need a custom
@@ -58,7 +58,7 @@ Key Management
 * Setting Passwords For All ZIP.RAES Files By Implementing A Custom View
 
     Another option is to use a prompting key manager by instantiating the class
-    {{{../../apidocs/net/java/truevfs/key/PromptingKeyManagerProvider.html}<<<PromptingKeyManagerProvider>>>}}
+    {{{../../apidocs/net/java/truevfs/key/spec/PromptingKeyManagerProvider.html}<<<PromptingKeyManagerProvider>>>}}
     which applies the Model-View-Controller pattern to manage its key providers.
     Here I simply substitute the default view class with a custom
     implementation.
