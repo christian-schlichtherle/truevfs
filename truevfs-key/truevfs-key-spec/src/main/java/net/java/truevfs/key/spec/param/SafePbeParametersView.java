@@ -4,14 +4,14 @@
  */
 package net.java.truevfs.key.spec.param;
 
-import net.java.truevfs.key.spec.PromptingKeyProvider.View;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truevfs.key.spec.PromptingKeyProvider.View;
 
 /**
  * A user interface to prompt for parameters for safe password based encryption.
  * <p>
  * Sub classes must be thread-safe and should have no side effects!
- * 
+ *
  * @param  <P> the type of the safe PBE parameters.
  * @author Christian Schlichtherle
  */
@@ -21,7 +21,7 @@ implements View<P> {
 
     /**
      * Returns new parameters for safe password based encryption.
-     * 
+     *
      * @return New parameters for safe password based encryption.
      */
     protected abstract P newPbeParameters();
