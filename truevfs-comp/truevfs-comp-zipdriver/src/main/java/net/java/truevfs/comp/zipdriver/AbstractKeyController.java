@@ -53,11 +53,9 @@ extends FsDecoratingController {
 
     protected abstract Class<? extends IOException> getKeyExceptionType();
 
-    private @CheckForNull KeyManager<?> getKeyManager() {
-        final KeyManagerContainer container = this.container;
-        return (null != container
-                    ? container
-                    : (this.container = driver.getKeyManagerContainer()))
+    private KeyManager<?> getKeyManager() {
+        final KeyManagerContainer c = this.container;
+        return (null != c ? c : (this.container = driver.getKeyManagerContainer()))
                 .keyManager(getKeyType());
     }
 
@@ -138,10 +136,7 @@ extends FsDecoratingController {
         final FsModel model = getModel();
         final URI mpu = driver.mountPointUri(model);
         final URI fsu = driver.fileSystemUri(model, name.toString());
-        if (!fsu.equals(mpu) || name.isRoot()) {
-            final KeyManager<?> keyManager = getKeyManager();
-            if (null != keyManager) keyManager.delete(fsu);
-        }
+        if (!fsu.equals(mpu) || name.isRoot()) getKeyManager().delete(fsu);
     }
 
     @Override
@@ -153,9 +148,7 @@ extends FsDecoratingController {
         } catch (final FsSyncWarningException ex) {
             builder.warn(ex);
         }
-        final KeyManager<?> keyManager = getKeyManager();
-        if (null != keyManager)
-            keyManager.unlock(driver.mountPointUri(getModel()));
+        getKeyManager().unlock(driver.mountPointUri(getModel()));
         builder.check();
     }
 }

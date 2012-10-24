@@ -4,16 +4,15 @@
  */
 package net.java.truevfs.comp.zipdriver;
 
-import net.java.truevfs.comp.zip.ZipParameters;
-import net.java.truevfs.comp.zip.ZipKeyException;
-import net.java.truevfs.comp.zip.WinZipAesParameters;
-import net.java.truevfs.comp.zip.ZipCryptoParameters;
-import net.java.truevfs.comp.zip.ZipParametersProvider;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Objects;
-import java.util.ServiceConfigurationError;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truevfs.comp.zip.WinZipAesParameters;
+import net.java.truevfs.comp.zip.ZipCryptoParameters;
+import net.java.truevfs.comp.zip.ZipKeyException;
+import net.java.truevfs.comp.zip.ZipParameters;
+import net.java.truevfs.comp.zip.ZipParametersProvider;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.KeyManagerContainer;
@@ -103,7 +102,7 @@ implements ZipParametersProvider, ZipCryptoParameters {
      * characters using the value of the field {@link #charset}, which is the
      * character set actually used to encode entry names and comments in the
      * ZIP file, e.g. UTF-8 or CP437.
-     * 
+     *
      * @see    WinZipAesParameters#getWritePassword(String)
      *         Discussion Of Alternative Character Set Encodings
      * @param  characters the password characters to encode.
@@ -116,10 +115,7 @@ implements ZipParametersProvider, ZipCryptoParameters {
     }
 
     private <K> KeyManager<K> keyManager(Class<K> type) {
-        final KeyManager<K> km = driver.getKeyManagerContainer().keyManager(type);
-        if (null == km)
-            throw new ServiceConfigurationError("No key manager available for " + type + ".");
-        return km;
+        return driver.getKeyManagerContainer().keyManager(type);
     }
 
     private URI resourceUri(String name) {
