@@ -58,7 +58,7 @@ public final class ManySmallEntriesTest {
                 assertTrue(set.add(name));
             }
         }
-        (bb = bbc.bufferDuplicate()).flip();
+        (bb = bbc.getBuffer()).flip();
         assertEquals(ZIP_SIZE, bb.limit());
 
         try (final ZipFile zf = new ZipFile(new ByteBufferChannel(bb))) {
