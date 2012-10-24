@@ -16,11 +16,11 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public class ZipKeyException extends ZipParametersException {
     private static final long serialVersionUID = 5762312735142938698L;
-    
+
     /**
      * Creates a ZIP key exception with
      * the given detail message.
-     * 
+     *
      * @param msg the detail message.
      */
     public ZipKeyException(@CheckForNull String msg) {
@@ -30,7 +30,7 @@ public class ZipKeyException extends ZipParametersException {
     /**
      * Creates a ZIP key exception with
      * the given cause.
-     * 
+     *
      * @param cause the cause for this exception to get thrown.
      */
     public ZipKeyException(@CheckForNull Throwable cause) {
