@@ -16,8 +16,9 @@ import java.util.zip.CRC32;
  * @author Christian Schlichtherle
  */
 final class Crc32InputStream extends CheckedInputStream {
+
     private final ZipEntry entry;
-    boolean closed;
+    private boolean closed;
 
     Crc32InputStream(
             final InputStream in,
