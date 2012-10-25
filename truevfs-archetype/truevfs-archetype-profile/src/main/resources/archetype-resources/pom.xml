@@ -63,11 +63,11 @@
         <!-- Uncomment this module to disable any secret key management,
              regardless of any other KeyManager module which may be present on
              the class path. -->
-        <!--exclusion>
+        <!--dependency>
             <groupId>net.java.truevfs</groupId>
             <artifactId>truevfs-key-disable</artifactId>
             <version>${truevfs.version}</version>
-        </exclusion-->
+        </dependency-->
 
         <!-- Lets hurl the key prompting dialog when entering an invalid key.
              Note that this dependency pulls in truevfs-key-swing as a
