@@ -52,7 +52,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-key-impl</artifactId>
+            <artifactId>truevfs-key-default</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>

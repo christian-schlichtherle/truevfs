@@ -12,9 +12,9 @@
         <version>0.9.4-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truevfs-key-impl</artifactId>
+    <artifactId>truevfs-key-default</artifactId>
 
-    <name>TrueVFS KeyManager Implementation</name>
+    <name>TrueVFS KeyManager Default</name>
     <description>
     The default KeyManager implementation in this module fails to resolve any
     encryption keys.

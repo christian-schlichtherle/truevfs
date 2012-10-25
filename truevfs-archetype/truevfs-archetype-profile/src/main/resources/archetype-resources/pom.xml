@@ -49,7 +49,7 @@
                 </exclusion-->
                 <!--exclusion>
                     <groupId>net.java.truevfs</groupId>
-                    <artifactId>truevfs-key-impl</artifactId>
+                    <artifactId>truevfs-key-default</artifactId>
                 </exclusion-->
                 <!--exclusion>
                     <groupId>net.java.truevfs</groupId>
