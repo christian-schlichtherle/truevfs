@@ -19,7 +19,7 @@ extends KeyManagerTestSuite<PromptingKeyManager<?>> {
     public void testMakePromptingKeyProvider() {
         URI id = URI.create("a");
 
-        PromptingKeyProvider<?> prov = manager.make(id);
+        PromptingKeyProvider<?> prov = manager.access(id);
         assertSame(id, prov.getResource());
     }
 
@@ -28,7 +28,7 @@ extends KeyManagerTestSuite<PromptingKeyManager<?>> {
         URI idA = URI.create("a");
         URI idB = URI.create("b");
 
-        PromptingKeyProvider<?> prov = manager.make(idA);
+        PromptingKeyProvider<?> prov = manager.access(idA);
         assertSame(idA, prov.getResource());
 
         manager.move(idA, idB);
@@ -39,7 +39,7 @@ extends KeyManagerTestSuite<PromptingKeyManager<?>> {
     public void testDeletePromptingKeyProvider() {
         URI id = URI.create("a");
 
-        PromptingKeyProvider<?> prov = manager.make(id);
+        PromptingKeyProvider<?> prov = manager.access(id);
         assertSame(id, prov.getResource());
 
         manager.delete(id);

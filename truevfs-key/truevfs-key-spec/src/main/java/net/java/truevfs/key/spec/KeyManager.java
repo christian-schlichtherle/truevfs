@@ -5,13 +5,12 @@
 package net.java.truevfs.key.spec;
 
 import java.net.URI;
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * A container for key providers for reading and writing protected resources.
+ * A manager of providers of secret keys for accessing protected resources.
  * <p>
- * Implementations must be thread-safe.
+ * Implementations must be safe for multi-threading.
  *
  * @param  <K> The type of the secret keys.
  * @author Christian Schlichtherle
@@ -20,62 +19,37 @@ import javax.annotation.concurrent.ThreadSafe;
 public interface KeyManager<K> {
 
     /**
-     * Returns the mapped key provider for the given protected resource.
-     * If no key provider is mapped yet, then a new key provider gets created
-     * and returned.
+     * Returns a key provider for accessing the identified protected resource.
      *
      * @param  resource the URI of the protected resource.
-     * @return The mapped key provider for the given protected resource.
      */
-    KeyProvider<K> make(URI resource);
+    KeyProvider<K> access(URI resource);
 
     /**
-     * Returns the mapped key provider for the given protected resource or
-     * {@code null} if no key provider is mapped yet.
+     * Notifies this key manager that an {@linkplain #access accessed} resource
+     * has changed its URI.
      *
-     * @param  resource the URI of the protected resource.
-     * @return The mapped key provider for the given protected resource or
-     *         {@code null} if no key provider is mapped yet.
+     * @param oldResource the old URI of the protected resource.
+     * @param newResource the new URI of the protected resource.
      */
-    @CheckForNull KeyProvider<K> get(URI resource);
+    void move(URI oldResource, URI newResource);
 
     /**
-     * Moves the mapped key provider from the URI {@code oldResource} to
-     * {@code newResource}.
+     * Notifies this key manager that an {@linkplain #access accessed} resource
+     * has been deleted.
+     * This implies {@link #release}.
      *
-     * @param  oldResource the old URI of the protected resource.
-     * @param  newResource the new URI of the protected resource.
-     * @return The key provider which was previously mapped for the protected
-     *         resource {@code newResource}.
-     * @throws IllegalArgumentException if {@code oldResource} compares
-     *         {@link URI#equals(Object) equal} to {@code newResource}.
+     * @param resource the URI of the protected resource.
      */
-    @CheckForNull KeyProvider<K> move(URI oldResource, URI newResource);
+    void delete(URI resource);
 
     /**
-     * Deletes the mapped key provider for the given protected resource.
-     * It is an error to use the returned key provider.
+     * Notifies this key manager that an {@linkplain #access accessed} resource
+     * has been released.
+     * The implementation needs to consider that another access-release cycle
+     * may start again later.
      *
-     * @param  resource the URI of the protected resource.
-     * @return The key provider which was previously mapped for the protected
-     *         resource.
+     * @param resource the URI of the protected resource.
      */
-    @CheckForNull KeyProvider<K> delete(URI resource);
-
-    /**
-     * If and only if this key manager prompts users for keys, e.g. a password,
-     * <em>and</em> prompting for the key for the given protected resources had
-     * been cancelled by the user, then the key provider shall get reset to a
-     * state so that the user will get prompted again the next time a key is
-     * requested from the provider.
-     * Otherwise, this method shall have no effect.
-     * <p>
-     * This method is typically used once a file system has been synced in
-     * order to give the user a chance to enter the key the next time the file
-     * system will get accessed again.
-     * Otherwise the key provider would forever stay in its cancelled state.
-     *
-     * @param resource
-     */
-    void unlock(URI resource);
+    void release(URI resource);
 }

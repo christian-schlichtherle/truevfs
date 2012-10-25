@@ -19,21 +19,16 @@ import net.java.truevfs.key.spec.KeyProvider;
 final class DefaultKeyManager extends AbstractKeyManager<Object> {
 
     @Override
-    public KeyProvider<Object> make(URI resource) {
+    public KeyProvider<Object> access(URI resource) {
         return new DefaultKeyProvider();
     }
 
     @Override
-    public KeyProvider<Object> get(URI resource) { return null; }
+    public void move(URI oldResource, URI newResource) { }
 
     @Override
-    public KeyProvider<Object> move(URI oldResource, URI newResource) {
-        return null;
-    }
+    public void delete(URI resource) { }
 
     @Override
-    public KeyProvider<Object> delete(URI resource) { return null; }
-
-    @Override
-    public void unlock(URI resource) { }
+    public void release(URI resource) { }
 }

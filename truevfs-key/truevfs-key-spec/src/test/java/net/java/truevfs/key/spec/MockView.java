@@ -4,9 +4,6 @@
  */
 package net.java.truevfs.key.spec;
 
-import net.java.truevfs.key.spec.SafeKey;
-import net.java.truevfs.key.spec.UnknownKeyException;
-import net.java.truevfs.key.spec.KeyPromptingCancelledException;
 import java.net.URI;
 import java.util.Objects;
 import java.util.Random;

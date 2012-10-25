@@ -4,9 +4,6 @@
  */
 package net.java.truevfs.key.spec;
 
-import net.java.truevfs.key.spec.PromptingKeyProvider;
-import net.java.truevfs.key.spec.PromptingKeyManager;
-import net.java.truevfs.key.spec.UnknownKeyException;
 import java.net.URI;
 import static net.java.truevfs.key.spec.MockView.Action.*;
 import static org.junit.Assert.*;
@@ -30,7 +27,7 @@ public class PromptingKeyProviderTest {
         view.setResource(RESOURCE);
         view.setChangeRequested(true);
         manager = new PromptingKeyManager<>(view);
-        provider = manager.make(RESOURCE);
+        provider = manager.access(RESOURCE);
     }
 
     @Test
