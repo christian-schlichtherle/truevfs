@@ -38,8 +38,7 @@ implements KeyProvider<K> {
     /**
      * Constructs a new safe key provider.
      */
-    protected SafeKeyProvider() {
-    }
+    protected SafeKeyProvider() { }
 
     /**
      * {@inheritDoc}
@@ -110,8 +109,7 @@ implements KeyProvider<K> {
 
     private K getNonNullKey() throws UnknownKeyException {
         final K key = getKey();
-        if (null == key)
-            throw new UnknownKeyException();
+        if (null == key) throw new UnknownKeyException();
         return key;
     }
 
@@ -124,7 +122,6 @@ implements KeyProvider<K> {
     public void setKey(final @CheckForNull K newKey) {
         final K oldKey = this.key;
         this.key = null == newKey ? null : newKey.clone();
-        if (null != oldKey)
-            oldKey.reset();
+        if (null != oldKey) oldKey.reset();
     }
 }
