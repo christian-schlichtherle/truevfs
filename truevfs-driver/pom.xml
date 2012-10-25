@@ -43,15 +43,16 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-kernel-spec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-kernel-spec</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-kernel-impl</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-key-default</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
