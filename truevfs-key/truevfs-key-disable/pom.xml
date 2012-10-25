@@ -12,14 +12,13 @@
         <version>0.9.4-SNAPSHOT</version>
     </parent>
 
-    <artifactId>truevfs-key-default</artifactId>
+    <artifactId>truevfs-key-disable</artifactId>
 
-    <name>TrueVFS KeyManager Default</name>
+    <name>TrueVFS KeyManager Disable</name>
     <description>
-    The KeyManager implementation in this module fails to resolve any secret
-    keys.
-    Its priority is set to Integer.MIN_VALUE, so any other KeyManager
-    module on the class path will take precedence.
+    Putting this module on the class path effectively disables any secret key
+    management, regardless of any other KeyManager module which may be present
+    on the class path.
     </description>
 
     <dependencies>
