@@ -148,7 +148,7 @@ extends FsDecoratingController {
         } catch (final FsSyncWarningException ex) {
             builder.warn(ex);
         }
-        getKeyManager().unlock(driver.mountPointUri(getModel()));
+        getKeyManager().release(driver.mountPointUri(getModel()));
         builder.check();
     }
 }

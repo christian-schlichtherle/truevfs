@@ -31,31 +31,36 @@ extends AbstractKeyManager<K> {
     /**
      * Returns a new key provider.
      *
-     * @return A new key provider.
+     * @param resource the URI of the protected resource.
      */
-    protected abstract P newKeyProvider();
+    protected abstract P newKeyProvider(URI resource);
 
-    @Override
-    public synchronized P make(final URI resource) {
-        P provider = providers.get(Objects.requireNonNull(resource));
-        if (null == provider)
-            providers.put(resource, provider = newKeyProvider());
-        return provider;
-    }
-
-    @Override
-    public synchronized @CheckForNull P get(final URI resource) {
+    /**
+     * Returns the mapped key provider for the given protected resource or
+     * {@code null} if no key provider is mapped.
+     * Note that this method is <em>not</em> synchronized!
+     *
+     * @param resource the URI of the protected resource.
+     */
+    protected final @CheckForNull P get(final URI resource) {
         return providers.get(Objects.requireNonNull(resource));
     }
 
     @Override
-    public synchronized @CheckForNull P move(   final URI oldResource,
-                                                final URI newResource) {
-        if (oldResource.equals(Objects.requireNonNull(newResource)))
-            throw new IllegalArgumentException();
-        final P provider = providers.remove(oldResource);
-        if (null != provider) return providers.put(newResource, provider);
-        else return providers.remove(newResource);
+    public synchronized P access(final URI resource) {
+        P access = get(resource);
+        if (null == access)
+            providers.put(resource, access = newKeyProvider(resource));
+        return access;
+    }
+
+    @Override
+    public synchronized void move(
+            final URI oldResource,
+            final URI newResource) {
+        if (oldResource.equals(Objects.requireNonNull(newResource))) return;
+        final P move = providers.remove(oldResource);
+        if (null != move) providers.put(newResource, move);
     }
 
     /**
@@ -65,9 +70,8 @@ extends AbstractKeyManager<K> {
      * for the secret key had been disabled or cancelled by the user.
      */
     @Override
-    public synchronized @CheckForNull P delete(final URI resource) {
-        final P provider = providers.remove(Objects.requireNonNull(resource));
-        if (null != provider) provider.setKey(null);
-        return provider;
+    public synchronized void delete(final URI resource) {
+        final P delete = providers.remove(Objects.requireNonNull(resource));
+        if (null != delete) delete.setKey(null);
     }
 }

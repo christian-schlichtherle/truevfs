@@ -6,7 +6,6 @@ package net.java.truevfs.key.spec;
 
 import java.net.URI;
 import java.util.Objects;
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.key.spec.PromptingKeyProvider.View;
 
@@ -40,45 +39,39 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
      * @return A new prompting key provider.
      */
     @Override
-    protected final PromptingKeyProvider<K> newKeyProvider() {
-        return new PromptingKeyProvider<>(this);
+    protected final PromptingKeyProvider<K> newKeyProvider(final URI resource) {
+        final PromptingKeyProvider<K> create = new PromptingKeyProvider<>(this);
+        create.setResource(resource);
+        return create;
     }
 
     @Override
-    public final synchronized PromptingKeyProvider<K> make(final URI resource) {
-        final PromptingKeyProvider<K> provider = super.make(resource);
-        provider.setResource(resource);
-        return provider;
+    public synchronized void move(
+            final URI oldResource,
+            final URI newResource) {
+        final PromptingKeyProvider<K> move = get(oldResource);
+        final PromptingKeyProvider<K> delete = get(newResource);
+        super.move(oldResource, newResource);
+        if (null != move) {
+            try {
+                if (null != delete) delete.setResource(null);
+            } finally {
+                move.setResource(newResource);
+            }
+        }
     }
 
     @Override
-    public final synchronized @CheckForNull PromptingKeyProvider<K> get(final URI resource) {
-        final PromptingKeyProvider<K> provider = super.get(resource);
-        if (null != provider) provider.setResource(resource);
-        return provider;
+    public synchronized void delete(final URI resource) {
+        final PromptingKeyProvider<K> delete = get(resource);
+        super.delete(resource);
+        if (null != delete) delete.setResource(null);
     }
 
     @Override
-    public final synchronized @CheckForNull PromptingKeyProvider<K> move(URI oldResource, URI newResource) {
-        final PromptingKeyProvider<K>
-                oldProvider = super.move(oldResource, newResource);
-        if (null != oldProvider) oldProvider.setResource(null);
-        final PromptingKeyProvider<K> newProvider = super.get(newResource);
-        if (null != newProvider) newProvider.setResource(newResource);
-        return oldProvider;
-    }
-
-    @Override
-    public final synchronized @CheckForNull PromptingKeyProvider<K> delete(URI resource) {
-        final PromptingKeyProvider<K> provider = super.delete(resource);
-        if (null != provider) provider.setResource(null);
-        return provider;
-    }
-
-    @Override
-    public synchronized void unlock(URI resource) {
-        final PromptingKeyProvider<K> provider = get(resource);
-        if (null != provider) provider.resetCancelledKey();
+    public synchronized void release(final URI resource) {
+        final PromptingKeyProvider<K> release = get(resource);
+        if (null != release) release.resetCancelledKey();
     }
 
     /**

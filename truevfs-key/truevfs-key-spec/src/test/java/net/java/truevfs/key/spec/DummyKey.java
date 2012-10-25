@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.key.spec;
 
-import net.java.truevfs.key.spec.SafeKey;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
@@ -14,10 +14,8 @@ import javax.annotation.concurrent.NotThreadSafe;
 @NotThreadSafe
 final class DummyKey implements SafeKey<DummyKey> {
 
-    private static volatile int count;
-
-    private final int key = count++;
-    boolean reset;
+    private static final AtomicInteger count = new AtomicInteger();
+    private final int key = count.getAndIncrement();
 
     @Override
     public DummyKey clone() {
@@ -29,17 +27,14 @@ final class DummyKey implements SafeKey<DummyKey> {
     }
 
     @Override
-    public void reset() {
-        reset = true;
-    }
+    public void reset() { }
 
     @Override
+    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     public boolean equals(@CheckForNull Object that) {
         return that instanceof DummyKey && this.key == ((DummyKey) that).key;
     }
 
     @Override
-    public int hashCode() {
-        return key;
-    }
+    public int hashCode() { return key; }
 }

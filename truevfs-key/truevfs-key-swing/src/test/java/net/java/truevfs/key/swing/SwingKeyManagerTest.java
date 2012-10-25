@@ -4,8 +4,6 @@
  */
 package net.java.truevfs.key.swing;
 
-import net.java.truevfs.key.swing.SwingKeyManager;
-import net.java.truevfs.key.swing.SwingAesPbeParametersView;
 import javax.annotation.CheckForNull;
 import net.java.truevfs.key.spec.PromptingKeyManager;
 import net.java.truevfs.key.spec.PromptingKeyManagerTestSuite;
@@ -15,6 +13,7 @@ import net.java.truevfs.key.spec.PromptingKeyManagerTestSuite;
  */
 public class SwingKeyManagerTest
 extends PromptingKeyManagerTestSuite {
+
     @Override
     protected @CheckForNull PromptingKeyManager<?> newKeyManager() {
         return new SwingKeyManager<>(new SwingAesPbeParametersView());

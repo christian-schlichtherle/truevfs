@@ -4,13 +4,9 @@
  */
 package net.java.truevfs.key.spec;
 
-import net.java.truevfs.key.spec.KeyProvider;
-import net.java.truevfs.key.spec.KeyManager;
 import java.net.URI;
-import java.util.Map;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
-import net.java.truevfs.key.spec.sl.KeyManagerMapLocator;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -19,7 +15,8 @@ import org.junit.Test;
  * @author Christian Schlichtherle
  */
 public abstract class KeyManagerTestSuite<M extends KeyManager<?>> {
-    protected M manager = Objects.requireNonNull(newKeyManager());
+
+    final M manager = Objects.requireNonNull(newKeyManager());
 
     protected abstract @CheckForNull M newKeyManager();
 
@@ -28,15 +25,15 @@ public abstract class KeyManagerTestSuite<M extends KeyManager<?>> {
         URI id = URI.create("a");
 
         try {
-            manager.make(null);
+            manager.access(null);
             fail();
         } catch (NullPointerException expected) {
         }
 
-        KeyProvider<?> prov1 = manager.make(id);
+        KeyProvider<?> prov1 = manager.access(id);
         assertNotNull(prov1);
 
-        KeyProvider<?> prov2 = manager.make(id);
+        KeyProvider<?> prov2 = manager.access(id);
         assertSame(prov1, prov2);
     }
 
@@ -63,18 +60,18 @@ public abstract class KeyManagerTestSuite<M extends KeyManager<?>> {
         } catch (NullPointerException expected) {
         }
 
-        assertNull(manager.move(idA, idB));
+        manager.move(idA, idB);
 
-        KeyProvider<?> provA1 = manager.make(idA);
+        KeyProvider<?> provA1 = manager.access(idA);
         assertNotNull(provA1);
 
-        assertNull(manager.move(idA, idB));
+        manager.move(idA, idB);
 
-        KeyProvider<?> provA2 = manager.make(idA);
+        KeyProvider<?> provA2 = manager.access(idA);
         assertNotNull(provA2);
         assertFalse(provA1.equals(provA2));
 
-        KeyProvider<?> provB1 = manager.make(idB);
+        KeyProvider<?> provB1 = manager.access(idB);
         assertNotNull(provB1);
         assertSame(provA1, provB1);
     }
@@ -83,25 +80,16 @@ public abstract class KeyManagerTestSuite<M extends KeyManager<?>> {
     public void testDeleteKeyProvider() {
         URI id = URI.create("a");
 
-        assertNull(manager.delete(id));
+        manager.delete(id);
 
-        KeyProvider<?> prov1 = manager.make(id);
-        assertNotNull(manager.delete(id));
+        KeyProvider<?> prov1 = manager.access(id);
+        manager.delete(id);
+        manager.delete(id);
 
-        assertNull(manager.delete(id));
-
-        KeyProvider<?> prov2 = manager.make(id);
-        assertNotNull(manager.delete(id));
-
-        assertNull(manager.delete(id));
+        KeyProvider<?> prov2 = manager.access(id);
+        manager.delete(id);
+        manager.delete(id);
 
         assertFalse(prov1.equals(prov2));
     }
-
-    /*@Test
-    public void testIsLocatable() {
-        final Map<Class<?>, KeyManager<?>> map = KeyManagerMapLocator.SINGLETON.getKeyManagers();
-        for (final String extension : new ExtensionSet(getExtensions()))
-            assertNotNull(map.get(FsScheme.create(extension)));
-    }*/
 }
