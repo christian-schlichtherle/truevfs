@@ -291,6 +291,11 @@ plug-in to its federated file system space.
             </dependency>
             <dependency>
                 <groupId>net.java.truevfs</groupId>
+                <artifactId>truevfs-key-disable</artifactId>
+                <version>${truevfs.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.truevfs</groupId>
                 <artifactId>truevfs-key-spec</artifactId>
                 <version>${truevfs.version}</version>
             </dependency>

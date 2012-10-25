@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.key.def;
+package net.java.truevfs.key.disabled;
 
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
@@ -16,14 +16,14 @@ import net.java.truevfs.key.spec.spi.KeyManagerMapModifier;
  * {@linkplain DisabledKeyManager#SINGLETON disabled key manager} singleton
  * which fails to resolve any secret keys.
  * Note that the {@link #getPriority} of this modifier is
- * {@link Integer#MIN_VALUE}, so any other modifier on the class path takes
- * precedence.
+ * {@link Integer#MAX_VALUE}, so it takes precedence over any other modifier
+ * on the class path.
  *
  * @since  TrueVFS 0.9.4
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class DefaultAesPbeKeyManagerMapModifier
+public final class DisabledAesPbeKeyManagerMapModifier
 extends KeyManagerMapModifier {
 
     @Override
@@ -32,7 +32,7 @@ extends KeyManagerMapModifier {
         return map;
     }
 
-    /** @return {@link Integer#MIN_VALUE} */
+    /** @return {@link Integer#MAX_VALUE} */
     @Override
-    public int getPriority() { return Integer.MIN_VALUE; }
+    public int getPriority() { return Integer.MAX_VALUE; }
 }

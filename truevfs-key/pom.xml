@@ -22,6 +22,7 @@
         <module>truevfs-key-console</module>
         <module>truevfs-key-hurlfb</module>
         <module>truevfs-key-default</module>
+        <module>truevfs-key-disable</module>
         <module>truevfs-key-spec</module>
         <module>truevfs-key-swing</module>
     </modules>
