@@ -10,4 +10,4 @@
  * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
-package net.java.truevfs.key.impl;
+package net.java.truevfs.key.def;
