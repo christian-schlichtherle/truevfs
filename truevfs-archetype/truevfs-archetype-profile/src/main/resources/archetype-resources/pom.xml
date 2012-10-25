@@ -60,7 +60,9 @@
 
         <!-- Uncomment WANTED modules. Note that this list is NOT complete. -->
 
-        <!-- Lets hurl the key prompting dialog when entering an invalid key. -->
+        <!-- Lets hurl the key prompting dialog when entering an invalid key.
+             Note that this dependency pulls in truevfs-key-swing as a
+             transitive dependency (see exclusion). -->
         <dependency>
             <groupId>net.java.truevfs</groupId>
             <artifactId>truevfs-key-hurlfb</artifactId>
