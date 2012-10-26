@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.key.spec.disabled;
+package net.java.truevfs.key.spec.unknown;
 
 import java.net.URI;
 import javax.annotation.concurrent.ThreadSafe;
@@ -17,16 +17,16 @@ import net.java.truevfs.key.spec.KeyProvider;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class DisabledKeyManager extends AbstractKeyManager<Object> {
+public final class UnknownKeyManager extends AbstractKeyManager<Object> {
 
     /** The singleton instance of this class. */
-    public static final KeyManager<Object> SINGLETON = new DisabledKeyManager();
+    public static final KeyManager<Object> SINGLETON = new UnknownKeyManager();
 
-    private DisabledKeyManager() { }
+    private UnknownKeyManager() { }
 
     @Override
     public KeyProvider<Object> access(URI resource) {
-        return DisabledKeyProvider.SINGLETON;
+        return UnknownKeyProvider.SINGLETON;
     }
 
     @Override
