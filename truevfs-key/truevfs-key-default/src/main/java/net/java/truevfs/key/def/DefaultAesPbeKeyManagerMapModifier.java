@@ -7,13 +7,13 @@ package net.java.truevfs.key.def;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.key.spec.KeyManager;
-import net.java.truevfs.key.spec.disabled.DisabledKeyManager;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
 import net.java.truevfs.key.spec.spi.KeyManagerMapModifier;
+import net.java.truevfs.key.spec.unknown.UnknownKeyManager;
 
 /**
  * This modifier maps the {@link AesPbeParameters} class to the
- * {@linkplain DisabledKeyManager#SINGLETON disabled key manager} singleton
+ * {@linkplain UnknownKeyManager#SINGLETON unknown key manager} singleton
  * which fails to resolve any secret keys.
  * Note that the {@link #getPriority} of this modifier is
  * {@link Integer#MIN_VALUE}, so any other modifier on the class path takes
@@ -28,7 +28,7 @@ extends KeyManagerMapModifier {
 
     @Override
     public Map<Class<?>, KeyManager<?>> apply(final Map<Class<?>, KeyManager<?>> map) {
-        map.put(AesPbeParameters.class, DisabledKeyManager.SINGLETON);
+        map.put(AesPbeParameters.class, UnknownKeyManager.SINGLETON);
         return map;
     }
 

@@ -3,11 +3,11 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Provides the disabled implementation of the interface
- * {@link net.java.truevfs.key.spec.KeyManager}.
+ * Provides the
+ * {@link net.java.truevfs.key.disable.DisableAesPbeKeyManagerMapModifier}.
  *
  * @since  TrueVFS 0.9.4
  * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
-package net.java.truevfs.key.disabled;
+package net.java.truevfs.key.disable;
