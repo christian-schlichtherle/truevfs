@@ -6,6 +6,7 @@ package net.java.truevfs.key.swing.spi;
 
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.services.LocatableDecorator;
+import net.java.truecommons.services.annotations.ServiceSpecification;
 import net.java.truevfs.key.swing.feedback.Feedback;
 import net.java.truevfs.key.swing.sl.InvalidKeyFeedbackLocator;
 
@@ -20,14 +21,12 @@ import net.java.truevfs.key.swing.sl.InvalidKeyFeedbackLocator;
  * {@linkplain #getPriority() priority} so that the product of the decorator
  * service with the greatest number becomes the head of the resulting product
  * chain.
- * <p>
- * Implementations should be thread-safe.
  *
  * @see    FeedbackFactory
  * @see    UnknownKeyFeedbackDecorator
  * @author Christian Schlichtherle
  */
-@ThreadSafe
+@ServiceSpecification
 public abstract class InvalidKeyFeedbackDecorator
 extends LocatableDecorator<Feedback> {
 }

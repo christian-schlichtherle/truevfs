@@ -5,15 +5,17 @@
 package net.java.truevfs.key.swing.feedback;
 
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.services.annotations.ServiceImplementation;
 import net.java.truevfs.key.swing.spi.InvalidKeyFeedbackDecorator;
 
 /**
  * Decorates any given feedback with a
  * {@link TemporarilyDisableDefaultButtonFeedback}.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @Immutable
+@ServiceImplementation
 public final class TemporarilyDisableDefaultButtonFeedbackDecorator
 extends InvalidKeyFeedbackDecorator {
 

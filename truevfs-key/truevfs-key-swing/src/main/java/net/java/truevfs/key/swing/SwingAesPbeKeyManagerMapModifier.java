@@ -7,6 +7,7 @@ package net.java.truevfs.key.swing;
 import java.awt.GraphicsEnvironment;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.services.annotations.ServiceImplementation;
 import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
 import net.java.truevfs.key.spec.spi.KeyManagerMapModifier;
@@ -18,8 +19,10 @@ import net.java.truevfs.key.spec.spi.KeyManagerMapModifier;
  * @author Christian Schlichtherle
  */
 @Immutable
+@ServiceImplementation
 public final class SwingAesPbeKeyManagerMapModifier
 extends KeyManagerMapModifier {
+
     @Override
     public Map<Class<?>, KeyManager<?>> apply(Map<Class<?>, KeyManager<?>> map) {
         map.put(AesPbeParameters.class,

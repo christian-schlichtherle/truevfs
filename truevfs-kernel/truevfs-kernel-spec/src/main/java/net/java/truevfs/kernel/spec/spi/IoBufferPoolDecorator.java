@@ -4,9 +4,9 @@
  */
 package net.java.truevfs.kernel.spec.spi;
 
-import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.cio.IoBufferPool;
 import net.java.truecommons.services.LocatableDecorator;
+import net.java.truecommons.services.annotations.ServiceSpecification;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 
 /**
@@ -22,7 +22,7 @@ import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
  * <p>
  * Implementations should be thread-safe.
  */
-@ThreadSafe
+@ServiceSpecification
 public abstract class IoBufferPoolDecorator
 extends LocatableDecorator<IoBufferPool> {
 }

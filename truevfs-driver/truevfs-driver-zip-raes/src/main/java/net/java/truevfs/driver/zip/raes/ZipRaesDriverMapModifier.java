@@ -6,6 +6,7 @@ package net.java.truevfs.driver.zip.raes;
 
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.services.annotations.ServiceImplementation;
 import net.java.truecommons.shed.ExtensionSet;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
@@ -30,11 +31,13 @@ import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
 </tr>
 </tbody>
 </table>
- * 
+ *
  * @author  Christian Schlichtherle
  */
 @Immutable
+@ServiceImplementation
 public final class ZipRaesDriverMapModifier extends FsDriverMapModifier {
+
     @Override
     public Map<FsScheme, FsDriver> apply(final Map<FsScheme, FsDriver> map) {
         // Select exactly ONE of the following drivers by
