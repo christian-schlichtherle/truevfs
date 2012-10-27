@@ -21,7 +21,7 @@ import net.java.truevfs.key.swing.spi.InvalidKeyFeedbackDecorator;
  *
  * @author Christian Schlichtherle
  */
-public class InvalidKeyFeedbackLocator implements Container<Feedback> {
+public final class InvalidKeyFeedbackLocator implements Container<Feedback> {
 
     /** The singleton instance of this class. */
     public static final InvalidKeyFeedbackLocator

@@ -21,7 +21,7 @@ import net.java.truevfs.key.swing.spi.UnknownKeyFeedbackDecorator;
  *
  * @author Christian Schlichtherle
  */
-public class UnknownKeyFeedbackLocator implements Container<Feedback> {
+public final class UnknownKeyFeedbackLocator implements Container<Feedback> {
 
     /** The singleton instance of this class. */
     public static final UnknownKeyFeedbackLocator
