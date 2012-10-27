@@ -22,7 +22,7 @@ import net.java.truevfs.kernel.spec.spi.FsManagerFactory;
  * @author Christian Schlichtherle
  */
 @Immutable
-public class FsManagerLocator implements Container<FsManager> {
+public final class FsManagerLocator implements Container<FsManager> {
 
     /** The singleton instance of this class. */
     public static final FsManagerLocator SINGLETON = new FsManagerLocator();
