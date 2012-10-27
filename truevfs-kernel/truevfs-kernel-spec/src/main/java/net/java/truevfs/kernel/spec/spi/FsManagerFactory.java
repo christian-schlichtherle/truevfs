@@ -4,8 +4,8 @@
  */
 package net.java.truevfs.kernel.spec.spi;
 
-import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.services.LocatableFactory;
+import net.java.truecommons.services.annotations.ServiceSpecification;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 
@@ -17,12 +17,10 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  * If multiple factory services are locatable on the class path at run time,
  * the service with the greatest {@linkplain #getPriority() priority} gets
  * selected.
- * <p>
- * Implementations should be thread-safe.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
+@ServiceSpecification
 public abstract class FsManagerFactory
 extends LocatableFactory<FsManager> {
 }

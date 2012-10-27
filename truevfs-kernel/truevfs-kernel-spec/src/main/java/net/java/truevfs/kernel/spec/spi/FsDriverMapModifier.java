@@ -5,8 +5,8 @@
 package net.java.truevfs.kernel.spec.spi;
 
 import java.util.Map;
-import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.services.LocatableModifier;
+import net.java.truecommons.services.annotations.ServiceSpecification;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
@@ -22,12 +22,10 @@ import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
  * {@linkplain #getPriority() priority} so that the result of the modifier
  * service with the greatest number becomes the result of the entire
  * modifier chain.
- * <p>
- * Implementations should be thread-safe.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
+@ServiceSpecification
 public abstract class FsDriverMapModifier
 extends LocatableModifier<Map<FsScheme, FsDriver>> {
 }

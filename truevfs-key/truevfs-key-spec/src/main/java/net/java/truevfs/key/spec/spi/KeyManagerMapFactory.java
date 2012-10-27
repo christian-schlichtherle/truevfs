@@ -8,13 +8,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.services.LocatableFactory;
+import net.java.truecommons.services.annotations.ServiceImplementation;
+import net.java.truecommons.services.annotations.ServiceSpecification;
 import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.sl.KeyManagerMapLocator;
 
 /**
  * A service for creating maps of classes to key managers.
- * Note that you can't subclass this class for customization.
- * It solely exists in order to support the
+ * Note that this class solely exists in order to support the
  * {@link KeyManagerMapLocator#SINGLETON}, which will use it to create the root
  * of the driver map which gets subsequently decorated by the
  * {@link KeyManagerMapModifier} implementations found on the class path.
@@ -22,7 +23,9 @@ import net.java.truevfs.key.spec.sl.KeyManagerMapLocator;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class KeyManagerMapFactory
+@ServiceSpecification
+@ServiceImplementation
+public class KeyManagerMapFactory
 extends LocatableFactory<Map<Class<?>, KeyManager<?>>> {
 
     /**

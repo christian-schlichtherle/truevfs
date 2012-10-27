@@ -8,6 +8,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.services.LocatableFactory;
+import net.java.truecommons.services.annotations.ServiceImplementation;
+import net.java.truecommons.services.annotations.ServiceSpecification;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
@@ -23,7 +25,9 @@ import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class FsDriverMapFactory
+@ServiceSpecification
+@ServiceImplementation
+public class FsDriverMapFactory
 extends LocatableFactory<Map<FsScheme, FsDriver>> {
 
     /**

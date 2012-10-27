@@ -6,6 +6,7 @@ package net.java.truevfs.key.disable;
 
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.services.annotations.ServiceImplementation;
 import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
 import net.java.truevfs.key.spec.spi.KeyManagerMapModifier;
@@ -23,6 +24,7 @@ import net.java.truevfs.key.spec.unknown.UnknownKeyManager;
  * @author Christian Schlichtherle
  */
 @Immutable
+@ServiceImplementation
 public final class DisableAesPbeKeyManagerMapModifier
 extends KeyManagerMapModifier {
 

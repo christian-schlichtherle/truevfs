@@ -22,7 +22,7 @@ import net.java.truevfs.comp.jmx.spi.MBeanServerProvider;
  * @author Christian Schlichtherle
  */
 @Immutable
-public class MBeanServerLocator implements Container<MBeanServer> {
+public final class MBeanServerLocator implements Container<MBeanServer> {
 
     /** The singleton instance of this class. */
     public static final MBeanServerLocator SINGLETON = new MBeanServerLocator();

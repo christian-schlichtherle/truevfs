@@ -6,6 +6,7 @@ package net.java.truevfs.driver.jar;
 
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.services.annotations.ServiceImplementation;
 import net.java.truecommons.shed.ExtensionSet;
 import net.java.truevfs.comp.zipdriver.JarDriver;
 import net.java.truevfs.kernel.spec.FsDriver;
@@ -35,7 +36,9 @@ import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
  * @author  Christian Schlichtherle
  */
 @Immutable
+@ServiceImplementation
 public final class JarDriverMapModifier extends FsDriverMapModifier {
+
     @Override
     public Map<FsScheme, FsDriver> apply(final Map<FsScheme, FsDriver> map) {
         final FsDriver driver = new JarDriver();

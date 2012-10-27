@@ -23,6 +23,12 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
+import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
+import static net.java.truecommons.cio.Entry.Type.FILE;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.IoSockets;
+import net.java.truecommons.cio.OutputSocket;
+import net.java.truecommons.services.annotations.ServiceImplementation;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.access.TUriHelper.*;
@@ -32,19 +38,15 @@ import net.java.truevfs.kernel.spec.FsMountPoint;
 import net.java.truevfs.kernel.spec.FsNode;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
 import net.java.truevfs.kernel.spec.FsNodePath;
-import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
-import static net.java.truecommons.cio.Entry.Type.FILE;
-import net.java.truecommons.cio.InputSocket;
-import net.java.truecommons.cio.IoSockets;
-import net.java.truecommons.cio.OutputSocket;
 import org.slf4j.LoggerFactory;
 
 /**
  * A {@link FileSystemProvider} implementation for use with NIO.2.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
+@ServiceImplementation(FileSystemProvider.class)
 public final class TFileSystemProvider extends FileSystemProvider {
 
     /** The scheme of the provider for the public no-arg constructor. */
@@ -66,7 +68,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
 
     /**
      * Obtains a file system provider for the given {@link TPath} URI.
-     * 
+     *
      * @param  name a {@link TPath} URI.
      * @return A file system provider.
      */
@@ -90,7 +92,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * URI {@link #getScheme() scheme} {@value #DEFAULT_SCHEME} for accessing
      * any path within the {@link #getRoot() root mount point} URI
      * {@value #DEFAULT_ROOT_MOUNT_POINT}.
-     * 
+     *
      * @deprecated This constructor is solely provided in order to use this
      * file system provider class with the service location feature of the
      * NIO.2 API!
@@ -114,7 +116,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
 
     /**
      * Returns the default scheme of this provider.
-     * 
+     *
      * @return the default scheme of this provider.
      */
     @Override
@@ -122,7 +124,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
 
     /**
      * Returns the root mount point of this provider.
-     * 
+     *
      * @return The root mount point of this provider.
      */
     FsNodePath getRoot() { return root; }
@@ -157,7 +159,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * If one or more prospective archive files are found, the file system for
      * the innermost prospective archive file is returned.
      * Otherwise, an {@link UnsupportedOperationException} is thrown.
-     * 
+     *
      * @param  path the path to scan for prospective archive files.
      * @param  configuration may contain a {@link TArchiveDetector} for the key
      *         {@link Parameter#ARCHIVE_DETECTOR}.
@@ -191,7 +193,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * If one or more prospective archive files are found, the file system for
      * the innermost prospective archive file is returned.
      * Otherwise, the file system for the innermost directory is returned.
-     * 
+     *
      * @param  uri the {@link TPath} uri to return a file system for.
      * @param  configuration may contain a {@link TArchiveDetector} for the key
      *         {@link Parameter#ARCHIVE_DETECTOR}.
@@ -216,7 +218,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * If one or more prospective archive files are found, the file system for
      * the innermost prospective archive file is returned.
      * Otherwise, the file system for the innermost directory is returned.
-     * 
+     *
      * @param  uri the {@link TPath} uri to return a file system for.
      * @return the file system for the innermost prospective archive file or
      *         directory.
@@ -232,7 +234,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
     /**
      * Obtains a file system for the given path.
      * If a file system doesn't exist yet, it's created.
-     * 
+     *
      * @param  path a path.
      * @return A file system.
      */
@@ -256,7 +258,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * The URI path component is scanned for prospective archive files using
      * the {@link TConfig#current() current configuration}.
      * Any trailing separators in {@code name} current discarded.
-     * 
+     *
      * @param  name the uri to return a {@link TPath} for.
      * @return the {@link TPath}
      * @throws IllegalArgumentException if the given {@code uri} is opaque.

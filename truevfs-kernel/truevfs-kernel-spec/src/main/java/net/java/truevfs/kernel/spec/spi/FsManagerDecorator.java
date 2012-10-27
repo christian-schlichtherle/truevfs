@@ -4,8 +4,8 @@
  */
 package net.java.truevfs.kernel.spec.spi;
 
-import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.services.LocatableDecorator;
+import net.java.truecommons.services.annotations.ServiceSpecification;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 
@@ -19,12 +19,10 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  * {@linkplain #getPriority() priority} so that the product of the decorator
  * service with the greatest number becomes the head of the resulting product
  * chain.
- * <p>
- * Implementations should be thread-safe.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
+@ServiceSpecification
 public abstract class FsManagerDecorator
 extends LocatableDecorator<FsManager> {
 }
