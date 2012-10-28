@@ -209,6 +209,8 @@ private final class FalsePositiveArchiveController(
           if (originalCause ne caught) originalCause addSuppressed caught
           throw originalCause
         case caught =>
+          assert(!caught.isInstanceOf[ControlFlowException]
+                 || caught.isInstanceOf[NeedsLockRetryException])
           caught addSuppressed original // provide full context
           throw caught
       }
