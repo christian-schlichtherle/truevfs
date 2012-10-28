@@ -4,7 +4,8 @@
  */
 package net.java.truevfs.comp.zip;
 
-import java.util.Arrays;
+import java.util.zip.ZipException;
+import net.java.truecommons.io.MutableBuffer;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -34,52 +35,24 @@ public final class ExtraFieldsTest {
     private final ExtraFields fields = new ExtraFields();
 
     @Test
-    public void testGetSet() {
-        assertEquals(0, fields.getDataBlock().length);
-
-        fields.readFrom(serialized, 0, serialized.length);
-        assertEquals(serialized.length, fields.getDataSize());
-
-        serialized[0] = (byte) 0xff;
-
-        byte[] got1 = fields.getDataBlock();
-        assertNotNull(got1);
-        assertNotSame(serialized, got1);
-
-        final byte[] got2 = fields.getDataBlock();
-        assertNotNull(got2);
-        assertNotSame(serialized, got2);
-
-        assertNotSame(got1, got2);
-
-        serialized[0] = (byte) 0x00;
-
-        assertTrue(Arrays.equals(serialized, got1));
-        assertTrue(Arrays.equals(serialized, got2));
-    }
-
-    @Test
-    public void testCollection0() {
-        fields.readFrom(serialized, 0, serialized.length);
-        final ExtraField ef = fields.get(ExtraField.ZIP64_HEADER_ID);
+    public void testCollection1() throws ZipException {
+        fields.parse(MutableBuffer.wrap(serialized));
+        final ExtraField ef = fields.get(ExtraFields.ZIP64_HEADER_ID);
         assertNotNull(ef);
-        assertSame(ef, fields.remove(ExtraField.ZIP64_HEADER_ID));
-        assertNull(fields.get(ExtraField.ZIP64_HEADER_ID));
+        assertSame(ef, fields.remove(ExtraFields.ZIP64_HEADER_ID));
+        assertNull(fields.get(ExtraFields.ZIP64_HEADER_ID));
         assertNull(fields.add(ef));
-        final byte[] got = fields.getDataBlock();
-        assertNotSame(serialized, got);
-        assertTrue(Arrays.equals(serialized, got));
     }
 
     @Test
-    public void testCollection1() {
-        assertEquals(0, fields.getDataBlock().length);
-        final ExtraField ef = new DefaultExtraField(ExtraField.ZIP64_HEADER_ID);
-        assertNull(fields.get(ExtraField.ZIP64_HEADER_ID));
+    public void testCollection2() throws ZipException {
+        assertEquals(0, fields.getTotalSize());
+        final ExtraField
+                ef = new BufferedExtraField(ExtraFields.ZIP64_HEADER_ID, 0);
+        assertNull(fields.get(ExtraFields.ZIP64_HEADER_ID));
         assertNull(fields.add(ef));
-        byte[] got = fields.getDataBlock();
-        assertEquals(4 + ef.getDataSize(), got.length);
-        assertSame(ef, fields.remove(ExtraField.ZIP64_HEADER_ID));
-        assertEquals(0, fields.getDataBlock().length);
+        assertEquals(ef.getTotalSize(), fields.getTotalSize());
+        assertSame(ef, fields.remove(ExtraFields.ZIP64_HEADER_ID));
+        assertEquals(0, fields.getTotalSize());
     }
 }
