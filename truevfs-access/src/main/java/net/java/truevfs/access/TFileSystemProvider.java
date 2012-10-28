@@ -28,7 +28,7 @@ import static net.java.truecommons.cio.Entry.Type.FILE;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.IoSockets;
 import net.java.truecommons.cio.OutputSocket;
-import net.java.truecommons.services.annotations.ServiceImplementation;
+import net.java.truecommons.annotations.ServiceImplementation;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.access.TUriHelper.*;

@@ -6,7 +6,7 @@ package net.java.truevfs.kernel.spec.spi;
 
 import net.java.truecommons.cio.IoBufferPool;
 import net.java.truecommons.services.LocatableDecorator;
-import net.java.truecommons.services.annotations.ServiceSpecification;
+import net.java.truecommons.annotations.ServiceSpecification;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 
 /**

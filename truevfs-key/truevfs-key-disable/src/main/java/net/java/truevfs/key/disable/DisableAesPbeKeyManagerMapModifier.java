@@ -6,7 +6,7 @@ package net.java.truevfs.key.disable;
 
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.services.annotations.ServiceImplementation;
+import net.java.truecommons.annotations.ServiceImplementation;
 import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
 import net.java.truevfs.key.spec.spi.KeyManagerMapModifier;

@@ -6,7 +6,7 @@ package net.java.truevfs.kernel.spec.spi;
 
 import java.util.Map;
 import net.java.truecommons.services.LocatableModifier;
-import net.java.truecommons.services.annotations.ServiceSpecification;
+import net.java.truecommons.annotations.ServiceSpecification;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
