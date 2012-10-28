@@ -13,7 +13,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.io.MutableBuffer;
 import static net.java.truevfs.comp.zip.Constants.EMPTY;
 import static net.java.truevfs.comp.zip.Constants.FORCE_ZIP64_EXT;
-import static net.java.truevfs.comp.zip.ExtraFields.ZIP64_HEADER_ID;
+import static net.java.truevfs.comp.zip.ExtraFieldSet.ZIP64_HEADER_ID;
 
 /**
  * Replacement for {@link java.util.zip.ZipEntry java.util.zip.ZipEntry}.
@@ -113,7 +113,7 @@ public class ZipEntry implements Cloneable {
      * Maps from Header ID [Integer] to extra field [ExtraField].
      * Should be {@code null} or may be empty if no extra fields are used.
      */
-    private @CheckForNull ExtraFields fields;
+    private @CheckForNull ExtraFieldSet fields;
 
     /** Comment field. */
     private @CheckForNull String comment;
@@ -142,7 +142,7 @@ public class ZipEntry implements Cloneable {
         this.size = template.size;
         this.eattr = template.eattr;
         this.offset = template.offset;
-        final ExtraFields templateFields = template.fields;
+        final ExtraFieldSet templateFields = template.fields;
         this.fields = templateFields == null ? null : templateFields.clone();
         this.comment = template.comment;
     }
@@ -156,7 +156,7 @@ public class ZipEntry implements Cloneable {
         } catch (CloneNotSupportedException ex) {
             throw new AssertionError(ex);
         }
-        final ExtraFields fields = this.fields;
+        final ExtraFieldSet fields = this.fields;
         entry.fields = fields == null ? null : fields.clone();
         return entry;
     }
@@ -495,25 +495,25 @@ public class ZipEntry implements Cloneable {
     }
 
     final @Nullable ExtraField getExtraField(int headerId) {
-        final ExtraFields fields = this.fields;
+        final ExtraFieldSet fields = this.fields;
         return fields == null ? null : fields.get(headerId);
     }
 
     final @Nullable ExtraField addExtraField(final ExtraField ef) {
         assert null != ef;
-        ExtraFields fields = this.fields;
-        if (null == fields) this.fields = fields = new ExtraFields();
+        ExtraFieldSet fields = this.fields;
+        if (null == fields) this.fields = fields = new ExtraFieldSet();
         return fields.add(ef);
     }
 
     final @Nullable ExtraField removeExtraField(final int headerId) {
-        final ExtraFields fields = this.fields;
+        final ExtraFieldSet fields = this.fields;
         return null != fields ? fields.remove(headerId) : null;
     }
 
     /**
      * Returns a protective copy of the serialized extra fields.
-     * Note that unlike its template {@link java.util.zip.ZipEntry#dataBlock()},
+     * Note that unlike its template {@link java.util.zip.ZipEntry#getExtra()},
      * this method never returns {@code null}.
      *
      * @return A new byte array holding the serialized extra fields.
@@ -576,11 +576,11 @@ public class ZipEntry implements Cloneable {
     }
 
     private byte[] getExtraFields(final boolean zip64) {
-        ExtraFields fields = this.fields;
+        ExtraFieldSet fields = this.fields;
         if (zip64) {
             final ExtraField ef = composeZip64ExtraField();
             if (null != ef) {
-                fields = null != fields ? fields.clone() : new ExtraFields();
+                fields = null != fields ? fields.clone() : new ExtraFieldSet();
                 fields.add(ef);
             }
         } else {
@@ -601,7 +601,7 @@ public class ZipEntry implements Cloneable {
     private void setExtraFields(final MutableBuffer mb, final boolean zip64)
     throws ZipException {
         if (0 < mb.remaining()) {
-            final ExtraFields fields = new ExtraFields();
+            final ExtraFieldSet fields = new ExtraFieldSet();
             fields.parse(mb);
             try {
                 if (zip64) parseZip64ExtraField(fields);
@@ -656,7 +656,7 @@ public class ZipEntry implements Cloneable {
      * extra field, if present.
      * The ZIP64 Extended Information extra field is <em>not</em> removed.
      */
-    private void parseZip64ExtraField(final ExtraFields fields)
+    private void parseZip64ExtraField(final ExtraFieldSet fields)
     throws ZipException {
         final ExtraField ef = fields.get(ZIP64_HEADER_ID);
         if (null == ef) return;
