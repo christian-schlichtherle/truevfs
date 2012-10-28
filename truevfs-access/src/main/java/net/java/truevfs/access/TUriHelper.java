@@ -1,12 +1,6 @@
 /*
- * Copyright (c) 2012 Schlichtherle IT Services.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *    Schlichtherle IT Services - initial API and implementation and/or initial documentation
+ * Copyright (C) 2005-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package net.java.truevfs.access;
 
@@ -20,7 +14,7 @@ import static net.java.truevfs.kernel.spec.FsNodeName.*;
 
 /**
  * Utility functions for {@link URI}s which represent file system path names.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
@@ -49,7 +43,7 @@ final class TUriHelper {
      * <pre>
      * {@code assert null == new URI("x/").resolve("..").getSchemeSpecificPart();}
      * </pre>
-     * 
+     *
      * @param  uri the URI to fix.
      * @return A fixed URI or {@code uri} if it doesn't need fixing.
      */
