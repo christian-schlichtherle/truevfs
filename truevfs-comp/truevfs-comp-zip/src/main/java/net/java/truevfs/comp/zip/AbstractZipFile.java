@@ -26,12 +26,12 @@ import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.io.BufferedReadOnlyChannel;
 import net.java.truecommons.io.ChannelInputStream;
 import net.java.truecommons.io.IntervalReadOnlyChannel;
+import net.java.truecommons.io.MutableBuffer;
 import net.java.truecommons.io.PowerBuffer;
 import net.java.truecommons.io.ReadOnlyChannel;
 import net.java.truecommons.io.Source;
 import net.java.truecommons.shed.HashMaps;
 import static net.java.truevfs.comp.zip.Constants.*;
-import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
 import static net.java.truevfs.comp.zip.WinZipAesExtraField.VV_AE_2;
 import static net.java.truevfs.comp.zip.WinZipAesUtils.overhead;
 import static net.java.truevfs.comp.zip.ZipEntry.*;
@@ -163,7 +163,7 @@ implements Closeable, Iterable<E> {
     private void checkZipFileSignature(final SeekableByteChannel channel)
     throws IOException {
         final long sig = PowerBuffer
-                .allocate(4)
+                .allocateDirect(4)
                 .littleEndian()
                 .load(channel.position(preamble))
                 .getUInt();
@@ -201,8 +201,8 @@ implements Closeable, Iterable<E> {
             final boolean postambled)
     throws IOException {
         // Search for End of central directory record.
-        final PowerBuffer eocdr = PowerBuffer
-                .allocate(EOCDR_MIN_LEN)
+        final MutableBuffer eocdr = MutableBuffer
+                .allocateDirect(EOCDR_MIN_LEN)
                 .littleEndian();
         final long max = length - EOCDR_MIN_LEN;
         final long min = !postambled && max >= 0xffff ? max - 0xffff : 0;
@@ -246,8 +246,8 @@ implements Closeable, Iterable<E> {
 
             // Check for ZIP64 End Of Central Directory Locator.
             final long eocdlPos = eocdrPos - ZIP64_EOCDL_LEN;
-            final PowerBuffer zip64eocdl = PowerBuffer
-                .allocate(ZIP64_EOCDL_LEN)
+            final MutableBuffer zip64eocdl = MutableBuffer
+                .allocateDirect(ZIP64_EOCDL_LEN)
                 .littleEndian();
             // zip64 end of central dir locator
             // signature                       4 bytes  (0x07064b50)
@@ -276,8 +276,8 @@ implements Closeable, Iterable<E> {
                         "ZIP file spanning/splitting is not supported!");
 
             // Read Zip64 End Of Central Directory Record.
-            final PowerBuffer zip64eocdr = PowerBuffer
-                    .allocate(ZIP64_EOCDR_MIN_LEN)
+            final MutableBuffer zip64eocdr = MutableBuffer
+                    .allocateDirect(ZIP64_EOCDR_MIN_LEN)
                     .littleEndian()
                     .load(channel.position(zip64eocdrPos));
             // zip64 end of central dir
@@ -353,8 +353,8 @@ implements Closeable, Iterable<E> {
             final SeekableByteChannel channel,
             int numEntries)
     throws IOException {
-        final PowerBuffer cfh = PowerBuffer
-                .allocate(CFH_MIN_LEN)
+        final MutableBuffer cfh = MutableBuffer
+                .allocateDirect(CFH_MIN_LEN)
                 .littleEndian();
         final Map<String, E> entries = new LinkedHashMap<>(
                 Math.max(HashMaps.initialCapacity(numEntries), 16));
@@ -365,7 +365,7 @@ implements Closeable, Iterable<E> {
             cfh.limit(CFH_MIN_LEN).load(channel);
             final int gpbf = cfh.position(8).getUShort();
             final int nameLen = cfh.position(28).getUShort();
-            final PowerBuffer name = PowerBuffer
+            final MutableBuffer name = MutableBuffer
                     .allocate(nameLen)
                     .load(channel);
             // See appendix D of PKWARE's ZIP File Format Specification.
@@ -409,14 +409,14 @@ implements Closeable, Iterable<E> {
                 entry.setRawOffset(lfhOff); // must be unmapped!
                 // extra field (variable size)
                 if (0 < extraLen)
-                    entry.setRawExtraFields(PowerBuffer
-                            .allocate(extraLen)
-                            .load(channel)
-                            .array());
+                    entry.setRawExtraFields(MutableBuffer
+                            .allocateDirect(extraLen)
+                            .load(channel));
                 // file comment (variable size)
                 if (0 < commentLen)
                     entry.setRawComment(decode(PowerBuffer
                             .allocate(commentLen)
+                            .littleEndian()
                             .load(channel)
                             .array()));
                 // Re-load virtual offset after ZIP64 Extended Information
@@ -492,8 +492,8 @@ implements Closeable, Iterable<E> {
                 channel = new SafeBufferedReadOnlyChannel(channel(), length);
         while (0 < postamble) {
             long pos = length - postamble;
-            final PowerBuffer lfh = PowerBuffer
-                    .allocate(LFH_MIN_LEN)
+            final MutableBuffer lfh = MutableBuffer
+                    .allocateDirect(LFH_MIN_LEN)
                     .littleEndian()
                     .load(channel.position(pos));
             if (LFH_SIG != lfh.getUInt())
@@ -530,10 +530,9 @@ implements Closeable, Iterable<E> {
                 entry.setRawOffset(mapper.unmap(pos));
                 // extra field (variable size)
                 if (0 < extraLen)
-                    entry.setRawExtraFields(PowerBuffer
-                            .allocate(extraLen)
-                            .load(channel)
-                            .array());
+                    entry.setRawExtraFields(MutableBuffer
+                            .allocateDirect(extraLen)
+                            .load(channel));
 
                 // Process entry contents.
                 if (entry.getGeneralPurposeBitFlag(GPBF_DATA_DESCRIPTOR)) {
@@ -562,7 +561,7 @@ implements Closeable, Iterable<E> {
                                         getCryptoParameters()),
                                     entry));
                         field = (WinZipAesExtraField)
-                                entry.getExtraField(WINZIP_AES_ID);
+                                entry.getExtraField(WinZipAesExtraField.HEADER_ID);
                         method = field.getMethod();
                     }
                     final int bufSize = getBufferSize(entry);
@@ -612,8 +611,8 @@ implements Closeable, Iterable<E> {
                     // We have reconstituted all meta data for the entry.
                     // Next comes the Data Descriptor.
                     // Let's parse and check it.
-                    final PowerBuffer dd = PowerBuffer
-                            .allocate(entry.isZip64ExtensionsRequired()
+                    final MutableBuffer dd = MutableBuffer
+                            .allocateDirect(entry.isZip64ExtensionsRequired()
                                 ? 4 + 8 + 8
                                 : 4 + 4 + 4)
                             .littleEndian()
@@ -900,8 +899,8 @@ implements Closeable, Iterable<E> {
         long pos = entry.getOffset();
         assert UNKNOWN != pos;
         pos = mapper.map(pos);
-        final PowerBuffer lfh = PowerBuffer
-                .allocate(LFH_MIN_LEN)
+        final MutableBuffer lfh = MutableBuffer
+                .allocateDirect(LFH_MIN_LEN)
                 .littleEndian()
                 .load(channel.position(pos));
         if (LFH_SIG != lfh.getUInt())
@@ -940,7 +939,7 @@ implements Closeable, Iterable<E> {
                     check = false;
                 }
                 final WinZipAesExtraField field
-                        = (WinZipAesExtraField) entry.getExtraField(WINZIP_AES_ID);
+                        = (WinZipAesExtraField) entry.getExtraField(WinZipAesExtraField.HEADER_ID);
                 method = field.getMethod();
             }
             if (check) {
@@ -952,8 +951,8 @@ implements Closeable, Iterable<E> {
                     // Note the Data Descriptor's Signature is optional:
                     // All newer apps should write it (and so does TrueVFS),
                     // but older apps might not.
-                    final PowerBuffer dd = PowerBuffer
-                            .allocate(8)
+                    final MutableBuffer dd = MutableBuffer
+                            .allocateDirect(8)
                             .littleEndian()
                             .load(channel.position(pos + entry.getCompressedSize()));
                     localCrc = dd.getUInt();
