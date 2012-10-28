@@ -7,9 +7,9 @@ package net.java.truevfs.comp.jmx.spi;
 import java.lang.management.ManagementFactory;
 import javax.annotation.concurrent.Immutable;
 import javax.management.MBeanServer;
-import net.java.truecommons.services.LocatableProvider;
 import net.java.truecommons.annotations.ServiceImplementation;
 import net.java.truecommons.annotations.ServiceSpecification;
+import net.java.truecommons.services.LocatableProvider;
 import net.java.truevfs.comp.jmx.sl.MBeanServerLocator;
 
 /**

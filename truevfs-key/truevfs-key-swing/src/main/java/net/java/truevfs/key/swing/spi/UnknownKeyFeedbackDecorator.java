@@ -4,9 +4,8 @@
  */
 package net.java.truevfs.key.swing.spi;
 
-import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.services.LocatableDecorator;
 import net.java.truecommons.annotations.ServiceSpecification;
+import net.java.truecommons.services.LocatableDecorator;
 import net.java.truevfs.key.swing.feedback.Feedback;
 import net.java.truevfs.key.swing.sl.UnknownKeyFeedbackLocator;
 
