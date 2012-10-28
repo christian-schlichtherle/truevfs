@@ -5,7 +5,7 @@
 package net.java.truevfs.key.swing.feedback;
 
 import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.services.annotations.ServiceImplementation;
+import net.java.truecommons.annotations.ServiceImplementation;
 import net.java.truevfs.key.swing.spi.InvalidKeyFeedbackDecorator;
 
 /**

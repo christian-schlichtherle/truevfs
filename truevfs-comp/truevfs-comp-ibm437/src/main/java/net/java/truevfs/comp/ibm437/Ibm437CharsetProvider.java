@@ -8,7 +8,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.spi.CharsetProvider;
 import java.util.*;
 import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.services.annotations.ServiceImplementation;
+import net.java.truecommons.annotations.ServiceImplementation;
 
 /**
  * Provides the {@code IBM437} alias {@code CP437} character set.

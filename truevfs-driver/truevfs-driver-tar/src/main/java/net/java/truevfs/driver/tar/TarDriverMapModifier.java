@@ -6,7 +6,7 @@ package net.java.truevfs.driver.tar;
 
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.services.annotations.ServiceImplementation;
+import net.java.truecommons.annotations.ServiceImplementation;
 import net.java.truevfs.comp.tardriver.TarDriver;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;

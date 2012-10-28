@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.java.truecommons</groupId>
         <artifactId>truecommons-parent</artifactId>
-        <version>21</version>
+        <version>22</version>
     </parent>
 
     <groupId>net.java.truevfs</groupId>
@@ -341,6 +341,12 @@ plug-in to its federated file system space.
             </dependency>
             <dependency>
                 <groupId>net.java.truecommons</groupId>
+                <artifactId>truecommons-annotations</artifactId>
+                <version>${truecommons.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.java.truecommons</groupId>
                 <artifactId>truecommons-cio</artifactId>
                 <version>${truecommons.version}</version>
             </dependency>
@@ -365,12 +371,6 @@ plug-in to its federated file system space.
                 <groupId>net.java.truecommons</groupId>
                 <artifactId>truecommons-services</artifactId>
                 <version>${truecommons.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.truecommons</groupId>
-                <artifactId>truecommons-services-annotations</artifactId>
-                <version>${truecommons.version}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>net.java.truecommons</groupId>
@@ -520,16 +520,16 @@ plug-in to its federated file system space.
 
     <profiles>
         <profile>
-            <id>non-transitive-java-main-source-dependencies</id>
+            <id>non-transitive-main-source-dependencies</id>
             <activation>
                 <file>
-                    <exists>src/main/java</exists>
+                    <exists>src/main</exists>
                 </file>
             </activation>
             <dependencies>
                 <dependency>
                     <groupId>net.java.truecommons</groupId>
-                    <artifactId>truecommons-services-annotations</artifactId>
+                    <artifactId>truecommons-annotations</artifactId>
                 </dependency>
             </dependencies>
         </profile>
@@ -541,16 +541,20 @@ plug-in to its federated file system space.
                 </file>
             </activation>
             <dependencies>
-                <!--dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-simple</artifactId>
-                    <scope>test</scope>
-                </dependency-->
                 <dependency>
                     <groupId>ch.qos.logback</groupId>
                     <artifactId>logback-classic</artifactId>
                     <scope>test</scope>
                 </dependency>
+                <dependency>
+                    <groupId>net.java.truecommons</groupId>
+                    <artifactId>truecommons-annotations</artifactId>
+                </dependency>
+                <!--dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                    <scope>test</scope>
+                </dependency-->
             </dependencies>
         </profile>
         <profile>
