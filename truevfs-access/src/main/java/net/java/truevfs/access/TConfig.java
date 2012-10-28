@@ -46,7 +46,7 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  * with its parent.
  * Note that the child thread cannot {@link #close()} the inherited current
  * configuration - this would result in an {@link IllegalStateException}.
- * 
+ *
  * <a name="examples"/><h3>Examples</h3>
  *
  * <a name="global"/><h4>Changing The Global Configuration</h4>
@@ -56,10 +56,10 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  * {@link #current()} method will return the global configuration.
  * This feature is intended to get used during the application setup to change
  * some configuration options with global scope like this:
- * <pre>{@code
+ * <pre><code>
 class MyApplication extends TApplication<IOException> {
 
-    \@Override
+    &#64;Override
     protected void setup() {
         // This should obtain the global configuration.
         TConfig config = TConfig.current();
@@ -72,14 +72,14 @@ class MyApplication extends TApplication<IOException> {
 
     ...
 }
- * }</pre>
- * 
+ * </code></pre>
+ *
  * <a name="local"/><h4>Setting The Archive Detector For The Current Thread</h4>
  * <p>
  * If an application needs to change the configuration for just the current
  * thread rather than changing the global configuration, then the
  * {@link #open()} method needs to get called like this:
- * <pre>{@code
+ * <pre><code>
 TFile file1 = new TFile("file.aff");
 assert !file1.isArchive();
 
@@ -95,7 +95,7 @@ try (TConfig config = TConfig.open()) {
     // Do some I/O here.
     ...
 }
- * }</pre>
+ * </code></pre>
  *
  * <a name="appending"/><h4>Appending To Archive Files For The Current Thread</h4>
  * <p>
@@ -122,7 +122,7 @@ try (TConfig config = TConfig.open()) {
  * operations.
  * You can set this preference in the global configuration as shown above or
  * you can set it on a case-by-case basis as follows:
- * <pre>{@code
+ * <pre><code>
 // We are going to append "entry" to "archive.zip".
 TFile file = new TFile("archive.zip/entry");
 
@@ -140,7 +140,7 @@ try (TConfig config = TConfig.open()) {
         ...
     }
 }
- * }</pre>
+ * </code></pre>
  * <p>
  * Note that it's specific to the archive file system driver if this output
  * option preference is supported or not.
@@ -148,7 +148,7 @@ try (TConfig config = TConfig.open()) {
  * to the default strategy of performing a full archive update whenever
  * required to avoid writing redundant archive entry data.
  * <p>
- * As of TrueVFS 1.0 Beta 1, the support is like this:
+ * As of TrueVFS 0.9, the support is like this:
  * <ul>
  * <li>The drivers of the module TrueVFS Driver ZIP fully support this output
  *     option preference, so it's available for EAR, JAR, WAR, ZIP etc.</li>
@@ -159,39 +159,39 @@ try (TConfig config = TConfig.open()) {
  *     archive entry contents.
  *     You cannot append to an existing TAR file, however.</li>
  * </ul>
- * 
+ *
  * <a name="unit-testing"/><h4>Unit Testing</h4>
  * <p>
  * Using the thread local inheritable configuration stack comes in handy when
  * unit testing, e.g. with JUnit. Consider this pattern:
- * <pre>{@code
+ * <pre><code>
 public class AppTest {
     private TConfig config;
 
-    \@Before
+    &#64;Before
     public void setUp() {
         config = TConfig.open();
         // Let's just recognize ZIP files.
         config.setArchiveDetector(new TArchiveDetector("zip"));
     }
 
-    \@After
+    &#64;After
     public void shutDown() {
         config.close();
     }
 
-    \@Test
+    &#64;Test
     public void testMethod() {
         // Test accessing some ZIP files here.
         ...
     }
 }
- * }</pre>
+ * </code></pre>
  * <p>
  * <b>Disclaimer</b>: Although this classes internally uses an
  * {@link InheritableThreadLocal}, it does not leak memory in multi class
  * loader environments when used appropriately.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @CleanupObligation
@@ -212,7 +212,7 @@ public final class TConfig extends Resource<IllegalStateException> {
      * If no configuration has been {@link #open() pushed} yet, the global
      * configuration gets returned.
      * Note that accessing the global configuration is not thread-safe!
-     * 
+     *
      * @return The current configuration.
      * @see    #open()
      */
@@ -222,7 +222,7 @@ public final class TConfig extends Resource<IllegalStateException> {
      * Creates a new current configuration by copying the current configuration
      * and pushing the copy onto the inheritable thread local configuration
      * stack.
-     * 
+     *
      * @return The new current configuration.
      * @see    #current()
      */
@@ -260,7 +260,7 @@ public final class TConfig extends Resource<IllegalStateException> {
 
     /**
      * Returns the file system manager.
-     * 
+     *
      * @return The file system manager.
      */
     FsManager getManager() {
@@ -273,7 +273,7 @@ public final class TConfig extends Resource<IllegalStateException> {
      * This method is solely provided for testing purposes.
      * Changing this property will show effect upon the next access to the
      * virtual file system.
-     * 
+     *
      * @param manager The file system manager.
      */
     void setManager(final FsManager manager) {
@@ -311,7 +311,7 @@ public final class TConfig extends Resource<IllegalStateException> {
 
     /**
      * Returns the access preferences to apply for file system operations.
-     * 
+     *
      * @return The access preferences to apply for file system operations.
      */
     public BitField<FsAccessOption> getAccessPreferences() {
@@ -323,7 +323,7 @@ public final class TConfig extends Resource<IllegalStateException> {
      * Sets the access preferences to apply for file system operations.
      * Changing this property will show effect upon the next access to the
      * virtual file system.
-     * 
+     *
      * @param  preferences the access preferences.
      * @throws IllegalArgumentException if an option is present in
      *         {@code accessPreferences} which is not present in
@@ -346,7 +346,7 @@ public final class TConfig extends Resource<IllegalStateException> {
     /**
      * Returns {@code true} if and only if the given access option is set in
      * the access preferences.
-     * 
+     *
      * @param  option the access option to test.
      * @return {@code true} if and only if the given access option is set in
      *         the access preferences.
@@ -359,7 +359,7 @@ public final class TConfig extends Resource<IllegalStateException> {
      * Sets or clears the given access option in the access preferences.
      * Changing this property will show effect upon the next access to the
      * virtual file system.
-     * 
+     *
      * @param option the access option to set or clear.
      * @param set {@code true} if you want the option to be set or
      *        {@code false} if you want it to be cleared.
@@ -410,7 +410,7 @@ public final class TConfig extends Resource<IllegalStateException> {
      * Note that in either case the parent directory of the outermost archive
      * file {@code a} must exist - TrueVFS does not automatically create
      * directories in the platform file system!
-     * 
+     *
      * @return The value of the property {@code lenient}, which is {@code true}
      *         if and only if the access preference
      *         {@link FsAccessOption#CREATE_PARENTS} is set in the
@@ -422,7 +422,7 @@ public final class TConfig extends Resource<IllegalStateException> {
      * Sets the value of the property {@code lenient}.
      * Changing this property will show effect upon the next access to the
      * virtual file system.
-     * 
+     *
      * @param lenient the value of the property {@code lenient}.
      */
     public void setLenient(final boolean lenient) {
@@ -435,7 +435,7 @@ public final class TConfig extends Resource<IllegalStateException> {
     /**
      * Pops this configuration off the inheritable
      * thread local configuration stack.
-     * 
+     *
      * @throws IllegalStateException If this configuration is not the
      *         {@linkplain #current() current configuration}.
      */
