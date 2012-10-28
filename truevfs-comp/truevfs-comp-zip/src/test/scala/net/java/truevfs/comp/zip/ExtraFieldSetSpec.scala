@@ -14,10 +14,10 @@ import scala.util._
 
 /** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])
-class ExtraFieldsSpec extends WordSpec with ShouldMatchers with ParallelTestExecution {
+class ExtraFieldSetSpec extends WordSpec with ShouldMatchers with ParallelTestExecution {
 
   "A collection of extra fields" should {
-    val fields = new ExtraFields
+    val fields = new ExtraFieldSet
 
     "throw an IllegalArgumentException when deserializing a data block which does not conform to the ZIP File Format Specification" in {
       val rnd = new Random()

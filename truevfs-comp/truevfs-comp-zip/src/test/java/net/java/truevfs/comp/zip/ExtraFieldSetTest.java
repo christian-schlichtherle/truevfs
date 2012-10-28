@@ -10,11 +10,11 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
- * Tests the collection of {@link ExtraFields Extra Fields}.
+ * Tests the collection of {@link ExtraFieldSet Extra Fields}.
  *
  * @author Christian Schlichtherle
  */
-public final class ExtraFieldsTest {
+public final class ExtraFieldSetTest {
 
     // Serialized Extra Fields in little endian order.
     private final byte[] serialized = new byte[] {
@@ -32,15 +32,15 @@ public final class ExtraFieldsTest {
         (byte) 0xfe, (byte) 0xca, // Header ID: 0xcafe (JarMarker)
         (byte) 0x00, (byte) 0x00, // Data Size: 0x0000
     };
-    private final ExtraFields fields = new ExtraFields();
+    private final ExtraFieldSet fields = new ExtraFieldSet();
 
     @Test
     public void testCollection1() throws ZipException {
         fields.parse(MutableBuffer.wrap(serialized));
-        final ExtraField ef = fields.get(ExtraFields.ZIP64_HEADER_ID);
+        final ExtraField ef = fields.get(ExtraFieldSet.ZIP64_HEADER_ID);
         assertNotNull(ef);
-        assertSame(ef, fields.remove(ExtraFields.ZIP64_HEADER_ID));
-        assertNull(fields.get(ExtraFields.ZIP64_HEADER_ID));
+        assertSame(ef, fields.remove(ExtraFieldSet.ZIP64_HEADER_ID));
+        assertNull(fields.get(ExtraFieldSet.ZIP64_HEADER_ID));
         assertNull(fields.add(ef));
     }
 
@@ -48,11 +48,11 @@ public final class ExtraFieldsTest {
     public void testCollection2() throws ZipException {
         assertEquals(0, fields.getTotalSize());
         final ExtraField
-                ef = new BufferedExtraField(ExtraFields.ZIP64_HEADER_ID, 0);
-        assertNull(fields.get(ExtraFields.ZIP64_HEADER_ID));
+                ef = new BufferedExtraField(ExtraFieldSet.ZIP64_HEADER_ID, 0);
+        assertNull(fields.get(ExtraFieldSet.ZIP64_HEADER_ID));
         assertNull(fields.add(ef));
         assertEquals(ef.getTotalSize(), fields.getTotalSize());
-        assertSame(ef, fields.remove(ExtraFields.ZIP64_HEADER_ID));
+        assertSame(ef, fields.remove(ExtraFieldSet.ZIP64_HEADER_ID));
         assertEquals(0, fields.getTotalSize());
     }
 }

@@ -20,7 +20,7 @@ import net.java.truecommons.io.MutableBuffer;
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
-final class ExtraFields implements Cloneable {
+final class ExtraFieldSet implements Cloneable {
 
     private static final Map<Integer, ExtraFieldFactory>
             registry = new HashMap<>();
@@ -49,9 +49,9 @@ final class ExtraFields implements Cloneable {
     /** Returns a shallow clone of this collection. */
     @Override
     @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
-    public ExtraFields clone() {
+    public ExtraFieldSet clone() {
         try {
-            final ExtraFields clone = (ExtraFields) super.clone();
+            final ExtraFieldSet clone = (ExtraFieldSet) super.clone();
             clone.fields = new TreeMap<>(fields);
             return clone;
         } catch (CloneNotSupportedException cannotHappen) {
