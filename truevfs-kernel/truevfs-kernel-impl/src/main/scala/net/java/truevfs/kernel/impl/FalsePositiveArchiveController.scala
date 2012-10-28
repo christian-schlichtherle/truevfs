@@ -15,7 +15,7 @@ import net.java.truecommons.cio.Entry._;
 /** Implements a chain of responsibility for resolving
   * [[net.java.truevfs.kernel.impl.FalsePositiveArchiveException]]s which
   * may get thrown by its decorated file system controller.
-  * 
+  *
   * This controller is a barrier for
   * [[net.java.truevfs.kernel.impl.FalsePositiveArchiveException]]s:
   * Whenever the decorated controller chain throws a
@@ -24,9 +24,9 @@ import net.java.truecommons.cio.Entry._;
   * If this fails with an [[java.io.IOException]], then the `IOException` which
   * is associated as the original cause of the initial
   * `FalsePositiveArchiveException` gets rethrown.
-  * 
+  *
   * This algorithm effectively achieves the following objectives:
-  * 
+  *
   * 1. False positive archive files get resolved correctly by accessing them as
   *    entities of the parent file system.
   * 2. If the file system driver for the parent file system throws another
@@ -39,7 +39,7 @@ import net.java.truecommons.cio.Entry._;
   *    This is required to make
   *    [[net.java.truevfs.kernel.impl.ControlFlowException]]s work as
   *    designed.
-  * 
+  *
   * As an example consider accessing a RAES encrypted ZIP file:
   * With the default driver configuration of the module TrueVFS ZIP.RAES,
   * whenever a ZIP.RAES file gets mounted, the user is prompted for a password.
@@ -195,21 +195,22 @@ private final class FalsePositiveArchiveController(
       operation(controller, name)
   } // TryChild
 
-  private case class UseParent(ex: FalsePositiveArchiveException) extends State {
-    val originalCause = ex.getCause
+  private case class UseParent(original: FalsePositiveArchiveException)
+  extends State {
+    val originalCause = original.getCause
 
     override def apply[V](name: FsNodeName, operation: Operation[V]) = {
       try {
         operation(getParent, parent(name))
       } catch {
-        case ex: FalsePositiveArchiveException =>
-          throw new AssertionError(ex)
-        case ex: ControlFlowException =>
-          assert(ex.isInstanceOf[NeedsLockRetryException])
-          throw ex
-        case ex: IOException =>
-          if (originalCause != ex) originalCause.addSuppressed(ex)
+        case caught: FalsePositiveArchiveException =>
+          throw new AssertionError(caught)
+        case caught: IOException =>
+          if (originalCause ne caught) originalCause addSuppressed caught
           throw originalCause
+        case caught =>
+          caught addSuppressed original // provide full context
+          throw caught
       }
     }
   } // UseParent
