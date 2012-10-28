@@ -10,9 +10,9 @@ import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.cio.IoBufferPool;
+import net.java.truecommons.cio.MemoryBufferPool;
 import net.java.truecommons.shed.InheritableThreadLocalStack;
 import net.java.truecommons.shed.Resource;
-import net.java.truevfs.kernel.spec.cio.ByteArrayIoBufferPool;
 
 /**
  * A container for configuration options with global or inheritable thread
@@ -148,7 +148,7 @@ public final class TestConfig extends Resource<RuntimeException> {
 
     public IoBufferPool getPool() {
         final IoBufferPool pool = this.pool;
-        return null != pool ? pool : (this.pool = new ByteArrayIoBufferPool(getDataSize()));
+        return null != pool ? pool : (this.pool = new MemoryBufferPool(getDataSize()));
     }
 
     public void setPool(final @CheckForNull IoBufferPool pool) {

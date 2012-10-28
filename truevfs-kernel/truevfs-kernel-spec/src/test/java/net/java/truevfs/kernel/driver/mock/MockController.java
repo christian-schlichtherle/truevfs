@@ -20,7 +20,6 @@ import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.cio.Entry.Type;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
-import net.java.truevfs.kernel.spec.cio.ByteArrayIoBuffer;
 import net.java.truevfs.kernel.spec.io.ThrowingInputStream;
 import net.java.truevfs.kernel.spec.io.ThrowingOutputStream;
 import net.java.truevfs.kernel.spec.io.ThrowingSeekableChannel;
@@ -183,7 +182,7 @@ extends FsAbstractController {
             protected OutputSocket<? extends Entry> socket()
             throws IOException {
                 checkAllExceptions(this);
-                final IoEntry<?> n = new ByteArrayIoBuffer(
+                final IoEntry<?> n = new MemoryBuffer(
                         name.toString(), config.getDataSize());
                 IoEntry<?> o = map.get(name);
                 if (null == o)
