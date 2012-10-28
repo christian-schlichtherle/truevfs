@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.java.truecommons</groupId>
         <artifactId>truecommons-parent</artifactId>
-        <version>20</version>
+        <version>21</version>
     </parent>
 
     <groupId>net.java.truevfs</groupId>
@@ -370,6 +370,7 @@ plug-in to its federated file system space.
                 <groupId>net.java.truecommons</groupId>
                 <artifactId>truecommons-services-annotations</artifactId>
                 <version>${truecommons.version}</version>
+                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>net.java.truecommons</groupId>
@@ -529,7 +530,6 @@ plug-in to its federated file system space.
                 <dependency>
                     <groupId>net.java.truecommons</groupId>
                     <artifactId>truecommons-services-annotations</artifactId>
-                    <optional>true</optional>
                 </dependency>
             </dependencies>
         </profile>
