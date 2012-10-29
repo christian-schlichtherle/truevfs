@@ -134,7 +134,8 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
+public final class FsNodePath
+implements Serializable, Comparable<FsNodePath> {
 
     private static final long serialVersionUID = 5798435461242930648L;
 
@@ -218,8 +219,6 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
      *
      * @param  mountPoint the nullable {@link #getMountPoint() mount point}.
      * @param  nodeName the {@link #getNodeName() node name}.
-     * @throws URISyntaxException if the composed path URI would not conform
-     *         to the syntax constraints for paths.
      */
     public FsNodePath(
             final @CheckForNull FsMountPoint mountPoint,
@@ -365,8 +364,7 @@ public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
      */
     public URI getHierarchicalUri() {
         final URI hierarchical = this.hierarchical;
-        if (null != hierarchical)
-            return hierarchical;
+        if (null != hierarchical) return hierarchical;
         if (uri.isOpaque()) {
             final URI mpu = mountPoint.getHierarchicalUri();
             final URI enu = nodeName.getUri();

@@ -131,7 +131,8 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
  */
 @Immutable
 @edu.umd.cs.findbugs.annotations.SuppressWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
-public final class FsMountPoint implements Serializable, Comparable<FsMountPoint> {
+public final class FsMountPoint
+implements Serializable, Comparable<FsMountPoint> {
 
     private static final long serialVersionUID = 5723957985634276648L;
 
@@ -324,10 +325,11 @@ public final class FsMountPoint implements Serializable, Comparable<FsMountPoint
         assert null == getUri().getRawFragment();
         if (getUri().isOpaque()) {
             assert getUri().getRawSchemeSpecificPart().endsWith(SEPARATOR);
-            assert null != getPath();
-            assert getPath().getUri().isAbsolute();
-            assert null == getPath().getUri().getRawFragment();
-            assert 0 != getPath().getNodeName().getUri().getRawPath().length();
+            final FsNodePath path = getPath();
+            assert null != path;
+            assert path.getUri().isAbsolute();
+            assert null == path.getUri().getRawFragment();
+            assert 0 != path.getNodeName().getUri().getRawPath().length();
         } else {
             assert getUri().normalize() == getUri();
             assert getUri().getRawPath().endsWith(FsNodeName.SEPARATOR);
