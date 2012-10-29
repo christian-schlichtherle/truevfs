@@ -5,7 +5,7 @@
 /**
  * Provides uniform, transparent, thread-safe, read/write access to archive
  * files as if they were virtual directories.
- * 
+ *
  * <h3>The TFile* Classes</h3>
  * <p>
  * This is the primary API for JSE&nbsp;6 compliant TrueVFS applications:
@@ -22,7 +22,7 @@
  * <p>
  * For example, an application could access an entry within an archive file
  * using a {@code TFile} like this:
- * <pre>{@code 
+ * <pre>{@code
  * File entry = new TFile("archive.zip/dir/HälloWörld.txt");
  * Writer writer = new TFileWriter(entry);
  * try {
@@ -43,7 +43,7 @@
  * because these classes were not designed for this task.
  * You have to use a {@code TFile(In|Out)putStream} or a
  * {@code TFile(Reader|Writer)} instead.
- * 
+ *
  * <h3>The TPath Class and its Companions</h3>
  * <p>
  * This is the primary API for JSE&nbsp;7 compliant TrueVFS applications:
@@ -60,7 +60,7 @@
  * <p>
  * For example, an application could access an entry within an archive file
  * which is located at a web site using a {@code TPath} like this:
- * <pre>{@code 
+ * <pre>{@code
  * Path path = new TPath(new URI("http://acme.com/download/everything.tar.gz/README.TXT"));
  * try (InputStream in = Files.newInputStream(path)) {
  *     // Read archive entry contents here.
@@ -74,7 +74,7 @@
  * <p>
  * Mind that a {@code TPath} is a {@code Path}, so you can use it
  * polymorphically with the NIO.2 API.
- * 
+ *
  * <h4><a name="fspsl"/>File System Provider Service Location</h4>
  * <p>
  * This package provides a JSE&nbsp;7 compliant
@@ -118,7 +118,7 @@
  * provider instance without a compile time dependency is to use
  * {@link java.nio.file.FileSystems#newFileSystem(java.nio.file.Path, java.lang.ClassLoader)}.
  * However, this is unlikely to get used in most applications.
- * 
+ *
  * <a name="ru"/><h3>Recommended Usage</h3>
  * <p>
  * To overcome these <a href="#fspsl">constraints</a>, an application should
@@ -127,15 +127,15 @@
  * one of the public class constructors.
  * Once created, it's safe to use {@code TPath} instances polymorphically as
  * {@link java.nio.file.Path} instances.
- * 
+ *
  * <h3>General Constraints</h3>
  * <p>
- * Mind that the NIO.2 API provides some features which are not supported by
- * the current implementation of this package, e.g. a file system permissions
- * or watch services.
+ * Currently, the NIO.2 API provides some features which are not supported by
+ * the implementation of this package, e.g. a file system permissions or watch
+ * services.
  * Consequently, if an unsupported method is called, an
  * {@link java.lang.UnsupportedOperationException} gets thrown.
- * 
+ *
  * <!--h3><a name="comparison"/>{@code TFileSystemProvider} versus
  * {@code ZipFileSystemProvider}</h3>
  * <p>
@@ -172,7 +172,7 @@
  * </tr>
  * </tbody>
  * </table-->
- * 
+ *
  * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
