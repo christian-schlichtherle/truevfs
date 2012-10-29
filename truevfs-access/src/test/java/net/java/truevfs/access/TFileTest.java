@@ -454,69 +454,6 @@ public final class TFileTest extends MockArchiveDriverTestBase {
         }
     }
 
-    @Test
-    public void testSerialization() throws IOException, ClassNotFoundException {
-        final ExceptionListener listener = new ExceptionListener() {
-            @Override
-            public void exceptionThrown(Exception ex) {
-                throw new UndeclaredThrowableException(ex);
-            }
-        };
-
-        for (final String[] params : new String[][] {
-            { "file:/file" },
-            { "mok:file:/archive.mok!/" },
-            { "mok:file:/archive.mok!/entry" },
-            { "mok2:mok1:file:/foo.mok1!/bar.mok2!/" },
-            { "mok2:mok1:file:/foo.mok1!/bar.mok2!/META-INF/MANIFEST.MF" },
-            { "mok2:mok1:file:/föö%20bär.mok1!/föö%20bär.mok2!/föö%20bär" },
-            { "mok:file:/föö%20bär.mok!/föö%20bär" },
-            { "file:/föö%20bär/föö%20bär" },
-            { "mok:file:/foo.mok!/bar" },
-            { "file:/foo/bar" },
-            { "file:/foo/bar" },
-        }) {
-            final TFile original = new TFile(URI.create(params[0]));
-
-            {
-                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                try (final ObjectOutputStream oos = new ObjectOutputStream(bos)) {
-                    oos.writeObject(original);
-                }
-
-                logger.trace("Number of serialized bytes: {}", bos.size());
-
-                final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-                final TFile clone;
-                try (final ObjectInputStream ois = new ObjectInputStream(bis)) {
-                    clone = (TFile) ois.readObject();
-                }
-
-                assertThat(clone, not(sameInstance(original)));
-                assertThat(clone, equalTo(original.getAbsoluteFile()));
-            }
-
-            {
-                final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                try (final XMLEncoder enc = new XMLEncoder(bos)) {
-                    enc.setExceptionListener(listener);
-                    enc.writeObject(original);
-                }
-
-                logger.trace("XML String: ", bos.toString("UTF-8"));
-
-                final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
-                final TFile clone;
-                try (final XMLDecoder dec = new XMLDecoder(bis)) {
-                    clone = (TFile) dec.readObject();
-                }
-
-                assertThat(clone, not(sameInstance(original)));
-                assertThat(clone, equalTo(original.getAbsoluteFile()));
-            }
-        }
-    }
-
     /**
      * Tests issue #TRUEZIP-154.
      * 
