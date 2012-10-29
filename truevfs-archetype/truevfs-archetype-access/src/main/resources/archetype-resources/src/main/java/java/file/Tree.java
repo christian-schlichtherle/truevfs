@@ -19,7 +19,7 @@ import net.java.truevfs.kernel.spec.FsSyncException;
  * on the run time class path and the path name argument is {@code archive.zip}
  * and this file actually exists as a ZIP file, then the tree graph of the
  * directory structure of this ZIP file gets printed.
- * 
+ *
  * @author  Christian Schlichtherle
  */
 public class Tree extends Application<RuntimeException> {
@@ -35,10 +35,8 @@ public class Tree extends Application<RuntimeException> {
 
     @Override
     protected int work(String[] args) {
-        if (0 >= args.length)
-            args = new String[] { "." };
-        for (String arg : args)
-            graph(new TFile(arg), "", "");
+        if (0 >= args.length) args = new String[] { "." };
+        for (String arg : args) graph(new TFile(arg), "", "");
         return 0;
     }
 
@@ -57,8 +55,7 @@ public class Tree extends Application<RuntimeException> {
                             ? LAST_PADDING
                             : DEFAULT_PADDING;
                 int i = 0;
-                while (i < l)
-                    graph(entries[i++], nextPadding, DEFAULT_PREFIX);
+                while (i < l) graph(entries[i++], nextPadding, DEFAULT_PREFIX);
                 graph(entries[i], nextPadding, LAST_PREFIX);
             }
         }
