@@ -4,44 +4,32 @@
  */
 package net.java.truevfs.access;
 
+import java.beans.*;
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.net.*;
 import java.nio.file.FileSystemException;
 import java.util.*;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import javax.annotation.WillClose;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.Immutable;
-import javax.swing.filechooser.FileSystemView;
-import net.java.truecommons.io.Streams;
-import net.java.truecommons.shed.BitField;
-import net.java.truecommons.shed.PathSplitter;
-import net.java.truecommons.shed.Paths;
-import net.java.truecommons.shed.UriBuilder;
-import net.java.truevfs.kernel.spec.*;
-import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
-import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
-import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
-import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
-import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
+import javax.annotation.*;
+import javax.annotation.concurrent.*;
+import static net.java.truecommons.cio.Entry.*;
 import net.java.truecommons.cio.Entry.Access;
 import static net.java.truecommons.cio.Entry.Access.*;
 import net.java.truecommons.cio.Entry.Size;
-import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
-import static net.java.truecommons.cio.Entry.Type.FILE;
-import static net.java.truecommons.cio.Entry.UNKNOWN;
+import static net.java.truecommons.cio.Entry.Type.*;
+import net.java.truecommons.io.*;
+import net.java.truecommons.shed.*;
+import net.java.truevfs.kernel.spec.*;
+import static net.java.truevfs.kernel.spec.FsAccessOption.*;
+import static net.java.truevfs.kernel.spec.FsNodeName.*;
+import static net.java.truevfs.kernel.spec.FsUriModifier.*;
 
 /**
  * A replacement for the class {@link File} which provides transparent
  * read/write access to archive files and their entries as if they were
  * (virtual) directories and files.
  * Because this class actually extends the class {@link File} it can get used
- * polymorphically with the class {@link FileSystemView} or any other class
- * which depends on the class {@link File}.
+ * polymorphic with the class {@link javax.swing.filechooser.FileSystemView}
+ * or any other class which depends on the class {@link File}.
  *
  * <a name="bulkIOMethods"/><h3>Bulk I/O Methods</h3>
  * <p>
@@ -86,7 +74,7 @@ import static net.java.truecommons.cio.Entry.UNKNOWN;
  * Copying</i> (RDC) to achieve best performance:</a>
  * With RDC, the raw entry data is copied from the input entry to the
  * output entry without the need to temporarily reproduce, copy and
- * process the original entry data again.
+ * process the file entry data again.
  * <p>
  * The benefits of this feature are archive driver specific:
  * In case of ZIP files with compressed entries, RDC avoids inflating the
@@ -112,7 +100,7 @@ import static net.java.truecommons.cio.Entry.UNKNOWN;
  * This is fine because it's fail-safe and performs reasonably well when
  * copying archive files (e.g. ZIP entries won't get recompressed thanks to
  * <a href="#RDC">RDC</a>).
- * 
+ *
  * <a name="verbatimCopy"><h4>Making Verbatim Copies of Directory Trees</h4></a>
  * <p>
  * Using the default {@code TArchiveDetector.ALL} results in <i>structural
@@ -144,7 +132,7 @@ import static net.java.truecommons.cio.Entry.UNKNOWN;
  * {@link #toNonArchiveFile()} ensure that prospective archive file detection
  * is inhibited when recursively copying the source and destination directory
  * trees.
- * 
+ *
  * <a name="falsePositives"/><h3>Detecting Archive Files and False Positives</h3>
  * <p>
  * Whenever an archive file extension is detected in a path, this class treats
@@ -401,7 +389,7 @@ public final class TFile extends File implements TRex {
      * like a copy constructor, otherwise the current archive detector gets
      * resolved by calling {@code TConfig.current().getArchiveDetector()} in order
      * to scan the entire path name for prospective archive files.
-     * 
+     *
      * @param file the file object to decorate.
      *        If this is an instance of this class, most of its fields current
      *        copied.
@@ -411,7 +399,7 @@ public final class TFile extends File implements TRex {
     /**
      * Constructs a new {@code TFile} instance which uses the given archive
      * detector to scan its path name for prospective archive files.
-     * 
+     *
      * @param file the file object to decorate.
      *        If this is an instance of this class, most of its fields get
      *        copied.
@@ -450,7 +438,7 @@ public final class TFile extends File implements TRex {
      * Constructs a new {@code TFile} instance which scans its path name for
      * prospective archive files using the current archive detector by calling
      * {@code TConfig.current().getArchiveDetector()}.
-     * 
+     *
      * @param path the path name.
      */
     public TFile(String path) { this(path, (TArchiveDetector) null); }
@@ -617,7 +605,7 @@ public final class TFile extends File implements TRex {
      *         {@link File#File(URI)}.
      * @see    #getNodePath()
      */
-    //@ConstructorProperties("nodePath")
+    @ConstructorProperties("nodePath")
     public TFile(FsNodePath path) { this(path, null); }
 
     /**
@@ -936,7 +924,7 @@ public final class TFile extends File implements TRex {
      * the last path name segment addresses an archive file which is currently
      * mounted by the TrueVFS Kernel - see
      * <a href="#traversal">Traversing Directory Trees</a>!
-     * 
+     *
      * @return A file object for the same path name, but does not detect any
      *         archive file name patterns in the last path name segment.
      * @see    TVFS#umount(TFile)
@@ -949,7 +937,7 @@ public final class TFile extends File implements TRex {
     /**
      * Returns the first parent directory (starting from this file) which is
      * <em>not</em> an archive file or a file located in an archive file.
-     * 
+     *
      * @return The first parent directory (starting from this file) which is
      *         <em>not</em> an archive file or a file located in an archive
      *         file.
@@ -1154,7 +1142,7 @@ public final class TFile extends File implements TRex {
      * In order to support unlimited nesting levels, this method returns
      * a {@code TFile} instance which may recursively address an entry within
      * another archive file.
-     * 
+     *
      * @return The innermost archive path object for this path object.
      */
     public @CheckForNull TFile getInnerArchive() {
@@ -1173,7 +1161,7 @@ public final class TFile extends File implements TRex {
      * This method always returns an undotified path, i.e. all redundant
      * occurences of {@code "."} and {@code ".."} in the path are removed
      * wherever possible.
-     * 
+     *
      * @return The entry name relative to the innermost archive file.
      */
     public @Nullable String getInnerEntryName() {
@@ -1198,7 +1186,7 @@ public final class TFile extends File implements TRex {
      * In order to support unlimited nesting levels, this method returns
      * a {@code TFile} instance which may recursively address an entry within
      * another archive file.
-     * 
+     *
      * @return The enclosing archive file in this path.
      */
     public @CheckForNull TFile getEnclArchive() {
@@ -1215,7 +1203,7 @@ public final class TFile extends File implements TRex {
      * This method always returns an undotified path, i.e. all redundant
      * occurences of {@code "."} and {@code ".."} in the path are removed
      * wherever possible.
-     * 
+     *
      * @return The entry name relative to the enclosing archive file.
      */
     public @Nullable String getEnclEntryName() {
@@ -1225,7 +1213,7 @@ public final class TFile extends File implements TRex {
     /**
      * Returns {@code true} if and only if this file is a
      * {@linkplain #getTopLevelArchive() top level archive file}.
-     * 
+     *
      * @return {@code true} if and only if this file is a
      *         {@linkplain #getTopLevelArchive() top level archive file}.
      */
@@ -1240,7 +1228,7 @@ public final class TFile extends File implements TRex {
      * If this method returns non-{@code null}, the value denotes the longest
      * part of the path which may (but does not need to) exist as a plain file
      * in the platform file system.
-     * 
+     *
      * @return The top level archive file in the path or {@code null} if this
      *         file object does not name an archive file.
      */
@@ -1254,7 +1242,8 @@ public final class TFile extends File implements TRex {
     /**
      * Returns the decorated file object.
      * <p>
-     * If this file instance has been created from a {@link FileSystemView},
+     * If this file instance has been created from a
+     * {@link javax.swing.filechooser.FileSystemView},
      * the decorated file object may be an instance of a sibling class, i.e.
      * another sub-class of {@link File}.
      *
@@ -1277,7 +1266,7 @@ public final class TFile extends File implements TRex {
      * <p>
      * TODO: Consider making this public in order to enable applications to
      * get access to archive entry properties.
-     * 
+     *
      * @return A file system controller if and only if the path denotes an
      *         archive file, or {@code null} otherwise.
      */
@@ -1402,7 +1391,7 @@ public final class TFile extends File implements TRex {
     /**
      * Returns {@code true} if and only if this file denotes a file system
      * root or a UNC (if running on the Windows platform).
-     * 
+     *
      * @return {@code true} if and only if this file denotes a file system
      *         root or a UNC (if running on the Windows platform).
      */
@@ -1414,7 +1403,7 @@ public final class TFile extends File implements TRex {
     /**
      * Returns {@code true} if and only if this file denotes a UNC.
      * Note that this should be relevant on the Windows platform only.
-     * 
+     *
      * @return {@code true} if and only if this file denotes a UNC.
      */
     public boolean isUNC() { return isUNC(getCanOrAbsPath()); }
@@ -1422,7 +1411,7 @@ public final class TFile extends File implements TRex {
     /**
      * Returns {@code true} if and only if this file denotes a UNC.
      * Note that this may be only relevant on the Windows platform.
-     * 
+     *
      * @param  path a file path.
      * @return {@code true} if and only if {@code path} denotes a UNC.
      */
@@ -1503,7 +1492,7 @@ public final class TFile extends File implements TRex {
 
     /**
      * Returns a file system node path which is consistent with {@link #toURI()}.
-     * 
+     *
      * @return A file system node path which is consistent with {@link #toURI()}.
      * @see    #TFile(FsNodePath)
      * @see    #toURI()
@@ -1574,7 +1563,7 @@ public final class TFile extends File implements TRex {
      * URI which would have been returned by this method if the file name of
      * the archive file had not been detected as a prospective archive file
      * and {@code entry} is an empty string.
-     * 
+     *
      * <a name="exampleUris"/><h3>Example URIs</h3>
      * <p>
      * <ul>
@@ -1590,7 +1579,7 @@ public final class TFile extends File implements TRex {
      *     recursively addresses the entry {@code WEB-INF/lib/bar.jar} in the
      *     WAR file addressed by {@code file:/foo.war}.</li>
      * </ul>
-     * 
+     *
      * @return A URI for this file object.
      * @see    #getNodePath()
      */
@@ -1895,7 +1884,7 @@ public final class TFile extends File implements TRex {
      * this method and are never returned.
      * <p>
      * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
-     * 
+     *
      * @return A possibly empty array with the members of this (virtual)
      *         directory or {@code null} if this instance does not refer to a
      *         (virtual) directory or if the virtual directory is inaccessible
@@ -2138,7 +2127,7 @@ public final class TFile extends File implements TRex {
     /**
      * Ensures that a (virtual) directory with {@link #getPath() this path name}
      * exists in the (federated) file system.
-     * 
+     *
      * @param  recursive whether or not any missing ancestor directories shall
      *         get created if required.
      * @return {@code this}
@@ -2173,7 +2162,7 @@ public final class TFile extends File implements TRex {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @deprecated This method just returns a boolean value to indicate failure,
      *             which is hard to analyze.
      * @see #rm()
@@ -2191,7 +2180,7 @@ public final class TFile extends File implements TRex {
 
     /**
      * Equivalent to {@link #rm(File) rm(this)}.
-     * 
+     *
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
@@ -2230,7 +2219,7 @@ public final class TFile extends File implements TRex {
 
     /**
      * Equivalent to {@link #rm_r(File) rm_r(this)}.
-     * 
+     *
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
@@ -2252,7 +2241,7 @@ public final class TFile extends File implements TRex {
      * is used to detect prospective archive files in the directory tree.
      * <p>
      * This file system operation is <em>not</em> atomic.
-     * 
+     *
      * @param  file the file or directory tree.
      *         Note that although this just needs to be a plain {@code File},
      *         archive files and entries are only supported for instances of
@@ -2281,7 +2270,7 @@ public final class TFile extends File implements TRex {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @param  dst the destination file or directory tree.
      *         Note that although this just needs to be a plain {@code File},
      *         archive files and entries are only supported for instances of
@@ -2305,7 +2294,7 @@ public final class TFile extends File implements TRex {
     /**
      * Equivalent to {@link #mv(File, File, TArchiveDetector) mv(this, dst, detector)},
      * where {@code detector} is {@code TConfig.current().getArchiveDetector()}.
-     * 
+     *
      * @param  dst the destination file or directory tree.
      *         Note that although this just needs to be a plain {@code File},
      *         archive files and entries are only supported for instances of
@@ -2332,7 +2321,7 @@ public final class TFile extends File implements TRex {
      * Which attributes are actually copied is specific to the destination
      * file system driver implementation, but the minimum guarantee is to
      * copy the last modification time.
-     * 
+     *
      * @param  src the source file or directory tree.
      *         Note that although this just needs to be a plain {@code File},
      *         archive files and entries are only supported for instances of
@@ -2593,7 +2582,7 @@ public final class TFile extends File implements TRex {
 
     /**
      * Equivalent to {@link #cp(File, File) cp(this, dst)}.
-     * 
+     *
      * @param  dst the destination file.
      *         Note that although this just needs to be a plain {@code File},
      *         archive files and entries are only supported for instances of
@@ -2651,7 +2640,7 @@ public final class TFile extends File implements TRex {
      * </tr>
      * </tbody>
      * </table>
-     * 
+     *
      * @param  src the source file.
      *         Note that although this just needs to be a plain {@code File},
      *         archive files and entries are only supported for instances of
@@ -2669,7 +2658,7 @@ public final class TFile extends File implements TRex {
 
     /**
      * Equivalent to {@link #cp_p(File, File) cp_p(this, dst)}.
-     * 
+     *
      * @param  dst the destination file.
      *         Note that although this just needs to be a plain {@code File},
      *         archive files and entries are only supported for instances of
@@ -2731,7 +2720,7 @@ public final class TFile extends File implements TRex {
      * </tr>
      * </tbody>
      * </table>
-     * 
+     *
      * @param  src the source file.
      *         Note that although this just needs to be a plain {@code File},
      *         archive files and entries are only supported for instances of
@@ -2751,7 +2740,7 @@ public final class TFile extends File implements TRex {
      * Equivalent to
      * {@link #cp_r(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, detector, detector)},
      * where {@code detector} is {@code TConfig.current().getArchiveDetector()}.
-     * 
+     *
      * @param  dst the destination file or directory tree.
      *         Note that although this just needs to be a plain {@code File},
      *         archive files and entries are only supported for instances of
@@ -2770,7 +2759,7 @@ public final class TFile extends File implements TRex {
     /**
      * Equivalent to
      * {@link #cp_r(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, detector, detector)}.
-     * 
+     *
      * @param  src the source file or directory tree.
      *         Note that although this just needs to be a plain {@code File},
      *         archive files and entries are only supported for instances of
@@ -2868,7 +2857,7 @@ public final class TFile extends File implements TRex {
      * Equivalent to
      * {@link #cp_rp(File, File, TArchiveDetector, TArchiveDetector) cp_rp(this, dst, detector, detector)},
      * where {@code detector} is {@code TConfig.current().getArchiveDetector()}.
-     * 
+     *
      * @param  dst the destination file or directory tree.
      *         Note that although this just needs to be a plain {@code File},
      *         archive files and entries are only supported for instances of
@@ -2887,7 +2876,7 @@ public final class TFile extends File implements TRex {
     /**
      * Equivalent to
      * {@link #cp_rp(File, File, TArchiveDetector, TArchiveDetector) cp_rp(this, dst, detector, detector)}.
-     * 
+     *
      * @param  src the source file or directory tree.
      *         Note that although this just needs to be a plain {@code File},
      *         archive files and entries are only supported for instances of
@@ -3268,7 +3257,7 @@ public final class TFile extends File implements TRex {
      * If this archive file has been successfully compacted, then it's left
      * unmounted, so any subsequent operation will mount it again, which
      * requires additional time.
-     * 
+     *
      * @return this
      * @throws IOException On any I/O error.
      * @see    FsAccessOption#GROW
