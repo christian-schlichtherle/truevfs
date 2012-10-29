@@ -20,7 +20,7 @@ import net.java.truevfs.access.TConfig;
  * present on the run time class path and the destination path name is
  * {@code archive.zip}, a ZIP file with this name gets created unless it
  * already exists.
- * 
+ *
  * @author  Christian Schlichtherle
  */
 public class Copy extends Application<IOException> {
@@ -35,7 +35,7 @@ public class Copy extends Application<IOException> {
         TFile src = new TFile(args[0]);
         TFile dst = new TFile(args[1]);
 
-        // TFile  doesn't do path name completion, so we do it manually in
+        // TFile doesn't do path name completion, so let's do it manually in
         // order to emulate the behavior of many copy command line utilities.
         if (TConfig.current().isLenient() && dst.isArchive() || dst.isDirectory())
             dst = new TFile(dst, src.getName());
