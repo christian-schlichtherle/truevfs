@@ -78,8 +78,7 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
             if (schemes.isEmpty())
                 throw new IllegalArgumentException("No file system schemes!");
             final FsDriver driver = Loader.promote(param[1], FsDriver.class);
-            for (final FsScheme scheme : schemes)
-                drivers.put(scheme, driver);
+            for (final FsScheme scheme : schemes) drivers.put(scheme, driver);
         }
         return Collections.unmodifiableMap(drivers);
     }
@@ -89,16 +88,12 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
         try {
             if (o instanceof Collection<?>)
                 for (final Object p : (Collection<?>) o)
-                    if (p instanceof FsScheme)
-                        set.add((FsScheme) p);
-                    else
-                        for (final String q : new ExtensionSet(p.toString()))
-                            set.add(new FsScheme(q));
-            else if (o instanceof FsScheme)
-                set.add((FsScheme) o);
-            else
-                for (final String p : new ExtensionSet(o.toString()))
-                    set.add(new FsScheme(p));
+                    if (p instanceof FsScheme) set.add((FsScheme) p);
+                    else for (final String q : new ExtensionSet(p.toString()))
+                        set.add(new FsScheme(q));
+            else if (o instanceof FsScheme) set.add((FsScheme) o);
+            else for (final String p : new ExtensionSet(o.toString()))
+                set.add(new FsScheme(p));
         } catch (final URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
