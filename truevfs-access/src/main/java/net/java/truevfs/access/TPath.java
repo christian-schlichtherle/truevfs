@@ -4,42 +4,26 @@
  */
 package net.java.truevfs.access;
 
-import java.io.File;
-import static java.io.File.separator;
-import static java.io.File.separatorChar;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.channels.SeekableByteChannel;
+import java.io.*;
+import static java.io.File.*;
+import java.net.*;
+import java.nio.channels.*;
 import java.nio.file.*;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchEvent.Modifier;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.FileAttributeView;
+import java.nio.file.attribute.*;
 import java.util.*;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.shed.BitField;
-import static net.java.truecommons.shed.HashMaps.initialCapacity;
+import javax.annotation.*;
+import javax.annotation.concurrent.*;
+import net.java.truecommons.cio.*;
+import net.java.truecommons.shed.*;
+import static net.java.truecommons.shed.HashMaps.*;
 import net.java.truecommons.shed.Paths;
-import net.java.truecommons.shed.QuotedUriSyntaxException;
-import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.access.TUriHelper.*;
-import net.java.truevfs.kernel.spec.FsAccessOption;
+import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsNode;
-import net.java.truevfs.kernel.spec.FsNodeName;
 import static net.java.truevfs.kernel.spec.FsNodeName.*;
-import net.java.truevfs.kernel.spec.FsNodePath;
-import net.java.truecommons.cio.Entry;
-import net.java.truecommons.cio.InputSocket;
-import net.java.truecommons.cio.OutputSocket;
 
 /**
  * A {@link Path} implementation for use with NIO.2.
@@ -88,11 +72,11 @@ import net.java.truecommons.cio.OutputSocket;
  * assert !file.isArchive();
  * </code></pre>
  * <p>
- * Mind that you should either use {@code archive} or {@code file} from the 
+ * Mind that you should either use {@code archive} or {@code file} from the
  * previous example to do any subsequent I/O - but not both - so that you don't
  * bypass or corrupt the state which gets implicitly associated with any
  * archive file by the TrueVFS Kernel module!
- * 
+ *
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -121,7 +105,7 @@ public final class TPath implements Path, TRex {
      * This constructor scans the {@linkplain TPath#toString() path name} resulting
      * from the segment parameters to detect prospective archive files using
      * the current archive detector {@code TConfig.current().getArchiveDetector()}.
-     * 
+     *
      * <h3>Examples</h3>
 <p>On all platforms:</p>
 <dl>
@@ -144,7 +128,7 @@ public final class TPath implements Path, TRex {
     <dt>Dito with mixed slash separators:</dt>
     <dd><code>Path path = new TPath("\\host/share\archive.zip");</code></dd>
 </dl>
-     * 
+     *
      * @param first the first sub path string.
      * @param more optional sub path strings.
      */
@@ -163,7 +147,7 @@ public final class TPath implements Path, TRex {
      * This constructor scans the {@linkplain TPath#toString() path name} resulting
      * from the segment parameters to detect prospective archive files using
      * the current archive detector {@code TConfig.current().getArchiveDetector()}.
-     * 
+     *
      * @param fileSystem the file system to access.
      * @param first the first sub path string.
      * @param more optional sub path strings.
@@ -195,7 +179,7 @@ public final class TPath implements Path, TRex {
      * This constructor scans the {@linkplain URI#getPath() path component} of
      * the URI to detect prospective archive files using the
      * current archive detector {@code TConfig.current().getArchiveDetector()}.
-     * 
+     *
      * <h3>Examples</h3>
 <p>On all platforms:</p>
 <dl>
@@ -222,7 +206,7 @@ public final class TPath implements Path, TRex {
     <dt>Dito with absolute, hierarchical URI:</dt>
     <dd><code>Path path = new TPath(new URI("file://host/share/archive.zip"));</code></dd>
 </dl>
-     * 
+     *
      * @param  name the path name.
      *         This must be a hierarchical URI with an undefined fragment
      *         component.
@@ -248,7 +232,7 @@ public final class TPath implements Path, TRex {
      * Otherwise, this constructor scans the {@linkplain File#getPath() path name}
      * of the file to detect prospective archive files using the
      * current archive detector {@code TConfig.current().getArchiveDetector()}.
-     * 
+     *
      * <h3>Examples</h3>
 <p>On all platforms:</p>
 <dl>
@@ -269,7 +253,7 @@ public final class TPath implements Path, TRex {
     <dt>Absolute path name with {@link TFile}:</dt>
     <dd><code>Path path = new TPath(new TFile("c:\home\christian\archive.zip"));</code></dd>
 </dl>
-     * 
+     *
      * @param file a file.
      *        If this is an instance of {@link TFile}, its
      *        {@linkplain TFile#getArchiveDetector() archive detector} and
@@ -298,14 +282,14 @@ public final class TPath implements Path, TRex {
      * This constructor scans the {@link Path#toString() path name} of the
      * given path to detect prospective archive files using the
      * current archive detector {@code TConfig.current().getArchiveDetector()}.
-     * 
+     *
      * <h3>Examples</h3>
 <p>On all platforms:</p>
 <dl>
     <dt>Relative path name:</dt>
     <dd><code>Path path = new TPath(Paths.current("app.war/WEB-INF/lib", "lib.jar/META-INF/MANIFEST.MF"));</code></dd>
 </dl>
-     * 
+     *
      * @param path a path.
      */
     public TPath(Path path) {
@@ -493,7 +477,7 @@ public final class TPath implements Path, TRex {
     /**
      * Returns the name of this path as a {@code URI}.
      * Multiple invocations of this method will return the same object.
-     * 
+     *
      * @return the name of this path as a {@code URI}.
      */
     URI getName() { return name; }
@@ -517,7 +501,7 @@ public final class TPath implements Path, TRex {
     /**
      * Returns the {@code TFileSystem} for this path.
      * Multiple invocations of this method will return the same object.
-     * 
+     *
      * @return the {@code TFileSystem} for this path.
      */
     @Override
@@ -543,7 +527,7 @@ public final class TPath implements Path, TRex {
      * inconsistent results and may even cause <strong>loss of data</strong> if
      * the last path name segment addresses an archive file which is currently
      * mounted by the TrueVFS Kernel!
-     * 
+     *
      * @return A path object for the same path name, but does not detect any
      *         archive file name patterns in the last path name segment.
      * @see    TFileSystem#close()
@@ -593,7 +577,7 @@ public final class TPath implements Path, TRex {
     /**
      * Returns the segments of this path's {@link #toString() name}.
      * Multiple invocations of this method will return the same object.
-     * 
+     *
      * @return The segments of this path's {@link #toString() name}.
      */
     private List<String> getElements() {
@@ -765,7 +749,7 @@ public final class TPath implements Path, TRex {
      * {@link #TPath(File) file constructor}, then the returned <em>new</em>
      * {@code TFile} object compares {@link TFile#equals(Object) equal} with
      * that file object, even if it was a plain {@link File} object.
-     * 
+     *
      * @return A {@code TFile} object for this path.
      * @throws UnsupportedOperationException if this path is not file based,
      *         i.e. if the scheme component of the {@link #getUri() URI} of
@@ -804,7 +788,7 @@ public final class TPath implements Path, TRex {
 
     private static final class SegmentIterator implements Iterator<Path> {
         final Iterator<String> i;
-        
+
         SegmentIterator(TPath path) {
             this.i = path.getElements().iterator();
         }
@@ -854,7 +838,7 @@ public final class TPath implements Path, TRex {
 
     /**
      * Returns a hash code which is consistent with {@link #equals(Object)}.
-     * 
+     *
      * @return A hash code which is consistent with {@link #equals(Object)}.
      */
     @Override
@@ -1013,7 +997,7 @@ public final class TPath implements Path, TRex {
             return p1.getNodePath().getMountPoint().equals(p2.getNodePath().getMountPoint())
                     && p1.toString().equals(p2.toString());
         }
-        
+
         int hashCode(TPath p) {
             final Integer hashCode = p.hashCode;
             if (null != hashCode) return hashCode;
