@@ -185,6 +185,8 @@ public interface FsController {
     /**
      * Returns an input socket for reading the contents of the file system
      * node addressed by the given name from the file system.
+     * Note that the assertions for this file system operation equally apply to
+     * any channel or stream created by the returned input socket!
      *
      * @param  options the options for accessing the file system node.
      * @param  name the name of the file system node.
@@ -198,6 +200,8 @@ public interface FsController {
     /**
      * Returns an output socket for writing the contents of the node addressed
      * by the given name to the file system.
+     * Note that the assertions for this file system operation equally apply to
+     * any channel or stream created by the returned output socket!
      *
      * @param  options the options for accessing the file system node.
      *         If {@link FsAccessOption#CREATE_PARENTS} is set, any missing
