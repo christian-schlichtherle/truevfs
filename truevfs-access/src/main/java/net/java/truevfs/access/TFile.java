@@ -7,6 +7,7 @@ package net.java.truevfs.access;
 import java.beans.*;
 import java.io.*;
 import java.net.*;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystemException;
 import java.util.*;
 import javax.annotation.*;
@@ -22,7 +23,7 @@ import static net.java.truevfs.access.ExpertFeature.Level.*;
 import static net.java.truevfs.access.ExpertFeature.Reason.*;
 import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
-//import static net.java.truevfs.kernel.spec.FsAssertion.Level.*;
+import static net.java.truevfs.kernel.spec.FsAssertion.Level.*;
 import static net.java.truevfs.kernel.spec.FsNodeName.*;
 import static net.java.truevfs.kernel.spec.FsUriModifier.*;
 
@@ -1053,12 +1054,14 @@ public final class TFile extends File implements TRex {
     }
 
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     public TFile getCanonicalFile() throws IOException {
         final String p = getCanonicalPath();
         return p.equals(getPath()) ? this : new TFile(p, getArchiveDetector());
     }
 
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     public String getCanonicalPath() throws IOException {
         return file.getCanonicalPath();
     }
@@ -1641,11 +1644,12 @@ public final class TFile extends File implements TRex {
     }
 
     /**
-     * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
+     * {@inheritDoc}
      *
      * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      */
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     public boolean exists() {
         // DONT test existance of getNodeName() in enclArchive because
         // it doesn't need to exist - see
@@ -1671,12 +1675,11 @@ public final class TFile extends File implements TRex {
      * In case a RAES encrypted ZIP file gets mounted, the user gets prompted
      * for its password unless the default configuration for key management
      * hasn't been overridden.
-     * <p>
-     * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
      * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      */
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     public boolean isFile() {
         if (null != innerArchive) {
             try {
@@ -1698,14 +1701,13 @@ public final class TFile extends File implements TRex {
      * In case a RAES encrypted ZIP file gets mounted, the user gets prompted
      * for its password unless the default configuration for key management
      * hasn't been overridden.
-     * <p>
-     * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
      * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      * @see #isArchive
      * @see #isEntry
      */
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     public boolean isDirectory() {
         if (null != innerArchive) {
             try {
@@ -1720,6 +1722,7 @@ public final class TFile extends File implements TRex {
     }
 
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     public boolean canRead() {
         if (null != innerArchive) {
             try {
@@ -1735,6 +1738,7 @@ public final class TFile extends File implements TRex {
     }
 
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     public boolean canWrite() {
         if (null != innerArchive) {
             try {
@@ -1750,6 +1754,7 @@ public final class TFile extends File implements TRex {
     }
 
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     public boolean canExecute() {
         if (null != innerArchive) {
             try {
@@ -1770,10 +1775,9 @@ public final class TFile extends File implements TRex {
      * For entries in a archive file, this is effectively a no-op:
      * The method will only return {@code true} if the entry isExisting and the
      * archive file was mounted read only.
-     * <p>
-     * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      */
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
     public boolean setReadOnly() {
         if (null != innerArchive) {
             try {
@@ -1795,12 +1799,11 @@ public final class TFile extends File implements TRex {
      * In case a RAES encrypted ZIP file gets mounted, the user gets prompted
      * for its password unless the default configuration for key management
      * hasn't been overridden.
-     * <p>
-     * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
      * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      */
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     public long length() {
         if (null != innerArchive) {
             final FsNode entry;
@@ -1823,13 +1826,12 @@ public final class TFile extends File implements TRex {
      * last modified, measured in milliseconds since the epoch (00:00:00 GMT,
      * January 1, 1970), or {@code 0L} if the file does not exist or if an
      * I/O error occurs or if this is a ghost directory in an archive file.
-     * <p>
-     * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
      * @see <a href="package.html">Package description for more information
      *      about ghost directories</a>
      */
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     public long lastModified() {
         if (null != innerArchive) {
             final FsNode entry;
@@ -1857,14 +1859,13 @@ public final class TFile extends File implements TRex {
      * (such as after a normal copy operation).
      * If you want to copy a file's contents as well as its last modification
      * time, use {@link #cp_p(File, File)} instead.
-     * <p>
-     * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
      * @see #cp_p(File, File)
      * @see <a href="package.html">Package description for more information
      *      about ghost directories</a>
      */
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
     public boolean setLastModified(final long time) {
         if (null != innerArchive) {
             try {
@@ -1888,8 +1889,6 @@ public final class TFile extends File implements TRex {
      * <p>
      * <b>Note:</b> Archive entries with absolute paths are ignored by
      * this method and are never returned.
-     * <p>
-     * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
      * @return A possibly empty array with the members of this (virtual)
      *         directory or {@code null} if this instance does not refer to a
@@ -1897,6 +1896,7 @@ public final class TFile extends File implements TRex {
      *         due to an I/O error.
      */
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     public @Nullable String[] list() {
         if (null != innerArchive) {
             final FsNode entry;
@@ -1920,8 +1920,6 @@ public final class TFile extends File implements TRex {
      * <p>
      * <b>Note:</b> Archive entries with absolute paths are ignored by
      * this method and are never returned.
-     * <p>
-     * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
      * @return A possibly empty array with the members of this (virtual)
      *         directory or {@code null} if this instance does not refer to a
@@ -1929,6 +1927,7 @@ public final class TFile extends File implements TRex {
      *         due to an I/O error.
      */
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     public @Nullable String[] list(final @CheckForNull FilenameFilter filter) {
         if (null != innerArchive) {
             final FsNode entry;
@@ -1953,6 +1952,7 @@ public final class TFile extends File implements TRex {
     }
 
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     public @Nullable TFile[] listFiles() {
         return listFiles((FilenameFilter) null);
     }
@@ -1962,10 +1962,9 @@ public final class TFile extends File implements TRex {
      * <p>
      * Note that archive entries with absolute paths are ignored by this
      * method and are never returned.
-     * <p>
-     * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      */
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     public @Nullable TFile[] listFiles(
             final @CheckForNull FilenameFilter filter) {
         if (null != innerArchive) {
@@ -2015,10 +2014,9 @@ public final class TFile extends File implements TRex {
      * <p>
      * Note that archive entries with absolute paths are ignored by this
      * method and are never returned.
-     * <p>
-     * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      */
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     public @Nullable TFile[] listFiles(final @CheckForNull FileFilter filter) {
         if (null != innerArchive) {
             final FsNode entry;
@@ -2060,36 +2058,33 @@ public final class TFile extends File implements TRex {
      * Creates a new, empty file similar to its superclass implementation.
      * Note that this method doesn't create archive files because archive
      * files are virtual directories, not files!
-     * <p>
-     * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
      * @see #mkdir
      */
     @Override
+    @FsAssertion(consistent=YES, isolated=NO)
     public boolean createNewFile() throws IOException {
         if (null != innerArchive) {
-            final FsController controller = innerArchive.getController();
-            final FsNodeName entryName = getNodeName();
-            // This is not really atomic, but should be OK in this case.
-            if (null != controller.node(getAccessPreferences(), entryName))
+            try {
+                innerArchive.getController().make(
+                        getAccessPreferences().set(EXCLUSIVE), getNodeName(),
+                        FILE,
+                        null);
+                return true;
+            } catch (final FileAlreadyExistsException ex) {
                 return false;
-            controller.make(
-                    getAccessPreferences().set(EXCLUSIVE), entryName,
-                    FILE,
-                    null);
-            return true;
+            }
         }
         return file.createNewFile();
     }
 
     @Override
+    @FsAssertion(consistent=YES, isolated=NO)
     public boolean mkdirs() {
-        if (null == innerArchive)
-            return file.mkdirs();
+        if (null == innerArchive) return file.mkdirs();
 
         final TFile parent = getParentFile();
-        if (null != parent && !parent.exists())
-            parent.mkdirs();
+        if (null != parent && !parent.exists()) parent.mkdirs();
 
         // TODO: Profile: return parent.isDirectory() && mkdir();
         // May perform better in certain situations where (probably false
@@ -2111,10 +2106,9 @@ public final class TFile extends File implements TRex {
      * {@code new TFileOutputStream("archive.zip/README");}
      * This assumes the default configuration where
      * {@link TConfig#isLenient TConfig.current().isLenient()} is true.
-     * <p>
-     * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      */
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
     public boolean mkdir() {
         if (null != innerArchive) {
             try {
@@ -2139,6 +2133,7 @@ public final class TFile extends File implements TRex {
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
      */
+    @FsAssertion(consistent=YES, isolated=NO)
     public TFile mkdir(final boolean recursive) throws IOException {
         final TFile innerArchive = this.innerArchive;
         if (null != innerArchive) {
@@ -2175,6 +2170,7 @@ public final class TFile extends File implements TRex {
      */
     @Deprecated
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
     public boolean delete() {
         try {
             rm(this);
@@ -2191,6 +2187,7 @@ public final class TFile extends File implements TRex {
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
     public TFile rm() throws IOException {
         rm(this);
         return this;
@@ -2199,8 +2196,6 @@ public final class TFile extends File implements TRex {
     /**
      * Deletes the given file or directory.
      * If the file is a directory, it must be empty.
-     * <p>
-     * This file system operation is <a href="package-summary.html#atomicity">virtually atomic</a>.
      *
      * @param  file the file or directory.
      *         Note that although this just needs to be a plain {@code File}
@@ -2209,6 +2204,7 @@ public final class TFile extends File implements TRex {
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
     public static void rm(File file) throws IOException {
         if (file instanceof TFile) {
             TFile tfile = (TFile) file;
@@ -2231,6 +2227,7 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
+    @FsAssertion(consistent=YES)
     public TFile rm_r() throws IOException {
         TBIO.rm_r(this, getArchiveDetector());
         return this;
@@ -2256,6 +2253,7 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
+    @FsAssertion(consistent=YES)
     public static void rm_r(File file) throws IOException {
         TBIO.rm_r(file,
                 file instanceof TFile
@@ -2264,6 +2262,7 @@ public final class TFile extends File implements TRex {
     }
 
     @Override
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=YES)
     public void deleteOnExit() {
         if (innerArchive != null) {
             // Support for this operation for archive files and entries has been
@@ -2288,6 +2287,7 @@ public final class TFile extends File implements TRex {
      */
     @Deprecated
     @Override
+    @FsAssertion(consistent=YES)
     public boolean renameTo(final File dst) {
         try {
             mv(this, dst, getArchiveDetector());
@@ -2310,6 +2310,7 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
+    @FsAssertion(consistent=YES)
     public TFile mv(File dst) throws IOException {
         mv(this, dst, TConfig.current().getArchiveDetector());
         return this;
@@ -2344,6 +2345,7 @@ public final class TFile extends File implements TRex {
      */
     @ExpertFeature( level=INTERMEDIATE,
                     value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
+    @FsAssertion(consistent=YES)
     public static void mv(
             final File src,
             final File dst,
@@ -2424,10 +2426,6 @@ public final class TFile extends File implements TRex {
      *   <td>Deletes partial written directories on failure</td>
      *   <td>n/a</td>
      * </tr>
-     * <tr>
-     *   <td>Atomic</td>
-     *   <td>No</td>
-     * </tr>
      * </tbody>
      * </table>
      *
@@ -2437,6 +2435,7 @@ public final class TFile extends File implements TRex {
      * @see    #cat(InputStream, OutputStream)
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
+    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
     public static void cp(  final @WillClose InputStream in,
                             final @WillClose OutputStream out)
     throws IOException {
@@ -2483,10 +2482,6 @@ public final class TFile extends File implements TRex {
      *   <td>Deletes partial written directories on failure</td>
      *   <td>n/a</td>
      * </tr>
-     * <tr>
-     *   <td>Atomic</td>
-     *   <td>No</td>
-     * </tr>
      * </tbody>
      * </table>
      *
@@ -2498,6 +2493,7 @@ public final class TFile extends File implements TRex {
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
+    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
     public static void cp(final @WillClose InputStream in, final File dst)
     throws IOException {
         Objects.requireNonNull(in);
@@ -2558,10 +2554,6 @@ public final class TFile extends File implements TRex {
      *   <td>Deletes partial written directories on failure</td>
      *   <td>n/a</td>
      * </tr>
-     * <tr>
-     *   <td>Atomic</td>
-     *   <td>No</td>
-     * </tr>
      * </tbody>
      * </table>
      *
@@ -2573,6 +2565,7 @@ public final class TFile extends File implements TRex {
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
+    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
     public static void cp(final File src, final @WillClose OutputStream out)
     throws IOException {
         Objects.requireNonNull(out);
@@ -2597,6 +2590,7 @@ public final class TFile extends File implements TRex {
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
      */
+    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
     public TFile cp(File dst) throws IOException {
         TBIO.cp(false, this, dst);
         return this;
@@ -2641,10 +2635,6 @@ public final class TFile extends File implements TRex {
      *   <td>Deletes partial written directories on failure</td>
      *   <td>n/a</td>
      * </tr>
-     * <tr>
-     *   <td>Atomic</td>
-     *   <td>No</td>
-     * </tr>
      * </tbody>
      * </table>
      *
@@ -2659,6 +2649,7 @@ public final class TFile extends File implements TRex {
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
+    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
     public static void cp(File src, File dst) throws IOException {
         TBIO.cp(false, src, dst);
     }
@@ -2673,6 +2664,7 @@ public final class TFile extends File implements TRex {
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
      */
+    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
     public TFile cp_p(File dst) throws IOException {
         TBIO.cp(true, this, dst);
         return this;
@@ -2721,10 +2713,6 @@ public final class TFile extends File implements TRex {
      *   <td>Deletes partial written directories on failure</td>
      *   <td>n/a</td>
      * </tr>
-     * <tr>
-     *   <td>Atomic</td>
-     *   <td>No</td>
-     * </tr>
      * </tbody>
      * </table>
      *
@@ -2739,6 +2727,7 @@ public final class TFile extends File implements TRex {
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
+    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
     public static void cp_p(File src, File dst) throws IOException {
         TBIO.cp(true, src, dst);
     }
@@ -2757,6 +2746,7 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
+    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
     public TFile cp_r(File dst) throws IOException {
         final TArchiveDetector detector = TConfig.current().getArchiveDetector();
         TBIO.cp_r(false, this, dst, detector, detector);
@@ -2785,6 +2775,7 @@ public final class TFile extends File implements TRex {
      */
     @ExpertFeature( level=INTERMEDIATE,
                     value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
+    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
     public static void cp_r(File src, File dst, TArchiveDetector detector)
     throws IOException {
         TBIO.cp_r(false, src, dst, detector, detector);
@@ -2830,10 +2821,6 @@ public final class TFile extends File implements TRex {
      *   <td>Deletes partial written directories on failure</td>
      *   <td>No</td>
      * </tr>
-     * <tr>
-     *   <td>Atomic</td>
-     *   <td>No</td>
-     * </tr>
      * </tbody>
      * </table>
      *
@@ -2855,6 +2842,7 @@ public final class TFile extends File implements TRex {
      */
     @ExpertFeature( level=INTERMEDIATE,
                     value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
+    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
     public static void cp_r(
             File src,
             File dst,
@@ -2878,6 +2866,7 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
+    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
     public TFile cp_rp(File dst) throws IOException {
         final TArchiveDetector detector = TConfig.current().getArchiveDetector();
         TBIO.cp_r(true, this, dst, detector, detector);
@@ -2906,6 +2895,7 @@ public final class TFile extends File implements TRex {
      */
     @ExpertFeature( level=INTERMEDIATE,
                     value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
+    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
     public static void cp_rp(File src, File dst, TArchiveDetector detector)
     throws IOException {
         TBIO.cp_r(true, src, dst, detector, detector);
@@ -2955,10 +2945,6 @@ public final class TFile extends File implements TRex {
      *   <td>Deletes partial written directories on failure</td>
      *   <td>No</td>
      * </tr>
-     * <tr>
-     *   <td>Atomic</td>
-     *   <td>No</td>
-     * </tr>
      * </tbody>
      * </table>
      *
@@ -2980,6 +2966,7 @@ public final class TFile extends File implements TRex {
      */
     @ExpertFeature( level=INTERMEDIATE,
                     value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
+    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
     public static void cp_rp(
             File src,
             File dst,
@@ -3030,10 +3017,6 @@ public final class TFile extends File implements TRex {
      *   <td>Deletes partial written directories on failure</td>
      *   <td>n/a</td>
      * </tr>
-     * <tr>
-     *   <td>Atomic</td>
-     *   <td>No</td>
-     * </tr>
      * </tbody>
      * </table>
      *
@@ -3041,10 +3024,11 @@ public final class TFile extends File implements TRex {
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
+    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
     public void input(final @WillNotClose InputStream in) throws IOException {
         Objects.requireNonNull(in);
         try {
-            try (TFileOutputStream out = new TFileOutputStream(this)) {
+            try (final TFileOutputStream out = new TFileOutputStream(this)) {
                 Streams.cat(in, out);
             }
         } catch (final IOException ex) {
@@ -3094,10 +3078,6 @@ public final class TFile extends File implements TRex {
      *   <td>Deletes partial written directories on failure</td>
      *   <td>n/a</td>
      * </tr>
-     * <tr>
-     *   <td>Atomic</td>
-     *   <td>No</td>
-     * </tr>
      * </tbody>
      * </table>
      *
@@ -3105,9 +3085,10 @@ public final class TFile extends File implements TRex {
      * @throws IOException if any I/O error occurs.
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
+    @FsAssertion(atomic=NO, consistent=YES, isolated=NO, durable=NOT_APPLICABLE)
     public void output(final @WillNotClose OutputStream out) throws IOException {
         Objects.requireNonNull(out);
-        try (TFileInputStream in = new TFileInputStream(this)) {
+        try (final TFileInputStream in = new TFileInputStream(this)) {
             Streams.cat(in, out);
         }
     }
@@ -3160,10 +3141,6 @@ public final class TFile extends File implements TRex {
      *   <td>Deletes partial written directories on failure</td>
      *   <td>n/a</td>
      * </tr>
-     * <tr>
-     *   <td>Atomic</td>
-     *   <td>No</td>
-     * </tr>
      * </tbody>
      * </table>
      *
@@ -3173,8 +3150,9 @@ public final class TFile extends File implements TRex {
      * @see    #cp(InputStream, OutputStream)
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    public static void cat( final @WillNotClose InputStream in,
-                            final @WillNotClose OutputStream out)
+    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
+    public static void cat( @WillNotClose InputStream in,
+                            @WillNotClose OutputStream out)
     throws IOException {
         Streams.cat(in, out);
     }
@@ -3225,7 +3203,7 @@ public final class TFile extends File implements TRex {
      * @throws IOException On any I/O error.
      * @see    FsAccessOption#GROW
      */
-    //@FsAssertion(atomic=YES, consistent=YES, isolated=NO, durable=YES)
+    @FsAssertion(atomic=YES, consistent=YES, isolated=NO, durable=YES)
     public TFile compact() throws IOException {
         // See http://java.net/jira/browse/TRUEZIP-205 .
         if (isTopLevelArchive()) compact(this);
