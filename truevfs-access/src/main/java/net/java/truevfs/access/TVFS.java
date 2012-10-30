@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.Filter;
+import static net.java.truevfs.access.ExpertFeature.Reason.*;
 import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsSyncOptions.UMOUNT;
 import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
@@ -142,6 +143,7 @@ public final class TVFS {
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
+    @ExpertFeature(THE_PRESENCE_OR_ABSENCE_OF_SOME_OPTIONS_MAY_YIELD_UNWANTED_SIDE_EFFECTS)
     public static void sync(FsSyncOption... options)
     throws FsSyncWarningException, FsSyncException {
         sync(FsSyncOptions.of(options));
@@ -163,6 +165,7 @@ public final class TVFS {
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
+    @ExpertFeature(THE_PRESENCE_OR_ABSENCE_OF_SOME_OPTIONS_MAY_YIELD_UNWANTED_SIDE_EFFECTS)
     public static void sync(BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
         sync(Filter.ACCEPT_ANY, options);
@@ -186,6 +189,7 @@ public final class TVFS {
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
+    @ExpertFeature(THE_PRESENCE_OR_ABSENCE_OF_SOME_OPTIONS_MAY_YIELD_UNWANTED_SIDE_EFFECTS)
     public static void sync(TFile tree, FsSyncOption... options)
     throws FsSyncWarningException, FsSyncException {
         sync(tree, FsSyncOptions.of(options));
@@ -209,6 +213,7 @@ public final class TVFS {
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
+    @ExpertFeature(THE_PRESENCE_OR_ABSENCE_OF_SOME_OPTIONS_MAY_YIELD_UNWANTED_SIDE_EFFECTS)
     public static void sync(TFile tree, BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
         sync(mountPoint(tree), options);
@@ -232,6 +237,7 @@ public final class TVFS {
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
+    @ExpertFeature(THE_PRESENCE_OR_ABSENCE_OF_SOME_OPTIONS_MAY_YIELD_UNWANTED_SIDE_EFFECTS)
     public static void sync(FsMountPoint tree, FsSyncOption... options)
     throws FsSyncWarningException, FsSyncException {
         sync(tree, FsSyncOptions.of(options));
@@ -255,6 +261,7 @@ public final class TVFS {
      *         archive entry stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
+    @ExpertFeature(THE_PRESENCE_OR_ABSENCE_OF_SOME_OPTIONS_MAY_YIELD_UNWANTED_SIDE_EFFECTS)
     public static void sync(FsMountPoint tree, BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
         sync(new FsControllerFilter(tree), options);
