@@ -18,17 +18,18 @@ import java.util.Set;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.shed.BitField;
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
-import net.java.truevfs.kernel.spec.FsNode;
-import net.java.truevfs.kernel.spec.FsNodeName;
-import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 import net.java.truecommons.cio.Entry;
 import static net.java.truecommons.cio.Entry.PosixEntity.*;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.IoBuffer;
 import net.java.truecommons.cio.OutputSocket;
+import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.FsAbstractNode;
+import net.java.truevfs.kernel.spec.FsAccessOption;
+import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
+import net.java.truevfs.kernel.spec.FsNode;
+import net.java.truevfs.kernel.spec.FsNodeName;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 
 /**
  * Adapts a {@link Path} instance to a {@link FsNode}.
@@ -36,7 +37,7 @@ import net.java.truecommons.cio.OutputSocket;
  * @author Christian Schlichtherle
  */
 @Immutable
-class FileNode extends FsNode implements IoBuffer {
+class FileNode extends FsAbstractNode implements IoBuffer {
 
     private static final Path CURRENT_DIRECTORY = Paths.get(".");
 

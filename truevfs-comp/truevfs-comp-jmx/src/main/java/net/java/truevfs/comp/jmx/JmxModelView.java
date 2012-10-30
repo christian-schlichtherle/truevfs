@@ -186,7 +186,8 @@ extends StandardMBean implements JmxModelMXBean {
             node = null;
         }
         if (null != node) return node;
-        final class DummyNode extends FsNode {
+
+        class DummyNode extends FsAbstractNode {
             @Override
             public String getName() { return en.toString(); }
 
@@ -206,7 +207,8 @@ extends StandardMBean implements JmxModelMXBean {
             public Boolean isPermitted(Access type, Entity entity) {
                 return null;
             }
-        }
+        } // DumyNode
+
         return new DummyNode();
     }
 

@@ -7,8 +7,8 @@ package net.java.truevfs.kernel.spec;
 import java.util.*;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truecommons.shed.BitField;
 import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
+import net.java.truecommons.shed.BitField;
 
 /**
  * A covariant file system node maintains a map of
@@ -16,13 +16,13 @@ import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
  * {@link #setKey(Entry.Type) key} property to determine the archive entry
  * in the map to which it forwards calls to {@link #getEntry()},
  * {@link #getSize(Size)}, {@link #getTime(Access)} etc.
- * 
+ *
  * @param  <E> the type of the mapped archive entries.
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public final class FsCovariantNode<E extends FsArchiveEntry>
-extends FsNode implements Cloneable {
+extends FsAbstractNode implements Cloneable {
 
     private final String name;
     private EnumMap<Type, E> map = new EnumMap<>(Type.class);
@@ -31,14 +31,14 @@ extends FsNode implements Cloneable {
 
     /**
      * Constructs a new covariant file system node with the given path.
-     * 
+     *
      * @param path the file system path.
      */
     public FsCovariantNode(String path) { name = path.toString(); }
 
     /**
      * Returns a deep clone of this covariant file system node.
-     * 
+     *
      * @param  driver the archive driver to use for cloning the mapped archive
      *         entries.
      * @return A deep clone of this covariant file system node.
@@ -69,7 +69,7 @@ extends FsNode implements Cloneable {
     /**
      * Returns {@code true} if and only if the name of this covariant node
      * identifies it as a root node.
-     * 
+     *
      * @return {@code true} if and only if the name of this covariant node
      *         identifies it as a root node.
      */
@@ -83,7 +83,7 @@ extends FsNode implements Cloneable {
      * Note that an arbitrary property value may get returned:
      * The initial value is {@code null} and even if it's not {@code null},
      * no node of this type needs to be mapped.
-     * 
+     *
      * @return the type of the file system node to which calls to
      *         {@link #getEntry()}, {@link #getSize(Size)},
      *         {@link #getTime(Access)} et al shall get forwarded.
@@ -97,7 +97,7 @@ extends FsNode implements Cloneable {
      * If the given type is {@code null} or no file system node of this type
      * is mappeed, then any subsequent call to these methods will fail with a
      * {@link NullPointerException}.
-     * 
+     *
      * @param type the type of the file system node to which calls to
      *        {@link #getEntry()}, {@link #getSize(Size)},
      *        {@link #getTime(Access)} et al shall get forwarded.
@@ -108,7 +108,7 @@ extends FsNode implements Cloneable {
      * Maps the given type to the given archive entry.
      * As a side effect, the {@link #getKey() key} property is set to the given
      * type.
-     * 
+     *
      * @param type the type to map.
      * @param entry the archive entry to map.
      * @return The previously mapped archive entry.
@@ -119,7 +119,7 @@ extends FsNode implements Cloneable {
 
     /**
      * Removes the archive entry for the given type from the map.
-     * 
+     *
      * @param type the type to remove.
      * @return The previously mapped archive entry.
      */
@@ -127,7 +127,7 @@ extends FsNode implements Cloneable {
 
     /**
      * Returns the archive entry for the given type.
-     * 
+     *
      * @param type the type of the archive entry to lookup.
      * @return The archive entry for the given type.
      */
@@ -144,7 +144,7 @@ extends FsNode implements Cloneable {
      * A collection of the mapped entries.
      * This is a bidirectional view: Any change is reflected in the map and
      * vice versa.
-     * 
+     *
      * @return a collection of the mapped entries
      */
     public Collection<E> getEntries() { return map.values(); }
@@ -168,7 +168,7 @@ extends FsNode implements Cloneable {
      * Returns the size mapped for the {@link #getKey() key} property.
      */
     @Override
-    public long getSize(Size type) {
+    public long getSize(final Size type) {
         if (DIRECTORY == key) return UNKNOWN; // TODO: Evaluate 0
         return map.get(key).getSize(type);
     }
