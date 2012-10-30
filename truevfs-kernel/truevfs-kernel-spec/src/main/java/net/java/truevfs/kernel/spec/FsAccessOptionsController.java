@@ -54,7 +54,7 @@ class EncryptionJarDriver extends JarDriver {
  * <p>
  * Mind that this is just sample code - for encryption, you should generally
  * prefer the TrueZIP Driver ZIP.RAES for its increased security level!
- * 
+ *
  * @since  TrueVFS 0.9.2
  * @author Christian Schlichtherle
  */
@@ -66,7 +66,7 @@ public abstract class FsAccessOptionsController extends FsDecoratingController {
 
     /**
      * Maps the given access options.
-     * 
+     *
      * @param  options the access options to map.
      * @return The mapped access options.
      */
@@ -81,6 +81,12 @@ public abstract class FsAccessOptionsController extends FsDecoratingController {
     @Override
     public final void checkAccess(BitField<FsAccessOption> options, FsNodeName name, BitField<Access> types) throws IOException {
         controller.checkAccess(map(options), name, types);
+    }
+
+    @Override
+    public final void setReadOnly(BitField<FsAccessOption> options, FsNodeName name)
+    throws IOException {
+        controller.setReadOnly(map(options), name);
     }
 
     @Override

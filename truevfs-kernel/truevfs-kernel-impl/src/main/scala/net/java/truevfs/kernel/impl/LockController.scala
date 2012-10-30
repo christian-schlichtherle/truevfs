@@ -16,13 +16,13 @@ import java.nio.channels._
 import javax.annotation.concurrent._
 
 /** Provides read/write locking for multi-threaded access by its clients.
-  * 
+  *
   * This controller is a barrier for
   * [[net.java.truevfs.kernel.impl.NeedsWriteLockException]]s:
   * Whenever the decorated controller chain throws a `NeedsWriteLockException`,
   * the read lock gets released before the write lock gets acquired and the
   * operation gets retried.
-  * 
+  *
   * This controller is also an emitter of and a barrier for
   * [[net.java.truevfs.kernel.impl.NeedsLockRetryException]]s:
   * If a lock can't get immediately acquired, then a `NeedsLockRetryException`
@@ -31,7 +31,7 @@ import javax.annotation.concurrent._
   * `LockController` for the first visited file system is found.
   * This controller will then pause the current thread for a small random
   * amount of milliseconds before retrying the operation.
-  * 
+  *
   * @see    LockingStrategy
   * @author Christian Schlichtherle
   */
@@ -46,8 +46,8 @@ extends ArchiveController[E] {
   abstract override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
     timedReadOrWriteLocked(super.checkAccess(options, name, types))
 
-  abstract override def setReadOnly(name: FsNodeName) =
-    timedLocked(writeLock)(super.setReadOnly(name))
+  abstract override def setReadOnly(options: AccessOptions, name: FsNodeName) =
+    timedLocked(writeLock)(super.setReadOnly(options, name))
 
   abstract override def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]) =
     timedLocked(writeLock)(super.setTime(options, name, times))

@@ -7,14 +7,14 @@ package net.java.truevfs.comp.inst;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsDecoratingController;
 import net.java.truevfs.kernel.spec.FsNodeName;
-import net.java.truecommons.cio.Entry;
-import net.java.truecommons.cio.InputSocket;
-import net.java.truecommons.cio.OutputSocket;
 
 /**
  * @param  <M> the type of the mediator.

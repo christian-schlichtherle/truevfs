@@ -40,10 +40,10 @@ class AspectControllerTest extends WordSpec with ShouldMatchers with MockitoSuga
         verify(delegate) checkAccess (null, null, null)
       }
 
-      "setReadOnly(*)" in {
-        controller setReadOnly null
+      "setReadOnly(**)" in {
+        controller setReadOnly (null, null)
         verify(controller) apply any()
-        verify(delegate) setReadOnly null
+        verify(delegate) setReadOnly (null, null)
       }
 
       "setTime(*, *, *)" in {

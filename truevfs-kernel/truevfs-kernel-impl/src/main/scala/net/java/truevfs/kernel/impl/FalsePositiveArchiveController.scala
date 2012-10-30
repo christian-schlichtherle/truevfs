@@ -73,8 +73,8 @@ private final class FalsePositiveArchiveController(
   override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
     apply(name, (c, n) => c checkAccess (options, n, types))
 
-  override def setReadOnly(name: FsNodeName) =
-    apply(name, (c, n) => c setReadOnly n)
+  override def setReadOnly(options: AccessOptions, name: FsNodeName) =
+    apply(name, (c, n) => c setReadOnly (options, n))
 
   override def setTime(options: AccessOptions, name: FsNodeName, times: java.util.Map[Access, java.lang.Long]) =
     apply(name, (c, n) => c setTime (options, n, times))

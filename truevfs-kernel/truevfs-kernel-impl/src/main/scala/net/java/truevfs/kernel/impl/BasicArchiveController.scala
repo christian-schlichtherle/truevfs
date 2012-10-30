@@ -35,7 +35,7 @@ import net.java.truecommons.cio.Entry.Type._;
   * This is important because client applications may repeatedly call them.
   * Of course, depending on the calling context, some or all of the archive
   * file's data may be lost in this case.
-  * 
+  *
   * @tparam E the type of the archive entries.
   * @author Christian Schlichtherle
   */
@@ -54,8 +54,8 @@ extends ArchiveController[E] {
   def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
     autoMount(options) checkAccess (options, name, types)
 
-  def setReadOnly(name: FsNodeName) =
-    autoMount(NONE) setReadOnly name
+  def setReadOnly(options: AccessOptions, name: FsNodeName) =
+    autoMount(NONE) setReadOnly (options, name)
 
   def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]) = {
     checkSync(options, name, CREATE) // alias for UPDATE

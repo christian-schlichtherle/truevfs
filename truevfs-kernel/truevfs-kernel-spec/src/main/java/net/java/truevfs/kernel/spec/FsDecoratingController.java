@@ -8,12 +8,12 @@ import java.io.IOException;
 import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.shed.BitField;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.cio.Entry.Type;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.OutputSocket;
+import net.java.truecommons.shed.BitField;
 
 /**
  * An abstract decorator for a file system controller.
@@ -54,8 +54,9 @@ public abstract class FsDecoratingController extends FsAbstractController {
     }
 
     @Override
-    public void setReadOnly(FsNodeName name) throws IOException {
-        controller.setReadOnly(name);
+    public void setReadOnly(BitField<FsAccessOption> options, FsNodeName name)
+    throws IOException {
+        controller.setReadOnly(options, name);
     }
 
     @Override

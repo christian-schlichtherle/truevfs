@@ -12,7 +12,7 @@ import net.java.truecommons.cio._
 import net.java.truecommons.cio.Entry._
 
 /** Calls a template method to apply an aspect to every file system operation.
-  * 
+  *
   * @see    #apply
   * @author Christian Schlichtherle
   */
@@ -22,7 +22,7 @@ extends FsDecoratingController(controller) {
 
   /**
     * Applies the aspect to the given file system operation.
-    * 
+    *
     * @param  operation the file system operation to apply an aspect to.
     * @return The return value of the file system operation.
     */
@@ -36,8 +36,8 @@ extends FsDecoratingController(controller) {
   override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
     apply(() => controller checkAccess (options, name, types))
 
-  override def setReadOnly(name: FsNodeName) =
-    apply(() => controller setReadOnly (name))
+  override def setReadOnly(options: AccessOptions, name: FsNodeName) =
+    apply(() => controller setReadOnly (options, name))
 
   override def setTime(options: AccessOptions, name: FsNodeName, times: java.util.Map[Access, java.lang.Long]) =
     apply(() => controller setTime (options, name, times))

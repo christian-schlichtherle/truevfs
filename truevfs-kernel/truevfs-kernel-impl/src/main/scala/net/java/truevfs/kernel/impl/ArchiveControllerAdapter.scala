@@ -20,7 +20,8 @@ private final class ArchiveControllerAdapter(
     c node (options, name) orNull
   override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
     c checkAccess (options, name, types)
-  override def setReadOnly(name: FsNodeName) = c setReadOnly (name)
+  override def setReadOnly(options: AccessOptions, name: FsNodeName) =
+    c setReadOnly (options, name)
   override def setTime(options: AccessOptions, name: FsNodeName, times: ju.Map[Access, jl.Long]) =
     c setTime (options, name, times)
   override def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long) =

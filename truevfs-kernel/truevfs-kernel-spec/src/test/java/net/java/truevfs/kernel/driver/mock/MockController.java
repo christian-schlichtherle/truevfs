@@ -83,7 +83,8 @@ extends FsAbstractController {
 
     @Override
     public FsNode node(
-            BitField<FsAccessOption> options, FsNodeName name)
+            final BitField<FsAccessOption> options,
+            final FsNodeName name)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -93,7 +94,9 @@ extends FsAbstractController {
 
     @Override
     public void checkAccess(
-            final BitField<FsAccessOption> options, final FsNodeName name, final BitField<Access> types)
+            final BitField<FsAccessOption> options,
+            final FsNodeName name,
+            final BitField<Access> types)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -103,7 +106,10 @@ extends FsAbstractController {
     }
 
     @Override
-    public void setReadOnly(FsNodeName name) throws IOException {
+    public void setReadOnly(
+            final BitField<FsAccessOption> options,
+            final FsNodeName name)
+    throws IOException {
         checkAllExceptions(this);
         assert null != name;
         throw new UnsupportedOperationException();
@@ -111,7 +117,9 @@ extends FsAbstractController {
 
     @Override
     public boolean setTime(
-            BitField<FsAccessOption> options, FsNodeName name, Map<Access, Long> times)
+            final BitField<FsAccessOption> options,
+            final FsNodeName name,
+            final Map<Access, Long> times)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -122,7 +130,9 @@ extends FsAbstractController {
 
     @Override
     public boolean setTime(
-            BitField<FsAccessOption> options, FsNodeName name, BitField<Access> types, long value)
+            final BitField<FsAccessOption> options,
+            final FsNodeName name,
+            final BitField<Access> types, long value)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -209,7 +219,11 @@ extends FsAbstractController {
     }
 
     @Override
-    public void make(  BitField<FsAccessOption> options, FsNodeName name, Type type, Entry template)
+    public void make(
+            final BitField<FsAccessOption> options,
+            final FsNodeName name,
+            final Type type,
+            final Entry template)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;
@@ -219,7 +233,9 @@ extends FsAbstractController {
     }
 
     @Override
-    public void unlink(BitField<FsAccessOption> options, FsNodeName name)
+    public void unlink(
+            final BitField<FsAccessOption> options,
+            final FsNodeName name)
     throws IOException {
         checkAllExceptions(this);
         assert null != name;

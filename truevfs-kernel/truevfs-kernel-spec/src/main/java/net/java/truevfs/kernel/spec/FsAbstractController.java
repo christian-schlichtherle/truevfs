@@ -8,16 +8,16 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.UniqueObject;
-import net.java.truecommons.cio.Entry.Access;
 
 /**
  * An abstract file system controller which implements the {@link #getModel()}
  * method.
  * <p>
  * Subclasses should be thread-safe.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
@@ -28,7 +28,7 @@ extends UniqueObject implements FsController {
 
     /**
      * Constructs a new file system controller for the given model.
-     * 
+     *
      * @param model the file system model.
      */
     protected FsAbstractController(final FsModel model) {
@@ -43,7 +43,7 @@ extends UniqueObject implements FsController {
     /**
      * Returns the mount point of this (virtual) file system as
      * defined by the {@linkplain #getModel() model}.
-     * 
+     *
      * @return The mount point of this (virtual) file system as
      *         defined by the {@linkplain #getModel() model}.
      */
@@ -54,7 +54,7 @@ extends UniqueObject implements FsController {
     /**
      * Returns the {@code mounted} property of the
      * {@linkplain #getModel() file system model}.
-     * 
+     *
      * @return the {@code mounted} property of the
      *         {@linkplain #getModel() file system model}.
      */
@@ -65,7 +65,7 @@ extends UniqueObject implements FsController {
     /**
      * Sets the {@code mounted} property of the
      * {@linkplain #getModel() file system model}.
-     * 
+     *
      * @param mounted the {@code mounted} property of the
      *         {@linkplain #getModel() file system model}.
      */
@@ -90,7 +90,7 @@ extends UniqueObject implements FsController {
     /**
      * Returns a string representation of this object for debugging and logging
      * purposes.
-     * 
+     *
      * @return A string representation of this object for debugging and logging
      *         purposes.
      */

@@ -21,7 +21,7 @@ import org.apache.http.HttpResponse;
 
 /**
  * A file system controller for the HTTP(S) schemes.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -82,7 +82,8 @@ public class HttpController extends FsAbstractController {
     }
 
     @Override
-    public void setReadOnly(FsNodeName name) throws IOException {
+    public void setReadOnly(BitField<FsAccessOption> options, FsNodeName name)
+    throws IOException {
     }
 
     @Override

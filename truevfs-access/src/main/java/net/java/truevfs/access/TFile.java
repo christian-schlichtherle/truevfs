@@ -1781,7 +1781,8 @@ public final class TFile extends File implements TRex {
     public boolean setReadOnly() {
         if (null != innerArchive) {
             try {
-                innerArchive.getController().setReadOnly(getNodeName());
+                innerArchive.getController()
+                        .setReadOnly(getAccessPreferences(), getNodeName());
                 return true;
             } catch (IOException ex) {
                 return false;
