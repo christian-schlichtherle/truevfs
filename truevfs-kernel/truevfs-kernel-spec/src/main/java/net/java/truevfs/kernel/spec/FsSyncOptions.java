@@ -4,13 +4,13 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import net.java.truecommons.shed.BitField;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.shed.BitField;
 import static net.java.truevfs.kernel.spec.FsSyncOption.*;
 
 /**
  * Provides common bit fields of synchronization options.
- * 
+ *
  * @see    FsController#sync(BitField)
  * @see    FsSyncOption
  * @author Christian Schlichtherle
@@ -55,7 +55,7 @@ public final class FsSyncOptions {
      * Note that this bit field deliberately doesn't include CLEAR_CACHE!
      * This is because CLEAR_CACHE may induce dead locks or even busy loops
      * when accessing nested archive files in different threads.
-     * 
+     *
      * @see <a href="http://java.net/jira/browse/TRUEZIP-268">#TRUEZIP-268</a>
      * @see <a href="http://java.net/jira/browse/TRUEZIP-269">#TRUEZIP-269</a>
      */
@@ -79,7 +79,7 @@ public final class FsSyncOptions {
 
     /**
      * Converts the given array to a bit field of synchronization options.
-     * 
+     *
      * @param  options an array of synchronization options.
      * @return A bit field of synchronization options.
      */
