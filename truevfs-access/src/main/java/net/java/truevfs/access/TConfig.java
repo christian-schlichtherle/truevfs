@@ -166,6 +166,7 @@ try (TConfig config = TConfig.open()) {
  * unit testing, e.g. with JUnit. Consider this pattern:
  * <pre><code>
 public class AppTest {
+
     private TConfig config;
 
     &#64;Before

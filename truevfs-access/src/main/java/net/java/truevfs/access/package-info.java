@@ -22,7 +22,7 @@
  * <p>
  * For example, an application could access an entry within an archive file
  * using a {@code TFile} like this:
- * <pre>{@code
+ * <pre><code>
  * File entry = new TFile("archive.zip/dir/HälloWörld.txt");
  * Writer writer = new TFileWriter(entry);
  * try {
@@ -30,7 +30,7 @@
  * } finally {
  *     writer.close();
  * }
- * }</pre>
+ * </code></pre>
  * <p>
  * This example presumes that the JARs of the file system driver modules
  * TrueVFS Driver File and TrueVFS Driver TAR are present on the run time class
@@ -60,13 +60,13 @@
  * <p>
  * For example, an application could access an entry within an archive file
  * which is located at a web site using a {@code TPath} like this:
- * <pre>{@code
+ * <pre><code>
  * Path path = new TPath(new URI("http://acme.com/download/everything.tar.gz/README.TXT"));
  * try (InputStream in = Files.newInputStream(path)) {
  *     // Read archive entry contents here.
  *     ...
  * }
- * }</pre>
+ * </code></pre>
  * <p>
  * This example presumes that the JARs of the file system driver modules
  * TrueVFS Driver HTTP(S) and TrueVFS Driver TAR are present on the run time
