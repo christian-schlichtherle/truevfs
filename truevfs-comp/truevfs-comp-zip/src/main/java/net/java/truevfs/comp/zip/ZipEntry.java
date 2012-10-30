@@ -522,7 +522,7 @@ public class ZipEntry implements Cloneable {
 
     /**
      * Returns a protective copy of the serialized extra fields.
-     * Note that unlike its template {@link java.util.zip.ZipEntry#getDataBlock()},
+     * Note that unlike its template {@link java.util.zip.ZipEntry#getExtra()},
      * this method never returns {@code null}.
      *
      * @return A new byte array holding the serialized extra fields.
