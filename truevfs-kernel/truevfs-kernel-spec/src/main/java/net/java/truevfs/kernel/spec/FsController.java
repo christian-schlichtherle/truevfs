@@ -5,19 +5,21 @@
 package net.java.truevfs.kernel.spec;
 
 import java.io.IOException;
+import java.lang.annotation.Inherited;
 import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import net.java.truecommons.shed.BitField;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.cio.Entry.Type;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.OutputSocket;
+import net.java.truecommons.shed.BitField;
+import static net.java.truevfs.kernel.spec.FsAssertion.Level.*;
 
 /**
  * Provides read/write access to a file system.
- * 
+ *
  * <h3>General Properties</h3>
  * <p>
  * The {@link FsModel#getMountPoint() mount point} of the
@@ -26,67 +28,41 @@ import net.java.truecommons.cio.OutputSocket;
  * Where the methods of this abstract class accept a
  * {@link FsNodeName file system node name} as a parameter, this MUST get
  * resolved against the {@link FsModel#getMountPoint() mount point} URI of this
- * controller's {@linkplain #getModel() file system model}.
- * 
- * <h3>Transaction Support</h3>
+ * controller's file system model.
+  * <p>
+ * As of TrueVFS 0.10, application level transactions are not supported,
+ * that is, multiple file system operations cannot get composed into a single
+ * application level transaction - support for this feature may be added in a
+ * future version.
  * <p>
- * Even on modern computers, I/O operations are inherently unreliable: They
- * can fail on hardware errors, network timeouts, third party interactions etc.
- * In an ideal world, we would like all file system operations to be truly
- * transactional like some relational database services.
- * However, file systems have to manage really big data, much more than most
- * relational databases will ever see.
- * Its not uncommon these days to store some gigabytes of data in a single
- * file, for example a video file.
- * However, buffering gigabytes of data just for an eventual rollback of a
- * transaction is still not a realistic option and considering the fact that
- * faster computers have always been used to store even bigger data then its
- * getting clear that it never will be.
- * Therefore, the contract of this abstract class strives for only limited
- * transactional support as follows.
- * <ol>
- * <li>
- * Generally all file system operations may fail with either a
- * {@link RuntimeException} or an {@link IOException} to respectively indicate
- * wrong input parameters or a file system operation failure.
- * Where the following terms consider a failure, the term equally applies to
- * both exception types.
- * <li>
- * With the exception of {@link #sync}, all file system operations SHOULD be
- * <i>atomic</i>, that is they either succeed or fail completely as if they had
- * not been called.
- * <li>
- * All file system operations MUST be <i>consistent</i>, that is they MUST
- * leave their resources in a state so that they can get retried, even after a
- * failure.
- * <li>
- * All file system operations SHOULD be <i>isolated</i> with respect to any
- * threads which share the same definition of the implementing class, that is
- * two such threads SHOULD NOT interfere with each other's file system
- * operations in any other way than the operation's defined side effect on the
- * stored data.
- * In general, this simply means that file system operations SHOULD be
- * thread-safe.
- * Note that some factory methods declare this as a MUST requirement for their
- * generated file system controllers, for example
- * {@link FsDriver#newController} and {@link FsMetaDriver#newController}.
- * <li>
- * All file system operations SHOULD be <i>durable</i>, that is their side
- * effect on the stored data SHOULD be permanent in the parent file system or
- * storage system.
- * <li>
- * Once a call to {@link #sync} has succeeded, all previous file system
- * operations MUST be durable.
- * Furthermore, any changes to the stored data in the parent file system or
- * storage system which have been made by third parties up to this point in
- * time MUST be visible to the users of this class.
- * This enables file system operations to use I/O buffers most of the time and
- * eventually synchronize their contents with the parent file system or storage
- * system upon a call to {@code sync}.
- * </ol>
+ * However, individual file system operations do come with assertions about
+ * their atomicity, consistency, isolation and durability.
+ * Each method of this interface which is expected to access the file system
+ * (rather than just memory) is annotated with an {@link FsAssertion}.
+ * The annotation is {@link Inherited}, so the assertion forms part of the
+ * contract which any implementation of this interface should comply to.
+ * <p>
+ * Note that file system controllers are generally allowed to buffer any
+ * changes made to their file system.
+ * This is generally true for file system controllers which operate on archive
+ * files.
+ * This means that all changes made to the file system via this interface may
+ * not be entirely durable until they get committed by calling {@link #sync}.
+ * The annotations account for this stipulation by leaving the
+ * {@link FsAssertion#durable() durability} property undefined.
+ * <p>
+ * An implementation which wants to buffer its changes until {@code sync} gets
+ * called needs to notify the {@linkplain FsManager file system manager} by
+ * calling {@link FsModel#setMounted setMounted(true)} on the controller's
+ * file system model before the first change is commenced.
+ * Likewise, when {@code sync} gets called, the controller needs to notify the
+ * file system manager by calling {@code setMounted(false)} on the controller's
+ * file system model if and only if the {@code sync} has been successfully
+ * completed.
+ * This protocol enables proper management of the controller's life cycle.
  * <p>
  * Implementations should be thread-safe.
- * 
+ *
  * @see    FsManager
  * @see    FsModel
  * @see    <a href="http://www.ietf.org/rfc/rfc2119.txt">RFC 2119: Key words for use in RFCs to Indicate Requirement Levels</a>
@@ -99,14 +75,14 @@ public interface FsController {
      * and only if this file system is not federated, i.e. not a member of
      * another file system.
      * Multiple invocations must return the same object.
-     * 
+     *
      * @return The nullable controller for the parent file system.
      */
     @Nullable FsController getParent();
 
     /**
      * Returns the file system model.
-     * 
+     *
      * @return The file system model.
      */
     FsModel getModel();
@@ -116,13 +92,14 @@ public interface FsController {
      * if it doesn't exist.
      * Modifying the returned node does not show any effect on the file system
      * and should result in an {@link UnsupportedOperationException}.
-     * 
+     *
      * @param  options the options for accessing the file system node.
      * @param  name the name of the file system node.
      * @return A file system node or {@code null} if no file system node
      *         exists for the given name.
      * @throws IOException on any I/O error.
      */
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     @CheckForNull FsNode node(
             BitField<FsAccessOption> options,
             FsNodeName name)
@@ -132,12 +109,13 @@ public interface FsController {
      * Checks if the file system node for the given {@code name} exists when
      * constrained by the given access {@code options} and permits the given
      * access {@code types}.
-     * 
+     *
      * @param  options the options for accessing the file system node.
      * @param  name the name of the file system node.
      * @param  types the types of the desired access.
      * @throws IOException on any I/O error.
      */
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     void checkAccess(
             BitField<FsAccessOption> options,
             FsNodeName name,
@@ -146,13 +124,14 @@ public interface FsController {
 
     /**
      * Sets the named file system node as read-only.
-     * This method will fail for typical federated (archive) file system
-     * controller implementations because they do not support it.
-     * 
+     * This method will fail for typical archive file system controller
+     * implementations because they do not support it.
+     *
      * @param  name the name of the file system node.
      * @throws IOException on any I/O error or if this operation is not
      *         supported.
      */
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
     void setReadOnly(FsNodeName name) throws IOException;
 
     /**
@@ -162,7 +141,7 @@ public interface FsController {
      * still some of the last access times may have been set.
      * Whether or not this is an atomic operation is specific to the
      * implementation.
-     * 
+     *
      * @param  options the options for accessing the file system node.
      * @param  name the name of the file system node.
      * @param  times the access times.
@@ -172,6 +151,7 @@ public interface FsController {
      * @throws NullPointerException if any key or value in the map is
      *         {@code null}.
      */
+    @FsAssertion(atomic=NO, consistent=YES, isolated=YES)
     boolean setTime(
             BitField<FsAccessOption> options,
             FsNodeName name,
@@ -183,7 +163,7 @@ public interface FsController {
      * bit field for the file system node with the given name.
      * If {@code false} is returned or an {@link IOException} is thrown, then
      * still some of the last access times may have been set.
-     * 
+     *
      * @param  options the options for accessing the file system node.
      * @param  name the name of the file system node.
      * @param  types the access types.
@@ -192,6 +172,7 @@ public interface FsController {
      *         types in {@code types} succeeded.
      * @throws IOException on any I/O error.
      */
+    @FsAssertion(atomic=NO, consistent=YES, isolated=YES)
     boolean setTime(
             BitField<FsAccessOption> options,
             FsNodeName name,
@@ -207,6 +188,7 @@ public interface FsController {
      * @param  name the name of the file system node.
      * @return An {@code InputSocket}.
      */
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
     InputSocket<? extends Entry> input(
             BitField<FsAccessOption> options,
             FsNodeName name);
@@ -225,6 +207,7 @@ public interface FsController {
      *         this node as possible - with the exception of its name and type.
      * @return An {@code OutputSocket}.
      */
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
     OutputSocket<? extends Entry> output(
             BitField<FsAccessOption> options,
             FsNodeName name,
@@ -258,6 +241,7 @@ public interface FsController {
      *             {@code false}.
      *         </ul>
      */
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
     void make(
             BitField<FsAccessOption> options,
             FsNodeName name,
@@ -268,11 +252,12 @@ public interface FsController {
     /**
      * Removes the named file system node from the file system.
      * If the named file system node is a directory, it must be empty.
-     * 
+     *
      * @param  options the options for accessing the file system node.
      * @param  name the name of the file system node.
      * @throws IOException on any I/O error.
      */
+    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
     void unlink(BitField<FsAccessOption> options, FsNodeName name)
     throws IOException;
 
@@ -298,6 +283,7 @@ public interface FsController {
      *         stream gets forcibly closed.
      * @throws FsSyncException if any error conditions apply.
      */
+    @FsAssertion(atomic=NO, consistent=YES, isolated=YES)
     void sync(BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException;
 }
