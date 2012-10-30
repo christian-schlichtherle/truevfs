@@ -18,8 +18,11 @@ import net.java.truecommons.cio.Entry.Size;
 import static net.java.truecommons.cio.Entry.Type.*;
 import net.java.truecommons.io.*;
 import net.java.truecommons.shed.*;
+import static net.java.truevfs.access.ExpertFeature.Level.*;
+import static net.java.truevfs.access.ExpertFeature.Reason.*;
 import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
+//import static net.java.truevfs.kernel.spec.FsAssertion.Level.*;
 import static net.java.truevfs.kernel.spec.FsNodeName.*;
 import static net.java.truevfs.kernel.spec.FsUriModifier.*;
 
@@ -411,6 +414,7 @@ public final class TFile extends File implements TRex {
      *        an instance of this class, then the current archive detector gets
      *        resolved by calling {@code TConfig.current().getArchiveDetector()}.
      */
+    @ExpertFeature(INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public TFile(final File file, final @CheckForNull TArchiveDetector detector) {
         super(file.getPath());
         if (file instanceof TFile) {
@@ -454,6 +458,7 @@ public final class TFile extends File implements TRex {
      *        detector gets resolved by calling
      *        {@code TConfig.current().getArchiveDetector()}.
      */
+    @ExpertFeature(INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public TFile(final String path, final @CheckForNull TArchiveDetector detector) {
         super(path);
         this.file = new File(path);
@@ -492,6 +497,7 @@ public final class TFile extends File implements TRex {
      *        detector gets resolved by calling
      *        {@code TConfig.current().getArchiveDetector()}.
      */
+    @ExpertFeature(INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public TFile(
             final @CheckForNull File parent,
             final String child,
@@ -531,6 +537,7 @@ public final class TFile extends File implements TRex {
      *        detector gets resolved by calling
      *        {@code TConfig.current().getArchiveDetector()}.
      */
+    @ExpertFeature(INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public TFile(
             final @CheckForNull String parent,
             final String child,
@@ -586,6 +593,7 @@ public final class TFile extends File implements TRex {
      *         the syntax constraints for {@link File#File(URI)}.
      * @see    #getNodePath()
      */
+    @ExpertFeature(INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public TFile(URI uri, @CheckForNull TArchiveDetector detector) {
         this(FsNodePath.create(uri, CANONICALIZE), detector);
     }
@@ -639,6 +647,7 @@ public final class TFile extends File implements TRex {
      *         {@link File#File(URI)}.
      * @see    #getNodePath()
      */
+    @ExpertFeature(INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public TFile(final FsNodePath path, final @CheckForNull TArchiveDetector detector) {
         super(path.getHierarchicalUri());
         parse(path, null != detector ? detector : TConfig.current().getArchiveDetector());
@@ -1256,9 +1265,7 @@ public final class TFile extends File implements TRex {
      *             including loss of data!
      */
     @Deprecated
-    public File getFile() {
-        return file;
-    }
+    public File getFile() { return file; }
 
     /**
      * Returns a file system controller if and only if the path denotes an
@@ -1616,7 +1623,6 @@ public final class TFile extends File implements TRex {
 
     @Deprecated
     @Override
-    @SuppressWarnings("deprecation")
     public URL toURL() throws MalformedURLException {
         return null != innerArchive ? toURI().toURL() : file.toURL();
     }
@@ -2305,8 +2311,7 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
     public TFile mv(File dst) throws IOException {
-        final TArchiveDetector detector = TConfig.current().getArchiveDetector();
-        mv(this, dst, detector);
+        mv(this, dst, TConfig.current().getArchiveDetector());
         return this;
     }
 
@@ -2337,6 +2342,8 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
+    @ExpertFeature( level=INTERMEDIATE,
+                    value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public static void mv(
             final File src,
             final File dst,
@@ -2776,6 +2783,8 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
+    @ExpertFeature( level=INTERMEDIATE,
+                    value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public static void cp_r(File src, File dst, TArchiveDetector detector)
     throws IOException {
         TBIO.cp_r(false, src, dst, detector, detector);
@@ -2844,6 +2853,8 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
+    @ExpertFeature( level=INTERMEDIATE,
+                    value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public static void cp_r(
             File src,
             File dst,
@@ -2893,6 +2904,8 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
+    @ExpertFeature( level=INTERMEDIATE,
+                    value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public static void cp_rp(File src, File dst, TArchiveDetector detector)
     throws IOException {
         TBIO.cp_r(true, src, dst, detector, detector);
@@ -2965,6 +2978,8 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
+    @ExpertFeature( level=INTERMEDIATE,
+                    value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public static void cp_rp(
             File src,
             File dst,
@@ -3164,20 +3179,57 @@ public final class TFile extends File implements TRex {
         Streams.cat(in, out);
     }
 
-    private static File parent(final File file) {
-        final File parent = file.getParentFile();
-        return null != parent ? parent : CURRENT_DIRECTORY;
-    }
-
-    private static @Nullable String extension(final TFile file) {
-        final FsScheme scheme = file.getScheme();
-        return null != scheme ? "." + scheme : null;
-    }
-
-    private static boolean move(File src, File dst) {
-        return src.exists()
-                && (!dst.exists() || dst.delete())
-                && src.renameTo(dst);
+    /**
+     * Compacts this archive file by removing any redundant archive entry
+     * contents and meta data, including central directories.
+     * If this file isn't a
+     * {@linkplain #isTopLevelArchive() top level archive file},
+     * then this operation does nothing and returns immediately.
+     * <p>
+     * This operation is intended to compact archive files which have been
+     * frequently updated with {@link FsAccessOption#GROW} or similar means.
+     * If this access preference is set and an archive file is updated
+     * frequently, then over time a lot of redundant artifacts such as archive
+     * entry contents and meta data, including central directories may be
+     * physically present in the archive file, even if all its entries have
+     * been deleted.
+     * This operation could then get used to remove any redundant artifacts
+     * again.
+     * <p>
+     * Mind that this operation has no means to detect if there is actually any
+     * redundant data present in this archive file.
+     * Any invocation will perform exactly the same steps, so if this archive
+     * file is already compact, then this will just waste time and temporary
+     * space in the platform file system.
+     * <p>
+     * Note that this operation is not thread-safe and hence not isolated, so
+     * you should not concurrently access this archive file or any of its
+     * entries!
+     * <p>
+     * This operation performs in the order of <i>O(s)</i>, where <i>s</i> is
+     * the total size of the archive file either before (worst case) or after
+     * (best case) compacting it.
+     * If this archive file has already been mounted, then <i>s</i> is the
+     * total size of the archive file after compacting it (best case).
+     * Otherwise, the definition of <i>s</i> is specific to the archive file
+     * system driver.
+     * Usually, if the archive file contains a central directory, you could
+     * expect the best case, otherwise the worst case, but this information
+     * is given without warranty.
+     * <p>
+     * If this archive file has been successfully compacted, then it's left
+     * unmounted, so any subsequent operation will mount it again, which
+     * requires additional time.
+     *
+     * @return this
+     * @throws IOException On any I/O error.
+     * @see    FsAccessOption#GROW
+     */
+    //@FsAssertion(atomic=YES, consistent=YES, isolated=NO, durable=YES)
+    public TFile compact() throws IOException {
+        // See http://java.net/jira/browse/TRUEZIP-205 .
+        if (isTopLevelArchive()) compact(this);
+        return this;
     }
 
     private static void compact(TFile grown) throws IOException {
@@ -3217,54 +3269,19 @@ public final class TFile extends File implements TRex {
         }
     }
 
-    /**
-     * Compacts this archive file by removing any redundant archive entry
-     * contents and meta data, including central directories.
-     * If this file isn't a
-     * {@linkplain #isTopLevelArchive() top level archive file},
-     * then this operation does nothing and returns immediately.
-     * <p>
-     * This operation is intended to compact archive files which have been
-     * frequently updated with {@link FsAccessOption#GROW} or similar means.
-     * If this access preference is set and an archive file is updated
-     * frequently, then over time a lot of redundant artifacts such as archive
-     * entry contents and meta data, including central directories may be
-     * physically present in the archive file, even if all its entries have
-     * been deleted.
-     * This operation could then get used to remove any redundant artifacts
-     * again.
-     * <p>
-     * Mind that this operation has no means to detect if there is actually any
-     * redundant data present in this archive file.
-     * Any invocation will perform exactly the same steps, so if this archive
-     * file is already compact, then this will just waste time and temporary
-     * space in the platform file system.
-     * <p>
-     * Note that this operation is not thread-safe and hence not atomic, so you
-     * should not concurrently access this archive file or any of its entries!
-     * <p>
-     * This operation performs in the order of <i>O(s)</i>, where <i>s</i> is
-     * the total size of the archive file either before (worst case) or after
-     * (best case) compacting it.
-     * If this archive file has already been mounted, then <i>s</i> is the
-     * total size of the archive file after compacting it (best case).
-     * Otherwise, the definition of <i>s</i> is specific to the archive file
-     * system driver.
-     * Usually, if the archive file contains a central directory, you could
-     * expect the best case, otherwise the worst case, but this information
-     * is given without warranty.
-     * <p>
-     * If this archive file has been successfully compacted, then it's left
-     * unmounted, so any subsequent operation will mount it again, which
-     * requires additional time.
-     *
-     * @return this
-     * @throws IOException On any I/O error.
-     * @see    FsAccessOption#GROW
-     */
-    public TFile compact() throws IOException {
-        // See http://java.net/jira/browse/TRUEZIP-205 .
-        if (isTopLevelArchive()) compact(this);
-        return this;
+    private static File parent(final File file) {
+        final File parent = file.getParentFile();
+        return null != parent ? parent : CURRENT_DIRECTORY;
+    }
+
+    private static @Nullable String extension(final TFile file) {
+        final FsScheme scheme = file.getScheme();
+        return null != scheme ? "." + scheme : null;
+    }
+
+    private static boolean move(File src, File dst) {
+        return src.exists()
+                && (!dst.exists() || dst.delete())
+                && src.renameTo(dst);
     }
 }
