@@ -37,8 +37,8 @@ extends ArchiveController[E] {
   abstract override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
     apply(super.checkAccess(options, name, types))
 
-  abstract override def setReadOnly(name: FsNodeName) =
-    apply(super.setReadOnly(name))
+  abstract override def setReadOnly(options: AccessOptions, name: FsNodeName) =
+    apply(super.setReadOnly(options, name))
 
   abstract override def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]) =
     apply(super.setTime(options, name, times))

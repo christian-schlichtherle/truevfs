@@ -12,7 +12,7 @@ import net.java.truecommons.cio.Entry._
 import net.java.truecommons.cio.Entry.Access._
 
 /** A read-only virtual file system for archive entries.
-  * 
+  *
   * All modifying methods throw a
   * [[net.java.truevfs.kernel.impl.FsReadOnlyFileSystemException]].
   *
@@ -33,7 +33,7 @@ extends ArchiveFileSystem(model, archive, rootTemplate) {
     super.checkAccess(options, name, types)
   }
 
-  override def setReadOnly(name: FsNodeName) { }
+  override def setReadOnly(options: AccessOptions, name: FsNodeName) { }
 
   override def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]) =
     throw new FsReadOnlyFileSystemException(mountPoint)

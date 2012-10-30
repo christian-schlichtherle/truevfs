@@ -127,12 +127,14 @@ public interface FsController {
      * This method will fail for typical archive file system controller
      * implementations because they do not support it.
      *
+     * @param  options the options for accessing the file system node.
      * @param  name the name of the file system node.
      * @throws IOException on any I/O error or if this operation is not
      *         supported.
      */
     @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
-    void setReadOnly(FsNodeName name) throws IOException;
+    void setReadOnly(BitField<FsAccessOption> options, FsNodeName name)
+    throws IOException;
 
     /**
      * Makes an attempt to set the last access time of all types in the given

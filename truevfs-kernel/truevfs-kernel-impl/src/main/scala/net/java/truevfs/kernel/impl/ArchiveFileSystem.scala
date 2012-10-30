@@ -23,7 +23,7 @@ import scala.annotation._
 import ArchiveFileSystem._
 
 /** A read/write virtual file system for archive entries.
-  * 
+  *
   * @tparam E the type of the archive entries.
   * @author Christian Schlichtherle
   */
@@ -129,7 +129,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
       throw new NoSuchFileException(fullPath(name))
   }
 
-  def setReadOnly(name: FsNodeName) {
+  def setReadOnly(options: AccessOptions, name: FsNodeName) {
     throw new FileSystemException(fullPath(name), null,
         "Cannot set read-only state!")
   }

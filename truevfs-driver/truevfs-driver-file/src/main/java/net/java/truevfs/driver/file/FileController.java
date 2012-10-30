@@ -18,10 +18,6 @@ import java.util.Map;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.shed.BitField;
-import net.java.truevfs.kernel.spec.*;
-import static net.java.truevfs.kernel.spec.FsAccessOption.*;
-import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.Entry.Access;
 import static net.java.truecommons.cio.Entry.Access.*;
@@ -29,6 +25,10 @@ import net.java.truecommons.cio.Entry.Type;
 import static net.java.truecommons.cio.Entry.UNKNOWN;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.OutputSocket;
+import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.*;
+import static net.java.truevfs.kernel.spec.FsAccessOption.*;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
 
 /**
  * A file system controller with a prospective directory in the platform file
@@ -119,7 +119,10 @@ final class FileController extends FsAbstractController {
     }
 
     @Override
-    public void setReadOnly(final FsNodeName name) throws IOException {
+    public void setReadOnly(
+            final BitField<FsAccessOption> options,
+            final FsNodeName name)
+    throws IOException {
         Path file = target.resolve(name.getPath());
         // Confirmed: There is no equivalent NIO.2 method, e.g. something like
         //   setAttribute(file, "readOnly", Boolean.TRUE, null);
