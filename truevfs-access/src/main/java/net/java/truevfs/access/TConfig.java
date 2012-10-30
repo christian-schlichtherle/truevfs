@@ -209,7 +209,7 @@ public final class TConfig extends Resource<IllegalStateException> {
      * Returns the current configuration.
      * First, this method peeks the inheritable thread local configuration
      * stack.
-     * If no configuration has been {@link #open() pushed} yet, the global
+     * If no configuration has been {@link #open()}ed yet, the global
      * configuration gets returned.
      * Note that accessing the global configuration is not thread-safe!
      *
