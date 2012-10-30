@@ -11,7 +11,7 @@ import net.java.truecommons.io.ClosedOutputException;
 import net.java.truecommons.shed.BitField;
 
 /**
- * Defines options for (federated) file system synchronization.
+ * Defines options for (virtual) file system synchronization.
  *
  * @see    FsController#sync(BitField)
  * @see    FsSyncOptions
@@ -21,11 +21,11 @@ import net.java.truecommons.shed.BitField;
 public enum FsSyncOption {
 
     /**
-     * Suppose there are any open I/O resources (streams, channels etc.) for
-     * any file system entries.
+     * Suppose there are any open I/O streams or channels for any file system
+     * entries.
      * Then if this option is set, the respective file system controller waits
      * until all <em>other</em> threads have closed their I/O resources before
-     * proceeding with the update of the federated file system.
+     * proceeding with the update of the file system.
      * I/O resources allocated by the <em>current</em> thread are always
      * ignored.
      * If the current thread gets interrupted while waiting, it will stop
@@ -40,41 +40,38 @@ public enum FsSyncOption {
     WAIT_CLOSE_IO,
 
     /**
-     * Suppose there are any open I/O resources (streams, channels etc.) for
-     * any file system entries.
+     * Suppose there are any open I/O streams or channels for any file system
+     * entries.
      * Then if this option is set, the respective file system controller
-     * proceeds to update the federated file system anyway and finally throws
-     * an {@link FsSyncWarningException} with a
+     * proceeds to update the file system anyway and finally throws an
+     * {@link FsSyncWarningException} with a
      * {@link FsOpenResourceException} as its cause to indicate that any
      * subsequent operations on these resources will fail with an
      * {@link ClosedInputException} or {@link ClosedOutputException}
      * respectively because they have been forced to close.
      * <p>
-     * If this option is not set however, the federated file system is
-     * <em>not</em> updated, but instead
-     * an {@link FsSyncException} with a {@link FsOpenResourceException} as
-     * its cause is thrown to indicate
-     * that the application must close all I/O resources first.
+     * If this option is not set however, the file system is <em>not</em>
+     * updated, but instead an {@link FsSyncException} with a
+     * {@link FsOpenResourceException} as its cause is thrown to indicate that
+     * the application must close all I/O resources first.
      */
     FORCE_CLOSE_IO,
 
     /**
      * If this option is set, all pending changes are aborted.
-     * This option is only meaningful immediately before the federated file
-     * system itself gets deleted and should not of used by client
-     * applications.
+     * This option is only meaningful immediately before the file system itself
+     * gets deleted and should not of used by client applications.
      */
     ABORT_CHANGES,
 
     /**
-     * Suppose a controller for a federated file system has selectively cached
-     * entry contents.
+     * Suppose a file system controller has selectively cached entry contents.
      * Then if this option is set when the file system gets synchronized,
      * the entry contents get cleared.
      * <p>
      * Note that this option may induce dead locks or even busy loops
      * when accessing nested archive files in different threads.
-     * 
+     *
      * @see <a href="http://java.net/jira/browse/TRUEZIP-268">#TRUEZIP-268</a>
      * @see <a href="http://java.net/jira/browse/TRUEZIP-269">#TRUEZIP-269</a>
      */
