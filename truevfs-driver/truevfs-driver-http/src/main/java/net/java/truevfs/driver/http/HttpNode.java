@@ -14,17 +14,17 @@ import java.util.Set;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.shed.BitField;
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
-import net.java.truevfs.kernel.spec.FsNode;
-import net.java.truevfs.kernel.spec.FsNodeName;
-import net.java.truevfs.kernel.spec.FsReadOnlyFileSystemException;
 import net.java.truecommons.cio.*;
 import static net.java.truecommons.cio.Entry.Access.READ;
 import static net.java.truecommons.cio.Entry.Access.WRITE;
 import static net.java.truecommons.cio.Entry.Size.DATA;
 import static net.java.truecommons.cio.Entry.Type.FILE;
+import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.FsAbstractNode;
+import net.java.truevfs.kernel.spec.FsAccessOption;
+import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
+import net.java.truevfs.kernel.spec.FsNodeName;
+import net.java.truevfs.kernel.spec.FsReadOnlyFileSystemException;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -38,7 +38,7 @@ import org.apache.http.client.methods.HttpUriRequest;
  * @author Christian Schlichtherle
  */
 @Immutable
-public class HttpNode extends FsNode implements IoEntry<HttpNode> {
+public class HttpNode extends FsAbstractNode implements IoEntry<HttpNode> {
 
     private final HttpController controller;
     private final String name;
