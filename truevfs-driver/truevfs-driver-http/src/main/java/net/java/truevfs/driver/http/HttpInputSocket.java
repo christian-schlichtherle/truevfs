@@ -9,14 +9,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.cio.*;
 import net.java.truecommons.io.ReadOnlyChannel;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truecommons.cio.*;
 
 /**
  * An input socket for HTTP(S) entries.
- * 
+ *
  * @see    HttpOutputSocket
  * @author Christian Schlichtherle
  */
