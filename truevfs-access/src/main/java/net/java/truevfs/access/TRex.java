@@ -10,10 +10,8 @@ import net.java.truevfs.kernel.spec.FsNodePath;
  * Defines common properties and operations of {@link TFile} and {@link TPath}.
  * This interface is of little practical use and solely exists for providing
  * a common abstraction layer with a common Javadoc.
- * <p>
- * TODO: Eventually refactor the silly name of this interface to a more
- * meaningful one. Proposals are welcome!
- * 
+ * Application developers should not use it - hence the silly name.
+ *
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -26,7 +24,7 @@ public interface TRex {
     /**
      * Returns the {@link TArchiveDetector} which was used to detect any
      * archive files in the path name of this object at construction time.
-     * 
+     *
      * @return The {@link TArchiveDetector} which was used to detect any
      *         archive files in the path name of this object at construction
      *         time.
@@ -38,7 +36,7 @@ public interface TRex {
      * Note that multiple calls to this method result in objects which are
      * required to compare {@linkplain Object#equals equal}, but are not
      * necessarily identical.
-     * 
+     *
      * @return the file system node path with an absolute URI.
      */
     FsNodePath getNodePath();
@@ -48,7 +46,7 @@ public interface TRex {
      * Note that multiple calls to this method result in objects which are
      * required to compare {@linkplain Object#equals equal}, but are not
      * necessarily identical.
-     * 
+     *
      * @return the file system mount point for this path.
      */
     FsMountPoint getMountPoint();
@@ -58,14 +56,14 @@ public interface TRex {
      * Note that multiple calls to this method result in objects which are
      * required to compare {@linkplain Object#equals equal}, but are not
      * necessarily identical.
-     * 
+     *
      * @return the file system entry name.
      */
     FsNodeName getNodeName();
 
     /**
      * Returns the absolute URI for this object.
-     * 
+     *
      * @return the absolute URI for this object.
      */
     URI getUri();
@@ -76,14 +74,14 @@ public interface TRex {
 
     /**
      * Returns a file representation of this object.
-     * 
+     *
      * @return A file representation of this object.
      */
     TFile toFile();
 
     /**
      * Returns a path representation of this object.
-     * 
+     *
      * @return A path representation of this object.
      */
     TPath toPath();
