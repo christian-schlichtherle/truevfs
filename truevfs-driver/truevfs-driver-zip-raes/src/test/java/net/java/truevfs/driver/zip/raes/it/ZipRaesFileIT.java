@@ -88,7 +88,7 @@ public final class ZipRaesFileIT extends TFileITSuite<TestZipRaesDriver> {
             fail();
         } catch (IOException expected) {
         }
-            
+
         umount();
         setAction(ENTER);
         archive.rm_r();
