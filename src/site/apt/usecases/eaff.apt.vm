@@ -40,7 +40,7 @@ Encrypted Application File Format
     with an instance of an archive driver class like this:
 
 +-------------------------------------------------+
-TConfig.get().setArchiveDetector(
+TConfig.current().setArchiveDetector(
     new TArchiveDetector("fox|bax", new SafeZipRaesDriver()));
 +-------------------------------------------------+
 
@@ -68,13 +68,9 @@ TConfig.get().setArchiveDetector(
     its encrypted payload, which makes reading a TZP file pretty fast.
 
     Note that the <<<SafeZipRaesDriver>>> uses the
-    {{{../truevfs-key/apidocs/net/java/truevfs/key/sl/KeyManagerLocator.html#SINGLETON}<<<KeyManagerLocator.SINGLETON>>>}}
+    {{{../truevfs-key/apidocs/net/java/truevfs/key/spec/sl/KeyManagerMapLocator.html#SINGLETON}<<<KeyManagerMapLocator.SINGLETON>>>}}
     to get a secret key manager.
-    The reference implementation of its service provider interface in the
-    module {{{../truevfs-key/index.html}TrueVFS Key}} will prompt the user for
-    entering the secret keys, either with a Swing GUI or - if the JVM is
-    running headless - on the console.
-    You can change this by following the instructions on the page about
+    You can configure key management by following the instructions on the page
     {{{../truevfs-driver/truevfs-driver-tzp/key-management.html}Key Management}}.
 
     Now you can easily create or overwrite an entry in your custom application
@@ -86,7 +82,7 @@ try (OutputStream out = new TFileOutputStream("file.fox/contents.xml")) {
 }
 +--+
 
-    Alternatively, you could use a 
+    Alternatively, you could use a
     {{{../apidocs/net/java/truevfs/access/TFileWriter.html}<<<TFileWriter>>>}}.
 
     This is how you could read the entry again:
@@ -97,7 +93,7 @@ try (InputStream in = new TFileInputStream("file.fox/contents.xml")) {
 }
 +--+
 
-    Alternatively, you could use a 
+    Alternatively, you could use a
     {{{../apidocs/net/java/truevfs/access/TFileReader.html}<<<TFileReader>>>}}.
 
     And finally, to delete a virtual directory tree - in this case your custom

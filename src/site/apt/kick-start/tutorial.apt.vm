@@ -15,14 +15,14 @@ Tutorial
 
     The following tutorial assumes some preconditions:
 
-    * You need to have a basic knowledge of the traditional <<<java.io>>> API.
+    * You need to have a basic knowledge of the <<<java.io>>> API.
       If not, please refer to
       {{{http://docs.oracle.com/javase/tutorial/essential/io/}The Java Tutorials Lesson: Basic I/O}}
       first.
 
     * You need to have a working application skeleton with the required TrueVFS
-      JARs as its dependencies.
-      If not, please refer to the section Kick-Starting on the
+      JARs on the class path.
+      If not present, please refer to the section Kick-Starting on the
       {{{./index.html#Kick-Starting}Getting Started}}
       page first.
 
@@ -117,7 +117,7 @@ try {
     Reading an archive entry is as easy as writing it - just use a class like
     {{{../apidocs/net/java/truevfs/access/TFileReader.html}<<<TFileReader>>>}}
     and point it to the archive entry:
-    
+
 +--+
 File entry = new TFile("archive.zip/dir/HälloWörld.txt");
 Reader reader = new TFileReader(entry);
