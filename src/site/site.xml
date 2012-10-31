@@ -62,8 +62,8 @@
         <menu name="External Resources">
             <item name="Road Map" href="http://java.net/jira/browse/TRUEVFS#selectedTab=com.atlassian.jira.plugin.system.project:roadmap-panel"/>
             <item name="Change Log" href="http://java.net/jira/browse/TRUEVFS#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel"/>
-            <item name="Developer Site" href="http://java.net/projects/truevfs"/>
             <item name="The TrueVFS Blog" href="http://truevfs.schlichtherle.de"/>
+            <item name="Developer Site" href="http://java.net/projects/truevfs"/>
         </menu>
         <menu name="Parent Module" ref="parent" inherit="bottom"/>
         <menu name="Sub-Modules" ref="modules" inherit="bottom"/>
