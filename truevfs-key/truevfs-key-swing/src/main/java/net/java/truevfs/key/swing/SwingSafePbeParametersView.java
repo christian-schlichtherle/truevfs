@@ -5,6 +5,7 @@
 package net.java.truevfs.key.swing;
 
 import java.awt.EventQueue;
+import java.awt.GraphicsEnvironment;
 import java.awt.Window;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -17,6 +18,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import javax.inject.Provider;
 import javax.swing.JOptionPane;
 import net.java.truecommons.services.Loader;
+import net.java.truevfs.key.spec.KeyPromptingDisabledException;
 import net.java.truevfs.key.spec.KeyPromptingInterruptedException;
 import net.java.truevfs.key.spec.PromptingKeyProvider.Controller;
 import net.java.truevfs.key.spec.UnknownKeyException;
@@ -110,17 +112,18 @@ extends SafePbeParametersView<P> {
         class PromptWriteKey implements Runnable {
             @Override
             public void run() {
-                promptWriteKeyEDT(controller);
+                promptWriteKeyOnEDT(controller);
             }
         } // PromptWriteKey
-        multiplexOnEDT(new PromptWriteKey()); // synchronized on class instance!
+
+        multiplexToEDT(new PromptWriteKey());
     }
 
     /**
      * This method is only called by the AWT Event Dispatch Thread,
      * so it doesn't need to be thread safe.
      */
-    private void promptWriteKeyEDT(
+    private void promptWriteKeyOnEDT(
             final Controller<P> controller) {
         assert EventQueue.isDispatchThread();
 
@@ -179,17 +182,18 @@ extends SafePbeParametersView<P> {
         class PromptReadKey implements Runnable {
             @Override
             public void run() {
-                promptReadKeyEDT(controller, invalid);
+                promptReadKeyOnEDT(controller, invalid);
             }
         } // PromptReadKey
-        multiplexOnEDT(new PromptReadKey()); // synchronized on class instance!
+
+        multiplexToEDT(new PromptReadKey());
     }
 
     /**
      * This method is only called by the AWT Event Dispatch Thread,
      * so it doesn't need to be thread safe.
      */
-    private void promptReadKeyEDT(
+    private void promptReadKeyOnEDT(
             final Controller<P> controller,
             final boolean invalid) {
         assert EventQueue.isDispatchThread();
@@ -266,8 +270,11 @@ extends SafePbeParametersView<P> {
      * If a {@link Throwable} is thrown by the EDT, then it's wrapped in an
      * {@link UndeclaredThrowableException} and re-thrown by this thread.
      */
-    private static void multiplexOnEDT(final Runnable task)
+    private static void multiplexToEDT(final Runnable task)
     throws UnknownKeyException {
+        if (GraphicsEnvironment.isHeadless())
+            throw new KeyPromptingDisabledException();
+
         if (EventQueue.isDispatchThread()) {
             task.run();
         } else {
