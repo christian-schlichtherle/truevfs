@@ -6,7 +6,6 @@ package net.java.truevfs.key.spec;
 
 import java.security.GeneralSecurityException;
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Thrown to indicate that the retrieval of the key to open or create a
@@ -15,18 +14,17 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class UnknownKeyException extends GeneralSecurityException {
+
     private static final long serialVersionUID = 6092786348232837265L;
 
-    public UnknownKeyException() {
-    }
+    public UnknownKeyException() { }
 
-    UnknownKeyException(@CheckForNull String msg) {
-        super(msg);
-    }
+    public UnknownKeyException(@CheckForNull String msg) { super(msg); }
 
-    public UnknownKeyException(@CheckForNull Throwable cause) {
-        super(cause);
+    public UnknownKeyException(@CheckForNull Throwable cause) { super(cause); }
+
+    public UnknownKeyException(@CheckForNull String msg, @CheckForNull Throwable cause) {
+        super(msg, cause);
     }
 }

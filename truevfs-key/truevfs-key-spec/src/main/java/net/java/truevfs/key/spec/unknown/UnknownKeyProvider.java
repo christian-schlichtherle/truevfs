@@ -5,6 +5,7 @@
 package net.java.truevfs.key.spec.unknown;
 
 import net.java.truevfs.key.spec.KeyProvider;
+import net.java.truevfs.key.spec.PersistentUnknownKeyException;
 import net.java.truevfs.key.spec.UnknownKeyException;
 
 /**
@@ -21,7 +22,7 @@ final class UnknownKeyProvider implements KeyProvider<Object> {
 
     @Override
     public Object getWriteKey() throws UnknownKeyException {
-        throw new UnknownKeyException();
+        throw new PersistentUnknownKeyException();
     }
 
     @Override

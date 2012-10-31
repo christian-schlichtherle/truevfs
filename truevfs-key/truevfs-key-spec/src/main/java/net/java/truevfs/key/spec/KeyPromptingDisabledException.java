@@ -5,7 +5,6 @@
 package net.java.truevfs.key.spec;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Thrown to indicate that the retrieval of the key to open or create a
@@ -15,8 +14,8 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @author  Christian Schlichtherle
  */
-@ThreadSafe
 public class KeyPromptingDisabledException extends PersistentUnknownKeyException  {
+
     private static final long serialVersionUID = 7656348649239172586L;
 
     public KeyPromptingDisabledException() {
@@ -24,7 +23,6 @@ public class KeyPromptingDisabledException extends PersistentUnknownKeyException
     }
 
     public KeyPromptingDisabledException(@CheckForNull Throwable cause) {
-        super("Key prompting has been disabled!");
-        super.initCause(cause);
+        super("Key prompting has been disabled!", cause);
     }
 }

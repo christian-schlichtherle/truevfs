@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.key.spec;
 
-import javax.annotation.concurrent.ThreadSafe;
+import javax.annotation.CheckForNull;
 
 /**
  * Thrown to indicate that the retrieval of the key to open or create a
@@ -14,11 +14,15 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @author  Christian Schlichtherle
  */
-@ThreadSafe
 public class KeyPromptingCancelledException extends PersistentUnknownKeyException {
+
     private static final long serialVersionUID = 7645927619378423566L;
-    
+
     public KeyPromptingCancelledException() {
         super("Key prompting has been cancelled!");
+    }
+
+    public KeyPromptingCancelledException(@CheckForNull Throwable cause) {
+        super("Key prompting has been cancelled!", cause);
     }
 }
