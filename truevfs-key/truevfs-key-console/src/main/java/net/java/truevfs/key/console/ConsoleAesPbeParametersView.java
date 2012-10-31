@@ -10,12 +10,13 @@ import net.java.truevfs.key.spec.param.AesPbeParameters;
 
 /**
  * A console based user interface for prompting for passwords.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
 final class ConsoleAesPbeParametersView
 extends ConsoleSafePbeParametersView<AesPbeParameters, AesKeyStrength> {
+
     @Override
     public AesPbeParameters newPbeParameters() {
         return new AesPbeParameters();

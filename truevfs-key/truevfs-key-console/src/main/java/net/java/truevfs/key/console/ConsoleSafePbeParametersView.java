@@ -20,7 +20,7 @@ import net.java.truevfs.key.spec.param.SafePbeParametersView;
 
 /**
  * A console based user interface for prompting for passwords.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
@@ -46,7 +46,7 @@ extends SafePbeParametersView<P> {
      */
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     private static URI lastResource = URI.create(""); // NOI18N
-    
+
     private static final String YES = resources.getString("yes");
     private static final String NO = resources.getString("no");
 
@@ -54,8 +54,7 @@ extends SafePbeParametersView<P> {
     public final void promptWriteKey(final Controller<P> controller)
     throws KeyPromptingDisabledException {
         final Console con = System.console();
-        if (null == con)
-            throw new KeyPromptingDisabledException();
+        if (null == con) throw new KeyPromptingDisabledException();
 
         synchronized (lock) {
             final URI resource = controller.getResource();
