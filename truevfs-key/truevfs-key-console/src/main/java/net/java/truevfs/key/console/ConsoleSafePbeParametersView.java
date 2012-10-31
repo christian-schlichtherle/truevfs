@@ -143,8 +143,7 @@ extends SafePbeParametersView<P> {
             final boolean invalid)
     throws KeyPromptingDisabledException {
         final Console con = System.console();
-        if (null == con)
-            throw new KeyPromptingDisabledException();
+        if (null == con) throw new KeyPromptingDisabledException();
 
         synchronized (lock) {
             if (invalid)
