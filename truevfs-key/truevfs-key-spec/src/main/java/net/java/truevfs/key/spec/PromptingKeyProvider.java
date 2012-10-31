@@ -185,7 +185,7 @@ extends SafeKeyProvider<K> {
                                 controller = provider.new ReadController(this)) {
                             provider.getView().promptReadKey(controller, invalid);
                         }
-                    } catch (PersistentUnknownKeyException ex) {
+                    } catch (final PersistentUnknownKeyException ex) {
                         setException(provider, ex);
                     }
                     state = provider.getState();
@@ -287,7 +287,7 @@ extends SafeKeyProvider<K> {
                 provider.setException(ex = new KeyPromptingCancelledException());
             return ex;
         }
-        
+
         final <K extends SafeKey<K>> void
         setException(PromptingKeyProvider<K> provider, PersistentUnknownKeyException ex) {
             provider.setException(ex);
@@ -307,7 +307,7 @@ extends SafeKeyProvider<K> {
      * <p>
      * Implementations of this interface must be thread safe
      * and should have no side effects!
-     * 
+     *
      * @param  <K> the type of the safe keys.
      * @author Christian Schlichtherle
      */

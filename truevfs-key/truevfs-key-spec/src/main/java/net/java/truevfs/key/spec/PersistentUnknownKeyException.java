@@ -14,14 +14,17 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @author  Christian Schlichtherle
  */
-@ThreadSafe
 public class PersistentUnknownKeyException extends UnknownKeyException {
+
     private static final long serialVersionUID = 2463586348235337265L;
 
-    PersistentUnknownKeyException() {
-    }
+    public PersistentUnknownKeyException() { }
 
-    PersistentUnknownKeyException(@CheckForNull String message) {
-        super(message);
+    public PersistentUnknownKeyException(@CheckForNull String msg) { super(msg); }
+
+    public PersistentUnknownKeyException(@CheckForNull Throwable cause) { super(cause); }
+
+    public PersistentUnknownKeyException(@CheckForNull String msg, @CheckForNull Throwable cause) {
+        super(msg, cause);
     }
 }
