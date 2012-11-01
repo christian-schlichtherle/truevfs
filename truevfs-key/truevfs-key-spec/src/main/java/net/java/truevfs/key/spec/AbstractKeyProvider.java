@@ -7,8 +7,8 @@ package net.java.truevfs.key.spec;
 import net.java.truecommons.shed.UniqueObject;
 
 /**
- * An abstract key manager.
- * When implementing a key manager, you should extend this class rather
+ * An abstract key provider.
+ * When implementing a key provider, you should extend this class rather
  * than directly implementing the interface in order to maintain binary
  * backwards compatibility even if the interface is changed.
  * <p>
@@ -17,8 +17,8 @@ import net.java.truecommons.shed.UniqueObject;
  * @param  <K> The type of the keys.
  * @author Christian Schlichtherle
  */
-public abstract class AbstractKeyManager<K>
-extends UniqueObject implements KeyManager<K> {
+public abstract class AbstractKeyProvider<K>
+extends UniqueObject implements KeyProvider<K> {
 
     /**
      * Returns a string representation of this object for logging and debugging

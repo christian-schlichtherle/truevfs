@@ -9,15 +9,21 @@ import java.util.ServiceConfigurationError;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.services.Container;
+import net.java.truecommons.shed.UniqueObject;
 
 /**
- * An abstract implementation of an immutable map of key classes to nullable
- * key managers.
+ * An abstract key manager map.
+ * When implementing a key manager map, you should extend this class rather
+ * than directly implementing the interface in order to maintain binary
+ * backwards compatibility even if the interface is changed.
+ * <p>
+ * Implementations must be safe for multi-threading.
  *
  * @author Christian Schlichtherle
  */
 @Immutable
 public abstract class AbstractKeyManagerMap
+extends UniqueObject
 implements KeyManagerMap, Container<Map<Class<?>, KeyManager<?>>> {
 
     @Override

@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.key.spec.unknown;
 
-import net.java.truevfs.key.spec.KeyProvider;
+import net.java.truevfs.key.spec.AbstractKeyProvider;
 import net.java.truevfs.key.spec.PersistentUnknownKeyException;
 import net.java.truevfs.key.spec.UnknownKeyException;
 
@@ -14,7 +14,7 @@ import net.java.truevfs.key.spec.UnknownKeyException;
  * @since  TrueVFS 0.9.4
  * @author Christian Schlichtherle
  */
-final class UnknownKeyProvider implements KeyProvider<Object> {
+final class UnknownKeyProvider extends AbstractKeyProvider<Object> {
 
     static final UnknownKeyProvider SINGLETON = new UnknownKeyProvider();
 

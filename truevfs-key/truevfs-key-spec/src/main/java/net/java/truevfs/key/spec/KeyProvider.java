@@ -9,6 +9,11 @@ import javax.annotation.CheckForNull;
 /**
  * Manages the life cycle of a key for reading and writing a protected
  * resource.
+ * When implementing a key provider, you should extend the
+ * {@link AbstractKeyProvider} class rather than directly implementing this
+ * interface in order to maintain binary backwards compatibility even if this
+ * interface is changed.
+ * <p>
  * A key provider is usually (but not necessarily) associated to one or more
  * protected resources by a {@link KeyManager}.
  * <p>
@@ -67,9 +72,9 @@ import javax.annotation.CheckForNull;
  * <p>
  * Implementations must be safe for multi-threading.
  *
- * @param   <K> The type of the keys.
- * @see     KeyManager
- * @author  Christian Schlichtherle
+ * @param  <K> The type of the keys.
+ * @see    KeyManager
+ * @author Christian Schlichtherle
  */
 public interface KeyProvider<K> {
 

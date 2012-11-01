@@ -20,7 +20,7 @@ import net.java.truevfs.key.spec.util.SuspensionPenalty;
  */
 @ThreadSafe
 public abstract class SafeKeyProvider<K extends SafeKey<K>>
-implements KeyProvider<K> {
+extends AbstractKeyProvider<K> {
 
     /**
      * The minimum delay between subsequent attempts to verify a key in
