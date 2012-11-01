@@ -17,7 +17,7 @@ import net.java.truecommons.shed.ControlFlowException;
 import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
 import net.java.truevfs.key.spec.KeyManager;
-import net.java.truevfs.key.spec.KeyManagerContainer;
+import net.java.truevfs.key.spec.KeyManagerMap;
 
 /**
  * This file system controller decorates another file system controller in
@@ -33,7 +33,7 @@ extends FsDecoratingController {
     private static final String ROOT_PATH = ROOT.getPath();
 
     protected final D driver;
-    private volatile KeyManagerContainer container;
+    private volatile KeyManagerMap container;
 
     /**
      * Constructs a new key manager controller.
@@ -54,9 +54,9 @@ extends FsDecoratingController {
     protected abstract Class<? extends IOException> getKeyExceptionType();
 
     private KeyManager<?> getKeyManager() {
-        final KeyManagerContainer c = this.container;
-        return (null != c ? c : (this.container = driver.getKeyManagerContainer()))
-                .keyManager(getKeyType());
+        final KeyManagerMap c = this.container;
+        return (null != c ? c : (this.container = driver.getKeyManagerMap()))
+                .manager(getKeyType());
     }
 
     private @CheckForNull IOException findKeyException(Throwable ex) {

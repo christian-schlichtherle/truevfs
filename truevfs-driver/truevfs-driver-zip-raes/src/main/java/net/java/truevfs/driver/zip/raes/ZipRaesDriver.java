@@ -10,6 +10,10 @@ import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.Entry.Type;
+import net.java.truecommons.cio.InputService;
+import net.java.truecommons.cio.OutputService;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.comp.zipdriver.JarDriver;
 import net.java.truevfs.comp.zipdriver.JarDriverEntry;
@@ -25,11 +29,7 @@ import net.java.truevfs.kernel.spec.FsInputSocketSource;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsNodeName;
 import net.java.truevfs.kernel.spec.FsOutputSocketSink;
-import net.java.truecommons.cio.Entry;
-import net.java.truecommons.cio.Entry.Type;
-import net.java.truecommons.cio.InputService;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
-import net.java.truecommons.cio.OutputService;
 
 /**
  * An abstract archive driver for RAES encrypted ZIP files which optionally
@@ -51,21 +51,19 @@ public abstract class ZipRaesDriver extends JarDriver {
      * @return {@code true}
      */
     @Override
-    public final boolean getPreambled() {
-        return true;
-    }
+    public final boolean getPreambled() { return true; }
 
     /**
      * Returns the RAES parameters for the given file system model.
      * <p>
      * The implementation in the class {@link ZipRaesDriver} returns
-     * {@code new KeyManagerRaesParameters(getKeyManagerContainer().getKeyManager(AesPbeParameters.class), mountPointUri(model))}.
+     * {@code new KeyManagerRaesParameters(getKeyManagerMap().getKeyManager(AesPbeParameters.class), mountPointUri(model))}.
      *
      * @param  model the file system model.
      * @return The RAES parameters for the given file system model.
      */
     protected RaesParameters raesParameters(FsModel model) {
-        return new KeyManagerRaesParameters(getKeyManagerContainer(),
+        return new KeyManagerRaesParameters(getKeyManagerMap(),
                                             mountPointUri(model));
     }
 

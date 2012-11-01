@@ -30,7 +30,7 @@ import static net.java.truecommons.cio.Entry.Size.DATA;
 import net.java.truecommons.cio.Entry.Type;
 import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
-import net.java.truevfs.key.spec.KeyManagerContainer;
+import net.java.truevfs.key.spec.KeyManagerMap;
 import net.java.truevfs.key.spec.KeyProvider;
 import net.java.truevfs.key.spec.sl.KeyManagerMapLocator;
 import org.slf4j.Logger;
@@ -63,7 +63,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
     }
 
     /**
-     * Returns the provider for key managers for accessing protected resources
+     * Returns the map of key managers for accessing protected resources
      * (encryption).
      * <p>
      * This is an immutable property - multiple calls must return the same
@@ -72,7 +72,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * @return {@link KeyManagerMapLocator#SINGLETON}, as by the implementation
      *         in the class {@link ZipDriver}.
      */
-    public KeyManagerContainer getKeyManagerContainer() {
+    public KeyManagerMap getKeyManagerMap() {
         return KeyManagerMapLocator.SINGLETON;
     }
 

@@ -4,14 +4,14 @@
  */
 package net.java.truevfs.key.spec;
 
-import javax.annotation.CheckForNull;
+import java.util.ServiceConfigurationError;
 
 /**
- * A container for key managers for secret key classes.
+ * A map of key classes to key managers.
  *
  * @author Christian Schlichtherle
  */
-public interface KeyManagerContainer {
+public interface KeyManagerMap {
 
     /**
      * Returns the key manager for the given secret key class.
@@ -19,11 +19,11 @@ public interface KeyManagerContainer {
      * This is a pure function - multiple calls must return the same value for
      * the same parameter.
      *
-     * @param  <K> the type of the secret keys.
-     * @param  type the class for the secret key type.
-     * @return the key manager for the given secret key class.
+     * @param  <K> the type of the keys.
+     * @param  type the class for the key type.
+     * @return the key manager for the key class.
      * @throws ServiceConfigurationError if no appropriate key manager is
      *         available.
      */
-    @CheckForNull <K> KeyManager<K> keyManager(Class<K> type);
+    <K> KeyManager<K> manager(Class<K> type);
 }

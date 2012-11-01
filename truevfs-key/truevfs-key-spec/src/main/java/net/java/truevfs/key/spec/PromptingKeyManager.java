@@ -39,10 +39,16 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
      * @return A new prompting key provider.
      */
     @Override
-    protected final PromptingKeyProvider<K> newKeyProvider(final URI resource) {
-        final PromptingKeyProvider<K> create = new PromptingKeyProvider<>(this);
-        create.setResource(resource);
-        return create;
+    protected final PromptingKeyProvider<K> newKeyProvider() {
+        return new PromptingKeyProvider<>(this);
+    }
+
+    @Override
+    public synchronized PromptingKeyProvider<K> provider(URI resource) {
+        PromptingKeyProvider<K> access = get(resource);
+        if (null == access)
+            (access = super.provider(resource)).setResource(resource);
+        return access;
     }
 
     @Override

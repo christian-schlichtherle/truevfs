@@ -11,28 +11,28 @@ import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.key.spec.PromptingKeyProvider.View;
 
 /**
- * Implements a provider for a single prompting key manager which will use the
+ * Implements a map for a single prompting key manager which will use the
  * prompting key provider view given to the
- * {@linkplain #PromptingKeyManagerContainer constructor}.
+ * {@linkplain #PromptingKeyManagerMap constructor}.
  * This class is convenient to use if you want to implement a custom view for
  * key prompting.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class PromptingKeyManagerContainer
-extends AbstractKeyManagerContainer {
+public final class PromptingKeyManagerMap
+extends AbstractKeyManagerMap {
 
     private final Map<Class<?>, KeyManager<?>> managers;
 
     /**
      * Constructs a new prompting key manager service using the given view.
-     * 
+     *
      * @param <K> the type of the safe keys.
      * @param clazz the class of the safe keys.
      * @param view the prompting key provider view for the safe keys.
      */
-    public <K extends SafeKey<K>> PromptingKeyManagerContainer(
+    public <K extends SafeKey<K>> PromptingKeyManagerMap(
             final Class<K> clazz,
             final View<K> view) {
         final Map<Class<?>, KeyManager<?>> map = new HashMap<>(2);

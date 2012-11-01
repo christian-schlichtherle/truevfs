@@ -15,7 +15,7 @@ import net.java.truevfs.key.spec.unknown.UnknownKeyManager;
 /**
  * This modifier maps the {@link AesPbeParameters} class to the
  * {@linkplain UnknownKeyManager#SINGLETON unknown key manager} singleton
- * which fails to resolve any secret keys.
+ * which fails to resolve any keys.
  * Note that the {@link #getPriority} of this modifier is
  * {@link Integer#MAX_VALUE}, so it takes precedence over any other modifier
  * on the class path.

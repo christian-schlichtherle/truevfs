@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.key.spec.spi;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.annotations.ServiceImplementation;
@@ -14,10 +14,10 @@ import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.sl.KeyManagerMapLocator;
 
 /**
- * A service for creating maps of classes to key managers.
+ * A service for creating maps of classes to nullable key managers.
  * Note that this class solely exists in order to support the
- * {@link KeyManagerMapLocator#SINGLETON}, which will use it to create the root
- * of the driver map which gets subsequently decorated by the
+ * {@link KeyManagerMapLocator#SINGLETON}, which will use it to create the
+ * manager map and subsequently modify it by the
  * {@link KeyManagerMapModifier} implementations found on the class path.
  *
  * @author Christian Schlichtherle
@@ -35,6 +35,6 @@ extends LocatableFactory<Map<Class<?>, KeyManager<?>>> {
      */
     @Override
     public Map<Class<?>, KeyManager<?>> get() {
-        return new LinkedHashMap<>(32);
+        return new HashMap<>(32);
     }
 }

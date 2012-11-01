@@ -16,6 +16,7 @@ import net.java.truevfs.key.spec.param.AesPbeParameters;
 @ThreadSafe
 final class SwingAesPbeParametersView
 extends SwingSafePbeParametersView<AesPbeParameters, AesKeyStrength> {
+
     @Override
     public AesPbeParameters newPbeParameters() {
         return new AesPbeParameters();

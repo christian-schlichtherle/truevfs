@@ -12,7 +12,7 @@ import net.java.truevfs.driver.zip.raes.crypto.RaesParameters;
 import net.java.truevfs.driver.zip.raes.crypto.RaesParametersProvider;
 import net.java.truevfs.driver.zip.raes.crypto.Type0RaesParameters;
 import net.java.truevfs.key.spec.KeyManager;
-import net.java.truevfs.key.spec.KeyManagerContainer;
+import net.java.truevfs.key.spec.KeyManagerMap;
 import net.java.truevfs.key.spec.KeyProvider;
 import net.java.truevfs.key.spec.UnknownKeyException;
 import net.java.truevfs.key.spec.param.AesKeyStrength;
@@ -44,9 +44,9 @@ implements RaesParametersProvider {
      * @param  raes the absolute URI of the RAES file.
      */
     public KeyManagerRaesParameters(
-            final KeyManagerContainer container,
+            final KeyManagerMap container,
             final URI raes) {
-        this(container.keyManager(AesPbeParameters.class), raes);
+        this(container.manager(AesPbeParameters.class), raes);
     }
 
     /**
@@ -87,9 +87,9 @@ implements RaesParametersProvider {
         public char[] getWritePassword()
         throws RaesKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.access(raes);
+                    provider = manager.provider(raes);
             try {
-                return provider.getWriteKey().getPassword();
+                return provider.prepareWriting().getPassword();
             } catch (final UnknownKeyException ex) {
                 throw new RaesKeyException(ex);
             }
@@ -99,9 +99,9 @@ implements RaesParametersProvider {
         public char[] getReadPassword(final boolean invalid)
         throws RaesKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.access(raes);
+                    provider = manager.provider(raes);
             try {
-                return provider.getReadKey(invalid).getPassword();
+                return provider.prepareReading(invalid).getPassword();
             } catch (final UnknownKeyException ex) {
                 throw new RaesKeyException(ex);
             }
@@ -111,9 +111,9 @@ implements RaesParametersProvider {
         public AesKeyStrength getKeyStrength()
         throws RaesKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.access(raes);
+                    provider = manager.provider(raes);
             try {
-                return provider.getWriteKey().getKeyStrength();
+                return provider.prepareWriting().getKeyStrength();
             } catch (final UnknownKeyException ex) {
                 throw new RaesKeyException(ex);
             }
@@ -123,10 +123,10 @@ implements RaesParametersProvider {
         public void setKeyStrength(final AesKeyStrength keyStrength)
         throws RaesKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.access(raes);
+                    provider = manager.provider(raes);
             final AesPbeParameters param;
             try {
-                param = provider.getReadKey(false);
+                param = provider.prepareReading(false);
             } catch (final UnknownKeyException ex) {
                 throw new RaesKeyException(ex);
             }

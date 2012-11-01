@@ -17,8 +17,8 @@ import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsScheme;
-import net.java.truevfs.key.spec.KeyManagerContainer;
-import net.java.truevfs.key.spec.PromptingKeyManagerContainer;
+import net.java.truevfs.key.spec.KeyManagerMap;
+import net.java.truevfs.key.spec.PromptingKeyManagerMap;
 import net.java.truevfs.key.spec.PromptingKeyProvider.Controller;
 import net.java.truevfs.key.spec.PromptingKeyProvider.View;
 import net.java.truevfs.key.spec.UnknownKeyException;
@@ -74,14 +74,15 @@ public final class KeyManagement {
         return new TArchiveDetector(provider,
                 extensions, new CustomZipDriver1(password));
     }
-    
+
     private static final class CustomZipDriver1 extends ZipDriver {
+
         final WinZipAesParameters param;
-        
+
         CustomZipDriver1(byte[] password) {
             param = new CustomWinZipAesParameters(password);
         }
-        
+
         @Override
         protected WinZipAesParameters zipCryptoParameters(
                 FsModel model,
@@ -90,11 +91,11 @@ public final class KeyManagement {
             // model.getMountPoint().toUri().
             // If you need a more user friendly form of this URI, then call
             // model.getMountPoint().toHierarchicalUri().
-            
+
             // Let's not use the key manager but instead our custom parameters.
             return param;
         }
-        
+
         @Override
         public FsController decorate(FsController controller) {
             // This is a minor improvement: The default implementation decorates
@@ -106,7 +107,7 @@ public final class KeyManagement {
             // given file system controller chain instead.
             return controller;
         }
-        
+
         @Override
         protected boolean rdc(
                 AbstractZipDriverEntry input,
@@ -115,31 +116,32 @@ public final class KeyManagement {
             // of our custom archive file format we do NOT need to process the
             // entries according to the following pipeline when copying them:
             // decrypt(inputKey) -> inflate() -> deflate() -> encrypt(outputKey)
-            
+
             // This reduces the processing pipeline to a simple copy operation
             // and is a DRASTIC performance improvement, e.g. when compacting
             // an archive file.
             return true;
-            
+
             // This is the default implementation - try to see the difference.
             //return input.isEncrypted() || output.isEncrypted();
         }
     } // CustomZipDriver1
-    
+
     private static final class CustomWinZipAesParameters
     implements WinZipAesParameters {
+
         final byte[] password;
-        
+
         CustomWinZipAesParameters(final byte[] password) {
             this.password = password.clone();
         }
-        
+
         @Override
         public byte[] getWritePassword(String name)
         throws ZipKeyException {
             return password.clone();
         }
-        
+
         @Override
         public byte[] getReadPassword(String name, boolean invalid)
         throws ZipKeyException {
@@ -147,13 +149,13 @@ public final class KeyManagement {
                 throw new ZipKeyException(name + " (invalid password)");
             return password.clone();
         }
-        
+
         @Override
         public AesKeyStrength getKeyStrength(String arg0)
         throws ZipKeyException {
             return AesKeyStrength.BITS_128;
         }
-        
+
         @Override
         public void setKeyStrength(String name, AesKeyStrength keyStrength)
         throws ZipKeyException {
@@ -192,30 +194,27 @@ public final class KeyManagement {
         return new TArchiveDetector(provider,
                     extensions, new CustomZipDriver2(password));
     }
-    
+
     private static final class CustomZipDriver2 extends ZipDriver {
-        final KeyManagerContainer container;
-        
+
+        final KeyManagerMap map;
+
         CustomZipDriver2(char[] password) {
-            this.container = new PromptingKeyManagerContainer(
+            this.map = new PromptingKeyManagerMap(
                     AesPbeParameters.class,
                     new CustomView(password));
         }
-        
+
         @Override
-        public KeyManagerContainer getKeyManagerContainer() {
-            return container;
-        }
+        public KeyManagerMap getKeyManagerMap() { return map; }
     } // CustomZipDriver2
-    
+
     private static final class CustomView
     implements View<AesPbeParameters> {
         final char[] password;
-        
-        CustomView(char[] password) {
-            this.password = password.clone();
-        }
-        
+
+        CustomView(char[] password) { this.password = password.clone(); }
+
         /**
          * You need to create a new key because the key manager may eventually
          * reset it when the archive file gets moved or deleted.
@@ -226,7 +225,7 @@ public final class KeyManagement {
             param.setKeyStrength(AesKeyStrength.BITS_128);
             return param;
         }
-        
+
         @Override
         public void promptWriteKey(Controller<AesPbeParameters> controller)
         throws UnknownKeyException {
@@ -237,7 +236,7 @@ public final class KeyManagement {
             // have been overridden.
             controller.setKey(newKey());
         }
-        
+
         @Override
         public void promptReadKey(  Controller<AesPbeParameters> controller,
                                     boolean invalid)

@@ -11,18 +11,18 @@ import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.services.Container;
 
 /**
- * An abstract provider for an immutable map of secret key classes to nullable
+ * An abstract implementation of an immutable map of key classes to nullable
  * key managers.
  *
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class AbstractKeyManagerContainer
-implements KeyManagerContainer, Container<Map<Class<?>, KeyManager<?>>> {
+public abstract class AbstractKeyManagerMap
+implements KeyManagerMap, Container<Map<Class<?>, KeyManager<?>>> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public final @CheckForNull <K> KeyManager<K> keyManager(final Class<K> type) {
+    public final @CheckForNull <K> KeyManager<K> manager(final Class<K> type) {
         final KeyManager<?> m = get().get(type);
         if (null == m)
             throw new ServiceConfigurationError("No key manager available for " + type + ".");
@@ -30,19 +30,19 @@ implements KeyManagerContainer, Container<Map<Class<?>, KeyManager<?>>> {
     }
 
     /**
-     * Returns an immutable map of secret key classes to nullable key managers.
+     * Returns an immutable map of key classes to nullable key managers.
      * Only the values of the returned map may be {@code null}.
      * <p>
      * This is an immutable property - multiple calls must return the same
      * object.
      *
-     * @return An immutable map of secret key classes to nullable key managers.
+     * @return An immutable map of key classes to nullable key managers.
      */
     @Override
     public abstract Map<Class<?>, KeyManager<?>> get();
 
     /**
-     * Returns a string representation of this object for debugging and logging
+     * Returns a string representation of this object for logging and debugging
      * purposes.
      */
     @Override

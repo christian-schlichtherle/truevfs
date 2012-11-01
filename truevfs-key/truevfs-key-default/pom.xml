@@ -16,8 +16,7 @@
 
     <name>TrueVFS KeyManager Default</name>
     <description>
-    The KeyManager implementation in this module fails to resolve any secret
-    keys.
+    The KeyManager implementation in this module fails to resolve any keys.
     Its priority is set to Integer.MIN_VALUE, so any other KeyManager
     module on the class path will take precedence.
     </description>

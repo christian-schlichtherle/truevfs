@@ -22,9 +22,9 @@ public class TestZipRaesDriver extends SafeZipRaesDriver {
     public IoBufferPool getPool() {
         return TestConfig.get().getPool();
     }
-    
+
     @Override
-    public TestKeyManagerContainer getKeyManagerContainer() {
+    public TestKeyManagerContainer getKeyManagerMap() {
         return container;
     }
 

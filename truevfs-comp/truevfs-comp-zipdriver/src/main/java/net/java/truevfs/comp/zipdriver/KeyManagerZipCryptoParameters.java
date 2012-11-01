@@ -15,7 +15,7 @@ import net.java.truevfs.comp.zip.ZipParameters;
 import net.java.truevfs.comp.zip.ZipParametersProvider;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.key.spec.KeyManager;
-import net.java.truevfs.key.spec.KeyManagerContainer;
+import net.java.truevfs.key.spec.KeyManagerMap;
 import net.java.truevfs.key.spec.KeyProvider;
 import net.java.truevfs.key.spec.UnknownKeyException;
 import net.java.truevfs.key.spec.param.AesKeyStrength;
@@ -25,7 +25,7 @@ import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS5PasswordToByte
 
 /**
  * An adapter which provides {@link ZipCryptoParameters} by using a
- * {@link KeyManagerContainer}.
+ * {@link KeyManagerMap}.
  * <p>
  * The current implementation supports only {@link WinZipAesParameters}.
  *
@@ -115,7 +115,7 @@ implements ZipParametersProvider, ZipCryptoParameters {
     }
 
     private <K> KeyManager<K> keyManager(Class<K> type) {
-        return driver.getKeyManagerContainer().keyManager(type);
+        return driver.getKeyManagerMap().manager(type);
     }
 
     private URI resourceUri(String name) {
@@ -124,7 +124,7 @@ implements ZipParametersProvider, ZipCryptoParameters {
 
     /**
      * Adapts a {@code KeyProvider} for {@link  AesPbeParameters} obtained
-     * from the {@link #keyManager} to {@code WinZipAesParameters}.
+     * from the {@link #get} to {@code WinZipAesParameters}.
      */
     private class WinZipAes implements WinZipAesParameters {
         final KeyManager<AesPbeParameters>
@@ -134,9 +134,9 @@ implements ZipParametersProvider, ZipCryptoParameters {
         public byte[] getWritePassword(final String name)
         throws ZipKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.access(resourceUri(name));
+                    provider = manager.provider(resourceUri(name));
             try {
-                return password(provider.getWriteKey().getPassword(), name);
+                return password(provider.prepareWriting().getPassword(), name);
             } catch (UnknownKeyException ex) {
                 throw new ZipKeyException(ex);
             }
@@ -146,9 +146,9 @@ implements ZipParametersProvider, ZipCryptoParameters {
         public byte[] getReadPassword(final String name, final boolean invalid)
         throws ZipKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.access(resourceUri(name));
+                    provider = manager.provider(resourceUri(name));
             try {
-                return password(provider.getReadKey(invalid).getPassword(), name);
+                return password(provider.prepareReading(invalid).getPassword(), name);
             } catch (UnknownKeyException ex) {
                 throw new ZipKeyException(ex);
             }
@@ -158,9 +158,9 @@ implements ZipParametersProvider, ZipCryptoParameters {
         public AesKeyStrength getKeyStrength(final String name)
         throws ZipKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.access(resourceUri(name));
+                    provider = manager.provider(resourceUri(name));
             try {
-                return provider.getWriteKey().getKeyStrength();
+                return provider.prepareWriting().getKeyStrength();
             } catch (UnknownKeyException ex) {
                 throw new ZipKeyException(ex);
             }
@@ -171,10 +171,10 @@ implements ZipParametersProvider, ZipCryptoParameters {
                                     final AesKeyStrength keyStrength)
         throws ZipKeyException {
             final KeyProvider<AesPbeParameters>
-                    provider = manager.access(resourceUri(name));
+                    provider = manager.provider(resourceUri(name));
             final AesPbeParameters param;
             try {
-                param = provider.getReadKey(false);
+                param = provider.prepareReading(false);
             } catch (UnknownKeyException ex) {
                 throw new ZipKeyException(ex);
             }

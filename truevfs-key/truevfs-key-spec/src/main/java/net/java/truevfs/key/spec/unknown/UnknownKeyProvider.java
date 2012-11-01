@@ -9,7 +9,7 @@ import net.java.truevfs.key.spec.PersistentUnknownKeyException;
 import net.java.truevfs.key.spec.UnknownKeyException;
 
 /**
- * This key provider fails to resolve any secret keys.
+ * This key provider fails to resolve any keys.
  *
  * @since  TrueVFS 0.9.4
  * @author Christian Schlichtherle
@@ -21,14 +21,14 @@ final class UnknownKeyProvider implements KeyProvider<Object> {
     private UnknownKeyProvider() { }
 
     @Override
-    public Object getWriteKey() throws UnknownKeyException {
+    public Object prepareWriting() throws UnknownKeyException {
         throw new PersistentUnknownKeyException();
     }
 
     @Override
-    public Object getReadKey(final boolean invalid) throws UnknownKeyException {
+    public Object prepareReading(final boolean invalid) throws UnknownKeyException {
         if (invalid) setKey(null);
-        return getWriteKey();
+        return prepareWriting();
     }
 
     @Override

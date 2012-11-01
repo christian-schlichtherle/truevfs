@@ -28,12 +28,8 @@ extends AbstractKeyManager<K> {
     /** Constructs a new safe key manager. */
     protected SafeKeyManager() { }
 
-    /**
-     * Returns a new key provider.
-     *
-     * @param resource the URI of the protected resource.
-     */
-    protected abstract P newKeyProvider(URI resource);
+    /** Returns a new key provider. */
+    protected abstract P newKeyProvider();
 
     /**
      * Returns the mapped key provider for the given protected resource or
@@ -47,31 +43,38 @@ extends AbstractKeyManager<K> {
     }
 
     @Override
-    public synchronized P access(final URI resource) {
-        P access = get(resource);
-        if (null == access)
-            providers.put(resource, access = newKeyProvider(resource));
-        return access;
+    public synchronized P provider(final URI resource) {
+        P p = get(resource);
+        if (null == p) providers.put(resource, p = newKeyProvider());
+        return p;
     }
 
     @Override
     public synchronized void move(
             final URI oldResource,
             final URI newResource) {
-        if (oldResource.equals(Objects.requireNonNull(newResource))) return;
-        final P move = providers.remove(oldResource);
-        if (null != move) providers.put(newResource, move);
+        Objects.requireNonNull(newResource);
+        final P p = providers.remove(Objects.requireNonNull(oldResource));
+        if (null != p) providers.put(newResource, p);
     }
 
     /**
      * {@inheritDoc}
      * <p>
      * The returned key provider is invalidated and will behave as if prompting
-     * for the secret key had been disabled or cancelled by the user.
+     * for the key had been disabled or cancelled by the user.
      */
     @Override
     public synchronized void delete(final URI resource) {
-        final P delete = providers.remove(Objects.requireNonNull(resource));
-        if (null != delete) delete.setKey(null);
+        final P p = providers.remove(Objects.requireNonNull(resource));
+        if (null != p) p.setKey(null);
     }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@code SafeKeyManager} does nothing.
+     */
+    @Override
+    public void release(URI resource) { }
 }

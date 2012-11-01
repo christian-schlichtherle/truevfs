@@ -12,8 +12,8 @@ import net.java.truevfs.key.spec.util.SuspensionPenalty;
  * Provides the base functionality required to implement a "safe" key provider.
  * Each instance of this class maintains a single instance of the interface
  * {@link SafeKey}).
- * A clone of this key is returned on each call to {@link #getWriteKey}
- * and {@link #getReadKey}.
+ * A clone of this key is returned on each call to {@link #prepareWriting}
+ * and {@link #prepareReading}.
  *
  * @param  <K> the type of the safe keys.
  * @author Christian Schlichtherle
@@ -26,7 +26,7 @@ implements KeyProvider<K> {
      * The minimum delay between subsequent attempts to verify a key in
      * milliseconds.
      * More specifically, this is the minimum delay between two calls to
-     * {@link #getReadKey} by the same thread if the parameter {@code invalid}
+     * {@link #prepareReading} by the same thread if the parameter {@code invalid}
      * is {@code true}.
      */
     public static final int MIN_KEY_RETRY_DELAY = SuspensionPenalty.MIN_KEY_RETRY_DELAY;
@@ -35,9 +35,6 @@ implements KeyProvider<K> {
 
     private final ThreadLocal<Long> invalidated = new ThreadLocal<>();
 
-    /**
-     * Constructs a new safe key provider.
-     */
     protected SafeKeyProvider() { }
 
     /**
@@ -47,23 +44,23 @@ implements KeyProvider<K> {
      * {@link #retrieveWriteKey}.
      *
      * @throws UnknownKeyException If {@code retrieveWriteKey} throws
-     *         this exception or the secret key is still {@code null}.
+     *         this exception or the key is still {@code null}.
      */
     @Override
-    public final K getWriteKey() throws UnknownKeyException {
+    public final K prepareWriting() throws UnknownKeyException {
         retrieveWriteKey();
         return getNonNullKey();
     }
 
     /**
-     * Retrieves the secret key for the encryption of a protected resource.
+     * Retrieves the key for writing a protected resource.
      * <p>
      * Subsequent calls to this method may return the same object.
      *
-     * @throws UnknownKeyException If the secret key is unknown.
+     * @throws UnknownKeyException If the key is unknown.
      *         At the subclasses discretion, this may mean that prompting for
      *         the key has been disabled or cancelled by the user.
-     * @see #getWriteKey
+     * @see #prepareWriting
      */
     protected abstract void retrieveWriteKey()
     throws UnknownKeyException;
@@ -79,12 +76,11 @@ implements KeyProvider<K> {
      * even when subclassed.
      *
      * @throws UnknownKeyException If {@code retrieveReadKey} throws
-     *         this exception or the secret key is still {@code null}.
+     *         this exception or the key is still {@code null}.
      */
     @Override
-    public final K getReadKey(boolean invalid) throws UnknownKeyException {
-        if (invalid)
-            invalidated.set(System.currentTimeMillis());
+    public final K prepareReading(boolean invalid) throws UnknownKeyException {
+        if (invalid) invalidated.set(System.currentTimeMillis());
         try {
             retrieveReadKey(invalid);
         } finally {
@@ -95,14 +91,14 @@ implements KeyProvider<K> {
     }
 
     /**
-     * Retrieves the secret key for the decryption of a protected resource.
+     * Retrieves the key for reading a protected resource.
      * <p>
      * Subsequent calls to this method may return the same object.
      *
-     * @throws UnknownKeyException If the secret key is unknown.
+     * @throws UnknownKeyException If the key is unknown.
      *         At the subclasses discretion, this may mean that prompting for
      *         the key has been disabled or cancelled by the user.
-     * @see #getReadKey
+     * @see #prepareReading
      */
     protected abstract void retrieveReadKey(boolean invalid)
     throws UnknownKeyException;
@@ -119,9 +115,9 @@ implements KeyProvider<K> {
     }
 
     @Override
-    public void setKey(final @CheckForNull K newKey) {
-        final K oldKey = this.key;
-        this.key = null == newKey ? null : newKey.clone();
-        if (null != oldKey) oldKey.reset();
+    public void setKey(final @CheckForNull K key) {
+        final K old = this.key;
+        this.key = null == key ? null : key.clone();
+        if (null != old) old.reset();
     }
 }
