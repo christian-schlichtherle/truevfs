@@ -25,8 +25,6 @@ public class MyUsageTest extends UsageTestSuite {
                         new KeyManagerMapFactory().get()));
 
         @Override
-        public Map<Class<?>, KeyManager<?>> get() {
-            return map;
-        }
+        public Map<Class<?>, KeyManager<?>> get() { return map; }
     }
 }
