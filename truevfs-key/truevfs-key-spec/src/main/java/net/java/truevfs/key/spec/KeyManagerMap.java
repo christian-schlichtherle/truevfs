@@ -8,6 +8,12 @@ import java.util.ServiceConfigurationError;
 
 /**
  * A map of key classes to key managers.
+ * When implementing a key manager map, you should extend the
+ * {@link AbstractKeyManagerMap} class rather than directly implementing this
+ * interface in order to maintain binary backwards compatibility even if this
+ * interface is changed.
+ * <p>
+ * Implementations must be safe for multi-threading.
  *
  * @author Christian Schlichtherle
  */

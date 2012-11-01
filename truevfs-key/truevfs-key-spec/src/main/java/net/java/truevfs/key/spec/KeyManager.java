@@ -8,7 +8,11 @@ import java.net.URI;
 
 /**
  * Manages the life cycle of key providers for accessing protected resources.
- * <p>
+ * When implementing a key manager, you should extend the
+ * {@link AbstractKeyManager} class rather than directly implementing this
+ * interface in order to maintain binary backwards compatibility even if this
+ * interface is changed.
+  * <p>
  * Implementations must be safe for multi-threading.
  *
  * @param  <K> The type of the keys.
