@@ -17,14 +17,13 @@ import java.util.WeakHashMap;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.inject.Provider;
 import javax.swing.JOptionPane;
-import net.java.truecommons.services.Loader;
 import net.java.truevfs.key.spec.KeyPromptingDisabledException;
 import net.java.truevfs.key.spec.KeyPromptingInterruptedException;
+import net.java.truevfs.key.spec.PromptingKeyProvider;
 import net.java.truevfs.key.spec.PromptingKeyProvider.Controller;
 import net.java.truevfs.key.spec.UnknownKeyException;
 import net.java.truevfs.key.spec.param.KeyStrength;
 import net.java.truevfs.key.spec.param.SafePbeParameters;
-import net.java.truevfs.key.spec.param.SafePbeParametersView;
 import net.java.truevfs.key.swing.feedback.Feedback;
 import net.java.truevfs.key.swing.sl.InvalidKeyFeedbackLocator;
 import net.java.truevfs.key.swing.sl.UnknownKeyFeedbackLocator;
@@ -39,7 +38,7 @@ import net.java.truevfs.key.swing.util.Windows;
 abstract class SwingSafePbeParametersView<
         P extends SafePbeParameters<P, S>,
         S extends KeyStrength>
-extends SafePbeParametersView<P> {
+implements PromptingKeyProvider.View<P> {
 
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(SwingSafePbeParametersView.class.getName());
@@ -57,9 +56,6 @@ extends SafePbeParametersView<P> {
 
     private static final Map<URI, ReadKeyPanel> readKeyPanels = new WeakHashMap<>();
 
-    private static final Loader loader
-            = new Loader(SwingSafePbeParametersView.class.getClassLoader());
-
     /**
      * The last resource ID used when prompting.
      * Initialized to the empty string.
@@ -70,6 +66,13 @@ extends SafePbeParametersView<P> {
             unknownKeyFeedbackProvider = UnknownKeyFeedbackLocator.SINGLETON;
     private volatile Provider<Feedback>
             invalidKeyFeedbackProvider = InvalidKeyFeedbackLocator.SINGLETON;
+
+    /**
+     * Returns new parameters for safe password based encryption.
+     *
+     * @return New parameters for safe password based encryption.
+     */
+    protected abstract P newPbeParameters();
 
     /**
      * Reads the encryption key as a byte sequence from the given pathname

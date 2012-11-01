@@ -16,7 +16,7 @@
 
     <name>TrueVFS KeyManager Disable</name>
     <description>
-    Putting this module on the class path effectively disables any secret key
+    Putting this module on the class path effectively disables any key
     management, regardless of any other KeyManager module which may be present
     on the class path.
     </description>

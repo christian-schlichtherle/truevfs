@@ -3,7 +3,7 @@
  * All rights reserved. Use is subject to license terms.
  */
 /**
- * Provides a key manager which fails to resolve any secret keys.
+ * Provides a key manager which fails to resolve any keys.
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truevfs.key.spec.unknown;

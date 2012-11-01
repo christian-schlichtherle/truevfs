@@ -7,7 +7,7 @@ package net.java.truevfs.comp.zipdriver;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import net.java.truevfs.key.spec.AbstractKeyManagerContainer;
+import net.java.truevfs.key.spec.AbstractKeyManagerMap;
 import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.MockView;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
@@ -15,7 +15,7 @@ import net.java.truevfs.key.spec.param.AesPbeParameters;
 /**
  * @author Christian Schlichtherle
  */
-public final class TestKeyManagerContainer extends AbstractKeyManagerContainer {
+public final class TestKeyManagerContainer extends AbstractKeyManagerMap {
 
     private final MockView<AesPbeParameters> view;
     private final Map<Class<?>, KeyManager<?>> managers;

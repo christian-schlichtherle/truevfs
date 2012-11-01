@@ -104,11 +104,11 @@ extends SafeKeyProvider<K> {
 
     /**
      * Returns whether or not the user shall get prompted for a new key upon
-     * the next call to {@link #getWriteKey()}, provided that the key
+     * the next call to {@link #prepareWriting()}, provided that the key
      * has been {@link #setKey set} before.
      *
      * @return Whether or not the user shall get prompted for a new key upon
-     *         the next call to {@link #getWriteKey()}, provided that the key
+     *         the next call to {@link #prepareWriting()}, provided that the key
      *         has been {@link #setKey set} before.
      */
     private boolean isChangeRequested() {
@@ -305,8 +305,7 @@ extends SafeKeyProvider<K> {
      * Implementations of this interface are maintained by a
      * {@link PromptingKeyManager}.
      * <p>
-     * Implementations of this interface must be thread safe
-     * and should have no side effects!
+     * Implementations must be safe for multi-threading!
      *
      * @param  <K> the type of the safe keys.
      * @author Christian Schlichtherle
@@ -326,8 +325,8 @@ extends SafeKeyProvider<K> {
          * parameter, then a clone of this object will be used as the key.
          * <p>
          * Otherwise, prompting for a key is permanently disabled and each
-         * subsequent call to {@link PromptingKeyProvider#getWriteKey} or
-         * {@link PromptingKeyProvider#getReadKey}
+         * subsequent call to {@link PromptingKeyProvider#prepareWriting} or
+         * {@link PromptingKeyProvider#prepareReading}
          * results in a {@link KeyPromptingCancelledException} until
          * {@link PromptingKeyProvider#resetCancelledKey()} or
          * {@link PromptingKeyProvider#resetUnconditionally()} gets
@@ -354,8 +353,8 @@ extends SafeKeyProvider<K> {
          * {@link Controller#setKey} with a {@code null}
          * parameter or throws a {@link KeyPromptingCancelledException}, then
          * prompting for the key is permanently disabled and each subsequent call
-         * to {@link PromptingKeyProvider#getWriteKey} or
-         * {@link PromptingKeyProvider#getReadKey} results in a
+         * to {@link PromptingKeyProvider#prepareWriting} or
+         * {@link PromptingKeyProvider#prepareReading} results in a
          * {@link KeyPromptingCancelledException} until
          * {@link PromptingKeyProvider#resetCancelledKey()} or
          * {@link PromptingKeyProvider#resetUnconditionally()} gets
@@ -374,8 +373,7 @@ extends SafeKeyProvider<K> {
     } // View
 
     /**
-     * Proxies access to the key for {@link View}
-     * implementations.
+     * Proxies access to the key for {@link View} implementations.
      *
      * @param  <K> the type of the safe keys.
      * @author Christian Schlichtherle
@@ -415,12 +413,12 @@ extends SafeKeyProvider<K> {
 
         /**
          * Requests to prompt the user for a new key upon the next call to
-         * {@link PromptingKeyProvider#getWriteKey()}, provided that the key is
+         * {@link PromptingKeyProvider#prepareWriting()}, provided that the key is
          * {@link PromptingKeyProvider#setKey set} by then.
          *
          * @param  changeRequested whether or not the user shall get prompted
          *         for a new key upon the next call to
-         *         {@link PromptingKeyProvider#getWriteKey()}, provided that the
+         *         {@link PromptingKeyProvider#prepareWriting()}, provided that the
          *         key is {@link PromptingKeyProvider#setKey set} then.
          * @throws IllegalStateException if setting this property is illegal in the
          *         current state.
@@ -429,8 +427,7 @@ extends SafeKeyProvider<K> {
     } // Controller
 
     /**
-     * Proxies access to the secret key for {@link View}
-     * implementations.
+     * Proxies access to the key for {@link View} implementations.
      */
     @NotThreadSafe
     private abstract class BaseController implements Controller<K>, Closeable {
@@ -477,8 +474,8 @@ extends SafeKeyProvider<K> {
     } // BaseController
 
     /**
-     * The controller to use when promting for a secret key to encrypt a
-     * protected resource.
+     * The controller to use when promting for a key to write a protected
+     * resource.
      */
     @NotThreadSafe
     private final class WriteController extends BaseController {
@@ -493,8 +490,8 @@ extends SafeKeyProvider<K> {
     } // WriteController
 
     /**
-     * The controller to use when promting for a secret key to decrypt a
-     * protected resource.
+     * The controller to use when promting for a key to read a protected
+     * resource.
      */
     @NotThreadSafe
     private final class ReadController extends BaseController {

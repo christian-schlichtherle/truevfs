@@ -16,7 +16,7 @@
 
     <name>TrueVFS KeyManager Specification</name>
     <description>
-        Specifies the API for secret key management.
+        Specifies a pluggable API for key management.
     </description>
 
     <dependencies>

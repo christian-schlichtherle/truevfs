@@ -11,7 +11,7 @@ import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.KeyProvider;
 
 /**
- * This key manager fails to resolve any secret keys.
+ * This key manager fails to resolve any keys.
  *
  * @since  TrueVFS 0.9.4
  * @author Christian Schlichtherle
@@ -25,7 +25,7 @@ public final class UnknownKeyManager extends AbstractKeyManager<Object> {
     private UnknownKeyManager() { }
 
     @Override
-    public KeyProvider<Object> access(URI resource) {
+    public KeyProvider<Object> provider(URI resource) {
         return UnknownKeyProvider.SINGLETON;
     }
 

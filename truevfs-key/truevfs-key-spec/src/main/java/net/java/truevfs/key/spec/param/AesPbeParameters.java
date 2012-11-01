@@ -16,14 +16,12 @@ import javax.annotation.concurrent.NotThreadSafe;
 public final class AesPbeParameters
 extends SafePbeParameters<AesPbeParameters, AesKeyStrength> {
 
-    public AesPbeParameters() {
-        reset();
-    }
+    public AesPbeParameters() { reset(); }
 
     @Override
     public void reset() {
         super.reset();
-        setKeyStrength(AesKeyStrength.BITS_128);
+        super.setKeyStrength(AesKeyStrength.BITS_128);
     }
 
     @Override

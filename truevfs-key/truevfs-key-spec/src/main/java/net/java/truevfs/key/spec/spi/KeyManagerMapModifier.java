@@ -24,5 +24,4 @@ import net.java.truevfs.key.spec.sl.KeyManagerMapLocator;
  */
 @ServiceSpecification
 public abstract class KeyManagerMapModifier
-extends LocatableModifier<Map<Class<?>, KeyManager<?>>> {
-}
+extends LocatableModifier<Map<Class<?>, KeyManager<?>>> { }

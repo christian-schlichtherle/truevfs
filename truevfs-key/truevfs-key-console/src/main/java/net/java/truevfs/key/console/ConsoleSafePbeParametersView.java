@@ -13,10 +13,10 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.key.spec.KeyPromptingDisabledException;
+import net.java.truevfs.key.spec.PromptingKeyProvider;
 import net.java.truevfs.key.spec.PromptingKeyProvider.Controller;
 import net.java.truevfs.key.spec.param.KeyStrength;
 import net.java.truevfs.key.spec.param.SafePbeParameters;
-import net.java.truevfs.key.spec.param.SafePbeParametersView;
 
 /**
  * A console based user interface for prompting for passwords.
@@ -27,7 +27,7 @@ import net.java.truevfs.key.spec.param.SafePbeParametersView;
 abstract class ConsoleSafePbeParametersView<
         P extends SafePbeParameters<P, S>,
         S extends KeyStrength>
-extends SafePbeParametersView<P> {
+implements PromptingKeyProvider.View<P> {
 
     private static final ResourceBundle resources = ResourceBundle
             .getBundle(ConsoleSafePbeParametersView.class.getName());
@@ -50,6 +50,13 @@ extends SafePbeParametersView<P> {
     private static final String YES = resources.getString("yes");
     private static final String NO = resources.getString("no");
 
+    /**
+     * Returns new parameters for safe password based encryption.
+     *
+     * @return New parameters for safe password based encryption.
+     */
+    protected abstract P newPbeParameters();
+
     @Override
     public final void promptWriteKey(final Controller<P> controller)
     throws KeyPromptingDisabledException {
@@ -64,14 +71,12 @@ extends SafePbeParametersView<P> {
             lastResource = resource;
 
             P param = controller.getKey();
-            if (null == param)
-                param = newPbeParameters();
+            if (null == param) param = newPbeParameters();
 
             while (true) {
                 char[] input1 = con.readPassword(
                         resources.getString("writeKey.newPasswd1"));
-                if (null == input1 || 0 >= input1.length)
-                    return;
+                if (null == input1 || 0 >= input1.length) return;
                 if (MIN_PASSWD_LEN > input1.length) {
                     con.printf(resources.getString("writeKey.passwd.tooShort"), MIN_PASSWD_LEN);
                     continue;
@@ -79,8 +84,7 @@ extends SafePbeParametersView<P> {
                 try {
                     char[] input2 = con.readPassword(
                             resources.getString("writeKey.newPasswd2"));
-                    if (input2 == null)
-                        return;
+                    if (input2 == null) return;
                     try {
                         if (!Arrays.equals(input1, input2)) {
                             con.printf(resources.getString("writeKey.passwd.noMatch"));
@@ -105,8 +109,7 @@ extends SafePbeParametersView<P> {
                 map = new HashMap<>(array.length / 3 * 4 + 1);
                 final PrintWriter writer = con.writer();
                 for (final S strength : array) {
-                    if (0 < builder.length())
-                        builder.append('/');
+                    if (0 < builder.length()) builder.append('/');
                     builder.append(strength.getBits());
                     map.put(strength.getBits(), strength);
                     writer.println(strength);
@@ -119,8 +122,7 @@ extends SafePbeParametersView<P> {
                         resources.getString("keyStrength.prompt"),
                         selection,
                         param.getKeyStrength().getBits());
-                if (null == input || input.length() <= 0)
-                    break;
+                if (null == input || input.length() <= 0) break;
                 try {
                     final int bits = Integer.parseInt(input);
                     final S strength = map.get(bits);
@@ -146,8 +148,7 @@ extends SafePbeParametersView<P> {
         if (null == con) throw new KeyPromptingDisabledException();
 
         synchronized (lock) {
-            if (invalid)
-                con.printf(resources.getString("readKey.invalid"));
+            if (invalid) con.printf(resources.getString("readKey.invalid"));
 
             final URI resource = controller.getResource();
             assert null != resource;

@@ -27,7 +27,7 @@ public class PromptingKeyProviderTest {
         view.setResource(RESOURCE);
         view.setChangeRequested(true);
         manager = new PromptingKeyManager<>(view);
-        provider = manager.access(RESOURCE);
+        provider = manager.provider(RESOURCE);
     }
 
     @Test
@@ -36,30 +36,30 @@ public class PromptingKeyProviderTest {
         view.setKey(key);
         assertSame(key, view.getKey());
 
-        assertEquals(key, provider.getWriteKey());
-        assertEquals(key, provider.getReadKey(false));
+        assertEquals(key, provider.prepareWriting());
+        assertEquals(key, provider.prepareReading(false));
 
         view.setAction(CANCEL);
 
-        assertEquals(key, provider.getWriteKey());
-        assertEquals(key, provider.getReadKey(false));
+        assertEquals(key, provider.prepareWriting());
+        assertEquals(key, provider.prepareReading(false));
 
         provider.resetCancelledKey();
 
-        assertEquals(key, provider.getReadKey(false));
-        assertEquals(key, provider.getWriteKey());
+        assertEquals(key, provider.prepareReading(false));
+        assertEquals(key, provider.prepareWriting());
 
         provider.resetUnconditionally();
 
         view.setKey(key = new DummyKey());
         try {
-            provider.getReadKey(false);
+            provider.prepareReading(false);
             fail();
         } catch (UnknownKeyException expected) {
         }
         view.setKey(key = new DummyKey());
         try {
-            provider.getWriteKey();
+            provider.prepareWriting();
             fail();
         } catch (UnknownKeyException expected) {
         }
@@ -68,13 +68,13 @@ public class PromptingKeyProviderTest {
 
         view.setKey(key = new DummyKey());
         try {
-            provider.getReadKey(false);
+            provider.prepareReading(false);
             fail();
         } catch (UnknownKeyException expected) {
         }
         view.setKey(key = new DummyKey());
         try {
-            provider.getWriteKey();
+            provider.prepareWriting();
             fail();
         } catch (UnknownKeyException expected) {
         }
@@ -83,25 +83,25 @@ public class PromptingKeyProviderTest {
         view.setAction(ENTER);
 
         view.setKey(key = new DummyKey());
-        assertEquals(key, provider.getReadKey(false));
+        assertEquals(key, provider.prepareReading(false));
         view.setKey(key = new DummyKey());
-        assertEquals(key, provider.getWriteKey());
+        assertEquals(key, provider.prepareWriting());
 
         provider.setKey(null);
         try {
-            provider.getReadKey(false);
+            provider.prepareReading(false);
             fail();
         } catch (UnknownKeyException expected) {
         }
         try {
-            provider.getWriteKey();
+            provider.prepareWriting();
             fail();
         } catch (UnknownKeyException expected) {
         }
 
         provider.setKey(key = new DummyKey());
-        assertEquals(key, provider.getReadKey(false));
+        assertEquals(key, provider.prepareReading(false));
         view.setKey(new DummyKey());
-        assertEquals(key, provider.getWriteKey());
+        assertEquals(key, provider.prepareWriting());
     }
 }

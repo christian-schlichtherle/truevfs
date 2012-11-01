@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.services.Locator;
-import net.java.truevfs.key.spec.AbstractKeyManagerContainer;
+import net.java.truevfs.key.spec.AbstractKeyManagerMap;
 import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.spi.KeyManagerMapFactory;
 import net.java.truevfs.key.spec.spi.KeyManagerMapModifier;
@@ -25,7 +25,7 @@ import net.java.truevfs.key.spec.spi.KeyManagerMapModifier;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class KeyManagerMapLocator extends AbstractKeyManagerContainer {
+public final class KeyManagerMapLocator extends AbstractKeyManagerMap {
 
     /** The singleton instance of this class. */
     public static final KeyManagerMapLocator

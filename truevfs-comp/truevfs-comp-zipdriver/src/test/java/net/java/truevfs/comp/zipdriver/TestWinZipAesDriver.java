@@ -24,7 +24,7 @@ public final class TestWinZipAesDriver extends ZipDriver {
     }
 
     @Override
-    public TestKeyManagerContainer getKeyManagerContainer() {
+    public TestKeyManagerContainer getKeyManagerMap() {
         return container;
     }
 

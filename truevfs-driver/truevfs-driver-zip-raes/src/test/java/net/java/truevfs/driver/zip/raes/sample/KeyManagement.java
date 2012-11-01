@@ -16,8 +16,8 @@ import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsScheme;
-import net.java.truevfs.key.spec.KeyManagerContainer;
-import net.java.truevfs.key.spec.PromptingKeyManagerContainer;
+import net.java.truevfs.key.spec.KeyManagerMap;
+import net.java.truevfs.key.spec.PromptingKeyManagerMap;
 import net.java.truevfs.key.spec.PromptingKeyProvider.Controller;
 import net.java.truevfs.key.spec.PromptingKeyProvider.View;
 import net.java.truevfs.key.spec.UnknownKeyException;
@@ -70,25 +70,26 @@ public final class KeyManagement {
         return new TArchiveDetector(provider,
                 extensions, new CustomZipRaesDriver1(password));
     }
-    
+
     private static final class CustomZipRaesDriver1 extends SafeZipRaesDriver {
+
         final RaesParameters param;
-        
+
         CustomZipRaesDriver1(char[] password) {
             param = new CustomRaesParameters(password);
         }
-        
+
         @Override
         protected RaesParameters raesParameters(FsModel model) {
             // If you need the URI of the particular archive file, then call
             // model.getMountPoint().toUri().
             // If you need a more user friendly form of this URI, then call
             // model.getMountPoint().toHierarchicalUri().
-            
+
             // Let's not use the key manager but instead our custom parameters.
             return param;
         }
-        
+
         @Override
         public FsController decorate(FsController controller) {
             // This is a minor improvement: The default implementation decorates
@@ -101,35 +102,35 @@ public final class KeyManagement {
             return controller;
         }
     } // CustomZipRaesDriver
-    
+
     private static final class CustomRaesParameters
     implements Type0RaesParameters {
+
         final char[] password;
-        
+
         CustomRaesParameters(final char[] password) {
             this.password = password.clone();
         }
-        
+
         @Override
         public char[] getWritePassword()
         throws RaesKeyException {
             return password.clone();
         }
-        
+
         @Override
         public char[] getReadPassword(boolean invalid)
         throws RaesKeyException {
-            if (invalid)
-                throw new RaesKeyException("Invalid password!");
+            if (invalid) throw new RaesKeyException("Invalid password!");
             return password.clone();
         }
-        
+
         @Override
         public AesKeyStrength getKeyStrength()
         throws RaesKeyException {
             return AesKeyStrength.BITS_128;
         }
-        
+
         @Override
         public void setKeyStrength(AesKeyStrength keyStrength)
         throws RaesKeyException {
@@ -165,30 +166,28 @@ public final class KeyManagement {
         return new TArchiveDetector(provider,
                     extensions, new CustomZipRaesDriver2(password));
     }
-    
+
     private static final class CustomZipRaesDriver2 extends SafeZipRaesDriver {
-        final KeyManagerContainer container;
-        
+
+        final KeyManagerMap map;
+
         CustomZipRaesDriver2(char[] password) {
-            this.container = new PromptingKeyManagerContainer(
+            this.map = new PromptingKeyManagerMap(
                     AesPbeParameters.class,
                     new CustomView(password));
         }
-        
+
         @Override
-        public KeyManagerContainer getKeyManagerContainer() {
-            return container;
-        }
+        public KeyManagerMap getKeyManagerMap() { return map; }
     } // CustomZipRaesDriver2
-    
+
     private static final class CustomView
     implements View<AesPbeParameters> {
+
         final char[] password;
-        
-        CustomView(char[] password) {
-            this.password = password.clone();
-        }
-        
+
+        CustomView(char[] password) { this.password = password.clone(); }
+
         /**
          * You need to create a new key because the key manager may eventually
          * reset it when the archive file gets moved or deleted.
@@ -199,7 +198,7 @@ public final class KeyManagement {
             param.setKeyStrength(AesKeyStrength.BITS_128);
             return param;
         }
-        
+
         @Override
         public void promptWriteKey(Controller<AesPbeParameters> controller)
         throws UnknownKeyException {
@@ -210,7 +209,7 @@ public final class KeyManagement {
             // have been overridden.
             controller.setKey(newKey());
         }
-        
+
         @Override
         public void promptReadKey(  Controller<AesPbeParameters> controller,
                                     boolean invalid)

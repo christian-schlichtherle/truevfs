@@ -25,15 +25,15 @@ public abstract class KeyManagerTestSuite<M extends KeyManager<?>> {
         URI id = URI.create("a");
 
         try {
-            manager.access(null);
+            manager.provider(null);
             fail();
         } catch (NullPointerException expected) {
         }
 
-        KeyProvider<?> prov1 = manager.access(id);
+        KeyProvider<?> prov1 = manager.provider(id);
         assertNotNull(prov1);
 
-        KeyProvider<?> prov2 = manager.access(id);
+        KeyProvider<?> prov2 = manager.provider(id);
         assertSame(prov1, prov2);
     }
 
@@ -62,16 +62,16 @@ public abstract class KeyManagerTestSuite<M extends KeyManager<?>> {
 
         manager.move(idA, idB);
 
-        KeyProvider<?> provA1 = manager.access(idA);
+        KeyProvider<?> provA1 = manager.provider(idA);
         assertNotNull(provA1);
 
         manager.move(idA, idB);
 
-        KeyProvider<?> provA2 = manager.access(idA);
+        KeyProvider<?> provA2 = manager.provider(idA);
         assertNotNull(provA2);
         assertFalse(provA1.equals(provA2));
 
-        KeyProvider<?> provB1 = manager.access(idB);
+        KeyProvider<?> provB1 = manager.provider(idB);
         assertNotNull(provB1);
         assertSame(provA1, provB1);
     }
@@ -82,11 +82,11 @@ public abstract class KeyManagerTestSuite<M extends KeyManager<?>> {
 
         manager.delete(id);
 
-        KeyProvider<?> prov1 = manager.access(id);
+        KeyProvider<?> prov1 = manager.provider(id);
         manager.delete(id);
         manager.delete(id);
 
-        KeyProvider<?> prov2 = manager.access(id);
+        KeyProvider<?> prov2 = manager.provider(id);
         manager.delete(id);
         manager.delete(id);
 

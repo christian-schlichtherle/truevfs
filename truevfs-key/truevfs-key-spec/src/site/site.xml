@@ -11,6 +11,7 @@
     <body>
         <menu name="Documentation">
             <item name="About" href="index.html"/>
+            <item name="Using the API" href="usage.html"/>
         </menu>
     </body>
 </project>
