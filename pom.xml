@@ -123,217 +123,217 @@ plug-in to its federated file system space.
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-access</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-access</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-access-swing</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-comp-ibm437</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-comp-inst</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-comp-jmx</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-comp-tardriver</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-comp-tardriver</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-comp-zip</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-comp-zip</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-comp-zipdriver</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-comp-zipdriver</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-file</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-http</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-jar</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-odf</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-sfx</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-tar</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-tar-bzip2</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-tar-gzip</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-tar-xz</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-zip</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-driver-zip-raes</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-ext-insight</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-ext-logging</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-ext-pacemaker</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-kernel-impl</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-kernel-spec</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-kernel-spec</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-key-console</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-key-default</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-key-disable</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-key-spec</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-key-spec</artifactId>
                 <type>test-jar</type>
                 <version>${project.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-key-swing</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-key-hurlfb</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-profile-base</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-profile-default</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-profile-full</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
             </dependency>
             <dependency>
-                <groupId>net.java.truevfs</groupId>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-samples</artifactId>
                 <version>${project.version}</version>
             </dependency>
