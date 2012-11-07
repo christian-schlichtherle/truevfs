@@ -83,55 +83,65 @@ implements RaesParametersProvider {
      * from the {@link #manager} to {@code Type0RaesParameters}.
      */
     private class Type0 implements Type0RaesParameters {
+        private AesPbeParameters key;
+
+        private KeyProvider<AesPbeParameters> provider() {
+            return manager.provider(raes);
+        }
+
         @Override
         public char[] getWritePassword()
         throws RaesKeyException {
-            final KeyProvider<AesPbeParameters>
-                    provider = manager.provider(raes);
-            try {
-                return provider.prepareWriting().getPassword();
-            } catch (final UnknownKeyException ex) {
-                throw new RaesKeyException(ex);
+            if (null == key) {
+                try {
+                    key = provider().prepareWriting();
+                } catch (final UnknownKeyException ex) {
+                    throw new RaesKeyException(ex);
+                }
             }
+            return key.getPassword();
         }
 
         @Override
         public char[] getReadPassword(final boolean invalid)
         throws RaesKeyException {
-            final KeyProvider<AesPbeParameters>
-                    provider = manager.provider(raes);
-            try {
-                return provider.prepareReading(invalid).getPassword();
-            } catch (final UnknownKeyException ex) {
-                throw new RaesKeyException(ex);
+            if (invalid || null == key) {
+                try {
+                    key = provider().prepareReading(invalid);
+                } catch (final UnknownKeyException ex) {
+                    throw new RaesKeyException(ex);
+                }
             }
+            return key.getPassword();
         }
 
         @Override
         public AesKeyStrength getKeyStrength()
         throws RaesKeyException {
-            final KeyProvider<AesPbeParameters>
-                    provider = manager.provider(raes);
-            try {
-                return provider.prepareWriting().getKeyStrength();
-            } catch (final UnknownKeyException ex) {
-                throw new RaesKeyException(ex);
+            if (null == key) {
+                try {
+                    key = provider().prepareWriting();
+                } catch (final UnknownKeyException ex) {
+                    throw new RaesKeyException(ex);
+                }
             }
+            return key.getKeyStrength();
         }
 
         @Override
         public void setKeyStrength(final AesKeyStrength keyStrength)
         throws RaesKeyException {
-            final KeyProvider<AesPbeParameters>
-                    provider = manager.provider(raes);
-            final AesPbeParameters param;
-            try {
-                param = provider.prepareReading(false);
-            } catch (final UnknownKeyException ex) {
-                throw new RaesKeyException(ex);
+            final KeyProvider<AesPbeParameters> p = provider();
+            if (null == key) {
+                assert false;
+                try {
+                    key = p.prepareReading(false);
+                } catch (final UnknownKeyException ex) {
+                    throw new RaesKeyException(ex);
+                }
             }
-            param.setKeyStrength(keyStrength);
-            provider.setKey(param);
+            key.setKeyStrength(keyStrength);
+            p.setKey(key);
         }
     } // Type0
 }
