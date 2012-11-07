@@ -39,7 +39,7 @@ extends SafeKeyManager<K, PromptingKeyProvider<K>> {
      * @return A new prompting key provider.
      */
     @Override
-    protected final PromptingKeyProvider<K> newKeyProvider() {
+    protected final PromptingKeyProvider<K> newProvider() {
         return new PromptingKeyProvider<>(this);
     }
 
