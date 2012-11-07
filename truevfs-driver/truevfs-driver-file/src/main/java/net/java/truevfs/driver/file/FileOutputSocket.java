@@ -20,16 +20,16 @@ import java.util.Set;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truecommons.shed.BitField;
-import static net.java.truecommons.shed.HashMaps.initialCapacity;
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 import net.java.truecommons.cio.AbstractOutputSocket;
 import net.java.truecommons.cio.Entry;
 import static net.java.truecommons.cio.Entry.Access.*;
 import static net.java.truecommons.cio.Entry.UNKNOWN;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.IoSockets;
+import net.java.truecommons.shed.BitField;
+import static net.java.truecommons.shed.HashMaps.initialCapacity;
+import net.java.truevfs.kernel.spec.FsAccessOption;
+import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 
 /**
  * An output socket for a file entry.
@@ -42,7 +42,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
 
     private static final int
             INITIAL_CAPACITY = initialCapacity(FsAccessOption.values().length);
-    private static final StandardOpenOption[] 
+    private static final StandardOpenOption[]
             WRITE_STANDARD_OPEN_OPTION = {
                 StandardOpenOption.WRITE,
                 StandardOpenOption.TRUNCATE_EXISTING,
