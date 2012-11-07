@@ -179,10 +179,6 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
 
   /**
    * Ensures that {@link #outputArchive} does not return {@code None}.
-   * This method will use
-   * <code>{@link #getContext()}.{@link FsOperationContext#getOutputOptions()}</code>
-   * to obtain the output options to use for writing the entry in the parent
-   * file system.
    *
    * @return The output archive.
    */
