@@ -4,8 +4,6 @@
  */
 package net.java.truevfs.driver.zip.raes.crypto;
 
-import net.java.truecommons.io.IntervalReadOnlyChannel;
-import net.java.truecommons.io.PowerBuffer;
 import java.io.EOFException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -13,6 +11,8 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.io.IntervalReadOnlyChannel;
+import net.java.truecommons.io.MutableBuffer;
 import net.java.truevfs.comp.zip.crypto.CipherReadOnlyChannel;
 import net.java.truevfs.comp.zip.crypto.CtrBlockCipher;
 import net.java.truevfs.comp.zip.crypto.SeekableBlockCipher;
@@ -57,7 +57,7 @@ final class Type0RaesReadOnlyChannel extends RaesReadOnlyChannel {
         assert null != channel;
 
         // Load header data.
-        final PowerBuffer header = PowerBuffer
+        final MutableBuffer header = MutableBuffer
                 .allocate(TYPE_0_HEADER_LEN_WO_SALT)
                 .littleEndian()
                 .load(channel.position(0));
@@ -87,13 +87,13 @@ final class Type0RaesReadOnlyChannel extends RaesReadOnlyChannel {
                     + "!");
 
         // Load salt.
-        final PowerBuffer salt = PowerBuffer
+        final MutableBuffer salt = MutableBuffer
                 .allocate(keyStrengthBytes)
                 .load(channel);
 
         // Init KLAC and footer.
         final Mac klac = new HMac(new SHA256Digest());
-        final PowerBuffer footer = PowerBuffer.allocate(klac.getMacSize());
+        final MutableBuffer footer = MutableBuffer.allocate(klac.getMacSize());
 
         // Init start, end and size of encrypted data.
         final long start = channel.position();
@@ -124,23 +124,23 @@ final class Type0RaesReadOnlyChannel extends RaesReadOnlyChannel {
         byte[] buf;
         long lastTry = 0; // don't enforce suspension on first prompt!
         do {
-            final char[] passwd = param.getReadPassword(0 != lastTry);
-            assert null != passwd;
-            final byte[] pass = PKCS12PasswordToBytes(passwd);
-            Arrays.fill(passwd, (char) 0);
+            final char[] pwc = param.getReadPassword(0 != lastTry);
+            assert null != pwc;
+            final byte[] pwb = PKCS12PasswordToBytes(pwc);
+            Arrays.fill(pwc, (char) 0);
 
-            gen.init(pass, salt.array(), iCount);
+            gen.init(pwb, salt.array(), iCount);
             aesCtrParam = (ParametersWithIV) gen.generateDerivedParameters(
                     keyStrengthBits, AES_BLOCK_SIZE_BITS);
             sha256MacParam = (KeyParameter) gen.generateDerivedMacParameters(
                     keyStrengthBits);
-            Arrays.fill(pass, (byte) 0);
+            Arrays.fill(pwb, (byte) 0);
 
             lastTry = SuspensionPenalty.enforce(lastTry);
 
             // Compute and verify KLAC.
             klac.init(sha256MacParam);
-            
+
             // Update the KLAC with the cipher key.
             // This is actually redundant, but it's part of the spec, so it
             // cannot get changed anymore.
