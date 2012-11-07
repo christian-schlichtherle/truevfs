@@ -75,7 +75,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
         if (options.get(EXCLUSIVE) && (exists = exists(entryFile)))
             throw new FileAlreadyExistsException(node.toString());
         if (options.get(CACHE)) {
-            // This is obviously NOT atomic.
+            // This is obviously NOT properly isolated.
             if (TRUE.equals(exists)
                     || null == exists && (exists = exists(entryFile))) {
                 //if (!isWritable(entryFile)) throw new IOException(...)
