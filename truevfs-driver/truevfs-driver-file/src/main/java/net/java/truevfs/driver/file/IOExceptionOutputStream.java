@@ -4,13 +4,13 @@
  */
 package net.java.truevfs.driver.file;
 
-import net.java.truecommons.io.DecoratingOutputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
+import net.java.truecommons.io.DecoratingOutputStream;
 
 /**
  * A decorating output stream which saves the last {@link IOException}
