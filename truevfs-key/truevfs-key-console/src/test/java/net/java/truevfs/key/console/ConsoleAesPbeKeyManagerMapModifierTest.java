@@ -8,13 +8,13 @@ import java.util.Arrays;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
 import net.java.truevfs.key.spec.spi.KeyManagerMapModifier;
 import net.java.truevfs.key.spec.spi.KeyManagerMapModifierTestSuite;
-import net.java.truevfs.key.console.ConsoleAesPbeKeyManagerMapModifier;
 
 /**
  * @author Christian Schlichtherle
  */
 public class ConsoleAesPbeKeyManagerMapModifierTest
 extends KeyManagerMapModifierTestSuite {
+
     @Override
     @SuppressWarnings("unchecked")
     protected Iterable<Class<?>> getClasses() {
