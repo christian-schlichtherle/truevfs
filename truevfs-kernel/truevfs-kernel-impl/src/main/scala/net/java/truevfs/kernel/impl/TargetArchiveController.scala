@@ -25,7 +25,7 @@ import TargetArchiveController._
 /** Manages I/O to the entry which represents the target archive file in its
   * parent file system, detects archive entry collisions and implements a sync
   * of the target archive file.
-  * 
+  *
   * This controller is an emitter of
   * [[net.java.truevfs.kernel.impl.ControlFlowException]]s, for example
   * when
@@ -183,7 +183,7 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
    * <code>{@link #getContext()}.{@link FsOperationContext#getOutputOptions()}</code>
    * to obtain the output options to use for writing the entry in the parent
    * file system.
-   * 
+   *
    * @return The output archive.
    */
   private def outputArchive(options: AccessOptions): OutputArchive[E] = {
@@ -241,7 +241,7 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
     new Output
   }
 
-  private def syncOn[X <: IOException] = new {
+  def syncOn[X <: IOException] = new {
     def apply[A](operation: => A)(implicit mf: ClassManifest[X]) = {
       try {
         operation
@@ -452,7 +452,7 @@ private object TargetArchiveController {
   }
 
   /** A dummy input archive to substitute for `None` when copying.
-    * 
+    *
     * @tparam E the type of the entries.
     */
   private final class DummyInputService[E <: Entry] extends InputService[E] {
