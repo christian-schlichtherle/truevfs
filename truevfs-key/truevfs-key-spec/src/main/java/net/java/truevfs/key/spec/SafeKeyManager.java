@@ -29,7 +29,7 @@ extends AbstractKeyManager<K> {
     protected SafeKeyManager() { }
 
     /** Returns a new key provider. */
-    protected abstract P newKeyProvider();
+    protected abstract P newProvider();
 
     /**
      * Returns the mapped key provider for the given protected resource or
@@ -45,7 +45,7 @@ extends AbstractKeyManager<K> {
     @Override
     public synchronized P provider(final URI resource) {
         P p = get(resource);
-        if (null == p) providers.put(resource, p = newKeyProvider());
+        if (null == p) providers.put(resource, p = newProvider());
         return p;
     }
 
