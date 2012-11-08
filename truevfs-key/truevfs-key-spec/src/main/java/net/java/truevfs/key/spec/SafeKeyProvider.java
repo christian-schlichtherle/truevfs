@@ -12,8 +12,8 @@ import net.java.truevfs.key.spec.util.SuspensionPenalty;
  * Provides the base functionality required to implement a "safe" key provider.
  * Each instance of this class maintains a single instance of the interface
  * {@link SafeKey}).
- * A clone of this key is returned on each call to {@link #prepareWriting}
- * and {@link #prepareReading}.
+ * A clone of this key is returned on each call to {@link #getKeyForWriting}
+ * and {@link #getKeyForReading}.
  *
  * @param  <K> the type of the safe keys.
  * @author Christian Schlichtherle
@@ -26,7 +26,7 @@ extends AbstractKeyProvider<K> {
      * The minimum delay between subsequent attempts to verify a key in
      * milliseconds.
      * More specifically, this is the minimum delay between two calls to
-     * {@link #prepareReading} by the same thread if the parameter {@code invalid}
+     * {@link #getKeyForReading} by the same thread if the parameter {@code invalid}
      * is {@code true}.
      */
     public static final int MIN_KEY_RETRY_DELAY = SuspensionPenalty.MIN_KEY_RETRY_DELAY;
@@ -35,20 +35,18 @@ extends AbstractKeyProvider<K> {
 
     private final ThreadLocal<Long> invalidated = new ThreadLocal<>();
 
-    protected SafeKeyProvider() { }
-
     /**
      * {@inheritDoc}
      * <p>
      * The implementation in {@link SafeKeyProvider} forwards the call to
-     * {@link #retrieveWriteKey}.
+     * {@link #setupKeyForWriting}.
      *
-     * @throws UnknownKeyException If {@code retrieveWriteKey} throws
+     * @throws UnknownKeyException If {@code setupKeyForWriting} throws
      *         this exception or the key is still {@code null}.
      */
     @Override
-    public final K prepareWriting() throws UnknownKeyException {
-        retrieveWriteKey();
+    public final K getKeyForWriting() throws UnknownKeyException {
+        setupKeyForWriting();
         return getNonNullKey();
     }
 
@@ -60,29 +58,29 @@ extends AbstractKeyProvider<K> {
      * @throws UnknownKeyException If the key is unknown.
      *         At the subclasses discretion, this may mean that prompting for
      *         the key has been disabled or cancelled by the user.
-     * @see #prepareWriting
+     * @see #getKeyForWriting
      */
-    protected abstract void retrieveWriteKey()
+    protected abstract void setupKeyForWriting()
     throws UnknownKeyException;
 
     /**
      * {@inheritDoc}
      * <p>
      * The implementation in {@link SafeKeyProvider} forwards the call to
-     * {@link #retrieveReadKey} and enforces a three seconds suspension penalty
+     * {@link #setupKeyForReading} and enforces a three seconds suspension penalty
      * if {@code invalid} is {@code true} before returning.
      * Because this method is final, this qualifies the implementation in
      * this class as a "safe" {@code KeyProvider} implementation,
      * even when subclassed.
      *
-     * @throws UnknownKeyException If {@code retrieveReadKey} throws
+     * @throws UnknownKeyException If {@code setupKeyForReading} throws
      *         this exception or the key is still {@code null}.
      */
     @Override
-    public final K prepareReading(boolean invalid) throws UnknownKeyException {
+    public final K getKeyForReading(boolean invalid) throws UnknownKeyException {
         if (invalid) invalidated.set(System.currentTimeMillis());
         try {
-            retrieveReadKey(invalid);
+            setupKeyForReading(invalid);
         } finally {
             final Long invalidated = this.invalidated.get();
             SuspensionPenalty.enforce(null == invalidated ? 0 : invalidated);
@@ -98,9 +96,9 @@ extends AbstractKeyProvider<K> {
      * @throws UnknownKeyException If the key is unknown.
      *         At the subclasses discretion, this may mean that prompting for
      *         the key has been disabled or cancelled by the user.
-     * @see #prepareReading
+     * @see #getKeyForReading
      */
-    protected abstract void retrieveReadKey(boolean invalid)
+    protected abstract void setupKeyForReading(boolean invalid)
     throws UnknownKeyException;
 
     private K getNonNullKey() throws UnknownKeyException {

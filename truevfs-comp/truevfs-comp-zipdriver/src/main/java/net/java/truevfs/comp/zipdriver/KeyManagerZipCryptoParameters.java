@@ -136,7 +136,7 @@ implements ZipParametersProvider, ZipCryptoParameters {
             final KeyProvider<AesPbeParameters>
                     provider = manager.provider(resourceUri(name));
             try {
-                return password(provider.prepareWriting().getPassword(), name);
+                return password(provider.getKeyForWriting().getPassword(), name);
             } catch (UnknownKeyException ex) {
                 throw new ZipKeyException(ex);
             }
@@ -148,7 +148,7 @@ implements ZipParametersProvider, ZipCryptoParameters {
             final KeyProvider<AesPbeParameters>
                     provider = manager.provider(resourceUri(name));
             try {
-                return password(provider.prepareReading(invalid).getPassword(), name);
+                return password(provider.getKeyForReading(invalid).getPassword(), name);
             } catch (UnknownKeyException ex) {
                 throw new ZipKeyException(ex);
             }
@@ -160,7 +160,7 @@ implements ZipParametersProvider, ZipCryptoParameters {
             final KeyProvider<AesPbeParameters>
                     provider = manager.provider(resourceUri(name));
             try {
-                return provider.prepareWriting().getKeyStrength();
+                return provider.getKeyForWriting().getKeyStrength();
             } catch (UnknownKeyException ex) {
                 throw new ZipKeyException(ex);
             }
@@ -174,7 +174,7 @@ implements ZipParametersProvider, ZipCryptoParameters {
                     provider = manager.provider(resourceUri(name));
             final AesPbeParameters param;
             try {
-                param = provider.prepareReading(false);
+                param = provider.getKeyForReading(false);
             } catch (UnknownKeyException ex) {
                 throw new ZipKeyException(ex);
             }

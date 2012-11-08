@@ -81,7 +81,7 @@ final class Type0RaesOutputStream extends RaesOutputStream {
         assert digest.getDigestSize() >= keyStrengthBytes;
 
         // Init password.
-        final char[] pwdChars = param.getWritePassword();
+        final char[] pwdChars = param.getPasswordForWriting();
         final byte[] pwdBytes = PBEParametersGenerator.PKCS12PasswordToBytes(pwdChars);
         Arrays.fill(pwdChars, (char) 0);
 

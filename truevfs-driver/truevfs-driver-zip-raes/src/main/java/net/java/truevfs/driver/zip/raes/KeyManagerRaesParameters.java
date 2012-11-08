@@ -90,11 +90,11 @@ implements RaesParametersProvider {
         }
 
         @Override
-        public char[] getWritePassword()
+        public char[] getPasswordForWriting()
         throws RaesKeyException {
             if (null == param) {
                 try {
-                    param = provider().prepareWriting();
+                    param = provider().getKeyForWriting();
                 } catch (final UnknownKeyException ex) {
                     throw new RaesKeyException(ex);
                 }
@@ -103,11 +103,11 @@ implements RaesParametersProvider {
         }
 
         @Override
-        public char[] getReadPassword(final boolean invalid)
+        public char[] getPasswordForReading(final boolean invalid)
         throws RaesKeyException {
             if (invalid || null == param) {
                 try {
-                    param = provider().prepareReading(invalid);
+                    param = provider().getKeyForReading(invalid);
                 } catch (final UnknownKeyException ex) {
                     throw new RaesKeyException(ex);
                 }
@@ -120,7 +120,7 @@ implements RaesParametersProvider {
         throws RaesKeyException {
             if (null == param) {
                 try {
-                    param = provider().prepareWriting();
+                    param = provider().getKeyForWriting();
                 } catch (final UnknownKeyException ex) {
                     throw new RaesKeyException(ex);
                 }
@@ -135,7 +135,7 @@ implements RaesParametersProvider {
             if (null == param) {
                 assert false;
                 try {
-                    param = p.prepareReading(false);
+                    param = p.getKeyForReading(false);
                 } catch (final UnknownKeyException ex) {
                     throw new RaesKeyException(ex);
                 }

@@ -5,16 +5,20 @@
 package net.java.truevfs.key.spec.param;
 
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truevfs.key.spec.SafeKey;
+import net.java.truevfs.key.spec.AbstractSecretKey;
+import static net.java.truevfs.key.spec.BufferUtils.*;
+import net.java.truevfs.key.spec.PromptingKey;
 
 /**
  * A JavaBean which holds parameters for password based encryption.
+ * Passwords get encoded using {@link StandardCharsets#UTF_8}.
  * <p>
- * Sub classes do not need to be thread-safe.
+ * Subclasses do <em>not</em> need to be safe for multi-threading.
  *
  * @param  <P> the type of these safe PBE parameters.
  * @param  <S> the type of the key strength.
@@ -24,76 +28,26 @@ import net.java.truevfs.key.spec.SafeKey;
 public abstract class SafePbeParameters<
         P extends SafePbeParameters<P, S>,
         S extends KeyStrength>
-implements SafeKey<P> {
+extends AbstractSecretKey<P> implements PromptingKey<P> {
 
-    private @CheckForNull CharBuffer buffer;
     private @CheckForNull S keyStrength;
-
-    private boolean invariants() {
-        final CharBuffer buffer = this.buffer;
-        if (null != buffer) {
-            assert 0 == buffer.position();
-            assert buffer.limit() == buffer.capacity();
-        }
-        return true;
-    }
-
-    @Override
-    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
-    public P clone() {
-        try {
-            final SafePbeParameters<P, S> clone;
-            try {
-                 clone = (SafePbeParameters<P, S>) super.clone();
-            } catch (CloneNotSupportedException ex) {
-                throw new AssertionError(ex);
-            }
-            clone.setBuffer(this.getBuffer());
-            return (P) clone;
-        } finally {
-            assert invariants();
-        }
-    }
+    //private boolean changeRequested;
 
     @Override
     public void reset() {
-        setPassword(null);
-        setKeyStrength(null);
-    }
-
-    private CharBuffer getBuffer() {
-        final CharBuffer buffer = this.buffer;
-        return null == buffer ? null : buffer.asReadOnlyBuffer();
-    }
-
-    private void setBuffer(final @CheckForNull CharBuffer buffer) {
-        this.buffer = null == buffer
-                ? null
-                : (CharBuffer) ByteBuffer
-                    .allocateDirect(2 * buffer.remaining())
-                    .asCharBuffer()
-                    .put(buffer/*.duplicate()*/)
-                    .rewind();
+        super.reset();
+        keyStrength = null;
+        //changeRequested = false;
     }
 
     /**
-     * Returns a protective copy of the stored password char array.
+     * Returns a protective copy of the password char array.
      * It's highly recommended to overwrite the char array with any
      * non-password data after using the password.
      *
-     * @return A protective copy of the stored password char array.
+     * @return A protective copy of the password char array.
      */
-    public @Nullable char[] getPassword() {
-        try {
-            final CharBuffer buffer = this.buffer;
-            if (null == buffer) return null;
-            final char[] password = new char[buffer.remaining()];
-            buffer.get(password).rewind();
-            return password;
-        } finally {
-            assert invariants();
-        }
-    }
+    public @Nullable char[] getPassword() { return charArray(getSecret()); }
 
     /**
      * Copies and stores the given password char array for deriving the cipher
@@ -104,20 +58,7 @@ implements SafeKey<P> {
      * @param password the password char array for deriving the cipher key.
      */
     public void setPassword(final @CheckForNull char[] password) {
-        try {
-            clearBuffer();
-            if (null != password) setBuffer(CharBuffer.wrap(password));
-        } finally {
-            assert invariants();
-        }
-    }
-
-    private void clearBuffer() {
-        final CharBuffer buffer = this.buffer;
-        if (null == buffer) return;
-        final int remaining = buffer.remaining();
-        for (int i = 0; i < remaining; i++) buffer.put((char) 0);
-        this.buffer = null;
+        setSecret(byteBuffer(password));
     }
 
     /**
@@ -131,13 +72,15 @@ implements SafeKey<P> {
      * @param bytes the byte array to decode.
      */
     public void setKeyFileBytes(final @CheckForNull byte[] bytes) {
+        // Recode the bytes as UTF-16BE encoded characters.
+        // This preserves the byte order when the password char array is later
+        // encoded to a byte array again in accordance with PKCS #12,
+        // section B.1.
+        final ByteBuffer bb = byteBuffer(ByteBuffer.wrap(bytes).asCharBuffer());
         try {
-            // Decode the characters from UTF-16BE, so that the byte order
-            // is preserved when the char array is later translated to a byte
-            // array again in accordance with PKCS #12, section B.1.
-            setBuffer(ByteBuffer.wrap(bytes).asCharBuffer());
+            setSecret(bb);
         } finally {
-            assert invariants();
+            fill(bb, (byte) 0);
         }
     }
 
@@ -154,7 +97,7 @@ implements SafeKey<P> {
      *
      * @return The cipher key strength.
      */
-    public @Nullable S getKeyStrength() { return keyStrength; }
+    public @CheckForNull S getKeyStrength() { return keyStrength; }
 
     /**
      * Sets the cipher key strength.
@@ -163,5 +106,38 @@ implements SafeKey<P> {
      */
     public void setKeyStrength(final @CheckForNull S keyStrength) {
         this.keyStrength = keyStrength;
+    }
+
+    /*@Override
+    public boolean isChangeRequested() { return changeRequested; }
+
+    @Override
+    public void setChangeRequested(final boolean changeRequested) {
+        this.changeRequested = changeRequested;
+    }*/
+
+    /**
+     * Safe PBE parameters equal another object if and only if the other object
+     * has the same runtime class and their properties compare equal.
+     */
+    @Override
+    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
+    public final boolean equals(final Object obj) {
+        if (this == obj) return true;
+        if (!super.equals(obj)) return false;
+        final SafePbeParameters<?, ?> that = (SafePbeParameters<?, ?>) obj;
+        return Objects.equals(this.keyStrength, that.keyStrength)
+                ;//&& this.changeRequested == that.changeRequested;
+    }
+
+    /**
+     * Returns a hash code which is consistent with {@link #equals(Object)}.
+     */
+    @Override
+    public final int hashCode() {
+        int c = super.hashCode();
+        c = 31 * c + Objects.hashCode(keyStrength);
+        //c = 31 * c + Boolean.valueOf(changeRequested).hashCode();
+        return c;
     }
 }

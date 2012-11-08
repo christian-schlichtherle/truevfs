@@ -113,13 +113,13 @@ public final class KeyManagement {
         }
 
         @Override
-        public char[] getWritePassword()
+        public char[] getPasswordForWriting()
         throws RaesKeyException {
             return password.clone();
         }
 
         @Override
-        public char[] getReadPassword(boolean invalid)
+        public char[] getPasswordForReading(boolean invalid)
         throws RaesKeyException {
             if (invalid) throw new RaesKeyException("Invalid password!");
             return password.clone();
@@ -200,7 +200,7 @@ public final class KeyManagement {
         }
 
         @Override
-        public void promptWriteKey(Controller<AesPbeParameters> controller)
+        public void promptForWriting(Controller<AesPbeParameters> controller)
         throws UnknownKeyException {
             // You might as well call controller.getResource() here in order to
             // programmatically set the parameters for individual resource URIs.
@@ -211,7 +211,7 @@ public final class KeyManagement {
         }
 
         @Override
-        public void promptReadKey(  Controller<AesPbeParameters> controller,
+        public void promptForReading(  Controller<AesPbeParameters> controller,
                                     boolean invalid)
         throws UnknownKeyException {
             // You might as well call controller.getResource() here in order to

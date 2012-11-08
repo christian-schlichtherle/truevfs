@@ -21,7 +21,7 @@ import net.java.truevfs.key.spec.PromptingKeyProvider.View;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class MockView<K extends SafeKey<K>> implements View<K> {
+public final class MockView<K extends PromptingKey<K>> implements View<K> {
     private volatile @CheckForNull URI resource;
     private volatile @CheckForNull K key;
     private volatile Action action = ENTER;
@@ -61,7 +61,7 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
 
     @Override
     public synchronized void
-    promptWriteKey(Controller<K> controller)
+    promptForWriting(Controller<K> controller)
     throws UnknownKeyException {
         final URI resource = getResource();
         if (null != resource && !resource.equals(controller.getResource()))
@@ -82,7 +82,7 @@ public final class MockView<K extends SafeKey<K>> implements View<K> {
 
     @Override
     public synchronized void
-    promptReadKey(Controller<K> controller, boolean invalid)
+    promptForReading(Controller<K> controller, boolean invalid)
     throws UnknownKeyException {
         final URI resource = getResource();
         if (null != resource && !resource.equals(controller.getResource()))

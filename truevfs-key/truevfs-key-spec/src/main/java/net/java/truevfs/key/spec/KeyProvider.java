@@ -23,14 +23,14 @@ import javax.annotation.CheckForNull;
  * authentication operations are modelled by this interface.
  * Instead, clients are assumed to use it for the following purposes:
  * <ol>
- * <li>The method {@link #prepareWriting} returns the key for writing the
+ * <li>The method {@link #getKeyForWriting} returns the key for writing the
  *     protected resources.
  *     This implies that the key does not need to get validated by any client.
- * <li>The method {@link #prepareReading} returns the key for reading the
+ * <li>The method {@link #getKeyForReading} returns the key for reading the
  *     protected resources.
  *     This implies that the key needs to get validated by some client.
  * <li>The method {@link #setKey} sets the key programmatically.
- *     This may get used after a call to {@link #prepareReading} in order to
+ *     This may get used after a call to {@link #getKeyForReading} in order to
  *     update some properties of the key and implies that the key has been
  *     validated by some client.
  * </ol>
@@ -41,33 +41,33 @@ import javax.annotation.CheckForNull;
  * Following are some typical use cases:
  * <ol>
  * <li>A new protected resource needs to get created.
- *     In this case, {@link #prepareWriting} needs to get called.
+ *     In this case, {@link #getKeyForWriting} needs to get called.
  * <li>The contents of an already existing protected resource need to get
  *     completely replaced.
  *     Hence there is no need to retrieve and validate the key.
- *     Again, {@link #prepareWriting} needs to get called.
+ *     Again, {@link #getKeyForWriting} needs to get called.
  * <li>The contents of an already existing protected resource need to be
  *     read, but not changed.
  *     This implies that the key needs to get retrieved and validated.
- *     In this case, {@link #prepareReading} needs to get called.
+ *     In this case, {@link #getKeyForReading} needs to get called.
  * <li>The contents of an already existing protected resource need to get
  *     read and then only partially updated with new contents.
  *     This implies that the key needs to get retrieved and validated.
  *     Because the contents are only partially updated, changing the key is not
  *     possible.
- *     In this case, just {@link #prepareReading} needs to get called.
+ *     In this case, just {@link #getKeyForReading} needs to get called.
  * <li>The contents of an already existing protected resource need to get
  *     read and then entirely replaced with new contents.
  *     This implies that the key needs to get retrieved and validated
  *     before it may optionally get replaced (at the provider's discretion)
  *     with a different key.
- *     In this case, first {@link #prepareReading} and then
- *     {@link #prepareWriting} need to get called.
+ *     In this case, first {@link #getKeyForReading} and then
+ *     {@link #getKeyForWriting} need to get called.
  * </ol>
  * As you can see in the last example, it is at the discretion of the key
- * provider implementation whether or not {@link #prepareWriting} returns a
+ * provider implementation whether or not {@link #getKeyForWriting} returns a
  * key which compares {@link Object#equals equal} to the key returned by
- * {@link #prepareReading} or returns a completely different key.
+ * {@link #getKeyForReading} or returns a completely different key.
  * Typically, a provider implementation enables the user to control this.
  * <p>
  * Implementations must be safe for multi-threading.
@@ -90,7 +90,7 @@ public interface KeyProvider<K> {
      *         reason, e.g. if prompting for the key has been disabled
      *         or cancelled by the user.
      */
-    K prepareWriting() throws UnknownKeyException;
+    K getKeyForWriting() throws UnknownKeyException;
 
     /**
      * Returns the key for reading a protected resource.
@@ -118,11 +118,11 @@ public interface KeyProvider<K> {
      *         reason, e.g. if prompting for the key has been disabled or
      *         cancelled by the user.
      */
-    K prepareReading(boolean invalid) throws UnknownKeyException;
+    K getKeyForReading(boolean invalid) throws UnknownKeyException;
 
     /**
      * Sets the key programmatically.
-     * This may get used after a call to {@link #prepareReading} in order to update
+     * This may get used after a call to {@link #getKeyForReading} in order to update
      * some properties of the key after it has been validated by the client.
      * <p>
      * Implementations should make a protective copy of the given key in order

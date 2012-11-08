@@ -12,10 +12,11 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
-final class DummyKey implements SafeKey<DummyKey> {
+final class DummyKey implements PromptingKey<DummyKey> {
 
     private static final AtomicInteger count = new AtomicInteger();
     private final int key = count.getAndIncrement();
+    private boolean changeRequested;
 
     @Override
     public DummyKey clone() {
@@ -27,14 +28,33 @@ final class DummyKey implements SafeKey<DummyKey> {
     }
 
     @Override
-    public void reset() { }
+    public void reset() {
+        changeRequested = false;
+    }
+
+    /*@Override
+    public boolean isChangeRequested() { return changeRequested; }
+
+    @Override
+    public void setChangeRequested(final boolean changeRequested) {
+        this.changeRequested = changeRequested;
+    }*/
 
     @Override
     @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
-    public boolean equals(@CheckForNull Object that) {
-        return that instanceof DummyKey && this.key == ((DummyKey) that).key;
+    public boolean equals(@CheckForNull Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof DummyKey)) return false;
+        final DummyKey that = (DummyKey) obj;
+        return this.key == that.key
+                && this.changeRequested == that.changeRequested;
     }
 
     @Override
-    public int hashCode() { return key; }
+    public int hashCode() {
+        int c = 17;
+        c = 31 * c + key;
+        c = 31 * c + Boolean.valueOf(changeRequested).hashCode();
+        return c;
+    }
 }

@@ -109,7 +109,7 @@ implements PromptingKeyProvider.View<P> {
     }
 
     @Override
-    public void promptWriteKey(
+    public void promptForWriting(
             final Controller<P> controller)
     throws UnknownKeyException {
         class PromptWriteKey implements Runnable {
@@ -178,7 +178,7 @@ implements PromptingKeyProvider.View<P> {
     }
 
     @Override
-    public void promptReadKey(
+    public void promptForReading(
             final Controller<P> controller,
             final boolean invalid)
     throws UnknownKeyException {

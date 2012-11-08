@@ -124,7 +124,7 @@ final class Type0RaesReadOnlyChannel extends RaesReadOnlyChannel {
         byte[] buf;
         long lastTry = 0; // don't enforce suspension on first prompt!
         do {
-            final char[] pwc = param.getReadPassword(0 != lastTry);
+            final char[] pwc = param.getPasswordForReading(0 != lastTry);
             assert null != pwc;
             final byte[] pwb = PKCS12PasswordToBytes(pwc);
             Arrays.fill(pwc, (char) 0);

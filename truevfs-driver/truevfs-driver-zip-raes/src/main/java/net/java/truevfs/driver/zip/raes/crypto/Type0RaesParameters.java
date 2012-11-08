@@ -26,7 +26,7 @@ public interface Type0RaesParameters extends RaesParameters {
      *         for writing a RAES type 0 file.
      * @throws RaesKeyException If key retrieval has failed for some reason.
      */
-    char[] getWritePassword() throws RaesKeyException;
+    char[] getPasswordForWriting() throws RaesKeyException;
 
     /**
      * Returns the password to use for reading a RAES type 0 file.
@@ -39,7 +39,7 @@ public interface Type0RaesParameters extends RaesParameters {
      *         for reading a RAES type 0 file.
      * @throws RaesKeyException If key retrieval has failed for some reason.
      */
-    char[] getReadPassword(boolean invalid) throws RaesKeyException;
+    char[] getPasswordForReading(boolean invalid) throws RaesKeyException;
 
     /**
      * Returns the key strength to use for writing a RAES type 0 file.
