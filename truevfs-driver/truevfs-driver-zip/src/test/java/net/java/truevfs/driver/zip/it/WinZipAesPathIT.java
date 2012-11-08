@@ -11,9 +11,9 @@ import net.java.truevfs.access.TPath;
 import net.java.truevfs.access.it.TPathITSuite;
 import net.java.truevfs.comp.zipdriver.TestWinZipAesDriver;
 import static net.java.truevfs.kernel.spec.FsAccessOption.ENCRYPT;
-import net.java.truevfs.key.spec.MockView;
-import static net.java.truevfs.key.spec.MockView.Action.CANCEL;
-import static net.java.truevfs.key.spec.MockView.Action.ENTER;
+import net.java.truevfs.key.spec.TestView;
+import static net.java.truevfs.key.spec.TestView.Action.CANCEL;
+import static net.java.truevfs.key.spec.TestView.Action.ENTER;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -38,7 +38,7 @@ public final class WinZipAesPathIT extends TPathITSuite<TestWinZipAesDriver> {
         TConfig.current().setAccessPreference(ENCRYPT, true);
     }
 
-    private void setAction(MockView.Action action) {
+    private void setAction(TestView.Action action) {
         getArchiveDriver().getView().setAction(action);
     }
 

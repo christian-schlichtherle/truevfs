@@ -79,7 +79,7 @@ import javax.annotation.CheckForNull;
 public interface KeyProvider<K> {
 
     /**
-     * Returns the key for writing a protected resource.
+     * Returns the key for (over)writing a protected resource.
      * This implies that the key does not need to get validated by any client.
      *
      * @return the key for writing a protected resource.

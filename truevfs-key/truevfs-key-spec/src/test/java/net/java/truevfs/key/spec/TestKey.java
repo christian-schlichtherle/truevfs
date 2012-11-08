@@ -9,43 +9,41 @@ import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @NotThreadSafe
-final class DummyKey implements PromptingKey<DummyKey> {
+final class TestKey implements PromptingKey<TestKey> {
 
     private static final AtomicInteger count = new AtomicInteger();
     private final int key = count.getAndIncrement();
     private boolean changeRequested;
 
     @Override
-    public DummyKey clone() {
+    public TestKey clone() {
         try {
-            return (DummyKey) super.clone();
+            return (TestKey) super.clone();
         } catch (CloneNotSupportedException ex) {
             throw new AssertionError(ex);
         }
     }
 
     @Override
-    public void reset() {
-        changeRequested = false;
-    }
+    public void reset() { changeRequested = false; }
 
-    /*@Override
+    @Override
     public boolean isChangeRequested() { return changeRequested; }
 
     @Override
     public void setChangeRequested(final boolean changeRequested) {
         this.changeRequested = changeRequested;
-    }*/
+    }
 
     @Override
     @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     public boolean equals(@CheckForNull Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof DummyKey)) return false;
-        final DummyKey that = (DummyKey) obj;
+        if (!(obj instanceof TestKey)) return false;
+        final TestKey that = (TestKey) obj;
         return this.key == that.key
                 && this.changeRequested == that.changeRequested;
     }

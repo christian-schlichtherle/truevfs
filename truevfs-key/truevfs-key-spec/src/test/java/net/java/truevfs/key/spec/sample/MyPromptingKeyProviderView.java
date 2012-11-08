@@ -17,7 +17,7 @@ public class MyPromptingKeyProviderView
 implements PromptingKeyProvider.View<AesPbeParameters> {
 
     @Override
-    public void promptForWriting(Controller<AesPbeParameters> controller)
+    public void promptKeyForWriting(Controller<AesPbeParameters> controller)
     throws UnknownKeyException {
         // In a real implementation, you should actually prompt the user now
         // for the password required for write access to the URI.
@@ -28,11 +28,12 @@ implements PromptingKeyProvider.View<AesPbeParameters> {
         // secret password.
         // Mind you, this really has to be a new key because old keys get wiped
         // out for security.
+        // Also, a protective copy of the parameters is made.
         controller.setKey(newFakeParameters());
     }
 
     @Override
-    public void promptForReading(
+    public void promptKeyForReading(
             Controller<AesPbeParameters> controller,
             boolean invalid)
     throws UnknownKeyException {
@@ -46,15 +47,18 @@ implements PromptingKeyProvider.View<AesPbeParameters> {
         // the case.
         if (invalid) throw new PersistentUnknownKeyException();
 
-        // If the user wants to change the password on the next write access,
-        // you should set the parameter in the following statement to true.
-        // I set it to the default, so you could comment this out.
-        controller.setChangeRequested(false);
+        // Otherwise, I create new fake paramters with our top secret password.
+        AesPbeParameters param = newFakeParameters();
 
-        // Finally, I just set a new fake key with our top secret password.
-        // Mind you, this really has to be a new key because old keys get wiped
-        // out for security.
-        controller.setKey(newFakeParameters());
+        // If the user wants to change the password on the next write access,
+        // you should set the following property to true.
+        // I set it to the default, so you could comment this statement out.
+        param.setChangeRequested(false);
+
+        // Finally, I set the new parameters.
+        // Mind you, this really has to be a new key because old keys get reset
+        // for security.
+        controller.setKey(param);
     }
 
     private AesPbeParameters newFakeParameters() {

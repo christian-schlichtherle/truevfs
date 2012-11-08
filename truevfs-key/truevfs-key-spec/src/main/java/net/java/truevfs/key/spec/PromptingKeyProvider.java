@@ -69,12 +69,12 @@ extends SafeKeyProvider<K> {
 
     @Override
     protected void setupKeyForWriting() throws UnknownKeyException {
-        getState().getKeyForWriting(this);
+        getState().setupKeyForWriting(this);
     }
 
     @Override
     protected void setupKeyForReading(boolean invalid) throws UnknownKeyException {
-        getState().getKeyForReading(this, invalid);
+        getState().setupKeyForReading(this, invalid);
     }
 
     @Override
@@ -91,21 +91,6 @@ extends SafeKeyProvider<K> {
         super.setKey(key);
     }
 
-    /**
-     * Returns whether or not the user shall get prompted for a new key upon
-     * the next call to {@link #promptForWriting()}, provided that the key
-     * has been {@link #setKey set} before.
-     *
-     * @return Whether or not the user shall get prompted for a new key upon
-     *         the next call to {@link #promptForWriting()}, provided that the key
-     *         has been {@link #setKey set} before.
-     */
-    private boolean isChangeRequested() { return changeRequested; }
-
-    private void setChangeRequested(final boolean changeRequested) {
-        this.changeRequested = changeRequested;
-    }
-
     private @CheckForNull PersistentUnknownKeyException getException() {
         return exception;
     }
@@ -116,22 +101,19 @@ extends SafeKeyProvider<K> {
     }
 
     /**
-     * Resets the state of this key provider, its current key and the value of
-     * its {@code changeRequested} property
+     * Resets the state of this key provider
      * if and only if prompting for a key has been cancelled.
      */
     public void resetCancelledKey() { getState().resetCancelledKey(this); }
 
     /**
-     * Resets the state of this key provider, its current key and the value of
-     * its {@code changeRequested} property
+     * Resets the state of this key provider
      * unconditionally.
      */
     public void resetUnconditionally() { reset(); }
 
     private void reset() {
         setKey0(null);
-        setChangeRequested(false);
         setException(null);
         setState(State.RESET);
     }
@@ -142,38 +124,40 @@ extends SafeKeyProvider<K> {
         RESET {
             @Override
             <K extends PromptingKey<K>> void
-            getKeyForWriting(final PromptingKeyProvider<K> provider)
+            setupKeyForWriting(final PromptingKeyProvider<K> provider)
             throws UnknownKeyException {
                 State state;
                 try {
                     try (final PromptingKeyProvider<K>.BaseController
                             controller = provider.new WriteController(this)) {
-                        provider.getView().promptForWriting(controller);
+                        provider.getView().promptKeyForWriting(controller);
                     }
                 } finally {
                     if (this == (state = provider.getState()))
                         provider.setState(state = CANCELLED);
                 }
-                state.getKeyForWriting(provider);
+                state.setupKeyForWriting(provider);
             }
 
             @Override
             <K extends PromptingKey<K>> void
-            getKeyForReading(PromptingKeyProvider<K> provider, boolean invalid)
+            setupKeyForReading(
+                    final PromptingKeyProvider<K> provider,
+                    final boolean invalid)
             throws UnknownKeyException {
                 State state;
                 do {
                     try {
                         try (final PromptingKeyProvider<K>.BaseController
                                 controller = provider.new ReadController(this)) {
-                            provider.getView().promptForReading(controller, invalid);
+                            provider.getView().promptKeyForReading(controller, invalid);
                         }
                     } catch (final PersistentUnknownKeyException ex) {
                         setException(provider, ex);
                     }
                     state = provider.getState();
                 } while (state == this);
-                state.getKeyForReading(provider, false);
+                state.setupKeyForReading(provider, false);
             }
 
             @Override
@@ -185,21 +169,25 @@ extends SafeKeyProvider<K> {
         SET {
             @Override
             <K extends PromptingKey<K>> void
-            getKeyForWriting(PromptingKeyProvider<K> provider)
+            setupKeyForWriting(final PromptingKeyProvider<K> provider)
             throws UnknownKeyException {
-                if (provider.isChangeRequested()) {
-                    provider.setChangeRequested(false);
-                    RESET.getKeyForWriting(provider); // DON'T change state!
+                final K key = getKey(provider);
+                if (key.isChangeRequested()) {
+                    key.setChangeRequested(false);
+                    setKey(provider, key);
+                    RESET.setupKeyForWriting(provider); // DON'T change state!
                 }
             }
 
             @Override
             <K extends PromptingKey<K>> void
-            getKeyForReading(PromptingKeyProvider<K> provider, boolean invalid)
+            setupKeyForReading(
+                    final PromptingKeyProvider<K> provider,
+                    final boolean invalid)
             throws UnknownKeyException {
                 if (invalid) {
                     provider.setState(RESET);
-                    RESET.getKeyForReading(provider, true);
+                    RESET.setupKeyForReading(provider, true);
                 }
             }
 
@@ -212,16 +200,16 @@ extends SafeKeyProvider<K> {
         CANCELLED {
             @Override
             <K extends PromptingKey<K>> void
-            getKeyForWriting(PromptingKeyProvider<K> provider)
+            setupKeyForWriting(PromptingKeyProvider<K> provider)
             throws UnknownKeyException {
-                throw getException(provider);
+                throw exception(provider);
             }
 
             @Override
             <K extends PromptingKey<K>> void
-            getKeyForReading(PromptingKeyProvider<K> provider, boolean invalid)
+            setupKeyForReading(PromptingKeyProvider<K> provider, boolean invalid)
             throws UnknownKeyException {
-                throw getException(provider);
+                throw exception(provider);
             }
 
             @Override
@@ -232,15 +220,22 @@ extends SafeKeyProvider<K> {
         };
 
         abstract <K extends PromptingKey<K>> void
-        getKeyForWriting(PromptingKeyProvider<K> provider)
+        setupKeyForWriting(PromptingKeyProvider<K> provider)
         throws UnknownKeyException;
 
         abstract <K extends PromptingKey<K>> void
-        getKeyForReading(PromptingKeyProvider<K> provider, boolean invalid)
+        setupKeyForReading(PromptingKeyProvider<K> provider, boolean invalid)
         throws UnknownKeyException;
 
         abstract <K extends PromptingKey<K>> void
         resetCancelledKey(PromptingKeyProvider<K> provider);
+
+        final <K extends PromptingKey<K>> URI
+        getResource(PromptingKeyProvider<K> provider) {
+            final URI resource = provider.getResource();
+            if (null == resource) throw new IllegalStateException();
+            return resource;
+        }
 
         final @CheckForNull <K extends PromptingKey<K>> K
         getKey(PromptingKeyProvider<K> provider) {
@@ -253,18 +248,8 @@ extends SafeKeyProvider<K> {
             provider.setState(null != key ? State.SET : State.CANCELLED);
         }
 
-        final <K extends PromptingKey<K>> void
-        setChangeRequested(PromptingKeyProvider<K> provider, boolean changeRequested) {
-            provider.setChangeRequested(changeRequested);
-        }
-
-        @CheckForNull <K extends PromptingKey<K>> URI
-        getResource(PromptingKeyProvider<K> provider) {
-            return provider.getResource();
-        }
-
         final <K extends PromptingKey<K>> PersistentUnknownKeyException
-        getException(PromptingKeyProvider<K> provider) {
+        exception(PromptingKeyProvider<K> provider) {
             PersistentUnknownKeyException ex = provider.getException();
             if (null == ex)
                 provider.setException(ex = new KeyPromptingCancelledException());
@@ -307,8 +292,8 @@ extends SafeKeyProvider<K> {
          * parameter, then a clone of this object will be used as the key.
          * <p>
          * Otherwise, prompting for a key is permanently disabled and each
-         * subsequent call to {@link PromptingKeyProvider#promptForWriting} or
-         * {@link PromptingKeyProvider#promptForReading}
+         * subsequent call to {@link PromptingKeyProvider#promptKeyForWriting} or
+         * {@link PromptingKeyProvider#promptKeyForReading}
          * results in a {@link KeyPromptingCancelledException} until
          * {@link PromptingKeyProvider#resetCancelledKey()} or
          * {@link PromptingKeyProvider#resetUnconditionally()} gets
@@ -317,7 +302,7 @@ extends SafeKeyProvider<K> {
          * @param  controller The key controller for storing the result.
          * @throws UnknownKeyException if key prompting fails for any reason.
          */
-        void promptForWriting(Controller<K> controller)
+        void promptKeyForWriting(Controller<K> controller)
         throws UnknownKeyException;
 
         /**
@@ -335,8 +320,8 @@ extends SafeKeyProvider<K> {
          * {@link Controller#setKey} with a {@code null}
          * parameter or throws a {@link KeyPromptingCancelledException}, then
          * prompting for the key is permanently disabled and each subsequent call
-         * to {@link PromptingKeyProvider#promptForWriting} or
-         * {@link PromptingKeyProvider#promptForReading} results in a
+         * to {@link PromptingKeyProvider#promptKeyForWriting} or
+         * {@link PromptingKeyProvider#promptKeyForReading} results in a
          * {@link KeyPromptingCancelledException} until
          * {@link PromptingKeyProvider#resetCancelledKey()} or
          * {@link PromptingKeyProvider#resetUnconditionally()} gets
@@ -350,7 +335,7 @@ extends SafeKeyProvider<K> {
          *         resulted in an invalid key.
          * @throws UnknownKeyException if key prompting fails for any reason.
          */
-        void promptForReading(Controller<K> controller, boolean invalid)
+        void promptKeyForReading(Controller<K> controller, boolean invalid)
         throws UnknownKeyException;
     } // View
 
@@ -375,7 +360,8 @@ extends SafeKeyProvider<K> {
         URI getResource();
 
         /**
-         * Returns the protected resource's key.
+         * Returns a clone of the protected resource's key or {@code null} if
+         * no key has been set.
          *
          * @return The protected resource's key.
          * @throws IllegalStateException if getting key is not legal in the
@@ -384,27 +370,15 @@ extends SafeKeyProvider<K> {
         @CheckForNull K getKey();
 
         /**
-         * Sets the protected resource's key to a clone of the given key.
+         * Sets the protected resource's key to a clone of the given key or
+         * resets it to null.
          *
-         * @param  key The key to clone to use for the protected resource.
+         * @param  key The nullable key to clone and use for accessing the
+         *         protected resource.
          * @throws IllegalStateException if setting key is not legal in the
          *         current state.
          */
         void setKey(@CheckForNull K key);
-
-        /**
-         * Requests to prompt the user for a new key upon the next call to
-         * {@link PromptingKeyProvider#promptForWriting()}, provided that the key is
-         * {@link PromptingKeyProvider#setKey set} by then.
-         *
-         * @param  changeRequested whether or not the user shall get prompted
-         *         for a new key upon the next call to
-         *         {@link PromptingKeyProvider#promptForWriting()}, provided that the
-         *         key is {@link PromptingKeyProvider#setKey set} then.
-         * @throws IllegalStateException if setting this property is illegal in the
-         *         current state.
-         */
-        void setChangeRequested(boolean changeRequested);
     } // Controller
 
     /**
@@ -424,29 +398,16 @@ extends SafeKeyProvider<K> {
         }
 
         @Override
-        public void close() { this.state = null; }
+        public final void close() { this.state = null; }
 
         @Override
-        public URI getResource() {
-            final URI resource = getState().getResource(PromptingKeyProvider.this);
-            if (null == resource)
-                throw new IllegalStateException();
-            return resource;
+        public final URI getResource() {
+            return getState().getResource(PromptingKeyProvider.this);
         }
 
         @Override
-        public K getKey() {
-            return getState().getKey(PromptingKeyProvider.this);
-        }
-
-        @Override
-        public void setKey(K key) {
+        public final void setKey(@CheckForNull K key) {
             getState().setKey(PromptingKeyProvider.this, key);
-        }
-
-        @Override
-        public void setChangeRequested(boolean changeRequested) {
-            getState().setChangeRequested(PromptingKeyProvider.this, changeRequested);
         }
     } // BaseController
 
@@ -460,8 +421,8 @@ extends SafeKeyProvider<K> {
         WriteController(State state) { super(state); }
 
         @Override
-        public void setChangeRequested(boolean changeRequested) {
-            throw new IllegalStateException();
+        public K getKey() {
+            return getState().getKey(PromptingKeyProvider.this);
         }
     } // WriteController
 

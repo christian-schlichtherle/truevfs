@@ -227,7 +227,7 @@ public final class KeyManagement {
         }
 
         @Override
-        public void promptForWriting(Controller<AesPbeParameters> controller)
+        public void promptKeyForWriting(Controller<AesPbeParameters> controller)
         throws UnknownKeyException {
             // You might as well call controller.getResource() here in order to
             // programmatically set the parameters for individual resource URIs.
@@ -238,7 +238,7 @@ public final class KeyManagement {
         }
 
         @Override
-        public void promptForReading(  Controller<AesPbeParameters> controller,
+        public void promptKeyForReading(  Controller<AesPbeParameters> controller,
                                     boolean invalid)
         throws UnknownKeyException {
             // You might as well call controller.getResource() here in order to

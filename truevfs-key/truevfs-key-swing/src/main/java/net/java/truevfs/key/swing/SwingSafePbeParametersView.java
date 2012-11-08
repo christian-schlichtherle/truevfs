@@ -109,24 +109,22 @@ implements PromptingKeyProvider.View<P> {
     }
 
     @Override
-    public void promptForWriting(
+    public void promptKeyForWriting(
             final Controller<P> controller)
     throws UnknownKeyException {
-        class PromptWriteKey implements Runnable {
+        class PromptKeyForWriting implements Runnable {
             @Override
-            public void run() {
-                promptWriteKeyOnEDT(controller);
-            }
-        } // PromptWriteKey
+            public void run() { promptKeyForWritingOnEDT(controller); }
+        } // PromptKeyForWriting
 
-        multiplexToEDT(new PromptWriteKey());
+        multiplexToEDT(new PromptKeyForWriting());
     }
 
     /**
      * This method is only called by the AWT Event Dispatch Thread,
      * so it doesn't need to be thread safe.
      */
-    private void promptWriteKeyOnEDT(
+    private void promptKeyForWritingOnEDT(
             final Controller<P> controller) {
         assert EventQueue.isDispatchThread();
 
@@ -134,8 +132,7 @@ implements PromptingKeyProvider.View<P> {
         assert null != resource;
 
         P param = controller.getKey();
-        if (null == param)
-            param = newPbeParameters();
+        if (null == param) param = newPbeParameters();
 
         final KeyStrengthPanel<S> keyStrengthPanel = new KeyStrengthPanel<>(
                 param.getKeyStrengthValues());
@@ -163,47 +160,46 @@ implements PromptingKeyProvider.View<P> {
             /*if (Thread.interrupted()) // test and clear status!
                 break;*/
 
-            if (result != JOptionPane.OK_OPTION)
-                break; // reuse old key
+            if (result != JOptionPane.OK_OPTION) break; // reuse old key
 
             if (keyPanel.updateParam(param)) { // valid input?
                 param.setKeyStrength(keyStrengthPanel.getKeyStrength());
-                controller.setKey(param);
                 break;
             }
 
             // Continue looping until valid input.
             assert keyPanel.getError() != null;
         }
+
+        controller.setKey(param);
     }
 
     @Override
-    public void promptForReading(
+    public void promptKeyForReading(
             final Controller<P> controller,
             final boolean invalid)
     throws UnknownKeyException {
-        class PromptReadKey implements Runnable {
+        class PromptKeyForReading implements Runnable {
             @Override
             public void run() {
-                promptReadKeyOnEDT(controller, invalid);
+                promptKeyForReadingOnEDT(controller, invalid);
             }
-        } // PromptReadKey
+        } // PromptKeyForReading
 
-        multiplexToEDT(new PromptReadKey());
+        multiplexToEDT(new PromptKeyForReading());
     }
 
     /**
      * This method is only called by the AWT Event Dispatch Thread,
      * so it doesn't need to be thread safe.
      */
-    private void promptReadKeyOnEDT(
+    private void promptKeyForReadingOnEDT(
             final Controller<P> controller,
             final boolean invalid) {
         assert EventQueue.isDispatchThread();
 
         final URI resource = controller.getResource();
         assert null != resource;
-        final P param = newPbeParameters();
 
         final ReadKeyPanel keyPanel;
         if (invalid) {
@@ -241,13 +237,14 @@ implements PromptingKeyProvider.View<P> {
 
             if (result != JOptionPane.OK_OPTION) {
                 controller.setKey(null);
-                break;
+                return;
             }
 
+            final P param = newPbeParameters();
             if (keyPanel.updateParam(param)) { // valid input?
+                param.setChangeRequested(keyPanel.isChangeKeySelected());
                 controller.setKey(param);
-                controller.setChangeRequested(keyPanel.isChangeKeySelected());
-                break;
+                return;
             }
 
             // Continue looping until valid input.

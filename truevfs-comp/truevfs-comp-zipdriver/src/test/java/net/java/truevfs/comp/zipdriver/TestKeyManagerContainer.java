@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import net.java.truevfs.key.spec.AbstractKeyManagerMap;
 import net.java.truevfs.key.spec.KeyManager;
-import net.java.truevfs.key.spec.MockView;
+import net.java.truevfs.key.spec.TestView;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
 
 /**
@@ -17,7 +17,7 @@ import net.java.truevfs.key.spec.param.AesPbeParameters;
  */
 public final class TestKeyManagerContainer extends AbstractKeyManagerMap {
 
-    private final MockView<AesPbeParameters> view;
+    private final TestView<AesPbeParameters> view;
     private final Map<Class<?>, KeyManager<?>> managers;
 
     public TestKeyManagerContainer() {
@@ -26,15 +26,15 @@ public final class TestKeyManagerContainer extends AbstractKeyManagerMap {
         managers = Collections.unmodifiableMap(map);
     }
 
-    private static MockView<AesPbeParameters> newView() {
+    private static TestView<AesPbeParameters> newView() {
         final AesPbeParameters key = new AesPbeParameters();
         key.setPassword("top secret".toCharArray());
-        final MockView<AesPbeParameters> view = new MockView<>();
+        final TestView<AesPbeParameters> view = new TestView<>();
         view.setKey(key);
         return view;
     }
 
-    public MockView<AesPbeParameters> getView() {
+    public TestView<AesPbeParameters> getView() {
         return view;
     }
 
