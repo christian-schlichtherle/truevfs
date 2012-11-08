@@ -9,18 +9,18 @@ import java.util.HashMap;
 import java.util.Map;
 import net.java.truevfs.key.spec.AbstractKeyManagerMap;
 import net.java.truevfs.key.spec.KeyManager;
-import net.java.truevfs.key.spec.prompting.TestView;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.prompting.TestView;
 
 /**
  * @author Christian Schlichtherle
  */
-public final class TestKeyManagerContainer extends AbstractKeyManagerMap {
+public final class TestKeyManagerMap extends AbstractKeyManagerMap {
 
     private final TestView<AesPbeParameters> view;
     private final Map<Class<?>, KeyManager<?>> managers;
 
-    public TestKeyManagerContainer() {
+    public TestKeyManagerMap() {
         final Map<Class<?>, KeyManager<?>> map = new HashMap<>(2);
         map.put(AesPbeParameters.class, new TestKeyManager<>(this.view = newView()));
         managers = Collections.unmodifiableMap(map);

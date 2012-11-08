@@ -4,19 +4,18 @@
  */
 package net.java.truevfs.comp.zipdriver;
 
-import net.java.truevfs.comp.zipdriver.ZipDriver;
-import net.java.truevfs.kernel.spec.TestConfig;
 import net.java.truecommons.cio.IoBufferPool;
-import net.java.truevfs.key.spec.prompting.TestView;
+import net.java.truevfs.kernel.spec.TestConfig;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.prompting.TestView;
 
 /**
  * @author Christian Schlichtherle
  */
 public final class TestWinZipAesDriver extends ZipDriver {
 
-    private final TestKeyManagerContainer
-            container = new TestKeyManagerContainer();
+    private final TestKeyManagerMap
+            container = new TestKeyManagerMap();
 
     @Override
     public IoBufferPool getPool() {
@@ -24,7 +23,7 @@ public final class TestWinZipAesDriver extends ZipDriver {
     }
 
     @Override
-    public TestKeyManagerContainer getKeyManagerMap() {
+    public TestKeyManagerMap getKeyManagerMap() {
         return container;
     }
 
