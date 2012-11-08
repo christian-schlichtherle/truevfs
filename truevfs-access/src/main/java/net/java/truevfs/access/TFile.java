@@ -2908,7 +2908,8 @@ public final class TFile extends File implements TRex {
      * source file to the destination file, too.
      * Which attributes are actually copied is specific to the source and
      * destination file system driver implementations, but the minimum
-     * guarantee is to copy the last modification time.
+     * guarantee is to copy the last modification time - except for archive
+     * files.
      * <p>
      * <table border="1">
      * <thead>
