@@ -10,14 +10,14 @@ import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.key.spec.PromptingKeyProvider.View;
 
 /**
- * A key manager which prompts the user for a key if required.
+ * A key manager which prompts the user for a secret key if required.
  *
- * @param  <K> the type of the safe keys.
+ * @param  <K> the type of the prompting keys.
  * @see    PromptingKeyProvider
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class PromptingKeyManager<K extends SafeKey<K>>
+public class PromptingKeyManager<K extends PromptingKey<K>>
 extends SafeKeyManager<K, PromptingKeyProvider<K>> {
 
     private final View<K> view;

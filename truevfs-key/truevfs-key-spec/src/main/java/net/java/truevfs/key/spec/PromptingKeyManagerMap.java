@@ -28,11 +28,11 @@ extends AbstractKeyManagerMap {
     /**
      * Constructs a new prompting key manager service using the given view.
      *
-     * @param <K> the type of the safe keys.
-     * @param clazz the class of the safe keys.
-     * @param view the prompting key provider view for the safe keys.
+     * @param <K> the type of the prompting keys.
+     * @param clazz the class of the prompting keys.
+     * @param view the view for the prompting key provider.
      */
-    public <K extends SafeKey<K>> PromptingKeyManagerMap(
+    public <K extends PromptingKey<K>> PromptingKeyManagerMap(
             final Class<K> clazz,
             final View<K> view) {
         final Map<Class<?>, KeyManager<?>> map = new HashMap<>(2);
@@ -42,7 +42,5 @@ extends AbstractKeyManagerMap {
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<Class<?>, KeyManager<?>> get() {
-        return managers;
-    }
+    public Map<Class<?>, KeyManager<?>> get() { return managers; }
 }

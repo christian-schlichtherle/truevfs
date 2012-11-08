@@ -25,9 +25,6 @@ extends AbstractKeyManager<K> {
 
     private final Map<URI, P> providers = new HashMap<>();
 
-    /** Constructs a new safe key manager. */
-    protected SafeKeyManager() { }
-
     /** Returns a new key provider. */
     protected abstract P newProvider();
 

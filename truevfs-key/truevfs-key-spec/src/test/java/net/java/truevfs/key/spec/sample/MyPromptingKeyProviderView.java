@@ -17,7 +17,7 @@ public class MyPromptingKeyProviderView
 implements PromptingKeyProvider.View<AesPbeParameters> {
 
     @Override
-    public void promptWriteKey(Controller<AesPbeParameters> controller)
+    public void promptForWriting(Controller<AesPbeParameters> controller)
     throws UnknownKeyException {
         // In a real implementation, you should actually prompt the user now
         // for the password required for write access to the URI.
@@ -32,7 +32,7 @@ implements PromptingKeyProvider.View<AesPbeParameters> {
     }
 
     @Override
-    public void promptReadKey(
+    public void promptForReading(
             Controller<AesPbeParameters> controller,
             boolean invalid)
     throws UnknownKeyException {

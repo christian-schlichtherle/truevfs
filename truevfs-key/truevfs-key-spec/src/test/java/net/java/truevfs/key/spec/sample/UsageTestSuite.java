@@ -34,7 +34,7 @@ public abstract class UsageTestSuite {
         KeyProvider<AesPbeParameters> provider = manager.provider(file.toURI());
 // END SNIPPET: gettingAPasswordForWritingAnEncryptedFile2
 // START SNIPPET: gettingAPasswordForWritingAnEncryptedFile3
-        AesPbeParameters param = provider.prepareWriting();
+        AesPbeParameters param = provider.getKeyForWriting();
 // END SNIPPET: gettingAPasswordForWritingAnEncryptedFile3
 // START SNIPPET: gettingAPasswordForWritingAnEncryptedFile4
         char[] password = param.getPassword();
@@ -57,7 +57,7 @@ public abstract class UsageTestSuite {
                 .provider(file.toURI());
         boolean invalid = false;
         do {
-            AesPbeParameters param = provider.prepareReading(invalid);
+            AesPbeParameters param = provider.getKeyForReading(invalid);
             char [] password = param.getPassword();
             try {
                 // Now read the file and verify the password.

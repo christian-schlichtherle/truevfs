@@ -21,14 +21,14 @@ final class UnknownKeyProvider extends AbstractKeyProvider<Object> {
     private UnknownKeyProvider() { }
 
     @Override
-    public Object prepareWriting() throws UnknownKeyException {
+    public Object getKeyForWriting() throws UnknownKeyException {
         throw new PersistentUnknownKeyException();
     }
 
     @Override
-    public Object prepareReading(final boolean invalid) throws UnknownKeyException {
+    public Object getKeyForReading(final boolean invalid) throws UnknownKeyException {
         if (invalid) setKey(null);
-        return prepareWriting();
+        return getKeyForWriting();
     }
 
     @Override

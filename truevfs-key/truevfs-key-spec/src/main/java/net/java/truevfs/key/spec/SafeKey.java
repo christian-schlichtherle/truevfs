@@ -22,7 +22,7 @@ public interface SafeKey<K extends SafeKey<K>> extends Cloneable {
     K clone();
 
     /**
-     * Wipes any key data from memory and resets this safe key to it's initial
+     * Clears any key data from memory and resets this safe key to it's initial
      * state.
      */
     void reset();

@@ -58,7 +58,7 @@ implements PromptingKeyProvider.View<P> {
     protected abstract P newPbeParameters();
 
     @Override
-    public final void promptWriteKey(final Controller<P> controller)
+    public final void promptForWriting(final Controller<P> controller)
     throws KeyPromptingDisabledException {
         final Console con = System.console();
         if (null == con) throw new KeyPromptingDisabledException();
@@ -140,7 +140,7 @@ implements PromptingKeyProvider.View<P> {
     }
 
     @Override
-    public void promptReadKey(
+    public void promptForReading(
             final Controller<P> controller,
             final boolean invalid)
     throws KeyPromptingDisabledException {
