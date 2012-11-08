@@ -12,7 +12,7 @@ import net.java.truecommons.shed.UniqueObject;
  * than directly implementing the interface in order to maintain binary
  * backwards compatibility even if the interface is changed.
  * <p>
- * Implementations must be safe for multi-threading.
+ * Subclasses must be safe for multi-threading.
  *
  * @param  <K> The type of the keys.
  * @author Christian Schlichtherle

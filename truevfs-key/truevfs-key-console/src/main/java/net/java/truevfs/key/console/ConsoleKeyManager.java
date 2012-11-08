@@ -5,17 +5,17 @@
 package net.java.truevfs.key.console;
 
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.key.spec.PromptingKeyManager;
-import net.java.truevfs.key.spec.param.SafePbeParameters;
+import net.java.truevfs.key.spec.prompting.PromptingKeyManager;
+import net.java.truevfs.key.spec.prompting.PromptingPbeParameters;
 
 /**
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class ConsoleKeyManager<P extends SafePbeParameters<P, ?>>
+final class ConsoleKeyManager<P extends PromptingPbeParameters<P, ?>>
 extends PromptingKeyManager<P> {
 
-    ConsoleKeyManager(ConsoleSafePbeParametersView<P, ?> view) {
+    ConsoleKeyManager(ConsolePromptingPbeParametersView<P, ?> view) {
         super(view);
     }
 }

@@ -2,9 +2,10 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.key.spec;
+package net.java.truevfs.key.spec.prompting;
 
 import java.net.URI;
+import net.java.truevfs.key.spec.KeyManagerTestSuite;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import org.junit.Test;

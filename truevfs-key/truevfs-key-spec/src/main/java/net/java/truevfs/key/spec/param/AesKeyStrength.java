@@ -6,14 +6,16 @@ package net.java.truevfs.key.spec.param;
 
 import java.util.ResourceBundle;
 import javax.annotation.concurrent.Immutable;
+import net.java.truevfs.key.spec.safe.SafeKeyStrength;
 
 /**
  * Enumerates the AES cipher key strenghts.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @Immutable
-public enum AesKeyStrength implements KeyStrength {
+public enum AesKeyStrength implements SafeKeyStrength {
+
     /** 128 bit AES cipher key. */
     BITS_128,
 
@@ -26,17 +28,11 @@ public enum AesKeyStrength implements KeyStrength {
     private static final ResourceBundle
             resources = ResourceBundle.getBundle(AesKeyStrength.class.getName());
 
-    /** Returns the key strength in bytes. */
     @Override
-    public int getBytes() {
-        return 16 + 8 * ordinal();
-    }
+    public int getBytes() { return 16 + 8 * ordinal(); }
 
-    /** Returns the key strength in bits. */
     @Override
-    public int getBits() {
-        return 8 * getBytes();
-    }
+    public int getBits() { return 8 * getBytes(); }
 
     @Override
     public String toString() {

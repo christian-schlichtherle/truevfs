@@ -7,7 +7,8 @@ package net.java.truevfs.key.spec;
 import java.net.URI;
 
 /**
- * Manages the life cycle of key providers for accessing protected resources.
+ * Manages the life cycle of key providers for writing and reading protected
+ * resources.
  * When implementing a key manager, you should extend the
  * {@link AbstractKeyManager} class rather than directly implementing this
  * interface in order to maintain binary backwards compatibility even if this

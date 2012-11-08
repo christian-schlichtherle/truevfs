@@ -18,7 +18,7 @@ import java.util.Arrays;
 import java.util.ResourceBundle;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import net.java.truevfs.key.spec.param.SafePbeParameters;
+import net.java.truevfs.key.spec.safe.SafePbeParameters;
 
 /**
  * This panel prompts the user for a key to open an existing protected
@@ -40,7 +40,7 @@ final class ReadKeyPanel extends KeyPanel {
             resources = ResourceBundle.getBundle(CLASS_NAME);
 
     private final Color defaultForeground;
-    
+
     /** Constructs a new read key panel. */
     ReadKeyPanel() {
         initComponents();
@@ -73,15 +73,15 @@ final class ReadKeyPanel extends KeyPanel {
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     public void setResource(final URI resource) {
-        final URI lastResource = SwingSafePbeParametersView.lastResource;
+        final URI lastResource = SwingPromptingPbeParametersView.lastResource;
         if (!lastResource.equals(resource)
-                && !lastResource.equals(SwingSafePbeParametersView.INITIAL_RESOURCE)) {
+                && !lastResource.equals(SwingPromptingPbeParametersView.INITIAL_RESOURCE)) {
             this.resource.setForeground(Color.RED);
         } else {
             this.resource.setForeground(defaultForeground);
         }
         this.resource.setText(resource.toString());
-        SwingSafePbeParametersView.lastResource = resource;
+        SwingPromptingPbeParametersView.lastResource = resource;
     }
 
     @Override
@@ -106,7 +106,7 @@ final class ReadKeyPanel extends KeyPanel {
             case AuthenticationPanel.AUTH_KEY_FILE:
                 final File keyFile = authenticationPanel.getKeyFile();
                 try {
-                    final byte[] key = SwingSafePbeParametersView.readKeyFile(
+                    final byte[] key = SwingPromptingPbeParametersView.readKeyFile(
                             keyFile);
                     param.setKeyFileBytes(key);
                     Arrays.fill(key, (byte) 0);
@@ -137,7 +137,7 @@ final class ReadKeyPanel extends KeyPanel {
 
     /**
      * Setter for property changeKeySelected.
-     * 
+     *
      * @param changeKeySelected New value of property changeKeySelected.
      */
     public void setChangeKeySelected(boolean changeKeySelected) {
@@ -283,7 +283,7 @@ final class ReadKeyPanel extends KeyPanel {
             }
         });
     }//GEN-LAST:event_passwdPanelAncestorWindowShown
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private final net.java.truevfs.key.swing.AuthenticationPanel authenticationPanel = new net.java.truevfs.key.swing.AuthenticationPanel();
     private final javax.swing.JCheckBox changeKey = new javax.swing.JCheckBox();

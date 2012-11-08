@@ -2,10 +2,12 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.key.spec;
+package net.java.truevfs.key.spec.safe;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truevfs.key.spec.AbstractKeyProvider;
+import net.java.truevfs.key.spec.UnknownKeyException;
 import net.java.truevfs.key.spec.util.SuspensionPenalty;
 
 /**
@@ -20,7 +22,7 @@ import net.java.truevfs.key.spec.util.SuspensionPenalty;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class SafeKeyProvider<K extends SafeKey<K>>
+public abstract class SafeKeyProvider<K extends SafeKey<K, ?>>
 extends AbstractKeyProvider<K> {
 
     /**

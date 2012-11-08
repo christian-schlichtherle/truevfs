@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import net.java.truevfs.key.spec.SafeKeyProvider;
+import net.java.truevfs.key.spec.safe.SafeKeyProvider;
 import net.java.truevfs.key.swing.feedback.DecoratingFeedback;
 import net.java.truevfs.key.swing.feedback.Feedback;
 

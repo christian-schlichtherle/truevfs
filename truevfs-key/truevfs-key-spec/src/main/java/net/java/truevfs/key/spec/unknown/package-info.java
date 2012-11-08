@@ -4,6 +4,8 @@
  */
 /**
  * Provides a key manager which fails to resolve any keys.
+ *
+ * @since TrueVFS 0.10
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truevfs.key.spec.unknown;

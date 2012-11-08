@@ -13,7 +13,7 @@ import net.java.truevfs.key.spec.KeyProvider;
 /**
  * This key manager fails to resolve any keys.
  *
- * @since  TrueVFS 0.9.4
+ * @since  TrueVFS 0.10
  * @author Christian Schlichtherle
  */
 @ThreadSafe

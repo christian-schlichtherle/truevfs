@@ -6,17 +6,17 @@ package net.java.truevfs.comp.zipdriver;
 
 import java.net.URI;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.key.spec.PromptingKey;
-import net.java.truevfs.key.spec.PromptingKeyManager;
-import net.java.truevfs.key.spec.PromptingKeyProvider;
-import net.java.truevfs.key.spec.PromptingKeyProvider.View;
+import net.java.truevfs.key.spec.prompting.PromptingKey;
+import net.java.truevfs.key.spec.prompting.PromptingKeyManager;
+import net.java.truevfs.key.spec.prompting.PromptingKeyProvider;
+import net.java.truevfs.key.spec.prompting.PromptingKeyProvider.View;
 
 /**
  * @param  <K> the type of the safe keys.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class TestKeyManager<K extends PromptingKey<K>>
+public final class TestKeyManager<K extends PromptingKey<K, ?>>
 extends PromptingKeyManager<K> {
 
     public TestKeyManager(final View<K> view) {

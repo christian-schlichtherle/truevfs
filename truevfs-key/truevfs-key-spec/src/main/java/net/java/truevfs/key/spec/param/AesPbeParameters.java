@@ -5,6 +5,7 @@
 package net.java.truevfs.key.spec.param;
 
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truevfs.key.spec.prompting.PromptingPbeParameters;
 
 /**
  * A JavaBean which holds password based encryption parameters for use with the
@@ -14,7 +15,7 @@ import javax.annotation.concurrent.NotThreadSafe;
  */
 @NotThreadSafe
 public final class AesPbeParameters
-extends SafePbeParameters<AesPbeParameters, AesKeyStrength> {
+extends PromptingPbeParameters<AesPbeParameters, AesKeyStrength> {
 
     public AesPbeParameters() { reset(); }
 

@@ -10,8 +10,8 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-import net.java.truevfs.key.spec.SafeKeyProvider;
-import static net.java.truevfs.key.spec.SafeKeyProvider.MIN_KEY_RETRY_DELAY;
+import net.java.truevfs.key.spec.safe.SafeKeyProvider;
+import static net.java.truevfs.key.spec.safe.SafeKeyProvider.MIN_KEY_RETRY_DELAY;
 
 /**
  * Provides feedback by disabling the default button of the root pane for

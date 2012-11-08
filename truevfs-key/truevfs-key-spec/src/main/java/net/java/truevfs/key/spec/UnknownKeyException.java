@@ -8,9 +8,8 @@ import java.security.GeneralSecurityException;
 import javax.annotation.CheckForNull;
 
 /**
- * Thrown to indicate that the retrieval of the key to open or create a
+ * Thrown to indicate that the retrieval of the key to (over)write or read a
  * protected resource has failed.
- * The subclass provides more information.
  *
  * @author Christian Schlichtherle
  */

@@ -4,8 +4,8 @@
  */
 package net.java.truevfs.key.spec.sample;
 
-import net.java.truevfs.key.spec.PromptingKeyManager;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.prompting.PromptingKeyManager;
 
 /** @author Christian Schlichtherle */
 public class MyKeyManager

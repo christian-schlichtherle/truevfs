@@ -6,7 +6,7 @@ package net.java.truevfs.key.swing;
 
 import net.java.truevfs.key.swing.AuthenticationPanel;
 import net.java.truevfs.key.swing.KeyPanel;
-import net.java.truevfs.key.spec.param.SafePbeParameters;
+import net.java.truevfs.key.spec.safe.SafePbeParameters;
 import net.java.truevfs.key.swing.util.JemmyUtils;
 import java.awt.EventQueue;
 import java.io.File;

@@ -2,13 +2,15 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.key.spec;
+package net.java.truevfs.key.spec.prompting;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.key.spec.PromptingKeyProvider.View;
+import net.java.truevfs.key.spec.AbstractKeyManagerMap;
+import net.java.truevfs.key.spec.KeyManager;
+import net.java.truevfs.key.spec.prompting.PromptingKeyProvider.View;
 
 /**
  * Implements a map for a single prompting key manager which will use the
@@ -32,7 +34,7 @@ extends AbstractKeyManagerMap {
      * @param clazz the class of the prompting keys.
      * @param view the view for the prompting key provider.
      */
-    public <K extends PromptingKey<K>> PromptingKeyManagerMap(
+    public <K extends PromptingKey<K, ?>> PromptingKeyManagerMap(
             final Class<K> clazz,
             final View<K> view) {
         final Map<Class<?>, KeyManager<?>> map = new HashMap<>(2);

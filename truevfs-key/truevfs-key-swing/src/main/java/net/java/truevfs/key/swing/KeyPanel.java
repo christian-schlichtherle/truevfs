@@ -6,7 +6,7 @@ package net.java.truevfs.key.swing;
 
 import java.net.URI;
 import javax.annotation.CheckForNull;
-import net.java.truevfs.key.spec.param.SafePbeParameters;
+import net.java.truevfs.key.spec.safe.SafePbeParameters;
 import net.java.truevfs.key.swing.feedback.Feedback;
 import net.java.truevfs.key.swing.util.EnhancedPanel;
 import net.java.truevfs.key.swing.util.PanelEvent;
