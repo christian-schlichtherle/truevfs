@@ -2,16 +2,17 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.key.spec;
+package net.java.truevfs.key.spec.prompting;
 
 import java.net.URI;
 import java.util.Objects;
 import java.util.Random;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.key.spec.PromptingKeyProvider.Controller;
-import net.java.truevfs.key.spec.PromptingKeyProvider.View;
-import static net.java.truevfs.key.spec.TestView.Action.ENTER;
+import net.java.truevfs.key.spec.UnknownKeyException;
+import net.java.truevfs.key.spec.prompting.PromptingKeyProvider.Controller;
+import net.java.truevfs.key.spec.prompting.PromptingKeyProvider.View;
+import static net.java.truevfs.key.spec.prompting.TestView.Action.ENTER;
 
 /**
  * A view implementation which uses its properties for providing a key whenever
@@ -21,7 +22,7 @@ import static net.java.truevfs.key.spec.TestView.Action.ENTER;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class TestView<K extends PromptingKey<K>> implements View<K> {
+public final class TestView<K extends PromptingKey<K, ?>> implements View<K> {
 
     private volatile @CheckForNull URI resource;
     private volatile @CheckForNull K key;
@@ -73,7 +74,7 @@ public final class TestView<K extends PromptingKey<K>> implements View<K> {
     public enum Action {
         ENTER {
             @Override
-            <K extends PromptingKey<K>> void
+            <K extends PromptingKey<K, ?>> void
             promptKeyForWriting(
                     final Controller<? super K> controller,
                     final @CheckForNull K key)
@@ -83,7 +84,7 @@ public final class TestView<K extends PromptingKey<K>> implements View<K> {
             }
 
             @Override
-            <K extends PromptingKey<K>> void
+            <K extends PromptingKey<K, ?>> void
             promptKeyForReading(
                     final Controller<? super K> controller,
                     final @CheckForNull K key)
@@ -97,7 +98,7 @@ public final class TestView<K extends PromptingKey<K>> implements View<K> {
             private final Random rnd = new Random();
 
             @Override
-            <K extends PromptingKey<K>> void
+            <K extends PromptingKey<K, ?>> void
             promptKeyForWriting(
                     final Controller<? super K> controller,
                     final @CheckForNull K key)
@@ -110,7 +111,7 @@ public final class TestView<K extends PromptingKey<K>> implements View<K> {
             }
 
             @Override
-            <K extends PromptingKey<K>> void
+            <K extends PromptingKey<K, ?>> void
             promptKeyForReading(
                     final Controller<? super K> controller,
                     final @CheckForNull K key)
@@ -125,7 +126,7 @@ public final class TestView<K extends PromptingKey<K>> implements View<K> {
 
         IGNORE {
             @Override
-            <K extends PromptingKey<K>> void
+            <K extends PromptingKey<K, ?>> void
             promptKeyForWriting(
                     Controller<? super K> controller,
                     @CheckForNull K key)
@@ -133,7 +134,7 @@ public final class TestView<K extends PromptingKey<K>> implements View<K> {
             }
 
             @Override
-            <K extends PromptingKey<K>> void
+            <K extends PromptingKey<K, ?>> void
             promptKeyForReading(
                     Controller<? super K> controller,
                     @CheckForNull K key)
@@ -141,13 +142,13 @@ public final class TestView<K extends PromptingKey<K>> implements View<K> {
             }
         };
 
-        abstract <K extends PromptingKey<K>> void
+        abstract <K extends PromptingKey<K, ?>> void
         promptKeyForWriting(
                 Controller<? super K> controller,
                 @CheckForNull K key)
         throws UnknownKeyException;
 
-        abstract <K extends PromptingKey<K>> void
+        abstract <K extends PromptingKey<K, ?>> void
         promptKeyForReading(
                 Controller<? super K> controller,
                 @CheckForNull K key)

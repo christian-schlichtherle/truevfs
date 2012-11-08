@@ -6,8 +6,8 @@ package net.java.truevfs.key.spec;
 
 import java.net.URI;
 import java.util.Objects;
-import javax.annotation.CheckForNull;
 import static org.junit.Assert.*;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -16,9 +16,14 @@ import org.junit.Test;
  */
 public abstract class KeyManagerTestSuite<M extends KeyManager<?>> {
 
-    final M manager = Objects.requireNonNull(newKeyManager());
+    protected M manager;
 
-    protected abstract @CheckForNull M newKeyManager();
+    protected abstract M newKeyManager();
+
+    @Before
+    public void before() {
+        manager = Objects.requireNonNull(newKeyManager());
+    }
 
     @Test
     public void testMakeKeyProvider() {

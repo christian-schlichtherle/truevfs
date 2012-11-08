@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.key.spec;
+package net.java.truevfs.key.spec.safe;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truevfs.key.spec.AbstractKeyManager;
 
 /**
  * Uses a map to hold the safe key providers managed by this instance.
@@ -19,8 +20,9 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class SafeKeyManager<   K extends SafeKey<K>,
-                                        P extends SafeKeyProvider<K>>
+public abstract class SafeKeyManager<
+        K extends SafeKey<K, ?>,
+        P extends SafeKeyProvider<K>>
 extends AbstractKeyManager<K> {
 
     private final Map<URI, P> providers = new HashMap<>();

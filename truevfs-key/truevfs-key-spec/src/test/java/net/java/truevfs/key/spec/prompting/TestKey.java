@@ -2,17 +2,19 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.key.spec;
+package net.java.truevfs.key.spec.prompting;
 
+import net.java.truevfs.key.spec.prompting.PromptingKey;
 import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truevfs.key.spec.safe.TestKeyStrength;
 
 /**
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-final class TestKey implements PromptingKey<TestKey> {
+final class TestKey implements PromptingKey<TestKey, TestKeyStrength> {
 
     private static final AtomicInteger count = new AtomicInteger();
     private final int key = count.getAndIncrement();
@@ -54,5 +56,20 @@ final class TestKey implements PromptingKey<TestKey> {
         c = 31 * c + key;
         c = 31 * c + Boolean.valueOf(changeRequested).hashCode();
         return c;
+    }
+
+    @Override
+    public TestKeyStrength[] getKeyStrengthValues() {
+        return TestKeyStrength.values();
+    }
+
+    @Override
+    public TestKeyStrength getKeyStrength() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void setKeyStrength(TestKeyStrength keyStrength) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

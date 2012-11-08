@@ -2,11 +2,11 @@
  * Copyright (C) 2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.key.spec;
+package net.java.truevfs.key.spec.safe;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import static net.java.truevfs.key.spec.BufferUtils.*;
+import static net.java.truevfs.key.spec.safe.BufferUtils.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;

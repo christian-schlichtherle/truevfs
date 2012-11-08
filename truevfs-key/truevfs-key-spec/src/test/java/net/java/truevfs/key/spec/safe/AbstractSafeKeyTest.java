@@ -1,4 +1,4 @@
-package net.java.truevfs.key.spec;
+package net.java.truevfs.key.spec.safe;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -11,7 +11,7 @@ import org.junit.Test;
 /**
  * @author Christian Schlichtherle
  */
-public class SecretKeyTest {
+public class AbstractSafeKeyTest {
 
     private TestKey key = new TestKey();
 
@@ -47,5 +47,6 @@ public class SecretKeyTest {
         assertThat(clone.getSecret(), is(secret));
     }
 
-    private static class TestKey extends AbstractSecretKey<TestKey> { }
+    private static class TestKey
+    extends AbstractSafeKey<TestKey, TestKeyStrength> { }
 }

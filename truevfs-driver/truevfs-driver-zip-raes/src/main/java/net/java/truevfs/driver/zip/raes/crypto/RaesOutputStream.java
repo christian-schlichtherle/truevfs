@@ -10,7 +10,7 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truevfs.key.spec.param.KeyStrength;
+import net.java.truevfs.key.spec.safe.SafeKeyStrength;
 import org.bouncycastle.crypto.Mac;
 
 /**
@@ -26,11 +26,11 @@ public abstract class RaesOutputStream extends DecoratingOutputStream {
     /**
      * Returns the key strength which is actually used to encrypt the data of
      * the RAES file.
-     * 
+     *
      * @return The key strength which is actually used to encrypt the data of
      *         the RAES file.
      */
-    public abstract KeyStrength getKeyStrength();
+    public abstract SafeKeyStrength getKeyStrength();
 
     /**
      * Update the given KLAC with the given file {@code length} in
@@ -51,7 +51,7 @@ public abstract class RaesOutputStream extends DecoratingOutputStream {
 
     /**
      * Creates a new RAES output stream.
-     * 
+     *
      * @param  param The {@link RaesParameters} used to determine and configure
      *         the type of RAES file created.
      *         If the class of this parameter matches multiple parameter

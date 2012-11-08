@@ -2,12 +2,13 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.key.spec;
+package net.java.truevfs.key.spec.prompting;
 
 import java.net.URI;
 import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.key.spec.PromptingKeyProvider.View;
+import net.java.truevfs.key.spec.prompting.PromptingKeyProvider.View;
+import net.java.truevfs.key.spec.safe.SafeKeyManager;
 
 /**
  * A key manager which prompts the user for a secret key if required.
@@ -17,7 +18,7 @@ import net.java.truevfs.key.spec.PromptingKeyProvider.View;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class PromptingKeyManager<K extends PromptingKey<K>>
+public class PromptingKeyManager<K extends PromptingKey<K, ?>>
 extends SafeKeyManager<K, PromptingKeyProvider<K>> {
 
     private final View<K> view;

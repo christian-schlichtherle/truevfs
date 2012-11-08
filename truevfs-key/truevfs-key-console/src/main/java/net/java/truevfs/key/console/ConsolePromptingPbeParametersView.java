@@ -12,11 +12,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.key.spec.KeyPromptingDisabledException;
-import net.java.truevfs.key.spec.PromptingKeyProvider;
-import net.java.truevfs.key.spec.PromptingKeyProvider.Controller;
-import net.java.truevfs.key.spec.param.KeyStrength;
-import net.java.truevfs.key.spec.param.SafePbeParameters;
+import net.java.truevfs.key.spec.prompting.KeyPromptingDisabledException;
+import net.java.truevfs.key.spec.prompting.PromptingKeyProvider;
+import net.java.truevfs.key.spec.prompting.PromptingKeyProvider.Controller;
+import net.java.truevfs.key.spec.prompting.PromptingPbeParameters;
+import net.java.truevfs.key.spec.safe.SafeKeyStrength;
 
 /**
  * A console based user interface for prompting for passwords.
@@ -24,13 +24,13 @@ import net.java.truevfs.key.spec.param.SafePbeParameters;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-abstract class ConsoleSafePbeParametersView<
-        P extends SafePbeParameters<P, S>,
-        S extends KeyStrength>
+abstract class ConsolePromptingPbeParametersView<
+        P extends PromptingPbeParameters<P, S>,
+        S extends SafeKeyStrength>
 implements PromptingKeyProvider.View<P> {
 
     private static final ResourceBundle resources = ResourceBundle
-            .getBundle(ConsoleSafePbeParametersView.class.getName());
+            .getBundle(ConsolePromptingPbeParametersView.class.getName());
 
     /**
      * Used to lock out prompting by multiple threads.

@@ -2,25 +2,28 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.key.spec;
+package net.java.truevfs.key.spec.safe;
 
 import java.nio.ByteBuffer;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
-import static net.java.truevfs.key.spec.BufferUtils.*;
+import static net.java.truevfs.key.spec.safe.BufferUtils.*;
 
 /**
- * A secret key for writing and reading protected resources.
+ * A safe key for writing and reading protected resources.
  * <p>
- * Subclasses do <em>not</em> need to be safe for multi-threading.
+ * Subclasses do not need to be safe for multi-threading.
  *
- * @param  <K> the type of this secret key.
+ * @param  <K> the type of this safe key.
  * @author Christian Schlichtherle
  */
-public abstract class AbstractSecretKey<K extends AbstractSecretKey<K>>
-implements SafeKey<K> {
+public abstract class AbstractSafeKey<
+        K extends AbstractSafeKey<K, S>,
+        S extends SafeKeyStrength>
+implements SafeKey<K, S> {
 
     private @CheckForNull ByteBuffer secret;
+    private @CheckForNull S keyStrength;
 
     private boolean invariants() {
         final ByteBuffer buffer = this.secret;
@@ -35,9 +38,9 @@ implements SafeKey<K> {
     @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     public K clone() {
         try {
-            final AbstractSecretKey<K> clone;
+            final AbstractSafeKey<K, S> clone;
             try {
-                 clone = (AbstractSecretKey<K>) super.clone();
+                 clone = (AbstractSafeKey<K, S>) super.clone();
             } catch (CloneNotSupportedException ex) {
                 throw new AssertionError(ex);
             }
@@ -53,6 +56,7 @@ implements SafeKey<K> {
         try {
             fill(secret, (byte) 0);
             secret = null;
+            keyStrength = null;
         } finally {
             assert invariants();
         }
@@ -92,11 +96,24 @@ implements SafeKey<K> {
         }
     }
 
-    /**
-     * A secret key equals another object if and only if the other object
-     * has the same runtime class and its property {@code secret} compares
-     * equal.
-     */
+    @Override
+    public @CheckForNull S getKeyStrength() {
+        try {
+            return keyStrength;
+        } finally {
+            assert invariants();
+        }
+    }
+
+    @Override
+    public void setKeyStrength(final @CheckForNull S keyStrength) {
+        try {
+            this.keyStrength = keyStrength;
+        } finally {
+            assert invariants();
+        }
+    }
+
     @Override
     @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     public boolean equals(final Object obj) {
@@ -104,24 +121,20 @@ implements SafeKey<K> {
             if (this == obj) return true;
             if (null == obj || !this.getClass().equals(obj.getClass()))
                 return false;
-            final AbstractSecretKey<?> that = (AbstractSecretKey<?>) obj;
-            return Objects.equals(this.secret, that.secret);
+            final AbstractSafeKey<?, ?> that = (AbstractSafeKey<?, ?>) obj;
+            return Objects.equals(this.secret, that.secret)
+                    && Objects.equals(this.keyStrength, that.keyStrength);
         } finally {
             assert invariants();
         }
     }
 
-    /**
-     * Returns a hash code which is consistent with {@link #equals(Object)}.
-     * This method is provided for completeness only - you should actually
-     * never use secret keys as hash map keys because of their mutable
-     * properties!
-     */
     @Override
     public int hashCode() {
         try {
             int c = 17;
             c = 31 * c + Objects.hashCode(secret);
+            c = 31 * c + Objects.hashCode(keyStrength);
             return c;
         } finally {
             assert invariants();

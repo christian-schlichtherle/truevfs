@@ -20,7 +20,7 @@ import javax.annotation.CheckForNull;
 import javax.swing.JComponent;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import net.java.truevfs.key.spec.param.SafePbeParameters;
+import net.java.truevfs.key.spec.safe.SafePbeParameters;
 
 /**
  * This panel prompts the user for a key to create or overwrite a protected
@@ -72,19 +72,19 @@ final class WriteKeyPanel extends KeyPanel {
     public URI getResource() {
         return URI.create(resource.getText());
     }
-    
+
     @Override
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     public void setResource(final URI resource) {
-        final URI lastResource = SwingSafePbeParametersView.lastResource;
+        final URI lastResource = SwingPromptingPbeParametersView.lastResource;
         if (!lastResource.equals(resource)
-                && !lastResource.equals(SwingSafePbeParametersView.INITIAL_RESOURCE)) {
+                && !lastResource.equals(SwingPromptingPbeParametersView.INITIAL_RESOURCE)) {
             this.resource.setForeground(Color.RED);
         } else {
             this.resource.setForeground(defaultForeground);
         }
         this.resource.setText(resource.toString());
-        SwingSafePbeParametersView.lastResource = resource;
+        SwingPromptingPbeParametersView.lastResource = resource;
     }
 
     @Override
@@ -129,7 +129,7 @@ final class WriteKeyPanel extends KeyPanel {
 
                     final byte[] key;
                     try {
-                        key = SwingSafePbeParametersView.readKeyFile(keyFile);
+                        key = SwingPromptingPbeParametersView.readKeyFile(keyFile);
                     } catch (FileNotFoundException ex) {
                         setError(resources.getString("keyFile.fileNotFoundException"));
                         return false;
@@ -156,7 +156,7 @@ final class WriteKeyPanel extends KeyPanel {
 
     /**
      * Checks the entropy of the given key.
-     * 
+     *
      * @param key the key to check.
      * @throws WeakKeyException if the entropy of the given key is too weak.
      */
@@ -195,16 +195,16 @@ final class WriteKeyPanel extends KeyPanel {
                 ? MessageFormat.format(resources.getString(key), new Object[] { param })
                 : resources.getString(key);
     }
-    
+
     /**
      * Getter for property {@code extraDataUI}.
-     * 
+     *
      * @return Value of property {@code extraDataUI}.
      */
     public JComponent getExtraDataUI() {
         return extraDataUI;
     }
-    
+
     /**
      * Setter for property {@code extraDataUI}.
      * This component is placed below the two password fields and above the
@@ -212,7 +212,7 @@ final class WriteKeyPanel extends KeyPanel {
      * It may be used to prompt the user for additional data which may form
      * part of the key or is separately stored in the key provider.
      * The panel is automatically revalidated.
-     * 
+     *
      * @param extraDataUI New value of property {@code extraDataUI}.
      */
     public void setExtraDataUI(final JComponent extraDataUI) {
@@ -235,7 +235,7 @@ final class WriteKeyPanel extends KeyPanel {
 
         revalidate();
     }
-    
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -387,7 +387,7 @@ final class WriteKeyPanel extends KeyPanel {
             }
         });
     }//GEN-LAST:event_passwdPanelAncestorWindowShown
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private final net.java.truevfs.key.swing.AuthenticationPanel authenticationPanel = new net.java.truevfs.key.swing.AuthenticationPanel();
     private final javax.swing.JLabel error = new javax.swing.JLabel();

@@ -6,11 +6,11 @@ package net.java.truevfs.key.spec.sample;
 
 import java.net.URI;
 import net.java.truevfs.key.spec.PersistentUnknownKeyException;
-import net.java.truevfs.key.spec.PromptingKeyProvider;
-import net.java.truevfs.key.spec.PromptingKeyProvider.Controller;
 import net.java.truevfs.key.spec.UnknownKeyException;
 import net.java.truevfs.key.spec.param.AesKeyStrength;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.prompting.PromptingKeyProvider;
+import net.java.truevfs.key.spec.prompting.PromptingKeyProvider.Controller;
 
 /** @author Christian Schlichtherle */
 public class MyPromptingKeyProviderView

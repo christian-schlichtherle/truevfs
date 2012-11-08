@@ -5,14 +5,12 @@
 package net.java.truevfs.key.spec;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
- * Thrown to indicate that the retrieval of the key to open or create a
+ * Thrown to indicate that the retrieval of the key to (over)write or read a
  * protected resource has failed and that this exception is cacheable.
- * The subclass provides more information.
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 public class PersistentUnknownKeyException extends UnknownKeyException {
 
@@ -20,9 +18,13 @@ public class PersistentUnknownKeyException extends UnknownKeyException {
 
     public PersistentUnknownKeyException() { }
 
-    public PersistentUnknownKeyException(@CheckForNull String msg) { super(msg); }
+    public PersistentUnknownKeyException(@CheckForNull String msg) {
+        super(msg);
+    }
 
-    public PersistentUnknownKeyException(@CheckForNull Throwable cause) { super(cause); }
+    public PersistentUnknownKeyException(@CheckForNull Throwable cause) {
+        super(cause);
+    }
 
     public PersistentUnknownKeyException(@CheckForNull String msg, @CheckForNull Throwable cause) {
         super(msg, cause);

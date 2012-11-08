@@ -21,11 +21,11 @@ import net.java.truevfs.key.osx.keychain.Keychain.Item;
 import static net.java.truevfs.key.osx.keychain.Keychain.ItemClass.*;
 import net.java.truevfs.key.osx.keychain.Keychain.Visitor;
 import net.java.truevfs.key.osx.keychain.KeychainException;
-import static net.java.truevfs.key.spec.BufferUtils.*;
 import net.java.truevfs.key.spec.AbstractKeyManager;
 import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.KeyProvider;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
+import static net.java.truevfs.key.spec.safe.BufferUtils.*;
 import org.slf4j.Logger;
 
 /**

@@ -11,7 +11,7 @@ import net.java.truevfs.key.spec.UnknownKeyException;
 /**
  * This key provider fails to resolve any keys.
  *
- * @since  TrueVFS 0.9.4
+ * @since  TrueVFS 0.10
  * @author Christian Schlichtherle
  */
 final class UnknownKeyProvider extends AbstractKeyProvider<Object> {

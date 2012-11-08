@@ -7,7 +7,7 @@ package net.java.truevfs.key.spec;
 import javax.annotation.CheckForNull;
 
 /**
- * Manages the life cycle of a key for reading and writing a protected
+ * Manages the life cycle of a key for writing and reading a protected
  * resource.
  * When implementing a key provider, you should extend the
  * {@link AbstractKeyProvider} class rather than directly implementing this

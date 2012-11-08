@@ -2,17 +2,14 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.key.spec.param;
+package net.java.truevfs.key.spec.safe;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truevfs.key.spec.AbstractSecretKey;
-import static net.java.truevfs.key.spec.BufferUtils.*;
-import net.java.truevfs.key.spec.PromptingKey;
+import static net.java.truevfs.key.spec.safe.BufferUtils.*;
 
 /**
  * A JavaBean which holds parameters for password based encryption.
@@ -27,18 +24,8 @@ import net.java.truevfs.key.spec.PromptingKey;
 @NotThreadSafe
 public abstract class SafePbeParameters<
         P extends SafePbeParameters<P, S>,
-        S extends KeyStrength>
-extends AbstractSecretKey<P> implements PromptingKey<P> {
-
-    private @CheckForNull S keyStrength;
-    private boolean changeRequested;
-
-    @Override
-    public void reset() {
-        super.reset();
-        keyStrength = null;
-        changeRequested = false;
-    }
+        S extends SafeKeyStrength>
+extends AbstractSafeKey<P, S> {
 
     /**
      * Returns a protective copy of the password char array.
@@ -82,62 +69,5 @@ extends AbstractSecretKey<P> implements PromptingKey<P> {
         } finally {
             fill(bb, (byte) 0);
         }
-    }
-
-    /**
-     * Returns a new non-empty array of all available key strength values.
-     * There should be no duplicated elements in this array.
-     *
-     * @return A new non-empty array of all available key strength values.
-     */
-    public abstract S[] getKeyStrengthValues();
-
-    /**
-     * Returns the cipher key strength.
-     *
-     * @return The cipher key strength.
-     */
-    public @CheckForNull S getKeyStrength() { return keyStrength; }
-
-    /**
-     * Sets the cipher key strength.
-     *
-     * @param keyStrength the cipher key strength.
-     */
-    public void setKeyStrength(final @CheckForNull S keyStrength) {
-        this.keyStrength = keyStrength;
-    }
-
-    @Override
-    public boolean isChangeRequested() { return changeRequested; }
-
-    @Override
-    public void setChangeRequested(final boolean changeRequested) {
-        this.changeRequested = changeRequested;
-    }
-
-    /**
-     * Safe PBE parameters equal another object if and only if the other object
-     * has the same runtime class and their properties compare equal.
-     */
-    @Override
-    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
-    public final boolean equals(final Object obj) {
-        if (this == obj) return true;
-        if (!super.equals(obj)) return false;
-        final SafePbeParameters<?, ?> that = (SafePbeParameters<?, ?>) obj;
-        return Objects.equals(this.keyStrength, that.keyStrength)
-                && this.changeRequested == that.changeRequested;
-    }
-
-    /**
-     * Returns a hash code which is consistent with {@link #equals(Object)}.
-     */
-    @Override
-    public final int hashCode() {
-        int c = super.hashCode();
-        c = 31 * c + Objects.hashCode(keyStrength);
-        c = 31 * c + Boolean.valueOf(changeRequested).hashCode();
-        return c;
     }
 }

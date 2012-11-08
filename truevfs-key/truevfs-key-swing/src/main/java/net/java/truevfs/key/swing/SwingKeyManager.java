@@ -5,17 +5,17 @@
 package net.java.truevfs.key.swing;
 
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.key.spec.PromptingKeyManager;
-import net.java.truevfs.key.spec.param.SafePbeParameters;
+import net.java.truevfs.key.spec.prompting.PromptingKeyManager;
+import net.java.truevfs.key.spec.prompting.PromptingPbeParameters;
 
 /**
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class SwingKeyManager<P extends SafePbeParameters<P, ?>>
+final class SwingKeyManager<P extends PromptingPbeParameters<P, ?>>
 extends PromptingKeyManager<P> {
 
-    SwingKeyManager(SwingSafePbeParametersView<P, ?> view) {
+    SwingKeyManager(SwingPromptingPbeParametersView<P, ?> view) {
         super(view);
     }
 }

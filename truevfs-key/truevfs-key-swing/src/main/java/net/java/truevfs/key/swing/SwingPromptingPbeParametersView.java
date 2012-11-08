@@ -17,13 +17,13 @@ import java.util.WeakHashMap;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.inject.Provider;
 import javax.swing.JOptionPane;
-import net.java.truevfs.key.spec.KeyPromptingDisabledException;
-import net.java.truevfs.key.spec.KeyPromptingInterruptedException;
-import net.java.truevfs.key.spec.PromptingKeyProvider;
-import net.java.truevfs.key.spec.PromptingKeyProvider.Controller;
 import net.java.truevfs.key.spec.UnknownKeyException;
-import net.java.truevfs.key.spec.param.KeyStrength;
-import net.java.truevfs.key.spec.param.SafePbeParameters;
+import net.java.truevfs.key.spec.prompting.KeyPromptingDisabledException;
+import net.java.truevfs.key.spec.prompting.KeyPromptingInterruptedException;
+import net.java.truevfs.key.spec.prompting.PromptingKeyProvider;
+import net.java.truevfs.key.spec.prompting.PromptingKeyProvider.Controller;
+import net.java.truevfs.key.spec.prompting.PromptingPbeParameters;
+import net.java.truevfs.key.spec.safe.SafeKeyStrength;
 import net.java.truevfs.key.swing.feedback.Feedback;
 import net.java.truevfs.key.swing.sl.InvalidKeyFeedbackLocator;
 import net.java.truevfs.key.swing.sl.UnknownKeyFeedbackLocator;
@@ -35,13 +35,13 @@ import net.java.truevfs.key.swing.util.Windows;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-abstract class SwingSafePbeParametersView<
-        P extends SafePbeParameters<P, S>,
-        S extends KeyStrength>
+abstract class SwingPromptingPbeParametersView<
+        P extends PromptingPbeParameters<P, S>,
+        S extends SafeKeyStrength>
 implements PromptingKeyProvider.View<P> {
 
     private static final ResourceBundle resources
-            = ResourceBundle.getBundle(SwingSafePbeParametersView.class.getName());
+            = ResourceBundle.getBundle(SwingPromptingPbeParametersView.class.getName());
     static final URI INITIAL_RESOURCE = URI.create(""); // NOI18N
 
     /**
@@ -278,7 +278,7 @@ implements PromptingKeyProvider.View<P> {
         if (EventQueue.isDispatchThread()) {
             task.run();
         } else {
-            synchronized (SwingSafePbeParametersView.class) {
+            synchronized (SwingPromptingPbeParametersView.class) {
                 try {
                     EventQueue.invokeAndWait(task);
                 } catch (InterruptedException interrupt) {
