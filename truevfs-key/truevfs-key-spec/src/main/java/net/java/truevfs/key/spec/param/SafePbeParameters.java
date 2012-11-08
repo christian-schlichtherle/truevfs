@@ -31,13 +31,13 @@ public abstract class SafePbeParameters<
 extends AbstractSecretKey<P> implements PromptingKey<P> {
 
     private @CheckForNull S keyStrength;
-    //private boolean changeRequested;
+    private boolean changeRequested;
 
     @Override
     public void reset() {
         super.reset();
         keyStrength = null;
-        //changeRequested = false;
+        changeRequested = false;
     }
 
     /**
@@ -108,13 +108,13 @@ extends AbstractSecretKey<P> implements PromptingKey<P> {
         this.keyStrength = keyStrength;
     }
 
-    /*@Override
+    @Override
     public boolean isChangeRequested() { return changeRequested; }
 
     @Override
     public void setChangeRequested(final boolean changeRequested) {
         this.changeRequested = changeRequested;
-    }*/
+    }
 
     /**
      * Safe PBE parameters equal another object if and only if the other object
@@ -127,7 +127,7 @@ extends AbstractSecretKey<P> implements PromptingKey<P> {
         if (!super.equals(obj)) return false;
         final SafePbeParameters<?, ?> that = (SafePbeParameters<?, ?>) obj;
         return Objects.equals(this.keyStrength, that.keyStrength)
-                ;//&& this.changeRequested == that.changeRequested;
+                && this.changeRequested == that.changeRequested;
     }
 
     /**
@@ -137,7 +137,7 @@ extends AbstractSecretKey<P> implements PromptingKey<P> {
     public final int hashCode() {
         int c = super.hashCode();
         c = 31 * c + Objects.hashCode(keyStrength);
-        //c = 31 * c + Boolean.valueOf(changeRequested).hashCode();
+        c = 31 * c + Boolean.valueOf(changeRequested).hashCode();
         return c;
     }
 }

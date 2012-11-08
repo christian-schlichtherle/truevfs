@@ -12,10 +12,11 @@ import java.net.URI;
  * {@link AbstractKeyManager} class rather than directly implementing this
  * interface in order to maintain binary backwards compatibility even if this
  * interface is changed.
-  * <p>
+ * <p>
  * Implementations must be safe for multi-threading.
  *
  * @param  <K> The type of the keys.
+ * @see    KeyManagerMap
  * @author Christian Schlichtherle
  */
 public interface KeyManager<K> {

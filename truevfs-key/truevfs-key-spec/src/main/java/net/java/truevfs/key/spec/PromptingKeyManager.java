@@ -13,7 +13,7 @@ import net.java.truevfs.key.spec.PromptingKeyProvider.View;
  * A key manager which prompts the user for a secret key if required.
  *
  * @param  <K> the type of the prompting keys.
- * @see    PromptingKeyProvider
+ * @see    PromptingKeyManagerMap
  * @author Christian Schlichtherle
  */
 @ThreadSafe

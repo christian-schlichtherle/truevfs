@@ -58,7 +58,7 @@ implements PromptingKeyProvider.View<P> {
     protected abstract P newPbeParameters();
 
     @Override
-    public final void promptForWriting(final Controller<P> controller)
+    public final void promptKeyForWriting(final Controller<P> controller)
     throws KeyPromptingDisabledException {
         final Console con = System.console();
         if (null == con) throw new KeyPromptingDisabledException();
@@ -140,7 +140,7 @@ implements PromptingKeyProvider.View<P> {
     }
 
     @Override
-    public void promptForReading(
+    public void promptKeyForReading(
             final Controller<P> controller,
             final boolean invalid)
     throws KeyPromptingDisabledException {
@@ -165,16 +165,17 @@ implements PromptingKeyProvider.View<P> {
             final P param = newPbeParameters();
             param.setPassword(passwd);
             Arrays.fill(passwd, (char) 0);
-            controller.setKey(param);
 
             while (true) {
                 String changeKey = con.readLine(resources.getString("readKey.change"));
-                controller.setChangeRequested(YES.equalsIgnoreCase(changeKey));
+                param.setChangeRequested(YES.equalsIgnoreCase(changeKey));
                 if (       null == changeKey
                         || changeKey.length() <= 0
                         || YES.equalsIgnoreCase(changeKey)
-                        || NO.equalsIgnoreCase(changeKey))
+                        || NO.equalsIgnoreCase(changeKey)) {
+                    controller.setKey(param);
                     return;
+                }
             }
         }
     }

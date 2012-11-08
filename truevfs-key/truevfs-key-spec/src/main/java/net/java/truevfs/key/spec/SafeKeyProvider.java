@@ -16,6 +16,7 @@ import net.java.truevfs.key.spec.util.SuspensionPenalty;
  * and {@link #getKeyForReading}.
  *
  * @param  <K> the type of the safe keys.
+ * @see    SafeKeyManager
  * @author Christian Schlichtherle
  */
 @ThreadSafe
@@ -51,9 +52,7 @@ extends AbstractKeyProvider<K> {
     }
 
     /**
-     * Retrieves the key for writing a protected resource.
-     * <p>
-     * Subsequent calls to this method may return the same object.
+     * Sets up the key for (over)writing a protected resource.
      *
      * @throws UnknownKeyException If the key is unknown.
      *         At the subclasses discretion, this may mean that prompting for
@@ -89,9 +88,7 @@ extends AbstractKeyProvider<K> {
     }
 
     /**
-     * Retrieves the key for reading a protected resource.
-     * <p>
-     * Subsequent calls to this method may return the same object.
+     * Sets up the key for reading a protected resource.
      *
      * @throws UnknownKeyException If the key is unknown.
      *         At the subclasses discretion, this may mean that prompting for

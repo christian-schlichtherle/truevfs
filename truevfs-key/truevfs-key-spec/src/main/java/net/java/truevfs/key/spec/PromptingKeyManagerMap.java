@@ -14,8 +14,8 @@ import net.java.truevfs.key.spec.PromptingKeyProvider.View;
  * Implements a map for a single prompting key manager which will use the
  * prompting key provider view given to the
  * {@linkplain #PromptingKeyManagerMap constructor}.
- * This class is convenient to use if you want to implement a custom view for
- * key prompting.
+ * This class is provided for convenience and may be used to ease the
+ * implementation of a custom view for key prompting.
  *
  * @author Christian Schlichtherle
  */

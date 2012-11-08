@@ -5,7 +5,7 @@
 package net.java.truevfs.key.spec;
 
 import java.net.URI;
-import static net.java.truevfs.key.spec.MockView.Action.*;
+import static net.java.truevfs.key.spec.TestView.Action.*;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,22 +17,21 @@ public class PromptingKeyProviderTest {
 
     private static final URI RESOURCE = URI.create("foo");
 
-    private MockView<DummyKey> view;
-    private PromptingKeyManager<DummyKey> manager;
-    private PromptingKeyProvider<DummyKey> provider;
+    private TestView<TestKey> view;
+    private PromptingKeyManager<TestKey> manager;
+    private PromptingKeyProvider<TestKey> provider;
 
     @Before
     public void setUp() {
-        view = new MockView<>();
+        view = new TestView<>();
         view.setResource(RESOURCE);
-        view.setChangeRequested(true);
         manager = new PromptingKeyManager<>(view);
         provider = manager.provider(RESOURCE);
     }
 
     @Test
     public void testLifeCycle() throws UnknownKeyException {
-        DummyKey key = new DummyKey();
+        TestKey key = new TestKey();
         view.setKey(key);
         assertSame(key, view.getKey());
 
@@ -51,13 +50,13 @@ public class PromptingKeyProviderTest {
 
         provider.resetUnconditionally();
 
-        view.setKey(key = new DummyKey());
+        view.setKey(key = new TestKey());
         try {
             provider.getKeyForReading(false);
             fail();
         } catch (UnknownKeyException expected) {
         }
-        view.setKey(key = new DummyKey());
+        view.setKey(key = new TestKey());
         try {
             provider.getKeyForWriting();
             fail();
@@ -66,13 +65,13 @@ public class PromptingKeyProviderTest {
 
         view.setAction(IGNORE);
 
-        view.setKey(key = new DummyKey());
+        view.setKey(key = new TestKey());
         try {
             provider.getKeyForReading(false);
             fail();
         } catch (UnknownKeyException expected) {
         }
-        view.setKey(key = new DummyKey());
+        view.setKey(key = new TestKey());
         try {
             provider.getKeyForWriting();
             fail();
@@ -82,9 +81,11 @@ public class PromptingKeyProviderTest {
         provider.resetCancelledKey();
         view.setAction(ENTER);
 
-        view.setKey(key = new DummyKey());
+        key = new TestKey();
+        key.setChangeRequested(true);
+        view.setKey(key);
         assertEquals(key, provider.getKeyForReading(false));
-        view.setKey(key = new DummyKey());
+        view.setKey(key = new TestKey());
         assertEquals(key, provider.getKeyForWriting());
 
         provider.setKey(null);
@@ -99,9 +100,9 @@ public class PromptingKeyProviderTest {
         } catch (UnknownKeyException expected) {
         }
 
-        provider.setKey(key = new DummyKey());
+        provider.setKey(key = new TestKey());
         assertEquals(key, provider.getKeyForReading(false));
-        view.setKey(new DummyKey());
+        view.setKey(new TestKey());
         assertEquals(key, provider.getKeyForWriting());
     }
 }

@@ -10,9 +10,9 @@ import net.java.truevfs.access.TFile;
 import net.java.truevfs.access.it.TFileITSuite;
 import net.java.truevfs.comp.zipdriver.TestWinZipAesDriver;
 import static net.java.truevfs.kernel.spec.FsAccessOption.ENCRYPT;
-import net.java.truevfs.key.spec.MockView.Action;
-import static net.java.truevfs.key.spec.MockView.Action.CANCEL;
-import static net.java.truevfs.key.spec.MockView.Action.ENTER;
+import net.java.truevfs.key.spec.TestView.Action;
+import static net.java.truevfs.key.spec.TestView.Action.CANCEL;
+import static net.java.truevfs.key.spec.TestView.Action.ENTER;
 import static org.junit.Assert.*;
 import org.junit.Test;
 

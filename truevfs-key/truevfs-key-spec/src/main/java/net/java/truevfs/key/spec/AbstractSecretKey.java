@@ -10,15 +10,15 @@ import javax.annotation.CheckForNull;
 import static net.java.truevfs.key.spec.BufferUtils.*;
 
 /**
- * A secret key for writing and reading protected resources which may be used
- * with {@linkplain PromptingKeyProvider prompting key providers} and their
- * {@linkplain PromptingKeyManager prompting key manager}.
+ * A secret key for writing and reading protected resources.
+ * <p>
+ * Subclasses do <em>not</em> need to be safe for multi-threading.
  *
  * @param  <K> the type of this secret key.
  * @author Christian Schlichtherle
  */
 public abstract class AbstractSecretKey<K extends AbstractSecretKey<K>>
-implements SecretKey<K> {
+implements SafeKey<K> {
 
     private @CheckForNull ByteBuffer secret;
 
@@ -68,7 +68,7 @@ implements SecretKey<K> {
         }
     }
 
-    @Override
+    /** Returns a protective copy of the secret. */
     public final @CheckForNull ByteBuffer getSecret() {
         try {
             return copy(secret);
@@ -77,7 +77,12 @@ implements SecretKey<K> {
         }
     }
 
-    @Override
+    /**
+     * Clears the current secret and sets it to a protective copy of the given
+     * secret.
+     *
+     * @param secret the secret to copy and set.
+     */
     public final void setSecret(final @CheckForNull ByteBuffer secret) {
         try {
             fill(this.secret, (byte) 0);
@@ -88,7 +93,7 @@ implements SecretKey<K> {
     }
 
     /**
-     * An abstract key equals another object if and only if the other object
+     * A secret key equals another object if and only if the other object
      * has the same runtime class and its property {@code secret} compares
      * equal.
      */
@@ -109,8 +114,8 @@ implements SecretKey<K> {
     /**
      * Returns a hash code which is consistent with {@link #equals(Object)}.
      * This method is provided for completeness only - you should actually
-     * never use secret key classes as keys in hash maps because of their
-     * mutable properties!
+     * never use secret keys as hash map keys because of their mutable
+     * properties!
      */
     @Override
     public int hashCode() {
