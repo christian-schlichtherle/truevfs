@@ -206,7 +206,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.*;
  * </tr>
  * <tr>
  *   <td><i>archive.zip</i></td>
- *   <td>TFile or directory does not exist</td>
+ *   <td>File or directory does not exist</td>
  *   <td>{@code true}</td>
  *   <td>{@code false}</td>
  *   <td>{@code false}</td>
@@ -263,7 +263,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.*;
  * </tr>
  * <tr>
  *   <td><i>archive.tzp</i></td>
- *   <td>TFile or directory does not exist</td>
+ *   <td>File or directory does not exist</td>
  *   <td>{@code true}</td>
  *   <td>{@code false}</td>
  *   <td>{@code false}</td>
@@ -302,7 +302,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.*;
  * </tr>
  * <tr>
  *   <td><i>other</i></td>
- *   <td>TFile or directory does not exist</td>
+ *   <td>File or directory does not exist</td>
  *   <td>{@code false}</td>
  *   <td>{@code false}</td>
  *   <td>{@code false}</td>
