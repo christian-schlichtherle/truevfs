@@ -32,11 +32,13 @@ extends SafeKey<K, S> {
     /**
      * Returns whether or not the user shall get prompted for a new key upon
      * the next call to {@link PromptingKeyProvider#getKeyForWriting},
-     * provided that the key has been {@link #setKey set} before.
+     * provided that the key has been {@link PromptingKeyProvider#setKey set}
+     * before.
      *
      * @return Whether or not the user shall get prompted for a new key upon
      *         the next call to {@link PromptingKeyProvider#getKeyForWriting},
-     *         provided that the key has been {@link #setKey set} before.
+     *         provided that the key has been
+     *         {@link PromptingKeyProvider#setKey set} before.
      */
     boolean isChangeRequested();
 

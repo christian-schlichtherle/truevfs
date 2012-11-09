@@ -7,7 +7,7 @@ package net.java.truevfs.key.osx.keychain;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.util.Map.Entry;
-import static net.java.truevfs.key.spec.safe.BufferUtils.*;
+import static net.java.truevfs.key.spec.util.BufferUtils.*;
 import net.java.truevfs.key.osx.keychain.Keychain.AttributeClass;
 import net.java.truevfs.key.osx.keychain.Keychain.Item;
 import net.java.truevfs.key.osx.keychain.Keychain.Visitor;

@@ -6,7 +6,7 @@ package net.java.truevfs.key.spec.safe;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import static net.java.truevfs.key.spec.safe.BufferUtils.*;
+import static net.java.truevfs.key.spec.util.BufferUtils.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
