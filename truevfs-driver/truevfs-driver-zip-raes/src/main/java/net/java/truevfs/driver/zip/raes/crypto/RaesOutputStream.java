@@ -4,12 +4,12 @@
  */
 package net.java.truevfs.driver.zip.raes.crypto;
 
-import net.java.truecommons.io.DecoratingOutputStream;
-import net.java.truecommons.io.Sink;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.io.DecoratingOutputStream;
+import net.java.truecommons.io.Sink;
 import net.java.truevfs.key.spec.safe.SafeKeyStrength;
 import org.bouncycastle.crypto.Mac;
 
@@ -76,8 +76,7 @@ public abstract class RaesOutputStream extends DecoratingOutputStream {
         while (null != p) {
             // HC SVNT DRACONES!
             if (p instanceof Type0RaesParameters) {
-                return new Type0RaesOutputStream((Type0RaesParameters) p,
-                        sink);
+                return new Type0RaesOutputStream((Type0RaesParameters) p, sink);
             } else if (p instanceof RaesParametersProvider) {
                 p = ((RaesParametersProvider) p).get(RaesParameters.class);
             } else {
