@@ -22,7 +22,7 @@ import net.java.truevfs.key.spec.util.SuspensionPenalty;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class SafeKeyProvider<K extends SafeKey<K, ?>>
+public abstract class SafeKeyProvider<K extends SafeKey<K>>
 extends AbstractKeyProvider<K> {
 
     /**

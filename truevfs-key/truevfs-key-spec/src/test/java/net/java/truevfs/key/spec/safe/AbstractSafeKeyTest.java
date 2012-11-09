@@ -47,6 +47,5 @@ public class AbstractSafeKeyTest {
         assertThat(clone.getSecret(), is(secret));
     }
 
-    private static class TestKey
-    extends AbstractSafeKey<TestKey, TestKeyStrength> { }
+    private static class TestKey extends AbstractSafeKey<TestKey> { }
 }

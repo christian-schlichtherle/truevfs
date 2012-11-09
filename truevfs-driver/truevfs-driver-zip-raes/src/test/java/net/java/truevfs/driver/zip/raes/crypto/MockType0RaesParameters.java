@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.driver.zip.raes.crypto;
 
-import net.java.truevfs.driver.zip.raes.crypto.Type0RaesParameters;
 import java.util.Random;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truevfs.key.spec.param.AesKeyStrength;

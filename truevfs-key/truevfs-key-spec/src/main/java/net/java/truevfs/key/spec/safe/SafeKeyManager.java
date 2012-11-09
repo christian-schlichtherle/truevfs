@@ -21,7 +21,7 @@ import net.java.truevfs.key.spec.AbstractKeyManager;
  */
 @ThreadSafe
 public abstract class SafeKeyManager<
-        K extends SafeKey<K, ?>,
+        K extends SafeKey<K>,
         P extends SafeKeyProvider<K>>
 extends AbstractKeyManager<K> {
 

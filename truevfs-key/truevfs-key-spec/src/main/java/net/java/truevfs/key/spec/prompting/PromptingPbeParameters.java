@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.key.spec.prompting;
 
+import java.beans.Transient;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truevfs.key.spec.safe.*;
 
@@ -20,7 +21,7 @@ import net.java.truevfs.key.spec.safe.*;
 public abstract class PromptingPbeParameters<
         P extends PromptingPbeParameters<P, S>,
         S extends SafeKeyStrength>
-extends SafePbeParameters<P, S> implements PromptingKey<P, S> {
+extends SafePbeParameters<P, S> implements PromptingKey<P> {
 
     private boolean changeRequested;
 
@@ -59,5 +60,11 @@ extends SafePbeParameters<P, S> implements PromptingKey<P, S> {
         int c = super.hashCode();
         c = 31 * c + Boolean.valueOf(changeRequested).hashCode();
         return c;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s[changeRequested=%b]",
+                super.toString(), changeRequested);
     }
 }

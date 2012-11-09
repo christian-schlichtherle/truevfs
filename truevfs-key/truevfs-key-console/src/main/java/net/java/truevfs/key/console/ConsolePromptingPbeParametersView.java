@@ -105,7 +105,7 @@ implements PromptingKeyProvider.View<P> {
             final Map<Integer, S> map;
             {
                 final StringBuilder builder = new StringBuilder();
-                final S[] array = param.getKeyStrengthValues();
+                final S[] array = param.getAllKeyStrengths();
                 map = new HashMap<>(array.length / 3 * 4 + 1);
                 final PrintWriter writer = con.writer();
                 for (final S strength : array) {

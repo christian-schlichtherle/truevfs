@@ -5,7 +5,6 @@
 package net.java.truevfs.key.spec.prompting;
 
 import net.java.truevfs.key.spec.safe.SafeKey;
-import net.java.truevfs.key.spec.safe.SafeKeyStrength;
 
 /**
  * A prompting key for writing and reading protected resources.
@@ -16,18 +15,8 @@ import net.java.truevfs.key.spec.safe.SafeKeyStrength;
  * @see    PromptingKeyProvider
  * @author Christian Schlichtherle
  */
-public interface PromptingKey<
-        K extends PromptingKey<K, S>,
-        S extends SafeKeyStrength>
-extends SafeKey<K, S> {
-
-    /**
-     * Returns a new non-empty array of all available key strength values.
-     * There should be no duplicated elements in this array.
-     *
-     * @return A new non-empty array of all available key strength values.
-     */
-    public abstract S[] getKeyStrengthValues();
+public interface PromptingKey<K extends PromptingKey<K>>
+extends SafeKey<K> {
 
     /**
      * Returns whether or not the user shall get prompted for a new key upon

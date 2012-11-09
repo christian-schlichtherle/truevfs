@@ -34,7 +34,7 @@ extends AbstractKeyManagerMap {
      * @param clazz the class of the prompting keys.
      * @param view the view for the prompting key provider.
      */
-    public <K extends PromptingKey<K, ?>> PromptingKeyManagerMap(
+    public <K extends PromptingKey<K>> PromptingKeyManagerMap(
             final Class<K> clazz,
             final View<K> view) {
         final Map<Class<?>, KeyManager<?>> map = new HashMap<>(2);

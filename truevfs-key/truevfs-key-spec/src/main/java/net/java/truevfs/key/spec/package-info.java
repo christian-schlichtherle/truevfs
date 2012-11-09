@@ -7,29 +7,31 @@
  * reading protected resources, for example encrypted files.
  * The primary objective of this API is to decouple...
  * <ul>
- * <li>the process to retrieve keys required for writing and reading protected
- *     resources from...
- * <li>the process to use and validate these keys.
+ * <li>the algorithms to create and persist keys required for writing and
+ *     reading protected resources from...
+ * <li>the algorithms to use and validate these keys.
  * </ul>
  * <p>
- * The process to retrieve keys is executed by the (abstract) classes and
- * interfaces in this package.
+ * The algorithms to create and persist keys are processed by the interfaces
+ * and classes in this package.
  * <p>
- * The process to use and optionally validate keys is executed by the users
+ * The algorithms to use and optionally validate keys is executed by the users
  * of this package - called <i>client applications</i> or <i>clients</i> for
  * short.
  * <p>
- * A protected resource can be anything which can be referenced by a
+ * A protected resource can be of any type which can be identified by a
  * {@link java.net.URI}:
  * As an example, it could be a URL to an encrypted file which the client
  * application is going to create or overwrite.
- * The key could be of any type, but typically its a user selectable password.
+ * <p>
+ * The key could also be of any type, but typically its a user selectable
+ * password.
  * <p>
  * The sub-packages of this package provide partial implementations which can
  * be easily extended to adapt to different user interface or persistence
  * technologies, e.g. Java Swing or Apple's Keychain.
  * <p>
- * Concrete implementations are provided by different plug-in modules.
+ * Complete implementations are provided by different plug-in modules.
  * These modules get located by the
  * {@link net.java.truevfs.key.spec.sl.KeyManagerMapLocator#SINGLETON} by
  * saerching the class path at run time.

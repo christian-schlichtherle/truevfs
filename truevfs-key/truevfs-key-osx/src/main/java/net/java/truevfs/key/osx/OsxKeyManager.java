@@ -4,6 +4,11 @@
  */
 package net.java.truevfs.key.osx;
 
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -79,29 +84,31 @@ final class OsxKeyManager extends AbstractKeyManager<AesPbeParameters> {
             throws KeychainException {
 
                 class Read implements Visitor {
-                    private @CheckForNull AesPbeParameters key;
+                    private @CheckForNull AesPbeParameters param;
 
                     @Override
                     public void visit(final Item item) throws KeychainException {
-                        final char[] pw = charArray(item.getSecret());
+                        param = decode(item.getAttributes().get(GENERIC));
+                        if (null == param) param = new AesPbeParameters();
+                        final ByteBuffer secret = item.getSecret();
                         try {
-                            (key = new AesPbeParameters()).setPassword(pw);
+                            param.setSecret(secret);
                         } finally {
-                            Arrays.fill(pw, (char) 0);
+                            fill(secret, (byte) 0);
                         }
                     }
                 }
 
                 final Read read = new Read();
                 keychain.visitItems(GENERIC_PASSWORD, attributes, read);
-                return read.key;
+                return read.param;
             }
         });
     }
 
     void setKey(
             final URI resource,
-            final @CheckForNull AesPbeParameters key) {
+            final @CheckForNull AesPbeParameters param) {
         access(resource, new Action<Void>() {
             @Override
             public Void call(
@@ -109,25 +116,31 @@ final class OsxKeyManager extends AbstractKeyManager<AesPbeParameters> {
                     final Map<AttributeClass, ByteBuffer> attributes)
             throws KeychainException {
 
-                if (null != key) {
-                    final char[] pw = key.getPassword();
+                if (null != param) {
+                    final ByteBuffer encSecret = param.getSecret();
                     try {
-                        final ByteBuffer buffer = byteBuffer(pw);
+                        final ByteBuffer encParam = encode(param);
 
                         class Update implements Visitor {
                             @Override
                             public void visit(Item item) throws KeychainException {
-                                item.setSecret(buffer);
+                                final Map<AttributeClass, ByteBuffer>
+                                        attributes = item.getAttributes();
+                                attributes.put(GENERIC, encParam);
+                                item.putAttributes(attributes);
+                                item.setSecret(encSecret);
                             }
                         }
 
                         try {
-                            keychain.createItem(GENERIC_PASSWORD, attributes, buffer);
+                            attributes.put(GENERIC, encParam);
+                            keychain.createItem(GENERIC_PASSWORD, attributes, encSecret);
                         } catch (final DuplicateItemException ex) {
+                            attributes.remove(GENERIC);
                             keychain.visitItems(GENERIC_PASSWORD, attributes, new Update());
                         }
                     } finally {
-                        Arrays.fill(pw, (char) 0);
+                        fill(encSecret, (byte) 0);
                     }
                 } else {
 
@@ -145,13 +158,40 @@ final class OsxKeyManager extends AbstractKeyManager<AesPbeParameters> {
         });
     }
 
+    static @CheckForNull AesPbeParameters decode(final @CheckForNull ByteBuffer bb) {
+        if (null == bb) return null;
+        final byte[] array = new byte[bb.remaining()]; // cannot use bb.array()!
+        bb.duplicate().get(array);
+        try (final XMLDecoder _ = new XMLDecoder(new ByteArrayInputStream(array))) {
+            final AesPbeParameters param = (AesPbeParameters) _.readObject();
+            assert null == param.getSecret();
+            return param;
+        }
+    }
+
+    static @CheckForNull ByteBuffer encode(@CheckForNull AesPbeParameters param) {
+        if (null == param) return null;
+        param = param.clone();
+        param.setSecret(null);
+        try (final ByteArrayOutputStream bos = new ByteArrayOutputStream(512)) {
+            try (final XMLEncoder _ = new XMLEncoder(bos)) {
+                _.writeObject(param);
+            }
+            bos.flush(); // redundant
+            return copy(ByteBuffer.wrap(bos.toByteArray()));
+        } catch (final IOException ex) {
+            logger.warn("encode.exception", ex);
+            return null;
+        }
+    }
+
     private @CheckForNull <T> T access(final URI resource, final Action<T> action) {
         if (skip) return null;
         try {
             return action.call(open(), attributes(resource));
         } catch (final KeychainException ex) {
             skip = true;
-            logger.debug("keychainException", ex);
+            logger.debug("access.exception", ex);
             return null;
         }
     }
