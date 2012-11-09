@@ -7,7 +7,7 @@ package net.java.truevfs.key.spec.safe;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
-import static net.java.truevfs.key.spec.safe.BufferUtils.*;
+import static net.java.truevfs.key.spec.util.BufferUtils.*;
 
 /**
  * A safe key for writing and reading protected resources.

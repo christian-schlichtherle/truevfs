@@ -26,7 +26,7 @@ import net.java.truevfs.key.osx.keychain.Security.SecKeychainAttributeList;
 import net.java.truevfs.key.osx.keychain.Security.SecKeychainItemRef;
 import net.java.truevfs.key.osx.keychain.Security.SecKeychainRef;
 import net.java.truevfs.key.osx.keychain.Security.SecKeychainSearchRef;
-import static net.java.truevfs.key.spec.safe.BufferUtils.*;
+import static net.java.truevfs.key.spec.util.BufferUtils.*;
 
 /**
  * The default implementation of {@link Keychain}.

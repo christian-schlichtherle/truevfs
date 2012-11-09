@@ -25,7 +25,7 @@ import net.java.truevfs.key.spec.AbstractKeyManager;
 import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.KeyProvider;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
-import static net.java.truevfs.key.spec.safe.BufferUtils.*;
+import static net.java.truevfs.key.spec.util.BufferUtils.*;
 import org.slf4j.Logger;
 
 /**

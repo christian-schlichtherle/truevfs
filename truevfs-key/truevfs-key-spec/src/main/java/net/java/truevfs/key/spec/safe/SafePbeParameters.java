@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
-import static net.java.truevfs.key.spec.safe.BufferUtils.*;
+import static net.java.truevfs.key.spec.util.BufferUtils.*;
 
 /**
  * A JavaBean which holds parameters for password based encryption.

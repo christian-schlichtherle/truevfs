@@ -295,8 +295,8 @@ extends SafeKeyProvider<K> {
          * parameter, then a clone of this object will be used as the key.
          * <p>
          * Otherwise, prompting for a key is permanently disabled and each
-         * subsequent call to {@link PromptingKeyProvider#promptKeyForWriting} or
-         * {@link PromptingKeyProvider#promptKeyForReading}
+         * subsequent call to {@link PromptingKeyProvider#getKeyForWriting} or
+         * {@link PromptingKeyProvider#getKeyForReading}
          * results in a {@link KeyPromptingCancelledException} until
          * {@link PromptingKeyProvider#resetCancelledKey()} or
          * {@link PromptingKeyProvider#resetUnconditionally()} gets
@@ -323,8 +323,8 @@ extends SafeKeyProvider<K> {
          * {@link Controller#setKey} with a {@code null}
          * parameter or throws a {@link KeyPromptingCancelledException}, then
          * prompting for the key is permanently disabled and each subsequent call
-         * to {@link PromptingKeyProvider#promptKeyForWriting} or
-         * {@link PromptingKeyProvider#promptKeyForReading} results in a
+         * to {@link PromptingKeyProvider#getKeyForWriting} or
+         * {@link PromptingKeyProvider#getKeyForReading} results in a
          * {@link KeyPromptingCancelledException} until
          * {@link PromptingKeyProvider#resetCancelledKey()} or
          * {@link PromptingKeyProvider#resetUnconditionally()} gets
