@@ -20,7 +20,7 @@ import net.java.truevfs.key.spec.unknown.UnknownKeyManager;
  * {@link Integer#MAX_VALUE}, so it takes precedence over any other modifier
  * on the class path.
  *
- * @since  TrueVFS 0.9.4
+ * @since  TrueVFS 0.10
  * @author Christian Schlichtherle
  */
 @Immutable

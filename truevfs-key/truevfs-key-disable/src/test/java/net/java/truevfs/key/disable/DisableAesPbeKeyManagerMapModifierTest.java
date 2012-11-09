@@ -10,7 +10,7 @@ import net.java.truevfs.key.spec.spi.KeyManagerMapModifier;
 import net.java.truevfs.key.spec.spi.KeyManagerMapModifierTestSuite;
 
 /**
- * @since  TrueVFS 0.9.4
+ * @since  TrueVFS 0.10
  * @author Christian Schlichtherle
  */
 public class DisableAesPbeKeyManagerMapModifierTest

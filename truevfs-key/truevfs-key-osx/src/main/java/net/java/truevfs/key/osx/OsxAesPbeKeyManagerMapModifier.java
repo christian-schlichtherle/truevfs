@@ -14,7 +14,7 @@ import net.java.truevfs.key.spec.spi.KeyManagerMapModifier;
 
 /**
  *
- * @since  TrueVFS 0.9.4
+ * @since  TrueVFS 0.10
  * @author Christian Schlichtherle
  */
 @Immutable
