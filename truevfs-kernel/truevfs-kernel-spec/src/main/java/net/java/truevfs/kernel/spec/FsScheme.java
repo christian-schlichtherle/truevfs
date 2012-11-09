@@ -16,7 +16,7 @@ import net.java.truecommons.shed.UriBuilder;
  * This is simply a {@link java.net.URI} scheme according to the syntax
  * constraints defined in
  * <a href="http://www.ietf.org/rfc/rfc2396.txt""><i>RFC&nbsp;2396: Uniform Resource Identifiers (URI): Generic Syntax</i></a>.
- * 
+ *
  * <h3><a name="serialization"/>Serialization</h3>
  * <p>
  * This class supports serialization with both
@@ -69,9 +69,9 @@ public final class FsScheme implements Serializable, Comparable<FsScheme> {
 
     /**
      * Returns the scheme as a string.
-     * 
+     *
      * @return The scheme as a string.
-     * @since  TrueVFS 0.9.4
+     * @since  TrueVFS 0.10
      * @deprecated This method is solely provided to support
      *             {@link XMLEncoder}/{@link XMLDecoder}.
      *             Applications should call {@link #toString()} instead.
@@ -98,7 +98,7 @@ public final class FsScheme implements Serializable, Comparable<FsScheme> {
 
     /**
      * Returns the scheme as a string.
-     * 
+     *
      * @return The scheme as a string.
      */
     @Override

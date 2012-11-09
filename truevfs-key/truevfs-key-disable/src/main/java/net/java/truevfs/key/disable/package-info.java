@@ -6,7 +6,7 @@
  * Provides the
  * {@link net.java.truevfs.key.disable.DisableAesPbeKeyManagerMapModifier}.
  *
- * @since  TrueVFS 0.9.4
+ * @since  TrueVFS 0.10
  * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
