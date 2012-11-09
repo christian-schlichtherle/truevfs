@@ -135,7 +135,7 @@ implements PromptingKeyProvider.View<P> {
         if (null == param) param = newPbeParameters();
 
         final KeyStrengthPanel<S> keyStrengthPanel = new KeyStrengthPanel<>(
-                param.getKeyStrengthValues());
+                param.getAllKeyStrengths());
         keyStrengthPanel.setKeyStrength(param.getKeyStrength());
         final WriteKeyPanel keyPanel = new WriteKeyPanel();
         keyPanel.setExtraDataUI(keyStrengthPanel);

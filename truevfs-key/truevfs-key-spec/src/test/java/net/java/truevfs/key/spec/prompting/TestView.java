@@ -22,7 +22,7 @@ import static net.java.truevfs.key.spec.prompting.TestView.Action.ENTER;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class TestView<K extends PromptingKey<K, ?>> implements View<K> {
+public final class TestView<K extends PromptingKey<K>> implements View<K> {
 
     private volatile @CheckForNull URI resource;
     private volatile @CheckForNull K key;
@@ -74,7 +74,7 @@ public final class TestView<K extends PromptingKey<K, ?>> implements View<K> {
     public enum Action {
         ENTER {
             @Override
-            <K extends PromptingKey<K, ?>> void
+            <K extends PromptingKey<K>> void
             promptKeyForWriting(
                     final Controller<? super K> controller,
                     final @CheckForNull K key)
@@ -84,7 +84,7 @@ public final class TestView<K extends PromptingKey<K, ?>> implements View<K> {
             }
 
             @Override
-            <K extends PromptingKey<K, ?>> void
+            <K extends PromptingKey<K>> void
             promptKeyForReading(
                     final Controller<? super K> controller,
                     final @CheckForNull K key)
@@ -98,7 +98,7 @@ public final class TestView<K extends PromptingKey<K, ?>> implements View<K> {
             private final Random rnd = new Random();
 
             @Override
-            <K extends PromptingKey<K, ?>> void
+            <K extends PromptingKey<K>> void
             promptKeyForWriting(
                     final Controller<? super K> controller,
                     final @CheckForNull K key)
@@ -111,7 +111,7 @@ public final class TestView<K extends PromptingKey<K, ?>> implements View<K> {
             }
 
             @Override
-            <K extends PromptingKey<K, ?>> void
+            <K extends PromptingKey<K>> void
             promptKeyForReading(
                     final Controller<? super K> controller,
                     final @CheckForNull K key)
@@ -126,7 +126,7 @@ public final class TestView<K extends PromptingKey<K, ?>> implements View<K> {
 
         IGNORE {
             @Override
-            <K extends PromptingKey<K, ?>> void
+            <K extends PromptingKey<K>> void
             promptKeyForWriting(
                     Controller<? super K> controller,
                     @CheckForNull K key)
@@ -134,7 +134,7 @@ public final class TestView<K extends PromptingKey<K, ?>> implements View<K> {
             }
 
             @Override
-            <K extends PromptingKey<K, ?>> void
+            <K extends PromptingKey<K>> void
             promptKeyForReading(
                     Controller<? super K> controller,
                     @CheckForNull K key)
@@ -142,13 +142,13 @@ public final class TestView<K extends PromptingKey<K, ?>> implements View<K> {
             }
         };
 
-        abstract <K extends PromptingKey<K, ?>> void
+        abstract <K extends PromptingKey<K>> void
         promptKeyForWriting(
                 Controller<? super K> controller,
                 @CheckForNull K key)
         throws UnknownKeyException;
 
-        abstract <K extends PromptingKey<K, ?>> void
+        abstract <K extends PromptingKey<K>> void
         promptKeyForReading(
                 Controller<? super K> controller,
                 @CheckForNull K key)

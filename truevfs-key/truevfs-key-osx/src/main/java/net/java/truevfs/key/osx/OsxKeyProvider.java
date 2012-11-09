@@ -20,7 +20,7 @@ final class OsxKeyProvider implements KeyProvider<AesPbeParameters> {
     private final OsxKeyManager manager;
     private final URI resource;
     private final KeyProvider<AesPbeParameters> provider;
-    private volatile AesPbeParameters key;
+    private volatile AesPbeParameters param;
 
     OsxKeyProvider(
             final OsxKeyManager manager,
@@ -33,25 +33,30 @@ final class OsxKeyProvider implements KeyProvider<AesPbeParameters> {
 
     @Override
     public AesPbeParameters getKeyForWriting() throws UnknownKeyException {
-        if (null == key) key = manager.getKey(resource);
-        if (null == key) key = provider.getKeyForWriting();
-        assert null != key;
-        return key;
+        AesPbeParameters op = param;
+        if (null == op) op = manager.getKey(resource);
+        if (null != op && !op.isChangeRequested()) return op.clone();
+        final AesPbeParameters np = provider.getKeyForWriting();
+        if (!np.equals(op)) manager.setKey(resource, np);
+        return param = np;
     }
 
     @Override
     public AesPbeParameters getKeyForReading(final boolean invalid)
     throws UnknownKeyException {
-        if (null == key && !invalid) key = manager.getKey(resource);
-        if (null == key || invalid) key = provider.getKeyForReading(invalid);
-        assert null != key;
-        return key;
+        if (!invalid) {
+            AesPbeParameters op = param;
+            if (null == op) op = manager.getKey(resource);
+            if (null != op) return op.clone();
+        }
+        return provider.getKeyForReading(invalid);
     }
 
     @Override
-    public void setKey(final AesPbeParameters nk) {
-        final AesPbeParameters ok = key;
-        provider.setKey(key = nk);
-        if (!nk.equals(ok)) manager.setKey(resource, nk);
+    public void setKey(final AesPbeParameters np) {
+        final AesPbeParameters op = param;
+        provider.setKey(np);
+        if (!np.equals(op)) manager.setKey(resource, np);
+        param = np;
     }
 }

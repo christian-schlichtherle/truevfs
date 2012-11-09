@@ -4,8 +4,10 @@
  */
 package net.java.truevfs.key.spec.safe;
 
+import java.beans.Transient;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
@@ -25,7 +27,15 @@ import static net.java.truevfs.key.spec.util.BufferUtils.*;
 public abstract class SafePbeParameters<
         P extends SafePbeParameters<P, S>,
         S extends SafeKeyStrength>
-extends AbstractSafeKey<P, S> {
+extends AbstractSafeKey<P> {
+
+    private @CheckForNull S keyStrength;
+
+    @Override
+    public void reset() {
+        super.reset();
+        keyStrength = null;
+    }
 
     /**
      * Returns a protective copy of the password char array.
@@ -34,6 +44,7 @@ extends AbstractSafeKey<P, S> {
      *
      * @return A protective copy of the password char array.
      */
+    @Transient
     public @Nullable char[] getPassword() { return charArray(getSecret()); }
 
     /**
@@ -69,5 +80,76 @@ extends AbstractSafeKey<P, S> {
         } finally {
             fill(bb, (byte) 0);
         }
+    }
+
+    /** Returns the cipher key strength as an object. */
+    @Transient
+    public @CheckForNull S getKeyStrength() {
+        return keyStrength;
+    }
+
+    /**
+     * Sets the cipher key strength as an object.
+     *
+     * @param keyStrength the cipher key strength as an object.
+     */
+    public void setKeyStrength(final @CheckForNull S keyStrength) {
+        this.keyStrength = keyStrength;
+    }
+
+    /** Returns the cipher key strength in bits. */
+    public int getKeyStrengthBits() {
+        return null == keyStrength ? 0 : keyStrength.getBits();
+    }
+
+    /**
+     * Sets the cipher key strength in bits.
+     * Note that this method performs a linear search for the keystrength
+     * object, so it should not get used on a regular basis - it's actually
+     * only provided to support {@code java.beans.XMLEncoder}.
+     *
+     * @param  bits the cipher key strength in bits.
+     * @throws IllegalArgumentException if an unknown bit size is provided.
+     * @see    #getAllKeyStrengths()
+     */
+    public void setKeyStrengthBits(final int bits) {
+        for (final S s : getAllKeyStrengths()) {
+            if (s.getBits() == bits) {
+                this.keyStrength = s;
+                return;
+            }
+        }
+        throw new IllegalArgumentException();
+    }
+
+    /**
+     * Returns a new non-empty array of all available cipher key strengths.
+     * There should be no duplicated elements in this array.
+     *
+     * @return A new non-empty array of all available cipher key strengths.
+     */
+    @Transient
+    public abstract S[] getAllKeyStrengths();
+
+    @Override
+    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
+    public boolean equals(final Object obj) {
+        if (this == obj) return true;
+        if (!super.equals(obj)) return false;
+        final SafePbeParameters<?, ?> that = (SafePbeParameters<?, ?>) obj;
+        return Objects.equals(this.keyStrength, that.keyStrength);
+    }
+
+    @Override
+    public int hashCode() {
+        int c = super.hashCode();
+        c = 31 * c + Objects.hashCode(keyStrength);
+        return c;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s[keystrength=%s]",
+                super.toString(), keyStrength);
     }
 }

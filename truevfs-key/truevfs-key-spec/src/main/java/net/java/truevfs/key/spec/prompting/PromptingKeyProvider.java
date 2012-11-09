@@ -27,7 +27,7 @@ import net.java.truevfs.key.spec.safe.SafeKeyProvider;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class PromptingKeyProvider<K extends PromptingKey<K, ?>>
+public final class PromptingKeyProvider<K extends PromptingKey<K>>
 extends SafeKeyProvider<K> {
 
     private final View<K> view;
@@ -126,7 +126,7 @@ extends SafeKeyProvider<K> {
     private enum State {
         RESET {
             @Override
-            <K extends PromptingKey<K, ?>> void
+            <K extends PromptingKey<K>> void
             setupKeyForWriting(final PromptingKeyProvider<K> provider)
             throws UnknownKeyException {
                 State state;
@@ -143,7 +143,7 @@ extends SafeKeyProvider<K> {
             }
 
             @Override
-            <K extends PromptingKey<K, ?>> void
+            <K extends PromptingKey<K>> void
             setupKeyForReading(
                     final PromptingKeyProvider<K> provider,
                     final boolean invalid)
@@ -164,14 +164,14 @@ extends SafeKeyProvider<K> {
             }
 
             @Override
-            <K extends PromptingKey<K, ?>> void
+            <K extends PromptingKey<K>> void
             resetCancelledKey(PromptingKeyProvider<K> provider) {
             }
         },
 
         SET {
             @Override
-            <K extends PromptingKey<K, ?>> void
+            <K extends PromptingKey<K>> void
             setupKeyForWriting(final PromptingKeyProvider<K> provider)
             throws UnknownKeyException {
                 final K key = getKey(provider);
@@ -183,7 +183,7 @@ extends SafeKeyProvider<K> {
             }
 
             @Override
-            <K extends PromptingKey<K, ?>> void
+            <K extends PromptingKey<K>> void
             setupKeyForReading(
                     final PromptingKeyProvider<K> provider,
                     final boolean invalid)
@@ -195,63 +195,63 @@ extends SafeKeyProvider<K> {
             }
 
             @Override
-            <K extends PromptingKey<K, ?>> void
+            <K extends PromptingKey<K>> void
             resetCancelledKey(PromptingKeyProvider<K> provider) {
             }
         },
 
         CANCELLED {
             @Override
-            <K extends PromptingKey<K, ?>> void
+            <K extends PromptingKey<K>> void
             setupKeyForWriting(PromptingKeyProvider<K> provider)
             throws UnknownKeyException {
                 throw exception(provider);
             }
 
             @Override
-            <K extends PromptingKey<K, ?>> void
+            <K extends PromptingKey<K>> void
             setupKeyForReading(PromptingKeyProvider<K> provider, boolean invalid)
             throws UnknownKeyException {
                 throw exception(provider);
             }
 
             @Override
-            <K extends PromptingKey<K, ?>> void
+            <K extends PromptingKey<K>> void
             resetCancelledKey(PromptingKeyProvider<K> provider) {
                 provider.reset();
             }
         };
 
-        abstract <K extends PromptingKey<K, ?>> void
+        abstract <K extends PromptingKey<K>> void
         setupKeyForWriting(PromptingKeyProvider<K> provider)
         throws UnknownKeyException;
 
-        abstract <K extends PromptingKey<K, ?>> void
+        abstract <K extends PromptingKey<K>> void
         setupKeyForReading(PromptingKeyProvider<K> provider, boolean invalid)
         throws UnknownKeyException;
 
-        abstract <K extends PromptingKey<K, ?>> void
+        abstract <K extends PromptingKey<K>> void
         resetCancelledKey(PromptingKeyProvider<K> provider);
 
-        final <K extends PromptingKey<K, ?>> URI
+        final <K extends PromptingKey<K>> URI
         getResource(PromptingKeyProvider<K> provider) {
             final URI resource = provider.getResource();
             if (null == resource) throw new IllegalStateException();
             return resource;
         }
 
-        final @CheckForNull <K extends PromptingKey<K, ?>> K
+        final @CheckForNull <K extends PromptingKey<K>> K
         getKey(PromptingKeyProvider<K> provider) {
             return provider.getKey0();
         }
 
-        final <K extends PromptingKey<K, ?>> void
+        final <K extends PromptingKey<K>> void
         setKey(PromptingKeyProvider<K> provider, @CheckForNull K key) {
             provider.setKey0(key);
             provider.setState(null != key ? State.SET : State.CANCELLED);
         }
 
-        final <K extends PromptingKey<K, ?>> PersistentUnknownKeyException
+        final <K extends PromptingKey<K>> PersistentUnknownKeyException
         exception(PromptingKeyProvider<K> provider) {
             PersistentUnknownKeyException ex = provider.getException();
             if (null == ex)
@@ -259,7 +259,7 @@ extends SafeKeyProvider<K> {
             return ex;
         }
 
-        final <K extends PromptingKey<K, ?>> void
+        final <K extends PromptingKey<K>> void
         setException(PromptingKeyProvider<K> provider, PersistentUnknownKeyException ex) {
             provider.setException(ex);
             provider.setState(CANCELLED);
@@ -281,7 +281,7 @@ extends SafeKeyProvider<K> {
      * @param  <K> the type of the safe keys.
      * @author Christian Schlichtherle
      */
-    public interface View<K extends PromptingKey<K, ?>> {
+    public interface View<K extends PromptingKey<K>> {
 
         /**
          * Prompts the user for the key for (over)writing the contents of a
@@ -349,7 +349,7 @@ extends SafeKeyProvider<K> {
      * @author Christian Schlichtherle
      */
     @NotThreadSafe
-    public interface Controller<K extends PromptingKey<K, ?>> {
+    public interface Controller<K extends PromptingKey<K>> {
 
         /**
          * Returns the unique resource identifier (resource ID) of the

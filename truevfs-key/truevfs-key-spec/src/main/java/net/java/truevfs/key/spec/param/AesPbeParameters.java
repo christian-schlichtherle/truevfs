@@ -26,7 +26,7 @@ extends PromptingPbeParameters<AesPbeParameters, AesKeyStrength> {
     }
 
     @Override
-    public AesKeyStrength[] getKeyStrengthValues() {
+    public AesKeyStrength[] getAllKeyStrengths() {
         return AesKeyStrength.values();
     }
 }

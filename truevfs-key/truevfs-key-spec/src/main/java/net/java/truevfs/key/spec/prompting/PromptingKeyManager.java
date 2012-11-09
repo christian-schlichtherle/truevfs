@@ -18,7 +18,7 @@ import net.java.truevfs.key.spec.safe.SafeKeyManager;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class PromptingKeyManager<K extends PromptingKey<K, ?>>
+public class PromptingKeyManager<K extends PromptingKey<K>>
 extends SafeKeyManager<K, PromptingKeyProvider<K>> {
 
     private final View<K> view;

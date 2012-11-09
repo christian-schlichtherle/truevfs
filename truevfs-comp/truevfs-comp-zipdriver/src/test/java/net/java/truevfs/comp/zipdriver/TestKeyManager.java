@@ -16,7 +16,7 @@ import net.java.truevfs.key.spec.prompting.PromptingKeyProvider.View;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class TestKeyManager<K extends PromptingKey<K, ?>>
+public final class TestKeyManager<K extends PromptingKey<K>>
 extends PromptingKeyManager<K> {
 
     public TestKeyManager(final View<K> view) {

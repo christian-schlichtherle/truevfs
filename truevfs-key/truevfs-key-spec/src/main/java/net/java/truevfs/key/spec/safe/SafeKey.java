@@ -4,8 +4,6 @@
  */
 package net.java.truevfs.key.spec.safe;
 
-import javax.annotation.CheckForNull;
-
 /**
  * A safe key for writing and reading protected resources.
  * <p>
@@ -14,42 +12,25 @@ import javax.annotation.CheckForNull;
  * @param  <K> the type of this safe key.
  * @author Christian Schlichtherle
  */
-public interface SafeKey<
-        K extends SafeKey<K, S>,
-        S extends SafeKeyStrength>
-extends Cloneable {
+public interface SafeKey<K extends SafeKey<K>> extends Cloneable {
 
     /**
-     * Returns a deep clone of this safe key.
-     *
-     * @return A deep clone of this safe key.
-     */
-    K clone();
-
-    /**
-     * Clears any key data from memory and resets this safe key to it's initial
-     * state.
+     * Wipes the secret data from memory and resets all properties to their
+     * initial state.
      */
     void reset();
 
     /**
-     * Returns the cipher key strength.
-     *
-     * @return The cipher key strength.
+     * Returns a deep clone of this safe key.
+     * The returned object does not share any mutable state with this object.
      */
-    @CheckForNull S getKeyStrength();
+    K clone();
 
     /**
-     * Sets the cipher key strength.
-     *
-     * @param keyStrength the cipher key strength.
-     */
-    void setKeyStrength(@CheckForNull S keyStrength);
-
-    /**
+     * Returns {@code true} if and only if this safe key deeply equals the
+     * given object.
      * A safe key equals another object if and only if the other object
-     * has the same runtime class and its properties compare equal.
-     * In other words, this is a deep-equals comparison.
+     * has the same runtime class and all its properties compare deeply equal.
      */
     @Override boolean equals(final Object obj);
 
