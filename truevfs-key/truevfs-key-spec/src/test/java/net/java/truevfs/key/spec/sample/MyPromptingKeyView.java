@@ -9,12 +9,12 @@ import net.java.truevfs.key.spec.PersistentUnknownKeyException;
 import net.java.truevfs.key.spec.UnknownKeyException;
 import net.java.truevfs.key.spec.param.AesKeyStrength;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
-import net.java.truevfs.key.spec.prompting.PromptingKeyProvider;
-import net.java.truevfs.key.spec.prompting.PromptingKeyProvider.Controller;
+import net.java.truevfs.key.spec.prompting.PromptingKey;
+import net.java.truevfs.key.spec.prompting.PromptingKey.Controller;
 
 /** @author Christian Schlichtherle */
-public class MyPromptingKeyProviderView
-implements PromptingKeyProvider.View<AesPbeParameters> {
+public class MyPromptingKeyView
+implements PromptingKey.View<AesPbeParameters> {
 
     @Override
     public void promptKeyForWriting(Controller<AesPbeParameters> controller)
@@ -29,7 +29,7 @@ implements PromptingKeyProvider.View<AesPbeParameters> {
         // Mind you, this really has to be a new key because old keys get wiped
         // out for security.
         // Also, a protective copy of the parameters is made.
-        controller.setKey(newFakeParameters());
+        controller.setKeyClone(newFakeParameters());
     }
 
     @Override
@@ -58,7 +58,7 @@ implements PromptingKeyProvider.View<AesPbeParameters> {
         // Finally, I set the new parameters.
         // Mind you, this really has to be a new key because old keys get reset
         // for security.
-        controller.setKey(param);
+        controller.setKeyClone(param);
     }
 
     private AesPbeParameters newFakeParameters() {

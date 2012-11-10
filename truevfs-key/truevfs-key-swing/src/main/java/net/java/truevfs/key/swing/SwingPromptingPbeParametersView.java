@@ -20,10 +20,10 @@ import javax.swing.JOptionPane;
 import net.java.truevfs.key.spec.UnknownKeyException;
 import net.java.truevfs.key.spec.prompting.KeyPromptingDisabledException;
 import net.java.truevfs.key.spec.prompting.KeyPromptingInterruptedException;
-import net.java.truevfs.key.spec.prompting.PromptingKeyProvider;
-import net.java.truevfs.key.spec.prompting.PromptingKeyProvider.Controller;
+import net.java.truevfs.key.spec.prompting.PromptingKey;
+import net.java.truevfs.key.spec.prompting.PromptingKey.Controller;
 import net.java.truevfs.key.spec.prompting.PromptingPbeParameters;
-import net.java.truevfs.key.spec.safe.SafeKeyStrength;
+import net.java.truevfs.key.spec.safe.KeyStrength;
 import net.java.truevfs.key.swing.feedback.Feedback;
 import net.java.truevfs.key.swing.sl.InvalidKeyFeedbackLocator;
 import net.java.truevfs.key.swing.sl.UnknownKeyFeedbackLocator;
@@ -37,8 +37,8 @@ import net.java.truevfs.key.swing.util.Windows;
 @ThreadSafe
 abstract class SwingPromptingPbeParametersView<
         P extends PromptingPbeParameters<P, S>,
-        S extends SafeKeyStrength>
-implements PromptingKeyProvider.View<P> {
+        S extends KeyStrength>
+implements PromptingKey.View<P> {
 
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(SwingPromptingPbeParametersView.class.getName());
@@ -124,14 +124,14 @@ implements PromptingKeyProvider.View<P> {
      * This method is only called by the AWT Event Dispatch Thread,
      * so it doesn't need to be thread safe.
      */
-    private void promptKeyForWritingOnEDT(
+    void promptKeyForWritingOnEDT(
             final Controller<P> controller) {
         assert EventQueue.isDispatchThread();
 
         final URI resource = controller.getResource();
         assert null != resource;
 
-        P param = controller.getKey();
+        P param = controller.getKeyClone();
         if (null == param) param = newPbeParameters();
 
         final KeyStrengthPanel<S> keyStrengthPanel = new KeyStrengthPanel<>(
@@ -171,7 +171,7 @@ implements PromptingKeyProvider.View<P> {
             assert keyPanel.getError() != null;
         }
 
-        controller.setKey(param);
+        controller.setKeyClone(param);
     }
 
     @Override
@@ -193,7 +193,7 @@ implements PromptingKeyProvider.View<P> {
      * This method is only called by the AWT Event Dispatch Thread,
      * so it doesn't need to be thread safe.
      */
-    private void promptKeyForReadingOnEDT(
+    void promptKeyForReadingOnEDT(
             final Controller<P> controller,
             final boolean invalid) {
         assert EventQueue.isDispatchThread();
@@ -236,14 +236,14 @@ implements PromptingKeyProvider.View<P> {
                 break;*/
 
             if (result != JOptionPane.OK_OPTION) {
-                controller.setKey(null);
+                controller.setKeyClone(null);
                 return;
             }
 
             final P param = newPbeParameters();
             if (keyPanel.updateParam(param)) { // valid input?
                 param.setChangeRequested(keyPanel.isChangeKeySelected());
-                controller.setKey(param);
+                controller.setKeyClone(param);
                 return;
             }
 

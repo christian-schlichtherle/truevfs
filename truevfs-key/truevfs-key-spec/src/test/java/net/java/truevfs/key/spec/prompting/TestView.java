@@ -10,8 +10,8 @@ import java.util.Random;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.key.spec.UnknownKeyException;
-import net.java.truevfs.key.spec.prompting.PromptingKeyProvider.Controller;
-import net.java.truevfs.key.spec.prompting.PromptingKeyProvider.View;
+import net.java.truevfs.key.spec.prompting.PromptingKey.Controller;
+import net.java.truevfs.key.spec.prompting.PromptingKey.View;
 import static net.java.truevfs.key.spec.prompting.TestView.Action.ENTER;
 
 /**
@@ -51,7 +51,7 @@ public final class TestView<K extends PromptingKey<K>> implements View<K> {
         final URI resource = getResource();
         if (null != resource && !resource.equals(controller.getResource()))
             throw new IllegalArgumentException();
-        controller.getKey();
+        controller.getKeyClone();
         action.promptKeyForWriting(controller, key);
     }
 
@@ -63,7 +63,7 @@ public final class TestView<K extends PromptingKey<K>> implements View<K> {
         if (null != resource && !resource.equals(controller.getResource()))
             throw new IllegalArgumentException();
         try {
-            controller.getKey();
+            controller.getKeyClone();
             throw new IllegalArgumentException();
         } catch (IllegalStateException expected) {
         }
@@ -79,8 +79,8 @@ public final class TestView<K extends PromptingKey<K>> implements View<K> {
                     final Controller<? super K> controller,
                     final @CheckForNull K key)
             throws UnknownKeyException {
-                controller.setKey(null);
-                controller.setKey(null != key ? key.clone() : null);
+                controller.setKeyClone(null);
+                controller.setKeyClone(key);
             }
 
             @Override
@@ -89,8 +89,8 @@ public final class TestView<K extends PromptingKey<K>> implements View<K> {
                     final Controller<? super K> controller,
                     final @CheckForNull K key)
             throws UnknownKeyException {
-                controller.setKey(null);
-                controller.setKey(null == key ? null : key.clone());
+                controller.setKeyClone(null);
+                controller.setKeyClone(key);
             }
         },
 
@@ -106,7 +106,7 @@ public final class TestView<K extends PromptingKey<K>> implements View<K> {
                 if (rnd.nextBoolean()) {
                     throw new KeyPromptingCancelledException();
                 }  else {
-                    controller.setKey(null);
+                    controller.setKeyClone(null);
                 }
             }
 
@@ -119,7 +119,7 @@ public final class TestView<K extends PromptingKey<K>> implements View<K> {
                 if (rnd.nextBoolean()) {
                     throw new KeyPromptingCancelledException();
                 } else {
-                    controller.setKey(null);
+                    controller.setKeyClone(null);
                 }
             }
         },

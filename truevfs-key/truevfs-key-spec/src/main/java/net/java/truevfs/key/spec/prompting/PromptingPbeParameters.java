@@ -20,7 +20,7 @@ import net.java.truevfs.key.spec.safe.*;
 @NotThreadSafe
 public abstract class PromptingPbeParameters<
         P extends PromptingPbeParameters<P, S>,
-        S extends SafeKeyStrength>
+        S extends KeyStrength>
 extends SafePbeParameters<P, S> implements PromptingKey<P> {
 
     private boolean changeRequested;

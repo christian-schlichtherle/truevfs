@@ -6,7 +6,7 @@ package net.java.truevfs.key.spec.param;
 
 import java.util.ResourceBundle;
 import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.key.spec.safe.SafeKeyStrength;
+import net.java.truevfs.key.spec.safe.KeyStrength;
 
 /**
  * Enumerates the AES cipher key strenghts.
@@ -14,7 +14,7 @@ import net.java.truevfs.key.spec.safe.SafeKeyStrength;
  * @author Christian Schlichtherle
  */
 @Immutable
-public enum AesKeyStrength implements SafeKeyStrength {
+public enum AesKeyStrength implements KeyStrength {
 
     /** 128 bit AES cipher key. */
     BITS_128,

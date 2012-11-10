@@ -10,7 +10,7 @@ import java.io.OutputStream;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.io.DecoratingOutputStream;
 import net.java.truecommons.io.Sink;
-import net.java.truevfs.key.spec.safe.SafeKeyStrength;
+import net.java.truevfs.key.spec.safe.KeyStrength;
 import org.bouncycastle.crypto.Mac;
 
 /**
@@ -30,7 +30,7 @@ public abstract class RaesOutputStream extends DecoratingOutputStream {
      * @return The key strength which is actually used to encrypt the data of
      *         the RAES file.
      */
-    public abstract SafeKeyStrength getKeyStrength();
+    public abstract KeyStrength getKeyStrength();
 
     /**
      * Update the given KLAC with the given file {@code length} in

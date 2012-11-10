@@ -14,7 +14,7 @@ import javax.annotation.concurrent.ThreadSafe;
  * @author  Christian Schlichtherle
  */
 @ThreadSafe
-public interface SafeKeyStrength {
+public interface KeyStrength {
 
     /**
      * Returns the index of the key strength.

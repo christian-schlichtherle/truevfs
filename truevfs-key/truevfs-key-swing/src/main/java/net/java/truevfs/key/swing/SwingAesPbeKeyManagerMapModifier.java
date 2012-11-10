@@ -10,6 +10,7 @@ import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.annotations.ServiceImplementation;
 import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.prompting.PromptingKeyManager;
 import net.java.truevfs.key.spec.spi.KeyManagerMapModifier;
 
 /**
@@ -26,7 +27,7 @@ extends KeyManagerMapModifier {
     @Override
     public Map<Class<?>, KeyManager<?>> apply(Map<Class<?>, KeyManager<?>> map) {
         map.put(AesPbeParameters.class,
-                new SwingKeyManager<>(new SwingAesPbeParametersView()));
+                new PromptingKeyManager<>(new SwingAesPbeParametersView()));
         return map;
     }
 

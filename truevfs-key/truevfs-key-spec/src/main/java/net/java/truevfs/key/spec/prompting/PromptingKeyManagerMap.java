@@ -10,7 +10,7 @@ import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.key.spec.AbstractKeyManagerMap;
 import net.java.truevfs.key.spec.KeyManager;
-import net.java.truevfs.key.spec.prompting.PromptingKeyProvider.View;
+import net.java.truevfs.key.spec.prompting.PromptingKey.View;
 
 /**
  * Implements a map for a single prompting key manager which will use the

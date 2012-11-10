@@ -17,12 +17,12 @@ import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.key.spec.KeyManagerMap;
-import net.java.truevfs.key.spec.prompting.PromptingKeyManagerMap;
-import net.java.truevfs.key.spec.prompting.PromptingKeyProvider.Controller;
-import net.java.truevfs.key.spec.prompting.PromptingKeyProvider.View;
 import net.java.truevfs.key.spec.UnknownKeyException;
 import net.java.truevfs.key.spec.param.AesKeyStrength;
 import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.prompting.PromptingKey.Controller;
+import net.java.truevfs.key.spec.prompting.PromptingKey.View;
+import net.java.truevfs.key.spec.prompting.PromptingKeyManagerMap;
 
 /**
  * Provides static utility methods to set passwords for RAES encrypted ZIP
@@ -207,7 +207,7 @@ public final class KeyManagement {
             // Note that this would typically return the hierarchical URI of
             // the archive file unless ZipDriver.mountPointUri(FsModel) would
             // have been overridden.
-            controller.setKey(newKey());
+            controller.setKeyClone(newKey());
         }
 
         @Override
@@ -219,7 +219,7 @@ public final class KeyManagement {
             // Note that this would typically return the hierarchical URI of
             // the archive file unless ZipDriver.mountPointUri(FsModel) would
             // have been overridden.
-            controller.setKey(newKey());
+            controller.setKeyClone(newKey());
         }
     } // CustomView
 // END SNIPPET: newArchiveDetector2

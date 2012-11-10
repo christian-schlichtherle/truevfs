@@ -11,13 +11,13 @@ import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import net.java.truevfs.key.spec.safe.SafeKeyProvider;
+import net.java.truevfs.key.spec.util.SuspensionPenalty;
 import net.java.truevfs.key.swing.feedback.DecoratingFeedback;
 import net.java.truevfs.key.swing.feedback.Feedback;
 
 /**
  * Provides feedback by hurling the containing window for
- * {@link SafeKeyProvider#MIN_KEY_RETRY_DELAY} / 2 milliseconds.
+ * {@link SuspensionPenalty#MIN_KEY_RETRY_DELAY} / 2 milliseconds.
  * <p>
  * This class is inspired by chapter #38 "Earthquake Dialog" of the book
  * "Swing Hacks" by Joshua Marinacci & Chris Adamson, published by O'Reilly
@@ -33,7 +33,7 @@ extends DecoratingFeedback implements Feedback {
 
     private final double amplitude = 25;
     private final double cycle = 150;
-    private final int    duration = SafeKeyProvider.MIN_KEY_RETRY_DELAY / 2;
+    private final int    duration = SuspensionPenalty.MIN_KEY_RETRY_DELAY / 2;
     private final int    fps = 75;
 
     HurlingWindowFeedback(Feedback feedback) {

@@ -56,16 +56,15 @@ final class OsxKeyManager extends AbstractKeyManager<AesPbeParameters> {
     }
 
     @Override
-    public void move(final URI oldResource, final URI newResource) {
-        final AesPbeParameters key = getKey(oldResource);
-        manager.move(oldResource, newResource);
-        setKey(newResource, key);
-        setKey(oldResource, null);
+    public void link(final URI oldResource, final URI newResource) {
+        final AesPbeParameters param = getKey(oldResource);
+        manager.link(oldResource, newResource);
+        setKey(newResource, param);
     }
 
     @Override
-    public void delete(final URI resource) {
-        manager.delete(resource);
+    public void unlink(final URI resource) {
+        manager.unlink(resource);
         setKey(resource, null);
     }
 

@@ -136,7 +136,7 @@ extends FsDecoratingController {
         final FsModel model = getModel();
         final URI mpu = driver.mountPointUri(model);
         final URI fsu = driver.fileSystemUri(model, name.toString());
-        if (!fsu.equals(mpu) || name.isRoot()) getKeyManager().delete(fsu);
+        if (!fsu.equals(mpu) || name.isRoot()) getKeyManager().unlink(fsu);
     }
 
     @Override
