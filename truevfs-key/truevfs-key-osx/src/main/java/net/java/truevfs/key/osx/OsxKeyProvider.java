@@ -26,9 +26,12 @@ final class OsxKeyProvider implements KeyProvider<AesPbeParameters> {
             final OsxKeyManager manager,
             final URI resource,
             final KeyProvider<AesPbeParameters> provider) {
-        this.manager = Objects.requireNonNull(manager);
-        this.resource = Objects.requireNonNull(resource);
-        this.provider = Objects.requireNonNull(provider);
+        assert null != manager;
+        assert null != resource;
+        assert null != provider;
+        this.manager = manager;
+        this.resource = resource;
+        this.provider = provider;
     }
 
     @Override

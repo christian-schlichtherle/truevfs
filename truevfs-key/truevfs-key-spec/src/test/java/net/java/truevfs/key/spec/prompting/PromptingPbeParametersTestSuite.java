@@ -9,7 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
 import javax.inject.Provider;
-import net.java.truevfs.key.spec.safe.SafeKeyStrength;
+import net.java.truevfs.key.spec.safe.KeyStrength;
 import org.junit.After;
 import org.junit.AfterClass;
 import static org.junit.Assert.*;
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class PromptingPbeParametersTestSuite<
         P extends PromptingPbeParameters<P, S>,
-        S extends SafeKeyStrength> {
+        S extends KeyStrength> {
 
     private static final Logger logger = LoggerFactory.getLogger(
             PromptingPbeParametersTestSuite.class);

@@ -13,10 +13,10 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.key.spec.prompting.KeyPromptingDisabledException;
-import net.java.truevfs.key.spec.prompting.PromptingKeyProvider;
-import net.java.truevfs.key.spec.prompting.PromptingKeyProvider.Controller;
+import net.java.truevfs.key.spec.prompting.PromptingKey;
+import net.java.truevfs.key.spec.prompting.PromptingKey.Controller;
 import net.java.truevfs.key.spec.prompting.PromptingPbeParameters;
-import net.java.truevfs.key.spec.safe.SafeKeyStrength;
+import net.java.truevfs.key.spec.safe.KeyStrength;
 
 /**
  * A console based user interface for prompting for passwords.
@@ -26,8 +26,8 @@ import net.java.truevfs.key.spec.safe.SafeKeyStrength;
 @ThreadSafe
 abstract class ConsolePromptingPbeParametersView<
         P extends PromptingPbeParameters<P, S>,
-        S extends SafeKeyStrength>
-implements PromptingKeyProvider.View<P> {
+        S extends KeyStrength>
+implements PromptingKey.View<P> {
 
     private static final ResourceBundle resources = ResourceBundle
             .getBundle(ConsolePromptingPbeParametersView.class.getName());
@@ -70,7 +70,7 @@ implements PromptingKeyProvider.View<P> {
                 con.printf(resources.getString("writeKey.banner"), resource);
             lastResource = resource;
 
-            P param = controller.getKey();
+            P param = controller.getKeyClone();
             if (null == param) param = newPbeParameters();
 
             while (true) {
@@ -135,7 +135,7 @@ implements PromptingKeyProvider.View<P> {
                 }
             }
 
-            controller.setKey(param);
+            controller.setKeyClone(param);
         }
     }
 
@@ -158,7 +158,7 @@ implements PromptingKeyProvider.View<P> {
 
             final char[] passwd = con.readPassword(resources.getString("readKey.passwd"));
             if (null == passwd || passwd.length <= 0) {
-                controller.setKey(null);
+                controller.setKeyClone(null);
                 return;
             }
 
@@ -173,7 +173,7 @@ implements PromptingKeyProvider.View<P> {
                         || changeKey.length() <= 0
                         || YES.equalsIgnoreCase(changeKey)
                         || NO.equalsIgnoreCase(changeKey)) {
-                    controller.setKey(param);
+                    controller.setKeyClone(param);
                     return;
                 }
             }

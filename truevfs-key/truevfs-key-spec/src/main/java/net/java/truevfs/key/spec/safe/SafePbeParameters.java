@@ -26,7 +26,7 @@ import static net.java.truevfs.key.spec.util.BufferUtils.*;
 @NotThreadSafe
 public abstract class SafePbeParameters<
         P extends SafePbeParameters<P, S>,
-        S extends SafeKeyStrength>
+        S extends KeyStrength>
 extends AbstractSafeKey<P> {
 
     private @CheckForNull S keyStrength;

@@ -10,12 +10,11 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.Timer;
-import net.java.truevfs.key.spec.safe.SafeKeyProvider;
-import static net.java.truevfs.key.spec.safe.SafeKeyProvider.MIN_KEY_RETRY_DELAY;
+import net.java.truevfs.key.spec.util.SuspensionPenalty;
 
 /**
  * Provides feedback by disabling the default button of the root pane for
- * {@link SafeKeyProvider#MIN_KEY_RETRY_DELAY} milliseconds when prompting for
+ * {@link SuspensionPenalty#MIN_KEY_RETRY_DELAY} milliseconds when prompting for
  * a key and the last input was invalid.
  * <p>
  * Note that the root pane is normally the root pane of a parent
@@ -37,12 +36,13 @@ extends DecoratingFeedback implements Feedback {
         final JButton b = panel.getRootPane().getDefaultButton();
         if (null == b) return;
         b.setEnabled(false);
-        final Timer t = new Timer(MIN_KEY_RETRY_DELAY, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                b.setEnabled(true);
-            }
-        });
+        final Timer t = new Timer(SuspensionPenalty.MIN_KEY_RETRY_DELAY,
+                new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        b.setEnabled(true);
+                    }
+                });
         t.setRepeats(false);
         t.start();
     }

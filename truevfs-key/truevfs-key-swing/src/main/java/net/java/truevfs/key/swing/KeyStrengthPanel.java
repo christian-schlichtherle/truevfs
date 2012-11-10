@@ -9,7 +9,7 @@ import java.util.ResourceBundle;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
-import net.java.truevfs.key.spec.safe.SafeKeyStrength;
+import net.java.truevfs.key.spec.safe.KeyStrength;
 import net.java.truevfs.key.swing.util.EnhancedPanel;
 
 /**
@@ -19,7 +19,7 @@ import net.java.truevfs.key.swing.util.EnhancedPanel;
  */
 @NotThreadSafe
 @SuppressWarnings("UseOfObsoleteCollectionType")
-final class KeyStrengthPanel<S extends SafeKeyStrength> extends EnhancedPanel {
+final class KeyStrengthPanel<S extends KeyStrength> extends EnhancedPanel {
     private static final long serialVersionUID = 5629581723148235643L;
 
     private static final ResourceBundle resources

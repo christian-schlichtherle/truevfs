@@ -11,7 +11,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truevfs.comp.zip.crypto.CipherOutputStream;
-import net.java.truevfs.key.spec.safe.SafeKeyStrength;
+import net.java.truevfs.key.spec.safe.KeyStrength;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
@@ -69,7 +69,7 @@ final class WinZipAesOutputStream extends DecoratingOutputStream {
         this.param = param;
 
         // Init key strength.
-        final SafeKeyStrength keyStrength = param.getKeyStrength();
+        final KeyStrength keyStrength = param.getKeyStrength();
         final int keyStrengthBits = keyStrength.getBits();
         final int keyStrengthBytes = keyStrength.getBytes();
 

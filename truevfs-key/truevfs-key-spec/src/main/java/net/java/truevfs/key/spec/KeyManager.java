@@ -30,20 +30,20 @@ public interface KeyManager<K> {
     KeyProvider<K> provider(URI resource);
 
     /**
-     * Notifies this key manager that a protected resource has moved.
+     * Notifies this key manager that a protected resource has been linked.
      *
      * @param oldResource the old URI of the protected resource.
      * @param newResource the new URI of the protected resource.
      */
-    void move(URI oldResource, URI newResource);
+    void link(URI oldResource, URI newResource);
 
     /**
-     * Notifies this key manager that a protected resource has been deleted.
-     * This implies {@link #release}.
+     * Notifies this key manager that a protected resource has been unlinked.
+     * This implies a {@link #release}.
      *
      * @param resource the URI of the protected resource.
      */
-    void delete(URI resource);
+    void unlink(URI resource);
 
     /**
      * Notifies this key manager that a protected resource has been released.

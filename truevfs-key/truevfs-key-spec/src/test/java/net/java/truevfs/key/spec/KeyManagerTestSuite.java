@@ -25,76 +25,68 @@ public abstract class KeyManagerTestSuite<M extends KeyManager<?>> {
         manager = Objects.requireNonNull(newKeyManager());
     }
 
-    @Test
-    public void testMakeKeyProvider() {
-        URI id = URI.create("a");
-
-        try {
-            manager.provider(null);
-            fail();
-        } catch (NullPointerException expected) {
-        }
-
-        KeyProvider<?> prov1 = manager.provider(id);
-        assertNotNull(prov1);
-
-        KeyProvider<?> prov2 = manager.provider(id);
-        assertSame(prov1, prov2);
+    @Test(expected = NullPointerException.class)
+    public void testNoKeyProviderForNullResource() {
+        manager.provider(null);
     }
 
     @Test
-    public void testMoveKeyProvider() {
+    public void testNonNullKeyProviderForAnyNonNullResource() {
+        assertNotNull(manager.provider(URI.create("a")));
+    }
+
+    @Test
+    public void testLinkKeyProvider() {
         URI idA = URI.create("a");
         URI idB = URI.create("b");
 
         try {
-            manager.move(null, null);
+            manager.link(null, null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            manager.move(idA, null);
+            manager.link(idA, null);
             fail();
         } catch (NullPointerException expected) {
         }
 
         try {
-            manager.move(null, idB);
+            manager.link(null, idB);
             fail();
         } catch (NullPointerException expected) {
         }
 
-        manager.move(idA, idB);
+        manager.link(idA, idB);
+        manager.unlink(idA);
 
         KeyProvider<?> provA1 = manager.provider(idA);
         assertNotNull(provA1);
 
-        manager.move(idA, idB);
+        manager.link(idA, idB);
+        manager.unlink(idA);
 
         KeyProvider<?> provA2 = manager.provider(idA);
         assertNotNull(provA2);
-        assertFalse(provA1.equals(provA2));
 
-        KeyProvider<?> provB1 = manager.provider(idB);
-        assertNotNull(provB1);
-        assertSame(provA1, provB1);
+        assertNotSame(provA1, provA2);
     }
 
     @Test
-    public void testDeleteKeyProvider() {
+    public void testUnlinkKeyProvider() {
         URI id = URI.create("a");
 
-        manager.delete(id);
+        manager.unlink(id);
 
         KeyProvider<?> prov1 = manager.provider(id);
-        manager.delete(id);
-        manager.delete(id);
+        manager.unlink(id);
+        manager.unlink(id);
 
         KeyProvider<?> prov2 = manager.provider(id);
-        manager.delete(id);
-        manager.delete(id);
+        manager.unlink(id);
+        manager.unlink(id);
 
-        assertFalse(prov1.equals(prov2));
+        assertNotSame(prov1, prov2);
     }
 }
