@@ -5,7 +5,6 @@
 package net.java.truevfs.key.osx;
 
 import java.net.URI;
-import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.key.spec.KeyProvider;
 import net.java.truevfs.key.spec.UnknownKeyException;
