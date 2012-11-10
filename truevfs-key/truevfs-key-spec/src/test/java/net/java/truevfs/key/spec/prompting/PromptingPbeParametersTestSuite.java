@@ -8,13 +8,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
-import javax.inject.Provider;
 import net.java.truevfs.key.spec.safe.KeyStrength;
-import org.junit.After;
-import org.junit.AfterClass;
 import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,7 +90,8 @@ public abstract class PromptingPbeParametersTestSuite<
         }
 
         logger.trace("Serialized object to {} bytes.", serialized.length);
-        logger.trace("Serialized form:\n{}", new String(serialized, StandardCharsets.UTF_8));
+        logger.trace("Serialized form:\n{}",
+                new String(serialized, StandardCharsets.UTF_8));
 
         try (final XMLDecoder
                 dec = new XMLDecoder(new ByteArrayInputStream(serialized))) {

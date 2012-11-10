@@ -116,30 +116,39 @@ final class OsxKeyManager extends AbstractKeyManager<AesPbeParameters> {
             throws KeychainException {
 
                 if (null != param) {
-                    final ByteBuffer encSecret = param.getSecret();
+                    final ByteBuffer newSecret = param.getSecret();
                     try {
-                        final ByteBuffer encParam = encode(param);
+                        final ByteBuffer newParam = encode(param);
 
                         class Update implements Visitor {
                             @Override
                             public void visit(Item item) throws KeychainException {
-                                final Map<AttributeClass, ByteBuffer>
-                                        attributes = item.getAttributes();
-                                attributes.put(GENERIC, encParam);
-                                item.putAttributes(attributes);
-                                item.setSecret(encSecret);
+                                {
+                                    final Map<AttributeClass, ByteBuffer>
+                                            attributes = item.getAttributes();
+                                    final ByteBuffer oldParam = attributes.get(GENERIC);
+                                    if (!newParam.equals(oldParam)) {
+                                        attributes.put(GENERIC, newParam);
+                                        item.putAttributes(attributes);
+                                    }
+                                }
+                                {
+                                    final ByteBuffer oldSecret = item.getSecret();
+                                    if (!newSecret.equals(oldSecret))
+                                        item.setSecret(newSecret);
+                                }
                             }
                         }
 
                         try {
-                            attributes.put(GENERIC, encParam);
-                            keychain.createItem(GENERIC_PASSWORD, attributes, encSecret);
+                            attributes.put(GENERIC, newParam);
+                            keychain.createItem(GENERIC_PASSWORD, attributes, newSecret);
                         } catch (final DuplicateItemException ex) {
                             attributes.remove(GENERIC);
                             keychain.visitItems(GENERIC_PASSWORD, attributes, new Update());
                         }
                     } finally {
-                        fill(encSecret, (byte) 0);
+                        fill(newSecret, (byte) 0);
                     }
                 } else {
 

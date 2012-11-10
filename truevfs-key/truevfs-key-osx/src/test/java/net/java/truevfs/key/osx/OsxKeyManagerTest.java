@@ -30,7 +30,8 @@ public class OsxKeyManagerTest {
         original.setPassword("föo".toCharArray());
         final ByteBuffer serialized = encode(original); // must not encode password!
 
-        logger.debug("Serialized form:\n{}", string(serialized));
+        logger.trace("Serialized object to {} bytes.", serialized.remaining());
+        logger.trace("Serialized form:\n{}", string(serialized));
 
         final AesPbeParameters clone = decode(serialized);
         original.setPassword(null);
