@@ -221,12 +221,7 @@ final class OsxKeyManager extends AbstractKeyManager<AesPbeParameters> {
 
     private synchronized Keychain open() throws KeychainException {
         if (null != keychain) return keychain;
-        final char[] password = KEYCHAIN.toCharArray();
-        try {
-            return keychain = Keychain.open(KEYCHAIN, password);
-        } finally {
-            Arrays.fill(password, (char) 0);
-        }
+        return keychain = Keychain.open(KEYCHAIN, null);
     }
 
     private synchronized void close() {
