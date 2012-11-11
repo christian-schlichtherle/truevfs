@@ -4,14 +4,15 @@
  */
 package net.java.truevfs.key.spec.prompting;
 
-import java.beans.Transient;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truevfs.key.spec.safe.*;
 
 /**
  * A JavaBean which holds parameters for password based encryption.
  * <p>
- * Subclasses do <em>not</em> need to be safe for multi-threading.
+ * Subclasses need to be serializable with {@code Object(Out|In)putStream} and
+ * {@code XML(En|De)coder}.
+ * Subclasses do not need to be safe for multi-threading.
  *
  * @param  <P> the type of these prompting PBE parameters.
  * @param  <S> the type of the key strength.

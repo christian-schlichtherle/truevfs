@@ -17,7 +17,9 @@ import static net.java.truevfs.key.spec.util.BufferUtils.*;
  * A JavaBean which holds parameters for password based encryption.
  * Passwords get encoded using {@link StandardCharsets#UTF_8}.
  * <p>
- * Subclasses do <em>not</em> need to be safe for multi-threading.
+ * Subclasses need to be serializable with {@code Object(Out|In)putStream} and
+ * {@code XML(En|De)coder}.
+ * Subclasses do not need to be safe for multi-threading.
  *
  * @param  <P> the type of these safe PBE parameters.
  * @param  <S> the type of the key strength.

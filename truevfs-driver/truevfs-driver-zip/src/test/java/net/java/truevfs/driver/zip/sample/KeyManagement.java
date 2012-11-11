@@ -238,9 +238,11 @@ public final class KeyManagement {
         }
 
         @Override
-        public void promptKeyForReading(  Controller<AesPbeParameters> controller,
-                                    boolean invalid)
+        public void promptKeyForReading(
+                Controller<AesPbeParameters> controller,
+                boolean invalid)
         throws UnknownKeyException {
+            if (invalid) throw new UnknownKeyException();
             // You might as well call controller.getResource() here in order to
             // programmatically set the parameters for individual resource URIs.
             // Note that this would typically return the hierarchical URI of
