@@ -6,7 +6,7 @@ package net.java.truevfs.key.swing;
 
 import java.net.URI;
 import javax.annotation.CheckForNull;
-import net.java.truevfs.key.spec.safe.SafePbeParameters;
+import net.java.truevfs.key.spec.PbeParameters;
 import net.java.truevfs.key.swing.feedback.Feedback;
 import net.java.truevfs.key.swing.util.EnhancedPanel;
 import net.java.truevfs.key.swing.util.PanelEvent;
@@ -74,7 +74,7 @@ abstract class KeyPanel extends EnhancedPanel {
      */
     public abstract void setError(final @CheckForNull String error);
 
-    abstract boolean updateParam(final SafePbeParameters<?, ?> param);
+    abstract boolean updateParam(final PbeParameters<?, ?> param);
 
     private static class KeyPanelListener implements PanelListener {
         @Override

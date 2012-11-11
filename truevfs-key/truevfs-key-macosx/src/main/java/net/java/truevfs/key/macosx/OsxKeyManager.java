@@ -28,7 +28,7 @@ import net.java.truevfs.key.macosx.keychain.KeychainException;
 import net.java.truevfs.key.spec.AbstractKeyManager;
 import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.KeyProvider;
-import net.java.truevfs.key.spec.prompting.PromptingPbeParameters;
+import net.java.truevfs.key.spec.prompting.AbstractPromptingPbeParameters;
 import static net.java.truevfs.key.spec.util.BufferUtils.*;
 import org.slf4j.Logger;
 
@@ -36,7 +36,7 @@ import org.slf4j.Logger;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public final class OsxKeyManager<P extends PromptingPbeParameters<P, ?>>
+public final class OsxKeyManager<P extends AbstractPromptingPbeParameters<P, ?>>
 extends AbstractKeyManager<P> {
 
     private static final String KEYCHAIN = "TrueVFS";
@@ -195,7 +195,7 @@ extends AbstractKeyManager<P> {
         final byte[] array = new byte[xml.remaining()]; // cannot use bb.array()!
         xml.duplicate().get(array);
         try (final XMLDecoder _ = new XMLDecoder(new ByteArrayInputStream(array))) {
-            return (PromptingPbeParameters<?, ?>) _.readObject();
+            return (AbstractPromptingPbeParameters<?, ?>) _.readObject();
         }
     }
 

@@ -17,7 +17,7 @@ import org.junit.Test;
  * @author Christian Schlichtherle
  */
 public abstract class PromptingKeyProviderTestSuite<
-        P extends PromptingPbeParameters<P, ?>> {
+        P extends AbstractPromptingPbeParameters<P, ?>> {
 
     private static final URI RESOURCE = URI.create("foo");
     private static final AtomicInteger count = new AtomicInteger();

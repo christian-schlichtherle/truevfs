@@ -6,8 +6,8 @@ package net.java.truevfs.key.macosx;
 
 import java.nio.ByteBuffer;
 import static net.java.truevfs.key.macosx.OsxKeyManager.*;
-import net.java.truevfs.key.spec.param.AesKeyStrength;
-import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.common.AesKeyStrength;
+import net.java.truevfs.key.spec.common.AesPbeParameters;
 import static net.java.truevfs.key.spec.util.BufferUtils.*;
 import static org.junit.Assert.*;
 import org.junit.Test;

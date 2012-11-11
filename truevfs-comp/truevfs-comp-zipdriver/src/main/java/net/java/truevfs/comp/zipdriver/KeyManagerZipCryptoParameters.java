@@ -18,8 +18,8 @@ import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.KeyManagerMap;
 import net.java.truevfs.key.spec.KeyProvider;
 import net.java.truevfs.key.spec.UnknownKeyException;
-import net.java.truevfs.key.spec.param.AesKeyStrength;
-import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.common.AesKeyStrength;
+import net.java.truevfs.key.spec.common.AesPbeParameters;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS5PasswordToBytes;
 

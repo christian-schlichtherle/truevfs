@@ -6,7 +6,7 @@ package net.java.truevfs.key.swing;
 
 import net.java.truevfs.key.swing.AuthenticationPanel;
 import net.java.truevfs.key.swing.KeyPanel;
-import net.java.truevfs.key.spec.safe.SafePbeParameters;
+import net.java.truevfs.key.spec.AbstractPbeParameters;
 import net.java.truevfs.key.swing.util.JemmyUtils;
 import java.awt.EventQueue;
 import java.io.File;
@@ -50,7 +50,7 @@ public abstract class KeyPanelTestSuite<P extends KeyPanel> extends JemmyUtils {
 
     protected abstract P newKeyPanel();
 
-    protected abstract SafePbeParameters<?, ?> newPbeParameters();
+    protected abstract AbstractPbeParameters<?, ?> newPbeParameters();
 
     @After
     public void tearDown() {
@@ -92,7 +92,7 @@ public abstract class KeyPanelTestSuite<P extends KeyPanel> extends JemmyUtils {
 
     @Test
     public void testKeyFile() throws InterruptedException {
-        final SafePbeParameters<?, ?> param = newPbeParameters();
+        final AbstractPbeParameters<?, ?> param = newPbeParameters();
 
         new JTabbedPaneOperator(frame).selectPage(AuthenticationPanel.AUTH_KEY_FILE); // select tab for key files
         new JButtonOperator(frame, KEY_FILE_CHOOSER).push(); // open file chooser
@@ -123,7 +123,7 @@ public abstract class KeyPanelTestSuite<P extends KeyPanel> extends JemmyUtils {
         fc.cancel(); // close file chooser
     }
 
-    protected final boolean updateParam(final SafePbeParameters<?, ?> param)
+    protected final boolean updateParam(final AbstractPbeParameters<?, ?> param)
     throws InterruptedException {
         class Update implements Runnable {
             boolean result;

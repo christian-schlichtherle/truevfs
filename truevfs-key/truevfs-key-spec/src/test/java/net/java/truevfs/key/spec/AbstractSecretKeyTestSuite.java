@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.key.spec.safe;
+package net.java.truevfs.key.spec;
 
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -26,10 +26,11 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Christian Schlichtherle
  */
-public abstract class AbstractSafeKeyTestSuite<K extends AbstractSafeKey<K>> {
+public abstract class AbstractSecretKeyTestSuite<
+        K extends AbstractSecretKey<K>> {
 
     private static final Logger logger = LoggerFactory.getLogger(
-            AbstractSafeKeyTestSuite.class);
+            AbstractSecretKeyTestSuite.class);
 
     private K key;
 

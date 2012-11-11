@@ -11,7 +11,7 @@ import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.KeyManagerMap;
 import net.java.truevfs.key.spec.KeyProvider;
 import net.java.truevfs.key.spec.UnknownKeyException;
-import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.common.AesPbeParameters;
 import net.java.truevfs.key.spec.sl.KeyManagerMapLocator;
 import org.junit.Test;
 

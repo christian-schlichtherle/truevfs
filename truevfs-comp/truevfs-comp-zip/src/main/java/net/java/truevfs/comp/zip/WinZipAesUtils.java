@@ -4,11 +4,11 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truevfs.key.spec.param.AesKeyStrength;
+import net.java.truevfs.key.spec.common.AesKeyStrength;
 
 /**
  * Static utility methods for WinZip AES encryption.
- * 
+ *
  * @author  Christian Schlichtherle
  */
 final class WinZipAesUtils {
@@ -17,10 +17,10 @@ final class WinZipAesUtils {
     private WinZipAesUtils() {
     }
 
-    /** 
+    /**
      * Returns the overhead in bytes which is added to each WinZip AES
      * encrypted entry.
-     * 
+     *
      * @param  keyStrength The AES key strength.
      * @return the overhead in bytes which is added to each WinZip AES
      *         encrypted entry.

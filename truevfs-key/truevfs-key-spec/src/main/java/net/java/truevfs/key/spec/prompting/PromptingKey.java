@@ -7,8 +7,8 @@ package net.java.truevfs.key.spec.prompting;
 import java.net.URI;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truevfs.key.spec.Key;
 import net.java.truevfs.key.spec.UnknownKeyException;
-import net.java.truevfs.key.spec.safe.SafeKey;
 
 /**
  * A prompting key for writing and reading protected resources.
@@ -20,7 +20,7 @@ import net.java.truevfs.key.spec.safe.SafeKey;
  * @author Christian Schlichtherle
  */
 public interface PromptingKey<K extends PromptingKey<K>>
-extends SafeKey<K> {
+extends Key<K> {
 
     /**
      * Returns whether or not the user shall get prompted for a new key upon

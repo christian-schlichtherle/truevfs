@@ -19,7 +19,7 @@ import net.java.truevfs.comp.zip.crypto.CipherReadOnlyChannel;
 import net.java.truevfs.comp.zip.crypto.SeekableBlockCipher;
 import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
 import static net.java.truevfs.comp.zip.WinZipAesOutputStream.*;
-import net.java.truevfs.key.spec.param.AesKeyStrength;
+import net.java.truevfs.key.spec.common.AesKeyStrength;
 import net.java.truevfs.key.spec.util.SuspensionPenalty;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;

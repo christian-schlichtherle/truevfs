@@ -5,7 +5,7 @@
 package net.java.truevfs.key.swing;
 
 import net.java.truevfs.key.swing.ReadKeyPanel;
-import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.common.AesPbeParameters;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.netbeans.jemmy.operators.JCheckBoxOperator;

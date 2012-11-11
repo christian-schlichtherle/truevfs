@@ -15,8 +15,8 @@ import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.KeyManagerMap;
 import net.java.truevfs.key.spec.KeyProvider;
 import net.java.truevfs.key.spec.UnknownKeyException;
-import net.java.truevfs.key.spec.param.AesKeyStrength;
-import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.common.AesKeyStrength;
+import net.java.truevfs.key.spec.common.AesPbeParameters;
 
 /**
  * An adapter which provides {@link RaesParameters} by using a

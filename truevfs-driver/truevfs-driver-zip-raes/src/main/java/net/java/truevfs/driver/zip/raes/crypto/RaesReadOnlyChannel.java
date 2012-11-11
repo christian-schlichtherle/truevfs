@@ -4,9 +4,6 @@
  */
 package net.java.truevfs.driver.zip.raes.crypto;
 
-import net.java.truecommons.io.PowerBuffer;
-import net.java.truecommons.io.ReadOnlyChannel;
-import net.java.truecommons.io.Source;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.EOFException;
 import java.io.IOException;
@@ -14,9 +11,12 @@ import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.io.PowerBuffer;
+import net.java.truecommons.io.ReadOnlyChannel;
+import net.java.truecommons.io.Source;
 import static net.java.truevfs.driver.zip.raes.crypto.Constants.HEADER_MIN_LEN;
 import static net.java.truevfs.driver.zip.raes.crypto.Constants.SIGNATURE;
-import net.java.truevfs.key.spec.param.AesKeyStrength;
+import net.java.truevfs.key.spec.common.AesKeyStrength;
 
 /**
  * This class implements a {@link SeekableByteChannel} for random read-only
@@ -150,7 +150,7 @@ public abstract class RaesReadOnlyChannel extends ReadOnlyChannel {
     /**
      * Returns the key strength which is actually used to decrypt the data
      * of the RAES file.
-     * 
+     *
      * @return The key strength which is actually used to decrypt the data
      *         of the RAES file.
      */

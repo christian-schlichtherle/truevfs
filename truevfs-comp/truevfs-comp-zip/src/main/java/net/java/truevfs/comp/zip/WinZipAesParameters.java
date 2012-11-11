@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truevfs.key.spec.param.AesKeyStrength;
+import net.java.truevfs.key.spec.common.AesKeyStrength;
 
 /**
  * The parameters of this interface are used with WinZip AES encrypted entries.

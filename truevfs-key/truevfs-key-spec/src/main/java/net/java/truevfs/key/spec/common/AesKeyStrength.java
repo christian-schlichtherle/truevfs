@@ -2,11 +2,11 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.key.spec.param;
+package net.java.truevfs.key.spec.common;
 
 import java.util.ResourceBundle;
 import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.key.spec.safe.KeyStrength;
+import net.java.truevfs.key.spec.KeyStrength;
 
 /**
  * Enumerates the AES cipher key strenghts.

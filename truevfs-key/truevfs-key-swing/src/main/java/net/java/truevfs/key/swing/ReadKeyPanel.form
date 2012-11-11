@@ -17,13 +17,13 @@
         <Component class="javax.swing.JLabel" name="passwdLabel">
           <Properties>
             <Property name="displayedMnemonic" type="int" editor="org.netbeans.modules.i18n.form.FormI18nMnemonicEditor">
-              <ResourceString bundle="" key="passwd" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="net/java/truevfs/key/swing/ReadKeyPanel.properties" key="passwd" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
               <ComponentRef name="passwdField"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="net/java/truevfs/keymanager/swing/ReadKeyPanel.properties" key="passwd" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="net/java/truevfs/key/swing/ReadKeyPanel.properties" key="passwd" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <AuxValues>
@@ -73,7 +73,7 @@
           <ComponentRef name="resource"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="net/java/truevfs/keymanager/swing/ReadKeyPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="net/java/truevfs/key/swing/ReadKeyPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <AuxValues>
@@ -132,7 +132,7 @@
     <Component class="javax.swing.JCheckBox" name="changeKey">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="net/java/truevfs/keymanager/swing/ReadKeyPanel.properties" key="changeKey" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="net/java/truevfs/key/swing/ReadKeyPanel.properties" key="changeKey" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <AuxValues>

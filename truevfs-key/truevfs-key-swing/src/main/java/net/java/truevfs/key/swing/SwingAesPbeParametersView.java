@@ -5,8 +5,8 @@
 package net.java.truevfs.key.swing;
 
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.key.spec.param.AesKeyStrength;
-import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.common.AesKeyStrength;
+import net.java.truevfs.key.spec.common.AesPbeParameters;
 
 /**
  * A Swing based user interface to prompt for passwords or key files.

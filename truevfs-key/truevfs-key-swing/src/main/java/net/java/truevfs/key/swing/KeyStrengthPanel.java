@@ -9,7 +9,7 @@ import java.util.ResourceBundle;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
-import net.java.truevfs.key.spec.safe.KeyStrength;
+import net.java.truevfs.key.spec.KeyStrength;
 import net.java.truevfs.key.swing.util.EnhancedPanel;
 
 /**

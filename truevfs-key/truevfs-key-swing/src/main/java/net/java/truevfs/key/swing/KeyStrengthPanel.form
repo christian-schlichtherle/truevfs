@@ -36,7 +36,7 @@
           <ComponentRef name="keyStrength"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="net/java/truevfs/keymanager/swing/KeyStrengthPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="net/java/truevfs/key/swing/KeyStrengthPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <AuxValues>
@@ -55,7 +55,7 @@
           <ComponentRef name="keyStrength"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="net/java/truevfs/keymanager/swing/KeyStrengthPanel.properties" key="keyStrength" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="net/java/truevfs/key/swing/KeyStrengthPanel.properties" key="keyStrength" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <AuxValues>

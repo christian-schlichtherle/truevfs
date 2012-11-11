@@ -7,8 +7,8 @@ package net.java.truevfs.key.spec.sample;
 import java.net.URI;
 import net.java.truevfs.key.spec.PersistentUnknownKeyException;
 import net.java.truevfs.key.spec.UnknownKeyException;
-import net.java.truevfs.key.spec.param.AesKeyStrength;
-import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.common.AesKeyStrength;
+import net.java.truevfs.key.spec.common.AesPbeParameters;
 import net.java.truevfs.key.spec.prompting.PromptingKey;
 import net.java.truevfs.key.spec.prompting.PromptingKey.Controller;
 

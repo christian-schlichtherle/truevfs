@@ -9,13 +9,13 @@ import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.comp.zipdriver.AbstractKeyController;
 import net.java.truevfs.driver.zip.raes.crypto.RaesKeyException;
 import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.common.AesPbeParameters;
 
 /**
  * This file system controller decorates another file system controller in
  * order to manage the authentication key required for accessing its
  * RAES encrypted ZIP file (ZIP.RAES).
- * 
+ *
  * @author Christian Schlichtherle
  */
 @Immutable
