@@ -22,7 +22,7 @@ extends UniqueObject {
 
     private final Map<URI, SharedKeyProvider<K>> providers = new HashMap<>();
 
-    synchronized @CheckForNull SharedKeyProvider<K> get(final URI resource) {
+    private @CheckForNull SharedKeyProvider<K> get(final URI resource) {
         return providers.get(Objects.requireNonNull(resource));
     }
 
@@ -45,8 +45,13 @@ extends UniqueObject {
         if (null != p) p.setKeyClone(null);
     }
 
-    synchronized void release(final URI resource) {
+    synchronized void resetCancelledKey(final URI resource) {
         final SharedKeyProvider<K> p = get(resource);
         if (null != p) p.resetCancelledKey();
+    }
+
+    synchronized void resetUnconditionally(final URI resource) {
+        final SharedKeyProvider<K> p = get(resource);
+        if (null != p) p.resetUnconditionally();
     }
 }

@@ -9,7 +9,6 @@ import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.key.spec.prompting.PromptingKey;
 import net.java.truevfs.key.spec.prompting.PromptingKey.View;
 import net.java.truevfs.key.spec.prompting.PromptingKeyManager;
-import net.java.truevfs.key.spec.prompting.PromptingKeyProvider;
 
 /**
  * @param  <K> the type of the safe keys.
@@ -23,7 +22,6 @@ extends PromptingKeyManager<K> {
 
     @Override
     public synchronized void release(final URI resource) {
-        final PromptingKeyProvider<K> provider = get(resource);
-        if (null != provider) provider.resetUnconditionally();
+        super.resetUnconditionally(resource);
     }
 }

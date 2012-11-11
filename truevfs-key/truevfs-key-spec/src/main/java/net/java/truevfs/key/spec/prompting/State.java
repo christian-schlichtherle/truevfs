@@ -88,7 +88,7 @@ enum State {
         @Override
         <K extends PromptingKey<K>> void resetCancelledKey(
                 SharedKeyProvider<K> provider) {
-            provider.reset();
+            provider.resetUnconditionally();
         }
     };
 
