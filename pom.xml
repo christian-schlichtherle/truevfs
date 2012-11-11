@@ -299,7 +299,7 @@ plug-in to its federated file system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-key-osx</artifactId>
+                <artifactId>truevfs-key-macosx</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

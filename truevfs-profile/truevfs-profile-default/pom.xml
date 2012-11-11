@@ -65,7 +65,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-key-osx</artifactId>
+            <artifactId>truevfs-key-macosx</artifactId>
             <scope>runtime</scope>
         </dependency>
     </dependencies>
