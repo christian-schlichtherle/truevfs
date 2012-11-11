@@ -6,9 +6,14 @@ package net.java.truevfs.key.spec.util;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CoderResult;
+import static java.nio.charset.CodingErrorAction.*;
 import static java.nio.charset.StandardCharsets.*;
 import java.util.Arrays;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 
 /**
  * Provides utility methods for encoding and decoding
@@ -23,31 +28,48 @@ public class BufferUtils {
 
     private BufferUtils() { }
 
-    public static @CheckForNull ByteBuffer byteBuffer(
+    public static @Nullable ByteBuffer byteBuffer(
             final @CheckForNull String string) {
         return null == string ? null : byteBuffer(CharBuffer.wrap(string));
     }
 
-    public static @CheckForNull ByteBuffer byteBuffer(
+    public static @Nullable ByteBuffer byteBuffer(
             final @CheckForNull char[] password) {
         return null == password ? null : byteBuffer(CharBuffer.wrap(password));
     }
 
-    public static @CheckForNull ByteBuffer byteBuffer(final CharBuffer cb) {
+    public static @Nullable ByteBuffer byteBuffer(final CharBuffer cb) {
         if (null == cb) return null;
-        final int max = cb.remaining() << 1;
-        final ByteBuffer bb = ByteBuffer.allocateDirect(max);
-        if (!UTF_8.newEncoder().encode(cb.duplicate(), bb, true).isUnderflow())
-            throw new IllegalStateException("Unencodable string!");
-        return (ByteBuffer) bb.flip();
+        final CharsetEncoder enc = UTF_8.newEncoder()
+                    //.onMalformedInput(REPLACE)
+                    //.onUnmappableCharacter(REPLACE)
+                    ;
+        int capacity = (int) (cb.remaining() * enc.averageBytesPerChar());
+        ByteBuffer bb;
+        CoderResult cr;
+        while (true) {
+            bb = ByteBuffer.allocateDirect(capacity);
+            cr = enc.encode(cb.duplicate(), bb, true);
+            if (cr.isUnderflow()) enc.flush(bb);
+            bb.flip();
+            if (cr.isUnderflow()) return bb;
+            if (!cr.isOverflow()) try {
+                cr.throwException();
+                throw new AssertionError();
+            } catch (final CharacterCodingException ex) {
+                throw new IllegalArgumentException(ex);
+            }
+            fill(bb, (byte) 0);
+            capacity = 2 * capacity + 1; // ensure progress
+        }
     }
 
-    public static @CheckForNull String string(
+    public static @Nullable String string(
             final @CheckForNull ByteBuffer bb) {
         return null == bb ? null : charBuffer(bb).toString();
     }
 
-    public static @CheckForNull char[] charArray(
+    public static @Nullable char[] charArray(
             final @CheckForNull ByteBuffer bb) {
         if (null == bb) return null;
         final CharBuffer cb = charBuffer(bb);
@@ -57,7 +79,7 @@ public class BufferUtils {
         return copy;
     }
 
-    public static @CheckForNull CharBuffer charBuffer(
+    public static @Nullable CharBuffer charBuffer(
             final @CheckForNull ByteBuffer bb) {
         if (null == bb) return null;
         return UTF_8.decode(bb.duplicate())/*.flip()*/; // no flipping required
@@ -87,7 +109,7 @@ public class BufferUtils {
      *         The properties of this buffer remain unchanged.
      * @return the new direct byte buffer with the copied data.
      */
-    public static @CheckForNull ByteBuffer copy(
+    public static @Nullable ByteBuffer copy(
             final @CheckForNull ByteBuffer bb) {
         return null == bb
                 ? null
