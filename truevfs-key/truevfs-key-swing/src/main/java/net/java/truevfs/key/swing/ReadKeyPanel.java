@@ -9,16 +9,14 @@ import java.awt.EventQueue;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
-import java.io.EOFException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import net.java.truevfs.key.spec.safe.SafePbeParameters;
+import net.java.truevfs.key.spec.PbeParameters;
 
 /**
  * This panel prompts the user for a key to open an existing protected
@@ -96,31 +94,28 @@ final class ReadKeyPanel extends KeyPanel {
     }
 
     @Override
-    boolean updateParam(final SafePbeParameters<?, ?> param) {
+    boolean updateParam(final PbeParameters<?, ?> param) {
         switch (authenticationPanel.getAuthenticationMethod()) {
             case AuthenticationPanel.AUTH_PASSWD:
                 final char[] passwd = passwdField.getPassword();
-                param.setPassword(passwd);
-                Arrays.fill(passwd, (char) 0);
+                try {
+                    param.setPassword(passwd);
+                } finally {
+                    Arrays.fill(passwd, (char) 0);
+                }
                 return true;
             case AuthenticationPanel.AUTH_KEY_FILE:
                 final File keyFile = authenticationPanel.getKeyFile();
                 try {
-                    final byte[] key = SwingPromptingPbeParametersView.readKeyFile(
-                            keyFile);
-                    param.setKeyFileBytes(key);
-                    Arrays.fill(key, (byte) 0);
-                    return true;
-                } catch (FileNotFoundException ex) {
-                    setError(resources.getString("keyFile.fileNotFoundException"));
-                    return false;
-                } catch (EOFException ex) {
-                    setError(resources.getString("keyFile.eofException"));
-                    return false;
-                } catch (IOException ex) {
-                    setError(resources.getString("keyFile.ioException"));
+                    SwingPromptingPbeParametersView
+                            .setPassword(param, keyFile, false);
+                } catch (final WeakKeyException cannotHappen) {
+                    throw new AssertionError(cannotHappen);
+                } catch (final IOException ex) {
+                    setError(ex.getLocalizedMessage());
                     return false;
                 }
+                return true;
             default:
                 throw new AssertionError("Unsupported authentication method!");
         }

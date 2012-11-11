@@ -4,18 +4,18 @@
  */
 package net.java.truevfs.driver.zip.raes.crypto;
 
-import net.java.truecommons.io.LittleEndianOutputStream;
-import net.java.truecommons.io.Sink;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.io.LittleEndianOutputStream;
+import net.java.truecommons.io.Sink;
 import net.java.truevfs.comp.zip.crypto.CipherOutputStream;
 import net.java.truevfs.comp.zip.crypto.CtrBlockCipher;
 import static net.java.truevfs.driver.zip.raes.crypto.Constants.*;
-import net.java.truevfs.key.spec.param.AesKeyStrength;
+import net.java.truevfs.key.spec.common.AesKeyStrength;
 import org.bouncycastle.crypto.*;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.engines.AESFastEngine;

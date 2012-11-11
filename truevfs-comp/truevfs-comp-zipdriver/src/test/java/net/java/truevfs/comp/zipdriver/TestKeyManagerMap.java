@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import net.java.truevfs.key.spec.AbstractKeyManagerMap;
 import net.java.truevfs.key.spec.KeyManager;
-import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.common.AesPbeParameters;
 import net.java.truevfs.key.spec.prompting.TestView;
 
 /**

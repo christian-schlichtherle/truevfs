@@ -4,16 +4,16 @@
  */
 package net.java.truevfs.key.spec.prompting;
 
-import net.java.truevfs.key.spec.safe.AbstractSafeKeyTestSuite;
-import net.java.truevfs.key.spec.safe.KeyStrength;
+import net.java.truevfs.key.spec.AbstractSecretKeyTestSuite;
+import net.java.truevfs.key.spec.KeyStrength;
 
 /**
  * @author Christian Schlichtherle
  */
 public abstract class PromptingPbeParametersTestSuite<
-        P extends PromptingPbeParameters<P, S>,
+        P extends AbstractPromptingPbeParameters<P, S>,
         S extends KeyStrength>
-extends AbstractSafeKeyTestSuite<P> {
+extends AbstractSecretKeyTestSuite<P> {
 
     protected abstract P newParam();
 

@@ -10,6 +10,7 @@ import java.nio.ByteBuffer;
 import java.util.EnumMap;
 import java.util.Map;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import net.java.truevfs.key.macosx.keychain.Keychain.AttributeClass;
 import static net.java.truevfs.key.macosx.keychain.Security.*;
 import net.java.truevfs.key.macosx.keychain.Security.SecKeychainAttribute;
@@ -19,11 +20,11 @@ import net.java.truevfs.key.macosx.keychain.Security.SecKeychainAttributeList;
 /**
  * @author Christian Schlichtherle
  */
-class KeychainUtils {
+final class KeychainUtils {
 
     private KeychainUtils() { }
 
-    static @CheckForNull SecKeychainAttributeList list(
+    static @Nullable SecKeychainAttributeList list(
             final @CheckForNull Map<AttributeClass, ByteBuffer> map) {
         if (null == map) return null;
         final SecKeychainAttributeList list = new SecKeychainAttributeList();
@@ -60,7 +61,7 @@ class KeychainUtils {
         else throw new IllegalArgumentException("" + size);
     }
 
-    static @CheckForNull Map<AttributeClass, ByteBuffer> map(
+    static @Nullable Map<AttributeClass, ByteBuffer> map(
             final @CheckForNull SecKeychainAttributeList list) {
         if (null == list) return null;
         final Map<AttributeClass, ByteBuffer>

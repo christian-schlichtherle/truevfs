@@ -6,8 +6,8 @@ package net.java.truevfs.key.swing;
 
 import net.java.truevfs.key.swing.KeyStrengthPanel;
 import net.java.truevfs.key.swing.WriteKeyPanel;
-import net.java.truevfs.key.spec.param.AesKeyStrength;
-import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.common.AesKeyStrength;
+import net.java.truevfs.key.spec.common.AesPbeParameters;
 import javax.swing.JComponent;
 import static org.junit.Assert.*;
 import org.junit.Test;

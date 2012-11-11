@@ -2,17 +2,17 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.key.spec.safe;
+package net.java.truevfs.key.spec;
 
 /**
- * A safe key for writing and reading protected resources.
+ * A generic key with basic features for life cycle management.
  * <p>
  * Implementations do not need to be safe for multi-threading.
  *
- * @param  <K> the type of this safe key.
+ * @param  <K> the type of this key.
  * @author Christian Schlichtherle
  */
-public interface SafeKey<K extends SafeKey<K>> extends Cloneable {
+public interface Key<K extends Key<K>> extends Cloneable {
 
     /**
      * Wipes the secret data from memory and resets all properties to their

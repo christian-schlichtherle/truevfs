@@ -16,13 +16,13 @@
         <Component class="javax.swing.JLabel" name="newPasswd1Label">
           <Properties>
             <Property name="displayedMnemonic" type="int" editor="org.netbeans.modules.i18n.form.FormI18nMnemonicEditor">
-              <ResourceString bundle="" key="newPasswd1" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="net/java/truevfs/key/swing/WriteKeyPanel.properties" key="newPasswd1" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
               <ComponentRef name="newPasswd1Field"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="net/java/truevfs/keymanager/swing/WriteKeyPanel.properties" key="newPasswd1" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="net/java/truevfs/key/swing/WriteKeyPanel.properties" key="newPasswd1" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <AuxValues>
@@ -51,13 +51,13 @@
         <Component class="javax.swing.JLabel" name="newPasswd2Label">
           <Properties>
             <Property name="displayedMnemonic" type="int" editor="org.netbeans.modules.i18n.form.FormI18nMnemonicEditor">
-              <ResourceString bundle="" key="newPasswd2" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="net/java/truevfs/key/swing/WriteKeyPanel.properties" key="newPasswd2" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
             <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
               <ComponentRef name="newPasswd2Field"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="net/java/truevfs/keymanager/swing/WriteKeyPanel.properties" key="newPasswd2" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+              <ResourceString bundle="net/java/truevfs/key/swing/WriteKeyPanel.properties" key="newPasswd2" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <AuxValues>
@@ -106,7 +106,7 @@
           <ComponentRef name="resource"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="net/java/truevfs/keymanager/swing/WriteKeyPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
+          <ResourceString bundle="net/java/truevfs/key/swing/WriteKeyPanel.properties" key="prompt" replaceFormat="resources.getString(&quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <AuxValues>
@@ -121,6 +121,7 @@
     </Component>
     <Component class="javax.swing.JTextPane" name="resource">
       <Properties>
+        <Property name="editable" type="boolean" value="false"/>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
           <Border info="org.netbeans.modules.form.compat2.border.CompoundBorderInfo">
             <CompoundBorder>
@@ -133,7 +134,6 @@
             </CompoundBorder>
           </Border>
         </Property>
-        <Property name="editable" type="boolean" value="false"/>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.modules.form.editors2.FontEditor">
           <FontInfo relative="true">
             <Font bold="true" component="resource" property="font" relativeSize="true" size="0"/>

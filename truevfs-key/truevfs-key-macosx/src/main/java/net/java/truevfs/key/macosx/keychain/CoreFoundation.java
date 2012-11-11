@@ -10,6 +10,7 @@ import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.sun.jna.PointerType;
 import com.sun.jna.Structure;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
 
@@ -60,6 +61,7 @@ final class CoreFoundation implements Library {
         public CFIndex(long value) { super(value); }
     } // CFindex
 
+    @SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
     public static class CFRange extends Structure {
         public CFIndex location, length;
 

@@ -18,7 +18,7 @@ import net.java.truevfs.comp.zip.crypto.CtrBlockCipher;
 import net.java.truevfs.comp.zip.crypto.SeekableBlockCipher;
 import static net.java.truevfs.driver.zip.raes.crypto.Constants.AES_BLOCK_SIZE_BITS;
 import static net.java.truevfs.driver.zip.raes.crypto.Constants.TYPE_0_HEADER_LEN_WO_SALT;
-import net.java.truevfs.key.spec.param.AesKeyStrength;
+import net.java.truevfs.key.spec.common.AesKeyStrength;
 import net.java.truevfs.key.spec.util.SuspensionPenalty;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;

@@ -2,10 +2,10 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.key.spec.param;
+package net.java.truevfs.key.spec.common;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truevfs.key.spec.prompting.PromptingPbeParameters;
+import net.java.truevfs.key.spec.prompting.AbstractPromptingPbeParameters;
 
 /**
  * A JavaBean which holds password based encryption parameters for use with the
@@ -15,7 +15,7 @@ import net.java.truevfs.key.spec.prompting.PromptingPbeParameters;
  */
 @NotThreadSafe
 public final class AesPbeParameters
-extends PromptingPbeParameters<AesPbeParameters, AesKeyStrength> {
+extends AbstractPromptingPbeParameters<AesPbeParameters, AesKeyStrength> {
 
     public AesPbeParameters() { reset(); }
 

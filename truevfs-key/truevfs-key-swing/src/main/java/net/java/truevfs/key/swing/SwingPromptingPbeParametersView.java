@@ -11,19 +11,24 @@ import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URI;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.WeakHashMap;
+import java.util.zip.Deflater;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.inject.Provider;
 import javax.swing.JOptionPane;
+import net.java.truevfs.key.spec.KeyStrength;
+import net.java.truevfs.key.spec.PbeParameters;
 import net.java.truevfs.key.spec.UnknownKeyException;
 import net.java.truevfs.key.spec.prompting.KeyPromptingDisabledException;
 import net.java.truevfs.key.spec.prompting.KeyPromptingInterruptedException;
 import net.java.truevfs.key.spec.prompting.PromptingKey;
 import net.java.truevfs.key.spec.prompting.PromptingKey.Controller;
 import net.java.truevfs.key.spec.prompting.PromptingPbeParameters;
-import net.java.truevfs.key.spec.safe.KeyStrength;
 import net.java.truevfs.key.swing.feedback.Feedback;
 import net.java.truevfs.key.swing.sl.InvalidKeyFeedbackLocator;
 import net.java.truevfs.key.swing.sl.UnknownKeyFeedbackLocator;
@@ -40,8 +45,9 @@ abstract class SwingPromptingPbeParametersView<
         S extends KeyStrength>
 implements PromptingKey.View<P> {
 
-    private static final ResourceBundle resources
-            = ResourceBundle.getBundle(SwingPromptingPbeParametersView.class.getName());
+    private static final ResourceBundle resources = ResourceBundle
+            .getBundle(SwingPromptingPbeParametersView.class.getName());
+
     static final URI INITIAL_RESOURCE = URI.create(""); // NOI18N
 
     /**
@@ -74,22 +80,88 @@ implements PromptingKey.View<P> {
      */
     protected abstract P newPbeParameters();
 
+    static void setPassword(
+            final PbeParameters<?, ?> param,
+            final File keyFile,
+            final boolean check)
+    throws IOException, WeakKeyException {
+        if (check && keyFile.canWrite())
+            throw new IOException(resources.getString("keyFile.canWrite"));
+        final byte[] key;
+        try {
+            key = readKeyFile(keyFile);
+        } catch (final FileNotFoundException ex) {
+            throw new IOException(resources.getString("keyFile.fileNotFoundException"), ex);
+        } catch (final EOFException ex) {
+            throw new IOException(resources.getString("keyFile.eofException"), ex);
+        } catch (final IOException ex) {
+            throw new IOException(resources.getString("keyFile.ioException"), ex);
+        }
+        try {
+            if (check) checkKeyEntropy(key);
+            setPassword(param, key);
+        } finally {
+            Arrays.fill(key, (byte) 0);
+        }
+    }
+
     /**
-     * Reads the encryption key as a byte sequence from the given pathname
-     * into a new buffer of exactly {@code KEY_FILE_LEN} bytes and returns it.
+     * Checks the entropy of the given key bytes.
+     *
+     * @param key the key to check.
+     * @throws WeakKeyException if the entropy of the given key is too weak.
+     */
+    private static void checkKeyEntropy(byte[] key) throws WeakKeyException {
+        Deflater def = new Deflater();
+        def.setInput(key);
+        def.finish();
+        assert def.getTotalOut() == 0;
+        final int n = def.deflate(new byte[key.length * 2]);
+        assert def.getTotalOut() == n;
+        def.end();
+        if (n < 2 * 256 / 8) // see RandomAccessEncryptionSpecification
+            throw new WeakKeyException(resources.getString("keyFile.badEntropy"));
+    }
+
+    /**
+     * Reads the encryption key as a char array from the given file.
      *
      * @throws FileNotFoundException if the file cannot get opened for reading.
      * @throws EOFException If the file is not at least {@code KEY_FILE_LEN}
      *         bytes long.
      * @throws IOException on any other I/O related issue.
      */
-    static byte[] readKeyFile(File file)
+    private static byte[] readKeyFile(File file)
     throws FileNotFoundException, EOFException, IOException {
         final byte[] buf = new byte[KEY_FILE_LEN];
-        try (final RandomAccessFile raf = new RandomAccessFile(file, "r")) {
-            raf.readFully(buf);
+        try (final FileInputStream _ = new FileInputStream(file)) {
+            new DataInputStream(_).readFully(buf);
         }
         return buf;
+    }
+
+    private static void setPassword(final PbeParameters<?, ?> param, final byte[] key) {
+        final char[] password = decode(key);
+        try {
+            param.setPassword(password);
+        } finally {
+            Arrays.fill(password, (char) 0);
+        }
+    }
+
+    /**
+     * Decode the UTF-16BE encoded bytes.
+     * This preserves the byte order when the password char array is later
+     * encoded to a byte array again in accordance with PKCS #12, section B.1.
+     *
+     * @param  bytes the UTF16-BE encoded bytes.
+     * @return a new array with the decoded character.
+     */
+    private static char[] decode(final byte[] bytes) {
+        final CharBuffer cb = ByteBuffer.wrap(bytes).asCharBuffer();
+        final char[] chars = new char[cb.remaining()];
+        cb.get(chars);
+        return chars;
     }
 
     Provider<Feedback> getUnknownKeyFeedbackProvider() {

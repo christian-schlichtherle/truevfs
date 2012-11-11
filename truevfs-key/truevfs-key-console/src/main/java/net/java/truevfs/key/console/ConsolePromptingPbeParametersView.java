@@ -12,11 +12,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truevfs.key.spec.KeyStrength;
 import net.java.truevfs.key.spec.prompting.KeyPromptingDisabledException;
 import net.java.truevfs.key.spec.prompting.PromptingKey;
 import net.java.truevfs.key.spec.prompting.PromptingKey.Controller;
 import net.java.truevfs.key.spec.prompting.PromptingPbeParameters;
-import net.java.truevfs.key.spec.safe.KeyStrength;
 
 /**
  * A console based user interface for prompting for passwords.

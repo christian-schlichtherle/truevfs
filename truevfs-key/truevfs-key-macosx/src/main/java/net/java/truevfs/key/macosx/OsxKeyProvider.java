@@ -8,13 +8,13 @@ import java.net.URI;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.key.spec.KeyProvider;
 import net.java.truevfs.key.spec.UnknownKeyException;
-import net.java.truevfs.key.spec.prompting.PromptingPbeParameters;
+import net.java.truevfs.key.spec.prompting.AbstractPromptingPbeParameters;
 
 /**
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class OsxKeyProvider<P extends PromptingPbeParameters<P, ?>>
+final class OsxKeyProvider<P extends AbstractPromptingPbeParameters<P, ?>>
 implements KeyProvider<P> {
 
     private final OsxKeyManager<P> manager;

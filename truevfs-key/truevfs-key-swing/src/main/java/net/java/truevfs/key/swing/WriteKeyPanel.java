@@ -7,20 +7,15 @@ package net.java.truevfs.key.swing;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
-import java.io.EOFException;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URI;
-import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.ResourceBundle;
-import java.util.zip.Deflater;
-import javax.annotation.CheckForNull;
 import javax.swing.JComponent;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import net.java.truevfs.key.spec.safe.SafePbeParameters;
+import net.java.truevfs.key.spec.PbeParameters;
 
 /**
  * This panel prompts the user for a key to create or overwrite a protected
@@ -100,7 +95,7 @@ final class WriteKeyPanel extends KeyPanel {
 
     @edu.umd.cs.findbugs.annotations.SuppressWarnings("SF_SWITCH_FALLTHROUGH")
     @Override
-    boolean updateParam(final SafePbeParameters<?, ?> param) {
+    boolean updateParam(final PbeParameters<?, ?> param) {
         try {
             switch (authenticationPanel.getAuthenticationMethod()) {
                 case AuthenticationPanel.AUTH_PASSWD:
@@ -109,7 +104,6 @@ final class WriteKeyPanel extends KeyPanel {
                     try {
                         if (Arrays.equals(newPasswd1, newPasswd2)) {
                             checkPasswdKey(newPasswd1);
-                            setError(null);
                             param.setPassword(newPasswd1);
                             return true;
                         } else {
@@ -122,34 +116,14 @@ final class WriteKeyPanel extends KeyPanel {
                     }
                 case AuthenticationPanel.AUTH_KEY_FILE:
                     final File keyFile = authenticationPanel.getKeyFile();
-                    if (keyFile.canWrite()) {
-                        setError(resources.getString("keyFile.canWrite"));
-                        return false;
-                    }
-
-                    final byte[] key;
-                    try {
-                        key = SwingPromptingPbeParametersView.readKeyFile(keyFile);
-                    } catch (FileNotFoundException ex) {
-                        setError(resources.getString("keyFile.fileNotFoundException"));
-                        return false;
-                    } catch (EOFException ex) {
-                        setError(resources.getString("keyFile.eofException"));
-                        return false;
-                    } catch (IOException ex) {
-                        setError(resources.getString("keyFile.ioException"));
-                        return false;
-                    }
-                    checkKeyFileKey(key);
-                    setError(null);
-                    param.setKeyFileBytes(key);
-                    Arrays.fill(key, (byte) 0);
+                    SwingPromptingPbeParametersView
+                            .setPassword(param, keyFile, true);
                     return true;
                 default:
                     throw new AssertionError("Unsupported authentication method!");
             }
-        } catch (WeakKeyException failure) {
-            setError(failure.getLocalizedMessage());
+        } catch (final IOException | WeakKeyException ex) {
+            setError(ex.getLocalizedMessage());
             return false;
         }
     }
@@ -160,40 +134,11 @@ final class WriteKeyPanel extends KeyPanel {
      * @param key the key to check.
      * @throws WeakKeyException if the entropy of the given key is too weak.
      */
-    protected void checkKeyFileKey(byte[] key)
-    throws WeakKeyException {
-        Deflater def = new Deflater();
-        def.setInput(key);
-        def.finish();
-        assert def.getTotalOut() == 0;
-        final int n = def.deflate(new byte[key.length * 2]);
-        assert def.getTotalOut() == n;
-        def.end();
-        if (n < 2 * 256 / 8) // see RandomAccessEncryptionSpecification
-            throw new WeakKeyException(
-                    localizedMessage(resources, "keyFile.badEntropy", null));
-    }
-
-    /**
-     * Checks the entropy of the given key.
-     *
-     * @param key the key to check.
-     * @throws WeakKeyException if the entropy of the given key is too weak.
-     */
-    protected void checkPasswdKey(char[] key)
+    private void checkPasswdKey(char[] key)
     throws WeakKeyException {
         if (MIN_PASSWD_LEN > key.length)
-            throw new WeakKeyException(localizedMessage(
-                    resources, "passwd.tooShort", MIN_PASSWD_LEN));
-    }
-
-    private static String localizedMessage(
-            final ResourceBundle resources,
-            final String key,
-            final @CheckForNull Object param) {
-        return param != null
-                ? MessageFormat.format(resources.getString(key), new Object[] { param })
-                : resources.getString(key);
+            throw new WeakKeyException(
+                    String.format(resources.getString("passwd.tooShort"), MIN_PASSWD_LEN));
     }
 
     /**
@@ -305,8 +250,8 @@ final class WriteKeyPanel extends KeyPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
         add(prompt, gridBagConstraints);
 
-        resource.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEtchedBorder(), javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2)));
         resource.setEditable(false);
+        resource.setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createEtchedBorder(), javax.swing.BorderFactory.createEmptyBorder(2, 2, 2, 2)));
         resource.setFont(resource.getFont().deriveFont(resource.getFont().getStyle() | java.awt.Font.BOLD));
         resource.setOpaque(false);
         gridBagConstraints = new java.awt.GridBagConstraints();

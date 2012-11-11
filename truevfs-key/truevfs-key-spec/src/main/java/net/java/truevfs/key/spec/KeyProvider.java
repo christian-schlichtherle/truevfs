@@ -7,7 +7,7 @@ package net.java.truevfs.key.spec;
 import javax.annotation.CheckForNull;
 
 /**
- * Manages the life cycle of a key for writing and reading a protected
+ * Manages the life cycle of a key for reading and (over)writing a protected
  * resource.
  * When implementing a key provider, you should extend the
  * {@link AbstractKeyProvider} class rather than directly implementing this
@@ -81,6 +81,9 @@ public interface KeyProvider<K> {
     /**
      * Returns the key for (over)writing a protected resource.
      * This implies that the key does not need to get validated by any client.
+     * <p>
+     * Implementations should return a protective copy of the key in order
+     * to protect against subsequent modifications by the client.
      *
      * @return the key for writing a protected resource.
      *         Subsequent calls to this method return a key which at
@@ -106,6 +109,9 @@ public interface KeyProvider<K> {
      * against an exhaustive search for the correct key.
      * As a rule of thumb, at least three seconds should pass between two
      * consecutive calls to this method by the same thread.
+     * <p>
+     * Implementations should return a protective copy of the key in order
+     * to protect against subsequent modifications by the client.
      *
      * @param  invalid {@code true} iff a previous call to this method returned
      *         an invalid key.
@@ -121,9 +127,10 @@ public interface KeyProvider<K> {
     K getKeyForReading(boolean invalid) throws UnknownKeyException;
 
     /**
-     * Sets the key programmatically.
-     * This may get used after a call to {@link #getKeyForReading} in order to update
-     * some properties of the key after it has been validated by the client.
+     * Sets the key for reading and (over)writing a protected resource.
+     * This may get used after a call to {@link #getKeyForReading} in order to
+     * update some properties of the key after it has been validated by the
+     * client.
      * <p>
      * Implementations should make a protective copy of the given key in order
      * to protect against subsequent modifications by the client.

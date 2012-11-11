@@ -5,8 +5,8 @@
 package net.java.truevfs.key.swing;
 
 import net.java.truevfs.key.swing.KeyStrengthPanel;
-import net.java.truevfs.key.spec.param.AesKeyStrength;
-import static net.java.truevfs.key.spec.param.AesKeyStrength.*;
+import net.java.truevfs.key.spec.common.AesKeyStrength;
+import static net.java.truevfs.key.spec.common.AesKeyStrength.*;
 import net.java.truevfs.key.swing.util.JemmyUtils;
 import org.junit.After;
 import static org.junit.Assert.assertSame;

@@ -42,9 +42,7 @@ public class FileComboBoxBrowser extends AbstractComboBoxBrowser<String> {
      * Constructs a new file combo box auto completion browser.
      * {@link #setComboBox} must be called in order to use this object.
      */
-    public FileComboBoxBrowser() {
-        this(null, null);
-    }
+    public FileComboBoxBrowser() { this(null, null); }
 
     public FileComboBoxBrowser(@CheckForNull JComboBox<String> comboBox) {
         this(comboBox, null);
@@ -105,7 +103,7 @@ public class FileComboBoxBrowser extends AbstractComboBoxBrowser<String> {
      * If this property has been set to {@code null} before, it's reinitialized
      * by calling {@link FileSystemView#getFileSystemView()}, so {@code null}
      * is never returned.
-     * 
+     *
      * @return The file system view.
      */
     public FileSystemView getFileSystemView() {
