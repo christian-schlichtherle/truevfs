@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2005-2012 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
+ */
 package net.java.truevfs.key.spec.safe;
 
 import java.beans.XMLDecoder;
@@ -34,6 +38,10 @@ public abstract class AbstractSafeKeyTestSuite<K extends AbstractSafeKey<K>> {
     @Before
     public void before() {
         key = newKey();
+    }
+
+    @Test
+    public void testNoSecret() {
         assertNull(key.getSecret());
     }
 
@@ -66,20 +74,8 @@ public abstract class AbstractSafeKeyTestSuite<K extends AbstractSafeKey<K>> {
 
     @Test
     public void testObjectSerialization() throws Exception {
-        final K original = newKey();
-        original.setSecret(byteBuffer("föo"));
-        final K clone  = cloneViaObjectSerialization(512, original);
-        original.setSecret(null);
-        assertEquals(original, clone);
-    }
-
-    @Test
-    public void testXmlSerialization() throws Exception {
-        final K original = newKey();
-        original.setSecret(byteBuffer("föo"));
-        final K clone  = cloneViaXmlSerialization(512, original);
-        original.setSecret(null);
-        assertEquals(original, clone);
+        assertEquals(key, cloneViaObjectSerialization(512,
+                updateTransientProperties(key)));
     }
 
     private static <T> T cloneViaObjectSerialization(
@@ -89,8 +85,8 @@ public abstract class AbstractSafeKeyTestSuite<K extends AbstractSafeKey<K>> {
         final byte[] serialized;
         try (final ByteArrayOutputStream
                 bos = new ByteArrayOutputStream(sizeHint)) {
-            try (final ObjectOutputStream oos = new ObjectOutputStream(bos)) {
-                oos.writeObject(original);
+            try (final ObjectOutputStream _ = new ObjectOutputStream(bos)) {
+                _.writeObject(original);
             }
             bos.flush(); // redundant
             serialized = bos.toByteArray();
@@ -104,6 +100,12 @@ public abstract class AbstractSafeKeyTestSuite<K extends AbstractSafeKey<K>> {
         }
     }
 
+    @Test
+    public void testXmlSerialization() throws Exception {
+        assertEquals(key, cloneViaXmlSerialization(512,
+                updateTransientProperties(key)));
+    }
+
     private static <T> T cloneViaXmlSerialization(
             final int sizeHint,
             final T original)
@@ -111,8 +113,8 @@ public abstract class AbstractSafeKeyTestSuite<K extends AbstractSafeKey<K>> {
         final byte[] serialized;
         try (final ByteArrayOutputStream
                 bos = new ByteArrayOutputStream(sizeHint)) {
-            try (final XMLEncoder enc = new XMLEncoder(bos)) {
-                enc.writeObject(original);
+            try (final XMLEncoder _ = new XMLEncoder(bos)) {
+                _.writeObject(original);
             }
             bos.flush(); // redundant
             serialized = bos.toByteArray();
@@ -126,5 +128,11 @@ public abstract class AbstractSafeKeyTestSuite<K extends AbstractSafeKey<K>> {
                 dec = new XMLDecoder(new ByteArrayInputStream(serialized))) {
             return (T) dec.readObject();
         }
+    }
+
+    protected K updateTransientProperties(K key) {
+        key = key.clone();
+        key.setSecret(byteBuffer("This secret must not get serialized!"));
+        return key;
     }
 }
