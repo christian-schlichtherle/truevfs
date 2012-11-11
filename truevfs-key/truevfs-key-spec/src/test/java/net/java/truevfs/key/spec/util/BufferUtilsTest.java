@@ -16,34 +16,42 @@ import org.junit.Test;
  */
 public class BufferUtilsTest {
 
+    private static final String[] tests = { "", "föo", "bär" };
+
     @Test
     public void testStringRoundTrip() {
-        final String ist = "föö";
-        final ByteBuffer ibb = byteBuffer(ist);
-        final ByteBuffer obb = ibb.duplicate();
-        final String ost = string(obb);
-        assertThat(ost, is(ist));
-        assertThat(obb, is(ibb));
+        for (final String s : tests) {
+            final String ist = s;
+            final ByteBuffer ibb = byteBuffer(ist);
+            final ByteBuffer obb = ibb.duplicate();
+            final String ost = string(obb);
+            assertThat(ost, is(ist));
+            assertThat(obb, is(ibb));
+        }
     }
 
     @Test
     public void testCharArrayRoundTrip() {
-        final char[] ica = "bär".toCharArray();
-        final ByteBuffer ibb = byteBuffer(ica);
-        final ByteBuffer obb = ibb.duplicate();
-        final char[] oca = charArray(obb);
-        assertThat(oca, is(ica));
-        assertThat(obb, is(ibb));
+        for (final String s : tests) {
+            final char[] ica = s.toCharArray();
+            final ByteBuffer ibb = byteBuffer(ica);
+            final ByteBuffer obb = ibb.duplicate();
+            final char[] oca = charArray(obb);
+            assertThat(oca, is(ica));
+            assertThat(obb, is(ibb));
+        }
     }
 
     @Test
     public void testCharBufferRoundTrip() {
-        final CharBuffer icb = CharBuffer.wrap("bäz");
-        final ByteBuffer ibb = byteBuffer(icb);
-        final ByteBuffer obb = ibb.duplicate();
-        final CharBuffer ocb = charBuffer(obb);
-        assertThat(ocb, is(icb));
-        assertThat(obb, is(ibb));
+        for (final String s : tests) {
+            final CharBuffer icb = CharBuffer.wrap(s);
+            final ByteBuffer ibb = byteBuffer(icb);
+            final ByteBuffer obb = ibb.duplicate();
+            final CharBuffer ocb = charBuffer(obb);
+            assertThat(ocb, is(icb));
+            assertThat(obb, is(ibb));
+        }
     }
 
     @Test
