@@ -74,7 +74,7 @@ extends AbstractKeyProvider<K> {
 
     /**
      * Resets the state of this key provider
-     * if and only if prompting for a key has been cancelled.
+     * if and only if prompting for the key has been cancelled.
      */
     public void resetCancelledKey() { provider.resetCancelledKey(); }
 
@@ -82,7 +82,7 @@ extends AbstractKeyProvider<K> {
      * Resets the state of this key provider
      * unconditionally.
      */
-    public void resetUnconditionally() { provider.reset(); }
+    public void resetUnconditionally() { provider.resetUnconditionally(); }
 
     private View<K> getView() { return manager.getView(); }
 

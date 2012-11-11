@@ -35,11 +35,6 @@ extends AbstractKeyManager<K> {
 
     public final View<K> getView() { return view; }
 
-    protected PromptingKeyProvider<K> get(final URI resource) {
-        final SharedKeyProvider<K> p = manager.get(resource);
-        return null == p ? null : new PromptingKeyProvider<>(this, resource, p);
-    }
-
     @Override
     public PromptingKeyProvider<K> provider(URI resource) {
         return new PromptingKeyProvider<>(this, resource,
@@ -56,13 +51,37 @@ extends AbstractKeyManager<K> {
         manager.unlink(resource);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@code PromptingKeyManager} forwards the
+     * call to {@link #resetCancelledKey(URI)}.
+     */
     @Override
-    public void release(URI resource) {
-        manager.release(resource);
+    public void release(URI resource) { resetCancelledKey(resource); }
+
+    /**
+     * Resets the state of the key provider for the given protected resource
+     * if and only if prompting for the key has been cancelled.
+     *
+     * @param resource the URI of the protected resource.
+     */
+    protected void resetCancelledKey(URI resource) {
+        manager.resetCancelledKey(resource);
     }
 
     /**
-     * Returns a string representation of this object for debugging and logging
+     * Resets the state of the key provider for the given protected resource
+     * unconditionally.
+     *
+     * @param resource the URI of the protected resource.
+     */
+    protected void resetUnconditionally(URI resource) {
+        manager.resetUnconditionally(resource);
+    }
+
+    /**
+     * Returns a string representation of this object for logging and debugging
      * purposes.
      */
     @Override

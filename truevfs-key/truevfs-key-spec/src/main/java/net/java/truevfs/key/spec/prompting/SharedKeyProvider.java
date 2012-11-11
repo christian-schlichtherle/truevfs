@@ -139,7 +139,7 @@ extends UniqueObject {
      */
     void resetCancelledKey() { state.resetCancelledKey(this); }
 
-    synchronized void reset() {
+    synchronized void resetUnconditionally() {
         setKeyClone(null);
         setException(null);
         this.state = State.RESET;
