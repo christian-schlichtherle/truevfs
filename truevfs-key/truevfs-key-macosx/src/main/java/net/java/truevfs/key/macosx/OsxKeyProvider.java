@@ -8,23 +8,24 @@ import java.net.URI;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.key.spec.KeyProvider;
 import net.java.truevfs.key.spec.UnknownKeyException;
-import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.prompting.PromptingPbeParameters;
 
 /**
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class OsxKeyProvider implements KeyProvider<AesPbeParameters> {
+final class OsxKeyProvider<P extends PromptingPbeParameters<P, ?>>
+implements KeyProvider<P> {
 
-    private final OsxKeyManager manager;
+    private final OsxKeyManager<P> manager;
     private final URI resource;
-    private final KeyProvider<AesPbeParameters> provider;
-    private volatile AesPbeParameters param;
+    private final KeyProvider<P> provider;
+    private volatile P param;
 
     OsxKeyProvider(
-            final OsxKeyManager manager,
+            final OsxKeyManager<P> manager,
             final URI resource,
-            final KeyProvider<AesPbeParameters> provider) {
+            final KeyProvider<P> provider) {
         assert null != manager;
         assert null != resource;
         assert null != provider;
@@ -34,20 +35,20 @@ final class OsxKeyProvider implements KeyProvider<AesPbeParameters> {
     }
 
     @Override
-    public AesPbeParameters getKeyForWriting() throws UnknownKeyException {
-        AesPbeParameters op = param;
+    public P getKeyForWriting() throws UnknownKeyException {
+        P op = param;
         if (null == op) op = manager.getKey(resource);
         if (null != op && !op.isChangeRequested()) return op.clone();
-        final AesPbeParameters np = provider.getKeyForWriting();
+        final P np = provider.getKeyForWriting();
         if (!np.equals(op)) manager.setKey(resource, np);
         return param = np;
     }
 
     @Override
-    public AesPbeParameters getKeyForReading(final boolean invalid)
+    public P getKeyForReading(final boolean invalid)
     throws UnknownKeyException {
         if (!invalid) {
-            AesPbeParameters op = param;
+            P op = param;
             if (null == op) op = manager.getKey(resource);
             if (null != op) return op.clone();
         }
@@ -55,8 +56,8 @@ final class OsxKeyProvider implements KeyProvider<AesPbeParameters> {
     }
 
     @Override
-    public void setKey(final AesPbeParameters np) {
-        final AesPbeParameters op = param;
+    public void setKey(final P np) {
+        final P op = param;
         provider.setKey(np);
         if (!np.equals(op)) manager.setKey(resource, np);
         param = np;

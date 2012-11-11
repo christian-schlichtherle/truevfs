@@ -28,12 +28,13 @@ public class OsxKeyManagerTest {
         original.setChangeRequested(true);
         original.setKeyStrength(AesKeyStrength.BITS_256);
         original.setPassword("föo".toCharArray());
-        final ByteBuffer serialized = encode(original); // must not encode password!
+        final ByteBuffer xml = serialize(original); // must not serialize password!
 
-        logger.trace("Serialized object to {} bytes.", serialized.remaining());
-        logger.trace("Serialized form:\n{}", string(serialized));
+        logger.trace("Serialized object to {} bytes.", xml.remaining());
+        logger.trace("Serialized form:\n{}", string(xml));
 
-        final AesPbeParameters clone = decode(serialized);
+        final AesPbeParameters clone = (AesPbeParameters) deserialize(xml);
+        assertNull(clone.getPassword());
         original.setPassword(null);
         assertEquals(original, clone);
     }

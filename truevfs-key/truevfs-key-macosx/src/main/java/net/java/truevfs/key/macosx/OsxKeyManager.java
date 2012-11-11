@@ -28,7 +28,7 @@ import net.java.truevfs.key.macosx.keychain.KeychainException;
 import net.java.truevfs.key.spec.AbstractKeyManager;
 import net.java.truevfs.key.spec.KeyManager;
 import net.java.truevfs.key.spec.KeyProvider;
-import net.java.truevfs.key.spec.param.AesPbeParameters;
+import net.java.truevfs.key.spec.prompting.PromptingPbeParameters;
 import static net.java.truevfs.key.spec.util.BufferUtils.*;
 import org.slf4j.Logger;
 
@@ -36,27 +36,30 @@ import org.slf4j.Logger;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class OsxKeyManager extends AbstractKeyManager<AesPbeParameters> {
+public final class OsxKeyManager<P extends PromptingPbeParameters<P, ?>>
+extends AbstractKeyManager<P> {
 
     private static final String KEYCHAIN = "TrueVFS";
     private static final Logger logger = new LocalizedLogger(OsxKeyManager.class);
 
-    private final KeyManager<AesPbeParameters> manager;
+    private final KeyManager<P> manager;
+    private final Class<P> keyClass;
     private Keychain keychain;
     private volatile boolean skip;
 
-    public OsxKeyManager(final KeyManager<AesPbeParameters> manager) {
+    public OsxKeyManager(final KeyManager<P> manager, final Class<P> keyClass) {
         this.manager = Objects.requireNonNull(manager);
+        this.keyClass = Objects.requireNonNull(keyClass);
     }
 
     @Override
-    public KeyProvider<AesPbeParameters> provider(URI resource) {
-        return new OsxKeyProvider(this, resource, manager.provider(resource));
+    public KeyProvider<P> provider(URI resource) {
+        return new OsxKeyProvider<>(this, resource, manager.provider(resource));
     }
 
     @Override
     public void link(final URI oldResource, final URI newResource) {
-        final AesPbeParameters param = getKey(oldResource);
+        final P param = getKey(oldResource);
         manager.link(oldResource, newResource);
         setKey(newResource, param);
     }
@@ -73,21 +76,27 @@ final class OsxKeyManager extends AbstractKeyManager<AesPbeParameters> {
         manager.release(resource);
     }
 
-    @CheckForNull AesPbeParameters getKey(final URI resource) {
-        return access(resource, new Action<AesPbeParameters>() {
+    @CheckForNull P getKey(final URI resource) {
+        return access(resource, new Action<P>() {
             @Override
-            public AesPbeParameters call(
+            public P call(
                     final Keychain keychain,
                     final Map<AttributeClass, ByteBuffer> attributes)
             throws KeychainException {
 
                 class Read implements Visitor {
-                    private @CheckForNull AesPbeParameters param;
+                    private @CheckForNull P param;
 
                     @Override
                     public void visit(final Item item) throws KeychainException {
-                        param = decode(item.getAttributes().get(GENERIC));
-                        if (null == param) param = new AesPbeParameters();
+                        param = (P) deserialize(item.getAttributes().get(GENERIC));
+                        if (null == param) try {
+                            param = keyClass.newInstance();
+                        } catch (final InstantiationException | IllegalAccessException ex) {
+                            logger.debug("getKey.exception", ex);
+                            return;
+                        }
+                        assert null == param.getSecret();
                         final ByteBuffer secret = item.getSecret();
                         try {
                             param.setSecret(secret);
@@ -106,7 +115,7 @@ final class OsxKeyManager extends AbstractKeyManager<AesPbeParameters> {
 
     void setKey(
             final URI resource,
-            final @CheckForNull AesPbeParameters param) {
+            final @CheckForNull P param) {
         access(resource, new Action<Void>() {
             @Override
             public Void call(
@@ -117,18 +126,19 @@ final class OsxKeyManager extends AbstractKeyManager<AesPbeParameters> {
                 if (null != param) {
                     final ByteBuffer newSecret = param.getSecret();
                     try {
-                        final ByteBuffer newParam = encode(param);
+                        final ByteBuffer newXml = serialize(param);
 
                         class Update implements Visitor {
                             @Override
                             public void visit(Item item) throws KeychainException {
                                 {
                                     final Map<AttributeClass, ByteBuffer>
-                                            attributes = item.getAttributes();
-                                    final ByteBuffer oldParam = attributes.get(GENERIC);
-                                    if (!newParam.equals(oldParam)) {
-                                        attributes.put(GENERIC, newParam);
-                                        item.putAttributes(attributes);
+                                            attr = item.getAttributes();
+                                    final ByteBuffer oldXml = attr.get(GENERIC);
+                                    final P oldParam = (P) deserialize(oldXml);
+                                    if (!param.equals(oldParam)) {
+                                        attr.put(GENERIC, newXml);
+                                        item.putAttributes(attr);
                                     }
                                 }
                                 {
@@ -137,10 +147,10 @@ final class OsxKeyManager extends AbstractKeyManager<AesPbeParameters> {
                                         item.setSecret(newSecret);
                                 }
                             }
-                        }
+                        } // Update
 
                         try {
-                            attributes.put(GENERIC, newParam);
+                            attributes.put(GENERIC, newXml);
                             keychain.createItem(GENERIC_PASSWORD, attributes, newSecret);
                         } catch (final DuplicateItemException ex) {
                             attributes.remove(GENERIC);
@@ -156,7 +166,7 @@ final class OsxKeyManager extends AbstractKeyManager<AesPbeParameters> {
                         public void visit(Item item) throws KeychainException {
                             item.delete();
                         }
-                    }
+                    } // Update
 
                     keychain.visitItems(GENERIC_PASSWORD, attributes, new Delete());
                 }
@@ -165,30 +175,27 @@ final class OsxKeyManager extends AbstractKeyManager<AesPbeParameters> {
         });
     }
 
-    static @CheckForNull AesPbeParameters decode(final @CheckForNull ByteBuffer bb) {
-        if (null == bb) return null;
-        final byte[] array = new byte[bb.remaining()]; // cannot use bb.array()!
-        bb.duplicate().get(array);
-        try (final XMLDecoder _ = new XMLDecoder(new ByteArrayInputStream(array))) {
-            final AesPbeParameters param = (AesPbeParameters) _.readObject();
-            assert null == param.getSecret();
-            return param;
-        }
-    }
-
-    static @CheckForNull ByteBuffer encode(@CheckForNull AesPbeParameters param) {
-        if (null == param) return null;
-        param = param.clone();
-        param.setSecret(null);
+    static @CheckForNull ByteBuffer serialize(
+            final @CheckForNull Object object) {
+        if (null == object) return null;
         try (final ByteArrayOutputStream bos = new ByteArrayOutputStream(512)) {
             try (final XMLEncoder _ = new XMLEncoder(bos)) {
-                _.writeObject(param);
+                _.writeObject(object);
             }
             bos.flush(); // redundant
             return copy(ByteBuffer.wrap(bos.toByteArray()));
         } catch (final IOException ex) {
-            logger.warn("encode.exception", ex);
+            logger.warn("serialize.exception", ex);
             return null;
+        }
+    }
+
+    static @CheckForNull Object deserialize(final @CheckForNull ByteBuffer xml) {
+        if (null == xml) return null;
+        final byte[] array = new byte[xml.remaining()]; // cannot use bb.array()!
+        xml.duplicate().get(array);
+        try (final XMLDecoder _ = new XMLDecoder(new ByteArrayInputStream(array))) {
+            return (PromptingPbeParameters<?, ?>) _.readObject();
         }
     }
 

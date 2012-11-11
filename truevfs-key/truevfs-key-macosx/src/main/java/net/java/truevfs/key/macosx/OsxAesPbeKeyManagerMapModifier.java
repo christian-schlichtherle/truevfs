@@ -31,7 +31,7 @@ extends KeyManagerMapModifier {
             throw new ServiceConfigurationError(
                 "This module is a pure persistence service and depends on another key manager module to implement the user interface.");
         map.put(AesPbeParameters.class,
-                new OsxKeyManager((KeyManager<AesPbeParameters>) m));
+                new OsxKeyManager<>((KeyManager<AesPbeParameters>) m, AesPbeParameters.class));
         return map;
     }
 
