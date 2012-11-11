@@ -16,11 +16,9 @@ import net.java.truevfs.key.spec.prompting.PromptingKey.View;
 
 /**
  * A key provider which prompts the user for a key for its protected resource.
- * The user is prompted via an instance of the {@link View}
- * interface.
- * The view may then display the resource URI by calling {@link #getResource}
- * on this instance and set the key by using the given
- * {@link Controller}.
+ * The user is prompted via an instance of the {@link View} interface.
+ * The view can then use the given {@link Controller} instance to ask for the
+ * URI of the protected resource and get/set the secret key appropriately.
  *
  * @param  <K> the type of the prompting keys.
  * @see    PromptingKeyManager
@@ -100,7 +98,7 @@ extends AbstractKeyProvider<K> {
      * Proxies access to the key for {@link View} implementations.
      */
     @NotThreadSafe
-    private abstract class BaseController implements Controller<K> {
+    private abstract class AbstractController implements Controller<K> {
 
         @Override
         public final URI getResource() { return resource; }
@@ -116,7 +114,7 @@ extends AbstractKeyProvider<K> {
      * resource.
      */
     @NotThreadSafe
-    private final class WriteController extends BaseController {
+    private final class WriteController extends AbstractController {
         @Override
         public K getKeyClone() { return provider.getKeyClone(); }
     } // WriteController
@@ -126,7 +124,7 @@ extends AbstractKeyProvider<K> {
      * resource.
      */
     @NotThreadSafe
-    private final class ReadController extends BaseController {
+    private final class ReadController extends AbstractController {
         @Override
         public K getKeyClone() { throw new IllegalStateException(); }
     } // ReadController

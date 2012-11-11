@@ -19,16 +19,12 @@ implements PromptingKey.View<AesPbeParameters> {
     @Override
     public void promptKeyForWriting(Controller<AesPbeParameters> controller)
     throws UnknownKeyException {
-        // In a real implementation, you should actually prompt the user now
-        // for the password required for write access to the URI.
-        // You can obtain the URI of the encrypted resource like this:
+        // When prompting, you can obtain the URI of the protected resource
+        // like this:
         URI resource = controller.getResource();
 
-        // In this stub implementation, I just set a new fake key with our top
+        // In this stub implementation, I just set a new fake key with a top
         // secret password.
-        // Mind you, this really has to be a new key because old keys get wiped
-        // out for security.
-        // Also, a protective copy of the parameters is made.
         controller.setKeyClone(newFakeParameters());
     }
 
@@ -37,17 +33,21 @@ implements PromptingKey.View<AesPbeParameters> {
             Controller<AesPbeParameters> controller,
             boolean invalid)
     throws UnknownKeyException {
-        // In a real implementation, you should actually prompt the user now
-        // for the password required for read access to the URI.
-        // You can obtain the URI of the encrypted resource like this:
-        URI resource = controller.getResource();
-
-        // In this stub implementation, I just check if I have provided an
-        // invalid password on a previous attempt and throw up if that's been
-        // the case.
+        // The invalid parameter is set to true if and only if a previous
+        // call to this method resulted in an invalid key.
+        // In this stub implementation, I throw up if that's been the case.
+        // In a real application, you should notify the user and prompt her
+        // for the key again.
+        // It is an error to ignore this parameter and the result of doing so
+        // would be an endless loop.
         if (invalid) throw new PersistentUnknownKeyException();
 
-        // Otherwise, I create new fake paramters with our top secret password.
+        // When prompting, you can obtain the URI of the protected resource
+        // like this:
+        URI resource = controller.getResource();
+
+        // In this stub implementation, I just create new fake parameters with
+        // a top secret password.
         AesPbeParameters param = newFakeParameters();
 
         // If the user wants to change the password on the next write access,
@@ -56,8 +56,6 @@ implements PromptingKey.View<AesPbeParameters> {
         param.setChangeRequested(false);
 
         // Finally, I set the new parameters.
-        // Mind you, this really has to be a new key because old keys get reset
-        // for security.
         controller.setKeyClone(param);
     }
 

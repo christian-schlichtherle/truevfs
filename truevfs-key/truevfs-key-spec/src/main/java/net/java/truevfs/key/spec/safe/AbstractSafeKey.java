@@ -9,10 +9,11 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.NotThreadSafe;
 import static net.java.truevfs.key.spec.util.BufferUtils.*;
 
 /**
- * A safe key for writing and reading protected resources.
+ * A JavaBean which holds parameters for secret key encryption.
  * <p>
  * Subclasses need to be serializable with {@code Object(Out|In)putStream} and
  * {@code XML(En|De)coder}.
@@ -21,6 +22,7 @@ import static net.java.truevfs.key.spec.util.BufferUtils.*;
  * @param  <K> the type of this safe key.
  * @author Christian Schlichtherle
  */
+@NotThreadSafe
 public abstract class AbstractSafeKey<K extends AbstractSafeKey<K>>
 implements SafeKey<K>, Serializable {
 
