@@ -9,13 +9,11 @@ import java.awt.Window;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
-import net.java.truecommons.logging.LocalizedLogger;
 import net.java.truevfs.key.swing.io.FileComboBoxBrowser;
 
 /**
@@ -28,8 +26,8 @@ public final class AuthenticationPanel extends JPanel {
 
     private static final long serialVersionUID = 3876515923659236921L;
 
-    private static final ResourceBundle
-            bundle = ResourceBundle.getBundle(AuthenticationPanel.class.getName());
+    private static final ResourceBundle resources = ResourceBundle
+            .getBundle(AuthenticationPanel.class.getName());
     private static final File
             BASE_DIR = FileSystemView.getFileSystemView().getDefaultDirectory();
 
@@ -62,7 +60,7 @@ public final class AuthenticationPanel extends JPanel {
      */
     public void setPasswdPanel(final JPanel passwdPanel) {
         passwdPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        final String title = bundle.getString("tab.passwd");
+        final String title = resources.getString("tab.passwd");
         if (title.equals(tabs.getTitleAt(AUTH_PASSWD)))
             tabs.removeTabAt(AUTH_PASSWD);
         tabs.insertTab(title, null, passwdPanel, null, AUTH_PASSWD); // NOI18N
@@ -80,14 +78,21 @@ public final class AuthenticationPanel extends JPanel {
      * @return The key file.
      */
     public File getKeyFile() {
-        return new File((String) keyFile.getSelectedItem());
+        String path = (String) keyFile.getSelectedItem();
+        File file = new File(path);
+        return file.isAbsolute() ? file : new File(BASE_DIR.getPath(), path);
     }
 
     private void setKeyFile(final File file) {
+        String newPath = file.getPath();
+        {
+            final String baseDirPath = BASE_DIR.getPath();
+            if (newPath.startsWith(baseDirPath))
+                newPath = newPath.substring(baseDirPath.length() + 1); // cut off file separator, too.
+        }
         final String oldPath = (String) keyFile.getSelectedItem();
-        if (file.getPath().equals(oldPath))
-            return;
-        keyFile.setSelectedItem(file.getPath());
+        if (newPath.equals(oldPath)) return;
+        keyFile.setSelectedItem(newPath);
     }
 
     /**
@@ -99,10 +104,10 @@ public final class AuthenticationPanel extends JPanel {
         final int method = tabs.getSelectedIndex();
         switch (method) {
             case AUTH_PASSWD:
-                assert bundle.getString("tab.passwd").equals(tabs.getTitleAt(method));
+                assert resources.getString("tab.passwd").equals(tabs.getTitleAt(method));
                 break;
             case AUTH_KEY_FILE:
-                assert bundle.getString("tab.keyFile").equals(tabs.getTitleAt(method));
+                assert resources.getString("tab.keyFile").equals(tabs.getTitleAt(method));
                 break;
             default:
                 throw new AssertionError("Unsupported authentication method!");
@@ -135,9 +140,9 @@ public final class AuthenticationPanel extends JPanel {
         });
         keyFilePanel.setLayout(new java.awt.GridBagLayout());
 
-        keyFileLabel.setDisplayedMnemonic(bundle.getString("keyFile").charAt(0));
+        keyFileLabel.setDisplayedMnemonic(resources.getString("keyFile").charAt(0));
         keyFileLabel.setLabelFor(keyFile);
-        keyFileLabel.setText(bundle.getString("keyFile")); // NOI18N
+        keyFileLabel.setText(resources.getString("keyFile")); // NOI18N
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(0, 0, 5, 0);
@@ -152,7 +157,7 @@ public final class AuthenticationPanel extends JPanel {
         keyFilePanel.add(keyFile, gridBagConstraints);
 
         keyFileChooser.setIcon(UIManager.getIcon("FileView.directoryIcon"));
-        keyFileChooser.setToolTipText(bundle.getString("selectKeyFile.toolTip")); // NOI18N
+        keyFileChooser.setToolTipText(resources.getString("selectKeyFile.toolTip")); // NOI18N
         keyFileChooser.setName("keyFileChooser"); // NOI18N
         keyFileChooser.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -165,7 +170,7 @@ public final class AuthenticationPanel extends JPanel {
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 0);
         keyFilePanel.add(keyFileChooser, gridBagConstraints);
 
-        tabs.addTab(bundle.getString("tab.keyFile"), keyFilePanel); // NOI18N
+        tabs.addTab(resources.getString("tab.keyFile"), keyFilePanel); // NOI18N
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
@@ -175,21 +180,17 @@ public final class AuthenticationPanel extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void keyFileChooserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_keyFileChooserActionPerformed
-        final JFileChooser fc = new CustomFileChooser();
-        if (JFileChooser.APPROVE_OPTION == fc.showOpenDialog(this)) {
-            File file = fc.getSelectedFile();
-            try {
-                final String filePath = file.getCanonicalPath();
-                final String userDirPath = BASE_DIR.getPath();
-                if (filePath.startsWith(userDirPath))
-                    file = new File(filePath.substring(userDirPath.length() + 1)); // cut off file separator, too.
-                setKeyFile(file);
-            } catch (IOException ex) {
-                new LocalizedLogger(AuthenticationPanel.class)
-                        .warn("stackTrace", ex);
-            }
-        }
+        final JFileChooser fc = newFileChooser();
+        if (JFileChooser.APPROVE_OPTION == fc.showOpenDialog(this))
+            setKeyFile(fc.getSelectedFile());
     }//GEN-LAST:event_keyFileChooserActionPerformed
+
+    private static JFileChooser newFileChooser() {
+        final JFileChooser fc = new JFileChooser(BASE_DIR);
+        fc.setDialogTitle(resources.getString("fileChooser.title"));
+        fc.setFileHidingEnabled(false);
+        return fc;
+    }
 
     private void keyFilePanelAncestorWindowShown(net.java.truevfs.key.swing.util.PanelEvent evt) {//GEN-FIRST:event_keyFilePanelAncestorWindowShown
         // These are the things I hate Swing for: All I want to do here is to
@@ -240,20 +241,9 @@ public final class AuthenticationPanel extends JPanel {
             }
         });
     }//GEN-LAST:event_keyFilePanelAncestorWindowShown
-        
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private final javax.swing.JComboBox<String> keyFile = new javax.swing.JComboBox<String>();
     private final javax.swing.JTabbedPane tabs = new javax.swing.JTabbedPane();
     // End of variables declaration//GEN-END:variables
-
-    /** A file chooser which with a dialog title and disabled file hiding. */
-    private static final class CustomFileChooser extends JFileChooser {
-        private static final long serialVersionUID = 2361832976537648223L;
-        
-        CustomFileChooser() {
-            super(BASE_DIR);
-            setDialogTitle(bundle.getString("fileChooser.title"));
-            setFileHidingEnabled(false);
-        }
-    }
 }
