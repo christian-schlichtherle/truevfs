@@ -8,6 +8,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.ImplementationsShouldExtend;
 
 /**
  * A file system node is an entry which can implement multiple entry types and
@@ -15,6 +16,7 @@ import net.java.truecommons.shed.BitField;
  *
  * @author Christian Schlichtherle
  */
+@ImplementationsShouldExtend(FsAbstractNode.class)
 public interface FsNode extends Entry {
 
     /**

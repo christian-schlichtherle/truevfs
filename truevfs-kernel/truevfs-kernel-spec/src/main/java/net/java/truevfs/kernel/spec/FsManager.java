@@ -7,6 +7,7 @@ package net.java.truevfs.kernel.spec;
 import java.io.Closeable;
 import java.io.IOException;
 import net.java.truecommons.shed.Filter;
+import net.java.truecommons.shed.ImplementationsShouldExtend;
 
 /**
  * A container which creates {@linkplain FsController} file system controllers
@@ -18,6 +19,7 @@ import net.java.truecommons.shed.Filter;
  * @see    FsModel
  * @author Christian Schlichtherle
  */
+@ImplementationsShouldExtend(FsAbstractManager.class)
 public interface FsManager {
 
     /**

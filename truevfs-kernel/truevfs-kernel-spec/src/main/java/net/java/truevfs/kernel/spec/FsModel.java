@@ -5,16 +5,18 @@
 package net.java.truevfs.kernel.spec;
 
 import javax.annotation.CheckForNull;
+import net.java.truecommons.shed.ImplementationsShouldExtend;
 
 /**
  * Defines common properties of any file system.
  * <p>
  * Implementations should be thread-safe.
- * 
+ *
  * @see    FsController
  * @see    FsManager
  * @author Christian Schlichtherle
  */
+@ImplementationsShouldExtend(FsAbstractModel.class)
 public interface FsModel {
 
     /**
@@ -44,7 +46,7 @@ public interface FsModel {
      * <p>
      * An implementation may always return {@code false} if the associated
      * file system controller is stateless.
-     * 
+     *
      * @return {@code true} if and only if some state associated with the
      *         federated file system has been modified so that the
      *         corresponding {@link FsController} must not get discarded until

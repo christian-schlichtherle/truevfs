@@ -6,6 +6,7 @@ package net.java.truevfs.kernel.spec;
 
 import java.util.ServiceConfigurationError;
 import javax.annotation.CheckForNull;
+import net.java.truecommons.shed.ImplementationsShouldExtend;
 
 /**
  * Queries the scheme of the mount point of the given file system model in
@@ -17,6 +18,7 @@ import javax.annotation.CheckForNull;
  * @see    FsDriver
  * @author Christian Schlichtherle
  */
+@ImplementationsShouldExtend(FsAbstractMetaDriver.class)
 public interface FsMetaDriver {
 
     /**
@@ -33,7 +35,7 @@ public interface FsMetaDriver {
      *         ? null == model.getParent()
      *         : parent.getModel().equals(model.getParent())
      * }</pre>
-     * 
+     *
      * @param  manager the manager of the new file system controller.
      * @param  model the file system model.
      * @param  parent the nullable parent file system controller.
