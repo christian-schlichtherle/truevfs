@@ -13,16 +13,16 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.shed.BitField;
-import static net.java.truecommons.shed.Paths.cutTrailingSeparators;
-import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
-import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.Entry.Type;
 import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
 import net.java.truecommons.cio.InputService;
 import net.java.truecommons.cio.IoBufferPool;
 import net.java.truecommons.cio.OutputService;
+import net.java.truecommons.shed.BitField;
+import static net.java.truecommons.shed.Paths.cutTrailingSeparators;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 
 /**
  * An abstract factory for components required for accessing archive files.
@@ -69,7 +69,7 @@ extends FsDriver {
      * <p>
      * The implementation in the class {@link FsArchiveDriver} simply returns
      * the given controller.
-     * 
+     *
      * @param  controller the file system controller to decorate or return.
      *         Note that this controller may throw {@link RuntimeException}s
      *         for non-local control flow!
@@ -125,7 +125,7 @@ extends FsDriver {
      * <p>
      * This is an immutable property - multiple calls must return the same
      * value.
-     * 
+     *
      * @return The implementation in the class {@link FsArchiveDriver} returns
      *         {@code false} for backwards compatibility.
      */
@@ -142,7 +142,7 @@ extends FsDriver {
      * <p>
      * This is an immutable property - multiple calls must return the same
      * value.
-     * 
+     *
      * @return The implementation in the class {@link FsArchiveDriver} returns
      *         {@code false} for backwards compatibility.
      */
@@ -165,7 +165,7 @@ extends FsDriver {
      * The implementation in {@link FsArchiveDriver} simply forwards the call
      * to {@link #source}
      * and {@link #newInput(FsModel, FsInputSocketSource)}.
-     * 
+     *
      * @param  model the file system model for the target archive file.
      * @param  options the options for accessing the target archive file in the
      *         parent file system.
@@ -199,13 +199,13 @@ extends FsDriver {
     /**
      * Creates a new input service for reading archive entries for the given
      * {@code model} from the target archive file referenced by {@code source}.
-     * 
+     *
      * @param  model the file system model.
      * @param  source the source for reading the target archive file.
      * @return A new input service.
      *         Note that this service does <em>not</em> need to be thread-safe!
      * @throws IOException on any I/O error.
-     * @see    #newInput(FsModel, BitField, FsController, FsNodeName) 
+     * @see    #newInput(FsModel, BitField, FsController, FsNodeName)
      */
     @CreatesObligation
     protected abstract InputService<E> newInput(
@@ -220,7 +220,7 @@ extends FsDriver {
      * The implementation in {@link FsArchiveDriver} simply forwards the call
      * to {@link #sink}
      * and {@link #newOutput(FsModel, FsOutputSocketSink, InputService)}.
-     * 
+     *
      * @param  model the file system model for the target archive file.
      * @param  options the options for accessing the target archive file in the
      *         parent file system.
@@ -253,7 +253,7 @@ extends FsDriver {
     /**
      * Creates a new input service for writing archive entries for the given
      * {@code model} to the target archive file referenced by {@code sink}.
-     * 
+     *
      * @param  model the file system model.
      * @param  sink the sink for writing the target archive file.
      * @param  input the nullable {@link InputService} for the target archive
@@ -266,7 +266,7 @@ extends FsDriver {
      * @return A new output service for writing the target archive file.
      *         Note that this service does <em>not</em> need to be thread-safe!
      * @throws IOException on any I/O error.
-     * @see    #newOutput(FsModel, BitField, FsController, FsNodeName, InputService) 
+     * @see    #newOutput(FsModel, BitField, FsController, FsNodeName, InputService)
      */
     @CreatesObligation
     protected abstract OutputService<E> newOutput(
@@ -283,13 +283,13 @@ extends FsDriver {
      * before forwarding the call to the given controller.
      * The implementation in the class {@link FsArchiveDriver} simply forwards
      * the call to the given controller with the given options unaltered.
-     * 
+     *
      * @param  options the options for accessing the file system node.
      * @param  controller the controller to use for reading an artifact of this
      *         driver.
      * @param  name the node name.
      * @return A source for reading an artifact of this driver.
-     * @see    #newInput(FsModel, BitField, FsController, FsNodeName) 
+     * @see    #newInput(FsModel, BitField, FsController, FsNodeName)
      */
     protected FsInputSocketSource source(
             BitField<FsAccessOption> options,
@@ -307,13 +307,13 @@ extends FsDriver {
      * before forwarding the call to the given controller.
      * The implementation in the class {@link FsArchiveDriver} simply forwards
      * the call to the given controller with the given options unaltered.
-     * 
+     *
      * @param  options the options for accessing the file system node.
      * @param  controller the controller to use for writing an artifact of this
      *         driver.
      * @param  name the node name.
      * @return A sink for writing an artifact of this driver.
-     * @see    #newOutput(FsModel, BitField, FsController, FsNodeName, InputService) 
+     * @see    #newOutput(FsModel, BitField, FsController, FsNodeName, InputService)
      */
     protected FsOutputSocketSink sink(
             BitField<FsAccessOption> options,
@@ -326,7 +326,7 @@ extends FsDriver {
     /**
      * Equivalent to {@link #newEntry(BitField, String, Entry.Type, Entry)
      * newEntry(FsAccessOptions.NONE, name, type, template)}.
-     * 
+     *
      * @param  name the entry name.
      * @param  type the entry type.
      * @param  template if not {@code null}, then the new entry shall inherit
