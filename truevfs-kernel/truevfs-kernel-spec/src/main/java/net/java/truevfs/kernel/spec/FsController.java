@@ -15,6 +15,7 @@ import net.java.truecommons.cio.Entry.Type;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.ImplementationsShouldExtend;
 import static net.java.truevfs.kernel.spec.FsAssertion.Level.*;
 
 /**
@@ -68,6 +69,7 @@ import static net.java.truevfs.kernel.spec.FsAssertion.Level.*;
  * @see    <a href="http://www.ietf.org/rfc/rfc2119.txt">RFC 2119: Key words for use in RFCs to Indicate Requirement Levels</a>
  * @author Christian Schlichtherle
  */
+@ImplementationsShouldExtend(FsAbstractController.class)
 public interface FsController {
 
     /**
