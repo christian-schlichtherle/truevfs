@@ -196,9 +196,8 @@ public abstract class ZipRaesDriver extends JarDriver {
     }
 
     /**
-     * Returns a new {@link JarDriverEntry}, enforcing that the data gets
-     * {@code DEFLATED} when written, even if copying data from a
-     * {@code STORED} source entry.
+     * Returns a new {@link JarDriverEntry}, requesting that the data gets
+     * {@code DEFLATED} if no template is provided.
      * This feature strengthens the security level of the authentication
      * process and inhibits the use of an unencrypted temporary I/O entry
      * (usually a temporary file) in case the sink is not copied from a file

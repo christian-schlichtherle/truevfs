@@ -397,19 +397,16 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
                 entry.setSize(template.getSize(DATA));
             }
         }
-        if (options.get(COMPRESS))
-            entry.setMethod(DEFLATED);
-        else if (options.get(STORE))
-            entry.setMethod(STORED);
         if (DIRECTORY != type) {
             if (UNKNOWN == entry.getMethod()) {
-                final int method = getMethod();
+                final int method;
+                if (options.get(COMPRESS)) method = DEFLATED;
+                else if (options.get(STORE)) method = STORED;
+                else method = getMethod();
                 entry.setMethod(method);
-                if (STORED != method)
-                    entry.setCompressedSize(UNKNOWN);
+                if (STORED != method) entry.setCompressedSize(UNKNOWN);
             }
-            if (options.get(ENCRYPT))
-                entry.setEncrypted(true);
+            if (options.get(ENCRYPT)) entry.setEncrypted(true);
         }
         return entry;
     }
