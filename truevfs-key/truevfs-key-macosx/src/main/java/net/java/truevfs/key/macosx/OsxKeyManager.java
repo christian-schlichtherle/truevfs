@@ -89,7 +89,7 @@ extends AbstractKeyManager<P> {
 
                     @Override
                     public void visit(final Item item) throws KeychainException {
-                        param = (P) deserialize(item.getAttributes().get(GENERIC));
+                        param = (P) deserialize(item.getAttribute(GENERIC));
                         if (null == param) try {
                             param = keyClass.newInstance();
                         } catch (final InstantiationException | IllegalAccessException ex) {
@@ -127,24 +127,25 @@ extends AbstractKeyManager<P> {
                     final ByteBuffer newSecret = param.getSecret();
                     try {
                         final ByteBuffer newXml = serialize(param);
+                        final P newParam = (P) deserialize(newXml); // rip off transient fields
 
                         class Update implements Visitor {
                             @Override
-                            public void visit(Item item) throws KeychainException {
+                            public void visit(final Item item)
+                            throws KeychainException {
                                 {
-                                    final Map<AttributeClass, ByteBuffer>
-                                            attr = item.getAttributes();
-                                    final ByteBuffer oldXml = attr.get(GENERIC);
-                                    final P oldParam = (P) deserialize(oldXml);
-                                    if (!param.equals(oldParam)) {
-                                        attr.put(GENERIC, newXml);
-                                        item.putAttributes(attr);
-                                    }
-                                }
-                                {
-                                    final ByteBuffer oldSecret = item.getSecret();
+                                    final ByteBuffer oldSecret =
+                                            item.getSecret();
                                     if (!newSecret.equals(oldSecret))
                                         item.setSecret(newSecret);
+                                }
+                                {
+                                    final @CheckForNull ByteBuffer oldXml =
+                                            item.getAttribute(GENERIC);
+                                    final @CheckForNull P oldParam =
+                                            (P) deserialize(oldXml);
+                                    if (!newParam.equals(oldParam))
+                                        item.setAttribute(GENERIC, newXml);
                                 }
                             }
                         } // Update

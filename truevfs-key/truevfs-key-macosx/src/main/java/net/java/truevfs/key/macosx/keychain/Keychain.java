@@ -7,6 +7,7 @@ package net.java.truevfs.key.macosx.keychain;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.key.macosx.keychain.Keychain.AttributeClass;
 import static net.java.truevfs.key.macosx.keychain.Keychain.AttributeClass.*;
@@ -102,9 +103,21 @@ public abstract class Keychain implements AutoCloseable {
         ItemClass getItemClass() throws KeychainException;
 
         /**
-         * Returns the attributes of this item.
+         * Returns the value of the attribute with the given class.
          */
-        Map<AttributeClass, ByteBuffer> getAttributes()
+        @Nullable ByteBuffer getAttribute(AttributeClass id)
+        throws KeychainException;
+
+        /**
+         * Sets the value of the attribute with the given class.
+         */
+        void setAttribute(AttributeClass id, @CheckForNull ByteBuffer value)
+        throws KeychainException;
+
+        /**
+         * Returns all attributes of this item in a map.
+         */
+        Map<AttributeClass, ByteBuffer> getAttributeMap()
         throws KeychainException;
 
         /**
@@ -112,7 +125,7 @@ public abstract class Keychain implements AutoCloseable {
          *
          * @param attributes the map of attributes to put into this item.
          */
-        void putAttributes(Map<AttributeClass, ByteBuffer> attributes)
+        void putAttributeMap(Map<AttributeClass, ByteBuffer> attributes)
         throws KeychainException;
 
         /**

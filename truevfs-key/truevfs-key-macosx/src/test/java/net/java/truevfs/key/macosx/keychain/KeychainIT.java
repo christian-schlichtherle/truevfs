@@ -171,11 +171,11 @@ public class KeychainIT {
 
         @Override
         public void visit(final Item item) throws KeychainException {
-            final Map<AttributeClass, ByteBuffer> attributes = item.getAttributes();
+            final Map<AttributeClass, ByteBuffer> attributes = item.getAttributeMap();
             final String service = string(attributes.get(SERVICE));
             if (!this.service.equals(service)) return;
             attributes.put(id, byteBuffer(string));
-            item.putAttributes(attributes);
+            item.putAttributeMap(attributes);
             modified = true;
         }
     } // ModifyAttribute
@@ -194,7 +194,7 @@ public class KeychainIT {
 
         @Override
         public void visit(final Item item) throws KeychainException {
-            final Map<AttributeClass, ByteBuffer> attributes = item.getAttributes();
+            final Map<AttributeClass, ByteBuffer> attributes = item.getAttributeMap();
             final String service = string(attributes.get(SERVICE));
             if (!this.service.equals(service)) return;
             item.setSecret(byteBuffer(data));
@@ -216,7 +216,7 @@ public class KeychainIT {
 
         @Override
         public void visit(final Item item) throws KeychainException {
-            final ByteBuffer service = item.getAttributes().get(SERVICE);
+            final ByteBuffer service = item.getAttributeMap().get(SERVICE);
             if (!this.service.equals(string(service))) return;
             if (null != data) assertEquals(data, string(item.getSecret()));
             item.delete();
