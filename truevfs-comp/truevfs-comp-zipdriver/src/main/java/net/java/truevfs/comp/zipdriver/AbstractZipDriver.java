@@ -13,6 +13,14 @@ import java.util.zip.Deflater;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.cio.*;
+import static net.java.truecommons.cio.Entry.Access.WRITE;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import net.java.truecommons.cio.Entry.Type;
+import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
+import net.java.truecommons.key.spec.KeyManagerMap;
+import net.java.truecommons.key.spec.KeyProvider;
+import net.java.truecommons.key.spec.sl.KeyManagerMapLocator;
 import net.java.truecommons.logging.LocalizedLogger;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.HashMaps;
@@ -24,15 +32,7 @@ import net.java.truevfs.comp.zip.ZipOutputStreamParameters;
 import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
-import net.java.truecommons.cio.*;
-import static net.java.truecommons.cio.Entry.Access.WRITE;
-import static net.java.truecommons.cio.Entry.Size.DATA;
-import net.java.truecommons.cio.Entry.Type;
-import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
-import net.java.truecommons.key.spec.KeyManagerMap;
-import net.java.truecommons.key.spec.KeyProvider;
-import net.java.truecommons.key.spec.sl.KeyManagerMapLocator;
 import org.slf4j.Logger;
 
 /**
@@ -111,7 +111,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * with the given model.
      * <p>
      * The implementation in the class {@link ZipDriver} returns the
-     * expression {@code model.getMountPoint().getHierarchicalUri()}
+     * expression {@code model.getMountPoint().toHierarchicalUri()}
      * in order to improve the readability of the URI in comparison to the
      * expression {@code model.getMountPoint().getUri()}.
      *
@@ -120,7 +120,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * @see    <a href="http://java.net/jira/browse/TRUEZIP-72">#TRUEZIP-72</a>
      */
     public URI mountPointUri(FsModel model) {
-        return model.getMountPoint().getHierarchicalUri();
+        return model.getMountPoint().toHierarchicalUri();
     }
 
     /**

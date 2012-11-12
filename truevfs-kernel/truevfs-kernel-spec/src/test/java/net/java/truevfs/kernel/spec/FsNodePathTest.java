@@ -360,7 +360,7 @@ public class FsNodePathTest {
             { "bar", "bar" },
         }) {
             final FsNodePath path = FsNodePath.create(URI.create(params[0]));
-            final URI hierarchical = path.getHierarchicalUri();
+            final URI hierarchical = path.toHierarchicalUri();
             assertThat(hierarchical, equalTo(URI.create(params[1])));
         }
     }

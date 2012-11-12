@@ -17,6 +17,14 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.Entry.Access;
+import static net.java.truecommons.cio.Entry.Access.*;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import static net.java.truecommons.cio.Entry.Type.*;
+import static net.java.truecommons.cio.Entry.UNKNOWN;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.FilteringIterator;
 import net.java.truevfs.kernel.spec.FsAccessOption;
@@ -31,18 +39,10 @@ import net.java.truevfs.kernel.spec.FsSyncException;
 import net.java.truevfs.kernel.spec.FsSyncOption;
 import static net.java.truevfs.kernel.spec.FsSyncOptions.UMOUNT;
 import net.java.truevfs.kernel.spec.FsSyncWarningException;
-import net.java.truecommons.cio.Entry;
-import net.java.truecommons.cio.Entry.Access;
-import static net.java.truecommons.cio.Entry.Access.*;
-import static net.java.truecommons.cio.Entry.Size.DATA;
-import static net.java.truecommons.cio.Entry.Type.*;
-import static net.java.truecommons.cio.Entry.UNKNOWN;
-import net.java.truecommons.cio.InputSocket;
-import net.java.truecommons.cio.OutputSocket;
 
 /**
  * A {@link FileSystem} implementation for use with NIO.2.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
@@ -134,7 +134,7 @@ public final class TFileSystem extends FileSystem {
 
     /**
      * Returns {@code true}.
-     * 
+     *
      * @return {@code true}.
      */
     @Override
@@ -144,7 +144,7 @@ public final class TFileSystem extends FileSystem {
 
     /**
      * Returns {@code false}.
-     * 
+     *
      * @return {@code false}.
      */
     @Override
@@ -152,9 +152,9 @@ public final class TFileSystem extends FileSystem {
         return false;
     }
 
-    /** 
+    /**
      * Returns {@link File#separator}.
-     * 
+     *
      * @return {@link File#separator}.
      */
     @Override
@@ -165,7 +165,7 @@ public final class TFileSystem extends FileSystem {
     @Override
     public Iterable<Path> getRootDirectories() {
         return Collections.singleton((Path)
-                new TPath(getMountPoint().getHierarchicalUri().resolve(SEPARATOR)));
+                new TPath(getMountPoint().toHierarchicalUri().resolve(SEPARATOR)));
     }
 
     /** @throws UnsupportedOperationException always */
@@ -191,7 +191,7 @@ public final class TFileSystem extends FileSystem {
      * "{@code /}".
      * Any leading and trailing separators in the resulting path name current
      * discarded.
-     * 
+     *
      * @param first the first sub path string.
      * @param more optional sub path strings.
      */
@@ -316,7 +316,7 @@ public final class TFileSystem extends FileSystem {
         Stream(final Iterator<Path> it) {
             this.it = it;
         }
-        
+
         @Override
         public Iterator<Path> iterator() {
             if (consumed)

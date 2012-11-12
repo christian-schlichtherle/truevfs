@@ -10,11 +10,11 @@ import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 
 /**
  * Filters {@linkplain FsController file system controllers} so that the
- * {@linkplain FsMountPoint#getHierarchicalUri() hierarchical URI}
+ * {@linkplain FsMountPoint#toHierarchicalUri() hierarchical URI}
  * of the {@linkplain FsModel#getMountPoint() mount point} of their
  * {@linkplain FsController#getModel() file system model} must match the given
  * prefix.
- * 
+ *
  * @see    FsManager#sync
  * @author Christian Schlichtherle
  */
@@ -31,7 +31,7 @@ public final class FsControllerFilter implements Filter<FsController> {
      *        controllers.
      */
     public FsControllerFilter(final FsMountPoint prefix) {
-        final URI p = prefix.getHierarchicalUri();
+        final URI p = prefix.toHierarchicalUri();
         this.ps = p.getScheme();
         this.pp = p.getPath();
         this.ppl = pp.length();
@@ -40,11 +40,11 @@ public final class FsControllerFilter implements Filter<FsController> {
 
     @Override
     public boolean accept(final FsController controller) {
-        final URI mp = controller.getModel().getMountPoint().getHierarchicalUri();
+        final URI mp = controller.getModel().getMountPoint().toHierarchicalUri();
         final String mpp;
         return mp.getScheme().equals(ps)
                 && (mpp = mp.getPath()).startsWith(pp)
-                && (pps 
+                && (pps
                     || mpp.length() == ppl
                     || SEPARATOR_CHAR == mpp.charAt(ppl));
     }
