@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import net.java.truevfs.key.macosx.keychain.Keychain.AttributeClass;
 import net.java.truevfs.key.macosx.keychain.Keychain.Item;
 import net.java.truevfs.key.macosx.keychain.Keychain.Visitor;
-import static net.java.truevfs.key.spec.util.BufferUtils.*;
+import static net.java.truevfs.key.spec.util.Buffers.*;
 
 public class ListDefaultKeychain {
 

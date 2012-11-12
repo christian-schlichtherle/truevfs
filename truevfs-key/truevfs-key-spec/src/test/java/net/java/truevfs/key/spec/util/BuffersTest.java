@@ -6,7 +6,7 @@ package net.java.truevfs.key.spec.util;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
-import static net.java.truevfs.key.spec.util.BufferUtils.*;
+import static net.java.truevfs.key.spec.util.Buffers.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Test;
@@ -14,7 +14,7 @@ import org.junit.Test;
 /**
  * @author Christian Schlichtherle
  */
-public class BufferUtilsTest {
+public class BuffersTest {
 
     private static final String[] tests = { "", "föo", "bär" };
 
