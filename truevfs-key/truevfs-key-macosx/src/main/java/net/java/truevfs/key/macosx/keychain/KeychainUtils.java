@@ -55,7 +55,7 @@ final class KeychainUtils {
         return list;
     }
 
-    private static Pointer malloc(int size) {
+    private static Pointer malloc(final int size) {
         if (0 < size) return new Memory(size);
         else if (0 == size) return (Memory) new Memory(4).share(0, 0); // fix
         else throw new IllegalArgumentException("" + size);
