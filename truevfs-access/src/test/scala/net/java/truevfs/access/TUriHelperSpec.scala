@@ -19,7 +19,10 @@ import TUriHelper._
  */
 @RunWith(classOf[JUnitRunner])
 class TUriHelperSpec
-extends WordSpec with ShouldMatchers with PropertyChecks {
+extends WordSpec
+with ShouldMatchers
+with PropertyChecks
+with ParallelTestExecution {
 
   "Checking a URI" should {
     "result in a URISyntaxException" when {
