@@ -25,7 +25,7 @@ public class ListDefaultKeychain {
                 try {
                     out.printf("\nClass: %s\n", item.getItemClass());
                     for (final Entry<AttributeClass, ByteBuffer> entry
-                            : item.getAttributes().entrySet())
+                            : item.getAttributeMap().entrySet())
                         out.printf("Attribute: %s=%s\n",
                                 entry.getKey(), string(entry.getValue()));
                     if (data) out.printf("Data: %s\n", string(item.getSecret()));

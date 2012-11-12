@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import static net.java.truevfs.key.macosx.keychain.CoreFoundation.*;
 import net.java.truevfs.key.macosx.keychain.Keychain.AttributeClass;
@@ -149,11 +150,35 @@ final class KeychainImpl extends Keychain {
                         }
 
                         @Override
-                        public Map<AttributeClass, ByteBuffer> getAttributes()
+                        public @Nullable ByteBuffer getAttribute(
+                                final AttributeClass id)
+                        throws KeychainException {
+                            return getAttributes(KeychainUtils.info(id)).get(id);
+                        }
+
+                        @Override
+                        public void setAttribute(
+                                final AttributeClass id,
+                                final @CheckForNull ByteBuffer value)
+                        throws KeychainException {
+                            final Map<AttributeClass, ByteBuffer> attributes =
+                                    new EnumMap<>(AttributeClass.class);
+                            attributes.put(id, value);
+                            putAttributeMap(attributes);
+                        }
+
+                        @Override
+                        public Map<AttributeClass, ByteBuffer> getAttributeMap()
+                        throws KeychainException {
+                            return getAttributes(info(getItemClass()));
+                        }
+
+                        private Map<AttributeClass, ByteBuffer> getAttributes(
+                                final SecKeychainAttributeInfo info)
                         throws KeychainException {
                             final PointerByReference ar = new PointerByReference();
                             check(SecKeychainItemCopyAttributesAndData(
-                                    ir, info(getItemClass()), null, ar, null, null));
+                                    ir, info, null, ar, null, null));
                             final SecKeychainAttributeList
                                     l = new SecKeychainAttributeList(
                                         ar.getValue());
@@ -166,7 +191,8 @@ final class KeychainImpl extends Keychain {
                         }
 
                         @Override
-                        public void putAttributes(final Map<AttributeClass, ByteBuffer> attributes)
+                        public void putAttributeMap(
+                                final Map<AttributeClass, ByteBuffer> attributes)
                         throws KeychainException {
                             check(SecKeychainItemModifyAttributesAndData(
                                     ir,
@@ -195,9 +221,8 @@ final class KeychainImpl extends Keychain {
                         @Override
                         public void setSecret(final ByteBuffer secret)
                         throws KeychainException {
-                            final int length = secret.remaining();
                             check(SecKeychainItemModifyAttributesAndData(
-                                    ir, null, length, secret));
+                                    ir, null, secret.remaining(), secret));
                         }
 
                         @Override
