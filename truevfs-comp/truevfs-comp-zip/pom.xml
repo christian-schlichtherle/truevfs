@@ -21,10 +21,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-key-spec</artifactId>
-        </dependency>
-        <dependency>
             <groupId>net.java.truecommons</groupId>
             <artifactId>truecommons-io</artifactId>
         </dependency>
@@ -32,6 +28,10 @@
             <groupId>net.java.truecommons</groupId>
             <artifactId>truecommons-io</artifactId>
             <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-key-spec</artifactId>
         </dependency>
         <dependency>
             <groupId>net.java.truecommons</groupId>

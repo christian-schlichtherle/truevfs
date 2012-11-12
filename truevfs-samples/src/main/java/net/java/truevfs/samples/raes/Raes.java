@@ -16,7 +16,7 @@ import java.nio.file.Path;
 import net.java.truevfs.driver.zip.raes.KeyManagerRaesParameters;
 import net.java.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import net.java.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
-import net.java.truevfs.key.spec.sl.KeyManagerMapLocator;
+import net.java.truecommons.key.spec.sl.KeyManagerMapLocator;
 
 /**
  * Saves and restores the contents of arbitrary files to and from the RAES
@@ -64,7 +64,7 @@ public final class Raes {
 
     /**
      * Decrypts the given RAES file to the given plain file.
-     * 
+     *
      * @param authenticate If this is {@code true}, the channel data get
      *        authenticated.
      *        Note that this operation has linear complexity.

@@ -50,13 +50,13 @@
             <type>test-jar</type>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-key-spec</artifactId>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-io</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>
             <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-io</artifactId>
+            <artifactId>truecommons-key-spec</artifactId>
             <type>test-jar</type>
         </dependency>
         <dependency>

@@ -30,9 +30,9 @@ import static net.java.truecommons.cio.Entry.Size.DATA;
 import net.java.truecommons.cio.Entry.Type;
 import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
-import net.java.truevfs.key.spec.KeyManagerMap;
-import net.java.truevfs.key.spec.KeyProvider;
-import net.java.truevfs.key.spec.sl.KeyManagerMapLocator;
+import net.java.truecommons.key.spec.KeyManagerMap;
+import net.java.truecommons.key.spec.KeyProvider;
+import net.java.truecommons.key.spec.sl.KeyManagerMapLocator;
 import org.slf4j.Logger;
 
 /**

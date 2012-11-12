@@ -11,9 +11,9 @@ import net.java.truevfs.access.TPath;
 import net.java.truevfs.access.it.TPathITSuite;
 import net.java.truevfs.comp.zipdriver.TestWinZipAesDriver;
 import static net.java.truevfs.kernel.spec.FsAccessOption.ENCRYPT;
-import net.java.truevfs.key.spec.prompting.TestView;
-import static net.java.truevfs.key.spec.prompting.TestView.Action.CANCEL;
-import static net.java.truevfs.key.spec.prompting.TestView.Action.ENTER;
+import net.java.truecommons.key.spec.prompting.TestView;
+import static net.java.truecommons.key.spec.prompting.TestView.Action.CANCEL;
+import static net.java.truecommons.key.spec.prompting.TestView.Action.ENTER;
 import static org.junit.Assert.*;
 import org.junit.Test;
 

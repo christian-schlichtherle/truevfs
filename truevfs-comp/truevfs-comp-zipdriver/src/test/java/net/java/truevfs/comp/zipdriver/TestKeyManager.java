@@ -6,9 +6,9 @@ package net.java.truevfs.comp.zipdriver;
 
 import java.net.URI;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.key.spec.prompting.PromptingKey;
-import net.java.truevfs.key.spec.prompting.PromptingKey.View;
-import net.java.truevfs.key.spec.prompting.PromptingKeyManager;
+import net.java.truecommons.key.spec.prompting.PromptingKey;
+import net.java.truecommons.key.spec.prompting.PromptingKey.View;
+import net.java.truecommons.key.spec.prompting.PromptingKeyManager;
 
 /**
  * @param  <K> the type of the safe keys.

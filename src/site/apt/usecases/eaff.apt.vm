@@ -67,9 +67,8 @@ TConfig.current().setArchiveDetector(
     By using CTR mode, RAES supports transparent <random> read access to
     its encrypted payload, which makes reading a TZP file pretty fast.
 
-    Note that the <<<SafeZipRaesDriver>>> uses the
-    {{{../truevfs-key/apidocs/net/java/truevfs/key/spec/sl/KeyManagerMapLocator.html#SINGLETON}<<<KeyManagerMapLocator.SINGLETON>>>}}
-    to get a secret key manager.
+    Note that the <<<SafeZipRaesDriver>>> uses the TrueCommons KeyManager API
+    for password management by default.
     You can configure key management by following the instructions on the page
     {{{../truevfs-driver/truevfs-driver-tzp/key-management.html}Key Management}}.
 

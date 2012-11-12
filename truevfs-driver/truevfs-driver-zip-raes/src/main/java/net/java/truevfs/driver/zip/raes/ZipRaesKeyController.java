@@ -9,7 +9,7 @@ import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.comp.zipdriver.AbstractKeyController;
 import net.java.truevfs.driver.zip.raes.crypto.RaesKeyException;
 import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.key.spec.common.AesPbeParameters;
+import net.java.truecommons.key.spec.common.AesPbeParameters;
 
 /**
  * This file system controller decorates another file system controller in

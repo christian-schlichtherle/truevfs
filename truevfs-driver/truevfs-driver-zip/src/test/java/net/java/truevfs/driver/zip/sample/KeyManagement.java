@@ -17,13 +17,13 @@ import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsScheme;
-import net.java.truevfs.key.spec.KeyManagerMap;
-import net.java.truevfs.key.spec.UnknownKeyException;
-import net.java.truevfs.key.spec.common.AesKeyStrength;
-import net.java.truevfs.key.spec.common.AesPbeParameters;
-import net.java.truevfs.key.spec.prompting.PromptingKey.Controller;
-import net.java.truevfs.key.spec.prompting.PromptingKey.View;
-import net.java.truevfs.key.spec.prompting.PromptingKeyManagerMap;
+import net.java.truecommons.key.spec.KeyManagerMap;
+import net.java.truecommons.key.spec.UnknownKeyException;
+import net.java.truecommons.key.spec.common.AesKeyStrength;
+import net.java.truecommons.key.spec.common.AesPbeParameters;
+import net.java.truecommons.key.spec.prompting.PromptingKey.Controller;
+import net.java.truecommons.key.spec.prompting.PromptingKey.View;
+import net.java.truecommons.key.spec.prompting.PromptingKeyManagerMap;
 
 /**
  * Provides static utility methods to set passwords for WinZip AES encrypted

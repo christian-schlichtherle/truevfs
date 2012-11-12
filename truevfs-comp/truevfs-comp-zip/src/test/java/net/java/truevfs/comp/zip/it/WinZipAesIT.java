@@ -9,7 +9,7 @@ import net.java.truevfs.comp.zip.ZipKeyException;
 import net.java.truevfs.comp.zip.ZipFile;
 import net.java.truevfs.comp.zip.WinZipAesParameters;
 import net.java.truevfs.comp.zip.ZipOutputStream;
-import net.java.truevfs.key.spec.common.AesKeyStrength;
+import net.java.truecommons.key.spec.common.AesKeyStrength;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;

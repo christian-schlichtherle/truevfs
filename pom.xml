@@ -101,7 +101,7 @@ plug-in to its federated file system space.
             &lt;b&gt;${project.name} ${project.version}&lt;/b&gt;
         </header>
 
-        <truecommons.version>2.1</truecommons.version>
+        <truecommons.version>2.2-SNAPSHOT</truecommons.version>
 
         <!-- for documentation purposes only - mind the dash! -->
         <truezip-version>7.7</truezip-version>
@@ -115,7 +115,6 @@ plug-in to its federated file system space.
         <module>truevfs-driver</module>
         <module>truevfs-ext</module>
         <module>truevfs-kernel</module>
-        <module>truevfs-key</module>
         <module>truevfs-profile</module>
         <module>truevfs-samples</module>
     </modules>
@@ -279,48 +278,6 @@ plug-in to its federated file system space.
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-key-console</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-key-default</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-key-disable</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-key-hurlfb</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-key-macosx</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-key-spec</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-key-spec</artifactId>
-                <type>test-jar</type>
-                <version>${project.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>truevfs-key-swing</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>${project.groupId}</groupId>
                 <artifactId>truevfs-profile-base</artifactId>
                 <version>${project.version}</version>
                 <type>pom</type>
@@ -369,6 +326,48 @@ plug-in to its federated file system space.
                 <type>test-jar</type>
                 <version>${truecommons.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.java.truecommons</groupId>
+                <artifactId>truecommons-key-console</artifactId>
+                <version>${truecommons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.truecommons</groupId>
+                <artifactId>truecommons-key-default</artifactId>
+                <version>${truecommons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.truecommons</groupId>
+                <artifactId>truecommons-key-disable</artifactId>
+                <version>${truecommons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.truecommons</groupId>
+                <artifactId>truecommons-key-hurlfb</artifactId>
+                <version>${truecommons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.truecommons</groupId>
+                <artifactId>truecommons-key-macosx</artifactId>
+                <version>${truecommons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.truecommons</groupId>
+                <artifactId>truecommons-key-spec</artifactId>
+                <version>${truecommons.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.java.truecommons</groupId>
+                <artifactId>truecommons-key-spec</artifactId>
+                <type>test-jar</type>
+                <version>${truecommons.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.java.truecommons</groupId>
+                <artifactId>truecommons-key-swing</artifactId>
+                <version>${truecommons.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.java.truecommons</groupId>

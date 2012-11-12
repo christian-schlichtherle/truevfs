@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truevfs.key.spec.common.AesKeyStrength;
+import net.java.truecommons.key.spec.common.AesKeyStrength;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
