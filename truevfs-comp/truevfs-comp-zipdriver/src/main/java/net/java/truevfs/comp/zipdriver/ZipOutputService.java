@@ -18,6 +18,11 @@ import java.util.zip.CheckedOutputStream;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.cio.*;
+import net.java.truecommons.cio.Entry.Access;
+import net.java.truecommons.cio.Entry.Size;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import static net.java.truecommons.cio.Entry.UNKNOWN;
 import net.java.truecommons.io.DecoratingOutputStream;
 import net.java.truecommons.io.DisconnectingOutputStream;
 import net.java.truecommons.io.InputException;
@@ -30,16 +35,11 @@ import static net.java.truevfs.comp.zip.ZipEntry.STORED;
 import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsOutputSocketSink;
-import net.java.truecommons.cio.*;
-import net.java.truecommons.cio.Entry.Access;
-import net.java.truecommons.cio.Entry.Size;
-import static net.java.truecommons.cio.Entry.Size.DATA;
-import static net.java.truecommons.cio.Entry.UNKNOWN;
 
 /**
  * An output service for writing ZIP files.
  * This output service can only write one entry concurrently.
- * 
+ *
  * @param  <E> the type of the ZIP driver entries.
  * @see    ZipInputService
  * @author Christian Schlichtherle
@@ -96,7 +96,7 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
 
     /**
      * Returns the file system model provided to the constructor.
-     * 
+     *
      * @return The file system model provided to the constructor.
      */
     public FsModel getModel() {
@@ -180,9 +180,6 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
                 local.setSize(peer.getSize(DATA));
             if (peer instanceof AbstractZipDriverEntry) {
                 // Set up entry attributes for Raw Data Copying (RDC).
-                // A preset method in the entry takes priority.
-                // The ZIP.RAES drivers use this feature to enforce
-                // deflation for enhanced authentication security.
                 final AbstractZipDriverEntry zpeer = (AbstractZipDriverEntry) peer;
                 rdc = driver.rdc(this, local, zpeer);
                 if (rdc) {
@@ -233,7 +230,7 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
     /**
      * Returns whether this ZIP output service is busy writing an archive entry
      * or not.
-     * 
+     *
      * @return Whether this ZIP output service is busy writing an archive entry
      *         or not.
      */
