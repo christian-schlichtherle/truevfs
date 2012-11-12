@@ -16,7 +16,7 @@ import net.java.truecommons.io.ReadOnlyChannel;
 import net.java.truecommons.io.Source;
 import static net.java.truevfs.driver.zip.raes.crypto.Constants.HEADER_MIN_LEN;
 import static net.java.truevfs.driver.zip.raes.crypto.Constants.SIGNATURE;
-import net.java.truevfs.key.spec.common.AesKeyStrength;
+import net.java.truecommons.key.spec.common.AesKeyStrength;
 
 /**
  * This class implements a {@link SeekableByteChannel} for random read-only

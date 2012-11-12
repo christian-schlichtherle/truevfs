@@ -14,12 +14,12 @@ import net.java.truevfs.comp.zip.ZipKeyException;
 import net.java.truevfs.comp.zip.ZipParameters;
 import net.java.truevfs.comp.zip.ZipParametersProvider;
 import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.key.spec.KeyManager;
-import net.java.truevfs.key.spec.KeyManagerMap;
-import net.java.truevfs.key.spec.KeyProvider;
-import net.java.truevfs.key.spec.UnknownKeyException;
-import net.java.truevfs.key.spec.common.AesKeyStrength;
-import net.java.truevfs.key.spec.common.AesPbeParameters;
+import net.java.truecommons.key.spec.KeyManager;
+import net.java.truecommons.key.spec.KeyManagerMap;
+import net.java.truecommons.key.spec.KeyProvider;
+import net.java.truecommons.key.spec.UnknownKeyException;
+import net.java.truecommons.key.spec.common.AesKeyStrength;
+import net.java.truecommons.key.spec.common.AesPbeParameters;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS5PasswordToBytes;
 

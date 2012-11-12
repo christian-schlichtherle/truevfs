@@ -46,18 +46,18 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-key-console</artifactId>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-key-console</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-key-default</artifactId>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-key-default</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-key-swing</artifactId>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-key-swing</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>

@@ -19,6 +19,7 @@
         <netbeans.hint.jdkPlatform>JDK_1.7</netbeans.hint.jdkPlatform>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <scala.version>${scala-version}</scala.version>
+        <truecommons.version>${truecommons-version}</truecommons.version>
         <truevfs.version>${truevfs-version}</truevfs.version>
     </properties>
 
@@ -43,15 +44,15 @@
                 </exclusion-->
                 <!--exclusion>
                     <groupId>net.java.truevfs</groupId>
-                    <artifactId>truevfs-key-console</artifactId>
+                    <artifactId>truecommons-key-console</artifactId>
                 </exclusion-->
                 <!--exclusion>
                     <groupId>net.java.truevfs</groupId>
-                    <artifactId>truevfs-key-default</artifactId>
+                    <artifactId>truecommons-key-default</artifactId>
                 </exclusion-->
                 <!--exclusion>
                     <groupId>net.java.truevfs</groupId>
-                    <artifactId>truevfs-key-swing</artifactId>
+                    <artifactId>truecommons-key-swing</artifactId>
                 </exclusion-->
             </exclusions>
         </dependency>
@@ -63,17 +64,17 @@
              the class path. -->
         <!--dependency>
             <groupId>net.java.truevfs</groupId>
-            <artifactId>truevfs-key-disable</artifactId>
+            <artifactId>truecommons-key-disable</artifactId>
             <version>${truevfs.version}</version>
         </dependency-->
 
         <!-- Lets hurl the key prompting dialog when entering an invalid key.
-             Note that this dependency pulls in truevfs-key-swing as a
+             Note that this dependency pulls in truecommons-key-swing as a
              transitive dependency (see exclusion). -->
         <dependency>
-            <groupId>net.java.truevfs</groupId>
-            <artifactId>truevfs-key-hurlfb</artifactId>
-            <version>${truevfs.version}</version>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-key-hurlfb</artifactId>
+            <version>${truecommons.version}</version>
             <scope>runtime</scope>
         </dependency>
 

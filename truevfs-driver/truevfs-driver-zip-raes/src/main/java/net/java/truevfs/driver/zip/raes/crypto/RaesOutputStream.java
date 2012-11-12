@@ -10,7 +10,7 @@ import java.io.OutputStream;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.io.DecoratingOutputStream;
 import net.java.truecommons.io.Sink;
-import net.java.truevfs.key.spec.KeyStrength;
+import net.java.truecommons.key.spec.KeyStrength;
 import org.bouncycastle.crypto.Mac;
 
 /**

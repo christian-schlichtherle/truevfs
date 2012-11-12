@@ -55,8 +55,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-key-default</artifactId>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-key-default</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

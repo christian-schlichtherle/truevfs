@@ -8,7 +8,7 @@ import java.io.IOException;
 import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.comp.zip.ZipKeyException;
 import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.key.spec.common.AesPbeParameters;
+import net.java.truecommons.key.spec.common.AesPbeParameters;
 
 /**
  * This file system controller decorates another file system controller in

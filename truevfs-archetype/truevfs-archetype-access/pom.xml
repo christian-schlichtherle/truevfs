@@ -26,8 +26,8 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-key-hurlfb</artifactId>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-key-hurlfb</artifactId>
             <optional>true</optional>
         </dependency>
     </dependencies>
