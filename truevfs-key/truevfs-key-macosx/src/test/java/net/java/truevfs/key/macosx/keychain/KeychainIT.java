@@ -13,7 +13,7 @@ import static net.java.truevfs.key.macosx.keychain.Keychain.AttributeClass.*;
 import net.java.truevfs.key.macosx.keychain.Keychain.Item;
 import static net.java.truevfs.key.macosx.keychain.Keychain.ItemClass.*;
 import net.java.truevfs.key.macosx.keychain.Keychain.Visitor;
-import static net.java.truevfs.key.spec.util.BufferUtils.*;
+import static net.java.truevfs.key.spec.util.Buffers.*;
 import org.junit.AfterClass;
 import static org.junit.Assert.*;
 import org.junit.BeforeClass;

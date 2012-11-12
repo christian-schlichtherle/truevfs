@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
-import static net.java.truevfs.key.spec.util.BufferUtils.*;
+import static net.java.truevfs.key.spec.util.Buffers.*;
 
 /**
  * A JavaBean with properties for secret key management.
@@ -36,7 +36,9 @@ extends AbstractKey<K> implements SecretKey<K> {
     }
 
     @Override
-    public void reset() {
+    public void reset() { reset0(); }
+
+    private void reset0() {
         fill(secret, (byte) 0);
         secret = null;
     }
@@ -47,7 +49,7 @@ extends AbstractKey<K> implements SecretKey<K> {
         try {
             super.finalize();
         } finally {
-            fill(secret, (byte) 0);
+            reset0();
         }
     }
 
@@ -65,7 +67,7 @@ extends AbstractKey<K> implements SecretKey<K> {
 
     @Override
     public final void setSecret(final @CheckForNull ByteBuffer secret) {
-        fill(this.secret, (byte) 0);
+        reset0();
         this.secret = copy(secret);
     }
 

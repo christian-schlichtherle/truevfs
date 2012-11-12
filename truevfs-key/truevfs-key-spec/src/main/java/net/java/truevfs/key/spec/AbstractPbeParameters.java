@@ -10,7 +10,7 @@ import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
-import static net.java.truevfs.key.spec.util.BufferUtils.*;
+import static net.java.truevfs.key.spec.util.Buffers.*;
 
 /**
  * A JavaBean with properties for password based encryption (PBE).
