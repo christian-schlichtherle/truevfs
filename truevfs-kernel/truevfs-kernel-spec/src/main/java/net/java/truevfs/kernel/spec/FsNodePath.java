@@ -22,7 +22,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
  * The purpose of a file system path is to parse a {@link URI} and decompose it
  * into a file system {@link #getMountPoint() mount point} and
  * {@linkplain #getNodeName() node name}.
- * 
+ *
  * <h3><a name="specification"/>Specification</h3>
  * <p>
  * A path adds the following syntax constraints to a
@@ -51,7 +51,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
  * For opaque URIs of the form {@code jar:<url>!/<node>}, these constraints
  * build a close subset of the syntax allowed by a
  * {@link java.net.JarURLConnection}.
- * 
+ *
  * <h3><a name="examples"/>Examples</h3>
  * <p>
  * Examples for valid path URIs are:
@@ -114,7 +114,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
  * </tr>
  * </tbody>
  * </table>
- * 
+ *
  * <h3><a name="identities"/>Identities</h3>
  * <p>
  * For any path {@code p}, it's generally true that
@@ -122,7 +122,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
  * <p>
  * Furthermore, it's generally true that
  * {@code new FsNodePath(p.getMountPoint(), p.getNodeName()).equals(p)}.
- * 
+ *
  * <h3><a name="serialization"/>Serialization</h3>
  * <p>
  * This class supports serialization with both
@@ -239,7 +239,7 @@ implements Serializable, Comparable<FsNodePath> {
                 final int enupl = enup.length();
                 final String enuq = enu.getRawQuery();
                 final int enuql = null == enuq ? 0 : enuq.length() + 1;
-                final StringBuilder ssp = 
+                final StringBuilder ssp =
                         new StringBuilder(mpusspl + enupl + enuql)
                         .append(mpussp)
                         .append(enup);
@@ -362,11 +362,11 @@ implements Serializable, Comparable<FsNodePath> {
      * @return A URI which is recursively transformed from the URI of this
      *         path so that it's absolute and hierarchical.
      */
-    public URI getHierarchicalUri() {
+    public URI toHierarchicalUri() {
         final URI hierarchical = this.hierarchical;
         if (null != hierarchical) return hierarchical;
         if (uri.isOpaque()) {
-            final URI mpu = mountPoint.getHierarchicalUri();
+            final URI mpu = mountPoint.toHierarchicalUri();
             final URI enu = nodeName.getUri();
             try {
                 return this.hierarchical = enu.toString().isEmpty()

@@ -22,7 +22,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.*;
 /**
  * Scans {@link URI}s for prospective archive files and resolves them against
  * base {@link FsNodePath}s.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
@@ -38,7 +38,7 @@ final class TUriResolver {
     /**
      * Constructs a new URI resolver which uses the given
      * {@link TArchiveDetector} to resolve for archive files.
-     * 
+     *
      * @param detector the archive detector to use for scanning.
      */
     TUriResolver(TArchiveDetector detector) {
@@ -64,7 +64,7 @@ final class TUriResolver {
      * according to the syntax constraints for file system node paths.
      * No {@code ".."} segments may remain after resolving.
      * A query component is copied to the result.
-     * 
+     *
      * @param  base the base file system node path for resolving.
      * @param  uri the URI to resolve for prospective archive files.
      * @return the file system node path combined from the given {@code base}
@@ -91,7 +91,7 @@ final class TUriResolver {
             }
             final int ppl = pathPrefixLength(uri);
             if (0 < ppl) {
-                final URI baseUri = base.getHierarchicalUri().resolve(SEPARATOR_URI);
+                final URI baseUri = base.toHierarchicalUri().resolve(SEPARATOR_URI);
                 final String authority = uri.getAuthority();
                 final String rootPath = null != authority || path.startsWith(SEPARATOR)
                         ? path.substring(0, ppl)
@@ -146,11 +146,11 @@ final class TUriResolver {
 
     /**
      * Returns the nullable parent of the given file system node path.
-     * 
+     *
      * @param  path a file system node path.
      * @return The parent file system node path or null if {@code path} does
      *         not name a parent.
-     * @throws URISyntaxException 
+     * @throws URISyntaxException
      */
     static @Nullable FsNodePath parent(FsNodePath path)
     throws URISyntaxException {

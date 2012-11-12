@@ -605,11 +605,11 @@ public final class TFile extends File implements TRex {
      * <code>new {@link #TFile(FsNodePath, TArchiveDetector) TFile(path, null)}</code>
      *
      * @param  path a node path with an absolute
-     *         {@link FsNodePath#getHierarchicalUri() hierarchical URI} which has a
-     *         scheme component which is known by the current archive detector
-     *         {@code TConfig.current().getArchiveDetector()}.
+     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} which
+     *         has a scheme component which is known by the current archive
+     *         detector {@code TConfig.current().getArchiveDetector()}.
      * @throws IllegalArgumentException if the
-     *         {@link FsNodePath#getHierarchicalUri() hierarchical URI} of the
+     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} of the
      *         given node path does not conform to the syntax constraints for
      *         {@link File#File(URI)}.
      * @see    #getNodePath()
@@ -634,7 +634,7 @@ public final class TFile extends File implements TRex {
      * {@code file} in order to maintain interoperability with the super class!
      *
      * @param  path a path with an absolute
-     *         {@link FsNodePath#getHierarchicalUri() hierarchical URI} which
+     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} which
      *         has a scheme component which is known by the given
      *         {@code detector}.
      * @param  detector the archive detector to look up archive file system
@@ -643,14 +643,14 @@ public final class TFile extends File implements TRex {
      *         detector gets resolved by calling
      *         {@code TConfig.current().getArchiveDetector()}.
      * @throws IllegalArgumentException if the
-     *         {@link FsNodePath#getHierarchicalUri() hierarchical URI} of the
+     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} of the
      *         given node path does not conform to the syntax constraints for
      *         {@link File#File(URI)}.
      * @see    #getNodePath()
      */
     @ExpertFeature(INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public TFile(final FsNodePath path, final @CheckForNull TArchiveDetector detector) {
-        super(path.getHierarchicalUri());
+        super(path.toHierarchicalUri());
         parse(path, null != detector ? detector : TConfig.current().getArchiveDetector());
     }
 
@@ -693,7 +693,7 @@ public final class TFile extends File implements TRex {
     private TFile(
             final FsMountPoint mountPoint,
             final TArchiveDetector detector) {
-        super(mountPoint.getHierarchicalUri());
+        super(mountPoint.toHierarchicalUri());
         this.file = new File(super.getPath());
         this.detector = detector;
         final FsNodePath mpp = mountPoint.getPath();
@@ -1454,13 +1454,13 @@ public final class TFile extends File implements TRex {
      * <p>
      * More formally, let {@code a} and {@code b} be two TFile objects.
      * Then if the expression
-     * {@code a.getNodePath().getHierarchicalUri().equals(b.getNodePath().getHierarchicalUri())}
+     * {@code a.getNodePath().toHierarchicalUri().equals(b.getNodePath().toHierarchicalUri())}
      * is true, the expression {@code a.equals(b)} is also true.
      * <p>
      * Note that this does <em>not</em> work vice versa:
      * E.g. on Windows, the expression
      * {@code new TFile("file").equals(new TFile("FILE"))} is true, but
-     * {@code new TFile("file").getNodePath().getHierarchicalUri().equals(new TFile("FILE").getNodePath().getHierarchicalUri())}
+     * {@code new TFile("file").getNodePath().toHierarchicalUri().equals(new TFile("FILE").getNodePath().toHierarchicalUri())}
      * is false because {@link FsNodePath#equals(Object)} is case sensitive.
      *
      * @param that the object to get compared with this object
@@ -1485,13 +1485,13 @@ public final class TFile extends File implements TRex {
      * <p>
      * More formally, let {@code a} and {@code b} be two TFile objects.
      * Now if the expression
-     * {@code a.getNodePath().getHierarchicalUri().compareTo(b.getNodePath().getHierarchicalUri()) == 0}
+     * {@code a.getNodePath().toHierarchicalUri().compareTo(b.getNodePath().toHierarchicalUri()) == 0}
      * is true, then the expression {@code a.compareTo(b) == 0} is also true.
      * <p>
      * Note that this does <em>not</em> work vice versa:
      * E.g. on Windows, the expression
      * {@code new TFile("file").compareTo(new TFile("FILE")) == 0} is true, but
-     * {@code new TFile("file").getNodePath().getHierarchicalUri().compareTo(new TFile("FILE").getNodePath().getHierarchicalUri()) == 0}
+     * {@code new TFile("file").getNodePath().toHierarchicalUri().compareTo(new TFile("FILE").getNodePath().toHierarchicalUri()) == 0}
      * is false because {@link FsNodePath#equals(Object)} is case sensitive.
      *
      * @param that the file object to get compared with this object

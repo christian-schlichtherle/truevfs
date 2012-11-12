@@ -11,7 +11,7 @@ import net.java.truevfs.kernel.spec.FsModel;
 
 /**
  * A controller for a {@linkplain FsModel file system model}.
- * 
+ *
  * @param  <M> the type of the JMX mediator.
  * @author Christian Schlichtherle
  */
@@ -29,7 +29,7 @@ extends InstrumentingModel<M> implements JmxComponent {
     private ObjectName objectName() {
         return mediator.nameBuilder(FsModel.class)
                 .put("mountPoint", ObjectName.quote(
-                    model.getMountPoint().getHierarchicalUri().toString()))
+                    model.getMountPoint().toHierarchicalUri().toString()))
                 .get();
     }
 

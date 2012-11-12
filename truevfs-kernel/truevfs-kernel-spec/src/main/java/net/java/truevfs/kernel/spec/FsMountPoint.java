@@ -18,7 +18,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
 
 /**
  * Addresses a file system mount point.
- * 
+ *
  * <h3><a name="specification"/>Specification</h3>
  * <p>
  * A mount point adds the following syntax constraints to a
@@ -41,7 +41,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
  *     The {@link #getPath() path} component property of the mount point is set
  *     to {@code null} in this case.
  * </ol>
- * 
+ *
  * <h3><a name="examples"/>Examples</h3>
  * <p>
  * Examples for valid mount point URIs are:
@@ -110,7 +110,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
  * </tr>
  * </tbody>
  * </table>
- * 
+ *
  * <h3><a name="identities"/>Identities</h3>
  * <p>
  * For any mount point {@code m}, it's generally true that
@@ -118,7 +118,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
  * <p>
  * For any mount point {@code m} with an opaque URI, it's generally true that
  * {@code new FsMountPoint(m.getScheme(), m.getPath()).equals(m)}.
- * 
+ *
  * <h3><a name="serialization"/>Serialization</h3>
  * <p>
  * This class supports serialization with both
@@ -358,12 +358,12 @@ implements Serializable, Comparable<FsMountPoint> {
      * @return A URI which is recursively transformed from the URI of this
      *         mount point so that it's absolute and hierarchical.
      */
-    public URI getHierarchicalUri() {
+    public URI toHierarchicalUri() {
         final URI hierarchical = this.hierarchical;
         return null != hierarchical
                 ? hierarchical
                 : (this.hierarchical = uri.isOpaque()
-                    ? path.getHierarchicalUri()
+                    ? path.toHierarchicalUri()
                     : uri);
     }
 
@@ -393,7 +393,7 @@ implements Serializable, Comparable<FsMountPoint> {
      * system,
      * or {@code null} iff this mount point's {@link #getUri URI} doesn't name
      * a parent mount point, that is if and only if it's hierarchical.
-     * 
+     *
      * @return The nullable parent component.
      */
     public @Nullable FsMountPoint getParent() {

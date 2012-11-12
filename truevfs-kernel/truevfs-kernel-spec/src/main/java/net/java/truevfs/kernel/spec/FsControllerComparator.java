@@ -9,7 +9,7 @@ import java.util.Comparator;
 /**
  * Compares {@linkplain FsController file system controllers} in reverse order
  * of the
- * {@linkplain FsMountPoint#getHierarchicalUri() hierarchical URI}
+ * {@linkplain FsMountPoint#toHierarchicalUri() hierarchical URI}
  * of the {@linkplain FsModel#getMountPoint() mount point} of their
  * {@linkplain FsController#getModel() file system model}.
  * When applied to a list of file system controllers for
@@ -17,7 +17,7 @@ import java.util.Comparator;
  * archive file system gets {@code sync()}ed before their parent file system so
  * that all file systems reflect all changes once the list has been completely
  * processed.
- * 
+ *
  * @see    FsControllerStream
  * @author Christian Schlichtherle
  */
@@ -25,7 +25,7 @@ public class FsControllerComparator implements Comparator<FsController> {
 
     @Override
     public int compare(FsController o1, FsController o2) {
-        return o2.getModel().getMountPoint().getHierarchicalUri().compareTo(
-                o1.getModel().getMountPoint().getHierarchicalUri());
+        return o2.getModel().getMountPoint().toHierarchicalUri().compareTo(
+                o1.getModel().getMountPoint().toHierarchicalUri());
     }
 }
