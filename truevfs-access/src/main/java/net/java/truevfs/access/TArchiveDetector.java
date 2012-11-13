@@ -7,6 +7,7 @@ package net.java.truevfs.access;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.*;
+import java.util.Map.Entry;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import javax.inject.Provider;
@@ -49,7 +50,7 @@ import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
  * the archive detector to recognize ZIP and JAR files in a path.
  * The same would be true for {@code "||.ZiP||.JaR||ZIP||JAR||"},
  * but this notation is discouraged because it's not in canonical form.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -70,11 +71,24 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
      */
     public static final TArchiveDetector ALL = new TArchiveDetector(null);
 
-    private static Map<FsScheme, FsDriver> newMap(final Object[][] config) {
+    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
+    private static ExtensionSet extensions(
+            final Provider<Map<FsScheme, FsDriver>> provider) {
+        if (provider instanceof TArchiveDetector)
+            return new ExtensionSet(((TArchiveDetector) provider).extensions);
+        final Map<FsScheme, FsDriver> map = provider.get();
+        final ExtensionSet set = new ExtensionSet();
+        for (final Entry<FsScheme, FsDriver> entry : map.entrySet())
+            if (entry.getValue().isArchiveDriver())
+                set.add(entry.getKey().toString());
+        return set;
+    }
+
+    private static Map<FsScheme, FsDriver> map(final Object[][] config) {
         final Map<FsScheme, FsDriver> drivers = new HashMap<>(
                 HashMaps.initialCapacity(config.length) * 2); // heuristics
         for (final Object[] param : config) {
-            final Collection<FsScheme> schemes = toSchemes(param[0]);
+            final Collection<FsScheme> schemes = schemes(param[0]);
             if (schemes.isEmpty())
                 throw new IllegalArgumentException("No file system schemes!");
             final FsDriver driver = Loader.promote(param[1], FsDriver.class);
@@ -83,7 +97,7 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
         return Collections.unmodifiableMap(drivers);
     }
 
-    private static Collection<FsScheme> toSchemes(final Object o) {
+    private static Collection<FsScheme> schemes(final Object o) {
         final Collection<FsScheme> set = new TreeSet<>();
         try {
             if (o instanceof Collection<?>)
@@ -100,15 +114,14 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
         return set;
     }
 
-    private final Map<FsScheme, FsDriver> drivers;
-
     /**
-     * The canonical string respresentation of the set of extensions recognized
-     * by this archive detector.
+     * The set of extensions recognized by this archive detector.
      * This set is used to filter the registered archive file extensions in
      * {@link #drivers}.
      */
-    private final String extensions;
+    private final ExtensionSet extensions;
+
+    private final Map<FsScheme, FsDriver> drivers;
 
     /**
      * Equivalent to
@@ -136,38 +149,22 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
      */
     public TArchiveDetector(final Provider<Map<FsScheme, FsDriver>> provider,
                             final @CheckForNull String extensions) {
-        final Map<FsScheme, FsDriver> inDrivers = provider.get();
-        final ExtensionSet inExtensions;
-        final Map<FsScheme, FsDriver> outDrivers;
-        if (null != extensions) {
-            inExtensions = new ExtensionSet(extensions);
-            outDrivers = new HashMap<>(initialCapacity(inDrivers.size()));
+        final ExtensionSet available = extensions(provider);
+        ExtensionSet accepted;
+        if (null == extensions) {
+            accepted = available;
         } else {
-            inExtensions = null;
-            outDrivers = inDrivers;
-        }
-        final ExtensionSet outExtensions = new ExtensionSet();
-        for (final Map.Entry<FsScheme, FsDriver> entry : inDrivers.entrySet()) {
-            final FsDriver driver = entry.getValue();
-            assert null != driver;
-            final FsScheme scheme = entry.getKey();
-            final boolean ad = driver.isArchiveDriver();
-            if (null != inExtensions) {
-                final boolean accepted = inExtensions.contains(scheme.toString());
-                if (!ad || accepted) outDrivers.put(scheme, driver);
-                if (ad && accepted) outExtensions.add(scheme.toString());
-            } else {
-                if (ad) outExtensions.add(scheme.toString());
+            accepted = new ExtensionSet(extensions);
+            if (accepted.retainAll(available)) {
+                accepted = new ExtensionSet(extensions);
+                accepted.removeAll(available);
+                assert !accepted.isEmpty();
+                throw new IllegalArgumentException(
+                        "\"" + accepted + "\" (no archive driver installed for these extensions)");
             }
         }
-        if (null != inExtensions) {
-            inExtensions.removeAll(outExtensions);
-            if (!inExtensions.isEmpty())
-                throw new IllegalArgumentException(
-                        "\"" + inExtensions + "\" (no archive driver installed for these extensions)");
-        }
-        this.drivers = Collections.unmodifiableMap(outDrivers);
-        this.extensions = outExtensions.toString();
+        this.extensions = accepted;
+        this.drivers = provider.get();
     }
 
     /**
@@ -184,7 +181,7 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
      * decorating the configuration of {@code provider} with
      * mappings for all canonicalized extensions in {@code extensions} to
      * {@code driver}.
-     * 
+     *
      * @param  provider the file system driver provider to decorate.
      * @param  extensions A list of file name extensions which shall identify
      *         prospective archive files.
@@ -209,7 +206,7 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
      * Creates a new {@code TArchiveDetector} by
      * decorating the configuration of {@code provider} with
      * mappings for all entries in {@code config}.
-     * 
+     *
      * @param  provider the file system driver provider to decorate.
      * @param  config an array of key-value pair arrays.
      *         The first element of each inner array must either be a
@@ -232,13 +229,13 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
      * @see    ExtensionSet Syntax contraints for extension lists.
      */
     public TArchiveDetector(Provider<Map<FsScheme, FsDriver>> provider, Object[][] config) {
-        this(provider, newMap(config));
+        this(provider, map(config));
     }
 
     /**
      * Constructs a new {@code TArchiveDetector} by decorating the given driver
      * provider with mappings for all entries in {@code config}.
-     * 
+     *
      * @param  provider the file system driver provider to decorate.
      * @param  config a map of file system schemes to file system drivers.
      *         {@code null} may be used to <i>shadow</i> a mapping for an equal
@@ -254,32 +251,24 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
      */
     public TArchiveDetector(final Provider<Map<FsScheme, FsDriver>> provider,
                             final Map<FsScheme, FsDriver> config) {
-        final Map<FsScheme, FsDriver> inDrivers = provider.get();
-        final Map<FsScheme, FsDriver> 
-                outDrivers = new HashMap<>(initialCapacity(inDrivers.size()));
-        final ExtensionSet outExtensions = new ExtensionSet();
-        for (final Map.Entry<FsScheme, FsDriver> entry : inDrivers.entrySet()) {
-            final FsDriver driver = entry.getValue();
-            assert null != driver;
-            /*if (null == driver)
-                continue;*/
-            final FsScheme scheme = entry.getKey();
-            outDrivers.put(scheme, driver);
-            if (driver.isArchiveDriver()) outExtensions.add(scheme.toString());
-        }
+        final ExtensionSet extensions = extensions(provider);
+        final Map<FsScheme, FsDriver> available = provider.get();
+        final Map<FsScheme, FsDriver> drivers = new HashMap<>(
+                initialCapacity(available.size() + config.size()));
+        drivers.putAll(available);
         for (final Map.Entry<FsScheme, FsDriver> entry : config.entrySet()) {
             final FsScheme scheme = entry.getKey();
             final FsDriver driver = entry.getValue();
             if (null != driver) {
-                outDrivers.put(scheme, driver);
-                outExtensions.add(scheme.toString());
+                extensions.add(scheme.toString());
+                drivers.put(scheme, driver);
             } else {
-                outDrivers.remove(scheme);
-                outExtensions.remove(scheme.toString());
+                extensions.remove(scheme.toString());
+                //drivers.remove(scheme); // keep the driver!
             }
         }
-        this.drivers = Collections.unmodifiableMap(outDrivers);
-        this.extensions = outExtensions.toString();
+        this.extensions = extensions;
+        this.drivers = Collections.unmodifiableMap(drivers);
     }
 
     /**
@@ -295,12 +284,12 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
      * @see    #TArchiveDetector(String)
      * @see    ExtensionSet Syntax constraints for extension lists.
      */
-    public String getExtensions() { return extensions; }
+    public String getExtensions() { return extensions.toString(); }
 
     /**
      * Returns the immutable map of file system drivers.
      * This is equivalent to {@link #get()}.
-     * 
+     *
      * @return the immutable map of file system drivers.
      */
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
@@ -333,26 +322,25 @@ public final class TArchiveDetector extends FsAbstractMetaDriver {
         int i = path.lastIndexOf(File.separatorChar) + 1;
         path = path.substring(i);//.toLowerCase(Locale.ROOT);
         final int l = path.length();
-        FsScheme scheme;
         for (i = 0; 0 < (i = path.indexOf('.', i) + 1) && i < l ;) {
-            try {
-                scheme = new FsScheme(path.substring(i));
+            final String scheme = path.substring(i);
+            if (extensions.contains(scheme)) try {
+                return new FsScheme(scheme);
             } catch (URISyntaxException noSchemeNoArchiveBadLuck) {
                 continue; // TODO: http://java.net/jira/browse/TRUEZIP-132
             }
-            final FsDriver driver = drivers.get(scheme);
-            if (null != driver && driver.isArchiveDriver()) return scheme;
         }
         return null;
     }
 
     @Override
+    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     public boolean equals(Object other) {
         if (this == other) return true;
         if (!(other instanceof TArchiveDetector)) return false;
         final TArchiveDetector that = (TArchiveDetector) other;
-        return this.extensions.equals(that.getExtensions())
-                && this.drivers.equals(that.getDrivers());
+        return this.extensions.equals(that.extensions)
+                && this.drivers.equals(that.drivers);
     }
 
     @Override
