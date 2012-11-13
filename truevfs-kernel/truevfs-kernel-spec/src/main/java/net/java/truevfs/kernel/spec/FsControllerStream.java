@@ -10,10 +10,10 @@ import net.java.truecommons.shed.Stream;
 /**
  * An ordered stream of file system controllers.
  * The controllers are sorted in reverse order of the
- * {@linkplain FsMountPoint#getHierarchicalUri() hierarchical URI}
+ * {@linkplain FsMountPoint#toHierarchicalUri() hierarchical URI}
  * of the {@linkplain FsModel#getMountPoint() mount point} of their
  * {@linkplain FsController#getModel() file system model}.
- * 
+ *
  * @see    FsControllerComparator
  * @author Christian Schlichtherle
  */
@@ -21,7 +21,7 @@ public interface FsControllerStream extends Stream<FsController> {
 
     /**
      * Returns the number of file system controllers in this stream.
-     * 
+     *
      * @return The number of file system controllers in this stream.
      */
     int size();
@@ -29,13 +29,13 @@ public interface FsControllerStream extends Stream<FsController> {
     /**
      * Returns a new iterator which enumerates the file system controllers in
      * reverse order of the
-     * {@linkplain FsMountPoint#getHierarchicalUri() hierarchical URI} of the
+     * {@linkplain FsMountPoint#toHierarchicalUri() hierarchical URI} of the
      * {@linkplain FsModel#getMountPoint() mount point} of their
      * {@linkplain FsController#getModel() file system model}.
-     * 
+     *
      * @return A new iterator which enumerates the file system controllers in
      *         reverse order of the
-     *         {@linkplain FsMountPoint#getHierarchicalUri() hierarchical URI}
+     *         {@linkplain FsMountPoint#toHierarchicalUri() hierarchical URI}
      *         of the {@linkplain FsModel#getMountPoint() mount point} of their
      *         {@linkplain FsController#getModel() file system model}.
      */
