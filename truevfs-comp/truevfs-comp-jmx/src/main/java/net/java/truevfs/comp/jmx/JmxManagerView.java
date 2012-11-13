@@ -13,11 +13,10 @@ import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.StandardMBean;
 import net.java.truecommons.shed.Filter;
-import net.java.truecommons.shed.SuppressedExceptionBuilder;
+import net.java.truecommons.shed.Visitor;
 import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsControllerVisitor;
 import net.java.truevfs.kernel.spec.FsManager;
-import net.java.truevfs.kernel.spec.FsSimpleControllerSyncVisitor;
+import net.java.truevfs.kernel.spec.FsControllerSyncVisitor;
 import net.java.truevfs.kernel.spec.FsSyncException;
 import net.java.truevfs.kernel.spec.FsSyncOptions;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
@@ -115,24 +114,15 @@ extends StandardMBean implements JmxManagerMXBean {
 
     private int count(final Filter<? super FsController> filter) {
 
-        @ThreadSafe
-        final class Visitor
-        extends AtomicInteger implements FsControllerVisitor<IOException> {
-            @Override
-            public Filter<? super FsController> filter() { return filter; }
-
-            @Override
-            public SuppressedExceptionBuilder<IOException> builder() {
-                return new SuppressedExceptionBuilder<>();
-            }
-
+        class CountingVisitor
+        extends AtomicInteger implements Visitor<FsController, IOException> {
             @Override
             public void visit(FsController controller) { incrementAndGet(); }
         } // Visitor
 
-        final Visitor visitor = new Visitor();
+        final CountingVisitor visitor = new CountingVisitor();
         try {
-            manager.visit(visitor);
+            manager.visit(filter, visitor);
         } catch (IOException ex) {
             throw new AssertionError(ex);
         }
@@ -146,7 +136,7 @@ extends StandardMBean implements JmxManagerMXBean {
 
     @Override
     public void sync() throws FsSyncException {
-        FsManagerLocator.SINGLETON.get().sync(
-                new FsSimpleControllerSyncVisitor(FsSyncOptions.NONE));
+        FsManagerLocator.SINGLETON.get().sync(Filter.ACCEPT_ANY,
+                new FsControllerSyncVisitor(FsSyncOptions.NONE));
     }
 }

@@ -113,9 +113,12 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
     }
   } // ManagedModel
 
-  override def sync(visitor: FsControllerSyncVisitor) {
-    if (visitor.filter == Filter.ACCEPT_ANY) SyncShutdownHook remove ()
-    visit(visitor)
+  override def sync(
+    filter: Filter[_ >: FsController],
+    visitor: Visitor[_ >: FsController, FsSyncException])
+  {
+    if (filter == Filter.ACCEPT_ANY) SyncShutdownHook remove ()
+    visit(filter, visitor)
   }
 
   /** Returns a new stream which represents a snapshot of the managed file
