@@ -125,9 +125,12 @@ extends FsDriver {
      * <p>
      * This is an immutable property - multiple calls must return the same
      * value.
+     * <p>
+     * The default value of this property is {@code false} as defined by the
+     * implementation in the class {@link FsArchiveDriver}.
      *
-     * @return The implementation in the class {@link FsArchiveDriver} returns
-     *         {@code false} for backwards compatibility.
+     * @return {@code true} if and only if the archive files produced by this
+     *         archive driver may contain redundant archive entry contents.
      */
     public boolean getRedundantContentSupport() { return false; }
 
@@ -142,9 +145,12 @@ extends FsDriver {
      * <p>
      * This is an immutable property - multiple calls must return the same
      * value.
+     * <p>
+     * The default value of this property is {@code false} as defined by the
+     * implementation in the class {@link FsArchiveDriver}.
      *
-     * @return The implementation in the class {@link FsArchiveDriver} returns
-     *         {@code false} for backwards compatibility.
+     * @return {@code true} if and only if the archive files produced by this
+     *         archive driver may contain redundant archive entry meta data.
      */
     public boolean getRedundantMetaDataSupport() { return false; }
 
