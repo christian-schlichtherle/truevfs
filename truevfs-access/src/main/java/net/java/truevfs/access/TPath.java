@@ -20,6 +20,8 @@ import net.java.truecommons.cio.*;
 import net.java.truecommons.shed.*;
 import static net.java.truecommons.shed.HashMaps.*;
 import net.java.truecommons.shed.Paths;
+import static net.java.truevfs.access.ExpertFeature.Level.*;
+import static net.java.truevfs.access.ExpertFeature.Reason.*;
 import static net.java.truevfs.access.TUriHelper.*;
 import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
@@ -533,6 +535,8 @@ public final class TPath implements Path, TRex {
      * @see    TFileSystem#close()
      * @see    TVFS#umount()
      */
+    @ExpertFeature( level=INTERMEDIATE,
+                    value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public TPath toNonArchivePath() {
         if (!isArchive()) return this;
         try (final TConfig config = TConfig.open()) {

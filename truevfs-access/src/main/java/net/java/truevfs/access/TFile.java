@@ -939,6 +939,8 @@ public final class TFile extends File implements TRex {
      *         archive file name patterns in the last path name segment.
      * @see    TVFS#umount(TFile)
      */
+    @ExpertFeature( level=INTERMEDIATE,
+                    value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public TFile toNonArchiveFile() {
         if (!isArchive()) return this;
         return new TFile(getParentFile(), getName(), TArchiveDetector.NULL);
