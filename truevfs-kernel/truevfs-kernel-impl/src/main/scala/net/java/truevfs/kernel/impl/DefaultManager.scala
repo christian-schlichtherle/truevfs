@@ -118,7 +118,7 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
     visitor: Visitor[_ >: FsController, FsSyncException])
   {
     if (filter == Filter.ACCEPT_ANY) SyncShutdownHook remove ()
-    visit(filter, visitor)
+    super.sync(filter, visitor)
   }
 
   /** Returns a new stream which represents a snapshot of the managed file
