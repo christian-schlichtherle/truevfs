@@ -54,7 +54,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
       val ef = new FsControllerFilter(emp) // evicted filter
       if (!(mounted exists ef)) {
         try {
-          manager sync new FsSimpleControllerSyncVisitor(FsSyncOptions.NONE, ef)
+          manager sync (ef, new FsControllerSyncVisitor(FsSyncOptions.NONE))
           it remove ()
         } catch {
           case ex: FsSyncException =>
@@ -82,15 +82,18 @@ extends JmxManager[PaceMediator](mediator, manager) {
     builder check ()
   }
 
-  override def sync(visitor: FsControllerSyncVisitor) {
-    val filter = visitor.filter
+  override def sync(filter: AnyControllerFilter,
+                    visitor: ControllerSyncVisitor) {
     val it = evicted.iterator
     while (it.hasNext) if (filter accept it.next) it remove ()
-    mounted sync (manager, visitor)
+    mounted sync (manager, filter, visitor)
   }
 }
 
 private object PaceManager {
+
+  type AnyControllerFilter = Filter[_ >: FsController]
+  type ControllerSyncVisitor = Visitor[_ >: FsController, FsSyncException]
 
   val logger = new LocalizedLogger(classOf[PaceManager])
 
@@ -176,39 +179,36 @@ private object PaceManager {
       locked(writeLock)(map put (mp, controller))
     }
 
-    def sync(manager: FsManager, visitor: FsControllerSyncVisitor) {
-      manager sync new FsControllerSyncVisitor {
-        override def filter =
-          new Filter[FsController] {
-            override def accept(controller: FsController) = {
-              val accepted = visitor.filter accept controller
-              if (accepted) {
+    def sync(manager: FsManager,
+             filter: AnyControllerFilter,
+             visitor: ControllerSyncVisitor) {
+      manager sync (
+        new Filter[FsController] {
+          override def accept(controller: FsController) = {
+            val accepted = filter accept controller
+            if (accepted) {
+              locked(writeLock) {
+                map remove controller.getModel.getMountPoint
+              }
+            }
+            accepted
+          }
+        },
+        new Visitor[FsController, FsSyncException] {
+          override def visit(controller: FsController) {
+            try {
+              visitor visit controller
+            } finally {
+              val model = controller.getModel
+              if (model.isMounted) {
                 locked(writeLock) {
-                  map remove controller.getModel.getMountPoint
+                  map put (model.getMountPoint, controller)
                 }
               }
-              accepted
-            }
-          }
-
-        override def visit(controller: FsController) {
-          try {
-            visitor visit controller
-          } finally {
-            val model = controller.getModel
-            if (model.isMounted) {
-              locked(writeLock) {
-                map put (model.getMountPoint, controller)
-              }
             }
           }
         }
-
-        override def options(controller: FsController) = {
-          assert(false)
-          visitor options controller
-        }
-      }
+      )
     }
   } // MountedControllerSet
 }

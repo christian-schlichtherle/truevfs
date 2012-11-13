@@ -7,10 +7,12 @@ package net.java.truevfs.kernel.spec;
 import java.io.IOException;
 import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.shed.Filter;
+import net.java.truecommons.shed.Visitor;
 
 /**
  * An abstract decorator for a file system manager.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
@@ -40,14 +42,19 @@ public abstract class FsDecoratingManager implements FsManager {
     }
 
     @Override
-    public void sync(FsControllerSyncVisitor visitor) throws FsSyncException {
-        manager.sync(visitor);
+    public void sync(
+            Filter<? super FsController> filter,
+            Visitor<? super FsController, FsSyncException> visitor)
+    throws FsSyncException {
+        manager.sync(filter, visitor);
     }
 
     @Override
-    public <X extends IOException> void visit(FsControllerVisitor<X> visitor)
+    public <X extends IOException> void visit(
+            Filter<? super FsController> filter,
+            Visitor<? super FsController, X> visitor)
     throws X {
-        manager.visit(visitor);
+        manager.visit(filter, visitor);
     }
 
     /**

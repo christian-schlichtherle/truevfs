@@ -7,21 +7,21 @@ package net.java.truevfs.kernel.spec.sample;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.IoSockets;
+import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.Filter;
 import static net.java.truevfs.kernel.spec.FsAccessOption.CREATE_PARENTS;
 import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
 import net.java.truevfs.kernel.spec.FsAccessOptions;
+import net.java.truevfs.kernel.spec.FsControllerSyncVisitor;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsMetaDriver;
 import net.java.truevfs.kernel.spec.FsNodePath;
-import net.java.truevfs.kernel.spec.FsSimpleControllerSyncVisitor;
 import net.java.truevfs.kernel.spec.FsSimpleMetaDriver;
 import net.java.truevfs.kernel.spec.FsSyncOptions;
 import net.java.truevfs.kernel.spec.FsUriModifier;
-import net.java.truecommons.cio.InputSocket;
-import net.java.truecommons.cio.IoSockets;
-import net.java.truecommons.cio.OutputSocket;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 
@@ -94,8 +94,8 @@ public final class Copy {
             // Commit all unsynchronized changes to the contents of federated
             // file systems, if any were accessed, and clean up temporary files
             // used for caching.
-            manager.sync(new FsSimpleControllerSyncVisitor(
-                    FsSyncOptions.UMOUNT));
+            manager.sync(Filter.ACCEPT_ANY,
+                    new FsControllerSyncVisitor(FsSyncOptions.UMOUNT));
         }
     }
 // END SNIPPET: copy

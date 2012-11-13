@@ -4,51 +4,48 @@
  */
 package net.java.truevfs.kernel.spec;
 
+import java.util.Objects;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.Visitor;
 
 /**
- * A visitor which performs a {@link FsController#sync} operation on
- * each file system controller which has been accepted by the {@link #filter}.
+ * A visitor which performs a {@link FsController#sync} operation with the
+ * options provided to its
+ * {@linkplain #FsControllerSyncVisitor constructor} on any given file
+ * system controller.
  * <p>
  * Subclasses should be thread-safe.
  *
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class FsControllerSyncVisitor
-implements FsControllerVisitor<FsSyncException> {
+public class FsControllerSyncVisitor
+implements Visitor<FsController, FsSyncException> {
+
+    private final BitField<FsSyncOption> options;
 
     /**
-     * Returns a new {@link FsSyncExceptionBuilder}.
-     * 
-     * @return A new {@link FsSyncExceptionBuilder}.
+     * Constructs a controller sync visitor.
+     *
+     * @param options the options to use for
+     *        {@linkplain FsController#sync sync}ing any given file system
+     *        controller.
      */
-    @Override
-    public final FsSyncExceptionBuilder builder() {
-        return new FsSyncExceptionBuilder();
+    public FsControllerSyncVisitor(final BitField<FsSyncOption> options) {
+        this.options = Objects.requireNonNull(options);
     }
 
     /**
-     * Obtains the {@linkplain #options options} for the given file system
-     * controller and calls {@link FsController#sync} on it.
-     * 
+     * Calls {@link FsController#sync} on the given controller with the options
+     * provided to the {@linkplain #FsControllerSyncVisitor constructor}.
+     *
      * @param  controller the file system controller to {@code sync()}.
      * @throws FsSyncException if {@code sync()}ing the file system failed for
      *         some reason.
      */
     @Override
     public void visit(FsController controller) throws FsSyncException {
-        controller.sync(options(controller));
+        controller.sync(options);
     }
-
-    /**
-     * Returns the options to use for {@linkplain FsController#sync sync()}ing
-     * the given file system controller.
-     * 
-     * @param  controller the file system controller to {@code sync()}.
-     * @return The options to use for {@linkplain FsController#sync sync()}ing
-     *         the given file system controller.
-     */
-    public abstract BitField<FsSyncOption> options(FsController controller);
 }

@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.Filter;
 import static net.java.truecommons.shed.Filter.*;
-import net.java.truecommons.shed.SuppressedExceptionBuilder;
+import net.java.truecommons.shed.Visitor;
 import net.java.truevfs.kernel.driver.mock.MockDriverMapContainer;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -70,8 +70,8 @@ public abstract class FsManagerTestSuite {
                     assertThat(controller.getParent(), sameInstance((Object) parent));
                 parent = controller;
             }
-            assertThat(count(new VisitCounter(ACCEPT_ANY)), is(params.length));
-            assertThat(count(new VisitCounter(ACCEPT_NONE)), is(0));
+            assertThat(count(ACCEPT_ANY), is(params.length));
+            assertThat(count(ACCEPT_NONE), is(0));
             parent = null;
             waitForAllManagersToGetGarbageCollected();
         }
@@ -108,8 +108,6 @@ public abstract class FsManagerTestSuite {
 
             final Iterator<String> it = Arrays.asList(params).iterator();
             class ControllerVisitor extends VisitCounter {
-                ControllerVisitor() { super(ACCEPT_ANY); }
-
                 @Override
                 public void visit(FsController controller) {
                     final FsMountPoint mountPoint
@@ -118,7 +116,7 @@ public abstract class FsManagerTestSuite {
                     super.visit(controller);
                 }
             }
-            assertThat(count(new ControllerVisitor()), is(params.length));
+            assertThat(count(ACCEPT_ANY, new ControllerVisitor()), is(params.length));
             assertThat(it.hasNext(), is(false));
 
             member = null;
@@ -130,7 +128,7 @@ public abstract class FsManagerTestSuite {
     private void waitForAllManagersToGetGarbageCollected() {
         do {
             System.gc(); // triggering GC in a loop seems to help with concurrency!
-        } while (0 < count(new VisitCounter(ACCEPT_ANY)));
+        } while (0 < count(ACCEPT_ANY));
     }
 
     @Test
@@ -158,15 +156,14 @@ public abstract class FsManagerTestSuite {
 
             // Assert that the manager has all input controllers mapped.
             class InputVisitor extends VisitCounter {
-                InputVisitor() { super(ACCEPT_ANY); }
-
                 @Override
                 public void visit(FsController controller) {
                     assertTrue(input.contains(controller));
                     super.visit(controller);
                 }
-            }
-            assertThat(count(new InputVisitor()), is(params[1].length));
+            } // InputVisitor
+
+            assertThat(count(ACCEPT_ANY, new InputVisitor()), is(params[1].length));
 
             final Set<FsMountPoint> output = new HashSet<>();
             for (final String param : params[2]) {
@@ -174,26 +171,30 @@ public abstract class FsManagerTestSuite {
                 output.add(mountPoint);
             }
 
-            final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[0][0]));
             class FilterVisitor extends VisitCounter {
-                FilterVisitor() { super(new FsControllerFilter(mountPoint)); }
-
                 @Override
                 public void visit(FsController controller) {
                     assertTrue(output.remove(controller.getModel().getMountPoint()));
                     super.visit(controller);
                 }
             }
-            assertThat(count(new FilterVisitor()), is(params[2].length));
+            final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[0][0]));
+            assertThat(count(new FsControllerFilter(mountPoint), new FilterVisitor()), is(params[2].length));
 
             assertTrue(output.isEmpty());
         }
     }
 
-    private int count(final VisitCounter counter) {
+    private int count(final Filter<? super FsController> filter) {
+        return count(filter, new VisitCounter());
+    }
+
+    private int count(
+            final Filter<? super FsController> filter,
+            final VisitCounter counter) {
         try {
-            manager.visit(counter);
-        } catch (IOException ex) {
+            manager.visit(filter, counter);
+        } catch (final IOException ex) {
             throw new AssertionError(ex);
         }
         return counter.get();
@@ -201,26 +202,11 @@ public abstract class FsManagerTestSuite {
 
     @ThreadSafe
     private static class VisitCounter
-    extends AtomicInteger implements FsControllerVisitor<IOException> {
-        final Filter<? super FsController> filter;
-
-        VisitCounter(final Filter<? super FsController> filter) {
-            assert null != filter;
-            this.filter = filter;
-        }
-
+    extends AtomicInteger implements Visitor<FsController, IOException> {
         @Override
-        public Filter<? super FsController> filter() { return filter; }
-
-        @Override
-        public final SuppressedExceptionBuilder<IOException> builder() {
-            return new SuppressedExceptionBuilder<>();
-        }
-
-        @Override
-        public void visit(FsController controller) {
+        public void visit(final FsController controller) {
             assertThat(controller, not(is((FsController) null)));
             incrementAndGet();
         }
-    } // TestVisitor
+    } // VisitCounter
 }

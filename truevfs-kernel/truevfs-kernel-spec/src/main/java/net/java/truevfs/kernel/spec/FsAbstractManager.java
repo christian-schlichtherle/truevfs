@@ -6,9 +6,9 @@ package net.java.truevfs.kernel.spec;
 
 import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.shed.ExceptionBuilder;
 import net.java.truecommons.shed.Filter;
 import net.java.truecommons.shed.UniqueObject;
+import net.java.truecommons.shed.Visitor;
 
 /**
  * An abstract file system manager.
@@ -22,24 +22,35 @@ public abstract class FsAbstractManager
 extends UniqueObject implements FsManager {
 
     @Override
-    public void sync(FsControllerSyncVisitor visitor) throws FsSyncException {
-        visit(visitor);
+    public void sync(
+            final Filter<? super FsController> filter,
+            final Visitor<? super FsController, FsSyncException> visitor)
+    throws FsSyncException {
+        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
+
+        class AssembleExceptionVisitor
+        implements Visitor<FsController, FsSyncException> {
+            @Override
+            public void visit(final FsController controller) {
+                try {
+                    visitor.visit(controller);
+                } catch (final FsSyncException ex) {
+                    builder.warn(ex);
+                }
+            }
+        } // AssembleExceptionVisitor
+
+        visit(filter, new AssembleExceptionVisitor());
+        builder.check();
     }
 
     @Override
     public final <X extends IOException> void visit(
-            final FsControllerVisitor<X> visitor)
+            final Filter<? super FsController> filter,
+            final Visitor<? super FsController, X> visitor)
     throws X {
-        try (final FsControllerStream stream = stream(visitor.filter())) {
-            final ExceptionBuilder<X, X> builder = visitor.builder();
-            for (final FsController controller : stream) {
-                try {
-                    visitor.visit(controller);
-                } catch (final IOException ex) {
-                    builder.warn((X) ex);
-                }
-            }
-            builder.check();
+        try (final FsControllerStream s = stream(filter)) {
+            for (final FsController c : s) visitor.visit(c);
         }
     }
 
@@ -50,13 +61,14 @@ extends UniqueObject implements FsManager {
      * the stream.
      * This ensures that when calling {@link #sync}, all file system changes
      * have been processed upon successful termination.
-     * 
+     *
      * @param  filter the filter to apply to the managed file system
      *         controllers.
      * @return A filtered stream of managed file system controllers in reverse
      *         order of their {@link FsMountPoint} mount point.
      */
-    protected abstract FsControllerStream stream(Filter<? super FsController> filter);
+    protected abstract FsControllerStream stream(
+            Filter<? super FsController> filter);
 
     /**
      * Returns a string representation of this object for debugging and logging
