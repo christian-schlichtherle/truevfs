@@ -18,7 +18,7 @@ class FsLoggerSpec extends WordSpec with ShouldMatchers with PropertyChecks {
 
   import FsLoggerSpec._
 
-  def create = new FsLogger()
+  def create = new FsLogger
 
   "A file system logger" when {
     "newly created" should {
