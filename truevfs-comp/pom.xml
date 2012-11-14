@@ -28,6 +28,7 @@
         <module>truevfs-comp-ibm437</module>
         <module>truevfs-comp-inst</module>
         <module>truevfs-comp-jmx</module>
+        <module>truevfs-comp-mmbs</module>
         <module>truevfs-comp-tardriver</module>
         <module>truevfs-comp-zip</module>
         <module>truevfs-comp-zipdriver</module>
