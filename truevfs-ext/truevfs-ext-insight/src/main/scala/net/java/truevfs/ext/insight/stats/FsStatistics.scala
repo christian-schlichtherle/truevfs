@@ -4,9 +4,18 @@
  */
 package net.java.truevfs.ext.insight.stats
 
+object FsStatistics {
+  /** Returns file system statistics with all properties set to zero. */
+  def apply() = {
+    val io = IoStatistics()
+    val sync = SyncStatistics()
+    new FsStatistics(io, io, sync) // cannot cache because of timeMillis!
+  }
+}
+
 /**
   * An immutable record of statistics for file system operations.
-  * 
+  *
   * @throws IllegalArgumentException if any parameter value is negative.
   * @author Christian Schlichtherle
   */
@@ -15,7 +24,7 @@ final case class FsStatistics private (
   writeStats: IoStatistics,
   syncStats: SyncStatistics,
   timeMillis: Long = System.currentTimeMillis
-) {
+) extends Immutable {
   require(0 <= timeMillis)
   require(null ne readStats)
   require(null ne writeStats)
@@ -24,7 +33,7 @@ final case class FsStatistics private (
   /**
     * Logs a read operation with the given sample data and returns a new
     * object to reflect the updated statistics.
-    * 
+    *
     * @param  nanosDelta the execution time in nanoseconds.
     * @param  bytesDelta the number of bytes read.
     * @return A new object which reflects the updated statistics.
@@ -37,7 +46,7 @@ final case class FsStatistics private (
   /**
     * Logs a write operation with the given sample data and returns a new
     * object to reflect the updated statistics.
-    * 
+    *
     * @param  nanosDelta the execution time in nanoseconds.
     * @param  bytesDelta the number of bytes written.
     * @return A new object which reflects the updated statistics.
@@ -50,7 +59,7 @@ final case class FsStatistics private (
   /**
     * Logs a sync operation with the given sample data and returns a new
     * object to reflect the updated statistics.
-    * 
+    *
     * @param  nanosDelta the execution time in nanoseconds.
     * @return A new object which reflects the updated statistics.
     * @throws IllegalArgumentException if any parameter value is negative.
@@ -63,13 +72,4 @@ final case class FsStatistics private (
     this.readStats.equalsIgnoreTime(that.readStats) &&
       this.writeStats.equalsIgnoreTime(that.writeStats) &&
       this.syncStats.equalsIgnoreTime(that.syncStats)
-}
-
-object FsStatistics {
-  /** Returns file system statistics with all properties set to zero. */
-  def apply() = {
-    val io = IoStatistics()
-    val sync = SyncStatistics()
-    new FsStatistics(io, io, sync) // cannot cache because of timeMillis!
-  }
 }
