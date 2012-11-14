@@ -24,5 +24,4 @@ import net.java.truevfs.comp.jmx.sl.MBeanServerLocator;
  */
 @ServiceSpecification
 public abstract class MBeanServerDecorator
-extends LocatableDecorator<MBeanServer> {
-}
+extends LocatableDecorator<MBeanServer> { }

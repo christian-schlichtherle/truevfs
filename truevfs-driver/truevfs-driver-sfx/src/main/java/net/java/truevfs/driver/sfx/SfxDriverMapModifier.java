@@ -43,4 +43,8 @@ public final class SfxDriverMapModifier extends FsDriverMapModifier {
         map.put(FsScheme.create("exe"), new ReadOnlySfxDriver());
         return map;
     }
+
+    /** @return -100 */
+    @Override
+    public int getPriority() { return -100; }
 }

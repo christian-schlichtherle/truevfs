@@ -4,15 +4,16 @@
  */
 package net.java.truevfs.driver.file;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle
  */
 public class FileBufferPoolFactoryTest {
+
     @Test
     public void testPriority() {
-        assertEquals(0, new FileBufferPoolFactory().getPriority());
+        assertTrue(new FileBufferPoolFactory().getPriority() < 0);
     }
 }

@@ -44,4 +44,8 @@ public final class TarGZipDriverMapModifier extends FsDriverMapModifier {
             map.put(FsScheme.create(extension), driver);
         return map;
     }
+
+    /** @return -100 */
+    @Override
+    public int getPriority() { return -100; }
 }

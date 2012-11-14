@@ -41,4 +41,8 @@ public final class FileDriverMapModifier extends FsDriverMapModifier {
         map.put(FsScheme.create("file"), new FileDriver());
         return map;
     }
+
+    /** @return -100 */
+    @Override
+    public int getPriority() { return -100; }
 }

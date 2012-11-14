@@ -44,4 +44,8 @@ public final class ZipDriverMapModifier extends FsDriverMapModifier {
         map.put(FsScheme.create("zip"), driver);
         return map;
     }
+
+    /** @return -100 */
+    @Override
+    public int getPriority() { return -100; }
 }

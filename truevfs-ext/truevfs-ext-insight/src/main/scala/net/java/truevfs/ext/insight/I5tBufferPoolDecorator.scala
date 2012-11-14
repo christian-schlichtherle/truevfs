@@ -11,8 +11,12 @@ import net.java.truevfs.kernel.spec.spi._
   * @author Christian Schlichtherle
   */
 @deprecated("This class is reserved for exclusive use by the [[net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator.SINGLETON]]!", "1")
-final class I5tBufferPoolDecorator extends IoBufferPoolDecorator {
+final class I5tBufferPoolDecorator
+extends IoBufferPoolDecorator with Immutable {
 
   override def apply(pool: IoBufferPool): IoBufferPool =
-    syncOperationsMediator.instrument(pool)
+    syncOperationsMediator instrument pool
+
+  /** @return -200 */
+  override def getPriority = -200
 }

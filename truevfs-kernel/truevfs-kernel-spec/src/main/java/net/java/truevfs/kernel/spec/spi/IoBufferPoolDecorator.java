@@ -24,5 +24,4 @@ import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
  */
 @ServiceSpecification
 public abstract class IoBufferPoolDecorator
-extends LocatableDecorator<IoBufferPool> {
-}
+extends LocatableDecorator<IoBufferPool> { }

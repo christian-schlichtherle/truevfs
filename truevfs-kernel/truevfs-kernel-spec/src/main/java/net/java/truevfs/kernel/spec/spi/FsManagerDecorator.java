@@ -24,5 +24,4 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  */
 @ServiceSpecification
 public abstract class FsManagerDecorator
-extends LocatableDecorator<FsManager> {
-}
+extends LocatableDecorator<FsManager> { }

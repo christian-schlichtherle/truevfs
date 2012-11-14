@@ -11,11 +11,12 @@ import net.java.truevfs.kernel.spec.spi._
   * @author Christian Schlichtherle
   */
 @deprecated("This class is reserved for exclusive use by the [[net.java.truevfs.kernel.spec.sl.FsManagerLocator.SINGLETON]]!", "1")
-final class LogManagerDecorator extends FsManagerDecorator with Immutable {
+final class LogManagerDecorator
+extends FsManagerDecorator with Immutable {
 
   override def apply(manager: FsManager): FsManager =
     LogMediator instrument manager
 
-  /** Returns -100. */
-  override def getPriority = -100
+  /** Returns -300. */
+  override def getPriority = -300
 }

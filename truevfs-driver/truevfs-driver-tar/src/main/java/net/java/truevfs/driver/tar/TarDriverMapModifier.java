@@ -43,4 +43,8 @@ public final class TarDriverMapModifier extends FsDriverMapModifier {
         map.put(FsScheme.create("tar"), driver);
         return map;
     }
+
+    /** @return -100 */
+    @Override
+    public int getPriority() { return -100; }
 }

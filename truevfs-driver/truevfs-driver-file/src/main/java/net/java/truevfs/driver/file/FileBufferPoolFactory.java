@@ -5,8 +5,8 @@
 package net.java.truevfs.driver.file;
 
 import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.cio.IoBufferPool;
 import net.java.truecommons.annotations.ServiceImplementation;
+import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.spi.IoBufferPoolFactory;
 
 /**
@@ -19,7 +19,9 @@ import net.java.truevfs.kernel.spec.spi.IoBufferPoolFactory;
 public final class FileBufferPoolFactory extends IoBufferPoolFactory {
 
     @Override
-    public IoBufferPool get() {
-        return new FileBufferPool();
-    }
+    public IoBufferPool get() { return new FileBufferPool(); }
+
+    /** @return -100 */
+    @Override
+    public int getPriority() { return -100; }
 }
