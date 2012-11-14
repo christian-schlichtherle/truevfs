@@ -17,8 +17,10 @@ private object MultiplexingMBeanServerSpec {
     def getMessage = "Hello world!"
   }
 
+  import MultiplexingMBeanServer.qualifier._
+
   private val on = new ObjectName("Test:type=Test") // original name
-  private val mnp = new ObjectName("Test:type=Test,CLASS_LOADER=*") // modified name pattern
+  private val mn = new ObjectName("Test:type=Test," + key + "=" + value) // modified name
   private val mbean = new Messenger
 }
 
@@ -34,9 +36,9 @@ class MultiplexingMBeanServerSpec extends WordSpec with ShouldMatchers {
     }
 
     "have its qualifier added to the MBean's object name in the original MBean server" in {
-      val set = ombs queryNames (mnp, null)
+      val set = ombs queryNames (mn, null)
       set should have size (1)
-      set.iterator.next getKeyProperty ("CLASS_LOADER") should not be (null)
+      set.iterator.next should equal (mn)
     }
 
     "find the registered MBean when quering object names" in {
@@ -51,12 +53,17 @@ class MultiplexingMBeanServerSpec extends WordSpec with ShouldMatchers {
       set.iterator.next.getObjectName should equal (on)
     }
 
+    "find the registered MBean when getting object instances" in {
+      val instance = mmbs getObjectInstance on
+      instance.getObjectName should equal (on)
+    }
+
     "unregister the MBean" in {
       mmbs.unregisterMBean(on)
     }
 
     "have unregistered the MBean in the original MBean server" in {
-      val set = ombs queryNames (mnp, null)
+      val set = ombs queryNames (mn, null)
       set should have size (0)
     }
   }
