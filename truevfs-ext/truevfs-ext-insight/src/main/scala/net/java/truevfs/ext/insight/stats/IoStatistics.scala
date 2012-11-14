@@ -4,9 +4,17 @@
  */
 package net.java.truevfs.ext.insight.stats
 
+object IoStatistics {
+  private val tenPowNine = BigInt(10) pow  9 // 1000000000
+  private val twoPowTen  = BigInt( 2) pow 10 //       1024
+
+  /** Returns I/O statistics with all properties set to zero. */
+  def apply() = new IoStatistics(0, 0, 0, 0) // cannot cache because of timeMillis!
+}
+
 /**
   * An immutable record of statistics for I/O operations.
-  * 
+  *
   * @param  sequenceNumber the non-negative sequence number.
   * @throws IllegalArgumentException if any parameter value is negative.
   * @author Christian Schlichtherle
@@ -17,7 +25,8 @@ final case class IoStatistics private (
   bytesTotal: Long,
   threadsTotal: Int,
   timeMillis: Long = System.currentTimeMillis
-) {
+) extends Immutable {
+
   require(0 <= (sequenceNumber | nanosecondsTotal | bytesTotal | threadsTotal | timeMillis))
 
   def nanosecondsPerOperation =
@@ -30,7 +39,7 @@ final case class IoStatistics private (
     import IoStatistics._
     if (0 == nanosecondsTotal) 0L
     else (BigInt(bytesTotal) * tenPowNine /
-          (BigInt(nanosecondsTotal) * oneK)).toLong
+          (BigInt(nanosecondsTotal) * twoPowTen)).toLong
   }
 
   /**
@@ -41,7 +50,7 @@ final case class IoStatistics private (
     * set to one (!) and its other properties will be reset to reflect only
     * the given parameter values at the current system time.
     * In other words, the statistics would restart from fresh.
-    * 
+    *
     * @param  nanosDelta the execution time.
     * @param  bytesDelta the number of bytes read or written.
     * @return A new object which reflects the updated statistics at the
@@ -64,15 +73,7 @@ final case class IoStatistics private (
 
   def equalsIgnoreTime(that: IoStatistics) =
     this.sequenceNumber == that.sequenceNumber &&
-      this.nanosecondsTotal == that.nanosecondsTotal &&
-      this.bytesTotal == that.bytesTotal &&
-      this.threadsTotal == that.threadsTotal
-}
-
-object IoStatistics {
-  private val tenPowNine = BigInt(10) pow 9
-  private val oneK = BigInt(1024)
-
-  /** Returns I/O statistics with all properties set to zero. */
-  def apply() = new IoStatistics(0, 0, 0, 0) // cannot cache because of timeMillis!
+    this.nanosecondsTotal == that.nanosecondsTotal &&
+    this.bytesTotal == that.bytesTotal &&
+    this.threadsTotal == that.threadsTotal
 }

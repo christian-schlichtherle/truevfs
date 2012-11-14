@@ -4,9 +4,14 @@
  */
 package net.java.truevfs.ext.insight.stats
 
+object SyncStatistics {
+  /** Returns sync statistics with all properties set to zero. */
+  def apply() = new SyncStatistics(0, 0, 0) // cannot cache because of timeMillis!
+}
+
 /**
   * An immutable record of statistics for sync operations.
-  * 
+  *
   * @param  sequenceNumber the non-negative sequence number.
   * @throws IllegalArgumentException if any parameter value is negative.
   * @author Christian Schlichtherle
@@ -16,7 +21,8 @@ final case class SyncStatistics private (
   nanosecondsTotal: Long,
   threadsTotal: Int,
   timeMillis: Long = System.currentTimeMillis
-) {
+) extends Immutable {
+
   require(0 <= (sequenceNumber | nanosecondsTotal | threadsTotal | timeMillis))
 
   def nanosecondsPerOperation =
@@ -30,7 +36,7 @@ final case class SyncStatistics private (
     * set to one (!) and its other properties will be reset to reflect only
     * the given parameter values at the current system time.
     * In other words, the statistics would restart from fresh.
-    * 
+    *
     * @param  nanosDelta the execution time.
     * @return A new object which reflects the updated statistics at the
     *         current system time.
@@ -51,11 +57,6 @@ final case class SyncStatistics private (
 
   def equalsIgnoreTime(that: SyncStatistics) =
     this.sequenceNumber == that.sequenceNumber &&
-      this.nanosecondsTotal == that.nanosecondsTotal &&
-      this.threadsTotal == that.threadsTotal
-}
-
-object SyncStatistics {
-  /** Returns sync statistics with all properties set to zero. */
-  def apply() = new SyncStatistics(0, 0, 0) // cannot cache because of timeMillis!
+    this.nanosecondsTotal == that.nanosecondsTotal &&
+    this.threadsTotal == that.threadsTotal
 }

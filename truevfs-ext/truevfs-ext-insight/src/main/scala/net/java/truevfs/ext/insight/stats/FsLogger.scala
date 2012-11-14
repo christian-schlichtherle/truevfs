@@ -7,9 +7,50 @@ package net.java.truevfs.ext.insight.stats
 import java.util.concurrent.atomic._
 import javax.annotation.concurrent._
 import FsLogger._
+import scala.collection._
+
+private object FsLogger {
+
+  private[this] val defaultSizePropertyKey = classOf[FsLogger].getName + ".defaultSize"
+  private val defaultSize = Integer getInteger (defaultSizePropertyKey, 10)
+  private[this] val maxValues = Array(
+    9, 99, 999, 9999, 99999, 999999, 9999999, 99999999, 999999999,
+    Integer.MAX_VALUE
+  )
+
+  private def length(x: Int) = {
+    assert(0 <= x)
+    var i = 0
+    while (x > maxValues{ val j = i; i += 1; j }) {
+    }
+    i
+  }
+
+  private def atomic[V](ref: AtomicReference[V])(next: V => V): V = {
+    while (true) {
+      val expect = ref.get
+      val update = next(expect)
+      if (ref.weakCompareAndSet(expect, update)) return update
+    }
+    throw new AssertionError
+  }
+
+  /**
+   * Adds a hash value for the current thread to the referenced set and returns
+   * its size.
+   *
+   * @param  ref the atomic reference to the immutable set to use for logging.
+   * @return the resulting size of the set
+   */
+  private def logCurrentThread(set: mutable.Set[Int]) = {
+    set synchronized {
+      (set += System identityHashCode Thread.currentThread).size
+    }
+  }
+}
 
 /**
- * A lock-free logger for [[net.java.truevfs.ext.insight.stats.FsStatistics]]
+ * A logger for [[net.java.truevfs.ext.insight.stats.FsStatistics]]
  * All operations get logged at offset zero.
  *
  * @author Christian Schlichtherle
@@ -25,9 +66,10 @@ final class FsLogger(val size: Int) {
     s
   }
   private[this] val _position = new AtomicReference[Int]
-  private[this] val _readThreads = new AtomicReference(Set.empty: Set[Long])
-  private[this] val _writeThreads = new AtomicReference(Set.empty: Set[Long])
-  private[this] val _syncThreads = new AtomicReference(Set.empty: Set[Long])
+
+  @volatile private[this] var _readThreads = mutable.Set.empty[Int]
+  @volatile private[this] var _writeThreads = mutable.Set.empty[Int]
+  @volatile private[this] var _syncThreads = mutable.Set.empty[Int]
 
   private def position = _position.get
 
@@ -104,12 +146,11 @@ final class FsLogger(val size: Int) {
   }
 
   def rotate() = {
-    val empty: Set[Long] = Set.empty
     val n = next()
     _stats.set(n, FsStatistics())
-    _readThreads.set(empty)
-    _writeThreads.set(empty)
-    _syncThreads.set(empty)
+    _readThreads = mutable.Set.empty
+    _writeThreads = mutable.Set.empty
+    _syncThreads = mutable.Set.empty
     n
   }
 
@@ -119,50 +160,5 @@ final class FsLogger(val size: Int) {
       if (size <= update) update -= size
       update
     }
-  }
-}
-
-object FsLogger {
-
-  private[this] val defaultSizePropertyKey = classOf[FsLogger].getName + ".defaultSize"
-  private val defaultSize = Integer.getInteger(defaultSizePropertyKey, 10)
-  private[this] val maxValues = Array(
-    9, 99, 999, 9999, 99999, 999999, 9999999, 99999999, 999999999,
-    Integer.MAX_VALUE
-  )
-
-  private def length(x: Int) = {
-    assert(0 <= x)
-    var i = 0
-    while (x > maxValues{ val j = i; i += 1; j }) {
-    }
-    i
-  }
-
-  private def hash(thread: Thread) = {
-    var hash = 17L
-    hash = 31 * hash + System.identityHashCode(thread)
-    hash = 31 * hash + thread.getId
-    hash
-  }
-
-  private def atomic[V](ref: AtomicReference[V])(next: V => V): V = {
-    while (true) {
-      val expect = ref.get
-      val update = next(expect)
-      if (ref.weakCompareAndSet(expect, update)) return update
-    }
-    throw new AssertionError
-  }
-
-  /**
-   * Adds a fingerprint of the current thread to the referenced set and returns its size.
-   *
-   * @param  ref the atomic reference to the immutable set to use for logging.
-   * @return the resulting size of the set
-   */
-  private def logCurrentThread(ref: AtomicReference[Set[Long]]) = {
-    val fp = hash(Thread.currentThread)
-    atomic(ref)(_ + fp).size
   }
 }
