@@ -11,8 +11,12 @@ import net.java.truevfs.kernel.spec.spi._
   * @author Christian Schlichtherle
   */
 @deprecated("This class is reserved for exclusive use by the [[net.java.truevfs.kernel.spec.sl.FsManagerLocator.SINGLETON]]!", "1")
-final class I5tManagerDecorator extends FsManagerDecorator {
+final class I5tManagerDecorator
+extends FsManagerDecorator with Immutable {
 
   override def apply(manager: FsManager): FsManager =
     syncOperationsMediator.instrument(manager)
+
+  /** @return -200 */
+  override def getPriority = -200
 }

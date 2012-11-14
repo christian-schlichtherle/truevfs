@@ -39,11 +39,9 @@ public class MBeanServerProvider extends LocatableProvider<MBeanServer> {
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in the class {@link MBeanServerProvider} returns
-     * {@code -100} if and only if it equals its
-     * {@linkplain #getClass() runtime class} or zero otherwise.
-     * In simple terms, if this method gets called on an object of a subclass
-     * then it will return zero unless it has been overridden.
+     * If the {@linkplain #getClass() runtime class} of this object is
+     * {@link MBeanServerProvider}, then {@code -100} gets returned.
+     * Otherwise, zero gets returned.
      */
     @Override
     public int getPriority() {

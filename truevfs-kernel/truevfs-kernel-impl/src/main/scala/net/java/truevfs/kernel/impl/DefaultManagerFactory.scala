@@ -8,9 +8,15 @@ import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.spi._
 
 /** Creates a default file system manager.
-  * 
+  *
   * @author Christian Schlichtherle
   */
-final class DefaultManagerFactory extends FsManagerFactory with Immutable {
+@deprecated("This class is reserved for exclusive use by the [[net.java.truevfs.kernel.spec.sl.FsManagerLocator.SINGLETON]]!", "1")
+final class DefaultManagerFactory
+extends FsManagerFactory with Immutable {
+
   override def get: FsManager = new DefaultManager
+
+  /** @return -100 */
+  override def getPriority = -100
 }

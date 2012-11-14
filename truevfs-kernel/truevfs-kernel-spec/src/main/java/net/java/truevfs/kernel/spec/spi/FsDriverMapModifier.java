@@ -27,5 +27,4 @@ import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
  */
 @ServiceSpecification
 public abstract class FsDriverMapModifier
-extends LocatableModifier<Map<FsScheme, FsDriver>> {
-}
+extends LocatableModifier<Map<FsScheme, FsDriver>> { }

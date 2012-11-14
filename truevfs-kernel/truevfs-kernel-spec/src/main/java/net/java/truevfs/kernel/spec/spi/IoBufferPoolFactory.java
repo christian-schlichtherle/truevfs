@@ -22,5 +22,4 @@ import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
  */
 @ServiceSpecification
 public abstract class IoBufferPoolFactory
-extends LocatableFactory<IoBufferPool> {
-}
+extends LocatableFactory<IoBufferPool> { }

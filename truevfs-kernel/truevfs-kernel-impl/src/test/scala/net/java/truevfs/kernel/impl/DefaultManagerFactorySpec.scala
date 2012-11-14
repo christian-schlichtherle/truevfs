@@ -24,8 +24,8 @@ extends WordSpec with ShouldMatchers {
       service.get should not be (null)
     }
 
-    "have priority 0" in {
-      service.getPriority should be (0)
+    "have negative priority" in {
+      service.getPriority should be < (0)
     }
   }
 }
