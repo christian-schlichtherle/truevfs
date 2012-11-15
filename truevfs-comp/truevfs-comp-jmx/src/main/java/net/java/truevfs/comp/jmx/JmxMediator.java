@@ -11,31 +11,41 @@ import javax.management.InstanceNotFoundException;
 import javax.management.JMException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import net.java.truecommons.jmx.ObjectNameBuilder;
+import net.java.truecommons.jmx.sl.MBeanServerLocator;
 import net.java.truecommons.logging.LocalizedLogger;
-import net.java.truevfs.comp.inst.Mediator;
-import net.java.truevfs.comp.jmx.sl.MBeanServerLocator;
 import org.slf4j.Logger;
 
 /**
  * A mediator for the instrumentation of the TrueVFS Kernel with JMX.
- * 
+ *
  * @param  <This> the type of this mediator.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
 public abstract class JmxMediator<This extends JmxMediator<This>>
-extends Mediator<This> {
+extends net.java.truevfs.comp.inst.Mediator<This> {
 
     /**
      * The localized logger to use.
      * This field is available for unit testing purposes only!
-     */ 
+     */
     private static final Logger logger = new LocalizedLogger(JmxMediator.class);
 
-    private Package getDomain() { return getClass().getPackage(); }
+    /**
+     * Returns the package object who's name should be used as the domain of
+     * any object names to register.
+     */
+    public Package getDomain() { return getClass().getPackage(); }
 
-    public final JmxObjectNameBuilder nameBuilder(Class<?> type) {
-        return new JmxObjectNameBuilder(getDomain())
+    /**
+     * Returns a new object name builder.
+     *
+     * @param type the class identifying the type of the MBean who's name shall
+     *        get build.
+     */
+    public ObjectNameBuilder nameBuilder(Class<?> type) {
+        return new ObjectNameBuilder(getDomain())
                 .put("type", type.getSimpleName());
     }
 
@@ -44,7 +54,7 @@ extends Mediator<This> {
      * <p>
      * The implementation in the class {@link JmxMediator} returns
      * {@code MBeanServerLocator.SINGLETON.get()}.
-     * 
+     *
      * @return the MBean server for registering the MBeans.
      */
     public MBeanServer getMBeanServer() {
@@ -54,12 +64,12 @@ extends Mediator<This> {
     /**
      * {@linkplain JmxComponent#activate Activates} and returns the given
      * {@code component}.
-     * 
+     *
      * @param  <C> the type of the component to activate.
      * @param  component the component to activate.
      * @return The activated component.
      */
-    protected final <C extends JmxComponent> C activate(C component) {
+    public <C extends JmxComponent> C activate(C component) {
         component.activate();
         return component;
     }
@@ -68,8 +78,10 @@ extends Mediator<This> {
      * Maps the given object {@code name} to the given {@code mbean}
      * in the {@linkplain #getMBeanServer MBean server}.
      * <p>
-     * Note that this method may log some messages on failure!
-     * 
+     * The implementation in the class {@link JmxMediator} logs error
+     * messages at the warn and trace level when the registration fails with
+     * an {@link InstanceAlreadyExistsException}.
+     *
      * @param  name the object name.
      * @param  mbean the MBean.
      * @return {@code true} if the MBean has been successfully registered
@@ -98,8 +110,10 @@ extends Mediator<This> {
      * Removes any MBean with the given object {@code name}
      * in the configured MBean server.
      * <p>
-     * Note that this method may log some messages on failure!
-     * 
+     * The implementation in the class {@link JmxMediator} logs error
+     * messages at the warn and trace level when the deregistration fails with
+     * an {@link InstanceNotFoundException}.
+     *
      * @param  name the object name.
      * @return {@code true} if any MBean has been successfully removed
      *         with the given {@code name}.

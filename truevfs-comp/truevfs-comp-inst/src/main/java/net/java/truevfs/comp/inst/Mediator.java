@@ -8,11 +8,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.cio.*;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsMetaDriver;
 import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truecommons.cio.*;
 
 /**
  * Implements the mediator role of the mediator pattern for instrumenting all
@@ -31,7 +31,7 @@ public abstract class Mediator<This extends Mediator<This>> {
 
     /**
      * Instruments the given {@code subject}.
-     * 
+     *
      * @param  subject the object to instrument.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
@@ -42,7 +42,7 @@ public abstract class Mediator<This extends Mediator<This>> {
 
     /**
      * Instruments the given {@code subject}.
-     * 
+     *
      * @param  subject the object to instrument.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
@@ -53,7 +53,7 @@ public abstract class Mediator<This extends Mediator<This>> {
 
     /**
      * Instruments the given {@code subject}.
-     * 
+     *
      * @param  origin the instrumenting object which called this method.
      * @param  subject the object to instrument.
      * @return An instrumenting object or {@code subject} if the implementation
@@ -68,7 +68,7 @@ public abstract class Mediator<This extends Mediator<This>> {
 
     /**
      * Instruments the given {@code subject}.
-     * 
+     *
      * @param  origin the instrumenting object which called this method.
      * @param  subject the object to instrument.
      * @return An instrumenting object or {@code subject} if the implementation
@@ -83,7 +83,7 @@ public abstract class Mediator<This extends Mediator<This>> {
 
     /**
      * Instruments the given {@code subject}.
-     * 
+     *
      * @param  origin the instrumenting object which called this method.
      * @param  subject the object to instrument.
      * @return An instrumenting object or {@code subject} if the implementation
@@ -98,7 +98,7 @@ public abstract class Mediator<This extends Mediator<This>> {
 
     /**
      * Instruments the given {@code subject}.
-     * 
+     *
      * @param  origin the instrumenting object which called this method.
      * @param  subject the object to instrument.
      * @return An instrumenting object or {@code subject} if the implementation
@@ -113,7 +113,7 @@ public abstract class Mediator<This extends Mediator<This>> {
 
     /**
      * Instruments the given {@code subject}.
-     * 
+     *
      * @param  origin the instrumenting object which called this method.
      * @param  subject the object to instrument.
      * @return An instrumenting object or {@code subject} if the implementation
@@ -128,7 +128,7 @@ public abstract class Mediator<This extends Mediator<This>> {
 
     /**
      * Instruments the given {@code subject}.
-     * 
+     *
      * @param  <E> the type of the target entry for I/O operations.
      * @param  origin the instrumenting object which called this method.
      * @param  subject the object to instrument.

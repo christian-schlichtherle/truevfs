@@ -7,12 +7,12 @@ package net.java.truevfs.comp.jmx;
 import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
-import net.java.truevfs.comp.inst.InstrumentingBuffer;
 import net.java.truecommons.cio.IoBuffer;
+import net.java.truevfs.comp.inst.InstrumentingBuffer;
 
 /**
  * A controller for an {@linkplain IoBuffer I/O buffer}.
- * 
+ *
  * @param  <M> the type of the JMX mediator.
  * @author Christian Schlichtherle
  */

@@ -11,7 +11,7 @@ import net.java.truevfs.kernel.spec.FsManager;
 
 /**
  * A controller for a {@linkplain FsManager file system manager}.
- * 
+ *
  * @param  <M> the type of the JMX mediator.
  * @author Christian Schlichtherle
  */
