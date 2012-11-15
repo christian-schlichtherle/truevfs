@@ -25,5 +25,9 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-comp-inst</artifactId>
         </dependency>
+        <dependency>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-jmx</artifactId>
+        </dependency>
     </dependencies>
 </project>
