@@ -11,11 +11,12 @@ import javax.management.ObjectName;
 
 /**
  * A builder for {@link ObjectName}s.
- * 
+ *
  * @author Christian Schlichtherle
  */
 public final class JmxObjectNameBuilder implements Provider<ObjectName> {
-    final Hashtable<String, String> table = new Hashtable<>();
+
+    private final Hashtable<String, String> table = new Hashtable<>();
 
     private final String domain;
 
