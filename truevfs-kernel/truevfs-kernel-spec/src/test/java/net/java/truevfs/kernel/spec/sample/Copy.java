@@ -17,9 +17,9 @@ import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
 import net.java.truevfs.kernel.spec.FsAccessOptions;
 import net.java.truevfs.kernel.spec.FsControllerSyncVisitor;
 import net.java.truevfs.kernel.spec.FsManager;
-import net.java.truevfs.kernel.spec.FsMetaDriver;
+import net.java.truevfs.kernel.spec.FsCompositeDriver;
 import net.java.truevfs.kernel.spec.FsNodePath;
-import net.java.truevfs.kernel.spec.FsSimpleMetaDriver;
+import net.java.truevfs.kernel.spec.FsSimpleCompositeDriver;
 import net.java.truevfs.kernel.spec.FsSyncOptions;
 import net.java.truevfs.kernel.spec.FsUriModifier;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
@@ -64,7 +64,7 @@ public final class Copy {
         try {
             // Search the class path for the set of all supported file system
             // drivers and build a composite driver from it.
-            FsMetaDriver driver = new FsSimpleMetaDriver(
+            FsCompositeDriver driver = new FsSimpleCompositeDriver(
                     FsDriverMapLocator.SINGLETON);
             // Resolve the source socket.
             // Note that an absolute URI is required, so we may need to use the

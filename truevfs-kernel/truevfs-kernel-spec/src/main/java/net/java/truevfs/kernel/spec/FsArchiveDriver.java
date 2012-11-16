@@ -51,16 +51,16 @@ extends FsDriver {
      * {@inheritDoc}
      * <p>
      * The implementation in the class {@link FsArchiveDriver} simply forwards
-     * the call to the given file system manager after asserting that
+     * the call to the given controller factory context after asserting that
      * {@code parent.getModel().equals(model.getParent())} is {@code true}.
      */
     @Override
     public final FsController newController(
-            FsManager manager,
+            FsManagerWithControllerFactory context,
             FsModel model,
             @Nonnull FsController parent) {
         assert parent.getModel().equals(model.getParent());
-        return manager.newController(this, model, parent);
+        return context.newController(this, model, parent);
     }
 
     /**

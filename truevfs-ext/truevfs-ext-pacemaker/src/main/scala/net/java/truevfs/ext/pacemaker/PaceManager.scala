@@ -18,11 +18,10 @@ import net.java.truevfs.kernel.spec.sl._
 import scala.math._
 import PaceManager._
 
-/**
- * The pace manager.
- *
- * @author Christian Schlichtherle
- */
+/** The pace manager.
+  *
+  * @author Christian Schlichtherle
+  */
 @ThreadSafe
 private class PaceManager(mediator: PaceMediator, manager: FsManager)
 extends JmxManager[PaceMediator](mediator, manager) {
@@ -186,11 +185,8 @@ private object PaceManager {
         new Filter[FsController] {
           override def accept(controller: FsController) = {
             val accepted = filter accept controller
-            if (accepted) {
-              locked(writeLock) {
-                map remove controller.getModel.getMountPoint
-              }
-            }
+            if (accepted)
+              locked(writeLock) { map remove controller.getModel.getMountPoint }
             accepted
           }
         },
@@ -200,11 +196,8 @@ private object PaceManager {
               visitor visit controller
             } finally {
               val model = controller.getModel
-              if (model.isMounted) {
-                locked(writeLock) {
-                  map put (model.getMountPoint, controller)
-                }
-              }
+              if (model.isMounted)
+                locked(writeLock) { map put (model.getMountPoint, controller) }
             }
           }
         }

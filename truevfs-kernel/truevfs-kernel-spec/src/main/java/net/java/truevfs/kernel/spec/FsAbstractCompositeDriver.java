@@ -16,17 +16,17 @@ import net.java.truecommons.services.Container;
  * the file system driver map returned by {@link #get()} to lookup the
  * appropriate driver for the scheme of any given mount point.
  * <p>
- * Subclasses should be immutable.
- * 
+ * Subclasses should be immutable, too.
+ *
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class FsAbstractMetaDriver
-implements FsMetaDriver, Container<Map<FsScheme, FsDriver>> {
+public abstract class FsAbstractCompositeDriver
+implements FsCompositeDriver, Container<Map<FsScheme, FsDriver>> {
 
     @Override
     public final FsController newController(
-            final FsManager manager,
+            final FsManagerWithControllerFactory context,
             final FsModel model,
             final @CheckForNull FsController parent)
     throws ServiceConfigurationError {
@@ -38,6 +38,6 @@ implements FsMetaDriver, Container<Map<FsScheme, FsDriver>> {
         if (null == driver)
             throw new ServiceConfigurationError(scheme
                     + " (Unknown file system scheme! May be the class path doesn't contain the respective driver module or it isn't set up correctly?)");
-        return driver.newController(manager, model, parent);
+        return driver.newController(context, model, parent);
     }
 }

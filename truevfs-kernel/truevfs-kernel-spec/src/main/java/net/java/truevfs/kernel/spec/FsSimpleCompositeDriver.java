@@ -16,7 +16,8 @@ import net.java.truecommons.services.Container;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class FsSimpleMetaDriver extends FsAbstractMetaDriver {
+public final class FsSimpleCompositeDriver
+extends FsAbstractCompositeDriver {
 
     private final Container<Map<FsScheme, FsDriver>> container;
 
@@ -24,10 +25,11 @@ public final class FsSimpleMetaDriver extends FsAbstractMetaDriver {
      * Constructs a new simple meta driver which will query the given
      * {@code provider} for an appropriate file system driver for the scheme
      * of a given mount point.
-     * 
+     *
      * @param container the driver map container.
      */
-    public FsSimpleMetaDriver(final Container<Map<FsScheme, FsDriver>> container) {
+    public FsSimpleCompositeDriver(
+            final Container<Map<FsScheme, FsDriver>> container) {
         this.container = Objects.requireNonNull(container);
     }
 

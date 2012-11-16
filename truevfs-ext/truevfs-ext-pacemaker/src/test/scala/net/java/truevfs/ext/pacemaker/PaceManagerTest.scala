@@ -5,7 +5,9 @@
 package net.java.truevfs.ext.pacemaker
 
 import collection.JavaConverters._
+import java.io.IOException
 import java.net._
+import net.java.truecommons.io.Loan._
 import net.java.truecommons.shed._
 import net.java.truecommons.shed.Filter
 import net.java.truevfs.kernel.spec._
@@ -129,6 +131,9 @@ extends WordSpec
 
 object PaceManagerTest {
 
+  type ControllerFilter = Filter[_ >: FsController]
+  type ControllerVisitor[X <: IOException] = Visitor[_ >: FsController, X]
+
   def newMountPoint(uri: String) = new FsMountPoint(new URI(uri))
 
   def newModel(mountPoint: FsMountPoint) = {
@@ -143,20 +148,13 @@ object PaceManagerTest {
 
   private class TestManager(var controllers: Iterable[FsController] = Iterable.empty[FsController])
   extends FsAbstractManager {
-    override def newController(driver: FsArchiveDriver[_ <: FsArchiveEntry], model: FsModel, parent: FsController) =
+    override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint) =
       throw new UnsupportedOperationException
 
-    override def controller(driver: FsMetaDriver, mountPoint: FsMountPoint) =
-      throw new UnsupportedOperationException
-
-    override def stream(filter: Filter[_ >: FsController]) = {
-      var filtered = controllers filter (filter accept _)
-      new FsControllerStream() {
-        override def size() = filtered.size
-        override def iterator = filtered.iterator.asJava
-        override def close() { filtered = null }
-      }
-    }
+    override def visit[X <: IOException](
+      filter: ControllerFilter,
+      visitor: ControllerVisitor[X]
+    ) { for (c <- controllers if filter accept c) visitor visit c }
   }
 
   private sealed abstract class Expectation(mountPoints: String*)

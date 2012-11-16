@@ -8,9 +8,9 @@ import java.util.Objects;
 import java.util.ServiceConfigurationError;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import net.java.truevfs.kernel.spec.FsCompositeDriver;
 import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsManager;
-import net.java.truevfs.kernel.spec.FsMetaDriver;
+import net.java.truevfs.kernel.spec.FsManagerWithControllerFactory;
 import net.java.truevfs.kernel.spec.FsModel;
 
 /**
@@ -19,21 +19,21 @@ import net.java.truevfs.kernel.spec.FsModel;
  */
 @Immutable
 public class InstrumentingMetaDriver<M extends Mediator<M>>
-implements FsMetaDriver {
+implements FsCompositeDriver {
 
     protected final M mediator;
-    protected final FsMetaDriver driver;
+    protected final FsCompositeDriver driver;
 
     public InstrumentingMetaDriver(
             final M mediator,
-            final FsMetaDriver driver) {
+            final FsCompositeDriver driver) {
         this.mediator = Objects.requireNonNull(mediator);
         this.driver = Objects.requireNonNull(driver);
     }
 
     @Override
     public FsController newController(
-            final FsManager manager,
+            final FsManagerWithControllerFactory manager,
             final FsModel model,
             final @CheckForNull FsController parent)
     throws ServiceConfigurationError {

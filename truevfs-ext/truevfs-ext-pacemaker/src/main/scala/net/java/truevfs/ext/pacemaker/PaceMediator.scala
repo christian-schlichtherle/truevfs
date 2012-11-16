@@ -8,8 +8,9 @@ import net.java.truevfs.comp.inst._
 import net.java.truevfs.comp.jmx._
 import net.java.truevfs.kernel.spec._
 
-/**
-  * A mediator for the instrumentation of the TrueVFS Kernel with a
+private object PaceMediator extends PaceMediator
+
+/** A mediator for the instrumentation of the TrueVFS Kernel with a
   * [[net.java.truevfs.ext.pace.PaceManager]].
   *
   * @author Christian Schlichtherle
@@ -22,5 +23,3 @@ private class PaceMediator extends JmxMediator[PaceMediator] with Immutable {
   override def instrument(origin: InstrumentingManager[PaceMediator], subject: FsController) =
     new PaceController(origin.asInstanceOf[PaceManager], subject)
 }
-
-private object PaceMediator extends PaceMediator

@@ -7,23 +7,22 @@ package net.java.truevfs.driver.http;
 import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsDriver;
-import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truecommons.cio.IoBufferPool;
+import net.java.truevfs.kernel.spec.FsManagerWithControllerFactory;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.PoolingClientConnectionManager;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 
 /**
  * A file system driver for the HTTP(S) schemes.
  * <p>
  * Subclasses must be thread-safe and should be immutable!
- * 
+ *
  * @see     #newClient()
  * @author  Christian Schlichtherle
  */
@@ -39,7 +38,7 @@ public class HttpDriver extends FsDriver {
 
     /**
      * Returns the cached http client obtained by calling {@link #newClient()}.
-     * 
+     *
      * @return The cached http client obtained by calling {@link #newClient()}.
      */
     protected final HttpClient getClient() {
@@ -54,7 +53,7 @@ public class HttpDriver extends FsDriver {
      * {@code new DefaultHttpClient(new ThreadSafeClientConnManager())}.
      * If you need special configuration, e.g. for authentication or caching,
      * then you should override this method.
-     * 
+     *
      * @return A new http client.
      */
     protected HttpClient newClient() {
@@ -85,7 +84,7 @@ public class HttpDriver extends FsDriver {
 
     @Override
     public FsController newController(
-            final FsManager manager,
+            final FsManagerWithControllerFactory manager,
             final FsModel model,
             final @CheckForNull FsController parent) {
         assert null == parent;

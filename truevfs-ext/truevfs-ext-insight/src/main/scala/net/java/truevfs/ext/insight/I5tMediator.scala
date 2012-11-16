@@ -57,7 +57,7 @@ extends JmxMediator[I5tMediator] {
   final override def instrument(subject: IoBufferPool) =
     new InstrumentingBufferPool[I5tMediator](bufferIoMediator, subject)
 
-  final override def instrument(origin: InstrumentingManager[I5tMediator], subject: FsMetaDriver) =
+  final override def instrument(origin: InstrumentingManager[I5tMediator], subject: FsCompositeDriver) =
     new InstrumentingMetaDriver[I5tMediator](this, subject)
 
   final override def instrument(origin: InstrumentingManager[I5tMediator], subject: FsController) =

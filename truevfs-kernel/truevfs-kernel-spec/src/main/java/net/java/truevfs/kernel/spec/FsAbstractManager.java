@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.io.IOException;
 import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.Filter;
 import net.java.truecommons.shed.UniqueObject;
@@ -26,58 +25,18 @@ extends UniqueObject implements FsManager {
             final Filter<? super FsController> filter,
             final Visitor<? super FsController, FsSyncException> visitor)
     throws FsSyncException {
-        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
+        final FsSyncExceptionBuilder b = new FsSyncExceptionBuilder();
 
         class AssembleExceptionVisitor
         implements Visitor<FsController, FsSyncException> {
             @Override
-            public void visit(final FsController controller) {
-                try {
-                    visitor.visit(controller);
-                } catch (final FsSyncException ex) {
-                    builder.warn(ex);
-                }
+            public void visit(final FsController c) {
+                try { visitor.visit(c); }
+                catch (final FsSyncException ex) { b.warn(ex); }
             }
         } // AssembleExceptionVisitor
 
         visit(filter, new AssembleExceptionVisitor());
-        builder.check();
-    }
-
-    @Override
-    public final <X extends IOException> void visit(
-            final Filter<? super FsController> filter,
-            final Visitor<? super FsController, X> visitor)
-    throws X {
-        try (final FsControllerStream s = stream(filter)) {
-            for (final FsController c : s) visitor.visit(c);
-        }
-    }
-
-    /**
-     * Returns a file system controller stream which results from filtering
-     * and sorting the managed file system controllers so that any child file
-     * systems appear <em>before</em> their respective parent file system in
-     * the stream.
-     * This ensures that when calling {@link #sync}, all file system changes
-     * have been processed upon successful termination.
-     *
-     * @param  filter the filter to apply to the managed file system
-     *         controllers.
-     * @return A filtered stream of managed file system controllers in reverse
-     *         order of their {@link FsMountPoint} mount point.
-     */
-    protected abstract FsControllerStream stream(
-            Filter<? super FsController> filter);
-
-    /**
-     * Returns a string representation of this object for debugging and logging
-     * purposes.
-     */
-    @Override
-    public String toString() {
-        return String.format("%s@%x",
-                getClass().getName(),
-                hashCode());
+        b.check();
     }
 }
