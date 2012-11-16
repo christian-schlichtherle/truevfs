@@ -26,7 +26,7 @@ import org.junit.Test;
  */
 public abstract class FsManagerTestSuite {
 
-    private final FsMetaDriver driver = new FsSimpleMetaDriver(
+    private final FsCompositeDriver driver = new FsSimpleCompositeDriver(
             new MockDriverMapContainer("file|tar|tar.gz|zip"));
     private FsManager manager;
 

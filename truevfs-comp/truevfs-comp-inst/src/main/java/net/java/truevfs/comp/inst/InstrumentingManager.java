@@ -27,7 +27,7 @@ extends FsDecoratingManager {
 
     @Override
     public FsController controller(
-            FsMetaDriver driver,
+            FsCompositeDriver driver,
             FsMountPoint mountPoint) {
         return mediator.instrument(this,
                 manager.controller(

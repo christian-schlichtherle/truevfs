@@ -21,7 +21,7 @@ private class LogMediator extends Mediator[LogMediator] with Immutable {
   override def instrument(subject: IoBufferPool): IoBufferPool =
     new InstrumentingBufferPool[LogMediator](this, subject)
 
-  override def instrument(origin: InstrumentingManager[LogMediator], subject: FsMetaDriver): FsMetaDriver =
+  override def instrument(origin: InstrumentingManager[LogMediator], subject: FsCompositeDriver): FsCompositeDriver =
     new InstrumentingMetaDriver[LogMediator](this, subject)
 
   override def instrument(origin: InstrumentingBufferPool[LogMediator], subject: IoBuffer): IoBuffer =

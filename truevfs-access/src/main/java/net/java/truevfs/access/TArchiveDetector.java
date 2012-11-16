@@ -15,7 +15,7 @@ import net.java.truecommons.services.Loader;
 import net.java.truecommons.shed.ExtensionSet;
 import net.java.truecommons.shed.HashMaps;
 import static net.java.truecommons.shed.HashMaps.initialCapacity;
-import net.java.truevfs.kernel.spec.FsAbstractMetaDriver;
+import net.java.truevfs.kernel.spec.FsAbstractCompositeDriver;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
@@ -54,7 +54,7 @@ import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class TArchiveDetector extends FsAbstractMetaDriver {
+public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     /**
      * This instance never recognizes any archive files in a path.

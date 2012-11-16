@@ -24,20 +24,6 @@ import net.java.truecommons.shed.Visitor;
 public interface FsManager {
 
     /**
-     * Returns a new thread-safe archive file system controller.
-     * This is a pure function without side effects.
-     *
-     * @param  driver the archive driver.
-     * @param  model the file system model.
-     * @param  parent the parent file system controller.
-     * @return A new archive file system controller.
-     */
-    FsController newController(
-            FsArchiveDriver<? extends FsArchiveEntry> driver,
-            FsModel model,
-            FsController parent);
-
-    /**
      * Returns the thread-safe file system controller for the given mount point.
      * The life cycle of the returned file system controller gets managed by
      * this manager, i.e. it gets remembered for future lookup and
@@ -48,7 +34,7 @@ public interface FsManager {
      * @param  mountPoint the mount point of the file system.
      * @return The thread-safe file system controller for the given mount point.
      */
-    FsController controller(FsMetaDriver driver, FsMountPoint mountPoint);
+    FsController controller(FsCompositeDriver driver, FsMountPoint mountPoint);
 
     /**
      * Uses the given visitor to {@link FsController#sync sync()} all managed

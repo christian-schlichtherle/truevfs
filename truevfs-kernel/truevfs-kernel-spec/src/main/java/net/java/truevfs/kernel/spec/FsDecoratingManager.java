@@ -16,7 +16,7 @@ import net.java.truecommons.shed.Visitor;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public abstract class FsDecoratingManager implements FsManager {
+public abstract class FsDecoratingManager extends FsAbstractManager {
 
     /** The decorated file system manager. */
     protected final FsManager manager;
@@ -26,17 +26,8 @@ public abstract class FsDecoratingManager implements FsManager {
     }
 
     @Override
-    public final FsController newController(
-            FsArchiveDriver<? extends FsArchiveEntry> driver,
-            FsModel model,
-            FsController parent) {
-        assert false : "This method should never get called on this class!";
-        return manager.newController(driver, model, parent);
-    }
-
-    @Override
     public FsController controller(
-            FsMetaDriver driver,
+            FsCompositeDriver driver,
             FsMountPoint mountPoint) {
         return manager.controller(driver, mountPoint);
     }

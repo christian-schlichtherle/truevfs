@@ -18,35 +18,24 @@ import net.java.truecommons.shed.ImplementationsShouldExtend;
  * @see    FsDriver
  * @author Christian Schlichtherle
  */
-@ImplementationsShouldExtend(FsAbstractMetaDriver.class)
-public interface FsMetaDriver {
+@ImplementationsShouldExtend(FsAbstractCompositeDriver.class)
+public interface FsCompositeDriver
+extends FsControllerFactory<FsManagerWithControllerFactory> {
 
     /**
-     * Returns a new thread-safe file system controller for the mount point of
-     * the given file system model.
+     * {@inheritDoc}
+     * <p>
      * The file system controller gets created by using a
      * {@link FsDriver file system driver} which gets looked up by querying the
      * scheme of the mount point of the given file system model with the
      * expression {@code model.getMountPoint().getScheme()}.
-     * <p>
-     * When called, you may assert the following precondition:
-     * <pre>{@code
-     * assert null == parent
-     *         ? null == model.getParent()
-     *         : parent.getModel().equals(model.getParent())
-     * }</pre>
      *
-     * @param  manager the manager of the new file system controller.
-     * @param  model the file system model.
-     * @param  parent the nullable parent file system controller.
-     * @return A new thread-safe file system controller for the mount point of
-     *         the given file system model.
      * @throws ServiceConfigurationError if no appropriate file system driver
      *         is known for the scheme of the given mount point.
-     * @see    FsDriver#newController
      */
+    @Override
     FsController newController(
-            FsManager manager,
+            FsManagerWithControllerFactory context,
             FsModel model,
             @CheckForNull FsController parent)
     throws ServiceConfigurationError;

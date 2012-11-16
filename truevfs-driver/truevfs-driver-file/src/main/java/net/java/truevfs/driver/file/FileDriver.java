@@ -8,12 +8,12 @@ import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsDriver;
-import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsModel;
+import net.java.truevfs.kernel.spec.FsManagerWithControllerFactory;
 
 /**
  * A file system driver for the FILE scheme.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -21,7 +21,7 @@ public final class FileDriver extends FsDriver {
 
     @Override
     public FsController newController(
-            final FsManager manager,
+            final FsManagerWithControllerFactory manager,
             final FsModel model,
             final @CheckForNull FsController parent) {
         assert null == parent;

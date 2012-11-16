@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.UniqueObject;
 
@@ -12,46 +11,26 @@ import net.java.truecommons.shed.UniqueObject;
  * An abstract factory for components required to access a file system.
  * <p>
  * Subclasses should be immutable.
- * 
+ *
+ * @param  <This> The type of this driver.
  * @see    FsMetaDriver
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class FsDriver extends UniqueObject {
+public abstract class FsDriver
+extends UniqueObject
+implements FsControllerFactory<FsManagerWithControllerFactory> {
 
     /**
      * Returns {@code true} iff this is an archive driver, i.e. if file systems
      * of this type must be a member of a parent file system.
      * <p>
      * The implementation in the class {@link FsDriver} returns {@code false}.
-     * 
+     *
      * @return {@code true} iff this is an archive driver, i.e. if file systems
      *         of this type must be a member of a parent file system.
      */
     public boolean isArchiveDriver() { return false; }
-
-    /**
-     * Returns a new thread-safe file system controller for the mount point of
-     * the given file system model.
-     * <p>
-     * When called, you may assert the following precondition:
-     * <pre>{@code
-     * assert null == parent
-     *         ? null == model.getParent()
-     *         : parent.getModel().equals(model.getParent())
-     * }</pre>
-     *
-     * @param  manager the manager of the new file system controller.
-     * @param  model the file system model.
-     * @param  parent the nullable parent file system controller.
-     * @return A new thread-safe file system controller for the mount point of
-     *         the given file system model.
-     * @see    FsMetaDriver#newController
-     */
-    public abstract FsController newController(
-            FsManager manager,
-            FsModel model,
-            @CheckForNull FsController parent);
 
     /**
      * Returns a string representation of this object for debugging and logging

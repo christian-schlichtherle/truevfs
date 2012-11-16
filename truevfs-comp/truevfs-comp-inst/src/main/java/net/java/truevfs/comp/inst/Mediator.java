@@ -11,7 +11,7 @@ import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.cio.*;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
-import net.java.truevfs.kernel.spec.FsMetaDriver;
+import net.java.truevfs.kernel.spec.FsCompositeDriver;
 import net.java.truevfs.kernel.spec.FsModel;
 
 /**
@@ -60,9 +60,9 @@ public abstract class Mediator<This extends Mediator<This>> {
      *         does not want to instrument it.
      * @see    #instrument(FsManager)
      */
-    public FsMetaDriver instrument(
+    public FsCompositeDriver instrument(
             InstrumentingManager<This> origin,
-            FsMetaDriver subject) {
+            FsCompositeDriver subject) {
         return subject;
     }
 
@@ -103,7 +103,7 @@ public abstract class Mediator<This extends Mediator<This>> {
      * @param  subject the object to instrument.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
-     * @see    #instrument(InstrumentingManager, FsMetaDriver)
+     * @see    #instrument(InstrumentingManager, FsCompositeDriver)
      */
     public FsModel instrument(
             InstrumentingMetaDriver<This> origin,
@@ -118,7 +118,7 @@ public abstract class Mediator<This extends Mediator<This>> {
      * @param  subject the object to instrument.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
-     * @see    #instrument(InstrumentingManager, FsMetaDriver)
+     * @see    #instrument(InstrumentingManager, FsCompositeDriver)
      */
     public FsController instrument(
             InstrumentingMetaDriver<This> origin,

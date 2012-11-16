@@ -15,13 +15,53 @@ import java.util.concurrent.locks._
 import javax.annotation.concurrent._
 import DefaultManager._
 
+@ThreadSafe
+private object DefaultManager {
+
+  type ControllerFilter = Filter[_ >: FsController]
+  type ControllerVisitor[X <: IOException] = Visitor[_ >: FsController, X]
+
+  private final class FrontController(c: FsController)
+  extends FsDecoratingController(c)
+  with FinalizeController
+
+  // HC SVNT DRACONES!
+  // The LockController extends the SyncController so that
+  // the extended controller (chain) doesn't need to be thread safe.
+  // The SyncController extends the CacheController because the
+  // selective entry cache needs to get flushed on a NeedsSyncException.
+  // The CacheController extends the ResourceController because the
+  // cache entries terminate streams and channels and shall not stop the
+  // extended controller (chain) from getting synced.
+  // The ResourceController extends the TargetArchiveController so that
+  // trying to sync the file system while any stream or channel to the
+  // latter is open gets detected and properly dealt with.
+  private final class BackController[E <: FsArchiveEntry](
+    driver: FsArchiveDriver[E],
+    model: FsModel,
+    parent: FsController
+  ) extends TargetArchiveController[E](driver, model, parent)
+  with ResourceController[E]
+  with CacheController[E]
+  with SyncController[E]
+  with LockController[E] {
+    override val pool = driver.getPool
+    require(null ne pool)
+  }
+
+  private object ReverseControllerOrdering
+  extends FsControllerComparator with Ordering[FsController]
+}
+
 /** The default implementation of a file system manager.
   *
   * @author Christian Schlichtherle
   */
 @ThreadSafe
 private final class DefaultManager
-extends FsAbstractManager with ReentrantReadWriteLockAspect {
+extends FsAbstractManager
+with FsManagerWithControllerFactory
+with ReentrantReadWriteLockAspect {
 
   override val lock = new ReentrantReadWriteLock
 
@@ -33,7 +73,7 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
     new WeakHashMap[FsMountPoint, Link[FsController]]
 
   override def newController
-  (driver: AnyArchiveDriver, model: FsModel, parent: FsController) = {
+  (context: AnyArchiveDriver, model: FsModel, parent: FsController) = {
     assert(!model.isInstanceOf[ArchiveModel[_]])
     // HC SVNT DRACONES!
     // The FalsePositiveArchiveController decorates the FrontController
@@ -41,12 +81,12 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
     // operations on false positive archive files.
     new FalsePositiveArchiveController(
       new FrontController(
-        driver decorate
+        context decorate
           new ArchiveControllerAdapter(parent,
-            new BackController(driver, model, parent))))
+            new BackController(context, model, parent))))
   }
 
-  override def controller(driver: FsMetaDriver, mountPoint: FsMountPoint): FsController = {
+  override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint): FsController = {
     try {
       readLocked(controller0(driver, mountPoint))
     } catch {
@@ -56,7 +96,7 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
     }
   }
 
-  private def controller0(d: FsMetaDriver, mp: FsMountPoint): FsController = {
+  private def controller0(d: FsCompositeDriver, mp: FsMountPoint): FsController = {
     controllers get mp flatMap (l => Option(l.get)) match {
       case Some(c) => c
       case None =>
@@ -114,66 +154,21 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
   } // ManagedModel
 
   override def sync(
-    filter: Filter[_ >: FsController],
-    visitor: Visitor[_ >: FsController, FsSyncException])
-  {
+    filter: ControllerFilter,
+    visitor: ControllerVisitor[FsSyncException]
+  ) {
     if (filter == Filter.ACCEPT_ANY) SyncShutdownHook remove ()
     super.sync(filter, visitor)
   }
 
-  /** Returns a new stream which represents a snapshot of the managed file
-    * system controllers.
-    *
-    * @param filter the file system controller filter to apply.
-    */
-  override def stream(filter: Filter[_ >: FsController]) = {
-    val iseq = readLocked(
-      controllers
-      .values
-      .flatMap(l => Option(l.get))
-      .filter(filter accept _)
-      .toIndexedSeq
-    )
-    final class Stream extends FsControllerStream {
-      var list = iseq.sorted(ReverseControllerOrdering).asJava
-      override def size = list.size
-      override def iterator = list.iterator
-      override def close() { list = null }
-    }
-    new Stream
+  override def visit[X <: IOException](
+    filter: ControllerFilter,
+    visitor: ControllerVisitor[X]
+  ) {
+    readLocked(controllers.values flatMap (l => Option(l.get)))
+    .filter (filter accept _)
+    .toIndexedSeq
+    .sorted (ReverseControllerOrdering)
+    .foreach (visitor visit _)
   }
-}
-
-@ThreadSafe
-private object DefaultManager {
-  private final class FrontController(c: FsController)
-  extends FsDecoratingController(c)
-  with FinalizeController
-
-  // HC SVNT DRACONES!
-  // The LockController extends the SyncController so that
-  // the extended controller (chain) doesn't need to be thread safe.
-  // The SyncController extends the CacheController because the
-  // selective entry cache needs to get flushed on a NeedsSyncException.
-  // The CacheController extends the ResourceController because the
-  // cache entries terminate streams and channels and shall not stop the
-  // extended controller (chain) from getting synced.
-  // The ResourceController extends the TargetArchiveController so that
-  // trying to sync the file system while any stream or channel to the
-  // latter is open gets detected and properly dealt with.
-  private final class BackController[E <: FsArchiveEntry](
-    driver: FsArchiveDriver[E],
-    model: FsModel,
-    parent: FsController
-  ) extends TargetArchiveController[E](driver, model, parent)
-  with ResourceController[E]
-  with CacheController[E]
-  with SyncController[E]
-  with LockController[E] {
-    override val pool = driver.getPool
-    require(null ne pool)
-  }
-
-  private object ReverseControllerOrdering
-  extends FsControllerComparator with Ordering[FsController]
 }

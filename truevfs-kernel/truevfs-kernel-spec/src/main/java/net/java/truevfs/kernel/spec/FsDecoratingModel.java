@@ -23,14 +23,10 @@ public abstract class FsDecoratingModel extends FsAbstractModel {
     }
 
     @Override
-    public boolean isMounted() {
-        return model.isMounted();
-    }
+    public boolean isMounted() { return model.isMounted(); }
 
     @Override
-    public void setMounted(boolean touched) {
-        model.setMounted(touched);
-    }
+    public void setMounted(boolean touched) { model.setMounted(touched); }
 
     /**
      * Returns a string representation of this object for debugging and logging
