@@ -19,7 +19,6 @@ import java.util.Comparator;
  * that all file systems reflect all changes once the list has been completely
  * processed.
  *
- * @see    FsControllerStream
  * @author Christian Schlichtherle
  */
 public class FsControllerComparator
