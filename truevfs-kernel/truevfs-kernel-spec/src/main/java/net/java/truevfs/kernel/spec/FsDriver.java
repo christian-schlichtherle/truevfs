@@ -12,8 +12,7 @@ import net.java.truecommons.shed.UniqueObject;
  * <p>
  * Subclasses should be immutable.
  *
- * @param  <This> The type of this driver.
- * @see    FsMetaDriver
+ * @see    FsCompositeDriver
  * @author Christian Schlichtherle
  */
 @Immutable
