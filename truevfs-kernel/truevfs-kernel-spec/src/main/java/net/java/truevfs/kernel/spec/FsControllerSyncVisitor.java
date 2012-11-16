@@ -20,7 +20,7 @@ import net.java.truecommons.shed.Visitor;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class FsControllerSyncVisitor
+public final class FsControllerSyncVisitor
 implements Visitor<FsController, FsSyncException> {
 
     private final BitField<FsSyncOption> options;
