@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.driver.http;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -52,9 +53,7 @@ public class HttpNode extends FsAbstractNode implements IoEntry<HttpNode> {
         this.uri = controller.resolve(name).getUri();
     }
 
-    final IoBufferPool getPool() {
-        return controller.getPool();
-    }
+    final IoBufferPool getPool() { return controller.getPool(); }
 
     private HttpResponse executeHead() throws IOException {
         return controller.executeHead(this);
@@ -64,13 +63,9 @@ public class HttpNode extends FsAbstractNode implements IoEntry<HttpNode> {
         return controller.executeGet(this);
     }
 
-    protected HttpUriRequest newHead() {
-        return new HttpHead(uri);
-    }
+    protected HttpUriRequest newHead() { return new HttpHead(uri); }
 
-    protected HttpUriRequest newGet() {
-        return new HttpGet(uri);
-    }
+    protected HttpUriRequest newGet() { return new HttpGet(uri); }
 
     private @CheckForNull String getHeaderField(String name) throws IOException {
         final Header header = executeHead().getLastHeader(name);
@@ -90,9 +85,7 @@ public class HttpNode extends FsAbstractNode implements IoEntry<HttpNode> {
     }
 
     @Override
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
     @Override
     public BitField<Type> getTypes() {
@@ -137,9 +130,9 @@ public class HttpNode extends FsAbstractNode implements IoEntry<HttpNode> {
     }
 
     @Override
+    @SuppressFBWarnings("NP_BOOLEAN_RETURN_NULL")
     public Boolean isPermitted(final Access type, final Entity entity) {
-        if (READ != type)
-            return null;
+        if (READ != type) return null;
         try {
             executeHead();
             return true;
@@ -149,23 +142,17 @@ public class HttpNode extends FsAbstractNode implements IoEntry<HttpNode> {
     }
 
     @Override
-    public @Nullable Set<String> getMembers() {
-        return null;
-    }
+    public @Nullable Set<String> getMembers() { return null; }
 
     @Override
-    public final InputSocket<HttpNode> input() {
-        return input(NONE);
-    }
+    public final InputSocket<HttpNode> input() { return input(NONE); }
 
     protected InputSocket<HttpNode> input(BitField<FsAccessOption> options) {
         return new HttpInputSocket(options, this);
     }
 
     @Override
-    public final OutputSocket<HttpNode> output() {
-        return output(NONE, null);
-    }
+    public final OutputSocket<HttpNode> output() { return output(NONE, null); }
 
     protected OutputSocket<HttpNode> output(
             BitField<FsAccessOption> options,

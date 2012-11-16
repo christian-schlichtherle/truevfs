@@ -4,14 +4,14 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truecommons.io.DecoratingOutputStream;
-import net.java.truecommons.io.LittleEndianOutputStream;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truevfs.comp.zip.crypto.CipherOutputStream;
+import net.java.truecommons.io.DecoratingOutputStream;
+import net.java.truecommons.io.LittleEndianOutputStream;
 import net.java.truecommons.key.spec.KeyStrength;
+import net.java.truevfs.comp.zip.crypto.CipherOutputStream;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
@@ -64,9 +64,22 @@ final class WinZipAesOutputStream extends DecoratingOutputStream {
             final LittleEndianOutputStream leos)
     throws IOException {
         super(leos);
+        this.param = param;
+        try {
+            init();
+        } catch (final Throwable ex) {
+            try {
+                leos.close();
+            } catch (final Throwable ex2) {
+                ex.addSuppressed(ex2);
+            }
+            throw ex;
+        }
+    }
+
+    private void init() throws IOException {
         assert null != leos;
         assert null != param;
-        this.param = param;
 
         // Init key strength.
         final KeyStrength keyStrength = param.getKeyStrength();

@@ -8,7 +8,6 @@ import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import net.java.truecommons.io.DecoratingOutputStream;
 
@@ -29,7 +28,7 @@ abstract class IOExceptionOutputStream extends DecoratingOutputStream {
      * @param out the nullable output stream to decorate.
      */
     @CreatesObligation
-    IOExceptionOutputStream(@Nullable @WillCloseWhenClosed OutputStream out) {
+    IOExceptionOutputStream(@WillCloseWhenClosed OutputStream out) {
         super(out);
     }
 

@@ -7,21 +7,22 @@ package net.java.truevfs.comp.tardriver;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.cio.*;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import static net.java.truecommons.cio.Entry.UNKNOWN;
 import net.java.truecommons.io.*;
 import static net.java.truecommons.shed.HashMaps.OVERHEAD_SIZE;
 import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import net.java.truecommons.shed.SuppressedExceptionBuilder;
 import static net.java.truevfs.comp.tardriver.TarDriver.*;
 import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truecommons.cio.*;
-import static net.java.truecommons.cio.Entry.Size.DATA;
-import static net.java.truecommons.cio.Entry.UNKNOWN;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 /**
@@ -136,30 +137,23 @@ implements OutputService<TarDriverEntry> {
         static final DirectoryTemplate INSTANCE = new DirectoryTemplate();
 
         @Override
-        public String getName() {
-            return "/";
-        }
+        public String getName() { return "/"; }
 
         @Override
-        public long getSize(Size type) {
-            return 0;
-        }
+        public long getSize(Size type) { return 0; }
 
         @Override
-        public long getTime(Access type) {
-            return UNKNOWN;
-        }
+        public long getTime(Access type) { return UNKNOWN; }
 
         @Override
-        public Boolean isPermitted(Access type, Entity entity) {
-            return null;
-        }
+        @SuppressFBWarnings("NP_BOOLEAN_RETURN_NULL")
+        public Boolean isPermitted(Access type, Entity entity) { return null; }
     } // DirectoryTemplate
 
     /**
      * Returns whether this TAR output service is busy writing an archive entry
      * or not.
-     * 
+     *
      * @return Whether this TAR output service is busy writing an archive entry
      *         or not.
      */
