@@ -27,12 +27,4 @@
         <module>truevfs-profile-default</module>
         <module>truevfs-profile-full</module>
     </modules>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-shade-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 </project>
