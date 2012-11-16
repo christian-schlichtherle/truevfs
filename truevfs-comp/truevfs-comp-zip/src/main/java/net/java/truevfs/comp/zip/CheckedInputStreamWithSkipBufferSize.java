@@ -6,6 +6,7 @@ package net.java.truevfs.comp.zip;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.CheckedInputStream;
 import java.util.zip.Checksum;
 
 /**
@@ -17,7 +18,8 @@ import java.util.zip.Checksum;
  *
  * @author Christian Schlichtherle
  */
-class CheckedInputStream extends java.util.zip.CheckedInputStream {
+class CheckedInputStreamWithSkipBufferSize extends CheckedInputStream {
+
     private final int skipBufferSize;
 
     /**
@@ -28,7 +30,7 @@ class CheckedInputStream extends java.util.zip.CheckedInputStream {
      * @param cksum the checksum
      * @param skipBufferSize the skip buffer size
      */
-    CheckedInputStream(
+    CheckedInputStreamWithSkipBufferSize(
             final InputStream in,
             final Checksum cksum,
             final int skipBufferSize) {

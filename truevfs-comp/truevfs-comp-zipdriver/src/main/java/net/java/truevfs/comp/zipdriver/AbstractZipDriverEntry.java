@@ -4,15 +4,16 @@
  */
 package net.java.truevfs.comp.zipdriver;
 
-import net.java.truevfs.comp.zip.DateTimeConverter;
-import net.java.truevfs.comp.zip.ZipEntry;
-import net.java.truevfs.kernel.spec.FsArchiveEntries;
-import net.java.truevfs.kernel.spec.FsArchiveEntry;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.cio.Entry;
 import static net.java.truecommons.cio.Entry.Access.WRITE;
 import static net.java.truecommons.cio.Entry.Size.DATA;
 import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
 import static net.java.truecommons.cio.Entry.Type.FILE;
+import net.java.truevfs.comp.zip.DateTimeConverter;
+import net.java.truevfs.comp.zip.ZipEntry;
+import net.java.truevfs.kernel.spec.FsArchiveEntries;
+import net.java.truevfs.kernel.spec.FsArchiveEntry;
 
 /**
  * ZIP archive entries apply the date/time conversion rules as defined by
@@ -40,9 +41,7 @@ public abstract class AbstractZipDriverEntry extends ZipEntry implements FsArchi
     }
 
     @Override
-    public Type getType() {
-        return isDirectory() ? DIRECTORY : FILE;
-    }
+    public Type getType() { return isDirectory() ? DIRECTORY : FILE; }
 
     @Override
     protected abstract DateTimeConverter getDateTimeConverter();
@@ -61,32 +60,28 @@ public abstract class AbstractZipDriverEntry extends ZipEntry implements FsArchi
 
     @Override
     public boolean setSize(final Size type, final long size) {
-        if (DATA != type)
-            return false;
+        if (DATA != type) return false;
         setSize(size);
         return true;
     }
 
     @Override
     public long getTime(Access type) {
-        if (WRITE != type)
-            return FsArchiveEntry.UNKNOWN;
+        if (WRITE != type) return FsArchiveEntry.UNKNOWN;
         long time = getTime();
         return 0 <= time ? time : FsArchiveEntry.UNKNOWN;
     }
 
     @Override
     public boolean setTime(Access type, long time) {
-        if (WRITE != type)
-            return false;
+        if (WRITE != type) return false;
         setTime(time);
         return true;
     }
 
     @Override
-    public Boolean isPermitted(Access type, Entity entity) {
-        return null;
-    }
+    @SuppressFBWarnings("NP_BOOLEAN_RETURN_NULL")
+    public Boolean isPermitted(Access type, Entity entity) { return null; }
 
     @Override
     public boolean setPermitted(Access type, Entity entity, Boolean value) {
@@ -98,7 +93,5 @@ public abstract class AbstractZipDriverEntry extends ZipEntry implements FsArchi
      * purposes.
      */
     @Override
-    public String toString() {
-        return FsArchiveEntries.toString(this);
-    }
+    public String toString() { return FsArchiveEntries.toString(this); }
 }

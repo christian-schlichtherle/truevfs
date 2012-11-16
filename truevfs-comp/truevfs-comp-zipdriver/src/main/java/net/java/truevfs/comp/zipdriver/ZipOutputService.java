@@ -7,6 +7,7 @@ package net.java.truevfs.comp.zipdriver;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -207,24 +208,17 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
         static final DirectoryTemplate INSTANCE = new DirectoryTemplate();
 
         @Override
-        public String getName() {
-            return "/";
-        }
+        public String getName() { return "/"; }
 
         @Override
-        public long getSize(Size type) {
-            return 0;
-        }
+        public long getSize(Size type) { return 0; }
 
         @Override
-        public long getTime(Access type) {
-            return UNKNOWN;
-        }
+        public long getTime(Access type) { return UNKNOWN; }
 
         @Override
-        public Boolean isPermitted(Access type, Entity entity) {
-            return null;
-        }
+        @SuppressFBWarnings("NP_BOOLEAN_RETURN_NULL")
+        public Boolean isPermitted(Access type, Entity entity) { return null; }
     } // DirectoryTemplate
 
     /**

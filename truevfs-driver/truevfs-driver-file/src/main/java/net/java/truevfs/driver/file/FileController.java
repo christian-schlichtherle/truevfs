@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.driver.file;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import static java.io.File.separatorChar;
 import java.io.IOException;
 import java.net.URI;
@@ -100,6 +101,7 @@ final class FileController extends FsAbstractController {
         file.getFileSystem().provider().checkAccess(file, modes);
     }
 
+    @SuppressFBWarnings("SF_SWITCH_NO_DEFAULT")
     private static AccessMode[] modes(final BitField<Access> types) {
         final EnumSet<AccessMode> modes = EnumSet.noneOf(AccessMode.class);
         for (final Access type : types) {

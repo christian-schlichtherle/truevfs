@@ -15,7 +15,7 @@ import java.util.zip.CRC32;
  *
  * @author Christian Schlichtherle
  */
-final class Crc32InputStream extends CheckedInputStream {
+final class Crc32InputStream extends CheckedInputStreamWithSkipBufferSize {
 
     private final ZipEntry entry;
     private boolean closed;

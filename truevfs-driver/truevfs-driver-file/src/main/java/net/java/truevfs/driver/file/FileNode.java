@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.driver.file;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import static java.io.File.separatorChar;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -149,9 +150,9 @@ class FileNode extends FsAbstractNode implements IoBuffer {
     }
 
     @Override
+    @SuppressFBWarnings("NP_BOOLEAN_RETURN_NULL")
     public Boolean isPermitted(final Access type, final Entity entity) {
-        if (!(entity instanceof PosixEntity))
-            return null;
+        if (!(entity instanceof PosixEntity)) return null;
         try {
             final Set<PosixFilePermission> permissions = getPosixFilePermissions(path);
             switch ((PosixEntity) entity) {

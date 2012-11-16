@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.kernel.spec;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
@@ -21,7 +22,10 @@ import java.util.Comparator;
  * @see    FsControllerStream
  * @author Christian Schlichtherle
  */
-public class FsControllerComparator implements Comparator<FsController> {
+public class FsControllerComparator
+implements Comparator<FsController>, Serializable {
+
+    private static final long serialVersionUID = 0L;
 
     @Override
     public int compare(FsController o1, FsController o2) {

@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.comp.jmx;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
@@ -204,6 +205,7 @@ extends StandardMBean implements JmxModelMXBean {
             public long getTime(Access type) { return UNKNOWN; }
 
             @Override
+            @SuppressFBWarnings("NP_BOOLEAN_RETURN_NULL")
             public Boolean isPermitted(Access type, Entity entity) {
                 return null;
             }

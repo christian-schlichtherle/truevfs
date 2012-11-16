@@ -4,19 +4,20 @@
  */
 package net.java.truevfs.comp.tardriver;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.Date;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import net.java.truecommons.shed.Releasable;
-import net.java.truevfs.kernel.spec.FsArchiveEntries;
-import net.java.truevfs.kernel.spec.FsArchiveEntry;
 import static net.java.truecommons.cio.Entry.Access.WRITE;
 import static net.java.truecommons.cio.Entry.Size.DATA;
 import static net.java.truecommons.cio.Entry.Size.STORAGE;
 import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
 import static net.java.truecommons.cio.Entry.Type.FILE;
 import net.java.truecommons.cio.IoBuffer;
+import net.java.truecommons.shed.Releasable;
+import net.java.truevfs.kernel.spec.FsArchiveEntries;
+import net.java.truevfs.kernel.spec.FsArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 /**
@@ -68,24 +69,16 @@ implements FsArchiveEntry, Releasable<IOException> {
         super.setDevMinor(template.getDevMinor());
     }
 
-    private boolean isInit(final int mask) {
-        return 0 != (init & mask);
-    }
+    private boolean isInit(final int mask) { return 0 != (init & mask); }
 
     private void setInit(final int mask, final boolean init) {
-        if (init)
-            this.init |=  mask;
-        else
-            this.init &= ~mask;
+        if (init) this.init |=  mask;
+        else      this.init &= ~mask;
     }
 
-    @Nullable IoBuffer getBuffer() {
-        return buffer;
-    }
+    @Nullable IoBuffer getBuffer() { return buffer; }
 
-    void setBuffer(@CheckForNull IoBuffer buffer) {
-        this.buffer = buffer;
-    }
+    void setBuffer(final @CheckForNull IoBuffer buffer) { this.buffer = buffer; }
 
     @Override
     public void release() throws IOException {
@@ -96,19 +89,13 @@ implements FsArchiveEntry, Releasable<IOException> {
     }
 
     @Override
-    public Type getType() {
-        return isDirectory() ? DIRECTORY : FILE;
-    }
+    public Type getType() { return isDirectory() ? DIRECTORY : FILE; }
 
     @Override
-    public long getSize() {
-        return isInit(SIZE) ? super.getSize() : UNKNOWN;
-    }
+    public long getSize() { return isInit(SIZE) ? super.getSize() : UNKNOWN; }
 
     @Override
-    public void setSize(long size) {
-        setSize0(size);
-    }
+    public void setSize(long size) { setSize0(size); }
 
     private void setSize0(final long size) {
         final boolean known = UNKNOWN != size;
@@ -129,8 +116,7 @@ implements FsArchiveEntry, Releasable<IOException> {
 
     @Override
     public boolean setSize(final Size type, final long size) {
-        if (DATA != type)
-            return false;
+        if (DATA != type) return false;
         setSize(size);
         return true;
     }
@@ -141,9 +127,7 @@ implements FsArchiveEntry, Releasable<IOException> {
     }
 
     @Override
-    public void setModTime(long time) {
-        setModTime0(time);
-    }
+    public void setModTime(long time) { setModTime0(time); }
 
     private void setModTime0(final long time) {
         final boolean known = UNKNOWN != time;
@@ -152,30 +136,26 @@ implements FsArchiveEntry, Releasable<IOException> {
     }
 
     @Override
-    public void setModTime(Date time) {
-        setModTime(time.getTime());
-    }
+    public void setModTime(Date time) { setModTime(time.getTime()); }
 
     @Override
     public long getTime(Access type) {
-        if (WRITE != type)
-            return UNKNOWN;
+        if (WRITE != type) return UNKNOWN;
         long time = getModTime().getTime();
         return 0 <= time ? time : UNKNOWN;
     }
 
     @Override
     public boolean setTime(Access type, long time) {
-        if (WRITE != type)
-            return false;
+        if (WRITE != type) return false;
         setModTime(time);
         return true;
     }
 
     @Override
+    @SuppressFBWarnings("NP_BOOLEAN_RETURN_NULL")
     public Boolean isPermitted(final Access type, final Entity entity) {
-        if (!(entity instanceof PosixEntity))
-            return null;
+        if (!(entity instanceof PosixEntity)) return null;
         switch ((PosixEntity) entity) {
         case USER:
             switch (type) {
@@ -215,8 +195,7 @@ implements FsArchiveEntry, Releasable<IOException> {
             final Access type,
             final Entity entity,
             final Boolean value) {
-        if (null == value || !(entity instanceof PosixEntity))
-            return false;
+        if (null == value || !(entity instanceof PosixEntity)) return false;
         switch ((PosixEntity) entity) {
         case USER:
             switch (type) {
@@ -265,7 +244,5 @@ implements FsArchiveEntry, Releasable<IOException> {
      * purposes.
      */
     @Override
-    public String toString() {
-        return FsArchiveEntries.toString(this);
-    }
+    public String toString() { return FsArchiveEntries.toString(this); }
 }

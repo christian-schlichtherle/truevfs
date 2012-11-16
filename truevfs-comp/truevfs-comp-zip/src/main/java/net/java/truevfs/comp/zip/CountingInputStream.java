@@ -4,13 +4,12 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truecommons.io.DecoratingInputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.io.DecoratingInputStream;
 
 /**
  * A decorating input stream which counts the number of bytes read or skipped!
@@ -23,13 +22,8 @@ final class CountingInputStream extends DecoratingInputStream {
     /** The number of bytes read. */
     private long bytesRead;
 
-    /**
-     * Constructs a new counting input stream.
-     *
-     * @param in the decorated input stream.
-     */
     @CreatesObligation
-    CountingInputStream(@Nullable @WillCloseWhenClosed InputStream in) {
+    CountingInputStream(@WillCloseWhenClosed InputStream in) {
         super(in);
     }
 

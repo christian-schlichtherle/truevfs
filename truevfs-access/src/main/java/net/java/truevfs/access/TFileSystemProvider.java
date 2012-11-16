@@ -23,12 +23,12 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.annotations.ServiceImplementation;
 import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
 import static net.java.truecommons.cio.Entry.Type.FILE;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.IoSockets;
 import net.java.truecommons.cio.OutputSocket;
-import net.java.truecommons.annotations.ServiceImplementation;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.access.TUriHelper.*;
@@ -171,7 +171,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public TFileSystem newFileSystem(Path path, Map<String, ?> configuration) {
-        try (final TConfig config = open(configuration)) {
+        try (final TConfig _ = open(configuration)) {
             final TPath p = new TPath(path);
             if (null == p.getMountPoint().getParent())
                 throw new UnsupportedOperationException("No prospective archive file detected."); // don't be greedy!
@@ -203,7 +203,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      */
     @Override
     public TFileSystem newFileSystem(URI uri, Map<String, ?> configuration) {
-        try (final TConfig config = open(configuration)) {
+        try (final TConfig _ = open(configuration)) {
             return getFileSystem(uri);
         }
     }

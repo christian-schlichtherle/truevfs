@@ -26,6 +26,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.io.BufferedReadOnlyChannel;
 import net.java.truecommons.io.ChannelInputStream;
 import net.java.truecommons.io.IntervalReadOnlyChannel;
+import net.java.truecommons.io.MutableBuffer;
 import net.java.truecommons.io.PowerBuffer;
 import net.java.truecommons.io.ReadOnlyChannel;
 import net.java.truecommons.io.Source;
@@ -201,7 +202,7 @@ implements Closeable, Iterable<E> {
             final boolean postambled)
     throws IOException {
         // Search for End of central directory record.
-        final PowerBuffer eocdr = PowerBuffer
+        final MutableBuffer eocdr = MutableBuffer
                 .allocate(EOCDR_MIN_LEN)
                 .littleEndian();
         final long max = length - EOCDR_MIN_LEN;
@@ -246,7 +247,7 @@ implements Closeable, Iterable<E> {
 
             // Check for ZIP64 End Of Central Directory Locator.
             final long eocdlPos = eocdrPos - ZIP64_EOCDL_LEN;
-            final PowerBuffer zip64eocdl = PowerBuffer
+            final MutableBuffer zip64eocdl = MutableBuffer
                 .allocate(ZIP64_EOCDL_LEN)
                 .littleEndian();
             // zip64 end of central dir locator
@@ -276,7 +277,7 @@ implements Closeable, Iterable<E> {
                         "ZIP file spanning/splitting is not supported!");
 
             // Read Zip64 End Of Central Directory Record.
-            final PowerBuffer zip64eocdr = PowerBuffer
+            final MutableBuffer zip64eocdr = MutableBuffer
                     .allocate(ZIP64_EOCDR_MIN_LEN)
                     .littleEndian()
                     .load(channel.position(zip64eocdrPos));
@@ -353,7 +354,7 @@ implements Closeable, Iterable<E> {
             final SeekableByteChannel channel,
             int numEntries)
     throws IOException {
-        final PowerBuffer cfh = PowerBuffer
+        final MutableBuffer cfh = MutableBuffer
                 .allocate(CFH_MIN_LEN)
                 .littleEndian();
         final Map<String, E> entries = new LinkedHashMap<>(
@@ -365,7 +366,7 @@ implements Closeable, Iterable<E> {
             cfh.limit(CFH_MIN_LEN).load(channel);
             final int gpbf = cfh.position(8).getUShort();
             final int nameLen = cfh.position(28).getUShort();
-            final PowerBuffer name = PowerBuffer
+            final MutableBuffer name = MutableBuffer
                     .allocate(nameLen)
                     .load(channel);
             // See appendix D of PKWARE's ZIP File Format Specification.
@@ -492,7 +493,7 @@ implements Closeable, Iterable<E> {
                 channel = new SafeBufferedReadOnlyChannel(channel(), length);
         while (0 < postamble) {
             long pos = length - postamble;
-            final PowerBuffer lfh = PowerBuffer
+            final MutableBuffer lfh = MutableBuffer
                     .allocate(LFH_MIN_LEN)
                     .littleEndian()
                     .load(channel.position(pos));
@@ -577,7 +578,16 @@ implements Closeable, Iterable<E> {
                         case BZIP2:
                             din = new CountingInputStream(
                                     new ChannelInputStream(echannel));
-                            in = new BZip2CompressorInputStream(din);
+                            try {
+                                in = new BZip2CompressorInputStream(din);
+                            } catch (final Throwable ex) {
+                                try {
+                                    din.close();
+                                } catch (final Throwable ex2) {
+                                    ex.addSuppressed(ex2);
+                                }
+                                throw ex;
+                            }
                             break;
                         default:
                             throw new ZipException(entry.getName()
@@ -612,7 +622,7 @@ implements Closeable, Iterable<E> {
                     // We have reconstituted all meta data for the entry.
                     // Next comes the Data Descriptor.
                     // Let's parse and check it.
-                    final PowerBuffer dd = PowerBuffer
+                    final MutableBuffer dd = MutableBuffer
                             .allocate(entry.isZip64ExtensionsRequired()
                                 ? 4 + 8 + 8
                                 : 4 + 4 + 4)
@@ -900,7 +910,7 @@ implements Closeable, Iterable<E> {
         long pos = entry.getOffset();
         assert UNKNOWN != pos;
         pos = mapper.map(pos);
-        final PowerBuffer lfh = PowerBuffer
+        final MutableBuffer lfh = MutableBuffer
                 .allocate(LFH_MIN_LEN)
                 .littleEndian()
                 .load(channel.position(pos));
@@ -952,7 +962,7 @@ implements Closeable, Iterable<E> {
                     // Note the Data Descriptor's Signature is optional:
                     // All newer apps should write it (and so does TrueVFS),
                     // but older apps might not.
-                    final PowerBuffer dd = PowerBuffer
+                    final MutableBuffer dd = MutableBuffer
                             .allocate(8)
                             .littleEndian()
                             .load(channel.position(pos + entry.getCompressedSize()));
