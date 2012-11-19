@@ -6,10 +6,10 @@ package net.java.truevfs.driver.file;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+import net.java.truevfs.kernel.spec.FsArchiveManager;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsManagerWithControllerFactory;
 
 /**
  * A file system driver for the FILE scheme.
@@ -21,7 +21,7 @@ public final class FileDriver extends FsDriver {
 
     @Override
     public FsController newController(
-            final FsManagerWithControllerFactory manager,
+            final FsArchiveManager manager,
             final FsModel model,
             final @CheckForNull FsController parent) {
         assert null == parent;

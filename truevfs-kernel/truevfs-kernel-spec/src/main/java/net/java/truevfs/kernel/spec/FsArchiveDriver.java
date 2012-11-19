@@ -56,7 +56,7 @@ extends FsDriver {
      */
     @Override
     public final FsController newController(
-            FsManagerWithControllerFactory context,
+            FsArchiveManager context,
             FsModel model,
             @Nonnull FsController parent) {
         assert parent.getModel().equals(model.getParent());

@@ -60,7 +60,7 @@ private object DefaultManager {
 @ThreadSafe
 private final class DefaultManager
 extends FsAbstractManager
-with FsManagerWithControllerFactory
+with FsArchiveManager
 with ReentrantReadWriteLockAspect {
 
   override val lock = new ReentrantReadWriteLock
