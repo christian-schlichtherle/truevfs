@@ -106,7 +106,7 @@ public abstract class Mediator<This extends Mediator<This>> {
      * @see    #instrument(InstrumentingManager, FsCompositeDriver)
      */
     public FsModel instrument(
-            InstrumentingMetaDriver<This> origin,
+            InstrumentingCompositeDriver<This> origin,
             FsModel subject) {
         return subject;
     }
@@ -121,7 +121,7 @@ public abstract class Mediator<This extends Mediator<This>> {
      * @see    #instrument(InstrumentingManager, FsCompositeDriver)
      */
     public FsController instrument(
-            InstrumentingMetaDriver<This> origin,
+            InstrumentingCompositeDriver<This> origin,
             FsController subject) {
         return subject;
     }
@@ -135,7 +135,7 @@ public abstract class Mediator<This extends Mediator<This>> {
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingManager, FsController)
-     * @see    #instrument(InstrumentingMetaDriver, FsController)
+     * @see    #instrument(InstrumentingCompositeDriver, FsController)
      */
     public <E extends Entry> InputSocket<E> instrument(
             InstrumentingController<This> origin,
@@ -152,7 +152,7 @@ public abstract class Mediator<This extends Mediator<This>> {
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingManager, FsController)
-     * @see    #instrument(InstrumentingMetaDriver, FsController)
+     * @see    #instrument(InstrumentingCompositeDriver, FsController)
      */
     public <E extends Entry> OutputSocket<E> instrument(
             InstrumentingController<This> origin,
