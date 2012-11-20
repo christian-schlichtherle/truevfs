@@ -26,37 +26,39 @@ public class TPathTest extends MockArchiveDriverTestBase {
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testIllegalConstructorParameters() {
-        if ('\\' == separatorChar) {
-            for (Object[] params : new Object[][] {
-                // $first, $more
-                { "c:", NO_STRINGS },
-                { "c:foo", NO_STRINGS },
-            }) {
-                try {
-                    new TPath(params[0].toString(), (String[]) params[1]);
-                    fail();
-                } catch (IllegalArgumentException expected) {
-                }
+    public void testIllegalConstructorParametersOnWindows() {
+        if ('\\' != separatorChar) return;
+        for (final Object[] params : new Object[][] {
+            // $first, $more
+            { "c:", NO_STRINGS },
+            { "c:foo", NO_STRINGS },
+        }) {
+            try {
+                new TPath(params[0].toString(), (String[]) params[1]);
+                fail();
+            } catch (IllegalArgumentException expected) {
             }
         }
     }
 
     @Test
-    public void testStringConstructor() {
-        if ('\\' == separatorChar) {
-            for (Object[] params : new Object[][] {
-                // $first, $more, $name, $address
-                //{ "c:foo", NO_STRINGS, "c:foo", "file:/c:foo" },
-                { "c:/foo", NO_STRINGS, "c:/foo", "file:/c:/foo" },
-                //{ "//", NO_STRINGS, "/", ROOT_DIRECTORY },
-                { "//foo", new String[] { "bar", "baz" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
-                { "///foo//", new String[] { "//bar//", "//", "//baz//" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
-            }) {
-                assertConstructorWithStrings(params);
-            }
+    public void testStringConstructorOnWindows() {
+        if ('\\' != separatorChar) return;
+        for (final Object[] params : new Object[][] {
+            // $first, $more, $name, $address
+            //{ "c:foo", NO_STRINGS, "c:foo", "file:/c:foo" },
+            { "c:/foo", NO_STRINGS, "c:/foo", "file:/c:/foo" },
+            //{ "//", NO_STRINGS, "/", ROOT_DIRECTORY },
+            { "//foo", new String[] { "bar", "baz" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+            { "///foo//", new String[] { "//bar//", "//", "//baz//" }, "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+        }) {
+            assertConstructorWithStrings(params);
         }
-        for (Object[] params : new Object[][] {
+    }
+
+    @Test
+    public void testStringConstructor() {
+        for (final Object[] params : new Object[][] {
             // $first, $more, $name, $address
             { "/", NO_STRINGS, "/", ROOT_DIRECTORY },
             { "/foo", NO_STRINGS, "/foo", ROOT_DIRECTORY + "foo" },
@@ -126,18 +128,21 @@ public class TPathTest extends MockArchiveDriverTestBase {
     }
 
     @Test
-    public void testResolve() {
-        if ('\\' == separatorChar) {
-            for (Object[] params : new Object[][] {
-                // $parent, $first, $name, $address
-                { "x", "c:/foo", "c:/foo", ROOT_DIRECTORY + "c:/foo" },
-                { "x", "//foo/bar/baz", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
-                { "x", "///foo//bar//baz//", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
-            }) {
-                assertResolve(params);
-            }
+    public void testResolveOnWindows() {
+        if ('\\' != separatorChar) return;
+        for (final Object[] params : new Object[][] {
+            // $parent, $first, $name, $address
+            { "x", "c:/foo", "c:/foo", ROOT_DIRECTORY + "c:/foo" },
+            { "x", "//foo/bar/baz", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+            { "x", "///foo//bar//baz//", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+        }) {
+            assertResolve(params);
         }
-        for (Object[] params : new Object[][] {
+    }
+
+    @Test
+    public void testResolve() {
+        for (final Object[] params : new Object[][] {
             // $parent, $first, $name, $address
             { "", "/", "/", ROOT_DIRECTORY },
             { "x", "/foo", "/foo", ROOT_DIRECTORY + "foo" },
@@ -191,18 +196,21 @@ public class TPathTest extends MockArchiveDriverTestBase {
     }
 
     @Test
-    public void testResolveSibling() {
-        if ('\\' == separatorChar) {
-            for (Object[] params : new Object[][] {
-                // $parent, $first, $more, $name, $address
-                { "x", "c:/foo", "c:/foo", ROOT_DIRECTORY + "c:/foo" },
-                { "x", "//foo/bar/baz", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
-                { "x", "///foo//bar//baz//", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
-            }) {
-                assertResolveSibling(params);
-            }
+    public void testResolveSiblingOnWindows() {
+        if ('\\' != separatorChar) return;
+        for (final Object[] params : new Object[][] {
+            // $parent, $first, $more, $name, $address
+            { "x", "c:/foo", "c:/foo", ROOT_DIRECTORY + "c:/foo" },
+            { "x", "//foo/bar/baz", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+            { "x", "///foo//bar//baz//", "//foo/bar/baz", ROOT_DIRECTORY + "/foo/bar/baz" },
+        }) {
+            assertResolveSibling(params);
         }
-        for (Object[] params : new Object[][] {
+    }
+
+    @Test
+    public void testResolveSibling() {
+        for (final Object[] params : new Object[][] {
             // $parent, $first, $name, $address
             { "", "/", "/", ROOT_DIRECTORY },
             { "x", "/foo", "/foo", ROOT_DIRECTORY + "foo" },
@@ -256,18 +264,21 @@ public class TPathTest extends MockArchiveDriverTestBase {
     }
 
     @Test
-    public void testGetParent() {
-        if ('\\' == separatorChar) {
-            for (String[] params : new String[][] {
-                // $path, $parent
-                { "c:/", null },
-                { "c:/foo", "c:/" },
-                { "c:/foo/", "c:/" },
-            }) {
-                assertGetParent(params);
-            }
+    public void testGetParentOnWindows() {
+        if ('\\' != separatorChar) return;
+        for (final String[] params : new String[][] {
+            // $path, $parent
+            { "c:/", null },
+            { "c:/foo", "c:/" },
+            { "c:/foo/", "c:/" },
+        }) {
+            assertGetParent(params);
         }
-        for (String[] params : new String[][] {
+    }
+
+    @Test
+    public void testGetParent() {
+        for (final String[] params : new String[][] {
             // $path, $parent
             { "", null },
             { ".", null },
@@ -303,22 +314,25 @@ public class TPathTest extends MockArchiveDriverTestBase {
     }
 
     @Test
-    public void testGetRoot() {
-        if ('\\' == separatorChar) {
-            for (String[] params : new String[][] {
-                // $test, $root
-                //{ "c:", null },
-                //{ "c:foo", null },
-                { "c://", "c:/" },
-                { "c:/", "c://" },
-                { "c:/foo", "c:/" },
-                { "//foo/bar/", "//foo/bar/" },
-                { "//foo/bar/baz", "//foo/bar/" },
-            }) {
-                assertGetRoot(params);
-            }
+    public void testGetRootOnWindows() {
+        if ('\\' != separatorChar) return;
+        for (final String[] params : new String[][] {
+            // $test, $root
+            //{ "c:", null },
+            //{ "c:foo", null },
+            { "c://", "c:/" },
+            { "c:/", "c://" },
+            { "c:/foo", "c:/" },
+            { "//foo/bar/", "//foo/bar/" },
+            { "//foo/bar/baz", "//foo/bar/" },
+        }) {
+            assertGetRoot(params);
         }
-        for (String[] params : new String[][] {
+    }
+
+    @Test
+    public void testGetRoot() {
+        for (final String[] params : new String[][] {
             // $test, $root
             { "", null },
             { "foo", null },
@@ -338,22 +352,25 @@ public class TPathTest extends MockArchiveDriverTestBase {
     }
 
     @Test
-    public void testGetFileName() {
-        if ('\\' == separatorChar) {
-            for (String[] params : new String[][] {
-                // $test, $root
-                //{ "c:", null },
-                //{ "c:foo", "foo" },
-                { "c:/", null },
-                { "c:/foo", "foo" },
-                { "c:/foo/bar", "bar" },
-                { "//foo/bar/", null },
-                { "//foo/bar/baz", "baz" },
-            }) {
-                assertGetFileName(params);
-            }
+    public void testGetFileNameOnWindows() {
+        if ('\\' != separatorChar) return;
+        for (final String[] params : new String[][] {
+            // $test, $root
+            //{ "c:", null },
+            //{ "c:foo", "foo" },
+            { "c:/", null },
+            { "c:/foo", "foo" },
+            { "c:/foo/bar", "bar" },
+            { "//foo/bar/", null },
+            { "//foo/bar/baz", "baz" },
+        }) {
+            assertGetFileName(params);
         }
-        for (String[] params : new String[][] {
+    }
+
+    @Test
+    public void testGetFileName() {
+        for (final String[] params : new String[][] {
             // $test, $root
             { "", null },
             { "foo", "foo" },
@@ -382,19 +399,22 @@ public class TPathTest extends MockArchiveDriverTestBase {
     }
 
     @Test
-    public void testElements() {
-        if ('\\' == separatorChar) {
-            for (Object[] params : new Object[][] {
-                // $first, $more
-                { "c:/foo", NO_STRINGS },
-                { "c:/foo", new String[] { "bar" } },
-                { "//foo/bar/boom", NO_STRINGS },
-                { "//foo/bar/boom", new String[] { "bang" } },
-            }) {
-                assertElements(params);
-            }
+    public void testElementsOnWindows() {
+        if ('\\' != separatorChar) return;
+        for (final Object[] params : new Object[][] {
+            // $first, $more
+            { "c:/foo", NO_STRINGS },
+            { "c:/foo", new String[] { "bar" } },
+            { "//foo/bar/boom", NO_STRINGS },
+            { "//foo/bar/boom", new String[] { "bang" } },
+        }) {
+            assertElements(params);
         }
-        for (Object[] params : new Object[][] {
+    }
+
+    @Test
+    public void testElements() {
+        for (final Object[] params : new Object[][] {
             // $first, $more
             { "", null },
             { "foo", NO_STRINGS },
