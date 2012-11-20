@@ -6,23 +6,23 @@
 
 Getting started without Maven
 
-    If you do not want to use Maven then you can easily download
-    {{{http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22net.java.truevfs%22%20AND%20v%3A%22${project.version}%22}<<individual TrueVFS artifacts>>}}
-    from Maven Central.
-
-    You can also directly download the {{{http://repo1.maven.org/maven2/net/java/truevfs/truevfs-profile-default/${project.version}/truevfs-profile-default-${project.version}-shaded.jar}<<shaded JAR for the default profile>>}}.
-    This shaded JAR saves you from grabbing the JARs for the modules referenced
-    by the
-    {{{../truevfs-profile/truevfs-profile-default/index.html}default profile}}
-    individually.
+    If you do not want to use Maven then you can easily download an all-in-one
+    shaded JAR for a
+    {{{../truevfs-profile/index.html}TrueVFS&#160;Profile}}
+    from
+    {{{http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22net.java.truevfs%22%20AND%20v%3A%22${project.version}%22%20AND%20l%3A%22shaded%22}Maven Central}}.
+    For a start, you should
+    {{{http://repo1.maven.org/maven2/net/java/truevfs/truevfs-profile-default/${project.version}/truevfs-profile-default-${project.version}-shaded.jar}<<download>>}}.
+    the shaded JAR for the
+    {{{../truevfs-profile/truevfs-profile-default/index.html}TrueVFS&#160;Profile&#160;Default}}.
 
 * Side effects
 
-    Profiles bundle some other TrueVFS modules so that you can use them as a
-    single all-in-one dependency (they do not provide any additional
-    functionality).
-    While using the default profile is very convenient, it may provide some
-    unwanted side effects:
+    Profiles bundle some TrueVFS modules so that you can easily use them as a
+    single all-in-one dependency.
+    Other than that, profiles do not provide additional functionality.
+    While using a profile is very convenient, it may provide some unwanted side
+    effects:
 
     * File system driver modules advertise services on the class path so that
       the client module
@@ -49,11 +49,12 @@ Getting started without Maven
 
     To avoid unwanted side effects, you could either...
 
+    [[a]] switch to Maven and simply exclude the unwanted modules from the
+          profile (here's a {{{../truevfs-profile/truevfs-profile-default/index.html}sample}}),
+          or...
+
     [[a]] {{{../truevfs-access/configuration.html}customize the initial configuration}}
           in code (here's a {{{../usecases/aff.html}sample}}), or...
-
-    [[a]] switch to Maven and simply exclude the unwanted modules from the
-          profile, or...
 
     [[a]] manually add the JARs for only the desired modules.
 
