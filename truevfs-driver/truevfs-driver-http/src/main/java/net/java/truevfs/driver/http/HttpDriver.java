@@ -8,10 +8,10 @@ import java.io.IOException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.cio.IoBufferPool;
+import net.java.truevfs.kernel.spec.FsArchiveManager;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsManagerWithControllerFactory;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -84,7 +84,7 @@ public class HttpDriver extends FsDriver {
 
     @Override
     public FsController newController(
-            final FsManagerWithControllerFactory manager,
+            final FsArchiveManager manager,
             final FsModel model,
             final @CheckForNull FsController parent) {
         assert null == parent;

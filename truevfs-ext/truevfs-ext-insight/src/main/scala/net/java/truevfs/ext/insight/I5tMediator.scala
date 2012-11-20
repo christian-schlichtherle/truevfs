@@ -58,7 +58,7 @@ extends JmxMediator[I5tMediator] {
     new InstrumentingBufferPool[I5tMediator](bufferIoMediator, subject)
 
   final override def instrument(origin: InstrumentingManager[I5tMediator], subject: FsCompositeDriver) =
-    new InstrumentingMetaDriver[I5tMediator](this, subject)
+    new InstrumentingCompositeDriver[I5tMediator](this, subject)
 
   final override def instrument(origin: InstrumentingManager[I5tMediator], subject: FsController) =
     new InstrumentingController[I5tMediator](applicationIoMediator, subject)
@@ -66,10 +66,10 @@ extends JmxMediator[I5tMediator] {
   final override def instrument(origin: InstrumentingBufferPool[I5tMediator], subject: IoBuffer) =
     activate(new JmxBuffer[I5tMediator](this, subject))
 
-  final override def instrument(origin: InstrumentingMetaDriver[I5tMediator], subject: FsModel) =
+  final override def instrument(origin: InstrumentingCompositeDriver[I5tMediator], subject: FsModel) =
     activate(new JmxModel[I5tMediator](this, subject))
 
-  final override def instrument(origin: InstrumentingMetaDriver[I5tMediator], subject: FsController) =
+  final override def instrument(origin: InstrumentingCompositeDriver[I5tMediator], subject: FsController) =
     new InstrumentingController[I5tMediator](kernelIoMediator, subject)
 
   final override def instrument[E <: Entry](origin: InstrumentingController[I5tMediator], subject: InputSocket[E]) =

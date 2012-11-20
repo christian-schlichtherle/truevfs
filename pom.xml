@@ -9,12 +9,12 @@
     <parent>
         <groupId>net.java.truecommons</groupId>
         <artifactId>truecommons-parent</artifactId>
-        <version>23</version>
+        <version>24</version>
     </parent>
 
     <groupId>net.java.truevfs</groupId>
     <artifactId>truevfs</artifactId>
-    <version>0.10</version>
+    <version>0.11-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>TrueVFS</name>
@@ -70,7 +70,7 @@ plug-in to its federated file system space.
         <connection>scm:hg:https://hg.java.net/hg/truevfs~v1</connection>
         <developerConnection>scm:hg:ssh://hg.java.net/truevfs~v1</developerConnection>
         <url>http://java.net/projects/truevfs/sources/v1/show</url>
-        <tag>truevfs-0.10</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
@@ -101,7 +101,7 @@ plug-in to its federated file system space.
             &lt;b&gt;${project.name} ${project.version}&lt;/b&gt;
         </header>
 
-        <truecommons.version>2.3</truecommons.version>
+        <truecommons.version>2.3.1</truecommons.version>
 
         <!-- for documentation purposes only - mind the dash! -->
         <truezip-version>7.7</truezip-version>

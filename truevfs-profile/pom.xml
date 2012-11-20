@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.java.truevfs</groupId>
         <artifactId>truevfs</artifactId>
-        <version>0.10</version>
+        <version>0.11-SNAPSHOT</version>
     </parent>
 
     <artifactId>truevfs-profile</artifactId>
@@ -27,12 +27,4 @@
         <module>truevfs-profile-default</module>
         <module>truevfs-profile-full</module>
     </modules>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-shade-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 </project>
