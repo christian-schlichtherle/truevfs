@@ -61,6 +61,7 @@ public class TPathTest extends MockArchiveDriverTestBase {
         for (final Object[] params : new Object[][] {
             // $first, $more, $name, $address
             { "/", NO_STRINGS, "/", ROOT_DIRECTORY },
+            { "/söme päth with späces", NO_STRINGS, "/söme päth with späces", ROOT_DIRECTORY + "söme%20päth%20with%20späces"},
             { "/foo", NO_STRINGS, "/foo", ROOT_DIRECTORY + "foo" },
             { "/foo", new String[] { "" }, "/foo", ROOT_DIRECTORY + "foo"},
             { "/foo", new String[] { "bar" }, "/foo/bar", ROOT_DIRECTORY + "foo/bar"},
@@ -77,6 +78,7 @@ public class TPathTest extends MockArchiveDriverTestBase {
             { "", new String[] { "foo" }, "foo", CURRENT_DIRECTORY + "foo" },
             { "", NO_STRINGS, "", CURRENT_DIRECTORY },
             { ".", NO_STRINGS, ".", CURRENT_DIRECTORY },
+            { "söme päth with späces", NO_STRINGS, "söme päth with späces", CURRENT_DIRECTORY + "söme%20päth%20with%20späces"},
             { "foo", NO_STRINGS, "foo", CURRENT_DIRECTORY + "foo" },
             { "foo", new String[] { "" }, "foo", CURRENT_DIRECTORY + "foo"},
             { "foo", new String[] { ".." }, "foo/..", CURRENT_DIRECTORY },

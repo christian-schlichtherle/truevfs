@@ -319,12 +319,11 @@ public final class TPath implements Path, TRex {
 
     @SuppressWarnings("AssignmentToForLoopParameter")
     private static URI name(final String first, final String... more) {
-        final StringBuilder b;
+        final StringBuilder sb;
         {
             int l = 1 + first.length(); // might prepend SEPARATOR
-            for (String m : more)
-                l += 1 + m.length(); // dito
-            b = new StringBuilder(l);
+            for (final String m : more) l += 1 + m.length(); // dito
+            sb = new StringBuilder(l);
         }
         int i = -1;
         {
@@ -334,8 +333,8 @@ public final class TPath implements Path, TRex {
                 char c = s.charAt(k);
                 if (SEPARATOR_CHAR != c
                         || i <= 0
-                        || 0 < i && SEPARATOR_CHAR != b.charAt(i)) {
-                    b.append(c);
+                        || 0 < i && SEPARATOR_CHAR != sb.charAt(i)) {
+                    sb.append(c);
                     i++;
                 }
             }
@@ -346,27 +345,36 @@ public final class TPath implements Path, TRex {
             for (int j = 0, k = 0; k < l; k++) {
                 char c = s.charAt(k);
                 final boolean n = SEPARATOR_CHAR != c;
-                final boolean o = 0 <= i && SEPARATOR_CHAR != b.charAt(i);
+                final boolean o = 0 <= i && SEPARATOR_CHAR != sb.charAt(i);
                 if (n || o) {
-                    if (0 == j && n && o)
-                        b.append(SEPARATOR_CHAR);
-                    b.append(c);
+                    if (0 == j && n && o) sb.append(SEPARATOR_CHAR);
+                    sb.append(c);
                     i++;
                     j++;
                 }
             }
         }
-        String p = b.toString();
+        String p = sb.toString();
         final int l = prefixLength(p);
         p = cutTrailingSeparators(p, l);
         try {
+            final UriBuilder ub = new UriBuilder();
             if (0 < l) {
                 if (SEPARATOR_CHAR != p.charAt(l - 1))
                     throw new QuotedUriSyntaxException(p, "Relative path with non-empty prefix.");
-                if (SEPARATOR_CHAR == p.charAt(0))
-                    return new URI(p); // may parse authority
+                if (1 < l && SEPARATOR_CHAR == p.charAt(0)) {
+                    assert separatorChar == '\\';
+                    assert SEPARATOR_CHAR == p.charAt(1);
+                    // Windows UNC with forward slashes, e.g. "//host[/share[/path]]"
+                    final int j = p.indexOf(SEPARATOR_CHAR, 2);
+                    if (-1 != j) {
+                        // E.g. "//host/share[/path]"
+                        ub.setAuthority(p.substring(2, j)); // "host"
+                        p = p.substring(j); // "/share[/path]"
+                    }
+                }
             }
-            return new UriBuilder().path(p).getUri();
+            return ub.path(p).getUri();
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -1002,6 +1010,7 @@ public final class TPath implements Path, TRex {
                     && p1.toString().equals(p2.toString());
         }
 
+        @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
         int hashCode(TPath p) {
             final Integer hashCode = p.hashCode;
             if (null != hashCode) return hashCode;
@@ -1037,6 +1046,7 @@ public final class TPath implements Path, TRex {
         }
 
         @Override
+        @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
         int hashCode(TPath p) {
             final Integer hashCode = p.hashCode;
             if (null != hashCode) return hashCode;
