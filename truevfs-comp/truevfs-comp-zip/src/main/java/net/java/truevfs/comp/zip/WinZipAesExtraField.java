@@ -5,10 +5,10 @@
 package net.java.truevfs.comp.zip;
 
 import javax.annotation.concurrent.NotThreadSafe;
-import static net.java.truevfs.comp.zip.LittleEndian.readUShort;
-import static net.java.truevfs.comp.zip.LittleEndian.writeShort;
 import net.java.truecommons.key.spec.common.AesKeyStrength;
 import static net.java.truecommons.key.spec.common.AesKeyStrength.BITS_128;
+import static net.java.truevfs.comp.zip.LittleEndian.readUShort;
+import static net.java.truevfs.comp.zip.LittleEndian.writeShort;
 
 /**
  * WinZip AES Extra Field.

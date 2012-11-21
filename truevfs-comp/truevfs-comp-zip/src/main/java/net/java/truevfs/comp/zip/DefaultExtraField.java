@@ -21,10 +21,10 @@ final class DefaultExtraField extends ExtraField {
     private @CheckForNull byte[] data;
 
     /**
-     * Constructs a new Extra Field.
+     * Constructs a new extra field.
      *
      * @param  headerId an unsigned short integer (two bytes) indicating the
-     *         type of the Extra Field.
+     *         type of the extra field.
      */
     DefaultExtraField(final int headerId) {
         assert UShort.check(headerId);

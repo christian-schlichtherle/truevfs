@@ -545,7 +545,7 @@ public class ZipEntry implements Cloneable {
     public final void setExtra(final @CheckForNull byte[] buf)
     throws IllegalArgumentException {
         if (null != buf) {
-            UShort.check(buf.length, "Extra Fields too large", null);
+            UShort.check(buf.length, "extra fields too large", null);
             setExtraFields(buf, false);
         } else {
             this.fields = null;
@@ -566,8 +566,8 @@ public class ZipEntry implements Cloneable {
      * This method <em>must not</em> get called before the uncompressed size,
      * compressed size and offset have been initialized!
      *
-     * @throws IllegalArgumentException If the data block does not conform to
-     *         the ZIP File Format Specification.
+     * @throws IllegalArgumentException if the serialized extra fields do not
+     *         conform to the ZIP File Format Specification.
      */
     final void setRawExtraFields(final byte[] buf)
     throws IllegalArgumentException {
@@ -589,16 +589,16 @@ public class ZipEntry implements Cloneable {
     }
 
     /**
-     * @throws IllegalArgumentException If the data block does not conform to
-     *         the ZIP File Format Specification.
+     * @throws IllegalArgumentException if the serialized extra fields do not
+     *         conform to the ZIP File Format Specification.
      */
     private void setExtraFields(final byte[] buf, final boolean zip64)
     throws IllegalArgumentException {
         assert UShort.check(buf.length);
         if (0 < buf.length) {
             final ExtraFields fields = new ExtraFields();
-            fields.readFrom(buf, 0, buf.length);
             try {
+                fields.readFrom(buf, 0, buf.length);
                 if (zip64) parseZip64ExtraField(fields);
             } catch (final IndexOutOfBoundsException ex) {
                 throw new IllegalArgumentException(ex);
