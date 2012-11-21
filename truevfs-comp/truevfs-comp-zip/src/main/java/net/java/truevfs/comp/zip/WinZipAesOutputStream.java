@@ -63,10 +63,64 @@ final class WinZipAesOutputStream extends DecoratingOutputStream {
             final WinZipAesEntryParameters param,
             final LittleEndianOutputStream leos)
     throws IOException {
-        super(leos);
-        this.param = param;
         try {
-            init();
+            assert null != leos;
+            assert null != param;
+            this.param = param;
+
+            // Init key strength.
+            final KeyStrength keyStrength = param.getKeyStrength();
+            final int keyStrengthBits = keyStrength.getBits();
+            final int keyStrengthBytes = keyStrength.getBytes();
+
+            // Shake the salt.
+            final byte[] salt = new byte[keyStrengthBytes / 2];
+            new SecureRandom().nextBytes(salt);
+
+            // Init password.
+            final byte[] passwd = param.getWritePassword();
+
+            // Derive cipher and MAC parameters.
+            final PBEParametersGenerator gen = new PKCS5S2ParametersGenerator();
+            gen.init(passwd, salt, ITERATION_COUNT);
+            // Here comes the strange part about WinZip AES encryption:
+            // Its unorthodox use of the Password-Based Key Derivation
+            // Function 2 (PBKDF2) of PKCS #5 V2.0 alias RFC 2898.
+            // Yes, the password verifier is only a 16 bit value.
+            // So we must use the MAC for password verification, too.
+            assert AES_BLOCK_SIZE_BITS <= keyStrengthBits;
+            final KeyParameter keyParam =
+                    (KeyParameter) gen.generateDerivedParameters(
+                        2 * keyStrengthBits + PWD_VERIFIER_BITS);
+            Arrays.fill(passwd, (byte) 0); // must not wipe before generator use!
+
+            // Can you believe they "forgot" the nonce in the CTR mode IV?! :-(
+            final byte[] ctrIv = new byte[AES_BLOCK_SIZE_BITS / 8];
+            final ParametersWithIV aesCtrParam = new ParametersWithIV(
+                    new KeyParameter(keyParam.getKey(), 0, keyStrengthBytes),
+                    ctrIv); // yes, the IV is an array of zero bytes!
+            final KeyParameter sha1HMacParam = new KeyParameter(
+                    keyParam.getKey(),
+                    keyStrengthBytes,
+                    keyStrengthBytes);
+
+            // Init cipher and stream.
+            final BufferedBlockCipher
+                    cipher = new BufferedBlockCipher(new WinZipAesCipher());
+            cipher.init(true, aesCtrParam);
+
+            // Init MAC.
+            final Mac mac = this.mac = new HMac(new SHA1Digest());
+            mac.init(sha1HMacParam);
+
+            // Init chain of output streams as Encrypt-then-MAC.
+            this.leos = leos;
+            this.out = new CipherOutputStream(cipher,
+                    new MacOutputStream(leos, mac));
+
+            // Write header.
+            leos.write(salt);
+            writePasswordVerifier(keyParam);
         } catch (final Throwable ex) {
             try {
                 leos.close();
@@ -75,65 +129,6 @@ final class WinZipAesOutputStream extends DecoratingOutputStream {
             }
             throw ex;
         }
-    }
-
-    private void init() throws IOException {
-        assert null != leos;
-        assert null != param;
-
-        // Init key strength.
-        final KeyStrength keyStrength = param.getKeyStrength();
-        final int keyStrengthBits = keyStrength.getBits();
-        final int keyStrengthBytes = keyStrength.getBytes();
-
-        // Shake the salt.
-        final byte[] salt = new byte[keyStrengthBytes / 2];
-        new SecureRandom().nextBytes(salt);
-
-        // Init password.
-        final byte[] passwd = param.getWritePassword();
-
-        // Derive cipher and MAC parameters.
-        final PBEParametersGenerator gen = new PKCS5S2ParametersGenerator();
-        gen.init(passwd, salt, ITERATION_COUNT);
-        // Here comes the strange part about WinZip AES encryption:
-        // Its unorthodox use of the Password-Based Key Derivation
-        // Function 2 (PBKDF2) of PKCS #5 V2.0 alias RFC 2898.
-        // Yes, the password verifier is only a 16 bit value.
-        // So we must use the MAC for password verification, too.
-        assert AES_BLOCK_SIZE_BITS <= keyStrengthBits;
-        final KeyParameter keyParam =
-                (KeyParameter) gen.generateDerivedParameters(
-                    2 * keyStrengthBits + PWD_VERIFIER_BITS);
-        Arrays.fill(passwd, (byte) 0); // must not wipe before generator use!
-
-        // Can you believe they "forgot" the nonce in the CTR mode IV?! :-(
-        final byte[] ctrIv = new byte[AES_BLOCK_SIZE_BITS / 8];
-        final ParametersWithIV aesCtrParam = new ParametersWithIV(
-                new KeyParameter(keyParam.getKey(), 0, keyStrengthBytes),
-                ctrIv); // yes, the IV is an array of zero bytes!
-        final KeyParameter sha1HMacParam = new KeyParameter(
-                keyParam.getKey(),
-                keyStrengthBytes,
-                keyStrengthBytes);
-
-        // Init cipher and stream.
-        final BufferedBlockCipher
-                cipher = new BufferedBlockCipher(new WinZipAesCipher());
-        cipher.init(true, aesCtrParam);
-
-        // Init MAC.
-        final Mac mac = this.mac = new HMac(new SHA1Digest());
-        mac.init(sha1HMacParam);
-
-        // Reinit chain of output streams as Encrypt-then-MAC.
-        this.leos = leos;
-        this.out = new CipherOutputStream(cipher,
-                new MacOutputStream(leos, mac));
-
-        // Write header.
-        leos.write(salt);
-        writePasswordVerifier(keyParam);
     }
 
     private void writePasswordVerifier(KeyParameter keyParam)
