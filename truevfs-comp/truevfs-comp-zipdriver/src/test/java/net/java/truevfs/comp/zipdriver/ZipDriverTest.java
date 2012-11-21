@@ -4,11 +4,9 @@
  */
 package net.java.truevfs.comp.zipdriver;
 
-import net.java.truevfs.comp.zipdriver.ZipDriver;
-import net.java.truevfs.comp.zipdriver.ZipDriverEntry;
+import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truecommons.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle
@@ -27,7 +25,5 @@ extends FsArchiveDriverTestSuite<ZipDriverEntry, ZipDriver> {
     }
 
     @Override
-    protected String getUnencodableName() {
-        return "\u2297";
-    }
+    protected String getUnencodableName() { return "\u2297"; }
 }
