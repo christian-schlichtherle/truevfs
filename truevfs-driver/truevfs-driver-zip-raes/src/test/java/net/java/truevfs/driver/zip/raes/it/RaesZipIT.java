@@ -169,14 +169,12 @@ public final class RaesZipIT extends ZipITSuite {
      * Skipped because the test is specific to plain ZIP files.
      */
     @Override
-    public void testBadGetCheckedInputStream() {
-    }
+    public void testBadGetCheckedInputStream() { }
 
     /**
      * Skipped because appending to RAES encrypted ZIP files is not possible
      * by design.
      */
     @Override
-    public void testAppending() {
-    }
+    public void testAppending() { }
 }
