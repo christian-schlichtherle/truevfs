@@ -16,9 +16,7 @@ import static net.java.truevfs.kernel.spec.FsAccessOption.ENCRYPT;
 public final class WinZipAesConcurrentSyncIT extends ConcurrentSyncITSuite<TestWinZipAesDriver> {
 
     @Override
-    protected String getExtensionList() {
-        return "zip";
-    }
+    protected String getExtensionList() { return "zip"; }
 
     @Override
     protected TestWinZipAesDriver newArchiveDriver() {

@@ -4,10 +4,10 @@
  */
 package net.java.truevfs.driver.zip.it;
 
+import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.access.it.ConcurrentSyncITSuite;
 import net.java.truevfs.comp.zipdriver.ZipDriver;
 import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truecommons.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle
@@ -16,9 +16,7 @@ public final class ZipConcurrentSyncIT
 extends ConcurrentSyncITSuite<ZipDriver> {
 
     @Override
-    protected String getExtensionList() {
-        return "zip";
-    }
+    protected String getExtensionList() { return "zip"; }
 
     @Override
     protected ZipDriver newArchiveDriver() {

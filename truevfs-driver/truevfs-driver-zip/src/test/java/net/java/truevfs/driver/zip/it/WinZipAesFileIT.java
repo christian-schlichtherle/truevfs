@@ -5,14 +5,14 @@
 package net.java.truevfs.driver.zip.it;
 
 import java.io.IOException;
+import net.java.truecommons.key.spec.prompting.TestView.Action;
+import static net.java.truecommons.key.spec.prompting.TestView.Action.CANCEL;
+import static net.java.truecommons.key.spec.prompting.TestView.Action.ENTER;
 import net.java.truevfs.access.TConfig;
 import net.java.truevfs.access.TFile;
 import net.java.truevfs.access.it.TFileITSuite;
 import net.java.truevfs.comp.zipdriver.TestWinZipAesDriver;
 import static net.java.truevfs.kernel.spec.FsAccessOption.ENCRYPT;
-import net.java.truecommons.key.spec.prompting.TestView.Action;
-import static net.java.truecommons.key.spec.prompting.TestView.Action.CANCEL;
-import static net.java.truecommons.key.spec.prompting.TestView.Action.ENTER;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -22,9 +22,7 @@ import org.junit.Test;
 public final class WinZipAesFileIT extends TFileITSuite<TestWinZipAesDriver> {
 
     @Override
-    protected String getExtensionList() {
-        return "zip";
-    }
+    protected String getExtensionList() { return "zip"; }
 
     @Override
     protected TestWinZipAesDriver newArchiveDriver() {
