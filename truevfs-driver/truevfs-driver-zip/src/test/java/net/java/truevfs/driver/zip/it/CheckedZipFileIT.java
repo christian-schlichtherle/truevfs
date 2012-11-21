@@ -4,10 +4,10 @@
  */
 package net.java.truevfs.driver.zip.it;
 
+import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.access.it.TFileITSuite;
 import net.java.truevfs.comp.zipdriver.CheckedZipDriver;
 import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truecommons.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle
@@ -15,9 +15,7 @@ import net.java.truecommons.cio.IoBufferPool;
 public final class CheckedZipFileIT extends TFileITSuite<CheckedZipDriver> {
 
     @Override
-    protected String getExtensionList() {
-        return "zip";
-    }
+    protected String getExtensionList() { return "zip"; }
 
     @Override
     protected CheckedZipDriver newArchiveDriver() {

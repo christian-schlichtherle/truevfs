@@ -4,10 +4,10 @@
  */
 package net.java.truevfs.driver.zip.it;
 
+import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.access.it.TPathITSuite;
 import net.java.truevfs.comp.zipdriver.ZipDriver;
 import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truecommons.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle
@@ -15,9 +15,7 @@ import net.java.truecommons.cio.IoBufferPool;
 public final class ZipPathIT extends TPathITSuite<ZipDriver> {
 
     @Override
-    protected String getExtensionList() {
-        return "zip";
-    }
+    protected String getExtensionList() { return "zip"; }
 
     @Override
     protected ZipDriver newArchiveDriver() {
