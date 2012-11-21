@@ -21,7 +21,7 @@ object TFile2Test {
   private val logger = LoggerFactory.getLogger(classOf[TFile2Test])
 
   private val listener = new ExceptionListener {
-    def exceptionThrown(ex: Exception) { throw ex }
+    def exceptionThrown(ex: Exception) = throw new AssertionError(ex)
   }
 }
 
@@ -76,12 +76,12 @@ class TFile2Test
 
   def objectRoundTrip(file: TFile) {
     val bos = new ByteArrayOutputStream
-    loan(new ObjectOutputStream(bos)) to { _ writeObject file }
+    loan(new ObjectOutputStream(bos)) to (_ writeObject file)
 
     logger trace ("Number of serialized bytes: {}", bos.size)
 
     val bis = new ByteArrayInputStream(bos.toByteArray)
-    val clone = loan(new ObjectInputStream(bis)) { _.readObject }
+    val clone = loan(new ObjectInputStream(bis)) to (_.readObject)
 
     clone should not be theSameInstanceAs (file)
     clone should equal (file.getAbsoluteFile)
@@ -89,7 +89,7 @@ class TFile2Test
 
   def xmlRoundTrip(file: TFile) {
     val bos = new ByteArrayOutputStream
-    loan(new XMLEncoder(bos)){ enc =>
+    loan(new XMLEncoder(bos)) to { enc =>
       enc setExceptionListener listener
       enc writeObject file
     }
@@ -97,7 +97,7 @@ class TFile2Test
     logger trace ("XML String: ", bos.toString("UTF-8"))
 
     val bis = new ByteArrayInputStream(bos.toByteArray)
-    val clone = loan(new XMLDecoder(bis)) { _.readObject }
+    val clone = loan(new XMLDecoder(bis)) to (_.readObject)
 
     clone should not be theSameInstanceAs (file)
     clone should equal (file.getAbsoluteFile)
