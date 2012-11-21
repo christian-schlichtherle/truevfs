@@ -112,12 +112,14 @@ public final class WinZipAesIT extends ZipITSuite {
         }
 
         @Override
-        public AesKeyStrength getKeyStrength(String name) throws ZipKeyException {
+        public AesKeyStrength getKeyStrength(String name)
+        throws ZipKeyException {
             return AesKeyStrength.BITS_128;
         }
 
         @Override
-        public void setKeyStrength(String name, AesKeyStrength keyStrength) throws ZipKeyException {
+        public void setKeyStrength(String name, AesKeyStrength keyStrength)
+        throws ZipKeyException {
             assertSame(AesKeyStrength.BITS_128, keyStrength);
         }
     } // WinZipAesCryptoParameters
