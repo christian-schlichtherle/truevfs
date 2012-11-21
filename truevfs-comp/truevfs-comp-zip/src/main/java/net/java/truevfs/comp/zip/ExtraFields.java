@@ -143,7 +143,8 @@ final class ExtraFields implements Cloneable {
      * @param  len The length of the data block in bytes.
      * @throws IndexOutOfBoundsException If the byte array
      *         {@code buf} does not hold at least {@code len}
-     *         bytes at the zero based offset {@code off}.
+     *         bytes at the zero based offset {@code off}
+     *         or if {@code len} is smaller than the extra field data requires.
      * @throws IllegalArgumentException If the data block does not conform to
      *         the ZIP File Format Specification.
      * @see    #getDataSize
@@ -160,11 +161,7 @@ final class ExtraFields implements Cloneable {
                 final int dataSize = readUShort(buf, off);
                 off += 2;
                 final ExtraField ef = ExtraField.create(headerId);
-                try {
-                    ef.readFrom(buf, off, dataSize);
-                } catch (final IndexOutOfBoundsException ex) {
-                    throw new IllegalArgumentException(ex);
-                }
+                ef.readFrom(buf, off, dataSize);
                 off += dataSize;
                 map.put(headerId, ef);
             }

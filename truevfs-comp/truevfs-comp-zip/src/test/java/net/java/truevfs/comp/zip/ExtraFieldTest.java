@@ -73,26 +73,19 @@ public final class ExtraFieldTest {
     }
 
     private static class NullExtraField extends ExtraField {
-        public NullExtraField() {
-        }
+        public NullExtraField() { }
 
         @Override
-        public int getHeaderId() {
-            return 0x0000;
-        }
+        public int getHeaderId() { return 0x0000; }
 
         @Override
-        int getDataSize() {
-            return 0;
-        }
+        int getDataSize() { return 0; }
 
         @Override
-        void readFrom(byte[] data, int off, int size) {
-        }
+        void readFrom(byte[] buf, int off, int len) { }
 
         @Override
-        void writeTo(byte[] data, int off) {
-        }
+        void writeTo(byte[] buf, int off) { }
     }
 
     private static final class TooSmallHeaderIDExtraField

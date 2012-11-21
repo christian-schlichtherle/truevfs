@@ -17,14 +17,14 @@ class ExtraFieldsSpec extends WordSpec with ShouldMatchers with ParallelTestExec
   "A collection of extra fields" should {
     val fields = new ExtraFields
 
-    "throw an IllegalArgumentException when deserializing a data block which does not conform to the ZIP File Format Specification" in {
+    "throw a RuntimeException when deserializing a data block which does not conform to the ZIP File Format Specification" in {
       val rnd = new Random()
       // Make space for a header id (2), a field length (2) and some data.
       val buf = new Array[Byte](4 + (rnd nextInt 100))
       var retry = false
       do {
         rnd.nextBytes(buf)
-        intercept[IllegalArgumentException] {
+        intercept[RuntimeException] {
           fields.readFrom(buf, 0, buf.size)
           retry = true
         }

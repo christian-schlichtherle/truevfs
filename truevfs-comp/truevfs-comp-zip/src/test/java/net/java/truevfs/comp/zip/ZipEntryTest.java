@@ -4,12 +4,6 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truevfs.comp.zip.DateTimeConverter;
-import net.java.truevfs.comp.zip.UInt;
-import net.java.truevfs.comp.zip.ZipEntry;
-import net.java.truevfs.comp.zip.UByte;
-import net.java.truevfs.comp.zip.ULong;
-import net.java.truevfs.comp.zip.UShort;
 import java.util.Arrays;
 import static net.java.truevfs.comp.zip.ZipEntry.*;
 import static org.junit.Assert.*;
@@ -19,6 +13,7 @@ import org.junit.Test;
  * @author Christian Schlichtherle
  */
 public final class ZipEntryTest {
+
     private final ZipEntry entry = new ZipEntry("test");
 
     @Test

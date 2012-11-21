@@ -11,7 +11,7 @@ import static net.java.truevfs.comp.zip.Constants.EMPTY;
 
 /**
  * Abstract base class for an extra field in a Local or Central Header of a
- * ZIP archive.
+ * ZIP file.
  * It defines the common properties of all extra fields and how to
  * serialize/deserialize them to/from byte arrays.
  *
@@ -58,8 +58,8 @@ abstract class ExtraField {
     }
 
     /**
-     * A static factory method which creates a new extra field based on the
-     * given Header ID.
+     * A static constructor which creates a new extra field based on the
+     * given header id.
      * The returned extra field still requires proper initialization, for
      * example by calling {@link #readFrom}.
      *
