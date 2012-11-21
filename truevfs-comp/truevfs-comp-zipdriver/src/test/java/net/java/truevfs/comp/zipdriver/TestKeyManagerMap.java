@@ -34,13 +34,9 @@ public final class TestKeyManagerMap extends AbstractKeyManagerMap {
         return view;
     }
 
-    public TestView<AesPbeParameters> getView() {
-        return view;
-    }
+    public TestView<AesPbeParameters> getView() { return view; }
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<Class<?>, KeyManager<?>> get() {
-        return managers;
-    }
+    public Map<Class<?>, KeyManager<?>> get() { return managers; }
 }
