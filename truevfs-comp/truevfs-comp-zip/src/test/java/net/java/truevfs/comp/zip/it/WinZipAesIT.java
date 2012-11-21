@@ -94,8 +94,7 @@ public final class WinZipAesIT extends ZipITSuite {
      * Skipped because this test is specified to a plain ZIP file.
      */
     @Override
-    public void testBadGetCheckedInputStream() {
-    }
+    public void testBadGetCheckedInputStream() { }
 
     private static final class WinZipAesCryptoParameters
     implements WinZipAesParameters {
