@@ -84,8 +84,7 @@ class TFile2Test
     val clone = loan(new ObjectInputStream(bis)) { _.readObject }
 
     clone should not be theSameInstanceAs (file)
-    clone should equal (file)
-    //clone should equal (file.getAbsoluteFile)
+    clone should equal (file.getAbsoluteFile)
   }
 
   def xmlRoundTrip(file: TFile) {
@@ -101,7 +100,6 @@ class TFile2Test
     val clone = loan(new XMLDecoder(bis)) { _.readObject }
 
     clone should not be theSameInstanceAs (file)
-    clone should equal (file)
-    //clone should equal (file.getAbsoluteFile)
+    clone should equal (file.getAbsoluteFile)
   }
 }
