@@ -905,8 +905,7 @@ implements Closeable, Iterable<E> {
         final SeekableByteChannel channel = channel();
         Objects.requireNonNull(name);
         final ZipEntry entry = entries.get(name);
-        if (null == entry)
-            return null;
+        if (null == entry) return null;
         long pos = entry.getOffset();
         assert UNKNOWN != pos;
         pos = mapper.map(pos);
@@ -927,8 +926,7 @@ implements Closeable, Iterable<E> {
                 assert UNKNOWN != entry.getCrc();
                 return new ChannelInputStream(echannel);
             }
-            if (null == check)
-                check = entry.isEncrypted();
+            if (null == check) check = entry.isEncrypted();
             int method = entry.getMethod();
             if (entry.isEncrypted()) {
                 if (WINZIP_AES != method)
@@ -967,8 +965,7 @@ implements Closeable, Iterable<E> {
                             .littleEndian()
                             .load(channel.position(pos + entry.getCompressedSize()));
                     localCrc = dd.getUInt();
-                    if (DD_SIG == localCrc)
-                        localCrc = dd.getUInt();
+                    if (DD_SIG == localCrc) localCrc = dd.getUInt();
                 } else {
                     // The CRC32 in the Local File Header.
                     localCrc = lfh.position(14).getUInt();
