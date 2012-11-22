@@ -94,7 +94,7 @@ class TFile2Test
       enc writeObject file
     }
 
-    logger trace ("XML String: ", bos.toString("UTF-8"))
+    logger trace ("XML String: {}", bos.toString("UTF-8"))
 
     val bis = new ByteArrayInputStream(bos.toByteArray)
     val clone = loan(new XMLDecoder(bis)) to (_.readObject)
