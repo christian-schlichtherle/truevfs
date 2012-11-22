@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.access;
 
-import java.beans.*;
 import java.io.*;
 import java.net.*;
 import java.nio.file.FileAlreadyExistsException;
@@ -416,6 +415,7 @@ public final class TFile extends File implements TRex {
      *        resolved by calling {@code TConfig.current().getArchiveDetector()}.
      */
     @ExpertFeature(INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
+    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     public TFile(final File file, final @CheckForNull TArchiveDetector detector) {
         super(file.getPath());
         if (file instanceof TFile) {
@@ -614,7 +614,6 @@ public final class TFile extends File implements TRex {
      *         {@link File#File(URI)}.
      * @see    #getNodePath()
      */
-    @ConstructorProperties("nodePath")
     public TFile(FsNodePath path) { this(path, null); }
 
     /**
@@ -717,7 +716,7 @@ public final class TFile extends File implements TRex {
         assert invariants();
     }
 
-    @SuppressWarnings("LeakingThisInConstructor")
+    @SuppressWarnings({"LeakingThisInConstructor", "AccessingNonPublicFieldOfAnotherObject"})
     private TFile(
             final File file,
             final @CheckForNull TFile innerArchive,
@@ -779,6 +778,7 @@ public final class TFile extends File implements TRex {
         }
     }
 
+    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     private void scan(
             TArchiveDetector detector,
             @CheckForNull TFile ancestor,
@@ -2208,6 +2208,7 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
+    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     public static void rm(File file) throws IOException {
         if (file instanceof TFile) {
             TFile tfile = (TFile) file;
@@ -2349,6 +2350,7 @@ public final class TFile extends File implements TRex {
     @ExpertFeature( level=INTERMEDIATE,
                     value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     @FsAssertion(consistent=YES)
+    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     public static void mv(
             final File src,
             final File dst,
