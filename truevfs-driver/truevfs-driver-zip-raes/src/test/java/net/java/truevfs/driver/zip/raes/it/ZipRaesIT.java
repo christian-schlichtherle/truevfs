@@ -27,7 +27,7 @@ import net.java.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
  *
  * @author Christian Schlichtherle
  */
-public final class RaesZipIT extends ZipITSuite {
+public final class ZipRaesIT extends ZipITSuite {
 
     /** Cipher text shorter than this gets authenticated. */
     private static int AUTHENTICATION_TRIGGER = 512 * 1024;
