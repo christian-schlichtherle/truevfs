@@ -44,6 +44,10 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
 @NotThreadSafe
 final class WinZipAesReadOnlyChannel extends ReadOnlyChannel {
 
+    private static final int MAC_SIZE = newMac().getMacSize();
+
+    private static Mac newMac() { return new HMac(new SHA1Digest()); }
+
     private final ByteBuffer authenticationCode;
 
     /**
@@ -87,8 +91,7 @@ final class WinZipAesReadOnlyChannel extends ReadOnlyChannel {
                 .buffer();
 
         // Init MAC and authentication code.
-        final Mac mac = new HMac(new SHA1Digest());
-        final MutableBuffer footer = MutableBuffer.allocate(mac.getMacSize() / 2);
+        final MutableBuffer footer = MutableBuffer.allocate(MAC_SIZE / 2);
 
         // Init start, end and size of encrypted data.
         final long start = channel.position();
@@ -172,7 +175,7 @@ final class WinZipAesReadOnlyChannel extends ReadOnlyChannel {
      * @throws IOException On any I/O related issue.
      */
     void authenticate() throws IOException {
-        final Mac mac = new HMac(new SHA1Digest());
+        final Mac mac = newMac();
         mac.init(sha1MacParam);
         final byte[] buf = ((CipherReadOnlyChannel) channel).mac(mac);
         if (!authenticationCode.equals(ByteBuffer.wrap(buf, 0, buf.length / 2)))
