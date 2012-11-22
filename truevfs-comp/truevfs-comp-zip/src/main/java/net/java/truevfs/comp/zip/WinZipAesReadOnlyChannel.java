@@ -4,9 +4,6 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truecommons.io.IntervalReadOnlyChannel;
-import net.java.truecommons.io.PowerBuffer;
-import net.java.truecommons.io.ReadOnlyChannel;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.EOFException;
 import java.io.IOException;
@@ -15,12 +12,15 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.Arrays;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truevfs.comp.zip.crypto.CipherReadOnlyChannel;
-import net.java.truevfs.comp.zip.crypto.SeekableBlockCipher;
-import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
-import static net.java.truevfs.comp.zip.WinZipAesOutputStream.*;
+import net.java.truecommons.io.IntervalReadOnlyChannel;
+import net.java.truecommons.io.MutableBuffer;
+import net.java.truecommons.io.ReadOnlyChannel;
 import net.java.truecommons.key.spec.common.AesKeyStrength;
 import net.java.truecommons.key.spec.util.SuspensionPenalty;
+import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
+import static net.java.truevfs.comp.zip.WinZipAesOutputStream.*;
+import net.java.truevfs.comp.zip.crypto.CipherReadOnlyChannel;
+import net.java.truevfs.comp.zip.crypto.SeekableBlockCipher;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.digests.SHA1Digest;
@@ -75,24 +75,24 @@ final class WinZipAesReadOnlyChannel extends ReadOnlyChannel {
         final int keyStrengthBytes = keyStrength.getBytes();
 
         // Load salt.
-        final ByteBuffer salt = PowerBuffer
+        final ByteBuffer salt = MutableBuffer
                 .allocate(keyStrengthBytes / 2)
                 .load(channel.position(0))
                 .buffer();
 
         // Load password verification value.
-        final ByteBuffer passwdVerifier = PowerBuffer
+        final ByteBuffer passwdVerifier = MutableBuffer
                 .allocate(PWD_VERIFIER_BITS / 8)
                 .load(channel)
                 .buffer();
 
         // Init MAC and authentication code.
         final Mac mac = new HMac(new SHA1Digest());
-        final PowerBuffer footer = PowerBuffer.allocate(mac.getMacSize() / 2);
+        final MutableBuffer footer = MutableBuffer.allocate(mac.getMacSize() / 2);
 
         // Init start, end and size of encrypted data.
         final long start = channel.position();
-        final long end = channel.size() - footer.limit();
+        final long end = channel.size() - footer.remaining();
         final long size = end - start;
         if (0 > size) {
             // Wrap an EOFException so that RawReadOnlyChannel can identify this issue.
