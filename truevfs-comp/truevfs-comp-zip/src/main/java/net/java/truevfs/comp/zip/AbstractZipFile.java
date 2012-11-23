@@ -1018,8 +1018,7 @@ implements Closeable, Iterable<E> {
     /** Checks that this ZIP file is still open for reading its entries. */
     private SeekableByteChannel channel() throws ZipException {
         final SeekableByteChannel channel = this.channel;
-        if (null == channel)
-            throw new ZipException("File closed!");
+        if (null == channel) throw new ZipException("File closed!");
         return channel;
     }
 
@@ -1057,8 +1056,7 @@ implements Closeable, Iterable<E> {
 
         @Override
         public void close() throws IOException {
-            if (closed)
-                return;
+            if (closed) return;
             // Never close the channel!
             //super.close();
             AbstractZipFile.this.open--;
