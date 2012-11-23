@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truecommons.io.OneTimeSink;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -17,6 +16,7 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.io.OneTimeSink;
 
 /**
  * Replacement for
@@ -58,9 +58,9 @@ public class ZipOutputStream extends AbstractZipOutputStream<ZipEntry> {
     /**
      * Constructs a ZIP output stream which decorates the given output stream
      * using the {@code "UTF-8"} charset.
-     * 
+     *
      * @param  out The output stream to write the ZIP file to.
-     * @throws IOException on any I/O error. 
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
     public ZipOutputStream(@WillCloseWhenClosed OutputStream out)
@@ -74,7 +74,7 @@ public class ZipOutputStream extends AbstractZipOutputStream<ZipEntry> {
      *
      * @param  out The output stream to write the ZIP file to.
      * @param  charset the character set to use.
-     * @throws IOException on any I/O error. 
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
     public ZipOutputStream(@WillCloseWhenClosed OutputStream out, Charset charset)
@@ -86,14 +86,14 @@ public class ZipOutputStream extends AbstractZipOutputStream<ZipEntry> {
     /**
      * Constructs a ZIP output stream which decorates the given output stream
      * and appends to the given ZIP file.
-     * 
+     *
      * @param  out The output stream to write the ZIP file to.
      *         If {@code appendee} is not {@code null}, then this must be set
      *         up so that it appends to the same ZIP file from which
      *         {@code appendee} is reading.
      * @param  appendee the ZIP file to append to.
      *         This may already be closed.
-     * @throws IOException on any I/O error. 
+     * @throws IOException on any I/O error.
      */
     @CreatesObligation
     public ZipOutputStream(
@@ -168,7 +168,7 @@ public class ZipOutputStream extends AbstractZipOutputStream<ZipEntry> {
      * <p>
      * Note that only {@link WinZipAesParameters WinZip AES encryption} is
      * currently supported.
-     * 
+     *
      * @param cryptoParameters the parameters for encryption or authentication
      *        of entries.
      */
