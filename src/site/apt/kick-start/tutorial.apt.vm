@@ -28,10 +28,10 @@ TrueVFS Tutorial
 
     []
 
-* The package <<<net.truevfs.file>>>
+* The package <<<net.java.truevfs.access>>>
 
     The entry point to the TrueVFS Access API is the package
-    {{{../apidocs/net/java/truevfs/access/package-summary.html}<<<net.truevfs.access>>>}}.
+    {{{../apidocs/net/java/truevfs/access/package-summary.html}<<<net.java.truevfs.access>>>}}.
     It contains the classes
     {{{../apidocs/net/java/truevfs/access/TFile.html}<<<TFile>>>}},
     {{{../apidocs/net/java/truevfs/access/TFileInputStream.html}<<<TFileInputStream>>>}},
