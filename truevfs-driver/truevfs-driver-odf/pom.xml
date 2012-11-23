@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.java.truevfs</groupId>
         <artifactId>truevfs-driver</artifactId>
-        <version>0.11-SNAPSHOT</version>
+        <version>0.10.1</version>
     </parent>
 
     <artifactId>truevfs-driver-odf</artifactId>
