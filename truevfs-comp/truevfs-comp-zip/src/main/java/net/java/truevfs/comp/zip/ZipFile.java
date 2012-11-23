@@ -4,8 +4,6 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truecommons.io.AbstractSource;
-import net.java.truecommons.io.OneTimeSource;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +19,9 @@ import java.util.zip.ZipException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.io.AbstractSource;
 import net.java.truecommons.io.LockInputStream;
+import net.java.truecommons.io.OneTimeSource;
 
 /**
  * Replacement for {@link java.util.zip.ZipFile java.util.zip.ZipFile}.
@@ -47,10 +47,10 @@ import net.java.truecommons.io.LockInputStream;
 public class ZipFile extends AbstractZipFile<ZipEntry> {
 
     /** The lock on which this object synchronizes. */
-    protected final Lock lock = new ReentrantLock();
+    private final Lock lock = new ReentrantLock();
 
     private final String name;
-    
+
     private volatile @CheckForNull ZipCryptoParameters cryptoParameters;
 
     /**
@@ -301,7 +301,7 @@ public class ZipFile extends AbstractZipFile<ZipEntry> {
 
     /**
      * Sets the parameters for encryption or authentication of entries.
-     * 
+     *
      * @param cryptoParameters the parameters for encryption or authentication
      *        of entries.
      */
