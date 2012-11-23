@@ -15,46 +15,76 @@ TrueVFS Tutorial
 
     The following tutorial assumes some preconditions:
 
-    * You need to have a basic knowledge of the <<<java.io>>> API.
+    * You need to have a basic knowledge of the <<<java.io>>> API (Application
+      Programming Interface).
       If not, please refer to
       {{{http://docs.oracle.com/javase/tutorial/essential/io/}The Java Tutorials Lesson: Basic I/O}}
       first.
 
     * You need to have a working application skeleton with the required TrueVFS
       JARs on the class path.
-      If not present, please refer to the section Kick-Starting on the
+      If not present, please refer to the page
       {{{./index.html#Kick-Starting}Getting Started}}
-      page first.
+      first.
 
     []
 
 * The package <<<net.java.truevfs.access>>>
 
-    The entry point to the TrueVFS Access API is the package
+    The module TrueVFS Access solely consists of the package
     {{{../apidocs/net/java/truevfs/access/package-summary.html}<<<net.java.truevfs.access>>>}}.
-    It contains the classes
+    This package supports two I/O API styles:
+
+    *
+    The old I/O API style (alias OIO, available since Java 1))
+    is supported by the classes
     {{{../apidocs/net/java/truevfs/access/TFile.html}<<<TFile>>>}},
     {{{../apidocs/net/java/truevfs/access/TFileInputStream.html}<<<TFileInputStream>>>}},
     {{{../apidocs/net/java/truevfs/access/TFileOutputStream.html}<<<TFileOutputStream>>>}},
-    {{{../apidocs/net/java/truevfs/access/TFileReader.html}<<<TFileReader>>>}},
-    {{{../apidocs/net/java/truevfs/access/TFileWriter.html}<<<TFileWriter>>>}}
-    etc, or just <<<TFile*>>> for short.
+    {{{../apidocs/net/java/truevfs/access/TFileReader.html}<<<TFileReader>>>}} and
+    {{{../apidocs/net/java/truevfs/access/TFileWriter.html}<<<TFileWriter>>>}},
+    or just <<<TFile*>>> for short.
 
-    Your starting point for almost all file system operations is an object of
-    the class <<<TFile>>>.
+    *
+    The new I/O API style (alias NIO.2, specified in JSR&#160;203 and included
+    in JSE&#160;7) is supported by the classes
+    {{{../apidocs/net/java/truevfs/access/TPath.html}<<<TPath>>>}},
+    {{{../apidocs/net/java/truevfs/access/TFileSystem.html}<<<TFileSystem>>>}} and
+    {{{../apidocs/net/java/truevfs/access/TFileSystemProvider.html}<<<TFileSystemProvider>>>}}.
+
+    []
+
+** OIO API
+
+    Using the OIO API, your starting point for almost all file system
+    operations is the class <<<TFile>>>.
     This class inherits from <<<java.io.File>>>, so you can use it with other
     APIs for its super class.
     The class
     {{{../apidocs/net/java/truevfs/access/swing/TFileChooser.html}<<<TFileChooser>>>}}
+    in the module
+    {{{../truevfs-access-swing/index.html}TrueVFS&#160;Access&#160;Swing}}
     uses this feature by subclassing <<<javax.swing.JFileChooser>>> so that you
     can browse archive files with it, too.
-    Note however that you can't use a plain old <<<java.io.FileInputStream>>>,
-    <<<java.io.FileOutputStream>>> etc with a <<<TFile>>> object.
+    However, you can't use a plain old <<<java.io.FileInputStream>>>,
+    <<<java.io.FileOutputStream>>> et al with a <<<TFile>>> object.
+    You have to use a <<TFileInputStream>>, <<TFileOutputStream>> et al instead.
 
-    While <<<TFile>>> supports the traditional <<<File>>> API, it also provides
-    many additional methods to overcome the known limitations of its super
-    class, e.g. the additional methods throw an <<<java.io.IOException>>> on
-    failure instead of simply returning a boolean value - see below.
+    Although the <<<TFile>>> class extends <<<File>>>, it also provides many
+    additional methods to overcome the known limitations of its super class,
+    e.g. the additional methods throw an <<<java.io.IOException>>> on failure
+    instead of simply returning a boolean value.
+    So the OIO API style is by no means obsolete - see below.
+
+** NIO.2
+
+    If you prefer the NIO.2 API style, then your starting point is the class
+    <<<TPath>>>.
+    The NIO.2 API overcomes many constraints of the OIO API.
+    However, for the brevity of this tutorial, the NIO.2 API is not covered
+    here.
+    For more information, please refer to the documentation of the module
+    {{{../truevfs-access/index.html}TrueVFS&#160;Access}}.
 
 * Create
 
