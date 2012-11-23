@@ -1,16 +1,14 @@
-#parse("common.vm")
-    ----------------------------
-    Getting started with a Shell
-    ----------------------------
+#parse("common.apt.vm")
+    ------------------------------
+    Getting Started without an IDE
+    ------------------------------
     Christian Schlichtherle
-    ----------------------------
+    ------------------------------
 
-Getting started with a Shell
+Getting Started without an IDE
 
     This guide shows how to kick-start a TrueVFS application in a command line
     shell with the help of a Maven archetype.
-
-#motivation()
 
 * Prerequisites
 
@@ -30,8 +28,8 @@ Getting started with a Shell
 
 +--
 $ mvn archetype:generate -B \
-    -DarchetypeGroupId=net.java.truevfs \
-    -DarchetypeArtifactId=truevfs-archetype-access \
+    -DarchetypeGroupId=${project.groupId} \
+    -DarchetypeArtifactId=${project.artifactId} \
     -DarchetypeVersion=${project.version} \
     -DgroupId=com.company \
     -DartifactId=project \

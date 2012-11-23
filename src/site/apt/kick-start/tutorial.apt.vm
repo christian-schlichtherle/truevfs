@@ -1,11 +1,11 @@
-#parse("../common.vm")
+#parse("common.apt.vm")
     -----------------------
-    Tutorial
+    TrueVFS Tutorial
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-Tutorial
+TrueVFS Tutorial
 
     TrueVFS provides CRUD (Create, Read, Update, Delete) operations for archive
     files while maintaining an easy-to-use file system API.

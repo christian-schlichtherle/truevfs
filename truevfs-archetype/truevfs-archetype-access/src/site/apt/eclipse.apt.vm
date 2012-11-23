@@ -1,16 +1,17 @@
-#parse("common.vm")
+#parse("common.apt.vm")
+
+## TODO: Update the screen shots.
+
     ----------------------------
-    Getting started with Eclipse
+    Getting Started with Eclipse
     ----------------------------
     Christian Schlichtherle
     ----------------------------
 
-Getting started with Eclipse
+Getting Started with Eclipse
 
     This guide shows how to kick-start a TrueVFS application in Eclipse
     with the help of a Maven archetype.
-
-#motivation()
 
 * Prerequisites
 

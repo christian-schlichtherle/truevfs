@@ -3,4 +3,4 @@
 ## Apparently, if it isn't the first file in alphabetical order, then the first
 ## file in alphabetical order which parses this file would ignore the result
 ## and hence the macros defined here would not be available to it.
-#parse("common.vm")
+#parse("common.apt.vm")

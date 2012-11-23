@@ -1,26 +1,7 @@
 ## This file contains macros for common use within this directory.
-#macro(motivation)
-    <<TODO>>: Update the screen shots.
 
-* Motivation
-
-    A typical issue for beginners is understanding the dependency of TrueVFS on
-    {{{../../truevfs-driver/index.html}file system driver modules}} at run time:
-    The module {{{../../truevfs-access/index.html}TrueVFS Access}} scans the
-    class path for
-    {{{../../truevfs-driver/index.html}file system driver}}
-    modules in order to set up the initial
-    {{{../../apidocs/net/java/truevfs/access/TConfig.html}configuration}}.
-
-    Although it's straightforward, setting up the class path can be a daunting
-    task for beginners, so a Maven archetype is provided as a template for
-    TrueVFS applications.
-    This archetype shows how to setup the run time dependencies and, as an
-    alternative, how to
-    {{{../../truevfs-access/configuration.html}customize the initial configuration}}
-    in code (here's a {{{../../usecases/aff.html}sample}}).
-#end ## motivation
 #macro(explore)
+
 * Explore Your Sample Applications
 
     The project directory contains the following files:
@@ -46,7 +27,7 @@
     sample applications terminate.
 
     [<<<src/main/java/com/company/project/java/(file|path)/Cat*.java>>>]
-    These command line utilities recursively copy their file arguments to the 
+    These command line utilities recursively copy their file arguments to the
     standard output.
     If you name any archive file entries in the arguments, they get copied, too.
 
@@ -77,7 +58,7 @@
     For example, if the JAR for the module <<<truevfs-driver-zip>>> is
     locatable on the class path at run time and a ZIP file <<<archive.zip>>>
     exists, then you can double click it to browse its entries.
-    
+
     [<<<src/main/(java|scala)/com/company/project/(java|scala)/(file|path)/Tree.java>>>]
     This command line utility prints the tree graph of the directory structure
     of its file or directory arguments to the standard output.
@@ -101,4 +82,5 @@
     modifier implementations on the class path.
 
     []
+
 #end ## explore

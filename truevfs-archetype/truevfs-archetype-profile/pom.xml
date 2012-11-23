@@ -18,7 +18,7 @@
     <name>TrueVFS Archetype Profile</name>
     <description>
     Creates a custom TrueVFS Profile which bundles all selected TrueVFS
-    modules for easy usage with and without Maven.
+    modules for ease of use with and without Maven.
     </description>
 
     <dependencies>

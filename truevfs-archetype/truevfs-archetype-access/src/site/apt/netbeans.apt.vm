@@ -1,16 +1,17 @@
-#parse("common.vm")
+#parse("common.apt.vm")
+
+## TODO: Update the screen shots.
+
     -----------------------------
-    Getting started with NetBeans
+    Getting Started with NetBeans
     -----------------------------
     Christian Schlichtherle
     -----------------------------
 
-Getting started with NetBeans
+Getting Started with NetBeans
 
     This guide shows how to kick-start a TrueVFS application in NetBeans
     with the help of a Maven archetype.
-
-#motivation()
 
 * Prerequisites
 
