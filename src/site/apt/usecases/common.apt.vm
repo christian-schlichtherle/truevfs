@@ -52,4 +52,4 @@ $title
     class extends the <<<java.io.File>>> class in order to add the
     required functionality.
 #end ## leadIn
-#parse("../common.vm")
+#parse("../common.apt.vm")

@@ -1,4 +1,4 @@
-#parse("common.vm")
+#parse("common.apt.vm")
 #leadIn("Software Build Tool (SBT)",
   "Suppose you're writing a plug-in for the next generation SBT
    which shall create assemblies of all project artifacts.",
@@ -32,7 +32,7 @@ new TFile("file").cp_rp(new TFile("archive.tar.gz/file"));
     directories - please consult the
     {{{../apidocs/net/java/truevfs/access/TFile.html}Javadoc}}
     for more information.
-    
+
     The type of the prospective archive file is detected by its
     extension in a path name.
     In this case <<<.tar.gz>>> was used, but you could use any other

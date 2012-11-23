@@ -1,21 +1,21 @@
-    -----------------------
-    About
-    -----------------------
-    Christian Schlichtherle
-    -----------------------
-
 ## Note that this text has been copied to the Maven site of all other
 ## TrueVFS Profile modules because there is no other way you could share text
 ## between Maven sites other than linking to it or relying on symbolic links.
 ## So if you edit this text, make sure the text for all other profile modules
 ## gets updated accordingly.
 
+    -----------------------
+    About
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
 About
 
     Profiles bundle some TrueVFS modules so that you can easily use them as a
     single all-in-one dependency.
     Other than that, profiles do not provide additional functionality.
-    For a complete list of the modules bundled in this profile, please refer
+    For a complete list of the modules bundled in a profile, please refer
     to its Dependencies report.
 
 * Using a profile with Maven

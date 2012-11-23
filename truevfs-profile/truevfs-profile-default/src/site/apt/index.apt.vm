@@ -1,14 +1,14 @@
-    --------------------------
-    About
-    --------------------------
-    Christian Schlichtherle
-    --------------------------
-
 ## Note that this text has been copied to the Maven site of all other
 ## TrueVFS Profile modules because there is no other way you could share text
 ## between Maven sites other than linking to it or relying on symbolic links.
 ## So if you edit this text, make sure the text for all other profile modules
 ## gets updated accordingly.
+
+    --------------------------
+    About
+    --------------------------
+    Christian Schlichtherle
+    --------------------------
 
 About
 

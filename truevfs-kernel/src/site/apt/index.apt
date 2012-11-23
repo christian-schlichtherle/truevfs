@@ -6,5 +6,5 @@
 
 About
 
-    Kernel modules specify and implement the API for accessing the
-    federated virtual file system space.
+    TrueVFS&#160;Kernel modules specify and implement the API for accessing the
+    virtual file system space.

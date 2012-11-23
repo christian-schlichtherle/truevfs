@@ -44,9 +44,7 @@
                 <item name="Encrypted Application File Format" href="usecases/eaff.html"/>
             </item>
             <item name="Getting Started" href="kick-start/index.html" collapse="true">
-                <item name="with Eclipse" href="kick-start/file/eclipse.html"/>
-                <item name="with NetBeans" href="kick-start/file/netbeans.html"/>
-                <item name="with a Shell" href="kick-start/file/shell.html"/>
+                <item name="with Maven" href="kick-start/maven.html"/>
                 <item name="without Maven" href="kick-start/no-maven.html"/>
                 <item name="Tutorial" href="kick-start/tutorial.html"/>
             </item>
