@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.comp.zip.crypto;
 
-import net.java.truecommons.io.DecoratingOutputStream;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -12,6 +11,7 @@ import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.io.DecoratingOutputStream;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
