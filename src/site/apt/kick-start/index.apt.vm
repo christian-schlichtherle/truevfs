@@ -19,11 +19,12 @@ Getting Started
     Once you've setup your project, you should read the short
     {{{./tutorial.html}TrueVFS Tutorial}} to learn about the client APIs.
 
-    If you use Maven, the
+    Whether you use Maven in your project or not, the
     {{{../truevfs-archetype/truevfs-archetype-access/index.html}TrueVFS&#160;Archetype&#160;Access}}
-    provides lots of sample code.
-    In addition, there is more sample code and applications available in the
-    {{{../truevfs-samples/index.html}TrueVFS&#160;Samples}} module.
+    sets up a template project for you with some fully-working example
+    applications in five minutes.
+    If you want even more sample code, then there is the module
+    {{{../truevfs-samples/index.html}TrueVFS&#160;Samples}}.
     Please
     {{{../truevfs-samples/source-repository.html}check out}} or
     {{{http://repo1.maven.org/maven2/net/java/truevfs/truevfs-samples/${project.version}/truevfs-samples-${project.version}-sources.jar}download}}
