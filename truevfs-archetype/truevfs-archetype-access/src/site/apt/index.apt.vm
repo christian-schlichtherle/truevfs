@@ -10,8 +10,7 @@ Getting Started
     TrueVFS&#160;application in about five minutes.
     This archetype solves two typical issues for beginners:
 
-    [[1]] <<How to set-up the project so that all (transitive) dependencies are
-          satisfied?>>
+    [[1]] <<How to set-up a project structure?>>
 
           TrueVFS applies the convention-over-configuration paradigm and
           therefore figures its initial setup by scanning the class path.
