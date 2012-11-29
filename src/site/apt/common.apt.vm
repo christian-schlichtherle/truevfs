@@ -1,5 +1,7 @@
 ## This file contains macros for common use within this directory.
+
 #macro(configuration $extension $file $modules_need $artifactId)
+
 * Customizing the Initial Configuration
 
     You may be wondering how TrueVFS gets configured to treat a file name with
@@ -33,6 +35,7 @@
 #end ## configuration
 
 #macro(cleaningUp)
+
 * Committing Changes / Cleaning Up
 
     If your application has created or changed one or more archive files,

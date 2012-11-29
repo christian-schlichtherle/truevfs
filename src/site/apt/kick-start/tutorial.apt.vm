@@ -1,11 +1,12 @@
-#parse("common.apt.vm")
+#parse("../common.apt.vm")
+
     -----------------------
-    TrueVFS Tutorial
+    Tutorial
     -----------------------
     Christian Schlichtherle
     -----------------------
 
-TrueVFS Tutorial
+Tutorial
 
     TrueVFS provides CRUD (Create, Read, Update, Delete) operations for archive
     files while maintaining an easy-to-use file system API.
@@ -275,4 +276,5 @@ new TFile("archive.tar.gz").rm_r(); // dito
    {{{../truevfs-driver/truevfs-driver-zip/index.html}TrueVFS Driver ZIP}}
    need",
   "<<<truevfs-driver-tar>>> and <<<truevfs-driver-zip>>>")
+
 #cleaningUp()
