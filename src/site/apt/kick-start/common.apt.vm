@@ -1,2 +1,0 @@
-## This file contains macros for common use within this directory.
-#parse("../common.apt.vm")
