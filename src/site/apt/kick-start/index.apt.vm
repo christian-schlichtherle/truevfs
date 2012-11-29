@@ -20,8 +20,8 @@ Getting Started
     sets up a template project for you with some fully-working example
     applications in five minutes.
     If you want even more sample code, then there is the module
-    {{{../truevfs-samples/index.html}TrueVFS&#160;Samples}}.
-    Please
+    {{{../truevfs-samples/index.html}TrueVFS&#160;Samples}} -
+    please
     {{{../truevfs-samples/source-repository.html}check out}} or
     {{{http://repo1.maven.org/maven2/net/java/truevfs/truevfs-samples/${project.version}/truevfs-samples-${project.version}-sources.jar}download}}
     its source code.
