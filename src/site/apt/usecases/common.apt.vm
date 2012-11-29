@@ -1,5 +1,7 @@
 ## This file contains macros for common use within this directory.
+
 #macro(leadIn $title $motivation $writing $heading)
+
     -----------------------
     $title
     -----------------------
@@ -35,12 +37,12 @@ $title
     files of all these types will be a cumbersome and tedious task because
     each archive type typically comes with its own API to read and write
     its archive files.
-  #set($tru="true")
-  #if($tru.equalsIgnoreCase($writing))
+#set($tru="true")
+#if($tru.equalsIgnoreCase($writing))
     Furthermore, the algorithms required to manage the state transitions
     required to support arbitrary modifications to an archive file in a
     thread-safe manner are very complex.
-  #end
+#end
 
 * $heading
 
@@ -51,5 +53,7 @@ $title
     {{{../apidocs/net/java/truevfs/access/TFile.html}<<<TFile>>>}}
     class extends the <<<java.io.File>>> class in order to add the
     required functionality.
+
 #end ## leadIn
+
 #parse("../common.apt.vm")
