@@ -480,11 +480,11 @@ plug-in to its federated file system space.
                             </plugin>
                             <plugin>
                                 <groupId>org.codehaus.mojo</groupId>
-                                <artifactId>jdepend-maven-plugin</artifactId>
+                                <artifactId>findbugs-maven-plugin</artifactId>
                             </plugin>
                             <plugin>
                                 <groupId>org.codehaus.mojo</groupId>
-                                <artifactId>findbugs-maven-plugin</artifactId>
+                                <artifactId>jdepend-maven-plugin</artifactId>
                             </plugin>
                         </reportPlugins>
                     </configuration>
