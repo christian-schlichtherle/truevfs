@@ -10,7 +10,7 @@ import net.java.truecommons.shed._
 /** Indicates that a file system controller needs to get `sync`ed before the
   * operation can get retried.
   *
-  * @see    FsSyncController
+  * @see    SyncController
   * @author Christian Schlichtherle
   */
 private final class NeedsSyncException private ()
