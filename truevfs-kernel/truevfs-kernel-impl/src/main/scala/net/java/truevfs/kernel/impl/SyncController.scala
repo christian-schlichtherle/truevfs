@@ -16,6 +16,14 @@ import java.io._
 import java.nio.channels._
 import javax.annotation.concurrent._
 
+private object SyncController {
+  private val NOT_WAIT_CLOSE_IO = BitField.of(WAIT_CLOSE_IO).not
+
+  final def modify(options: SyncOptions) =
+    if (1 < LockingStrategy.lockCount) options.and(NOT_WAIT_CLOSE_IO)
+    else options
+}
+
 /** Performs a `sync` operation if required.
   *
   * This controller is a barrier for
@@ -103,8 +111,8 @@ extends ArchiveController[E] {
     }
 
   /**
-   * Applies the given file system operation and syncs the decorated controller
-   * when appropriate.
+   * Syncs the super class controller if needed and applies the given file
+   * system operation.
    *
    * @throws FsSyncWarningException if <em>only</em> warning conditions
    *         apply.
@@ -112,6 +120,7 @@ extends ArchiveController[E] {
    *         synchronized with constraints, e.g. if an unclosed archive entry
    *         stream gets forcibly closed.
    * @throws FsSyncException if any error conditions apply.
+   * @throws IOException at the discretion of `operation`.
    */
   private def apply[V](operation: => V): V = {
     while (true) {
@@ -135,12 +144,18 @@ extends ArchiveController[E] {
   abstract override def sync(options: SyncOptions) { doSync(options) }
 
   /**
-   * Modifies the sync options so that no dead lock can appear due to waiting
-   * for I/O resources in a recursive file system operationa and restarts the
-   * sync operation if required.
+   * Performs a sync on the super class controller whereby the sync options are
+   * modified so that no dead lock can appear due to waiting for I/O resources
+   * in a recursive file system operation.
    *
    * @param  options the sync options
-   * @return the potentially modified sync options.
+   * @throws FsSyncWarningException if <em>only</em> warning conditions
+   *         apply.
+   *         This implies that the respective parent file system has been
+   *         synchronized with constraints, e.g. if an unclosed archive entry
+   *         stream gets forcibly closed.
+   * @throws FsSyncException if any error conditions apply.
+   * @throws NeedsLockRetryException
    */
   private def doSync(options: SyncOptions) {
     // HC SVNT DRACONES!
@@ -152,19 +167,7 @@ extends ArchiveController[E] {
         super.sync(modified)
         done = true
       } catch {
-        case ex: FsSyncWarningException =>
-          ex.getCause match {
-            case _: FsOpenResourceException if (modified get FORCE_CLOSE_IO) =>
-              // This exception was thrown by the resource controller in
-              // order to indicate that the state of the virtual file system
-              // may have completely changed as a side effect of temporarily
-              // releasing its write lock.
-              // We need to remember this exception for later rethrowing
-              // and restart the sync operation.
-              builder warn ex
-            case _ =>
-              throw builder fail ex
-          }
+        case ex: FsSyncWarningException => throw builder fail ex
         case ex: FsSyncException =>
           ex.getCause match {
             case _: FsOpenResourceException if (modified ne options) =>
@@ -176,20 +179,12 @@ extends ArchiveController[E] {
           }
         case yeahIKnow_IWasActuallyDoingThat: NeedsSyncException =>
           // This exception was thrown by the resource controller in
-          // order to indicate that the state of the virtual file system
-          // may have completely changed as a side effect of temporarily
-          // releasing its write lock.
+          // order to indicate that the state of the virtual file
+          // system may have completely changed as a side effect of
+          // temporarily releasing its write lock.
           // We need to repeat the sync operation.
       }
     } while (!done)
     builder check ()
   }
-}
-
-private object SyncController {
-  private val NOT_WAIT_CLOSE_IO = BitField.of(WAIT_CLOSE_IO).not
-
-  final def modify(options: SyncOptions) =
-    if (1 < LockingStrategy.lockCount) options.and(NOT_WAIT_CLOSE_IO)
-    else options
 }
