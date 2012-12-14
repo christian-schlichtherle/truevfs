@@ -20,7 +20,7 @@ private object SyncController {
   private val NOT_WAIT_CLOSE_IO = BitField.of(WAIT_CLOSE_IO).not
 
   final def modify(options: SyncOptions) =
-    if (1 < LockingStrategy.lockCount) options.and(NOT_WAIT_CLOSE_IO)
+    if (1 < LockingStrategy.lockCount) options and NOT_WAIT_CLOSE_IO
     else options
 }
 
@@ -170,12 +170,11 @@ extends ArchiveController[E] {
         case ex: FsSyncWarningException =>
           ex.getCause match {
             case _: FsOpenResourceException if (modified get FORCE_CLOSE_IO) =>
-              // This exception was thrown by the resource controller in
-              // order to indicate that the state of the virtual file system
-              // may have completely changed as a side effect of temporarily
-              // releasing its write lock.
-              // We need to remember this exception for later rethrowing
-              // and restart the sync operation.
+              // TODO: If this case is removed, then the integration
+              // tests for the TrueZIP Driver ODF will fail.
+              // Explain why!
+              // The exception needs to be remembered for later
+              // rethrowing before repeating the sync operation.
               builder warn ex
             case _ =>
               throw builder fail ex
@@ -194,7 +193,7 @@ extends ArchiveController[E] {
           // order to indicate that the state of the virtual file
           // system may have completely changed as a side effect of
           // temporarily releasing its write lock.
-          // We need to repeat the sync operation.
+          // The sync operation needs to get repeated.
       }
     } while (!done)
     builder check ()
