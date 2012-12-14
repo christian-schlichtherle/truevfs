@@ -253,8 +253,7 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
   def sync(options: SyncOptions) {
     try {
       val builder = new FsSyncExceptionBuilder
-      if (!(options get ABORT_CHANGES))
-        copy(builder)
+      if (!(options get ABORT_CHANGES)) copy(builder)
       close(options, builder)
       builder check ()
     } finally {
