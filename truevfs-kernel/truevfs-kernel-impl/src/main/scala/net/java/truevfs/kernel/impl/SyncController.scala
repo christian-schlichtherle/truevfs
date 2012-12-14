@@ -141,7 +141,12 @@ extends ArchiveController[E] {
     throw new AssertionError("unreachable statement")
   }
 
-  abstract override def sync(options: SyncOptions) { doSync(options) }
+  abstract override def sync(options: SyncOptions) {
+    assert(writeLockedByCurrentThread)
+    assert(!readLockedByCurrentThread)
+
+    doSync(options)
+  }
 
   /**
    * Performs a sync on the super class controller whereby the sync options are
@@ -160,33 +165,19 @@ extends ArchiveController[E] {
   private def doSync(options: SyncOptions) {
     // HC SVNT DRACONES!
     val modified = SyncController modify options
-    val builder = new FsSyncExceptionBuilder;
     var done = false
     do {
       try {
         super.sync(modified)
         done = true
       } catch {
-        case ex: FsSyncWarningException =>
-          ex.getCause match {
-            case _: FsOpenResourceException if (modified get FORCE_CLOSE_IO) =>
-              // TODO: If this case is removed, then the integration
-              // tests for the TrueZIP Driver ODF will fail.
-              // Explain why!
-              // The exception needs to be remembered for later
-              // rethrowing before repeating the sync operation.
-              builder warn ex
-            case _ =>
-              throw builder fail ex
-          }
         case ex: FsSyncException =>
           ex.getCause match {
             case _: FsOpenResourceException if (modified ne options) =>
+              assert(!ex.isInstanceOf[FsSyncWarningException])
               // Swallow ex.
-              builder check ()
               throw NeedsLockRetryException()
-            case _ =>
-              throw builder fail ex
+            case _ => throw ex
           }
         case yeahIKnow_IWasActuallyDoingThat: NeedsSyncException =>
           // This exception was thrown by the resource controller in
@@ -196,6 +187,5 @@ extends ArchiveController[E] {
           // The sync operation needs to get repeated.
       }
     } while (!done)
-    builder check ()
   }
 }
