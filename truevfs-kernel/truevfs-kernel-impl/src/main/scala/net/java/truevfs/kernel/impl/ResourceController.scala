@@ -15,8 +15,12 @@ import java.io._
 import java.nio.channels._
 import javax.annotation.concurrent._
 
+private object ResourceController {
+  private val waitTimeoutMillis = LockingStrategy.acquireTimeoutMillis
+}
+
 /** Accounts input and output resources returned by its decorated controller.
-  * 
+  *
   * @see    ResourceManager
   * @author Christian Schlichtherle
   */
@@ -95,7 +99,7 @@ extends ArchiveController[E] {
   }
 
   /** Closes and disconnects all entry streams of the output and input archive.
-    * 
+    *
     * @param builder the exception handling strategy.
     */
   private def closeResources(builder: FsSyncExceptionBuilder) {
@@ -124,7 +128,7 @@ extends ArchiveController[E] {
     /**
       * Close()s this resource and finally stops accounting for it unless a
       * {@link ControlFlowException} is thrown.
-      * 
+      *
       * @see http://java.net/jira/browse/TRUEZIP-279 .
       */
     abstract override def close() {
@@ -134,8 +138,4 @@ extends ArchiveController[E] {
       finally { if (!cfe) accountant stopAccountingFor this }
     }
   }
-}
-
-private object ResourceController {
-  private val waitTimeoutMillis = LockingStrategy.acquireTimeoutMillis
 }
