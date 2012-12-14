@@ -167,7 +167,19 @@ extends ArchiveController[E] {
         super.sync(modified)
         done = true
       } catch {
-        case ex: FsSyncWarningException => throw builder fail ex
+        case ex: FsSyncWarningException =>
+          ex.getCause match {
+            case _: FsOpenResourceException if (modified get FORCE_CLOSE_IO) =>
+              // This exception was thrown by the resource controller in
+              // order to indicate that the state of the virtual file system
+              // may have completely changed as a side effect of temporarily
+              // releasing its write lock.
+              // We need to remember this exception for later rethrowing
+              // and restart the sync operation.
+              builder warn ex
+            case _ =>
+              throw builder fail ex
+          }
         case ex: FsSyncException =>
           ex.getCause match {
             case _: FsOpenResourceException if (modified ne options) =>
