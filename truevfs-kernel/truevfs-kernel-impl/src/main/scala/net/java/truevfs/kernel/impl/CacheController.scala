@@ -21,7 +21,7 @@ import net.java.truecommons.cio.Entry.Type._;
 /** A selective cache for file system entries.
   * Decorating a file system controller with this class has the following
   * effects:
-  * 
+  *
   * - Caching and buffering for an entry needs to get activated by using the
   *   methods `input` or `output` with the access option
   *   [[net.java.truevfs.kernel.impl.FsAccessOption.CACHE]].
@@ -35,17 +35,17 @@ import net.java.truecommons.cio.Entry.Type._;
   *   clients, allowing it to create, read, update or delete the entry data
   *   while some clients are still busy on reading or writing the copied
   *   entry data.
-  * 
+  *
   * '''TO THE FUTURE ME:'''
   * FOR TRUEZIP 7.5, IT TOOK ME TWO MONTHS OF CONSECUTIVE CODING, TESTING,
   * DEBUGGING, ANALYSIS AND SWEATING TO GET THIS DAMN BEAST WORKING STRAIGHT!
   * DON'T EVEN THINK YOU COULD CHANGE A SINGLE CHARACTER IN THIS CODE AND
   * EASILY GET AWAY WITH IT!
   * '''YOU HAVE BEEN WARNED!'''
-  * 
+  *
   * Well, if you really feel like changing something, run the integration test
   * suite at least ten times to make sure your changes really work - I mean it!
-  * 
+  *
   * @author Christian Schlichtherle
   */
 @NotThreadSafe
@@ -108,13 +108,15 @@ extends ArchiveController[E] {
   }
 
   abstract override def sync(options: SyncOptions) {
+    assert(writeLockedByCurrentThread)
+    assert(!readLockedByCurrentThread)
+
     syncCacheEntries(options)
     super.sync(options.clear(CLEAR_CACHE))
     if (caches.isEmpty) mounted = false
   }
 
   private def syncCacheEntries(options: SyncOptions) {
-    assert(writeLockedByCurrentThread)
     // HC SVNT DRACONES!
     if (0 >= caches.size()) return
     val flush = !(options get ABORT_CHANGES)
@@ -231,7 +233,7 @@ extends ArchiveController[E] {
         def preOutput() { make(_options, template) }
 
         def postOutput() {
-          make(_options clear EXCLUSIVE, template orElse Option(cache)) 
+          make(_options clear EXCLUSIVE, template orElse Option(cache))
           register()
         }
 
