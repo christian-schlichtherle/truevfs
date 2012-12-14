@@ -422,6 +422,11 @@ plug-in to its federated file system space.
                             </goals>
                         </execution>
                     </executions>
+                    <configuration>
+                        <args>
+                            <arg>-deprecation</arg>
+                        </args>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-shade-plugin</artifactId>
