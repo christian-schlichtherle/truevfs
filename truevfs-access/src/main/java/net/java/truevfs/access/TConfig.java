@@ -19,25 +19,24 @@ import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 
 /**
- * A container for configuration options with global or inheritable thread
- * local scope.
+ * A mutable container for configuration options with global or inheritable
+ * thread local scope.
  * <p>
- * A thread can call {@link #current()} to current access to the
- * <i>current configuration</i> at any time .
+ * At any time, a thread can call {@link #current()} to get access to the
+ * mutable <i>current configuration</i>.
  * If no configuration has been pushed onto the inheritable thread local
- * configuration stack before, this will return the <i>global configuration</i>
- * which is shared by all threads (hence its name).
- * Note that accessing the global configuration is not thread-safe!
+ * configuration stack before, then this will return the
+ * <i>global configuration</i> which is shared by all threads.
+ * As an implication, accessing the global configuration may not be thread-safe.
  * <p>
- * To create an <i>inheritable thread local configuration</i>, a thread can
- * simply call {@link #open()}.
- * This will copy the <i>current configuration</i> (which may be identical to
- * the global configuration) and push the copy on top of the inheritable thread
+ * To create an <i>inheritable thread local configuration</i>, a thread may
+ * call {@link #open()}.
+ * This will copy the <i>current configuration</i> (which may be the global
+ * configuration) and push the copy on top of the inheritable thread
  * local configuration stack.
  * <p>
  * Later, the thread can use {@link #close()} to pop this configuration
- * respectively off the top of the inheritable thread local configuration stack
- * again.
+ * off the top of the inheritable thread local configuration stack again.
  * <p>
  * Finally, whenever a child thread gets started, it will share the
  * <em>same</em> current configuration with its parent thread.
@@ -54,8 +53,8 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  * If the thread local configuration stack is empty, i.e. no {@link #open()}
  * without a corresponding {@link #close()} has been called before, then the
  * {@link #current()} method will return the global configuration.
- * This feature is intended to get used during the application setup to change
- * some configuration options with global scope like this:
+ * This feature is intended to get used during application setup to change some
+ * configuration options with global scope like this:
  * <pre><code>
 class MyApplication extends TApplication<IOException> {
 
@@ -148,10 +147,12 @@ try (TConfig config = TConfig.open()) {
  * to the default strategy of performing a full archive update whenever
  * required to avoid writing redundant archive entry data.
  * <p>
- * As of TrueVFS 0.9, the support is like this:
+ * As of TrueVFS 0.11, the support is like this:
  * <ul>
+ * <li>The drivers of the module TrueVFS Driver JAR fully support this output
+ *     option preference, so it's available for EAR, JAR, WAR files.</li>
  * <li>The drivers of the module TrueVFS Driver ZIP fully support this output
- *     option preference, so it's available for EAR, JAR, WAR, ZIP etc.</li>
+ *     option preference, so it's available for ZIP files.</li>
  * <li>The drivers of the module TrueVFS Driver ZIP.RAES only allow redundant
  *     archive entry contents and meta data.
  *     You cannot append to an existing ZIP.RAES file, however.</li>
@@ -372,7 +373,7 @@ public final class TConfig extends Resource<IllegalStateException> {
     /**
      * Returns the value of the property {@code lenient}, which is {@code true}
      * if and only if the access preference {@link FsAccessOption#CREATE_PARENTS}
-     * is set in the {@linkplain #getAccessPreferences() access accessPreferences}.
+     * is set in the {@linkplain #getAccessPreferences() access preferences}.
      * This property controls whether archive files and their member
      * directories get automatically created whenever required.
      * <p>
