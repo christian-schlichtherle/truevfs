@@ -1,0 +1,9 @@
+\.chg\..*$
+\.conflict\~$
+^\.idea/
+\.iml$
+\.orig$
+\.orig\..*$
+\.rej$
+glob:target/
+glob:.DS_Store
