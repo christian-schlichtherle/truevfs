@@ -55,9 +55,9 @@ Tutorial
 
     []
 
-** OIO API
+** OIO API style
 
-    Using the OIO API, your starting point for almost all file system
+    Using the OIO API style, your starting point for almost all file system
     operations is the class <<<TFile>>>.
     This class inherits from <<<java.io.File>>>, so you can use it with other
     APIs for its super class.
@@ -77,7 +77,7 @@ Tutorial
     instead of simply returning a boolean value.
     So the OIO API style is by no means obsolete - see below.
 
-** NIO.2
+** NIO.2 API style
 
     If you prefer the NIO.2 API style, then your starting point is the class
     <<<TPath>>>.
