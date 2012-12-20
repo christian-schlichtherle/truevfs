@@ -11,7 +11,6 @@ import net.java.truevfs.kernel.spec.spi._
   *
   * @author Christian Schlichtherle
   */
-@deprecated("This class is reserved for exclusive use by the [[net.java.truevfs.kernel.spec.sl.FsManagerLocator.SINGLETON]]!", "1")
 final class DefaultManagerFactory
 extends FsManagerFactory with Immutable {
 

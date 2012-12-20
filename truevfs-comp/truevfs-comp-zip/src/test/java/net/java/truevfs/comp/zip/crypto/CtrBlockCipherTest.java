@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.comp.zip.crypto;
 
-import net.java.truevfs.comp.zip.crypto.CtrBlockCipher;
 import java.security.SecureRandom;
 import java.util.Random;
 import org.bouncycastle.crypto.BlockCipher;

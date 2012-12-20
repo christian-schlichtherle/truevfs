@@ -15,8 +15,12 @@ import java.io._
 import java.nio.channels._
 import javax.annotation.concurrent._
 
+private object ResourceController {
+  private val waitTimeoutMillis = LockingStrategy.acquireTimeoutMillis
+}
+
 /** Accounts input and output resources returned by its decorated controller.
-  * 
+  *
   * @see    ResourceManager
   * @author Christian Schlichtherle
   */
@@ -56,46 +60,47 @@ extends ArchiveController[E] {
   }: AnyOutputSocket
 
   abstract override def sync(options: SyncOptions) {
-    syncResources(options)
-    super.sync(options)
-  }
-
-  private def syncResources(options: SyncOptions) {
     assert(writeLockedByCurrentThread)
     assert(!readLockedByCurrentThread)
+
     // HC SVNT DRACONES!
     val beforeWait = accountant.resources
-    if (0 == beforeWait.total) return
-    {
-      val builder = new FsSyncExceptionBuilder
-      try {
-        if (0 != beforeWait.local && !(options get FORCE_CLOSE_IO))
-          throw new FsOpenResourceException(beforeWait.local, beforeWait.total)
-        accountant awaitClosingOfOtherThreadsResources
-        (if (options get WAIT_CLOSE_IO) 0 else waitTimeoutMillis)
-        val afterWait = accountant.resources
-        if (0 != afterWait.total)
-          throw new FsOpenResourceException(afterWait.local, afterWait.total)
-      } catch {
-        case ex: FsOpenResourceException =>
-          if (!(options get FORCE_CLOSE_IO))
-            throw builder fail new FsSyncException(mountPoint, ex)
-          builder warn new FsSyncWarningException(mountPoint, ex)
-      }
-      closeResources(builder)
-      builder check ()
+    if (0 == beforeWait.total) {
+      super.sync(options)
+      return
     }
+
+    val builder = new FsSyncExceptionBuilder
+    try {
+      if (0 != beforeWait.local && !(options get FORCE_CLOSE_IO))
+        throw new FsOpenResourceException(beforeWait.local, beforeWait.total)
+      accountant awaitClosingOfOtherThreadsResources
+      (if (options get WAIT_CLOSE_IO) 0 else waitTimeoutMillis)
+      val afterWait = accountant.resources
+      if (0 != afterWait.total)
+        throw new FsOpenResourceException(afterWait.local, afterWait.total)
+    } catch {
+      case ex: FsOpenResourceException =>
+        if (!(options get FORCE_CLOSE_IO))
+          throw builder fail new FsSyncException(mountPoint, ex)
+        builder warn new FsSyncWarningException(mountPoint, ex)
+    }
+    closeResources(builder)
     if (beforeWait.needsWaiting) {
-      // waitOtherThreads(*) has temporarily released the write
-      // lock, so the state of the virtual file system may have
+      // awaitClosingOfOtherThreadsResources(*) has temporarily released
+      // the write lock, so the state of the virtual file system may have
       // completely changed and thus we need to restart the sync
-      // operation.
+      // operation unless an exception occured.
+      builder check ()
       throw NeedsSyncException()
     }
+    try { super.sync(options) }
+    catch { case ex: FsSyncException => throw builder fail ex }
+    builder check ()
   }
 
   /** Closes and disconnects all entry streams of the output and input archive.
-    * 
+    *
     * @param builder the exception handling strategy.
     */
   private def closeResources(builder: FsSyncExceptionBuilder) {
@@ -124,7 +129,7 @@ extends ArchiveController[E] {
     /**
       * Close()s this resource and finally stops accounting for it unless a
       * {@link ControlFlowException} is thrown.
-      * 
+      *
       * @see http://java.net/jira/browse/TRUEZIP-279 .
       */
     abstract override def close() {
@@ -134,8 +139,4 @@ extends ArchiveController[E] {
       finally { if (!cfe) accountant stopAccountingFor this }
     }
   }
-}
-
-private object ResourceController {
-  private val waitTimeoutMillis = LockingStrategy.acquireTimeoutMillis
 }
