@@ -928,12 +928,6 @@ public final class TFile extends File implements TRex {
      * archive file name patterns in the last path name segment.
      * The parent file object is unaffected by this transformation, so the
      * path name of this file object may address an entry in an archive file.
-     * <p>
-     * <em>Warning:</em> Doing I/O on the returned file object will yield
-     * inconsistent results and may even cause <strong>loss of data</strong> if
-     * the last path name segment addresses an archive file which is currently
-     * mounted by the TrueVFS Kernel - see
-     * <a href="#traversal">Traversing Directory Trees</a>!
      *
      * @return A file object for the same path name, but does not detect any
      *         archive file name patterns in the last path name segment.
