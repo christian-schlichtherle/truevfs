@@ -2344,38 +2344,34 @@ public final class TFile extends File implements TRex {
     @ExpertFeature( level=INTERMEDIATE,
                     value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     @FsAssertion(consistent=YES)
-    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     public static void mv(
             final File src,
             final File dst,
             final TArchiveDetector detector)
     throws IOException {
-        if (detector.getExtensions().isEmpty()) {
-            final boolean srcArchived;
-            final File srcDelegate;
-            if (src instanceof TFile) {
-                final TFile srcFile = (TFile) src;
-                srcArchived = null != srcFile.innerArchive;
-                srcDelegate = srcFile.file;
-            } else {
-                srcArchived = false;
-                srcDelegate = src;
-            }
-            final boolean dstArchived;
-            final File dstDelegate;
-            if (dst instanceof TFile) {
-                final TFile dstFile = (TFile) dst;
-                dstArchived = null != dstFile.innerArchive;
-                dstDelegate = dstFile.file;
-            } else {
-                dstArchived = false;
-                dstDelegate = dst;
-            }
-            if (!srcArchived && !dstArchived)
-                if (srcDelegate.renameTo(dstDelegate))
-                    return;
-                else
-                    throw new FileSystemException(src.getPath(), dst.getPath(), "Cannot move!");
+        final boolean srcArchived;
+        final File srcDelegate;
+        if (src instanceof TFile) {
+            final TFile srcFile = (TFile) src;
+            srcArchived = null != srcFile.getInnerArchive();
+            srcDelegate = srcFile.getFile();
+        } else {
+            srcArchived = false;
+            srcDelegate = src;
+        }
+        final boolean dstArchived;
+        final File dstDelegate;
+        if (dst instanceof TFile) {
+            final TFile dstFile = (TFile) dst;
+            dstArchived = null != dstFile.getInnerArchive();
+            dstDelegate = dstFile.getFile();
+        } else {
+            dstArchived = false;
+            dstDelegate = dst;
+        }
+        if (!srcArchived && !dstArchived) {
+            if (srcDelegate.renameTo(dstDelegate)) return;
+            throw new FileSystemException(src.getPath(), dst.getPath(), "Cannot rename.");
         }
         TBIO.mv(src, dst, detector);
     }
