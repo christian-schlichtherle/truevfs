@@ -403,32 +403,6 @@ plug-in to its federated file system space.
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>net.alchim31.maven</groupId>
-                    <artifactId>scala-maven-plugin</artifactId>
-                    <executions>
-                        <execution>
-                            <id>scala-compile-first</id>
-                            <phase>process-resources</phase>
-                            <goals>
-                                <goal>add-source</goal>
-                                <goal>compile</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>scala-test-compile</id>
-                            <phase>process-test-resources</phase>
-                            <goals>
-                                <goal>testCompile</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <args>
-                            <arg>-deprecation</arg>
-                        </args>
-                    </configuration>
-                </plugin>
-                <plugin>
                     <artifactId>maven-shade-plugin</artifactId>
                     <executions>
                         <execution>
@@ -529,6 +503,32 @@ plug-in to its federated file system space.
                             <net.truevfs.driver.zip.io.forceZip64Ext>false</net.truevfs.driver.zip.io.forceZip64Ext>
                             <java.io.tmpdir>${java.io.tmpdir.it}</java.io.tmpdir>
                         </systemPropertyVariables>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>net.alchim31.maven</groupId>
+                    <artifactId>scala-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>scala-compile-first</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                                <goal>compile</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>scala-test-compile</id>
+                            <phase>process-test-resources</phase>
+                            <goals>
+                                <goal>testCompile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <args>
+                            <arg>-deprecation</arg>
+                        </args>
                     </configuration>
                 </plugin>
             </plugins>
