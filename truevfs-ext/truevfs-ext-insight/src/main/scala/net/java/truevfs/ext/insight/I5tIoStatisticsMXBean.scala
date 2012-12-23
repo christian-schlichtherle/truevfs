@@ -34,5 +34,5 @@ trait I5tIoStatisticsMXBean {
   def getWriteOperations: Long
   def getWriteThreadsTotal: Int
 
-  def rotate ()
+  def rotate()
 }

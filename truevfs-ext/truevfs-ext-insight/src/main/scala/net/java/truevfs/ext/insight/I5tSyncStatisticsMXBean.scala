@@ -24,5 +24,5 @@ trait I5tSyncStatisticsMXBean {
   def getTimeUpdatedDate: String
   def getTimeUpdatedMillis: Long
 
-  def rotate ()
+  def rotate()
 }
