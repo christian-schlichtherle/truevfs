@@ -347,18 +347,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
         if (null != dstEntry) {
             if (o.get(EXCLUSIVE))
                 throw new FileAlreadyExistsException(dst.toString());
-            if (dstEntry.isType(DIRECTORY)) {
-                try {
-                    // Try first...
-                    dst.delete();
-                } catch (IOException ex) {
-                    // ... before you check!
-                    if (!dstEntry.getMembers().isEmpty())
-                        throw (IOException) new DirectoryNotEmptyException(dst.toString())
-                                .initCause(ex);
-                    throw ex;
-                }
-            }
+            if (dstEntry.isType(DIRECTORY)) dst.delete();
         }
         final InputSocket<?> input = src.input(src.getAccessPreferences());
         final OutputSocket<?> output = dst.output(o,
