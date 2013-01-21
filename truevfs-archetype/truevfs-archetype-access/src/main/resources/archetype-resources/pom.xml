@@ -159,7 +159,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
+                <version>3.0</version>
                 <configuration>
                     <!-- For NetBeans. -->
                     <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
