@@ -17,7 +17,7 @@ private final class ArchiveControllerAdapter(
 ) extends FsAbstractController(c.model) with Immutable {
 
   override def node(options: AccessOptions, name: FsNodeName) =
-    c node (options, name) orNull
+    (c node (options, name)).orNull
   override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
     c checkAccess (options, name, types)
   override def setReadOnly(options: AccessOptions, name: FsNodeName) =

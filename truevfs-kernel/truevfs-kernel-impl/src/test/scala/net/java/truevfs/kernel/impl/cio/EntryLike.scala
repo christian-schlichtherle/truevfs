@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.kernel.impl.cio
 
+import language.higherKinds
 import net.java.truecommons.cio.Entry._
 import net.java.truecommons.cio.Entry.Access._
 import net.java.truecommons.cio.Entry.Size._

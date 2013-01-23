@@ -11,9 +11,10 @@ import net.java.truecommons.cio.Entry._
 import java.{lang => jl}
 import java.{util => ju}
 import ju.concurrent.locks._
+import language.implicitConversions
 
 /** Implements the Kernel API.
-  * 
+  *
   * @author Christian Schlichtherle
   */
 package object impl {

@@ -102,8 +102,8 @@ with ReentrantReadWriteLockAspect {
       case None =>
         checkWriteLockedByCurrentThread
         val p = Option(mp.getParent) map (controller0(d, _))
-        val m = new ManagedModel(mp, p map (_.getModel) orNull)
-        val c = d newController (this, m, p orNull)
+        val m = new ManagedModel(mp, (p map (_.getModel)).orNull)
+        val c = d newController (this, m, p.orNull)
         m init c
         c
     }

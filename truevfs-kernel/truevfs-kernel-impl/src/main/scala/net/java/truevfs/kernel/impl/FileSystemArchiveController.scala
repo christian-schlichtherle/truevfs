@@ -20,7 +20,7 @@ import net.java.truecommons.cio.Entry._;
   * [[net.java.truevfs.kernel.impl.ControlFlowException]]s, for example
   * when
   * [[net.java.truevfs.kernel.impl.NeedsWriteLockException requiring a write lock].
-  * 
+  *
   * @tparam E the type of the archive entries.
   * @author Christian Schlichtherle
   */
@@ -35,10 +35,10 @@ extends BasicArchiveController[E] with MountState[E] {
   final def autoMount(options: AccessOptions, autoCreate: Boolean) =
     mountState autoMount (options, autoCreate)
 
-  final def fileSystem = mountState fileSystem
+  final def fileSystem = mountState.fileSystem
 
   final def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]]) {
-    mountState fileSystem = fileSystem
+    mountState.fileSystem = fileSystem
   }
 
   /**
@@ -67,7 +67,7 @@ extends BasicArchiveController[E] with MountState[E] {
     def autoMount(options: AccessOptions, autoCreate: Boolean) = {
       checkWriteLockedByCurrentThread
       mount(options, autoCreate)
-      mountState.fileSystem get
+      mountState.fileSystem.get
     }
 
     def fileSystem = None

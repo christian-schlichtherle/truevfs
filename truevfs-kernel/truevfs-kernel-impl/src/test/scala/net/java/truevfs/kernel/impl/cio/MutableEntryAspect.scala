@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.kernel.impl.cio
 
+import language.implicitConversions
 import net.java.truecommons.cio._
 import net.java.truecommons.cio.Entry._
 import net.java.truevfs.kernel.impl.util._

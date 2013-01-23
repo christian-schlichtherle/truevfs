@@ -16,16 +16,16 @@ import FileSystem._
   * However, this class works with any generic decomposable key type for which
   * a [[net.java.truevfs.kernel.impl.util.FileSystem.Composition]] and a
   * [[net.java.truevfs.kernel.impl.util.DirectoryFactory]] exist.
-  * 
+  *
   * Using this class helps to save some heap space if the paths address deeply
   * nested directory trees where many path segments can get shared between
   * mapped entries &mdash; provided that no other references to the paths are
   * held!
-  * 
+  *
   * This class supports both `null` paths and entries.
-  * 
+  *
   * This class is ''not'' thread-safe!
-  * 
+  *
   * @tparam K the type of the paths (keys) in this (virtual) file system (map).
   * @tparam  V the type of the entries (values) in this (virtual) file system
   *         (map).
@@ -67,7 +67,7 @@ final class FileSystem[K >: Null, V](
     })
   }
 
-  override def get(path: K) = node(path) flatMap (_ entry)
+  override def get(path: K) = node(path) flatMap (_.entry)
 
   def node(path: K): Option[Node[K, V]] = node(Option(path))
 
@@ -95,7 +95,7 @@ final class FileSystem[K >: Null, V](
             link(parent, None) link (segment, entry)
         }
       case None =>
-        if (entry isDefined) _root entry = entry
+        if (entry.isDefined) _root.entry = entry
         _root
     }
   }
@@ -111,11 +111,11 @@ final class FileSystem[K >: Null, V](
           case composition(parent, segment) =>
             node(parent) foreach { node =>
               node unlink segment
-              if (node isDead) unlink(parent)
+              if (node.isDead) unlink(parent)
             }
         }
       case None =>
-        _root entry = None
+        _root.entry = None
     }
   }
 
@@ -140,9 +140,9 @@ object FileSystem {
   /** A file system node. */
   sealed abstract class Node[K >: Null, +V] extends Iterable[(K, Node[K, V])] {
     def path: Option[K]
-    final def isRoot = path isEmpty
+    final def isRoot = path.isEmpty
     def entry: Option[V]
-    final def isGhost = entry isEmpty
+    final def isGhost = entry.isEmpty
     final def isLeaf = isEmpty
     final override def stringPrefix = "Node"
     final override def toString = stringPrefix + "(path=" + path + ", isLeaf=" + isLeaf + ", entry=" + entry + ")"
@@ -156,16 +156,16 @@ object FileSystem {
 
     private[this] val _members = fs.directoryFactory.create[INode[K, V]]
 
-    if (_entry isDefined) fs._size += 1
+    if (_entry.isDefined) fs._size += 1
 
-    override def iterator = _members iterator
+    override def iterator = _members.iterator
     override def foreach[U](f: ((K, Node[K, V])) => U): Unit = _members foreach f
-    override def size = _members size
+    override def size = _members.size
 
-    override def path = address _2
+    override def path = address._2
 
     def address: (FileSystem[K, V], Option[K]) = {
-      val (node, segment) = parent get
+      val (node, segment) = parent.get
       val (fs, path) = node.address
       fs -> Some(fs composition (path, segment))
     }
@@ -174,11 +174,11 @@ object FileSystem {
 
     def entry_=(entry: Option[V])(implicit fs: FileSystem[K, V]) {
       // HC SVNT DRACONES!
-      if (_entry isDefined) {
-        if (entry isEmpty)
+      if (_entry.isDefined) {
+        if (entry.isEmpty)
           fs._size -= 1
       } else {
-        if (entry isDefined)
+        if (entry.isDefined)
           fs._size += 1
       }
       _entry = entry
@@ -189,7 +189,7 @@ object FileSystem {
     def link(segment: K, entry: Option[V])(implicit fs: FileSystem[K, V]) = {
       _members get segment match {
         case Some(node) =>
-          if (entry isDefined) node entry = entry
+          if (entry.isDefined) node.entry = entry
           node
         case None =>
           val node = new INode[K, V](Some(this, segment), entry)
@@ -200,8 +200,8 @@ object FileSystem {
 
     def unlink(segment: K)(implicit fs: FileSystem[K, V]) {
       _members get segment foreach { node =>
-        node entry = None
-        if (node isLeaf) _members -= segment
+        node.entry = None
+        if (node.isLeaf) _members -= segment
       }
     }
 
@@ -243,7 +243,7 @@ object FileSystem {
       } else {
         // There's no point in copying here!
         Some(None, path)
-      } 
+      }
     }
   } // StringComposition
 
