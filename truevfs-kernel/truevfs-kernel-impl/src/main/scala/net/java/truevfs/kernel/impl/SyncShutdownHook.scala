@@ -45,9 +45,9 @@ private object SyncShutdownHook extends Thread {
     * @see #register
     */
   def remove() {
-    if (_manager isDefined) {
+    if (_manager.isDefined) {
       synchronized {
-        if (_manager isDefined) {
+        if (_manager.isDefined) {
           // Prevent memory leak in dynamic class loader environments.
           Runtime.getRuntime removeShutdownHook this
           _manager = None
@@ -74,7 +74,7 @@ private object SyncShutdownHook extends Thread {
                       new FsControllerSyncVisitor(FsSyncOptions.UMOUNT)) // may call remove()!
       } catch {
         // Logging doesn't work in a shutdown hook!
-        case ex => ex printStackTrace()
+        case ex: FsSyncException => ex printStackTrace ()
       }
     }
   }

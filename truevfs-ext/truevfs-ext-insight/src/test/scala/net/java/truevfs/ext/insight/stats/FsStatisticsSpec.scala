@@ -35,7 +35,7 @@ class FsStatisticsSpec extends WordSpec with ShouldMatchers with PropertyChecks 
 
       def toObject(a: Array[Byte]) = {
         loan (new ObjectInputStream(new ByteArrayInputStream(a)))
-        .to(_ readObject)
+        .to(_.readObject)
       }
 
       val array = toArray(original)

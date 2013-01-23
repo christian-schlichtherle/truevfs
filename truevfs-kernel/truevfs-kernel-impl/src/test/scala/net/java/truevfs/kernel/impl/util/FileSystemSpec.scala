@@ -37,7 +37,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
         forAll { parentPath: String =>
           whenever (isParentPath(parentPath)) {
             val parentEntry = Entry(parentPath)
-            fs += parentPath -> parentEntry 
+            fs += parentPath -> parentEntry
             fs(parentPath) should be theSameInstanceAs(parentEntry )
             fs.size should be >= (1)
             val iterator = fs.iterator
@@ -134,10 +134,10 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
           case Remove(path) => fs -= path; fs
           case NoOp()       => fs
         }
-        result should have size (expected size)
+        result should have size (expected.size)
         for (path <- expected)
           result(path).path should be (path)
-        result.values map (_ path) should equal (expected)
+        result.values map (_.path) should equal (expected)
       }
     }
   }
