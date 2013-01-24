@@ -9,7 +9,7 @@ package net.java.truevfs.comp.zip;
  * <p>
  * <b>Warning:</b> This interface is <em>not</em> intended for public use
  * - its API may change at will without prior notification!
- * 
+ *
  * @param  <E> The type of the created ZIP entries.
  * @author Christian Schlichtherle
  */
@@ -23,7 +23,7 @@ extends ZipCharsetParameters, ZipEntryFactory<E> {
      * Self Extracting Archives typically use a preamble to store the
      * application code that is required to extract the ZIP file contents.
      * <p>
-     * If this method returns {@code false}, the a ZIP file must start with
+     * If this method returns {@code false}, then a ZIP file must start with
      * either a Local File Header (LFH) signature,
      * a ZIP64 End Of Central Directory Record (EOCDR) signature or an End Of
      * Central Directory Record (EOCDR) signature.
