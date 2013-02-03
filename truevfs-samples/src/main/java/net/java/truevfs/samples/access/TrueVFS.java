@@ -503,7 +503,7 @@ public enum TrueVFS {
     private enum MkdirOption { P }
     private enum RmOption { R }
 
-    private final class RmVisitor extends SimpleFileVisitor<Path> {
+    private static class RmVisitor extends SimpleFileVisitor<Path> {
         @Override
         public FileVisitResult visitFile(
                 final Path file,
