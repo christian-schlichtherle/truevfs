@@ -55,7 +55,7 @@ import net.java.truevfs.kernel.spec.FsAccessOption;
  * If they are not however, some considerable amount of time is spent searching
  * for the Central Directory required to be present in ZIP (and hence SFX)
  * files.
- * 
+ *
  * @author Christian Schlichtherle
  */
 public enum TrueVFS {
@@ -267,7 +267,7 @@ public enum TrueVFS {
     /**
      * Scans the given command parameters for options of the given class.
      * As a side effect, any found options are popped off the parameter stack.
-     * 
+     *
      * @param  <T> the type of the enum class for the options.
      * @param  params the command parameters.
      * @param  option the enum class for the options.
@@ -460,20 +460,17 @@ public enum TrueVFS {
         }
     }
 
+    @SuppressWarnings("CallToThreadDumpStack")
     public static void main(String[] args) {
         try {
             final Deque<String> parameters = new LinkedList<>(Arrays.asList(args));
             final String command = parameters.pop().toUpperCase(Locale.ROOT);
             valueOf(command).run(parameters);
-        } catch (IllegalArgumentException | NoSuchElementException ex) {
-            String message = ex.getLocalizedMessage();
-            if (null == message) {
-                final StringBuilder builder = new StringBuilder(25*80);
-                for (final TrueVFS truevfs : values())
-                    builder.append('\n').append(truevfs.getUsage());
-                message = builder.toString();
-            }
-            err.println(message);
+        } catch (final IllegalArgumentException | NoSuchElementException ex) {
+            final StringBuilder builder = new StringBuilder(25 * 80);
+            for (final TrueVFS truevfs : values())
+                builder.append('\n').append(truevfs.getUsage());
+            err.println(builder.toString());
             System.exit(2);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -481,12 +478,10 @@ public enum TrueVFS {
         }
     }
 
+    String getUsage() { return message("usage", TrueVFS.class.getSimpleName()); }
+    String getHelp() { return message("help"); }
+
     String message(String key, Object... args) {
-        /*return String.format(
-                ResourceBundle
-                    .getBundle(TrueVFS.class.getCanonicalName())
-                    .getString(name() + "." + key),
-                args);*/
         return String.format(
                 ResourceBundle
                     .getBundle(TrueVFS.class.getCanonicalName() + "." + name())
@@ -494,14 +489,11 @@ public enum TrueVFS {
                 args);
     }
 
-    String getUsage() { return message("usage", TrueVFS.class.getSimpleName()); }
-    String getHelp() { return message("help"); }
-
     /**
      * Runs this command.
      * Implementations are free to modify the given deque.
-     * 
-     * @param params the command parameters.
+     *
+     * @param  params the command parameters.
      * @throws Exception on any error.
      */
     abstract void run(Deque<String> params) throws Exception;
