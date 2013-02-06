@@ -73,6 +73,16 @@ plug-in to its federated file system space.
         <tag>HEAD</tag>
     </scm>
 
+    <distributionManagement>
+        <site>
+            <id>truevfs-website</id>
+            <name>TrueVFS Website</name>
+            <!-- DON'T use ${project.groupId}, ${project.artifactId} here.
+                 This would change in sub-modules! -->
+            <url>file://${env.HOME}/sites/net.java.truevfs/</url>
+        </site>
+    </distributionManagement>
+
     <properties>
         <netbeans.hint.jdkPlatform>JDK_1.7</netbeans.hint.jdkPlatform>
         <maven.compiler.source>1.7</maven.compiler.source>
@@ -603,12 +613,4 @@ plug-in to its federated file system space.
             </build>
         </profile>
     </profiles>
-
-    <distributionManagement>
-        <site>
-            <id>truevfs-website</id>
-            <name>TrueVFS Website</name>
-            <url>file:/Users/christian/Projects/truevfs~web</url>
-        </site>
-    </distributionManagement>
 </project>
