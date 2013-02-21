@@ -120,6 +120,7 @@ with ReentrantReadWriteLockAspect {
    */
   private final class ManagedModel(mountPoint: FsMountPoint, parent: FsModel)
   extends FsAbstractModel(mountPoint, parent) {
+
     private[this] var _controller: FsController = _
     @volatile private[this] var _mounted: Boolean = _
 
