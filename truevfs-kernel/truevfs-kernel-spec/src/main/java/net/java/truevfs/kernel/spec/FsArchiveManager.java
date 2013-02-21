@@ -2,7 +2,7 @@ package net.java.truevfs.kernel.spec;
 
 /**
  * A file system manager with a file system controller factory which accepts
- * an archive driver as its context.
+ * any archive driver as its context.
  *
  * @since  TrueVFS 0.10
  * @author Christian Schlichtherle
