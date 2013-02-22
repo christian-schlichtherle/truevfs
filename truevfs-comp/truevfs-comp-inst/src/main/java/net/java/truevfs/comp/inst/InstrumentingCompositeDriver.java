@@ -29,6 +29,14 @@ implements FsCompositeDriver {
     }
 
     @Override
+    public final FsModel newModel(
+            FsManager context,
+            FsMountPoint mountPoint,
+            FsModel parent) {
+        return driver.newModel(context, mountPoint, parent);
+    }
+
+    @Override
     public FsController newController(
             final FsManager manager,
             final FsModel model,

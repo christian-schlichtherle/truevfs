@@ -25,6 +25,17 @@ public abstract class FsAbstractCompositeDriver
 implements FsCompositeDriver, Container<Map<FsScheme, FsDriver>> {
 
     @Override
+    public final FsModel newModel(
+            final FsManager context,
+            final FsMountPoint mountPoint,
+            final FsModel parent) {
+        assert null == parent
+                    ? null == mountPoint.getParent()
+                    : parent.getMountPoint().equals(mountPoint.getParent());
+        return driver(mountPoint).newModel(context, mountPoint, parent);
+    }
+
+    @Override
     public final FsController newController(
             final FsManager context,
             final FsModel model,
@@ -33,11 +44,15 @@ implements FsCompositeDriver, Container<Map<FsScheme, FsDriver>> {
         assert null == parent
                     ? null == model.getParent()
                     : parent.getModel().equals(model.getParent());
-        final FsScheme scheme = model.getMountPoint().getScheme();
+        return driver(model.getMountPoint()).newController(context, model, parent);
+    }
+
+    private FsDriver driver(final FsMountPoint mountPoint) {
+        final FsScheme scheme = mountPoint.getScheme();
         final FsDriver driver = get().get(scheme);
         if (null == driver)
             throw new ServiceConfigurationError(scheme
                     + " (Unknown file system scheme! May be the class path doesn't contain the respective driver module or it isn't set up correctly?)");
-        return driver.newController(context, model, parent);
+        return driver;
     }
 }
