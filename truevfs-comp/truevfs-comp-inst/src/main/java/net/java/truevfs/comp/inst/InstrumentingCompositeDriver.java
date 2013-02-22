@@ -8,10 +8,7 @@ import java.util.Objects;
 import java.util.ServiceConfigurationError;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.kernel.spec.FsArchiveManager;
-import net.java.truevfs.kernel.spec.FsCompositeDriver;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsModel;
+import net.java.truevfs.kernel.spec.*;
 
 /**
  * @param  <M> the type of the mediator.
@@ -33,7 +30,7 @@ implements FsCompositeDriver {
 
     @Override
     public FsController newController(
-            final FsArchiveManager manager,
+            final FsManager manager,
             final FsModel model,
             final @CheckForNull FsController parent)
     throws ServiceConfigurationError {

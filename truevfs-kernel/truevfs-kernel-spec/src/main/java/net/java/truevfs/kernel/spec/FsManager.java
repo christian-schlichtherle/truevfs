@@ -21,7 +21,8 @@ import net.java.truecommons.shed.Visitor;
  * @author Christian Schlichtherle
  */
 @ImplementationsShouldExtend(FsAbstractManager.class)
-public interface FsManager {
+public interface FsManager
+extends FsControllerFactory<FsArchiveDriver<? extends FsArchiveEntry>>{
 
     /**
      * Returns the thread-safe file system controller for the given mount point.

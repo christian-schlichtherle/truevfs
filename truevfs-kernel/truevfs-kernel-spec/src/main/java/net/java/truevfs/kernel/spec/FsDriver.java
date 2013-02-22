@@ -18,7 +18,7 @@ import net.java.truecommons.shed.UniqueObject;
 @Immutable
 public abstract class FsDriver
 extends UniqueObject
-implements FsControllerFactory<FsArchiveManager> {
+implements FsControllerFactory<FsManager> {
 
     /**
      * Returns {@code true} iff this is an archive driver, i.e. if file systems

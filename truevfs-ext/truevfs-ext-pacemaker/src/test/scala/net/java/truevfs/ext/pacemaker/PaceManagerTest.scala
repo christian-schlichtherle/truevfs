@@ -131,6 +131,7 @@ extends WordSpec
 
 object PaceManagerTest {
 
+  type AnyArchiveDriver = FsArchiveDriver[_ <: FsArchiveEntry]
   type ControllerFilter = Filter[_ >: FsController]
   type ControllerVisitor[X <: IOException] = Visitor[_ >: FsController, X]
 
@@ -148,6 +149,9 @@ object PaceManagerTest {
 
   private class TestManager(var controllers: Iterable[FsController] = Iterable.empty[FsController])
   extends FsAbstractManager {
+    override def newController(context: AnyArchiveDriver, model: FsModel, parent: FsController): FsController =
+      throw new UnsupportedOperationException
+
     override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint) =
       throw new UnsupportedOperationException
 

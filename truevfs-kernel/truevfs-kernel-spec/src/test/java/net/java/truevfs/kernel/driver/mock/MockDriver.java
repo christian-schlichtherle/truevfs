@@ -6,10 +6,7 @@ package net.java.truevfs.kernel.driver.mock;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsDriver;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsArchiveManager;
+import net.java.truevfs.kernel.spec.*;
 
 /**
  * @author Christian Schlichtherle
@@ -19,7 +16,7 @@ public final class MockDriver extends FsDriver {
 
     @Override
     public FsController newController(
-            final FsArchiveManager context,
+            final FsManager context,
             final FsModel model,
             final @CheckForNull FsController parent) {
         return new MockController(model, parent, null);

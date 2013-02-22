@@ -5,24 +5,16 @@
 package net.java.truevfs.kernel.spec;
 
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.CharConversionException;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.WillNotClose;
+import java.io.*;
+import java.nio.charset.*;
+import javax.annotation.*;
 import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.*;
 import net.java.truecommons.cio.Entry.Type;
 import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
-import net.java.truecommons.cio.InputService;
-import net.java.truecommons.cio.IoBufferPool;
-import net.java.truecommons.cio.OutputService;
 import net.java.truecommons.shed.BitField;
 import static net.java.truecommons.shed.Paths.cutTrailingSeparators;
-import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
-import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
+import static net.java.truevfs.kernel.spec.FsNodeName.*;
 
 /**
  * An abstract factory for components required for accessing archive files.
@@ -56,7 +48,7 @@ extends FsDriver {
      */
     @Override
     public final FsController newController(
-            FsArchiveManager context,
+            FsManager context,
             FsModel model,
             @Nonnull FsController parent) {
         assert parent.getModel().equals(model.getParent());
