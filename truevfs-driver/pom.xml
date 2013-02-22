@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2012 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>net.java.truevfs</groupId>
+        <artifactId>truevfs</artifactId>
+        <version>0.11-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>truevfs-driver</artifactId>
+    <packaging>pom</packaging>
+
+    <name>TrueVFS Driver</name>
+    <description>
+        Driver modules provide services to extend the TrueVFS Kernel with
+        support for a particular type of file system.
+        Driver modules advertise their services on the class path in order to
+        make them locatable by the TrueVFS Kernel at runtime.
+    </description>
+
+    <modules>
+        <module>truevfs-driver-file</module>
+        <module>truevfs-driver-http</module>
+        <module>truevfs-driver-jar</module>
+        <module>truevfs-driver-odf</module>
+        <module>truevfs-driver-sfx</module>
+        <module>truevfs-driver-tar</module>
+        <module>truevfs-driver-tar-bzip2</module>
+        <module>truevfs-driver-tar-gzip</module>
+        <module>truevfs-driver-tar-xz</module>
+        <module>truevfs-driver-zip</module>
+        <module>truevfs-driver-zip-raes</module>
+    </modules>
+
+    <dependencies>
+        <!-- All drivers depend on the TrueVFS Kernel and its test suite for
+             integration testing. -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-kernel-spec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-kernel-spec</artifactId>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-kernel-impl</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-key-default</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
