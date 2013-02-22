@@ -77,6 +77,7 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
 
   override def newController
   (context: AnyArchiveDriver, model: FsModel, parent: FsController): FsController = {
+    assert(model.getParent == parent.getModel)
     assert(!model.isInstanceOf[ArchiveModel[_]])
     // HC SVNT DRACONES!
     // The FalsePositiveArchiveController decorates the FrontController
@@ -118,11 +119,7 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
   /**
    * A model which schedules its controller for
    * {@linkplain #sync(BitField) synchronization} by &quot;observing&quot; its
-   * {@code touched} property.
-   * <p>
-   * Extending the super-class to register for updates to the {@code touched}
-   * property is simpler, faster and requires a smaller memory footprint than
-   * the alternative observer pattern.
+   * property {@code mounted}.
    */
   private final class ManagedModel(model: FsModel)
   extends FsDecoratingModel(model) {

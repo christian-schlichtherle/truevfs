@@ -33,18 +33,8 @@ extends FsDriver {
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in the class {@link FsArchiveDriver} always returns
-     * {@code true}.
-     */
-    @Override
-    public final boolean isArchiveDriver() { return true; }
-
-    /**
-     * {@inheritDoc}
-     * <p>
      * The implementation in the class {@link FsArchiveDriver} simply forwards
-     * the call to the given controller factory context after asserting that
-     * {@code parent.getModel().equals(model.getParent())} is {@code true}.
+     * the call to the given file system manager.
      */
     @Override
     public final FsController newController(
@@ -56,16 +46,25 @@ extends FsDriver {
     }
 
     /**
-     * This hook can get overridden by archive drivers in order to decorate the
-     * given file system controller with some other file system controller(s).
+     * {@inheritDoc}
      * <p>
      * The implementation in the class {@link FsArchiveDriver} simply returns
-     * the given controller.
+     * {@code true}.
+     */
+    @Override
+    public final boolean isArchiveDriver() { return true; }
+
+    /**
+     * This function can get overridden by drivers in order to decorate the
+     * given file system controller with some other file system controller(s).
+     * <p>
+     * The implementation in the class {@link FsDriver} simply returns the
+     * given controller.
      *
      * @param  controller the file system controller to decorate or return.
      *         Note that this controller may throw {@link RuntimeException}s
      *         for non-local control flow!
-     * @return The decorated file system controller or simply
+     * @return A decorating file system controller or simply
      *         {@code controller}.
      */
     public FsController decorate(FsController controller) { return controller; }

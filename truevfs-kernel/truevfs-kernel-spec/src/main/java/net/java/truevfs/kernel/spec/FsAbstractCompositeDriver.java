@@ -4,8 +4,7 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.util.Map;
-import java.util.ServiceConfigurationError;
+import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.services.Container;
