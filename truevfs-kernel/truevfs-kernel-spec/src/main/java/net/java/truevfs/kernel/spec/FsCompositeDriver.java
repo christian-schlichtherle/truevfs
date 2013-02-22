@@ -20,7 +20,7 @@ import net.java.truecommons.shed.ImplementationsShouldExtend;
  */
 @ImplementationsShouldExtend(FsAbstractCompositeDriver.class)
 public interface FsCompositeDriver
-extends FsControllerFactory<FsArchiveManager> {
+extends FsControllerFactory<FsManager> {
 
     /**
      * {@inheritDoc}
@@ -35,7 +35,7 @@ extends FsControllerFactory<FsArchiveManager> {
      */
     @Override
     FsController newController(
-            FsArchiveManager context,
+            FsManager context,
             FsModel model,
             @CheckForNull FsController parent)
     throws ServiceConfigurationError;

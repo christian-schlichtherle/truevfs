@@ -26,7 +26,7 @@ implements FsCompositeDriver, Container<Map<FsScheme, FsDriver>> {
 
     @Override
     public final FsController newController(
-            final FsArchiveManager context,
+            final FsManager context,
             final FsModel model,
             final @CheckForNull FsController parent)
     throws ServiceConfigurationError {

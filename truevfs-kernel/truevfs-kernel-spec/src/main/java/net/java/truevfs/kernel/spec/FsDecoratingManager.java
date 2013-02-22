@@ -6,9 +6,9 @@ package net.java.truevfs.kernel.spec;
 
 import java.io.IOException;
 import java.util.Objects;
+import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.shed.Filter;
-import net.java.truecommons.shed.Visitor;
+import net.java.truecommons.shed.*;
 
 /**
  * An abstract decorator for a file system manager.
@@ -23,6 +23,14 @@ public abstract class FsDecoratingManager extends FsAbstractManager {
 
     protected FsDecoratingManager(final FsManager manager) {
         this.manager = Objects.requireNonNull(manager);
+    }
+
+    @Override
+    public FsController newController(
+            FsArchiveDriver<? extends FsArchiveEntry> context,
+            FsModel model,
+            @Nullable FsController parent) {
+        return manager.newController(context, model, parent);
     }
 
     @Override

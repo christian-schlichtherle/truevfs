@@ -59,9 +59,7 @@ private object DefaultManager {
   */
 @ThreadSafe
 private final class DefaultManager
-extends FsAbstractManager
-with FsArchiveManager
-with ReentrantReadWriteLockAspect {
+extends FsAbstractManager with ReentrantReadWriteLockAspect {
 
   override val lock = new ReentrantReadWriteLock
 
