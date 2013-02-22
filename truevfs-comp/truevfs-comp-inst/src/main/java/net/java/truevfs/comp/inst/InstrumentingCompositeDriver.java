@@ -33,12 +33,16 @@ implements FsCompositeDriver {
             FsManager context,
             FsMountPoint mountPoint,
             FsModel parent) {
-        return driver.newModel(context, mountPoint, parent);
+        assert null == parent
+                ? null == mountPoint.getParent()
+                : parent.getMountPoint().equals(mountPoint.getParent());
+        return mediator.instrument(this,
+                driver.newModel(context, mountPoint, parent));
     }
 
     @Override
     public FsController newController(
-            final FsManager manager,
+            final FsManager context,
             final FsModel model,
             final @CheckForNull FsController parent)
     throws ServiceConfigurationError {
@@ -46,10 +50,7 @@ implements FsCompositeDriver {
                     ? null == model.getParent()
                     : parent.getModel().equals(model.getParent());
         return mediator.instrument(this,
-                driver.newController(
-                    manager,
-                    mediator.instrument(this, model),
-                    parent));
+                driver.newController(context, model, parent));
     }
 
     @Override
