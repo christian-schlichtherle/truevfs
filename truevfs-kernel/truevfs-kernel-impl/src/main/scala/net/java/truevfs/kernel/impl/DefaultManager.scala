@@ -70,8 +70,13 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
   private[this] val controllers =
     new WeakHashMap[FsMountPoint, Link[FsController]]
 
+  override def newModel
+  (context: FsDriver, mountPoint: FsMountPoint, parent: FsModel): FsModel = {
+      new DefaultModel(mountPoint, parent)
+  }
+
   override def newController
-  (context: AnyArchiveDriver, model: FsModel, parent: FsController) = {
+  (context: AnyArchiveDriver, model: FsModel, parent: FsController): FsController = {
     assert(!model.isInstanceOf[ArchiveModel[_]])
     // HC SVNT DRACONES!
     // The FalsePositiveArchiveController decorates the FrontController
@@ -84,7 +89,8 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
             new BackController(context, model, parent))))
   }
 
-  override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint): FsController = {
+  override def controller
+  (driver: FsCompositeDriver, mountPoint: FsMountPoint): FsController = {
     try {
       readLocked(controller0(driver, mountPoint))
     } catch {
@@ -94,14 +100,16 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
     }
   }
 
-  private def controller0(d: FsCompositeDriver, mp: FsMountPoint): FsController = {
-    controllers get mp flatMap (l => Option(l.get)) match {
+  private def controller0
+  (driver: FsCompositeDriver, mountPoint: FsMountPoint): FsController = {
+    controllers get mountPoint flatMap (l => Option(l.get)) match {
       case Some(c) => c
       case None =>
         checkWriteLockedByCurrentThread
-        val p = Option(mp.getParent) map (controller0(d, _))
-        val m = new ManagedModel(mp, (p map (_.getModel)).orNull)
-        val c = d newController (this, m, p.orNull)
+        val pc = Option(mountPoint.getParent) map (controller0(driver, _))
+        val pm = pc map (_.getModel)
+        val m = new ManagedModel(driver newModel (this, mountPoint, pm.orNull))
+        val c = driver newController (this, m, pc.orNull)
         m init c
         c
     }
@@ -116,20 +124,17 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
    * property is simpler, faster and requires a smaller memory footprint than
    * the alternative observer pattern.
    */
-  private final class ManagedModel(mountPoint: FsMountPoint, parent: FsModel)
-  extends FsAbstractModel(mountPoint, parent) {
+  private final class ManagedModel(model: FsModel)
+  extends FsDecoratingModel(model) {
 
     private[this] var _controller: FsController = _
-    @volatile private[this] var _mounted: Boolean = _
 
     def init(controller: FsController) {
       assert(null ne controller)
-      assert(!_mounted)
+      assert(!model.isMounted)
       _controller = controller
       schedule(false)
     }
-
-    override def isMounted = _mounted
 
     /**
      * Schedules the file system controller for synchronization according
@@ -137,10 +142,10 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
      */
     override def setMounted(mounted: Boolean) {
       writeLocked {
-        if (_mounted != mounted) {
+        if (model.isMounted != mounted) {
           if (mounted) SyncShutdownHook register DefaultManager.this
           schedule(mounted)
-          _mounted = mounted
+          model.setMounted(mounted)
         }
       }
     }
