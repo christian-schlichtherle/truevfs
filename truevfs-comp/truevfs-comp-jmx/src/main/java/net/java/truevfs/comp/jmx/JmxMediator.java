@@ -6,14 +6,11 @@ package net.java.truevfs.comp.jmx;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
-import javax.management.InstanceAlreadyExistsException;
-import javax.management.InstanceNotFoundException;
-import javax.management.JMException;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
+import javax.management.*;
 import net.java.truecommons.jmx.ObjectNameBuilder;
 import net.java.truecommons.jmx.sl.MBeanServerLocator;
 import net.java.truecommons.logging.LocalizedLogger;
+import net.java.truevfs.comp.inst.Mediator;
 import org.slf4j.Logger;
 
 /**
@@ -24,7 +21,7 @@ import org.slf4j.Logger;
  */
 @ThreadSafe
 public abstract class JmxMediator<This extends JmxMediator<This>>
-extends net.java.truevfs.comp.inst.Mediator<This> {
+extends Mediator<This> {
 
     /**
      * The localized logger to use.
