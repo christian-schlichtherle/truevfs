@@ -20,11 +20,20 @@ public abstract class FsDriver
 extends UniqueObject
 implements FsModelFactory<FsManager>, FsControllerFactory<FsManager> {
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * The implementation in the class {@link FsDriver} simply forwards
+     * the call to the given file system manager.
+     */
     @Override
     public final FsModel newModel(
             FsManager context,
             FsMountPoint mountPoint,
             FsModel parent) {
+        assert null == parent
+                ? null == mountPoint.getParent()
+                : parent.getMountPoint().equals(mountPoint.getParent());
         return context.newModel(this, mountPoint, parent);
     }
 
