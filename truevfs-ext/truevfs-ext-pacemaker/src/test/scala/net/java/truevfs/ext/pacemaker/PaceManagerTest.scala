@@ -149,6 +149,9 @@ object PaceManagerTest {
 
   private class TestManager(var controllers: Iterable[FsController] = Iterable.empty[FsController])
   extends FsAbstractManager {
+    override def newModel(context: FsDriver, mountPoint: FsMountPoint, parent: FsModel): FsModel =
+      throw new UnsupportedOperationException
+
     override def newController(context: AnyArchiveDriver, model: FsModel, parent: FsController): FsController =
       throw new UnsupportedOperationException
 

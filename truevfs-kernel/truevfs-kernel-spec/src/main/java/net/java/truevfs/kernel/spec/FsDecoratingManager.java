@@ -26,6 +26,17 @@ public abstract class FsDecoratingManager extends FsAbstractManager {
     }
 
     @Override
+    public FsModel newModel(
+            FsDriver context,
+            FsMountPoint mountPoint,
+            FsModel parent) {
+        assert null == parent
+                    ? null == mountPoint.getParent()
+                    : parent.getMountPoint().equals(mountPoint.getParent());
+        return manager.newModel(context, mountPoint, parent);
+    }
+
+    @Override
     public FsController newController(
             FsArchiveDriver<? extends FsArchiveEntry> context,
             FsModel model,
