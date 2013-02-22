@@ -30,6 +30,9 @@ public abstract class FsDecoratingManager extends FsAbstractManager {
             FsArchiveDriver<? extends FsArchiveEntry> context,
             FsModel model,
             @Nullable FsController parent) {
+        assert null == parent
+                    ? null == model.getParent()
+                    : parent.getModel().equals(model.getParent());
         return manager.newController(context, model, parent);
     }
 
