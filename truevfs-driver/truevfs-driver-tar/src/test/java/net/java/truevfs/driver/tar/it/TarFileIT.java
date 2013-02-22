@@ -4,10 +4,10 @@
  */
 package net.java.truevfs.driver.tar.it;
 
+import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.comp.tardriver.TarDriver;
 import net.java.truevfs.comp.tardriver.it.TarFileITSuite;
 import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truecommons.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle
