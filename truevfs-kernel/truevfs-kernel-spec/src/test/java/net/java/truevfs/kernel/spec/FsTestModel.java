@@ -4,9 +4,6 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsAbstractModel;
-import net.java.truevfs.kernel.spec.FsMountPoint;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
 
