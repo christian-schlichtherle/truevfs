@@ -4,35 +4,28 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import net.java.truecommons.io.Source;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.channels.SeekableByteChannel;
-import net.java.truecommons.cio.Entry;
-import net.java.truecommons.cio.InputSocket;
+import java.util.Objects;
+import net.java.truecommons.cio.*;
+import net.java.truecommons.io.Source;
 import net.java.truecommons.shed.BitField;
 
 /**
  * An adapter from an input socket to a source with access options.
- * 
+ *
  * @author Christian Schlichtherle
  */
-/* class FsInputSocketSource
- * (val options: BitField[FsAccessOption], val socket: InputSocket[_ <: Entry]) {
- *   def this(sink: FsInputSocketSource) = this(sink.options, sink.socket)
- *   def stream() = socket stream null
- *   def channel() = socket channel null
- * }
- */
 public class FsInputSocketSource implements Source {
+
     private final BitField<FsAccessOption> options;
     private final InputSocket<? extends Entry> socket;
 
     public FsInputSocketSource(
             final BitField<FsAccessOption> options,
             final InputSocket<? extends Entry> socket) {
-        this.options = options;
-        this.socket = socket;
+        this.options = Objects.requireNonNull(options);
+        this.socket = Objects.requireNonNull(socket);
     }
 
     public FsInputSocketSource(final FsInputSocketSource source) {

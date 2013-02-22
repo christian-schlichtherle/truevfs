@@ -4,35 +4,28 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import net.java.truecommons.io.Sink;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.channels.SeekableByteChannel;
-import net.java.truecommons.cio.Entry;
-import net.java.truecommons.cio.OutputSocket;
+import java.util.Objects;
+import net.java.truecommons.cio.*;
+import net.java.truecommons.io.Sink;
 import net.java.truecommons.shed.BitField;
 
 /**
  * An adapter from an output socket to a sink with access options.
- * 
+ *
  * @author Christian Schlichtherle
  */
-/* class FsOutputSocketSink
- * (val options: BitField[FsAccessOption], val socket: OutputSocket[_ <: Entry]) {
- *   def this(sink: FsOutputSocketSink) = this(sink.options, sink.socket)
- *   def stream() = socket stream null
- *   def channel() = socket channel null
- * }
- */
 public class FsOutputSocketSink implements Sink {
+
     private final BitField<FsAccessOption> options;
     private final OutputSocket<? extends Entry> socket;
 
     public FsOutputSocketSink(
             final BitField<FsAccessOption> options,
             final OutputSocket<? extends Entry> socket) {
-        this.options = options;
-        this.socket = socket;
+        this.options = Objects.requireNonNull(options);
+        this.socket = Objects.requireNonNull(socket);
     }
 
     public FsOutputSocketSink(final FsOutputSocketSink sink) {
