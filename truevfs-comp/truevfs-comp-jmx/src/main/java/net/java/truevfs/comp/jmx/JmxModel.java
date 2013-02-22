@@ -41,11 +41,8 @@ extends InstrumentingModel<M> implements JmxComponent {
     @Override
     public void setMounted(final boolean mounted) {
         if (model.isMounted() == mounted) return;
-        try {
-            model.setMounted(mounted);
-        } finally {
-            if (mounted) mediator.register(objectName, newView());
-            else mediator.deregister(objectName);
-        }
+        model.setMounted(mounted);
+        if (mounted) mediator.register(objectName, newView());
+        else mediator.deregister(objectName);
     }
 }
