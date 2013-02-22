@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.comp.inst;
 
-import java.util.Objects;
+import static java.util.Objects.requireNonNull;
 import java.util.ServiceConfigurationError;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
@@ -24,8 +24,8 @@ implements FsCompositeDriver {
     public InstrumentingCompositeDriver(
             final M mediator,
             final FsCompositeDriver driver) {
-        this.mediator = Objects.requireNonNull(mediator);
-        this.driver = Objects.requireNonNull(driver);
+        this.mediator = requireNonNull(mediator);
+        this.driver = requireNonNull(driver);
     }
 
     @Override
