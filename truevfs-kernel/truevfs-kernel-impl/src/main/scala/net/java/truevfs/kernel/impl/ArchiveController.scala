@@ -5,15 +5,13 @@
 package net.java.truevfs.kernel.impl
 
 import net.java.truecommons.shed._
-import java.io._
-import java.nio.file._
 import net.java.truevfs.kernel.spec._
 import net.java.truecommons.cio._
 import net.java.truecommons.cio.Entry._
 
 /** Provides read/write access to an archive file system.
   * This is a mirror of [[net.java.truevfs.kernel.spec.FsController]] which has
-  * been customozed to leverage the Scala language and library.
+  * been customized to leverage the Scala language and library.
   *
   * @author Christian Schlichtherle
   */

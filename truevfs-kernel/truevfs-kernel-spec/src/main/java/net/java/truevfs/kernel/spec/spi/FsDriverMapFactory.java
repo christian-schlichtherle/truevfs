@@ -16,10 +16,10 @@ import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
 
 /**
  * A service for creating maps of file system schemes to file system drivers.
- * Note that you can't subclass this class for customization.
+ * Note that you shouldn't subclass this class for customization.
  * It solely exists in order to support the
- * {@link FsDriverMapLocator#SINGLETON}, which will use it to create the root
- * of the driver map which gets subsequently decorated by the
+ * {@link FsDriverMapLocator#SINGLETON}, which will use it to create the
+ * initial driver map which gets subsequently modified by the
  * {@link FsDriverMapModifier} implementations found on the class path.
  *
  * @author Christian Schlichtherle
