@@ -4,17 +4,14 @@
  */
 package net.java.truevfs.ext.pacemaker
 
-import collection.JavaConverters._
 import java.{util => ju}
 import java.util.concurrent._
 import java.util.concurrent.locks._
 import javax.annotation.concurrent._
-import net.java.truecommons.io.Loan._
 import net.java.truecommons.logging._
 import net.java.truecommons.shed._
 import net.java.truevfs.comp.jmx._
 import net.java.truevfs.kernel.spec._
-import net.java.truevfs.kernel.spec.sl._
 import scala.math._
 import PaceManager._
 
@@ -34,10 +31,7 @@ private object PaceManager {
   val maximumFileSystemsMountedPropertyKey =
     classOf[PaceManager].getPackage.getName + ".maximumFileSystemsMounted"
 
-  /**
-    * The minimum value for the maximum number of mounted file systems,
-    * which is {@value}.
-    */
+  /** The minimum value for the maximum number of mounted file systems. */
   val maximumFileSystemsMountedMinimumValue = 2
 
   /**
@@ -157,7 +151,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
    * archive files unless they are the parent of some most recently accessed
    * archive files.
    *
-   * @param controller the file system controller to access.
+   * @param ac the file system controller to access.
    */
   def postAccess(ac: FsController) {
     if (ac.getModel.isMounted) mounted add ac
