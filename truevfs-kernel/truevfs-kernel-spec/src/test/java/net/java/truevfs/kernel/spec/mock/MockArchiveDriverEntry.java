@@ -2,18 +2,13 @@
  * Copyright (C) 2005-2012 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truevfs.kernel.driver.mock;
+package net.java.truevfs.kernel.spec.mock;
 
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Objects;
 import javax.annotation.CheckForNull;
 import net.java.truecommons.cio.Entry;
-import net.java.truecommons.cio.Entry.Access;
-import net.java.truecommons.cio.Entry.Entity;
-import net.java.truecommons.cio.Entry.PosixEntity;
-import net.java.truecommons.cio.Entry.Size;
-import net.java.truecommons.cio.Entry.Type;
 import net.java.truecommons.cio.IoBuffer;
 import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.FsArchiveEntries;

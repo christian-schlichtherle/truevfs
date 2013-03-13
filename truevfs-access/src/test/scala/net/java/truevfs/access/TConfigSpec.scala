@@ -9,8 +9,8 @@ import java.util.concurrent._
 import net.java.truecommons.io.Loan._
 import net.java.truecommons.services._
 import net.java.truecommons.shed._
-import net.java.truevfs.kernel.driver.mock._
 import net.java.truevfs.kernel.spec.FsAccessOption._
+import net.java.truevfs.kernel.spec.mock.MockArchiveDriver
 import net.java.truevfs.kernel.spec.sl._
 import net.java.truevfs.kernel.spec.spi._
 import org.junit.runner._
@@ -24,7 +24,7 @@ import TConfig._
   * DO NOT MODIFY THE GLOBAL CONFIGURATION IN THESE TESTS!
   * Its global scope makes it available to any other test running in parallel,
   * if any.
-  * 
+  *
   * @author Christian Schlichtherle
   */
 @RunWith(classOf[JUnitRunner])
@@ -149,7 +149,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
           (BitField.of(STORE)),
           (BitField.of(COMPRESS)),
           (BitField.of(ENCRYPT))
-        );
+        )
         forAll(legal) { preferences =>
           config setAccessPreferences preferences
           config.getAccessPreferences should be theSameInstanceAs (preferences)
@@ -171,7 +171,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
           (BitField.of(EXCLUSIVE)),
           (BitField.of(APPEND)),
           (BitField.of(STORE, COMPRESS))
-        );
+        )
         forAll(illegal) { preferences =>
           intercept[IllegalArgumentException] {
             config.setAccessPreferences(preferences)

@@ -292,6 +292,5 @@ public interface FsController {
      * @throws FsSyncException if any error conditions apply.
      */
     @FsAssertion(atomic=NO, consistent=YES, isolated=YES)
-    void sync(BitField<FsSyncOption> options)
-    throws FsSyncWarningException, FsSyncException;
+    void sync(BitField<FsSyncOption> options) throws FsSyncException;
 }

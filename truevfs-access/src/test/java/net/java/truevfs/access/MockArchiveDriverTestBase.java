@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truevfs.kernel.driver.mock.MockArchiveDriver;
+import net.java.truevfs.kernel.spec.mock.MockArchiveDriver;
 
 /**
  * @author Christian Schlichtherle
