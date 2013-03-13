@@ -5,5 +5,4 @@
 \.orig$
 \.orig\..*$
 \.rej$
-glob:target/
-glob:.DS_Store
+target/
