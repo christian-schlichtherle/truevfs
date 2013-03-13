@@ -4,14 +4,13 @@
  */
 package net.java.truevfs.kernel.impl.cio
 
-import net.java.truevfs.kernel.driver.mock._
 import net.java.truecommons.cio.Entry.Access._
 import net.java.truecommons.cio.Entry.PosixEntity._
 import net.java.truecommons.cio.Entry.Size._
 import net.java.truecommons.cio.Entry.Type._
 import net.java.truecommons.cio.Entry._
-import net.java.truecommons.cio._
 import net.java.truevfs.kernel.spec._
+import net.java.truevfs.kernel.spec.mock.MockArchiveDriverEntry
 import org.junit.runner._
 import org.scalatest.junit._
 import org.scalatest.matchers._

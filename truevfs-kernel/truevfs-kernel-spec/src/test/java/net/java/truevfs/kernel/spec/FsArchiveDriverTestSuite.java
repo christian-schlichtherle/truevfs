@@ -20,7 +20,7 @@ import net.java.truecommons.io.DecoratingSeekableChannel;
 import net.java.truecommons.io.PowerBuffer;
 import net.java.truecommons.shed.BitField;
 import static net.java.truecommons.shed.Throwables.contains;
-import net.java.truevfs.kernel.driver.mock.MockController;
+import net.java.truevfs.kernel.spec.mock.MockController;
 import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
 import net.java.truecommons.cio.*;
 import static net.java.truecommons.cio.Entry.Access.*;
@@ -78,7 +78,7 @@ extends FsArchiveDriverTestBase<D> {
     /**
      * Returns an unencodable name or {@code null} if all characters are
      * encodable in entry names for this archive type.
-     * 
+     *
      * @return An unencodable name or {@code null} if all characters are
      *         encodable in entry names for this archive type.
      */

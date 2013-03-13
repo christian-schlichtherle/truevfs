@@ -15,7 +15,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.Filter;
 import static net.java.truecommons.shed.Filter.*;
 import net.java.truecommons.shed.Visitor;
-import net.java.truevfs.kernel.driver.mock.MockDriverMapContainer;
+import net.java.truevfs.kernel.spec.mock.MockDriverMapContainer;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -72,7 +72,7 @@ public abstract class FsManagerTestSuite {
             }
             assertThat(count(ACCEPT_ANY), is(params.length));
             assertThat(count(ACCEPT_NONE), is(0));
-            parent = null;
+            parent = null; // enable GC
             waitForAllManagersToGetGarbageCollected();
         }
     }
@@ -119,8 +119,8 @@ public abstract class FsManagerTestSuite {
             assertThat(count(ACCEPT_ANY, new ControllerVisitor()), is(params.length));
             assertThat(it.hasNext(), is(false));
 
-            member = null;
-            top = null;
+            member = null; // enable GC
+            top = null; // enable GC
             waitForAllManagersToGetGarbageCollected();
         }
     }

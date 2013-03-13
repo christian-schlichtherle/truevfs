@@ -9,7 +9,7 @@ import java.util.Locale;
 import java.util.Map;
 import javax.annotation.Nullable;
 import net.java.truecommons.shed.ExtensionSet;
-import net.java.truevfs.kernel.driver.mock.MockArchiveDriver;
+import net.java.truevfs.kernel.spec.mock.MockArchiveDriver;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
@@ -166,19 +166,19 @@ public final class TArchiveDetectorTest {
                                 assert arg0 == null;
                                 assert arg1 == null;
                                 try {
-                                    new TArchiveDetector((String) null, (FsArchiveDriver<?>) null);
+                                    new TArchiveDetector((String) null, null);
                                     fail("Index " + i);
                                 } catch (Throwable failure) {
                                     assertTrue(expected.isAssignableFrom(failure.getClass()));
                                 }
                                 try {
-                                    new TArchiveDetector((TArchiveDetector) null, (Object[][]) null);
+                                    new TArchiveDetector(null, (Object[][]) null);
                                     fail("Index " + i);
                                 } catch (Throwable failure) {
                                     assertTrue(expected.isAssignableFrom(failure.getClass()));
                                 }
                                 try {
-                                    new TArchiveDetector((TArchiveDetector) null, (Map<FsScheme, FsDriver>) null);
+                                    new TArchiveDetector(null, (Map<FsScheme, FsDriver>) null);
                                     fail("Index " + i);
                                 } catch (Throwable failure) {
                                     assertTrue(expected.isAssignableFrom(failure.getClass()));
