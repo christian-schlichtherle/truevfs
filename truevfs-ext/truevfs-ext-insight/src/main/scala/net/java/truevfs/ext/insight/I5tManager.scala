@@ -21,7 +21,7 @@ extends JmxManager(mediator, manager) {
 
   override def sync(filter: Filter[_ >: FsController], visitor: Visitor[_ >: FsController, FsSyncException]) {
     val start = System.nanoTime
-    super.sync(filter, visitor)
+    manager sync (filter, visitor)
     mediator logSync (System.nanoTime - start)
     mediator rotateAllStats this
   }
