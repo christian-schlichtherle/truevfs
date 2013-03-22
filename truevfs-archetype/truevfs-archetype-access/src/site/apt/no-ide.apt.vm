@@ -14,17 +14,17 @@ Getting Started without an IDE
 
     You need to have the following software installed:
 
-    * {{{http://maven.apache.org}Apache&#160;Maven&#160;3.0.4}}
+    * {{{http://maven.apache.org}Apache&#160;Maven&#160;3.0.4}} or later.
 
-    * JSE&#160;7.
+    * JSE&#160;7 or later.
 
     []
 
-* Generate Maven Archetype
+* Generating a Sample Project
 
-    To generate the application archetype, type the following command in a
-    shell while setting the <groupId>, <artifactId> and
-    <package> properties to the appropriate values for your project:
+    To generate a sample project, type the following command in a shell,
+    thereby customizing the value of the properties <<<groupId>>>,
+    <<<artifactId>>> and <<<package>>> to meet your requirements:
 
 +--
 $ mvn archetype:generate -B \
@@ -37,8 +37,8 @@ $ mvn archetype:generate -B \
     -Dpackage=com.company.project
 +--
 
-    Upon successful execution, a new directory with the value of the
-    <<<artifactId>>> property as its name will have been created in the current
+    Upon successful execution, a new directory with the value of the property
+    <<<artifactId>>> as its name will have been created in the current
     directory.
     If you copy/paste the above command literally to a shell this would result
     in the following directory structure:
