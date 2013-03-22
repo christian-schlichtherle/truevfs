@@ -23,12 +23,12 @@ Getting Started with NetBeans
 
     []
 
-* Set Up NetBeans
+* Setting Up NetBeans
 
     NetBeans 7.0 ships with an embedded snapshot of Maven 3.0.3, so you don't
     need to install or configure anything.
 
-* Generate Maven Archetype
+* Generating a Sample Project
 
     To generate the application archetype, select <File> -> <New Project>
     or type <Ctrl+Shift+N> to open the following dialog:
@@ -61,7 +61,7 @@ Getting Started with NetBeans
 
 #explore()
 
-* Build And Run Your Application
+* Building And Running the Sample Project
 
     To build and run your application in your local Maven repository,
     select select <Run> -\> <Build Project>.

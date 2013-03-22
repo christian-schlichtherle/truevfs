@@ -23,7 +23,7 @@ Getting Started with Eclipse
 
     []
 
-* Set Up Eclipse
+* Setting Up Eclipse
 
     You need to have the Maven Integration feature installed.
     If you are using Eclipse Indigo with Java Developer Tools, then you need
@@ -46,7 +46,7 @@ Getting Started with Eclipse
     Sonatype Inc. provides online documentation for this task at
     {{http://www.sonatype.com/books/m2eclipse-book/reference/preferences.html}}.
 
-* Generate Maven Archetype
+* Generating a Sample Project
 
     To generate the application archetype, select <File> -> <New> -> <Other...>
     or type <Ctrl+N> to open the following dialog:
@@ -78,7 +78,7 @@ Getting Started with Eclipse
 
 #explore()
 
-* Build And Run Your Application
+* Building And Running the Sample Project
 
     To build and run your application in your local Maven repository,
     select your project in the Package Explorer view and select <Run> ->
