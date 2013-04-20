@@ -5,6 +5,7 @@ package ${package}.java.file;
 
 import ${package}.java.Application;
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import net.java.truevfs.access.TFile;
 import net.java.truevfs.kernel.spec.FsSyncException;
@@ -22,32 +23,38 @@ import net.java.truevfs.kernel.spec.FsSyncException;
  *
  * @author  Christian Schlichtherle
  */
-public class Tree extends Application<RuntimeException> {
+public class Tree extends Application<IOException> {
 
     private static final String DEFAULT_PREFIX  = "|-- ";
     private static final String LAST_PREFIX     = "`-- ";
     private static final String DEFAULT_PADDING = "|   ";
     private static final String LAST_PADDING    = "    ";
 
-    public static void main(String[] args) throws FsSyncException {
+    public static void main(String[] args) throws IOException {
         System.exit(new Tree().run(args));
     }
 
     @Override
-    protected int work(String[] args) {
+    protected int work(String[] args) throws IOException {
         if (0 >= args.length) args = new String[] { "." };
         for (String arg : args) graph(new TFile(arg), "", "");
         return 0;
     }
 
-    private void graph(File file, String padding, String prefix) {
+    private void graph(
+            final File file,
+            final String padding,
+            final String prefix)
+    throws IOException {
         if (!file.exists())
             throw new IllegalArgumentException(file + " (file or directory does not exist)");
         System.out.append(padding).append(prefix).println(file.getName());
         if (file.isDirectory()) {
-            File[] entries = file.listFiles();
+            final File[] entries = file.listFiles();
+            if (null == entries)
+                throw new IOException(file + " (cannot list directory");
             Arrays.sort(entries);
-            int l = entries.length - 1;
+            final int l = entries.length - 1;
             if (0 <= l) {
                 String nextPadding = padding;
                 if (0 < prefix.length())

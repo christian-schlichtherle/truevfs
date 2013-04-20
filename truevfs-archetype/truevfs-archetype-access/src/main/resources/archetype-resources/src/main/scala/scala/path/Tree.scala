@@ -7,7 +7,6 @@ import ${package}.scala.Application
 import java.nio.file.Files._
 import java.nio.file.Path
 import java.util.TreeSet
-import net.java.truevfs.access.TApplication
 import net.java.truevfs.access.TPath
 import scala.collection.JavaConversions._
 
@@ -21,10 +20,11 @@ import scala.collection.JavaConversions._
  * on the run time class path and the path name argument is {@code archive.zip}
  * and this file actually exists as a ZIP file, then the tree graph of the
  * directory structure of this ZIP file gets printed.
- * 
+ *
  * @author Christian Schlichtherle
  */
 object Tree extends Application {
+
   private val defaultPrefix  = "|-- "
   private val lastPrefix     = "`-- "
   private val defaultPadding = "|   "
@@ -47,11 +47,8 @@ object Tree extends Application {
       // Create a sorted set from the directory stream.
       val entries = new TreeSet[Path] {
         val stream = newDirectoryStream(file)
-        try {
-          for (member <- stream) super.add(member)
-        } finally {
-          stream.close
-        }
+        try { for (member <- stream) super.add(member) }
+        finally { stream.close }
       }
       // Graph the sorted set.
       if (!entries.isEmpty) {
@@ -59,7 +56,7 @@ object Tree extends Application {
           if (prefix.isEmpty) ""
           else if (prefix == lastPrefix) lastPadding
           else defaultPadding)
-        entries.dropRight(1).foreach(graph(_, nextPadding, defaultPrefix))
+        entries dropRight 1 foreach (graph(_, nextPadding, defaultPrefix))
         graph(entries.last, nextPadding, lastPrefix)
       }
     }

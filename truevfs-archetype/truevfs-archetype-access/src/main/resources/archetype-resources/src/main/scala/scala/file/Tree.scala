@@ -5,6 +5,7 @@ package ${package}.scala.file
 
 import ${package}.scala.Application
 import java.io.File
+import java.io.IOException;
 import java.util.Arrays
 import net.java.truevfs.access.TFile
 
@@ -18,10 +19,11 @@ import net.java.truevfs.access.TFile
  * on the run time class path and the path name argument is {@code archive.zip}
  * and this file actually exists as a ZIP file, then the tree graph of the
  * directory structure of this ZIP file gets printed.
- * 
+ *
  * @author Christian Schlichtherle
  */
 object Tree extends Application {
+
   private val defaultPrefix  = "|-- "
   private val lastPrefix     = "`-- "
   private val defaultPadding = "|   "
@@ -39,16 +41,18 @@ object Tree extends Application {
 
   private def graph(file: File, padding: String = "", prefix: String = "") {
     require(file.exists(), file + " (file or directory does not exist)")
-    System.out.append(padding).append(prefix).println(file.getName)
-    if (file.isDirectory()) {
-      val entries = file.listFiles()
-      Arrays.sort(entries.asInstanceOf[Array[Object]])
+    System.out append padding append prefix println file.getName
+    if (file isDirectory ()) {
+      val entries = file listFiles ()
+      if (null eq entries)
+        throw new IOException(file + " (cannot list directory")
+      Arrays sort entries.asInstanceOf[Array[Object]]
       val nextPadding = padding + (
         if (prefix.isEmpty) ""
         else if (prefix == lastPrefix) lastPadding
         else defaultPadding)
       import scala.collection.JavaConversions._
-      entries.dropRight(1).foreach(graph(_, nextPadding, defaultPrefix))
+      entries dropRight 1 foreach (graph(_, nextPadding, defaultPrefix))
       graph(entries.last, nextPadding, lastPrefix)
     }
   }
