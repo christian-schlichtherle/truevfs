@@ -46,14 +46,16 @@ object Tree extends Application {
       val entries = file listFiles ()
       if (null eq entries)
         throw new IOException(file + " (cannot list directory")
-      Arrays sort entries.asInstanceOf[Array[Object]]
-      val nextPadding = padding + (
-        if (prefix.isEmpty) ""
-        else if (prefix == lastPrefix) lastPadding
-        else defaultPadding)
-      import scala.collection.JavaConversions._
-      entries dropRight 1 foreach (graph(_, nextPadding, defaultPrefix))
-      graph(entries.last, nextPadding, lastPrefix)
+      if (!entries.isEmpty) {
+        Arrays sort entries.asInstanceOf[Array[Object]]
+        val nextPadding = padding + (
+          if (prefix.isEmpty) ""
+          else if (prefix == lastPrefix) lastPadding
+          else defaultPadding)
+        import scala.collection.JavaConversions._
+        entries dropRight 1 foreach (graph(_, nextPadding, defaultPrefix))
+        graph(entries.last, nextPadding, lastPrefix)
+      }
     }
   }
 }

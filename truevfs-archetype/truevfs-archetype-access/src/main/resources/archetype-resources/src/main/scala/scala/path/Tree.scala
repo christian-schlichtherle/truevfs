@@ -50,7 +50,6 @@ object Tree extends Application {
         try { for (member <- stream) super.add(member) }
         finally { stream.close }
       }
-      // Graph the sorted set.
       if (!entries.isEmpty) {
         val nextPadding = padding + (
           if (prefix.isEmpty) ""
