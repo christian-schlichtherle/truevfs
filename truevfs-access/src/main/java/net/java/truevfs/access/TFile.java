@@ -3162,13 +3162,12 @@ public final class TFile extends File implements TRex {
      * <p>
      * This operation is intended to compact archive files which have been
      * frequently updated with {@link FsAccessOption#GROW} or similar means.
-     * If this access preference is set and an archive file is updated
-     * frequently, then over time a lot of redundant artifacts such as archive
-     * entry contents and meta data, including central directories may be
-     * physically present in the archive file, even if all its entries have
-     * been deleted.
-     * This operation could then get used to remove any redundant artifacts
-     * again.
+     * If this access option is set and an archive file is updated frequently,
+     * then over time a lot of redundant artifacts such as archive entry
+     * contents and meta data, including central directories may be physically
+     * present in the archive file, even if all its entries have been deleted.
+     * This operation should then get used to remove any redundant artifacts
+     * and reclaim the storage space.
      * <p>
      * Mind that this operation has no means to detect if there is actually any
      * redundant data present in this archive file.
