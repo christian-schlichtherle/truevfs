@@ -8,6 +8,7 @@ import java.io.IOException;
 import net.java.truevfs.access.TFile;
 import net.java.truevfs.access.it.TFileITSuite;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -36,11 +37,8 @@ extends TFileITSuite<D> {
 
     /**
      * Skipped because appending to TAR files is currently not supported.
-     * 
-     * @deprecated 
      */
-    @Deprecated
+    @Ignore
     @Override
-    public final void testGrowing() {
-    }
+    public final void testGrowing() { }
 }

@@ -12,6 +12,7 @@ import net.java.truecommons.key.spec.prompting.TestView.Action;
 import static net.java.truecommons.key.spec.prompting.TestView.Action.CANCEL;
 import static net.java.truecommons.key.spec.prompting.TestView.Action.ENTER;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -98,7 +99,7 @@ public final class ZipRaesFileIT extends TFileITSuite<TestZipRaesDriver> {
      * Skipped because appending to RAES encrypted ZIP files is not possible
      * by design.
      */
+    @Ignore
     @Override
-    public void testGrowing() {
-    }
+    public void testGrowing() { }
 }
