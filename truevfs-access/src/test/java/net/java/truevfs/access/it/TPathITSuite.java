@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * by using the API of the TrueVFS Access Path module.
  *
  * @param  <D> the type of the archive driver.
- * @see    TFileITSuite Test suite for the TrueVFS Access File* API.
+ * @see    TFileITSuite
  * @author Christian Schlichtherle
  */
 public abstract class TPathITSuite<D extends FsArchiveDriver<?>>
@@ -86,7 +86,7 @@ extends ConfiguredClientTestBase<D> {
                 final Path temp = this.temp;
                 this.temp = null;
                 if (null != temp && exists(temp))
-                    delete(temp);                
+                    delete(temp);
             }
         } catch (final IOException ex) {
             logger.trace(
@@ -349,7 +349,7 @@ extends ConfiguredClientTestBase<D> {
                                         final Path file2)
     throws IOException {
         assertFalse(exists(dir));
-        
+
         createDirectory(dir);
         assertTrue(exists(dir));
         assertTrue(isDirectory(dir));
@@ -359,19 +359,19 @@ extends ConfiguredClientTestBase<D> {
             if (tdir.isArchive() || tdir.isEntry())
                 assertEquals(0, size(dir));
         }
-        
+
         createFile(file1);
         assertTrue(exists(file1));
         assertFalse(isDirectory(file1));
         assertTrue(isRegularFile(file1));
         assertEquals(0, size(file1));
-        
+
         try {
             createFile(file2);
             fail("Creating a file in another file should throw an IOException!");
         } catch (IOException expected) {
         }
-        
+
         delete(file1); // OK now!
         assertFalse(exists(file1));
         assertFalse(isDirectory(file1));
@@ -381,7 +381,7 @@ extends ConfiguredClientTestBase<D> {
             fail();
         } catch (NoSuchFileException expected) {
         }
-        
+
         delete(dir);
         assertFalse(exists(dir));
         assertFalse(isDirectory(dir));
@@ -464,7 +464,7 @@ extends ConfiguredClientTestBase<D> {
             delete(archive);
         }
     }
-    
+
     @Test
     public void testLenientFileOutputStream() throws IOException {
         TPath file = archive.resolve("dir/inner" + getExtension() + "/dir/test.txt");
@@ -687,7 +687,7 @@ extends ConfiguredClientTestBase<D> {
         delete(file1);
         assertFalse(exists(file1));
     }
-    
+
     @Test
     public void testMkdir() throws IOException {
         final TPath dir1 = archive;
@@ -696,7 +696,7 @@ extends ConfiguredClientTestBase<D> {
         final TPath dir4 = dir3.resolve("dir");
         final TPath dir5 = dir4.resolve("nuts" + getExtension());
         final TPath dir6 = dir5.resolve("dir");
-        
+
         assert TConfig.current().isLenient();
 
         createDirectory(dir6); // create all at once! note archive is in current directory!
@@ -853,10 +853,10 @@ extends ConfiguredClientTestBase<D> {
     @Test
     public void testInputOutput() throws IOException {
         assertInputOutput(archive);
-        
+
         final TPath archiveTest = archive.resolve("test");
         assertInputOutput(archiveTest);
-        
+
         final TPath archiveInner = archive.resolve("inner" + getExtension());
         final TPath archiveInnerTest = archiveInner.resolve("test");
         assertInputOutput(archiveInnerTest);
@@ -890,19 +890,19 @@ extends ConfiguredClientTestBase<D> {
     @Test
     public void testCopyContainingOrSameFiles() throws IOException {
         assert !exists(archive);
-        
+
         final TPath dir = archive.getParent();
         assertNotNull(dir);
         final TPath entry = archive.resolve("entry");
-        
+
         assertCopyContainingOrSameFiles0(dir, archive);
         assertCopyContainingOrSameFiles0(archive, entry);
-        
+
         copy(new ByteArrayInputStream(getData()), entry);
-        
+
         assertCopyContainingOrSameFiles0(dir, archive);
         assertCopyContainingOrSameFiles0(archive, entry);
-        
+
         archive.toFile().rm_r();
     }
 
@@ -913,7 +913,7 @@ extends ConfiguredClientTestBase<D> {
         assertCopyContainingOrSameFiles1(a, b.toRealPath());
         assertCopyContainingOrSameFiles1(a.toRealPath(), b.toRealPath());
     }
-    
+
     private void assertCopyContainingOrSameFiles1(final TPath a, final TPath b)
     throws IOException {
         try {
@@ -959,7 +959,7 @@ extends ConfiguredClientTestBase<D> {
     throws IOException {
         if (off >= names.length)
             return;
-        
+
         final TPath dir = parent.resolve(names[off]);
 
         createDirectory(dir); // create valid archive file
@@ -1109,7 +1109,7 @@ extends ConfiguredClientTestBase<D> {
         archive.toFile().rm_r();
         assertFalse(exists(archive.toNonArchivePath()));
     }
-    
+
     @Test
     public void testRenameValidArchive() throws IOException {
         try (final PrintStream out = new PrintStream(
@@ -1118,7 +1118,7 @@ extends ConfiguredClientTestBase<D> {
         }
         assertRenameArchiveToTemp(archive);
     }
-    
+
     @Test
     public void testRenameFalsePositive() throws IOException {
         // Create false positive archive.
@@ -1171,11 +1171,11 @@ extends ConfiguredClientTestBase<D> {
         final TPath archive2b = archive2.resolve("b");
         final TPath archive3a = archive3.resolve("a");
         final TPath archive3b = archive3.resolve("b");
-        
+
         delete(temp);
-        
+
         assertInput(archive1a);
-        
+
         for (int i = 2; i >= 1; i--) {
             assertRenameTo(archive1a, archive1b);
             assertRenameTo(archive1b, archive2a);
@@ -1256,13 +1256,13 @@ extends ConfiguredClientTestBase<D> {
             assertNull(listFiles(tpath));
         }
     }
-    
+
     @Test
     public void testMultithreadedSingleArchiveMultipleEntriesReading()
     throws Exception {
         assertMultithreadedSingleArchiveMultipleEntriesReading(NUM_IO_THREADS, NUM_IO_THREADS);
     }
-    
+
     private void assertMultithreadedSingleArchiveMultipleEntriesReading(
             final int nEntries,
             final int nThreads)
@@ -1333,7 +1333,7 @@ extends ConfiguredClientTestBase<D> {
         assertMultithreadedSingleArchiveMultipleEntriesWriting(false);
         assertMultithreadedSingleArchiveMultipleEntriesWriting(true);
     }
-    
+
     private void assertMultithreadedSingleArchiveMultipleEntriesWriting(
             final boolean wait)
     throws Exception {

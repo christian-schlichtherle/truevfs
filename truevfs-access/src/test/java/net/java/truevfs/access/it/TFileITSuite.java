@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
  * by using the API of the TrueVFS Access File* module.
  *
  * @param  <D> the type of the archive driver.
+ * @see    TPathITSuite
  * @author Christian Schlichtherle
  */
 public abstract class TFileITSuite<D extends FsArchiveDriver<?>>
@@ -341,7 +342,7 @@ extends ConfiguredClientTestBase<D> {
                                         final File file2)
     throws IOException {
         assertFalse(dir.exists());
-        
+
         assertTrue(dir.mkdir());
         assertTrue(dir.exists());
         assertTrue(dir.isDirectory());
@@ -351,25 +352,25 @@ extends ConfiguredClientTestBase<D> {
             if (tdir.isArchive() || tdir.isEntry())
                 assertEquals(0, dir.length());
         }
-        
+
         assertTrue(file1.createNewFile());
         assertTrue(file1.exists());
         assertFalse(file1.isDirectory());
         assertTrue(file1.isFile());
         assertEquals(0, file1.length());
-        
+
         try {
             file2.createNewFile();
             fail("Creating a file in another file should throw an IOException!");
         } catch (IOException expected) {
         }
-        
+
         TFile.rm(file1); // OK now!
         assertFalse(file1.exists());
         assertFalse(file1.isDirectory());
         assertFalse(file1.isFile());
         assertEquals(0, file1.length());
-        
+
         TFile.rm(dir);
         assertFalse(dir.exists());
         assertFalse(dir.isDirectory());
@@ -663,7 +664,7 @@ extends ConfiguredClientTestBase<D> {
         file1.rm();
         assertFalse(file1.exists());
     }
-    
+
     @Test
     public void testMkdir() throws IOException {
         final TFile dir1 = archive;
@@ -672,18 +673,18 @@ extends ConfiguredClientTestBase<D> {
         final TFile dir4 = new TFile(dir3, "dir");
         final TFile dir5 = new TFile(dir4, "nuts" + getExtension());
         final TFile dir6 = new TFile(dir5, "dir");
-        
+
         assert TConfig.current().isLenient();
-        
+
         assertTrue(dir6.mkdir()); // create all at once! note archive is in current directory!
-        
+
         assertFalse(dir6.mkdir()); // exists already!
         assertFalse(dir5.mkdir()); // exists already!
         assertFalse(dir4.mkdir()); // exists already!
         assertFalse(dir3.mkdir()); // exists already!
         assertFalse(dir2.mkdir()); // exists already!
         assertFalse(dir1.mkdir()); // exists already!
-        
+
         dir6.rm();
         dir5.rm();
         dir4.rm();
@@ -715,7 +716,7 @@ extends ConfiguredClientTestBase<D> {
         dir2.rm();
         dir1.rm();
     }
-    
+
     @Test
     public void testDirectoryTree() throws IOException {
         assertDirectoryTree(
@@ -764,10 +765,10 @@ extends ConfiguredClientTestBase<D> {
     @Test
     public void testInputOutput() throws IOException {
         assertInputOutput(archive);
-        
+
         final TFile archiveTest = new TFile(archive, "test");
         assertInputOutput(archiveTest);
-        
+
         final TFile archiveInner = new TFile(archive, "inner" + getExtension());
         final TFile archiveInnerTest = new TFile(archiveInner, "test");
         assertInputOutput(archiveInnerTest);
@@ -801,22 +802,22 @@ extends ConfiguredClientTestBase<D> {
     @Test
     public void testCopyContainingOrSameFiles() throws IOException {
         assert !archive.exists();
-        
+
         final TFile dir = archive.getParentFile();
         assertNotNull(dir);
         final TFile entry = new TFile(archive, "entry");
-        
+
         assertCopyContainingOrSameFiles0(dir, archive);
         assertCopyContainingOrSameFiles0(archive, entry);
-        
+
         entry.input(new ByteArrayInputStream(getData()));
-        
+
         assertCopyContainingOrSameFiles0(dir, archive);
         assertCopyContainingOrSameFiles0(archive, entry);
-        
+
         TFile.rm_r(archive);
     }
-    
+
     private void assertCopyContainingOrSameFiles0(final TFile a, final TFile b)
     throws IOException {
         assertCopyContainingOrSameFiles1(a, b);
@@ -824,7 +825,7 @@ extends ConfiguredClientTestBase<D> {
         assertCopyContainingOrSameFiles1(a, b.getCanOrAbsFile());
         assertCopyContainingOrSameFiles1(a.getCanOrAbsFile(), b.getCanOrAbsFile());
     }
-    
+
     private void assertCopyContainingOrSameFiles1(final TFile a, final TFile b)
     throws IOException {
         try {
@@ -870,7 +871,7 @@ extends ConfiguredClientTestBase<D> {
     throws IOException {
         if (off >= names.length)
             return;
-        
+
         final TFile dir = new TFile(parent, names[off]);
 
         assertTrue(dir.mkdir()); // create valid archive file
@@ -1020,7 +1021,7 @@ extends ConfiguredClientTestBase<D> {
         archive.rm_r();
         assertFalse(archive.toNonArchiveFile().exists());
     }
-    
+
     @Test
     public void testRenameValidArchive() throws IOException {
         try (final PrintStream out = new PrintStream(new TFileOutputStream(new TFile(archive, "entry")))) {
@@ -1028,7 +1029,7 @@ extends ConfiguredClientTestBase<D> {
         }
         assertRenameArchiveToTemp(archive);
     }
-    
+
     @Test
     public void testRenameFalsePositive() throws IOException {
         // Create false positive archive.
@@ -1081,11 +1082,11 @@ extends ConfiguredClientTestBase<D> {
         final TFile archive2b = new TFile(archive2, "b");
         final TFile archive3a = new TFile(archive3, "a");
         final TFile archive3b = new TFile(archive3, "b");
-        
+
         temp.rm();
-        
+
         assertInput(archive1a);
-        
+
         for (int i = 2; i >= 1; i--) {
             assertRenameTo(archive1a, archive1b);
             assertRenameTo(archive1b, archive2a);
@@ -1098,7 +1099,7 @@ extends ConfiguredClientTestBase<D> {
             assertRenameTo(archive2a, archive1b);
             assertRenameTo(archive1b, archive1a);
         }
-        
+
         assertRenameTo(archive, temp);
         assertRenameTo(temp, archive);
         archive3.rm();
@@ -1107,7 +1108,7 @@ extends ConfiguredClientTestBase<D> {
         archive1a.rm();
         archive.rm();
     }
-    
+
     private void assertRenameTo(TFile src, TFile dst) throws IOException {
         assertTrue(src.exists());
         assertFalse(dst.exists());
@@ -1124,7 +1125,7 @@ extends ConfiguredClientTestBase<D> {
         "Another directory member",
         "Yet another directory member",
     };
-    
+
     @Test
     public void testList() throws IOException {
         final File dir = createTempFile();
@@ -1207,7 +1208,7 @@ extends ConfiguredClientTestBase<D> {
             TFile.rm_r(archive);
         }
     }
-    
+
     private void createTestArchive(final int nEntries) throws IOException {
         for (int i = 0; i < nEntries; i++)
             createTestFile(new TFile(archive, i + ""));
@@ -1241,14 +1242,14 @@ extends ConfiguredClientTestBase<D> {
             }
         }
     }
-    
+
     @Test
     public void testMultithreadedSingleArchiveMultipleEntriesWriting()
     throws Exception {
         assertMultithreadedSingleArchiveMultipleEntriesWriting(false);
         assertMultithreadedSingleArchiveMultipleEntriesWriting(true);
     }
-    
+
     private void assertMultithreadedSingleArchiveMultipleEntriesWriting(
             final boolean wait)
     throws Exception {
@@ -1302,7 +1303,7 @@ extends ConfiguredClientTestBase<D> {
         assertMultithreadedMultipleArchivesSingleEntryWriting(false);
         assertMultithreadedMultipleArchivesSingleEntryWriting(true);
     }
-    
+
     private void assertMultithreadedMultipleArchivesSingleEntryWriting(
             final boolean syncIndividually)
     throws Exception {
