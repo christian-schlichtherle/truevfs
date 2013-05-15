@@ -85,6 +85,7 @@ plug-in to its federated file system space.
 
     <properties>
         <netbeans.hint.jdkPlatform>JDK_1.7</netbeans.hint.jdkPlatform>
+
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
@@ -113,8 +114,8 @@ plug-in to its federated file system space.
 
         <truecommons.version>2.3.1</truecommons.version>
 
-        <!-- for documentation purposes only - mind the dash! -->
-        <truezip-version>7.7.1</truezip-version>
+        <!-- For documentation purposes only - mind the dash! -->
+        <truezip-version>7.7.2</truezip-version>
     </properties>
 
     <modules>
