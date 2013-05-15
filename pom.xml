@@ -94,7 +94,7 @@ plug-in to its federated file system space.
         <java.io.tmpdir.it>${project.build.directory}/it</java.io.tmpdir.it>
 
         <!-- maven-javadoc-plugin -->
-        <google.analytics.accountId>UA-25500668-1</google.analytics.accountId>
+        <google.analytics.accountId>UA-25500668-2</google.analytics.accountId>
         <header>
             <!-- Google Analytics -->
             &lt;script type="text/javascript"&gt;
