@@ -28,7 +28,7 @@ import TargetArchiveController._
   * of the target archive file.
   *
   * This controller is an emitter of
-  * [[net.java.truevfs.kernel.impl.ControlFlowException]]s, for example
+  * [[net.java.truecommons.shed.ControlFlowException]]s, for example
   * when
   * [[net.java.truevfs.kernel.impl.FalsePositiveArchiveException detecting a false positive archive file], or
   * [[net.java.truevfs.kernel.impl.NeedsSyncException requiring a sync].
