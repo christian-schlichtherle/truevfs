@@ -114,7 +114,7 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
   private def mount0(options: AccessOptions, autoCreate: Boolean) {
     // HC SVNT DRACONES!
 
-    // Check parent file system entry.
+    // Check parent file system node.
     val pn = {
       try {
         parent node (options, name)
@@ -127,7 +127,7 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
       }
     }
 
-    // Obtain file system by creating or loading it from the parent entry.
+    // Obtain file system by creating or loading it from the parent node.
     val fs = {
       if (null eq pn) {
         if (autoCreate) {
