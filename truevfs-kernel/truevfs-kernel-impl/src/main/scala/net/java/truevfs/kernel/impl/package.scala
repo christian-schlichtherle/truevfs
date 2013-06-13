@@ -10,7 +10,6 @@ import net.java.truecommons.cio._
 import net.java.truecommons.cio.Entry._
 import java.{lang => jl}
 import java.{util => ju}
-import ju.concurrent.locks._
 import language.implicitConversions
 
 /** Implements the Kernel API.
@@ -18,6 +17,7 @@ import language.implicitConversions
   * @author Christian Schlichtherle
   */
 package object impl {
+
   private[impl] type AccessOptions = BitField[FsAccessOption]
   private[impl] type SyncOptions = BitField[FsSyncOption]
   private[impl] type AnyArchiveDriver = FsArchiveDriver[_ <: FsArchiveEntry]
@@ -38,7 +38,7 @@ package object impl {
   }
 
   implicit private[impl] def asJavaMapFromAccessToLong(input: Map[Access, Long]): ju.Map[Access, jl.Long] = {
-    var output = new ju.HashMap[Access, jl.Long]()
+    val output = new ju.HashMap[Access, jl.Long]()
     for ((key, value) <- input)
       output.put(key, Long.box(value))
     output
