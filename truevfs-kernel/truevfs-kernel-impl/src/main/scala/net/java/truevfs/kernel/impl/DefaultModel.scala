@@ -10,6 +10,7 @@ import net.java.truevfs.kernel.spec._
 @ThreadSafe
 private final class DefaultModel(mountPoint: FsMountPoint, parent: FsModel)
 extends FsAbstractModel(mountPoint, parent) {
+
   @volatile private[this] var mounted: Boolean = _
 
   override def isMounted = mounted
