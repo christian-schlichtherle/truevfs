@@ -33,8 +33,7 @@ extends FsModelFactory<FsManager>, FsControllerFactory<FsManager> {
      * @throws ServiceConfigurationError if no appropriate file system driver
      *         is known for the scheme of the given mount point.
      */
-    @Override
-    FsModel newModel(
+    @Override FsModel newModel(
             FsManager context,
             FsMountPoint mountPoint,
             @CheckForNull FsModel parent);
@@ -50,8 +49,7 @@ extends FsModelFactory<FsManager>, FsControllerFactory<FsManager> {
      * @throws ServiceConfigurationError if no appropriate file system driver
      *         is known for the scheme of the mount point of the given model.
      */
-    @Override
-    FsController newController(
+    @Override FsController newController(
             FsManager context,
             FsModel model,
             @CheckForNull FsController parent)
