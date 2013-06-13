@@ -151,20 +151,20 @@ extends JmxManager[PaceMediator](mediator, manager) {
    * archive files unless they are the parent of some most recently accessed
    * archive files.
    *
-   * @param ac the file system controller to access.
+   * @param accessedController the accessed file system controller.
    */
-  def postAccess(ac: FsController) {
-    if (ac.getModel.isMounted) mounted add ac
+  def postAccess(accessedController: FsController) {
+    if (accessedController.getModel.isMounted) mounted add accessedController
     val it = evicted.iterator
     if (!it.hasNext) return
     val builder = new FsSyncExceptionBuilder
     do {
-      val ec = it.next // evicted controller
-      val emp = ec.getModel.getMountPoint // evicted mount point
-      val ef = new FsControllerFilter(emp) // evicted filter
-      if (!(mounted exists ef)) {
+      val evictedController = it.next
+      val evictedMountPoint = evictedController.getModel.getMountPoint
+      val evictedFilter = new FsControllerFilter(evictedMountPoint)
+      if (!(mounted exists evictedFilter)) {
         try {
-          manager sync (ef, new FsControllerSyncVisitor(FsSyncOptions.NONE))
+          manager sync (evictedFilter, new FsControllerSyncVisitor(FsSyncOptions.NONE))
           it remove ()
         } catch {
           case ex: FsSyncException =>
