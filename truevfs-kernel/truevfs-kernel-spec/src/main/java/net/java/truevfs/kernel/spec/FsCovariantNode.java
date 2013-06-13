@@ -13,9 +13,9 @@ import net.java.truecommons.shed.BitField;
 /**
  * A covariant file system node maintains a map of
  * {@link FsArchiveEntry archive entries} and uses its
- * {@link #setKey(Entry.Type) key} property to determine the archive entry
- * in the map to which it forwards calls to {@link #getEntry()},
- * {@link #getSize(Size)}, {@link #getTime(Access)} etc.
+ * {@link #getKey() key} property to determine the archive entry in the map to
+ * which it forwards calls to {@link #getEntry()}, {@link #getSize(Size)},
+ * {@link #getTime(Access)} et al.
  *
  * @param  <E> the type of the mapped archive entries.
  * @author Christian Schlichtherle
@@ -34,7 +34,7 @@ extends FsAbstractNode implements Cloneable {
      *
      * @param path the file system path.
      */
-    public FsCovariantNode(String path) { name = path.toString(); }
+    public FsCovariantNode(String path) { name = path.toString(); } // check NPE
 
     /**
      * Returns a deep clone of this covariant file system node.
@@ -44,7 +44,7 @@ extends FsAbstractNode implements Cloneable {
      * @return A deep clone of this covariant file system node.
      */
     @SuppressWarnings("unchecked")
-    public FsCovariantNode<E> clone(FsArchiveDriver<E> driver) {
+    public FsCovariantNode<E> clone(final FsArchiveDriver<E> driver) {
         final FsCovariantNode<E> clone;
         try {
             clone = (FsCovariantNode<E>) super.clone();
@@ -98,11 +98,11 @@ extends FsAbstractNode implements Cloneable {
      * is mappeed, then any subsequent call to these methods will fail with a
      * {@link NullPointerException}.
      *
-     * @param type the type of the file system node to which calls to
+     * @param key the type of the file system node to which calls to
      *        {@link #getEntry()}, {@link #getSize(Size)},
      *        {@link #getTime(Access)} et al shall get forwarded.
      */
-    public void setKey(final @Nullable Type type) { key = type; }
+    public void setKey(@Nullable Type key) { this.key = key; }
 
     /**
      * Maps the given type to the given archive entry.
@@ -162,15 +162,14 @@ extends FsAbstractNode implements Cloneable {
      * the given type.
      */
     @Override
-    public boolean isType(final Type type) { return map.containsKey(type); }
+    public boolean isType(Type type) { return map.containsKey(type); }
 
     /**
      * Returns the size mapped for the {@link #getKey() key} property.
      */
     @Override
-    public long getSize(final Size type) {
-        if (DIRECTORY == key) return UNKNOWN; // TODO: Evaluate 0
-        return map.get(key).getSize(type);
+    public long getSize(Size type) {
+        return DIRECTORY == key ? UNKNOWN : map.get(key).getSize(type);
     }
 
     /**
