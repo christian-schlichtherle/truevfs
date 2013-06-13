@@ -102,7 +102,7 @@ extends FsDriver {
         }
         if (!enc.canEncode(name))
             throw new CharConversionException(name +
-                    " (entry name not encodable with " + getCharset() + ")");
+                    " (entry name is not encodable with " + getCharset() + ")");
     }
 
     private final ThreadLocal<CharsetEncoder> encoder = new ThreadLocal<>();
