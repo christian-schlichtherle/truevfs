@@ -72,7 +72,7 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
 
   override def newModel
   (context: FsDriver, mountPoint: FsMountPoint, parent: FsModel): FsModel =
-    new DefaultModel(mountPoint, parent)
+    context decorate new DefaultModel(mountPoint, parent)
 
   override def newController
   (context: AnyArchiveDriver, model: FsModel, parent: FsController): FsController = {
