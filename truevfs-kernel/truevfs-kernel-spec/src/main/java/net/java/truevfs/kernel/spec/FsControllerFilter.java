@@ -20,9 +20,9 @@ import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
  */
 public final class FsControllerFilter implements Filter<FsController> {
 
-    private final String ps, pp;
-    private final int ppl;
-    private final boolean pps;
+    private final String scheme, path;
+    private final int pathLength;
+    private final boolean pathEndsWithSeparator;
 
     /**
      * Constructs a new file system controller filter.
@@ -32,20 +32,20 @@ public final class FsControllerFilter implements Filter<FsController> {
      */
     public FsControllerFilter(final FsMountPoint prefix) {
         final URI p = prefix.toHierarchicalUri();
-        this.ps = p.getScheme();
-        this.pp = p.getPath();
-        this.ppl = pp.length();
-        this.pps = SEPARATOR_CHAR == pp.charAt(ppl - 1);
+        this.scheme = p.getScheme();
+        this.path = p.getPath();
+        this.pathLength = path.length();
+        this.pathEndsWithSeparator = SEPARATOR_CHAR == path.charAt(pathLength - 1);
     }
 
     @Override
     public boolean accept(final FsController controller) {
         final URI mp = controller.getModel().getMountPoint().toHierarchicalUri();
-        final String mpp;
-        return mp.getScheme().equals(ps)
-                && (mpp = mp.getPath()).startsWith(pp)
-                && (pps
-                    || mpp.length() == ppl
-                    || SEPARATOR_CHAR == mpp.charAt(ppl));
+        final String path;
+        return mp.getScheme().equals(scheme)
+                && (path = mp.getPath()).startsWith(this.path)
+                && (pathEndsWithSeparator
+                    || path.length() == pathLength
+                    || SEPARATOR_CHAR == path.charAt(pathLength));
     }
 }
