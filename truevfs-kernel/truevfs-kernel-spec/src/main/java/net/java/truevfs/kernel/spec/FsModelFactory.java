@@ -12,7 +12,7 @@ import javax.annotation.CheckForNull;
  * Implementations need to be safe for multithreading.
  *
  * @param  <Context> The type of the calling context.
- * @since  TrueVFS 0.11
+ * @since  TrueVFS 0.10
  * @author Christian Schlichtherle
  */
 public interface FsModelFactory<Context> {
