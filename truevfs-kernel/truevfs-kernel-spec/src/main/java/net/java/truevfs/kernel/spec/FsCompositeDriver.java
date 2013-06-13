@@ -20,7 +20,7 @@ import net.java.truecommons.shed.ImplementationsShouldExtend;
  */
 @ImplementationsShouldExtend(FsAbstractCompositeDriver.class)
 public interface FsCompositeDriver
-extends FsModelFactory<FsManager>, FsControllerFactory<FsManager> {
+extends FsModel.Factory<FsManager>, FsController.Factory<FsManager> {
 
     /**
      * {@inheritDoc}
