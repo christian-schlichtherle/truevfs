@@ -18,7 +18,7 @@ import net.java.truecommons.shed.UniqueObject;
 @Immutable
 public abstract class FsDriver
 extends UniqueObject
-implements FsModelFactory<FsManager>, FsControllerFactory<FsManager> {
+implements FsModel.Factory<FsManager>, FsController.Factory<FsManager> {
 
     /**
      * {@inheritDoc}

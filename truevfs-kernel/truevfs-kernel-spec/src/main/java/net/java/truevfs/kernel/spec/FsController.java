@@ -293,4 +293,39 @@ public interface FsController {
      */
     @FsAssertion(atomic=NO, consistent=YES, isolated=YES)
     void sync(BitField<FsSyncOption> options) throws FsSyncException;
+
+    /**
+     * A factory for {@linkplain FsController file system controllers}.
+     * <p>
+     * Implementations need to be safe for multi-threading.
+     *
+     * @param  <Context> The type of the calling context.
+     * @since  TrueVFS 0.11
+     * @author Christian Schlichtherle
+     */
+    interface Factory<Context> {
+
+        /**
+         * Returns a new thread-safe file system controller for the mount point of
+         * the given file system model.
+         * This is a pure function without side effects.
+         * <p>
+         * When called, you may assert the following precondition:
+         * <pre>{@code
+         * assert null == parent
+         *         ? null == model.getParent()
+         *         : parent.getModel().equals(model.getParent())
+         * }</pre>
+         *
+         * @param  context the calling context.
+         * @param  model the file system model.
+         * @param  parent the nullable parent file system controller.
+         * @return A new thread-safe file system controller for the mount point of
+         *         the given file system model.
+         */
+        FsController newController(
+                Context context,
+                FsModel model,
+                @CheckForNull FsController parent);
+    }
 }
