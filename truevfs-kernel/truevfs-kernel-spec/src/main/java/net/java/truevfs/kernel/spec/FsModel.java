@@ -10,7 +10,7 @@ import net.java.truecommons.shed.ImplementationsShouldExtend;
 /**
  * Defines common properties of any file system.
  * <p>
- * Implementations should be thread-safe.
+ * Implementations should be safe for multi-threaded access.
  *
  * @see    FsController
  * @see    FsManager
@@ -69,7 +69,7 @@ public interface FsModel {
     /**
      * A factory for {@linkplain FsModel file system models}.
      * <p>
-     * Implementations need to be safe for multi-threading.
+     * Implementations should be safe for multi-threaded access.
      *
      * @param  <Context> The type of the calling context.
      * @since  TrueVFS 0.11
@@ -78,8 +78,7 @@ public interface FsModel {
     interface Factory<Context> {
 
         /**
-         * Returns a new thread-safe file system model for the given mount
-         * point.
+         * Returns a new file system model for the given mount point.
          * This is a pure function without side effects.
          * <p>
          * When called, you may assert the following precondition:
@@ -92,8 +91,7 @@ public interface FsModel {
          * @param  context the calling context.
          * @param  mountPoint the mount point of the file system.
          * @param  parent the nullable parent file system model.
-         * @return A new thread-safe file system model for the given mount
-         *         point.
+         * @return A new file system model for the given mount point.
          */
         FsModel newModel(
                 Context context,
