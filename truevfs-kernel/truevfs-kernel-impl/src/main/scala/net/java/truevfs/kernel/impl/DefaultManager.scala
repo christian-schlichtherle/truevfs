@@ -71,9 +71,8 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
     new WeakHashMap[FsMountPoint, Link[FsController]]
 
   override def newModel
-  (context: FsDriver, mountPoint: FsMountPoint, parent: FsModel): FsModel = {
-      new DefaultModel(mountPoint, parent)
-  }
+  (context: FsDriver, mountPoint: FsMountPoint, parent: FsModel): FsModel =
+    new DefaultModel(mountPoint, parent)
 
   override def newController
   (context: AnyArchiveDriver, model: FsModel, parent: FsController): FsController = {
