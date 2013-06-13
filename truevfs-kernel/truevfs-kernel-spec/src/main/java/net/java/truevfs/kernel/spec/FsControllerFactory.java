@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import javax.annotation.Nullable;
+import javax.annotation.CheckForNull;
 
 /**
  * A factory for {@linkplain FsController file system controllers}.
@@ -38,5 +38,5 @@ public interface FsControllerFactory<Context> {
     FsController newController(
             Context context,
             FsModel model,
-            @Nullable FsController parent);
+            @CheckForNull FsController parent);
 }
