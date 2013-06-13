@@ -39,10 +39,11 @@ extends FsModelFactory<FsDriver>,
     FsController controller(FsCompositeDriver driver, FsMountPoint mountPoint);
 
     /**
-     * Uses the given visitor to {@link FsController#sync sync()} all managed
-     * file system controllers which get accepted by the given {@code filter}.
+     * Invokes the given visitor to {@link FsController#sync sync()} all
+     * managed file system controllers which get accepted by the given
+     * {@code filter}.
      * <p>
-     * Call this method instead of {@link #visit} for {@code sync()}ing in
+     * Call this method instead of {@link #accept} for {@code sync()}ing in
      * order to support processing of additional aspects such as controlling a
      * shutdown hook, logging statistics et al.
      * <p>
@@ -71,8 +72,8 @@ extends FsModelFactory<FsDriver>,
     throws FsSyncException;
 
     /**
-     * Uses the given visitor to call an operation on all managed
-     * file system controllers which get accepted by the given {@code filter}.
+     * Invokes the given visitor on all managed file system controllers which
+     * get accepted by the given {@code filter}.
      * This is the engine for calls to {@link #sync}.
      *
      * @param  filter the filter for the managed file system controllers.
@@ -80,7 +81,7 @@ extends FsModelFactory<FsDriver>,
      * @throws IOException at the discretion of the visitor.
      *         This will abort the visiting.
      */
-    <X extends IOException> void visit(
+    <X extends IOException> void accept(
             Filter<? super FsController> filter,
             Visitor<? super FsController, X> visitor)
     throws X;

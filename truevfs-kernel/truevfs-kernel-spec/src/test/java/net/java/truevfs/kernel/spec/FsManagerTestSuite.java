@@ -193,7 +193,7 @@ public abstract class FsManagerTestSuite {
             final Filter<? super FsController> filter,
             final VisitCounter counter) {
         try {
-            manager.visit(filter, counter);
+            manager.accept(filter, counter);
         } catch (final IOException ex) {
             throw new AssertionError(ex);
         }

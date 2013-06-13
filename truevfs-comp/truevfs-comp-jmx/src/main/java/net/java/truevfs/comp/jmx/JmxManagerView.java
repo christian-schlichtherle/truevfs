@@ -122,7 +122,7 @@ extends StandardMBean implements JmxManagerMXBean {
 
         final CountingVisitor visitor = new CountingVisitor();
         try {
-            manager.visit(filter, visitor);
+            manager.accept(filter, visitor);
         } catch (IOException ex) {
             throw new AssertionError(ex);
         }

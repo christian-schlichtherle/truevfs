@@ -36,7 +36,7 @@ extends UniqueObject implements FsManager {
             }
         } // AssembleExceptionVisitor
 
-        visit(filter, new AssembleExceptionVisitor());
+        accept(filter, new AssembleExceptionVisitor());
         b.check();
     }
 }

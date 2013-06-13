@@ -162,7 +162,7 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
     super.sync(filter, visitor)
   }
 
-  override def visit[X <: IOException](
+  override def accept[X <: IOException](
     filter: ControllerFilter,
     visitor: ControllerVisitor[X]
   ) {
