@@ -158,7 +158,7 @@ object PaceManagerTest {
     override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint) =
       throw new UnsupportedOperationException
 
-    override def visit[X <: IOException](
+    override def accept[X <: IOException](
       filter: ControllerFilter,
       visitor: ControllerVisitor[X]
     ) { for (c <- controllers if filter accept c) visitor visit c }
