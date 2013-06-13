@@ -62,7 +62,7 @@ import static net.java.truevfs.kernel.spec.FsAssertion.Level.*;
  * completed.
  * This protocol enables proper management of the controller's life cycle.
  * <p>
- * Implementations should be thread-safe.
+ * Implementations should be safe for multi-threaded access.
  *
  * @see    FsManager
  * @see    FsModel
@@ -297,7 +297,7 @@ public interface FsController {
     /**
      * A factory for {@linkplain FsController file system controllers}.
      * <p>
-     * Implementations need to be safe for multi-threading.
+     * Implementations should be safe for multi-threaded access.
      *
      * @param  <Context> The type of the calling context.
      * @since  TrueVFS 0.11
@@ -306,8 +306,8 @@ public interface FsController {
     interface Factory<Context> {
 
         /**
-         * Returns a new thread-safe file system controller for the mount point of
-         * the given file system model.
+         * Returns a new file system controller for the mount point of the
+         * given file system model.
          * This is a pure function without side effects.
          * <p>
          * When called, you may assert the following precondition:
@@ -320,8 +320,8 @@ public interface FsController {
          * @param  context the calling context.
          * @param  model the file system model.
          * @param  parent the nullable parent file system controller.
-         * @return A new thread-safe file system controller for the mount point of
-         *         the given file system model.
+         * @return A new file system controller for the mount point of the
+         *         given file system model.
          */
         FsController newController(
                 Context context,
