@@ -17,7 +17,7 @@ import net.java.truecommons.cio.Entry._
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private[pacemaker] abstract class AspectController(controller: FsController)
+private abstract class AspectController(controller: FsController)
 extends FsDecoratingController(controller) {
 
   /**

@@ -17,10 +17,10 @@ import PaceManager._
 
 private object PaceManager {
 
-  type AnyControllerFilter = Filter[_ >: FsController]
-  type ControllerSyncVisitor = Visitor[_ >: FsController, FsSyncException]
+  private type AnyControllerFilter = Filter[_ >: FsController]
+  private type ControllerSyncVisitor = Visitor[_ >: FsController, FsSyncException]
 
-  val logger = new LocalizedLogger(classOf[PaceManager])
+  private val logger = new LocalizedLogger(classOf[PaceManager])
 
   /**
     * The key string for the system property which defines the value of the
@@ -28,25 +28,25 @@ private object PaceManager {
     * which is equivalent to the expression
     * `PaceManager.class.getPackage().getName() + ".maximumFileSystemsMounted"`.
     */
-  val maximumFileSystemsMountedPropertyKey =
+  private val maximumFileSystemsMountedPropertyKey =
     classOf[PaceManager].getPackage.getName + ".maximumFileSystemsMounted"
 
   /** The minimum value for the maximum number of mounted file systems. */
-  val maximumFileSystemsMountedMinimumValue = 2
+  private val maximumFileSystemsMountedMinimumValue = 2
 
   /**
     * The default value for the maximum number of mounted file systems.
     * The value of this constant will be set to
-    * `MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE` unless a system
+    * `maximumFileSystemsMountedMinimumValue` unless a system
     * property with the key string
-    * `MAXIMUM_FILE_SYSTEMS_MOUNTED_PROPERTY_KEY`
+    * `maximumFileSystemsMountedPropertyKey`
     * is set to a value which is greater than
-    * `MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE`.
+    * `maximumFileSystemsMountedMinimumValue`.
     *
     * Mind you that this constant is initialized when this interface is loaded
     * and cannot accurately reflect the value in a remote JVM instance.
     */
-  val maximumFileSystemsMountedDefaultValue =
+  private val maximumFileSystemsMountedDefaultValue =
     max(maximumFileSystemsMountedMinimumValue,
         Integer getInteger (maximumFileSystemsMountedPropertyKey,
                             maximumFileSystemsMountedMinimumValue))
@@ -60,6 +60,9 @@ private object PaceManager {
     finally { lock unlock () }
   }
 
+  private def mountPoint(controller: FsController) =
+    controller.getModel.getMountPoint
+
   private final class MountedControllerMap(evicted: ju.Collection[FsController])
   extends ju.LinkedHashMap[FsMountPoint, FsController](initialCapacity, 0.75f, true) {
 
@@ -71,7 +74,7 @@ private object PaceManager {
 
     def max = _max
     def max_=(max: Int) {
-      require (max >= maximumFileSystemsMountedMinimumValue)
+      require(max >= maximumFileSystemsMountedMinimumValue)
       _max = max
     }
 
@@ -97,7 +100,7 @@ private object PaceManager {
       locked(readLock)(map exists filter)
 
     def add(controller: FsController) {
-      val mp = controller.getModel.getMountPoint
+      val mp = mountPoint(controller)
       locked(writeLock)(map put (mp, controller))
     }
 
@@ -109,7 +112,7 @@ private object PaceManager {
           override def accept(controller: FsController) = {
             val accepted = filter accept controller
             if (accepted)
-              locked(writeLock) { map remove controller.getModel.getMountPoint }
+              locked(writeLock) { map remove mountPoint(controller) }
             accepted
           }
         },
@@ -148,20 +151,18 @@ extends JmxManager[PaceMediator](mediator, manager) {
   /**
    * Registers access to the given controller and eventually sync()s some
    * recently accessed archive files which exceed the maximum number of mounted
-   * archive files unless they are the parent of some most recently accessed
-   * archive files.
+   * archive files unless they are the parent of some mounted archive files.
    *
    * @param accessedController the accessed file system controller.
    */
-  def postAccess(accessedController: FsController) {
+  private[pacemaker] def postAccess(accessedController: FsController) {
     if (accessedController.getModel.isMounted) mounted add accessedController
     val it = evicted.iterator
     if (!it.hasNext) return
     val builder = new FsSyncExceptionBuilder
     do {
       val evictedController = it.next
-      val evictedMountPoint = evictedController.getModel.getMountPoint
-      val evictedFilter = new FsControllerFilter(evictedMountPoint)
+      val evictedFilter = new FsControllerFilter(mountPoint(evictedController))
       if (!(mounted exists evictedFilter)) {
         try {
           manager sync (evictedFilter, new FsControllerSyncVisitor(FsSyncOptions.NONE))
