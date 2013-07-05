@@ -16,7 +16,7 @@ trait PaceManagerMXBean extends JmxManagerMXBean {
   /**
     * Returns the maximum number of file systems which may have been mounted
     * at any time.
-    * The mimimum value is `MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE`.
+    * The minimum value is `MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE`.
     * The default value is `MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE`.
     *
     * @return The maximum number of mounted file systems.
