@@ -11,6 +11,7 @@ import javax.annotation.concurrent._
 import net.java.truevfs.kernel.spec._
 import net.java.truecommons.cio._
 import net.java.truecommons.cio.Entry._;
+import scala.Option
 
 /** This abstract archive controller controls the mount state transition.
   * It is up to the sub-class to implement the actual mounting/unmounting

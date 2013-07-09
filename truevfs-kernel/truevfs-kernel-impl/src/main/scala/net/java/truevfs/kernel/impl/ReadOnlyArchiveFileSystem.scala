@@ -10,6 +10,7 @@ import net.java.truevfs.kernel.spec._
 import net.java.truecommons.cio._
 import net.java.truecommons.cio.Entry._
 import net.java.truecommons.cio.Entry.Access._
+import scala.Option
 
 /** A read-only virtual file system for archive entries.
   *

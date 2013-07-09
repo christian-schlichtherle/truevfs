@@ -15,6 +15,7 @@ import net.java.truecommons.cio.Entry._
 import java.io._
 import java.nio.channels._
 import javax.annotation.concurrent._
+import scala.Option
 
 private object SyncController {
   private val NOT_WAIT_CLOSE_IO = BitField.of(WAIT_CLOSE_IO).not

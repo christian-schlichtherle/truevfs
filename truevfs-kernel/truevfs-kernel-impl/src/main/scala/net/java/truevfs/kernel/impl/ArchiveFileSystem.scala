@@ -20,6 +20,7 @@ import net.java.truecommons.cio.Entry._
 import net.java.truecommons.cio.Entry.Access._
 import net.java.truecommons.cio.Entry.Type._
 import scala.annotation._
+import scala.Option
 import ArchiveFileSystem._
 
 /** A read/write virtual file system for archive entries.

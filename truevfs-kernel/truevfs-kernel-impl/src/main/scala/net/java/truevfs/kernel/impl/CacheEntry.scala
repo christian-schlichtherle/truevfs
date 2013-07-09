@@ -12,6 +12,7 @@ import java.nio.channels._
 import javax.annotation.concurrent._
 import net.java.truecommons.cio.Entry._
 import net.java.truecommons.cio._
+import scala.Option
 import CacheEntry._
 
 /** Provides caching services for input and output sockets with the following

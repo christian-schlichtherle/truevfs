@@ -8,6 +8,7 @@ import net.java.truecommons.shed._
 import net.java.truevfs.kernel.spec._
 import net.java.truecommons.cio._
 import net.java.truecommons.cio.Entry._
+import scala.Option
 
 /** Provides read/write access to an archive file system.
   * This is a mirror of [[net.java.truevfs.kernel.spec.FsController]] which has

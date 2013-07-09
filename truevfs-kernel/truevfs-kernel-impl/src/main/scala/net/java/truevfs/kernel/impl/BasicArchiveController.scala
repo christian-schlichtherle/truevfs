@@ -18,6 +18,7 @@ import net.java.truecommons.cio._
 import net.java.truecommons.cio.Entry._;
 import net.java.truecommons.cio.Entry.Access._;
 import net.java.truecommons.cio.Entry.Type._;
+import scala.Option
 
 /** An abstract base class for any archive file system controller which
   * provide all the essential services required for accessing a prospective
@@ -90,7 +91,7 @@ extends ArchiveController[E] {
       override def channel(peer: AnyOutputSocket) = socket(peer) channel peer
 
       def socket(peer: AnyOutputSocket) = {
-        target(peer) // may sync() if in same target archive file!
+        AbstractInputSocket target peer // may sync() if in same target archive file!
         input(target().getName)
       }
     } // Input

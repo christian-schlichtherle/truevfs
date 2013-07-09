@@ -17,6 +17,7 @@ import net.java.truevfs.kernel.spec.FsSyncOptions._
 import net.java.truecommons.cio._
 import net.java.truecommons.cio.Entry._;
 import net.java.truecommons.cio.Entry.Type._;
+import scala.Option
 
 /** A selective cache for file system entries.
   * Decorating a file system controller with this class has the following
