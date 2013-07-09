@@ -14,6 +14,7 @@ import net.java.truevfs.kernel.impl.LockingStrategy._
 import java.io._
 import java.nio.channels._
 import javax.annotation.concurrent._
+import scala.Option
 
 /** Provides read/write locking for multi-threaded access by its clients.
   *

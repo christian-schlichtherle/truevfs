@@ -21,6 +21,7 @@ import net.java.truevfs.kernel.spec.FsAccessOption._
 import net.java.truevfs.kernel.spec.FsAccessOptions._
 import net.java.truevfs.kernel.spec.FsSyncOption._
 import scala.reflect.ClassTag
+import scala.Option
 import TargetArchiveController._
 
 /** Manages I/O to the entry which represents the target archive file in its

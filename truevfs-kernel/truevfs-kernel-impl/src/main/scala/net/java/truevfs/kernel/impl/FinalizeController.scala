@@ -13,9 +13,10 @@ import javax.annotation.concurrent._
 import net.java.truevfs.kernel.spec._
 import net.java.truecommons.cio._
 import net.java.truecommons.cio.Entry._;
+import scala.Option
 
 /** Finalizes unclosed resources returned by its decorated controller.
-  * 
+  *
   * @author Christian Schlichtherle
   */
 @ThreadSafe

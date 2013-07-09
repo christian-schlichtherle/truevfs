@@ -7,6 +7,7 @@ package net.java.truevfs.kernel.impl
 import net.java.truecommons.shed._
 import net.java.truevfs.kernel.spec._
 import javax.annotation.concurrent._
+import scala.Option
 
 /** A shutdown hook singleton which `sync`s a `register`ed file system manager
   * when it's `run`.

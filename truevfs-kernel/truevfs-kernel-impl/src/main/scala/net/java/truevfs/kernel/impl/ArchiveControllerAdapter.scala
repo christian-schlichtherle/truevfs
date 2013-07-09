@@ -4,12 +4,13 @@
  */
 package net.java.truevfs.kernel.impl
 
-import net.java.truecommons.shed._
 import java.{lang => jl}
 import java.{util => ju}
-import net.java.truevfs.kernel.spec._
 import net.java.truecommons.cio._
 import net.java.truecommons.cio.Entry._
+import net.java.truecommons.shed._
+import net.java.truevfs.kernel.spec._
+import scala.Option
 
 private final class ArchiveControllerAdapter(
   override val getParent: FsController,

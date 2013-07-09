@@ -14,6 +14,7 @@ import net.java.truecommons.cio.Entry._;
 import java.io._
 import java.nio.channels._
 import javax.annotation.concurrent._
+import scala.Option
 
 private object ResourceController {
   private val waitTimeoutMillis = LockingStrategy.acquireTimeoutMillis

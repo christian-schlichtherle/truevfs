@@ -13,6 +13,7 @@ import net.java.truevfs.kernel.spec._
 import java.io._
 import java.util.concurrent.locks._
 import javax.annotation.concurrent._
+import scala.Option
 import DefaultManager._
 
 @ThreadSafe
