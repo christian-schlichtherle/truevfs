@@ -216,30 +216,11 @@ private final class CacheEntry private (
       assert(Strategy.WriteBack.eq(strategy) || 0 == b.writers)
       if (0 < b.readers) {
         b.readers -= 1
-        if (1 == b.readers && 0 == b.writers && buffer.orNull.ne(b)) b release ()
+        if (0 == b.readers && 0 == b.writers && buffer.orNull.ne(b))
+          b release ()
       }
     }
   } // InputBufferPool
-
-  private[CacheEntry] abstract class OutputBufferPool
-  extends Pool[Buffer, IOException] {
-    override def allocate() = {
-      val b = new Buffer
-      assert(0 == b.readers)
-      b.writers = 1
-      b
-    }
-
-    override def release(b: Buffer) {
-      assert(Strategy.WriteBack.eq(strategy) || 0 == b.readers)
-      b.writers = 0
-      try {
-        b save _output.get
-      } finally {
-        buffer = Some(b)
-      }
-    }
-  } // OutputBufferPool
 
   private[CacheEntry] final class WriteThroughOutputBufferPool
   extends OutputBufferPool {
@@ -253,10 +234,27 @@ private final class CacheEntry private (
     override def release(b: Buffer) {
       if (0 != b.writers) {
         if (buffer.orNull ne b) buffer = Some(b)
-        else super.release(b)
+        else                    super.release(b)
       }
     }
   } // WriteBackOutputBufferPool
+
+  private[CacheEntry] abstract class OutputBufferPool
+  extends Pool[Buffer, IOException] {
+    override def allocate() = {
+      val b = new Buffer
+      assert(0 == b.readers)
+      b.writers = 1
+      b
+    }
+
+    override def release(b: Buffer) {
+      assert(Strategy.WriteBack.eq(strategy) || 0 == b.readers)
+      b.writers = 0
+      try { b save _output.get }
+      finally { buffer = Some(b) }
+    }
+  } // OutputBufferPool
 
   /** An I/O buffer for the cached contents. */
   private final class Buffer extends IoBuffer {
