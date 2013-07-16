@@ -13,7 +13,6 @@
     </parent>
 
     <artifactId>truevfs-profile-default</artifactId>
-    <packaging>pom</packaging>
 
     <name>TrueVFS Profile Default</name>
     <description>
