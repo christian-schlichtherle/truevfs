@@ -11,8 +11,9 @@ import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.NotThreadSafe;
 
 /**
- * A temp file pool entry.
- * 
+ * A pooled file buffer.
+ *
+ * @see    FileBufferPool
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
@@ -24,12 +25,7 @@ final class FileBuffer extends FileNode {
         this.pool = pool;
     }
 
-    @Override
-    public void release() throws IOException {
-        if (null == pool)
-            throw new IllegalStateException(getPath() + " (already released)");
-        pool(null);
-    }
+    @Override public void release() throws IOException { pool(null); }
 
     private void pool(@CheckForNull final FileBufferPool newPool) throws IOException {
         final FileBufferPool oldPool = this.pool;
@@ -40,10 +36,7 @@ final class FileBuffer extends FileNode {
     @Override
     @SuppressWarnings(value = "FinalizeDeclaration")
     protected void finalize() throws Throwable {
-        try {
-            pool(null);
-        } finally {
-            super.finalize();
-        }
+        try { pool(null); }
+        finally { super.finalize(); }
     }
 }
