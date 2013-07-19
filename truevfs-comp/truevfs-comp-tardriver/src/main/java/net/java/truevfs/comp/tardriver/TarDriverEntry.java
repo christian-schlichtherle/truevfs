@@ -82,10 +82,9 @@ implements FsArchiveEntry, Releasable<IOException> {
 
     @Override
     public void release() throws IOException {
-        if (null != buffer) {
-            buffer.release();
-            buffer = null;
-        }
+        if (null == buffer) return;
+        buffer.release();
+        buffer = null;
     }
 
     @Override

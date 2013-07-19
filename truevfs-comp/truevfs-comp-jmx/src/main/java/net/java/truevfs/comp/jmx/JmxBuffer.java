@@ -37,10 +37,7 @@ extends InstrumentingBuffer<M> implements JmxComponent {
 
     @Override
     public void release() throws IOException {
-        try {
-            entry.release();
-        } finally {
-            mediator.deregister(objectName());
-        }
+        try { entry.release(); }
+        finally { mediator.deregister(objectName()); }
     }
 }
