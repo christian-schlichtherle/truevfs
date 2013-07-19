@@ -66,10 +66,10 @@ final class FileBufferPool extends IoBufferPool {
             final @CheckForNull Path dir,
             final @CheckForNull String prefix) {
         this.dir = null != dir ? dir : TEMP_DIR;
-        this.prefix = null != prefix ? ensureEndsWithDot(prefix) : "tvfs";
+        this.prefix = null != prefix ? prefixPlusDot(prefix) : "tvfs";
     }
 
-    private static String ensureEndsWithDot(String prefix) {
+    private static String prefixPlusDot(String prefix) {
         return prefix.endsWith(".") ? prefix : prefix + ".";
     }
 
