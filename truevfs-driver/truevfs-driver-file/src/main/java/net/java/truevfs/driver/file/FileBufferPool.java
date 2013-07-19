@@ -6,7 +6,9 @@ package net.java.truevfs.driver.file;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
-import static java.nio.file.Files.createTempFile;
+import java.nio.file.Files;
+import static java.nio.file.Files.createDirectories;
+import static java.nio.file.Files.exists;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
@@ -73,12 +75,33 @@ final class FileBufferPool extends IoBufferPool {
 
     @Override
     public FileNode allocate() throws IOException {
-        // TODO: Fix https://java.net/jira/browse/TRUEVFS-107 .
-        return new FileBuffer(createTempFile(dir, prefix, null, attributes()),
-                this);
+        return new FileBuffer(createTempFile(), this);
+    }
+
+    private Path createTempFile() throws IOException {
+        try {
+            return Files.createTempFile(dir, prefix, null, attributes());
+        } catch (final IOException ex) {
+            if (exists(dir)) throw ex;
+            createTempDir();
+            return createTempFile();
+        }
     }
 
     private static FileAttribute<?>[] attributes() {
         return 0 == ATTRIBUTES.length ? ATTRIBUTES : ATTRIBUTES.clone();
+    }
+
+    private void createTempDir() {
+        assert !exists(dir);
+        try {
+            createDirectories(dir);
+        } catch (final IOException ex) {
+            // Must NOT map to IOException - see
+            // https://java.net/jira/browse/TRUEZIP-321 .
+            throw new IllegalArgumentException(dir + " (cannot create directory for temporary files)",
+                    ex);
+        }
+        assert exists(dir);
     }
 }
