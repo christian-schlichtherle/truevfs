@@ -104,7 +104,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
       loan(open()) to { config =>
         intercept[NullPointerException] { config setManager null }
         config.getManager should be theSameInstanceAs (FsManagerLocator.SINGLETON.get)
-        val manager = new Locator(classOf[FsManagerLocator])
+        val manager = new ServiceLocator(classOf[FsManagerLocator])
         .factory(classOf[FsManagerFactory], classOf[FsManagerDecorator])
         .get
         config setManager manager

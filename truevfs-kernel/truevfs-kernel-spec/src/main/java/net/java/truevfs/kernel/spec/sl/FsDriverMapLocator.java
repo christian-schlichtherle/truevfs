@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.Map;
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.services.Container;
-import net.java.truecommons.services.Locator;
+import net.java.truecommons.services.ServiceLocator;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapFactory;
@@ -17,7 +17,7 @@ import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
 /**
  * A container of the singleton immutable map of all known file system schemes
  * to file system drivers.
- * The map is populated by using a {@link Locator} to search for advertised
+ * The map is populated by using a {@link ServiceLocator} to search for advertised
  * implementations of the factory service specification class
  * {@link FsDriverMapFactory}
  * and the modifier service specification class
@@ -41,7 +41,7 @@ implements Container<Map<FsScheme, FsDriver>> {
     private static final class Lazy {
         static final Map<FsScheme, FsDriver> drivers
                 = Collections.unmodifiableMap(
-                    new Locator(FsDriverMapLocator.class)
+                    new ServiceLocator(FsDriverMapLocator.class)
                     .factory(FsDriverMapFactory.class, FsDriverMapModifier.class)
                     .get());
     }

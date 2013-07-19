@@ -6,14 +6,14 @@ package net.java.truevfs.kernel.spec.sl;
 
 import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.services.Container;
-import net.java.truecommons.services.Locator;
+import net.java.truecommons.services.ServiceLocator;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.spi.FsManagerDecorator;
 import net.java.truevfs.kernel.spec.spi.FsManagerFactory;
 
 /**
  * A container of the singleton file system manager.
- * The file system manager is created by using a {@link Locator} to search for
+ * The file system manager is created by using a {@link ServiceLocator} to search for
  * advertised implementations of the factory service specification class
  * {@link FsManagerFactory}
  * and the decorator service specification class
@@ -35,7 +35,7 @@ public final class FsManagerLocator implements Container<FsManager> {
     /** A static data utility class used for lazy initialization. */
     private static final class Lazy {
         static final FsManager manager
-                = new Locator(FsManagerLocator.class)
+                = new ServiceLocator(FsManagerLocator.class)
                 .factory(FsManagerFactory.class, FsManagerDecorator.class)
                 .get();
     }
