@@ -83,8 +83,7 @@ class FileNode extends FsAbstractNode implements IoBuffer {
     }
 
     @Override
-    public void release() throws IOException {
-    }
+    public void release() throws IOException { }
 
     /** Returns the decorated file. */
     final Path getPath() {
