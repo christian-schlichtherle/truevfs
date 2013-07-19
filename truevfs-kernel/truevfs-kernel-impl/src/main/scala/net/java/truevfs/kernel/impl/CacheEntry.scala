@@ -15,11 +15,46 @@ import net.java.truecommons.cio._
 import scala.Option
 import CacheEntry._
 
+private object CacheEntry {
+  /** Defines different cache entry strategies. */
+  sealed trait Strategy {
+    final def newCacheEntry(pool: IoBufferPool) = new CacheEntry(this, pool)
+
+    private[CacheEntry] def newOutputBufferPool(cache: CacheEntry)
+    : CacheEntry#OutputBufferPool
+  }
+
+  /** Provided different cache entry strategies. */
+  object Strategy {
+    /** A write-through cache flushes any written data as soon as the
+      * output stream created by `CacheEntry.output` gets closed.
+      */
+    object WriteThrough extends Strategy {
+      private[CacheEntry] override def newOutputBufferPool(cache: CacheEntry)
+      : CacheEntry#OutputBufferPool =
+        new cache.WriteThroughOutputBufferPool
+    }
+
+    /** A write-back cache flushes any written data if and only if it gets
+      * explicitly `CacheEntry.flushed`.
+      */
+    object WriteBack extends Strategy {
+      private[CacheEntry] override def newOutputBufferPool(cache: CacheEntry)
+      : CacheEntry#OutputBufferPool =
+        new cache.WriteBackOutputBufferPool
+    }
+  }
+
+  /** Used to proxy the backing store entries. */
+  private final class ProxyEntry(entry: Entry)
+  extends DecoratingEntry[Entry](entry)
+}
+
 /** Provides caching services for input and output sockets with the following
   * features:
   *
   * - Upon the first read operation, the entry data will be read from the
-  *   backing store and temporarily stored in the cache.
+  *   backing store and stored in the cache.
   *   Subsequent or concurrent read operations will be served from the cache
   *   without re-reading the entry data from the backing store again until
   *   the cache gets `release`d.
@@ -29,7 +64,7 @@ import CacheEntry._
   *   cache gets `flush`ed.
   * - After a write operation, the entry data will be stored in the cache for
   *   subsequent read operations until the cache gets `release`d.
-  * - As a side effect, caching decouples the underlying storage from its
+  * - As a side effect, caching decouples the backing store from its
   *   clients, allowing it to create, read, update or delete the entry data
   *   while some clients are still busy on reading or writing the cached
   *   entry data.
@@ -217,7 +252,7 @@ private final class CacheEntry private (
       assert(Strategy.WriteBack.eq(strategy) || 0 == b.writers)
       if (0 < b.readers) {
         b.readers -= 1
-        if (0 == b.readers && 0 == b.writers && buffer.orNull.ne(b))
+        if (0 == b.readers && 0 == b.writers && b.ne(buffer.orNull))
           b release ()
       }
     }
@@ -343,39 +378,4 @@ private final class CacheEntry private (
       abstract override def close()
     }
   }
-}
-
-private object CacheEntry {
-  /** Defines different cache entry strategies. */
-  sealed trait Strategy {
-    final def newCacheEntry(pool: IoBufferPool) = new CacheEntry(this, pool)
-
-    private[CacheEntry] def newOutputBufferPool(cache: CacheEntry)
-    : CacheEntry#OutputBufferPool
-  }
-
-  /** Provided different cache entry strategies. */
-  object Strategy {
-    /** A write-through cache flushes any written data as soon as the
-      * output stream created by `CacheEntry.output` gets closed.
-      */
-    object WriteThrough extends Strategy {
-      private[CacheEntry] override def newOutputBufferPool(cache: CacheEntry)
-      : CacheEntry#OutputBufferPool =
-        new cache.WriteThroughOutputBufferPool
-    }
-
-    /** A write-back cache flushes any written data if and only if it gets
-      * explicitly `CacheEntry.flushed`.
-      */
-    object WriteBack extends Strategy {
-      private[CacheEntry] override def newOutputBufferPool(cache: CacheEntry)
-      : CacheEntry#OutputBufferPool =
-        new cache.WriteBackOutputBufferPool
-    }
-  }
-
-  /** Used to proxy the backing store entries. */
-  private final class ProxyEntry(entry: Entry)
-  extends DecoratingEntry[Entry](entry)
 }
