@@ -114,7 +114,7 @@ plug-in to its federated file system space.
             &lt;b&gt;${project.name} ${project.version}&lt;/b&gt;
         </header>
 
-        <truecommons.version>2.3.2-SNAPSHOT</truecommons.version>
+        <truecommons.version>2.3.2</truecommons.version>
 
         <!-- For documentation purposes only - mind the dash! -->
         <truezip-version>7.7.2</truezip-version>
