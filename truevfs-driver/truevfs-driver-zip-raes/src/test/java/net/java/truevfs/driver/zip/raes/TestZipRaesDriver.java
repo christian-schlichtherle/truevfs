@@ -6,7 +6,7 @@ package net.java.truevfs.driver.zip.raes;
 
 import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.comp.zipdriver.TestKeyManagerMap;
-import net.java.truevfs.kernel.spec.TestConfig;
+import net.java.truevfs.kernel.spec.FsTestConfig;
 import net.java.truecommons.key.spec.common.AesPbeParameters;
 import net.java.truecommons.key.spec.prompting.TestView;
 
@@ -20,7 +20,7 @@ public class TestZipRaesDriver extends SafeZipRaesDriver {
 
     @Override
     public IoBufferPool getPool() {
-        return TestConfig.get().getPool();
+        return FsTestConfig.get().getPool();
     }
 
     @Override

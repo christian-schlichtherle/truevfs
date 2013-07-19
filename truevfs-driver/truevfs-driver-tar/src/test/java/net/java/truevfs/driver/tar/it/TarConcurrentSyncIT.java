@@ -6,7 +6,7 @@ package net.java.truevfs.driver.tar.it;
 
 import net.java.truevfs.access.it.ConcurrentSyncITSuite;
 import net.java.truevfs.comp.tardriver.TarDriver;
-import net.java.truevfs.kernel.spec.TestConfig;
+import net.java.truevfs.kernel.spec.FsTestConfig;
 import net.java.truecommons.cio.IoBufferPool;
 
 /**
@@ -24,7 +24,7 @@ extends ConcurrentSyncITSuite<TarDriver> {
         return new TarDriver() {
             @Override
             public IoBufferPool getPool() {
-                return TestConfig.get().getPool();
+                return FsTestConfig.get().getPool();
             }
         };
     }

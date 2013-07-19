@@ -20,8 +20,8 @@ import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.cio.Entry.Size;
 import net.java.truecommons.io.DecoratingOutputStream;
 import net.java.truecommons.shed.HashMaps;
-import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truevfs.kernel.spec.ThrowManager;
+import net.java.truevfs.kernel.spec.FsTestConfig;
+import net.java.truevfs.kernel.spec.FsThrowManager;
 import net.java.truevfs.kernel.spec.cio.ThrowingInputService;
 import net.java.truevfs.kernel.spec.cio.ThrowingOutputService;
 
@@ -33,11 +33,11 @@ public class MockArchive
 implements Container<MockArchiveDriverEntry> {
 
     final Map<String, MockArchiveDriverEntry> entries;
-    private final TestConfig config;
-    private @CheckForNull ThrowManager control;
+    private final FsTestConfig config;
+    private @CheckForNull FsThrowManager control;
 
-    public static MockArchive create(@CheckForNull TestConfig config) {
-        if (null == config) config = TestConfig.get();
+    public static MockArchive create(@CheckForNull FsTestConfig config) {
+        if (null == config) config = FsTestConfig.get();
         return new MockArchive(
                 new LinkedHashMap<String, MockArchiveDriverEntry>(
                     HashMaps.initialCapacity(config.getNumEntries())),
@@ -46,13 +46,13 @@ implements Container<MockArchiveDriverEntry> {
 
     private MockArchive(
             final Map<String, MockArchiveDriverEntry> entries,
-            final TestConfig config) {
+            final FsTestConfig config) {
         this.entries = entries;
         this.config = config;
     }
 
-    private ThrowManager getThrowControl() {
-        final ThrowManager control = this.control;
+    private FsThrowManager getThrowControl() {
+        final FsThrowManager control = this.control;
         return null != control ? control : (this.control = config.getThrowControl());
     }
 
@@ -108,7 +108,7 @@ implements Container<MockArchiveDriverEntry> {
 
         MockInputService(
                 Map<String, MockArchiveDriverEntry> entries,
-                TestConfig config) {
+                FsTestConfig config) {
             super(entries, config);
         }
 
@@ -158,7 +158,7 @@ implements Container<MockArchiveDriverEntry> {
 
         MockOutputService(
                 Map<String, MockArchiveDriverEntry> entries,
-                TestConfig config) {
+                FsTestConfig config) {
             super(entries, config);
         }
 

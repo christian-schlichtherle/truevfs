@@ -12,19 +12,19 @@ import java.nio.channels.SeekableByteChannel;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truevfs.kernel.spec.ThrowManager;
+import net.java.truevfs.kernel.spec.FsTestConfig;
+import net.java.truevfs.kernel.spec.FsThrowManager;
 
 /**
  * A decorating seekable byte channel which supports throwing exceptions
- * according to {@link TestConfig}.
+ * according to {@link FsTestConfig}.
  * 
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
 public final class ThrowingSeekableChannel extends DecoratingSeekableChannel {
 
-    private final ThrowManager control;
+    private final FsThrowManager control;
 
     @CreatesObligation
     public ThrowingSeekableChannel(
@@ -35,11 +35,11 @@ public final class ThrowingSeekableChannel extends DecoratingSeekableChannel {
     @CreatesObligation
     public ThrowingSeekableChannel(
             final @WillCloseWhenClosed SeekableByteChannel channel,
-            final @CheckForNull ThrowManager control) {
+            final @CheckForNull FsThrowManager control) {
         super(channel);
         this.control = null != control
                 ? control
-                : TestConfig.get().getThrowControl();
+                : FsTestConfig.get().getThrowControl();
     }
 
     private void checkAllExceptions() throws IOException {

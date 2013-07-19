@@ -14,8 +14,8 @@ import net.java.truecommons.cio.DecoratingOutputService;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.OutputService;
 import net.java.truecommons.cio.OutputSocket;
-import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truevfs.kernel.spec.ThrowManager;
+import net.java.truevfs.kernel.spec.FsTestConfig;
+import net.java.truevfs.kernel.spec.FsThrowManager;
 
 /**
  * @param   <E> The type of the entries served to the decorated output service.
@@ -25,8 +25,8 @@ import net.java.truevfs.kernel.spec.ThrowManager;
 @ThreadSafe
 public class ThrowingOutputService<E extends Entry>
 extends DecoratingOutputService<E> {
-    private final TestConfig config;
-    private volatile @CheckForNull ThrowManager control;
+    private final FsTestConfig config;
+    private volatile @CheckForNull FsThrowManager control;
 
     public ThrowingOutputService(
             final @WillCloseWhenClosed OutputService<E> service) {
@@ -35,13 +35,13 @@ extends DecoratingOutputService<E> {
 
     public ThrowingOutputService(
             final @WillCloseWhenClosed OutputService<E> service,
-            final @CheckForNull TestConfig config) {
+            final @CheckForNull FsTestConfig config) {
         super(service);
-        this.config = null != config ? config : TestConfig.get();
+        this.config = null != config ? config : FsTestConfig.get();
     }
 
-    private ThrowManager getThrowControl() {
-        final ThrowManager control = this.control;
+    private FsThrowManager getThrowControl() {
+        final FsThrowManager control = this.control;
         return null != control ? control : (this.control = config.getThrowControl());
     }
 

@@ -6,7 +6,7 @@ package net.java.truevfs.comp.zipdriver;
 
 import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.FsArchiveDriverTestSuite;
-import net.java.truevfs.kernel.spec.TestConfig;
+import net.java.truevfs.kernel.spec.FsTestConfig;
 
 /**
  * @author Christian Schlichtherle
@@ -19,7 +19,7 @@ extends FsArchiveDriverTestSuite<JarDriverEntry, CheckedJarDriver> {
         return new CheckedJarDriver() {
             @Override
             public IoBufferPool getPool() {
-                return TestConfig.get().getPool();
+                return FsTestConfig.get().getPool();
             }
         };
     }

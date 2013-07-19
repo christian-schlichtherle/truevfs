@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.driver.tar.bzip2;
 
-import net.java.truevfs.kernel.spec.TestConfig;
+import net.java.truevfs.kernel.spec.FsTestConfig;
 import net.java.truecommons.cio.IoBufferPool;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
@@ -17,7 +17,7 @@ public final class TestTarBZip2Driver extends TarBZip2Driver {
 
     @Override
     public IoBufferPool getPool() {
-        return TestConfig.get().getPool();
+        return FsTestConfig.get().getPool();
     }
 
     @Override

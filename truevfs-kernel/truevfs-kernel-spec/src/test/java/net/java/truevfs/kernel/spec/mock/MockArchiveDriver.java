@@ -27,12 +27,12 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
 
     public static final Charset MOCK_CHARSET = Charset.forName("UTF-8");
 
-    private final TestConfig config;
+    private final FsTestConfig config;
     private final ConcurrentMap<FsMountPoint, MockArchive>
             containers;
 
     public MockArchiveDriver() {
-        this.config = TestConfig.get();
+        this.config = FsTestConfig.get();
         this.containers = new ConcurrentHashMap<>(
                 HashMaps.initialCapacity(config.getNumEntries()));
     }

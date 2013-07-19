@@ -35,8 +35,8 @@ extends FsAbstractController {
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final ConcurrentMap<FsNodeName, IoEntry<?>>
             map = new ConcurrentHashMap<>();
-    private final TestConfig config;
-    private volatile @CheckForNull ThrowManager control;
+    private final FsTestConfig config;
+    private volatile @CheckForNull FsThrowManager control;
 
     public MockController(FsModel model, @CheckForNull FsController parent) {
         this(model, parent, null);
@@ -51,17 +51,17 @@ extends FsAbstractController {
      */
     public MockController(  final FsModel model,
                             final @CheckForNull FsController parent,
-                            final @CheckForNull TestConfig config) {
+                            final @CheckForNull FsTestConfig config) {
         super(model);
         assert null == model.getParent()
                 ? null == parent
                 : model.getParent().equals(parent.getModel());
         this.parent = parent;
-        this.config = null != config ? config : TestConfig.get();
+        this.config = null != config ? config : FsTestConfig.get();
     }
 
-    private ThrowManager getThrowControl() {
-        final ThrowManager control = this.control;
+    private FsThrowManager getThrowControl() {
+        final FsThrowManager control = this.control;
         return null != control ? control : (this.control = config.getThrowControl());
     }
 

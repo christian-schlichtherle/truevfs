@@ -6,7 +6,7 @@ package net.java.truevfs.driver.odf;
 
 import net.java.truevfs.comp.zipdriver.JarDriverEntry;
 import net.java.truevfs.kernel.spec.FsArchiveDriverTestSuite;
-import net.java.truevfs.kernel.spec.TestConfig;
+import net.java.truevfs.kernel.spec.FsTestConfig;
 import net.java.truecommons.cio.IoBufferPool;
 
 /**
@@ -20,7 +20,7 @@ extends FsArchiveDriverTestSuite<JarDriverEntry, CheckedOdfDriver> {
         return new CheckedOdfDriver() {
             @Override
             public IoBufferPool getPool() {
-                return TestConfig.get().getPool();
+                return FsTestConfig.get().getPool();
             }
         };
     }

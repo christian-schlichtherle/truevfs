@@ -66,7 +66,7 @@ extends FsArchiveDriverTestBase<D> {
     public void setUp() throws IOException {
         super.setUp();
         // Order is important here!
-        final TestConfig config = TestConfig.get();
+        final FsTestConfig config = FsTestConfig.get();
         config.setDataSize(getMaxArchiveLength());
         config.setPool(null); // reset
         model = newArchiveModel();
@@ -454,23 +454,23 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private void checkAllExceptions(final Object thiz) throws IOException {
-        final ThrowManager ctl = getThrowControl();
+        final FsThrowManager ctl = getThrowControl();
         ctl.check(thiz, IOException.class);
         ctl.check(thiz, RuntimeException.class);
         ctl.check(thiz, Error.class);
     }
 
-    private ThrowManager getThrowControl() {
-        return TestConfig.get().getThrowControl();
+    private FsThrowManager getThrowControl() {
+        return FsTestConfig.get().getThrowControl();
     }
 
     private int getNumEntries() {
-        return TestConfig.get().getNumEntries();
+        return FsTestConfig.get().getNumEntries();
     }
 
     private final class ParentController extends MockController {
         ParentController(FsModel model, @CheckForNull FsController parent) {
-            super(model, parent, TestConfig.get());
+            super(model, parent, FsTestConfig.get());
         }
 
         @Override

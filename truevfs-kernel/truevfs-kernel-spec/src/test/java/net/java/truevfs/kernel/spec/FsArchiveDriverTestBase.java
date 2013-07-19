@@ -40,7 +40,7 @@ public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
     @OverrideMustInvoke(When.FIRST)
     public void setUp() throws IOException {
         data = DATA.clone();
-        final TestConfig config = TestConfig.push();
+        final FsTestConfig config = FsTestConfig.push();
         config.setDataSize(data.length * 4 / 3); // account for archive type specific overhead
         config.setPool(null); // reset
     }
@@ -48,11 +48,11 @@ public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
     @After
     @OverrideMustInvoke(When.LAST)
     public void tearDown() {
-        TestConfig.pop();
+        FsTestConfig.pop();
     }
 
-    /*protected final TestConfig getTestConfig() {
-        return TestConfig.get();
+    /*protected final FsTestConfig getTestConfig() {
+        return FsTestConfig.get();
     }*/
 
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
