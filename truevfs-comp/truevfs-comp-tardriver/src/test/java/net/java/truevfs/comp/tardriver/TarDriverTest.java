@@ -5,7 +5,7 @@
 package net.java.truevfs.comp.tardriver;
 
 import net.java.truevfs.kernel.spec.FsArchiveDriverTestSuite;
-import net.java.truevfs.kernel.spec.TestConfig;
+import net.java.truevfs.kernel.spec.FsTestConfig;
 import net.java.truecommons.cio.IoBufferPool;
 
 /**
@@ -19,7 +19,7 @@ extends FsArchiveDriverTestSuite<TarDriverEntry, TarDriver> {
         return new TarDriver() {
             @Override
             public IoBufferPool getPool() {
-                return TestConfig.get().getPool();
+                return FsTestConfig.get().getPool();
             }
         };
     }

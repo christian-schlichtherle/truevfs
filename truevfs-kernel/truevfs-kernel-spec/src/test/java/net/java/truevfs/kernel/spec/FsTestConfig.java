@@ -45,23 +45,23 @@ import net.java.truecommons.shed.*;
  */
 @ThreadSafe
 @CleanupObligation
-public final class TestConfig extends Resource<IllegalStateException> {
+public final class FsTestConfig extends Resource<IllegalStateException> {
 
     public static final int DEFAULT_NUM_ENTRIES = 10;
     public static final int DEFAULT_DATA_LENGTH = 1024;
 
-    private static final InheritableThreadLocalStack<TestConfig>
+    private static final InheritableThreadLocalStack<FsTestConfig>
             configs = new InheritableThreadLocalStack<>();
 
-    private static final TestConfig GLOBAL = new TestConfig();
+    private static final FsTestConfig GLOBAL = new FsTestConfig();
 
     // I don't think this field should be volatile.
     // This would make a difference if and only if two threads were changing
     // the GLOBAL configuration concurrently, which is discouraged.
     // Instead, the global configuration should only ioBufferPool changed once at
     // application startup and then each thread should modify only its thread
-    // local configuration which has been obtained by a call to TestConfig.push().
-    private final ThrowManager throwControl;
+    // local configuration which has been obtained by a call to FsTestConfig.push().
+    private final FsThrowManager throwControl;
     private int numEmtries = DEFAULT_NUM_ENTRIES;
     private int dataSize = DEFAULT_DATA_LENGTH;
     private IoBufferPool pool;
@@ -77,7 +77,7 @@ public final class TestConfig extends Resource<IllegalStateException> {
      * @return The current configuration.
      * @see    #push()
      */
-    public static TestConfig get() {
+    public static FsTestConfig get() {
         return configs.peekOrElse(GLOBAL);
     }
 
@@ -90,8 +90,8 @@ public final class TestConfig extends Resource<IllegalStateException> {
      * @see    #ioBufferPool()
      */
     @CreatesObligation
-    public static TestConfig push() {
-        return configs.push(new TestConfig(get()));
+    public static FsTestConfig push() {
+        return configs.push(new FsTestConfig(get()));
     }
 
     /**
@@ -106,19 +106,19 @@ public final class TestConfig extends Resource<IllegalStateException> {
     }
 
     /** Default constructor for the global configuration. */
-    private TestConfig() {
-        this.throwControl = new ThrowManager();
+    private FsTestConfig() {
+        this.throwControl = new FsThrowManager();
     }
 
     /** Copy constructor for inheritable thread local configurations. */
-    private TestConfig(final TestConfig template) {
-        this.throwControl = new ThrowManager(template.getThrowControl());
+    private FsTestConfig(final FsTestConfig template) {
+        this.throwControl = new FsThrowManager(template.getThrowControl());
         this.numEmtries = template.getNumEntries();
         this.dataSize = template.getDataSize();
         this.pool = template.getPool();
     }
 
-    public ThrowManager getThrowControl() {
+    public FsThrowManager getThrowControl() {
         return this.throwControl;
     }
 

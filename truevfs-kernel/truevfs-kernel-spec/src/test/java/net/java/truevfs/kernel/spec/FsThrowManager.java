@@ -16,13 +16,13 @@ import static net.java.truecommons.shed.Throwables.wrap;
  */
 @NotThreadSafe
 @CleanupObligation
-public final class ThrowManager {
+public final class FsThrowManager {
 
     private final Map<Class<?>, Throwable> throwables;
 
     /** Default constructor. */
     @SuppressWarnings("CollectionWithoutInitialCapacity")
-    public ThrowManager() {
+    public FsThrowManager() {
         this.throwables = new HashMap<>();
     }
 
@@ -31,7 +31,7 @@ public final class ThrowManager {
      * 
      * @param template The template to copy.
      */
-    public ThrowManager(final ThrowManager template) {
+    public FsThrowManager(final FsThrowManager template) {
         this.throwables = new HashMap<>(template.throwables);
     }
 

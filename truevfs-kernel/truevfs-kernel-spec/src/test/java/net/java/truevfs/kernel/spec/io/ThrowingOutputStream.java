@@ -11,12 +11,12 @@ import java.io.OutputStream;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truevfs.kernel.spec.TestConfig;
-import net.java.truevfs.kernel.spec.ThrowManager;
+import net.java.truevfs.kernel.spec.FsTestConfig;
+import net.java.truevfs.kernel.spec.FsThrowManager;
 
 /**
  * A decorating output stream which supports throwing exceptions according to
- * {@link TestConfig}.
+ * {@link FsTestConfig}.
  * 
  * @see     ThrowingInputStream
  * @author  Christian Schlichtherle
@@ -24,7 +24,7 @@ import net.java.truevfs.kernel.spec.ThrowManager;
 @NotThreadSafe
 public final class ThrowingOutputStream extends DecoratingOutputStream {
 
-    private final ThrowManager control;
+    private final FsThrowManager control;
 
     @CreatesObligation
     public ThrowingOutputStream(@WillCloseWhenClosed OutputStream out) {
@@ -33,11 +33,11 @@ public final class ThrowingOutputStream extends DecoratingOutputStream {
 
     @CreatesObligation
     public ThrowingOutputStream(final @WillCloseWhenClosed OutputStream out,
-                                final @CheckForNull ThrowManager control) {
+                                final @CheckForNull FsThrowManager control) {
         super(out);
         this.control = null != control
                 ? control
-                : TestConfig.get().getThrowControl();
+                : FsTestConfig.get().getThrowControl();
     }
 
     private void checkAllExceptions() throws IOException {

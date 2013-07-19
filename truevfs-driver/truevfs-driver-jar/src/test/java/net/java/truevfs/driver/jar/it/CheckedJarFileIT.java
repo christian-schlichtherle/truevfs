@@ -7,7 +7,7 @@ package net.java.truevfs.driver.jar.it;
 import net.java.truevfs.access.it.TFileITSuite;
 import net.java.truevfs.comp.zipdriver.CheckedJarDriver;
 import net.java.truevfs.comp.zipdriver.JarDriver;
-import net.java.truevfs.kernel.spec.TestConfig;
+import net.java.truevfs.kernel.spec.FsTestConfig;
 import net.java.truecommons.cio.IoBufferPool;
 
 /**
@@ -25,7 +25,7 @@ public final class CheckedJarFileIT extends TFileITSuite<JarDriver> {
         return new CheckedJarDriver() {
             @Override
             public IoBufferPool getPool() {
-                return TestConfig.get().getPool();
+                return FsTestConfig.get().getPool();
             }
         };
     }
