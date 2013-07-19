@@ -21,7 +21,7 @@ import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.cio.IoBufferPool;
 
 /**
- * This I/O pool creates and deletes temporary files as {@link FileNode}s.
+ * This I/O pool creates and deletes temporary files as {@link FileBuffer}s.
  *
  * @author Christian Schlichtherle
  */
@@ -31,47 +31,54 @@ final class FileBufferPool extends IoBufferPool {
     private static final Path TEMP_DIR
             = Paths.get(System.getProperty("java.io.tmpdir"));
 
-    private static final boolean IS_POSIX = FileSystems
+    private static final FileAttribute<?>[] ATTRIBUTES = isPosix()
+            ? posixAttributes()
+            : emptyAttributes();
+
+    private static boolean isPosix() {
+        return FileSystems
             .getDefault()
             .supportedFileAttributeViews()
             .contains("posix");
-    private static final FileAttribute<Set<PosixFilePermission>>
-            POSIX_PERMISSIONS = PosixFilePermissions.asFileAttribute(
-                EnumSet.of( OWNER_READ, OWNER_WRITE,
-                            GROUP_READ, GROUP_WRITE,
-                            OTHERS_READ, OTHERS_WRITE));
-    private static final FileAttribute<?>[]
-            POSIX_ATTRIBUTES = new FileAttribute<?>[] { POSIX_PERMISSIONS };
-    private static final FileAttribute<?>[]
-            NO_ATTRIBUTES = new FileAttribute<?>[0];
+    }
 
-    private static FileAttribute<?>[] attributes() {
-        return IS_POSIX ? POSIX_ATTRIBUTES.clone() : NO_ATTRIBUTES;
+    private static FileAttribute<?>[] posixAttributes() {
+        return new FileAttribute<?>[] { posixPermissions() };
+    }
+
+    private static FileAttribute<?>[] emptyAttributes() {
+        return new FileAttribute<?>[0];
+    }
+
+    private static FileAttribute<Set<PosixFilePermission>> posixPermissions() {
+        return PosixFilePermissions.asFileAttribute(
+                EnumSet.of(OWNER_READ, OWNER_WRITE));
     }
 
     private final @Nullable Path dir;
-    private final String name;
+    private final String prefix;
 
-    /**
-     * Constructs a default instance of this pool.
-     * Use this if you don't have special requirements regarding the temp file
-     * prefix, suffix or directory.
-     */
-    FileBufferPool() {
-        this(null, null);
-    }
+    FileBufferPool() { this(null, null); }
 
     FileBufferPool(
             final @CheckForNull Path dir,
-            final @CheckForNull String name) {
+            final @CheckForNull String prefix) {
         this.dir = null != dir ? dir : TEMP_DIR;
-        // See http://java.net/jira/browse/TRUEZIP-152
-        this.name = null != name ? name + "." : "tzp";
+        this.prefix = null != prefix ? ensureEndsWithDot(prefix) : "tvfs";
+    }
+
+    private static String ensureEndsWithDot(String prefix) {
+        return prefix.endsWith(".") ? prefix : prefix + ".";
     }
 
     @Override
     public FileNode allocate() throws IOException {
-        return new FileBuffer(createTempFile(dir, name, null, attributes()),
+        // TODO: Fix https://java.net/jira/browse/TRUEVFS-107 .
+        return new FileBuffer(createTempFile(dir, prefix, null, attributes()),
                 this);
+    }
+
+    private static FileAttribute<?>[] attributes() {
+        return 0 == ATTRIBUTES.length ? ATTRIBUTES : ATTRIBUTES.clone();
     }
 }
