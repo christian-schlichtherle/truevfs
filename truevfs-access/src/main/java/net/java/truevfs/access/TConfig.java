@@ -203,7 +203,7 @@ public final class TConfig extends Resource<IllegalStateException> {
             NOT_ACCESS_PREFERENCES_MASK = ACCESS_PREFERENCES_MASK.not();
 
     private static final InheritableThreadLocalStack<TConfig>
-            stack = new InheritableThreadLocalStack<>();
+            configs = new InheritableThreadLocalStack<>();
 
     static final TConfig GLOBAL = new TConfig();
 
@@ -218,7 +218,7 @@ public final class TConfig extends Resource<IllegalStateException> {
      * @return The current configuration.
      * @see    #open()
      */
-    public static TConfig current() { return stack.peekOrElse(GLOBAL); }
+    public static TConfig current() { return configs.peekOrElse(GLOBAL); }
 
     /**
      * Creates a new current configuration by copying the current configuration
@@ -229,7 +229,7 @@ public final class TConfig extends Resource<IllegalStateException> {
      * @see    #current()
      */
     @CreatesObligation
-    public static TConfig open() { return stack.push(new TConfig(current())); }
+    public static TConfig open() { return configs.push(new TConfig(current())); }
 
     // I don't think these fields should be volatile.
     // This would make a difference if and only if two threads were changing
@@ -257,7 +257,7 @@ public final class TConfig extends Resource<IllegalStateException> {
 
     private void checkOpen() {
         if (!isOpen())
-            throw new IllegalStateException("This configuration has been close()d.");
+            throw new IllegalStateException("This configuration has already been close()d.");
     }
 
     /**
@@ -432,18 +432,19 @@ public final class TConfig extends Resource<IllegalStateException> {
     }
 
     @Override
-    protected void onClose() throws IllegalStateException { stack.popIf(this); }
+    @DischargesObligation
+    public void close() throws IllegalStateException { super.close(); }
 
     /**
-     * Pops this configuration off the inheritable
-     * thread local configuration stack.
+     * Pops this configuration off the inheritable thread local configuration
+     * stack.
      *
      * @throws IllegalStateException If this configuration is not the
      *         {@linkplain #current() current configuration}.
      */
-    @Override
-    @DischargesObligation
-    public void close() throws IllegalStateException { super.close(); }
+    @Override protected void onBeforeClose() throws IllegalStateException {
+        configs.popIf(this);
+    }
 
     @Override
     public boolean equals(Object other) {
