@@ -10,7 +10,7 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
 import net.java.truecommons.services.Factory;
-import net.java.truecommons.services.Locator;
+import net.java.truecommons.services.ServiceLocator;
 import net.java.truecommons.shed.ExtensionSet;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsArchiveDriverTestBase;
@@ -44,7 +44,7 @@ extends FsArchiveDriverTestBase<D> {
         final Factory<FsManager> f =
                 ConfiguredClientTestBase.managerFactory;
         return (null != f ? f : (ConfiguredClientTestBase.managerFactory =
-                    new Locator(FsManagerLocator.class)
+                    new ServiceLocator(FsManagerLocator.class)
                        .factory(FsManagerFactory.class, FsManagerDecorator.class))
                 ).get();
     }
