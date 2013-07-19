@@ -4,15 +4,11 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
+import edu.umd.cs.findbugs.annotations.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.cio.IoBufferPool;
-import net.java.truecommons.cio.MemoryBufferPool;
-import net.java.truecommons.shed.InheritableThreadLocalStack;
-import net.java.truecommons.shed.Resource;
+import net.java.truecommons.cio.*;
+import net.java.truecommons.shed.*;
 
 /**
  * A container for configuration options with global or inheritable thread
@@ -49,7 +45,7 @@ import net.java.truecommons.shed.Resource;
  */
 @ThreadSafe
 @CleanupObligation
-public final class TestConfig extends Resource<RuntimeException> {
+public final class TestConfig extends Resource<IllegalStateException> {
 
     public static final int DEFAULT_NUM_ENTRIES = 10;
     public static final int DEFAULT_DATA_LENGTH = 1024;
@@ -157,12 +153,16 @@ public final class TestConfig extends Resource<RuntimeException> {
 
     @Override
     @DischargesObligation
-    public void close() {
-        super.close();
-    }
+    public void close() throws IllegalStateException { super.close(); }
 
-    @Override
-    protected void onClose() {
+    /**
+     * Pops this configuration off the inheritable thread local configuration
+     * stack.
+     *
+     * @throws IllegalStateException If this configuration is not the
+     *         {@linkplain #current() current configuration}.
+     */
+    @Override protected void onBeforeClose() throws IllegalStateException {
         configs.popIf(this);
     }
 }
