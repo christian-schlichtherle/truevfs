@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.java.truecommons</groupId>
         <artifactId>truecommons-parent</artifactId>
-        <version>54</version>
+        <version>55</version>
     </parent>
 
     <groupId>net.java.truevfs</groupId>
@@ -116,6 +116,10 @@ plug-in to its federated file system space.
 
         <!-- For documentation purposes only - mind the dash! -->
         <truezip-version>7.7.2</truezip-version>
+
+        <!-- maven-surefire-plugin && maven-failsafe-plugin -->
+        <parallel>both</parallel>
+        <threadCount>10</threadCount>
     </properties>
 
     <modules>
