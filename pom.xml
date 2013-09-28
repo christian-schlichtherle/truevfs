@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.java.truecommons</groupId>
         <artifactId>truecommons-parent</artifactId>
-        <version>55</version>
+        <version>63</version>
     </parent>
 
     <groupId>net.java.truevfs</groupId>
@@ -116,10 +116,6 @@ plug-in to its federated file system space.
 
         <!-- For documentation purposes only - mind the dash! -->
         <truezip-version>7.7.2</truezip-version>
-
-        <!-- maven-surefire-plugin && maven-failsafe-plugin -->
-        <parallel>both</parallel>
-        <threadCount>10</threadCount>
     </properties>
 
     <modules>
@@ -315,11 +311,6 @@ plug-in to its federated file system space.
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.dev.jna</groupId>
-                <artifactId>jna</artifactId>
-                <version>3.5.1</version>
-            </dependency>
-            <dependency>
                 <groupId>net.java.truecommons</groupId>
                 <artifactId>truecommons-annotations</artifactId>
                 <version>${truecommons.version}</version>
@@ -452,6 +443,12 @@ plug-in to its federated file system space.
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
+                        <parallel>classesAndMethods</parallel>
+                        <!-- Consider 0% blocking factor because unit tests
+                             shouldn't do any I/O.
+                             This is per CPU core.
+                             -->
+                        <threadCount>1</threadCount>
                         <includes>
                             <include>**/*Test.class</include>
                             <include>**/*Spec.class</include>
@@ -464,7 +461,10 @@ plug-in to its federated file system space.
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <configuration>
-                        <!-- Consider 90% blocking factor for I/O. -->
+                        <parallel>classesAndMethods</parallel>
+                        <!-- Assume 90% blocking factor for I/O.
+                             This is per CPU core.
+                             -->
                         <threadCount>10</threadCount>
                         <!-- The server VM is expected to be less tolerant
                              against multithreading bugs when running the tests.
@@ -478,14 +478,14 @@ plug-in to its federated file system space.
                              -->
                         <argLine>-server -Xmx650m</argLine>
                         <systemPropertyVariables>
+                            <net.java.truecommons.shed.ControlFlowException.traceable>true</net.java.truecommons.shed.ControlFlowException.traceable>
                             <!-- While running the tests with isolated
                                  file system managers yields better performance
                                  it would also conceal any multithreading bugs
                                  in the classes under test, so it's generally
                                  discouraged. -->
-                            <net.truevfs.kernel.spec.FsManager.isolate>false</net.truevfs.kernel.spec.FsManager.isolate>
-                            <net.java.truecommons.shed.ControlFlowException.traceable>true</net.java.truecommons.shed.ControlFlowException.traceable>
-                            <net.truevfs.driver.zip.io.forceZip64Ext>false</net.truevfs.driver.zip.io.forceZip64Ext>
+                            <net.java.truevfs.kernel.spec.FsManager.isolate>false</net.java.truevfs.kernel.spec.FsManager.isolate>
+                            <net.java.truevfs.comp.zip.forceZip64Ext>false</net.java.truevfs.comp.zip.forceZip64Ext>
                             <java.io.tmpdir>${java.io.tmpdir.it}</java.io.tmpdir>
                         </systemPropertyVariables>
                     </configuration>
@@ -508,7 +508,7 @@ plug-in to its federated file system space.
         <plugins>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9</version>
+                <version>2.9.1</version>
                 <configuration>
                     <links>
                         <link>http://www.bouncycastle.org/docs/docs1.6/</link>
