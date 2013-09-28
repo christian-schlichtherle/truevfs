@@ -919,8 +919,15 @@ implements Closeable, Iterable<E> {
         pos += LFH_MIN_LEN
                 + lfh.getUShort() // file name length
                 + lfh.getUShort(); // extra field length
-        SeekableByteChannel echannel = new EntryReadOnlyChannel(
+        SeekableByteChannel echannel;
+        try {
+        echannel = new EntryReadOnlyChannel(
                 pos, entry.getCompressedSize());
+        } catch (IllegalArgumentException ex) {
+            throw (IOException) new ZipException(name +
+                    " (invalid meta data in local file header or central directory record)"
+                    ).initCause(ex);
+        }
         try {
             if (!process) {
                 assert UNKNOWN != entry.getCrc();
