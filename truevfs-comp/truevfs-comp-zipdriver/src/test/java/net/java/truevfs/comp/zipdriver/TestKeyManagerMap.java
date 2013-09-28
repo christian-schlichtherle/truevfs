@@ -5,7 +5,6 @@
 package net.java.truevfs.comp.zipdriver;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import net.java.truecommons.key.spec.AbstractKeyManagerMap;
 import net.java.truecommons.key.spec.KeyManager;
@@ -20,10 +19,11 @@ public final class TestKeyManagerMap extends AbstractKeyManagerMap {
     private final TestView<AesPbeParameters> view;
     private final Map<Class<?>, KeyManager<?>> managers;
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public TestKeyManagerMap() {
-        final Map<Class<?>, KeyManager<?>> map = new HashMap<>(2);
-        map.put(AesPbeParameters.class, new TestKeyManager<>(this.view = newView()));
-        managers = Collections.unmodifiableMap(map);
+        final Class clazz = AesPbeParameters.class;
+        final KeyManager manager = new TestKeyManager(this.view = newView());
+        managers = (Map) Collections.singletonMap(clazz, manager);
     }
 
     private static TestView<AesPbeParameters> newView() {
