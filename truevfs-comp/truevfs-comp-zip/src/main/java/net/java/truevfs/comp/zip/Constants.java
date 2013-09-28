@@ -16,7 +16,7 @@ final class Constants {
 
     /**
      * This boolean field is set by the system property
-     * {@code net.truevfs.driver.zip.io.forceZip64Ext}.
+     * {@code net.java.truevfs.comp.zip.forceZip64Ext}.
      * If this property is set to {@code true} (case is ignored),
      * then ZIP64 extensions are always added when writing a ZIP file,
      * regardless of its size.
