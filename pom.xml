@@ -14,7 +14,7 @@
 
     <groupId>net.java.truevfs</groupId>
     <artifactId>truevfs</artifactId>
-    <version>0.10.5</version>
+    <version>0.10.6-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>TrueVFS</name>
@@ -70,7 +70,7 @@ plug-in to its federated file system space.
         <connection>scm:hg:https://hg.java.net/hg/truevfs~v1</connection>
         <developerConnection>scm:hg:ssh://hg.java.net/truevfs~v1</developerConnection>
         <url>http://java.net/projects/truevfs/sources/v1/show</url>
-        <tag>truevfs-0.10.5</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
