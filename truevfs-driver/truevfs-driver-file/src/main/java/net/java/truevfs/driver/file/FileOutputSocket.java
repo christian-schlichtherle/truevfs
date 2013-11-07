@@ -9,9 +9,19 @@ import java.io.IOException;
 import java.io.OutputStream;
 import static java.lang.Boolean.TRUE;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.file.*;
-import static java.nio.file.Files.*;
+import java.nio.file.AccessMode;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import static java.nio.file.Files.createDirectories;
+import static java.nio.file.Files.createFile;
+import static java.nio.file.Files.exists;
+import static java.nio.file.Files.getFileAttributeView;
+import static java.nio.file.Files.move;
+import static java.nio.file.Files.newByteChannel;
+import java.nio.file.OpenOption;
+import java.nio.file.Path;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
 import java.util.Collections;
@@ -22,14 +32,19 @@ import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.cio.AbstractOutputSocket;
 import net.java.truecommons.cio.Entry;
-import static net.java.truecommons.cio.Entry.Access.*;
+import static net.java.truecommons.cio.Entry.Access.CREATE;
+import static net.java.truecommons.cio.Entry.Access.READ;
+import static net.java.truecommons.cio.Entry.Access.WRITE;
 import static net.java.truecommons.cio.Entry.UNKNOWN;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.IoSockets;
 import net.java.truecommons.shed.BitField;
 import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import net.java.truevfs.kernel.spec.FsAccessOption;
-import static net.java.truevfs.kernel.spec.FsAccessOption.*;
+import static net.java.truevfs.kernel.spec.FsAccessOption.APPEND;
+import static net.java.truevfs.kernel.spec.FsAccessOption.CACHE;
+import static net.java.truevfs.kernel.spec.FsAccessOption.CREATE_PARENTS;
+import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
 
 /**
  * An output socket for a file entry.
@@ -187,7 +202,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
                 if (closed) return;
                 super.close();
                 closed = true;
-                close(buffer, null == exception);
+                FileOutputSocket.this.close(buffer, null == exception);
             }
         } // Channel
 
@@ -217,7 +232,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
                 if (closed) return;
                 super.close();
                 closed = true;
-                close(buffer, null == exception);
+                FileOutputSocket.this.close(buffer, null == exception);
             }
         } // Stream
 
