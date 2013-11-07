@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.java.truecommons</groupId>
         <artifactId>truecommons-parent</artifactId>
-        <version>63</version>
+        <version>68</version>
     </parent>
 
     <groupId>net.java.truevfs</groupId>
@@ -112,10 +112,10 @@ plug-in to its federated file system space.
             &lt;b&gt;${project.name} ${project.version}&lt;/b&gt;
         </header>
 
-        <truecommons.version>2.3.2</truecommons.version>
+        <truecommons.version>2.3.3</truecommons.version>
 
         <!-- For documentation purposes only - mind the dash! -->
-        <truezip-version>7.7.2</truezip-version>
+        <truezip-version>7.7.5</truezip-version>
     </properties>
 
     <modules>
@@ -548,7 +548,7 @@ plug-in to its federated file system space.
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>clirr-maven-plugin</artifactId>
-                <version>2.5</version>
+                <version>2.6</version>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
