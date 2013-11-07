@@ -9,11 +9,7 @@ import java.nio.charset.Charset;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.shed.BitField;
-import net.java.truevfs.kernel.spec.*;
-import static net.java.truevfs.kernel.spec.FsAccessOption.CACHE;
-import static net.java.truevfs.kernel.spec.FsAccessOption.COMPRESS;
-import net.java.truecommons.cio.*;
+import net.java.truecommons.cio.Entry;
 import static net.java.truecommons.cio.Entry.ALL_POSIX_ACCESS;
 import static net.java.truecommons.cio.Entry.ALL_POSIX_ENTITIES;
 import net.java.truecommons.cio.Entry.Access;
@@ -21,11 +17,24 @@ import static net.java.truecommons.cio.Entry.Access.WRITE;
 import net.java.truecommons.cio.Entry.PosixEntity;
 import static net.java.truecommons.cio.Entry.Size.DATA;
 import net.java.truecommons.cio.Entry.Type;
+import net.java.truecommons.cio.InputService;
+import net.java.truecommons.cio.IoBufferPool;
+import net.java.truecommons.cio.OutputService;
+import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.FsAccessOption;
+import static net.java.truevfs.kernel.spec.FsAccessOption.CACHE;
+import static net.java.truevfs.kernel.spec.FsAccessOption.COMPRESS;
+import net.java.truevfs.kernel.spec.FsArchiveDriver;
+import net.java.truevfs.kernel.spec.FsController;
+import net.java.truevfs.kernel.spec.FsInputSocketSource;
+import net.java.truevfs.kernel.spec.FsModel;
+import net.java.truevfs.kernel.spec.FsNodeName;
+import net.java.truevfs.kernel.spec.FsOutputSocketSink;
+import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.archivers.tar.TarConstants;
-import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
 
 /**
  * An archive driver for Tape Archive files (TAR).
@@ -40,12 +49,6 @@ import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
  */
 @Immutable
 public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
-
-    /** Default record size */
-    static final int DEFAULT_RCDSIZE = 512;
-
-    /** Default block size */
-    static final int DEFAULT_BLKSIZE = DEFAULT_RCDSIZE * 20;
 
     /**
      * The character set for entry names and comments, which is the default

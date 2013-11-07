@@ -5,29 +5,51 @@
 package net.java.truevfs.comp.tardriver;
 
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PushbackInputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.NoSuchFileException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 import javax.annotation.CheckForNull;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.cio.AbstractInputSocket;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.Entry.Type;
+import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
+import static net.java.truecommons.cio.Entry.Type.FILE;
+import net.java.truecommons.cio.InputService;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.IoBuffer;
+import net.java.truecommons.cio.IoBufferPool;
+import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.io.Source;
 import net.java.truecommons.io.Streams;
 import net.java.truecommons.shed.ExceptionBuilder;
 import static net.java.truecommons.shed.HashMaps.OVERHEAD_SIZE;
 import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import net.java.truecommons.shed.SuppressedExceptionBuilder;
-import static net.java.truevfs.comp.tardriver.TarDriver.*;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truecommons.cio.*;
-import net.java.truecommons.cio.Entry.Type;
-import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
-import static net.java.truecommons.cio.Entry.Type.FILE;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import static org.apache.commons.compress.archivers.tar.TarConstants.*;
+import static org.apache.commons.compress.archivers.tar.TarConstants.DEFAULT_BLKSIZE;
+import static org.apache.commons.compress.archivers.tar.TarConstants.DEFAULT_RCDSIZE;
+import static org.apache.commons.compress.archivers.tar.TarConstants.GIDLEN;
+import static org.apache.commons.compress.archivers.tar.TarConstants.MODELEN;
+import static org.apache.commons.compress.archivers.tar.TarConstants.MODTIMELEN;
+import static org.apache.commons.compress.archivers.tar.TarConstants.NAMELEN;
+import static org.apache.commons.compress.archivers.tar.TarConstants.SIZELEN;
+import static org.apache.commons.compress.archivers.tar.TarConstants.UIDLEN;
 import org.apache.commons.compress.archivers.tar.TarUtils;
 
 /**
@@ -123,7 +145,7 @@ implements InputService<TarDriverEntry> {
      * for the first record only.
      * This method is required because the {@code TarArchiveInputStream}
      * unfortunately does not do any validation!
-     * 
+     *
      * @param  in the stream to read from.
      * @return A stream which holds all the data {@code in} did.
      * @throws EOFException on unexpected end-of-file.
