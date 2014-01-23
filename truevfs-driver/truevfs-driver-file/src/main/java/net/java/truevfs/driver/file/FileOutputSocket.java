@@ -16,6 +16,7 @@ import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.createFile;
 import static java.nio.file.Files.exists;
 import static java.nio.file.Files.getFileAttributeView;
+import static java.nio.file.Files.isDirectory;
 import static java.nio.file.Files.move;
 import static java.nio.file.Files.newByteChannel;
 import java.nio.file.OpenOption;
@@ -106,7 +107,19 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
         }
         if (options.get(CREATE_PARENTS) && !TRUE.equals(exists)) {
             final Path parentFile = entryFile.getParent();
-            if (null != parentFile) createDirectories(parentFile);
+            if (null != parentFile) {
+                try {
+                    createDirectories(parentFile);
+                } catch (IOException ex) {
+                    // Workaround for bug in Oracle JDK 1.7.0_51:
+                    // A call to Files.createDirectories("C:\\") will fail on
+                    // Windows although it shouldn't.
+                    // Likewise, a call to Files.createDirectories("/") will
+                    // fail on Mac OS X although it shouldn't.
+                    // On Linux, it supposedly works however.
+                    if (!isDirectory(parentFile)) throw ex;
+                }
+            }
         }
         return buffer;
     }
