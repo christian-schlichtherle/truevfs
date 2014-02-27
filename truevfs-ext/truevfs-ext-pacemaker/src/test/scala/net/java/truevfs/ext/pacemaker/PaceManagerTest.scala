@@ -16,7 +16,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest._
 import org.scalatest.junit._
-import org.scalatest.matchers._
+import org.scalatest.Matchers._
 import org.scalatest.mock.MockitoSugar.mock
 import org.scalatest.prop._
 import PaceManagerTest._
@@ -25,7 +25,6 @@ import PaceManagerTest._
 @RunWith(classOf[JUnitRunner])
 class PaceManagerTest
 extends WordSpec
-   with ShouldMatchers
    with PropertyChecks
    with OneInstancePerTest {
 
@@ -121,7 +120,7 @@ extends WordSpec
             verify(controller, atLeastOnce()) sync FsSyncOptions.NONE
           else
             verify(controller, never()) sync any()
-          verify(controller, atLeast(0)).getModel
+          verify(controller, org.mockito.Mockito.atLeast(0)).getModel
           verifyNoMoreInteractions(controller)
         }
       }

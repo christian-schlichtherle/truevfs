@@ -33,7 +33,7 @@ class TFile2Test
 
   private val config = TConfig open ()
 
-  @Before def before() {
+  @Before def setUp() {
     val manager = mock[FsManager]
     val driver = mock[FsDriver]
     val archiveDriver = mock[FsArchiveDriver[FsArchiveEntry]]
@@ -48,7 +48,7 @@ class TFile2Test
     config setArchiveDetector detector
   }
 
-  @After def after() {
+  @After def tearDown() {
     config close ()
   }
 

@@ -6,6 +6,7 @@ package net.java.truevfs.ext.pacemaker
 
 import net.java.truevfs.kernel.spec._
 import net.java.truecommons.cio._
+import net.java.truecommons.cio.Entry
 import org.junit.runner._
 import org.mockito.Matchers._
 import org.mockito.Mockito._

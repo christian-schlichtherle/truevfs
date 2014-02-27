@@ -5,11 +5,12 @@
 package net.java.truevfs.kernel.impl
 
 import java.io._
-import net.java.truecommons.cio.Entry._
 import java.nio._
+import net.java.truecommons.cio._
+import net.java.truecommons.cio.Entry
+import net.java.truecommons.cio.Entry._
 import net.java.truecommons.cio.Entry.Access._
 import net.java.truecommons.cio.Entry.Size._
-import net.java.truecommons.cio._
 import net.java.truevfs.kernel.spec.cio._
 import net.java.truevfs.kernel.impl.cio.EntryAspect._
 import org.junit.runner._
