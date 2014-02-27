@@ -5,6 +5,7 @@
 package net.java.truevfs.kernel.impl.cio
 
 import net.java.truecommons.cio._
+import net.java.truecommons.cio.Entry
 import net.java.truecommons.cio.Entry._
 import org.junit.runner._
 import org.scalatest._
@@ -23,7 +24,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
   "A path map container" should {
     "correctly persist entries" in {
       val container = newContainer
-      
+
       pending
     }
   }
