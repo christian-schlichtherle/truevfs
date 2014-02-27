@@ -13,7 +13,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
-import static java.nio.file.attribute.PosixFilePermission.*;
+import static java.nio.file.attribute.PosixFilePermission.GROUP_READ;
+import static java.nio.file.attribute.PosixFilePermission.GROUP_WRITE;
+import static java.nio.file.attribute.PosixFilePermission.OTHERS_READ;
+import static java.nio.file.attribute.PosixFilePermission.OTHERS_WRITE;
+import static java.nio.file.attribute.PosixFilePermission.OWNER_READ;
+import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.EnumSet;
 import java.util.Set;
@@ -54,7 +59,9 @@ final class FileBufferPool extends IoBufferPool {
 
     private static FileAttribute<Set<PosixFilePermission>> posixPermissions() {
         return PosixFilePermissions.asFileAttribute(
-                EnumSet.of(OWNER_READ, OWNER_WRITE));
+                EnumSet.of(OWNER_READ, OWNER_WRITE,
+                           GROUP_READ, GROUP_WRITE,
+                           OTHERS_READ, OTHERS_WRITE));
     }
 
     private final @Nullable Path dir;
