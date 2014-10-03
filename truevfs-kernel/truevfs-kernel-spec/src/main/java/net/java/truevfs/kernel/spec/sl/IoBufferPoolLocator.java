@@ -35,7 +35,7 @@ public final class IoBufferPoolLocator implements Container<IoBufferPool> {
     /** A static data utility class used for lazy initialization. */
     private static final class Lazy {
         static final IoBufferPool pool
-                = new ServiceLocator(Lazy.class)
+                = new ServiceLocator(IoBufferPoolLocator.class)
                 .factory(IoBufferPoolFactory.class, IoBufferPoolDecorator.class)
                 .get();
     }
