@@ -22,7 +22,7 @@ import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
  * {@link FsDriverMapFactory}
  * and the modifier service specification class
  * {@link FsDriverMapModifier}.
- *
+ * 
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -41,7 +41,7 @@ implements Container<Map<FsScheme, FsDriver>> {
     private static final class Lazy {
         static final Map<FsScheme, FsDriver> drivers
                 = Collections.unmodifiableMap(
-                    new ServiceLocator(Lazy.class)
+                    new ServiceLocator(FsDriverMapLocator.class)
                     .factory(FsDriverMapFactory.class, FsDriverMapModifier.class)
                     .get());
     }
