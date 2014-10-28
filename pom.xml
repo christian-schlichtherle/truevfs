@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.java.truecommons</groupId>
         <artifactId>truecommons-parent</artifactId>
-        <version>79</version>
+        <version>82</version>
     </parent>
 
     <groupId>net.java.truevfs</groupId>
@@ -508,7 +508,7 @@ plug-in to its federated file system space.
         <plugins>
             <plugin>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
+                <version>2.10.1</version>
                 <configuration>
                     <links>
                         <link>http://www.bouncycastle.org/docs/docs1.6/</link>
