@@ -4,17 +4,16 @@
  */
 package net.java.truevfs.kernel.impl
 
-import collection.mutable.WeakHashMap
-import collection.JavaConverters._
-import net.java.truecommons.io.Loan._
-import net.java.truecommons.shed._
-import net.java.truecommons.shed.Link.Type._
-import net.java.truevfs.kernel.spec._
 import java.io._
 import java.util.concurrent.locks._
 import javax.annotation.concurrent._
+
+import net.java.truecommons.shed.Link.Type._
+import net.java.truecommons.shed._
+import net.java.truevfs.kernel.impl.DefaultManager._
+import net.java.truevfs.kernel.spec._
+
 import scala.Option
-import DefaultManager._
 
 @ThreadSafe
 private object DefaultManager {
@@ -60,7 +59,7 @@ private object DefaultManager {
   */
 @ThreadSafe
 private final class DefaultManager
-extends FsAbstractManager with ReentrantReadWriteLockAspect {
+extends FsAbstractManager with ReentrantReadWriteLockAspect { manager =>
 
   override val lock = new ReentrantReadWriteLock
 
@@ -69,7 +68,7 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
    * keyed by the mount point of their respective file system model.
    */
   private[this] val controllers =
-    new WeakHashMap[FsMountPoint, Link[FsController]]
+    new collection.mutable.WeakHashMap[FsMountPoint, Link[FsController]]
 
   override def newModel
   (context: FsDriver, mountPoint: FsMountPoint, parent: FsModel): FsModel =
@@ -106,7 +105,7 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
     controllers get mountPoint flatMap (l => Option(l.get)) match {
       case Some(c) => c
       case None =>
-        checkWriteLockedByCurrentThread
+        checkWriteLockedByCurrentThread()
         val pc = Option(mountPoint.getParent) map (controller0(driver, _))
         val pm = pc map (_.getModel)
         val m = new ManagedModel(driver newModel (this, mountPoint, pm.orNull))
@@ -115,44 +114,6 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
         c
     }
   }
-
-  /**
-   * A model which schedules its controller for
-   * {@linkplain #sync(BitField) synchronization} by &quot;observing&quot; its
-   * property {@code mounted}.
-   */
-  private final class ManagedModel(model: FsModel)
-  extends FsDecoratingModel(model) {
-
-    private[this] var _controller: FsController = _
-
-    def init(controller: FsController) {
-      assert(null ne controller)
-      assert(!model.isMounted)
-      _controller = controller
-      schedule(false)
-    }
-
-    /**
-     * Schedules the file system controller for synchronization according
-     * to the given mount status.
-     */
-    override def setMounted(mounted: Boolean) {
-      writeLocked {
-        if (model.isMounted != mounted) {
-          if (mounted) SyncShutdownHook register DefaultManager.this
-          schedule(mounted)
-          model.setMounted(mounted)
-        }
-      }
-    }
-
-    def schedule(mandatory: Boolean) {
-      assert(writeLockedByCurrentThread)
-      controllers += getMountPoint ->
-        ((if (mandatory) STRONG else WEAK) newLink _controller)
-    }
-  } // ManagedModel
 
   override def sync(
     filter: ControllerFilter,
@@ -167,9 +128,45 @@ extends FsAbstractManager with ReentrantReadWriteLockAspect {
     visitor: ControllerVisitor[X]
   ) {
     readLocked(controllers.values flatMap (l => Option(l.get)))
-    .filter (filter accept _)
+    .filter(filter accept _)
     .toIndexedSeq
-    .sorted (ReverseControllerOrdering)
-    .foreach (visitor visit _)
+    .sorted(ReverseControllerOrdering)
+    .foreach(visitor visit _)
   }
+
+  /** A model which schedules its controller for synchronization by observing
+    * its property `mounted` - see method `sync(BitField)`.
+    */
+  private final class ManagedModel(model: FsModel)
+    extends FsDecoratingModel(model) {
+
+    private[this] var _controller: FsController = _
+
+    def init(controller: FsController) {
+      assert(null ne controller)
+      assert(!model.isMounted)
+      _controller = controller
+      schedule(mandatory = false)
+    }
+
+    /**
+     * Schedules the file system controller for synchronization according
+     * to the given mount status.
+     */
+    override def setMounted(mounted: Boolean) {
+      writeLocked {
+        if (model.isMounted != mounted) {
+          if (mounted) SyncShutdownHook register manager
+          schedule(mandatory = mounted)
+          model.setMounted(mounted)
+        }
+      }
+    }
+
+    def schedule(mandatory: Boolean) {
+      assert(writeLockedByCurrentThread)
+      controllers += getMountPoint ->
+        ((if (mandatory) STRONG else WEAK) newLink _controller)
+    }
+  } // ManagedModel
 }
