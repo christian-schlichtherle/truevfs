@@ -4,24 +4,27 @@
  */
 package net.java.truevfs.kernel.impl
 
-import net.java.truecommons.shed._
-import net.java.truecommons.shed.HashMaps._
-import net.java.truecommons.shed.Paths._
+import java.io.IOException
 import java.net._
 import java.nio.file._
 import java.util.Locale
 import javax.annotation.concurrent._
-import net.java.truevfs.kernel.spec._
+
+import net.java.truecommons.cio.Entry.Access._
+import net.java.truecommons.cio.Entry.Type._
+import net.java.truecommons.cio.Entry._
+import net.java.truecommons.cio._
+import net.java.truecommons.shed.HashMaps._
+import net.java.truecommons.shed.Paths._
+import net.java.truecommons.shed._
+import net.java.truevfs.kernel.impl.ArchiveFileSystem._
 import net.java.truevfs.kernel.spec.FsAccessOption._
 import net.java.truevfs.kernel.spec.FsAccessOptions._
 import net.java.truevfs.kernel.spec.FsNodeName._
-import net.java.truecommons.cio._
-import net.java.truecommons.cio.Entry._
-import net.java.truecommons.cio.Entry.Access._
-import net.java.truecommons.cio.Entry.Type._
-import scala.annotation._
+import net.java.truevfs.kernel.spec._
+
 import scala.Option
-import ArchiveFileSystem._
+import scala.annotation._
 
 /** A read/write virtual file system for archive entries.
   *
@@ -409,7 +412,7 @@ private object ArchiveFileSystem {
     * The file system is modifiable and marked as touched!
     *
     * @tparam E The type of the archive entries.
-    * @param  driver the archive driver to use.
+    * @param  model the archive model to use.
     * @return A new archive file system.
     */
   def apply[E <: FsArchiveEntry](model: ArchiveModel[E]) =
@@ -432,19 +435,22 @@ private object ArchiveFileSystem {
     * `archive`.
     *
     * @tparam E The type of the archive entries.
-    * @param  driver the archive driver to use.
+    * @param  model the archive model to use.
     * @param  archive The archive entry container to read the entries for
     *         the population of the archive file system.
     * @param  rootTemplate The optional template to use for the root entry of
     *         the returned archive file system.
-    * @param  readOnly If and only if `true`, any subsequent
+    * @param  readOnly If not empty, any subsequent
     *         modifying operation on the file system will result in a
-    *         [[net.java.truevfs.kernel.impl.FsReadOnlyFileSystemException]].
-    *@return A new archive file system.
+    *         [[net.java.truevfs.kernel.spec.FsReadOnlyFileSystemException]]
+    *         with the contained [[java.lang.Throwable]] as its cause.
+    * @return A new archive file system.
     */
-  def apply[E <: FsArchiveEntry](model: ArchiveModel[E], archive: Container[E], rootTemplate: Option[Entry], readOnly: Boolean) = {
-    if (readOnly) new ReadOnlyArchiveFileSystem(model, archive, rootTemplate)
-    else new ArchiveFileSystem(model, archive, rootTemplate)
+  def apply[E <: FsArchiveEntry](model: ArchiveModel[E], archive: Container[E], rootTemplate: Option[Entry], readOnly: Option[Throwable]) = {
+    readOnly match {
+      case Some(cause) => new ReadOnlyArchiveFileSystem(model, archive, rootTemplate, cause)
+      case None => new ArchiveFileSystem(model, archive, rootTemplate)
+    }
   }
 
   private def typeName(entry: FsCovariantNode[_ <: Entry]): String = {

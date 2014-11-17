@@ -5,24 +5,24 @@
 package net.java.truevfs.kernel.impl
 
 import java.io._
-import java.nio.channels._
 import java.nio.file._
-import java.util.concurrent.locks._
 import javax.annotation.concurrent._
-import net.java.truecommons.cio._
-import net.java.truecommons.cio.Entry._
+
 import net.java.truecommons.cio.Entry.Access._
 import net.java.truecommons.cio.Entry.Size._
 import net.java.truecommons.cio.Entry.Type._
+import net.java.truecommons.cio.Entry._
+import net.java.truecommons.cio._
 import net.java.truecommons.io._
 import net.java.truecommons.shed._
-import net.java.truevfs.kernel.spec._
+import net.java.truevfs.kernel.impl.TargetArchiveController._
 import net.java.truevfs.kernel.spec.FsAccessOption._
 import net.java.truevfs.kernel.spec.FsAccessOptions._
 import net.java.truevfs.kernel.spec.FsSyncOption._
-import scala.reflect.ClassTag
+import net.java.truevfs.kernel.spec._
+
 import scala.Option
-import TargetArchiveController._
+import scala.reflect.ClassTag
 
 /** Manages I/O to the entry which represents the target archive file in its
   * parent file system, detects archive entry collisions and implements a sync
@@ -144,10 +144,10 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
         // ro must be init first because the parent archive
         // controller could be a FileController and on Windows this
         // property changes to TRUE once a file is opened for reading!
-        val ro = isReadOnlyTarget()
+        val ro = optionalReadOnlyCause()
         val is = {
           try {
-            driver newInput (model, MOUNT_OPTIONS, parent, name);
+            driver newInput (model, MOUNT_OPTIONS, parent, name)
           } catch {
             case ex: FalsePositiveArchiveException =>
               throw new AssertionError(ex)
@@ -167,15 +167,13 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
     fileSystem = Some(fs)
   }
 
-  private def isReadOnlyTarget() = {
+  private def optionalReadOnlyCause() = {
     try {
       parent checkAccess (MOUNT_OPTIONS, name, WRITE_ACCESS);
-      false
+      None
     } catch {
-      case ex: FalsePositiveArchiveException =>
-        throw new AssertionError(ex)
-      case ex: IOException =>
-        true
+      case cause: FalsePositiveArchiveException => throw new AssertionError(cause)
+      case cause: IOException => Some(cause)
     }
   }
 
