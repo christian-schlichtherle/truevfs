@@ -71,16 +71,43 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     }
 
     /**
+     * Returns {@code true} if writing PAX headers for non US-ASCII entry names
+     * should be supported or not.
+     * As of TrueVFS 0.10.7, the implementation in {@link TarDriver} returns
+     * {@code true}.
+     * In older versions, the behaviour was as if this method returned
+     * {@code false}.
+     *
+     * @since TrueVFS 0.10.7
+     */
+    public boolean getAddPaxHeaderForNonAsciiNames() {
+        return true;
+    }
+
+    /**
      * Returns the method to use for encoding entry names with
      * {@link TarConstants#NAMELEN} or more characters.
-     * The implementation in {@link TarDriver} returns
+     * As of TrueVFS 0.10.7, the implementation in {@link TarDriver} returns
+     * {@link TarArchiveOutputStream#LONGFILE_POSIX}.
+     * In older versions, the implementation returned
      * {@link TarArchiveOutputStream#LONGFILE_GNU}.
-     *
-     * @return The method to use for encoding entry names with
-     *         {@link TarConstants#NAMELEN} or more characters.
      */
     public int getLongFileMode() {
-        return TarArchiveOutputStream.LONGFILE_GNU;
+        return TarArchiveOutputStream.LONGFILE_POSIX;
+    }
+
+    /**
+     * Returns the method to use for writing entries of more than
+     * {@link TarConstants#MAXSIZE} (8 GiB) size.
+     * As of TrueVFS 0.10.7, the implementation in {@link TarDriver} returns
+     * {@link TarArchiveOutputStream#BIGNUMBER_POSIX}.
+     * In older versions, the behaviour was as if this method returned
+     * {@link TarArchiveOutputStream#BIGNUMBER_ERROR}.
+     *
+     * @since TrueVFS 0.10.7
+     */
+    public int getBigNumberMode() {
+        return TarArchiveOutputStream.BIGNUMBER_POSIX;
     }
 
     /**

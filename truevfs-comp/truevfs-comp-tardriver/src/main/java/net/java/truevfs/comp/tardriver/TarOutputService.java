@@ -83,7 +83,9 @@ implements OutputService<TarDriverEntry> {
             final TarArchiveOutputStream
                     taos = this.taos = new TarArchiveOutputStream(out,
                         DEFAULT_BLKSIZE, DEFAULT_RCDSIZE, driver.getEncoding());
+            taos.setAddPaxHeadersForNonAsciiNames(driver.getAddPaxHeaderForNonAsciiNames());
             taos.setLongFileMode(driver.getLongFileMode());
+            taos.setBigNumberMode(driver.getBigNumberMode());
         } catch (final Throwable ex) {
             try {
                 out.close();
