@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.kernel.impl
 
-import java.io.IOException
+import java.io.{CharConversionException, IOException}
 import java.net._
 import java.nio.file._
 import java.util.Locale
@@ -52,8 +52,8 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     touched = true
   }
 
-  def this(model: ArchiveModel[E], archive: Container[E], rootTemplate: Option[Entry]) {
-    // Allocate some extra capacity to create missing parent directories.
+  def this(model: ArchiveModel[E], archive: Container[E], rootTemplate: Entry) {
+    // Allocate some extra capacity for creating missing parent directories.
     this(model, new EntryTable(archive.size + OVERHEAD_SIZE))
     // Load entries from source archive.
     var paths = List[String]()
@@ -70,7 +70,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     }
     // Setup root file system entry, potentially replacing its previous
     // mapping from the source archive.
-    master.add(RootPath, newEntry(RootPath, DIRECTORY, rootTemplate))
+    master.add(RootPath, newEntry(RootPath, DIRECTORY, Some(rootTemplate)))
     // Now perform a file system check to create missing parent directories
     // and populate directories with their members - this must be done
     // separately!
@@ -99,7 +99,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
       val pp = splitter.getParentPath
       val mn = splitter.getMemberName
       val pcn = master.get(pp) match {
-        case Some(pcn) if pcn.isType(DIRECTORY) => pcn
+        case Some(x) if x.isType(DIRECTORY) => x
         case _ => master.add(pp, newEntry(pp, DIRECTORY, None))
       }
       pcn.add(mn)
@@ -140,7 +140,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
 
   def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]) = {
     val cn = master.get(name.getPath) match {
-      case Some(cn) => cn
+      case Some(x) => x
       case _ => throw new NoSuchFileException(fullPath(name))
     }
     // HC SVNT DRACONES!
@@ -446,7 +446,7 @@ private object ArchiveFileSystem {
     *         with the contained [[java.lang.Throwable]] as its cause.
     * @return A new archive file system.
     */
-  def apply[E <: FsArchiveEntry](model: ArchiveModel[E], archive: Container[E], rootTemplate: Option[Entry], readOnly: Option[Throwable]) = {
+  def apply[E <: FsArchiveEntry](model: ArchiveModel[E], archive: Container[E], rootTemplate: Entry, readOnly: Option[Throwable]) = {
     readOnly match {
       case Some(cause) => new ReadOnlyArchiveFileSystem(model, archive, rootTemplate, cause)
       case None => new ArchiveFileSystem(model, archive, rootTemplate)
@@ -486,7 +486,7 @@ private object ArchiveFileSystem {
 
     def add(name: String, ae: E) = {
       val cn = map.get(name) match {
-        case Some(cn) => cn
+        case Some(x) => x
         case _ =>
           val cn = new FsCovariantNode[E](name)
           map.put(name, cn)

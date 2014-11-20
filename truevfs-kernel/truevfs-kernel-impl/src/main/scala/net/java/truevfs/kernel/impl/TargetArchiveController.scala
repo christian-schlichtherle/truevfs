@@ -156,7 +156,7 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
               throw new PersistentFalsePositiveArchiveException(ex)
           }
         }
-        val fs = ArchiveFileSystem(model, is, Option(pn), ro)
+        val fs = ArchiveFileSystem(model, is, pn, ro)
         inputArchive = Some(new InputArchive(is))
         assert(mounted)
         fs
