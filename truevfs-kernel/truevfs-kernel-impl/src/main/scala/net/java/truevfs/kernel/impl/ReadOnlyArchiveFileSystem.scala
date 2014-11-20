@@ -26,7 +26,7 @@ import scala.Option
 private final class ReadOnlyArchiveFileSystem[E <: FsArchiveEntry](
   model: ArchiveModel[E],
   archive: Container[E],
-  rootTemplate: Option[Entry],
+  rootTemplate: Entry,
   cause: Throwable)
 extends ArchiveFileSystem(model, archive, rootTemplate) {
   import ReadOnlyArchiveFileSystem._

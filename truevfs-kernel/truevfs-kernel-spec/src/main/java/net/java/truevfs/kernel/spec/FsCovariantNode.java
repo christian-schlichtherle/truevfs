@@ -138,7 +138,7 @@ extends FsAbstractNode implements Cloneable {
      *
      * @return the archive entry mapped for the {@link #getKey() key} property.
      */
-    public @Nullable E getEntry() { return map.get(this.key); }
+    public @Nullable E getEntry() { return map.get(key); }
 
     /**
      * A collection of the mapped entries.
