@@ -64,9 +64,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
           ae.getName.replace('\\', SEPARATOR_CHAR)), // fix illegal Windoze file name separators
         SEPARATOR_CHAR)
       master.add(path, ae)
-      if (!path.startsWith(SEPARATOR)
-          && !(".." + SEPARATOR).startsWith(path.substring(0, math.min(3, path.length))))
-            paths ::= path
+      if (isValidEntryName(path)) paths ::= path
     }
     // Setup root file system entry, potentially replacing its previous
     // mapping from the source archive.
@@ -460,6 +458,11 @@ private object ArchiveFileSystem {
   }
 
   private def typeName(tµpe: Type) = tµpe.toString.toLowerCase(Locale.ROOT)
+
+  private def isValidEntryName(path: String) = {
+    !isAbsolute(path, SEPARATOR_CHAR) &&
+      !(".." + SEPARATOR).startsWith(path.substring(0, math.min(3, path.length)))
+  }
 
   /** The master archive entry table.
     *
