@@ -197,7 +197,7 @@ implements Closeable, Iterable<E> {
             final SeekableByteChannel channel,
             final boolean postambled)
     throws IOException {
-        // Search for End of central directory record.
+        // Search for End Of Central Directory Record.
         final MutableBuffer eocdr = MutableBuffer
                 .allocate(EOCDR_MIN_LEN)
                 .littleEndian();
@@ -207,114 +207,119 @@ implements Closeable, Iterable<E> {
             eocdr.rewind().limit(4).load(channel.position(eocdrPos));
             // end of central dir signature    4 bytes  (0x06054b50)
             if (EOCDR_SIG != eocdr.getUInt()) continue;
+            try {
+                // Process End Of Central Directory Record.
+                eocdr.limit(EOCDR_MIN_LEN).load(channel);
+                // number of this disk             2 bytes
+                long diskNo = eocdr.getUShort();
+                // number of the disk with the
+                // start of the central directory  2 bytes
+                long cdDiskNo = eocdr.getUShort();
+                // total number of entries in the
+                // central directory on this disk  2 bytes
+                long cdEntriesDisk = eocdr.getUShort();
+                // total number of entries in
+                // the central directory           2 bytes
+                long cdEntries = eocdr.getUShort();
+                if (0 != diskNo || 0 != cdDiskNo || cdEntriesDisk != cdEntries)
+                    throw new ZipException(
+                            "ZIP file spanning/splitting is not supported!");
+                // size of the central directory   4 bytes
+                long cdSize = eocdr.getUInt();
+                // offset of start of central
+                // directory with respect to
+                // the starting disk number        4 bytes
+                long cdPos = eocdr.getUInt();
+                // .ZIP file comment length        2 bytes
+                int commentLen = eocdr.getUShort();
+                // .ZIP file comment       (variable size)
+                if (0 < commentLen)
+                    comment = MutableBuffer
+                            .allocate(commentLen)
+                            .load(channel)
+                            .array();
+                preamble = eocdrPos;
+                postamble = length - channel.position();
 
-            // Process End Of Central Directory Record.
-            eocdr.limit(EOCDR_MIN_LEN).load(channel);
-            // number of this disk             2 bytes
-            long diskNo = eocdr.getUShort();
-            // number of the disk with the
-            // start of the central directory  2 bytes
-            long cdDiskNo = eocdr.getUShort();
-            // total number of entries in the
-            // central directory on this disk  2 bytes
-            long cdEntriesDisk = eocdr.getUShort();
-            // total number of entries in
-            // the central directory           2 bytes
-            long cdEntries = eocdr.getUShort();
-            if (0 != diskNo || 0 != cdDiskNo || cdEntriesDisk != cdEntries)
-                throw new ZipException(
-                        "ZIP file spanning/splitting is not supported!");
-            // size of the central directory   4 bytes
-            long cdSize = eocdr.getUInt();
-            // offset of start of central
-            // directory with respect to
-            // the starting disk number        4 bytes
-            long cdPos = eocdr.getUInt();
-            // .ZIP file comment length        2 bytes
-            int commentLen = eocdr.getUShort();
-            // .ZIP file comment       (variable size)
-            if (0 < commentLen)
-                comment = MutableBuffer
-                        .allocate(commentLen)
-                        .load(channel)
-                        .array();
-            preamble = eocdrPos;
-            postamble = length - channel.position();
+                // Check for ZIP64 End Of Central Directory Locator.
+                final long eocdlPos = eocdrPos - ZIP64_EOCDL_LEN;
+                final MutableBuffer zip64eocdl = MutableBuffer
+                    .allocate(ZIP64_EOCDL_LEN)
+                    .littleEndian();
+                // zip64 end of central dir locator
+                // signature                       4 bytes  (0x07064b50)
+                if (0 > eocdlPos || ZIP64_EOCDL_SIG != zip64eocdl
+                        .load(channel.position(eocdlPos))
+                        .getUInt()) {
+                    // Seek and check first CFH, probably requiring an offset mapper.
+                    long offset = eocdrPos - cdSize;
+                    channel.position(offset);
+                    offset -= cdPos;
+                    if (0 != offset) mapper = new OffsetPositionMapper(offset);
+                    return (int) cdEntries;
+                }
 
-            // Check for ZIP64 End Of Central Directory Locator.
-            final long eocdlPos = eocdrPos - ZIP64_EOCDL_LEN;
-            final MutableBuffer zip64eocdl = MutableBuffer
-                .allocate(ZIP64_EOCDL_LEN)
-                .littleEndian();
-            // zip64 end of central dir locator
-            // signature                       4 bytes  (0x07064b50)
-            if (0 > eocdlPos || ZIP64_EOCDL_SIG != zip64eocdl
-                    .load(channel.position(eocdlPos))
-                    .getUInt()) {
-                // Seek and check first CFH, probably requiring an offset mapper.
-                long offset = eocdrPos - cdSize;
-                channel.position(offset);
-                offset -= cdPos;
-                if (0 != offset) mapper = new OffsetPositionMapper(offset);
+                // number of the disk with the
+                // start of the zip64 end of
+                // central directory               4 bytes
+                final long zip64eocdrDisk = zip64eocdl.getUInt();
+                // relative offset of the zip64
+                // end of central directory record 8 bytes
+                final long zip64eocdrPos = zip64eocdl.getLong();
+                // total number of disks           4 bytes
+                final long totalDisks = zip64eocdl.getUInt();
+                if (0 != zip64eocdrDisk || 1 != totalDisks)
+                    throw new ZipException(
+                            "ZIP file spanning/splitting is not supported!");
+
+                // Read Zip64 End Of Central Directory Record.
+                final MutableBuffer zip64eocdr = MutableBuffer
+                        .allocate(ZIP64_EOCDR_MIN_LEN)
+                        .littleEndian()
+                        .load(channel.position(zip64eocdrPos));
+                // zip64 end of central dir
+                // signature                       4 bytes  (0x06064b50)
+                if (ZIP64_EOCDR_SIG != zip64eocdr.getUInt())
+                    throw new ZipException(
+                            "Expected ZIP64 end of central directory record!");
+                // size of zip64 end of central
+                // directory record                8 bytes
+                // version made by                 2 bytes
+                // version needed to extract       2 bytes
+                zip64eocdr.skip(8 + 2 + 2);
+                // number of this disk             4 bytes
+                diskNo = zip64eocdr.getUInt();
+                // number of the disk with the
+                // start of the central directory  4 bytes
+                cdDiskNo = zip64eocdr.getUInt();
+                // total number of entries in the
+                // central directory on this disk  8 bytes
+                cdEntriesDisk = zip64eocdr.getLong();
+                // total number of entries in the
+                // central directory               8 bytes
+                cdEntries = zip64eocdr.getLong();
+                if (0 != diskNo || 0 != cdDiskNo || cdEntriesDisk != cdEntries)
+                    throw new ZipException(
+                            "ZIP file spanning/splitting is not supported!");
+                if (cdEntries < 0 || Integer.MAX_VALUE < cdEntries)
+                    throw new ZipException(
+                            "Total number of entries in the central directory out of range!");
+                // size of the central directory   8 bytes
+                //cdSize = zip64eocdr.getLong();
+                zip64eocdr.skip(8);
+                // offset of start of central
+                // directory with respect to
+                // the starting disk number        8 bytes
+                cdPos = zip64eocdr.getLong();
+                // zip64 extensible data sector    (variable size)
+                channel.position(cdPos);
+                preamble = zip64eocdrPos;
                 return (int) cdEntries;
+            } catch (RuntimeException e) {
+                throw (ZipException) new ZipException(
+                        "Invalid (ZIP64) End Of Central Directory Record")
+                        .initCause(e);
             }
-
-            // number of the disk with the
-            // start of the zip64 end of
-            // central directory               4 bytes
-            final long zip64eocdrDisk = zip64eocdl.getUInt();
-            // relative offset of the zip64
-            // end of central directory record 8 bytes
-            final long zip64eocdrPos = zip64eocdl.getLong();
-            // total number of disks           4 bytes
-            final long totalDisks = zip64eocdl.getUInt();
-            if (0 != zip64eocdrDisk || 1 != totalDisks)
-                throw new ZipException(
-                        "ZIP file spanning/splitting is not supported!");
-
-            // Read Zip64 End Of Central Directory Record.
-            final MutableBuffer zip64eocdr = MutableBuffer
-                    .allocate(ZIP64_EOCDR_MIN_LEN)
-                    .littleEndian()
-                    .load(channel.position(zip64eocdrPos));
-            // zip64 end of central dir
-            // signature                       4 bytes  (0x06064b50)
-            if (ZIP64_EOCDR_SIG != zip64eocdr.getUInt())
-                throw new ZipException(
-                        "Expected ZIP64 end of central directory record!");
-            // size of zip64 end of central
-            // directory record                8 bytes
-            // version made by                 2 bytes
-            // version needed to extract       2 bytes
-            zip64eocdr.skip(8 + 2 + 2);
-            // number of this disk             4 bytes
-            diskNo = zip64eocdr.getUInt();
-            // number of the disk with the
-            // start of the central directory  4 bytes
-            cdDiskNo = zip64eocdr.getUInt();
-            // total number of entries in the
-            // central directory on this disk  8 bytes
-            cdEntriesDisk = zip64eocdr.getLong();
-            // total number of entries in the
-            // central directory               8 bytes
-            cdEntries = zip64eocdr.getLong();
-            if (0 != diskNo || 0 != cdDiskNo || cdEntriesDisk != cdEntries)
-                throw new ZipException(
-                        "ZIP file spanning/splitting is not supported!");
-            if (cdEntries < 0 || Integer.MAX_VALUE < cdEntries)
-                throw new ZipException(
-                        "Total number of entries in the central directory out of range!");
-            // size of the central directory   8 bytes
-            //cdSize = zip64eocdr.getLong();
-            zip64eocdr.skip(8);
-            // offset of start of central
-            // directory with respect to
-            // the starting disk number        8 bytes
-            cdPos = zip64eocdr.getLong();
-            // zip64 extensible data sector    (variable size)
-            channel.position(cdPos);
-            preamble = zip64eocdrPos;
-            return (int) cdEntries;
         }
 
         // Start recovering file entries from min.
@@ -421,9 +426,10 @@ implements Closeable, Iterable<E> {
                 // offset and conditionally update the preamble size from it.
                 lfhOff = mapper.map(entry.getOffset());
                 if (lfhOff < preamble) preamble = lfhOff;
-            } catch (final IllegalArgumentException e) {
-                throw (ZipException) new ZipException(entry.getName()
-                        + " (invalid Central File Header)").initCause(e);
+            } catch (RuntimeException e) {
+                throw (ZipException) new ZipException(
+                        entry.getName() + " (invalid Central File Header)")
+                        .initCause(e);
             }
 
             // Map the entry using the name that has been determined
@@ -660,9 +666,10 @@ implements Closeable, Iterable<E> {
                         throw new ZipException(entry.getName()
                                 + " (truncated entry data)");
                 }
-            } catch (final IllegalArgumentException e) {
-                throw (ZipException) new ZipException(entry.getName()
-                        + " (invalid Local File Header or Data Descriptor)").initCause(e);
+            } catch (RuntimeException e) {
+                throw (ZipException) new ZipException(
+                        entry.getName() + " (invalid Local File Header or Data Descriptor)")
+                        .initCause(e);
             }
 
             // Entry is almost recovered. Update the postamble length.
@@ -919,10 +926,10 @@ implements Closeable, Iterable<E> {
         try {
             echannel = new EntryReadOnlyChannel(
                     pos, entry.getCompressedSize());
-        } catch (IllegalArgumentException e) {
-            throw (IOException) new ZipException(name +
-                    " (invalid Local File Header, Data Descriptor or Central File Header)"
-                    ).initCause(e);
+        } catch (RuntimeException e) {
+            throw (ZipException) new ZipException(
+                    name + " (invalid Local File Header, Data Descriptor or Central File Header)")
+                    .initCause(e);
         }
         try {
             if (!process) {
