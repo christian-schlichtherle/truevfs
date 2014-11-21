@@ -151,13 +151,13 @@ implements Closeable, Iterable<E> {
             assert null != entries;
             assert null != mapper;
             // Do NOT close bchannel - would close channel as well!
-        } catch (final Throwable ex) {
+        } catch (final Throwable e1) {
             try {
                 channel.close();
-            } catch (final Throwable ex2) {
-                ex.addSuppressed(ex2);
+            } catch (final Throwable e2) {
+                e1.addSuppressed(e2);
             }
-            throw ex;
+            throw e1;
         }
     }
 
@@ -425,9 +425,9 @@ implements Closeable, Iterable<E> {
                 // offset and conditionally update the preamble size from it.
                 lfhOff = mapper.map(entry.getOffset());
                 if (lfhOff < preamble) preamble = lfhOff;
-            } catch (final IllegalArgumentException cause) {
+            } catch (final IllegalArgumentException e) {
                 throw (ZipException) new ZipException(entry.getName()
-                        + " (invalid meta data)").initCause(cause);
+                        + " (invalid meta data)").initCause(e);
             }
 
             // Map the entry using the name that has been determined
@@ -580,13 +580,13 @@ implements Closeable, Iterable<E> {
                                     new ChannelInputStream(echannel));
                             try {
                                 in = new BZip2CompressorInputStream(din);
-                            } catch (final Throwable ex) {
+                            } catch (final Throwable e1) {
                                 try {
                                     din.close();
-                                } catch (final Throwable ex2) {
-                                    ex.addSuppressed(ex2);
+                                } catch (final Throwable e2) {
+                                    e1.addSuppressed(e2);
                                 }
-                                throw ex;
+                                throw e1;
                             }
                             break;
                         default:
@@ -664,9 +664,9 @@ implements Closeable, Iterable<E> {
                         throw new ZipException(entry.getName()
                                 + " (truncated entry data)");
                 }
-            } catch (final IllegalArgumentException ex) {
+            } catch (final IllegalArgumentException e) {
                 throw (ZipException) new ZipException(entry.getName()
-                        + " (invalid meta data)").initCause(ex);
+                        + " (invalid meta data)").initCause(e);
             }
 
             // Entry is almost recovered. Update the postamble length.
@@ -923,10 +923,10 @@ implements Closeable, Iterable<E> {
         try {
         echannel = new EntryReadOnlyChannel(
                 pos, entry.getCompressedSize());
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException e) {
             throw (IOException) new ZipException(name +
                     " (invalid meta data in local file header or central directory record)"
-                    ).initCause(ex);
+                    ).initCause(e);
         }
         try {
             if (!process) {
@@ -1003,13 +1003,13 @@ implements Closeable, Iterable<E> {
             }
             if (check) in = new Crc32InputStream(in, bufSize, entry);
             return in;
-        } catch (final Throwable ex) {
+        } catch (final Throwable e1) {
             try {
                 echannel.close();
-            } catch (final Throwable ex2) {
-                ex.addSuppressed(ex2);
+            } catch (final Throwable e2) {
+                e1.addSuppressed(e2);
             }
-            throw ex;
+            throw e1;
         }
     }
 
