@@ -7,6 +7,15 @@ package net.java.truevfs.comp.zip;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
+import net.java.truecommons.io.*;
+import net.java.truecommons.shed.HashMaps;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.WillNotClose;
+import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
@@ -18,26 +27,13 @@ import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
 import java.util.zip.Inflater;
 import java.util.zip.ZipException;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truecommons.io.BufferedReadOnlyChannel;
-import net.java.truecommons.io.ChannelInputStream;
-import net.java.truecommons.io.IntervalReadOnlyChannel;
-import net.java.truecommons.io.MutableBuffer;
-import net.java.truecommons.io.PowerBuffer;
-import net.java.truecommons.io.ReadOnlyChannel;
-import net.java.truecommons.io.Source;
-import net.java.truecommons.shed.HashMaps;
+
 import static net.java.truevfs.comp.zip.Constants.*;
 import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
 import static net.java.truevfs.comp.zip.WinZipAesExtraField.VV_AE_2;
 import static net.java.truevfs.comp.zip.WinZipAesUtils.overhead;
 import static net.java.truevfs.comp.zip.ZipEntry.*;
 import static net.java.truevfs.comp.zip.ZipParametersUtils.parameters;
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 /**
  * Provides unsafe (raw) access to a ZIP file using shared {@link ZipEntry}
@@ -163,7 +159,7 @@ implements Closeable, Iterable<E> {
 
     private void checkZipFileSignature(final SeekableByteChannel channel)
     throws IOException {
-        final long sig = PowerBuffer
+        final long sig = MutableBuffer
                 .allocate(4)
                 .littleEndian()
                 .load(channel.position(preamble))
@@ -238,7 +234,7 @@ implements Closeable, Iterable<E> {
             int commentLen = eocdr.getUShort();
             // .ZIP file comment       (variable size)
             if (0 < commentLen)
-                comment = PowerBuffer
+                comment = MutableBuffer
                         .allocate(commentLen)
                         .load(channel)
                         .array();
@@ -410,13 +406,13 @@ implements Closeable, Iterable<E> {
                 entry.setRawOffset(lfhOff); // must be unmapped!
                 // extra field (variable size)
                 if (0 < extraLen)
-                    entry.setRawExtraFields(PowerBuffer
+                    entry.setRawExtraFields(MutableBuffer
                             .allocate(extraLen)
                             .load(channel)
                             .array());
                 // file comment (variable size)
                 if (0 < commentLen)
-                    entry.setRawComment(decode(PowerBuffer
+                    entry.setRawComment(decode(MutableBuffer
                             .allocate(commentLen)
                             .load(channel)
                             .array()));
@@ -503,7 +499,7 @@ implements Closeable, Iterable<E> {
             final int nameLen = lfh.position(26).getUShort();
             // See appendix D of PKWARE's ZIP File Format Specification.
             if (0 != (gpbf & GPBF_UTF8)) charset = UTF8;
-            final E entry = param.newEntry(decode(PowerBuffer
+            final E entry = param.newEntry(decode(MutableBuffer
                     .allocate(nameLen)
                     .load(channel)
                     .array()));
@@ -531,7 +527,7 @@ implements Closeable, Iterable<E> {
                 entry.setRawOffset(mapper.unmap(pos));
                 // extra field (variable size)
                 if (0 < extraLen)
-                    entry.setRawExtraFields(PowerBuffer
+                    entry.setRawExtraFields(MutableBuffer
                             .allocate(extraLen)
                             .load(channel)
                             .array());
