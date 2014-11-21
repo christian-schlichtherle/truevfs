@@ -423,7 +423,7 @@ implements Closeable, Iterable<E> {
                 if (lfhOff < preamble) preamble = lfhOff;
             } catch (final IllegalArgumentException e) {
                 throw (ZipException) new ZipException(entry.getName()
-                        + " (invalid meta data)").initCause(e);
+                        + " (invalid Central File Header)").initCause(e);
             }
 
             // Map the entry using the name that has been determined
@@ -662,7 +662,7 @@ implements Closeable, Iterable<E> {
                 }
             } catch (final IllegalArgumentException e) {
                 throw (ZipException) new ZipException(entry.getName()
-                        + " (invalid meta data)").initCause(e);
+                        + " (invalid Local File Header or Data Descriptor)").initCause(e);
             }
 
             // Entry is almost recovered. Update the postamble length.
@@ -917,11 +917,11 @@ implements Closeable, Iterable<E> {
                 + lfh.getUShort(); // extra field length
         SeekableByteChannel echannel;
         try {
-        echannel = new EntryReadOnlyChannel(
-                pos, entry.getCompressedSize());
+            echannel = new EntryReadOnlyChannel(
+                    pos, entry.getCompressedSize());
         } catch (IllegalArgumentException e) {
             throw (IOException) new ZipException(name +
-                    " (invalid meta data in local file header or central directory record)"
+                    " (invalid Local File Header, Data Descriptor or Central File Header)"
                     ).initCause(e);
         }
         try {
