@@ -44,8 +44,9 @@ cp -rp archive.zip archive.tar.gz
     handling, improved performance plus advanced features for archive drivers
     and virtual file system monitoring and management.
 
-    TrueVFS has been developed by refactoring the TrueZIP code base and
-    reflects the latest changes up to TrueZIP&#160;${truezip-version} - see
+    TrueVFS has been developed by refactoring the TrueZIP code base.
+    TrueVFS&#160;${project.version} reflects the latest changes up to
+    TrueZIP&#160;${truezip-version} - see
     {{{https://java.net/jira/browse/TRUEVFS/?selectedTab=com.atlassian.jira.jira-projects-plugin:changelog-panel}Change Log}}.
     While refactoring, the original suite of test code has been maintained and
     extended so that you can put the same faith into TrueVFS than you can put
