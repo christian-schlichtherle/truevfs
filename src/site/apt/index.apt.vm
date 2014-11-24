@@ -24,49 +24,47 @@ cp -rp archive.zip archive.tar.gz
 
     ... if only the <<<cp>>> command would let you access ZIP files and TAR.GZ
     files as if they were directories.
+    The high abstraction level of the API in the client module
+    {{{./truevfs-access/index.html}TrueVFS&#160;Access}} enables optimization
+    of I/O access, so that this example operation doesn't even require any
+    buffering to temporary files!
 
-    Note that the high abstraction level of the client API enables optimization
-    of I/O access, so that this example operation doesn't even require
-    buffering to temporary files.
+* License
 
-    TrueVFS is Open Source Software and is covered by the
-    {{{./license.html}Eclipse Public License, Version 1.0}}.
-    The most recent version is TrueVFS&#160;${project.version} - see
-    {{{http://java.net/jira/browse/TRUEVFS#selectedTab=com.atlassian.jira.plugin.system.project:changelog-panel}Change Log}}.
+    TrueVFS is open source software and is covered by the Eclipse Public
+    License, Version 1.0, so you can link to it in your closed source software
+    for free.
+    Please refer to the {{{./license.html}license agreement}} for details.
 
 * State Of Affairs
 
-    TrueVFS is the successor of {{{http://truezip.java.net}TrueZIP}}.
-    TrueVFS&#160;${project.version} has been developed by refactoring the
-    TrueZIP code base and reflects the latest changes up to
-    TrueZIP&#160;${truezip-version}.
-    While refactoring, the original automated test suite has been maintained
-    and extended so that you can easily put the same faith into
-    TrueVFS&#160;${project.version} than you could put into
-    TrueZIP&#160;${truezip-version}.
+    TrueVFS is the official successor of {{{http://truezip.java.net}TrueZIP}}.
+    As of version 7.7.7, the TrueZIP project has changed to maintenance mode.
+    In comparison, TrueVFS&#160;${project.version} provides superior error
+    handling, improved performance plus advanced features for archive drivers
+    and virtual file system monitoring and management.
 
-    If you are interested in the plans for this project, please have a look
-    at its
-    {{{http://java.net/jira/browse/TRUEVFS#selectedTab=com.atlassian.jira.plugin.system.project%3Aroadmap-panel}Road Map}}
-    on JIRA or subscribe to its {{{./mail-lists.html}Users Mailing List}} for
+    TrueVFS has been developed by refactoring the TrueZIP code base and
+    reflects the latest changes up to TrueZIP&#160;${truezip-version} - see
+    {{{https://java.net/jira/browse/TRUEVFS/?selectedTab=com.atlassian.jira.jira-projects-plugin:changelog-panel}Change Log}}.
+    While refactoring, the original suite of test code has been maintained and
+    extended so that you can put the same faith into TrueVFS than you can put
+    into TrueZIP.
+
+* Future Direction
+
+    If you are interested in the plans for TrueVFS, please have a look at its
+    {{{https://java.net/jira/browse/TRUEVFS/?selectedTab=com.atlassian.jira.jira-projects-plugin:roadmap-panel}Road Map}}
+    or subscribe to its {{{./mail-lists.html}Users Mailing List}} for
     discussion.
-    As of now, TrueVFS and TrueZIP share the same mailing lists, so if you are
-    already subscribed to any TrueZIP mailing list, then you don’t need to
-    change anything.
+    For continuity, TrueVFS and TrueZIP share the same mailing lists.
+    If you are already subscribed to any TrueZIP mailing list, then you don’t
+    need to do  anything.
 
-    Note that the TrueVFS version is not yet at 1.0 because chances are that
-    there will be backwards incompatible changes to the API of internal modules.
+    TrueVFS version is not yet at 1.0 because chances are that there will be
+    backwards incompatible changes to the API of internal modules.
     This is unlikely to happen to the API of the client module
     {{{./truevfs-access/index.html}TrueVFS&#160;Access}}, however.
-
-    Developing TrueVFS is a serious effort which requires a lot of time.
-    If TrueVFS has helped you or your organization to save some valuable
-    development time or enable new features in your application, then please
-    consider making a donation.
-    To make a donation, just click the <Donate> button in the navigation bar on
-    the left side or {{{./team-list.html}contact me}} personally.
-    Any donation contributes to the ongoing development and support of the
-    TrueVFS project. Thank you very much for your consideration!
 
 * Supported File System Types
 
@@ -83,7 +81,7 @@ cp -rp archive.zip archive.tar.gz
     {{{./truevfs-driver/truevfs-driver-zip/index.html}ZIP}}
     and
     {{{./truevfs-driver/truevfs-driver-tzp/index.html}ZIP.RAES (TZP)}}
-    file system schemes. For the 1.0 release, there will be more.
+    file system schemes.
 
     Simply add the JAR artifact of these driver modules to the run time class
     path to make their file system drivers available for service location in
@@ -107,8 +105,8 @@ cp -rp archive.zip archive.tar.gz
 
 * Extending TrueVFS
 
-    As a framework, TrueVFS provides the API to write file system drivers which
-    plug-in to its federated file system space.
+    As a framework, TrueVFS provides the API to write pluggable file system
+    drivers which seemlessly integrate into the federated file system space.
     The module TrueVFS&#160;Kernel modules features federating, multithreading,
     multiplexing, caching and accounting so that (archive) file system drivers
     do not need to take care of these aspects of a (virtual) file system.
@@ -125,3 +123,11 @@ cp -rp archive.zip archive.tar.gz
       {{{./apidocs/net/java/truevfs/kernel/spec/FsDriver.html}<<<FsDriver>>>}}.
 
     []
+
+* Professional Services
+
+    Do you need any consultancy on using or integrating TrueVFS into your
+    application?
+    Or do you need any extensions or improvements to TrueVFS?
+    If you are interested in {{{./team-list.html}my}} professional services,
+    then please contact sales AT schlichtherle DOT de.
