@@ -114,8 +114,8 @@ plug-in to its federated file system space.
 
         <truecommons.version>2.3.4</truecommons.version>
 
-        <!-- For documentation purposes only - mind the dash! -->
-        <truezip-version>7.7.6</truezip-version>
+        <!-- For documentation purposes only - mind the dash in the property name! -->
+        <truezip-version>7.7.7</truezip-version>
     </properties>
 
     <modules>
