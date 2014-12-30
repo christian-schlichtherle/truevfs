@@ -40,8 +40,7 @@ public final class ZipDriverMapModifier extends FsDriverMapModifier {
 
     @Override
     public Map<FsScheme, FsDriver> apply(final Map<FsScheme, FsDriver> map) {
-        final FsDriver driver = new ZipDriver();
-        map.put(FsScheme.create("zip"), driver);
+        map.put(FsScheme.create("zip"), new ZipDriver());
         return map;
     }
 

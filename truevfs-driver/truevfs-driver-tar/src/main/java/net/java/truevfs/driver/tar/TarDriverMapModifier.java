@@ -39,8 +39,7 @@ public final class TarDriverMapModifier extends FsDriverMapModifier {
 
     @Override
     public Map<FsScheme, FsDriver> apply(final Map<FsScheme, FsDriver> map) {
-        final FsDriver driver = new TarDriver();
-        map.put(FsScheme.create("tar"), driver);
+        map.put(FsScheme.create("tar"), new TarDriver());
         return map;
     }
 
