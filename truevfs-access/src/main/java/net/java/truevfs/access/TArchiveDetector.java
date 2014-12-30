@@ -320,14 +320,15 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
         // look for the first dot in it and look up the remainder ...
         path = path.replace('/', File.separatorChar);
         int i = path.lastIndexOf(File.separatorChar) + 1;
-        path = path.substring(i);//.toLowerCase(Locale.ROOT);
+        path = path.substring(i);
         final int l = path.length();
         for (i = 0; 0 < (i = path.indexOf('.', i) + 1) && i < l ;) {
             final String scheme = path.substring(i);
-            if (extensions.contains(scheme)) try {
-                return new FsScheme(scheme);
-            } catch (URISyntaxException noSchemeNoArchiveBadLuck) {
-                continue; // TODO: http://java.net/jira/browse/TRUEZIP-132
+            if (extensions.contains(scheme)) {
+                try {
+                    return new FsScheme(scheme); // TODO: http://java.net/jira/browse/TRUEZIP-132
+                } catch (URISyntaxException noSchemeNoArchiveBadLuck) {
+                }
             }
         }
         return null;
