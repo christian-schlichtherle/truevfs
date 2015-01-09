@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.driver.jar;
 
-import net.java.truevfs.driver.jar.JarDriverMapModifier;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapModifierTestSuite;
 
