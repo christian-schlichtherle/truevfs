@@ -463,9 +463,7 @@ plug-in to its federated file system space.
                              This is per CPU core.
                              -->
                         <threadCount>10</threadCount>
-                        <!-- The server VM is expected to be less tolerant
-                             against multithreading bugs when running the tests.
-                             Setting -XX:+DisableExplicitGC would trigger an
+                        <!-- Setting -XX:+DisableExplicitGC would trigger an
                              endless loop because some tests check if the
                              garbage collection and the finalization kicked
                              in to close() open I/O resources (streams,
@@ -473,7 +471,7 @@ plug-in to its federated file system space.
                              See http://www.oracle.com/technetwork/java/javase/tech/vmoptions-jsp-140102.html .
                              See http://www.oracle.com/technetwork/java/tuning-139912.html#section4.2.5 .
                              -->
-                        <argLine>-server -Xmx650m</argLine>
+                        <argLine>-Xmx650m</argLine>
                         <systemPropertyVariables>
                             <net.java.truecommons.shed.ControlFlowException.traceable>true</net.java.truecommons.shed.ControlFlowException.traceable>
                             <!-- While running the tests with isolated
