@@ -415,7 +415,6 @@ plug-in to its federated file system space.
                         </execution>
                     </executions>
                     <configuration>
-                        <shadedArtifactAttached>true</shadedArtifactAttached>
                         <filters>
                             <filter>
                                 <artifact>*:*</artifact>
@@ -427,6 +426,8 @@ plug-in to its federated file system space.
                                 </excludes>
                             </filter>
                         </filters>
+                        <shadedArtifactAttached>true</shadedArtifactAttached>
+                        <shadedClassifierName>all</shadedClassifierName>
                         <transformers>
                             <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer" />
                             <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
