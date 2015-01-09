@@ -26,10 +26,9 @@
             <artifactId>truevfs-profile-default</artifactId>
             <version>${truevfs.version}</version>
             <type>pom</type>
-            <!-- Lets get rid of the Swing dependencies. -->
             <exclusions>
-                <!-- Uncomment UNWANTED modules.
-                     Note that this list is NOT complete. -->
+                <!-- Uncomment UNWANTED modules! Note that this list is NOT complete. -->
+
                 <!--exclusion>
                     <groupId>net.java.truevfs</groupId>
                     <artifactId>truevfs-access-swing</artifactId>
@@ -53,7 +52,7 @@
             </exclusions>
         </dependency>
 
-        <!-- Uncomment WANTED modules. Note that this list is NOT complete. -->
+        <!-- Uncomment WANTED modules! Note that this list is NOT complete. -->
 
         <!-- Uncomment this module to disable any secret key management,
              regardless of any other KeyManager module which may be present on
