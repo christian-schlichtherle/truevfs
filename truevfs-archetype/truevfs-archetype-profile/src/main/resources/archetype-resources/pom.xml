@@ -18,6 +18,16 @@
         <truevfs.version>${truevfs-version}</truevfs.version>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-library</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!-- Depending on the TrueVFS Profile Default is a good starting point.
              Typical applications will need nothing else. -->
