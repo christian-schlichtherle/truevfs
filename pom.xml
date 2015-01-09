@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.java.truecommons</groupId>
         <artifactId>truecommons-parent</artifactId>
-        <version>83</version>
+        <version>88</version>
     </parent>
 
     <groupId>net.java.truevfs</groupId>
@@ -84,10 +84,6 @@ plug-in to its federated file system space.
     </distributionManagement>
 
     <properties>
-        <netbeans.hint.jdkPlatform>JDK_1.7</netbeans.hint.jdkPlatform>
-
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
         <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
 
