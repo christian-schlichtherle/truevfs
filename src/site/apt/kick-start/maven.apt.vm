@@ -20,8 +20,8 @@ Getting Started with an Archetype
 
     For ease of use, most TrueVFS modules are bundled in one or more TrueVFS
     profiles.
-    Besides the mere bundling, each profile also provides a shaded JAR with all
-    transient dependencies included, which may be easier to redistribute or use
-    in non-Maven projects.
+    Besides the mere bundling, each profile also provides a all-in-one JAR with
+    all transient dependencies included, which may be easier to redistribute or
+    use in non-Maven projects.
     You can create your own custom profile by applying the
     {{{../truevfs-archetype/truevfs-archetype-profile/index.html}TrueVFS&#160;Archetype&#160;Profile}}.

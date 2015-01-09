@@ -21,7 +21,7 @@ Getting Started
     {{{./maven.html}Getting Started with an Archetype}}.
 
     If you do not want to install Maven, then you can download an all-in-one
-    shaded JAR by following the guide
+    JAR by following the guide
     {{{./no-maven.html}Getting started without Maven}}.
 
     Please make your choice now.
