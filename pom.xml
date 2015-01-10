@@ -479,7 +479,7 @@ plug-in to its federated file system space.
                                  it would also conceal any multithreading bugs
                                  in the classes under test, so it's generally
                                  discouraged. -->
-                            <net.java.truevfs.kernel.spec.FsManager.isolate>false</net.java.truevfs.kernel.spec.FsManager.isolate>
+                            <net.java.truevfs.access.isolateFsManager>false</net.java.truevfs.access.isolateFsManager>
                             <net.java.truevfs.comp.zip.forceZip64Ext>false</net.java.truevfs.comp.zip.forceZip64Ext>
                             <java.io.tmpdir>${java.io.tmpdir.it}</java.io.tmpdir>
                         </systemPropertyVariables>
