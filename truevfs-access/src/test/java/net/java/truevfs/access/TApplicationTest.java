@@ -4,9 +4,7 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truevfs.access.TApplication;
 import static org.junit.Assert.assertEquals;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -14,12 +12,7 @@ import org.junit.Test;
  */
 public final class TApplicationTest {
 
-    TApplication<RuntimeException> instance;
-
-    @Before
-    public void setUp() {
-        instance = new TestApplication();
-    }
+    private final TApplication<RuntimeException> instance = new TestApplication();
 
     @Test
     public void testSetup() {
