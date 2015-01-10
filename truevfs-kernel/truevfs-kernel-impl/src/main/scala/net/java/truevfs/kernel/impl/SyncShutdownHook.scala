@@ -69,10 +69,11 @@ private object SyncShutdownHook extends Thread {
   override def run() {
     // HC SVNT DRACONES!
     _manager foreach { manager =>
-      _manager = None // MUST reset to void calls to cancel() during the sync()!
+      _manager = None // MUST reset to void calls to remove() during a sync()!
       try {
+        // This may call remove()!
         manager sync (Filter.ACCEPT_ANY,
-                      new FsControllerSyncVisitor(FsSyncOptions.UMOUNT)) // may call remove()!
+                      new FsControllerSyncVisitor(FsSyncOptions.UMOUNT))
       } catch {
         // Logging doesn't work in a shutdown hook!
         case ex: FsSyncException => ex printStackTrace ()
