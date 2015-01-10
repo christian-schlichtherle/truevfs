@@ -21,6 +21,7 @@ import net.java.truevfs.kernel.spec.FsNodePath;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.spi.FsManagerDecorator;
 import net.java.truevfs.kernel.spec.spi.FsManagerFactory;
+import org.slf4j.LoggerFactory;
 
 /**
  * @param  <D> the type of the archive driver.
@@ -28,6 +29,17 @@ import net.java.truevfs.kernel.spec.spi.FsManagerFactory;
  */
 public abstract class ConfiguredClientTestBase<D extends FsArchiveDriver<?>>
 extends FsArchiveDriverTestBase<D> {
+
+    private static final String ISOLATE_FS_MANAGER_PROPERTY_KEY =
+            FsManager.class.getName() + ".isolate";
+    private static final boolean ISOLATE_FS_MANAGER =
+            Boolean.getBoolean(ISOLATE_FS_MANAGER_PROPERTY_KEY);
+
+    static {
+        LoggerFactory
+                .getLogger(FsArchiveDriverTestBase.class)
+                .debug("Isolate file system manager: {}", ISOLATE_FS_MANAGER);
+    }
 
     protected static final long TIMEOUT_MILLIS = 50;
     protected static final FsMountPoint ROOT_DIRECTORY = FsMountPoint
@@ -65,7 +77,9 @@ extends FsArchiveDriverTestBase<D> {
         // So the default value 'false' helps to identify potential isolation
         // issues in case this invariant is violated.
         // See http://truevfs.java.net/truevfs-access/usage.html#Third_Party_Access
-        if (ISOLATE_FS_MANAGER) config.setManager(newManager());
+        if (ISOLATE_FS_MANAGER) {
+            config.setManager(newManager());
+        }
         final TArchiveDetector detector = new TArchiveDetector(getExtensionList(), getArchiveDriver());
         environment = Collections.singletonMap(ARCHIVE_DETECTOR, detector);
         config.setArchiveDetector(detector);
