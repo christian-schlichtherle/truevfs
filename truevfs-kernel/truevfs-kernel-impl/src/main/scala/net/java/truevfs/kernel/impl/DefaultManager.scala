@@ -22,7 +22,7 @@ import scala.Option
 @ThreadSafe
 private final class DefaultManager
 extends FsAbstractManager
-   with ReentrantReadWriteLockAspect {
+   with ReentrantReadWriteLockAspect { manager =>
 
   override val lock = new ReentrantReadWriteLock
 
@@ -33,7 +33,9 @@ extends FsAbstractManager
   private[this] val controllers =
     new collection.mutable.WeakHashMap[FsMountPoint, Link[FsController]]
 
-  private[this] val syncShutdownHook = new SyncShutdownHook(this)
+  private[this] val syncOnShutdown = ShutdownFuse(armed = false) {
+    manager sync(Filter.ACCEPT_ANY, new FsControllerSyncVisitor(FsSyncOptions.UMOUNT))
+  }
 
   override def newModel(context: FsDriver, mountPoint: FsMountPoint, parent: FsModel): FsModel =
     context decorate new DefaultModel(mountPoint, parent)
@@ -80,7 +82,7 @@ extends FsAbstractManager
 
   override def sync(filter: ControllerFilter, visitor: ControllerVisitor[FsSyncException]) {
     if (filter == Filter.ACCEPT_ANY) {
-      syncShutdownHook deregister ()
+      syncOnShutdown disarm ()
     }
     super.sync(filter, visitor)
   }
@@ -116,7 +118,7 @@ extends FsAbstractManager
       writeLocked {
         if (model.isMounted != mounted) {
           if (mounted) {
-            syncShutdownHook register ()
+            syncOnShutdown arm ()
           }
           schedule(mandatory = mounted)
           model setMounted mounted
