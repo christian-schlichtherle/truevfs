@@ -64,7 +64,7 @@ extends FsArchiveDriverTestBase<D> {
         // the parent file system) und must not confuse other threads about the
         // state of the synced archive file(s).
         // So the default value 'false' helps to identify potential isolation
-        // issues in case this invariant is not met.
+        // issues in case this invariant is violated.
         // See http://truevfs.java.net/truevfs-access/usage.html#Third_Party_Access
         if (ISOLATE_FS_MANAGER) config.setManager(newManager());
         final TArchiveDetector detector = new TArchiveDetector(getExtensionList(), getArchiveDriver());
