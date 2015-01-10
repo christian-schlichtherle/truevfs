@@ -17,14 +17,16 @@ import org.slf4j.LoggerFactory;
  * @author Christian Schlichtherle
  */
 public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
+
     private static final String ISOLATE_FS_MANAGER_PROPERTY_KEY =
             FsManager.class.getName() + ".isolate";
     protected static final boolean ISOLATE_FS_MANAGER =
             Boolean.getBoolean(ISOLATE_FS_MANAGER_PROPERTY_KEY);
+
     static {
-        LoggerFactory  .getLogger(FsArchiveDriverTestBase.class)
-                .debug( "Isolate file system manager: {}",
-                        ISOLATE_FS_MANAGER);
+        LoggerFactory
+                .getLogger(FsArchiveDriverTestBase.class)
+                .debug("Isolate file system manager: {}", ISOLATE_FS_MANAGER);
     }
 
     /** The data to get compressed. */
