@@ -11,9 +11,11 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import static net.java.truecommons.shed.ConcurrencyUtils.*;
+import static net.java.truecommons.shed.ConcurrencyUtils.NUM_CPU_THREADS;
+import static net.java.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskJoiner;
+import static net.java.truecommons.shed.ConcurrencyUtils.start;
 import net.java.truevfs.access.ConfiguredClientTestBase;
 import net.java.truevfs.access.TFile;
 import net.java.truevfs.access.TFileOutputStream;
@@ -25,8 +27,8 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /**
- * Performs integration testing of a particular {@link FsArchiveDriver}
- * by using the API of the TrueVFS Access File* module.
+ * Tests a particular {@link FsArchiveDriver} using the API of the module
+ * TrueVFS Access.
  *
  * @param  <D> The type of the archive driver.
  * @author Christian Schlichtherle

@@ -4,16 +4,45 @@
  */
 package net.java.truevfs.access.it;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.DataInputStream;
 import static java.io.File.separatorChar;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
-import java.nio.file.*;
-import static java.nio.file.Files.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import static java.nio.file.Files.copy;
+import static java.nio.file.Files.createDirectory;
+import static java.nio.file.Files.createFile;
+import static java.nio.file.Files.delete;
+import static java.nio.file.Files.exists;
+import static java.nio.file.Files.getLastModifiedTime;
+import static java.nio.file.Files.isDirectory;
+import static java.nio.file.Files.isRegularFile;
+import static java.nio.file.Files.newDirectoryStream;
+import static java.nio.file.Files.newInputStream;
+import static java.nio.file.Files.newOutputStream;
+import static java.nio.file.Files.setLastModifiedTime;
+import static java.nio.file.Files.size;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.NotDirectoryException;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.Callable;
 import net.java.truecommons.io.ClosedInputException;
 import net.java.truecommons.io.ClosedOutputException;
@@ -28,7 +57,7 @@ import net.java.truevfs.access.TConfig;
 import net.java.truevfs.access.TFile;
 import net.java.truevfs.access.TPath;
 import net.java.truevfs.access.TVFS;
-import static net.java.truevfs.kernel.spec.FsAccessOption.*;
+import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsOpenResourceException;
@@ -37,15 +66,24 @@ import static net.java.truevfs.kernel.spec.FsSyncOption.CLEAR_CACHE;
 import static net.java.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
 import static net.java.truevfs.kernel.spec.FsSyncOptions.SYNC;
 import net.java.truevfs.kernel.spec.FsSyncWarningException;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Performs integration testing of a particular {@link FsArchiveDriver}
- * by using the API of the TrueVFS Access Path module.
+ * Tests a particular {@link FsArchiveDriver} using the API of the module
+ * TrueVFS Access.
  *
  * @param  <D> the type of the archive driver.
  * @see    TFileITSuite
