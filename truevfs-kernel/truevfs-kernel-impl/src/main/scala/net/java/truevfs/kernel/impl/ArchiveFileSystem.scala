@@ -32,9 +32,7 @@ import scala.annotation._
   * @author Christian Schlichtherle
   */
 @NotThreadSafe
-private class ArchiveFileSystem[E <: FsArchiveEntry] private(
-  final override val model: ArchiveModel[E],
-  master: EntryTable[E])
+private class ArchiveFileSystem[E <: FsArchiveEntry] private (final override val model: ArchiveModel[E], master: EntryTable[E])
 extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
 
   private val splitter = new Splitter
@@ -43,7 +41,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
   private var touched: Boolean = _
 
   def this(model: ArchiveModel[E]) {
-    this(model, new EntryTable(OVERHEAD_SIZE))
+    this(model, new EntryTable[E](OVERHEAD_SIZE))
     val root = newEntry(RootPath, DIRECTORY, None)
     val time = System.currentTimeMillis()
     for (access <- ALL_ACCESS)
@@ -54,7 +52,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
 
   def this(model: ArchiveModel[E], archive: Container[E], rootTemplate: Entry) {
     // Allocate some extra capacity for creating missing parent directories.
-    this(model, new EntryTable(archive.size + OVERHEAD_SIZE))
+    this(model, new EntryTable[E](archive.size + OVERHEAD_SIZE))
     // Load entries from source archive.
     var paths = List[String]()
     val normalizer = new PathNormalizer(SEPARATOR_CHAR)
@@ -320,7 +318,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     // Test.
     val np = name.getPath
     val mcn = master.get(np) match {
-      case Some(mcn) => mcn
+      case Some(x) => x
       case _ => throw new NoSuchFileException(fullPath(name))
     }
     if (mcn.isType(DIRECTORY)) {
