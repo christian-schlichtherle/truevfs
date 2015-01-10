@@ -30,10 +30,18 @@ import org.slf4j.LoggerFactory;
 public abstract class ConfiguredClientTestBase<D extends FsArchiveDriver<?>>
 extends FsArchiveDriverTestBase<D> {
 
-    private static final String ISOLATE_FS_MANAGER_PROPERTY_KEY =
-            FsManager.class.getName() + ".isolate";
-    private static final boolean ISOLATE_FS_MANAGER =
-            Boolean.getBoolean(ISOLATE_FS_MANAGER_PROPERTY_KEY);
+    /**
+     * Controls if each test case should use its own file system manager.
+     * If set to {@code true}, then a new file system manager gets created for
+     * each test.
+     * This is required to run both all test classes and all test methods in
+     * parallel.
+     * If this property is disabled, then only all test methods can be run
+     * in parallel.
+     * See configuration of the maven-failsafe-plugin in the top level POM.
+     */
+    private static final boolean ISOLATE_FS_MANAGER = Boolean.getBoolean(
+            ConfiguredClientTestBase.class.getPackage().getName() + ".isolateFsManager");
 
     static {
         LoggerFactory
