@@ -4,11 +4,15 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import edu.umd.cs.findbugs.annotations.*;
+import edu.umd.cs.findbugs.annotations.CleanupObligation;
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.cio.*;
-import net.java.truecommons.shed.*;
+import net.java.truecommons.cio.IoBufferPool;
+import net.java.truecommons.cio.MemoryBufferPool;
+import net.java.truecommons.shed.InheritableThreadLocalStack;
+import net.java.truecommons.shed.Resource;
 
 /**
  * A container for configuration options with global or inheritable thread
@@ -58,7 +62,7 @@ public final class FsTestConfig extends Resource<IllegalStateException> {
     // I don't think this field should be volatile.
     // This would make a difference if and only if two threads were changing
     // the GLOBAL configuration concurrently, which is discouraged.
-    // Instead, the global configuration should only ioBufferPool changed once at
+    // Instead, the global configuration should only get changed once at
     // application startup and then each thread should modify only its thread
     // local configuration which has been obtained by a call to FsTestConfig.push().
     private final FsThrowManager throwControl;
