@@ -10,24 +10,12 @@ import java.io.IOException;
 import java.util.Random;
 import org.junit.After;
 import org.junit.Before;
-import org.slf4j.LoggerFactory;
 
 /**
  * @param  <D> The type of the archive driver.
  * @author Christian Schlichtherle
  */
 public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
-
-    private static final String ISOLATE_FS_MANAGER_PROPERTY_KEY =
-            FsManager.class.getName() + ".isolate";
-    protected static final boolean ISOLATE_FS_MANAGER =
-            Boolean.getBoolean(ISOLATE_FS_MANAGER_PROPERTY_KEY);
-
-    static {
-        LoggerFactory
-                .getLogger(FsArchiveDriverTestBase.class)
-                .debug("Isolate file system manager: {}", ISOLATE_FS_MANAGER);
-    }
 
     /** The data to get compressed. */
     private static final byte[] DATA = new byte[1024]; // enough to waste some heat on CPU cycles
