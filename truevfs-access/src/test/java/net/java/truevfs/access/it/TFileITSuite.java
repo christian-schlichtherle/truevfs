@@ -4,8 +4,18 @@
  */
 package net.java.truevfs.access.it;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.DataInputStream;
+import java.io.File;
 import static java.io.File.separatorChar;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -29,7 +39,7 @@ import net.java.truevfs.access.TFile;
 import net.java.truevfs.access.TFileInputStream;
 import net.java.truevfs.access.TFileOutputStream;
 import net.java.truevfs.access.TVFS;
-import static net.java.truevfs.kernel.spec.FsAccessOption.*;
+import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsOpenResourceException;
@@ -38,15 +48,24 @@ import static net.java.truevfs.kernel.spec.FsSyncOption.CLEAR_CACHE;
 import static net.java.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
 import static net.java.truevfs.kernel.spec.FsSyncOptions.SYNC;
 import net.java.truevfs.kernel.spec.FsSyncWarningException;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Performs integration testing of a particular {@link FsArchiveDriver}
- * by using the API of the TrueVFS Access File* module.
+ * Tests a particular {@link FsArchiveDriver} using the API of the module
+ * TrueVFS Access.
  *
  * @param  <D> the type of the archive driver.
  * @see    TPathITSuite
