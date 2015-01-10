@@ -19,7 +19,6 @@ import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsMountPoint;
 import net.java.truevfs.kernel.spec.FsNodePath;
 import net.java.truevfs.kernel.spec.FsScheme;
-import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 import net.java.truevfs.kernel.spec.spi.FsManagerDecorator;
 import net.java.truevfs.kernel.spec.spi.FsManagerFactory;
 
@@ -44,9 +43,9 @@ extends FsArchiveDriverTestBase<D> {
         final Factory<FsManager> f =
                 ConfiguredClientTestBase.managerFactory;
         return (null != f ? f : (ConfiguredClientTestBase.managerFactory =
-                    new ServiceLocator(FsManagerLocator.class)
-                       .factory(FsManagerFactory.class, FsManagerDecorator.class))
-                ).get();
+                new ServiceLocator(ConfiguredClientTestBase.class)
+                        .factory(FsManagerFactory.class, FsManagerDecorator.class)))
+                .get();
     }
 
     private TConfig config;
