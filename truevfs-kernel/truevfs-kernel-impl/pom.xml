@@ -33,6 +33,11 @@
             <type>test-jar</type>
         </dependency>
         <dependency>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-shed</artifactId>
+            <type>test-jar</type>
+        </dependency>
+        <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
         </dependency>

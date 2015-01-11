@@ -1,5 +1,9 @@
 package net.java.truevfs.kernel.impl
 
+import java.util.concurrent.Callable
+
+import net.java.truecommons.shed.ConcurrencyUtils
+import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory
 import org.junit.runner.RunWith
 import org.mockito.Matchers.any
 import org.mockito.Mockito.inOrder
@@ -82,6 +86,34 @@ private class ShutdownFuseTest extends WordSpec {
         io verify registry add any[Thread]
         io verifyNoMoreInteractions ()
       }
+    }
+
+    "disarmed and armed again concurrently" should {
+      "not throw an exception" in {
+        // Use the DefaultThreadRegistry
+        val fuse = ShutdownFuse { /* no-op */ }
+        runConcurrently(ConcurrencyUtils.NUM_CPU_THREADS) { _ =>
+          for (i <- 1 to 10) {
+            fuse disarm()
+            fuse arm()
+          }
+        }
+      }
+    }
+
+    def runConcurrently(numThreads: Int)(fun: Int => Unit) {
+      startConcurrently(numThreads)(fun) join ()
+    }
+
+    def startConcurrently(numThreads: Int)(fun: Int => Unit) = {
+      ConcurrencyUtils start (
+        numThreads,
+        new TaskFactory {
+          override def newTask(threadNum: Int) = new Callable[Unit] {
+            override def call() { fun(threadNum) }
+          }
+        }
+      )
     }
   }
 }
