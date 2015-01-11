@@ -4,9 +4,9 @@
  */
 package net.java.truevfs.kernel.impl
 
-import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.concurrent.ThreadSafe
-import ShutdownFuse._
+
+import net.java.truevfs.kernel.impl.ShutdownFuse._
 
 /** Arms and disarms a configured shutdown hook.
   * A shutdown fuse allows to repeatedly register and remove its configured
@@ -19,13 +19,14 @@ import ShutdownFuse._
 @ThreadSafe
 private final class ShutdownFuse private (armed: Boolean, registry: ThreadRegistry, hook: => Unit) {
 
-  private[this] val _armed = new AtomicBoolean
+  @volatile
+  private[this] var _armed: Boolean = _
 
   private[this] val _thread = new Thread {
     override def run() {
       // HC SVNT DRACONES!
       // MUST void any calls to disarm() during shutdown hook execution!
-      if (getAndSetArmed(false)) {
+      onDisarm {
         hook // could call disarm()!
       }
     }
@@ -35,21 +36,31 @@ private final class ShutdownFuse private (armed: Boolean, registry: ThreadRegist
     arm()
   }
 
-  @inline
-  private[this] def getAndSetArmed = _armed.getAndSet _
-
   /** Arms this shutdown fuse. */
-  def arm() {
-    if (!getAndSetArmed(true)) {
-      registry add _thread
+  def arm() { onArm { registry add _thread } }
+
+  /** Disarms this shutdown fuse. */
+  def disarm() { onDisarm { registry remove _thread } }
+
+  @inline
+  private[this] def onArm(block: => Unit) {
+    onCondition(!_armed) {
+      _armed = true
+      block
     }
   }
 
-  /** Disarms this shutdown fuse. */
-  def disarm() {
-    if (getAndSetArmed(false)) {
-      registry remove _thread
+  @inline
+  private[this] def onDisarm(block: => Unit) {
+    onCondition(_armed) {
+      _armed = false
+      block
     }
+  }
+
+  @inline
+  private[this] def onCondition(condition: => Boolean)(block: => Unit) {
+    if (condition) { synchronized { if (condition) { block } } }
   }
 
   /** For testing only! */
