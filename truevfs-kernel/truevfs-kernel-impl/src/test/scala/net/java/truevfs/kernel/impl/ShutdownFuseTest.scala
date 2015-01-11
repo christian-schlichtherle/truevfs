@@ -1,11 +1,12 @@
 package net.java.truevfs.kernel.impl
 
 import org.junit.runner.RunWith
+import org.mockito.Matchers.any
+import org.mockito.Mockito.inOrder
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
-
-import scala.sys.ShutdownHookThread
+import org.scalatest.mock.MockitoSugar.mock
 
 /**
  * @author Christian Schlichtherle
@@ -13,64 +14,73 @@ import scala.sys.ShutdownHookThread
 @RunWith(classOf[JUnitRunner])
 private class ShutdownFuseTest extends WordSpec {
 
-  trait Simple {
-    var executed = false
-    val fuse = ShutdownFuse {
+  trait Fixture {
+    val registry = mock[ShutdownFuse.ThreadRegistry]
+    val io = inOrder(registry)
+    private[this] var executed: Boolean = _
+    val fuse: ShutdownFuse = ShutdownFuse(armed = true, registry) {
+      fuse disarm () // must cause no harm!
       executed = true
     }
 
-    def blowUp(): Unit = {
-      val thread = fuse.thread
-      thread start ()
-      thread join ()
+    def blowUp() {
+      executed should equal (false)
+      fuse blowUp ()
+      executed should equal (true)
     }
   }
 
   "A shutdown fuse" when {
-    "constructed" should {
-      "not run the shutdown hook" in new Simple {
-        executed should equal (false)
+    "just constructed" should {
+      "add the shutdown hook" in new Fixture {
+        io verify registry add any[Thread]
+        io verifyNoMoreInteractions ()
       }
     }
 
-    "constructed and blown-up" should {
-      "run the shutdown hook" in new Simple {
-        blowUp()
-        executed should equal (true)
-      }
-    }
-
-    "constructed, disarmed and blown-up" should {
-      "not run the shutdown hook" in new Simple {
+    "disarmed" should {
+      "add and remove the shutdown hook" in new Fixture {
         fuse disarm ()
-        blowUp()
-        executed should equal (false)
+        io verify registry add any[Thread]
+        io verify registry remove any[Thread]
+        io verifyNoMoreInteractions ()
       }
     }
 
-    "constructed, armed and blown-up" should {
-      "run the shutdown hook" in new Simple {
+    "armed" should {
+      "add the shutdown hook" in new Fixture {
         fuse arm ()
-        blowUp()
-        executed should equal (true)
+        io verify registry add any[Thread]
+        io verifyNoMoreInteractions ()
       }
     }
 
-    "constructed, disarmed, armed and blown-up" should {
-      "run the shutdown hook" in new Simple {
+    "disarmed and armed again" should {
+      "add, remove and add the shutdown hook again" in new Fixture {
         fuse disarm ()
         fuse arm ()
-        blowUp()
-        executed should equal (true)
+        io verify registry add any[Thread]
+        io verify registry remove any[Thread]
+        io verify registry add any[Thread]
+        io verifyNoMoreInteractions ()
       }
     }
 
-    "constructed, armed, disarmed and blown-up" should {
-      "not run the shutdown hook" in new Simple {
+    "armed and disarmed again" should {
+      "add and remove the shutdown hook" in new Fixture {
         fuse arm ()
         fuse disarm ()
+        io verify registry add any[Thread]
+        io verify registry remove any[Thread]
+        io verifyNoMoreInteractions ()
+      }
+    }
+
+    "blown-up" should {
+      "register and execute the shutdown hook" in new Fixture {
         blowUp()
-        executed should equal (false)
+        io verify registry add any[Thread]
+        io verifyNoMoreInteractions ()
       }
     }
   }

@@ -6,8 +6,7 @@ package net.java.truevfs.kernel.impl
 
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.concurrent.ThreadSafe
-
-import scala.sys.runtime
+import ShutdownFuse._
 
 /** Arms and disarms a configured shutdown hook.
   * A shutdown fuse allows to repeatedly register and remove its configured
@@ -18,47 +17,74 @@ import scala.sys.runtime
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private final class ShutdownFuse private(initiallyArmed: Boolean, shutdownHook: => Unit) {
+private final class ShutdownFuse private (armed: Boolean, registry: ThreadRegistry, hook: => Unit) {
 
-  private[this] val armed = new AtomicBoolean
+  private[this] val _armed = new AtomicBoolean
 
-  val thread = new Thread {
+  private[this] val _thread = new Thread {
     override def run() {
       // HC SVNT DRACONES!
-      // MUST void any calls to off() during shutdown hook execution!
+      // MUST void any calls to disarm() during shutdown hook execution!
       if (getAndSetArmed(false)) {
-        shutdownHook // could call off()!
+        hook // could call disarm()!
       }
     }
   }
 
-  if (initiallyArmed) {
+  if (armed) {
     arm()
   }
 
   @inline
-  private[this] def getAndSetArmed = armed.getAndSet _
+  private[this] def getAndSetArmed = _armed.getAndSet _
 
   /** Arms this shutdown fuse. */
   def arm() {
     if (!getAndSetArmed(true)) {
-      runtime addShutdownHook thread
+      registry add _thread
     }
   }
 
   /** Disarms this shutdown fuse. */
   def disarm() {
     if (getAndSetArmed(false)) {
-      runtime removeShutdownHook thread
+      registry remove _thread
     }
   }
+
+  /** For testing only! */
+  private[impl] def blowUp() { _thread run () }
 }
 
 private object ShutdownFuse {
 
   @inline
-  def apply(shutdownHook: => Unit): ShutdownFuse = apply(armed = true)(shutdownHook)
+  def apply(hook: => Unit): ShutdownFuse = apply()(hook)
 
   @inline
-  def apply(armed: Boolean)(shutdownHook: => Unit) = new ShutdownFuse(armed, shutdownHook)
+  def apply(armed: Boolean = true, registry: ThreadRegistry = DefaultThreadRegistry)(hook: => Unit) = new ShutdownFuse(armed, registry, hook)
+
+  sealed trait ThreadRegistry {
+    def add(thread: Thread)
+    def remove(thread: Thread)
+  }
+
+  object DefaultThreadRegistry extends ThreadRegistry {
+
+    def add(thread: Thread) {
+      try {
+        Runtime.getRuntime addShutdownHook thread
+      } catch {
+        case theHookCouldNotArmTheFuse: IllegalStateException => // ignore
+      }
+    }
+
+    def remove(thread: Thread) {
+      try {
+        Runtime.getRuntime removeShutdownHook thread
+      } catch {
+        case theHookCouldNotDisarmTheFuse: IllegalStateException => // ignore
+      }
+    }
+  }
 }
