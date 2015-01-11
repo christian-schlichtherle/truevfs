@@ -32,9 +32,7 @@ private final class ShutdownFuse private (armed: Boolean, registry: ThreadRegist
     }
   }
 
-  if (armed) {
-    arm()
-  }
+  if (armed) { arm() }
 
   /** Arms this shutdown fuse. */
   def arm() { onArm { registry add _thread } }
