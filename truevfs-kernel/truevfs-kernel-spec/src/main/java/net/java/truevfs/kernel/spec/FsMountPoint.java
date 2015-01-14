@@ -11,6 +11,8 @@ import java.net.URISyntaxException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.shed.QuotedUriSyntaxException;
 import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
@@ -44,7 +46,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
  *
  * <h3><a name="examples"/>Examples</h3>
  * <p>
- * Examples for valid mount point URIs are:
+ * Examples for <em>valid</em> mount point URIs:
  * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
@@ -56,30 +58,29 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
  * </thead>
  * <tbody>
  * <tr>
- *   <td>{@code foo:/bar/}</td>
- *   <td>{@code foo}</td>
- *   <td>(n/a)<sup>*</sup></td>
- *   <td>(n/a)<sup>*</sup></td>
+ *   <td>{@code "foo:/bar/"}</td>
+ *   <td>{@code "foo"}</td>
+ *   <td>{@code null}</td>
+ *   <td>{@code null}</td>
  * </tr>
  * <tr>
- *   <td>{@code foo:bar:/baz!/}</td>
- *   <td>{@code foo}</td>
- *   <td>{@code bar:/baz}</td>
- *   <td>{@code bar:/}</td>
+ *   <td>{@code "foo:bar:/baz!/"}</td>
+ *   <td>{@code "foo"}</td>
+ *   <td>{@code "bar:/baz"}</td>
+ *   <td>{@code "bar:/"}</td>
  * </tr>
  * <tr>
- *   <td>{@code foo:bar:baz:/bang!/boom!/}</td>
- *   <td>{@code foo}</td>
- *   <td>{@code bar:baz:/bang!/boom}</td>
- *   <td>{@code baz:/bang}</td>
+ *   <td>{@code "foo:bar:baz:/bang!/boom!/"}</td>
+ *   <td>{@code "foo"}</td>
+ *   <td>{@code "bar:baz:/bang!/boom"}</td>
+ *   <td>{@code "baz:/bang"}</td>
  * </tr>
  * </tbody>
  * </table>
  * <p>
- * <sup>*</sup> the component property is {@code null} and hence its URI is not
- * available.
+ * <sup>*</sup> the property is {@code null} and hence its URI is not available.
  * <p>
- * Examples for invalid mount point URIs are:
+ * Examples for <em>invalid</em> mount point URIs:
  * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
@@ -130,7 +131,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
  * @author Christian Schlichtherle
  */
 @Immutable
-@edu.umd.cs.findbugs.annotations.SuppressWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
+@SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
 public final class FsMountPoint
 implements Serializable, Comparable<FsMountPoint> {
 
@@ -144,7 +145,7 @@ implements Serializable, Comparable<FsMountPoint> {
      */
     public static final String SEPARATOR = "!" + FsNodeName.SEPARATOR;
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
+    @SuppressFBWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private URI uri; // not final for serialization only!
 
     private transient @Nullable FsNodePath path;
@@ -247,11 +248,7 @@ implements Serializable, Comparable<FsMountPoint> {
             throw new QuotedUriSyntaxException(pu, "Empty node name");
         this.uri = new UriBuilder(true)
                 .scheme(scheme.toString())
-                .path(new StringBuilder(pu.getScheme())
-                    .append(':')
-                    .append(pu.getRawSchemeSpecificPart())
-                    .append(SEPARATOR)
-                    .toString())
+                .path(pu.getScheme() + ':' + pu.getRawSchemeSpecificPart() + SEPARATOR)
                 .toUri();
         this.scheme = scheme;
         this.path = path;
@@ -296,11 +293,7 @@ implements Serializable, Comparable<FsMountPoint> {
             if (NULL != modifier) {
                 URI nuri = new UriBuilder(true)
                         .scheme(uri.getScheme())
-                        .path(new StringBuilder(pu.getScheme())
-                            .append(':')
-                            .append(pu.getRawSchemeSpecificPart())
-                            .append(SEPARATOR)
-                            .toString())
+                        .path(pu.getScheme() + ':' + pu.getRawSchemeSpecificPart() + SEPARATOR)
                         .toUri();
                 if (!uri.equals(nuri))
                     uri = nuri;
