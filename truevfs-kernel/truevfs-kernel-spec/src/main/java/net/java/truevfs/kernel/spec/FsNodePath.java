@@ -11,6 +11,8 @@ import java.net.URISyntaxException;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.shed.QuotedUriSyntaxException;
 import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
@@ -54,7 +56,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
  *
  * <h3><a name="examples"/>Examples</h3>
  * <p>
- * Examples for valid path URIs are:
+ * Examples for <em>valid</em> node path URIs:
  * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
@@ -87,7 +89,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
  * </tbody>
  * </table>
  * <p>
- * Examples for invalid path URIs are:
+ * Examples for <em>invalid</em> node path URIs:
  * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
@@ -141,7 +143,7 @@ implements Serializable, Comparable<FsNodePath> {
 
     private static final URI DOT = URI.create(".");
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
+    @SuppressFBWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private URI uri; // not final for serialization only!
 
     private transient @Nullable FsMountPoint mountPoint;
@@ -343,9 +345,9 @@ implements Serializable, Comparable<FsNodePath> {
     }
 
     /**
-     * Returns the URI for this path.
+     * Returns the URI for this node path.
      *
-     * @return The URI for this path.
+     * @return The URI for this node path.
      */
     public URI getUri() { return uri; }
 
