@@ -44,10 +44,6 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_NAME;
  * <p>
  * Examples for <em>valid</em> node name URIs:
  * </p>
- * <ul>
- * <li>{@code "foo"}
- * <li>{@code "foo/bar"}
- * </ul>
  * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
@@ -372,18 +368,18 @@ implements Serializable, Comparable<FsNodeName> {
     public URI getUri() { return uri; }
 
     /**
-     * Returns the path of this node name.
+     * Returns the path component of this node name.
      * Equivalent to {@link #getUri() getUri()}{@code .getPath()}.
      *
-     * @return The path of this node name.
+     * @return The path component of this node name.
      */
     public String getPath() { return uri.getPath(); }
 
     /**
-     * Returns the query of this node name.
+     * Returns the query component of this node name.
      * Equivalent to {@link #getUri() getUri()}{@code .getQuery()}.
      *
-     * @return The query of this node name.
+     * @return The query component of this node name.
      */
     public @CheckForNull String getQuery() { return uri.getQuery(); }
 
