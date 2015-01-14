@@ -10,6 +10,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.shed.QuotedUriSyntaxException;
 import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
@@ -40,7 +42,8 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_NAME;
  * 
  * <h3><a name="examples"/>Examples</h3>
  * <p>
- * Examples for valid node name URIs are:
+ * Examples for <em>valid</em> node name URIs:
+ * </p>
  * <ul>
  * <li>{@code "foo"}
  * <li>{@code "foo/bar"}
@@ -49,40 +52,41 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_NAME;
  * <thead>
  * <tr>
  *   <th>{@link #getUri() uri} property</th>
+ *   <th>{@link #isRoot() root} property</th>
  *   <th>{@link #getPath() path} property</th>
  *   <th>{@link #getQuery() query} property</th>
- *   <th>{@link #getFragment() fragment} property</th>
  * </tr>
  * </thead>
  * <tbody>
  * <tr>
- *   <td>{@code foo}</td>
- *   <td>{@code foo}</td>
- *   <td>(null)</td>
- *   <td>(null)</td>
+ *   <td>{@code ""}</td>
+ *   <td>{@code true}</td>
+ *   <td>{@code ""}</td>
+ *   <td>{@code null}</td>
  * </tr>
  * <tr>
- *   <td>{@code foo/bar}</td>
- *   <td>{@code foo/bar}</td>
- *   <td>(null)</td>
- *   <td>(null)</td>
+ *   <td>{@code "foo"}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code "foo"}</td>
+ *   <td>{@code null}</td>
  * </tr>
  * <tr>
- *   <td>{@code foo?bar}</td>
- *   <td>{@code foo}</td>
- *   <td>{@code bar}</td>
- *   <td>(null)</td>
+ *   <td>{@code "foo/bar"}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code "foo/bar"}</td>
+ *   <td>{@code null}</td>
  * </tr>
  * <tr>
- *   <td>{@code foo#bar}</td>
- *   <td>{@code foo}</td>
- *   <td>(null)</td>
- *   <td>{@code bar}</td>
+ *   <td>{@code "foo?bar"}</td>
+ *   <td>{@code false}</td>
+ *   <td>{@code "foo"}</td>
+ *   <td>{@code "bar"}</td>
  * </tr>
  * </tbody>
  * </table>
  * <p>
- * Examples for invalid node name URIs are:
+ * Examples for <em>invalid</em> node name URIs:
+ * </p>
  * <table border=1 cellpadding=5 summary="">
  * <thead>
  * <tr>
@@ -110,6 +114,10 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_NAME;
  * <tr>
  *   <td>{@code foo/.}</td>
  *   <td>not a normalized URI</td>
+ * </tr>
+ * <tr>
+ *   <td>{@code foo#bar}</td>
+ *   <td>fragment defined</td>
  * </tr>
  * </tbody>
  * </table>
@@ -167,7 +175,7 @@ implements Serializable, Comparable<FsNodeName> {
         }
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
+    @SuppressFBWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private URI uri; // not final for serialization only!
 
     /**
@@ -353,9 +361,7 @@ implements Serializable, Comparable<FsNodeName> {
         if (null != path && !path.isEmpty())
             return false;
         final String query = uri.getRawQuery();
-        if (null != query)
-            return false;
-        return true;
+        return null == query;
     }
 
     /**
@@ -380,14 +386,6 @@ implements Serializable, Comparable<FsNodeName> {
      * @return The query of this node name.
      */
     public @CheckForNull String getQuery() { return uri.getQuery(); }
-
-    /**
-     * Returns the fragment of this node name.
-     * Equivalent to {@link #getUri() getUri()}{@code .getFragment()}.
-     *
-     * @return The fragment of this node name.
-     */
-    public @CheckForNull String getFragment() { return uri.getFragment(); }
 
     /**
      * Implements a natural ordering which is consistent with

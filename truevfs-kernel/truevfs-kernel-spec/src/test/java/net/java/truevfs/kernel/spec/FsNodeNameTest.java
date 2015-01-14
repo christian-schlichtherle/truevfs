@@ -166,36 +166,40 @@ public class FsNodeNameTest {
             try {
                 FsNodeName.create(uri);
                 fail(param);
-            } catch (IllegalArgumentException ex) {
+            } catch (IllegalArgumentException ignored) {
             }
 
             try {
                 new FsNodeName(uri);
                 fail(param);
-            } catch (URISyntaxException ex) {
+            } catch (URISyntaxException ignored) {
             }
         }
     }
 
     @Test
     public void testConstructorWithValidUri() {
-        for (final String[] params : new String[][] {
+        for (final Object[] params : new Object[][] {
             // { $parent, $member, $result },
-            { "foo%3Abar", "baz", "foo%3Abar/baz" },
-            { "foo", "bar%3Abaz", "foo/bar%3Abaz" },
-            { "foo", "", "foo", },
-            { "", "", "", },
-            { "föö", "?bär", "föö?bär" },
-            { "föö?bär", "", "föö" },
-            { "föö?bär", "?täscht", "föö?täscht" },
-            { "föö", "", "föö" },
-            { "", "föö", "föö" },
-            { "föö", "bär", "föö/bär" },
+            { "", "", "",  true, "", null},
+            { "foo%3Abar", "baz", "foo%3Abar/baz", false, "foo:bar/baz", null },
+            { "foo", "bar%3Abaz", "foo/bar%3Abaz", false, "foo/bar:baz", null },
+            { "foo", "?bar%3Abaz", "foo?bar%3Abaz", false, "foo", "bar:baz" },
+            { "foo", "", "foo", false, "foo", null },
+            { "föö", "?bär", "föö?bär", false, "föö", "bär" },
+            { "föö?bär", "", "föö", false, "föö", null },
+            { "föö?bär", "?täscht", "föö?täscht", false, "föö", "täscht" },
+            { "föö", "", "föö", false, "föö", null },
+            { "", "föö", "föö", false, "föö", null },
+            { "föö", "bär", "föö/bär", false, "föö/bär", null },
         }) {
-            final FsNodeName parent = FsNodeName.create(URI.create(params[0]));
-            final FsNodeName member = FsNodeName.create(URI.create(params[1]));
+            final FsNodeName parent = FsNodeName.create(URI.create((String) params[0]));
+            final FsNodeName member = FsNodeName.create(URI.create((String) params[1]));
             final FsNodeName result = new FsNodeName(parent, member);
-            assertThat(result.getUri(), equalTo(URI.create(params[2])));
+            assertThat(result.getUri(), equalTo(URI.create((String) params[2])));
+            assertThat(result.isRoot(), equalTo(params[3]));
+            assertThat(result.getPath(), equalTo(params[4]));
+            assertThat(result.getQuery(), equalTo(params[5]));
             assertThat(FsNodeName.create(result.getUri()), equalTo(result));
         }
     }
