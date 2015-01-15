@@ -20,7 +20,7 @@ import org.bouncycastle.crypto.Mac;
 /**
  * Provides buffered random read-only access to the plain text of an encrypted
  * file.
- * Note that this channel implements its own virtual position.
+ * Note that this channel maintains its own virtual position.
  *
  * @see    CipherOutputStream
  * @author Christian Schlichtherle

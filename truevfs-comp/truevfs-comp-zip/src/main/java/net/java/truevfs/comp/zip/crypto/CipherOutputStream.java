@@ -20,13 +20,11 @@ import org.bouncycastle.crypto.InvalidCipherTextException;
  * <ul>
  * <li>This implementation is based on Bouncy Castle's lightweight crypto API
  *     and uses a {@link BufferedBlockCipher} for ciphering.
- * <li>The {@link #cipher} used for encryption or decryption is accessible to
- *     subclasses.
  * <li>The {@code flush()} method just flushes the underlying output stream
  *     and has no effect on the cipher.
- * <li>A {@link #finish()} method has been added to allow finishing the output
+ * <li>For compensation, the {@link #finish()} method finishes the output
  *     (probably producing padding bytes) without closing the output.
- *     This could be used in a subclass to produce a trailer with additional
+ *     This can get used in clients to produce a trailer with additional
  *     information about the ciphered data (e.g. a MAC).
  * </ul>
  *
