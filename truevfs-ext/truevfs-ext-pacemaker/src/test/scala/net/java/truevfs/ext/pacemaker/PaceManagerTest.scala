@@ -4,29 +4,24 @@
  */
 package net.java.truevfs.ext.pacemaker
 
-import collection.JavaConverters._
 import java.io.IOException
 import java.net._
-import net.java.truecommons.io.Loan._
-import net.java.truecommons.shed._
-import net.java.truecommons.shed.Filter
+
+import net.java.truecommons.shed.{Filter, _}
+import net.java.truevfs.ext.pacemaker.PaceManagerTest._
 import net.java.truevfs.kernel.spec._
 import org.junit.runner._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.Matchers._
 import org.scalatest._
 import org.scalatest.junit._
-import org.scalatest.Matchers._
 import org.scalatest.mock.MockitoSugar.mock
-import org.scalatest.prop._
-import PaceManagerTest._
+import org.scalatest.prop.PropertyChecks._
 
 /** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])
-class PaceManagerTest
-extends WordSpec
-   with PropertyChecks
-   with OneInstancePerTest {
+class PaceManagerTest extends WordSpec with OneInstancePerTest {
 
   "A PaceManager" should {
     val mediator = mock[PaceMediator]
@@ -99,7 +94,7 @@ extends WordSpec
           reset(controller)
           when(controller.getModel) thenReturn model
         }
-        controllers.values filter expectation foreach (expectation stub _)
+        controllers.values filter expectation foreach expectation.stub
 
         // Register access to the controller as if some file system operation
         // had been successfully completed.

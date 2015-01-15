@@ -6,6 +6,8 @@ package net.java.truevfs.access;
 
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -36,7 +38,7 @@ public final class TFileReader extends InputStreamReader {
      * @throws IOException on any I/O error.
      */
     @CreatesObligation
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("DM_DEFAULT_ENCODING")
+    @SuppressFBWarnings("DM_DEFAULT_ENCODING")
     public TFileReader(File file) throws IOException {
 	super(new TFileInputStream(file));
     }
@@ -64,10 +66,4 @@ public final class TFileReader extends InputStreamReader {
     public TFileReader(File file, CharsetDecoder decoder) throws IOException {
 	super(new TFileInputStream(file), decoder);
     }
-
-    /*@Override
-    @DischargesObligation
-    public void close() throws IOException {
-        super.close();
-    }*/
 }

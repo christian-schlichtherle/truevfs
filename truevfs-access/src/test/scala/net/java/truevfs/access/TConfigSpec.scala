@@ -4,21 +4,23 @@
  */
 package net.java.truevfs.access
 
-import collection.JavaConverters._
 import java.util.concurrent._
+
 import net.java.truecommons.io.Loan._
 import net.java.truecommons.services._
 import net.java.truecommons.shed._
+import net.java.truevfs.access.TConfig._
 import net.java.truevfs.kernel.spec.FsAccessOption._
 import net.java.truevfs.kernel.spec.mock.MockArchiveDriver
 import net.java.truevfs.kernel.spec.sl._
 import net.java.truevfs.kernel.spec.spi._
 import org.junit.runner._
+import org.scalatest.Matchers._
 import org.scalatest._
 import org.scalatest.junit._
-import org.scalatest.matchers._
-import org.scalatest.prop._
-import TConfig._
+import org.scalatest.prop.PropertyChecks._
+
+import scala.collection.JavaConverters._
 
 /**
   * DO NOT MODIFY THE GLOBAL CONFIGURATION IN THESE TESTS!
@@ -28,8 +30,7 @@ import TConfig._
   * @author Christian Schlichtherle
   */
 @RunWith(classOf[JUnitRunner])
-class TConfigSpec
-extends WordSpec with ShouldMatchers with PropertyChecks {
+class TConfigSpec extends WordSpec {
 
   private def inNewChild[V](operation: => V) {
     var ex: Throwable = null
@@ -47,7 +48,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
 
   "The TConfig class" should {
     "have the GLOBAL configuration as its current() configuration by default" in {
-      current should be theSameInstanceAs (GLOBAL)
+      current should be theSameInstanceAs GLOBAL
     }
 
     "throw an  IllegalStateException when calling close() without a prior call to open()" in {
@@ -59,30 +60,30 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
       loan(open()) to { c2 =>
         c2 should not be theSameInstanceAs (c1)
         c2 should equal (c1)
-        current should be theSameInstanceAs (c2)
+        current should be theSameInstanceAs c2
         inNewChild {
-          current should be theSameInstanceAs (c2)
+          current should be theSameInstanceAs c2
           intercept[IllegalStateException] { current close () }
         }
         loan(open()) to { c3 =>
           c3 should not be theSameInstanceAs (c2)
           c3 should equal (c2)
-          current should be theSameInstanceAs (c3)
+          current should be theSameInstanceAs c3
           inNewChild {
-            current should be theSameInstanceAs (c3)
+            current should be theSameInstanceAs c3
             intercept[IllegalStateException] { current close () }
           }
         }
-        current should be theSameInstanceAs (c2)
+        current should be theSameInstanceAs c2
       }
-      current should be theSameInstanceAs (c1)
+      current should be theSameInstanceAs c1
     }
   }
 
   "The GLOBAL configuration" should {
     "be correctly initialized" in {
-      GLOBAL.getManager should be theSameInstanceAs (FsManagerLocator.SINGLETON.get)
-      GLOBAL.getArchiveDetector should be theSameInstanceAs (TArchiveDetector.ALL)
+      GLOBAL.getManager should be theSameInstanceAs FsManagerLocator.SINGLETON.get
+      GLOBAL.getArchiveDetector should be theSameInstanceAs TArchiveDetector.ALL
       GLOBAL.getAccessPreferences should equal (BitField.of(CREATE_PARENTS))
     }
 
@@ -103,22 +104,22 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
     "update its mutable property for a file system manager" in {
       loan(open()) to { config =>
         intercept[NullPointerException] { config setManager null }
-        config.getManager should be theSameInstanceAs (FsManagerLocator.SINGLETON.get)
+        config.getManager should be theSameInstanceAs FsManagerLocator.SINGLETON.get
         val manager = new ServiceLocator(classOf[FsManagerLocator])
         .factory(classOf[FsManagerFactory], classOf[FsManagerDecorator])
         .get
         config setManager manager
-        config.getManager should be theSameInstanceAs (manager)
+        config.getManager should be theSameInstanceAs manager
       }
     }
 
     "update its mutable property for an archive detector" in {
       loan(open()) to { config =>
         intercept[NullPointerException] { config setArchiveDetector null }
-        config.getArchiveDetector should be theSameInstanceAs (TArchiveDetector.ALL)
+        config.getArchiveDetector should be theSameInstanceAs TArchiveDetector.ALL
         val detector = new TArchiveDetector("mok", new MockArchiveDriver())
         config setArchiveDetector detector
-        config.getArchiveDetector should be theSameInstanceAs (detector)
+        config.getArchiveDetector should be theSameInstanceAs detector
       }
     }
 
@@ -128,7 +129,7 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
         config.getAccessPreferences should equal (BitField.of(CREATE_PARENTS))
         val preferences = BitField.of(CACHE)
         config setAccessPreferences preferences
-        config.getAccessPreferences should be theSameInstanceAs (preferences)
+        config.getAccessPreferences should be theSameInstanceAs preferences
       }
     }
 
@@ -142,17 +143,17 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
     "correctly update its property for access preferences with legal values" in {
       loan(open()) to { config =>
         val legal = Table(
-          ("preferences"),
-          (BitField.of(CACHE)),
-          (BitField.of(CREATE_PARENTS)),
-          (BitField.of(GROW)),
-          (BitField.of(STORE)),
-          (BitField.of(COMPRESS)),
-          (BitField.of(ENCRYPT))
+          "preferences",
+          BitField.of(CACHE),
+          BitField.of(CREATE_PARENTS),
+          BitField.of(GROW),
+          BitField.of(STORE),
+          BitField.of(COMPRESS),
+          BitField.of(ENCRYPT)
         )
         forAll(legal) { preferences =>
           config setAccessPreferences preferences
-          config.getAccessPreferences should be theSameInstanceAs (preferences)
+          config.getAccessPreferences should be theSameInstanceAs preferences
           for (preference <- preferences.asScala) {
             config.setAccessPreference(preference, false)
             config.getAccessPreferences should equal (preferences.clear(preference))
@@ -167,10 +168,10 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
     "refuse to update its property for access preferences with illegal values" in {
       loan(open()) to { config =>
         val illegal = Table(
-          ("preferences"),
-          (BitField.of(EXCLUSIVE)),
-          (BitField.of(APPEND)),
-          (BitField.of(STORE, COMPRESS))
+          "preferences",
+          BitField.of(EXCLUSIVE),
+          BitField.of(APPEND),
+          BitField.of(STORE, COMPRESS)
         )
         forAll(illegal) { preferences =>
           intercept[IllegalArgumentException] {

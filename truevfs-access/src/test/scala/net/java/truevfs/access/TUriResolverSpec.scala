@@ -6,21 +6,21 @@ package net.java.truevfs.access
 
 import java.io.File._
 import java.net._
+
 import net.java.truevfs.kernel.spec._
 import org.junit.runner._
-import org.mockito.Mockito._
+import org.scalatest.Matchers._
 import org.scalatest._
 import org.scalatest.junit._
-import org.scalatest.matchers._
-import org.scalatest.mock._
-import org.scalatest.prop._
+import org.scalatest.mock.MockitoSugar.mock
+import org.scalatest.prop.PropertyChecks._
+import org.scalatest.prop.TableFor3
 
 /**
  * @author Christian Schlichtherle
  */
 @RunWith(classOf[JUnitRunner])
-class TUriResolverSpec
-extends WordSpec with ShouldMatchers with PropertyChecks with MockitoSugar {
+class TUriResolverSpec extends WordSpec {
 
   "TUriResolver.parent(FsNodePath)" should {
     "return the correct parent file system node path" in {
@@ -166,13 +166,17 @@ extends WordSpec with ShouldMatchers with PropertyChecks with MockitoSugar {
     }
   }
 
-  private def apply[V](f: TUriResolver => V): V = {
-    val driver = mock[FsDriver]
-    val archiveDriver = mock[FsArchiveDriver[_]]
-    val detector = new TArchiveDetector(TArchiveDetector.NULL, Array(
-        Array("file", driver),
-        Array("mok", archiveDriver)
-      ))
-    f(new TUriResolver(detector))
+  private def apply[V](fun: TUriResolver => V) = {
+    fun(
+      new TUriResolver(
+        new TArchiveDetector(
+          TArchiveDetector.NULL,
+          Array(
+            Array("file", mock[FsDriver]),
+            Array("mok", mock[FsArchiveDriver[_]])
+          )
+        )
+      )
+    )
   }
 }

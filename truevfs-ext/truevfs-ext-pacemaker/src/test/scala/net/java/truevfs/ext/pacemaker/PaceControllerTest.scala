@@ -6,23 +6,17 @@ package net.java.truevfs.ext.pacemaker
 
 import net.java.truecommons.shed.ControlFlowException
 import net.java.truevfs.kernel.spec._
-import net.java.truecommons.cio._
 import org.junit.runner._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.scalatest.Matchers._
 import org.scalatest._
 import org.scalatest.junit._
-import org.scalatest.matchers._
-import AspectControllerTest._
-import org.scalatest.mock._
+import org.scalatest.mock.MockitoSugar.mock
 
 /** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])
-class PaceControllerTest
-extends WordSpec
-   with ShouldMatchers
-   with MockitoSugar
-   with OneInstancePerTest {
+class PaceControllerTest extends WordSpec with OneInstancePerTest {
 
   "A PaceController" when {
     val manager = mock[PaceManager]
@@ -40,7 +34,7 @@ extends WordSpec
 
       "call only PaceManager.retain(*) and .accessed(*) if the operation succeeded" in {
         val result = new AnyRef
-        controller apply (() => result) should be theSameInstanceAs (result)
+        controller apply (() => result) should be theSameInstanceAs result
         verify(manager) postAccess delegate
         verifyNoMoreInteractions(manager)
       }

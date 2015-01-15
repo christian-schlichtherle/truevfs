@@ -4,21 +4,19 @@
  */
 package net.java.truevfs.ext.pacemaker
 
+import net.java.truecommons.cio.{Entry, _}
+import net.java.truevfs.ext.pacemaker.AspectControllerTest._
 import net.java.truevfs.kernel.spec._
-import net.java.truecommons.cio._
-import net.java.truecommons.cio.Entry
 import org.junit.runner._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest._
 import org.scalatest.junit._
-import org.scalatest.matchers._
-import AspectControllerTest._
-import org.scalatest.mock._
+import org.scalatest.mock.MockitoSugar.mock
 
 /** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])
-class AspectControllerTest extends WordSpec with ShouldMatchers with MockitoSugar with OneInstancePerTest {
+class AspectControllerTest extends WordSpec with OneInstancePerTest {
 
   def calling = afterWord("calling")
 
@@ -74,15 +72,15 @@ class AspectControllerTest extends WordSpec with ShouldMatchers with MockitoSuga
         }
 
         "stream(*)" in {
-          socket stream (null)
+          socket stream null
           verify(controller) apply any()
-          verify(delegateSocket) stream (null)
+          verify(delegateSocket) stream null
         }
 
         "channel(*)" in {
-          socket channel (null)
+          socket channel null
           verify(controller) apply any()
-          verify(delegateSocket) channel (null)
+          verify(delegateSocket) channel null
         }
       }
 
@@ -101,15 +99,15 @@ class AspectControllerTest extends WordSpec with ShouldMatchers with MockitoSuga
         }
 
         "stream(*)" in {
-          socket stream (null)
+          socket stream null
           verify(controller) apply any()
-          verify(delegateSocket) stream (null)
+          verify(delegateSocket) stream null
         }
 
         "channel(*)" in {
-          socket channel (null)
+          socket channel null
           verify(controller) apply any()
-          verify(delegateSocket) channel (null)
+          verify(delegateSocket) channel null
         }
       }
 
@@ -126,7 +124,7 @@ class AspectControllerTest extends WordSpec with ShouldMatchers with MockitoSuga
       }
 
       "sync(*)" in {
-        controller sync (null)
+        controller sync null
         verify(controller) apply any()
         verify(delegate) sync null
       }

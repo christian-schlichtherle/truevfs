@@ -4,18 +4,15 @@
  */
 package net.java.truevfs.access.swing;
 
-import java.awt.Toolkit;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.Objects;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import net.java.truevfs.access.TFile;
+import net.java.truevfs.access.TFileComparator;
+import org.slf4j.LoggerFactory;
+
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.WillClose;
-import javax.swing.CellEditor;
-import javax.swing.JTree;
+import javax.swing.*;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.TreeExpansionEvent;
@@ -23,9 +20,13 @@ import javax.swing.event.TreeExpansionListener;
 import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
-import net.java.truevfs.access.TFile;
-import net.java.truevfs.access.TFileComparator;
-import org.slf4j.LoggerFactory;
+import java.awt.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.Objects;
 
 /**
  * A custom {@link JTree} to browse files and directories.
@@ -97,7 +98,7 @@ public final class TFileTree extends JTree {
      *         of {@link TFileTreeModel}.
      */
     @Override
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("BC_UNCONFIRMED_CAST")
+    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     public void setModel(TreeModel model) {
         super.setModel((TFileTreeModel) Objects.requireNonNull(model));
     }

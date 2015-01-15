@@ -4,16 +4,20 @@
  */
 package net.java.truevfs.driver.http;
 
-import java.io.IOException;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.cio.IoBufferPool;
-import net.java.truevfs.kernel.spec.*;
+import net.java.truevfs.kernel.spec.FsController;
+import net.java.truevfs.kernel.spec.FsDriver;
+import net.java.truevfs.kernel.spec.FsManager;
+import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.PoolingClientConnectionManager;
+import org.apache.http.impl.client.HttpClientBuilder;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.Immutable;
+import java.io.IOException;
 
 /**
  * A file system driver for the HTTP(S) schemes.
@@ -26,7 +30,7 @@ import org.apache.http.impl.conn.PoolingClientConnectionManager;
 @Immutable
 public class HttpDriver extends FsDriver {
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
+    @SuppressFBWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private volatile @CheckForNull HttpClient client;
 
     final IoBufferPool getPool() {
@@ -47,14 +51,14 @@ public class HttpDriver extends FsDriver {
      * Returns a new http client.
      * <p>
      * The implementation in the class {@link HttpDriver} simply returns
-     * {@code new DefaultHttpClient(new ThreadSafeClientConnManager())}.
+     * {@code HttpClientBuilder.create().useSystemProperties().build()}.
      * If you need special configuration, e.g. for authentication or caching,
      * then you should override this method.
      *
      * @return A new http client.
      */
     protected HttpClient newClient() {
-        return new DefaultHttpClient(new PoolingClientConnectionManager());
+        return HttpClientBuilder.create().useSystemProperties().build();
     }
 
     /**

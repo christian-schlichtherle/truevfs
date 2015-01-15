@@ -5,31 +5,20 @@
 package net.java.truevfs.access
 
 import java.beans._
-import java.net._
 import java.io._
+import java.net._
+
 import net.java.truecommons.io.Loan._
+import net.java.truevfs.access.TFile2Test._
 import net.java.truevfs.kernel.spec._
-import org.scalatest.matchers._
-import org.scalatest.mock._
-import org.scalatest.prop._
-import org.slf4j._
 import org.junit._
-import TFile2Test._
+import org.scalatest.Matchers._
 import org.scalatest.junit.JUnitSuite
+import org.scalatest.mock.MockitoSugar.mock
+import org.scalatest.prop.PropertyChecks._
+import org.slf4j._
 
-object TFile2Test {
-  private val logger = LoggerFactory.getLogger(classOf[TFile2Test])
-
-  private val listener = new ExceptionListener {
-    def exceptionThrown(ex: Exception) = throw new AssertionError(ex)
-  }
-}
-
-class TFile2Test
-  extends JUnitSuite
-  with ShouldMatchers
-  with PropertyChecks
-  with MockitoSugar {
+class TFile2Test extends JUnitSuite {
 
   private val config = TConfig open ()
 
@@ -54,18 +43,18 @@ class TFile2Test
 
   @Test def testSerialization() {
     val table = Table(
-      ("uri"),
-      ("file:/file"),
-      ("a1:file:/archive.a1!/"),
-      ("a1:file:/archive.a1!/entry"),
-      ("a2:a1:file:/foo.a1!/bar.a2!/"),
-      ("a2:a1:file:/foo.a1!/bar.a2!/META-INF/MANIFEST.MF"),
-      ("a2:a1:file:/föö%20bär.a1!/föö%20bär.a2!/föö%20bär"),
-      ("a1:file:/föö%20bär.a1!/föö%20bär"),
-      ("file:/föö%20bär/föö%20bär"),
-      ("a1:file:/foo.a1!/bar"),
-      ("file:/foo/bar"),
-      ("file:/foo/bar")
+      "uri",
+      "file:/file",
+      "a1:file:/archive.a1!/",
+      "a1:file:/archive.a1!/entry",
+      "a2:a1:file:/foo.a1!/bar.a2!/",
+      "a2:a1:file:/foo.a1!/bar.a2!/META-INF/MANIFEST.MF",
+      "a2:a1:file:/föö%20bär.a1!/föö%20bär.a2!/föö%20bär",
+      "a1:file:/föö%20bär.a1!/föö%20bär",
+      "file:/föö%20bär/föö%20bär",
+      "a1:file:/foo.a1!/bar",
+      "file:/foo/bar",
+      "file:/foo/bar"
     )
     forAll(table) { uri =>
       val file = new TFile(URI.create(uri))
@@ -101,5 +90,13 @@ class TFile2Test
 
     clone should not be theSameInstanceAs (file)
     clone should equal (file.getAbsoluteFile)
+  }
+}
+
+object TFile2Test {
+  private val logger = LoggerFactory.getLogger(classOf[TFile2Test])
+
+  private val listener = new ExceptionListener {
+    def exceptionThrown(ex: Exception) = throw new AssertionError(ex)
   }
 }

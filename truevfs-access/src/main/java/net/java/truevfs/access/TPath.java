@@ -16,6 +16,8 @@ import java.nio.file.attribute.*;
 import java.util.*;
 import javax.annotation.*;
 import javax.annotation.concurrent.*;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.cio.*;
 import net.java.truecommons.shed.*;
 import static net.java.truecommons.shed.HashMaps.*;
@@ -304,7 +306,7 @@ public final class TPath implements Path, TRex {
                 null);
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
+    @SuppressFBWarnings("ES_COMPARING_STRINGS_WITH_EQ")
     private TPath(
             URI name,
             @CheckForNull TArchiveDetector detector,
@@ -380,7 +382,7 @@ public final class TPath implements Path, TRex {
         }
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("ES_COMPARING_STRINGS_WITH_EQ")
+    @SuppressFBWarnings("ES_COMPARING_STRINGS_WITH_EQ")
     private static URI name(URI uri) {
         try {
             uri = fix(check(uri));
@@ -998,7 +1000,7 @@ public final class TPath implements Path, TRex {
      * {@code TPath} object is just used for resolving another {@code TPath}
      * object.
      */
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("SE_COMPARATOR_SHOULD_BE_SERIALIZABLE")
+    @SuppressFBWarnings("SE_COMPARATOR_SHOULD_BE_SERIALIZABLE")
     private static class TPathComparator implements Comparator<TPath> {
         @Override
         public int compare(TPath p1, TPath p2) {
@@ -1032,7 +1034,7 @@ public final class TPath implements Path, TRex {
      * {@code TPath} object is just used for resolving another {@code TPath}
      * object.
      */
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("SE_COMPARATOR_SHOULD_BE_SERIALIZABLE")
+    @SuppressFBWarnings("SE_COMPARATOR_SHOULD_BE_SERIALIZABLE")
     private static final class WindowsTPathComparator extends TPathComparator {
         @Override
         public int compare(TPath p1, TPath p2) {

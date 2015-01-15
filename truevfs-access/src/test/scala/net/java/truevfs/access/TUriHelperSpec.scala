@@ -6,30 +6,27 @@ package net.java.truevfs.access
 
 import java.io.File._
 import java.net._
+
+import net.java.truevfs.access.TUriHelper._
 import org.junit.runner._
+import org.scalatest.Matchers._
 import org.scalatest._
 import org.scalatest.junit._
-import org.scalatest.matchers._
-import org.scalatest.mock._
-import org.scalatest.prop._
-import TUriHelper._
+import org.scalatest.prop.PropertyChecks._
+import org.scalatest.prop.TableFor2
 
 /**
- * @author Christian Schlichtherle
- */
+  * @author Christian Schlichtherle
+  */
 @RunWith(classOf[JUnitRunner])
-class TUriHelperSpec
-extends WordSpec
-with ShouldMatchers
-with PropertyChecks
-with ParallelTestExecution {
+class TUriHelperSpec extends WordSpec {
 
   "Checking a URI" should {
     "result in a URISyntaxException" when {
       "providing a URI with a fragment component" in {
         val table = Table(
-          ("uri"),
-          ("#bar")
+          "uri",
+          "#bar"
         )
         forAll(table) { _uri =>
           val uri = new URI(_uri)
@@ -42,13 +39,13 @@ with ParallelTestExecution {
   // See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7198297 :
   "Fixing a URI" should {
     "be required unless bug 7198297 has been fixed in the JDK" in {
-      new URI("x/").resolve("..").getRawSchemeSpecificPart() should be (null)
-      new URI("x/").resolve("..").getSchemeSpecificPart() should be (null)
+      (new URI("x/") resolve "..").getRawSchemeSpecificPart should be (null)
+      (new URI("x/") resolve "..").getSchemeSpecificPart should be (null)
     }
 
     "should successfully work around bug 7198297" in {
-      fix(new URI("x/").resolve("..")).getRawSchemeSpecificPart should not be (null)
-      fix(new URI("x/").resolve("..")).getSchemeSpecificPart should not be (null)
+      fix(new URI("x/") resolve "..").getRawSchemeSpecificPart should not be null
+      fix(new URI("x/") resolve "..").getSchemeSpecificPart should not be null
     }
   }
 
@@ -77,9 +74,8 @@ with ParallelTestExecution {
         ))
 
       def dinnerForOne(table: TableFor2[String, Boolean]) {
-        forAll(table) { (_uri, result) =>
-          val uri = new URI(_uri)
-          hasAbsolutePath(uri) should be (result)
+        forAll(table) { (uri, result) =>
+          hasAbsolutePath(new URI(uri)) should be (result)
         }
       }
     }

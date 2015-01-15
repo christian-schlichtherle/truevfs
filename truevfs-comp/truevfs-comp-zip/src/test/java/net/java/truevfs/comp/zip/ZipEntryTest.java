@@ -4,10 +4,12 @@
  */
 package net.java.truevfs.comp.zip;
 
+import org.junit.Test;
+
 import java.util.Arrays;
+
 import static net.java.truevfs.comp.zip.ZipEntry.*;
 import static org.junit.Assert.*;
-import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle
@@ -28,13 +30,13 @@ public final class ZipEntryTest {
         try {
             entry.setPlatform((short) (UNKNOWN - 1));
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setPlatform((short) (UByte.MAX_VALUE + 1));
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         assertEquals(UNKNOWN, entry.getPlatform());
@@ -55,19 +57,19 @@ public final class ZipEntryTest {
         try {
             entry.setRawPlatform(UNKNOWN - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setRawPlatform(UByte.MIN_VALUE - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setRawPlatform(UByte.MAX_VALUE + 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         assertEquals(0, entry.getRawPlatform());
@@ -86,19 +88,19 @@ public final class ZipEntryTest {
         try {
             entry.setGeneralPurposeBitFlags(UNKNOWN - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setGeneralPurposeBitFlags(UShort.MIN_VALUE - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setGeneralPurposeBitFlags(UShort.MAX_VALUE + 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         assertEquals(UShort.MIN_VALUE, entry.getGeneralPurposeBitFlags());
@@ -117,19 +119,19 @@ public final class ZipEntryTest {
         try {
             entry.setMethod(UNKNOWN - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setMethod(UShort.MAX_VALUE);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setMethod(UShort.MAX_VALUE + 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         assertEquals(UNKNOWN, entry.getMethod());
@@ -148,19 +150,19 @@ public final class ZipEntryTest {
         try {
             entry.setRawMethod(UNKNOWN - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setRawMethod(UShort.MIN_VALUE - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setRawMethod(UShort.MAX_VALUE + 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         assertEquals(0, entry.getRawMethod());
@@ -189,13 +191,13 @@ public final class ZipEntryTest {
         try {
             entry.setTime(Long.MIN_VALUE);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setTime(UNKNOWN - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         assertEquals(UNKNOWN, entry.getTime());
@@ -215,19 +217,19 @@ public final class ZipEntryTest {
         try {
             entry.setRawTime(UNKNOWN - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setRawTime(UInt.MIN_VALUE - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setRawTime(UInt.MAX_VALUE + 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         assertEquals(0, entry.getRawTime());
@@ -243,13 +245,13 @@ public final class ZipEntryTest {
         try {
             entry.setCrc(UNKNOWN - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setCrc(UInt.MAX_VALUE + 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         assertEquals(UNKNOWN, entry.getCrc());
@@ -266,19 +268,19 @@ public final class ZipEntryTest {
         try {
             entry.setRawCrc(UNKNOWN - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setRawCrc(UInt.MIN_VALUE - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setRawCrc(UInt.MAX_VALUE + 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         assertEquals(0, entry.getRawCrc());
@@ -293,13 +295,13 @@ public final class ZipEntryTest {
         try {
             entry.setCompressedSize(UNKNOWN - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setCompressedSize(ULong.MAX_VALUE + 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         assertEquals(UNKNOWN, entry.getCompressedSize());
@@ -319,19 +321,19 @@ public final class ZipEntryTest {
         try {
             entry.setRawCompressedSize(UNKNOWN - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setRawCompressedSize(ULong.MIN_VALUE - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setRawCompressedSize(ULong.MAX_VALUE + 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         assertEquals(0, entry.getRawCompressedSize());
@@ -349,13 +351,13 @@ public final class ZipEntryTest {
         try {
             entry.setSize(UNKNOWN - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setSize(ULong.MAX_VALUE + 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         assertEquals(UNKNOWN, entry.getSize());
@@ -375,19 +377,19 @@ public final class ZipEntryTest {
         try {
             entry.setRawSize(UNKNOWN - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setRawSize(ULong.MIN_VALUE - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setRawSize(ULong.MAX_VALUE + 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         assertEquals(0, entry.getRawSize());
@@ -405,13 +407,13 @@ public final class ZipEntryTest {
         try {
             entry.setExternalAttributes(UNKNOWN - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setExternalAttributes(UInt.MAX_VALUE + 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         assertEquals(UNKNOWN, entry.getExternalAttributes());
@@ -428,19 +430,19 @@ public final class ZipEntryTest {
         try {
             entry.setRawExternalAttributes(UNKNOWN - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setRawExternalAttributes(UInt.MIN_VALUE - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setRawExternalAttributes(UInt.MAX_VALUE + 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         assertEquals(0, entry.getRawExternalAttributes());
@@ -455,19 +457,19 @@ public final class ZipEntryTest {
         try {
             entry.setRawOffset(UNKNOWN - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setRawOffset(ULong.MIN_VALUE - 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         try {
             entry.setRawOffset(ULong.MAX_VALUE + 1);
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (IllegalArgumentException ignored) {
         }
 
         assertEquals(UNKNOWN, entry.getOffset());

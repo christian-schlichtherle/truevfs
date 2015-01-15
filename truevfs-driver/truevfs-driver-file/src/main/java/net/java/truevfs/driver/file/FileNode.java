@@ -5,31 +5,32 @@
 package net.java.truevfs.driver.file;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import static java.io.File.separatorChar;
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import static java.nio.file.Files.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.PosixFilePermission;
-import static java.nio.file.attribute.PosixFilePermission.*;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.cio.Entry;
-import static net.java.truecommons.cio.Entry.PosixEntity.*;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.IoBuffer;
 import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAbstractNode;
 import net.java.truevfs.kernel.spec.FsAccessOption;
-import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
 import net.java.truevfs.kernel.spec.FsNode;
 import net.java.truevfs.kernel.spec.FsNodeName;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import static java.io.File.separatorChar;
+import static java.nio.file.Files.*;
+import static java.nio.file.attribute.PosixFilePermission.*;
+import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 
 /**
@@ -45,7 +46,7 @@ class FileNode extends FsAbstractNode implements IoBuffer {
     private final Path path;
     private final String name;
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
+    @SuppressFBWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     volatile @CheckForNull FileBufferPool pool;
 
     FileNode(final Path path) {
