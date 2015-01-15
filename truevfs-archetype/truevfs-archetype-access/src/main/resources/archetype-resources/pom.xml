@@ -15,9 +15,9 @@
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
-        <netbeans.compile.on.save>none</netbeans.compile.on.save>
         <netbeans.hint.jdkPlatform>JDK_1.7</netbeans.hint.jdkPlatform>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <scala.version>${scala-version}</scala.version>
         <truecommons.version>${truecommons-version}</truecommons.version>
         <truevfs.version>${truevfs-version}</truevfs.version>
@@ -122,7 +122,7 @@
         <!--dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.0.7</version>
+            <version>1.1.2</version>
             <scope>runtime</scope>
         </dependency-->
 
@@ -132,7 +132,7 @@
         <dependency>
             <groupId>com.google.code.findbugs</groupId>
             <artifactId>annotations</artifactId>
-            <version>2.0.1</version>
+            <version>3.0.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -147,7 +147,7 @@
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>scala-compile-first</id>
@@ -168,7 +168,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.0</version>
+                <version>3.2</version>
                 <configuration>
                     <!-- For NetBeans. -->
                     <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
@@ -186,7 +186,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-shade-plugin</artifactId>
-                        <version>2.0</version>
+                        <version>2.3</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
