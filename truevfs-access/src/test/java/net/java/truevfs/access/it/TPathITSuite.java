@@ -4,82 +4,40 @@
  */
 package net.java.truevfs.access.it;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.DataInputStream;
-import static java.io.File.separatorChar;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
-import java.nio.ByteBuffer;
-import java.nio.file.DirectoryStream;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import static java.nio.file.Files.copy;
-import static java.nio.file.Files.createDirectory;
-import static java.nio.file.Files.createFile;
-import static java.nio.file.Files.delete;
-import static java.nio.file.Files.exists;
-import static java.nio.file.Files.getLastModifiedTime;
-import static java.nio.file.Files.isDirectory;
-import static java.nio.file.Files.isRegularFile;
-import static java.nio.file.Files.newDirectoryStream;
-import static java.nio.file.Files.newInputStream;
-import static java.nio.file.Files.newOutputStream;
-import static java.nio.file.Files.setLastModifiedTime;
-import static java.nio.file.Files.size;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.NotDirectoryException;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.FileTime;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.Callable;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.io.ClosedInputException;
 import net.java.truecommons.io.ClosedOutputException;
 import net.java.truecommons.io.Streams;
 import net.java.truecommons.shed.BitField;
-import static net.java.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskJoiner;
-import static net.java.truecommons.shed.ConcurrencyUtils.start;
-import net.java.truevfs.access.ConfiguredClientTestBase;
-import net.java.truevfs.access.TConfig;
-import net.java.truevfs.access.TFile;
-import net.java.truevfs.access.TPath;
-import net.java.truevfs.access.TVFS;
-import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
-import net.java.truevfs.kernel.spec.FsArchiveDriver;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsOpenResourceException;
-import net.java.truevfs.kernel.spec.FsSyncException;
-import static net.java.truevfs.kernel.spec.FsSyncOption.CLEAR_CACHE;
-import static net.java.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
-import static net.java.truevfs.kernel.spec.FsSyncOptions.SYNC;
-import net.java.truevfs.kernel.spec.FsSyncWarningException;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import net.java.truevfs.access.*;
+import net.java.truevfs.kernel.spec.*;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
+import java.nio.ByteBuffer;
+import java.nio.file.*;
+import java.nio.file.attribute.FileTime;
+import java.util.*;
+import java.util.concurrent.Callable;
+
+import static java.io.File.separatorChar;
+import static java.nio.file.Files.*;
+import static net.java.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
+import static net.java.truecommons.shed.ConcurrencyUtils.start;
+import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
+import static net.java.truevfs.kernel.spec.FsSyncOption.CLEAR_CACHE;
+import static net.java.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
+import static net.java.truevfs.kernel.spec.FsSyncOptions.SYNC;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.*;
 
 /**
  * Tests a particular {@link FsArchiveDriver} using the API of the module
@@ -296,7 +254,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             newOutputStream(archive).close();
             fail();
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
 
         assertRm(file);
@@ -322,7 +280,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             newOutputStream(archive).close();
             fail();
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
 
         assertRm(file);
@@ -336,12 +294,12 @@ extends ConfiguredClientTestBase<D> {
         try {
             size(file);
             fail();
-        } catch (NoSuchFileException expected) {
+        } catch (NoSuchFileException ignored) {
         }
         try {
             getLastModifiedTime(file);
             fail();
-        } catch (NoSuchFileException expected) {
+        } catch (NoSuchFileException ignored) {
         }
     }
 
@@ -351,7 +309,7 @@ extends ConfiguredClientTestBase<D> {
         assertCreateNewEnhancedFile();
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
+    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     private void assertCreateNewPlainFile() throws IOException {
         final Path archive = createTempFile();
         delete(archive);
@@ -360,12 +318,12 @@ extends ConfiguredClientTestBase<D> {
         try {
             createFile(file1);
             fail("Creating a file in a non-existent directory should throw an IOException!");
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
         assertCreateNewFile(archive, file1, file2);
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
+    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     private void assertCreateNewEnhancedFile() throws IOException {
         final TPath file1 = archive.resolve("test.txt");
         final TPath file2 = file1.resolve("test.txt");
@@ -374,14 +332,14 @@ extends ConfiguredClientTestBase<D> {
             try {
                 createFile(file1);
                 fail("Creating a file in a non-existent directory should throw an IOException!");
-            } catch (IOException expected) {
+            } catch (IOException ignored) {
             }
             assertCreateNewFile(archive, file1, file2);
         }
         assertCreateNewFile(archive, file1, file2);
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
+    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     private void assertCreateNewFile(   final Path dir,
                                         final Path file1,
                                         final Path file2)
@@ -407,7 +365,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             createFile(file2);
             fail("Creating a file in another file should throw an IOException!");
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
 
         delete(file1); // OK now!
@@ -417,7 +375,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             size(file1);
             fail();
-        } catch (NoSuchFileException expected) {
+        } catch (NoSuchFileException ignored) {
         }
 
         delete(dir);
@@ -427,7 +385,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             size(dir);
             fail();
-        } catch (NoSuchFileException expected) {
+        } catch (NoSuchFileException ignored) {
         }
     }
 
@@ -468,19 +426,19 @@ extends ConfiguredClientTestBase<D> {
         try {
             newOutputStream(dir).close();
             fail();
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
         Path tmp = Files.createTempFile(TEMP_FILE_PREFIX, null);
         try {
             try {
                 copy(tmp, dir);
                 fail();
-            } catch (FileAlreadyExistsException expected) {
+            } catch (FileAlreadyExistsException ignored) {
             }
             try {
                 copy(dir, tmp);
                 fail();
-            } catch (FileAlreadyExistsException expected) {
+            } catch (FileAlreadyExistsException ignored) {
             }
         } finally {
             delete(tmp);
@@ -495,7 +453,7 @@ extends ConfiguredClientTestBase<D> {
             try {
                 assertFileOutputStream(file);
                 fail("Creating ghost directories should not be allowed when Path.isLenient() is false!");
-            } catch (IOException expected) {
+            } catch (IOException ignored) {
             }
             createDirectory(archive);
             assertFileOutputStream(file);
@@ -512,7 +470,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             delete(archive);
             fail("directory not empty");
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
         umount(); // allow external modifications!
         delete(archive.toNonArchivePath()); // use plain file to delete instead!
@@ -522,7 +480,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             size(archive);
             fail();
-        } catch (NoSuchFileException expected) {
+        } catch (NoSuchFileException ignored) {
         }
     }
 
@@ -546,7 +504,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             createFile(file);
             fail();
-        } catch (FileAlreadyExistsException expected) {
+        } catch (FileAlreadyExistsException ignored) {
         }
         assertTrue(exists(file));
         assertFalse(isDirectory(file));
@@ -560,12 +518,12 @@ extends ConfiguredClientTestBase<D> {
         try {
             size(file);
             fail();
-        } catch (NoSuchFileException expected) {
+        } catch (NoSuchFileException ignored) {
         }
     }
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
+    @SuppressFBWarnings("OS_OPEN_STREAM")
     @Test
     public void testBusyFileInputStream()
     throws IOException, InterruptedException {
@@ -637,7 +595,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
+    @SuppressFBWarnings("OS_OPEN_STREAM")
     @Test
     public void testBusyFileOutputStream()
     throws IOException, InterruptedException {
@@ -742,32 +700,32 @@ extends ConfiguredClientTestBase<D> {
         try {
             createDirectory(dir6);
             fail();
-        } catch (FileAlreadyExistsException expected) {
+        } catch (FileAlreadyExistsException ignored) {
         }
         try {
             createDirectory(dir5);
             fail();
-        } catch (FileAlreadyExistsException expected) {
+        } catch (FileAlreadyExistsException ignored) {
         }
         try {
             createDirectory(dir4);
             fail();
-        } catch (FileAlreadyExistsException expected) {
+        } catch (FileAlreadyExistsException ignored) {
         }
         try {
             createDirectory(dir3);
             fail();
-        } catch (FileAlreadyExistsException expected) {
+        } catch (FileAlreadyExistsException ignored) {
         }
         try {
             createDirectory(dir2);
             fail();
-        } catch (FileAlreadyExistsException expected) {
+        } catch (FileAlreadyExistsException ignored) {
         }
         try {
             createDirectory(dir1);
             fail();
-        } catch (FileAlreadyExistsException expected) {
+        } catch (FileAlreadyExistsException ignored) {
         }
 
         delete(dir6);
@@ -783,27 +741,27 @@ extends ConfiguredClientTestBase<D> {
             try {
                 createDirectory(dir6);
                 fail();
-            } catch (IOException expected) {
+            } catch (IOException ignored) {
             }
             try {
                 createDirectory(dir5);
                 fail();
-            } catch (IOException expected) {
+            } catch (IOException ignored) {
             }
             try {
                 createDirectory(dir4);
                 fail();
-            } catch (IOException expected) {
+            } catch (IOException ignored) {
             }
             try {
                 createDirectory(dir3);
                 fail();
-            } catch (IOException expected) {
+            } catch (IOException ignored) {
             }
             try {
                 createDirectory(dir2);
                 fail();
-            } catch (IOException expected) {
+            } catch (IOException ignored) {
             }
 
             createDirectory(dir1);
@@ -861,7 +819,7 @@ extends ConfiguredClientTestBase<D> {
             try {
                 size(member);
                 fail();
-            } catch (NoSuchFileException expected) {
+            } catch (NoSuchFileException ignored) {
             }
         }
     }
@@ -957,22 +915,22 @@ extends ConfiguredClientTestBase<D> {
         try {
             copy(a, a, StandardCopyOption.REPLACE_EXISTING);
             fail();
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
         try {
             copy(a, b, StandardCopyOption.REPLACE_EXISTING);
             fail();
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
         try {
             copy(b, a, StandardCopyOption.REPLACE_EXISTING);
             fail();
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
         try {
             copy(b, b, StandardCopyOption.REPLACE_EXISTING);
             fail();
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
     }
 
@@ -1093,20 +1051,20 @@ extends ConfiguredClientTestBase<D> {
             try {
                 delete(entry1);
                 fail();
-            } catch (IOException expected) {
+            } catch (IOException ignored) {
             }
             out1.write(getData());
             try (final OutputStream out2 = newOutputStream(entry2)) {
                 try {
                     delete(entry2);
                     fail();
-                } catch (IOException expected) {
+                } catch (IOException ignored) {
                 }
                 out2.write(getData());
                 try {
                     archive.toFile().rm_r();
                     fail();
-                } catch (IOException expected) {
+                } catch (IOException ignored) {
                 }
             }
         }
@@ -1123,13 +1081,13 @@ extends ConfiguredClientTestBase<D> {
                 try {
                     archive.toFile().rm_r();
                     fail();
-                } catch (IOException expected) {
+                } catch (IOException ignored) {
                 }
             }
             try {
                 delete(entry1);
                 fail("deleted within archive.toFile().rm_r()");
-            } catch (IOException expected) {
+            } catch (IOException ignored) {
             }
             final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
             try {
@@ -1141,7 +1099,7 @@ extends ConfiguredClientTestBase<D> {
             try {
                 archive.toFile().rm_r();
                 fail();
-            } catch (IOException expected) {
+            } catch (IOException ignored) {
             }
         }
         archive.toFile().rm_r();

@@ -4,27 +4,42 @@
  */
 package net.java.truevfs.access;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import net.java.truecommons.cio.Entry.Access;
+import net.java.truecommons.cio.Entry.Size;
+import net.java.truecommons.io.Streams;
+import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.PathSplitter;
+import net.java.truecommons.shed.Paths;
+import net.java.truecommons.shed.UriBuilder;
+import net.java.truevfs.kernel.spec.*;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.WillClose;
+import javax.annotation.WillNotClose;
+import javax.annotation.concurrent.Immutable;
 import java.io.*;
-import java.net.*;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystemException;
 import java.util.*;
-import javax.annotation.*;
-import javax.annotation.concurrent.*;
-import static net.java.truecommons.cio.Entry.*;
-import net.java.truecommons.cio.Entry.Access;
+
 import static net.java.truecommons.cio.Entry.Access.*;
-import net.java.truecommons.cio.Entry.Size;
-import static net.java.truecommons.cio.Entry.Type.*;
-import net.java.truecommons.io.*;
-import net.java.truecommons.shed.*;
-import static net.java.truevfs.access.ExpertFeature.Level.*;
-import static net.java.truevfs.access.ExpertFeature.Reason.*;
-import net.java.truevfs.kernel.spec.*;
-import static net.java.truevfs.kernel.spec.FsAccessOption.*;
+import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
+import static net.java.truecommons.cio.Entry.Type.FILE;
+import static net.java.truecommons.cio.Entry.UNKNOWN;
+import static net.java.truevfs.access.ExpertFeature.Level.INTERMEDIATE;
+import static net.java.truevfs.access.ExpertFeature.Reason.INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA;
+import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
+import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
 import static net.java.truevfs.kernel.spec.FsAssertion.Level.*;
-import static net.java.truevfs.kernel.spec.FsNodeName.*;
-import static net.java.truevfs.kernel.spec.FsUriModifier.*;
+import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
+import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 
 /**
  * A replacement for the class {@link File} which provides transparent
@@ -382,7 +397,7 @@ public final class TFile extends File implements TRex {
      *
      * @see #readObject
      */
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
+    @SuppressFBWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private transient volatile @CheckForNull FsController controller;
 
     /**
@@ -1464,7 +1479,7 @@ public final class TFile extends File implements TRex {
      * @see   #compareTo(File)
      */
     @Override
-    @SuppressWarnings({"EqualsWhichDoesntCheckParameterClass"})
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     public boolean equals(Object that) { return file.equals(that); }
 
     /**

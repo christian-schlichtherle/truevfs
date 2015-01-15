@@ -4,18 +4,20 @@
  */
 package net.java.truevfs.access.it;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
-import java.io.DataInputStream;
-import java.io.File;
-import static java.io.File.separatorChar;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import net.java.truecommons.io.ClosedInputException;
+import net.java.truecommons.io.ClosedOutputException;
+import net.java.truecommons.io.InputException;
+import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
+import net.java.truecommons.shed.ConcurrencyUtils.TaskJoiner;
+import net.java.truevfs.access.*;
+import net.java.truevfs.kernel.spec.*;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
@@ -25,43 +27,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
-import net.java.truecommons.io.ClosedInputException;
-import net.java.truecommons.io.ClosedOutputException;
-import net.java.truecommons.io.InputException;
-import net.java.truecommons.shed.BitField;
+
+import static java.io.File.separatorChar;
 import static net.java.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
-import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
-import net.java.truecommons.shed.ConcurrencyUtils.TaskJoiner;
 import static net.java.truecommons.shed.ConcurrencyUtils.start;
-import net.java.truevfs.access.ConfiguredClientTestBase;
-import net.java.truevfs.access.TConfig;
-import net.java.truevfs.access.TFile;
-import net.java.truevfs.access.TFileInputStream;
-import net.java.truevfs.access.TFileOutputStream;
-import net.java.truevfs.access.TVFS;
 import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
-import net.java.truevfs.kernel.spec.FsArchiveDriver;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsOpenResourceException;
-import net.java.truevfs.kernel.spec.FsSyncException;
 import static net.java.truevfs.kernel.spec.FsSyncOption.CLEAR_CACHE;
 import static net.java.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
 import static net.java.truevfs.kernel.spec.FsSyncOptions.SYNC;
-import net.java.truevfs.kernel.spec.FsSyncWarningException;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.Assert.*;
 
 /**
  * Tests a particular {@link FsArchiveDriver} using the API of the module
@@ -278,7 +254,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             new TFileOutputStream(archive).close();
             fail();
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
 
         assertRm(file);
@@ -304,7 +280,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             new TFileOutputStream(archive).close();
             fail();
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
 
         assertRm(file);
@@ -325,7 +301,7 @@ extends ConfiguredClientTestBase<D> {
         assertCreateNewEnhancedFile();
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
+    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     private void assertCreateNewPlainFile() throws IOException {
         final File archive = createTempFile();
         TFile.rm(archive);
@@ -334,12 +310,12 @@ extends ConfiguredClientTestBase<D> {
         try {
             file1.createNewFile();
             fail("Creating a file in a non-existent directory should throw an IOException!");
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
         assertCreateNewFile(archive, file1, file2);
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
+    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     private void assertCreateNewEnhancedFile() throws IOException {
         final File file1 = new TFile(archive, "test.txt");
         final File file2 = new TFile(file1, "test.txt");
@@ -348,14 +324,14 @@ extends ConfiguredClientTestBase<D> {
             try {
                 file1.createNewFile();
                 fail("Creating a file in a non-existent directory should throw an IOException!");
-            } catch (IOException expected) {
+            } catch (IOException ignored) {
             }
             assertCreateNewFile(archive, file1, file2);
         }
         assertCreateNewFile(archive, file1, file2);
     }
 
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
+    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     private void assertCreateNewFile(   final File dir,
                                         final File file1,
                                         final File file2)
@@ -381,7 +357,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             file2.createNewFile();
             fail("Creating a file in another file should throw an IOException!");
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
 
         TFile.rm(file1); // OK now!
@@ -434,19 +410,19 @@ extends ConfiguredClientTestBase<D> {
         try {
             new TFileOutputStream(dir).close();
             fail();
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
         File tmp = TFile.createTempFile(TEMP_FILE_PREFIX, null);
         try {
             try {
                 TFile.cp(tmp, dir);
                 fail();
-            } catch (IOException expected) {
+            } catch (IOException ignored) {
             }
             try {
                 TFile.cp(dir, tmp);
                 fail();
-            } catch (IOException expected) {
+            } catch (IOException ignored) {
             }
         } finally {
             TFile.rm(tmp);
@@ -461,7 +437,7 @@ extends ConfiguredClientTestBase<D> {
             try {
                 assertFileOutputStream(file);
                 fail("Creating ghost directories should not be allowed when File.isLenient() is false!");
-            } catch (IOException expected) {
+            } catch (IOException ignored) {
             }
             assertTrue(archive.mkdir());
             assertFileOutputStream(file);
@@ -478,7 +454,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             archive.rm();
             fail("directory not empty");
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
         umount(); // allow external modifications!
         TFile.rm(archive.toNonArchiveFile()); // use plain file to delete instead!
@@ -520,7 +496,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
+    @SuppressFBWarnings("OS_OPEN_STREAM")
     @Test
     public void testBusyFileInputStream()
     throws IOException, InterruptedException {
@@ -595,7 +571,7 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("OS_OPEN_STREAM")
+    @SuppressFBWarnings("OS_OPEN_STREAM")
     @Test
     public void testBusyFileOutputStream()
     throws IOException, InterruptedException {
@@ -850,22 +826,22 @@ extends ConfiguredClientTestBase<D> {
         try {
             TFile.cp(a, a);
             fail();
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
         try {
             TFile.cp(a, b);
             fail();
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
         try {
             TFile.cp(b, a);
             fail();
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
         try {
             TFile.cp(b, b);
             fail();
-        } catch (IOException expected) {
+        } catch (IOException ignored) {
         }
     }
 
@@ -986,20 +962,20 @@ extends ConfiguredClientTestBase<D> {
             try {
                 entry1.rm();
                 fail();
-            } catch (IOException expected) {
+            } catch (IOException ignored) {
             }
             out1.write(getData());
             try (final OutputStream out2 = new TFileOutputStream(entry2)) {
                 try {
                     entry2.rm();
                     fail();
-                } catch (IOException expected) {
+                } catch (IOException ignored) {
                 }
                 out2.write(getData());
                 try {
                     archive.rm_r();
                     fail();
-                } catch (IOException expected) {
+                } catch (IOException ignored) {
                 }
             }
         }
@@ -1016,13 +992,13 @@ extends ConfiguredClientTestBase<D> {
                 try {
                     archive.rm_r();
                     fail();
-                } catch (IOException expected) {
+                } catch (IOException ignored) {
                 }
             }
             try {
                 entry1.rm();
                 fail("deleted within archive.rm_r()");
-            } catch (IOException expected) {
+            } catch (IOException ignored) {
             }
             final ByteArrayOutputStream out = new ByteArrayOutputStream(getDataLength());
             try {
@@ -1034,7 +1010,7 @@ extends ConfiguredClientTestBase<D> {
             try {
                 archive.rm_r();
                 fail();
-            } catch (IOException expected) {
+            } catch (IOException ignored) {
             }
         }
         archive.rm_r();

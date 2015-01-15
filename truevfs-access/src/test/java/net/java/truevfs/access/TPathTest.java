@@ -36,7 +36,7 @@ public class TPathTest extends MockArchiveDriverTestBase {
             try {
                 new TPath(params[0].toString(), (String[]) params[1]);
                 fail();
-            } catch (IllegalArgumentException expected) {
+            } catch (IllegalArgumentException ignored) {
             }
         }
     }
