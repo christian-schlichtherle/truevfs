@@ -4,12 +4,12 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import edu.umd.cs.findbugs.annotations.OverrideMustInvoke;
-import edu.umd.cs.findbugs.annotations.When;
-import java.io.IOException;
-import java.util.Random;
 import org.junit.After;
 import org.junit.Before;
+
+import javax.annotation.OverridingMethodsMustInvokeSuper;
+import java.io.IOException;
+import java.util.Random;
 
 /**
  * @param  <D> The type of the archive driver.
@@ -27,7 +27,7 @@ public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
     private volatile D driver;
 
     @Before
-    @OverrideMustInvoke(When.FIRST)
+    @OverridingMethodsMustInvokeSuper
     public void setUp() throws IOException {
         data = DATA.clone();
         final FsTestConfig config = FsTestConfig.push();
@@ -36,14 +36,10 @@ public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
     }
 
     @After
-    @OverrideMustInvoke(When.LAST)
+    @OverridingMethodsMustInvokeSuper
     public void tearDown() {
         FsTestConfig.pop();
     }
-
-    /*protected final FsTestConfig getTestConfig() {
-        return FsTestConfig.get();
-    }*/
 
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
     protected final byte[] getData() {
