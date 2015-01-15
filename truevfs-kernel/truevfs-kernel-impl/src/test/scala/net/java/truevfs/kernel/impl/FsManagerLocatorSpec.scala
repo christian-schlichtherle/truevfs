@@ -8,15 +8,15 @@ import net.java.truevfs.kernel.spec.sl._
 import org.junit.runner._
 import org.scalatest._
 import org.scalatest.junit._
-import org.scalatest.matchers._
+import org.scalatest.Matchers._
 
 /** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])
-class FsManagerLocatorSpec extends WordSpec with ShouldMatchers {
+class FsManagerLocatorSpec extends WordSpec {
 
   "The file system manager locator singleton" should {
     "provide a default file system manager" in {
-      FsManagerLocator.SINGLETON.get.isInstanceOf[DefaultManager] should be (true)
+      FsManagerLocator.SINGLETON.get.isInstanceOf[DefaultManager] should equal (true)
     }
   }
 }

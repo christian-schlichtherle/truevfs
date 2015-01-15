@@ -7,12 +7,12 @@ package net.java.truevfs.kernel.impl.util
 import org.junit.runner.RunWith
 import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.prop.PropertyChecks
+import org.scalatest.Matchers._
+import org.scalatest.prop.PropertyChecks._
 
 @RunWith(classOf[JUnitRunner])
 class FileSystemSpec
-extends WordSpec with ShouldMatchers with PropertyChecks {
+extends WordSpec {
   import FileSystemSpec._
 
   private def newFileSystem = FileSystem[Entry]('/')
@@ -26,8 +26,8 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
             fs.remove(path) should be (None)
           }
         }
-        fs should have size (0)
-        fs.iterator.hasNext should be (false)
+        fs should have size 0
+        fs.iterator.hasNext should equal (false)
       }
     }
 
@@ -38,25 +38,25 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
           whenever (isParentPath(parentPath)) {
             val parentEntry = Entry(parentPath)
             fs += parentPath -> parentEntry
-            fs(parentPath) should be theSameInstanceAs(parentEntry )
-            fs.size should be >= (1)
+            fs(parentPath) should be theSameInstanceAs parentEntry
+            fs.size should be >= 1
             val iterator = fs.iterator
-            iterator.hasNext should be (true)
+            iterator.hasNext should equal (true)
             iterator.next should be ((parentPath, parentEntry ))
-            iterator.hasNext should be (false)
+            iterator.hasNext should equal (false)
             forAll { memberName: String =>
               whenever (isMemberName(memberName)) {
                 val path = parentPath + '/' + memberName
                 val entry = Entry(path)
                 fs += path -> entry
-                fs(path) should be theSameInstanceAs(entry)
-                fs.size should be >= (2)
+                fs(path) should be theSameInstanceAs entry
+                fs.size should be >= 2
                 val iterator = fs.iterator
-                iterator.hasNext should be (true)
+                iterator.hasNext should equal (true)
                 iterator.next should be ((parentPath, parentEntry ))
-                iterator.hasNext should be (true)
+                iterator.hasNext should equal (true)
                 iterator.next should be ((path, entry))
-                iterator.hasNext should be (false)
+                iterator.hasNext should equal (false)
                 fs.remove(path) should be (Some(entry))
                 fs.get(path) should be (None)
                 fs.remove(path) should be (None)
@@ -74,12 +74,12 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
   private def check(path: String, entry: Entry) {
     val fs = newFileSystem
     fs += path -> entry
-    fs(path) should be theSameInstanceAs (entry)
-    fs should have size (1)
+    fs(path) should be theSameInstanceAs entry
+    fs should have size 1
     val iterator = fs.iterator
-    iterator.hasNext should be (true)
+    iterator.hasNext should equal (true)
     iterator.next should be (path -> entry)
-    iterator.hasNext should be (false)
+    iterator.hasNext should equal (false)
     fs.remove(path) should be (Some(entry))
     fs.get(path) should be (None)
   }
@@ -127,14 +127,14 @@ extends WordSpec with ShouldMatchers with PropertyChecks {
           case List(path) =>
             val result = collection.mutable.LinkedHashMap[String, Entry]()
             fs.list(path) foreach (_ foreach {
-                case (path, entry) => result += path -> entry
+                case (pathKey, entryValue) => result += pathKey -> entryValue
             })
             result
           case Add(path)    => fs += path -> Entry(path); fs
           case Remove(path) => fs -= path; fs
           case NoOp()       => fs
         }
-        result should have size (expected.size)
+        result should have size expected.size
         for (path <- expected)
           result(path).path should be (path)
         result.values map (_.path) should equal (expected)

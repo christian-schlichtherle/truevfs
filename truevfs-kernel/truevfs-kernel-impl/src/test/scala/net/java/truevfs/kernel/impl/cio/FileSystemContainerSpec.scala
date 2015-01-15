@@ -4,20 +4,16 @@
  */
 package net.java.truevfs.kernel.impl.cio
 
-import net.java.truecommons.cio._
 import net.java.truecommons.cio.Entry
 import net.java.truecommons.cio.Entry._
+import net.java.truevfs.kernel.impl.cio.FileSystemContainerSpec._
 import org.junit.runner._
 import org.scalatest._
 import org.scalatest.junit._
-import org.scalatest.matchers._
-import org.scalatest.prop._
 
 /** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])
-class FileSystemContainerSpec
-extends WordSpec with ShouldMatchers with PropertyChecks {
-  import FileSystemContainerSpec._
+class FileSystemContainerSpec extends WordSpec {
 
   private def newContainer = new FileSystemContainer[DummyEntry]
 
