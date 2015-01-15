@@ -84,7 +84,7 @@ import static net.java.truevfs.kernel.spec.FsNodeName.*;
  * @author Christian Schlichtherle
  */
 @Immutable
-@edu.umd.cs.findbugs.annotations.SuppressWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
+@SuppressFBWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class TPath implements Path, TRex {
 
     private static final TPathComparator COMPARATOR = '\\' == separatorChar

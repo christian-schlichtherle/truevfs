@@ -23,6 +23,8 @@ import java.util.Set;
 import java.util.WeakHashMap;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.annotations.ServiceImplementation;
 import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
 import static net.java.truecommons.cio.Entry.Type.FILE;
@@ -97,7 +99,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * file system provider class with the service location feature of the
      * NIO.2 API!
      */
-    @edu.umd.cs.findbugs.annotations.SuppressWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
+    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     @SuppressWarnings("LeakingThisInConstructor")
     @Deprecated
     public TFileSystemProvider() {
