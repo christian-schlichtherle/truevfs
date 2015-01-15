@@ -15,7 +15,7 @@ import FileSystem._
   * character such as `'/'`.
   * However, this class works with any generic decomposable key type for which
   * a [[net.java.truevfs.kernel.impl.util.FileSystem.Composition]] and a
-  * [[net.java.truevfs.kernel.impl.util.DirectoryFactory]] exist.
+  * [[net.java.truevfs.kernel.impl.util.FileSystem.DirectoryFactory]] exist.
   *
   * Using this class helps to save some heap space if the paths address deeply
   * nested directory trees where many path segments can get shared between
@@ -41,7 +41,7 @@ final class FileSystem[K >: Null, V](
 
   reset()
 
-  implicit private def self = this
+  implicit private def self: FileSystem[K, V] = this
 
   private def reset() { _root = new Root; _size = 0}
 
@@ -55,7 +55,7 @@ final class FileSystem[K >: Null, V](
 
   private def iterator(path: Option[K], node: Node[K, V]): Iterator[(K, V)] = {
     node.entry.map(path.orNull -> _).iterator ++ node.iterator.flatMap {
-      case (segment, node) => iterator(Some(composition(path, segment)), node)
+      case (matchedSegment, matchedNode) => iterator(Some(composition(path, matchedSegment)), matchedNode)
     }
   }
 
@@ -71,12 +71,12 @@ final class FileSystem[K >: Null, V](
 
   def node(path: K): Option[Node[K, V]] = node(Option(path))
 
-  private def node(path: Option[K]): Option[INode[K, V]] = {
-    path match {
+  private def node(optPath: Option[K]): Option[INode[K, V]] = {
+    optPath match {
       case Some(path) =>
         path match {
           case composition(parent, segment) =>
-            node(parent) flatMap (_ get(segment))
+            node(parent) flatMap (_ get segment)
         }
       case None =>
         Some(_root)
@@ -87,15 +87,15 @@ final class FileSystem[K >: Null, V](
 
   def link(path: K, entry: V): Node[K, V] = link(Option(path), Some(entry))
 
-  private def link(path: Option[K], entry: Option[V]): INode[K, V] = {
-    path match {
+  private def link(optPath: Option[K], optEntry: Option[V]): INode[K, V] = {
+    optPath match {
       case Some(path) =>
         path match {
           case composition(parent, segment) =>
-            link(parent, None) link (segment, entry)
+            link(parent, None) link (segment, optEntry)
         }
       case None =>
-        if (entry.isDefined) _root.entry = entry
+        if (optEntry.isDefined) _root.entry = optEntry
         _root
     }
   }
@@ -104,8 +104,8 @@ final class FileSystem[K >: Null, V](
 
   def unlink(path: K): Unit = unlink(Option(path))
 
-  private def unlink(path: Option[K]) {
-    path match {
+  private def unlink(optPath: Option[K]) {
+    optPath match {
       case Some(path) =>
         path match {
           case composition(parent, segment) =>
@@ -145,7 +145,7 @@ object FileSystem {
     final def isGhost = entry.isEmpty
     final def isLeaf = isEmpty
     final override def stringPrefix = "Node"
-    final override def toString = stringPrefix + "(path=" + path + ", isLeaf=" + isLeaf + ", entry=" + entry + ")"
+    final override def toString() = stringPrefix + "(path=" + path + ", isLeaf=" + isLeaf + ", entry=" + entry + ")"
   } // Node
 
   private class INode[K >: Null, V] protected (
@@ -228,8 +228,8 @@ object FileSystem {
 
   final class StringComposition(separator: Char)
   extends Composition[String] {
-    override def apply(parent: Option[String], segment: String) = {
-      parent match {
+    override def apply(optParent: Option[String], segment: String) = {
+      optParent match {
         case Some(parent) => parent + segment
         case None => segment
       }
