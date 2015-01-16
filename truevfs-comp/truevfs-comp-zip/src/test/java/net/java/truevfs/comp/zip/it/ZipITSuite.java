@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
@@ -60,15 +61,8 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
     private Path file;
     private byte[] data;
 
-    /**
-     * A subclass must override this method to create the {@link #data}
-     * to be zipped.
-     * It must also finally call this superclass implementation to create
-     * the temporary file to be used as a ZIP file.
-     *
-     * @throws IOException On any I/O error.
-     */
     @Before
+    @OverridingMethodsMustInvokeSuper
     public void setUp() throws IOException {
         file = createTempFile(TEMP_FILE_PREFIX, null);
         delete(file);
@@ -84,12 +78,13 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
     }
 
     @After
+    @OverridingMethodsMustInvokeSuper
     public void tearDown() {
         try {
             deleteIfExists(file);
         } catch (final IOException ex) {
             logger.trace(
-                    "Failed to clean up test file (this may be just an aftermath):",
+                    "Failed to clean up test file (this may be just an implication of the root cause):",
                     ex);
         }
     }
