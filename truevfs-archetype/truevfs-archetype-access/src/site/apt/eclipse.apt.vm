@@ -1,0 +1,102 @@
+#parse("common.apt.vm")
+
+## TODO: Update the screen shots.
+
+    ----------------------------
+    Getting Started with Eclipse
+    ----------------------------
+    Christian Schlichtherle
+    ----------------------------
+
+Getting Started with Eclipse
+
+    This guide shows how to kick-start a TrueVFS application in Eclipse
+    with the help of a Maven archetype.
+
+* Prerequisites
+
+    You need to have the following software installed:
+
+    * {{{http://www.eclipse.org/downloads/}Eclipse&#160;Helios}} or later.
+
+    * JSE&#160;7.
+
+    []
+
+* Setting Up Eclipse
+
+    You need to have the Maven Integration feature installed.
+    If you are using Eclipse Indigo with Java Developer Tools, then you need
+    nothing extra.
+    Otherwise, you can easily install the feature by selecting the menu item
+    <Help> -\> <Eclipse Marketplace...>.
+
+    You can verify the installation by selecting <Help> -> <About Eclipse>.
+    The dialog should show a button with the red label <m2>:
+
+[eclipse/01_About_Eclipse.png] About Eclipse
+
+    If you click on this button, a property dialog is opened which should look
+    like this:
+
+[eclipse/02_About_Eclipse_Features.png] About Eclipse Features
+
+    Once installed, it's a very good idea to configure the feature preferences
+    in your current Workspace now or in your projects later.
+    Sonatype Inc. provides online documentation for this task at
+    {{http://www.sonatype.com/books/m2eclipse-book/reference/preferences.html}}.
+
+* Generating a Sample Project
+
+    To generate the application archetype, select <File> -> <New> -> <Other...>
+    or type <Ctrl+N> to open the following dialog:
+
+[eclipse/03_New.png] New
+
+    Select <Maven> -\> <Maven Project> and click <Next> to open the following
+    dialog:
+
+[eclipse/04_New_Maven_Project.png] New Maven Project
+
+    Click <Next> to open the following dialog:
+
+[eclipse/05_New_Maven_Project.png] New Maven Project
+
+    Make sure to have <All Catalogs> or <Nexus Indexer> selected in the
+    <Catalog> drop down combo box, enter <<<truevfs>>> into the <Filter> field,
+    select the latest entry with the Artifact Id <<<truevfs-archetype-access>>>
+    and click <Next> to open the following dialog:
+
+[eclipse/06_New_Maven_Project.png] New Maven Project
+
+    Enter the appropriate values for your project's <Group Id>, <Artifact Id>,
+    <Version> and <Package> and then click <Finish> to see the magical
+    population of the Package Explorer with your shiny new TrueVFS Access
+    application happen:
+
+[eclipse/07_Package_Explorer.png] Package Explorer
+
+#explore()
+
+* Building And Running the Sample Project
+
+    To build and run your application in your local Maven repository,
+    select your project in the Package Explorer view and select <Run> ->
+    <Run As> -\> <Maven install>.
+    This should open a Console view with the output of the Maven command.
+    Close to its end, it should read <<<[INFO] BUILD SUCCESS>>>:
+
+[eclipse/08_Console.png] Console
+
+    To run the main class <<<Tree>>>, select it in the Package Explorer view
+    and select <Run> -\> <Run As> -\> <Java Application>.
+    This should produce a similar output to the following in the Console view:
+
+[eclipse/09_Console.png] Console
+
+    Note that the contents of the JAR file
+    <<<target/project-0.1-SNAPSHOT.jar>>> get listed, too!
+    This is because the configuration file <<<pom.xml>>> is set up to recognize
+    JAR files as virtual directories by adding the module TrueVFS Driver ZIP
+    with the artifactId <<<truevfs-driver-zip>>> to the run time class path.
+    You can change this by editing the configuration file <<<pom.xml>>>.
