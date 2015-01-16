@@ -15,6 +15,12 @@ import org.bouncycastle.crypto.BlockCipher;
 public interface SeekableBlockCipher extends BlockCipher {
 
     /**
+     * Returns the index of the block, starting at 0, which will be processed
+     * next when {@link #processBlock(byte[], int, byte[], int)} is called.
+     */
+    long getBlockCounter();
+
+    /**
      * Sets the counter so that the block with the given index, starting
      * at 0, can be processed next.
      *
@@ -23,10 +29,4 @@ public interface SeekableBlockCipher extends BlockCipher {
      *        {@link #processBlock(byte[], int, byte[], int)} is called.
      */
     void setBlockCounter(long blockCounter);
-
-    /**
-     * Returns the index of the block, starting at 0, which will be processed
-     * next when {@link #processBlock(byte[], int, byte[], int)} is called.
-     */
-    long getBlockCounter();
 }

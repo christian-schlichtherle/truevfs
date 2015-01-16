@@ -4,30 +4,29 @@
  */
 package net.java.truevfs.comp.zip.it;
 
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.charset.Charset;
-import static java.nio.file.Files.*;
-import java.nio.file.Path;
-import static java.nio.file.StandardOpenOption.APPEND;
-import static java.nio.file.StandardOpenOption.WRITE;
-import java.util.*;
-import java.util.concurrent.Callable;
-import static net.java.truecommons.shed.ConcurrencyUtils.*;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
-import static net.java.truecommons.shed.HashMaps.initialCapacity;
-import net.java.truevfs.comp.zip.Crc32Exception;
-import net.java.truevfs.comp.zip.ZipEntry;
-import net.java.truevfs.comp.zip.ZipEntryFactory;
-import net.java.truevfs.comp.zip.ZipFile;
-import net.java.truevfs.comp.zip.ZipOutputStream;
+import net.java.truevfs.comp.zip.*;
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.concurrent.Callable;
+
+import static java.nio.file.Files.*;
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.WRITE;
+import static net.java.truecommons.shed.ConcurrencyUtils.NUM_IO_THREADS;
+import static net.java.truecommons.shed.ConcurrencyUtils.start;
+import static net.java.truecommons.shed.HashMaps.initialCapacity;
+import static org.junit.Assert.*;
 
 /**
  * Performs an integration test for reading and writing ZIP files.

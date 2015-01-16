@@ -4,17 +4,15 @@
  */
 package net.java.truevfs.comp.zip.it;
 
+import net.java.truecommons.key.spec.common.AesKeyStrength;
+import net.java.truevfs.comp.zip.*;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import net.java.truecommons.key.spec.common.AesKeyStrength;
-import net.java.truevfs.comp.zip.WinZipAesParameters;
-import net.java.truevfs.comp.zip.ZipEntry;
-import net.java.truevfs.comp.zip.ZipFile;
-import net.java.truevfs.comp.zip.ZipKeyException;
-import net.java.truevfs.comp.zip.ZipOutputStream;
+
 import static org.junit.Assert.assertSame;
 
 /**
