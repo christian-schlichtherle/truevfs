@@ -24,6 +24,7 @@ import org.bouncycastle.crypto.io.MacOutputStream;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.bouncycastle.util.io.TeeOutputStream;
 
 /**
  * Writes a type 0 RAES file.
@@ -122,7 +123,7 @@ final class Type0RaesOutputStream extends RaesOutputStream {
             final LittleEndianOutputStream leos =
                     this.leos = new LittleEndianOutputStream(out);
             this.out = new CipherOutputStream(cipher,
-                    new MacOutputStream(leos, mac));
+                    new TeeOutputStream(leos, new MacOutputStream(mac)));
 
             // Write data envelope header.
             leos.writeInt(SIGNATURE);

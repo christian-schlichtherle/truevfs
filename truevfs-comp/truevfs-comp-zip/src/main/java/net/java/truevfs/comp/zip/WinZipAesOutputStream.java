@@ -21,6 +21,7 @@ import org.bouncycastle.crypto.io.MacOutputStream;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.bouncycastle.util.io.TeeOutputStream;
 
 /**
  * Encrypts ZIP entry contents according the WinZip AES specification.
@@ -112,8 +113,9 @@ final class WinZipAesOutputStream extends DecoratingOutputStream {
 
             // Init chain of output streams as Encrypt-then-MAC.
             this.leos = leos;
-            this.mos = new MacOutputStream(leos, mac);
-            this.out = new CipherOutputStream(cipher, mos);
+            this.mos = new MacOutputStream(mac);
+            this.out = new CipherOutputStream(cipher,
+                    new TeeOutputStream(leos, mos));
 
             // Write header.
             leos.write(salt);
@@ -141,10 +143,7 @@ final class WinZipAesOutputStream extends DecoratingOutputStream {
         ((CipherOutputStream) out).finish();
 
         // Compute and write the first half of the MAC into the footer.
-        final Mac mac = mos.getMac();
-        final byte[] buf = new byte[mac.getMacSize()]; // MAC buffer
-        final int bufLength = mac.doFinal(buf, 0);
-        assert bufLength == buf.length;
-        this.leos.write(buf, 0, bufLength / 2);
+        final byte[] buf = mos.getMac();
+        this.leos.write(buf, 0, buf.length / 2);
     }
 }
