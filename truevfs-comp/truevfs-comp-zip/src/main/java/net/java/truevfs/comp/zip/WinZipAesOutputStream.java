@@ -48,8 +48,8 @@ final class WinZipAesOutputStream extends DecoratingOutputStream {
 
     static final int PWD_VERIFIER_BITS = 16;
 
-    /** The Message Authentication Code (MAC). */
-    private final Mac mac;
+    /** The Message Authentication Code (MAC) output stream. */
+    private final MacOutputStream mos;
 
     /**
      * The low level data output stream.
@@ -107,13 +107,13 @@ final class WinZipAesOutputStream extends DecoratingOutputStream {
             cipher.init(true, aesCtrParam);
 
             // Init MAC.
-            final Mac mac = this.mac = new HMac(new SHA1Digest());
+            final Mac mac = new HMac(new SHA1Digest());
             mac.init(sha1HMacParam);
 
             // Init chain of output streams as Encrypt-then-MAC.
             this.leos = leos;
-            this.out = new CipherOutputStream(cipher,
-                    new MacOutputStream(leos, mac));
+            this.mos = new MacOutputStream(leos, mac);
+            this.out = new CipherOutputStream(cipher, mos);
 
             // Write header.
             leos.write(salt);
@@ -140,8 +140,8 @@ final class WinZipAesOutputStream extends DecoratingOutputStream {
         // Flush partial block to out, if any.
         ((CipherOutputStream) out).finish();
 
-        // Calculate and write MAC to footer.
-        final Mac mac = this.mac;
+        // Compute and write the first half of the MAC into the footer.
+        final Mac mac = mos.getMac();
         final byte[] buf = new byte[mac.getMacSize()]; // MAC buffer
         final int bufLength = mac.doFinal(buf, 0);
         assert bufLength == buf.length;
