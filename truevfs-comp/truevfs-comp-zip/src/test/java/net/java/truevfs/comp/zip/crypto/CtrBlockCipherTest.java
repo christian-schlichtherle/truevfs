@@ -4,18 +4,20 @@
  */
 package net.java.truevfs.comp.zip.crypto;
 
-import java.security.SecureRandom;
-import java.util.Random;
 import org.bouncycastle.crypto.BlockCipher;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.modes.SICBlockCipher;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.junit.Test;
+
+import java.security.SecureRandom;
+import java.util.Random;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle

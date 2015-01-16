@@ -5,6 +5,7 @@
 package net.java.truevfs.comp.zip.it;
 
 import net.java.truevfs.comp.zip.ZipEntry;
+
 import static net.java.truevfs.comp.zip.ZipEntry.DEFLATED;
 
 /**

@@ -4,14 +4,15 @@
  */
 package net.java.truevfs.comp.zip.crypto.it;
 
-import java.io.IOException;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import net.java.truecommons.io.ReadOnlyChannelITSuite;
 import net.java.truevfs.comp.zip.crypto.CipherReadOnlyChannel;
 import net.java.truevfs.comp.zip.crypto.SeekableBlockCipher;
 import org.bouncycastle.crypto.engines.NullEngine;
+
+import java.io.IOException;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * @author Christian Schlichtherle

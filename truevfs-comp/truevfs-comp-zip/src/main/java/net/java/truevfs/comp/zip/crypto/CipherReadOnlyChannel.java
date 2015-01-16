@@ -4,18 +4,19 @@
  */
 package net.java.truevfs.comp.zip.crypto;
 
+import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import net.java.truecommons.io.ReadOnlyChannel;
 import net.java.truecommons.io.Streams;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import org.bouncycastle.crypto.Mac;
+
+import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
-import static java.lang.Math.min;
-import static java.lang.Math.min;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Objects;
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.NotThreadSafe;
-import org.bouncycastle.crypto.Mac;
+
+import static java.lang.Math.min;
 
 /**
  * Provides buffered random read-only access to the plain text of an encrypted
