@@ -48,25 +48,22 @@ final class WinZipAesOutputStream extends DecoratingOutputStream {
 
     static final int PWD_VERIFIER_BITS = 16;
 
-    private final WinZipAesEntryParameters param;
-
     /** The Message Authentication Code (MAC). */
-    private Mac mac;
+    private final Mac mac;
 
     /**
      * The low level data output stream.
      * Used for writing the header and footer.
      **/
-    private LittleEndianOutputStream leos;
+    private final LittleEndianOutputStream leos;
 
     WinZipAesOutputStream(
             final WinZipAesEntryParameters param,
             final LittleEndianOutputStream leos)
     throws IOException {
+        assert null != param;
         try {
             assert null != leos;
-            assert null != param;
-            this.param = param;
 
             // Init key strength.
             final KeyStrength keyStrength = param.getKeyStrength();
@@ -120,7 +117,7 @@ final class WinZipAesOutputStream extends DecoratingOutputStream {
 
             // Write header.
             leos.write(salt);
-            writePasswordVerifier(keyParam);
+            writePasswordVerifier(param, keyParam);
         } catch (final Throwable ex) {
             try {
                 leos.close();
@@ -131,7 +128,7 @@ final class WinZipAesOutputStream extends DecoratingOutputStream {
         }
     }
 
-    private void writePasswordVerifier(KeyParameter keyParam)
+    private void writePasswordVerifier(WinZipAesEntryParameters param, KeyParameter keyParam)
     throws IOException {
         this.leos.write(
                 keyParam.getKey(),
