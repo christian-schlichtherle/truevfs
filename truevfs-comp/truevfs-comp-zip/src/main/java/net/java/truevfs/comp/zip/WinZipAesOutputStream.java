@@ -29,7 +29,7 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * @see     <a href="http://www.winzip.com/win/en/aes_tips.htm">AES Coding Tips for Developers (WinZip Computing, S.L.)</a>
  * @see     <a href="http://www.gladman.me.uk/cryptography_technology/fileencrypt/">A Password Based File Encyption Utility (Dr. Gladman)</a>
  * @see     <a href="http://www.ietf.org/rfc/rfc2898.txt">RFC 2898: PKCS #5: Password-Based Cryptography Specification Version 2.0 (IETF et al.)</a>
- * @see     RawZipOutputStream$WinZipAesOutputMethod
+ * @see     AbstractZipOutputStream$WinZipAesOutputMethod
  * @author  Christian Schlichtherle
  */
 @NotThreadSafe
