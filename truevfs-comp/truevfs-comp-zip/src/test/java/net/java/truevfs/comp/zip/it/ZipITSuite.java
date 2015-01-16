@@ -143,7 +143,7 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
     public final void testConstructors() throws Exception {
         write(file, data);
 
-        try (final SeekableByteChannel channel = newByteChannel(file)) {
+        try (SeekableByteChannel channel = newByteChannel(file)) {
             try {
                 newZipOutputStream(null, (Charset) null);
                 fail();
@@ -266,9 +266,9 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
         // Create empty ZIP file.
         newZipOutputStream(newOutputStream(file)).close();
 
-        try (final ZipFile zf = newZipFile(file)) {
+        try (ZipFile zf = newZipFile(file)) {
             assertEquals(0, zf.getPreambleLength());
-            try (final InputStream in = zf.getPreambleInputStream()) {
+            try (InputStream in = zf.getPreambleInputStream()) {
                 assertEquals(-1, in.read());
             }
         }
@@ -276,11 +276,11 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
 
     @Test
     public final void testGetInputStream() throws IOException {
-        try (final ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
+        try (ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
             zos.putNextEntry(newEntry("foo"));
         }
 
-        try (final ZipFile zf = newZipFile(file)) {
+        try (ZipFile zf = newZipFile(file)) {
             zf.getInputStream("foo").close();
             assertNull(zf.getInputStream("bar"));
         }
@@ -288,14 +288,14 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
 
     @Test
     public final void testWriteAndReadSingleBytes() throws IOException {
-        try (final ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
+        try (ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
             zos.putNextEntry(newEntry("file"));
             for (int i = 0; i < data.length; i++)
                 zos.write(data[i]);
         }
 
-        try (   final ZipFile zf = newZipFile(file);
-                final InputStream in = zf.getInputStream("file")) {
+        try (ZipFile zf = newZipFile(file);
+             InputStream in = zf.getInputStream("file")) {
             for (int c, i = 0; 0 <= (c = in.read()); i++)
                 assertEquals(data[i] & 0xff, c);
         }
@@ -319,7 +319,7 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
     throws Exception {
         createTestZipFile(nEntries);
 
-        try (final ZipFile zf = newZipFile(file)) {
+        try (ZipFile zf = newZipFile(file)) {
             final class CheckAllEntriesFactory implements TaskFactory {
                 @Override
                 public Callable<?> newTask(int threadNum) {
@@ -337,9 +337,9 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
 
                         // Now read in the entries in the shuffled order.
                         final byte[] buf = new byte[data.length];
-                        for (final ZipEntry entry : entries) {
+                        for (ZipEntry entry : entries) {
                             // Read full entry and check the contents.
-                            try (final InputStream in = zf.getInputStream(entry.getName())) {
+                            try (InputStream in = zf.getInputStream(entry.getName())) {
                                 int off = 0;
                                 int read;
                                 while (true) {
@@ -372,7 +372,7 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
     private void createTestZipFile(final int nEntries) throws IOException {
         final HashSet<String> set = new HashSet<>(initialCapacity(nEntries));
 
-        try (final ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
+        try (ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
             for (int i = 0; i < nEntries; i++) {
                 String name = i + ".txt";
                 zos.putNextEntry(newEntry(name));
@@ -381,7 +381,7 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
             }
         }
 
-        try (final ZipFile zf = newZipFile(file)) {
+        try (ZipFile zf = newZipFile(file)) {
             // Check that zf correctly enumerates all entries.
             for (ZipEntry entry : zf) {
                 assertEquals(data.length, entry.getSize());
@@ -395,12 +395,12 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
     public final void testGoodGetCheckedInputStream() throws IOException {
         // Create test ZIP file.
         final String name = "entry";
-        try (final ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
+        try (ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
             zos.putNextEntry(newEntry(name));
             zos.write(data);
         }
 
-        try (final ZipFile zf = newZipFile(file)) {
+        try (ZipFile zf = newZipFile(file)) {
             InputStream in = zf.getCheckedInputStream(name);
             in.close();
 
@@ -434,7 +434,7 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
         for (int i = 0; i < 4; i++) {
             // Create test ZIP file.
             final String name = "entry";
-            try (final ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
+            try (ZipOutputStream zos = newZipOutputStream(newOutputStream(file))) {
                 zos.putNextEntry(newEntry(name));
                 zos.write(data);
             }
@@ -445,7 +445,7 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
             // Modify ZIP file to contain an incorrect CRC32 value in the
             // Central File Header.
             final ByteBuffer crc = ByteBuffer.wrap(new byte[] { (byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF });
-            try (final SeekableByteChannel channel = newByteChannel(file, WRITE)) {
+            try (SeekableByteChannel channel = newByteChannel(file, WRITE)) {
                 if (tweakDD) {
                     channel.position(channel.size() - 57 - 28); // CRC-32 position in Data Descriptor
                     channel.write(crc);
@@ -456,10 +456,10 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
                 }
             }
 
-            try (final ZipFile zf = new ZipFile(file)) {
+            try (ZipFile zf = new ZipFile(file)) {
                 try {
                     // Open checked input stream and join immediately.
-                    try (final InputStream in = zf.getCheckedInputStream(name)) {
+                    try (InputStream ignored = zf.getCheckedInputStream(name)) {
                         if (tweakDD ^ tweakCFH)
                             fail("Expected CRC32Exception!");
                     }
@@ -471,7 +471,7 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
 
                 try {
                     // Open checked input stream and read fully, using multiple methods.
-                    try (final InputStream in = zf.getCheckedInputStream(name)) {
+                    try (InputStream in = zf.getCheckedInputStream(name)) {
                         if (tweakDD ^ tweakCFH)
                             fail("Expected CRC32Exception!");
 
@@ -510,7 +510,7 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
         append(0, 20, data1);
         append(10, 20, data2);
 
-        try (final ZipFile zf = newZipFile(file)) {
+        try (ZipFile zf = newZipFile(file)) {
             assertEquals(30, zf.size());
             // Check that zf correctly enumerates all entries.
             final byte[] buf = new byte[data1.length];
@@ -518,7 +518,7 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
                 final String name = i + ".txt";
                 final ZipEntry entry = zf.entry(name);
                 assertEquals(data1.length, entry.getSize());
-                try (final InputStream in = zf.getInputStream(name)) {
+                try (InputStream in = zf.getInputStream(name)) {
                     int off = 0;
                     int read;
                     do {
