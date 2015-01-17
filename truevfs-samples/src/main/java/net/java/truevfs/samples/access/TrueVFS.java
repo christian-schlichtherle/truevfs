@@ -60,10 +60,55 @@ import net.java.truevfs.kernel.spec.FsAccessOption;
  */
 public enum TrueVFS {
 
+    // This enum needs to be first, all remaining enums should be sorted alphabetically.
     USAGE {
         @Override
         void run(final Deque<String> params) {
             throw new IllegalArgumentException();
+        }
+    },
+
+    CAT {
+        @Override
+        void run(final Deque<String> params) throws IOException {
+            if (1 > params.size()) throw new NoSuchElementException();
+            for (   String param;
+                    null != (param = params.poll());
+                    ) {
+                final TPath path = new TPath(param);
+                try (final InputStream in = newInputStream(path)) {
+                    TFile.cat(in, out);
+                }
+            }
+        }
+    },
+
+    COMPACT {
+        @Override
+        void run(final Deque<String> params) throws IOException {
+            if (1 > params.size()) throw new NoSuchElementException();
+            for (   String param;
+                    null != (param = params.poll());
+                    ) {
+                final TFile file = new TFile(param);
+                if (file.isTopLevelArchive()) file.compact();
+                else err.println(message("ntlaf", file));
+            }
+        }
+    },
+
+    CP {
+        @Override
+        void run(final Deque<String> params) throws IOException {
+            final BitField<CpOption> options = options(params, CpOption.class);
+            cpOrMv(this, options, params);
+        }
+    },
+
+    EXISTS {
+        @Override
+        void run(final Deque<String> params) {
+            out.println(exists(new TPath(params.pop())));
         }
     },
 
@@ -74,10 +119,24 @@ public enum TrueVFS {
         }
     },
 
-    VERSION {
+    ISARCHIVE {
         @Override
         void run(final Deque<String> params) {
-            out.println(message("version", TrueVFS.class.getSimpleName()));
+            out.println(new TPath(params.pop()).isArchive());
+        }
+    },
+
+    ISDIRECTORY {
+        @Override
+        void run(final Deque<String> params) {
+            out.println(isDirectory(new TPath(params.pop())));
+        }
+    },
+
+    ISFILE {
+        @Override
+        void run(final Deque<String> params) {
+            out.println(isRegularFile(new TPath(params.pop())));
         }
     },
 
@@ -112,55 +171,6 @@ public enum TrueVFS {
         String getHelp() { return LS.getHelp(); }
     },
 
-    CAT {
-        @Override
-        void run(final Deque<String> params) throws IOException {
-            if (1 > params.size()) throw new NoSuchElementException();
-            for (   String param;
-                    null != (param = params.poll());
-                    ) {
-                final TPath path = new TPath(param);
-                try (final InputStream in = newInputStream(path)) {
-                    TFile.cat(in, out);
-                }
-            }
-        }
-    },
-
-    CP {
-        @Override
-        void run(final Deque<String> params) throws IOException {
-            final BitField<CpOption> options = options(params, CpOption.class);
-            cpOrMv(this, options, params);
-        }
-    },
-
-    MV {
-        @Override
-        void run(final Deque<String> params) throws IOException {
-            cpOrMv(this, BitField.noneOf(CpOption.class), params);
-        }
-    },
-
-    TOUCH {
-        @Override
-        void run(final Deque<String> params) throws IOException {
-            if (1 > params.size()) throw new NoSuchElementException();
-            for (   String param;
-                    null != (param = params.poll());
-                    ) {
-                final TPath path = new TPath(param);
-                try {
-                    createFile(path);
-                } catch (FileAlreadyExistsException ex) {
-                    setLastModifiedTime(
-                            path,
-                            FileTime.fromMillis(System.currentTimeMillis()));
-                }
-            }
-        }
-    },
-
     MKDIR {
         @Override
         void run(final Deque<String> params) throws IOException {
@@ -186,6 +196,13 @@ public enum TrueVFS {
 
         @Override
         String getHelp() { return MKDIR.getHelp(); }
+    },
+
+    MV {
+        @Override
+        void run(final Deque<String> params) throws IOException {
+            cpOrMv(this, BitField.noneOf(CpOption.class), params);
+        }
     },
 
     RM {
@@ -215,52 +232,36 @@ public enum TrueVFS {
         String getHelp() { return RM.getHelp(); }
     },
 
-    COMPACT {
+    SIZE {
+        @Override
+        void run(final Deque<String> params) throws IOException {
+            out.println(size(new TPath(params.pop())));
+        }
+    },
+
+    TOUCH {
         @Override
         void run(final Deque<String> params) throws IOException {
             if (1 > params.size()) throw new NoSuchElementException();
             for (   String param;
                     null != (param = params.poll());
                     ) {
-                final TFile file = new TFile(param);
-                if (file.isTopLevelArchive()) file.compact();
-                else err.println(message("ntlaf", file));
+                final TPath path = new TPath(param);
+                try {
+                    createFile(path);
+                } catch (FileAlreadyExistsException ex) {
+                    setLastModifiedTime(
+                            path,
+                            FileTime.fromMillis(System.currentTimeMillis()));
+                }
             }
         }
     },
 
-    ISARCHIVE {
+    VERSION {
         @Override
         void run(final Deque<String> params) {
-            out.println(new TPath(params.pop()).isArchive());
-        }
-    },
-
-    ISDIRECTORY {
-        @Override
-        void run(final Deque<String> params) {
-            out.println(isDirectory(new TPath(params.pop())));
-        }
-    },
-
-    ISFILE {
-        @Override
-        void run(final Deque<String> params) {
-            out.println(isRegularFile(new TPath(params.pop())));
-        }
-    },
-
-    EXISTS {
-        @Override
-        void run(final Deque<String> params) {
-            out.println(exists(new TPath(params.pop())));
-        }
-    },
-
-    SIZE {
-        @Override
-        void run(final Deque<String> params) throws IOException {
-            out.println(size(new TPath(params.pop())));
+            out.println(message("version", TrueVFS.class.getSimpleName()));
         }
     };
 
