@@ -69,12 +69,4 @@
             <artifactId>scalacheck_${scala.lang.version}</artifactId>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-shade-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 </project>
