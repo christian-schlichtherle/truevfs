@@ -27,4 +27,20 @@
         <module>truevfs-profile-default</module>
         <module>truevfs-profile-full</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>sonatype-oss-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <configuration>
+                            <shadedClassifierName>all</shadedClassifierName>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
