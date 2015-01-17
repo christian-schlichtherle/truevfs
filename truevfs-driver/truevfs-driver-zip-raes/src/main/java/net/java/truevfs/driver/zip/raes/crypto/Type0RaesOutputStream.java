@@ -13,6 +13,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.io.LittleEndianOutputStream;
 import net.java.truecommons.io.Sink;
 import net.java.truecommons.key.spec.common.AesKeyStrength;
+import net.java.truevfs.comp.zip.crypto.BufferedPartialBlockCipher;
 import net.java.truevfs.comp.zip.crypto.CipherOutputStream;
 import net.java.truevfs.comp.zip.crypto.CtrBlockCipher;
 import static net.java.truevfs.driver.zip.raes.crypto.Constants.*;
@@ -97,7 +98,7 @@ final class Type0RaesOutputStream extends RaesOutputStream {
         Arrays.fill(pwdBytes, (byte) 0);
 
         // Init cipher.
-        final BufferedBlockCipher cipher = new BufferedBlockCipher(
+        final BufferedBlockCipher cipher = new BufferedPartialBlockCipher(
                 new CtrBlockCipher( // or new SICBlockCipher(
                     new AESFastEngine()));
         cipher.init(true, aesCtrParam);
