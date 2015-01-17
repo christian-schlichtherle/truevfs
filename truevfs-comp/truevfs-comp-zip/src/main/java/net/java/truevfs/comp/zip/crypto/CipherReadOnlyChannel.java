@@ -21,14 +21,14 @@ import static java.lang.Math.min;
 /**
  * Provides buffered random read-only access to the plain text of an encrypted
  * file.
- * Note that this channel maintains its own virtual position.
+ * Note that this channel maintains its own virtual file pointer.
  *
  * @see    CipherOutputStream
  * @author Christian Schlichtherle
  */
 //
 // Note that this is mostly a copy of
-// net.truevfs.kernel.io.BufferedReadOnlyChannel which has been tuned for
+// net.java.truecommons.io.BufferedReadOnlyChannel which has been tuned for
 // performance.
 //
 @NotThreadSafe
@@ -68,7 +68,7 @@ public final class CipherReadOnlyChannel extends ReadOnlyChannel {
     /**
      * Constructs a new cipher read-only channel.
      *
-     * @param cipher the seekable block cipher.
+     * @param cipher the initialized, seekable block cipher.
      * @param channel the seekable byte channel.
      */
     @CreatesObligation
@@ -221,8 +221,8 @@ public final class CipherReadOnlyChannel extends ReadOnlyChannel {
     }
 
     /**
-     * Positions the block with so that it holds the decrypted data
-     * referenced by the virtual file pointer.
+     * Positions the block so that it holds the decrypted data referenced by
+     * the virtual file pointer.
      *
      * @throws IOException on any I/O error.
      *         The block is not positioned in this case.
