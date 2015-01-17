@@ -13,6 +13,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.io.LittleEndianOutputStream;
 import net.java.truecommons.io.Sink;
 import net.java.truecommons.key.spec.common.AesKeyStrength;
+import net.java.truevfs.comp.zip.crypto.BufferedPartialBlockCipher;
 import net.java.truevfs.comp.zip.crypto.CipherOutputStream;
 import net.java.truevfs.comp.zip.crypto.CtrBlockCipher;
 import static net.java.truevfs.driver.zip.raes.crypto.Constants.*;
@@ -24,6 +25,7 @@ import org.bouncycastle.crypto.io.MacOutputStream;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.bouncycastle.util.io.TeeOutputStream;
 
 /**
  * Writes a type 0 RAES file.
@@ -96,7 +98,7 @@ final class Type0RaesOutputStream extends RaesOutputStream {
         Arrays.fill(pwdBytes, (byte) 0);
 
         // Init cipher.
-        final BufferedBlockCipher cipher = new BufferedBlockCipher(
+        final BufferedBlockCipher cipher = new BufferedPartialBlockCipher(
                 new CtrBlockCipher( // or new SICBlockCipher(
                     new AESFastEngine()));
         cipher.init(true, aesCtrParam);
@@ -122,7 +124,7 @@ final class Type0RaesOutputStream extends RaesOutputStream {
             final LittleEndianOutputStream leos =
                     this.leos = new LittleEndianOutputStream(out);
             this.out = new CipherOutputStream(cipher,
-                    new MacOutputStream(leos, mac));
+                    new TeeOutputStream(leos, new MacOutputStream(mac)));
 
             // Write data envelope header.
             leos.writeInt(SIGNATURE);
