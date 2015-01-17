@@ -11,6 +11,7 @@ import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.io.DecoratingOutputStream;
 import net.java.truecommons.io.LittleEndianOutputStream;
 import net.java.truecommons.key.spec.KeyStrength;
+import net.java.truevfs.comp.zip.crypto.BufferedPartialBlockCipher;
 import net.java.truevfs.comp.zip.crypto.CipherOutputStream;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.Mac;
@@ -104,7 +105,7 @@ final class WinZipAesOutputStream extends DecoratingOutputStream {
 
             // Init cipher and stream.
             final BufferedBlockCipher
-                    cipher = new BufferedBlockCipher(new WinZipAesCipher());
+                    cipher = new BufferedPartialBlockCipher(new WinZipAesCipher());
             cipher.init(true, aesCtrParam);
 
             // Init MAC.
