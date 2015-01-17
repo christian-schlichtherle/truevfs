@@ -14,8 +14,9 @@ import net.java.truevfs.driver.tar.bzip2.TarBZip2Driver;
 import net.java.truevfs.driver.tar.gzip.TarGZipDriver;
 import net.java.truevfs.driver.tar.xz.TarXZDriver;
 import net.java.truevfs.kernel.spec.FsAccessOption;
+import org.apache.commons.compress.utils.Charsets;
 
-import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -58,7 +59,7 @@ public enum TrueVFS {
     // This enum needs to be first, all remaining enums should be sorted alphabetically.
     USAGE {
         @Override
-        void run(final Deque<String> args) {
+        void run(Deque<String> args) {
             throw new IllegalArgumentException();
         }
     },
@@ -90,52 +91,50 @@ public enum TrueVFS {
 
     CP {
         @Override
-        void run(final Deque<String> args) throws IOException {
-            final BitField<CpOption> options = options(args, CpOption.class);
-            cpOrMv(this, options, args);
+        void run(Deque<String> args) throws IOException {
+            cpOrMv(options(args, CpOption.class), args);
         }
     },
 
     EXISTS {
         @Override
-        void run(final Deque<String> args) {
+        void run(Deque<String> args) {
             out.println(exists(new TPath(args.pop())));
         }
     },
 
     HELP {
         @Override
-        void run(final Deque<String> args) {
+        void run(Deque<String> args) {
             out.println(TrueVFS.valueOf(args.pop().toUpperCase(Locale.ENGLISH)).getUsage());
         }
     },
 
     ISARCHIVE {
         @Override
-        void run(final Deque<String> args) {
+        void run(Deque<String> args) {
             out.println(new TPath(args.pop()).isArchive());
         }
     },
 
     ISDIRECTORY {
         @Override
-        void run(final Deque<String> args) {
+        void run(Deque<String> args) {
             out.println(isDirectory(new TPath(args.pop())));
         }
     },
 
     ISFILE {
         @Override
-        void run(final Deque<String> args) {
+        void run(Deque<String> args) {
             out.println(isRegularFile(new TPath(args.pop())));
         }
     },
 
     LS {
         @Override
-        void run(final Deque<String> args) throws IOException {
-            final BitField<LsOption> options = options(args, LsOption.class);
-            ls(this, options, args);
+        void run(Deque<String> args) throws IOException {
+            ls(options(args, LsOption.class), args);
         }
     },
 
@@ -189,8 +188,8 @@ public enum TrueVFS {
 
     MV {
         @Override
-        void run(final Deque<String> args) throws IOException {
-            cpOrMv(this, BitField.noneOf(CpOption.class), args);
+        void run(Deque<String> args) throws IOException {
+            cpOrMv(BitField.noneOf(CpOption.class), args);
         }
     },
 
@@ -221,7 +220,7 @@ public enum TrueVFS {
 
     SIZE {
         @Override
-        void run(final Deque<String> args) throws IOException {
+        void run(Deque<String> args) throws IOException {
             out.println(size(new TPath(args.pop())));
         }
     },
@@ -245,7 +244,7 @@ public enum TrueVFS {
 
     VERSION {
         @Override
-        void run(final Deque<String> args) {
+        void run(Deque<String> args) {
             out.println(message("version", TrueVFS.class.getSimpleName()));
         }
     };
@@ -272,125 +271,16 @@ public enum TrueVFS {
         return options;
     }
 
-    private static void ls(
-            final BitField<LsOption> options,
-            final TPath file,
-            final String path)
-    throws IOException {
-        final BasicFileAttributes attr =
-                readAttributes(file, BasicFileAttributes.class);
-        final boolean detailed = options.get(LsOption.L);
-        if (detailed)
-            out.printf("%,11d %tF %<tT ", attr.size(), attr.lastModifiedTime().toMillis());
-        out.append(path);
-        if (detailed) {
-            if (attr.isDirectory()) {
-                if (attr.isRegularFile()) out.append('+'); // covariant
-                else out.append(TFile.separator);
-            }
-            if (attr.isSymbolicLink()) out.append('>');
-            if (attr.isOther()) out.append('?');
-        }
-        out.println();
-    }
-
-    private static void ls(
-            final TrueVFS command,
-            BitField<LsOption> options,
-            final TFile file,
-            final String path)
-    throws IOException {
-        if (file.isDirectory()) {
-            final TFile[] members = file.listFiles();
-            if (null == members)
-                throw new IOException(command.message("dina", path));
-            // Sort directories to the start.
-            Arrays.sort(members, new TFileComparator());
-            for (final TFile member : members) {
-                String memberPath = member.getName();
-                if (!path.isEmpty())
-                    memberPath = path + TFile.separator + memberPath;
-                ls(options, member.toPath(), memberPath);
-                if (options.get(LsOption.R) && member.isDirectory())
-                    ls(command, options, member, memberPath);
-            }
-        } else if (file.exists()) {
-            ls(options, file.toPath(), path);
-        } else {
-            throw new IOException(command.message("nsfod", path));
-        }
-    }
-
-    static void ls(
-            final TrueVFS command,
-            BitField<LsOption> options,
+    void cpOrMv(
+            final BitField<CpOption> options,
             final Deque<String> args)
-    throws IOException {
-        if (0 >= args.size()) args.push(".");
-        final boolean multi = 1 < args.size();
-        for (final String arg : args) {
-            final TFile file = new TFile(arg);
-            if (multi) out.println(arg + ":");
-            if (file.isDirectory()) ls(command, options, file, "");
-            else ls(command, options, file, file.getPath());
-        }
-    }
-
-    private static TArchiveDetector newArchiveDetector(final Charset charset) {
-        assert null != charset;
-        return new TArchiveDetector(TArchiveDetector.ALL,
-                new Object[][] {
-                    { "ear|jar|war", new JarDriver() },
-                    { "exe", new ReadOnlySfxDriver() {
-                        @Override
-                        public Charset getCharset() {
-                            return charset;
-                        }
-                    } },
-                    { "tar", new TarDriver() {
-                        @Override
-                        public Charset getCharset() {
-                            return charset;
-                        }
-                    } },
-                    { "tar.bz2|tar.bzip2|tb2|tbz|tbz2", new TarBZip2Driver() {
-                        @Override
-                        public Charset getCharset() {
-                            return charset;
-                        }
-                    } },
-                    { "tar.gz|tar.gzip|tgz", new TarGZipDriver() {
-                        @Override
-                        public Charset getCharset() {
-                            return charset;
-                        }
-                    } },
-                    { "tar.xz|txz", new TarXZDriver() {
-                        @Override
-                        public Charset getCharset() {
-                            return charset;
-                        }
-                    } },
-                    { "zip", new ZipDriver() {
-                        @Override
-                        public Charset getCharset() {
-                            return charset;
-                        }
-                    } },
-                });
-    }
-
-    static void cpOrMv(
-            final TrueVFS command,
-            BitField<CpOption> options,
-            final Deque<String> args)
-    throws IOException {
+            throws IOException {
         try (final TConfig config = TConfig.open()) {
             TArchiveDetector srcDetector;
             if (options.get(CpOption.CP437IN))
                 srcDetector = newArchiveDetector(Charset.forName("IBM437"));
             else if (options.get(CpOption.UTF8IN))
-                srcDetector = newArchiveDetector(Charset.forName("UTF-8"));
+                srcDetector = newArchiveDetector(Charsets.UTF_8);
             else
                 srcDetector = config.getArchiveDetector();
 
@@ -400,7 +290,7 @@ public enum TrueVFS {
             else if (options.get(CpOption.CP437OUT))
                 dstDetector = newArchiveDetector(Charset.forName("IBM437"));
             else if (options.get(CpOption.UTF8OUT))
-                dstDetector = newArchiveDetector(Charset.forName("UTF-8"));
+                dstDetector = newArchiveDetector(Charsets.UTF_8);
             else
                 dstDetector = config.getArchiveDetector();
 
@@ -420,12 +310,12 @@ public enum TrueVFS {
                 final TFile dst = expandPath
                         ? new TFile(last, src.getName(), dstDetector)
                         : last;
-                if (MV.equals(command)) {
+                if (equals(MV)) {
                     try {
                         if (dst.isFile()) dst.rm();
                         src.mv(dst);
                     } catch (final IOException ex) {
-                        throw new IOException(command.message("cmt", src, dst), ex);
+                        throw new IOException(message("cmt", src, dst), ex);
                     }
                 } else { // cp
                     if (options.get(CpOption.R))
@@ -434,13 +324,136 @@ public enum TrueVFS {
                         else
                             TFile.cp_r(src, dst, srcDetector, dstDetector);
                     else
-                        if (options.get(CpOption.P))
-                            TFile.cp_p(src, dst);
-                        else
-                            TFile.cp(src, dst);
+                    if (options.get(CpOption.P))
+                        TFile.cp_p(src, dst);
+                    else
+                        TFile.cp(src, dst);
                 }
             }
         }
+    }
+
+    private static TArchiveDetector newArchiveDetector(final Charset charset) {
+        assert null != charset;
+        return new TArchiveDetector(
+                TArchiveDetector.ALL,
+                new Object[][]{
+                        {
+                                "ear|jar|war",
+                                new JarDriver()
+                        },
+                        {
+                                "exe",
+                                new ReadOnlySfxDriver() {
+                                    @Override public Charset getCharset() {
+                                        return charset;
+                                    }
+                                }
+                        },
+                        {
+                                "tar",
+                                new TarDriver() {
+                                    @Override public Charset getCharset() {
+                                        return charset;
+                                    }
+                                }
+                        },
+                        {
+                                "tar.bz2|tar.bzip2|tb2|tbz|tbz2",
+                                new TarBZip2Driver() {
+                                    @Override public Charset getCharset() {
+                                        return charset;
+                                    }
+                                }
+                        },
+                        {
+                                "tar.gz|tar.gzip|tgz",
+                                new TarGZipDriver() {
+                                    @Override public Charset getCharset() {
+                                        return charset;
+                                    }
+                                }
+                        },
+                        {
+                                "tar.xz|txz",
+                                new TarXZDriver() {
+                                    @Override public Charset getCharset() {
+                                        return charset;
+                                    }
+                                }
+                        },
+                        {
+                                "zip",
+                                new ZipDriver() {
+                                    @Override public Charset getCharset() {
+                                        return charset;
+                                    }
+                                }
+                        },
+                }
+        );
+    }
+
+    void ls(
+            final BitField<LsOption> options,
+            final Deque<String> args)
+            throws IOException {
+        if (0 >= args.size()) args.push(".");
+        final boolean multi = 1 < args.size();
+        for (final String arg : args) {
+            final TFile file = new TFile(arg);
+            if (multi) out.println(arg + ":");
+            if (file.isDirectory()) ls(options, file, "");
+            else ls(options, file, file.getPath());
+        }
+    }
+
+    private void ls(
+            final BitField<LsOption> options,
+            final TFile file,
+            final String path)
+            throws IOException {
+        if (file.isDirectory()) {
+            final TFile[] members = file.listFiles();
+            if (null == members)
+                throw new IOException(message("dina", path));
+            // Sort directories to the start.
+            Arrays.sort(members, new TFileComparator());
+            for (final TFile member : members) {
+                String memberPath = member.getName();
+                if (!path.isEmpty())
+                    memberPath = path + TFile.separator + memberPath;
+                ls(options, member.toPath(), memberPath);
+                if (options.get(LsOption.R) && member.isDirectory())
+                    ls(options, member, memberPath);
+            }
+        } else if (file.exists()) {
+            ls(options, file.toPath(), path);
+        } else {
+            throw new IOException(message("nsfod", path));
+        }
+    }
+
+    private static void ls(
+            final BitField<LsOption> options,
+            final TPath file,
+            final String path)
+            throws IOException {
+        final BasicFileAttributes attr =
+                readAttributes(file, BasicFileAttributes.class);
+        final boolean detailed = options.get(LsOption.L);
+        if (detailed)
+            out.printf("%,11d %tF %<tT ", attr.size(), attr.lastModifiedTime().toMillis());
+        out.append(path);
+        if (detailed) {
+            if (attr.isDirectory()) {
+                if (attr.isRegularFile()) out.append('+'); // covariant
+                else out.append(TFile.separator);
+            }
+            if (attr.isSymbolicLink()) out.append('>');
+            if (attr.isOther()) out.append('?');
+        }
+        out.println();
     }
 
     public static void main(String[] args) {
@@ -511,7 +524,7 @@ public enum TrueVFS {
         @Override
         public FileVisitResult postVisitDirectory(
                 final Path dir,
-                final @CheckForNull IOException exc)
+                final @Nullable IOException exc)
         throws IOException {
             if (null != exc) throw exc;
             delete(dir);
