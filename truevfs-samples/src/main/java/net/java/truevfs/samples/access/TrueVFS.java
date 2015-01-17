@@ -4,29 +4,8 @@
  */
 package net.java.truevfs.samples.access;
 
-import java.io.IOException;
-import java.io.InputStream;
-import static java.lang.System.*;
-import java.nio.charset.Charset;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.FileVisitResult;
-import static java.nio.file.Files.*;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.LinkedList;
-import java.util.Locale;
-import java.util.NoSuchElementException;
-import java.util.ResourceBundle;
 import net.java.truecommons.shed.BitField;
-import net.java.truevfs.access.TArchiveDetector;
-import net.java.truevfs.access.TConfig;
-import net.java.truevfs.access.TFile;
-import net.java.truevfs.access.TFileComparator;
-import net.java.truevfs.access.TPath;
+import net.java.truevfs.access.*;
 import net.java.truevfs.comp.tardriver.TarDriver;
 import net.java.truevfs.comp.zipdriver.JarDriver;
 import net.java.truevfs.comp.zipdriver.ZipDriver;
@@ -35,6 +14,22 @@ import net.java.truevfs.driver.tar.bzip2.TarBZip2Driver;
 import net.java.truevfs.driver.tar.gzip.TarGZipDriver;
 import net.java.truevfs.driver.tar.xz.TarXZDriver;
 import net.java.truevfs.kernel.spec.FsAccessOption;
+
+import javax.annotation.CheckForNull;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
+import java.util.*;
+
+import static java.lang.System.err;
+import static java.lang.System.out;
+import static java.nio.file.Files.*;
 
 /**
  * A comprehensive command line utility which allows you to work
@@ -63,20 +58,18 @@ public enum TrueVFS {
     // This enum needs to be first, all remaining enums should be sorted alphabetically.
     USAGE {
         @Override
-        void run(final Deque<String> params) {
+        void run(final Deque<String> args) {
             throw new IllegalArgumentException();
         }
     },
 
     CAT {
         @Override
-        void run(final Deque<String> params) throws IOException {
-            if (1 > params.size()) throw new NoSuchElementException();
-            for (   String param;
-                    null != (param = params.poll());
-                    ) {
-                final TPath path = new TPath(param);
-                try (final InputStream in = newInputStream(path)) {
+        void run(final Deque<String> args) throws IOException {
+            if (1 > args.size()) throw new NoSuchElementException();
+            for (final String arg : args) {
+                final TPath path = new TPath(arg);
+                try (InputStream in = newInputStream(path)) {
                     TFile.cat(in, out);
                 }
             }
@@ -85,12 +78,10 @@ public enum TrueVFS {
 
     COMPACT {
         @Override
-        void run(final Deque<String> params) throws IOException {
-            if (1 > params.size()) throw new NoSuchElementException();
-            for (   String param;
-                    null != (param = params.poll());
-                    ) {
-                final TFile file = new TFile(param);
+        void run(final Deque<String> args) throws IOException {
+            if (1 > args.size()) throw new NoSuchElementException();
+            for (final String arg : args) {
+                final TFile file = new TFile(arg);
                 if (file.isTopLevelArchive()) file.compact();
                 else err.println(message("ntlaf", file));
             }
@@ -99,88 +90,86 @@ public enum TrueVFS {
 
     CP {
         @Override
-        void run(final Deque<String> params) throws IOException {
-            final BitField<CpOption> options = options(params, CpOption.class);
-            cpOrMv(this, options, params);
+        void run(final Deque<String> args) throws IOException {
+            final BitField<CpOption> options = options(args, CpOption.class);
+            cpOrMv(this, options, args);
         }
     },
 
     EXISTS {
         @Override
-        void run(final Deque<String> params) {
-            out.println(exists(new TPath(params.pop())));
+        void run(final Deque<String> args) {
+            out.println(exists(new TPath(args.pop())));
         }
     },
 
     HELP {
         @Override
-        void run(final Deque<String> params) {
-            out.println(valueOf(params.pop().toUpperCase(Locale.ROOT)).getHelp());
+        void run(final Deque<String> args) {
+            out.println(TrueVFS.valueOf(args.pop().toUpperCase(Locale.ENGLISH)).getUsage());
         }
     },
 
     ISARCHIVE {
         @Override
-        void run(final Deque<String> params) {
-            out.println(new TPath(params.pop()).isArchive());
+        void run(final Deque<String> args) {
+            out.println(new TPath(args.pop()).isArchive());
         }
     },
 
     ISDIRECTORY {
         @Override
-        void run(final Deque<String> params) {
-            out.println(isDirectory(new TPath(params.pop())));
+        void run(final Deque<String> args) {
+            out.println(isDirectory(new TPath(args.pop())));
         }
     },
 
     ISFILE {
         @Override
-        void run(final Deque<String> params) {
-            out.println(isRegularFile(new TPath(params.pop())));
+        void run(final Deque<String> args) {
+            out.println(isRegularFile(new TPath(args.pop())));
         }
     },
 
     LS {
         @Override
-        void run(final Deque<String> params) throws Exception {
-            final BitField<LsOption> options = options(params, LsOption.class);
-            ls(this, options, params);
+        void run(final Deque<String> args) throws IOException {
+            final BitField<LsOption> options = options(args, LsOption.class);
+            ls(this, options, args);
         }
     },
 
     LL {
         @Override
-        void run(final Deque<String> params) throws Exception {
-            params.push("-l");
-            LS.run(params);
+        void run(final Deque<String> args) throws IOException {
+            args.push("-l");
+            LS.run(args);
         }
 
         @Override
-        String getHelp() { return LS.getHelp(); }
+        String getUsage() { return LS.getUsage(); }
     },
 
     LLR {
         @Override
-        void run(final Deque<String> params) throws Exception {
-            params.push("-r");
-            params.push("-l");
-            LS.run(params);
+        void run(final Deque<String> args) throws IOException {
+            args.push("-r");
+            args.push("-l");
+            LS.run(args);
         }
 
         @Override
-        String getHelp() { return LS.getHelp(); }
+        String getUsage() { return LS.getUsage(); }
     },
 
     MKDIR {
         @Override
-        void run(final Deque<String> params) throws IOException {
-            final boolean recursive = options(params, MkdirOption.class)
+        void run(final Deque<String> args) throws IOException {
+            final boolean recursive = options(args, MkdirOption.class)
                     .get(MkdirOption.P);
-            if (1 > params.size()) throw new NoSuchElementException();
-            for (   String param;
-                    null != (param = params.poll());
-                    ) {
-                final TPath path = new TPath(param);
+            if (args.size() < 1) throw new IllegalArgumentException();
+            for (final String arg : args) {
+                final TPath path = new TPath(arg);
                 if (recursive) createDirectories(path);
                 else           createDirectory(path);
             }
@@ -189,32 +178,30 @@ public enum TrueVFS {
 
     MKDIRS {
         @Override
-        void run(final Deque<String> params) throws Exception {
-            params.push("-p");
-            MKDIR.run(params);
+        void run(final Deque<String> args) throws IOException {
+            args.push("-p");
+            MKDIR.run(args);
         }
 
         @Override
-        String getHelp() { return MKDIR.getHelp(); }
+        String getUsage() { return MKDIR.getUsage(); }
     },
 
     MV {
         @Override
-        void run(final Deque<String> params) throws IOException {
-            cpOrMv(this, BitField.noneOf(CpOption.class), params);
+        void run(final Deque<String> args) throws IOException {
+            cpOrMv(this, BitField.noneOf(CpOption.class), args);
         }
     },
 
     RM {
         @Override
-        void run(final Deque<String> params) throws IOException {
-            final boolean recursive = options(params, RmOption.class)
+        void run(final Deque<String> args) throws IOException {
+            final boolean recursive = options(args, RmOption.class)
                     .get(RmOption.R);
-            if (1 > params.size()) throw new NoSuchElementException();
-            for (   String param;
-                    null != (param = params.poll());
-                    ) {
-                final TPath path = new TPath(param);
+            if (1 > args.size()) throw new NoSuchElementException();
+            for (final String arg : args) {
+                final TPath path = new TPath(arg);
                 if (recursive) walkFileTree(path, new RmVisitor());
                 else           delete(path);
             }
@@ -223,30 +210,28 @@ public enum TrueVFS {
 
     RMR {
         @Override
-        void run(final Deque<String> params) throws Exception {
-            params.push("-r");
-            RM.run(params);
+        void run(final Deque<String> args) throws IOException {
+            args.push("-r");
+            RM.run(args);
         }
 
         @Override
-        String getHelp() { return RM.getHelp(); }
+        String getUsage() { return RM.getUsage(); }
     },
 
     SIZE {
         @Override
-        void run(final Deque<String> params) throws IOException {
-            out.println(size(new TPath(params.pop())));
+        void run(final Deque<String> args) throws IOException {
+            out.println(size(new TPath(args.pop())));
         }
     },
 
     TOUCH {
         @Override
-        void run(final Deque<String> params) throws IOException {
-            if (1 > params.size()) throw new NoSuchElementException();
-            for (   String param;
-                    null != (param = params.poll());
-                    ) {
-                final TPath path = new TPath(param);
+        void run(final Deque<String> args) throws IOException {
+            if (1 > args.size()) throw new NoSuchElementException();
+            for (final String arg : args) {
+                final TPath path = new TPath(arg);
                 try {
                     createFile(path);
                 } catch (FileAlreadyExistsException ex) {
@@ -260,7 +245,7 @@ public enum TrueVFS {
 
     VERSION {
         @Override
-        void run(final Deque<String> params) {
+        void run(final Deque<String> args) {
             out.println(message("version", TrueVFS.class.getSimpleName()));
         }
     };
@@ -270,19 +255,19 @@ public enum TrueVFS {
      * As a side effect, any found options are popped off the parameter stack.
      *
      * @param  <T> the type of the enum class for the options.
-     * @param  params the command parameters.
+     * @param  args the command arguments.
      * @param  option the enum class for the options.
      * @return a bit field of the options found.
      */
     private static <T extends Enum<T>> BitField<T> options(
-            final Deque<String> params,
+            final Deque<String> args,
             final Class<T> option) {
         BitField<T> options = BitField.noneOf(option);
-        for (   String param;
-                null != (param = params.peek()) && '-' == param.charAt(0);
-                params.pop()) {
-            param = param.substring(1).toUpperCase(Locale.ROOT);
-            options = options.set(valueOf(option, param));
+        for (   String arg;
+                null != (arg = args.peek()) && '-' == arg.charAt(0);
+                args.pop()) {
+            arg = arg.substring(1).toUpperCase(Locale.ENGLISH);
+            options = options.set(valueOf(option, arg));
         }
         return options;
     }
@@ -299,11 +284,12 @@ public enum TrueVFS {
             out.printf("%,11d %tF %<tT ", attr.size(), attr.lastModifiedTime().toMillis());
         out.append(path);
         if (detailed) {
-            if (attr.isDirectory())
-                if (attr.isRegularFile())   out.append('+'); // covariant
-                else                        out.append(TFile.separator);
-            if (attr.isSymbolicLink())      out.append('>');
-            if (attr.isOther())             out.append('?');
+            if (attr.isDirectory()) {
+                if (attr.isRegularFile()) out.append('+'); // covariant
+                else out.append(TFile.separator);
+            }
+            if (attr.isSymbolicLink()) out.append('>');
+            if (attr.isOther()) out.append('?');
         }
         out.println();
     }
@@ -338,15 +324,13 @@ public enum TrueVFS {
     static void ls(
             final TrueVFS command,
             BitField<LsOption> options,
-            final Deque<String> params)
+            final Deque<String> args)
     throws IOException {
-        if (0 >= params.size()) params.push(".");
-        final boolean multi = 1 < params.size();
-        for (   String param;
-                null != (param = params.poll());
-                ) {
-            final TFile file = new TFile(param);
-            if (multi) out.println(param + ":");
+        if (0 >= args.size()) args.push(".");
+        final boolean multi = 1 < args.size();
+        for (final String arg : args) {
+            final TFile file = new TFile(arg);
+            if (multi) out.println(arg + ":");
             if (file.isDirectory()) ls(command, options, file, "");
             else ls(command, options, file, file.getPath());
         }
@@ -399,7 +383,7 @@ public enum TrueVFS {
     static void cpOrMv(
             final TrueVFS command,
             BitField<CpOption> options,
-            final Deque<String> params)
+            final Deque<String> args)
     throws IOException {
         try (final TConfig config = TConfig.open()) {
             TArchiveDetector srcDetector;
@@ -426,16 +410,14 @@ public enum TrueVFS {
                     .set(FsAccessOption.GROW, options.get(CpOption.GROW))
                     .set(FsAccessOption.ENCRYPT, options.get(CpOption.ENCRYPT)));
 
-            final TFile last = new TFile(params.removeLast(), dstDetector);
-            if (1 > params.size()) throw new NoSuchElementException();
-            if (1 < params.size() && !last.isArchive() && !last.isDirectory())
+            final TFile last = new TFile(args.removeLast(), dstDetector);
+            final boolean expandPath = last.isArchive() && !last.isFile() || last.isDirectory();
+            if (args.isEmpty() || 1 < args.size() && !expandPath)
                 throw new IllegalArgumentException();
 
-            for (   String param;
-                    null != (param = params.poll());
-                    ) {
-                final TFile src = new TFile(param, srcDetector);
-                final TFile dst = 1 < params.size() || last.isDirectory()
+            for (final String arg : args) {
+                final TFile src = new TFile(arg, srcDetector);
+                final TFile dst = expandPath
                         ? new TFile(last, src.getName(), dstDetector)
                         : last;
                 if (MV.equals(command)) {
@@ -461,32 +443,44 @@ public enum TrueVFS {
         }
     }
 
-    @SuppressWarnings("CallToThreadDumpStack")
     public static void main(String[] args) {
-        try {
-            final Deque<String> parameters = new LinkedList<>(Arrays.asList(args));
-            final String command = parameters.pop().toUpperCase(Locale.ROOT);
-            valueOf(command).run(parameters);
-        } catch (final IllegalArgumentException | NoSuchElementException ex) {
-            final StringBuilder builder = new StringBuilder(25 * 80);
-            for (final TrueVFS truevfs : values())
-                builder.append('\n').append(truevfs.getUsage());
-            err.println(builder.toString());
-            System.exit(2);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(1);
-        }
+        System.exit(main(new LinkedList<>(Arrays.asList(args))));
     }
 
-    String getUsage() { return message("usage", TrueVFS.class.getSimpleName()); }
-    String getHelp() { return message("help"); }
+    @SuppressWarnings("CallToThreadDumpStack")
+    private static int main(final Deque<String> args) {
+        final TrueVFS command;
+        try {
+            command = valueOf(args.pop().toUpperCase(Locale.ENGLISH));
+        } catch (final IllegalArgumentException | NoSuchElementException ex) {
+            final StringBuilder builder = new StringBuilder(25 * 80);
+            for (final TrueVFS truevfs : values()) {
+                if (0 != builder.length()) builder.append('\n');
+                builder.append(truevfs.getSynopsis());
+            }
+            err.println(builder.toString());
+            return 1;
+        }
+        try {
+            command.run(args);
+        } catch (final IllegalArgumentException | NoSuchElementException ex) {
+            err.println(command.getUsage());
+            return 2;
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return 3;
+        }
+        return 0;
+    }
+
+    String getSynopsis() { return message("synopsis", TrueVFS.class.getSimpleName()); }
+    String getUsage() { return message("usage"); }
 
     String message(String key, Object... args) {
         return String.format(
                 ResourceBundle
-                    .getBundle(TrueVFS.class.getCanonicalName() + "." + name())
-                    .getString(key),
+                        .getBundle(TrueVFS.class.getName() + "." + name())
+                        .getString(key),
                 args);
     }
 
@@ -494,10 +488,10 @@ public enum TrueVFS {
      * Runs this command.
      * Implementations are free to modify the given deque.
      *
-     * @param  params the command parameters.
-     * @throws Exception on any error.
+     * @param  args the command arguments.
+     * @throws IOException on any I/O error.
      */
-    abstract void run(Deque<String> params) throws Exception;
+    abstract void run(Deque<String> args) throws IOException;
 
     private enum LsOption { L, R }
     private enum CpOption { P, R, UNZIP, CP437IN, CP437OUT, UTF8IN, UTF8OUT, STORE, COMPRESS, GROW, ENCRYPT }
@@ -517,7 +511,7 @@ public enum TrueVFS {
         @Override
         public FileVisitResult postVisitDirectory(
                 final Path dir,
-                final IOException exc)
+                final @CheckForNull IOException exc)
         throws IOException {
             if (null != exc) throw exc;
             delete(dir);
