@@ -16,6 +16,7 @@ import scala.Option
 import CacheEntry._
 
 private object CacheEntry {
+
   /** Defines different cache entry strategies. */
   sealed trait Strategy {
     final def newCacheEntry(pool: IoBufferPool) = new CacheEntry(this, pool)
