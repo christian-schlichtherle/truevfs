@@ -1,0 +1,43 @@
+    -----------------------
+    Getting Started
+    -----------------------
+    Christian Schlichtherle
+    -----------------------
+
+Getting Started
+
+    Using this archetype you can generate, build and run your first
+    TrueVFS&#160;application in about five minutes.
+    This archetype solves two typical issues for beginners:
+
+    [[1]] <<How to set-up a project structure?>>
+
+          TrueVFS applies the convention-over-configuration paradigm and
+          therefore figures its initial setup by scanning the class path.
+          The POM of the generated application is richly commented to showcase
+          the available options for including and excluding
+          {{{../../truevfs-driver/index.html}TrueVFS&#160;Driver}}
+          and
+          {{{../../truevfs-ext/index.html}TrueVFS&#160;Extension}}
+          modules on the class path.
+
+          This should work for most applications.
+          However, some advanced options are not simply configurable by
+          composing the class path.
+          Once you get to this point, please refer to the page
+          {{{../../truevfs-access/configuration.html}Configuring TrueVFS&#160;Access}}
+          for more information.
+
+    [[1]] <<How to use the TrueVFS&#160;API?>>
+
+          As a starter, you should read the
+          {{{../../kick-start/tutorial.html}TrueVFS Tutorial}}.
+          The generated application contains lots of sample code demonstrating
+          different features of the client APIs in Java and Scala.
+          Working from there, it should be straightforward to apply the client
+          APIs to your individual use case.
+
+    []
+
+    Please select the guide which is the closest match for your development
+    environment from the menu on the left of this page.
