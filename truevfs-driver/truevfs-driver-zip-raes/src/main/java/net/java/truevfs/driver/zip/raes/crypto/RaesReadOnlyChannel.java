@@ -44,7 +44,7 @@ import net.java.truecommons.key.spec.common.AesKeyStrength;
  * authentication of the pay load, in which case the authentication
  * provided by this class may be safely skipped.
  * <p>
- * Note that this channel implements its own virtual position.
+ * Note that this channel implements its own virtual file pointer.
  *
  * @see    RaesOutputStream
  * @author Christian Schlichtherle
