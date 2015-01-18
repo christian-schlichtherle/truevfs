@@ -127,16 +127,6 @@
             <scope>runtime</scope>
         </dependency-->
 
-        <!-- This is only required for the Scala compiler.
-             If you are not using Scala in your project, then you can remove
-             this dependency. -->
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>annotations</artifactId>
-            <version>3.0.0</version>
-            <scope>provided</scope>
-        </dependency>
-
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>

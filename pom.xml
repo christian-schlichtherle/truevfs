@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.java.truecommons</groupId>
         <artifactId>truecommons-parent</artifactId>
-        <version>89</version>
+        <version>91</version>
     </parent>
 
     <groupId>net.java.truevfs</groupId>
@@ -308,17 +308,6 @@ plug-in to its federated file system space.
             </dependency>
 
             <dependency>
-                <groupId>com.google.code.findbugs</groupId>
-                <artifactId>annotations</artifactId>
-                <version>3.0.0</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>javax.inject</groupId>
-                <artifactId>javax.inject</artifactId>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
                 <groupId>net.java.truecommons</groupId>
                 <artifactId>truecommons-annotations</artifactId>
                 <version>${truecommons.version}</version>
@@ -575,20 +564,6 @@ plug-in to its federated file system space.
 
     <profiles>
         <profile>
-            <id>non-transitive-main-sources-dependencies</id>
-            <activation>
-                <file>
-                    <exists>src/main</exists>
-                </file>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>net.java.truecommons</groupId>
-                    <artifactId>truecommons-annotations</artifactId>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>non-transitive-test-sources-dependencies</id>
             <activation>
                 <file>
@@ -600,10 +575,6 @@ plug-in to its federated file system space.
                     <groupId>ch.qos.logback</groupId>
                     <artifactId>logback-classic</artifactId>
                     <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>net.java.truecommons</groupId>
-                    <artifactId>truecommons-annotations</artifactId>
                 </dependency>
                 <!--dependency>
                     <groupId>org.slf4j</groupId>
