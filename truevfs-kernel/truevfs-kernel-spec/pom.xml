@@ -24,6 +24,14 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-annotations</artifactId>
+        </dependency>
+        <dependency>
             <groupId>net.java.truecommons</groupId>
             <artifactId>truecommons-cio</artifactId>
         </dependency>
