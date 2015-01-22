@@ -5,18 +5,12 @@
 package net.java.truevfs.driver.zip.raes.crypto;
 
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.security.SecureRandom;
-import java.util.Arrays;
-import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.io.LittleEndianOutputStream;
 import net.java.truecommons.io.Sink;
 import net.java.truecommons.key.spec.common.AesKeyStrength;
 import net.java.truevfs.comp.zip.crypto.BufferedPartialBlockCipher;
 import net.java.truevfs.comp.zip.crypto.CipherOutputStream;
 import net.java.truevfs.comp.zip.crypto.CtrBlockCipher;
-import static net.java.truevfs.driver.zip.raes.crypto.Constants.*;
 import org.bouncycastle.crypto.*;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.engines.AESFastEngine;
@@ -26,6 +20,14 @@ import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.util.io.TeeOutputStream;
+
+import javax.annotation.concurrent.NotThreadSafe;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.security.SecureRandom;
+import java.util.Arrays;
+
+import static net.java.truevfs.driver.zip.raes.crypto.Constants.*;
 
 /**
  * Writes a type 0 RAES file.
@@ -45,17 +47,17 @@ final class Type0RaesOutputStream extends RaesOutputStream {
     /** The key strength. */
     private final AesKeyStrength keyStrength;
 
-    /** The Message Authentication Code (MAC). */
-    private Mac mac;
+    /** The message authentication code (MAC). */
+    private final Mac mac;
 
-    /** The cipher Key and cipher text Length Authentication Code (KLAC). */
-    private Mac klac;
+    /** The cipher key and cipher text length authentication code (KLAC). */
+    private final Mac klac;
 
     /**
      * The low level data output stream.
      * Used for writing the header and footer.
      **/
-    private LittleEndianOutputStream leos;
+    private final LittleEndianOutputStream leos;
 
     /** The offset where the encrypted application data starts. */
     private long start;
@@ -166,14 +168,14 @@ final class Type0RaesOutputStream extends RaesOutputStream {
         final byte[] buf = new byte[mac.getMacSize()]; // MAC buffer
         int bufLength;
 
-        // Calculate and write KLAC to data envelope footer.
+        // Compute and write the first half of the KLAC to the data envelope footer.
         // Please note that we will only use the first half of the
         // authentication code for security reasons.
         final long length = trailer - start; // message length
         klac(klac, length, buf);
         leos.write(buf, 0, buf.length / 2);
 
-        // Calculate and write MAC to data envelope footer.
+        // Compute and write the first half of the MAC to the data envelope footer.
         // Again, we will only use the first half of the
         // authentication code for security reasons.
         bufLength = mac.doFinal(buf, 0);

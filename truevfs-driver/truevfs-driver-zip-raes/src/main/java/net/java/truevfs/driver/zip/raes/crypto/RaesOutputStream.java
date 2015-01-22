@@ -40,10 +40,10 @@ public abstract class RaesOutputStream extends DecoratingOutputStream {
      * The result is stored in {@code buf}, which must match the given
      * KLAC's output size.
      */
-    static void klac(final Mac klac, long size, final byte[] buf) {
+    static void klac(final Mac klac, long length, final byte[] buf) {
         for (int i = 0; i < 8; i++) {
-            klac.update((byte) size);
-            size >>= 8;
+            klac.update((byte) length);
+            length >>= 8;
         }
         final int bufLength = klac.doFinal(buf, 0);
         assert bufLength == buf.length;
