@@ -98,8 +98,8 @@ final class Type0RaesReadOnlyChannel extends RaesReadOnlyChannel {
         // Init start, end and size of encrypted data.
         final long start = channel.position();
         final long end = channel.size() - footer.limit();
-        final long size = end - start;
-        if (0 > size) {
+        final long length = end - start;
+        if (0 > length) {
             // Wrap an EOFException so that a caller can identify this issue.
             throw new RaesException("False positive Type 0 RAES file is too short!",
                     new EOFException());
@@ -147,7 +147,7 @@ final class Type0RaesReadOnlyChannel extends RaesReadOnlyChannel {
             final byte[] cipherKey = ((KeyParameter) aesCtrParam.getParameters()).getKey();
             klac.update(cipherKey, 0, cipherKey.length);
             buf = new byte[klac.getMacSize()];
-            RaesOutputStream.klac(klac, size, buf);
+            RaesOutputStream.klac(klac, length, buf);
         } while (!passwdVerifier.equals(ByteBuffer.wrap(buf, 0, buf.length / 2)));
 
         // Init parameters for authenticate().
@@ -158,7 +158,7 @@ final class Type0RaesReadOnlyChannel extends RaesReadOnlyChannel {
                 cipher = new CtrBlockCipher(new AESFastEngine());
         cipher.init(false, aesCtrParam);
         this.channel = new CipherReadOnlyChannel(cipher,
-                new IntervalReadOnlyChannel(channel.position(start), size));
+                new IntervalReadOnlyChannel(channel.position(start), length));
 
         // Commit key strength.
         param.setKeyStrength(keyStrength);
