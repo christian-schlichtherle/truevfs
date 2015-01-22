@@ -7,33 +7,25 @@ package net.java.truevfs.kernel.spec.cio;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.*;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truecommons.cio.DecoratingInputSocket;
-import net.java.truecommons.cio.DecoratingOutputService;
-import net.java.truecommons.cio.DecoratingOutputSocket;
-import net.java.truecommons.cio.Entry;
-import static net.java.truecommons.cio.Entry.ALL_ACCESS;
+import net.java.truecommons.cio.*;
 import net.java.truecommons.cio.Entry.Access;
-import static net.java.truecommons.cio.Entry.Size.DATA;
-import static net.java.truecommons.cio.Entry.UNKNOWN;
-import net.java.truecommons.cio.InputSocket;
-import net.java.truecommons.cio.IoBuffer;
-import net.java.truecommons.cio.IoBufferPool;
-import net.java.truecommons.cio.IoSockets;
-import net.java.truecommons.cio.MutableEntry;
-import net.java.truecommons.cio.OutputService;
-import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.io.DecoratingOutputStream;
 import net.java.truecommons.io.InputException;
 import net.java.truecommons.shed.CompoundIterator;
 import net.java.truecommons.shed.ExceptionBuilder;
 import net.java.truecommons.shed.PriorityExceptionBuilder;
 import net.java.truecommons.shed.SuppressedExceptionBuilder;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.WillCloseWhenClosed;
+import javax.annotation.concurrent.NotThreadSafe;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.*;
+
+import static net.java.truecommons.cio.Entry.ALL_ACCESS;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import static net.java.truecommons.cio.Entry.UNKNOWN;
 
 /**
  * Decorates another output service to enable concurrent writing of multiple
@@ -171,9 +163,9 @@ extends DecoratingOutputService<E> {
             final BufferedEntryOutputStream out = i.next();
             try {
                 if (out.storeBuffer()) i.remove();
-            } catch (final InputException ex) {
+            } catch (InputException ex) {
                 builder.warn(ex);
-            } catch (final IOException ex) {
+            } catch (IOException ex) {
                 throw builder.fail(ex);
             }
         }
@@ -273,13 +265,13 @@ extends DecoratingOutputService<E> {
                         updateProperties(local, input.target());
                     else
                         discardBuffer();
-                } catch (final IOException ex) {
+                } catch (IOException ex) {
                     builder.warn(ex);
                 }
             }
             try {
                 storeBuffers();
-            } catch (final IOException ex) {
+            } catch (IOException ex) {
                 builder.warn(ex);
             }
             builder.check();
@@ -299,7 +291,7 @@ extends DecoratingOutputService<E> {
             buffer.release();
         }
 
-        boolean storeBuffer() throws InputException, IOException {
+        boolean storeBuffer() throws IOException {
             if (!closed || isBusy()) return false;
             IoSockets.copy(input, output);
             buffer.release();
