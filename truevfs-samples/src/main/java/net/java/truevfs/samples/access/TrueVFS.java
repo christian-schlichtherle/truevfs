@@ -301,7 +301,7 @@ public enum TrueVFS {
                     .set(FsAccessOption.ENCRYPT, options.get(CpOption.ENCRYPT)));
 
             final TFile last = new TFile(args.removeLast(), dstDetector);
-            final boolean expandPath = last.isArchive() && !last.isFile() || last.isDirectory();
+            final boolean expandPath = last.isDirectory();
             if (args.isEmpty() || 1 < args.size() && !expandPath)
                 throw new IllegalArgumentException();
 
