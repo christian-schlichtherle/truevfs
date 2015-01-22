@@ -10,7 +10,7 @@
     <body>
         <menu name="Documentation">
             <item name="About" href="index.html"/>
-            <item name="Nzip Utility" href="Nzip.html"/>
+            <item name="TrueVFS Command Line Utility" href="TrueVFS.html"/>
         </menu>
     </body>
 </project>
