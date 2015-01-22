@@ -3039,7 +3039,7 @@ public final class TFile extends File implements TRex {
     public void input(final @WillNotClose InputStream in) throws IOException {
         Objects.requireNonNull(in);
         try {
-            try (final TFileOutputStream out = new TFileOutputStream(this)) {
+            try (TFileOutputStream out = new TFileOutputStream(this)) {
                 Streams.cat(in, out);
             }
         } catch (final IOException ex) {
@@ -3099,7 +3099,7 @@ public final class TFile extends File implements TRex {
     @FsAssertion(atomic=NO, consistent=YES, isolated=NO, durable=NOT_APPLICABLE)
     public void output(final @WillNotClose OutputStream out) throws IOException {
         Objects.requireNonNull(out);
-        try (final TFileInputStream in = new TFileInputStream(this)) {
+        try (TFileInputStream in = new TFileInputStream(this)) {
             Streams.cat(in, out);
         }
     }
