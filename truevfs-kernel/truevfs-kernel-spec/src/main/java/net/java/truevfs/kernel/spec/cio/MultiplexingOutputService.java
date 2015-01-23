@@ -10,10 +10,8 @@ import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import net.java.truecommons.cio.*;
 import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.io.DecoratingOutputStream;
-import net.java.truecommons.io.InputException;
 import net.java.truecommons.shed.CompoundIterator;
 import net.java.truecommons.shed.ExceptionBuilder;
-import net.java.truecommons.shed.PriorityExceptionBuilder;
 import net.java.truecommons.shed.SuppressedExceptionBuilder;
 
 import javax.annotation.CheckForNull;
@@ -21,7 +19,10 @@ import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import static net.java.truecommons.cio.Entry.ALL_ACCESS;
 import static net.java.truecommons.cio.Entry.Size.DATA;
@@ -156,35 +157,14 @@ extends DecoratingOutputService<E> {
 
     final void storeBuffers() throws IOException {
         if (isBusy()) return;
-        final ExceptionBuilder<IOException, IOException> builder
-                = new PriorityExceptionBuilder<>(IOExceptionComparator.INSTANCE);
-        for (   final Iterator<BufferedEntryOutputStream> i = buffers.values().iterator();
-                i.hasNext(); ) {
-            final BufferedEntryOutputStream out = i.next();
-            try {
-                if (out.storeBuffer()) i.remove();
-            } catch (InputException ex) {
-                builder.warn(ex);
-            } catch (IOException ex) {
-                throw builder.fail(ex);
-            }
-        }
-        builder.check();
+        for (Iterator<BufferedEntryOutputStream> i = buffers.values().iterator(); i.hasNext(); )
+            if (i.next().storeBuffer())
+                i.remove();
     }
-
-    private static final class IOExceptionComparator
-    implements Comparator<IOException> {
-        static final IOExceptionComparator INSTANCE = new IOExceptionComparator();
-
-        @Override
-        public int compare(IOException o1, IOException o2) {
-            return    (o1 instanceof InputException ? 0 : 1)
-                    - (o2 instanceof InputException ? 0 : 1);
-        }
-    } // IOExceptionComparator
 
     /** This entry output stream writes directly to this output service. */
     private final class EntryOutputStream extends DecoratingOutputStream {
+
         boolean closed;
 
         EntryOutputStream(final @WillCloseWhenClosed OutputStream out) {
@@ -213,6 +193,7 @@ extends DecoratingOutputService<E> {
     @CleanupObligation
     private final class BufferedEntryOutputStream
     extends DecoratingOutputStream {
+
         final InputSocket<?> input;
         final OutputSocket<? extends E> output;
         final IoBuffer buffer;
