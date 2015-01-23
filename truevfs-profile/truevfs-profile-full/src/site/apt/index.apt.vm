@@ -60,8 +60,8 @@ About
 * Using this profile without Maven
 
     If you do not want to use Maven then you can directly
-    {{{http://repo1.maven.org/maven2/net/java/truevfs/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}-shaded.jar}<<download>>}}
-    the shaded JAR of this profile from Maven Central.
+    {{{http://repo1.maven.org/maven2/net/java/truevfs/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}-all.jar}<<download>>}}
+    the all-in-one JAR of this profile from Maven Central.
     This all-in-one JAR contains all transitive dependencies, including third
     party JARs, e.g. for Apache Commons Compress et al.
     However, you cannot exclude any dependencies or change their version.
