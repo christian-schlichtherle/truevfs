@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2015 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>net.java.truevfs</groupId>
+        <artifactId>truevfs</artifactId>
+        <version>0.10.8</version>
+    </parent>
+
+    <artifactId>truevfs-profile</artifactId>
+    <packaging>pom</packaging>
+
+    <name>TrueVFS Profile</name>
+    <description>
+        Profile modules bundle some other modules so that you can use them as
+        a single all-in-one dependency - they do not provide any additional
+        functionality.
+    </description>
+
+    <modules>
+        <module>truevfs-profile-base</module>
+        <module>truevfs-profile-default</module>
+        <module>truevfs-profile-full</module>
+    </modules>
+
+    <profiles>
+        <profile>
+            <id>sonatype-oss-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <configuration>
+                            <shadedClassifierName>all</shadedClassifierName>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

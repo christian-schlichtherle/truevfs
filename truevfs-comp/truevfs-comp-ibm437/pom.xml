@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2015 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>net.java.truevfs</groupId>
+        <artifactId>truevfs-comp</artifactId>
+        <version>0.10.8</version>
+    </parent>
+
+    <artifactId>truevfs-comp-ibm437</artifactId>
+
+    <name>TrueVFS Component IBM437</name>
+    <description>
+        Provides the IBM437 character set alias CP437 for use with genuine ZIP
+        files.
+
+        Add the JAR artifact of this module to the run time class path to
+        make its file system drivers available for service location in the
+        client API modules.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-annotations</artifactId>
+        </dependency>
+    </dependencies>
+</project>
