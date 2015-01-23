@@ -7,7 +7,6 @@ package net.java.truevfs.access.it;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.io.ClosedInputException;
 import net.java.truecommons.io.ClosedOutputException;
-import net.java.truecommons.io.InputException;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskJoiner;
@@ -506,14 +505,13 @@ extends ConfiguredClientTestBase<D> {
         assertTrue(file1.createNewFile());
         umount(); // redundant
         assertTrue(file2.createNewFile()); // calls FsController.mknod()
-        final InputStream in1 = new TFileInputStream(file1);
-        try {
+        try (InputStream in1 = new TFileInputStream(file1)) {
             try {
                 new TFileInputStream(file2).close();
                 fail();
-            } catch (final FsSyncException ex) {
-                if (!(ex.getCause() instanceof FsOpenResourceException))
-                    throw ex;
+            } catch (final FsSyncException e) {
+                if (!(e.getCause() instanceof FsOpenResourceException))
+                    throw e;
             }
             file2.input(in1);
 
@@ -521,18 +519,16 @@ extends ConfiguredClientTestBase<D> {
             try {
                 umount(); // forces closing of in1
                 fail();
-            } catch (final FsSyncWarningException ex) {
-                if (!(ex.getCause() instanceof FsOpenResourceException))
-                    throw ex;
+            } catch (final FsSyncWarningException e) {
+                if (!(e.getCause() instanceof FsOpenResourceException))
+                    throw e;
             }
             assertTrue(file2.isFile());
             try {
                 file2.input(in1);
                 fail();
-            } catch (final InputException ex) {
-                if (!(ex.getCause() instanceof ClosedInputException))
-                    throw ex;
-                assertFalse(file2.exists()); // previous op has removed file2!
+            } catch (ClosedInputException e) {
+                assertFalse(file2.exists()); // TFile.input(InputStream) has removed file2!
             }
 
             // Open file1 as stream and let the garbage collection close the stream automatically.
@@ -542,30 +538,27 @@ extends ConfiguredClientTestBase<D> {
                 // This operation may succeed without any exception if
                 // the garbage collector did its job.
                 umount(); // allow external modifications!
-            } catch (final FsSyncWarningException ex) {
+            } catch (final FsSyncWarningException e) {
                 // It may fail once if a stream was busy!
-                if (!(ex.getCause() instanceof FsOpenResourceException))
-                    throw ex;
+                if (!(e.getCause() instanceof FsOpenResourceException))
+                    throw e;
             }
             umount(); // It must not fail twice for the same reason!
 
             TFile.rm(archive.toNonArchiveFile());
-        } finally {
-            // Closing the invalidated stream explicitly should be OK.
-            in1.close();
         }
 
         // Cleanup.
         try {
             file2.rm();
             fail();
-        } catch (IOException alreadyDeletedExternally) {
+        } catch (IOException ignored) { // already deleted externally
         }
         assertFalse(file2.exists());
         try {
             file1.rm();
             fail();
-        } catch (IOException alreadyDeletedExternally) {
+        } catch (IOException ignored) { // already deleted externally
         }
         assertFalse(file1.exists());
     }

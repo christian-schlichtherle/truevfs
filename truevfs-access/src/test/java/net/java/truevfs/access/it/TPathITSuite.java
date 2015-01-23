@@ -533,30 +533,30 @@ extends ConfiguredClientTestBase<D> {
         createFile(file1); // uses FsAccessOption.CACHE!
         umount();
         createFile(file2); // uses FsAccessOption.CACHE!
-        final InputStream in1 = newInputStream(file1);
-        try {
+        try (InputStream in1 = newInputStream(file1)) {
             try {
                 // This operation may fail if the file system gets concurrently
                 // synced and hence the cache gets flushed.
                 copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
-            } catch (final FsSyncException ex) {
-                if (!(ex.getCause() instanceof FsOpenResourceException))
-                    throw ex;
+            } catch (final FsSyncException e) {
+                if (!(e.getCause() instanceof FsOpenResourceException))
+                    throw e;
             }
 
             // in1 is still open!
             try {
                 umount(); // forces closing of in1
                 fail();
-            } catch (final FsSyncWarningException ex) {
-                if (!(ex.getCause() instanceof FsOpenResourceException))
-                    throw ex;
+            } catch (final FsSyncWarningException e) {
+                if (!(e.getCause() instanceof FsOpenResourceException))
+                    throw e;
             }
             assertTrue(isRegularFile(file2));
             try {
                 copy(in1, file2, StandardCopyOption.REPLACE_EXISTING);
                 fail();
-            } catch (ClosedInputException ex) {
+            } catch (ClosedInputException e) {
+                assertTrue(Files.isRegularFile(file2)); // copy(...) leaves file2!
             }
 
             // Open file1 as stream and let the garbage collection close the stream automatically.
@@ -566,30 +566,27 @@ extends ConfiguredClientTestBase<D> {
                 // This operation may succeed without any exception if
                 // the garbage collector did its job.
                 umount(); // allow external modifications!
-            } catch (final FsSyncWarningException ex) {
+            } catch (final FsSyncWarningException e) {
                 // It may fail once if a stream was busy!
-                if (!(ex.getCause() instanceof FsOpenResourceException))
-                    throw ex;
+                if (!(e.getCause() instanceof FsOpenResourceException))
+                    throw e;
             }
             umount(); // It must not fail twice for the same reason!
 
             delete(archive.toNonArchivePath());
-        } finally {
-            // Closing the invalidated stream explicitly should be OK.
-            in1.close();
         }
 
         // Cleanup.
         try {
             delete(file2);
             fail();
-        } catch (IOException alreadyDeletedExternally) {
+        } catch (IOException ignored) { // already deleted externally
         }
         assertFalse(exists(file2));
         try {
             delete(file1);
             fail();
-        } catch (IOException alreadyDeletedExternally) {
+        } catch (IOException ignored) { // already deleted externally
         }
         assertFalse(exists(file1));
     }

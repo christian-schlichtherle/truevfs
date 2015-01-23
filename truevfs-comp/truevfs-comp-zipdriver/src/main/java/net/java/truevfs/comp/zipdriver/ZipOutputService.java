@@ -8,6 +8,20 @@ import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import net.java.truecommons.cio.*;
+import net.java.truecommons.io.DecoratingOutputStream;
+import net.java.truecommons.io.DisconnectingOutputStream;
+import net.java.truecommons.io.Streams;
+import net.java.truecommons.shed.CompoundIterator;
+import net.java.truecommons.shed.SuppressedExceptionBuilder;
+import net.java.truevfs.comp.zip.AbstractZipOutputStream;
+import net.java.truevfs.comp.zip.ZipCryptoParameters;
+import net.java.truevfs.kernel.spec.FsModel;
+import net.java.truevfs.kernel.spec.FsOutputSocketSink;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.WillNotClose;
+import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,26 +30,11 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truecommons.cio.*;
-import net.java.truecommons.cio.Entry.Access;
-import net.java.truecommons.cio.Entry.Size;
+
 import static net.java.truecommons.cio.Entry.Size.DATA;
 import static net.java.truecommons.cio.Entry.UNKNOWN;
-import net.java.truecommons.io.DecoratingOutputStream;
-import net.java.truecommons.io.DisconnectingOutputStream;
-import net.java.truecommons.io.InputException;
-import net.java.truecommons.io.Streams;
-import net.java.truecommons.shed.CompoundIterator;
-import net.java.truecommons.shed.SuppressedExceptionBuilder;
-import net.java.truevfs.comp.zip.AbstractZipOutputStream;
-import net.java.truevfs.comp.zip.ZipCryptoParameters;
 import static net.java.truevfs.comp.zip.ZipEntry.STORED;
 import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsOutputSocketSink;
 
 /**
  * An output service for writing ZIP files.
@@ -315,6 +314,7 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
     @CleanupObligation
     private final class BufferedEntryOutputStream
     extends DecoratingOutputStream {
+
         final IoBuffer buffer;
         final E local;
         boolean closed;
@@ -367,22 +367,14 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
             try (final InputStream in = buffer.input().stream(null)) {
                 final ZipOutputService<E> zos = ZipOutputService.this;
                 zos.putNextEntry(local, true);
-                try {
-                    Streams.cat(in, zos);
-                } catch (final InputException ex) { // NOT IOException!
-                    builder.warn(ex);
-                }
-                try {
-                    zos.closeEntry();
-                } catch (final IOException ex) {
-                    builder.warn(ex);
-                }
-            } catch (final IOException ex) {
+                Streams.cat(in, zos);
+                zos.closeEntry();
+            } catch (IOException ex) {
                 builder.warn(ex);
             } finally {
                 try {
                     buffer.release();
-                } catch (final IOException ex) {
+                } catch (IOException ex) {
                     builder.warn(ex);
                 }
             }
