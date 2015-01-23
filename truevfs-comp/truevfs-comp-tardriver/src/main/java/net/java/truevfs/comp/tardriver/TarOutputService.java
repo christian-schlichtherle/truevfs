@@ -252,25 +252,26 @@ implements OutputService<TarDriverEntry> {
             storeBuffer();
         }
 
+        @SuppressWarnings("ThrowFromFinallyBlock")
         void storeBuffer() throws IOException {
             final IoBuffer buffer = this.buffer;
-            final SuppressedExceptionBuilder<IOException>
-                    builder = new SuppressedExceptionBuilder<>();
+            Throwable t1 = null;
             try (final InputStream in = buffer.input().stream(null)) {
                 final TarArchiveOutputStream taos = TarOutputService.this.taos;
                 taos.putArchiveEntry(local);
                 Streams.cat(in, taos);
                 taos.closeArchiveEntry();
-            } catch (IOException ex) {
-                builder.warn(ex);
+            } catch (final Throwable t2) {
+                t1 = t2;
+                throw t2;
             } finally {
                 try {
                     buffer.release();
-                } catch (IOException ex) {
-                    builder.warn(ex);
+                } catch (final Throwable t2) {
+                    if (null == t1) throw t2;
+                    t1.addSuppressed(t2);
                 }
             }
-            builder.check();
         }
     } // BufferedEntryOutputStream
 }
