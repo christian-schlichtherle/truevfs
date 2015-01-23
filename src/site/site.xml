@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2015 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
+  -->
+<project    xmlns="http://maven.apache.org/DECORATION/1.1.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/DECORATION/1.1.0 http://maven.apache.org/xsd/decoration-1.1.0.xsd">
+    <googleAnalyticsAccountId>UA-25500668-2</googleAnalyticsAccountId>
+    <custom>
+        <googleCustomSearchId>003580521944097984334:8uinm6tpaz4</googleCustomSearchId>
+        <paypalButton>
+            <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+                <div class="paypalButton">
+                    <input type="hidden" name="cmd" value="_s-xclick"/>
+                    <input type="hidden" name="hosted_button_id" value="AGDEQWWKNZ6UL"/>
+                    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" style="border: 0" name="submit" alt="PayPal - The safer, easier way to pay online!"/>
+                </div>
+            </form>
+        </paypalButton>
+        <sourceLineNumbersEnabled>false</sourceLineNumbersEnabled>
+    </custom>
+    <publishDate position="bottom"/>
+    <skin>
+        <groupId>net.java.truecommons</groupId>
+        <artifactId>truecommons-skin</artifactId>
+        <version>RELEASE</version>
+     </skin>
+    <body>
+        <head>
+            <link rel="alternate" type="application/rss+xml" title="The TrueZIP Blog - Announcements Feed" href="http://truevfs.schlichtherle.de/category/announcements/feed/"/>
+        </head>
+        <breadcrumbs>
+            <item name="TrueVFS" href="index.html"/>
+        </breadcrumbs>
+        <menu name="Documentation">
+            <item name="About" href="index.html"/>
+            <item name="Key Features" href="features.html"/>
+            <item name="Use Cases" href="usecases/index.html" collapse="true">
+                <item name="Software Build Tool" href="usecases/sbt.html"/>
+                <item name="Search Engine" href="usecases/se.html"/>
+                <item name="Integrated Development Environment" href="usecases/ide.html"/>
+                <item name="Application File Format" href="usecases/aff.html"/>
+                <item name="Encrypted Application File Format" href="usecases/eaff.html"/>
+            </item>
+            <item name="Getting Started" href="kick-start/index.html" collapse="true">
+                <item name="with an Archetype" href="kick-start/maven.html"/>
+                <item name="without Maven" href="kick-start/no-maven.html"/>
+                <item name="Tutorial" href="kick-start/tutorial.html"/>
+            </item>
+            <item name="Getting Help" href="help.html" collapse="true">
+                <item name="Javadoc" href="apidocs/index.html"/>
+                <item name="Frequently Asked Questions" href="faq.html"/>
+                <item name="Mailing Lists" href="mail-lists.html"/>
+                <item name="Issue Tracking" href="issue-tracking.html"/>
+            </item>
+            <item name="Basic Concepts" href="concepts.html"/>
+            <item name="Glossary" href="glossary.html"/>
+        </menu>
+        <menu name="External Resources">
+            <item name="Road Map" href="https://java.net/jira/browse/TRUEVFS/?selectedTab=com.atlassian.jira.jira-projects-plugin:roadmap-panel"/>
+            <item name="Change Log" href="https://java.net/jira/browse/TRUEVFS/?selectedTab=com.atlassian.jira.jira-projects-plugin:changelog-panel"/>
+            <item name="Christian's Blog" href="http://illegalexception.schlichtherle.de"/>
+            <item name="Developer Site" href="http://java.net/projects/truevfs"/>
+        </menu>
+        <menu name="Parent Module" ref="parent" inherit="bottom"/>
+        <menu name="Sub-Modules" ref="modules" inherit="bottom"/>
+        <menu name="Reports" ref="reports" inherit="bottom"/>
+    </body>
+</project>
