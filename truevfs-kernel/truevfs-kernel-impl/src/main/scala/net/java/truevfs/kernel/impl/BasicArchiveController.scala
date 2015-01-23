@@ -153,16 +153,10 @@ extends ArchiveController[E] {
             try {
               in close ()
             } catch {
-              case ex2: IOException =>
-                val ex3 = new InputException(ex2)
+              case t: Throwable =>
                 ex match {
-                  case Some(ex) => ex addSuppressed ex3
-                  case _ => throw ex3
-                }
-              case ex2: Throwable =>
-                ex match {
-                  case Some(ex) => ex addSuppressed ex2
-                  case _ => throw ex2
+                  case Some(x) => x addSuppressed t
+                  case _ => throw t
                 }
             }
           }

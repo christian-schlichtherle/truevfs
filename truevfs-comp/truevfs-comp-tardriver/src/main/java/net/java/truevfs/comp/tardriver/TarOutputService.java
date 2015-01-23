@@ -8,36 +8,26 @@ import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truecommons.cio.AbstractOutputSocket;
-import net.java.truecommons.cio.Entry;
-import static net.java.truecommons.cio.Entry.Size.DATA;
-import static net.java.truecommons.cio.Entry.UNKNOWN;
-import net.java.truecommons.cio.InputSocket;
-import net.java.truecommons.cio.IoBuffer;
-import net.java.truecommons.cio.IoBufferPool;
-import net.java.truecommons.cio.OutputBusyException;
-import net.java.truecommons.cio.OutputService;
-import net.java.truecommons.cio.OutputSocket;
+import net.java.truecommons.cio.*;
 import net.java.truecommons.io.DecoratingOutputStream;
 import net.java.truecommons.io.DisconnectingOutputStream;
-import net.java.truecommons.io.InputException;
 import net.java.truecommons.io.Sink;
 import net.java.truecommons.io.Streams;
-import static net.java.truecommons.shed.HashMaps.OVERHEAD_SIZE;
-import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import net.java.truecommons.shed.SuppressedExceptionBuilder;
 import net.java.truevfs.kernel.spec.FsModel;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.NotThreadSafe;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.*;
+
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import static net.java.truecommons.cio.Entry.UNKNOWN;
+import static net.java.truecommons.shed.HashMaps.OVERHEAD_SIZE;
+import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import static org.apache.commons.compress.archivers.tar.TarConstants.DEFAULT_BLKSIZE;
 import static org.apache.commons.compress.archivers.tar.TarConstants.DEFAULT_RCDSIZE;
 
@@ -227,6 +217,7 @@ implements OutputService<TarDriverEntry> {
     @CleanupObligation
     private final class BufferedEntryOutputStream
     extends DecoratingOutputStream {
+
         final IoBuffer buffer;
         final TarDriverEntry local;
         boolean closed;
@@ -261,33 +252,26 @@ implements OutputService<TarDriverEntry> {
             storeBuffer();
         }
 
+        @SuppressWarnings("ThrowFromFinallyBlock")
         void storeBuffer() throws IOException {
             final IoBuffer buffer = this.buffer;
-            final SuppressedExceptionBuilder<IOException>
-                    builder = new SuppressedExceptionBuilder<>();
+            Throwable t1 = null;
             try (final InputStream in = buffer.input().stream(null)) {
                 final TarArchiveOutputStream taos = TarOutputService.this.taos;
                 taos.putArchiveEntry(local);
-                try {
-                    Streams.cat(in, taos);
-                } catch (final InputException ex) { // NOT IOException!
-                    builder.warn(ex);
-                }
-                try {
-                    taos.closeArchiveEntry();
-                } catch (final IOException ex) {
-                    builder.warn(ex);
-                }
-            } catch (final IOException ex) {
-                builder.warn(ex);
+                Streams.cat(in, taos);
+                taos.closeArchiveEntry();
+            } catch (final Throwable t2) {
+                t1 = t2;
+                throw t2;
             } finally {
                 try {
                     buffer.release();
-                } catch (final IOException ex) {
-                    builder.warn(ex);
+                } catch (final Throwable t2) {
+                    if (null == t1) throw t2;
+                    t1.addSuppressed(t2);
                 }
             }
-            builder.check();
         }
     } // BufferedEntryOutputStream
 }

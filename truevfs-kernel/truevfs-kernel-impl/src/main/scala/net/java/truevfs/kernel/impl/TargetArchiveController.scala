@@ -289,7 +289,6 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
         return
     }
 
-    var warning: Option[IOException] = None
     for (cn <- fileSystem.get) {
       for (ae <- cn.getEntries) {
         val aen = ae.getName
@@ -313,10 +312,7 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
             }
           } catch {
             case ex: IOException =>
-              if (warning.isDefined || !ex.isInstanceOf[InputException])
-                throw handler fail new FsSyncException(mountPoint, ex)
-              warning = Some(ex)
-              handler warn new FsSyncWarningException(mountPoint, ex)
+              throw handler fail new FsSyncException(mountPoint, ex)
           }
         }
       }
