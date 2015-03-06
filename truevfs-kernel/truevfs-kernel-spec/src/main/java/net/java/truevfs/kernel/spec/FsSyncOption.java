@@ -31,11 +31,11 @@ public enum FsSyncOption {
      * If the current thread gets interrupted while waiting, it will stop
      * waiting and proceed normally as if this option wasn't set.
      * <p>
-     * Beware: If an I/O resource has not been closed because the client
-     * application does not always properly close its streams, even on an
-     * {@link IOException} (which is a typical bug in many Java applications),
-     * then the respective file system controller will not return from the
-     * update until the current thread gets interrupted!
+     * <strong>WARNING:</strong> If an I/O resource has not been closed because
+     * the client application does not always properly close its streams, even
+     * on an {@link IOException} (which is a common bug in many Java
+     * applications), then the respective file system controller will not
+     * return from the update until the current thread gets interrupted!
      */
     WAIT_CLOSE_IO,
 
