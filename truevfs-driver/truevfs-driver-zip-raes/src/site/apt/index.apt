@@ -7,13 +7,13 @@
 About
 
     This module provides the file system driver map modifier class
-    {{{../../apidocs/net/java/truevfs/driver/zip/raes/ZipRaesDriverMapModifier.html}<<<ZipRaesDriverMapModifier>>>}}
+    {{{../../apidocs/net/java/truevfs/driver/zip/raes/ZipRaesDriverMapModifier.html}<<<net.java.truevfs.driver.zip.raes.ZipRaesDriverMapModifier>>>}}
     which provides the following file system driver mappings:
 
 *--*--*
 ||URI Schemes / Archive File Extension||File System Driver Class|
 *--+--+
-|<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{../../apidocs/net/java/truevfs/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}|
+|<<<tzp>>>, <<<zip.rae>>>, <<<zip.raes>>>|{{{../../apidocs/net/java/truevfs/driver/zip/raes/SafeZipRaesDriver.html}<<<net.java.truevfs.driver.zip.raes.SafeZipRaesDriver>>>}}|
 *--+--+
 
     Add the JAR artifact of this module to the run time class path to
@@ -21,7 +21,7 @@ About
     client API modules.
     The URI schemes will then get recognized as default archive file extensions
     by the class
-    {{{../../apidocs/net/java/truevfs/access/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+    {{{../../apidocs/net/java/truevfs/access/TArchiveDetector.html}<<<net.java.truevfs.access.TArchiveDetector>>>}}.
 
 * Key Features
 
@@ -83,10 +83,10 @@ About
         This can significantly improve the access performance for large
         ZIP.RAES files at the expense of authentication strength due to the
         frequent collisions of CRC-32 values.
-        This strategy is configurable by selecting either the
-        {{{../../apidocs/net/java/truevfs/driver/zip/raes/SafeZipRaesDriver.html}<<<SafeZipRaesDriver>>>}}
-        or the
-        {{{../../apidocs/net/java/truevfs/driver/zip/raes/ParanoidZipRaesDriver.html}<<<ParanoidZipRaesDriver>>>}}.
+        This strategy is configurable by selecting either the class
+        {{{../../apidocs/net/java/truevfs/driver/zip/raes/SafeZipRaesDriver.html}<<<net.java.truevfs.driver.zip.raes.SafeZipRaesDriver>>>}}
+        or the class
+        {{{../../apidocs/net/java/truevfs/driver/zip/raes/ParanoidZipRaesDriver.html}<<<net.java.truevfs.driver.zip.raes.ParanoidZipRaesDriver>>>}}.
 
     [Fast Access]
         RAES Type 0 uses CTR mode.
