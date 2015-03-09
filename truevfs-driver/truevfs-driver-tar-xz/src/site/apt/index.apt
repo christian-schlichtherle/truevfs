@@ -7,13 +7,13 @@
 About
 
     This module provides the file system driver map modifier class
-    {{{../../apidocs/net/java/truevfs/driver/tar/xz/TarXZDriverMapModifier.html}<<<TarXZDriverMapModifier>>>}}
+    {{{../../apidocs/net/java/truevfs/driver/tar/xz/TarXZDriverMapModifier.html}<<<net.java.truevfs.driver.tar.xz.TarXZDriverMapModifier>>>}}
     which provides the following file system driver mappings:
 
 *--*--*
 ||URI Schemes / Archive File Extensions||File System Driver Class|
 *--+--+
-|<<<tar.xz>>>, <<<txz>>>|{{{../../apidocs/net/java/truevfs/driver/tar/xz/TarXZDriver.html}<<<TarXZDriver>>>}}|
+|<<<tar.xz>>>, <<<txz>>>|{{{../../apidocs/net/java/truevfs/driver/tar/xz/TarXZDriver.html}<<<net.java.truevfs.driver.tar.xz.TarXZDriver>>>}}|
 *--+--+
 
     Add the JAR artifact of this module to the run time class path to
@@ -21,4 +21,4 @@ About
     client API module.
     The URI schemes will then get recognized as default archive file extensions
     by the class
-    {{{../../apidocs/net/java/truevfs/access/TArchiveDetector.html}<<<TArchiveDetector>>>}}.
+    {{{../../apidocs/net/java/truevfs/access/TArchiveDetector.html}<<<net.java.truevfs.access.TArchiveDetector>>>}}.
