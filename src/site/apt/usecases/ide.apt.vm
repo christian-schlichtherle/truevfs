@@ -23,7 +23,7 @@ try (Writer writer = new TFileWriter("archive.jar/META-INF/MANIFEST.MF")) {
 }
 +--+
 
-    You may be glad to know that this works recursively, too.
+    You may be glad to see that this works recursively, too.
     Here's how to read the manifest of a library JAR within a web
     application:
 
