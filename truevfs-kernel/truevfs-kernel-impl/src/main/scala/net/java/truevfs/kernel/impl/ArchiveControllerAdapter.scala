@@ -8,7 +8,7 @@ import java.{lang => jl, util => ju}
 
 import net.java.truecommons.cio.Entry._
 import net.java.truecommons.cio._
-import net.java.truecommons.shed._
+import net.java.truecommons.shed.BitField
 import net.java.truevfs.kernel.spec._
 
 private final class ArchiveControllerAdapter(
