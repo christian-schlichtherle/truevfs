@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.kernel.impl
 
-import net.java.truevfs.kernel.spec._
 import java.util._
 import java.util.concurrent._
 import java.util.concurrent.locks._
@@ -31,17 +30,14 @@ private abstract class LockingStrategy {
     * If this is the first execution of this method on the call stack of the
     * current thread, then the lock gets acquired using `Lock.lock()`.
     * Once the lock has been acquired the operation gets called.
-    * If the operation fails with a
-    * [[net.java.truevfs.kernel.impl.NeedsLockRetryException]], then
-    * the lock gets temporarily released and the current thread gets paused
-    * for a small random amount of milliseconds before this algorithm starts
-    * over again.
+    * If the operation fails with a [[NeedsLockRetryException]], then the lock
+    * gets temporarily released and the current thread gets paused for a small
+    * random amount of milliseconds before this algorithm starts over again.
     * 
     * If this is ''not'' the first execution of this method on the call
     * stack of the current thread however, then the lock gets acquired
     * according to the strategy defined by this object.
-    * If acquiring the lock fails, then a
-    * [[net.java.truevfs.kernel.impl.NeedsLockRetryException]] gets
+    * If acquiring the lock fails, then a [[NeedsLockRetryException]] gets
     * thrown.
     * Once the lock has been acquired the operation gets called just as if
     * this was the first execution of this method on the call stack of the
@@ -53,9 +49,7 @@ private abstract class LockingStrategy {
     * milliseconds.
     * However, this requires some cooperation by the caller '''and''' the given
     * operation: Both '''must''' terminate their execution in a consistent
-    * state, because a
-    * [[net.java.truevfs.kernel.impl.NeedsLockRetryException]] may occur
-    * anytime!
+    * state, because a [[NeedsLockRetryException]] may occur anytime!
     * 
     * @tparam V the return type of the operation.
     * @param  lock The lock to hold while calling the operation.
@@ -99,7 +93,7 @@ private abstract class LockingStrategy {
 }
 
 private object LockingStrategy {
-  private val arbitrateMaxMillis = 100;
+  private val arbitrateMaxMillis = 100
   val acquireTimeoutMillis = arbitrateMaxMillis
   private val accounts = new ThreadLocalAccount
 

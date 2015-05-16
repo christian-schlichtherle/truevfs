@@ -55,7 +55,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
             ex.getCause match {
               case _: FsOpenResourceException =>
                 // Do NOT remove evicted controller - the sync shall get
-                // retried at the call to this method!
+                // retried at the next call to this method!
                 //it remove ()
 
                 // This is pretty much a normal situation, so just log the
