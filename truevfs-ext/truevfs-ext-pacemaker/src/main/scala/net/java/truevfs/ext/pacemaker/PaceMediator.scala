@@ -11,7 +11,7 @@ import net.java.truevfs.kernel.spec._
 private object PaceMediator extends PaceMediator
 
 /** A mediator for the instrumentation of the TrueVFS Kernel with a
-  * [[net.java.truevfs.ext.pace.PaceManager]].
+  * [[PaceManager]] and a [[PaceController]].
   *
   * @author Christian Schlichtherle
   */
