@@ -4,16 +4,16 @@
  */
 package net.java.truevfs.kernel.impl
 
-import net.java.truecommons.io._
-import net.java.truecommons.shed._
-import net.java.truevfs.kernel.spec._
-import net.java.truevfs.kernel.spec._
-import net.java.truevfs.kernel.spec.FsSyncOption._
-import net.java.truecommons.cio._
-import net.java.truecommons.cio.Entry._;
 import java.io._
 import java.nio.channels._
 import javax.annotation.concurrent._
+
+import net.java.truecommons.cio._
+import net.java.truecommons.io._
+import net.java.truecommons.shed._
+import net.java.truevfs.kernel.spec.FsSyncOption._
+import net.java.truevfs.kernel.spec._
+
 import scala.Option
 
 private object ResourceController {
@@ -81,10 +81,10 @@ extends ArchiveController[E] {
       if (0 != afterWait.total)
         throw new FsOpenResourceException(afterWait.local, afterWait.total)
     } catch {
-      case ex: FsOpenResourceException =>
+      case e: FsOpenResourceException =>
         if (!(options get FORCE_CLOSE_IO))
-          throw builder fail new FsSyncException(mountPoint, ex)
-        builder warn new FsSyncWarningException(mountPoint, ex)
+          throw builder fail new FsSyncException(mountPoint, e)
+        builder warn new FsSyncWarningException(mountPoint, e)
     }
     closeResources(builder)
     if (beforeWait.needsWaiting) {
@@ -105,14 +105,16 @@ extends ArchiveController[E] {
     * @param builder the exception handling strategy.
     */
   private def closeResources(builder: FsSyncExceptionBuilder) {
+
     final class IOExceptionHandler
     extends ExceptionHandler[IOException, RuntimeException] {
-      def fail(ex: IOException) = throw new AssertionError(ex)
-      def warn(ex: IOException) {
-        builder.warn(new FsSyncWarningException(mountPoint, ex))
+      def fail(e: IOException) = throw new AssertionError(e)
+      def warn(e: IOException) {
+        builder warn new FsSyncWarningException(mountPoint, e)
       }
     } // IOExceptionHandler
-    accountant closeAllResources (new IOExceptionHandler)
+
+    accountant closeAllResources new IOExceptionHandler
   }
 
   private class ResourceInputStream(in: InputStream)
@@ -129,14 +131,14 @@ extends ArchiveController[E] {
 
     /**
       * Close()s this resource and finally stops accounting for it unless a
-      * {@link ControlFlowException} is thrown.
+      * [[ControlFlowException]] is thrown.
       *
       * @see http://java.net/jira/browse/TRUEZIP-279 .
       */
     abstract override def close() {
       var cfe = false
       try     { super.close() }
-      catch   { case ex: ControlFlowException => cfe = true; throw ex }
+      catch   { case e: ControlFlowException => cfe = true; throw e }
       finally { if (!cfe) accountant stopAccountingFor this }
     }
   }
