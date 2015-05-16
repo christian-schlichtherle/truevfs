@@ -21,38 +21,38 @@ private class LogMediator extends Mediator[LogMediator] with Immutable {
   override def instrument(subject: IoBufferPool): IoBufferPool =
     new InstrumentingBufferPool[LogMediator](this, subject)
 
-  override def instrument(origin: InstrumentingManager[LogMediator], subject: FsCompositeDriver): FsCompositeDriver =
+  override def instrument(context: InstrumentingManager[LogMediator], subject: FsCompositeDriver): FsCompositeDriver =
     new InstrumentingCompositeDriver[LogMediator](this, subject)
 
-  override def instrument(origin: InstrumentingBufferPool[LogMediator], subject: IoBuffer): IoBuffer =
+  override def instrument(context: InstrumentingBufferPool[LogMediator], subject: IoBuffer): IoBuffer =
     new LogBuffer(this, subject)
 
-  override def instrument(origin: InstrumentingCompositeDriver[LogMediator], subject: FsController): FsController =
+  override def instrument(context: InstrumentingCompositeDriver[LogMediator], subject: FsController): FsController =
     new InstrumentingController[LogMediator](this, subject)
 
-  override def instrument[E <: Entry](origin: InstrumentingController[LogMediator], subject: InputSocket[E]): InputSocket[E] =
+  override def instrument[E <: Entry](context: InstrumentingController[LogMediator], subject: InputSocket[E]): InputSocket[E] =
     new InstrumentingInputSocket[LogMediator, E](this, subject)
 
-  override def instrument[E <: Entry](origin: InstrumentingController[LogMediator], subject: OutputSocket[E]): OutputSocket[E] =
+  override def instrument[E <: Entry](context: InstrumentingController[LogMediator], subject: OutputSocket[E]): OutputSocket[E] =
     new InstrumentingOutputSocket[LogMediator, E](this, subject)
 
-  override def instrument[B <: IoBuffer](origin: InstrumentingBuffer[LogMediator], subject: InputSocket[B]): InputSocket[B] =
+  override def instrument[B <: IoBuffer](context: InstrumentingBuffer[LogMediator], subject: InputSocket[B]): InputSocket[B] =
     new InstrumentingInputSocket[LogMediator, B](this, subject)
 
-  override def instrument[B <: IoBuffer](origin: InstrumentingBuffer[LogMediator], subject: OutputSocket[B]): OutputSocket[B] =
+  override def instrument[B <: IoBuffer](context: InstrumentingBuffer[LogMediator], subject: OutputSocket[B]): OutputSocket[B] =
     new InstrumentingOutputSocket[LogMediator, B](this, subject)
 
-  override def instrument[E <: Entry](origin: InstrumentingInputSocket[LogMediator, E], subject: InputStream): InputStream =
-    new LogInputStream(origin, subject)
+  override def instrument[E <: Entry](context: InstrumentingInputSocket[LogMediator, E], subject: InputStream): InputStream =
+    new LogInputStream(context, subject)
 
-  override def instrument[E <: Entry](origin: InstrumentingInputSocket[LogMediator, E], subject: SeekableByteChannel): SeekableByteChannel =
-    new LogInputChannel(origin, subject)
+  override def instrument[E <: Entry](context: InstrumentingInputSocket[LogMediator, E], subject: SeekableByteChannel): SeekableByteChannel =
+    new LogInputChannel(context, subject)
 
-  override def instrument[E <: Entry](origin: InstrumentingOutputSocket[LogMediator, E], subject: OutputStream): OutputStream =
-    new LogOutputStream(origin, subject)
+  override def instrument[E <: Entry](context: InstrumentingOutputSocket[LogMediator, E], subject: OutputStream): OutputStream =
+    new LogOutputStream(context, subject)
 
-  override def instrument[E <: Entry](origin: InstrumentingOutputSocket[LogMediator, E], subject: SeekableByteChannel): SeekableByteChannel =
-    new LogOutputChannel(origin, subject)
+  override def instrument[E <: Entry](context: InstrumentingOutputSocket[LogMediator, E], subject: SeekableByteChannel): SeekableByteChannel =
+    new LogOutputChannel(context, subject)
 }
 
 private object LogMediator extends LogMediator

@@ -13,7 +13,7 @@ import org.slf4j._
  * @author Christian Schlichtherle
  */
 private final class LogInputStream(
-  override val origin: InputSocket[_ <: Entry],
+  override val context: InputSocket[_ <: Entry],
   in: InputStream
 ) extends DecoratingInputStream(in) with LogCloseable with Immutable {
   override def logger = LogInputStream.logger

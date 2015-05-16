@@ -28,7 +28,7 @@ public abstract class Mediator<This extends Mediator<This>> {
     /**
      * Instruments the given {@code subject}.
      *
-     * @param  subject the object to instrument.
+     * @param  subject the subject of instrumentation.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      */
@@ -39,7 +39,7 @@ public abstract class Mediator<This extends Mediator<This>> {
     /**
      * Instruments the given {@code subject}.
      *
-     * @param  subject the object to instrument.
+     * @param  subject the subject of instrumentation.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      */
@@ -50,14 +50,14 @@ public abstract class Mediator<This extends Mediator<This>> {
     /**
      * Instruments the given {@code subject}.
      *
-     * @param  origin the instrumenting object which called this method.
-     * @param  subject the object to instrument.
+     * @param  context the instrumenting object which called this method.
+     * @param  subject the subject of instrumentation.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(FsManager)
      */
     public FsCompositeDriver instrument(
-            InstrumentingManager<This> origin,
+            InstrumentingManager<This> context,
             FsCompositeDriver subject) {
         return subject;
     }
@@ -65,14 +65,14 @@ public abstract class Mediator<This extends Mediator<This>> {
     /**
      * Instruments the given {@code subject}.
      *
-     * @param  origin the instrumenting object which called this method.
-     * @param  subject the object to instrument.
+     * @param  context the instrumenting object which called this method.
+     * @param  subject the subject of instrumentation.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(FsManager)
      */
     public FsController instrument(
-            InstrumentingManager<This> origin,
+            InstrumentingManager<This> context,
             FsController subject) {
         return subject;
     }
@@ -80,14 +80,14 @@ public abstract class Mediator<This extends Mediator<This>> {
     /**
      * Instruments the given {@code subject}.
      *
-     * @param  origin the instrumenting object which called this method.
-     * @param  subject the object to instrument.
+     * @param  context the instrumenting object which called this method.
+     * @param  subject the subject of instrumentation.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(IoBufferPool)
      */
     public IoBuffer instrument(
-            InstrumentingBufferPool<This> origin,
+            InstrumentingBufferPool<This> context,
             IoBuffer subject) {
         return subject;
     }
@@ -95,14 +95,14 @@ public abstract class Mediator<This extends Mediator<This>> {
     /**
      * Instruments the given {@code subject}.
      *
-     * @param  origin the instrumenting object which called this method.
-     * @param  subject the object to instrument.
+     * @param  context the instrumenting object which called this method.
+     * @param  subject the subject of instrumentation.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingManager, FsCompositeDriver)
      */
     public FsModel instrument(
-            InstrumentingCompositeDriver<This> origin,
+            InstrumentingCompositeDriver<This> context,
             FsModel subject) {
         return subject;
     }
@@ -110,14 +110,14 @@ public abstract class Mediator<This extends Mediator<This>> {
     /**
      * Instruments the given {@code subject}.
      *
-     * @param  origin the instrumenting object which called this method.
-     * @param  subject the object to instrument.
+     * @param  context the instrumenting object which called this method.
+     * @param  subject the subject of instrumentation.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingManager, FsCompositeDriver)
      */
     public FsController instrument(
-            InstrumentingCompositeDriver<This> origin,
+            InstrumentingCompositeDriver<This> context,
             FsController subject) {
         return subject;
     }
@@ -126,15 +126,15 @@ public abstract class Mediator<This extends Mediator<This>> {
      * Instruments the given {@code subject}.
      *
      * @param  <E> the type of the target entry for I/O operations.
-     * @param  origin the instrumenting object which called this method.
-     * @param  subject the object to instrument.
+     * @param  context the instrumenting object which called this method.
+     * @param  subject the subject of instrumentation.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingManager, FsController)
      * @see    #instrument(InstrumentingCompositeDriver, FsController)
      */
     public <E extends Entry> InputSocket<E> instrument(
-            InstrumentingController<This> origin,
+            InstrumentingController<This> context,
             InputSocket<E> subject) {
         return subject;
     }
@@ -143,15 +143,15 @@ public abstract class Mediator<This extends Mediator<This>> {
      * Instruments the given {@code subject}.
      *
      * @param  <E> the type of the target entry for I/O operations.
-     * @param  origin the instrumenting object which called this method.
-     * @param  subject the object to instrument.
+     * @param  context the instrumenting object which called this method.
+     * @param  subject the subject of instrumentation.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingManager, FsController)
      * @see    #instrument(InstrumentingCompositeDriver, FsController)
      */
     public <E extends Entry> OutputSocket<E> instrument(
-            InstrumentingController<This> origin,
+            InstrumentingController<This> context,
             OutputSocket<E> subject) {
         return subject;
     }
@@ -160,14 +160,14 @@ public abstract class Mediator<This extends Mediator<This>> {
      * Instruments the given {@code subject}.
      *
      * @param  <B> the type of the target entry for I/O operations.
-     * @param  origin the instrumenting object which called this method.
-     * @param  subject the object to instrument.
+     * @param  context the instrumenting object which called this method.
+     * @param  subject the subject of instrumentation.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingBufferPool, IoBuffer)
      */
     public <B extends IoBuffer> InputSocket<B> instrument(
-            InstrumentingBuffer<This> origin,
+            InstrumentingBuffer<This> context,
             InputSocket<B> subject) {
         return subject;
     }
@@ -176,14 +176,14 @@ public abstract class Mediator<This extends Mediator<This>> {
      * Instruments the given {@code subject}.
      *
      * @param  <B> the type of the target entry for I/O operations.
-     * @param  origin the instrumenting object which called this method.
-     * @param  subject the object to instrument.
+     * @param  context the instrumenting object which called this method.
+     * @param  subject the subject of instrumentation.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingBufferPool, IoBuffer)
      */
     public <B extends IoBuffer> OutputSocket<B> instrument(
-            InstrumentingBuffer<This> origin,
+            InstrumentingBuffer<This> context,
             OutputSocket<B> subject) {
         return subject;
     }
@@ -192,15 +192,15 @@ public abstract class Mediator<This extends Mediator<This>> {
      * Instruments the given {@code subject}.
      *
      * @param  <E> the type of the target entry for I/O operations.
-     * @param  origin the instrumenting object which called this method.
-     * @param  subject the object to instrument.
+     * @param  context the instrumenting object which called this method.
+     * @param  subject the subject of instrumentation.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingController, InputSocket)
      * @see    #instrument(InstrumentingBuffer, InputSocket)
      */
     public <E extends Entry> InputStream instrument(
-            InstrumentingInputSocket<This, E> origin,
+            InstrumentingInputSocket<This, E> context,
             InputStream subject) {
         return subject;
     }
@@ -209,15 +209,15 @@ public abstract class Mediator<This extends Mediator<This>> {
      * Instruments the given {@code subject}.
      *
      * @param  <E> the type of the target entry for I/O operations.
-     * @param  origin the instrumenting object which called this method.
-     * @param  subject the object to instrument.
+     * @param  context the instrumenting object which called this method.
+     * @param  subject the subject of instrumentation.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingController, InputSocket)
      * @see    #instrument(InstrumentingBuffer, InputSocket)
      */
     public <E extends Entry> SeekableByteChannel instrument(
-            InstrumentingInputSocket<This, E> origin,
+            InstrumentingInputSocket<This, E> context,
             SeekableByteChannel subject) {
         return subject;
     }
@@ -226,15 +226,15 @@ public abstract class Mediator<This extends Mediator<This>> {
      * Instruments the given {@code subject}.
      *
      * @param  <E> the type of the target entry for I/O operations.
-     * @param  origin the instrumenting object which called this method.
-     * @param  subject the object to instrument.
+     * @param  context the instrumenting object which called this method.
+     * @param  subject the subject of instrumentation.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingController, OutputSocket)
      * @see    #instrument(InstrumentingBuffer, OutputSocket)
      */
     public <E extends Entry> OutputStream instrument(
-            InstrumentingOutputSocket<This, E> origin,
+            InstrumentingOutputSocket<This, E> context,
             OutputStream subject) {
         return subject;
     }
@@ -243,15 +243,15 @@ public abstract class Mediator<This extends Mediator<This>> {
      * Instruments the given {@code subject}.
      *
      * @param  <E> the type of the target entry for I/O operations.
-     * @param  origin the instrumenting object which called this method.
-     * @param  subject the object to instrument.
+     * @param  context the instrumenting object which called this method.
+     * @param  subject the subject of instrumentation.
      * @return An instrumenting object or {@code subject} if the implementation
      *         does not want to instrument it.
      * @see    #instrument(InstrumentingController, OutputSocket)
      * @see    #instrument(InstrumentingBuffer, OutputSocket)
      */
     public <E extends Entry> SeekableByteChannel instrument(
-            InstrumentingOutputSocket<This, E> origin,
+            InstrumentingOutputSocket<This, E> context,
             SeekableByteChannel subject) {
         return subject;
     }
