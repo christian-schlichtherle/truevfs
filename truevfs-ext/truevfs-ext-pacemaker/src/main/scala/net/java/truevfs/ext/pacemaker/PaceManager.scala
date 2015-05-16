@@ -180,8 +180,10 @@ private object PaceManager {
         new Filter[FsController] {
           override def accept(controller: FsController) = {
             val accepted = filter accept controller
-            if (accepted)
-              locked(writeLock) { map remove mountPoint(controller) }
+            if (accepted) {
+              val mp = mountPoint(controller)
+              locked(writeLock) { map remove mp }
+            }
             accepted
           }
         },
@@ -191,8 +193,10 @@ private object PaceManager {
               visitor visit controller
             } finally {
               val model = controller.getModel
-              if (model.isMounted)
-                locked(writeLock) { map put (model.getMountPoint, controller) }
+              if (model.isMounted) {
+                val mp = model.getMountPoint
+                locked(writeLock) { map put (mp, controller) }
+              }
             }
           }
         }
