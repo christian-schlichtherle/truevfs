@@ -10,7 +10,7 @@ import javax.management.MBeanInfo
 import net.java.truevfs.comp.jmx.JmxManagerView
 
 /**
- * A view for a [[net.java.truevfs.ext.pace.PaceManager]].
+ * A view for a [[PaceManager]].
  *
  * @author Christian Schlichtherle
  */
