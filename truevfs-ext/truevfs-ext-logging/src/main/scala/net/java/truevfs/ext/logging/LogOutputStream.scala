@@ -13,7 +13,7 @@ import org.slf4j._
  * @author Christian Schlichtherle
  */
 private final class LogOutputStream(
-  override val origin: OutputSocket[_ <: Entry],
+  override val context: OutputSocket[_ <: Entry],
   out: OutputStream
 ) extends DecoratingOutputStream(out) with LogCloseable with Immutable {
   override def logger = LogOutputStream.logger

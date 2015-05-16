@@ -18,12 +18,12 @@ private trait LogCloseable extends Closeable with LogResource {
 
   def log(message: String) {
     try {
-      log(message, origin target ())
+      log(message, context target ())
     } catch {
       case ex: IOException =>
         logger trace ("Couldn't resolve resource target: ", ex)
     }
   }
 
-  def origin: IoSocket[_ <: Entry]
+  def context: IoSocket[_ <: Entry]
 }
