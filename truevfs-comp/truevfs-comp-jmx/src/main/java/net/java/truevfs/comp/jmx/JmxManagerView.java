@@ -80,46 +80,20 @@ extends StandardMBean implements JmxManagerMXBean {
 
     @Override
     public int getFileSystemsMounted() {
-        class FileSystemsMounted implements Filter<FsController> {
-            @Override
-            public boolean accept(FsController controller) {
-                return controller.getModel().isMounted();
-            }
-        }
-        return count(new FileSystemsMounted());
+        return count(new MountedFileSystemsFilter());
     }
 
     @Override
     public int getTopLevelArchiveFileSystemsTotal() {
-        class TopLevelArchiveFileSystemsTotal implements Filter<FsController> {
-            @Override
-            public boolean accept(FsController controller) {
-                return isTopLevelArchive(controller);
-            }
-        }
-        return count(new TopLevelArchiveFileSystemsTotal());
+        return count(new TotalTopLevelArchiveFileSystemsFilter());
     }
 
     @Override
     public int getTopLevelArchiveFileSystemsMounted() {
-        class TopLevelArchiveFileSystemsMounted implements Filter<FsController> {
-            @Override
-            public boolean accept(FsController controller) {
-                return isTopLevelArchive(controller)
-                        && controller.getModel().isMounted();
-            }
-        }
-        return count(new TopLevelArchiveFileSystemsMounted());
+        return count(new MountedTopLevelArchiveFileSystemsFilter());
     }
 
     private int count(final Filter<? super FsController> filter) {
-
-        class CountingVisitor
-        extends AtomicInteger implements Visitor<FsController, IOException> {
-            @Override
-            public void visit(FsController controller) { incrementAndGet(); }
-        } // Visitor
-
         final CountingVisitor visitor = new CountingVisitor();
         try {
             manager.accept(filter, visitor);
@@ -129,14 +103,49 @@ extends StandardMBean implements JmxManagerMXBean {
         return visitor.get();
     }
 
-    private boolean isTopLevelArchive(final FsController controller) {
-        final FsController parent = controller.getParent();
-        return null != parent && null == parent.getParent();
-    }
-
     @Override
     public void sync() throws FsSyncException {
         FsManagerLocator.SINGLETON.get().sync(Filter.ACCEPT_ANY,
                 new FsControllerSyncVisitor(FsSyncOptions.NONE));
     }
+}
+
+final class MountedFileSystemsFilter
+implements Filter<FsController> {
+
+    @Override
+    public boolean accept(FsController controller) {
+        return controller.getModel().isMounted();
+    }
+}
+
+final class TotalTopLevelArchiveFileSystemsFilter
+implements Filter<FsController> {
+
+    @Override
+    public boolean accept(final FsController controller) {
+        final FsController parent = controller.getParent();
+        return null != parent && null == parent.getParent();
+    }
+}
+
+final class MountedTopLevelArchiveFileSystemsFilter
+implements Filter<FsController> {
+
+    final Filter<FsController> mountedFileSystemsFilter = new MountedFileSystemsFilter();
+    final Filter<FsController> totalTopLevelArchiveFileSystemsFilter = new TotalTopLevelArchiveFileSystemsFilter();
+
+    @Override
+    public boolean accept(FsController controller) {
+        return mountedFileSystemsFilter.accept(controller) &&
+                totalTopLevelArchiveFileSystemsFilter.accept(controller);
+    }
+}
+
+final class CountingVisitor
+extends AtomicInteger
+implements Visitor<FsController, IOException> {
+
+    @Override
+    public void visit(FsController controller) { incrementAndGet(); }
 }
