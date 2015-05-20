@@ -4,14 +4,15 @@
  */
 package net.java.truevfs.kernel.impl
 
-import net.java.truecommons.shed._
-import collection.JavaConverters._
 import java.io._
 import java.util.concurrent._
 import java.util.concurrent.locks._
 import javax.annotation._
 import javax.annotation.concurrent._
-import scala.util.control._
+
+import net.java.truecommons.shed._
+
+import scala.collection.JavaConverters._
 
 /** Accounts for [[java.io.Closeable]] resources.
   * 
@@ -50,7 +51,7 @@ extends LockAspect[Lock] {
     * @param resource the closeable resource to stop accounting for.
     */
   def stopAccountingFor(@WillNotClose resource: Closeable) {
-    accounts.remove(resource) foreach { _ => locked (condition signalAll ()) }
+    accounts remove resource foreach { _ => locked (condition signalAll ()) }
   }
 
   /** Waits until all closeable resources which have been started accounting
@@ -112,7 +113,8 @@ extends LockAspect[Lock] {
     val currentThread = Thread.currentThread
     var local, total = 0
     for (account <- accounts.values if account.accountant eq this) {
-      if (account.owner eq currentThread) local += 1
+      if (account.owner eq currentThread)
+        local += 1
       total += 1
     }
     Resources(local, total)

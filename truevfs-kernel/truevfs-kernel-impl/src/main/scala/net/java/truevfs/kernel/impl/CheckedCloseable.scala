@@ -14,6 +14,7 @@ import javax.annotation.concurrent._
   */
 @NotThreadSafe
 private trait CheckedCloseable extends Closeable {
+
   private[this] var closed: Boolean = _
 
   /**
