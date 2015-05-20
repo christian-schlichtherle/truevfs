@@ -13,8 +13,6 @@ import net.java.truecommons.shed._
 import net.java.truevfs.kernel.impl.DefaultManager._
 import net.java.truevfs.kernel.spec._
 
-import scala.Option
-
 /** The default implementation of a file system manager.
   *
   * @author Christian Schlichtherle
@@ -81,9 +79,8 @@ extends FsAbstractManager
   }
 
   override def sync(filter: ControllerFilter, visitor: ControllerVisitor[FsSyncException]) {
-    if (filter == Filter.ACCEPT_ANY) {
+    if (filter == Filter.ACCEPT_ANY)
       syncOnShutdown disarm ()
-    }
     super.sync(filter, visitor)
   }
 
