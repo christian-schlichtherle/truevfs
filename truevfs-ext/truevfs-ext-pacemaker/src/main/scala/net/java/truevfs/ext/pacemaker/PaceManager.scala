@@ -23,8 +23,8 @@ import PaceManager._
 private class PaceManager(mediator: PaceMediator, manager: FsManager)
 extends JmxManager[PaceMediator](mediator, manager) {
 
-  private[this] val evicted = new ConcurrentLinkedQueue[FsController]
-  private[this] val mounted = new MountedControllerSet(evicted)
+  private val evicted = new ConcurrentLinkedQueue[FsController]
+  private val mounted = new MountedControllerSet(evicted)
 
   def max = mounted.max
   def max_=(max: Int) { mounted.max = max }
@@ -39,16 +39,19 @@ extends JmxManager[PaceMediator](mediator, manager) {
    * @param accessedController the accessed file system controller.
    */
   private[pacemaker] def postAccess(accessedController: FsController) {
-    if (accessedController.getModel.isMounted) mounted add accessedController
+    if (accessedController.getModel.isMounted)
+      mounted add accessedController
     val i = evicted.iterator
-    if (!i.hasNext) return
+    if (!i.hasNext)
+      return
     val builder = new FsSyncExceptionBuilder
     do {
       val evictedController = i.next
-      val evictedFilter = new FsControllerFilter(mountPoint(evictedController))
-      if (!(mounted exists evictedFilter)) {
+      val prefix = mountPoint(evictedController)
+      val evictedControllerFilter = new FsControllerFilter(prefix)
+      if (!(mounted exists evictedControllerFilter)) { // is not mounted, including child file systems?
         try {
-          manager sync (evictedFilter, new FsControllerSyncVisitor(FsSyncOptions.NONE))
+          manager sync (evictedControllerFilter, new FsControllerSyncVisitor(FsSyncOptions.NONE))
           i remove ()
         } catch {
           case e: FsSyncException =>
@@ -79,7 +82,9 @@ extends JmxManager[PaceMediator](mediator, manager) {
   override def sync(filter: AnyControllerFilter,
                     visitor: ControllerSyncVisitor) {
     val i = evicted.iterator
-    while (i.hasNext) if (filter accept i.next) i remove ()
+    while (i.hasNext)
+      if (filter accept i.next)
+        i remove ()
     mounted sync (manager, filter, visitor)
   }
 }
@@ -136,10 +141,13 @@ private object PaceManager {
     extends ju.LinkedHashMap[FsMountPoint, FsController](initialCapacity, 0.75f, true) {
 
     override def removeEldestEntry(entry: ju.Map.Entry[FsMountPoint, FsController]) =
-      if (size > max) evicted.add(entry.getValue) else false
+      if (size > max)
+        evicted add entry.getValue
+      else
+        false
 
     @volatile
-    private[this] var _max = maximumFileSystemsMountedDefaultValue
+    private var _max = maximumFileSystemsMountedDefaultValue
 
     def max = _max
     def max_=(max: Int) {
@@ -160,15 +168,14 @@ private object PaceManager {
   (evicted: ju.Collection[FsController])
   (implicit lock: ReentrantReadWriteLock = new ReentrantReadWriteLock) {
 
-    private[this] val map = new MountedControllerMap(evicted)
-    private[this] val readLock = lock.readLock
-    private[this] val writeLock = lock.writeLock
+    private val map = new MountedControllerMap(evicted)
+    private val readLock = lock.readLock
+    private val writeLock = lock.writeLock
 
     def max = map.max
     def max_=(max: Int) { map.max = max }
 
-    def exists(filter: AnyControllerFilter) =
-      readLocked { map exists filter }
+    def exists(filter: AnyControllerFilter) = readLocked { map exists filter }
 
     def add(controller: FsController) {
       val mp = mountPoint(controller)
