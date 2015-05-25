@@ -78,8 +78,8 @@ extends JmxManager[PaceMediator](mediator, manager) {
 
   override def sync(filter: AnyControllerFilter,
                     visitor: ControllerSyncVisitor) {
-    val it = evicted.iterator
-    while (it.hasNext) if (filter accept it.next) it remove ()
+    val i = evicted.iterator
+    while (i.hasNext) if (filter accept i.next) i remove ()
     mounted sync (manager, filter, visitor)
   }
 }
