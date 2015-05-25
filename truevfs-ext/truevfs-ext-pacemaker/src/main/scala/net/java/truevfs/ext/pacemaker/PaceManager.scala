@@ -40,19 +40,19 @@ extends JmxManager[PaceMediator](mediator, manager) {
    */
   private[pacemaker] def postAccess(accessedController: FsController) {
     if (accessedController.getModel.isMounted) mounted add accessedController
-    val it = evicted.iterator
-    if (!it.hasNext) return
+    val i = evicted.iterator
+    if (!i.hasNext) return
     val builder = new FsSyncExceptionBuilder
     do {
-      val evictedController = it.next
+      val evictedController = i.next
       val evictedFilter = new FsControllerFilter(mountPoint(evictedController))
       if (!(mounted exists evictedFilter)) {
         try {
           manager sync (evictedFilter, new FsControllerSyncVisitor(FsSyncOptions.NONE))
-          it remove ()
+          i remove ()
         } catch {
-          case ex: FsSyncException =>
-            ex.getCause match {
+          case e: FsSyncException =>
+            e.getCause match {
               case _: FsOpenResourceException =>
                 // Do NOT remove evicted controller - the sync shall get
                 // retried at the next call to this method!
@@ -60,19 +60,19 @@ extends JmxManager[PaceMediator](mediator, manager) {
 
                 // This is pretty much a normal situation, so just log the
                 // exception at the TRACE level.
-                logger trace ("ignoring", ex)
+                logger trace ("ignoring", e)
               case _ =>
                 // Prevent retrying this operation - it would most likely yield
                 // the same result.
-                it remove ()
+                i remove ()
 
                 // Mark the exception for subsequent rethrowing at the end of
                 // this method.
-                builder warn ex
+                builder warn e
             }
         }
       }
-    } while (it.hasNext)
+    } while (i.hasNext)
     builder check ()
   }
 
@@ -166,11 +166,11 @@ private object PaceManager {
     def max_=(max: Int) { map.max = max }
 
     def exists(filter: AnyControllerFilter) =
-      locked(readLock)(map exists filter)
+      readLocked { map exists filter }
 
     def add(controller: FsController) {
       val mp = mountPoint(controller)
-      locked(writeLock)(map put (mp, controller))
+      writeLocked { map put (mp, controller) }
     }
 
     def sync(manager: FsManager,
@@ -182,7 +182,7 @@ private object PaceManager {
             val accepted = filter accept controller
             if (accepted) {
               val mp = mountPoint(controller)
-              locked(writeLock) { map remove mp }
+              writeLocked { map remove mp }
             }
             accepted
           }
@@ -195,12 +195,15 @@ private object PaceManager {
               val model = controller.getModel
               if (model.isMounted) {
                 val mp = model.getMountPoint
-                locked(writeLock) { map put (mp, controller) }
+                writeLocked { map put (mp, controller) }
               }
             }
           }
         }
         )
     }
+
+    def readLocked[V] = locked[V](readLock)_
+    def writeLocked[V] = locked[V](writeLock)_
   } // MountedControllerSet
 }
