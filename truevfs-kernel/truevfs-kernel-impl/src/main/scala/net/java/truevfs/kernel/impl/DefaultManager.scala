@@ -54,13 +54,13 @@ extends FsAbstractManager
 
   override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint): FsController = {
     try {
-      readLocked(controller0(driver, mountPoint))
+      readLocked { controller0(driver, mountPoint) }
     } catch {
       case ex: NeedsWriteLockException =>
         if (readLockedByCurrentThread) {
           throw ex
         }
-        writeLocked(controller0(driver, mountPoint))
+        writeLocked { controller0(driver, mountPoint) }
     }
   }
 
