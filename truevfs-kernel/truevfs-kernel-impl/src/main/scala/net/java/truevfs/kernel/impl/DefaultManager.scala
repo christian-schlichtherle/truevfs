@@ -9,7 +9,7 @@ import java.util.concurrent.locks._
 import javax.annotation.concurrent._
 
 import net.java.truecommons.shed.Link.Type._
-import net.java.truecommons.shed._
+import net.java.truecommons.shed.{Filter, Link, Visitor}
 import net.java.truevfs.kernel.impl.DefaultManager._
 import net.java.truevfs.kernel.spec._
 
@@ -86,10 +86,10 @@ extends FsAbstractManager
 
   override def accept[X <: IOException](filter: ControllerFilter, visitor: ControllerVisitor[X]) {
     readLocked { controllers.values flatMap { l => Option(l.get) } }
-    .filter { filter accept _ }
+    .filter { filter.accept }
     .toIndexedSeq
     .sorted(ReverseControllerOrdering)
-    .foreach { visitor visit _ }
+    .foreach { visitor.visit }
   }
 
   /** A model which schedules its controller for synchronization by observing
