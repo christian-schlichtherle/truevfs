@@ -148,8 +148,10 @@ private object PaceManager {
     }
 
     def exists(filter: AnyControllerFilter): Boolean = {
-      val it = values.iterator
-      while (it.hasNext) if (filter accept it.next) return true
+      val i = values.iterator
+      while (i.hasNext)
+        if (filter accept i.next)
+          return true
       false
     }
   } // MountedControllerMap
