@@ -4,7 +4,9 @@
  */
 package net.java.truevfs.ext.pacemaker
 
+import java.io.IOException
 import javax.annotation.concurrent._
+
 import net.java.truecommons.shed._
 import net.java.truevfs.kernel.spec._
 
@@ -13,7 +15,7 @@ import net.java.truevfs.kernel.spec._
   * operation in order to sync the least recently accessed file systems which
   * exceed the maximum number of mounted file systems and then register itself
   * as the most recently accessed file system.
-  * 
+  *
   * @author Christian Schlichtherle
   */
 @ThreadSafe
@@ -21,9 +23,14 @@ private class PaceController(manager: PaceManager, controller: FsController)
 extends AspectController(controller) {
 
   override def apply[V](operation: () => V) = {
-    val result = operation()
+    val getResult = try {
+      val result = operation()
+      () => result
+    } catch {
+      case e: IOException => () => throw e
+    }
     manager postAccess controller
-    result
+    getResult()
   }
 
   override def sync(options: BitField[FsSyncOption]) = controller sync options // skip apply!
