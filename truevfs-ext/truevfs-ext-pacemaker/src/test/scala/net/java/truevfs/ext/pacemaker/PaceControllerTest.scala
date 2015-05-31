@@ -4,12 +4,14 @@
  */
 package net.java.truevfs.ext.pacemaker
 
-import net.java.truecommons.shed.ControlFlowException
+import java.io.IOException
+
+import net.java.truecommons.cio.Entry
 import net.java.truevfs.kernel.spec._
 import org.junit.runner._
 import org.mockito.Matchers._
+import org.mockito.Mockito
 import org.mockito.Mockito._
-import org.scalatest.Matchers._
 import org.scalatest._
 import org.scalatest.junit._
 import org.scalatest.mock.MockitoSugar.mock
@@ -25,22 +27,29 @@ class PaceControllerTest extends WordSpec with OneInstancePerTest {
     val controller = spy(new PaceController(manager, delegate))
 
     "apply()ing its aspect" should {
-      "call only PaceManager.retain(*) if the operation fails" in {
-        intercept[ControlFlowException] {
-          controller apply (() => throw new ControlFlowException)
-        }
-        verifyNoMoreInteractions(manager)
+      def verifyAspect() {
+        val io = Mockito inOrder(delegate, manager)
+        import io._
+        verify(delegate) checkAccess (FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)
+        verify(manager) postAccess delegate
+        verifyNoMoreInteractions()
       }
 
-      "call only PaceManager.retain(*) and .accessed(*) if the operation succeeded" in {
-        val result = new AnyRef
-        controller apply (() => result) should be theSameInstanceAs result
-        verify(manager) postAccess delegate
-        verifyNoMoreInteractions(manager)
+      "call PaceManager.postAccess(delegate) if the operation succeeds" in {
+        controller checkAccess (FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)
+        verifyAspect()
+      }
+
+      "call PaceManager.postAccess(delegate) even if an IOException is thrown" in {
+        when(delegate checkAccess (FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)) thenThrow new IOException()
+        intercept[IOException] {
+          controller checkAccess (FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)
+        }
+        verifyAspect()
       }
     }
 
-    "calling sync(*)" should {
+    "calling its sync(*) method" should {
       "not apply() its aspect" in {
         controller sync null
         verify(controller, never()) apply any()
