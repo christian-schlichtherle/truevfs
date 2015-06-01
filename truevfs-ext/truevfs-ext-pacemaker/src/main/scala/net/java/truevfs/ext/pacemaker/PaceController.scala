@@ -23,14 +23,11 @@ private class PaceController(manager: PaceManager, controller: FsController)
 extends AspectController(controller) {
 
   override def apply[V](operation: () => V) = {
-    val getResult = try {
-      val result = operation()
-      () => result
-    } catch {
-      case e: IOException => () => throw e
+    try {
+      operation()
+    } finally {
+      manager postAccess controller
     }
-    manager postAccess controller
-    getResult()
   }
 
   override def sync(options: BitField[FsSyncOption]) = controller sync options // skip apply!
