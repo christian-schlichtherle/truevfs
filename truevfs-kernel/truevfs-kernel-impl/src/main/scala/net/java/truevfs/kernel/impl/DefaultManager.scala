@@ -65,12 +65,12 @@ extends FsAbstractManager
   }
 
   private def controller0(driver: FsCompositeDriver, mountPoint: FsMountPoint): FsController = {
-    controllers get mountPoint flatMap (l => Option(l.get)) match {
+    controllers get mountPoint flatMap { l => Option(l.get) } match {
       case Some(c) => c
       case None =>
         checkWriteLockedByCurrentThread()
-        val pc = Option(mountPoint.getParent) map (controller0(driver, _))
-        val pm = pc map (_.getModel)
+        val pc = Option(mountPoint.getParent) map { controller0(driver, _) }
+        val pm = pc map { _.getModel }
         val m = new ManagedModel(driver newModel (this, mountPoint, pm.orNull))
         val c = driver newController (this, m, pc.orNull)
         m init c
