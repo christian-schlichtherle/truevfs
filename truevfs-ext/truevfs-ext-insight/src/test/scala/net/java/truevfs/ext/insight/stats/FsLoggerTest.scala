@@ -4,33 +4,29 @@
  */
 package net.java.truevfs.ext.insight.stats
 
-import org.junit.runner._
-import org.scalatest.junit._
-import org.scalatest.matchers._
-import org.scalatest.prop._
+import net.java.truevfs.ext.insight.stats.FsLoggerTest._
+import org.junit.runner.RunWith
 import org.scalatest._
+import org.scalatest.junit.JUnitRunner
+import org.scalatest.prop._
 
-/**
- * @author Christian Schlichtherle
- */
+/** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])
-class FsLoggerSpec extends WordSpec with ShouldMatchers with PropertyChecks {
-
-  import FsLoggerSpec._
+class FsLoggerTest extends WordSpec with ShouldMatchers with PropertyChecks {
 
   def create = new FsLogger
 
   "A file system logger" when {
     "newly created" should {
       "have ten as its default size" in {
-        create should have size (10)
+        create should have size 10
       }
 
       "provide empty statistics for all offsets" in {
         val empty = FsStatistics()
         val logger = create
         for (offset <- 0 until logger.size)
-          logger stats offset equalsIgnoreTime empty should be (true)
+          logger stats offset equalsIgnoreTime empty should equal (true)
       }
 
       "throw a RuntimeException when accessing negative offsets" in {
@@ -60,8 +56,8 @@ class FsLoggerSpec extends WordSpec with ShouldMatchers with PropertyChecks {
         Thread sleep 1
         val readStats = logger logRead (nanos, bytes)
         val current = logger.current
-        current.readStats should be theSameInstanceAs (readStats)
-        current.readStats equalsIgnoreTime expected.readStats should be (true)
+        current.readStats should be theSameInstanceAs readStats
+        current.readStats equalsIgnoreTime expected.readStats should equal (true)
         current.writeStats should equal (expected.writeStats)
         current.syncStats should equal (expected.syncStats)
         current.timeMillis should be (expected.timeMillis)
@@ -76,8 +72,8 @@ class FsLoggerSpec extends WordSpec with ShouldMatchers with PropertyChecks {
         val writeStats = logger logWrite (nanos, bytes)
         val current = logger.current
         current.readStats should equal (expected.readStats)
-        current.writeStats should be theSameInstanceAs (writeStats)
-        current.writeStats equalsIgnoreTime expected.writeStats should be (true)
+        current.writeStats should be theSameInstanceAs writeStats
+        current.writeStats equalsIgnoreTime expected.writeStats should equal (true)
         current.syncStats should equal (expected.syncStats)
         current.timeMillis should be (expected.timeMillis)
       }
@@ -92,8 +88,8 @@ class FsLoggerSpec extends WordSpec with ShouldMatchers with PropertyChecks {
         val current = logger.current
         current.readStats should equal (expected.readStats)
         current.writeStats should equal (expected.writeStats)
-        current.syncStats should be theSameInstanceAs (syncStats)
-        current.syncStats equalsIgnoreTime expected.syncStats should be (true)
+        current.syncStats should be theSameInstanceAs syncStats
+        current.syncStats equalsIgnoreTime expected.syncStats should equal (true)
         current.timeMillis should be (expected.timeMillis)
       }
     }
@@ -114,7 +110,7 @@ class FsLoggerSpec extends WordSpec with ShouldMatchers with PropertyChecks {
         for (i <- 0 until size) {
           logger rotate ()
           val current = logger.current
-          logger stats 0 should be theSameInstanceAs (current)
+          logger stats 0 should be theSameInstanceAs current
         }
       }
 
@@ -124,7 +120,7 @@ class FsLoggerSpec extends WordSpec with ShouldMatchers with PropertyChecks {
           logger rotate ()
           val newStats = logger.current
           newStats should not be theSameInstanceAs (oldStats)
-          logger stats 1 should be theSameInstanceAs (oldStats)
+          logger stats 1 should be theSameInstanceAs oldStats
         }
       }
 
@@ -132,14 +128,14 @@ class FsLoggerSpec extends WordSpec with ShouldMatchers with PropertyChecks {
         for (i <- 0 until size) {
           logger rotate ()
           val newStats = logger.current
-          newStats equalsIgnoreTime FsStatistics() should be (true)
+          newStats equalsIgnoreTime FsStatistics() should equal (true)
         }
       }
     }
   }
 }
 
-object FsLoggerSpec {
+object FsLoggerTest {
   private val nanos = 1000 * 1000
   private val bytes = 1024
 }
