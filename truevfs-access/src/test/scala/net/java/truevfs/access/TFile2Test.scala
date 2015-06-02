@@ -8,7 +8,7 @@ import java.beans._
 import java.io._
 import java.net._
 
-import net.java.truecommons.io.Loan._
+import net.java.truecommons.shed.ResourceLoan._
 import net.java.truevfs.access.TFile2Test._
 import net.java.truevfs.kernel.spec._
 import org.junit._
@@ -18,6 +18,7 @@ import org.scalatest.mock.MockitoSugar.mock
 import org.scalatest.prop.PropertyChecks._
 import org.slf4j._
 
+/** @author Christian Schlichtherle */
 class TFile2Test extends JUnitSuite {
 
   private val config = TConfig open ()
@@ -65,12 +66,12 @@ class TFile2Test extends JUnitSuite {
 
   def objectRoundTrip(file: TFile) {
     val bos = new ByteArrayOutputStream
-    loan(new ObjectOutputStream(bos)) to (_ writeObject file)
+    loan(new ObjectOutputStream(bos)) to { _ writeObject file }
 
     logger trace ("Number of serialized bytes: {}", bos.size)
 
     val bis = new ByteArrayInputStream(bos.toByteArray)
-    val clone = loan(new ObjectInputStream(bis)) to (_.readObject)
+    val clone = loan(new ObjectInputStream(bis)) to { _ readObject () }
 
     clone should not be theSameInstanceAs (file)
     clone should equal (file.getAbsoluteFile)
@@ -86,7 +87,7 @@ class TFile2Test extends JUnitSuite {
     logger trace ("XML String: {}", bos.toString("UTF-8"))
 
     val bis = new ByteArrayInputStream(bos.toByteArray)
-    val clone = loan(new XMLDecoder(bis)) to (_.readObject)
+    val clone = loan(new XMLDecoder(bis)) to { _ readObject () }
 
     clone should not be theSameInstanceAs (file)
     clone should equal (file.getAbsoluteFile)

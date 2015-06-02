@@ -6,8 +6,8 @@ package net.java.truevfs.access
 
 import java.util.concurrent._
 
-import net.java.truecommons.io.Loan._
 import net.java.truecommons.services._
+import net.java.truecommons.shed.ResourceLoan._
 import net.java.truecommons.shed._
 import net.java.truevfs.access.TConfig._
 import net.java.truevfs.kernel.spec.FsAccessOption._
@@ -22,15 +22,14 @@ import org.scalatest.prop.PropertyChecks._
 
 import scala.collection.JavaConverters._
 
-/**
-  * DO NOT MODIFY THE GLOBAL CONFIGURATION IN THESE TESTS!
+/** DO NOT MODIFY THE GLOBAL CONFIGURATION IN THESE TESTS!
   * Its global scope makes it available to any other test running in parallel,
   * if any.
   *
   * @author Christian Schlichtherle
   */
 @RunWith(classOf[JUnitRunner])
-class TConfigSpec extends WordSpec {
+class TConfigTest extends WordSpec {
 
   private def inNewChild[V](operation: => V) {
     var ex: Throwable = null
