@@ -7,7 +7,7 @@ package net.java.truevfs.ext.pacemaker
 import javax.annotation.concurrent._
 
 import net.java.truecommons.shed._
-import net.java.truevfs.ext.pacemaker.OnTryFinally._
+import net.java.truecommons.shed.OnTryFinally._
 import net.java.truevfs.kernel.spec._
 
 /**
@@ -22,13 +22,12 @@ import net.java.truevfs.kernel.spec._
 private class PaceController(manager: PaceManager, controller: FsController)
 extends AspectController(controller) {
 
-  override def apply[V](operation: () => V) = {
+  override def apply[V](operation: () => V) =
     onTry {
       operation()
     } onFinally {
       manager postAccess controller
     }
-  }
 
   override def sync(options: BitField[FsSyncOption]) { controller sync options } // skip apply!
 }
