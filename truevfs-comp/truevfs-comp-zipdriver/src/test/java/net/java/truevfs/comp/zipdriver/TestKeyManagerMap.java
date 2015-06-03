@@ -23,7 +23,7 @@ public final class TestKeyManagerMap extends AbstractKeyManagerMap {
     public TestKeyManagerMap() {
         final Class clazz = AesPbeParameters.class;
         final KeyManager manager = new TestKeyManager(this.view = newView());
-        managers = (Map) Collections.singletonMap(clazz, manager);
+        managers = Collections.<Class<?>, KeyManager<?>>singletonMap(clazz, manager);
     }
 
     private static TestView<AesPbeParameters> newView() {
