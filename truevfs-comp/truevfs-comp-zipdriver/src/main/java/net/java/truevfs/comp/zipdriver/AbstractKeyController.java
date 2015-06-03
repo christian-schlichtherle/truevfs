@@ -62,7 +62,8 @@ extends FsDecoratingController {
     private @CheckForNull IOException findKeyException(Throwable ex) {
         final Class<? extends IOException> clazz = getKeyExceptionType();
         do {
-            if (clazz.isInstance(ex)) return clazz.cast(ex);
+            if (clazz.isInstance(ex))
+                return clazz.cast(ex);
         } while (null != (ex = ex.getCause()));
         return null;
     }
@@ -75,7 +76,8 @@ extends FsDecoratingController {
         try {
             return controller.node(options, name);
         } catch (final ControlFlowException ex) {
-            if (!name.isRoot() || null == findKeyException(ex)) throw ex;
+            if (!name.isRoot() || null == findKeyException(ex))
+                throw ex;
             Entry node = getParent().node(
                     options, getModel()
                                  .getMountPoint()
@@ -84,7 +86,8 @@ extends FsDecoratingController {
                                  .getNodeName());
             // We're not holding any locks, so it's possible that someone else
             // has concurrently modified the parent file system.
-            if (null == node) return null;
+            if (null == node)
+                return null;
             // The entry is inaccessible for some reason.
             // This may be because the cipher key is not available.
             // Now mask the entry as a special file.
@@ -104,7 +107,8 @@ extends FsDecoratingController {
         try {
             controller.checkAccess(options, name, types);
         } catch (final ControlFlowException ex) {
-            if (!name.isRoot() || null == findKeyException(ex)) throw ex;
+            if (!name.isRoot() || null == findKeyException(ex))
+                throw ex;
             getParent().checkAccess(
                     options, getModel()
                                  .getMountPoint()
@@ -130,13 +134,15 @@ extends FsDecoratingController {
             // This prevents the application from inadvertently deleting an
             // encrypted ZIP file just because the user cancelled key prompting.
             final IOException keyEx = findKeyException(ex);
-            if (null == keyEx) throw ex;
+            if (null == keyEx)
+                throw ex;
             throw keyEx;
         }
         final FsModel model = getModel();
         final URI mpu = driver.mountPointUri(model);
         final URI fsu = driver.fileSystemUri(model, name.toString());
-        if (!fsu.equals(mpu) || name.isRoot()) getKeyManager().unlink(fsu);
+        if (!fsu.equals(mpu) || name.isRoot())
+            getKeyManager().unlink(fsu);
     }
 
     @Override
@@ -145,7 +151,7 @@ extends FsDecoratingController {
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         try {
             controller.sync(options);
-        } catch (final FsSyncWarningException ex) {
+        } catch (FsSyncWarningException ex) {
             builder.warn(ex);
         }
         getKeyManager().release(driver.mountPointUri(getModel()));
