@@ -6,6 +6,9 @@ package net.java.truevfs.comp.zipdriver;
 
 import java.net.URI;
 import javax.annotation.concurrent.ThreadSafe;
+
+import net.java.truecommons.key.spec.AbstractKeyManager;
+import net.java.truecommons.key.spec.KeyProvider;
 import net.java.truecommons.key.spec.prompting.PromptingKey;
 import net.java.truecommons.key.spec.prompting.PromptingKey.View;
 import net.java.truecommons.key.spec.prompting.PromptingKeyManager;
@@ -16,12 +19,27 @@ import net.java.truecommons.key.spec.prompting.PromptingKeyManager;
  */
 @ThreadSafe
 public final class TestKeyManager<K extends PromptingKey<K>>
-extends PromptingKeyManager<K> {
+extends AbstractKeyManager<K> {
 
-    public TestKeyManager(View<K> view) { super(view); }
+    private final PromptingKeyManager<K> manager;
+
+    public TestKeyManager(View<K> view) {
+        this.manager = new PromptingKeyManager<>(view);
+    }
 
     @Override
-    public synchronized void release(final URI resource) {
-        super.resetUnconditionally(resource);
+    public KeyProvider<K> provider(URI resource) {
+        return manager.provider(resource);
     }
+
+    @Override
+    public void link(URI oldResource, URI newResource) {
+        manager.link(oldResource, newResource);
+    }
+
+    @Override
+    public void unlink(URI resource) { manager.unlink(resource); }
+
+    @Override
+    public void release(URI resource) { unlink(resource); }
 }
