@@ -23,7 +23,7 @@ import net.java.truevfs.kernel.spec.FsAccessOptions._
 import net.java.truevfs.kernel.spec.FsNodeName._
 import net.java.truevfs.kernel.spec._
 
-import scala.Option
+import scala.{None, Option, Some}
 import scala.annotation._
 
 /** A read/write virtual file system for archive entries.
