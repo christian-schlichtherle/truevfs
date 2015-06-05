@@ -62,7 +62,8 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
           ae.getName.replace('\\', SEPARATOR_CHAR)), // fix illegal Windoze file name separators
         SEPARATOR_CHAR)
       master.add(path, ae)
-      if (isValidEntryName(path)) paths ::= path
+      if (isValidEntryName(path))
+        paths ::= path
     }
     // Setup root file system entry, potentially replacing its previous
     // mapping from the source archive.
@@ -70,7 +71,8 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     // Now perform a file system check to create missing parent directories
     // and populate directories with their members - this must be done
     // separately!
-    for (path <- paths) fix(path)
+    for (path <- paths)
+      fix(path)
   }
 
   private def fullPath(name: FsNodeName) = path(name).toString
@@ -302,7 +304,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     }
 
     def head = segments.head.entry
-  } // Make
+  }
 
   /** Tests the named file system entry and then - unless its the file system
     * root - notifies the listener and deletes the entry.
@@ -323,7 +325,8 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     }
     if (mcn.isType(DIRECTORY)) {
         val size = mcn.getMembers.size
-        if (0 != size) throw new DirectoryNotEmptyException(fullPath(name))
+        if (0 != size)
+          throw new DirectoryNotEmptyException(fullPath(name))
     }
     if (name.isRoot) {
       // Removing the root entry MUST get silently ignored in order to
@@ -342,8 +345,10 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
       // This signal will be ignored by drivers which do no support a
       // central directory (TAR).
       val mae = mcn.getEntry
-      for (tµpe <- ALL_SIZES) mae.setSize(tµpe, UNKNOWN)
-      for (tµpe <- ALL_ACCESS) mae.setTime(tµpe, UNKNOWN)
+      for (tµpe <- ALL_SIZES)
+        mae.setSize(tµpe, UNKNOWN)
+      for (tµpe <- ALL_ACCESS)
+        mae.setTime(tµpe, UNKNOWN)
     }
     splitter.split(np)
     val pp = splitter.getParentPath
@@ -397,7 +402,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     driver.checkEncodable(name)
     driver.newEntry(options, name, tµpe, template.orNull)
   }
-} // ArchiveFileSystem
+}
 
 private object ArchiveFileSystem {
   private val RootPath = ROOT.getPath
@@ -451,16 +456,17 @@ private object ArchiveFileSystem {
 
   private def typeName(entry: FsCovariantNode[_ <: Entry]): String = {
     val types = entry.getTypes
-    if (1 == types.cardinality) typeName(types.iterator.next)
-    else types.toString.toLowerCase(Locale.ROOT)
+    if (1 == types.cardinality)
+      typeName(types.iterator.next)
+    else
+      types.toString.toLowerCase(Locale.ROOT)
   }
 
   private def typeName(tµpe: Type) = tµpe.toString.toLowerCase(Locale.ROOT)
 
-  private def isValidEntryName(path: String) = {
+  private def isValidEntryName(path: String) =
     !isAbsolute(path, SEPARATOR_CHAR) &&
       !(".." + SEPARATOR).startsWith(path.substring(0, math.min(3, path.length)))
-  }
 
   /** The master archive entry table.
     *
@@ -500,14 +506,17 @@ private object ArchiveFileSystem {
     def get(name: String) = map.get(name)
 
     def remove(name: String) = map.remove(name)
-  } // EntryTable
+  }
 
   private final class Splitter extends PathSplitter(SEPARATOR_CHAR, false) {
     override def getParentPath = {
       val path = super.getParentPath
-      if (null ne path) path else RootPath
+      if (null ne path)
+        path
+      else
+        RootPath
     }
-  } // Splitter
+  }
 
   /** A case class which represents a path segment for use by
     * [[net.java.truevfs.kernel.impl.ArchiveFileSystem.Make]].
@@ -518,4 +527,5 @@ private object ArchiveFileSystem {
   private final case class Segment[E <: FsArchiveEntry](
     name: Option[String],
     entry: FsCovariantNode[E])
-} // ArchiveFileSystem
+}
+
