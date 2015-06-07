@@ -79,9 +79,32 @@ extends FsAbstractManager
   }
 
   override def sync(filter: ControllerFilter, visitor: ControllerVisitor[FsSyncException]) {
-    if (filter == Filter.ACCEPT_ANY)
-      syncOnShutdown disarm ()
-    super.sync(filter, visitor)
+    var disarm = true
+    try {
+      super.sync(
+        new Filter[FsController] {
+          override def accept(controller: FsController) = {
+            val accepted = filter accept controller
+            if (!accepted)
+              disarm = false
+            accepted
+          }
+        },
+        new Visitor[FsController, FsSyncException] {
+          override def visit(controller: FsController) {
+            try {
+              visitor visit controller
+            } finally {
+              if (controller.getModel.isMounted)
+                disarm = false
+            }
+          }
+        }
+      )
+    } finally {
+      if (disarm)
+        syncOnShutdown disarm ()
+    }
   }
 
   override def accept[X <: IOException](filter: ControllerFilter, visitor: ControllerVisitor[X]) {
