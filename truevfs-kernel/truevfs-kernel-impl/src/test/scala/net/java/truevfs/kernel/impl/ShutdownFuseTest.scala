@@ -111,7 +111,7 @@ private object ShutdownFuseTest {
     val registry = mock[ShutdownFuse.ThreadRegistry]
     val io = inOrder(registry)
     private[this] var executed: Boolean = _
-    val fuse: ShutdownFuse = ShutdownFuse(armed = true, registry) {
+    val fuse: ShutdownFuse = ShutdownFuse(registry = registry) {
       fuse disarm () // must cause no harm!
       executed = true
     }
