@@ -101,7 +101,7 @@ class PaceManagerTest extends WordSpec with OneInstancePerTest {
         controllers.values filter expectation foreach expectation.stub
 
         // Register access to the controller as if some file system operation
-        // had been successfully completed.
+        // had been performed.
         expectation match {
           case Synced(_*) | Shelved(_*) =>
             manager postAccess controllers(mountPoint)
@@ -128,7 +128,7 @@ class PaceManagerTest extends WordSpec with OneInstancePerTest {
 
 object PaceManagerTest {
 
-  type AnyArchiveDriver = FsArchiveDriver[_ <: FsArchiveEntry]
+  type ArchiveDriver = FsArchiveDriver[_ <: FsArchiveEntry]
   type ControllerFilter = Filter[_ >: FsController]
   type ControllerVisitor[X <: IOException] = Visitor[_ >: FsController, X]
 
@@ -141,15 +141,18 @@ object PaceManagerTest {
     model
   }
 
-  def newController(model: FsModel) =
-    (when(mock[FsController].getModel) thenReturn model).getMock.asInstanceOf[FsController]
+  def newController(model: FsModel) = {
+    val controller = mock[FsController]
+    when(controller.getModel) thenReturn model
+    controller
+  }
 
   private final class TestManager(var controllers: Iterable[FsController] = Iterable.empty[FsController])
   extends FsAbstractManager {
-    override def newModel(context: FsDriver, mountPoint: FsMountPoint, parent: FsModel): FsModel =
+    override def newModel(context: FsDriver, mountPoint: FsMountPoint, parent: FsModel) =
       throw new UnsupportedOperationException
 
-    override def newController(context: AnyArchiveDriver, model: FsModel, parent: FsController): FsController =
+    override def newController(context: ArchiveDriver, model: FsModel, parent: FsController) =
       throw new UnsupportedOperationException
 
     override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint) =
