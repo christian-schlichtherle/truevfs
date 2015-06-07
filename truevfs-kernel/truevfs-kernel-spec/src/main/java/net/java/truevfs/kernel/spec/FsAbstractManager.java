@@ -21,22 +21,18 @@ public abstract class FsAbstractManager
 extends UniqueObject implements FsManager {
 
     @Override
-    public void sync(
-            final Filter<? super FsController> filter,
-            final Visitor<? super FsController, FsSyncException> visitor)
-    throws FsSyncException {
-        final FsSyncExceptionBuilder b = new FsSyncExceptionBuilder();
-
-        class AssembleExceptionVisitor
-        implements Visitor<FsController, FsSyncException> {
+    public void sync(final Filter<? super FsController> filter, final Visitor<? super FsController, FsSyncException> visitor) throws FsSyncException {
+        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
+        accept(filter, new Visitor<FsController, FsSyncException>() {
             @Override
-            public void visit(final FsController c) {
-                try { visitor.visit(c); }
-                catch (final FsSyncException ex) { b.warn(ex); }
+            public void visit(final FsController controller) {
+                try {
+                    visitor.visit(controller);
+                } catch (FsSyncException ex) {
+                    builder.warn(ex);
+                }
             }
-        } // AssembleExceptionVisitor
-
-        accept(filter, new AssembleExceptionVisitor());
-        b.check();
+        });
+        builder.check();
     }
 }
