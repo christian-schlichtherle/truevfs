@@ -79,7 +79,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
     builder check ()
   }
 
-  override def sync(filter: AnyControllerFilter,
+  override def sync(filter: ControllerFilter,
                     visitor: ControllerSyncVisitor) {
     val i = evicted.iterator
     while (i.hasNext)
@@ -91,7 +91,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
 
 private object PaceManager {
 
-  private type AnyControllerFilter = Filter[_ >: FsController]
+  private type ControllerFilter = Filter[_ >: FsController]
   private type ControllerSyncVisitor = Visitor[_ >: FsController, FsSyncException]
 
   private val logger = new LocalizedLogger(classOf[PaceManager])
@@ -155,14 +155,14 @@ private object PaceManager {
       _max = max
     }
 
-    def exists(filter: AnyControllerFilter): Boolean = {
+    def exists(filter: ControllerFilter): Boolean = {
       val i = values.iterator
       while (i.hasNext)
         if (filter accept i.next)
           return true
       false
     }
-  } // MountedControllerMap
+  }
 
   private final class MountedControllerSet
   (evicted: ju.Collection[FsController])
@@ -175,7 +175,7 @@ private object PaceManager {
     def max = map.max
     def max_=(max: Int) { map.max = max }
 
-    def exists(filter: AnyControllerFilter) = readLocked { map exists filter }
+    def exists(filter: ControllerFilter) = readLocked { map exists filter }
 
     def add(controller: FsController) {
       val mp = mountPoint(controller)
@@ -183,7 +183,7 @@ private object PaceManager {
     }
 
     def sync(manager: FsManager,
-             filter: AnyControllerFilter,
+             filter: ControllerFilter,
              visitor: ControllerSyncVisitor) {
       manager sync (
         new Filter[FsController] {
@@ -212,7 +212,8 @@ private object PaceManager {
         )
     }
 
-    def readLocked[V] = locked[V](readLock)_
-    def writeLocked[V] = locked[V](writeLock)_
-  } // MountedControllerSet
+    def readLocked[V] = locked[V](readLock) _
+
+    def writeLocked[V] = locked[V](writeLock) _
+  }
 }
