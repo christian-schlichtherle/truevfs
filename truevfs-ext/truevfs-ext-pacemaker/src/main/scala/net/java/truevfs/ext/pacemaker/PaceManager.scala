@@ -47,8 +47,8 @@ extends JmxManager[PaceMediator](mediator, manager) {
     val builder = new FsSyncExceptionBuilder
     do {
       val evictedController = i.next
-      val mountPoint = mountPoint(evictedController)
-      val evictedControllerFilter = new FsControllerFilter(mountPoint)
+      val mp = mountPoint(evictedController)
+      val evictedControllerFilter = new FsControllerFilter(mp)
       if (!(mounted exists evictedControllerFilter)) { // is not mounted, including child file systems?
         try {
           manager sync (evictedControllerFilter, new FsControllerSyncVisitor(FsSyncOptions.NONE))
@@ -166,7 +166,7 @@ private object PaceManager {
 
   private final class MountedControllerSet
   (evicted: ju.Collection[FsController])
-  (implicit lock: ReentrantReadWriteLock = new ReentrantReadWriteLock) {
+  (implicit lock: ReadWriteLock = new ReentrantReadWriteLock) {
 
     private val map = new MountedControllerMap(evicted)
     private val readLock = lock.readLock
