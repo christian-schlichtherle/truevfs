@@ -17,7 +17,7 @@ import net.java.truevfs.kernel.impl.ShutdownFuse._
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private final class ShutdownFuse private (armed: Boolean, registry: ThreadRegistry, hook: => Unit) {
+private final class ShutdownFuse private (registry: ThreadRegistry)(hook: => Unit) {
 
   @volatile
   private[this] var _armed: Boolean = _
@@ -31,8 +31,6 @@ private final class ShutdownFuse private (armed: Boolean, registry: ThreadRegist
       }
     }
   }
-
-  if (armed) { arm() }
 
   /** Arms this shutdown fuse. */
   def arm() { onArm { registry add _thread } }
@@ -71,7 +69,12 @@ private object ShutdownFuse {
   def apply(hook: => Unit): ShutdownFuse = apply()(hook)
 
   @inline
-  def apply(armed: Boolean = true, registry: ThreadRegistry = DefaultThreadRegistry)(hook: => Unit) = new ShutdownFuse(armed, registry, hook)
+  def apply(armed: Boolean = true, registry: ThreadRegistry = DefaultThreadRegistry)(hook: => Unit) = {
+    val fuse = new ShutdownFuse(registry)(hook)
+    if (armed)
+      fuse arm ()
+    fuse
+  }
 
   sealed trait ThreadRegistry {
     def add(thread: Thread)
