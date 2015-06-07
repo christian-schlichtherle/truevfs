@@ -85,7 +85,7 @@ extends FsAbstractManager
   }
 
   override def accept[X <: IOException](filter: ControllerFilter, visitor: ControllerVisitor[X]) {
-    readLocked { controllers.values flatMap { l => Option(l.get) } }
+    readLocked { controllers.values flatMap { link => Option(link.get) } }
     .filter { filter.accept }
     .toIndexedSeq
     .sorted(ReverseControllerOrdering)
@@ -134,8 +134,8 @@ extends FsAbstractManager
 
 private object DefaultManager {
 
-  type ControllerFilter = Filter[_ >: FsController]
-  type ControllerVisitor[X <: IOException] = Visitor[_ >: FsController, X]
+  private type ControllerFilter = Filter[_ >: FsController]
+  private type ControllerVisitor[X <: IOException] = Visitor[_ >: FsController, X]
 
   private final class FrontController(c: FsController)
   extends FsDecoratingController(c)
