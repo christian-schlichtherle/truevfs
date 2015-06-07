@@ -209,7 +209,7 @@ private object PaceManager {
             }
           }
         }
-        )
+      )
     }
 
     def readLocked[V] = locked[V](readLock) _
