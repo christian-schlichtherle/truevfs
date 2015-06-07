@@ -13,7 +13,7 @@ import org.scalatest.junit._
   * @author Christian Schlichtherle
   */
 @RunWith(classOf[JUnitRunner])
-class DefaultManagerFactorySpec extends WordSpec {
+class DefaultManagerFactoryTest extends WordSpec {
 
   "A default file system manager factory" should {
     val service = new DefaultManagerFactory

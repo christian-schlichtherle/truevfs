@@ -12,7 +12,7 @@ import org.scalatest.Matchers._
 
 /** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])
-class FsManagerLocatorSpec extends WordSpec {
+class FsManagerLocatorTest extends WordSpec {
 
   "The file system manager locator singleton" should {
     "provide a default file system manager" in {

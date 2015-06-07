@@ -9,11 +9,10 @@ import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.Matchers._
 import org.scalatest.prop.PropertyChecks._
+import FileSystemTest._
 
 @RunWith(classOf[JUnitRunner])
-class FileSystemSpec
-extends WordSpec {
-  import FileSystemSpec._
+class FileSystemTest extends WordSpec {
 
   private def newFileSystem = FileSystem[Entry]('/')
 
@@ -141,9 +140,9 @@ extends WordSpec {
       }
     }
   }
-} // FileSystemSpec
+}
 
-object FileSystemSpec {
+object FileSystemTest {
 
   private def isParentPath(parentPath: String) =
     null != parentPath && !parentPath.isEmpty && !parentPath.endsWith("/")
@@ -154,4 +153,4 @@ object FileSystemSpec {
   private def isPath(path: String) = null != path
 
   private final case class Entry(path: String)
-} // FileSystemSpec
+}

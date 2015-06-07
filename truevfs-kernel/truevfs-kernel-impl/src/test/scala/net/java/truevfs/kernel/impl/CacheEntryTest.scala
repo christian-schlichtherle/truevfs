@@ -6,45 +6,22 @@ package net.java.truevfs.kernel.impl
 
 import java.io._
 import java.nio._
-import net.java.truecommons.cio._
-import net.java.truecommons.cio.Entry
-import net.java.truecommons.cio.Entry._
+
 import net.java.truecommons.cio.Entry.Access._
-import net.java.truecommons.cio.Entry.Size._
-import net.java.truevfs.kernel.spec.cio._
+import net.java.truecommons.cio.Entry._
+import net.java.truecommons.cio.{Entry, _}
+import net.java.truevfs.kernel.impl.CacheEntry.Strategy._
+import net.java.truevfs.kernel.impl.CacheEntryTest._
 import net.java.truevfs.kernel.impl.cio.EntryAspect._
 import org.junit.runner._
-import org.scalatest.junit._
-import org.scalatest.matchers._
-import org.scalatest.prop._
+import org.scalatest.Matchers._
 import org.scalatest._
-import CacheEntry.Strategy._
-
-/** @author Christian Schlichtherle */
-private object CacheEntrySpec {
-  class BrokenInputSocket(override val target: Entry)
-  extends AbstractInputSocket[Entry] {
-    require(null ne target)
-
-    override def stream(peer: AnyOutputSocket) = new InputStream {
-      override def read = throw new IOException
-    }
-  }
-
-  class BrokenOutputSocket(override val target: Entry)
-  extends AbstractOutputSocket[Entry] {
-    require(null ne target)
-
-    override def stream(peer: AnyInputSocket) = new OutputStream {
-      override def write(b: Int) { throw new IOException }
-    }
-  }
-}
+import org.scalatest.junit._
+import org.scalatest.prop.PropertyChecks._
 
 /** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])
-class CacheEntrySpec extends WordSpec with ShouldMatchers with PropertyChecks {
-  import CacheEntrySpec._
+class CacheEntryTest extends WordSpec {
 
   private val initialCapacity = 32
   private val mockEntryName = "mock"
@@ -272,6 +249,27 @@ class CacheEntrySpec extends WordSpec with ShouldMatchers with PropertyChecks {
         back getCount WRITE should be (1)
         cache.dataSize should be (UNKNOWN)
       }
+    }
+  }
+}
+
+/** @author Christian Schlichtherle */
+private object CacheEntryTest {
+  class BrokenInputSocket(override val target: Entry)
+    extends AbstractInputSocket[Entry] {
+    require(null ne target)
+
+    override def stream(peer: AnyOutputSocket) = new InputStream {
+      override def read = throw new IOException
+    }
+  }
+
+  class BrokenOutputSocket(override val target: Entry)
+    extends AbstractOutputSocket[Entry] {
+    require(null ne target)
+
+    override def stream(peer: AnyInputSocket) = new OutputStream {
+      override def write(b: Int) { throw new IOException }
     }
   }
 }
