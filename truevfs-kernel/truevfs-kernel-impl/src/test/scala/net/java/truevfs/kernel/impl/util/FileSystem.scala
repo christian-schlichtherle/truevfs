@@ -4,8 +4,13 @@
  */
 package net.java.truevfs.kernel.impl.util
 
-import collection._
-import FileSystem._
+import java.{util => ju}
+import java.util.Comparator
+
+import net.java.truevfs.kernel.impl.util.FileSystem._
+
+import scala.collection.JavaConverters._
+import scala.collection._
 
 /**
   * A (virtual) file system is a mutable map from decomposable keys, named
@@ -27,7 +32,7 @@ import FileSystem._
   * This class is ''not'' thread-safe!
   *
   * @tparam K the type of the paths (keys) in this (virtual) file system (map).
-  * @tparam  V the type of the entries (values) in this (virtual) file system
+  * @tparam V the type of the entries (values) in this (virtual) file system
   *         (map).
   * @author Christian Schlichtherle
   */
@@ -120,7 +125,7 @@ final class FileSystem[K >: Null, V](
   }
 
   override def stringPrefix = "FileSystem"
-} // FileSystem
+}
 
 /**
   * @author Christian Schlichtherle
@@ -146,7 +151,7 @@ object FileSystem {
     final def isLeaf = isEmpty
     final override def stringPrefix = "Node"
     final override def toString() = stringPrefix + "(path=" + path + ", isLeaf=" + isLeaf + ", entry=" + entry + ")"
-  } // Node
+  }
 
   private class INode[K >: Null, V] protected (
     private[this] val parent: Option[(INode[K, V], K)],
@@ -206,12 +211,12 @@ object FileSystem {
     }
 
     def isDead = isGhost && isLeaf
-  } // INode
+  }
 
   private final class Root[K >: Null, V](implicit fs: FileSystem[K, V])
   extends INode[K, V](None, None) {
     override def address = fs -> None
-  } // Root
+  }
 
   trait Composition[K] extends ((Option[K], K) => K) {
     /** The composition method for injection. */
@@ -224,7 +229,7 @@ object FileSystem {
      * space savings!
      */
     def unapply(path: K): Some[(Option[K], K)]
-  } // Composition
+  }
 
   final class StringComposition(separator: Char)
   extends Composition[String] {
@@ -245,21 +250,21 @@ object FileSystem {
         Some(None, path)
       }
     }
-  } // StringComposition
+  }
 
   trait DirectoryFactory[K] {
     def create[V]: mutable.Map[K, V]
-  } // DirectoryFactory
+  }
 
   final class HashedDirectoryFactory[K] extends DirectoryFactory[K] {
     def create[V] = new mutable.HashMap
-  } // HashDirectoryFactory
+  }
 
   final class SortedDirectoryFactory[K : Ordering] extends DirectoryFactory[K] {
-    def create[V] = new mutable.ImmutableMapAdaptor(immutable.SortedMap.empty)
-  } // SortedDirectoryFactory
+    def create[V] = new ju.TreeMap[K, V](implicitly[Comparator[K]]).asScala
+  }
 
   final class LinkedDirectoryFactory[K] extends DirectoryFactory[K] {
     def create[V] = new mutable.LinkedHashMap
   }
-} // FileSystem
+}
