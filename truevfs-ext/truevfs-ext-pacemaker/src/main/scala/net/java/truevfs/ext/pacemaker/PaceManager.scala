@@ -47,8 +47,8 @@ extends JmxManager[PaceMediator](mediator, manager) {
     val builder = new FsSyncExceptionBuilder
     do {
       val evictedController = i.next
-      val prefix = mountPoint(evictedController)
-      val evictedControllerFilter = new FsControllerFilter(prefix)
+      val mountPoint = mountPoint(evictedController)
+      val evictedControllerFilter = new FsControllerFilter(mountPoint)
       if (!(mounted exists evictedControllerFilter)) { // is not mounted, including child file systems?
         try {
           manager sync (evictedControllerFilter, new FsControllerSyncVisitor(FsSyncOptions.NONE))
