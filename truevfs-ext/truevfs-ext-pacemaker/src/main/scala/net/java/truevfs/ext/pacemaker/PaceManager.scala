@@ -78,12 +78,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
     builder check ()
   }
 
-  override def sync(filter: ControllerFilter,
-                    visitor: ControllerSyncVisitor) {
-    val i = evicted.values.iterator
-    while (i.hasNext)
-      if (filter accept i.next)
-        i remove ()
+  override def sync(filter: ControllerFilter, visitor: ControllerSyncVisitor) {
     mounted sync (manager, filter, visitor)
   }
 }
@@ -147,6 +142,11 @@ private object PaceManager {
         false
       }
 
+    override def remove(key: Object) = {
+      evicted remove key
+      super.remove(key)
+    }
+
     @volatile
     private var _max = maximumFileSystemsMountedDefaultValue
 
@@ -187,25 +187,22 @@ private object PaceManager {
              filter: ControllerFilter,
              visitor: ControllerSyncVisitor) {
       manager sync (
-        new Filter[FsController] {
-          override def accept(controller: FsController) = {
-            val accepted = filter accept controller
-            if (accepted) {
-              val mp = mountPoint(controller)
-              writeLocked { map remove mp }
-            }
-            accepted
-          }
-        },
+        filter,
         new Visitor[FsController, FsSyncException] {
           override def visit(controller: FsController) {
+            val model = controller.getModel
+            val wasMounted = model.isMounted
             try {
               visitor visit controller
             } finally {
-              val model = controller.getModel
-              if (model.isMounted) {
-                val mp = model.getMountPoint
-                writeLocked { map put (mp, controller) }
+              val isMounted = model.isMounted
+              val mp = model.getMountPoint
+              if (isMounted) {
+                //if (!wasMounted)
+                  writeLocked { map put (mp, controller) } // preserve access order and evicted map
+              } else {
+                if (wasMounted)
+                  writeLocked { map remove mp }
               }
             }
           }
