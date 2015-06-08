@@ -19,6 +19,8 @@ import org.scalatest.junit._
 import org.scalatest.mock.MockitoSugar.mock
 import org.scalatest.prop.PropertyChecks._
 
+import scala.language.implicitConversions
+
 /** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])
 class PaceManagerTest extends WordSpec with OneInstancePerTest {
@@ -45,8 +47,8 @@ class PaceManagerTest extends WordSpec with OneInstancePerTest {
 
     "sync() the least recently accessed and mounted controller which exceeds the maximum mounted file system limit" in {
       val controllers = {
-        def newMapping(uri: String) =
-          uri -> newController(newModel(newMountPoint(uri)))
+        def newMapping(mountPoint: FsMountPoint) =
+          mountPoint -> newController(newModel(mountPoint))
         collection.mutable.LinkedHashMap(
           newMapping("p:/"),
           newMapping("a:p:/1!/"),
@@ -67,7 +69,7 @@ class PaceManagerTest extends WordSpec with OneInstancePerTest {
       manager sync (Filter.ACCEPT_ANY,
                     new FsControllerSyncVisitor(FsSyncOptions.SYNC))
 
-      val table = Table[String, Expectation](
+      val table = Table[FsMountPoint, Expectation](
         ("access", "expectation"),
 
         ("p:/", Synced("a:p:/1!/", "a:a:p:/1!/a!/", "a:a:p:/1!/b!/", "a:a:p:/1!/c!/", "a:p:/2!/", "a:a:p:/2!/a!/", "a:a:p:/2!/b!/", "a:a:p:/2!/c!/", "a:a:p:/3!/a!/")),
@@ -132,7 +134,7 @@ object PaceManagerTest {
   type ControllerFilter = Filter[_ >: FsController]
   type ControllerVisitor[X <: IOException] = Visitor[_ >: FsController, X]
 
-  def newMountPoint(uri: String) = new FsMountPoint(new URI(uri))
+  implicit def toMountPoint(string: String): FsMountPoint = new FsMountPoint(new URI(string))
 
   def newModel(mountPoint: FsMountPoint) = {
     val model = mock[FsModel]
@@ -164,21 +166,21 @@ object PaceManagerTest {
     ) { controllers filter filter.accept foreach visitor.visit }
   }
 
-  private sealed abstract class Expectation(mountPoints: String*)
+  private sealed abstract class Expectation(mountPoints: FsMountPoint*)
   extends (FsController => Boolean) {
     private val set = mountPoints.toSet
-    def contains(mountPoint: String) = set contains mountPoint
+    def contains(mountPoint: FsMountPoint) = set contains mountPoint
     override def apply(controller: FsController) =
-      contains(controller.getModel.getMountPoint.toString)
+      contains(controller.getModel.getMountPoint)
     def stub(controller: FsController)
   }
 
-  private final case class Synced(mountPoints: String*)
+  private final case class Synced(mountPoints: FsMountPoint*)
   extends Expectation(mountPoints: _*) {
     override def stub(controller: FsController) { }
   }
 
-  private final case class Shelved(mountPoints: String*)
+  private final case class Shelved(mountPoints: FsMountPoint*)
   extends Expectation(mountPoints: _*) {
     override def stub(controller: FsController) {
       doThrow(new FsSyncException(controller.getModel.getMountPoint, new FsOpenResourceException(1, 1)))
@@ -186,7 +188,7 @@ object PaceManagerTest {
     }
   }
 
-  private final case class Discarded(mountPoints: String*)
+  private final case class Discarded(mountPoints: FsMountPoint*)
   extends Expectation(mountPoints: _*) {
     override def stub(controller: FsController) {
       doThrow(new FsSyncException(controller.getModel.getMountPoint, new Exception))
