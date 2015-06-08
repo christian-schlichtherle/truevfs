@@ -196,13 +196,16 @@ private object PaceManager {
               visitor visit controller
             } finally {
               val isMounted = model.isMounted
-              val mp = model.getMountPoint
-              if (isMounted) {
-                //if (!wasMounted)
-                  writeLocked { map put (mp, controller) } // preserve access order and evicted map
-              } else {
-                if (wasMounted)
+              def mp = model.getMountPoint
+              if (wasMounted) {
+                if (!isMounted) {
                   writeLocked { map remove mp }
+                }
+              } else {
+                if (isMounted) {
+                  assert(false)
+                  writeLocked { map put (mp, controller) } // preserve access order and evicted map
+                }
               }
             }
           }
