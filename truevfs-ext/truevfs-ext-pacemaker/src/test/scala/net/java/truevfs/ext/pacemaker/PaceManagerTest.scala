@@ -13,6 +13,8 @@ import net.java.truevfs.kernel.spec._
 import org.junit.runner._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 import org.scalatest.Matchers._
 import org.scalatest._
 import org.scalatest.junit._
@@ -47,34 +49,34 @@ class PaceManagerTest extends WordSpec with OneInstancePerTest {
 
     "sync() the least recently accessed and mounted controller which exceeds the maximum mounted file system limit" in {
       val controllers = {
-        def newMapping(mountPoint: FsMountPoint) =
-          mountPoint -> newController(newModel(mountPoint))
-        collection.mutable.LinkedHashMap(
-          newMapping("p:/"),
-          newMapping("a:p:/1!/"),
-          newMapping("a:a:p:/1!/a!/"),
-          newMapping("a:a:p:/1!/b!/"),
-          newMapping("a:a:p:/1!/c!/"),
-          newMapping("a:p:/2!/"),
-          newMapping("a:a:p:/2!/a!/"),
-          newMapping("a:a:p:/2!/b!/"),
-          newMapping("a:a:p:/2!/c!/"),
-          newMapping("a:p:/3!/"),
-          newMapping("a:a:p:/3!/a!/"),
-          newMapping("a:a:p:/3!/b!/"),
-          newMapping("a:a:p:/3!/c!/")
+        implicit def mapping(string: String): (FsMountPoint, FsController) = {
+          val mountPoint = parseMountPoint(string)
+          (mountPoint, mockController(mockModel(mountPoint)))
+        }
+        collection.mutable.LinkedHashMap[FsMountPoint, FsController](
+          "p:/",
+          "a:p:/1!/",
+          "a:a:p:/1!/a!/",
+          "a:a:p:/1!/b!/",
+          "a:a:p:/1!/c!/",
+          "a:p:/2!/",
+          "a:a:p:/2!/a!/",
+          "a:a:p:/2!/b!/",
+          "a:a:p:/2!/c!/",
+          "a:p:/3!/",
+          "a:a:p:/3!/a!/",
+          "a:a:p:/3!/b!/",
+          "a:a:p:/3!/c!/"
         )
       }
       delegate.controllers = controllers.values
-      manager sync (Filter.ACCEPT_ANY,
-                    new FsControllerSyncVisitor(FsSyncOptions.SYNC))
 
       val table = Table[FsMountPoint, Expectation](
         ("access", "expectation"),
 
-        ("p:/", Synced("a:p:/1!/", "a:a:p:/1!/a!/", "a:a:p:/1!/b!/", "a:a:p:/1!/c!/", "a:p:/2!/", "a:a:p:/2!/a!/", "a:a:p:/2!/b!/", "a:a:p:/2!/c!/", "a:a:p:/3!/a!/")),
-        ("a:p:/1!/", Synced("a:a:p:/3!/b!/")),
-        ("a:a:p:/1!/a!/", Synced("a:p:/3!/", "a:a:p:/3!/a!/", "a:a:p:/3!/b!/", "a:a:p:/3!/c!/")),
+        ("p:/", Synced()),
+        ("a:p:/1!/", Synced()),
+        ("a:a:p:/1!/a!/", Synced()),
         ("a:a:p:/1!/b!/", Synced()),
         ("a:a:p:/1!/c!/", Synced("a:a:p:/1!/a!/")),
         ("a:p:/2!/", Synced("a:a:p:/1!/b!/")),
@@ -96,27 +98,37 @@ class PaceManagerTest extends WordSpec with OneInstancePerTest {
         // Reset controllers and stub their behavior according to the expected
         // result.
         controllers.values foreach { controller =>
-          val model = controller.getModel // backup
+          val model = controller.getModel
+          val mountPoint = model.getMountPoint
+          reset(model)
+          when(model.getMountPoint) thenReturn mountPoint
           reset(controller)
           when(controller.getModel) thenReturn model
+          doAnswer(new Answer[Unit] {
+            override def answer(invocation: InvocationOnMock) {
+              when(controller.getModel.isMounted) thenReturn false
+            }
+          }) when controller sync any()
         }
         controllers.values filter expectation foreach expectation.stub
 
-        // Register access to the controller as if some file system operation
-        // had been performed.
+        // Simulate and register access to the controller as if some file
+        // system operation had been performed.
+        val controller = controllers(mountPoint)
+        when(controller.getModel.isMounted) thenReturn (null != mountPoint.getParent)
         expectation match {
           case Synced(_*) | Shelved(_*) =>
-            manager postAccess controllers(mountPoint)
+            manager postAccess controller
 
           case Discarded(_*) =>
             intercept[FsSyncException] {
-              manager postAccess controllers(mountPoint)
+              manager postAccess controller
             }
         }
 
         // Verify sync() attempts on managed controllers.
-        forAll(Table(("mountPoint", "controller"), controllers.toSeq: _*)) { (mountPoint, controller) =>
-          if (expectation contains mountPoint)
+        forAll(Table("controller", controllers.values.toSeq: _*)) { controller =>
+          if (expectation(controller))
             verify(controller, atLeastOnce()) sync FsSyncOptions.NONE
           else
             verify(controller, never()) sync any()
@@ -124,6 +136,9 @@ class PaceManagerTest extends WordSpec with OneInstancePerTest {
           verifyNoMoreInteractions(controller)
         }
       }
+
+      manager sync (Filter.ACCEPT_ANY,
+        new FsControllerSyncVisitor(FsSyncOptions.SYNC))
     }
   }
 }
@@ -134,16 +149,16 @@ object PaceManagerTest {
   type ControllerFilter = Filter[_ >: FsController]
   type ControllerVisitor[X <: IOException] = Visitor[_ >: FsController, X]
 
-  implicit def toMountPoint(string: String): FsMountPoint = new FsMountPoint(new URI(string))
+  implicit def parseMountPoint(string: String): FsMountPoint =
+    new FsMountPoint(new URI(string))
 
-  def newModel(mountPoint: FsMountPoint) = {
+  def mockModel(mountPoint: FsMountPoint) = {
     val model = mock[FsModel]
     when(model.getMountPoint) thenReturn mountPoint
-    when(model.isMounted) thenReturn (null != mountPoint.getParent)
     model
   }
 
-  def newController(model: FsModel) = {
+  def mockController(model: FsModel) = {
     val controller = mock[FsController]
     when(controller.getModel) thenReturn model
     controller
@@ -169,9 +184,8 @@ object PaceManagerTest {
   private sealed abstract class Expectation(mountPoints: FsMountPoint*)
   extends (FsController => Boolean) {
     private val set = mountPoints.toSet
-    def contains(mountPoint: FsMountPoint) = set contains mountPoint
     override def apply(controller: FsController) =
-      contains(controller.getModel.getMountPoint)
+      set contains controller.getModel.getMountPoint
     def stub(controller: FsController)
   }
 
@@ -183,16 +197,18 @@ object PaceManagerTest {
   private final case class Shelved(mountPoints: FsMountPoint*)
   extends Expectation(mountPoints: _*) {
     override def stub(controller: FsController) {
-      doThrow(new FsSyncException(controller.getModel.getMountPoint, new FsOpenResourceException(1, 1)))
-      .when(controller) sync any()
+      doThrow(
+        new FsSyncException(controller.getModel.getMountPoint, new FsOpenResourceException(1, 1))
+      ) when controller sync any()
     }
   }
 
   private final case class Discarded(mountPoints: FsMountPoint*)
   extends Expectation(mountPoints: _*) {
     override def stub(controller: FsController) {
-      doThrow(new FsSyncException(controller.getModel.getMountPoint, new Exception))
-      .when(controller) sync any()
+      doThrow(
+        new FsSyncException(controller.getModel.getMountPoint, new Exception)
+      ) when controller sync any()
     }
   }
 }
