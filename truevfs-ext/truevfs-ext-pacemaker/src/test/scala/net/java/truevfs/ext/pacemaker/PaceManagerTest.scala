@@ -28,7 +28,7 @@ import scala.language.implicitConversions
 class PaceManagerTest extends WordSpec with OneInstancePerTest {
 
   "A PaceManager" should {
-    val mediator = mock[PaceMediator]
+    val mediator = new PaceMediator
     val delegate = new TestManager
     val manager = new PaceManager(mediator, delegate)
 
@@ -47,11 +47,11 @@ class PaceManagerTest extends WordSpec with OneInstancePerTest {
       }
     }
 
-    "sync() the least recently accessed and mounted controller which exceeds the maximum mounted file system limit" in {
+    "unmount the least recently accessed archive file systems which exceed the maximum number of mounted archive file systems" in {
       val controllers = {
         implicit def mapping(string: String): (FsMountPoint, FsController) = {
           val mountPoint = parseMountPoint(string)
-          (mountPoint, mockController(mockModel(mountPoint)))
+          (mountPoint, mockController(model(mediator, mountPoint)))
         }
         collection.mutable.LinkedHashMap[FsMountPoint, FsController](
           "p:/",
@@ -99,14 +99,11 @@ class PaceManagerTest extends WordSpec with OneInstancePerTest {
         // result.
         controllers.values foreach { controller =>
           val model = controller.getModel
-          val mountPoint = model.getMountPoint
-          reset(model)
-          when(model.getMountPoint) thenReturn mountPoint
           reset(controller)
           when(controller.getModel) thenReturn model
           doAnswer(new Answer[Unit] {
             override def answer(invocation: InvocationOnMock) {
-              when(controller.getModel.isMounted) thenReturn false
+              controller.getModel setMounted false
             }
           }) when controller sync any()
         }
@@ -115,7 +112,8 @@ class PaceManagerTest extends WordSpec with OneInstancePerTest {
         // Simulate and register access to the controller as if some file
         // system operation had been performed.
         val controller = controllers(mountPoint)
-        when(controller.getModel.isMounted) thenReturn (null != mountPoint.getParent)
+        if (null != mountPoint.getParent)
+          controller.getModel setMounted true
         expectation match {
           case Synced(_*) | Shelved(_*) =>
             manager postAccess controller
@@ -143,7 +141,7 @@ class PaceManagerTest extends WordSpec with OneInstancePerTest {
   }
 }
 
-object PaceManagerTest {
+private object PaceManagerTest {
 
   type ArchiveDriver = FsArchiveDriver[_ <: FsArchiveEntry]
   type ControllerFilter = Filter[_ >: FsController]
@@ -152,10 +150,16 @@ object PaceManagerTest {
   implicit def parseMountPoint(string: String): FsMountPoint =
     new FsMountPoint(new URI(string))
 
-  def mockModel(mountPoint: FsMountPoint) = {
-    val model = mock[FsModel]
-    when(model.getMountPoint) thenReturn mountPoint
-    model
+  def model(mediator: PaceMediator, mountPoint: FsMountPoint) = {
+    val parent =
+      if (null != mountPoint.getParent) {
+        val parent = mock[FsModel]
+        when(parent.getMountPoint) thenReturn mountPoint.getParent
+        parent
+      } else {
+        null
+      }
+    mediator instrument (null, new DefaultModel(mountPoint, parent))
   }
 
   def mockController(model: FsModel) = {
@@ -210,5 +214,14 @@ object PaceManagerTest {
         new FsSyncException(controller.getModel.getMountPoint, new Exception)
       ) when controller sync any()
     }
+  }
+
+  private final class DefaultModel(mountPoint: FsMountPoint, parent: FsModel)
+    extends FsAbstractModel(mountPoint, parent) {
+
+    private var mounted: Boolean = _
+
+    override def isMounted = mounted
+    override def setMounted(mounted: Boolean) { this.mounted = mounted }
   }
 }
