@@ -39,13 +39,17 @@ private final class Cache[K, V](initialMaximumSize: Int) {
     _maximumSize = maximumSize
   }
 
-  def get(key: AnyRef) = readLocked { cached get key }
+  def get(key: AnyRef) =
+    // The lookup needs to be write-locked because the access-ordered cache map
+    // may get modified to record the access to the key!
+    writeLocked { cached get key }
 
   def put(key: K, value: V) = writeLocked { cached put (key, value) }
 
   def remove(key: AnyRef) = writeLocked { cached remove key }
 
-  def exists(filter: Filter[_ >: V]) = readLocked { cached exists filter }
+  def existsValue(filter: Filter[_ >: V]) =
+    readLocked { cached existsValue filter }
 
   private def readLocked[A] = locked[A](readLock) _
 
@@ -81,7 +85,7 @@ private final class Cache[K, V](initialMaximumSize: Int) {
       super.remove(key)
     }
 
-    def exists(filter: Filter[_ >: V]): Boolean = {
+    def existsValue(filter: Filter[_ >: V]): Boolean = {
       val iterator = values.iterator
       while (iterator.hasNext)
         if (filter accept iterator.next)
