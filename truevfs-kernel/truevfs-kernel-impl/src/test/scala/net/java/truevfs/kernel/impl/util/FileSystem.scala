@@ -4,8 +4,8 @@
  */
 package net.java.truevfs.kernel.impl.util
 
-import java.{util => ju}
 import java.util.Comparator
+import java.{util => ju}
 
 import net.java.truevfs.kernel.impl.util.FileSystem._
 
