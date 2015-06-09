@@ -17,7 +17,7 @@ import net.java.truevfs.kernel.spec.*;
  * given the choice to either return the given object as is or to decorate it
  * with a colleague for instrumentation.
  * <p>
- * Implementations should be thread-safe.
+ * Implementations generally need to be thread-safe.
  *
  * @param  <This> the type of this mediator.
  * @author Christian Schlichtherle

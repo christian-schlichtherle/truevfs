@@ -4,14 +4,15 @@
  */
 package net.java.truevfs.comp.jmx;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
-import javax.management.*;
 import net.java.truecommons.jmx.ObjectNameBuilder;
 import net.java.truecommons.jmx.sl.MBeanServerLocator;
 import net.java.truecommons.logging.LocalizedLogger;
 import net.java.truevfs.comp.inst.Mediator;
 import org.slf4j.Logger;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.Immutable;
+import javax.management.*;
 
 /**
  * A mediator for the instrumentation of the TrueVFS Kernel with JMX.
@@ -19,7 +20,7 @@ import org.slf4j.Logger;
  * @param  <This> the type of this mediator.
  * @author Christian Schlichtherle
  */
-@ThreadSafe
+@Immutable
 public abstract class JmxMediator<This extends JmxMediator<This>>
 extends Mediator<This> {
 
