@@ -4,10 +4,11 @@
  */
 package net.java.truevfs.comp.jmx;
 
-import javax.annotation.concurrent.ThreadSafe;
-import javax.management.ObjectName;
 import net.java.truevfs.comp.inst.InstrumentingModel;
 import net.java.truevfs.kernel.spec.FsModel;
+
+import javax.annotation.concurrent.ThreadSafe;
+import javax.management.ObjectName;
 
 /**
  * A controller for a {@linkplain FsModel file system model}.
@@ -40,9 +41,12 @@ extends InstrumentingModel<M> implements JmxComponent {
 
     @Override
     public void setMounted(final boolean mounted) {
-        if (model.isMounted() == mounted) return;
-        model.setMounted(mounted);
-        if (mounted) mediator.register(objectName, newView());
-        else mediator.deregister(objectName);
+        if (model.isMounted() != mounted) {
+            model.setMounted(mounted);
+            if (mounted)
+                mediator.register(objectName, newView());
+            else
+                mediator.deregister(objectName);
+        }
     }
 }
