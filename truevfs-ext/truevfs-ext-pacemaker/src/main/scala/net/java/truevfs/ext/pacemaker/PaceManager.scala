@@ -5,7 +5,7 @@
 package net.java.truevfs.ext.pacemaker
 
 import java.{util => ju}
-import java.util.concurrent._
+import java.util.{concurrent => juc}
 import java.util.concurrent.locks._
 import javax.annotation.concurrent._
 import net.java.truecommons.logging._
@@ -23,7 +23,7 @@ import PaceManager._
 private class PaceManager(mediator: PaceMediator, manager: FsManager)
 extends JmxManager[PaceMediator](mediator, manager) {
 
-  private val evicted = new ConcurrentHashMap[FsMountPoint, FsController]
+  private val evicted = new juc.ConcurrentHashMap[FsMountPoint, FsController]
   private val mounted = new MountedControllerSet(evicted)
 
   def max = mounted.max
@@ -78,7 +78,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
     builder check ()
   }
 
-  override def sync(filter: ControllerFilter, visitor: ControllerSyncVisitor) {
+  override def sync(filter: ControllerFilter, visitor: ControllerVisitor) {
     mounted sync (manager, filter, visitor)
   }
 }
@@ -86,7 +86,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
 private object PaceManager {
 
   private type ControllerFilter = Filter[_ >: FsController]
-  private type ControllerSyncVisitor = Visitor[_ >: FsController, FsSyncException]
+  private type ControllerVisitor = Visitor[_ >: FsController, FsSyncException]
 
   private val logger = new LocalizedLogger(classOf[PaceManager])
 
@@ -119,20 +119,8 @@ private object PaceManager {
       Integer getInteger (maximumFileSystemsMountedPropertyKey,
         maximumFileSystemsMountedMinimumValue))
 
-  private val initialCapacity =
-    HashMaps initialCapacity (maximumFileSystemsMountedDefaultValue + 1)
-
-  private def locked[V](lock: Lock)(operation: => V) = {
-    lock lock ()
-    try { operation }
-    finally { lock unlock () }
-  }
-
-  private def mountPoint(controller: FsController) =
-    controller.getModel.getMountPoint
-
-  private final class MountedControllerMap(evicted: ConcurrentMap[FsMountPoint, FsController])
-    extends ju.LinkedHashMap[FsMountPoint, FsController](initialCapacity, 0.75f, true) {
+  private final class MountedControllerMap(evicted: juc.ConcurrentMap[FsMountPoint, FsController])
+    extends ju.LinkedHashMap[FsMountPoint, FsController](HashMaps initialCapacity maximumFileSystemsMountedDefaultValue, 0.75f, true) {
 
     override def removeEldestEntry(entry: ju.Map.Entry[FsMountPoint, FsController]) =
       if (size > max) {
@@ -166,7 +154,7 @@ private object PaceManager {
   }
 
   private final class MountedControllerSet
-  (evicted: ConcurrentMap[FsMountPoint, FsController])
+  (evicted: juc.ConcurrentMap[FsMountPoint, FsController])
   (implicit lock: ReadWriteLock = new ReentrantReadWriteLock) {
 
     private val map = new MountedControllerMap(evicted)
@@ -176,18 +164,17 @@ private object PaceManager {
     def max = map.max
     def max_=(max: Int) { map.max = max }
 
-    def exists(filter: ControllerFilter) = readLocked { map exists filter }
-
     def add(controller: FsController) {
-      val mp = mountPoint(controller)
-      writeLocked { map put (mp, controller) }
+      val mountPoint = controller.getModel.getMountPoint
+      writeLocked { map put (mountPoint, controller) }
     }
+
+    def exists(filter: ControllerFilter) = readLocked { map exists filter }
 
     def sync(manager: FsManager,
              filter: ControllerFilter,
-             visitor: ControllerSyncVisitor) {
-      manager sync (
-        filter,
+             visitor: ControllerVisitor) {
+      manager sync (filter,
         new Visitor[FsController, FsSyncException] {
           override def visit(controller: FsController) {
             val model = controller.getModel
@@ -196,15 +183,15 @@ private object PaceManager {
               visitor visit controller
             } finally {
               val isMounted = model.isMounted
-              def mp = model.getMountPoint
+              def mountPoint = model.getMountPoint
               if (wasMounted) {
                 if (!isMounted) {
-                  writeLocked { map remove mp }
+                  writeLocked { map remove mountPoint }
                 }
               } else {
                 if (isMounted) {
-                  assert(false)
-                  writeLocked { map put (mp, controller) } // preserve access order and evicted map
+                  writeLocked { map put (mountPoint, controller) }
+                  assert(false, "A file system controller visitor should not cause an archive file system to get mounted.")
                 }
               }
             }
@@ -213,8 +200,17 @@ private object PaceManager {
       )
     }
 
-    def readLocked[V] = locked[V](readLock) _
+    private def readLocked[V] = locked[V](readLock) _
 
-    def writeLocked[V] = locked[V](writeLock) _
+    private def writeLocked[V] = locked[V](writeLock) _
+
+    private def locked[V](lock: Lock)(block: => V) = {
+      lock lock ()
+      try {
+        block
+      } finally {
+        lock unlock ()
+      }
+    }
   }
 }
