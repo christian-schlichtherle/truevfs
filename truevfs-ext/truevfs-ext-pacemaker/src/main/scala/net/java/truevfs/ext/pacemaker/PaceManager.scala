@@ -164,7 +164,7 @@ private object PaceManager {
               } else {
                 if (isMounted) {
                   writeLocked { map put (mountPoint, controller) }
-                  assert(false, "A file system controller visitor should not cause an archive file system to get mounted.")
+                  assert(assertion = false, "A file system controller visitor should not cause an archive file system to get mounted.")
                 }
               }
             }
