@@ -4,48 +4,33 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.net.URI;
 import net.java.truecommons.shed.Filter;
-import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
+
+import java.util.Objects;
 
 /**
- * Filters {@linkplain FsController file system controllers} so that the
- * {@linkplain FsMountPoint#toHierarchicalUri() hierarchical URI}
- * of the {@linkplain FsModel#getMountPoint() mount point} of their
- * {@linkplain FsController#getModel() file system model} must match the given
- * prefix.
+ * A filter which accepts a given
+ * {@linkplain FsController file system controller} if its
+ * {@linkplain FsModel file system model} is accepted by the configured
+ * file system model {@linkplain Filter filter}.
  *
  * @see    FsManager#sync
  * @author Christian Schlichtherle
  */
 public final class FsControllerFilter implements Filter<FsController> {
 
-    private final String scheme, path;
-    private final int pathLength;
-    private final boolean pathEndsWithSeparator;
+    private final Filter<? super FsModel> filter;
 
-    /**
-     * Constructs a new file system controller filter.
-     *
-     * @param prefix the prefix of the mount point used to filter file system
-     *        controllers.
-     */
-    public FsControllerFilter(final FsMountPoint prefix) {
-        final URI p = prefix.toHierarchicalUri();
-        this.scheme = p.getScheme();
-        this.path = p.getPath();
-        this.pathLength = path.length();
-        this.pathEndsWithSeparator = SEPARATOR_CHAR == path.charAt(pathLength - 1);
+    public FsControllerFilter(FsMountPoint prefix) {
+        this(new FsModelFilter(prefix));
+    }
+
+    public FsControllerFilter(final Filter<? super FsModel> filter) {
+        this.filter = Objects.requireNonNull(filter);
     }
 
     @Override
-    public boolean accept(final FsController controller) {
-        final URI mp = controller.getModel().getMountPoint().toHierarchicalUri();
-        final String path;
-        return mp.getScheme().equals(scheme)
-                && (path = mp.getPath()).startsWith(this.path)
-                && (pathEndsWithSeparator
-                    || path.length() == pathLength
-                    || SEPARATOR_CHAR == path.charAt(pathLength));
+    public boolean accept(FsController controller) {
+        return filter.accept(controller.getModel());
     }
 }
