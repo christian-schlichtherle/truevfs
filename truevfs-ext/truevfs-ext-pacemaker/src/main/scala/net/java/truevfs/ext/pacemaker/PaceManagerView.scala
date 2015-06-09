@@ -10,10 +10,10 @@ import javax.management.MBeanInfo
 import net.java.truevfs.comp.jmx.JmxManagerView
 
 /** A view for a [[PaceManager]].
+  * This class is thread-safe.
   *
   * @author Christian Schlichtherle
   */
-@ThreadSafe
 private final class PaceManagerView(manager: PaceManager)
 extends JmxManagerView[PaceManager](classOf[PaceManagerMXBean], manager)
 with PaceManagerMXBean {
