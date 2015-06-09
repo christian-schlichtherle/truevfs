@@ -4,22 +4,21 @@
  */
 package net.java.truevfs.ext.pacemaker
 
-import java.{util => ju}
-import java.util.{concurrent => juc}
 import java.util.concurrent.locks._
-import javax.annotation.concurrent._
+import java.util.{concurrent => juc}
+import java.{util => ju}
+
 import net.java.truecommons.logging._
 import net.java.truecommons.shed._
 import net.java.truevfs.comp.jmx._
+import net.java.truevfs.ext.pacemaker.PaceManager._
 import net.java.truevfs.kernel.spec._
-import scala.math._
-import PaceManager._
 
 /** The pace manager.
+  * This class is thread-safe.
   *
   * @author Christian Schlichtherle
   */
-@ThreadSafe
 private class PaceManager(mediator: PaceMediator, manager: FsManager)
 extends JmxManager[PaceMediator](mediator, manager) {
 
@@ -85,41 +84,9 @@ extends JmxManager[PaceMediator](mediator, manager) {
 
 private object PaceManager {
 
-  private type ControllerFilter = Filter[_ >: FsController]
-  private type ControllerVisitor = Visitor[_ >: FsController, FsSyncException]
+  val logger = new LocalizedLogger(classOf[PaceManager])
 
-  private val logger = new LocalizedLogger(classOf[PaceManager])
-
-  /**
-   * The key string for the system property which defines the value of the
-   * constant `MAXIMUM_FILE_SYSTEMS_MOUNTED_DEFAULT_VALUE`,
-   * which is equivalent to the expression
-   * `PaceManager.class.getPackage().getName() + ".maximumFileSystemsMounted"`.
-   */
-  private val maximumFileSystemsMountedPropertyKey =
-    classOf[PaceManager].getPackage.getName + ".maximumFileSystemsMounted"
-
-  /** The minimum value for the maximum number of mounted file systems. */
-  private val maximumFileSystemsMountedMinimumValue = 2
-
-  /**
-   * The default value for the maximum number of mounted file systems.
-   * The value of this constant will be set to
-   * `maximumFileSystemsMountedMinimumValue` unless a system
-   * property with the key string
-   * `maximumFileSystemsMountedPropertyKey`
-   * is set to a value which is greater than
-   * `maximumFileSystemsMountedMinimumValue`.
-   *
-   * Mind you that this constant is initialized when this interface is loaded
-   * and cannot accurately reflect the value in a remote JVM instance.
-   */
-  private val maximumFileSystemsMountedDefaultValue =
-    max(maximumFileSystemsMountedMinimumValue,
-      Integer getInteger (maximumFileSystemsMountedPropertyKey,
-        maximumFileSystemsMountedMinimumValue))
-
-  private final class MountedControllerMap(evicted: juc.ConcurrentMap[FsMountPoint, FsController])
+  final class MountedControllerMap(evicted: juc.ConcurrentMap[FsMountPoint, FsController])
     extends ju.LinkedHashMap[FsMountPoint, FsController](HashMaps initialCapacity maximumFileSystemsMountedDefaultValue, 0.75f, true) {
 
     override def removeEldestEntry(entry: ju.Map.Entry[FsMountPoint, FsController]) =
@@ -153,7 +120,7 @@ private object PaceManager {
     }
   }
 
-  private final class MountedControllerSet
+  final class MountedControllerSet
   (evicted: juc.ConcurrentMap[FsMountPoint, FsController])
   (implicit lock: ReadWriteLock = new ReentrantReadWriteLock) {
 

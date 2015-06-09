@@ -6,8 +6,7 @@ package net.java.truevfs.ext.pacemaker
 
 import net.java.truevfs.comp.jmx.JmxManagerMXBean
 
-/**
-  * The MXBean interface for a [[PaceManager]].
+/** The MXBean interface for a [[PaceManager]].
   *
   * @author Christian Schlichtherle
   */

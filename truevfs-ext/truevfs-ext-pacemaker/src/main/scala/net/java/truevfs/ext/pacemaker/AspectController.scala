@@ -5,20 +5,19 @@
 package net.java.truevfs.ext.pacemaker
 
 import javax.annotation._
-import javax.annotation.concurrent._
+
+import net.java.truecommons.cio.Entry._
+import net.java.truecommons.cio._
 import net.java.truecommons.shed._
 import net.java.truevfs.kernel.spec._
-import net.java.truecommons.cio._
-import net.java.truecommons.cio.Entry._
 
 /** Calls a template method to apply an aspect to every file system operation.
   *
   * @see    #apply
   * @author Christian Schlichtherle
   */
-@ThreadSafe
 private abstract class AspectController(controller: FsController)
-extends FsDecoratingController(controller) {
+extends FsDecoratingController(controller) with Immutable {
 
   /**
     * Applies the aspect to the given file system operation.
@@ -27,8 +26,6 @@ extends FsDecoratingController(controller) {
     * @return The return value of the file system operation.
     */
   protected def apply[V](operation: () => V): V
-
-  private type AccessOptions = BitField[FsAccessOption]
 
   override def node(options: AccessOptions, name: FsNodeName) =
     apply(() => controller node (options, name))
