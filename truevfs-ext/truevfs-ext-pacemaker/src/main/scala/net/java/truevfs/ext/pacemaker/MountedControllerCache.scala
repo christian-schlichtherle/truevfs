@@ -1,11 +1,11 @@
 package net.java.truevfs.ext.pacemaker
 
-import java.{util => ju}
+import java.util.concurrent.locks.{Lock, ReadWriteLock, ReentrantReadWriteLock}
 import java.util.{concurrent => juc}
-import java.util.concurrent.locks.{Lock, ReentrantReadWriteLock, ReadWriteLock}
+import java.{util => ju}
 
 import net.java.truecommons.shed.{HashMaps, Visitor}
-import net.java.truevfs.kernel.spec.{FsSyncException, FsManager, FsController, FsMountPoint}
+import net.java.truevfs.kernel.spec.{FsController, FsManager, FsMountPoint, FsSyncException}
 
 /** A set of mounted file system controllers.
   *
