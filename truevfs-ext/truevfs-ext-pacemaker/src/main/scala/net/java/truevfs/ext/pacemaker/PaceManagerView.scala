@@ -27,6 +27,6 @@ with PaceManagerMXBean {
     }
   }
 
-  override def getMaximumFileSystemsMounted = manager.max
-  override def setMaximumFileSystemsMounted(max: Int) { manager.max = max }
+  override def getMaximumFileSystemsMounted = manager.maximumSize
+  override def setMaximumFileSystemsMounted(maximumSize: Int) { manager.maximumSize = maximumSize }
 }
