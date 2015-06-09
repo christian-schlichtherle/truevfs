@@ -9,11 +9,10 @@ import javax.management.MBeanAttributeInfo
 import javax.management.MBeanInfo
 import net.java.truevfs.comp.jmx.JmxManagerView
 
-/**
- * A view for a [[PaceManager]].
- *
- * @author Christian Schlichtherle
- */
+/** A view for a [[PaceManager]].
+  *
+  * @author Christian Schlichtherle
+  */
 @ThreadSafe
 private final class PaceManagerView(manager: PaceManager)
 extends JmxManagerView[PaceManager](classOf[PaceManagerMXBean], manager)
