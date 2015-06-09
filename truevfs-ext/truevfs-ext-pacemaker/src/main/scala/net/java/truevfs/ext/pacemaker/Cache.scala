@@ -6,7 +6,10 @@ import java.{util => ju}
 
 import net.java.truecommons.shed.{Filter, HashMaps}
 
-/** A simple cache implementation.
+/** A simple, generic cache.
+  * Note that unlike other caches, whenever a map entry gets evicted, it gets
+  * added to a concurrent map which can get queried using the [[evictedKeySet]]
+  * and [[evictedValues]] methods for further cleanup.
   * This class is thread-safe.
   *
   * @tparam K the type of the keys
