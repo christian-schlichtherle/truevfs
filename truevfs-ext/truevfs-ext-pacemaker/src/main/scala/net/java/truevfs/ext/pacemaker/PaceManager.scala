@@ -28,53 +28,59 @@ extends JmxManager[PaceMediator](mediator, manager) {
   def max = mounted.max
   def max_=(max: Int) { mounted.max = max }
 
-  protected override def newView = new PaceManagerView(this)
+  override def newView = new PaceManagerView(this)
 
   /**
    * Registers access to the given controller and eventually sync()s some
    * recently accessed archive files which exceed the maximum number of mounted
    * archive files unless they are the parent of some mounted archive files.
    *
-   * @param accessedController the accessed file system controller.
+   * @param controller the accessed file system controller.
    */
-  private[pacemaker] def postAccess(accessedController: FsController) {
-    if (accessedController.getModel.isMounted)
-      mounted add accessedController
-    val i = evicted.keySet.iterator
-    if (!i.hasNext)
-      return
-    val builder = new FsSyncExceptionBuilder
-    do {
-      val evictedMountPoint = i.next
-      val evictedControllerFilter = new FsControllerFilter(evictedMountPoint)
-      if (!(mounted exists evictedControllerFilter)) { // is not mounted, including child file systems?
-        try {
-          manager sync (evictedControllerFilter, new FsControllerSyncVisitor(FsSyncOptions.NONE))
-          i remove ()
-        } catch {
-          case e: FsSyncException =>
-            e.getCause match {
-              case _: FsOpenResourceException =>
-                // Do NOT remove evicted controller - the sync shall get
-                // retried at the next call to this method!
-                //it remove ()
+  def postAccess(controller: FsController) {
+    if (controller.getModel.isMounted)
+      mounted add controller
+    unmountEvictedArchiveFileSystems()
+  }
 
-                // This is pretty much a normal situation, so just log the
-                // exception at the TRACE level.
-                logger trace ("ignoring", e)
-              case _ =>
-                // Prevent retrying this operation - it would most likely yield
-                // the same result.
-                i remove ()
+  private def unmountEvictedArchiveFileSystems() {
+    val iterator = evicted.keySet.iterator
+    if (iterator.hasNext) {
+      val builder = new FsSyncExceptionBuilder
+      do {
+        val evictedMountPoint = iterator next ()
+        val evictedControllerFilter = new FsControllerFilter(evictedMountPoint)
+        // Check that neither the evicted file system nor any of its child file
+        // systems are currently mounted.
+        if (!(mounted exists evictedControllerFilter)) {
+          try {
+            manager sync (evictedControllerFilter, new FsControllerSyncVisitor(FsSyncOptions.NONE))
+            iterator remove ()
+          } catch {
+            case e: FsSyncException =>
+              e.getCause match {
+                case _: FsOpenResourceException =>
+                  // Do NOT remove evicted controller - the sync shall get
+                  // retried at the next call to this method!
+                  //it remove ()
 
-                // Mark the exception for subsequent rethrowing at the end of
-                // this method.
-                builder warn e
-            }
+                  // This is pretty much a normal situation, so just log the
+                  // exception at the TRACE level.
+                  logger trace ("ignoring", e)
+                case _ =>
+                  // Prevent retrying this operation - it would most likely yield
+                  // the same result.
+                  iterator remove ()
+
+                  // Mark the exception for subsequent rethrowing at the end of
+                  // this method.
+                  builder warn e
+              }
+          }
         }
-      }
-    } while (i.hasNext)
-    builder check ()
+      } while (iterator.hasNext)
+      builder check ()
+    }
   }
 
   override def sync(filter: ControllerFilter, visitor: ControllerVisitor) {
