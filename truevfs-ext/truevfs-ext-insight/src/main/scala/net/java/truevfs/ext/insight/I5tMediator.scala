@@ -6,21 +6,20 @@ package net.java.truevfs.ext.insight
 
 import java.io._
 import java.nio.channels._
-import javax.annotation.concurrent._
+
+import net.java.truecommons.cio._
 import net.java.truevfs.comp.inst._
 import net.java.truevfs.comp.jmx._
 import net.java.truevfs.ext.insight.stats._
 import net.java.truevfs.kernel.spec._
-import net.java.truecommons.cio._
 
 /**
  * A mediator for the instrumentation of the TrueVFS Kernel with JMX.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 private abstract class I5tMediator(val subject: String)
-extends JmxMediator[I5tMediator] {
+extends JmxMediator[I5tMediator] with Immutable {
 
   assert(null ne subject)
 

@@ -4,13 +4,11 @@
  */
 package net.java.truevfs.ext.insight
 
-import javax.annotation.concurrent._
 import net.java.truevfs.comp.jmx._
 
 /**
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 private class I5tSyncMediator(subject: String) extends I5tMediator(subject) {
 
   override def newStats(offset: Int) = new I5tSyncStatistics(this, offset)

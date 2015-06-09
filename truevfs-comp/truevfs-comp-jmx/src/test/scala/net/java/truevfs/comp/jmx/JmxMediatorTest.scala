@@ -6,7 +6,7 @@ package net.java.truevfs.comp.jmx
 
 import javax.management._
 
-import net.java.truevfs.comp.jmx.JmxMediatorSpec._
+import net.java.truevfs.comp.jmx.JmxMediatorTest._
 import org.junit.runner._
 import org.scalatest.Matchers._
 import org.scalatest._
@@ -14,7 +14,7 @@ import org.scalatest.junit.JUnitRunner
 
 /** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])
-class JmxMediatorSpec extends WordSpec with OneInstancePerTest {
+class JmxMediatorTest extends WordSpec with OneInstancePerTest {
 
   "A JmxMediator" should {
     val mediator = new TestMediator
@@ -42,11 +42,11 @@ class JmxMediatorSpec extends WordSpec with OneInstancePerTest {
   }
 }
 
-private object JmxMediatorSpec {
+private object JmxMediatorTest {
 
   private[this] val mbs = MBeanServerFactory.newMBeanServer
 
-  private class TestMediator extends JmxMediator[TestMediator] {
+  private class TestMediator extends JmxMediator[TestMediator] with Immutable {
     override def getMBeanServer = mbs
   }
 
