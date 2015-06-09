@@ -4,15 +4,13 @@
  */
 package net.java.truevfs.ext.pacemaker
 
-import java.util.{concurrent => juc}
-import java.{util => ju}
-
 import net.java.truecommons.logging._
+import net.java.truecommons.shed.Visitor
 import net.java.truevfs.comp.jmx._
 import net.java.truevfs.ext.pacemaker.PaceManager._
 import net.java.truevfs.kernel.spec._
 
-/** The pace manager.
+/** A pace manager.
   * This class is thread-safe.
   *
   * @author Christian Schlichtherle
@@ -20,11 +18,12 @@ import net.java.truevfs.kernel.spec._
 private class PaceManager(mediator: PaceMediator, manager: FsManager)
 extends JmxManager[PaceMediator](mediator, manager) {
 
-  private val cache = new MountedControllerCache(maximumFileSystemsMountedDefaultValue)
+  private val cache = new Cache[FsMountPoint, FsController](maximumFileSystemsMountedDefaultValue)
 
-  private val evictedMountPoints = cache.evictedMountPoints
+  private val evictedMountPoints = cache.evictedKeySet
 
   def maximumSize = cache.maximumSize
+
   def maximumSize_=(maximumSize: Int) {
     require(maximumSize >= maximumFileSystemsMountedMinimumValue)
     cache.maximumSize = maximumSize
@@ -40,8 +39,9 @@ extends JmxManager[PaceMediator](mediator, manager) {
    * @param controller the accessed file system controller.
    */
   def postAccess(controller: FsController) {
-    if (controller.getModel.isMounted)
-      cache add controller
+    val model = controller.getModel
+    if (model.isMounted)
+      cache put (model.getMountPoint, controller)
     unmountEvictedArchiveFileSystems()
   }
 
@@ -86,7 +86,29 @@ extends JmxManager[PaceMediator](mediator, manager) {
   }
 
   override def sync(filter: ControllerFilter, visitor: ControllerVisitor) {
-    cache sync (manager, filter, visitor)
+    manager sync (filter,
+      new Visitor[FsController, FsSyncException] {
+        override def visit(controller: FsController) {
+          val model = controller.getModel
+          val wasMounted = model.isMounted
+          try {
+            visitor visit controller
+          } finally {
+            val isMounted = model.isMounted
+            def mountPoint = model.getMountPoint
+            if (wasMounted) {
+              if (!isMounted)
+                cache remove mountPoint
+            } else {
+              if (isMounted) {
+                cache put (mountPoint, controller)
+                assert(assertion = false, "A file system controller visitor should not cause an archive file system to get mounted.")
+              }
+            }
+          }
+        }
+      }
+    )
   }
 }
 
