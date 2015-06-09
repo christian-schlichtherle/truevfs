@@ -32,13 +32,15 @@ extends JmxMediator[I5tMediator] with Immutable {
   final def activateStats(origin: JmxComponent) { activateStats(0) }
 
   final def activateAllStats(origin: JmxComponent) {
-    for (mediator <- mediators) mediator activateStats origin
+    for (mediator <- mediators)
+      mediator activateStats origin
   }
 
   def rotateStats(origin: JmxComponent) { activateStats(logger rotate ()) }
 
   final def rotateAllStats(origin: JmxComponent) {
-    for (mediator <- mediators) mediator rotateStats origin
+    for (mediator <- mediators)
+      mediator rotateStats origin
   }
 
   final def logRead(nanos: Long, bytes: Int) { logger logRead (nanos, bytes) }
@@ -48,7 +50,7 @@ extends JmxMediator[I5tMediator] with Immutable {
 
   final def formatOffset(offset: Int) = { logger format offset }
 
-  final override def toString = "%s[subject=%s]".format(getClass.getName, subject)
+  final override def toString = "%s[subject=%s]" format (getClass.getName, subject)
 
   final override def instrument(subject: FsManager) =
     activate(new I5tManager(syncOperationsMediator, subject))
@@ -57,31 +59,31 @@ extends JmxMediator[I5tMediator] with Immutable {
     new InstrumentingBufferPool[I5tMediator](bufferIoMediator, subject)
 
   final override def instrument(context: InstrumentingManager[I5tMediator], subject: FsCompositeDriver) =
-    new InstrumentingCompositeDriver[I5tMediator](this, subject)
+    new InstrumentingCompositeDriver(this, subject)
 
   final override def instrument(context: InstrumentingManager[I5tMediator], subject: FsController) =
     new InstrumentingController[I5tMediator](applicationIoMediator, subject)
 
   final override def instrument(context: InstrumentingBufferPool[I5tMediator], subject: IoBuffer) =
-    activate(new JmxBuffer[I5tMediator](this, subject))
+    activate(new JmxBuffer(this, subject))
 
   final override def instrument(context: InstrumentingCompositeDriver[I5tMediator], subject: FsModel) =
-    activate(new JmxModel[I5tMediator](this, subject))
+    activate(new JmxModel(this, subject))
 
   final override def instrument(context: InstrumentingCompositeDriver[I5tMediator], subject: FsController) =
     new InstrumentingController[I5tMediator](kernelIoMediator, subject)
 
   final override def instrument[E <: Entry](context: InstrumentingController[I5tMediator], subject: InputSocket[E]) =
-    new InstrumentingInputSocket[I5tMediator, E](this, subject)
+    new InstrumentingInputSocket(this, subject)
 
   final override def instrument[E <: Entry](context: InstrumentingController[I5tMediator], subject: OutputSocket[E]) =
-    new InstrumentingOutputSocket[I5tMediator, E](this, subject)
+    new InstrumentingOutputSocket(this, subject)
 
   final override def instrument[B <: IoBuffer](context: InstrumentingBuffer[I5tMediator], subject: InputSocket[B]) =
-    new InstrumentingInputSocket[I5tMediator, B](this, subject)
+    new InstrumentingInputSocket(this, subject)
 
   final override def instrument[B <: IoBuffer](context: InstrumentingBuffer[I5tMediator], subject: OutputSocket[B]) =
-    new InstrumentingOutputSocket[I5tMediator, B](this, subject)
+    new InstrumentingOutputSocket(this, subject)
 
   final override def instrument[E <: Entry](context: InstrumentingInputSocket[I5tMediator, E], subject: InputStream) =
     activate(new I5tInputStream(this, subject))
