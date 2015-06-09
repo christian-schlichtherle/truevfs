@@ -30,7 +30,6 @@ private final class MountedControllerCache(initialMaximumSize: Int) {
 
   def maximumSize = _maximumSize
   def maximumSize_=(maximumSize: Int) {
-    println("Setting maximum size to " + maximumSize)
     require(0 <= maximumSize)
     _maximumSize = maximumSize
   }
@@ -86,8 +85,6 @@ private final class MountedControllerCache(initialMaximumSize: Int) {
 
   private final class MountedControllerMap
     extends ju.LinkedHashMap[FsMountPoint, FsController](HashMaps initialCapacity initialMaximumSize, 0.75f, true) {
-
-    println("Constructing mounted controller map.")
 
     override def removeEldestEntry(entry: ju.Map.Entry[FsMountPoint, FsController]) =
       if (size > maximumSize) {
