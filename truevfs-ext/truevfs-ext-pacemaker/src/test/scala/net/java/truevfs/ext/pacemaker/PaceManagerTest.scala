@@ -111,16 +111,18 @@ class PaceManagerTest extends WordSpec with OneInstancePerTest {
 
         // Simulate and register access to the controller as if some file
         // system operation had been performed.
-        val controller = controllers(mountPoint)
-        if (null != mountPoint.getParent)
-          controller.getModel setMounted true
+        {
+          val controller = controllers(mountPoint)
+          if (null != mountPoint.getParent)
+            controller.getModel setMounted true
+        }
         expectation match {
           case Synced(_*) | Shelved(_*) =>
-            manager postAccess controller
+            manager recordAccess mountPoint
 
           case Discarded(_*) =>
             intercept[FsSyncException] {
-              manager postAccess controller
+              manager recordAccess mountPoint
             }
         }
 

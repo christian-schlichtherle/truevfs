@@ -22,7 +22,7 @@ extends AspectController(controller) {
     onTry {
       operation()
     } onFinally {
-      manager postAccess controller
+      manager recordAccess getMountPoint
     }
 
   override def sync(options: BitField[FsSyncOption]) { controller sync options } // skip apply!
