@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.java.truevfs</groupId>
         <artifactId>truevfs-profile</artifactId>
-        <version>0.10.10-SNAPSHOT</version>
+        <version>0.11.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>truevfs-profile-base</artifactId>
