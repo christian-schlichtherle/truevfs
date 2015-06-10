@@ -78,10 +78,10 @@ extends FsModel.Factory<FsDriver>,
      * @param filter the filter for the managed file system controllers.
      *        Calling this object must not have any observable side effect!
      * @param visitor the visitor for the filtered file system controllers.
-     * @throws IOException at the discretion of the visitor.
+     * @throws Exception at the discretion of the visitor.
      *         This will abort the visiting.
      */
-    <X extends IOException> void accept(
+    <X extends Exception> void accept(
             Filter<? super FsController> filter,
             Visitor<? super FsController, X> visitor)
     throws X;

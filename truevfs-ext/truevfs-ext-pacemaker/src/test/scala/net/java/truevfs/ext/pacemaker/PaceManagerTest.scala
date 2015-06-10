@@ -147,7 +147,7 @@ private object PaceManagerTest {
 
   type ArchiveDriver = FsArchiveDriver[_ <: FsArchiveEntry]
   type ControllerFilter = Filter[_ >: FsController]
-  type ControllerVisitor[X <: IOException] = Visitor[_ >: FsController, X]
+  type ControllerVisitor[X <: Exception] = Visitor[_ >: FsController, X]
 
   implicit def parseMountPoint(string: String): FsMountPoint =
     new FsMountPoint(new URI(string))
@@ -181,7 +181,7 @@ private object PaceManagerTest {
     override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint) =
       throw new UnsupportedOperationException
 
-    override def accept[X <: IOException](
+    override def accept[X <: Exception](
       filter: ControllerFilter,
       visitor: ControllerVisitor[X]
     ) { controllers filter filter.accept foreach visitor.visit }
