@@ -4,11 +4,12 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.io.Closeable;
-import java.io.IOException;
 import net.java.truecommons.shed.Filter;
 import net.java.truecommons.shed.ImplementationsShouldExtend;
 import net.java.truecommons.shed.Visitor;
+
+import java.io.Closeable;
+import java.io.IOException;
 
 /**
  * A container which creates {@linkplain FsController} file system controllers
@@ -29,7 +30,7 @@ extends FsModel.Factory<FsDriver>,
      * Returns the thread-safe file system controller for the given mount point.
      * The life cycle of the returned file system controller gets managed by
      * this manager, i.e. it gets remembered for future lookup and
-     * {@link #sync synchronization}.
+     * {@link FsController#sync synchronization}.
      *
      * @param  driver the composite file system driver which shall get used to
      *         create a new file system controller if required.
@@ -52,12 +53,10 @@ extends FsModel.Factory<FsDriver>,
      * that all controllers get synced, even if one or more controllers fail
      * with an {@link FsSyncException}.
      *
-     * @param  filter the filter for the managed file system controllers.
-     *         If set to {@link Filter#ACCEPT_ANY}, then the implementation may
-     *         perform additional cleanup operations, e.g. remove a shutdown
-     *         hook.
-     * @param  visitor the visitor for syncing the filtered file system
-     *         controllers.
+     * @param filter the filter for the managed file system controllers.
+     *        Calling this object must not have any observable side effect!
+     * @param visitor the visitor for syncing the filtered file system
+     *        controllers.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
      *         apply.
      *         This implies that the respective file system controller has been
@@ -76,8 +75,9 @@ extends FsModel.Factory<FsDriver>,
      * get accepted by the given {@code filter}.
      * This is the engine for calls to {@link #sync}.
      *
-     * @param  filter the filter for the managed file system controllers.
-     * @param  visitor the visitor for the filtered file system controllers.
+     * @param filter the filter for the managed file system controllers.
+     *        Calling this object must not have any observable side effect!
+     * @param visitor the visitor for the filtered file system controllers.
      * @throws IOException at the discretion of the visitor.
      *         This will abort the visiting.
      */
