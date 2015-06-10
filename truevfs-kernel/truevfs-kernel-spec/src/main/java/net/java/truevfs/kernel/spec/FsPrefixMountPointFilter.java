@@ -11,32 +11,31 @@ import java.net.URI;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 
 /**
- * A filter which accepts a given
- * {@linkplain FsMountPoint file system mount points} if its
+ * A filter which accepts a given file system
+ * {@linkplain FsMountPoint mount point} if its
  * {@linkplain FsMountPoint#toHierarchicalUri() hierarchical URI} matches
- * the configured prefix file system mount point.
+ * the configured prefix mount point.
  *
  * @author Christian Schlichtherle
  */
-public final class FsMountPointFilter implements Filter<FsMountPoint> {
+public final class FsPrefixMountPointFilter implements Filter<FsMountPoint> {
 
     private final String prefixScheme, prefixPath;
     private final int prefixPathLength;
     private final boolean prefixPathEndsWithSeparator;
 
-    /**
-     * Constructs a new file system mount point filter.
-     *
-     * @param prefix the prefix file system mount point used to filter the given
-     *               file system mount points.
-     */
-    public FsMountPointFilter(final FsMountPoint prefix) {
+    private FsPrefixMountPointFilter(final FsMountPoint prefix) {
         final URI prefixUri = prefix.toHierarchicalUri();
         this.prefixScheme = prefixUri.getScheme();
         this.prefixPath = prefixUri.getPath();
         this.prefixPathLength = prefixPath.length();
         this.prefixPathEndsWithSeparator =
                 prefixPath.charAt(prefixPathLength - 1) == SEPARATOR_CHAR;
+    }
+
+    /** Returns a prefix mount point filter for the given prefix mount point. */
+    public static FsPrefixMountPointFilter forPrefix(FsMountPoint prefix) {
+        return new FsPrefixMountPointFilter(prefix);
     }
 
     @Override

@@ -16,13 +16,12 @@ import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.StandardMBean;
 import net.java.truecommons.cio.Entry;
-import net.java.truecommons.cio.Entry.Access;
+
 import static net.java.truecommons.cio.Entry.Access.*;
-import net.java.truecommons.cio.Entry.Entity;
+
 import net.java.truecommons.cio.Entry.Size;
 import static net.java.truecommons.cio.Entry.Size.DATA;
 import static net.java.truecommons.cio.Entry.Size.STORAGE;
-import net.java.truecommons.cio.Entry.Type;
 import static net.java.truecommons.cio.Entry.UNKNOWN;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
@@ -217,7 +216,7 @@ extends StandardMBean implements JmxModelMXBean {
     @Override
     public void sync() throws FsSyncWarningException, FsSyncException {
         FsManagerLocator.SINGLETON.get().sync(
-                new FsControllerFilter(model.getMountPoint()),
+                FsControllerFilter.forPrefix(model.getMountPoint()),
                 new FsControllerSyncVisitor(FsSyncOptions.NONE));
     }
 }

@@ -264,7 +264,7 @@ public final class TVFS {
     @ExpertFeature(THE_PRESENCE_OR_ABSENCE_OF_SOME_OPTIONS_MAY_YIELD_UNWANTED_SIDE_EFFECTS)
     public static void sync(FsMountPoint tree, BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        sync(new FsControllerFilter(tree), options);
+        sync(FsControllerFilter.forPrefix(tree), options);
     }
 
     private static void sync(

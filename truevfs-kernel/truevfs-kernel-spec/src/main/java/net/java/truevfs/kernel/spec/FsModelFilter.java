@@ -9,8 +9,8 @@ import net.java.truecommons.shed.Filter;
 import java.util.Objects;
 
 /**
- * A filter which accepts a given {@linkplain FsModel file system model} if its
- * {@linkplain FsMountPoint file system mount point} is accepted by the
+ * A filter which accepts a given file system {@linkplain FsModel model} if its
+ * file system {@linkplain FsMountPoint mount point} is accepted by the
  * configured file system mount point {@linkplain Filter filter}.
  *
  * @author Christian Schlichtherle
@@ -19,12 +19,13 @@ public final class FsModelFilter implements Filter<FsModel> {
 
     private final Filter<? super FsMountPoint> filter;
 
-    public FsModelFilter(FsMountPoint prefix) {
-        this(new FsMountPointFilter(prefix));
-    }
-
     public FsModelFilter(final Filter<? super FsMountPoint> filter) {
         this.filter = Objects.requireNonNull(filter);
+    }
+
+    /** Returns a model filter for the given prefix mount point. */
+    public static FsModelFilter forPrefix(FsMountPoint prefix) {
+        return new FsModelFilter(FsPrefixMountPointFilter.forPrefix(prefix));
     }
 
     @Override

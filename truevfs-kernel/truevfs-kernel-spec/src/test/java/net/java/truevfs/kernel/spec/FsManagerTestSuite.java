@@ -179,7 +179,7 @@ public abstract class FsManagerTestSuite {
                 }
             }
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[0][0]));
-            assertThat(count(new FsControllerFilter(mountPoint), new FilterVisitor()), is(params[2].length));
+            assertThat(count(FsControllerFilter.forPrefix(mountPoint), new FilterVisitor()), is(params[2].length));
 
             assertTrue(output.isEmpty());
         }
