@@ -24,7 +24,7 @@ private final class PaceModel(mediator: PaceMediator, model: FsModel)
         cachedMountPoints remove getMountPoint
     } else {
       if (isMounted)
-        cachedMountPoints put (getMountPoint, model)
+        cachedMountPoints add getMountPoint
     }
   }
 }

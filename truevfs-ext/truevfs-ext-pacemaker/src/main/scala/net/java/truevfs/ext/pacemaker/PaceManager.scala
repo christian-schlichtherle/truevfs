@@ -26,21 +26,16 @@ extends JmxManager[PaceMediator](mediator, manager) {
   override def newView = new PaceManagerView(this)
 
   /**
-   * Registers access to the given controller and eventually sync()s some
-   * recently accessed archive files which exceed the maximum number of mounted
-   * archive files unless they are the parent of some mounted archive files.
+   * Records access to a file system after the fact and tries to unmount the
+   * least-recently accessed file systems which exceed the maximum number
+   * of mounted file systems.
+   * A file system is never unmounted if there any open streams or channels
+   * associated with it or if any of its child file systems is mounted.
    *
-   * @param controller the accessed file system controller.
+   * @param mountPoint the mount point of the accessed file system.
    */
-  def postAccess(controller: FsController) {
-    // Depending on a number of preconditions, the mount point of the file
-    // system may have already been added to the cache by our pace model in
-    // the file system model decorator chain.
-    // In this case, looking up the mount point in the cache is enough to update
-    // its state with the access order of mount points.
-    // Otherwise, the lookup will simply return `null` and the state of the
-    // cache will be unchanged.
-    cachedMountPoints get controller.getModel.getMountPoint
+  def recordAccess(mountPoint: FsMountPoint) {
+    cachedMountPoints recordAccess mountPoint
     unmountEvictedArchiveFileSystems()
   }
 
@@ -52,8 +47,8 @@ extends JmxManager[PaceMediator](mediator, manager) {
         val evictedMountPoint = iterator next ()
         val evictedMountPointFilter = FsPrefixMountPointFilter forPrefix evictedMountPoint
         // Check that neither the evicted file system nor any of its child file
-        // systems are currently mounted.
-        if (!(cachedMountPoints existsKey evictedMountPointFilter.accept)) {
+        // systems is actually mounted.
+        if (!(cachedMountPoints exists evictedMountPointFilter.accept)) {
           try {
             manager sync (FsControllerFilter forPrefix evictedMountPoint, new FsControllerSyncVisitor(FsSyncOptions.NONE))
             iterator remove ()
