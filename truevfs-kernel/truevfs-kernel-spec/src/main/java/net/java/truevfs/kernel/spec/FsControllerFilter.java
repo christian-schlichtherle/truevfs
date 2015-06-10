@@ -25,14 +25,6 @@ public final class FsControllerFilter implements Filter<FsController> {
         this.filter = Objects.requireNonNull(filter);
     }
 
-    /**
-     * @deprecated Use {@link #forPrefix(FsMountPoint)} instead.
-     */
-    @Deprecated
-    public FsControllerFilter(FsMountPoint prefix) {
-        this(FsModelFilter.forPrefix(prefix));
-    }
-
     /** Returns a controller filter for the given prefix mount point. */
     public static FsControllerFilter forPrefix(FsMountPoint prefix) {
         return new FsControllerFilter(FsModelFilter.forPrefix(prefix));
