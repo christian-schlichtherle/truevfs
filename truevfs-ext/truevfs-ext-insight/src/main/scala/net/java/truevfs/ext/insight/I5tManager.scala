@@ -21,14 +21,14 @@ extends JmxManager(mediator, manager) {
   }
 
   override def accept[X <: Exception](filter: Filter[_ >: FsController], visitor: Visitor[_ >: FsController, X]) {
-    var synced = true
+    var allUnmounted = true
     val start = System.nanoTime
     manager accept (
       new Filter[FsController] {
         override def accept(controller: FsController) = {
           val accepted = filter accept controller
           if (!accepted)
-            synced = false
+            allUnmounted = false
           accepted
         }
       },
@@ -38,12 +38,12 @@ extends JmxManager(mediator, manager) {
             visitor visit controller
           } finally {
             if (controller.getModel.isMounted)
-              synced = false
+              allUnmounted = false
           }
         }
       }
     )
-    if (synced) {
+    if (allUnmounted) {
       mediator logSync (System.nanoTime - start)
       mediator rotateAllStats this
     }

@@ -81,40 +81,35 @@ extends FsAbstractManager
   }
 
   override def accept[X <: Exception](filter: ControllerFilter, visitor: ControllerVisitor[X]) {
-    var disarm = true
+    var allUnmounted = true
     try {
-      accept0(
-        new Filter[FsController] {
-          override def accept(controller: FsController) = {
-            val accepted = filter accept controller
-            if (!accepted)
-              disarm = false
-            accepted
-          }
-        },
-        new Visitor[FsController, FsSyncException] {
-          override def visit(controller: FsController) {
-            try {
-              visitor visit controller
-            } finally {
-              if (controller.getModel.isMounted)
-                disarm = false
-            }
-          }
+      withFilter { controller =>
+        val accepted = filter accept controller
+        if (!accepted)
+          allUnmounted = false
+        accepted
+      } visit { controller =>
+        try {
+          visitor visit controller
+        } finally {
+          if (controller.getModel.isMounted)
+            allUnmounted = false
         }
-      )
+      }
     } finally {
-      if (disarm)
+      if (allUnmounted)
         syncOnShutdown disarm ()
     }
   }
 
-  private def accept0[X <: Exception](filter: ControllerFilter, visitor: ControllerVisitor[X]) {
-    readLocked { controllers.values flatMap { link => Option(link.get) } }
-    .filter { filter.accept }
-    .toIndexedSeq
-    .sorted(ReverseControllerOrdering)
-    .foreach { visitor.visit }
+  private final case class withFilter(filter: FsController => Boolean) {
+    def visit(visitor: FsController => Unit) {
+      readLocked { controllers.values flatMap { link => Option(link.get) } }
+        .filter(filter)
+        .toIndexedSeq
+        .sorted(ReverseControllerOrdering)
+        .foreach(visitor)
+    }
   }
 
   /** A model which schedules its controller for synchronization by observing
