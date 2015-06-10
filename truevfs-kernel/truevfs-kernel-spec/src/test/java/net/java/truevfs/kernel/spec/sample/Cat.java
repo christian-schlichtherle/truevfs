@@ -4,25 +4,19 @@
  */
 package net.java.truevfs.kernel.spec.sample;
 
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.io.Streams;
+import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.Filter;
+import net.java.truevfs.kernel.spec.*;
+import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
+import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import net.java.truecommons.cio.InputSocket;
-import net.java.truecommons.io.Streams;
-import net.java.truecommons.shed.BitField;
-import net.java.truecommons.shed.Filter;
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truevfs.kernel.spec.FsControllerSyncVisitor;
-import net.java.truevfs.kernel.spec.FsManager;
-import net.java.truevfs.kernel.spec.FsCompositeDriver;
-import net.java.truevfs.kernel.spec.FsNodePath;
-import net.java.truevfs.kernel.spec.FsSimpleCompositeDriver;
-import net.java.truevfs.kernel.spec.FsSyncOptions;
-import net.java.truevfs.kernel.spec.FsUriModifier;
-import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
-import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 
 /**
  * A poor man's blend of the cat(1) and wget(1) command line utility
@@ -89,8 +83,10 @@ public final class Cat {
             // Commit all unsynchronized changes to the contents of federated
             // file systems, if any were accessed, and clean up temporary files
             // used for caching.
-            manager.sync(Filter.ACCEPT_ANY,
-                    new FsControllerSyncVisitor(FsSyncOptions.UMOUNT));
+            new FsSync()
+                    .manager(manager)
+                    .options(FsSyncOptions.UMOUNT)
+                    .run();
         }
     }
 // END SNIPPET: cat

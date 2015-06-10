@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.kernel.impl
 
-import java.io._
 import java.util.concurrent.locks._
 import javax.annotation.concurrent._
 
@@ -32,7 +31,10 @@ extends FsAbstractManager
     new collection.mutable.WeakHashMap[FsMountPoint, Link[FsController]]
 
   private[this] val syncOnShutdown = ShutdownFuse(armed = false) {
-    manager sync(Filter.ACCEPT_ANY, new FsControllerSyncVisitor(FsSyncOptions.UMOUNT))
+    new FsSync()
+      .manager(manager)
+      .options(FsSyncOptions.UMOUNT)
+      .run()
   }
 
   override def newModel(context: FsDriver, mountPoint: FsMountPoint, parent: FsModel): FsModel =
@@ -78,10 +80,10 @@ extends FsAbstractManager
     }
   }
 
-  override def sync(filter: ControllerFilter, visitor: ControllerVisitor[FsSyncException]) {
+  override def accept[X <: Exception](filter: ControllerFilter, visitor: ControllerVisitor[X]) {
     var disarm = true
     try {
-      super.sync(
+      accept0(
         new Filter[FsController] {
           override def accept(controller: FsController) = {
             val accepted = filter accept controller
@@ -107,7 +109,7 @@ extends FsAbstractManager
     }
   }
 
-  override def accept[X <: Exception](filter: ControllerFilter, visitor: ControllerVisitor[X]) {
+  private def accept0[X <: Exception](filter: ControllerFilter, visitor: ControllerVisitor[X]) {
     readLocked { controllers.values flatMap { link => Option(link.get) } }
     .filter { filter.accept }
     .toIndexedSeq
