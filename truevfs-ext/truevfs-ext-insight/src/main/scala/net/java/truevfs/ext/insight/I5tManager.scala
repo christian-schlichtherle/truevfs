@@ -5,6 +5,7 @@
 package net.java.truevfs.ext.insight
 
 import javax.annotation.concurrent._
+
 import net.java.truecommons.shed._
 import net.java.truevfs.comp.jmx._
 import net.java.truevfs.kernel.spec._
@@ -19,10 +20,32 @@ extends JmxManager(mediator, manager) {
     mediator activateAllStats this
   }
 
-  override def sync(filter: Filter[_ >: FsController], visitor: Visitor[_ >: FsController, FsSyncException]) {
+  override def accept[X <: Exception](filter: Filter[_ >: FsController], visitor: Visitor[_ >: FsController, X]) {
+    var synced = true
     val start = System.nanoTime
-    manager sync (filter, visitor)
-    mediator logSync (System.nanoTime - start)
-    mediator rotateAllStats this
+    manager accept (
+      new Filter[FsController] {
+        override def accept(controller: FsController) = {
+          val accepted = filter accept controller
+          if (!accepted)
+            synced = false
+          accepted
+        }
+      },
+      new Visitor[FsController, X] {
+        override def visit(controller: FsController) {
+          try {
+            visitor visit controller
+          } finally {
+            if (controller.getModel.isMounted)
+              synced = false
+          }
+        }
+      }
+    )
+    if (synced) {
+      mediator logSync (System.nanoTime - start)
+      mediator rotateAllStats this
+    }
   }
 }

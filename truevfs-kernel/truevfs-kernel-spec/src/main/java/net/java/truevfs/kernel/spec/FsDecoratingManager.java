@@ -4,11 +4,12 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.io.IOException;
-import java.util.Objects;
+import net.java.truecommons.shed.Filter;
+import net.java.truecommons.shed.Visitor;
+
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.shed.*;
+import java.util.Objects;
 
 /**
  * An abstract decorator for a file system manager.
@@ -52,14 +53,6 @@ public abstract class FsDecoratingManager extends FsAbstractManager {
             FsCompositeDriver driver,
             FsMountPoint mountPoint) {
         return manager.controller(driver, mountPoint);
-    }
-
-    @Override
-    public void sync(
-            Filter<? super FsController> filter,
-            Visitor<? super FsController, FsSyncException> visitor)
-    throws FsSyncException {
-        manager.sync(filter, visitor);
     }
 
     @Override

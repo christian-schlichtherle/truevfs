@@ -4,22 +4,20 @@
  */
 package net.java.truevfs.comp.jmx;
 
-import java.io.IOException;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
+import net.java.truecommons.shed.Filter;
+import net.java.truecommons.shed.Visitor;
+import net.java.truevfs.kernel.spec.FsController;
+import net.java.truevfs.kernel.spec.FsManager;
+import net.java.truevfs.kernel.spec.FsSync;
+import net.java.truevfs.kernel.spec.FsSyncException;
+
 import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.StandardMBean;
-import net.java.truecommons.shed.Filter;
-import net.java.truecommons.shed.Visitor;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsManager;
-import net.java.truevfs.kernel.spec.FsControllerSyncVisitor;
-import net.java.truevfs.kernel.spec.FsSyncException;
-import net.java.truevfs.kernel.spec.FsSyncOptions;
-import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A view for a {@linkplain FsManager file system manager}.
@@ -101,8 +99,7 @@ extends StandardMBean implements JmxManagerMXBean {
 
     @Override
     public void sync() throws FsSyncException {
-        FsManagerLocator.SINGLETON.get().sync(Filter.ACCEPT_ANY,
-                new FsControllerSyncVisitor(FsSyncOptions.NONE));
+        new FsSync().run();
     }
 }
 

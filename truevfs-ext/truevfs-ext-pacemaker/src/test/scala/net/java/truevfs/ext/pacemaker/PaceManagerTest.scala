@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.ext.pacemaker
 
-import java.io.IOException
 import java.net._
 
 import net.java.truecommons.shed.{Filter, _}
@@ -137,8 +136,9 @@ class PaceManagerTest extends WordSpec with OneInstancePerTest {
         }
       }
 
-      manager sync (Filter.ACCEPT_ANY,
-        new FsControllerSyncVisitor(FsSyncOptions.SYNC))
+      new FsSync()
+        .manager(manager)
+        .run()
     }
   }
 }

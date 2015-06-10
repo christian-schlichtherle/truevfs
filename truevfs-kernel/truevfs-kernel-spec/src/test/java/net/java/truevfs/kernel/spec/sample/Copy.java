@@ -4,26 +4,21 @@
  */
 package net.java.truevfs.kernel.spec.sample;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.IoSockets;
 import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.Filter;
-import static net.java.truevfs.kernel.spec.FsAccessOption.CREATE_PARENTS;
-import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
-import net.java.truevfs.kernel.spec.FsAccessOptions;
-import net.java.truevfs.kernel.spec.FsControllerSyncVisitor;
-import net.java.truevfs.kernel.spec.FsManager;
-import net.java.truevfs.kernel.spec.FsCompositeDriver;
-import net.java.truevfs.kernel.spec.FsNodePath;
-import net.java.truevfs.kernel.spec.FsSimpleCompositeDriver;
-import net.java.truevfs.kernel.spec.FsSyncOptions;
-import net.java.truevfs.kernel.spec.FsUriModifier;
+import net.java.truevfs.kernel.spec.*;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+
+import static net.java.truevfs.kernel.spec.FsAccessOption.CREATE_PARENTS;
+import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
 
 /**
  * A poor man's blend of the cp(1) or curl(1) command line utilities
@@ -94,8 +89,10 @@ public final class Copy {
             // Commit all unsynchronized changes to the contents of federated
             // file systems, if any were accessed, and clean up temporary files
             // used for caching.
-            manager.sync(Filter.ACCEPT_ANY,
-                    new FsControllerSyncVisitor(FsSyncOptions.UMOUNT));
+            new FsSync()
+                    .manager(manager)
+                    .options(FsSyncOptions.UMOUNT)
+                    .run();
         }
     }
 // END SNIPPET: copy

@@ -4,12 +4,15 @@
  */
 package net.java.truevfs.access;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.Filter;
-import static net.java.truevfs.access.ExpertFeature.Reason.*;
+import net.java.truecommons.shed.Visitor;
 import net.java.truevfs.kernel.spec.*;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import static net.java.truevfs.access.ExpertFeature.Reason.THE_PRESENCE_OR_ABSENCE_OF_SOME_OPTIONS_MAY_YIELD_UNWANTED_SIDE_EFFECTS;
 import static net.java.truevfs.kernel.spec.FsSyncOptions.UMOUNT;
 import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 
@@ -108,7 +111,7 @@ public final class TVFS {
      * Otherwise, the path of the file object is used to create a new mount
      * point.
      * Note that making up an artificial mount point like this will only work
-     * with the {@link FsFilteringManager}!
+     * for use with {@link FsManager#accept(Filter, Visitor)}.
      *
      * @param  tree a file or directory in the (virtual) file system space.
      * @return A mount point for the given (virtual) directory tree.
@@ -168,7 +171,10 @@ public final class TVFS {
     @ExpertFeature(THE_PRESENCE_OR_ABSENCE_OF_SOME_OPTIONS_MAY_YIELD_UNWANTED_SIDE_EFFECTS)
     public static void sync(BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        sync(Filter.ACCEPT_ANY, options);
+        new FsSync()
+                .manager(TConfig.current().getManager())
+                .options(options)
+                .run();
     }
 
     /**
@@ -264,14 +270,11 @@ public final class TVFS {
     @ExpertFeature(THE_PRESENCE_OR_ABSENCE_OF_SOME_OPTIONS_MAY_YIELD_UNWANTED_SIDE_EFFECTS)
     public static void sync(FsMountPoint tree, BitField<FsSyncOption> options)
     throws FsSyncWarningException, FsSyncException {
-        sync(FsControllerFilter.forPrefix(tree), options);
+        new FsSync()
+                .manager(TConfig.current().getManager())
+                .filter(FsControllerFilter.forPrefix(tree))
+                .options(options)
+                .run();
     }
 
-    private static void sync(
-            Filter<? super FsController> filter,
-            BitField<FsSyncOption> options)
-    throws FsSyncException {
-        TConfig.current().getManager().sync(filter,
-                new FsControllerSyncVisitor(options));
-    }
 }

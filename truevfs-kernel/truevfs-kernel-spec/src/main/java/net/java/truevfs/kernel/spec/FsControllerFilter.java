@@ -5,6 +5,7 @@
 package net.java.truevfs.kernel.spec;
 
 import net.java.truecommons.shed.Filter;
+import net.java.truecommons.shed.Visitor;
 
 import java.util.Objects;
 
@@ -14,7 +15,7 @@ import java.util.Objects;
  * {@linkplain FsModel model} is accepted by the configured file system model
  * {@linkplain Filter filter}.
  *
- * @see    FsManager#sync
+ * @see    FsManager#accept(Filter, Visitor)
  * @author Christian Schlichtherle
  */
 public final class FsControllerFilter implements Filter<FsController> {

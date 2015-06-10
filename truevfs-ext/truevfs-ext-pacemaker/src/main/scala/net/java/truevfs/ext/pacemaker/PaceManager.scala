@@ -50,7 +50,10 @@ extends JmxManager[PaceMediator](mediator, manager) {
         // systems is actually mounted.
         if (!(cachedMountPoints exists evictedMountPointFilter.accept)) {
           try {
-            manager sync (FsControllerFilter forPrefix evictedMountPoint, new FsControllerSyncVisitor(FsSyncOptions.NONE))
+            new FsSync()
+              .manager(manager)
+              .filter(FsControllerFilter forPrefix evictedMountPoint)
+              .run()
             iterator remove ()
           } catch {
             case e: FsSyncException =>
