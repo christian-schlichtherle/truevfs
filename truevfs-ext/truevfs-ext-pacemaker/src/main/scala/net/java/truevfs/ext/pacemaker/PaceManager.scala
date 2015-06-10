@@ -17,7 +17,7 @@ import net.java.truevfs.kernel.spec._
 private class PaceManager(mediator: PaceMediator, manager: FsManager)
 extends JmxManager[PaceMediator](mediator, manager) {
 
-  private val cachedModels = mediator.cachedModels
+  private val cachedMountPoints = mediator.cachedMountPoints
   private val evictedMountPoints = mediator.evictedMountPoints
 
   def maximumSize = mediator.maximumSize
@@ -40,7 +40,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
     // its state with the access order of mount points.
     // Otherwise, the lookup will simply return `null` and the state of the
     // cache will be unchanged.
-    cachedModels get controller.getModel.getMountPoint
+    cachedMountPoints get controller.getModel.getMountPoint
     unmountEvictedArchiveFileSystems()
   }
 
@@ -50,12 +50,12 @@ extends JmxManager[PaceMediator](mediator, manager) {
       val builder = new FsSyncExceptionBuilder
       do {
         val evictedMountPoint = iterator next ()
-        val evictedModelFilter = new FsModelFilter(evictedMountPoint)
+        val evictedMountPointFilter = FsPrefixMountPointFilter forPrefix evictedMountPoint
         // Check that neither the evicted file system nor any of its child file
         // systems are currently mounted.
-        if (!(cachedModels existsValue evictedModelFilter)) {
+        if (!(cachedMountPoints existsKey evictedMountPointFilter.accept)) {
           try {
-            manager sync(new FsControllerFilter(evictedModelFilter), new FsControllerSyncVisitor(FsSyncOptions.NONE))
+            manager sync (FsControllerFilter forPrefix evictedMountPoint, new FsControllerSyncVisitor(FsSyncOptions.NONE))
             iterator remove ()
           } catch {
             case e: FsSyncException =>

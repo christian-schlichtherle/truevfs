@@ -15,13 +15,13 @@ import net.java.truevfs.kernel.spec._
   */
 private class PaceMediator extends JmxMediator[PaceMediator] with Immutable {
 
-  final val cachedModels = new Cache[FsMountPoint, FsModel](maximumFileSystemsMountedDefaultValue)
-  final val evictedMountPoints = cachedModels.evictedKeySet
+  final val cachedMountPoints = new Cache[FsMountPoint, FsModel](maximumFileSystemsMountedDefaultValue)
+  final val evictedMountPoints = cachedMountPoints.evictedKeySet
 
-  final def maximumSize = cachedModels.maximumSize
+  final def maximumSize = cachedMountPoints.maximumSize
   final def maximumSize_=(maximumSize: Int) {
     require(maximumSize >= maximumFileSystemsMountedMinimumValue)
-    cachedModels.maximumSize = maximumSize
+    cachedMountPoints.maximumSize = maximumSize
   }
 
   final override def instrument(subject: FsManager) =
