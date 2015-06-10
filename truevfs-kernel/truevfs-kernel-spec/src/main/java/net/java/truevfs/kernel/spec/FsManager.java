@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.kernel.spec;
 
+import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.Filter;
 import net.java.truecommons.shed.ImplementationsShouldExtend;
 import net.java.truecommons.shed.Visitor;
@@ -37,17 +38,19 @@ extends FsModel.Factory<FsDriver>,
     FsController controller(FsCompositeDriver driver, FsMountPoint mountPoint);
 
     /**
-     * Invokes the given visitor on all managed file system controllers which
-     * get accepted by the given {@code filter}.
+     * Invokes the given {@code visitor} on all managed file system controllers
+     * which get accepted by the given {@code filter}.
      *
      * @param filter the filter for the managed file system controllers.
-     *        Calling this object must not have any observable side effect!
+     *        Calling this object must not have any observable side effects!
      * @param visitor the visitor for the filtered file system controllers.
+     *        Calling this object may have an observable side effect, e.g.
+     *        {@link FsController#sync(BitField)}.
      * @throws Exception at the discretion of the visitor.
      *         This will abort the visiting.
      */
     <X extends Exception> void accept(
             Filter<? super FsController> filter,
             Visitor<? super FsController, X> visitor)
-    throws X;
+            throws X;
 }
