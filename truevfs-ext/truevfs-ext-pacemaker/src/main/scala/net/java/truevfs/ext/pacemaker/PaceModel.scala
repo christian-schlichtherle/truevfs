@@ -14,17 +14,17 @@ import net.java.truevfs.kernel.spec.FsModel
 private final class PaceModel(mediator: PaceMediator, model: FsModel)
   extends InstrumentingModel(mediator, model) {
 
-  private val cachedModels = mediator.cachedModels
+  private val cachedMountPoints = mediator.cachedMountPoints
 
   override def setMounted(isMounted: Boolean) {
     val wasMounted = model.isMounted
     model setMounted isMounted
     if (wasMounted) {
       if (!isMounted)
-        cachedModels remove getMountPoint
+        cachedMountPoints remove getMountPoint
     } else {
       if (isMounted)
-        cachedModels put (getMountPoint, model)
+        cachedMountPoints put (getMountPoint, model)
     }
   }
 }

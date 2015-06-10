@@ -1,15 +1,16 @@
 package net.java.truevfs.ext.pacemaker
 
+import java.util.Map.Entry
 import java.util.concurrent.locks.{Lock, ReadWriteLock, ReentrantReadWriteLock}
 import java.util.{concurrent => juc}
 import java.{util => ju}
-
-import net.java.truecommons.shed.{Filter, HashMaps}
+import scala.collection.JavaConverters._
+import net.java.truecommons.shed.HashMaps
 
 /** A simple, generic cache.
   * Note that unlike other caches, whenever a map entry gets evicted, it gets
-  * added to a concurrent map which can get queried using the [[evictedKeySet]]
-  * and [[evictedValues]] methods for further cleanup.
+  * added to a concurrent map which can get queried using the
+  * [[evictedKeySet]] method for further processing.
   * This class is thread-safe.
   *
   * @tparam K the type of the keys
@@ -31,7 +32,6 @@ private final class Cache[K, V](initialMaximumSize: Int) {
   maximumSize = initialMaximumSize
 
   def evictedKeySet = evicted.keySet
-  def evictedValues = evicted.values
 
   def maximumSize = _maximumSize
   def maximumSize_=(maximumSize: Int) {
@@ -48,8 +48,8 @@ private final class Cache[K, V](initialMaximumSize: Int) {
 
   def remove(key: AnyRef) = writeLocked { cached remove key }
 
-  def existsValue(filter: Filter[_ >: V]) =
-    readLocked { cached existsValue filter }
+  def existsKey(predicate: K => Boolean) =
+    readLocked { cached existsKey predicate }
 
   private def readLocked[A] = locked[A](readLock) _
 
@@ -67,7 +67,7 @@ private final class Cache[K, V](initialMaximumSize: Int) {
   private final class CacheMap
     extends ju.LinkedHashMap[K, V](HashMaps initialCapacity initialMaximumSize, 0.75f, true) {
 
-    override def removeEldestEntry(entry: ju.Map.Entry[K, V]) =
+    override def removeEldestEntry(entry: Entry[K, V]) =
       if (size > maximumSize) {
         evicted put (entry.getKey, entry.getValue)
         true
@@ -85,12 +85,6 @@ private final class Cache[K, V](initialMaximumSize: Int) {
       super.remove(key)
     }
 
-    def existsValue(filter: Filter[_ >: V]): Boolean = {
-      val iterator = values.iterator
-      while (iterator.hasNext)
-        if (filter accept iterator.next)
-          return true
-      false
-    }
+    def existsKey(predicate: K => Boolean) = keySet.asScala exists predicate
   }
 }
