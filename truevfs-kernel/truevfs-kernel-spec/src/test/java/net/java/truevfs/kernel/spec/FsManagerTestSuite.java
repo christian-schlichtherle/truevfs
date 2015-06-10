@@ -192,17 +192,13 @@ public abstract class FsManagerTestSuite {
     private int count(
             final Filter<? super FsController> filter,
             final VisitCounter counter) {
-        try {
-            manager.accept(filter, counter);
-        } catch (final IOException ex) {
-            throw new AssertionError(ex);
-        }
+        manager.accept(filter, counter);
         return counter.get();
     }
 
     @ThreadSafe
     private static class VisitCounter
-    extends AtomicInteger implements Visitor<FsController, IOException> {
+    extends AtomicInteger implements Visitor<FsController, RuntimeException> {
         @Override
         public void visit(final FsController controller) {
             assertThat(controller, not(is((FsController) null)));
