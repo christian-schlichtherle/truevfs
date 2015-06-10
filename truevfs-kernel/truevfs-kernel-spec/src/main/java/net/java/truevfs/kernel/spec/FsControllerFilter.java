@@ -9,10 +9,10 @@ import net.java.truecommons.shed.Filter;
 import java.util.Objects;
 
 /**
- * A filter which accepts a given
- * {@linkplain FsController file system controller} if its
- * {@linkplain FsModel file system model} is accepted by the configured
- * file system model {@linkplain Filter filter}.
+ * A filter which accepts a given file system
+ * {@linkplain FsController controller} if its file system
+ * {@linkplain FsModel model} is accepted by the configured file system model
+ * {@linkplain Filter filter}.
  *
  * @see    FsManager#sync
  * @author Christian Schlichtherle
@@ -21,12 +21,21 @@ public final class FsControllerFilter implements Filter<FsController> {
 
     private final Filter<? super FsModel> filter;
 
-    public FsControllerFilter(FsMountPoint prefix) {
-        this(new FsModelFilter(prefix));
-    }
-
     public FsControllerFilter(final Filter<? super FsModel> filter) {
         this.filter = Objects.requireNonNull(filter);
+    }
+
+    /**
+     * @deprecated Use {@link #forPrefix(FsMountPoint)} instead.
+     */
+    @Deprecated
+    public FsControllerFilter(FsMountPoint prefix) {
+        this(FsModelFilter.forPrefix(prefix));
+    }
+
+    /** Returns a controller filter for the given prefix mount point. */
+    public static FsControllerFilter forPrefix(FsMountPoint prefix) {
+        return new FsControllerFilter(FsModelFilter.forPrefix(prefix));
     }
 
     @Override
