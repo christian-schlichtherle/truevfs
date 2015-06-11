@@ -4,22 +4,24 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.io.IOException;
+import net.java.truecommons.shed.Filter;
+import net.java.truecommons.shed.Visitor;
+import net.java.truevfs.kernel.spec.mock.MockDriverMapContainer;
+import org.junit.Before;
+import org.junit.Test;
+
+import javax.annotation.concurrent.ThreadSafe;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.shed.Filter;
-import static net.java.truecommons.shed.Filter.*;
-import net.java.truecommons.shed.Visitor;
-import net.java.truevfs.kernel.spec.mock.MockDriverMapContainer;
+
+import static net.java.truecommons.shed.Filter.ACCEPT_ANY;
+import static net.java.truecommons.shed.Filter.ACCEPT_NONE;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle
@@ -107,7 +109,9 @@ public abstract class FsManagerTestSuite {
             }
 
             final Iterator<String> it = Arrays.asList(params).iterator();
-            class ControllerVisitor extends VisitCounter {
+
+            class ControllerVisitor extends CountingVisitor {
+
                 @Override
                 public void visit(FsController controller) {
                     final FsMountPoint mountPoint
@@ -116,6 +120,7 @@ public abstract class FsManagerTestSuite {
                     super.visit(controller);
                 }
             }
+
             assertThat(count(ACCEPT_ANY, new ControllerVisitor()), is(params.length));
             assertThat(it.hasNext(), is(false));
 
@@ -155,7 +160,7 @@ public abstract class FsManagerTestSuite {
             }
 
             // Assert that the manager has all input controllers mapped.
-            class InputVisitor extends VisitCounter {
+            class InputVisitor extends CountingVisitor {
                 @Override
                 public void visit(FsController controller) {
                     assertTrue(input.contains(controller));
@@ -171,7 +176,7 @@ public abstract class FsManagerTestSuite {
                 output.add(mountPoint);
             }
 
-            class FilterVisitor extends VisitCounter {
+            class FilterVisitor extends CountingVisitor {
                 @Override
                 public void visit(FsController controller) {
                     assertTrue(output.remove(controller.getModel().getMountPoint()));
@@ -185,24 +190,21 @@ public abstract class FsManagerTestSuite {
         }
     }
 
-    private int count(final Filter<? super FsController> filter) {
-        return count(filter, new VisitCounter());
+    private int count(Filter<? super FsController> filter) {
+        return count(filter, new CountingVisitor());
     }
 
-    private int count(
-            final Filter<? super FsController> filter,
-            final VisitCounter counter) {
-        manager.accept(filter, counter);
-        return counter.get();
+    private int count(Filter<? super FsController> filter, CountingVisitor counter) {
+        return manager.accept(filter, counter).get();
     }
+}
 
-    @ThreadSafe
-    private static class VisitCounter
-    extends AtomicInteger implements Visitor<FsController, RuntimeException> {
-        @Override
-        public void visit(final FsController controller) {
-            assertThat(controller, not(is((FsController) null)));
-            incrementAndGet();
-        }
-    } // VisitCounter
+class CountingVisitor
+extends AtomicInteger implements Visitor<FsController, RuntimeException> {
+
+    @Override
+    public void visit(final FsController controller) {
+        assertNotNull(controller);
+        incrementAndGet();
+    }
 }

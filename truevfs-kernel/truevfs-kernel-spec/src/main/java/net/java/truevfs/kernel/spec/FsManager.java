@@ -38,19 +38,18 @@ extends FsModel.Factory<FsDriver>,
     FsController controller(FsCompositeDriver driver, FsMountPoint mountPoint);
 
     /**
-     * Invokes the given {@code visitor} on all managed file system controllers
-     * which get accepted by the given {@code filter}.
+     * Filters all managed file system controllers using the given
+     * {@code filter} and accepts the given {@code visitor} to them.
      *
      * @param filter the filter for the managed file system controllers.
      *        Calling this object must not have any observable side effects!
-     * @param visitor the visitor for the filtered file system controllers.
+     * @param visitor the visitor of the filtered file system controllers.
      *        Calling this object may have an observable side effect, e.g.
      *        {@link FsController#sync(BitField)}.
-     * @throws Exception at the discretion of the visitor.
-     *         This will abort the visiting.
+     * @return {@code visitor}
+     * @throws X at the discretion of the given visitor.
+     *         Throwing this exception aborts the visiting.
      */
-    <X extends Exception> void accept(
-            Filter<? super FsController> filter,
-            Visitor<? super FsController, X> visitor)
-            throws X;
+    <X extends Exception, V extends Visitor<? super FsController, X>>
+    V accept(Filter<? super FsController> filter, V visitor) throws X;
 }

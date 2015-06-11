@@ -91,10 +91,8 @@ extends StandardMBean implements JmxManagerMXBean {
         return count(new MountedTopLevelArchiveFileSystemsFilter());
     }
 
-    private int count(final Filter<? super FsController> filter) {
-        final CountingVisitor visitor = new CountingVisitor();
-        manager.accept(filter, visitor);
-        return visitor.get();
+    private int count(Filter<? super FsController> filter) {
+        return manager.accept(filter, new CountingVisitor()).get();
     }
 
     @Override
@@ -136,8 +134,7 @@ implements Filter<FsController> {
 }
 
 final class CountingVisitor
-extends AtomicInteger
-implements Visitor<FsController, RuntimeException> {
+extends AtomicInteger implements Visitor<FsController, RuntimeException> {
 
     @Override
     public void visit(FsController controller) { incrementAndGet(); }
