@@ -85,15 +85,13 @@ extends FsAbstractManager
     try {
       manager withFilter { controller =>
         val accepted = filter accept controller
-        if (!accepted)
-          allUnmounted = false
+        allUnmounted &= accepted
         accepted
       } accept { controller =>
         try {
           visitor visit controller
         } finally {
-          if (controller.getModel.isMounted)
-            allUnmounted = false
+          allUnmounted &= !controller.getModel.isMounted
         }
       }
     } finally {
