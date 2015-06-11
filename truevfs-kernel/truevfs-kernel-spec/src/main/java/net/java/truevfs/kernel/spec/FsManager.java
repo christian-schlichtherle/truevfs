@@ -42,9 +42,12 @@ extends FsModel.Factory<FsDriver>,
      * {@code filter} and accepts the given {@code visitor} to them.
      *
      * @param filter the filter for the managed file system controllers.
-     *        Calling this object must not have any observable side effects!
+     *        Calls to its {@link Filter#accept(Object)} method should terminate
+     *        quickly without an exception and must not have any side effects on
+     *        the given controllers!
      * @param visitor the visitor of the filtered file system controllers.
-     *        Calling this object may have an observable side effect, e.g.
+     *        Calls to its {@link Visitor#visit(Object)} method may have side
+     *        effects on the given controllers, e.g. by calling
      *        {@link FsController#sync(BitField)}.
      * @return {@code visitor}
      * @throws X at the discretion of the given visitor.
