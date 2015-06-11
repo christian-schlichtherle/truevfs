@@ -181,10 +181,10 @@ private object PaceManagerTest {
     override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint) =
       throw new UnsupportedOperationException
 
-    override def accept[X <: Exception](
-      filter: ControllerFilter,
-      visitor: ControllerVisitor[X]
-    ) { controllers filter filter.accept foreach visitor.visit }
+    override def accept[X <: Exception, V <: Visitor[_ >: FsController, X]](filter: ControllerFilter, visitor: V) = {
+      controllers filter filter.accept foreach visitor.visit
+      visitor
+    }
   }
 
   private sealed abstract class Expectation(mountPoints: FsMountPoint*)

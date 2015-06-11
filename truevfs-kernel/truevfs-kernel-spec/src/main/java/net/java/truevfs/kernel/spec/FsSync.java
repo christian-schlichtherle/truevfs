@@ -60,8 +60,11 @@ public final class FsSync {
      * @throws FsSyncException if any error conditions apply.
      */
     public void run() throws FsSyncException {
-        final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
-        manager().accept(filter, new Visitor<FsController, RuntimeException>() {
+
+        final class SyncVisitor implements Visitor<FsController, RuntimeException> {
+
+            final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
+
             @Override
             public void visit(final FsController controller) {
                 try {
@@ -70,8 +73,13 @@ public final class FsSync {
                     builder.warn(e);
                 }
             }
-        });
-        builder.check();
+
+            void check() throws FsSyncException {
+                builder.check();
+            }
+        }
+
+        manager().accept(filter, new SyncVisitor()).check();
     }
 
     private FsManager manager() { return managerProvider.get(); }

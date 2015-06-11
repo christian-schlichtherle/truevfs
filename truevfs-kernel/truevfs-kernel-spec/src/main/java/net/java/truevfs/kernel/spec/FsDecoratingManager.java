@@ -56,11 +56,8 @@ public abstract class FsDecoratingManager extends FsAbstractManager {
     }
 
     @Override
-    public <X extends Exception> void accept(
-            Filter<? super FsController> filter,
-            Visitor<? super FsController, X> visitor)
-    throws X {
-        manager.accept(filter, visitor);
+    public <X extends Exception, V extends Visitor<? super FsController, X>> V accept(final Filter<? super FsController> filter, V visitor) throws X {
+        return manager.accept(filter, visitor);
     }
 
     /**

@@ -13,22 +13,21 @@ import net.java.truevfs.kernel.spec._
 /** @author Christian Schlichtherle */
 @ThreadSafe
 private final class I5tManager(mediator: I5tMediator, manager: FsManager)
-extends JmxManager(mediator, manager) {
+extends JmxManager(mediator, manager) { self =>
 
   override def activate() {
     super.activate()
     mediator activateAllStats this
   }
 
-  override def accept[X <: Exception](filter: Filter[_ >: FsController], visitor: Visitor[_ >: FsController, X]) {
+  override def accept[X <: Exception, V <: Visitor[_ >: FsController, X]](filter: Filter[_ >: FsController], visitor: V) = {
     var allUnmounted = true
     val start = System.nanoTime
-    manager accept (
+    manager.accept[X, Visitor[FsController, X]](
       new Filter[FsController] {
         override def accept(controller: FsController) = {
           val accepted = filter accept controller
-          if (!accepted)
-            allUnmounted = false
+          allUnmounted &= accepted
           accepted
         }
       },
@@ -37,15 +36,15 @@ extends JmxManager(mediator, manager) {
           try {
             visitor visit controller
           } finally {
-            if (controller.getModel.isMounted)
-              allUnmounted = false
+            allUnmounted &= !controller.getModel.isMounted
           }
         }
       }
     )
     if (allUnmounted) {
       mediator logSync (System.nanoTime - start)
-      mediator rotateAllStats this
+      mediator rotateAllStats self
     }
+    visitor
   }
 }

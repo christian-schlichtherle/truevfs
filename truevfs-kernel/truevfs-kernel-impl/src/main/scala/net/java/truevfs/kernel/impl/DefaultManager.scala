@@ -80,15 +80,15 @@ extends FsAbstractManager
     }
   }
 
-  override def accept[X <: Exception](filter: ControllerFilter, visitor: ControllerVisitor[X]) {
+  override def accept[X <: Exception, V <: Visitor[_ >: FsController, X]](filter: Filter[_ >: FsController], visitor: V) = {
     var allUnmounted = true
     try {
-      withFilter { controller =>
+      manager withFilter { controller =>
         val accepted = filter accept controller
         if (!accepted)
           allUnmounted = false
         accepted
-      } visit { controller =>
+      } accept { controller =>
         try {
           visitor visit controller
         } finally {
@@ -100,10 +100,11 @@ extends FsAbstractManager
       if (allUnmounted)
         syncOnShutdown disarm ()
     }
+    visitor
   }
 
   private final case class withFilter(filter: FsController => Boolean) {
-    def visit(visitor: FsController => Unit) {
+    def accept(visitor: FsController => Unit) {
       readLocked { controllers.values flatMap { link => Option(link.get) } }
         .filter(filter)
         .toIndexedSeq
@@ -153,9 +154,6 @@ extends FsAbstractManager
 }
 
 private object DefaultManager {
-
-  private type ControllerFilter = Filter[_ >: FsController]
-  private type ControllerVisitor[X <: Exception] = Visitor[_ >: FsController, X]
 
   private final class FrontController(c: FsController)
   extends FsDecoratingController(c)
