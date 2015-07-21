@@ -55,15 +55,15 @@
                     <artifactId>truevfs-driver-odf</artifactId>
                 </exclusion-->
                 <!--exclusion>
-                    <groupId>net.java.truevfs</groupId>
+                    <groupId>net.java.truecommons</groupId>
                     <artifactId>truecommons-key-console</artifactId>
                 </exclusion-->
                 <!--exclusion>
-                    <groupId>net.java.truevfs</groupId>
+                    <groupId>net.java.truecommons</groupId>
                     <artifactId>truecommons-key-default</artifactId>
                 </exclusion-->
                 <!--exclusion>
-                    <groupId>net.java.truevfs</groupId>
+                    <groupId>net.java.truecommons</groupId>
                     <artifactId>truecommons-key-swing</artifactId>
                 </exclusion-->
             </exclusions>
@@ -75,9 +75,9 @@
              regardless of any other KeyManager module which may be present on
              the class path. -->
         <!--dependency>
-            <groupId>net.java.truevfs</groupId>
+            <groupId>net.java.truecommons</groupId>
             <artifactId>truecommons-key-disable</artifactId>
-            <version>${truevfs.version}</version>
+            <version>${truecommons.version}</version>
         </dependency-->
 
         <!-- Lets hurl the key prompting dialog when entering an invalid key.
