@@ -233,7 +233,7 @@ public class FsNodePathTest {
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithValidUri() {
         for (final String[] params : new String[][] {
-            //{ $path, $mountPoint, $entryName },
+            //{ $path, $mountPoint, $nodeName },
             { "foo:bar:baz:/bä%20ng!/bö%20öm!/plö%20nk", "foo:bar:baz:/bä%20ng!/bö%20öm!/", "plö%20nk" },
             { "foo:bar:baz:/bäng!/bööm!/plönk", "foo:bar:baz:/bäng!/bööm!/", "plönk" },
             { "foo:bar:baz:/bang!/boom!/plonk", "foo:bar:baz:/bang!/boom!/", "plonk" },
@@ -302,21 +302,21 @@ public class FsNodePathTest {
         }) {
             FsNodePath path = FsNodePath.create(URI.create(params[0]), CANONICALIZE);
             final FsMountPoint mountPoint = null == params[1] ? null : FsMountPoint.create(URI.create(params[1]));
-            final FsNodeName entryName = FsNodeName.create(URI.create(params[2]));
-            assertPath(path, mountPoint, entryName);
-            path = new FsNodePath(mountPoint, entryName);
-            assertPath(path, mountPoint, entryName);
+            final FsNodeName nodeName = FsNodeName.create(URI.create(params[2]));
+            assertPath(path, mountPoint, nodeName);
+            path = new FsNodePath(mountPoint, nodeName);
+            assertPath(path, mountPoint, nodeName);
         }
     }
 
     private void assertPath(final FsNodePath path,
                             final FsMountPoint mountPoint,
-                            final FsNodeName entryName) {
+                            final FsNodeName nodeName) {
         if (null != mountPoint)
             assertThat(path.getMountPoint(), equalTo(mountPoint));
         else
             assertThat(path.getMountPoint(), nullValue());
-        assertThat(path.getNodeName(), equalTo(entryName));
+        assertThat(path.getNodeName(), equalTo(nodeName));
         assertThat(path.toString(), equalTo(path.getUri().toString()));
         assertThat(FsNodePath.create(path.getUri()), equalTo(path));
         assertThat(FsNodePath.create(path.getUri()).hashCode(), equalTo(path.hashCode()));
@@ -337,7 +337,7 @@ public class FsNodePathTest {
     }
 
     @Test
-    public void testHierarchicalize() {
+    public void testToHierarchicalUri() {
         for (final String[] params : new String[][] {
             { "foo:bar:baz:/x/bö%20m?plö%20k!/bä%20g?zö%20k!/", "baz:/x/bö%20m/bä%20g?zö%20k" },
             { "bar:baz:/x/bö%20m?plö%20k!/bä%20g?zö%20k", "baz:/x/bö%20m/bä%20g?zö%20k" },

@@ -271,7 +271,7 @@ public class FsMountPointTest {
     }
 
     @Test
-    public void testHierarchicalize() {
+    public void testToHierarchicalUri() {
         for (final String[] params : new String[][] {
             { "foo:bar:baz:/x/bö%20m?plö%20k!/bä%20g?zö%20k!/", "baz:/x/bö%20m/bä%20g?zö%20k" },
             { "foo:bar:baz:/x/bööm?plönk!/bäng?zönk!/", "baz:/x/bööm/bäng?zönk" },
