@@ -425,7 +425,7 @@ implements Iterable<E> {
      *         parameters which match a known encrypted ZIP file type.
      *         This algorithm is recursively applied.
      * @return A new {@code EncryptedOutputMethod}.
-     * @throws ZipCryptoParametersException if {@code param} is {@code null} or
+     * @throws ZipParametersException if {@code param} is {@code null} or
      *         no suitable crypto parameters can get found.
      */
     private EncryptedOutputMethod newEncryptedOutputMethod(
