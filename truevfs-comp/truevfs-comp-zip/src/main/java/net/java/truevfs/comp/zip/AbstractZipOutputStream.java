@@ -269,13 +269,11 @@ implements Iterable<E> {
      * @throws IllegalArgumentException if the compression level is invalid.
      * @see    #getLevel
      */
-    public void setLevel(int level) {
-	setLevel0(level);
-    }
+    public void setLevel(int level) { setLevel0(level); }
 
     private void setLevel0(int level) {
-        if ((level < Deflater.BEST_SPEED || Deflater.BEST_COMPRESSION < level)
-                && Deflater.DEFAULT_COMPRESSION != level)
+        if ((level < Deflater.NO_COMPRESSION || Deflater.BEST_COMPRESSION < level)
+                && level != Deflater.DEFAULT_COMPRESSION)
             throw new IllegalArgumentException("Invalid compression level!");
         this.level = level;
     }
