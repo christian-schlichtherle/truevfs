@@ -217,7 +217,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * The implementation in the class {@link ZipDriver} returns
      * {@code !local.isEncrypted() && !remote.isEncrypted()} in order to cover
      * the typical case that the cipher keys of both targets are not the same.
-     * Note that there is no secure way to explicitly test for this.
+     * Note that there is no safe way to explicitly test for this.
      *
      * @param  input the input target entry for copying the contents.
      * @param  output the output target entry for copying the contents.
