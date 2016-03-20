@@ -306,7 +306,6 @@ public final class TPath implements Path, TRex {
                 null);
     }
 
-    @SuppressFBWarnings("ES_COMPARING_STRINGS_WITH_EQ")
     private TPath(
             URI name,
             @CheckForNull TArchiveDetector detector,
@@ -631,9 +630,8 @@ public final class TPath implements Path, TRex {
 
     @Override
     public boolean startsWith(Path that) {
-        if (!this.getFileSystem().equals(that.getFileSystem()))
-            return false;
-        return startsWith(that.toString());
+        return this.getFileSystem().equals(that.getFileSystem())
+                && startsWith(that.toString());
     }
 
     @Override
@@ -647,9 +645,8 @@ public final class TPath implements Path, TRex {
 
     @Override
     public boolean endsWith(Path that) {
-        if (!this.getFileSystem().equals(that.getFileSystem()))
-            return false;
-        return endsWith(that.toString());
+        return this.getFileSystem().equals(that.getFileSystem())
+                && endsWith(that.toString());
     }
 
     @Override
@@ -701,12 +698,12 @@ public final class TPath implements Path, TRex {
                     .resolve(other);
         }
         final TArchiveDetector detector = TConfig.current().getArchiveDetector();
-        final FsNodePath path = new TUriResolver(detector).resolve(
+        final FsNodePath nodePath = new TUriResolver(detector).resolve(
                 hasAbsolutePath(other)
                     ? TFileSystemProvider.get(getName()).getRoot()
                     : getNodePath(),
                 other);
-        return new TPath(name, detector, path);
+        return new TPath(name, detector, nodePath);
     }
 
     @Override
