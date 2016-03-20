@@ -104,7 +104,7 @@ public final class TPath implements Path, TRex {
      * <p>
      * The supported path name separators are "{@link File#separator}" and
      * "{@code /}".
-     * Any trailing separators in the resulting path name current discarded.
+     * Any trailing separators in the resulting path name get discarded.
      * <p>
      * This constructor scans the {@linkplain TPath#toString() path name} resulting
      * from the segment parameters to detect prospective archive files using
@@ -145,7 +145,7 @@ public final class TPath implements Path, TRex {
      * <p>
      * The supported path name separators are "{@link File#separator}" and
      * "{@code /}".
-     * Any leading and trailing separators in the resulting path name current
+     * Any leading and trailing separators in the resulting path name get
      * discarded.
      * <p>
      * This constructor scans the {@linkplain TPath#toString() path name} resulting
@@ -214,7 +214,7 @@ public final class TPath implements Path, TRex {
      * @param  name the path name.
      *         This must be a hierarchical URI with an undefined fragment
      *         component.
-     *         Any trailing separators in the path component current discarded.
+     *         Any trailing separators in the path component get discarded.
      * @throws IllegalArgumentException if the preconditions for the parameter
      *         do not hold.
      */
@@ -230,7 +230,7 @@ public final class TPath implements Path, TRex {
      * <p>
      * If {@code file} is an instance of {@link TFile}, its
      * {@linkplain TFile#getArchiveDetector() archive detector} and
-     * {@linkplain TFile#getNodePath() file system node path} current shared with
+     * {@linkplain TFile#getNodePath() file system node path} get shared with
      * this instance.
      * <p>
      * Otherwise, this constructor scans the {@linkplain File#getPath() path name}
@@ -261,7 +261,7 @@ public final class TPath implements Path, TRex {
      * @param file a file.
      *        If this is an instance of {@link TFile}, its
      *        {@linkplain TFile#getArchiveDetector() archive detector} and
-     *        {@linkplain TFile#getNodePath() file system node path} current shared
+     *        {@linkplain TFile#getNodePath() file system node path} get shared
      *        with this instance.
      */
     public TPath(File file) {
@@ -867,7 +867,7 @@ public final class TPath implements Path, TRex {
     private String toString0() {
         final URI name = getName();
         // If name is not absolute, we must call name.getSchemeSpecificPart(),
-        // not just name.toString() in order to current the *decoded* URI!
+        // not just name.toString() in order to get the *decoded* URI!
         return name.isAbsolute()
                 ? name.toString()
                 : name.getSchemeSpecificPart().replace(SEPARATOR_CHAR, separatorChar);
