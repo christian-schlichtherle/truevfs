@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2015 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>net.java.truevfs</groupId>
+        <artifactId>truevfs</artifactId>
+        <version>0.11.1</version>
+    </parent>
+
+    <artifactId>truevfs-samples</artifactId>
+
+    <name>TrueVFS Samples</name>
+    <description>
+    Sample applications to demonstrate the usage of various TrueVFS module APIs.
+
+    Some of these samples use rather advanced or exotic features which makes
+    them more complex than necessary for a typical application.
+
+    By design, the sample applications use all file system drivers which can be
+    located at runtime.
+    Location of the available file system drivers is performed by scanning the
+    class path - see the Javaodoc for the TrueVFS Kernel class
+    net.truevfs.kernel.spec.sl.FsDriverMapLocator for more information.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-driver-jar</artifactId>
+            <!--scope>runtime</scope-->
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-driver-sfx</artifactId>
+            <!--scope>runtime</scope-->
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-driver-tar</artifactId>
+            <!--scope>runtime</scope-->
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-driver-tar-bzip2</artifactId>
+            <!--scope>runtime</scope-->
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-driver-tar-gzip</artifactId>
+            <!--scope>runtime</scope-->
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-driver-tar-xz</artifactId>
+            <!--scope>runtime</scope-->
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-driver-zip</artifactId>
+            <!--scope>runtime</scope-->
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-driver-zip-raes</artifactId>
+            <!--scope>runtime</scope-->
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-profile-full</artifactId>
+            <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>truevfs-ext-insight</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>truevfs-ext-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>sonatype-oss-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <configuration>
+                            <shadedClassifierName>standalone</shadedClassifierName>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>net.java.truevfs.samples.access.TrueVFS</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2015 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>net.java.truevfs</groupId>
+        <artifactId>truevfs-driver</artifactId>
+        <version>0.11.1</version>
+    </parent>
+
+    <artifactId>truevfs-driver-sfx</artifactId>
+
+    <name>TrueVFS Driver SFX</name>
+    <description>
+        Provides a file system driver for read-only access to the SelF
+        eXtracting ZIP file format, alias SFX.
+
+        Add the JAR artifact of this module to the run time class path to
+        make its file system drivers available for service location in the
+        client API modules.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-comp-zipdriver</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-shed</artifactId>
+            <type>test-jar</type>
+        </dependency>
+    </dependencies>
+</project>

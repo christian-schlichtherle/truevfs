@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project    xmlns="http://maven.apache.org/POM/4.0.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>${groupId}</groupId>
+    <artifactId>${artifactId}</artifactId>
+    <version>${version}</version>
+
+    <name>${project.artifactId}</name>
+    <description>TrueVFS Client Application Demo</description>
+
+    <properties>
+        <mainClass>${package}.java.file.Tree</mainClass>
+        <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+        <netbeans.compile.on.save>none</netbeans.compile.on.save>
+        <netbeans.hint.jdkPlatform>JDK_1.7</netbeans.hint.jdkPlatform>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <scala.version>${scala-version}</scala.version>
+        <truecommons.version>${truecommons-version}</truecommons.version>
+        <truevfs.version>${truevfs-version}</truevfs.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.scala-lang</groupId>
+                <artifactId>scala-library</artifactId>
+                <version>${scala.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!-- Depending on the TrueVFS Profile Default is a good starting point.
+             Typical applications will need nothing else. -->
+        <dependency>
+            <groupId>net.java.truevfs</groupId>
+            <artifactId>truevfs-profile-default</artifactId>
+            <version>${truevfs.version}</version>
+            <type>pom</type>
+            <exclusions>
+                <!-- Uncomment UNWANTED modules.
+                     Note that this list is NOT complete. -->
+                <!--exclusion>
+                    <groupId>net.java.truevfs</groupId>
+                    <artifactId>truevfs-access-swing</artifactId>
+                </exclusion-->
+                <!--exclusion>
+                    <groupId>net.java.truevfs</groupId>
+                    <artifactId>truevfs-driver-odf</artifactId>
+                </exclusion-->
+                <!--exclusion>
+                    <groupId>net.java.truecommons</groupId>
+                    <artifactId>truecommons-key-console</artifactId>
+                </exclusion-->
+                <!--exclusion>
+                    <groupId>net.java.truecommons</groupId>
+                    <artifactId>truecommons-key-default</artifactId>
+                </exclusion-->
+                <!--exclusion>
+                    <groupId>net.java.truecommons</groupId>
+                    <artifactId>truecommons-key-swing</artifactId>
+                </exclusion-->
+            </exclusions>
+        </dependency>
+
+        <!-- Uncomment WANTED modules. Note that this list is NOT complete. -->
+
+        <!-- Uncomment this module to disable any secret key management,
+             regardless of any other KeyManager module which may be present on
+             the class path. -->
+        <!--dependency>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-key-disable</artifactId>
+            <version>${truecommons.version}</version>
+        </dependency-->
+
+        <!-- Lets hurl the key prompting dialog when entering an invalid key.
+             Note that this dependency pulls in truecommons-key-swing as a
+             transitive dependency (see exclusion). -->
+        <dependency>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-key-hurlfb</artifactId>
+            <version>${truecommons.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- This runtime dependency instruments the TrueVFS Kernel for
+             statistics monitoring via JMX. -->
+        <!--dependency>
+            <groupId>net.java.truevfs</groupId>
+            <artifactId>truevfs-ext-insight</artifactId>
+            <version>${truevfs.version}</version>
+            <scope>runtime</scope>
+        </dependency-->
+
+        <!-- This runtime dependency instruments the TrueVFS Kernel for
+             logging via SLF4J. -->
+        <!--dependency>
+            <groupId>net.java.truevfs</groupId>
+            <artifactId>truevfs-ext-logging</artifactId>
+            <version>${truevfs.version}</version>
+            <scope>runtime</scope>
+        </dependency-->
+
+        <!-- This runtime dependency constrains the number of concurrently
+             mounted archive file systems in order to save some heap space.
+             This module provides a JMX interface for monitoring and
+             management. -->
+        <!--dependency>
+            <groupId>net.java.truevfs</groupId>
+            <artifactId>truevfs-ext-pacemaker</artifactId>
+            <version>${truevfs.version}</version>
+            <scope>runtime</scope>
+        </dependency-->
+
+        <!-- You need to select an SLF4J Logger implementation to get some
+             logging output. -->
+        <!--dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.1.2</version>
+            <scope>runtime</scope>
+        </dependency-->
+
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>scala-compile-first</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>scala-test-compile</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.2</version>
+                <configuration>
+                    <!-- For NetBeans. -->
+                    <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>standalone</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <version>2.3</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>shade</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/SIG-*</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>standalone</shadedClassifierName>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer">
+                                    <addHeader>false</addHeader>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>${mainClass}</mainClass>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

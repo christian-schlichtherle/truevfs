@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (C) 2005-2015 Schlichtherle IT Services.
+  - All rights reserved. Use is subject to license terms.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>net.java.truevfs</groupId>
+        <artifactId>truevfs</artifactId>
+        <version>0.11.1</version>
+    </parent>
+
+    <artifactId>truevfs-access-swing</artifactId>
+
+    <name>TrueVFS Access Swing</name>
+    <description>
+This module provides Swing GUI classes for viewing file trees
+and choosing entries in archive files.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>truevfs-access</artifactId>
+        </dependency>
+    </dependencies>
+</project>
