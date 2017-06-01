@@ -31,7 +31,7 @@ virtual directories in a file system path.
 As a framework, TrueVFS provides the API to write file system drivers which
 plug-in to its federated file system space.
     </description>
-    <url>http://truevfs.java.net</url>
+    <url>https://bitbucket.org/christian-schlichtherle/truevfs</url>
     <inceptionYear>2005</inceptionYear>
     <licenses>
         <license>
@@ -40,36 +40,14 @@ plug-in to its federated file system space.
             <distribution>repo</distribution>
         </license>
     </licenses>
-    <mailingLists>
-        <mailingList>
-            <name>Announce Mailing List</name>
-            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20announce</subscribe>
-            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20announce</unsubscribe>
-            <archive>http://java.net/projects/truezip/lists/announce/archive</archive>
-        </mailingList>
-        <mailingList>
-            <name>Users Mailing List</name>
-            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20users</subscribe>
-            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20users</unsubscribe>
-            <post>users@truezip.java.net</post>
-            <archive>http://java.net/projects/truezip/lists/users/archive</archive>
-        </mailingList>
-        <mailingList>
-            <name>Developers Mailing List</name>
-            <subscribe>mailto:sympa@truezip.java.net?subject=subscribe%20dev</subscribe>
-            <unsubscribe>mailto:sympa@truezip.java.net?subject=unsubscribe%20dev</unsubscribe>
-            <post>dev@truezip.java.net</post>
-            <archive>http://java.net/projects/truezip/lists/dev/archive</archive>
-        </mailingList>
-    </mailingLists>
     <issueManagement>
-        <system>JIRA</system>
-        <url>https://java.net/jira/browse/TRUEVFS</url>
+        <system>Bitbucket</system>
+        <url>https://bitbucket.org/christian-schlichtherle/truevfs/issues</url>
     </issueManagement>
     <scm>
-        <connection>scm:hg:https://hg.java.net/hg/truevfs~v1</connection>
-        <developerConnection>scm:hg:ssh://hg.java.net/truevfs~v1</developerConnection>
-        <url>http://java.net/projects/truevfs/sources/v1/show</url>
+        <connection>scm:hg:https://christian-schlichtherle@bitbucket.org/christian-schlichtherle/truevfs</connection>
+        <developerConnection>scm:hg:ssh://hg@bitbucket.org/christian-schlichtherle/truevfs</developerConnection>
+        <url>https://bitbucket.org/christian-schlichtherle/truevfs</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -79,7 +57,7 @@ plug-in to its federated file system space.
             <name>TrueVFS Website</name>
             <!-- DON'T use ${project.groupId}, ${project.artifactId} here.
                  This would change in sub-modules! -->
-            <url>file://${env.HOME}/sites/net.java.truevfs/</url>
+            <url>file://${env.HOME}/sites/christian-schlichtherle.bitbucket.io/truevfs</url>
         </site>
     </distributionManagement>
 
