@@ -58,10 +58,7 @@
             <item name="Glossary" href="glossary.html"/>
         </menu>
         <menu name="External Resources">
-            <item name="Road Map" href="https://java.net/jira/browse/TRUEVFS/?selectedTab=com.atlassian.jira.jira-projects-plugin:roadmap-panel"/>
-            <item name="Change Log" href="https://java.net/jira/browse/TRUEVFS/?selectedTab=com.atlassian.jira.jira-projects-plugin:changelog-panel"/>
             <item name="Christian's Blog" href="http://illegalexception.schlichtherle.de"/>
-            <item name="Developer Site" href="http://java.net/projects/truevfs"/>
         </menu>
         <menu name="Parent Module" ref="parent" inherit="bottom"/>
         <menu name="Sub-Modules" ref="modules" inherit="bottom"/>

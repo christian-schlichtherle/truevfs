@@ -46,21 +46,12 @@ cp -rp archive.zip archive.tar.gz
 
     TrueVFS has been developed by refactoring the TrueZIP code base.
     TrueVFS&#160;${project.version} reflects the latest changes up to
-    TrueZIP&#160;${truezip-version} - see
-    {{{https://java.net/jira/browse/TRUEVFS/?selectedTab=com.atlassian.jira.jira-projects-plugin:changelog-panel}Change Log}}.
+    TrueZIP&#160;${truezip-version}.
     While refactoring, the original suite of test code has been maintained and
     extended so that you can put the same faith into TrueVFS than you can put
     into TrueZIP.
 
 * Future Direction
-
-    If you are interested in the plans for TrueVFS, please have a look at its
-    {{{https://java.net/jira/browse/TRUEVFS/?selectedTab=com.atlassian.jira.jira-projects-plugin:roadmap-panel}Road Map}}
-    or subscribe to its {{{./mail-lists.html}Users Mailing List}} for
-    discussion.
-    For continuity, TrueVFS and TrueZIP share the same mailing lists.
-    If you are already subscribed to any TrueZIP mailing list, then you don’t
-    need to do  anything.
 
     TrueVFS version is not yet at 1.0 because chances are that there will be
     backwards incompatible changes to the API of internal modules.

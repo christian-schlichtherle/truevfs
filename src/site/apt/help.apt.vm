@@ -18,11 +18,9 @@ Getting Help
 
     Once your question or issue is regarded as a bug report, improvement
     request, feature request or task request it gets tracked in
-    {{{http://java.net/jira/browse/TRUEVFS}<<JIRA>>}}.
-    You can then use JIRA to monitor and discuss its progress, vote for it, add
+    {{{https://bitbucket.org/christian-schlichtherle/truevfs/issues}<<Bitbucket>>}}.
+    You can use ticket system to monitor and discuss its progress, vote for it, add
     file attachments, download hotfixes etc.
-    JIRA is also used to schedule new TrueVFS versions and prepare their
-    Release Notes.
 
     Finally, if you want to stay up to date please check
     {{{http://truevfs.schlichtherle.de}<<The&#160;TrueVFS&#160;Blog>>}}
