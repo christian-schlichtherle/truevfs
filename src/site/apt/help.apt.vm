@@ -16,17 +16,7 @@ Getting Help
 
     Please also check the {{{./faq.html}<<Frequently Asked Questions>>}}.
 
-    For any bug report, improvement request, feature request, task request,
-    help request etc. please subscribe to the
-    {{{./mail-lists.html}<<User Mailing List>>}} and post it there.
-    If you have an account on {{{http://java.net}java.net}}, your subscription
-    will get immediately accepted, otherwise you'll have to wait until it gets
-    manually accepted.
-    The response time for approving subscription requests and answering posts
-    is usually less than a day.
-    This statement is based on experience and comes without warranty!
-
-    Once your question or issue has been regarded as a bug report, improvement
+    Once your question or issue is regarded as a bug report, improvement
     request, feature request or task request it gets tracked in
     {{{http://java.net/jira/browse/TRUEVFS}<<JIRA>>}}.
     You can then use JIRA to monitor and discuss its progress, vote for it, add
