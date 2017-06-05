@@ -286,6 +286,11 @@ plug-in to its federated file system space.
             </dependency>
 
             <dependency>
+                <groupId>global.namespace.scala-plus</groupId>
+                <artifactId>scala-plus_${scala.lang.version}</artifactId>
+                <version>0.1</version>
+            </dependency>
+            <dependency>
                 <groupId>net.java.truecommons</groupId>
                 <artifactId>truecommons-annotations</artifactId>
                 <version>${truecommons.version}</version>

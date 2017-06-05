@@ -6,8 +6,8 @@ package net.java.truevfs.access
 
 import java.util.concurrent._
 
+import global.namespace.scala.plus.ResourceLoan._
 import net.java.truecommons.services._
-import net.java.truecommons.shed.ResourceLoan._
 import net.java.truecommons.shed._
 import net.java.truevfs.access.TConfig._
 import net.java.truevfs.kernel.spec.FsAccessOption._

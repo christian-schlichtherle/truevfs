@@ -6,7 +6,7 @@ package net.java.truevfs.ext.insight.stats
 
 import java.io._
 
-import net.java.truecommons.shed.ResourceLoan._
+import global.namespace.scala.plus.ResourceLoan._
 import net.java.truevfs.ext.insight.stats.FsStatisticsTest._
 import org.junit.runner.RunWith
 import org.scalatest._
