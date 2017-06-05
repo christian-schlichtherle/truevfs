@@ -46,6 +46,11 @@ and choosing entries in archive files.
             <type>test-jar</type>
         </dependency>
         <dependency>
+            <groupId>global.namespace.scala-plus</groupId>
+            <artifactId>scala-plus_${scala.lang.version}</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>net.java.truecommons</groupId>
             <artifactId>truecommons-shed</artifactId>
             <type>test-jar</type>

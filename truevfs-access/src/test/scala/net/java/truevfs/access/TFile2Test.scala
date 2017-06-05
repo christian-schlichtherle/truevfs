@@ -8,7 +8,7 @@ import java.beans._
 import java.io._
 import java.net._
 
-import net.java.truecommons.shed.ResourceLoan._
+import global.namespace.scala.plus.ResourceLoan._
 import net.java.truevfs.access.TFile2Test._
 import net.java.truevfs.kernel.spec._
 import org.junit._

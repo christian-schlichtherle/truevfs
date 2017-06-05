@@ -29,6 +29,11 @@
             <artifactId>truevfs-comp-jmx</artifactId>
         </dependency>
         <dependency>
+            <groupId>global.namespace.scala-plus</groupId>
+            <artifactId>scala-plus_${scala.lang.version}</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
         </dependency>

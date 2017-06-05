@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.ext.pacemaker
 
-import net.java.truecommons.shed.OnTryFinally._
+import global.namespace.scala.plus.OnTryFinally._
 import net.java.truecommons.shed._
 import net.java.truevfs.kernel.spec._
 
