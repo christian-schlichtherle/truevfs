@@ -9,14 +9,14 @@ import java.io._
 import global.namespace.scala.plus.ResourceLoan._
 import net.java.truevfs.ext.insight.stats.FsStatisticsTest._
 import org.junit.runner.RunWith
+import org.scalatest.Matchers._
 import org.scalatest._
 import org.scalatest.junit._
-import org.scalatest.prop._
 import org.slf4j.LoggerFactory
 
 /** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])
-class FsStatisticsTest extends WordSpec with ShouldMatchers with PropertyChecks {
+class FsStatisticsTest extends WordSpec {
 
   val original = FsStatistics()
   .logRead(1000 * 1000, 1024, 1)
