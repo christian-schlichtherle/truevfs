@@ -125,36 +125,30 @@ public class TarXZDriver extends TarDriver {
     }
 
     private static final class FixedXZOutputStream extends XZOutputStream {
+
         final FixedBufferedOutputStream out;
 
-        private FixedXZOutputStream(
-                final FixedBufferedOutputStream out,
-                final LZMA2Options options)
-        throws IOException {
+        FixedXZOutputStream(final FixedBufferedOutputStream out, final LZMA2Options options) throws IOException {
             super(out, options);
             this.out = out;
         }
 
-        /**
-         * Ignores the call.
-         * This workaround is required for proper error recovery in Java 8, where {@link FilterOutputStream#close()}
-         * no longer silently ignores any {@link IOException} thrown by {@link FilterOutputStream#flush()}.
-         */
+        //
+        // Ignores the call.
+        // This workaround is required for proper error recovery in Java 8, where {@link FilterOutputStream#close()}
+        // no longer silently ignores any {@link IOException} thrown by {@link FilterOutputStream#flush()}.
+        //
         @Override
         public void flush() throws IOException { }
 
         @Override
         public void close() throws IOException {
-            // Workaround for super class implementation which remembers and
-            // rethrows any IOException thrown by the decorated output stream.
-            // TODO: Remove all this in TrueVFS. TrueVFS uses a
-            // ControlFlowException instead, which is an Error class (!) and
-            // should not interfere with the super class implementation in this
-            // way.
+            // Workaround for super class implementation which fails to close the decorated stream on a subsequent call
+            // if the initial attempt failed with a throwable - see http://java.net/jira/browse/TRUEZIP-234 .
             out.setIgnoreClose(true);
             super.close();
             out.setIgnoreClose(false);
             out.close();
         }
-    } // FixedXZOutputStream
+    }
 }
