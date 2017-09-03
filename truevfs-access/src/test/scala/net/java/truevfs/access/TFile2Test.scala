@@ -14,7 +14,7 @@ import net.java.truevfs.kernel.spec._
 import org.junit._
 import org.scalatest.Matchers._
 import org.scalatest.junit.JUnitSuite
-import org.scalatest.mock.MockitoSugar.mock
+import org.scalatest.mockito.MockitoSugar.mock
 import org.scalatest.prop.PropertyChecks._
 import org.slf4j._
 
