@@ -9,7 +9,7 @@ import org.junit.runner._
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.mock.MockitoSugar.mock
+import org.scalatest.mockito.MockitoSugar.mock
 import org.scalatest.prop.PropertyChecks._
 
 import scala.collection.JavaConverters._

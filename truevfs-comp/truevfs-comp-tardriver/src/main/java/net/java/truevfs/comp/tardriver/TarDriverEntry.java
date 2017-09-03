@@ -60,9 +60,9 @@ implements FsArchiveEntry, Releasable<IOException> {
         super.setMode(template.getMode());
         this.setModTime0(template.getModTime().getTime());
         this.setSize0(template.getSize());
-        super.setUserId(template.getUserId());
+        super.setUserId(template.getLongUserId());
         super.setUserName(template.getUserName());
-        super.setGroupId(template.getGroupId());
+        super.setGroupId(template.getLongGroupId());
         super.setGroupName(template.getGroupName());
         super.setLinkName(template.getLinkName());
         super.setDevMajor(template.getDevMajor());

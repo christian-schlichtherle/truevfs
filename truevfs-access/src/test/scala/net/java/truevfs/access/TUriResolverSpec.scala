@@ -12,7 +12,7 @@ import org.junit.runner._
 import org.scalatest.Matchers._
 import org.scalatest._
 import org.scalatest.junit._
-import org.scalatest.mock.MockitoSugar.mock
+import org.scalatest.mockito.MockitoSugar.mock
 import org.scalatest.prop.PropertyChecks._
 import org.scalatest.prop.TableFor3
 
