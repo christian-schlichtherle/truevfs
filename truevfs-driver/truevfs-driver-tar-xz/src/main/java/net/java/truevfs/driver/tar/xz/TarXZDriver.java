@@ -4,28 +4,23 @@
  */
 package net.java.truevfs.driver.tar.xz;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.cio.InputService;
+import net.java.truecommons.cio.OutputService;
 import net.java.truecommons.io.AbstractSink;
 import net.java.truecommons.io.AbstractSource;
 import net.java.truecommons.io.Streams;
 import net.java.truecommons.shed.BitField;
-import net.java.truevfs.comp.tardriver.FixedBufferedOutputStream;
-import net.java.truevfs.comp.tardriver.TarDriver;
-import net.java.truevfs.comp.tardriver.TarDriverEntry;
-import net.java.truevfs.comp.tardriver.TarInputService;
-import net.java.truevfs.comp.tardriver.TarOutputService;
+import net.java.truevfs.comp.tardriver.*;
 import net.java.truevfs.kernel.spec.*;
-import static net.java.truevfs.kernel.spec.FsAccessOption.STORE;
-import net.java.truecommons.cio.InputService;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
-import net.java.truecommons.cio.OutputService;
 import org.tukaani.xz.LZMA2Options;
 import org.tukaani.xz.XZInputStream;
 import org.tukaani.xz.XZOutputStream;
+
+import javax.annotation.concurrent.Immutable;
+import java.io.*;
+
+import static net.java.truevfs.kernel.spec.FsAccessOption.STORE;
 
 /**
  * An archive driver for XZ compressed TAR files (TAR.XZ).
@@ -139,6 +134,14 @@ public class TarXZDriver extends TarDriver {
             super(out, options);
             this.out = out;
         }
+
+        /**
+         * Ignores the call.
+         * This workaround is required for proper error recovery in Java 8, where {@link FilterOutputStream#close()}
+         * no longer silently ignores any {@link IOException} thrown by {@link FilterOutputStream#flush()}.
+         */
+        @Override
+        public void flush() throws IOException { }
 
         @Override
         public void close() throws IOException {
