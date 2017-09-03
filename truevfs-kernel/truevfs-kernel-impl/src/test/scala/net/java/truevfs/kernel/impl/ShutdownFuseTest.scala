@@ -5,7 +5,7 @@ import java.util.concurrent.Callable
 import net.java.truecommons.shed.ConcurrencyUtils
 import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory
 import org.junit.runner.RunWith
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.inOrder
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec

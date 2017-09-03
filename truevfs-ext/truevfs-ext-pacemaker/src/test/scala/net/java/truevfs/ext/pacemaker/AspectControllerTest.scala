@@ -8,11 +8,11 @@ import net.java.truecommons.cio.{Entry, _}
 import net.java.truevfs.ext.pacemaker.AspectControllerTest._
 import net.java.truevfs.kernel.spec._
 import org.junit.runner._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest._
 import org.scalatest.junit._
-import org.scalatest.mock.MockitoSugar.mock
+import org.scalatest.mockito.MockitoSugar.mock
 
 /** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])

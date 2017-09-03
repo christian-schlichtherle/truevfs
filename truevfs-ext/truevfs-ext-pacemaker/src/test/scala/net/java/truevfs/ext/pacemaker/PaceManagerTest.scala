@@ -10,14 +10,14 @@ import net.java.truecommons.shed.{Filter, _}
 import net.java.truevfs.ext.pacemaker.PaceManagerTest._
 import net.java.truevfs.kernel.spec._
 import org.junit.runner._
-import org.mockito.Matchers._
+import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.Matchers._
 import org.scalatest._
 import org.scalatest.junit._
-import org.scalatest.mock.MockitoSugar.mock
+import org.scalatest.mockito.MockitoSugar.mock
 import org.scalatest.prop.PropertyChecks._
 
 import scala.language.implicitConversions
