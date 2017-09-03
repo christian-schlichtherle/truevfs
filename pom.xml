@@ -64,6 +64,11 @@ plug-in to its federated file system space.
     <properties>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
         <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
+        <maven.compiler.source>1.8</maven.compiler.source>
+
+        <!-- maven-enforcer-plugin -->
+        <!-- Older versions will fail to build the TrueLicense Maven Archetype. -->
+        <maven.enforcer.requireMavenVersion>3.5.0</maven.enforcer.requireMavenVersion>
 
         <!-- maven-antrun-plugin && maven-failsafe-plugin -->
         <java.io.tmpdir.it>${project.build.directory}/it</java.io.tmpdir.it>
@@ -85,6 +90,8 @@ plug-in to its federated file system space.
             <!-- Header text -->
             &lt;b&gt;${project.name} ${project.version}&lt;/b&gt;
         </header>
+
+        <scala.version>2.11.11</scala.version>
 
         <truecommons.version>2.5.0</truecommons.version>
 
