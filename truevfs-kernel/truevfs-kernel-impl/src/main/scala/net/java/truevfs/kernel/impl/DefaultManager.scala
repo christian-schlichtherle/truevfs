@@ -101,7 +101,7 @@ extends FsAbstractManager
     visitor
   }
 
-  private final case class withFilter(filter: FsController => Boolean) {
+  private case class withFilter(filter: FsController => Boolean) {
     def accept(visitor: FsController => Unit) {
       readLocked { controllers.values flatMap { link => Option(link.get) } }
         .filter(filter)

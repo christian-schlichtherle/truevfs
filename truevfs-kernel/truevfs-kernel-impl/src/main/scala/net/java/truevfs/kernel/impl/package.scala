@@ -27,7 +27,8 @@ package object impl {
 
   // Used for looping through BitField, Container etc.
   implicit private[impl] def asScalaIterable[E](i: jl.Iterable[E]): Iterable[E] = {
-    collection.JavaConversions.iterableAsScalaIterable(i)
+    import collection.JavaConverters._
+    i.asScala
   }
 
   implicit private[impl] def asScalaMapFromAccessToLong(input: ju.Map[Access, jl.Long]): Map[Access, Long] = {
