@@ -17,7 +17,7 @@ class FileSystemContainerTest extends WordSpec {
 
   private def newContainer = new FileSystemContainer[DummyEntry]
 
-  "A path map container" should {
+  "A file system container" should {
     "correctly persist entries" in {
       val container = newContainer
 
