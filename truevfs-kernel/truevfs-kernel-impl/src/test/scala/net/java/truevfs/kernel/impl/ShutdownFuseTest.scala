@@ -17,7 +17,7 @@ import ShutdownFuseTest._
  * @author Christian Schlichtherle
  */
 @RunWith(classOf[JUnitRunner])
-private class ShutdownFuseTest extends WordSpec {
+class ShutdownFuseTest extends WordSpec {
 
   "A shutdown fuse with a mock thread registry" when {
     "just constructed" should {
