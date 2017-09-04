@@ -10,7 +10,7 @@ import org.mockito.Mockito.inOrder
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.mock.MockitoSugar.mock
+import org.scalatest.mockito.MockitoSugar.mock
 import ShutdownFuseTest._
 
 /**
