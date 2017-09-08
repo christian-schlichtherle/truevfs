@@ -58,9 +58,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * {@code IoBufferPoolLocator.SINGLETON.get()}.
      */
     @Override
-    public IoBufferPool getPool() {
-        return IoBufferPoolLocator.SINGLETON.get();
-    }
+    public IoBufferPool getPool() { return IoBufferPoolLocator.SINGLETON.get(); }
 
     /**
      * Returns the map of key managers for accessing protected resources
@@ -72,15 +70,13 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * @return {@link KeyManagerMapLocator#SINGLETON}, as by the implementation
      *         in the class {@link ZipDriver}.
      */
-    public KeyManagerMap getKeyManagerMap() {
-        return KeyManagerMapLocator.SINGLETON;
-    }
+    public KeyManagerMap getKeyManagerMap() { return KeyManagerMapLocator.SINGLETON; }
 
-    public final @CheckForNull ZipCryptoParameters zipCryptoParameters(ZipInputService<E> input) {
+    final @CheckForNull ZipCryptoParameters zipCryptoParameters(ZipInputService<E> input) {
         return zipCryptoParameters(input.getModel(), input.getRawCharset());
     }
 
-    public final @CheckForNull ZipCryptoParameters zipCryptoParameters(ZipOutputService<E> output) {
+    final @CheckForNull ZipCryptoParameters zipCryptoParameters(ZipOutputService<E> output) {
         return zipCryptoParameters(output.getModel(), output.getRawCharset());
     }
 
@@ -99,9 +95,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * @return The ZIP crypto parameters for the given file system model
      *         and character set or {@code null} if not available.
      */
-    protected @CheckForNull ZipCryptoParameters zipCryptoParameters(
-            FsModel model,
-            Charset charset) {
+    protected @CheckForNull ZipCryptoParameters zipCryptoParameters(FsModel model, Charset charset) {
         return new KeyManagerZipCryptoParameters(this, model, charset);
     }
 
@@ -119,9 +113,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * @return The URI which represents the file system model's mount point.
      * @see    <a href="http://java.net/jira/browse/TRUEZIP-72">#TRUEZIP-72</a>
      */
-    public URI mountPointUri(FsModel model) {
-        return model.getMountPoint().toHierarchicalUri();
-    }
+    public URI mountPointUri(FsModel model) { return model.getMountPoint().toHierarchicalUri(); }
 
     /**
      * A template method for resolving the resource URI which is required to
@@ -184,23 +176,15 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * @param input the origin of the entry.
      * @return {@code entry.isEncrypted()}.
      */
-    public boolean check(
-            E local,
-            @WillNotClose ZipInputService<E> input) {
+    public boolean check(E local, @WillNotClose ZipInputService<E> input) {
         return local.isEncrypted();
     }
 
-    public final boolean rdc(
-            @WillNotClose ZipInputService<E> input,
-            E local,
-            AbstractZipDriverEntry peer) {
+    final boolean rdc(@WillNotClose ZipInputService<E> input, E local, AbstractZipDriverEntry peer) {
         return rdc(local, peer);
     }
 
-    public final boolean rdc(
-            @WillNotClose ZipOutputService<E> output,
-            E local,
-            AbstractZipDriverEntry peer) {
+    final boolean rdc(@WillNotClose ZipOutputService<E> output, E local, AbstractZipDriverEntry peer) {
         return rdc(peer, local);
     }
 
@@ -297,19 +281,14 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in the class {@link ZipDriver} decorates the
-     * given controller with a package private controller which keeps track of
-     * the AES PBE parameters.
-     * This should pool overridden in order to return just {@code controller} if
-     * and only if you are overriding
-     * {@link #zipCryptoParameters(FsModel, Charset)}, too, and do not want to
-     * use the locatable key manager to resolve passwords, e.g. for WinZip AES
-     * encryption.
+     * The implementation in the class {@link ZipDriver} decorates the given controller with a package private
+     * controller which keeps track of the AES PBE parameters, e.g. the encryption passwords.
+     * This method should be overridden in order to return just {@code controller} if and only if you are overriding
+     * {@link #zipCryptoParameters(FsModel, Charset)}, too, and do not want to use a locatable key manager to resolve
+     * passwords for WinZip AES encryption.
      */
     @Override
-    public FsController decorate(FsController controller) {
-        return new ZipKeyController(controller, this);
-    }
+    public FsController decorate(FsController controller) { return new ZipKeyController(controller, this); }
 
     @Override
     protected final ZipInputService<E> newInput(
@@ -329,11 +308,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
     }
 
     @CreatesObligation
-    protected ZipInputService<E> newZipInput(
-            FsModel model,
-            FsInputSocketSource source)
-    throws IOException {
-        assert null != model;
+    protected ZipInputService<E> newZipInput(FsModel model, FsInputSocketSource source) throws IOException {
         return new ZipInputService<>(model, source, this);
     }
 
@@ -363,8 +338,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * for an upcast in {@link #newOutput}.
      * Thus, when overriding this method, {@link #newOutput} should get
      * overridden, too.
-     * Otherwise, a class cast exception will pool thrown in
-     * {@link #newOutput}.
+     * Otherwise, a class cast exception will be thrown in {@link #newOutput}.
      */
     @Override
     protected FsOutputSocketSink sink(
