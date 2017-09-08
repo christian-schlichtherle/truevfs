@@ -8,12 +8,15 @@ import net.java.truecommons.io._
 import net.java.truecommons.shed._
 import edu.umd.cs.findbugs.annotations._
 import java.io._
+import java.lang
 import java.nio.channels._
 import javax.annotation.concurrent._
+
 import net.java.truecommons.cio.Entry._
 import net.java.truecommons.cio._
-import scala.Option
 import CacheEntry._
+
+import scala.{None, Option, Some}
 
 private object CacheEntry {
 
@@ -104,14 +107,14 @@ private final class CacheEntry private (
 
   override def getName = "Johnny Cache!"
 
-  override def getSize(tµpe: Size) = {
+  override def getSize(tµpe: Size): Long = {
     buffer match {
       case Some(b) => b getSize tµpe
       case None => UNKNOWN
     }
   }
 
-  override def getTime(tµpe: Access) = {
+  override def getTime(tµpe: Access): Long = {
     buffer match {
       case Some(b) => b getTime tµpe
       case None => UNKNOWN
@@ -134,7 +137,7 @@ private final class CacheEntry private (
     *         backing store.
     * @return `this`
     */
-  def configure(input: AnyInputSocket) = {
+  def configure(input: AnyInputSocket): CacheEntry = {
     require(null ne input)
     _input = Some(input)
     this
@@ -151,7 +154,7 @@ private final class CacheEntry private (
     *         backing store.
     * @return `this`
     */
-  def configure(output: AnyOutputSocket) = {
+  def configure(output: AnyOutputSocket): CacheEntry = {
     require(null ne output)
     _output = Some(output)
     this
@@ -164,8 +167,8 @@ private final class CacheEntry private (
   def input: AnyInputSocket = {
     final class Input extends DelegatingInputSocket[Entry]
     with BufferAllocator {
-      override def socket() = buffer(inputBufferPool).input
-      override def target() = target(_input.get)
+      override def socket(): InputSocket[Buffer] = buffer(inputBufferPool).input
+      override def target(): Entry = target(_input.get)
     }
     new Input
   }
@@ -177,8 +180,8 @@ private final class CacheEntry private (
   def output: AnyOutputSocket = {
     final class Output extends DelegatingOutputSocket[Entry]
     with BufferAllocator {
-      override def socket() = buffer(outputBufferPool).output
-      override def target() = target(_output.get)
+      override def socket(): OutputSocket[Buffer] = buffer(outputBufferPool).output
+      override def target(): Entry = target(_output.get)
     }
     new Output
   }
@@ -186,13 +189,13 @@ private final class CacheEntry private (
   private trait BufferAllocator {
     private[this] var allocated: Option[Buffer] = None
 
-    def buffer(pool: Pool[Buffer, IOException]) = {
+    def buffer(pool: Pool[Buffer, IOException]): Buffer = {
       val b = pool allocate ()
       allocated = Some(b)
       b
     }
 
-    def target(socket: AnyIoSocket) = {
+    def target(socket: AnyIoSocket): Entry = {
       allocated match {
         case Some(b) => b
         case None => new ProxyEntry(socket target ())
@@ -204,12 +207,12 @@ private final class CacheEntry private (
     * Whether or not this method needs to be called depends on the caching
     * strategy.
     * E.g. the caching strategy
-    * [[net.java.truevfs.kernel.impl.CacheEntry.Strategy.WRITE_THROUGH]]
+    * [[net.java.truevfs.kernel.impl.CacheEntry.Strategy#WRITE_THROUGH]]
     * writes any changed entry data immediately, so calling this method has no
     * effect.
     */
   override def flush() {
-    buffer foreach { outputBufferPool release _ }
+    buffer foreach outputBufferPool.release
   }
 
   /** Clears the entry data from this cache without flushing it.
@@ -224,7 +227,7 @@ private final class CacheEntry private (
   }
 
   private final class InputBufferPool extends Pool[Buffer, IOException] {
-    override def allocate() = {
+    override def allocate(): Buffer = {
       val b = buffer match {
         case Some(b) => b
         case None =>
@@ -278,7 +281,7 @@ private final class CacheEntry private (
 
   private[CacheEntry] abstract class OutputBufferPool
   extends Pool[Buffer, IOException] {
-    override def allocate() = {
+    override def allocate(): Buffer = {
       val b = new Buffer
       assert(0 == b.readers)
       b.writers = 1
@@ -300,16 +303,16 @@ private final class CacheEntry private (
     var readers: Int = _
     var writers: Int = _
 
-    override def getName = data.getName
-    override def getSize(tµpe: Size) = data getSize tµpe
-    override def getTime(tµpe: Access) = data getTime tµpe
-    override def isPermitted(tµpe: Access, entity: Entity) =
+    override def getName: String = data.getName
+    override def getSize(tµpe: Size): Long = data getSize tµpe
+    override def getTime(tµpe: Access): Long = data getTime tµpe
+    override def isPermitted(tµpe: Access, entity: Entity): lang.Boolean =
       data isPermitted (tµpe, entity)
 
     def load(input: AnyInputSocket) { IoSockets copy (input, data.output) }
     def save(output: AnyOutputSocket) { IoSockets copy (data.input, output) }
 
-    override def release {
+    override def release() {
       assert(0 == writers)
       assert(0 == readers)
       data release ()
@@ -319,7 +322,7 @@ private final class CacheEntry private (
       final class Input extends AbstractInputSocket[Buffer] {
         private[this] val socket = data.input
 
-        override def target() = Buffer.this
+        override def target(): Buffer = Buffer.this
 
         override def stream(peer: AnyOutputSocket) =
           new CacheInputStream(socket stream peer)
@@ -334,7 +337,7 @@ private final class CacheEntry private (
       final class Output extends AbstractOutputSocket[Buffer] {
         private[this] val socket = data.output
 
-        override def target() = Buffer.this
+        override def target(): Buffer = Buffer.this
 
         override def stream(peer: AnyInputSocket) =
           new CacheOutputStream(socket stream peer)
@@ -358,11 +361,11 @@ private final class CacheEntry private (
     extends DecoratingSeekableChannel(channel) with OutputResource
 
     private trait InputResource extends Resource {
-      abstract override def close() = close(inputBufferPool)
+      abstract override def close(): Unit = close(inputBufferPool)
     }
 
     private trait OutputResource extends Resource {
-      abstract override def close() = close(outputBufferPool)
+      abstract override def close(): Unit = close(outputBufferPool)
     }
 
     private trait Resource extends Closeable {

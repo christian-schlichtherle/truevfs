@@ -7,7 +7,7 @@ package net.java.truevfs.ext.pacemaker
 import java.net._
 
 import net.java.truecommons.shed.{Filter, _}
-import net.java.truevfs.ext.pacemaker.PaceManagerTest._
+import net.java.truevfs.ext.pacemaker.PaceManagerTest.{Expectation, _}
 import net.java.truevfs.kernel.spec._
 import org.junit.runner._
 import org.mockito.ArgumentMatchers._
@@ -152,7 +152,7 @@ private object PaceManagerTest {
   implicit def parseMountPoint(string: String): FsMountPoint =
     new FsMountPoint(new URI(string))
 
-  def model(mediator: PaceMediator, mountPoint: FsMountPoint) = {
+  def model(mediator: PaceMediator, mountPoint: FsMountPoint): PaceModel = {
     val parent =
       if (null != mountPoint.getParent) {
         val parent = mock[FsModel]
@@ -164,7 +164,7 @@ private object PaceManagerTest {
     mediator instrument (null, new DefaultModel(mountPoint, parent))
   }
 
-  def mockController(model: FsModel) = {
+  def mockController(model: FsModel): FsController = {
     val controller = mock[FsController]
     when(controller.getModel) thenReturn model
     controller
@@ -181,7 +181,7 @@ private object PaceManagerTest {
     override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint) =
       throw new UnsupportedOperationException
 
-    override def accept[X <: Exception, V <: Visitor[_ >: FsController, X]](filter: ControllerFilter, visitor: V) = {
+    override def accept[X <: Exception, V <: Visitor[_ >: FsController, X]](filter: ControllerFilter, visitor: V): V = {
       controllers filter filter.accept foreach visitor.visit
       visitor
     }
@@ -190,7 +190,7 @@ private object PaceManagerTest {
   private sealed abstract class Expectation(mountPoints: FsMountPoint*)
   extends (FsController => Boolean) {
     private val set = mountPoints.toSet
-    override def apply(controller: FsController) =
+    override def apply(controller: FsController): Boolean =
       set contains controller.getModel.getMountPoint
     def stub(controller: FsController)
   }
@@ -223,7 +223,7 @@ private object PaceManagerTest {
 
     private var mounted: Boolean = _
 
-    override def isMounted = mounted
+    override def isMounted: Boolean = mounted
     override def setMounted(mounted: Boolean) { this.mounted = mounted }
   }
 }

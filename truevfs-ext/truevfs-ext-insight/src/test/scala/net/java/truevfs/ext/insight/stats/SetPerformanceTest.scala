@@ -20,8 +20,8 @@ object SetPerformanceTest {
   def main(args: Array[String]) {
     for (i <- 1 to iterations) {
       printf("\nIteration %d:\n", i)
-      printf("Immutable Set: %s\n", format(immutableSet))
-      printf("Mutable Set  : %s\n", format(mutableSet))
+      printf("Immutable Set: %s\n", format(() => immutableSet()))
+      printf("Mutable Set  : %s\n", format(() => mutableSet()))
     }
   }
 

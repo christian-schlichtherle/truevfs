@@ -4,23 +4,19 @@
  */
 package net.java.truevfs.kernel.impl
 
-import net.java.truecommons.shed._
 import java.io._
-import java.nio.channels._
 import javax.annotation.concurrent._
+
 import net.java.truevfs.kernel.spec._
-import net.java.truecommons.cio._
-import net.java.truecommons.cio.Entry._;
-import scala.Option
 
 /** This abstract archive controller controls the mount state transition.
   * It is up to the sub-class to implement the actual mounting/unmounting
   * strategy.
   *
   * This controller is an emitter of
-  * [[net.java.truevfs.kernel.impl.ControlFlowException]]s, for example
+  * [[net.java.truecommons.shed.ControlFlowException]]s, for example
   * when
-  * [[net.java.truevfs.kernel.impl.NeedsWriteLockException requiring a write lock].
+  * [[net.java.truevfs.kernel.impl.NeedsWriteLockException requiring a write lock]].
   *
   * @tparam E the type of the archive entries.
   * @author Christian Schlichtherle
@@ -33,10 +29,10 @@ extends BasicArchiveController[E] with MountState[E] {
   /** The mount state of the archive file system. */
   private[this] var mountState: MountState[E] = new ResetFileSystem
 
-  final def autoMount(options: AccessOptions, autoCreate: Boolean) =
+  final def autoMount(options: AccessOptions, autoCreate: Boolean): ArchiveFileSystem[E] =
     mountState autoMount (options, autoCreate)
 
-  final def fileSystem = mountState.fileSystem
+  final def fileSystem: Option[ArchiveFileSystem[E]] = mountState.fileSystem
 
   final def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]]) {
     mountState.fileSystem = fileSystem
@@ -46,7 +42,7 @@ extends BasicArchiveController[E] with MountState[E] {
    * Mounts the (virtual) archive file system from the target file.
    * <p>
    * Upon normal termination, this method is expected to have called
-   * {@link #setFileSystem} to assign the fully initialized file system
+   * `setFileSystem` to assign the fully initialized file system
    * to this controller.
    * Other than this, the method must not have any side effects on the
    * state of this class or its super class.
@@ -56,7 +52,7 @@ extends BasicArchiveController[E] with MountState[E] {
    * system is acquired.
    *
    * @param  options the options for accessing the file system entry.
-   * @param  autoCreate If this is {@code true} and the archive file does not
+   * @param  autoCreate If this is `true` and the archive file does not
    *         exist, then a new archive file system with only a virtual root
    *         directory is created with its last modification time set to the
    *         system's current time.
@@ -65,38 +61,42 @@ extends BasicArchiveController[E] with MountState[E] {
   def mount(options: AccessOptions, autoCreate: Boolean)
 
   private final class ResetFileSystem extends MountState[E] {
-    def autoMount(options: AccessOptions, autoCreate: Boolean) = {
-      checkWriteLockedByCurrentThread
+
+    def autoMount(options: AccessOptions, autoCreate: Boolean): ArchiveFileSystem[E] = {
+      checkWriteLockedByCurrentThread()
       mount(options, autoCreate)
       mountState.fileSystem.get
     }
 
-    def fileSystem = None
+    def fileSystem: Option[ArchiveFileSystem[E]] = None
 
     def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]]) {
       // Passing in None may happen by sync(*).
       fileSystem.foreach { fs => mountState = new MountedFileSystem(fs) }
     }
-  } // ResetFileSystem
+  }
 
-  private final class MountedFileSystem(fs: ArchiveFileSystem[E])
-  extends MountState[E] {
-    def autoMount(options: AccessOptions, autoCreate: Boolean) = fs
+  private final class MountedFileSystem(fs: ArchiveFileSystem[E]) extends MountState[E] {
 
-    def fileSystem = Some(fs)
+    def autoMount(options: AccessOptions, autoCreate: Boolean): ArchiveFileSystem[E] = fs
+
+    def fileSystem: Option[ArchiveFileSystem[E]]  = Some(fs)
 
     def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]]) {
       fileSystem match {
-        case Some(fs) => throw new IllegalStateException("File system already mounted!")
+        case Some(_) => throw new IllegalStateException("File system already mounted!")
         case _ => mountState = new ResetFileSystem
       }
     }
-  } // MountedFileSystem
+  }
 }
 
 /** Represents the mount state of the archive file system. */
 private sealed trait MountState[E <: FsArchiveEntry] {
+
   def autoMount(options: AccessOptions, autoCreate: Boolean): ArchiveFileSystem[E]
+
   def fileSystem: Option[ArchiveFileSystem[E]]
-  def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]])
-} // MountState
+
+  def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]]): Unit
+}

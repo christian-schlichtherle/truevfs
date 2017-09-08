@@ -105,9 +105,9 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     }
   }
 
-  override def size = master.size
+  override def size: Int = master.size
 
-  def iterator = master.iterator
+  def iterator: Iterator[FsCovariantNode[E]] = master.iterator
 
   /** Returns a covariant file system node or `None` if no file system
     * node exists for the given name.
@@ -119,7 +119,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     * @return A covariant file system node or `None` if no file system
     *         node exists for the given name.
     */
-  def node(options: AccessOptions, name: FsNodeName) = {
+  def node(options: AccessOptions, name: FsNodeName): Option[FsCovariantNode[E]] = {
     master.get(name.getPath) match {
       case Some(cn) => Some(cn.clone(driver))
       case None => None
@@ -136,7 +136,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
         "Cannot set read-only state!")
   }
 
-  def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]) = {
+  def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]): Boolean = {
     val cn = master.get(name.getPath) match {
       case Some(x) => x
       case _ => throw new NoSuchFileException(fullPath(name))
@@ -150,7 +150,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     ok
   }
 
-  def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long) = {
+  def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long): Boolean = {
     if (0 > value)
       throw new IllegalArgumentException(fullPath(name)
                                          + " (negative access time)")
@@ -195,7 +195,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     *         [[net.java.truevfs.kernel.impl.ArchiveFileSystem.Make]]
     *         object.
     */
-  def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) = {
+  def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]): Make = {
     require(null ne tµpe)
     if (FILE.ne(tµpe) && DIRECTORY.ne(tµpe)) // TODO: Add support for other types.
       throw new FileSystemException(fullPath(name), null,
@@ -303,7 +303,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
       time
     }
 
-    def head = segments.head.entry
+    def head: FsCovariantNode[E] = segments.head.entry
   }
 
   /** Tests the named file system entry and then - unless its the file system
@@ -447,7 +447,7 @@ private object ArchiveFileSystem {
     *         with the contained [[java.lang.Throwable]] as its cause.
     * @return A new archive file system.
     */
-  def apply[E <: FsArchiveEntry](model: ArchiveModel[E], archive: Container[E], rootTemplate: Entry, readOnly: Option[Throwable]) = {
+  def apply[E <: FsArchiveEntry](model: ArchiveModel[E], archive: Container[E], rootTemplate: Entry, readOnly: Option[Throwable]): ArchiveFileSystem[E] = {
     readOnly match {
       case Some(cause) => new ReadOnlyArchiveFileSystem(model, archive, rootTemplate, cause)
       case None => new ArchiveFileSystem(model, archive, rootTemplate)
@@ -484,14 +484,14 @@ private object ArchiveFileSystem {
     private[this] val map = new collection.mutable.LinkedHashMap[String, FsCovariantNode[E]] {
       // See https://issues.scala-lang.org/browse/SI-5804 .
       table = new Array(initialCapacity(_initialSize))
-      threshold = (table.size * 3L / 4).toInt
+      threshold = (table.length * 3L / 4).toInt
     }
 
-    override def size = map.size
+    override def size: Int = map.size
 
-    override def iterator = map.values.iterator
+    override def iterator: Iterator[FsCovariantNode[E]] = map.values.iterator
 
-    def add(name: String, ae: E) = {
+    def add(name: String, ae: E): FsCovariantNode[E] = {
       val cn = map.get(name) match {
         case Some(x) => x
         case _ =>
@@ -503,13 +503,13 @@ private object ArchiveFileSystem {
       cn
     }
 
-    def get(name: String) = map.get(name)
+    def get(name: String): Option[FsCovariantNode[E]] = map.get(name)
 
-    def remove(name: String) = map.remove(name)
+    def remove(name: String): Option[FsCovariantNode[E]] = map.remove(name)
   }
 
   private final class Splitter extends PathSplitter(SEPARATOR_CHAR, false) {
-    override def getParentPath = {
+    override def getParentPath: String = {
       val path = super.getParentPath
       if (null ne path)
         path
