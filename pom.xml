@@ -105,6 +105,7 @@ plug-in to its federated file system space.
         <module>truevfs-comp</module>
         <module>truevfs-driver</module>
         <module>truevfs-ext</module>
+        <module>truevfs-it</module>
         <module>truevfs-kernel</module>
         <module>truevfs-profile</module>
         <module>truevfs-samples</module>
