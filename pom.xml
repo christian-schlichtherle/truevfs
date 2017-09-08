@@ -405,12 +405,6 @@ plug-in to its federated file system space.
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <configuration>
-                        <parallel>classesAndMethods</parallel>
-                        <!-- Consider 0% blocking factor because unit tests
-                             shouldn't do any I/O.
-                             This is per CPU core.
-                             -->
-                        <threadCount>1</threadCount>
                         <includes>
                             <include>**/*Test.class</include>
                             <include>**/*Spec.class</include>
@@ -423,11 +417,6 @@ plug-in to its federated file system space.
                 <plugin>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <configuration>
-                        <parallel>methods</parallel>
-                        <!-- Assume 90% blocking factor for I/O.
-                             This is per CPU core.
-                             -->
-                        <threadCount>10</threadCount>
                         <!-- Setting -XX:+DisableExplicitGC would trigger an
                              endless loop because some tests check if the
                              garbage collection and the finalization kicked
