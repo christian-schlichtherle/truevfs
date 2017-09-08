@@ -14,6 +14,8 @@ import net.java.truevfs.access.it.TFileITSuite;
 import net.java.truevfs.comp.zipdriver.TestWinZipAesDriver;
 import static net.java.truevfs.kernel.spec.FsAccessOption.ENCRYPT;
 import static org.junit.Assert.*;
+
+import net.java.truevfs.comp.zipdriver.ZipDriver;
 import org.junit.Test;
 
 /**

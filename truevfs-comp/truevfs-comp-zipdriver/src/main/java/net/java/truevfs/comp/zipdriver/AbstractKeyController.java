@@ -34,7 +34,7 @@ extends FsDecoratingController {
 
     protected final D driver;
 
-    private volatile KeyManagerMap keyManagers;
+    private volatile KeyManagerMap keyManagerMap;
 
     /**
      * Constructs a new key manager controller.
@@ -53,12 +53,6 @@ extends FsDecoratingController {
     protected abstract Class<?> getKeyType();
 
     protected abstract Class<? extends IOException> getKeyExceptionType();
-
-    private KeyManager<?> getKeyManager() {
-        final KeyManagerMap c = this.keyManagers;
-        return (null != c ? c : (this.keyManagers = driver.getKeyManagerMap()))
-                .manager(getKeyType());
-    }
 
     private @CheckForNull IOException findKeyException(Throwable ex) {
         final Class<? extends IOException> clazz = getKeyExceptionType();
@@ -143,7 +137,7 @@ extends FsDecoratingController {
         final URI mpu = driver.mountPointUri(model);
         final URI fsu = driver.fileSystemUri(model, name.toString());
         if (!fsu.equals(mpu) || name.isRoot())
-            getKeyManager().unlink(fsu);
+            keyManager().unlink(fsu);
     }
 
     @Override
@@ -155,7 +149,14 @@ extends FsDecoratingController {
         } catch (FsSyncWarningException ex) {
             builder.warn(ex);
         }
-        getKeyManager().release(driver.mountPointUri(getModel()));
+        keyManager().release(driver.mountPointUri(getModel()));
         builder.check();
+    }
+
+    private KeyManager<?> keyManager() { return keyManagerMap().manager(getKeyType()); }
+
+    private KeyManagerMap keyManagerMap() {
+        final KeyManagerMap keyManagerMap = this.keyManagerMap;
+        return null != keyManagerMap ? keyManagerMap : (this.keyManagerMap = driver.getKeyManagerMap());
     }
 }
