@@ -32,7 +32,7 @@
         </dependency>
         <dependency>
             <groupId>global.namespace.scala-plus</groupId>
-            <artifactId>scala-plus_${scala.lang.version}</artifactId>
+            <artifactId>scala-plus_${scala.compat.version}</artifactId>
         </dependency>
         <dependency>
             <groupId>org.scala-lang</groupId>

@@ -24,7 +24,7 @@ import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS12PasswordToBytes;
 import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.engines.AESFastEngine;
+import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.generators.PKCS12ParametersGenerator;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
@@ -154,8 +154,7 @@ final class Type0RaesReadOnlyChannel extends RaesReadOnlyChannel {
         this.sha256MacParam = sha256MacParam;
 
         // Init cipher and channel.
-        final SeekableBlockCipher
-                cipher = new CtrBlockCipher(new AESFastEngine());
+        final SeekableBlockCipher cipher = new CtrBlockCipher(new AESEngine());
         cipher.init(false, aesCtrParam);
         this.channel = new CipherReadOnlyChannel(cipher,
                 new IntervalReadOnlyChannel(channel.position(start), length));
