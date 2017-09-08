@@ -28,11 +28,6 @@
             <artifactId>truevfs-kernel-spec</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-kernel-spec</artifactId>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
             <groupId>net.java.truecommons</groupId>
             <artifactId>truecommons-shed</artifactId>
             <type>test-jar</type>
