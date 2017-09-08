@@ -17,7 +17,7 @@ import net.java.truecommons.key.spec.common.AesPbeParameters;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class ZipKeyController extends AbstractKeyController<AbstractZipDriver<?>> {
+final class ZipKeyController extends AbstractKeyController {
 
     ZipKeyController(FsController controller, AbstractZipDriver<?> driver) {
         super(controller, driver);

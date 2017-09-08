@@ -244,8 +244,7 @@ extends FsAbstractController {
     }
 
     @Override
-    public void sync(final BitField<FsSyncOption> options)
-    throws FsSyncException {
+    public void sync(final BitField<FsSyncOption> options) throws FsSyncException {
         getThrowControl().check(this, FsSyncException.class);
         checkUndeclaredExceptions(this);
         assert null != options;
