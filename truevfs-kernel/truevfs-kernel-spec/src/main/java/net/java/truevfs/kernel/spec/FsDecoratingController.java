@@ -112,8 +112,7 @@ public abstract class FsDecoratingController extends FsAbstractController {
     }
 
     @Override
-    public void sync(BitField<FsSyncOption> options)
-    throws FsSyncException {
+    public void sync(BitField<FsSyncOption> options) throws FsSyncException {
         controller.sync(options);
     }
 

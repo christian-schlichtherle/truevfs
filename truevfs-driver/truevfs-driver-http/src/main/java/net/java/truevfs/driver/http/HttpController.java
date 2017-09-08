@@ -122,6 +122,5 @@ public class HttpController extends FsAbstractController {
     }
 
     @Override
-    public void sync(BitField<FsSyncOption> options) {
-    }
+    public void sync(BitField<FsSyncOption> options) { }
 }

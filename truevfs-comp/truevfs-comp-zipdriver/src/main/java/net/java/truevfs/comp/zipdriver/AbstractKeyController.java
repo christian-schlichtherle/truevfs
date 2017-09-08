@@ -27,12 +27,11 @@ import net.java.truecommons.key.spec.KeyManagerMap;
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class AbstractKeyController<D extends AbstractZipDriver<?>>
-extends FsDecoratingController {
+public abstract class AbstractKeyController extends FsDecoratingController {
 
     private static final String ROOT_PATH = ROOT.getPath();
 
-    protected final D driver;
+    protected final AbstractZipDriver<?> driver;
 
     private volatile KeyManagerMap keyManagerMap;
 
@@ -45,7 +44,7 @@ extends FsDecoratingController {
      */
     protected AbstractKeyController(
             final FsController controller,
-            final D driver) {
+            final AbstractZipDriver<?> driver) {
         super(controller);
         this.driver = Objects.requireNonNull(driver);
     }
@@ -141,8 +140,7 @@ extends FsDecoratingController {
     }
 
     @Override
-    public void sync(final BitField<FsSyncOption> options)
-    throws FsSyncWarningException, FsSyncException {
+    public void sync(final BitField<FsSyncOption> options) throws FsSyncException {
         final FsSyncExceptionBuilder builder = new FsSyncExceptionBuilder();
         try {
             controller.sync(options);
