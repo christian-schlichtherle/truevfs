@@ -76,12 +76,15 @@
         <dependency>
             <groupId>global.namespace.scala-plus</groupId>
             <artifactId>scala-plus_${scala.compat.version}</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>net.java.truecommons</groupId>
             <artifactId>truecommons-io</artifactId>
             <type>test-jar</type>
+        </dependency>
+        <dependency>
+            <groupId>net.java.truecommons</groupId>
+            <artifactId>truecommons-key-default</artifactId>
         </dependency>
         <dependency>
             <groupId>net.java.truecommons</groupId>
