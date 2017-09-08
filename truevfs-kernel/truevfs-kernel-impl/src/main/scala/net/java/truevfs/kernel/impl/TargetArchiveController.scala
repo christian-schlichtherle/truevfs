@@ -5,6 +5,7 @@
 package net.java.truevfs.kernel.impl
 
 import java.io._
+import java.nio.channels.SeekableByteChannel
 import java.nio.file._
 import javax.annotation.concurrent._
 
@@ -21,7 +22,7 @@ import net.java.truevfs.kernel.spec.FsAccessOptions._
 import net.java.truevfs.kernel.spec.FsSyncOption._
 import net.java.truevfs.kernel.spec._
 
-import scala.Option
+import scala.{None, Option, Some}
 import scala.reflect.ClassTag
 
 /** Manages I/O to the entry which represents the target archive file in its
@@ -31,8 +32,8 @@ import scala.reflect.ClassTag
   * This controller is an emitter of
   * [[net.java.truecommons.shed.ControlFlowException]]s, for example
   * when
-  * [[net.java.truevfs.kernel.impl.FalsePositiveArchiveException detecting a false positive archive file], or
-  * [[net.java.truevfs.kernel.impl.NeedsSyncException requiring a sync].
+  * [[net.java.truevfs.kernel.impl.FalsePositiveArchiveException detecting a false positive archive file]], or
+  * [[net.java.truevfs.kernel.impl.NeedsSyncException requiring a sync]].
   *
   * @tparam E the type of the archive entries.
   * @author Christian Schlichtherle
@@ -53,14 +54,14 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
   assert(null ne name)
 
   /**
-   * The (possibly cached) {@link InputArchive} which is used to mount the
+   * The (possibly cached) [[InputArchive]] which is used to mount the
    * (virtual) archive file system and read the entries from the target
    * archive file.
    */
   private[this] var _inputArchive: Option[InputArchive[E]] = None
 
   /**
-   * The (possibly cached) {@link OutputArchive} which is used to write the
+   * The (possibly cached) [[OutputArchive]] which is used to write the
    * entries to the target archive file.
    */
   private[this] var _outputArchive: Option[OutputArchive[E]] = None
@@ -169,7 +170,7 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
 
   private def optionalReadOnlyCause() = {
     try {
-      parent checkAccess (MOUNT_OPTIONS, name, WRITE_ACCESS);
+      parent checkAccess (MOUNT_OPTIONS, name, WRITE_ACCESS)
       None
     } catch {
       case cause: FalsePositiveArchiveException => throw new AssertionError(cause)
@@ -178,7 +179,7 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
   }
 
   /**
-   * Ensures that {@link #outputArchive} does not return {@code None}.
+   * Ensures that `outputArchive` does not return `None`.
    *
    * @return The output archive.
    */
@@ -207,31 +208,31 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
     oa
   }
 
-  def input(name: String) = {
+  def input(name: String): InputSocket[E] = {
     final class Input extends AbstractInputSocket[E] {
-      lazy val socket = inputArchive.get input name
+      lazy val socket: InputSocket[E] = inputArchive.get input name
 
-      def target() = syncOn[ClosedInputException] { socket target () }
+      def target(): E = syncOn[ClosedInputException] { socket target () }
 
-      override def stream(peer: AnyOutputSocket) =
+      override def stream(peer: AnyOutputSocket): InputStream =
         syncOn[ClosedInputException] { socket stream peer }
 
-      override def channel(peer: AnyOutputSocket) =
+      override def channel(peer: AnyOutputSocket): SeekableByteChannel =
         syncOn[ClosedInputException] { socket channel peer }
     }
     new Input
   }
 
-  def output(options: AccessOptions, entry: E) = {
+  def output(options: AccessOptions, entry: E): OutputSocket[E] = {
     final class Output extends AbstractOutputSocket[E] {
-      lazy val socket = outputArchive(options) output entry
+      lazy val socket: OutputSocket[E] = outputArchive(options) output entry
 
-      def target = entry
+      def target: E = entry
 
-      override def stream(peer: AnyInputSocket) =
+      override def stream(peer: AnyInputSocket): OutputStream =
         syncOn[ClosedOutputException] { socket stream peer }
 
-      override def channel(peer: AnyInputSocket) =
+      override def channel(peer: AnyInputSocket): SeekableByteChannel =
         syncOn[ClosedOutputException] { socket channel peer }
     }
     new Output
@@ -240,7 +241,7 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
   private def syncOn[X <: IOException] = new SyncOn
 
   private class SyncOn[X <: IOException] {
-    def apply[A](operation: => A)(implicit mf: ClassTag[X]) = {
+    def apply[A](operation: => A)(implicit mf: ClassTag[X]): A = {
       try { operation }
       catch { case x: X => throw NeedsSyncException() }
     }
@@ -348,7 +349,7 @@ extends FileSystemArchiveController[E] with ArchiveModelAspect[E] {
     }
     _outputArchive.foreach { oa =>
       try {
-        oa.close();
+        oa close ()
       } catch {
         case ex: ControlFlowException =>
           assert(ex.isInstanceOf[NeedsLockRetryException], ex)
@@ -429,13 +430,13 @@ private object TargetArchiveController {
   private final class InputArchive[E <: FsArchiveEntry]
   (val driverProduct: InputService[E])
   extends LockInputService(new DisconnectingInputService(driverProduct)) {
-    def clutch = container.asInstanceOf[DisconnectingInputService[E]]
+    def clutch: DisconnectingInputService[E] = container.asInstanceOf[DisconnectingInputService[E]]
   }
 
   private final class OutputArchive[E <: FsArchiveEntry]
   (driverProduct: OutputService[E])
   extends LockOutputService(new DisconnectingOutputService(driverProduct)) {
-    def clutch = container.asInstanceOf[DisconnectingOutputService[E]]
+    def clutch: DisconnectingOutputService[E] = container.asInstanceOf[DisconnectingOutputService[E]]
   }
 
   /** A dummy input archive to substitute for `None` when copying.
@@ -444,9 +445,9 @@ private object TargetArchiveController {
     */
   private final class DummyInputService[E <: Entry] extends InputService[E] {
     override def size = 0
-    override def iterator = java.util.Collections.emptyList[E].iterator
-    override def entry(name: String) = null.asInstanceOf[E]
-    override def input(name: String) = throw new AssertionError
-    override def close() = throw new AssertionError
+    override def iterator: java.util.Iterator[E] = java.util.Collections.emptyList[E].iterator
+    override def entry(name: String): E = null.asInstanceOf[E]
+    override def input(name: String): InputSocket[E] = throw new AssertionError
+    override def close(): Unit = throw new AssertionError
   }
 } // TargetArchiveController
