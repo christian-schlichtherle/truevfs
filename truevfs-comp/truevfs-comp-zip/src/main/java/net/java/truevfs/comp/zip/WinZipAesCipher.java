@@ -5,7 +5,7 @@
 package net.java.truevfs.comp.zip;
 
 import net.java.truevfs.comp.zip.crypto.CtrBlockCipher;
-import org.bouncycastle.crypto.engines.AESFastEngine;
+import org.bouncycastle.crypto.engines.AESEngine;
 
 /**
  * Implements Counter (CTR) mode (alias Segmented Integer Counter - SIC)
@@ -21,11 +21,11 @@ final class WinZipAesCipher extends CtrBlockCipher {
 
     /**
      * Constructs a new block cipher mode for use with WinZip AES.
-     * This constructor uses an {@link AESFastEngine} as the underlying block
+     * This constructor uses an {@link AESEngine} as the underlying block
      * cipher.
      */
     WinZipAesCipher() {
-        super(new AESFastEngine());
+        super(new AESEngine());
     }
 
     @Override

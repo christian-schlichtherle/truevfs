@@ -102,18 +102,14 @@ public abstract class ZipRaesDriver extends JarDriver {
     /**
      * {@inheritDoc}
      * <p>
-     * The implementation in the class {@link ZipRaesDriver} decorates the
-     * given controller with a package private controller which keeps track of
-     * the encryption keys.
-     * This should getKeyManager overridden in order to return just {@code controller} if
-     * and only if you are overriding
-     * {@link #raesParameters(FsModel)}, too, and do not want to use the
-     * locatable key manager to resolve passwords for RAES encryption.
+     * The implementation in the class {@link ZipRaesDriver} decorates the given controller with a package private
+     * controller which keeps track of the AES PBE parameters, e.g. the encryption passwords.
+     * This method should be overridden in order to return just {@code controller} if and only if you are overriding
+     * {@link #raesParameters(FsModel)}, too, and do not want to use a locatable key manager to resolve
+     * passwords for RAES encryption.
      */
     @Override
-    public FsController decorate(FsController controller) {
-        return new ZipRaesKeyController(controller, this);
-    }
+    public FsController decorate(FsController controller) { return new ZipRaesKeyController(controller, this); }
 
     @Override
     protected ZipInputService<JarDriverEntry> newZipInput(

@@ -38,26 +38,10 @@
     </modules>
 
     <dependencies>
-        <!-- All drivers depend on the TrueVFS Kernel and its test suite for
-             integration testing. -->
+        <!-- All drivers depend on the TrueVFS Kernel. -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-kernel-spec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-kernel-spec</artifactId>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-kernel-impl</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-key-default</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

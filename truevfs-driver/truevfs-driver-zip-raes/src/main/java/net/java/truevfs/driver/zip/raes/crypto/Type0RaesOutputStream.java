@@ -13,7 +13,7 @@ import net.java.truevfs.comp.zip.crypto.CipherOutputStream;
 import net.java.truevfs.comp.zip.crypto.CtrBlockCipher;
 import org.bouncycastle.crypto.*;
 import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.engines.AESFastEngine;
+import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.generators.PKCS12ParametersGenerator;
 import org.bouncycastle.crypto.io.MacOutputStream;
 import org.bouncycastle.crypto.macs.HMac;
@@ -102,7 +102,7 @@ final class Type0RaesOutputStream extends RaesOutputStream {
         // Init cipher.
         final BufferedBlockCipher cipher = new BufferedPartialBlockCipher(
                 new CtrBlockCipher( // or new SICBlockCipher(
-                    new AESFastEngine()));
+                    new AESEngine()));
         cipher.init(true, aesCtrParam);
 
         // Init MAC.

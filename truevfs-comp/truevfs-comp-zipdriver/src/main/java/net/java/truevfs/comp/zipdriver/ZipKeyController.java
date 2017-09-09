@@ -17,22 +17,15 @@ import net.java.truecommons.key.spec.common.AesPbeParameters;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class ZipKeyController
-extends AbstractKeyController<AbstractZipDriver<?>> {
+final class ZipKeyController extends AbstractKeyController {
 
-    public ZipKeyController(
-            FsController controller,
-            AbstractZipDriver<?> driver) {
+    ZipKeyController(FsController controller, AbstractZipDriver<?> driver) {
         super(controller, driver);
     }
 
     @Override
-    protected Class<?> getKeyType() {
-        return AesPbeParameters.class;
-    }
+    protected Class<?> getKeyType() { return AesPbeParameters.class; }
 
     @Override
-    protected Class<? extends IOException> getKeyExceptionType() {
-        return ZipKeyException.class;
-    }
+    protected Class<? extends IOException> getKeyExceptionType() { return ZipKeyException.class; }
 }
