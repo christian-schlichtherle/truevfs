@@ -9,7 +9,7 @@
     <parent>
         <groupId>net.java.truecommons</groupId>
         <artifactId>truecommons-parent</artifactId>
-        <version>114</version>
+        <version>115</version>
     </parent>
 
     <groupId>net.java.truevfs</groupId>
@@ -64,6 +64,7 @@ plug-in to its federated file system space.
     <properties>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
         <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
+        <maven.compiler.source>1.7</maven.compiler.source>
 
         <!-- maven-enforcer-plugin -->
         <!-- Older versions will fail to build the TrueLicense Maven Archetype. -->
