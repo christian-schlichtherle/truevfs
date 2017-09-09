@@ -25,7 +25,7 @@ lazy val root: Project = project
 
 lazy val access: Project = project
   .in(file("truevfs-access"))
-  .dependsOn(driverFile % Runtime, kernelSpec % "compile; test->test")
+  .dependsOn(driverFile % Runtime, kernelSpec)
   .settings(javaLibrarySettings)
   .settings(
     libraryDependencies ++= Seq(
@@ -33,7 +33,6 @@ lazy val access: Project = project
       ScalaCheck % Test,
       ScalaPlus % Test,
       ScalaTest % Test,
-      TrueCommonsShed % Test classifier "" classifier "tests"
     )
   )
 
@@ -63,13 +62,10 @@ lazy val compZip: Project = project
 
 lazy val compZipdriver: Project = project
   .in(file("truevfs-comp/truevfs-comp-zipdriver"))
-  .dependsOn(access % "test->test", compZip % "compile; test->test", kernelSpec % "compile; test->test")
+  .dependsOn(compZip, kernelSpec)
   .settings(javaLibrarySettings)
   .settings(
-    libraryDependencies ++= Seq(
-      TrueCommonsIO % Test classifier "tests",
-      TrueCommonsKeySpec % Test classifier "tests"
-    )
+    normalizedName := "truevfs-comp-zipdriver"
   )
 
 lazy val driver: Project = project
@@ -79,7 +75,7 @@ lazy val driver: Project = project
 
 lazy val driverFile: Project = project
   .in(file("truevfs-driver/truevfs-driver-file"))
-  .dependsOn(kernelSpec % "compile; test->test")
+  .dependsOn(kernelSpec)
   .settings(javaLibrarySettings)
   .settings(
     normalizedName := "truevfs-driver-file"
@@ -92,7 +88,7 @@ lazy val kernel: Project = project
 
 lazy val kernelImpl: Project = project
   .in(file("truevfs-kernel/truevfs-kernel-impl"))
-  .dependsOn(kernelSpec % "compile; test->test")
+  .dependsOn(kernelSpec)
   .settings(scalaLibrarySettings)
   .settings(
     libraryDependencies ++= Seq(
@@ -116,5 +112,5 @@ lazy val kernelSpec: Project = project
       TrueCommonsIO,
       TrueCommonsServices
     ),
-    normalizedName := "truevfs-kernel-impl"
+    normalizedName := "truevfs-kernel-spec"
   )
