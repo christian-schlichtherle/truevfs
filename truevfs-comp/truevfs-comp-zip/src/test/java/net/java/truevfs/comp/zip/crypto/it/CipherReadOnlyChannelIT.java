@@ -21,26 +21,19 @@ public class CipherReadOnlyChannelIT extends ReadOnlyChannelITSuite {
 
     @Override
     protected SeekableByteChannel newChannel(Path path) throws IOException {
-        return new CipherReadOnlyChannel(
-                new SeekableNullEngine(), Files.newByteChannel(path));
+        return new CipherReadOnlyChannel(new SeekableNullEngine(), Files.newByteChannel(path));
     }
 
-    private static final class SeekableNullEngine
-    extends NullEngine implements SeekableBlockCipher {
+    private static final class SeekableNullEngine extends NullEngine implements SeekableBlockCipher {
+
         long blockCounter;
 
-        SeekableNullEngine() {
-            init(true, null);
-        }
+        SeekableNullEngine() { init(true, null); }
 
         @Override
-        public void setBlockCounter(final long blockCounter) {
-            this.blockCounter = blockCounter;
-        }
+        public void setBlockCounter(final long blockCounter) { this.blockCounter = blockCounter; }
 
         @Override
-        public long getBlockCounter() {
-            return blockCounter;
-        }
+        public long getBlockCounter() { return blockCounter; }
     }
 }

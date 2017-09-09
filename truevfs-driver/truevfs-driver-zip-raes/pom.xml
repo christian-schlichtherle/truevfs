@@ -27,42 +27,7 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-access</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-access</artifactId>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-comp-zip</artifactId>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-comp-zipdriver</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-comp-zipdriver</artifactId>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-io</artifactId>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-key-spec</artifactId>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-shed</artifactId>
-            <type>test-jar</type>
         </dependency>
     </dependencies>
 </project>

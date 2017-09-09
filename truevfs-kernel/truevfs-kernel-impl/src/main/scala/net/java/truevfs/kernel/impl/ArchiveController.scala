@@ -8,7 +8,8 @@ import net.java.truecommons.shed._
 import net.java.truevfs.kernel.spec._
 import net.java.truecommons.cio._
 import net.java.truecommons.cio.Entry._
-import scala.Option
+
+import scala.{None, Option, Some}
 
 /** Provides read/write access to an archive file system.
   * This is a mirror of [[net.java.truevfs.kernel.spec.FsController]] which has
@@ -41,18 +42,17 @@ private trait ArchiveController[E <: FsArchiveEntry] {
     * @param  that the object to compare.
     * @return `this == that`
     */
-  final override def equals(that: Any) = this == that
+  final override def equals(that: Any): Boolean = this == that
 
   /** Returns a hash code which is consistent with `equals`.
     *
     * @return A hash code which is consistent with `equals`.
     * @see    Object#hashCode
     */
-   final override def hashCode = System.identityHashCode(this)
+   final override def hashCode: Int = System.identityHashCode(this)
 
   /** Returns a string representation of this object for logging and debugging
     * purposes.
     */
-  final override def toString =
-    "%s@%x[model=%s]".format(getClass.getName, hashCode, model)
+  final override def toString: String = "%s@%x[model=%s]".format(getClass.getName, hashCode, model)
 }

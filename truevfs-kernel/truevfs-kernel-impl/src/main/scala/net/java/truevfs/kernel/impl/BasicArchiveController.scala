@@ -15,10 +15,11 @@ import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.FsAccessOption._
 import net.java.truevfs.kernel.spec.FsAccessOptions._
 import net.java.truecommons.cio._
-import net.java.truecommons.cio.Entry._;
-import net.java.truecommons.cio.Entry.Access._;
-import net.java.truecommons.cio.Entry.Type._;
-import scala.Option
+import net.java.truecommons.cio.Entry._
+import net.java.truecommons.cio.Entry.Access._
+import net.java.truecommons.cio.Entry.Type._
+
+import scala.{None, Option, Some}
 
 /** An abstract base class for any archive file system controller which
   * provide all the essential services required for accessing a prospective
@@ -52,45 +53,45 @@ extends ArchiveController[E] {
   def node(options: AccessOptions, name: FsNodeName): Option[FsNode] =
     autoMount(options) node (options, name)
 
-  def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
+  def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]): Unit =
     autoMount(options) checkAccess (options, name, types)
 
-  def setReadOnly(options: AccessOptions, name: FsNodeName) =
+  def setReadOnly(options: AccessOptions, name: FsNodeName): Unit =
     autoMount(NONE) setReadOnly (options, name)
 
-  def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]) = {
+  def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]): Boolean = {
     checkSync(options, name, CREATE) // alias for UPDATE
     autoMount(options) setTime (options, name, times)
   }
 
-  def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long) = {
+  def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long): Boolean = {
     checkSync(options, name, CREATE) // alias for UPDATE
     autoMount(options) setTime (options, name, types, value)
   }
 
-  def input(options: AccessOptions, name: FsNodeName) = {
+  def input(options: AccessOptions, name: FsNodeName): AnyInputSocket = {
     require(null ne options)
     require(null ne name)
 
     final class Input extends AbstractInputSocket[E] {
-      def target() = {
+      def target(): E = {
         checkSync(options, name, READ)
         autoMount(options) node (options, name) match {
           case Some(ce) =>
             val ae = ce get FILE
             if (null eq ae)
               throw new FileSystemException(fullPath(name), null,
-                                            "Expected a FILE entry, but is a " + ce.getTypes + " entry!");
+                                            "Expected a FILE entry, but is a " + ce.getTypes + " entry!")
             ae
           case _ => throw new NoSuchFileException(fullPath(name))
         }
       }
 
-      override def stream(peer: AnyOutputSocket) = socket(peer) stream peer
+      override def stream(peer: AnyOutputSocket): InputStream = socket(peer) stream peer
 
-      override def channel(peer: AnyOutputSocket) = socket(peer) channel peer
+      override def channel(peer: AnyOutputSocket): SeekableByteChannel = socket(peer) channel peer
 
-      def socket(peer: AnyOutputSocket) = {
+      def socket(peer: AnyOutputSocket): InputSocket[E] = {
         AbstractInputSocket target peer // may sync() if in same target archive file!
         input(target().getName)
       }
@@ -101,12 +102,12 @@ extends ArchiveController[E] {
 
   def input(name: String): InputSocket[E]
 
-  def output(options: AccessOptions, name: FsNodeName, template: Option[Entry]) = {
+  def output(options: AccessOptions, name: FsNodeName, template: Option[Entry]): AnyOutputSocket = {
     require(null ne options)
     require(null ne name)
 
     final class Output extends AbstractOutputSocket[FsArchiveEntry] {
-      def target() = {
+      def target(): FsArchiveEntry = {
         val ae = make().head.getEntry
         if (options get APPEND) {
           // A proxy entry must get returned here in order to inhibit
@@ -119,7 +120,7 @@ extends ArchiveController[E] {
         }
       }
 
-      override def stream(peer: AnyInputSocket) = {
+      override def stream(peer: AnyInputSocket): OutputStream = {
         val tx = make()
         val ae = tx.head.getEntry
         val in = append()
@@ -163,7 +164,7 @@ extends ArchiveController[E] {
         }
       }
 
-      def make() = {
+      def make(): ArchiveFileSystem[E]#Make = {
         checkSync(options, name, WRITE)
         // Start creating or overwriting the archive entry.
         // This will fail if the entry already exists as a directory.
@@ -198,11 +199,11 @@ extends ArchiveController[E] {
         case ex: FalsePositiveArchiveException =>
           if (DIRECTORY ne tµpe)
             throw ex
-          autoMount(options, true);
+          autoMount(options, autoCreate = true)
           return
       }
       throw new FileAlreadyExistsException(fullPath(name), null,
-                                           "Cannot replace a directory entry!");
+                                           "Cannot replace a directory entry!")
     } else {
       checkSync(options, name, CREATE)
       autoMount(options, options get CREATE_PARENTS)
@@ -222,32 +223,30 @@ extends ArchiveController[E] {
     }
   }
 
-  /**
-   * Checks if the intended access to the named archive entry in the virtual
-   * file system is possible without performing a
-   * {@link FsController#sync(BitField, ExceptionHandler) sync} operation in
-   * advance.
-   *
-   * @param  options the options for accessing the file system entry.
-   * @param  name the name of the file system entry.
-   * @param  intention the intended I/O operation on the archive entry.
-   * @throws NeedsSyncException If a sync operation is required before the
-   *         intended access could succeed.
-   */
+  /** Checks if the intended access to the named archive entry in the virtual
+    * file system is possible without performing a
+    * [[FsController#sync(BitField, ExceptionHandler)]] sync} operation in
+    * advance.
+    *
+    * @param  options the options for accessing the file system entry.
+    * @param  name the name of the file system entry.
+    * @param  intention the intended I/O operation on the archive entry.
+    * @throws NeedsSyncException If a sync operation is required before the
+    *         intended access could succeed.
+    */
   def checkSync(options: AccessOptions, name: FsNodeName, intention: Access)
 
-  /**
-   * Returns the (virtual) archive file system mounted from the target
-   * archive file.
-   *
-   * @param  options the options for accessing the file system entry.
-   * @param  autoCreate If this is {@code true} and the archive file does not
-   *         exist, then a new archive file system with only a virtual root
-   *         directory is created with its last modification time set to the
-   *         system's current time.
-   * @return An archive file system.
-   * @throws IOException on any I/O error.
-   */
+  /** Returns the (virtual) archive file system mounted from the target
+    * archive file.
+    *
+    * @param  options the options for accessing the file system entry.
+    * @param  autoCreate If this is `true` and the archive file does not
+    *         exist, then a new archive file system with only a virtual root
+    *         directory is created with its last modification time set to the
+    *         system's current time.
+    * @return An archive file system.
+    * @throws IOException on any I/O error.
+    */
   def autoMount(options: AccessOptions, autoCreate: Boolean = false): ArchiveFileSystem[E]
 }
 
@@ -258,11 +257,11 @@ private object BasicArchiveController {
   extends DecoratingEntry[FsArchiveEntry](entry) with FsArchiveEntry {
     def getType: Type = entry.getType
 
-    def setSize(tµpe: Size, value: Long) = entry setSize (tµpe, value)
+    def setSize(tµpe: Size, value: Long): Boolean = entry setSize (tµpe, value)
 
-    def setTime(tµpe: Access, value: Long) = entry setTime (tµpe, value)
+    def setTime(tµpe: Access, value: Long): Boolean = entry setTime (tµpe, value)
 
-    def setPermitted(tµpe: Access, entity: Entity, value: java.lang.Boolean) =
+    def setPermitted(tµpe: Access, entity: Entity, value: java.lang.Boolean): Boolean =
       entry.setPermitted(tµpe, entity, value)
   }
 }

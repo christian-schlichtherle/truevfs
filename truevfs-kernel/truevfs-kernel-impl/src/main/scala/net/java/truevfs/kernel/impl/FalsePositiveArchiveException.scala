@@ -18,5 +18,5 @@ import java.io._
   */
 private class FalsePositiveArchiveException(cause: IOException)
 extends ControlFlowException(cause) with Immutable {
-  override def getCause() = super.getCause.asInstanceOf[IOException]
+  override def getCause: IOException = super.getCause.asInstanceOf[IOException]
 }

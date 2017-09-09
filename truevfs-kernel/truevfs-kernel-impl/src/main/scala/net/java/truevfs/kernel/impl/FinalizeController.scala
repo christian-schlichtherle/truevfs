@@ -12,8 +12,9 @@ import java.nio.channels._
 import javax.annotation.concurrent._
 import net.java.truevfs.kernel.spec._
 import net.java.truecommons.cio._
-import net.java.truecommons.cio.Entry._;
-import scala.Option
+import net.java.truecommons.cio.Entry._
+
+import scala.{None, Option, Some}
 
 /** Finalizes unclosed resources returned by its decorated controller.
   *

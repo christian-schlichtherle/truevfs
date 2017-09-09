@@ -19,7 +19,7 @@ import net.java.truecommons.key.spec.common.AesPbeParameters;
  * @author Christian Schlichtherle
  */
 @Immutable
-final class ZipRaesKeyController extends AbstractKeyController<ZipRaesDriver> {
+final class ZipRaesKeyController extends AbstractKeyController {
 
     ZipRaesKeyController(FsController controller, ZipRaesDriver driver) {
         super(controller, driver);

@@ -19,5 +19,5 @@ private object NeedsWriteLockException {
 
   private[this] val instance = new NeedsWriteLockException
 
-  def apply() = if (isTraceable) new NeedsWriteLockException else instance
+  def apply(): NeedsWriteLockException = if (isTraceable) new NeedsWriteLockException else instance
 }

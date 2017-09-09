@@ -41,54 +41,9 @@ and choosing entries in archive files.
             <artifactId>truevfs-kernel-spec</artifactId>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-kernel-spec</artifactId>
-            <type>test-jar</type>
-        </dependency>
-        <dependency>
             <groupId>global.namespace.scala-plus</groupId>
-            <artifactId>scala-plus_${scala.lang.version}</artifactId>
+            <artifactId>scala-plus_${scala.compat.version}</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-shed</artifactId>
-            <type>test-jar</type>
-        </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
-    <profiles>
-        <profile>
-            <id>sonatype-oss-release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>test-jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
