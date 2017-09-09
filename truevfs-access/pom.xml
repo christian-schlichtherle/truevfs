@@ -33,17 +33,7 @@ and choosing entries in archive files.
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-kernel-impl</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-kernel-spec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>global.namespace.scala-plus</groupId>
-            <artifactId>scala-plus_${scala.compat.version}</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
