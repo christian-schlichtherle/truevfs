@@ -103,10 +103,10 @@ object BuildSettings {
     artifactSettings ++ Seq(
       // Support testing Java projects with ScalaTest et al:
       compileOrder := CompileOrder.JavaThenScala,
-      javacOptions := DefaultOptions.javac ++ Seq(Opts.compile.deprecation, "-g"),
+      javacOptions := DefaultOptions.javac ++ Seq(Opts.compile.deprecation, "-source", "1.7", "-g"),
       javacOptions in doc := DefaultOptions.javac,
       scalacOptions := DefaultOptions.scalac ++ Seq(Opts.compile.deprecation, Opts.compile.explaintypes, "-feature", Opts.compile.unchecked),
-      scalaVersion := ScalaVersion_2_12
+      scalaVersion := ScalaVersion_2_11
     )
   }
 
@@ -119,7 +119,7 @@ object BuildSettings {
 
   def scalaLibrarySettings: Seq[Setting[_]] = {
     librarySettings ++ Seq(
-      crossScalaVersions := Seq(ScalaVersion_2_11, ScalaVersion_2_12)
+      crossScalaVersions := Seq(ScalaVersion_2_10, ScalaVersion_2_11, ScalaVersion_2_12)
     )
   }
 }

@@ -44,6 +44,7 @@ object Dependencies {
   val TrueCommonsShed: ModuleID = "net.java.truecommons" % "truecommons-shed" % TrueCommonsVersion
   val XZ: ModuleID = "org.tukaani" % "xz" % "1.6"
 
+  val ScalaVersion_2_10: String = sys.props.getOrElse("SCALA_VERSION_2.10", "2.10.6")
   val ScalaVersion_2_11: String = sys.props.getOrElse("SCALA_VERSION_2.11", "2.11.11")
   val ScalaVersion_2_12: String = sys.props.getOrElse("SCALA_VERSION_2.12", "2.12.3")
 }
