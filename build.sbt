@@ -22,6 +22,11 @@ lazy val root: Project = project
   .aggregate(access, comp, driver, kernel)
   .settings(releaseSettings)
   .settings(aggregateSettings)
+  .settings(inThisBuild(
+    dependencyOverrides ++= Set(
+      FindBugsAnnotations
+    )
+  ))
 
 lazy val access: Project = project
   .in(file("truevfs-access"))
@@ -29,10 +34,10 @@ lazy val access: Project = project
   .settings(javaLibrarySettings)
   .settings(
     libraryDependencies ++= Seq(
+      JUnitInterface % Test,
       MockitoCore % Test,
       ScalaCheck % Test,
-      ScalaPlus % Test,
-      ScalaTest % Test,
+      ScalaTest % Test
     )
   )
 
@@ -78,6 +83,9 @@ lazy val driverFile: Project = project
   .dependsOn(kernelSpec)
   .settings(javaLibrarySettings)
   .settings(
+    libraryDependencies ++= Seq(
+      JUnitInterface % Test
+    ),
     normalizedName := "truevfs-driver-file"
   )
 
@@ -92,6 +100,7 @@ lazy val kernelImpl: Project = project
   .settings(scalaLibrarySettings)
   .settings(
     libraryDependencies ++= Seq(
+      JUnitInterface % Test,
       MockitoCore % Test,
       ScalaCheck % Test,
       ScalaTest % Test,
