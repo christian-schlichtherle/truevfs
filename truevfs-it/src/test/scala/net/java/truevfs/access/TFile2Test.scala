@@ -21,9 +21,10 @@ import org.slf4j._
 /** @author Christian Schlichtherle */
 class TFile2Test extends JUnitSuite {
 
-  private val config = TConfig open ()
+  private var config: TConfig = _
 
   @Before def setUp() {
+    config = TConfig open ()
     val manager = mock[FsManager]
     val driver = mock[FsDriver]
     val archiveDriver = mock[FsArchiveDriver[FsArchiveEntry]]
@@ -95,9 +96,10 @@ class TFile2Test extends JUnitSuite {
 }
 
 object TFile2Test {
+
   private val logger = LoggerFactory.getLogger(classOf[TFile2Test])
 
   private val listener = new ExceptionListener {
-    def exceptionThrown(ex: Exception) = throw new AssertionError(ex)
+    def exceptionThrown(ex: Exception): Unit = throw new AssertionError(ex)
   }
 }
