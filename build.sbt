@@ -19,7 +19,7 @@ import Dependencies._
 
 lazy val root: Project = project
   .in(file("."))
-  .aggregate(access, accessSwing, comp, driver, ext, it, kernel, samples)
+  .aggregate(access, accessSwing, comp, driver, ext, it, kernel, profile, samples)
   .settings(releaseSettings)
   .settings(aggregateSettings)
 
@@ -39,7 +39,7 @@ lazy val access: Project = project
 
 lazy val accessSwing: Project = project
   .in(file("truevfs-access-swing"))
-  .dependsOn(access)
+  .dependsOn(access % "compile,runtime->@")
   .settings(javaLibrarySettings)
   .settings(
     normalizedName := "truevfs-access-swing"
@@ -284,7 +284,7 @@ lazy val extPacemaker: Project = project
 lazy val it: Project = project
   .in(file("truevfs-it"))
   .dependsOn(
-    access,
+    access % "compile,runtime->@",
     driverFile,
     driverHttp,
     driverJar,
@@ -294,7 +294,7 @@ lazy val it: Project = project
     driverTarBzip2,
     driverTarGzip,
     driverTarXz,
-    driverZip,
+    driverZip % "compile,runtime->@",
     driverZipRaes,
     kernelImpl
   ).settings(scalaLibrarySettings)
@@ -348,10 +348,67 @@ lazy val kernelSpec: Project = project
     normalizedName := "truevfs-kernel-spec"
   )
 
+lazy val profile: Project = project
+  .in(file("truevfs-profile"))
+  .aggregate(profileBase, profileDefault, profileFull)
+  .settings(aggregateSettings)
+
+lazy val profileBase: Project = project
+  .in(file("truevfs-profile/truevfs-profile-base"))
+  .dependsOn(
+    accessSwing % "compile,runtime->@",
+    driverJar % Runtime,
+    driverZip % "runtime->runtime",
+    kernelImpl % Runtime
+  ).settings(scalaLibrarySettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      TruecommonsKeyConsole % Runtime,
+      TruecommonsKeyDefault % Runtime,
+      TruecommonsKeySwing % Runtime
+    ),
+    normalizedName := "truevfs-profile-base"
+  )
+
+lazy val profileDefault: Project = project
+  .in(file("truevfs-profile/truevfs-profile-default"))
+  .dependsOn(
+    driverHttp % Runtime,
+    driverOdf % Runtime,
+    driverTar % Runtime,
+    driverTarBzip2 % Runtime,
+    driverTarGzip % Runtime,
+    driverTarXz % Runtime,
+    driverZipRaes % Runtime,
+    profileBase % "compile,runtime->@"
+  ).settings(scalaLibrarySettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      TruecommonsKeyMacosx % Runtime
+    ),
+    normalizedName := "truevfs-profile-default"
+  )
+
+lazy val profileFull: Project = project
+  .in(file("truevfs-profile/truevfs-profile-full"))
+  .dependsOn(
+    driverSfx % Runtime,
+    extInsight % Runtime,
+    extLogging % Runtime,
+    extPacemaker % Runtime,
+    profileDefault % "compile,runtime->@"
+  ).settings(scalaLibrarySettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      TruecommonsKeyHurlfb % Runtime
+    ),
+    normalizedName := "truevfs-profile-full"
+  )
+
 lazy val samples: Project = project
   .in(file("truevfs-samples"))
   .dependsOn(
-    access,
+    access % "compile,runtime->@",
     driverFile % Runtime,
     driverHttp % Runtime,
     driverJar,
@@ -361,7 +418,7 @@ lazy val samples: Project = project
     driverTarBzip2,
     driverTarGzip,
     driverTarXz,
-    driverZip,
+    driverZip % "compile,runtime->@",
     driverZipRaes,
     kernelImpl % Runtime
   ).settings(javaLibrarySettings)
