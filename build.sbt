@@ -19,14 +19,9 @@ import Dependencies._
 
 lazy val root: Project = project
   .in(file("."))
-  .aggregate(access, comp, driver, kernel)
+  .aggregate(access, accessSwing, comp, driver, ext, it, kernel, samples)
   .settings(releaseSettings)
   .settings(aggregateSettings)
-  .settings(inThisBuild(
-    dependencyOverrides ++= Set(
-      FindBugsAnnotations
-    )
-  ))
 
 lazy val access: Project = project
   .in(file("truevfs-access"))
@@ -34,38 +29,96 @@ lazy val access: Project = project
   .settings(javaLibrarySettings)
   .settings(
     libraryDependencies ++= Seq(
-      JUnitInterface % Test,
+      JunitInterface % Test,
       MockitoCore % Test,
-      ScalaCheck % Test,
-      ScalaTest % Test
-    )
+      Scalacheck % Test,
+      Scalatest % Test
+    ),
+    normalizedName := "truevfs-access"
+  )
+
+lazy val accessSwing: Project = project
+  .in(file("truevfs-access-swing"))
+  .dependsOn(access)
+  .settings(javaLibrarySettings)
+  .settings(
+    normalizedName := "truevfs-access-swing"
   )
 
 lazy val comp: Project = project
   .in(file("truevfs-comp"))
-  .aggregate(compZip, compZipdriver)
-  .settings(aggregateSettings)
+  .aggregate(
+    compIbm437,
+    compInst,
+    compJmx,
+    compTarDriver,
+    compZip,
+    compZipDriver
+  ).settings(aggregateSettings)
+
+lazy val compIbm437: Project = project
+  .in(file("truevfs-comp/truevfs-comp-ibm437"))
+  .settings(javaLibrarySettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      JunitInterface % Test,
+      TruecommonsAnnotations
+    ),
+    normalizedName := "truevfs-comp-ibm437"
+  )
+
+lazy val compInst: Project = project
+  .in(file("truevfs-comp/truevfs-comp-inst"))
+  .dependsOn(kernelSpec)
+  .settings(javaLibrarySettings)
+  .settings(
+    normalizedName := "truevfs-comp-inst"
+  )
+
+lazy val compJmx: Project = project
+  .in(file("truevfs-comp/truevfs-comp-jmx"))
+  .dependsOn(compInst)
+  .settings(javaLibrarySettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      JunitInterface % Test,
+      Scalatest % Test,
+      TruecommonsJMX
+    ),
+    normalizedName := "truevfs-comp-jmx"
+  )
+
+lazy val compTarDriver: Project = project
+  .in(file("truevfs-comp/truevfs-comp-tardriver"))
+  .dependsOn(kernelSpec)
+  .settings(javaLibrarySettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      CommonsCompress
+    ),
+    normalizedName := "truevfs-comp-tardriver"
+  )
 
 lazy val compZip: Project = project
   .in(file("truevfs-comp/truevfs-comp-zip"))
   .settings(javaLibrarySettings)
   .settings(
     libraryDependencies ++= Seq(
-      BCProvJDK15On,
+      BcprovJdk15on,
       CommonsCompress,
-      FindBugsAnnotations,
-      JUnitInterface % Test,
-      ScalaTest % Test,
-      TrueCommonsIO classifier "",
-      TrueCommonsIO % Test classifier "tests",
-      TrueCommonsKeySpec,
-      TrueCommonsShed,
-      TrueCommonsShed % Test classifier "tests"
+      FindbugsAnnotations,
+      JunitInterface % Test,
+      Scalatest % Test,
+      TruecommonsIO classifier "",
+      TruecommonsIO % Test classifier "tests",
+      TruecommonsKeySpec,
+      TruecommonsShed,
+      TruecommonsShed % Test classifier "tests"
     ),
     normalizedName := "truevfs-comp-zip"
   )
 
-lazy val compZipdriver: Project = project
+lazy val compZipDriver: Project = project
   .in(file("truevfs-comp/truevfs-comp-zipdriver"))
   .dependsOn(compZip, kernelSpec)
   .settings(javaLibrarySettings)
@@ -75,8 +128,19 @@ lazy val compZipdriver: Project = project
 
 lazy val driver: Project = project
   .in(file("truevfs-driver"))
-  .aggregate(driverFile)
-  .settings(aggregateSettings)
+  .aggregate(
+    driverFile,
+    driverHttp,
+    driverJar,
+    driverOdf,
+    driverSfx,
+    driverTar,
+    driverTarBzip2,
+    driverTarGzip,
+    driverTarXz,
+    driverZip,
+    driverZipRaes
+  ).settings(aggregateSettings)
 
 lazy val driverFile: Project = project
   .in(file("truevfs-driver/truevfs-driver-file"))
@@ -84,9 +148,169 @@ lazy val driverFile: Project = project
   .settings(javaLibrarySettings)
   .settings(
     libraryDependencies ++= Seq(
-      JUnitInterface % Test
+      JunitInterface % Test
     ),
     normalizedName := "truevfs-driver-file"
+  )
+
+lazy val driverHttp: Project = project
+  .in(file("truevfs-driver/truevfs-driver-http"))
+  .dependsOn(kernelSpec)
+  .settings(javaLibrarySettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      Httpclient,
+      JclOverSlf4j % Runtime
+    ),
+    normalizedName := "truevfs-driver-http"
+  )
+
+lazy val driverJar: Project = project
+  .in(file("truevfs-driver/truevfs-driver-jar"))
+  .dependsOn(compZipDriver)
+  .settings(javaLibrarySettings)
+  .settings(
+    normalizedName := "truevfs-driver-jar"
+  )
+
+lazy val driverOdf: Project = project
+  .in(file("truevfs-driver/truevfs-driver-odf"))
+  .dependsOn(compZipDriver)
+  .settings(javaLibrarySettings)
+  .settings(
+    normalizedName := "truevfs-driver-odf"
+  )
+
+lazy val driverSfx: Project = project
+  .in(file("truevfs-driver/truevfs-driver-sfx"))
+  .dependsOn(compZipDriver)
+  .settings(javaLibrarySettings)
+  .settings(
+    normalizedName := "truevfs-driver-sfx"
+  )
+
+lazy val driverTar: Project = project
+  .in(file("truevfs-driver/truevfs-driver-tar"))
+  .dependsOn(compTarDriver)
+  .settings(javaLibrarySettings)
+  .settings(
+    normalizedName := "truevfs-driver-tar"
+  )
+
+lazy val driverTarBzip2: Project = project
+  .in(file("truevfs-driver/truevfs-driver-tar-bzip2"))
+  .dependsOn(compTarDriver)
+  .settings(javaLibrarySettings)
+  .settings(
+    normalizedName := "truevfs-driver-tar-bzip2"
+  )
+
+lazy val driverTarGzip: Project = project
+  .in(file("truevfs-driver/truevfs-driver-tar-gzip"))
+  .dependsOn(compTarDriver)
+  .settings(javaLibrarySettings)
+  .settings(
+    normalizedName := "truevfs-driver-tar-gzip"
+  )
+
+lazy val driverTarXz: Project = project
+  .in(file("truevfs-driver/truevfs-driver-tar-xz"))
+  .dependsOn(compTarDriver)
+  .settings(javaLibrarySettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      Xz
+    ),
+    normalizedName := "truevfs-driver-tar-xz"
+  )
+
+lazy val driverZip: Project = project
+  .in(file("truevfs-driver/truevfs-driver-zip"))
+  .dependsOn(compIbm437 % Runtime, compZipDriver)
+  .settings(javaLibrarySettings)
+  .settings(
+    normalizedName := "truevfs-driver-zip"
+  )
+
+lazy val driverZipRaes: Project = project
+  .in(file("truevfs-driver/truevfs-driver-zip-raes"))
+  .dependsOn(compZipDriver)
+  .settings(javaLibrarySettings)
+  .settings(
+    normalizedName := "truevfs-driver-zip-raes"
+  )
+
+lazy val ext: Project = project
+  .in(file("truevfs-ext"))
+  .aggregate(extInsight, extLogging, extPacemaker)
+  .settings(aggregateSettings)
+
+lazy val extInsight: Project = project
+  .in(file("truevfs-ext/truevfs-ext-insight"))
+  .dependsOn(compJmx)
+  .settings(scalaLibrarySettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      JunitInterface % Test,
+      ScalaPlus,
+      Scalatest % Test
+    ),
+    normalizedName := "truevfs-ext-insight"
+  )
+
+lazy val extLogging: Project = project
+  .in(file("truevfs-ext/truevfs-ext-logging"))
+  .dependsOn(compInst)
+  .settings(scalaLibrarySettings)
+  .settings(
+    normalizedName := "truevfs-ext-logging"
+  )
+
+lazy val extPacemaker: Project = project
+  .in(file("truevfs-ext/truevfs-ext-pacemaker"))
+  .dependsOn(compJmx)
+  .settings(scalaLibrarySettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      JunitInterface % Test,
+      MockitoCore % Test,
+      Scalacheck % Test,
+      ScalaPlus,
+      Scalatest % Test
+    ),
+    normalizedName := "truevfs-ext-logging"
+  )
+
+lazy val it: Project = project
+  .in(file("truevfs-it"))
+  .dependsOn(
+    access,
+    driverFile,
+    driverHttp,
+    driverJar,
+    driverOdf,
+    driverSfx,
+    driverTar,
+    driverTarBzip2,
+    driverTarGzip,
+    driverTarXz,
+    driverZip,
+    driverZipRaes,
+    kernelImpl
+  ).settings(scalaLibrarySettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      JunitInterface % Test,
+      MockitoCore % Test,
+      Scalacheck % Test,
+      ScalaPlus,
+      Scalatest % Test,
+      TruecommonsIO % Test classifier "tests",
+      TruecommonsKeyDefault,
+      TruecommonsKeySpec % Test classifier "" classifier "tests",
+      TruecommonsShed % Test classifier "" classifier "tests"
+    ),
+    normalizedName := "truevfs-it"
   )
 
 lazy val kernel: Project = project
@@ -100,11 +324,11 @@ lazy val kernelImpl: Project = project
   .settings(scalaLibrarySettings)
   .settings(
     libraryDependencies ++= Seq(
-      JUnitInterface % Test,
+      JunitInterface % Test,
       MockitoCore % Test,
-      ScalaCheck % Test,
-      ScalaTest % Test,
-      TrueCommonsShed % Test classifier "" classifier "tests"
+      Scalacheck % Test,
+      Scalatest % Test,
+      TruecommonsShed % Test classifier "" classifier "tests"
     ),
     normalizedName := "truevfs-kernel-impl"
   )
@@ -114,12 +338,41 @@ lazy val kernelSpec: Project = project
   .settings(javaLibrarySettings)
   .settings(
     libraryDependencies ++= Seq(
-      FindBugsAnnotations,
-      JUnitInterface % Test,
-      TrueCommonsAnnotations,
-      TrueCommonsCIO,
-      TrueCommonsIO,
-      TrueCommonsServices
+      FindbugsAnnotations,
+      JunitInterface % Test,
+      TruecommonsAnnotations,
+      TruecommonsCIO,
+      TruecommonsIO,
+      TruecommonsServices
     ),
     normalizedName := "truevfs-kernel-spec"
+  )
+
+lazy val samples: Project = project
+  .in(file("truevfs-samples"))
+  .dependsOn(
+    access,
+    driverFile % Runtime,
+    driverHttp % Runtime,
+    driverJar,
+    driverOdf % Runtime,
+    driverSfx,
+    driverTar,
+    driverTarBzip2,
+    driverTarGzip,
+    driverTarXz,
+    driverZip,
+    driverZipRaes,
+    kernelImpl % Runtime
+  ).settings(javaLibrarySettings)
+  .settings(
+    libraryDependencies ++= Seq(
+      Slf4jSimple % Runtime,
+      TruecommonsKeyConsole % Runtime,
+      TruecommonsKeyDefault % Runtime,
+      TruecommonsKeyHurlfb % Runtime,
+      TruecommonsKeyMacosx % Runtime,
+      TruecommonsKeySwing % Runtime
+    ),
+    normalizedName := "truevfs-samples"
   )

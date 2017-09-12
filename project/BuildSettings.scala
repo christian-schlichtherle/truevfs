@@ -94,7 +94,7 @@ object BuildSettings {
       fork := true, // triggers `javaOptions`
       javaOptions += "-ea"
     )) ++ Seq(
-      dependencyOverrides += JUnit,
+      dependencyOverrides ++= Set(FindbugsAnnotations, Junit),
       testOptions += Tests.Argument(TestFrameworks.JUnit, "-a", "-v")
     )
   }
