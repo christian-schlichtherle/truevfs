@@ -39,7 +39,7 @@ lazy val access: Project = project
 
 lazy val accessSwing: Project = project
   .in(file("truevfs-access-swing"))
-  .dependsOn(access % "compile,runtime->@")
+  .dependsOn(access % "compile;runtime->runtime")
   .settings(javaLibrarySettings)
   .settings(
     normalizedName := "truevfs-access-swing"
@@ -284,7 +284,7 @@ lazy val extPacemaker: Project = project
 lazy val it: Project = project
   .in(file("truevfs-it"))
   .dependsOn(
-    access % "compile,runtime->@",
+    access % "compile;runtime->runtime",
     driverFile,
     driverHttp,
     driverJar,
@@ -294,7 +294,7 @@ lazy val it: Project = project
     driverTarBzip2,
     driverTarGzip,
     driverTarXz,
-    driverZip % "compile,runtime->@",
+    driverZip % "compile;runtime->runtime",
     driverZipRaes,
     kernelImpl
   ).settings(scalaLibrarySettings)
@@ -356,7 +356,7 @@ lazy val profile: Project = project
 lazy val profileBase: Project = project
   .in(file("truevfs-profile/truevfs-profile-base"))
   .dependsOn(
-    accessSwing % "compile,runtime->@",
+    accessSwing % "runtime->runtime",
     driverJar % Runtime,
     driverZip % "runtime->runtime",
     kernelImpl % Runtime
@@ -380,7 +380,7 @@ lazy val profileDefault: Project = project
     driverTarGzip % Runtime,
     driverTarXz % Runtime,
     driverZipRaes % Runtime,
-    profileBase % "compile,runtime->@"
+    profileBase % "runtime->runtime"
   ).settings(scalaLibrarySettings)
   .settings(
     libraryDependencies ++= Seq(
@@ -396,7 +396,7 @@ lazy val profileFull: Project = project
     extInsight % Runtime,
     extLogging % Runtime,
     extPacemaker % Runtime,
-    profileDefault % "compile,runtime->@"
+    profileDefault % "runtime->runtime"
   ).settings(scalaLibrarySettings)
   .settings(
     libraryDependencies ++= Seq(
@@ -408,7 +408,7 @@ lazy val profileFull: Project = project
 lazy val samples: Project = project
   .in(file("truevfs-samples"))
   .dependsOn(
-    access % "compile,runtime->@",
+    access % "compile;runtime->runtime",
     driverFile % Runtime,
     driverHttp % Runtime,
     driverJar,
@@ -418,7 +418,7 @@ lazy val samples: Project = project
     driverTarBzip2,
     driverTarGzip,
     driverTarXz,
-    driverZip % "compile,runtime->@",
+    driverZip % "compile;runtime->runtime",
     driverZipRaes,
     kernelImpl % Runtime
   ).settings(javaLibrarySettings)
