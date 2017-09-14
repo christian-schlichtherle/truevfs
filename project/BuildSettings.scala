@@ -103,7 +103,7 @@ object BuildSettings {
     artifactSettings ++ Seq(
       // Support testing Java projects with ScalaTest et al:
       compileOrder := CompileOrder.JavaThenScala,
-      javacOptions := DefaultOptions.javac ++ Seq(Opts.compile.deprecation, "-source", "1.7", "-g"),
+      javacOptions := DefaultOptions.javac ++ Seq(Opts.compile.deprecation, "-source", "1.7", "-target", "1.7", "-g"),
       javacOptions in doc := DefaultOptions.javac,
       scalacOptions := DefaultOptions.scalac ++ Seq(Opts.compile.deprecation, Opts.compile.explaintypes, "-feature", Opts.compile.unchecked),
       scalaVersion := ScalaVersion_2_11
