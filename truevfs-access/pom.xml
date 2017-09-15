@@ -16,13 +16,8 @@
 
     <name>TrueVFS Access</name>
     <description>
-This module provides convenient access to the (virtual federated) file system
-space for TrueVFS client applications.
-It features simple, uniform, transparent, thread-safe, read/write access to
-archive files as if they were virtual directories in a file system path.
-
-This module also provides Swing GUI classes for viewing file trees
-and choosing entries in archive files.
+        Provides convenient access to the (federated virtual) file system space for TrueVFS client applications.
+        Features simple, uniform, transparent, thread-safe, read/write access to archive files as if they were virtual directories in a file system path.
     </description>
 
     <dependencies>

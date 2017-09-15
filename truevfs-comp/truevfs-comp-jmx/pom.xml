@@ -16,8 +16,7 @@
 
     <name>TrueVFS Component JMX</name>
     <description>
-        Provides basic functionality for instrumenting the TrueVFS Kernel with
-        JMX.
+        Provides basic functionality for instrumenting the TrueVFS Kernel with JMX.
     </description>
 
     <dependencies>

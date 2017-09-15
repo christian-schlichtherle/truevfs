@@ -17,16 +17,10 @@
     <name>TrueVFS Kernel Specification</name>
     <description>
         Specifies the API for accessing the federated virtual file system space.
-        Most noteably, the specification contains a service provider API for a
-        singleton file system manager, an I/O buffer pool and a file system
-        driver map.
+        Provides a service provider API for a singleton file system manager, an I/O buffer pool and a file system driver map.
     </description>
 
     <dependencies>
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>annotations</artifactId>
-        </dependency>
         <dependency>
             <groupId>net.java.truecommons</groupId>
             <artifactId>truecommons-annotations</artifactId>

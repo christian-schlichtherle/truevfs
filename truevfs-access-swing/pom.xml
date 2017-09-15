@@ -16,8 +16,7 @@
 
     <name>TrueVFS Access Swing</name>
     <description>
-This module provides Swing GUI classes for viewing file trees
-and choosing entries in archive files.
+        Provides Swing GUI classes for viewing file trees and choosing entries in archive files.
     </description>
 
     <dependencies>
