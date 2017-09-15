@@ -14,9 +14,9 @@
 
     <artifactId>truevfs-it</artifactId>
 
-    <name>TrueVFS IT</name>
+    <name>TrueVFS Integration Tests</name>
     <description>
-        The TrueVFS IT module provides the integration tests.
+        Provides integration tests for TrueVFS.
     </description>
 
     <dependencies>

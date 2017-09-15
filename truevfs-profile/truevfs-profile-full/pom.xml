@@ -16,11 +16,9 @@
 
     <name>TrueVFS Profile Full</name>
     <description>
-        Designed for testing purposes only and should not be used in production
-        environments because of its negative performance impact.
-        Depends on the default configuration profile and adds the modules
-        TrueVFS Driver SFX, TrueVFS Extension JMX/JUL and TrueVFS Samples.
-        The main class of this executable JAR is net.truevfs.samples.access.Nzip.
+        Bundles dependencies to support all TrueVFS features.
+        Should not be used in production environments because of its slightly negative performance impact.
+        Depends on the default configuration profile and adds the file system driver for SFX and the extensions Insight, Logging and Pacemaker.
     </description>
 
     <dependencies>

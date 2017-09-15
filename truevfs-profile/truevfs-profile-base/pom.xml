@@ -16,16 +16,11 @@
 
     <name>TrueVFS Profile Base</name>
     <description>
-        Designed to support the most prominent use case with minimum dependencies.
-        Only provides the file system driver modules TrueVFS Driver JAR and
-        TrueVFS Driver ZIP.
+        Bundles dependencies to support the most prominent use cases.
+        Provides the file system drivers for JAR and ZIP.
     </description>
 
     <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-access</artifactId>
-        </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>truevfs-access-swing</artifactId>

@@ -16,10 +16,8 @@
 
     <name>TrueVFS Profile Default</name>
     <description>
-        Designed for applications which want to access all TrueVFS features
-        without the slight negative performance impact of some excluded modules.
-        Depends on the base configuration profile and adds the file system
-        driver modules for HTTP(S), ODF, TAR and ZIP.RAES.
+        Bundles dependencies to support accessing all TrueVFS features without the slight negative performance impact of some excluded modules.
+        Depends on the base configuration profile and adds the file system drivers for HTTP(S), ODF, TAR, TAR.BZIP2, TAR.GZIP, TAR.XZ and ZIP.RAES.
     </description>
 
     <dependencies>

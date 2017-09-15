@@ -17,9 +17,7 @@
     <name>TrueVFS Kernel Implementation</name>
     <description>
         Implements the API for accessing the federated virtual file system space.
-        This reference implementation can get overridden by providing another
-        file system manager factory implementation with a higher priority on
-        the class path.
+        You can override it by providing another file system manager factory implementation with a higher priority on the class path.
     </description>
 
     <dependencies>

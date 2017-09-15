@@ -17,10 +17,7 @@
     <name>TrueVFS Driver ZIP</name>
     <description>
         Provides a file system driver for accessing the ZIP file format.
-
-        Add the JAR artifact of this module to the run time class path to
-        make its file system drivers available for service location in the
-        client API modules.
+        Add the JAR artifact of this module to the run time class path to make its file system drivers available for service location in the client API modules.
     </description>
 
     <dependencies>
