@@ -28,12 +28,16 @@ lazy val access: Project = project
   .dependsOn(driverFile % Runtime, kernelSpec)
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides convenient access to the (federated virtual) file system space for TrueVFS client applications.
+        |Features simple, uniform, transparent, thread-safe, read/write access to archive files as if they were virtual directories in a file system path.""".stripMargin,
     libraryDependencies ++= Seq(
       JunitInterface % Test,
       MockitoCore % Test,
       Scalacheck % Test,
       Scalatest % Test
     ),
+    name := "TrueVFS Access",
     normalizedName := "truevfs-access"
   )
 
@@ -42,6 +46,9 @@ lazy val accessSwing: Project = project
   .dependsOn(access % "compile;runtime->runtime")
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """This module provides Swing GUI classes for viewing file trees and choosing entries in archive files.""".stripMargin,
+    name := "TrueVFS Access Swing",
     normalizedName := "truevfs-access-swing"
   )
 
@@ -60,10 +67,14 @@ lazy val compIbm437: Project = project
   .in(file("truevfs-comp/truevfs-comp-ibm437"))
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides the IBM437 character set alias CP437 for use with genuine ZIP files.
+        |Add the JAR artifact of this module to the run time class path to make its file system drivers available for service location in the client API modules.""".stripMargin,
     libraryDependencies ++= Seq(
       JunitInterface % Test,
       TruecommonsAnnotations
     ),
+    name := "TrueVFS Component IBM437",
     normalizedName := "truevfs-comp-ibm437"
   )
 
@@ -72,6 +83,9 @@ lazy val compInst: Project = project
   .dependsOn(kernelSpec)
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides basic functionality for instrumenting the TrueVFS Kernel.""".stripMargin,
+    name := "TrueVFS Component Instrumentation",
     normalizedName := "truevfs-comp-inst"
   )
 
@@ -80,11 +94,14 @@ lazy val compJmx: Project = project
   .dependsOn(compInst)
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides basic functionality for instrumenting the TrueVFS Kernel with JMX.""".stripMargin,
     libraryDependencies ++= Seq(
       JunitInterface % Test,
       Scalatest % Test,
       TruecommonsJMX
     ),
+    name := "TrueVFS Component JMX",
     normalizedName := "truevfs-comp-jmx"
   )
 
@@ -93,9 +110,12 @@ lazy val compTarDriver: Project = project
   .dependsOn(kernelSpec)
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides basic drivers for reading and writing TAR files.""".stripMargin,
     libraryDependencies ++= Seq(
       CommonsCompress
     ),
+    name := "TrueVFS Component TarDriver",
     normalizedName := "truevfs-comp-tardriver"
   )
 
@@ -103,18 +123,21 @@ lazy val compZip: Project = project
   .in(file("truevfs-comp/truevfs-comp-zip"))
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides basic functionality for reading and writing ZIP files.""".stripMargin,
     libraryDependencies ++= Seq(
       BcprovJdk15on,
       CommonsCompress,
       FindbugsAnnotations,
       JunitInterface % Test,
       Scalatest % Test,
-      TruecommonsIO classifier "",
+      TruecommonsIO,
       TruecommonsIO % Test classifier "tests",
       TruecommonsKeySpec,
       TruecommonsShed,
       TruecommonsShed % Test classifier "tests"
     ),
+    name := "TrueVFS Component ZIP",
     normalizedName := "truevfs-comp-zip"
   )
 
@@ -123,6 +146,9 @@ lazy val compZipDriver: Project = project
   .dependsOn(compZip, kernelSpec)
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides basic drivers for reading and writing ZIP files.""".stripMargin,
+    name := "TrueVFS Component ZipDriver",
     normalizedName := "truevfs-comp-zipdriver"
   )
 
@@ -147,9 +173,13 @@ lazy val driverFile: Project = project
   .dependsOn(kernelSpec)
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides a file system driver for accessing the platform file system.
+        |Add the JAR artifact of this module to the run time class path to make its file system drivers available for service location in the client API modules.""".stripMargin,
     libraryDependencies ++= Seq(
       JunitInterface % Test
     ),
+    name := "TrueVFS Driver FILE",
     normalizedName := "truevfs-driver-file"
   )
 
@@ -158,10 +188,14 @@ lazy val driverHttp: Project = project
   .dependsOn(kernelSpec)
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides a file system driver for read-only access to the web.
+        |Add the JAR artifact of this module to the run time class path to make its file system drivers available for service location in the client API modules.""".stripMargin,
     libraryDependencies ++= Seq(
       Httpclient,
       JclOverSlf4j % Runtime
     ),
+    name := "TrueVFS Driver HTTP(S)",
     normalizedName := "truevfs-driver-http"
   )
 
@@ -170,6 +204,10 @@ lazy val driverJar: Project = project
   .dependsOn(compZipDriver)
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides a file system driver for accessing the JAR file format.
+        |Add the JAR artifact of this module to the run time class path to make its file system drivers available for service location in the client API modules.""".stripMargin,
+    name := "TrueVFS Driver JAR",
     normalizedName := "truevfs-driver-jar"
   )
 
@@ -178,6 +216,10 @@ lazy val driverOdf: Project = project
   .dependsOn(compZipDriver)
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides a file system driver for accessing the Open Document File format.
+        |Add the JAR artifact of this module to the run time class path to make its file system drivers available for service location in the client API modules.""".stripMargin,
+    name := "TrueVFS Driver ODF",
     normalizedName := "truevfs-driver-odf"
   )
 
@@ -186,6 +228,10 @@ lazy val driverSfx: Project = project
   .dependsOn(compZipDriver)
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides a file system driver for read-only access to the SelF eXtracting ZIP file format, alias SFX.
+        |Add the JAR artifact of this module to the run time class path to make its file system drivers available for service location in the client API modules.""".stripMargin,
+    name := "TrueVFS Driver SFX",
     normalizedName := "truevfs-driver-sfx"
   )
 
@@ -194,6 +240,10 @@ lazy val driverTar: Project = project
   .dependsOn(compTarDriver)
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides a file system driver for accessing the TAR file format.
+        |Add the JAR artifact of this module to the run time class path to make its file system drivers available for service location in the client API modules.""".stripMargin,
+    name := "TrueVFS Driver TAR",
     normalizedName := "truevfs-driver-tar"
   )
 
@@ -202,6 +252,10 @@ lazy val driverTarBzip2: Project = project
   .dependsOn(compTarDriver)
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides a file system driver for accessing the BZIP2 compressed TAR file format.
+        |Add the JAR artifact of this module to the run time class path to make its file system drivers available for service location in the client API modules.""".stripMargin,
+    name := "TrueVFS Driver TAR.BZIP2",
     normalizedName := "truevfs-driver-tar-bzip2"
   )
 
@@ -210,6 +264,10 @@ lazy val driverTarGzip: Project = project
   .dependsOn(compTarDriver)
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides a file system driver for accessing the GZIP compressed TAR file format.
+        |Add the JAR artifact of this module to the run time class path to make its file system drivers available for service location in the client API modules.""".stripMargin,
+    name := "TrueVFS Driver TAR.GZIP",
     normalizedName := "truevfs-driver-tar-gzip"
   )
 
@@ -218,9 +276,13 @@ lazy val driverTarXz: Project = project
   .dependsOn(compTarDriver)
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides a file system driver for accessing the XZ compressed TAR file format.
+        |Add the JAR artifact of this module to the run time class path to make its file system drivers available for service location in the client API modules.""".stripMargin,
     libraryDependencies ++= Seq(
       Xz
     ),
+    name := "TrueVFS Driver TAR.XZ",
     normalizedName := "truevfs-driver-tar-xz"
   )
 
@@ -229,6 +291,10 @@ lazy val driverZip: Project = project
   .dependsOn(compIbm437 % Runtime, compZipDriver)
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides a file system driver for accessing the ZIP file format.
+        |Add the JAR artifact of this module to the run time class path to make its file system drivers available for service location in the client API modules.""".stripMargin,
+    name := "TrueVFS Driver ZIP",
     normalizedName := "truevfs-driver-zip"
   )
 
@@ -237,6 +303,10 @@ lazy val driverZipRaes: Project = project
   .dependsOn(compZipDriver)
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Provides a file system driver for accessing the RAES encrypted ZIP file format, alias ZIP.RAES or TZP.
+        |Add the JAR artifact of this module to the run time class path to make its file system drivers available for service location in the client API modules.""".stripMargin,
+    name := "TrueVFS Driver ZIP.RAES",
     normalizedName := "truevfs-driver-zip-raes"
   )
 
@@ -250,11 +320,15 @@ lazy val extInsight: Project = project
   .dependsOn(compJmx)
   .settings(scalaLibrarySettings)
   .settings(
+    description :=
+      """Instruments the TrueVFS Kernel for statistics monitoring via JMX.
+        |Add the JAR artifact of this module to the run time class path to make its services available for service location in the client API modules.""".stripMargin,
     libraryDependencies ++= Seq(
       JunitInterface % Test,
-      ScalaPlus,
+      ScalaPlus % Test,
       Scalatest % Test
     ),
+    name := "TrueVFS Extension Insight",
     normalizedName := "truevfs-ext-insight"
   )
 
@@ -263,6 +337,10 @@ lazy val extLogging: Project = project
   .dependsOn(compInst)
   .settings(scalaLibrarySettings)
   .settings(
+    description :=
+      """Instruments the TrueVFS Kernel for logging via SLF4J.
+        |Add the JAR artifact of this module to the run time class path to make its services available for service location in the client API modules.""".stripMargin,
+    name := "TrueVFS Extension Logging",
     normalizedName := "truevfs-ext-logging"
   )
 
@@ -271,6 +349,10 @@ lazy val extPacemaker: Project = project
   .dependsOn(compJmx)
   .settings(scalaLibrarySettings)
   .settings(
+    description :=
+      """Constraints the number of concurrently mounted archive file systems in order to save some heap space.
+        |Provides a JMX interface for monitoring and management.
+        |Add the JAR artifact of this module to the run time class path to make its services available for service location in the client API modules.""".stripMargin,
     libraryDependencies ++= Seq(
       JunitInterface % Test,
       MockitoCore % Test,
@@ -278,7 +360,8 @@ lazy val extPacemaker: Project = project
       ScalaPlus,
       Scalatest % Test
     ),
-    normalizedName := "truevfs-ext-logging"
+    name := "TrueVFS Extension Pacemaker",
+    normalizedName := "truevfs-ext-pacemaker"
   )
 
 lazy val it: Project = project
@@ -299,17 +382,20 @@ lazy val it: Project = project
     kernelImpl
   ).settings(scalaLibrarySettings)
   .settings(
+    description :=
+      """Provides integration tests for TrueVFS.""".stripMargin,
     libraryDependencies ++= Seq(
       JunitInterface % Test,
       MockitoCore % Test,
       Scalacheck % Test,
       ScalaPlus,
       Scalatest % Test,
-      TruecommonsIO % Test classifier "tests",
+      TruecommonsIO % Test classifier "" classifier "tests",
       TruecommonsKeyDefault,
       TruecommonsKeySpec % Test classifier "" classifier "tests",
       TruecommonsShed % Test classifier "" classifier "tests"
     ),
+    name := "TrueVFS Integration Tests",
     normalizedName := "truevfs-it"
   )
 
@@ -323,13 +409,16 @@ lazy val kernelImpl: Project = project
   .dependsOn(kernelSpec)
   .settings(scalaLibrarySettings)
   .settings(
+    description :=
+      """Implements the API for accessing the federated virtual file system space.
+        |You can override it by providing another file system manager factory implementation with a higher priority on the class path.""".stripMargin,
     libraryDependencies ++= Seq(
       JunitInterface % Test,
       MockitoCore % Test,
-      Scalacheck % Test,
       Scalatest % Test,
       TruecommonsShed % Test classifier "" classifier "tests"
     ),
+    name := "TrueVFS Kernel Implementation",
     normalizedName := "truevfs-kernel-impl"
   )
 
@@ -337,14 +426,17 @@ lazy val kernelSpec: Project = project
   .in(file("truevfs-kernel/truevfs-kernel-spec"))
   .settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Specifies the API for accessing the federated virtual file system space.
+        |Provides a service provider API for a singleton file system manager, an I/O buffer pool and a file system driver map.""".stripMargin,
     libraryDependencies ++= Seq(
-      FindbugsAnnotations,
       JunitInterface % Test,
       TruecommonsAnnotations,
       TruecommonsCIO,
       TruecommonsIO,
       TruecommonsServices
     ),
+    name := "TrueVFS Kernel Specification",
     normalizedName := "truevfs-kernel-spec"
   )
 
@@ -356,17 +448,21 @@ lazy val profile: Project = project
 lazy val profileBase: Project = project
   .in(file("truevfs-profile/truevfs-profile-base"))
   .dependsOn(
-    accessSwing % "runtime->runtime",
+    accessSwing % "compile;runtime->runtime",
     driverJar % Runtime,
     driverZip % "runtime->runtime",
     kernelImpl % Runtime
   ).settings(scalaLibrarySettings)
   .settings(
+    description :=
+      """Bundles dependencies to support the most prominent use cases.
+        |Provides the file system drivers for JAR and ZIP.""".stripMargin,
     libraryDependencies ++= Seq(
       TruecommonsKeyConsole % Runtime,
       TruecommonsKeyDefault % Runtime,
       TruecommonsKeySwing % Runtime
     ),
+    name := "TrueVFS Profile Base",
     normalizedName := "truevfs-profile-base"
   )
 
@@ -380,12 +476,16 @@ lazy val profileDefault: Project = project
     driverTarGzip % Runtime,
     driverTarXz % Runtime,
     driverZipRaes % Runtime,
-    profileBase % "runtime->runtime"
+    profileBase % "compile;runtime->runtime"
   ).settings(scalaLibrarySettings)
   .settings(
+    description :=
+      """Bundles dependencies to support accessing all TrueVFS features without the slight negative performance impact of some excluded modules.
+        |Depends on the base configuration profile and adds the file system drivers for HTTP(S), ODF, TAR, TAR.BZIP2, TAR.GZIP, TAR.XZ and ZIP.RAES.""".stripMargin,
     libraryDependencies ++= Seq(
       TruecommonsKeyMacosx % Runtime
     ),
+    name := "TrueVFS Profile Default",
     normalizedName := "truevfs-profile-default"
   )
 
@@ -396,12 +496,17 @@ lazy val profileFull: Project = project
     extInsight % Runtime,
     extLogging % Runtime,
     extPacemaker % Runtime,
-    profileDefault % "runtime->runtime"
+    profileDefault % "compile;runtime->runtime"
   ).settings(scalaLibrarySettings)
   .settings(
+    description :=
+      """Bundles dependencies to support all TrueVFS features.
+        |Should not be used in production environments because of its slightly negative performance impact.
+        |Depends on the default configuration profile and adds the file system driver for SFX and the extensions Insight, Logging and Pacemaker.""".stripMargin,
     libraryDependencies ++= Seq(
       TruecommonsKeyHurlfb % Runtime
     ),
+    name := "TrueVFS Profile Full",
     normalizedName := "truevfs-profile-full"
   )
 
@@ -423,6 +528,8 @@ lazy val samples: Project = project
     kernelImpl % Runtime
   ).settings(javaLibrarySettings)
   .settings(
+    description :=
+      """Sample applications to demonstrate the usage of TrueVFS modules to support many, even esoteric use cases.""".stripMargin,
     libraryDependencies ++= Seq(
       Slf4jSimple % Runtime,
       TruecommonsKeyConsole % Runtime,
@@ -431,5 +538,6 @@ lazy val samples: Project = project
       TruecommonsKeyMacosx % Runtime,
       TruecommonsKeySwing % Runtime
     ),
+    name := "TrueVFS Samples",
     normalizedName := "truevfs-samples"
   )

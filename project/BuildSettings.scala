@@ -94,6 +94,7 @@ object BuildSettings {
       fork := true, // triggers `javaOptions`
       javaOptions += "-ea"
     )) ++ Seq(
+      // This is a `Set` in SBT 0.13.X and a `Seq` in SBT 1.X, so add them one-by-one to stay compatible.
       dependencyOverrides += FindbugsAnnotations,
       dependencyOverrides += Junit,
       testOptions += Tests.Argument(TestFrameworks.JUnit, "-a", "-v")
