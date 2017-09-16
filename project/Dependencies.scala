@@ -28,7 +28,7 @@ object Dependencies {
   val JclOverSlf4j: ModuleID = "org.slf4j" % "jcl-over-slf4j" % Slf4jVersion
   val Junit: ModuleID = "junit" % "junit" % "4.12"
   val JunitInterface: ModuleID = "com.novocode" % "junit-interface" % "0.11"
-  val MockitoCore: ModuleID = "org.mockito" % "mockito-core" % "2.9.0"
+  val MockitoCore: ModuleID = "org.mockito" % "mockito-core" % "2.10.0"
   val Scalacheck: ModuleID = "org.scalacheck" %% "scalacheck" % "1.13.5"
   def scalaLibrary(scalaVersion: String): ModuleID = "org.scala-lang" % "scala-library" % scalaVersion
   val ScalaPlus: ModuleID = "global.namespace.scala-plus" %% "scala-plus" % "0.1"
