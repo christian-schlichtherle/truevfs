@@ -514,7 +514,6 @@ lazy val samples: Project = project
   .in(file("truevfs-samples"))
   .dependsOn(
     access % "compile;runtime->runtime",
-    driverFile % Runtime,
     driverHttp % Runtime,
     driverJar,
     driverOdf % Runtime,
@@ -526,7 +525,7 @@ lazy val samples: Project = project
     driverZip % "compile;runtime->runtime",
     driverZipRaes,
     kernelImpl % Runtime
-  ).settings(javaLibrarySettings)
+  ).settings(scalaLibrarySettings)
   .settings(
     description :=
       """Sample applications to demonstrate the usage of TrueVFS modules to support many, even esoteric use cases.""".stripMargin,
