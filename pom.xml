@@ -86,16 +86,7 @@
     </properties>
 
     <modules>
-        <module>truevfs-access</module>
-        <module>truevfs-access-swing</module>
         <module>truevfs-archetype</module>
-        <module>truevfs-comp</module>
-        <module>truevfs-driver</module>
-        <module>truevfs-ext</module>
-        <module>truevfs-it</module>
-        <module>truevfs-kernel</module>
-        <module>truevfs-profile</module>
-        <module>truevfs-samples</module>
     </modules>
 
     <dependencyManagement>

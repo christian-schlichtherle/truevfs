@@ -17,21 +17,6 @@
 
     <name>TrueVFS Archetype Profile</name>
     <description>
-    Creates a custom TrueVFS Profile which bundles all selected TrueVFS
-    modules for ease of use with and without Maven.
+        Creates a custom TrueVFS Profile which bundles all selected TrueVFS modules for ease of use.
     </description>
-
-    <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>truevfs-profile-default</artifactId>
-            <type>pom</type>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-key-hurlfb</artifactId>
-            <optional>true</optional>
-        </dependency>
-    </dependencies>
 </project>

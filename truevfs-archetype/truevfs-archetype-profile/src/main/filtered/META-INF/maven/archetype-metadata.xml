@@ -12,6 +12,9 @@
         <requiredProperty key="scala-version">
             <defaultValue>${scala.version}</defaultValue>
         </requiredProperty>
+        <requiredProperty key="scala-compat-version">
+            <defaultValue>${scala.compat.version}</defaultValue>
+        </requiredProperty>
         <requiredProperty key="truecommons-version">
             <defaultValue>${truecommons.version}</defaultValue>
         </requiredProperty>
