@@ -15,11 +15,9 @@
         <mainClass>${package}.java.file.Tree</mainClass>
         <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
         <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <netbeans.compile.on.save>none</netbeans.compile.on.save>
-        <netbeans.hint.jdkPlatform>JDK_1.7</netbeans.hint.jdkPlatform>
+        <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
         <scala.compat.version>${scala-compat-version}</scala.compat.version>
         <scala.version>${scala-version}</scala.version>
         <truecommons.version>${truecommons-version}</truecommons.version>
@@ -137,16 +135,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
-                <configuration>
-                    <!-- For NetBeans. -->
-                    <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
