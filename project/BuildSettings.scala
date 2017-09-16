@@ -43,7 +43,7 @@ object BuildSettings {
 
   private def commonSettings: Seq[Setting[_]] = {
     Seq(
-      homepage := Some(url("https://bitbucket.org/christian-schlichtherle/truevfs")),
+      homepage := Some(url("http://truevfs.net/")),
       licenses := Seq("Apache License, Version 2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0")),
       organization := "net.java.truevfs",
       organizationHomepage := Some(new URL("http://schlichtherle.de")),
@@ -54,7 +54,7 @@ object BuildSettings {
             <name>Christian Schlichtherle</name>
             <email>christian AT schlichtherle DOT de</email>
             <organization>Schlichtherle IT Services</organization>
-            <timezone>Europe/Berlin</timezone>
+            <timezone>4</timezone>
             <roles>
               <role>owner</role>
             </roles>
@@ -63,6 +63,10 @@ object BuildSettings {
             </properties>
           </developer>
         </developers>
+        <issueManagement>
+          <system>Github</system>
+          <url>https://github.com/christian-schlichtherle/truevfs/issues</url>
+        </issueManagement>
       },
       pomIncludeRepository := (_ => false),
       publishTo := {
@@ -76,9 +80,9 @@ object BuildSettings {
         )
       },
       scmInfo := Some(ScmInfo(
-        browseUrl = url("https://bitbucket.org/christian-schlichtherle/truevfs"),
-        connection = "scm:hg:https://christian-schlichtherle@bitbucket.org/christian-schlichtherle/truevfs",
-        devConnection = Some("scm:hg:ssh://hg@bitbucket.org/christian-schlichtherle/truevfs")
+        browseUrl = url("https://github.com/christian-schlichtherle/truevfs"),
+        connection = "scm:git:https://github.com/christian-schlichtherle/truevfs.git",
+        devConnection = Some("scm:git:https://github.com/christian-schlichtherle/truevfs.git")
       ))
     )
   }
