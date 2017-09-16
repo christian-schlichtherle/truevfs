@@ -23,7 +23,7 @@
         As a library, TrueVFS provides simple, uniform, transparent, thread-safe, read/write access to archive files as if they were virtual directories in a file system path.
         As a framework, TrueVFS provides the API to write file system drivers which plug-in to its federated file system space.
     </description>
-    <url>https://bitbucket.org/christian-schlichtherle/truevfs</url>
+    <url>http://truevfs.net/</url>
     <inceptionYear>2005</inceptionYear>
     <licenses>
         <license>
