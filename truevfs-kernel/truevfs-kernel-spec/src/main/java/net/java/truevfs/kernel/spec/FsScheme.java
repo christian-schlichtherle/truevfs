@@ -15,9 +15,9 @@ import net.java.truecommons.shed.UriBuilder;
  * Addresses a file system scheme.
  * This is simply a {@link java.net.URI} scheme according to the syntax
  * constraints defined in
- * <a href="http://www.ietf.org/rfc/rfc2396.txt""><i>RFC&nbsp;2396: Uniform Resource Identifiers (URI): Generic Syntax</i></a>.
+ * <a href="http://www.ietf.org/rfc/rfc2396.txt"><i>RFC&nbsp;2396: Uniform Resource Identifiers (URI): Generic Syntax</i></a>.
  *
- * <h3><a name="serialization"/>Serialization</h3>
+ * <h3><a name="serialization">Serialization</a></h3>
  * <p>
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.

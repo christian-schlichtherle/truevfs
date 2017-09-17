@@ -23,7 +23,7 @@ import javax.swing.filechooser.FileView;
  * Note that this class accesses archive files lazily, i.e. it does not
  * eagerly check the true status with {@link TFile#isDirectory} or similar
  * unless really necessary. This is to prevent dead locks between the Event
- * Dispatch Thread and the Basic L&F TFile Loading Threads which are forked
+ * Dispatch Thread and the Basic L&amp;F TFile Loading Threads which are forked
  * by JFileChooser.
  *
  * @author Christian Schlichtherle

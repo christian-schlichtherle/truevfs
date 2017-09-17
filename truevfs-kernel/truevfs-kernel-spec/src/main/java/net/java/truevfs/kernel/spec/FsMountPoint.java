@@ -21,7 +21,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
 /**
  * Addresses a file system mount point.
  *
- * <h3><a name="specification"/>Specification</h3>
+ * <h3><a name="specification">Specification</a></h3>
  * <p>
  * A mount point adds the following syntax constraints to a
  * {@link URI Uniform Resource Identifier}:
@@ -44,7 +44,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
  *     to {@code null} in this case.
  * </ol>
  *
- * <h3><a name="examples"/>Examples</h3>
+ * <h3><a name="examples">Examples</a></h3>
  * <p>
  * Examples for <em>valid</em> mount point URIs:
  * <table border=1 cellpadding=5 summary="">
@@ -112,7 +112,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
  * </tbody>
  * </table>
  *
- * <h3><a name="identities"/>Identities</h3>
+ * <h3><a name="identities">Identities</a></h3>
  * <p>
  * For any mount point {@code m}, it's generally true that
  * {@code new FsMountPoint(m.getUri()).equals(m)}.
@@ -120,7 +120,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
  * For any mount point {@code m} with an opaque URI, it's generally true that
  * {@code new FsMountPoint(m.getScheme(), m.getPath()).equals(m)}.
  *
- * <h3><a name="serialization"/>Serialization</h3>
+ * <h3><a name="serialization">Serialization</a></h3>
  * <p>
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
