@@ -1,24 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  - Copyright (C) 2005-2015 Schlichtherle IT Services.
+  - Copyright (C) 2005-2017 Schlichtherle IT Services.
   - All rights reserved. Use is subject to license terms.
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>net.java.truevfs</groupId>
-        <artifactId>truevfs</artifactId>
-        <version>0.12.0-SNAPSHOT</version>
+        <groupId>net.java.truecommons</groupId>
+        <artifactId>truecommons-parent</artifactId>
+        <version>116</version>
     </parent>
 
+    <groupId>net.java.truevfs</groupId>
     <artifactId>truevfs-archetype</artifactId>
+    <version>0.12.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>TrueVFS Archetype</name>
     <description>
         Archetype modules generate sample code for using or extending TrueVFS.
     </description>
+    <url>http://truevfs.net/</url>
+    <inceptionYear>2005</inceptionYear>
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/christian-schlichtherle/truevfs/issues</url>
+    </issueManagement>
+    <scm>
+        <connection>scm:git:https://github.com/christian-schlichtherle/truevfs.git</connection>
+        <developerConnection>scm:git:https://github.com/christian-schlichtherle/truevfs.git</developerConnection>
+        <url>https://github.com/christian-schlichtherle/truevfs</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <properties>
+        <maven.compiler.source>1.7</maven.compiler.source>
+
+        <!-- maven-enforcer-plugin -->
+        <!-- Older versions will fail to build the TrueLicense Maven Archetype. -->
+        <maven.enforcer.requireMavenVersion>3.5.0</maven.enforcer.requireMavenVersion>
+
+        <scala.compat.version>2.11</scala.compat.version>
+        <scala.version>2.11.11</scala.version>
+        <truecommons.version>2.5.0</truecommons.version>
+        <truevfs.version>${project.version}</truevfs.version>
+    </properties>
 
     <modules>
         <module>truevfs-archetype-access</module>

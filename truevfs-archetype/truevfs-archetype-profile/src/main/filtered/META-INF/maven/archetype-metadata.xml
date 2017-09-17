@@ -19,7 +19,7 @@
             <defaultValue>${truecommons.version}</defaultValue>
         </requiredProperty>
         <requiredProperty key="truevfs-version">
-            <defaultValue>${project.version}</defaultValue>
+            <defaultValue>${truevfs.version}</defaultValue>
         </requiredProperty>
     </requiredProperties>
 </archetype-descriptor>
