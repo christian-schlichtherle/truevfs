@@ -23,7 +23,6 @@ import net.java.truecommons.key.spec.KeyManagerMap;
  * This file system controller decorates another file system controller in
  * order to manage the keys required for accessing encrypted ZIP files.
  *
- * @param  <D> the type of the ZIP driver.
  * @author Christian Schlichtherle
  */
 @Immutable

@@ -75,7 +75,7 @@
  * Mind that a {@code TPath} is a {@code Path}, so you can use it
  * polymorphically with the NIO.2 API.
  *
- * <h4><a name="fspsl"/>File System Provider Service Location</h4>
+ * <h4><a name="fspsl">File System Provider Service Location</a></h4>
  * <p>
  * This package provides a JSE&nbsp;7 compliant
  * {@link java.nio.file.spi.FileSystemProvider file system provider}
@@ -119,7 +119,7 @@
  * {@link java.nio.file.FileSystems#newFileSystem(java.nio.file.Path, java.lang.ClassLoader)}.
  * However, this is unlikely to get used in most applications.
  *
- * <a name="ru"/><h3>Recommended Usage</h3>
+ * <h3><a name="ru">Recommended Usage</a></h3>
  * <p>
  * To overcome these <a href="#fspsl">constraints</a>, an application should
  * not rely on File System Provider Service Location and directly create

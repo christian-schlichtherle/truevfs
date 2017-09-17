@@ -25,7 +25,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
  * into a file system {@link #getMountPoint() mount point} and
  * {@linkplain #getNodeName() node name}.
  *
- * <h3><a name="specification"/>Specification</h3>
+ * <h3><a name="specification">Specification</a></h3>
  * <p>
  * A path adds the following syntax constraints to a
  * {@link URI Uniform Resource Identifier}:
@@ -54,7 +54,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
  * build a close subset of the syntax allowed by a
  * {@link java.net.JarURLConnection}.
  *
- * <h3><a name="examples"/>Examples</h3>
+ * <h3><a name="examples">Examples</a></h3>
  * <p>
  * Examples for <em>valid</em> node path URIs:
  * <table border=1 cellpadding=5 summary="">
@@ -117,7 +117,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
  * </tbody>
  * </table>
  *
- * <h3><a name="identities"/>Identities</h3>
+ * <h3><a name="identities">Identities</a></h3>
  * <p>
  * For any path {@code p}, it's generally true that
  * {@code new FsNodePath(p.getUri()).equals(p)}.
@@ -125,7 +125,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
  * Furthermore, it's generally true that
  * {@code new FsNodePath(p.getMountPoint(), p.getNodeName()).equals(p)}.
  *
- * <h3><a name="serialization"/>Serialization</h3>
+ * <h3><a name="serialization">Serialization</a></h3>
  * <p>
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.

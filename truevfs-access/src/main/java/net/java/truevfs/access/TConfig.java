@@ -46,57 +46,57 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  * Note that the child thread cannot {@link #close()} the inherited current
  * configuration - this would result in an {@link IllegalStateException}.
  *
- * <a name="examples"/><h3>Examples</h3>
+ * <h3><a name="examples">Examples</a></h3>
  *
- * <a name="global"/><h4>Changing The Global Configuration</h4>
+ * <h4><a name="global">Changing The Global Configuration</a></h4>
  * <p>
  * If the thread local configuration stack is empty, i.e. no {@link #open()}
  * without a corresponding {@link #close()} has been called before, then the
  * {@link #current()} method will return the global configuration.
  * This feature is intended to get used during application setup to change some
  * configuration options with global scope like this:
- * <pre><code>
-class MyApplication extends TApplication<IOException> {
-
-    &#64;Override
-    protected void setup() {
-        // This should obtain the global configuration.
-        TConfig config = TConfig.current();
-        // Configure custom application file format.
-        config.setArchiveDetector(new TArchiveDetector("aff", new JarDriver()));
-        // Set FsAccessOption.GROW for appending-to rather than reassembling
-        // existing archive files.
-        config.setAccessPreference(FsAccessOption.GROW, true);
-    }
-
-    ...
-}
- * </code></pre>
+ * <pre>{@code
+ * class MyApplication extends TApplication<IOException> {
  *
- * <a name="local"/><h4>Setting The Archive Detector For The Current Thread</h4>
+ * &#64;Override
+ *     protected void setup() {
+ *         // This should obtain the global configuration.
+ *         TConfig config = TConfig.current();
+ *         // Configure custom application file format.
+ *         config.setArchiveDetector(new TArchiveDetector("aff", new JarDriver()));
+ *         // Set FsAccessOption.GROW for appending-to rather than reassembling
+ *         // existing archive files.
+ *         config.setAccessPreference(FsAccessOption.GROW, true);
+ *     }
+ *
+ *     ...
+ * }
+ * }</pre>
+ *
+ * <h4><a name="local">Setting The Archive Detector For The Current Thread</a></h4>
  * <p>
  * If an application needs to change the configuration for just the current
  * thread rather than changing the global configuration, then the
  * {@link #open()} method needs to get called like this:
- * <pre><code>
-TFile file1 = new TFile("file.aff");
-assert !file1.isArchive();
-
-// First, push a new current configuration onto the inheritable thread local
-// stack.
-try (TConfig config = TConfig.open()) {
-    // Configure custom application file format "aff".
-    config.setArchiveDetector(new TArchiveDetector("aff", new JarDriver()));
-
-    // Now use the current configuration.
-    TFile file2 = new TFile("file.aff");
-    assert file2.isArchive();
-    // Do some I/O here.
-    ...
-}
- * </code></pre>
+ * <pre>{@code
+ * TFile file1 = new TFile("file.aff");
+ * assert !file1.isArchive();
  *
- * <a name="appending"/><h4>Appending To Archive Files For The Current Thread</h4>
+ * // First, push a new current configuration onto the inheritable thread local
+ * // stack.
+ * try (TConfig config = TConfig.open()) {
+ *     // Configure custom application file format "aff".
+ *     config.setArchiveDetector(new TArchiveDetector("aff", new JarDriver()));
+ *
+ *     // Now use the current configuration.
+ *     TFile file2 = new TFile("file.aff");
+ *     assert file2.isArchive();
+ *     // Do some I/O here.
+ *     ...
+ * }
+ * }</pre>
+ *
+ * <h4><a name="appending">Appending To Archive Files For The Current Thread</a></h4>
  * <p>
  * By default, TrueVFS is configured to produce the smallest possible archive
  * files.
@@ -121,25 +121,25 @@ try (TConfig config = TConfig.open()) {
  * operations.
  * You can set this preference in the global configuration as shown above or
  * you can set it on a case-by-case basis as follows:
- * <pre><code>
-// We are going to append "entry" to "archive.zip".
-TFile file = new TFile("archive.zip/entry");
-
-// First, push a new current configuration on the inheritable thread local
-// stack.
-try (TConfig config = TConfig.open()) {
-    // Set FsAccessOption.GROW for appending-to rather than reassembling
-    // existing archive files.
-    config.setAccessPreference(FsAccessOption.GROW, true);
-
-    // Now use the current configuration and append the entry to the archive
-    // file even if it's already present.
-    try (TFileOutputStream out = new TFileOutputStream(file)) {
-        // Do some output here.
-        ...
-    }
-}
- * </code></pre>
+ * <pre>{@code
+ * // We are going to append "entry" to "archive.zip".
+ * TFile file = new TFile("archive.zip/entry");
+ *
+ * // First, push a new current configuration on the inheritable thread local
+ * // stack.
+ * try (TConfig config = TConfig.open()) {
+ *     // Set FsAccessOption.GROW for appending-to rather than reassembling
+ *     // existing archive files.
+ *     config.setAccessPreference(FsAccessOption.GROW, true);
+ *
+ *     // Now use the current configuration and append the entry to the archive
+ *     // file even if it's already present.
+ *     try (TFileOutputStream out = new TFileOutputStream(file)) {
+ *         // Do some output here.
+ *         ...
+ *     }
+ * }
+ * }</pre>
  * <p>
  * Note that it's specific to the archive file system driver if this output
  * option preference is supported or not.
@@ -161,34 +161,34 @@ try (TConfig config = TConfig.open()) {
  *     You cannot append to an existing TAR file, however.</li>
  * </ul>
  *
- * <a name="unit-testing"/><h4>Unit Testing</h4>
+ * <h4><a name="unit-testing">Unit Testing</a></h4>
  * <p>
  * Using the thread local inheritable configuration stack comes in handy when
  * unit testing, e.g. with JUnit. Consider this pattern:
- * <pre><code>
-public class AppTest {
-
-    private TConfig config;
-
-    &#64;Before
-    public void setUp() {
-        config = TConfig.open();
-        // Let's just recognize ZIP files.
-        config.setArchiveDetector(new TArchiveDetector("zip"));
-    }
-
-    &#64;After
-    public void shutDown() {
-        config.close();
-    }
-
-    &#64;Test
-    public void testMethod() {
-        // Test accessing some ZIP files here.
-        ...
-    }
-}
- * </code></pre>
+ * <pre>{@code
+ * public class AppTest {
+ *
+ *     private TConfig config;
+ *
+ *     &#64;Before
+ *     public void setUp() {
+ *         config = TConfig.open();
+ *         // Let's just recognize ZIP files.
+ *         config.setArchiveDetector(new TArchiveDetector("zip"));
+ *     }
+ *
+ *     &#64;After
+ *     public void shutDown() {
+ *         config.close();
+ *     }
+ *
+ *     &#64;Test
+ *     public void testMethod() {
+ *         // Test accessing some ZIP files here.
+ *         ...
+ *     }
+ * }
+ * }</pre>
  * <p>
  * <b>Disclaimer</b>: Although this class internally uses an
  * {@link InheritableThreadLocal}, it does not leak memory in multi class

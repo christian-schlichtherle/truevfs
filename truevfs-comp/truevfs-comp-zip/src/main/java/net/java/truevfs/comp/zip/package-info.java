@@ -66,7 +66,7 @@
  *         executable code.
  *     </ol>
  * <li>{@link net.java.truevfs.comp.zip.ZipFile} supports reading archive
- *     data from a {@link java.nio.channel.SeekableByteChannel}, which allows
+ *     data from a {@link java.nio.channels.SeekableByteChannel}, which allows
  *     to read archive data from composite data sources like e.g. RAES
  *     encrypted ZIP files directly without the need to decrypt them to a
  *     temporary file first.

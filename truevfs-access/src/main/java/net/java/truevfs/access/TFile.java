@@ -49,7 +49,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
  * polymorphic with the class {@link javax.swing.filechooser.FileSystemView}
  * or any other class which depends on the class {@link File}.
  *
- * <a name="bulkIOMethods"/><h3>Bulk I/O Methods</h3>
+ * <h3><a name="bulkIOMethods">Bulk I/O Methods</a></h3>
  * <p>
  * This class provides some convenient methods which use pooled buffers and
  * pooled threads in order to achieve superior performance as compared to the
@@ -85,11 +85,11 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
  * not work.
  * This constraint is meant to prevent ambiguous method semantics.
  *
- * <a name="directDataCopying"/><a name="RDC"/><h4>Raw Data Copying (RDC)</h4>
+ * <h4><a name="directDataCopying"><a name="RDC">Raw Data Copying (RDC)</a></a></h4>
  * <p>
  * If data is copied from an archive file to another archive file of the
  * same type, some of the copy methods support a feature called <i>Raw Data
- * Copying</i> (RDC) to achieve best performance:</a>
+ * Copying</i> (RDC) to achieve best performance:
  * With RDC, the raw entry data is copied from the input entry to the
  * output entry without the need to temporarily reproduce, copy and
  * process the file entry data again.
@@ -102,7 +102,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
  * file, but shows no impact otherwise because the TAR file format doesn't
  * support compression.
  *
- * <a name="traversal"><h3>Traversing Directory Trees</h3></a>
+ * <h3><a name="traversal">Traversing Directory Trees</a></h3>
  * <p>
  * When traversing directory trees, e.g. when searching, copying or moving
  * them, it's important that all file objects use
@@ -119,7 +119,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
  * copying archive files (e.g. ZIP entries won't get recompressed thanks to
  * <a href="#RDC">RDC</a>).
  *
- * <a name="verbatimCopy"><h4>Making Verbatim Copies of Directory Trees</h4></a>
+ * <h4><a name="verbatimCopy">Making Verbatim Copies of Directory Trees</a></h4>
  * <p>
  * Using the default {@code TArchiveDetector.ALL} results in <i>structural
  * copies</i> rather than <i>verbatim copies</i> (byte-by-byte copies) of any
@@ -151,7 +151,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
  * is inhibited when recursively copying the source and destination directory
  * trees.
  *
- * <a name="falsePositives"/><h3>Detecting Archive Files and False Positives</h3>
+ * <h3><a name="falsePositives">Detecting Archive Files and False Positives</a></h3>
  * <p>
  * Whenever an archive file extension is detected in a path, this class treats
  * the corresponding file or directory as a <i>prospective archive file</i>.
@@ -168,8 +168,9 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
  * The following table shows how certain methods in this class behave,
  * depending upon an archive file's path and its <i>true state</i> in the
  * first parent file system where it actually exists.
- * <p>
- * <table border="1">
+ *
+ * <table>
+ * <caption>Test Methods</caption>
  * <thead>
  * <tr>
  *   <th>Path</th>
@@ -1585,8 +1586,8 @@ public final class TFile extends File implements TRex {
      * the archive file had not been detected as a prospective archive file
      * and {@code entry} is an empty string.
      *
-     * <a name="exampleUris"/><h3>Example URIs</h3>
-     * <p>
+     * <h3><a name="exampleUris">Example URIs</a></h3>
+     *
      * <ul>
      * <li>{@code file:/foo} addresses a regular file</li>
      * <li>{@code war:file:/foo.war!/} addresses the root entry of the WAR file
@@ -2399,8 +2400,9 @@ public final class TFile extends File implements TRex {
      * thread to fill a FIFO of pooled buffers which is concurrently flushed by
      * the current thread.
      * It performs best when used with <em>unbuffered</em> streams.
-     * <p>
-     * <table border="1">
+     *
+     * <table>
+     * <caption>Feature Matrix</caption>
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2455,8 +2457,9 @@ public final class TFile extends File implements TRex {
     /**
      * Copies the input stream {@code in} to the file {@code dst} and
      * closes the stream - even if an exception occurs.
-     * <p>
-     * <table border="1">
+     *
+     * <table>
+     * <caption>Feature Matrix</caption>
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2527,8 +2530,9 @@ public final class TFile extends File implements TRex {
     /**
      * Copies the file {@code src} to the output stream {@code out} and
      * closes the stream - even if an exception occurs.
-     * <p>
-     * <table border="1">
+     *
+     * <table>
+     * <caption>Feature Matrix</caption>
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2608,8 +2612,9 @@ public final class TFile extends File implements TRex {
 
     /**
      * Copies the file {@code src} to the file {@code dst}.
-     * <p>
-     * <table border="1">
+     *
+     * <table>
+     * <caption>Feature Matrix</caption>
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2686,8 +2691,9 @@ public final class TFile extends File implements TRex {
      * Which attributes are actually copied is specific to the source and
      * destination file system driver implementations, but the minimum
      * guarantee is to copy the last modification time.
-     * <p>
-     * <table border="1">
+     *
+     * <table>
+     * <caption>Feature Matrix</caption>
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2794,8 +2800,9 @@ public final class TFile extends File implements TRex {
     /**
      * Recursively copies the file or directory {@code src}
      * to the file or directory {@code dst}.
-     * <p>
-     * <table border="1">
+     *
+     * <table>
+     * <caption>Feature Matrix</caption>
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2919,8 +2926,9 @@ public final class TFile extends File implements TRex {
      * destination file system driver implementations, but the minimum
      * guarantee is to copy the last modification time - except for archive
      * files.
-     * <p>
-     * <table border="1">
+     *
+     * <table>
+     * <caption>Feature Matrix</caption>
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -2991,8 +2999,9 @@ public final class TFile extends File implements TRex {
      * Copies the input stream {@code in} to this file or entry in an archive
      * file
      * <em>without</em> closing the stream.
-     * <p>
-     * <table border="1">
+     *
+     * <table>
+     * <caption>Feature Matrix</caption>
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -3052,8 +3061,9 @@ public final class TFile extends File implements TRex {
      * Copies this file or entry in an archive file to the output stream
      * {@code out}
      * <em>without</em> closing the stream.
-     * <p>
-     * <table border="1">
+     *
+     * <table>
+     * <caption>Feature Matrix</caption>
      * <thead>
      * <tr>
      *   <th>Feature</th>
@@ -3115,8 +3125,9 @@ public final class TFile extends File implements TRex {
      * thread to fill a FIFO of data buffers which is concurrently flushed by
      * the current thread.
      * It performs best when used with <em>unbuffered</em> streams.
-     * <p>
-     * <table border="1">
+     *
+     * <table>
+     * <caption>Feature Matrix</caption>
      * <thead>
      * <tr>
      *   <th>Feature</th>

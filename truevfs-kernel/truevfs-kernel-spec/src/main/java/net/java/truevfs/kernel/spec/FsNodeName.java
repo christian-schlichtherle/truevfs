@@ -20,7 +20,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_NAME;
 /**
  * Addresses a file system node relative to its {@link FsMountPoint mount point}.
  * 
- * <h3><a name="specification"/>Specification</h3>
+ * <h3><a name="specification">Specification</a></h3>
  * <p>
  * An node name adds the following syntax constraints to a
  * {@link URI Uniform Resource Identifier}:
@@ -40,7 +40,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_NAME;
  * <li>The URI must not define a fragment component.
  * </ol>
  * 
- * <h3><a name="examples"/>Examples</h3>
+ * <h3><a name="examples">Examples</a></h3>
  * <p>
  * Examples for <em>valid</em> node name URIs:
  * </p>
@@ -118,12 +118,12 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_NAME;
  * </tbody>
  * </table>
  * 
- * <h3><a name="identities"/>Identities</h3>
+ * <h3><a name="identities">Identities</a></h3>
  * <p>
  * For any node name {@code e}, it's generally true that
  * {@code new FsNodeName(e.getUri()).equals(e)}.
  * 
- * <h3><a name="serialization"/>Serialization</h3>
+ * <h3><a name="serialization">Serialization</a></h3>
  * <p>
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
