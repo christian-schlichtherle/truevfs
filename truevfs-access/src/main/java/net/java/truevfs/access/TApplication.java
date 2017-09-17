@@ -74,7 +74,7 @@ public abstract class TApplication<E extends Exception> {
      * {@link TApplication} is empty!
      * This means that the initial setup is not changed.
      * The initial setup is determined by loading service classes from the
-     * class path and applying reasonable defaults if nothing is found.
+     * classpath and applying reasonable defaults if nothing is found.
      * <p>
      * As an alternative to overriding this method, the setup may get changed
      * in a sub class constructor.
@@ -90,18 +90,12 @@ public abstract class TApplication<E extends Exception> {
      * TConfig.get().setArchiveDetector(new TArchiveDetector("ear|jar|war"));
      * }</pre>
      * <p>
-     * This will filter all file system drivers found on the class path in the
+     * This will filter all file system drivers found on the classpath in the
      * initial setup so that only files with the pattern {@code *.ear},
      * {@code *.jar} or {@code *.war} (case ignoring) are detected
      * as prospective archive files.
      * If no file system driver is present for a named extension in the initial
      * setup, an {@link IllegalArgumentException} is thrown.
-     * <p>
-     * The beauty of this simple example is that it does not require to change
-     * the compile time class path.
-     * For more advanced examples however, the file {@code pom.xml} needs to
-     * get edited so that the respective modules get added to the compile time
-     * class path.
      * <p>
      * The constructors of the {@link TFile} class use the
      * {@link TArchiveDetector} class to scan a path name for extensions of
@@ -113,8 +107,7 @@ public abstract class TApplication<E extends Exception> {
      * By default, all new {@link TFile} objects will use a default
      * {@link TArchiveDetector} which recognizes the canonical archive file
      * extensions registered by all archive driver modules which are present on
-     * the class path at run time - these can be configured by editing the
-     * file {@code pom.xml}.
+     * the runtime classpath.
      * <p>
      * However, if you use the following statement, all {@link TFile} objects
      * will use the given default {@link TArchiveDetector} which recognizes
@@ -122,7 +115,7 @@ public abstract class TApplication<E extends Exception> {
      * ZIP files as archive files and hence as virtual directories.
      * This requires the JARs for the archive driver modules
      * {@code truevfs-driver-tar} and {@code truevfs-driver-zip} to be present
-     * on the class path at compile time:
+     * on the compile-time classpath:
      * <pre>{@code
      * TConfig.get().setArchiveDetector(
      *         new TArchiveDetector(
