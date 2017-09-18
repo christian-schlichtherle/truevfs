@@ -13,11 +13,10 @@ import net.java.truevfs.comp.jmx._
 import net.java.truevfs.ext.insight.stats._
 import net.java.truevfs.kernel.spec._
 
-/**
- * A mediator for the instrumentation of the TrueVFS Kernel with JMX.
- *
- * @author Christian Schlichtherle
- */
+/** A mediator for the instrumentation of the TrueVFS Kernel with JMX.
+  *
+  * @author Christian Schlichtherle
+  */
 private abstract class I5tMediator(val subject: String)
 extends JmxMediator[I5tMediator] with Immutable {
 
@@ -27,73 +26,73 @@ extends JmxMediator[I5tMediator] with Immutable {
 
   def newStats(offset: Int): I5tStatistics
 
-  private def activateStats(offset: Int) { activate(newStats(offset)) }
+  private def activateStats(offset: Int): Unit = { activate(newStats(offset)) }
 
-  final def activateStats(origin: JmxComponent) { activateStats(0) }
+  final def activateStats(origin: JmxComponent): Unit = { activateStats(0) }
 
-  final def activateAllStats(origin: JmxComponent) {
+  final def activateAllStats(origin: JmxComponent): Unit = {
     for (mediator <- mediators)
       mediator activateStats origin
   }
 
-  def rotateStats(origin: JmxComponent) { activateStats(logger rotate ()) }
+  def rotateStats(origin: JmxComponent): Unit = { activateStats(logger rotate ()) }
 
-  final def rotateAllStats(origin: JmxComponent) {
+  final def rotateAllStats(origin: JmxComponent): Unit = {
     for (mediator <- mediators)
       mediator rotateStats origin
   }
 
-  final def logRead(nanos: Long, bytes: Int) { logger logRead (nanos, bytes) }
-  final def logWrite(nanos: Long, bytes: Int) { logger logWrite (nanos, bytes) }
-  final def logSync(nanos: Long) { logger logSync nanos }
-  final def stats(offset: Int) = { logger stats offset }
+  final def logRead(nanos: Long, bytes: Int): Unit = { logger logRead (nanos, bytes) }
+  final def logWrite(nanos: Long, bytes: Int): Unit = { logger logWrite (nanos, bytes) }
+  final def logSync(nanos: Long): Unit = { logger logSync nanos }
+  final def stats(offset: Int): FsStatistics = { logger stats offset }
 
-  final def formatOffset(offset: Int) = { logger format offset }
+  final def formatOffset(offset: Int): String = { logger format offset }
 
-  final override def toString = "%s[subject=%s]" format (getClass.getName, subject)
+  final override def toString: String = "%s[subject=%s]" format (getClass.getName, subject)
 
-  final override def instrument(subject: FsManager) =
+  final override def instrument(subject: FsManager): FsManager =
     activate(new I5tManager(syncOperationsMediator, subject))
 
-  final override def instrument(subject: IoBufferPool) =
+  final override def instrument(subject: IoBufferPool): IoBufferPool =
     new InstrumentingBufferPool[I5tMediator](bufferIoMediator, subject)
 
-  final override def instrument(context: InstrumentingManager[I5tMediator], subject: FsCompositeDriver) =
+  final override def instrument(context: InstrumentingManager[I5tMediator], subject: FsCompositeDriver): FsCompositeDriver =
     new InstrumentingCompositeDriver(this, subject)
 
-  final override def instrument(context: InstrumentingManager[I5tMediator], subject: FsController) =
+  final override def instrument(context: InstrumentingManager[I5tMediator], subject: FsController): FsController =
     new InstrumentingController[I5tMediator](applicationIoMediator, subject)
 
-  final override def instrument(context: InstrumentingBufferPool[I5tMediator], subject: IoBuffer) =
+  final override def instrument(context: InstrumentingBufferPool[I5tMediator], subject: IoBuffer): IoBuffer =
     activate(new JmxBuffer(this, subject))
 
-  final override def instrument(context: InstrumentingCompositeDriver[I5tMediator], subject: FsModel) =
+  final override def instrument(context: InstrumentingCompositeDriver[I5tMediator], subject: FsModel): FsModel =
     activate(new JmxModel(this, subject))
 
-  final override def instrument(context: InstrumentingCompositeDriver[I5tMediator], subject: FsController) =
+  final override def instrument(context: InstrumentingCompositeDriver[I5tMediator], subject: FsController): FsController =
     new InstrumentingController[I5tMediator](kernelIoMediator, subject)
 
-  final override def instrument[E <: Entry](context: InstrumentingController[I5tMediator], subject: InputSocket[E]) =
+  final override def instrument[E <: Entry](context: InstrumentingController[I5tMediator], subject: InputSocket[E]): InputSocket[E] =
     new InstrumentingInputSocket(this, subject)
 
-  final override def instrument[E <: Entry](context: InstrumentingController[I5tMediator], subject: OutputSocket[E]) =
+  final override def instrument[E <: Entry](context: InstrumentingController[I5tMediator], subject: OutputSocket[E]): OutputSocket[E] =
     new InstrumentingOutputSocket(this, subject)
 
-  final override def instrument[B <: IoBuffer](context: InstrumentingBuffer[I5tMediator], subject: InputSocket[B]) =
+  final override def instrument[B <: IoBuffer](context: InstrumentingBuffer[I5tMediator], subject: InputSocket[B]): InputSocket[B] =
     new InstrumentingInputSocket(this, subject)
 
-  final override def instrument[B <: IoBuffer](context: InstrumentingBuffer[I5tMediator], subject: OutputSocket[B]) =
+  final override def instrument[B <: IoBuffer](context: InstrumentingBuffer[I5tMediator], subject: OutputSocket[B]): OutputSocket[B] =
     new InstrumentingOutputSocket(this, subject)
 
-  final override def instrument[E <: Entry](context: InstrumentingInputSocket[I5tMediator, E], subject: InputStream) =
+  final override def instrument[E <: Entry](context: InstrumentingInputSocket[I5tMediator, E], subject: InputStream): InputStream =
     activate(new I5tInputStream(this, subject))
 
-  final override def instrument[E <: Entry](context: InstrumentingInputSocket[I5tMediator, E], subject: SeekableByteChannel) =
+  final override def instrument[E <: Entry](context: InstrumentingInputSocket[I5tMediator, E], subject: SeekableByteChannel): SeekableByteChannel =
     activate(new I5tSeekableChannel(this, subject))
 
-  final override def instrument[E <: Entry](context: InstrumentingOutputSocket[I5tMediator, E], subject: OutputStream) =
+  final override def instrument[E <: Entry](context: InstrumentingOutputSocket[I5tMediator, E], subject: OutputStream): OutputStream =
     activate(new I5tOutputStream(this, subject))
 
-  final override def instrument[E <: Entry](context: InstrumentingOutputSocket[I5tMediator, E], subject: SeekableByteChannel) =
+  final override def instrument[E <: Entry](context: InstrumentingOutputSocket[I5tMediator, E], subject: SeekableByteChannel): SeekableByteChannel =
     activate(new I5tSeekableChannel(this, subject))
 }

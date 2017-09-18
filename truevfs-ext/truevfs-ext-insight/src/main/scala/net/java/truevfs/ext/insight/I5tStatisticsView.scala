@@ -17,7 +17,7 @@ import net.java.truevfs.ext.insight.stats._
 private abstract class I5tStatisticsView(tµpe: Class[_], isMXBean: Boolean)
 extends StandardMBean(tµpe, isMXBean) with FsStatisticsView {
 
-  protected override def getDescription(info: MBeanAttributeInfo) = {
+  protected override def getDescription(info: MBeanAttributeInfo): String = {
     info.getName match {
       case "ReadBytesPerOperation"        => "The average number of bytes per read operation."
       case "ReadBytesTotal"               => "The total number of bytes read."
@@ -46,7 +46,7 @@ extends StandardMBean(tµpe, isMXBean) with FsStatisticsView {
     }
   }
 
-  protected override def getDescription(info: MBeanOperationInfo) = {
+  protected override def getDescription(info: MBeanOperationInfo): String = {
     info.getName match {
       case "rotate" => "Rotates the underlying statistics. This operation does not affect snapshots."
       case _        => null
@@ -55,5 +55,5 @@ extends StandardMBean(tµpe, isMXBean) with FsStatisticsView {
 
   def getSubject: String
 
-  def rotate()
+  def rotate(): Unit
 }

@@ -152,7 +152,7 @@ private object PaceManagerTest {
   implicit def parseMountPoint(string: String): FsMountPoint =
     new FsMountPoint(new URI(string))
 
-  def model(mediator: PaceMediator, mountPoint: FsMountPoint): PaceModel = {
+  def model(mediator: PaceMediator, mountPoint: FsMountPoint): FsModel = {
     val parent =
       if (null != mountPoint.getParent) {
         val parent = mock[FsModel]

@@ -7,6 +7,8 @@ package net.java.truevfs.ext.insight
 import javax.annotation.concurrent._
 import javax.management._
 
+import net.java.truevfs.ext.insight.stats.FsStatistics
+
 /**
  * A view for [[net.java.truevfs.ext.insight.stats.SyncStatistics]].
  *
@@ -21,7 +23,7 @@ with I5tSyncStatisticsMXBean {
 
   protected override def getDescription(info: MBeanInfo) = "A log of sync statistics."
 
-  override def stats = controller.stats
-  override def getSubject = controller.subject
-  override def rotate { controller.rotate }
+  override def stats: FsStatistics = controller.stats
+  override def getSubject: String = controller.subject
+  override def rotate(): Unit = { controller.rotate }
 }

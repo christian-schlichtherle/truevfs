@@ -15,24 +15,24 @@ import net.java.truevfs.kernel.spec._
 private final class I5tManager(mediator: I5tMediator, manager: FsManager)
 extends JmxManager(mediator, manager) { self =>
 
-  override def activate() {
+  override def activate(): Unit = {
     super.activate()
     mediator activateAllStats this
   }
 
-  override def accept[X <: Exception, V <: Visitor[_ >: FsController, X]](filter: Filter[_ >: FsController], visitor: V) = {
+  override def accept[X <: Exception, V <: Visitor[_ >: FsController, X]](filter: Filter[_ >: FsController], visitor: V): V = {
     var allUnmounted = true
     val start = System.nanoTime
     manager.accept[X, Visitor[FsController, X]](
       new Filter[FsController] {
-        override def accept(controller: FsController) = {
+        override def accept(controller: FsController): Boolean = {
           val accepted = filter accept controller
           allUnmounted &= accepted
           accepted
         }
       },
       new Visitor[FsController, X] {
-        override def visit(controller: FsController) {
+        override def visit(controller: FsController): Unit = {
           try {
             visitor visit controller
           } finally {

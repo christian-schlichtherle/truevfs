@@ -14,9 +14,8 @@ import net.java.truevfs.kernel.spec.spi._
 final class I5tBufferPoolDecorator
 extends IoBufferPoolDecorator with Immutable {
 
-  override def apply(pool: IoBufferPool): IoBufferPool =
-    syncOperationsMediator instrument pool
+  override def apply(pool: IoBufferPool): IoBufferPool = syncOperationsMediator instrument pool
 
   /** @return -200 */
-  override def getPriority = -200
+  override def getPriority: Int = -200
 }
