@@ -20,15 +20,15 @@ private final class I5tOutputStream(
   mediator: I5tMediator, @WillCloseWhenClosed out: OutputStream
 ) extends InstrumentingOutputStream(mediator, out) with JmxComponent {
 
-  override def activate() { }
+  override def activate(): Unit = { }
 
-  override def write(b: Int) {
+  override def write(b: Int): Unit = {
     val start = System.nanoTime
     out write b
     mediator logWrite (System.nanoTime - start, 1)
   }
 
-  override def write(b: Array[Byte], off: Int, len: Int) {
+  override def write(b: Array[Byte], off: Int, len: Int): Unit = {
     val start = System.nanoTime
     out write (b, off, len)
     mediator logWrite (System.nanoTime - start, len)

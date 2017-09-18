@@ -11,9 +11,9 @@ import net.java.truevfs.comp.jmx._
  */
 private class I5tSyncMediator(subject: String) extends I5tMediator(subject) {
 
-  override def newStats(offset: Int) = new I5tSyncStatistics(this, offset)
+  override def newStats(offset: Int): I5tStatistics = new I5tSyncStatistics(this, offset)
 
-  override def rotateStats(origin: JmxComponent) {
+  override def rotateStats(origin: JmxComponent): Unit = {
     origin match {
       case _: I5tManager =>
       case _ => super.rotateStats(origin)

@@ -14,9 +14,8 @@ import net.java.truevfs.kernel.spec.spi._
 final class I5tManagerDecorator
 extends FsManagerDecorator with Immutable {
 
-  override def apply(manager: FsManager): FsManager =
-    syncOperationsMediator.instrument(manager)
+  override def apply(manager: FsManager): FsManager = syncOperationsMediator.instrument(manager)
 
   /** @return -200 */
-  override def getPriority = -200
+  override def getPriority: Int = -200
 }

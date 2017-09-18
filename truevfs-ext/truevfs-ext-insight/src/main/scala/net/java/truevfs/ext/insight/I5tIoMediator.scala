@@ -9,5 +9,5 @@ package net.java.truevfs.ext.insight
  */
 private class I5tIoMediator(subject: String) extends I5tMediator(subject) {
 
-  override def newStats(offset: Int) = new I5tIoStatistics(this, offset)
+  override def newStats(offset: Int): I5tStatistics = new I5tIoStatistics(this, offset)
 }

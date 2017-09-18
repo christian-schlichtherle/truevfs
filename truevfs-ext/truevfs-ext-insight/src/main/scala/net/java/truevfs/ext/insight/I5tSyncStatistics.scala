@@ -15,5 +15,5 @@ import javax.annotation.concurrent.ThreadSafe
 private final class I5tSyncStatistics(mediator: I5tMediator, offset: Int)
 extends I5tStatistics(mediator, offset) {
 
-  def newView = new I5tSyncStatisticsView(this)
+  def newView: I5tStatisticsView = new I5tSyncStatisticsView(this)
 }

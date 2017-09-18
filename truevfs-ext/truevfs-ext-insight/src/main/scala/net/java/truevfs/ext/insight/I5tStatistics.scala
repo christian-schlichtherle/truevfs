@@ -19,9 +19,9 @@ extends JmxComponent {
 
   assert(0 <= offset)
 
-  def subject = mediator.subject
-  def stats = mediator stats offset
-  def rotate { mediator rotateStats this }
+  def subject: String = mediator.subject
+  def stats: FsStatistics = mediator stats offset
+  def rotate(): Unit = { mediator rotateStats this }
 
   private def objectName = mediator
     .nameBuilder(classOf[FsStatistics])
@@ -31,8 +31,8 @@ extends JmxComponent {
 
   def newView: I5tStatisticsView
 
-  override def activate() { mediator register (objectName, newView) }
+  override def activate(): Unit = { mediator register (objectName, newView) }
 
-  override def toString =
+  override def toString: String =
     "%s[subject=%s, offset=%d, mediator=%s]" format (getClass.getName, subject, offset, mediator)
 }
