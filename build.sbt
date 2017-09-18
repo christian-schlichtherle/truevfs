@@ -22,6 +22,7 @@ lazy val root: Project = project
   .aggregate(access, accessSwing, comp, driver, ext, it, kernel, profile, samples)
   .settings(releaseSettings)
   .settings(aggregateSettings)
+  .settings(name := "TrueVFS")
 
 lazy val access: Project = project
   .in(file("truevfs-access"))
@@ -61,7 +62,9 @@ lazy val comp: Project = project
     compTarDriver,
     compZip,
     compZipDriver
-  ).settings(aggregateSettings)
+  )
+  .settings(aggregateSettings)
+  .settings(name := "TrueVFS Component")
 
 lazy val compIbm437: Project = project
   .in(file("truevfs-comp/truevfs-comp-ibm437"))
@@ -166,7 +169,9 @@ lazy val driver: Project = project
     driverTarXz,
     driverZip,
     driverZipRaes
-  ).settings(aggregateSettings)
+  )
+  .settings(aggregateSettings)
+  .settings(name := "TrueVFS Driver")
 
 lazy val driverFile: Project = project
   .in(file("truevfs-driver/truevfs-driver-file"))
@@ -314,6 +319,7 @@ lazy val ext: Project = project
   .in(file("truevfs-ext"))
   .aggregate(extInsight, extLogging, extPacemaker)
   .settings(aggregateSettings)
+  .settings(name := "TrueVFS Extension")
 
 lazy val extInsight: Project = project
   .in(file("truevfs-ext/truevfs-ext-insight"))
@@ -403,6 +409,7 @@ lazy val kernel: Project = project
   .in(file("truevfs-kernel"))
   .aggregate(kernelImpl, kernelSpec)
   .settings(aggregateSettings)
+  .settings(name := "TrueVFS Kernel")
 
 lazy val kernelImpl: Project = project
   .in(file("truevfs-kernel/truevfs-kernel-impl"))
@@ -444,6 +451,7 @@ lazy val profile: Project = project
   .in(file("truevfs-profile"))
   .aggregate(profileBase, profileDefault, profileFull)
   .settings(aggregateSettings)
+  .settings(name := "TrueVFS Profile")
 
 lazy val profileBase: Project = project
   .in(file("truevfs-profile/truevfs-profile-base"))
