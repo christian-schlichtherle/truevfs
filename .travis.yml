@@ -11,17 +11,15 @@ dist: trusty
 
 env:
 - SCALA_VERSION_2_10=2.10.0 SCALA_VERSION_2.11=2.11.0 SCALA_VERSION_2.12=2.12.0
-#- SCALA_VERSION_2_10=2.10.6 SCALA_VERSION_2.11=2.11.11 SCALA_VERSION_2.12=2.12.3
+- SCALA_VERSION_2_10=2.10.6 SCALA_VERSION_2.11=2.11.11 SCALA_VERSION_2.12=2.12.3
 
 git:
   depth: 3
 
 jdk:
 - openjdk8
-#- oraclejdk8
+- oraclejdk8
 
 language: scala
 
 script: sbt +test
-
-sudo: false
