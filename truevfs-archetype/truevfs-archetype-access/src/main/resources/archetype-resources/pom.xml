@@ -18,6 +18,7 @@
         <maven.compiler.target>${maven.compiler.source}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.build.sourceEncoding}</project.reporting.outputEncoding>
+        <scala.compat.version>${scala-compat-version}</scala.compat.version>
         <scala.version>${scala-version}</scala.version>
         <truecommons.version>${truecommons-version}</truecommons.version>
         <truevfs.version>${truevfs-version}</truevfs.version>
@@ -38,7 +39,7 @@
              Typical applications will need nothing else. -->
         <dependency>
             <groupId>net.java.truevfs</groupId>
-            <artifactId>truevfs-profile-default</artifactId>
+            <artifactId>truevfs-profile-default_${scala.compat.version}</artifactId>
             <version>${truevfs.version}</version>
             <type>pom</type>
             <exclusions>
@@ -92,7 +93,7 @@
              statistics monitoring via JMX. -->
         <!--dependency>
             <groupId>net.java.truevfs</groupId>
-            <artifactId>truevfs-ext-insight</artifactId>
+            <artifactId>truevfs-ext-insight_${scala.compat.version}</artifactId>
             <version>${truevfs.version}</version>
             <scope>runtime</scope>
         </dependency-->
@@ -101,7 +102,7 @@
              logging via SLF4J. -->
         <!--dependency>
             <groupId>net.java.truevfs</groupId>
-            <artifactId>truevfs-ext-logging</artifactId>
+            <artifactId>truevfs-ext-logging_${scala.compat.version}</artifactId>
             <version>${truevfs.version}</version>
             <scope>runtime</scope>
         </dependency-->
@@ -112,7 +113,7 @@
              management. -->
         <!--dependency>
             <groupId>net.java.truevfs</groupId>
-            <artifactId>truevfs-ext-pacemaker</artifactId>
+            <artifactId>truevfs-ext-pacemaker_${scala.compat.version}</artifactId>
             <version>${truevfs.version}</version>
             <scope>runtime</scope>
         </dependency-->
