@@ -402,7 +402,8 @@ lazy val it: Project = project
       TruecommonsShed % Test classifier "" classifier "tests"
     ),
     name := "TrueVFS Integration Tests",
-    normalizedName := "truevfs-it"
+    normalizedName := "truevfs-it",
+    publishArtifact := false
   )
 
 lazy val kernel: Project = project
