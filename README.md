@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/christian-schlichtherle/truevfs.svg)](https://travis-ci.org/christian-schlichtherle/truevfs)
+[![Build Status](https://api.travis-ci.org/christian-schlichtherle/truevfs.svg)](https://travis-ci.org/christian-schlichtherle/truevfs)
 
 # TrueVFS
 
