@@ -1,5 +1,5 @@
 [![Build Status](https://api.travis-ci.org/christian-schlichtherle/truevfs.svg)](https://travis-ci.org/christian-schlichtherle/truevfs)
-[![Maven Central](https://img.shields.io/maven-central/v/net.java.truevfs/truevfs.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22net.java.truevfs%22)
+[![Maven Central](https://img.shields.io/maven-central/v/net.java.truevfs/truevfs-kernel-spec.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22net.java.truevfs%22)
 
 # TrueVFS
 
