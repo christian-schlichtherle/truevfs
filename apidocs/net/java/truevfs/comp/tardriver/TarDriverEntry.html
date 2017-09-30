@@ -1,0 +1,600 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- NewPage -->
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>TarDriverEntry (TrueVFS 0.12.0 API)</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<script type="text/javascript"><!--
+    if (location.href.indexOf('is-external=true') == -1) {
+        parent.document.title="TarDriverEntry (TrueVFS 0.12.0 API)";
+    }
+//-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+<!-- ========= START OF TOP NAVBAR ======= -->
+<div class="topNav"><a name="navbar_top">
+<!--   -->
+</a><a href="#skip-navbar_top" title="Skip navigation links"></a><a name="navbar_top_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/TarDriverEntry.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriver.html" title="class in net.java.truevfs.comp.tardriver"><span class="strong">Prev Class</span></a></li>
+<li><a href="../../../../../net/java/truevfs/comp/tardriver/TarException.html" title="class in net.java.truevfs.comp.tardriver"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../index.html?net/java/truevfs/comp/tardriver/TarDriverEntry.html" target="_top">Frames</a></li>
+<li><a href="TarDriverEntry.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_top">
+<li><a href="../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#fields_inherited_from_class_org.apache.commons.compress.archivers.tar.TarArchiveEntry">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_summary">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#constructor_detail">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_top">
+<!--   -->
+</a></div>
+<!-- ========= END OF TOP NAVBAR ========= -->
+<!-- ======== START OF CLASS DATA ======== -->
+<div class="header">
+<div class="subTitle">net.java.truevfs.comp.tardriver</div>
+<h2 title="Class TarDriverEntry" class="title">Class TarDriverEntry</h2>
+</div>
+<div class="contentContainer">
+<ul class="inheritance">
+<li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">java.lang.Object</a></li>
+<li>
+<ul class="inheritance">
+<li><a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true" title="class or interface in org.apache.commons.compress.archivers.tar">org.apache.commons.compress.archivers.tar.TarArchiveEntry</a></li>
+<li>
+<ul class="inheritance">
+<li>net.java.truevfs.comp.tardriver.TarDriverEntry</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="description">
+<ul class="blockList">
+<li class="blockList">
+<dl>
+<dt>All Implemented Interfaces:</dt>
+<dd>net.java.truecommons.cio.Entry, net.java.truecommons.cio.MutableEntry, net.java.truecommons.shed.Releasable&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a>&gt;, <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveEntry.html" title="interface in net.java.truevfs.kernel.spec">FsArchiveEntry</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/ArchiveEntry.html?is-external=true" title="class or interface in org.apache.commons.compress.archivers">ArchiveEntry</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true" title="class or interface in org.apache.commons.compress.archivers.tar">TarConstants</a></dd>
+</dl>
+<hr>
+<br>
+<pre>public class <span class="strong">TarDriverEntry</span>
+extends <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true" title="class or interface in org.apache.commons.compress.archivers.tar">TarArchiveEntry</a>
+implements <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveEntry.html" title="interface in net.java.truevfs.kernel.spec">FsArchiveEntry</a>, net.java.truecommons.shed.Releasable&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a>&gt;</pre>
+<div class="block">An entry in a TAR archive which implements the <code>FsArchiveEntry</code>
+ interface.</div>
+<dl><dt><span class="strong">Author:</span></dt>
+  <dd>Christian Schlichtherle</dd></dl>
+</li>
+</ul>
+</div>
+<div class="summary">
+<ul class="blockList">
+<li class="blockList">
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="nested_class_summary">
+<!--   -->
+</a>
+<h3>Nested Class Summary</h3>
+<ul class="blockList">
+<li class="blockList"><a name="nested_classes_inherited_from_class_net.java.truecommons.cio.Entry">
+<!--   -->
+</a>
+<h3>Nested classes/interfaces inherited from interface&nbsp;net.java.truecommons.cio.Entry</h3>
+<code>net.java.truecommons.cio.Entry.Access, net.java.truecommons.cio.Entry.Entity, net.java.truecommons.cio.Entry.PosixEntity, net.java.truecommons.cio.Entry.Size, net.java.truecommons.cio.Entry.Type</code></li>
+</ul>
+</li>
+</ul>
+<!-- =========== FIELD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field_summary">
+<!--   -->
+</a>
+<h3>Field Summary</h3>
+<ul class="blockList">
+<li class="blockList"><a name="fields_inherited_from_class_org.apache.commons.compress.archivers.tar.TarArchiveEntry">
+<!--   -->
+</a>
+<h3>Fields inherited from class&nbsp;org.apache.commons.compress.archivers.tar.<a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true" title="class or interface in org.apache.commons.compress.archivers.tar">TarArchiveEntry</a></h3>
+<code><a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#DEFAULT_DIR_MODE" title="class or interface in org.apache.commons.compress.archivers.tar">DEFAULT_DIR_MODE</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#DEFAULT_FILE_MODE" title="class or interface in org.apache.commons.compress.archivers.tar">DEFAULT_FILE_MODE</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#MAX_NAMELEN" title="class or interface in org.apache.commons.compress.archivers.tar">MAX_NAMELEN</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#MILLIS_PER_SECOND" title="class or interface in org.apache.commons.compress.archivers.tar">MILLIS_PER_SECOND</a></code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="fields_inherited_from_class_net.java.truecommons.cio.Entry">
+<!--   -->
+</a>
+<h3>Fields inherited from interface&nbsp;net.java.truecommons.cio.Entry</h3>
+<code>ALL_ACCESS, ALL_POSIX_ACCESS, ALL_POSIX_ENTITIES, ALL_SIZES, ALL_TYPES, DIRECTORY_TYPE, FILE_TYPE, NO_ACCESS, NO_POSIX_ENTITIES, NO_SIZES, NO_TYPES, SPECIAL_TYPE, SYMLINK_TYPE, UNKNOWN</code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="fields_inherited_from_class_org.apache.commons.compress.archivers.ArchiveEntry">
+<!--   -->
+</a>
+<h3>Fields inherited from interface&nbsp;org.apache.commons.compress.archivers.<a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/ArchiveEntry.html?is-external=true" title="class or interface in org.apache.commons.compress.archivers">ArchiveEntry</a></h3>
+<code><a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/ArchiveEntry.html?is-external=true#SIZE_UNKNOWN" title="class or interface in org.apache.commons.compress.archivers">SIZE_UNKNOWN</a></code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="fields_inherited_from_class_org.apache.commons.compress.archivers.tar.TarConstants">
+<!--   -->
+</a>
+<h3>Fields inherited from interface&nbsp;org.apache.commons.compress.archivers.tar.<a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true" title="class or interface in org.apache.commons.compress.archivers.tar">TarConstants</a></h3>
+<code><a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#ATIMELEN_GNU" title="class or interface in org.apache.commons.compress.archivers.tar">ATIMELEN_GNU</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#ATIMELEN_XSTAR" title="class or interface in org.apache.commons.compress.archivers.tar">ATIMELEN_XSTAR</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#CHKSUM_OFFSET" title="class or interface in org.apache.commons.compress.archivers.tar">CHKSUM_OFFSET</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#CHKSUMLEN" title="class or interface in org.apache.commons.compress.archivers.tar">CHKSUMLEN</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#CTIMELEN_GNU" title="class or interface in org.apache.commons.compress.archivers.tar">CTIMELEN_GNU</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#CTIMELEN_XSTAR" title="class or interface in org.apache.commons.compress.archivers.tar">CTIMELEN_XSTAR</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#DEFAULT_BLKSIZE" title="class or interface in org.apache.commons.compress.archivers.tar">DEFAULT_BLKSIZE</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#DEFAULT_RCDSIZE" title="class or interface in org.apache.commons.compress.archivers.tar">DEFAULT_RCDSIZE</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#DEVLEN" title="class or interface in org.apache.commons.compress.archivers.tar">DEVLEN</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#FORMAT_OLDGNU" title="class or interface in org.apache.commons.compress.archivers.tar">FORMAT_OLDGNU</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#FORMAT_POSIX" title="class or interface in org.apache.commons.compress.archivers.tar">FORMAT_POSIX</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#FORMAT_XSTAR" title="class or interface in org.apache.commons.compress.archivers.tar">FORMAT_XSTAR</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#GIDLEN" title="class or interface in org.apache.commons.compress.archivers.tar">GIDLEN</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#GNAMELEN" title="class or interface in org.apache.commons.compress.archivers.tar">GNAMELEN</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#GNU_LONGLINK" title="class or interface in org.apache.commons.compress.archivers.tar">GNU_LONGLINK</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#ISEXTENDEDLEN_GNU" title="class or interface in org.apache.commons.compress.archivers.tar">ISEXTENDEDLEN_GNU</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#ISEXTENDEDLEN_GNU_SPARSE" title="class or interface in org.apache.commons.compress.archivers.tar">ISEXTENDEDLEN_GNU_SPARSE</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#LF_BLK" title="class or interface in org.apache.commons.compress.archivers.tar">LF_BLK</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#LF_CHR" title="class or interface in org.apache.commons.compress.archivers.tar">LF_CHR</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#LF_CONTIG" title="class or interface in org.apache.commons.compress.archivers.tar">LF_CONTIG</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#LF_DIR" title="class or interface in org.apache.commons.compress.archivers.tar">LF_DIR</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#LF_FIFO" title="class or interface in org.apache.commons.compress.archivers.tar">LF_FIFO</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#LF_GNUTYPE_LONGLINK" title="class or interface in org.apache.commons.compress.archivers.tar">LF_GNUTYPE_LONGLINK</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#LF_GNUTYPE_LONGNAME" title="class or interface in org.apache.commons.compress.archivers.tar">LF_GNUTYPE_LONGNAME</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#LF_GNUTYPE_SPARSE" title="class or interface in org.apache.commons.compress.archivers.tar">LF_GNUTYPE_SPARSE</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#LF_LINK" title="class or interface in org.apache.commons.compress.archivers.tar">LF_LINK</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#LF_NORMAL" title="class or interface in org.apache.commons.compress.archivers.tar">LF_NORMAL</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#LF_OLDNORM" title="class or interface in org.apache.commons.compress.archivers.tar">LF_OLDNORM</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#LF_PAX_EXTENDED_HEADER_LC" title="class or interface in org.apache.commons.compress.archivers.tar">LF_PAX_EXTENDED_HEADER_LC</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#LF_PAX_EXTENDED_HEADER_UC" title="class or interface in org.apache.commons.compress.archivers.tar">LF_PAX_EXTENDED_HEADER_UC</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#LF_PAX_GLOBAL_EXTENDED_HEADER" title="class or interface in org.apache.commons.compress.archivers.tar">LF_PAX_GLOBAL_EXTENDED_HEADER</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#LF_SYMLINK" title="class or interface in org.apache.commons.compress.archivers.tar">LF_SYMLINK</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#LONGNAMESLEN_GNU" title="class or interface in org.apache.commons.compress.archivers.tar">LONGNAMESLEN_GNU</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#MAGIC_ANT" title="class or interface in org.apache.commons.compress.archivers.tar">MAGIC_ANT</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#MAGIC_GNU" title="class or interface in org.apache.commons.compress.archivers.tar">MAGIC_GNU</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#MAGIC_OFFSET" title="class or interface in org.apache.commons.compress.archivers.tar">MAGIC_OFFSET</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#MAGIC_POSIX" title="class or interface in org.apache.commons.compress.archivers.tar">MAGIC_POSIX</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#MAGIC_XSTAR" title="class or interface in org.apache.commons.compress.archivers.tar">MAGIC_XSTAR</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#MAGICLEN" title="class or interface in org.apache.commons.compress.archivers.tar">MAGICLEN</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#MAXID" title="class or interface in org.apache.commons.compress.archivers.tar">MAXID</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#MAXSIZE" title="class or interface in org.apache.commons.compress.archivers.tar">MAXSIZE</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#MODELEN" title="class or interface in org.apache.commons.compress.archivers.tar">MODELEN</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#MODTIMELEN" title="class or interface in org.apache.commons.compress.archivers.tar">MODTIMELEN</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#NAMELEN" title="class or interface in org.apache.commons.compress.archivers.tar">NAMELEN</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#OFFSETLEN_GNU" title="class or interface in org.apache.commons.compress.archivers.tar">OFFSETLEN_GNU</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#PAD2LEN_GNU" title="class or interface in org.apache.commons.compress.archivers.tar">PAD2LEN_GNU</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#PREFIXLEN" title="class or interface in org.apache.commons.compress.archivers.tar">PREFIXLEN</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#PREFIXLEN_XSTAR" title="class or interface in org.apache.commons.compress.archivers.tar">PREFIXLEN_XSTAR</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#REALSIZELEN_GNU" title="class or interface in org.apache.commons.compress.archivers.tar">REALSIZELEN_GNU</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#SIZELEN" title="class or interface in org.apache.commons.compress.archivers.tar">SIZELEN</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#SPARSELEN_GNU" title="class or interface in org.apache.commons.compress.archivers.tar">SPARSELEN_GNU</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#SPARSELEN_GNU_SPARSE" title="class or interface in org.apache.commons.compress.archivers.tar">SPARSELEN_GNU_SPARSE</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#UIDLEN" title="class or interface in org.apache.commons.compress.archivers.tar">UIDLEN</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#UNAMELEN" title="class or interface in org.apache.commons.compress.archivers.tar">UNAMELEN</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#VERSION_ANT" title="class or interface in org.apache.commons.compress.archivers.tar">VERSION_ANT</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#VERSION_GNU_SPACE" title="class or interface in org.apache.commons.compress.archivers.tar">VERSION_GNU_SPACE</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#VERSION_GNU_ZERO" title="class or interface in org.apache.commons.compress.archivers.tar">VERSION_GNU_ZERO</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#VERSION_OFFSET" title="class or interface in org.apache.commons.compress.archivers.tar">VERSION_OFFSET</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#VERSION_POSIX" title="class or interface in org.apache.commons.compress.archivers.tar">VERSION_POSIX</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#VERSIONLEN" title="class or interface in org.apache.commons.compress.archivers.tar">VERSIONLEN</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#XSTAR_MAGIC_LEN" title="class or interface in org.apache.commons.compress.archivers.tar">XSTAR_MAGIC_LEN</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarConstants.html?is-external=true#XSTAR_MAGIC_OFFSET" title="class or interface in org.apache.commons.compress.archivers.tar">XSTAR_MAGIC_OFFSET</a></code></li>
+</ul>
+</li>
+</ul>
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor_summary">
+<!--   -->
+</a>
+<h3>Constructor Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Constructor Summary table, listing constructors, and an explanation">
+<caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier</th>
+<th class="colLast" scope="col">Constructor and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html#TarDriverEntry(java.lang.String)">TarDriverEntry</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>protected </code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html#TarDriverEntry(java.lang.String,%20org.apache.commons.compress.archivers.tar.TarArchiveEntry)">TarDriverEntry</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+              <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true" title="class or interface in org.apache.commons.compress.archivers.tar">TarArchiveEntry</a>&nbsp;template)</code>&nbsp;</td>
+</tr>
+</table>
+</li>
+</ul>
+<!-- ========== METHOD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_summary">
+<!--   -->
+</a>
+<h3>Method Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
+<caption><span>Methods</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Date.html?is-external=true" title="class or interface in java.util">Date</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html#getModTime()">getModTime</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>long</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html#getSize()">getSize</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>long</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html#getSize(net.java.truecommons.cio.Entry.Size)">getSize</a></strong>(net.java.truecommons.cio.Entry.Size&nbsp;type)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>long</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html#getTime(net.java.truecommons.cio.Entry.Access)">getTime</a></strong>(net.java.truecommons.cio.Entry.Access&nbsp;type)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>net.java.truecommons.cio.Entry.Type</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html#getType()">getType</a></strong>()</code>
+<div class="block">Returns the type of this archive entry.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html#isPermitted(net.java.truecommons.cio.Entry.Access,%20net.java.truecommons.cio.Entry.Entity)">isPermitted</a></strong>(net.java.truecommons.cio.Entry.Access&nbsp;type,
+           net.java.truecommons.cio.Entry.Entity&nbsp;entity)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html#release()">release</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html#setModTime(java.util.Date)">setModTime</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Date.html?is-external=true" title="class or interface in java.util">Date</a>&nbsp;time)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html#setModTime(long)">setModTime</a></strong>(long&nbsp;time)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html#setPermitted(net.java.truecommons.cio.Entry.Access,%20net.java.truecommons.cio.Entry.Entity,%20java.lang.Boolean)">setPermitted</a></strong>(net.java.truecommons.cio.Entry.Access&nbsp;type,
+            net.java.truecommons.cio.Entry.Entity&nbsp;entity,
+            <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;value)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html#setSize(net.java.truecommons.cio.Entry.Size,%20long)">setSize</a></strong>(net.java.truecommons.cio.Entry.Size&nbsp;type,
+       long&nbsp;size)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html#setSize(long)">setSize</a></strong>(long&nbsp;size)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html#setTime(net.java.truecommons.cio.Entry.Access,%20long)">setTime</a></strong>(net.java.truecommons.cio.Entry.Access&nbsp;type,
+       long&nbsp;time)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html#toString()">toString</a></strong>()</code>
+<div class="block">Returns a string representation of this object for debugging and logging
+ purposes.</div>
+</td>
+</tr>
+</table>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_org.apache.commons.compress.archivers.tar.TarArchiveEntry">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;org.apache.commons.compress.archivers.tar.<a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true" title="class or interface in org.apache.commons.compress.archivers.tar">TarArchiveEntry</a></h3>
+<code><a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#equals(java.lang.Object)" title="class or interface in org.apache.commons.compress.archivers.tar">equals</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#equals(org.apache.commons.compress.archivers.tar.TarArchiveEntry)" title="class or interface in org.apache.commons.compress.archivers.tar">equals</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#getDevMajor()" title="class or interface in org.apache.commons.compress.archivers.tar">getDevMajor</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#getDevMinor()" title="class or interface in org.apache.commons.compress.archivers.tar">getDevMinor</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#getDirectoryEntries()" title="class or interface in org.apache.commons.compress.archivers.tar">getDirectoryEntries</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#getFile()" title="class or interface in org.apache.commons.compress.archivers.tar">getFile</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#getGroupId()" title="class or interface in org.apache.commons.compress.archivers.tar">getGroupId</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#getGroupName()" title="class or interface in org.apache.commons.compress.archivers.tar">getGroupName</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#getLastModifiedDate()" title="class or interface in org.apache.commons.compress.archivers.tar">getLastModifiedDate</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#getLinkName()" title="class or interface in org.apache.commons.compress.archivers.tar">getLinkName</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#getLongGroupId()" title="class or interface in org.apache.commons.compress.archivers.tar">getLongGroupId</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#getLongUserId()" title="class or interface in org.apache.commons.compress.archivers.tar">getLongUserId</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#getMode()" title="class or interface in org.apache.commons.compress.archivers.tar">getMode</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#getName()" title="class or interface in org.apache.commons.compress.archivers.tar">getName</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#getRealSize()" title="class or interface in org.apache.commons.compress.archivers.tar">getRealSize</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#getUserId()" title="class or interface in org.apache.commons.compress.archivers.tar">getUserId</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#getUserName()" title="class or interface in org.apache.commons.compress.archivers.tar">getUserName</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#hashCode()" title="class or interface in org.apache.commons.compress.archivers.tar">hashCode</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isBlockDevice()" title="class or interface in org.apache.commons.compress.archivers.tar">isBlockDevice</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isCharacterDevice()" title="class or interface in org.apache.commons.compress.archivers.tar">isCharacterDevice</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isCheckSumOK()" title="class or interface in org.apache.commons.compress.archivers.tar">isCheckSumOK</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isDescendent(org.apache.commons.compress.archivers.tar.TarArchiveEntry)" title="class or interface in org.apache.commons.compress.archivers.tar">isDescendent</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isDirectory()" title="class or interface in org.apache.commons.compress.archivers.tar">isDirectory</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isExtended()" title="class or interface in org.apache.commons.compress.archivers.tar">isExtended</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isFIFO()" title="class or interface in org.apache.commons.compress.archivers.tar">isFIFO</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isFile()" title="class or interface in org.apache.commons.compress.archivers.tar">isFile</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isGlobalPaxHeader()" title="class or interface in org.apache.commons.compress.archivers.tar">isGlobalPaxHeader</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isGNULongLinkEntry()" title="class or interface in org.apache.commons.compress.archivers.tar">isGNULongLinkEntry</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isGNULongNameEntry()" title="class or interface in org.apache.commons.compress.archivers.tar">isGNULongNameEntry</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isGNUSparse()" title="class or interface in org.apache.commons.compress.archivers.tar">isGNUSparse</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isLink()" title="class or interface in org.apache.commons.compress.archivers.tar">isLink</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isOldGNUSparse()" title="class or interface in org.apache.commons.compress.archivers.tar">isOldGNUSparse</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isPaxGNUSparse()" title="class or interface in org.apache.commons.compress.archivers.tar">isPaxGNUSparse</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isPaxHeader()" title="class or interface in org.apache.commons.compress.archivers.tar">isPaxHeader</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isSparse()" title="class or interface in org.apache.commons.compress.archivers.tar">isSparse</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isStarSparse()" title="class or interface in org.apache.commons.compress.archivers.tar">isStarSparse</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#isSymbolicLink()" title="class or interface in org.apache.commons.compress.archivers.tar">isSymbolicLink</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#parseTarHeader(byte[])" title="class or interface in org.apache.commons.compress.archivers.tar">parseTarHeader</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#parseTarHeader(byte[],%20org.apache.commons.compress.archivers.zip.ZipEncoding)" title="class or interface in org.apache.commons.compress.archivers.tar">parseTarHeader</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#setDevMajor(int)" title="class or interface in org.apache.commons.compress.archivers.tar">setDevMajor</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#setDevMinor(int)" title="class or interface in org.apache.commons.compress.archivers.tar">setDevMinor</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#setGroupId(int)" title="class or interface in org.apache.commons.compress.archivers.tar">setGroupId</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#setGroupId(long)" title="class or interface in org.apache.commons.compress.archivers.tar">setGroupId</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#setGroupName(java.lang.String)" title="class or interface in org.apache.commons.compress.archivers.tar">setGroupName</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#setIds(int,%20int)" title="class or interface in org.apache.commons.compress.archivers.tar">setIds</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#setLinkName(java.lang.String)" title="class or interface in org.apache.commons.compress.archivers.tar">setLinkName</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#setMode(int)" title="class or interface in org.apache.commons.compress.archivers.tar">setMode</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#setName(java.lang.String)" title="class or interface in org.apache.commons.compress.archivers.tar">setName</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#setNames(java.lang.String,%20java.lang.String)" title="class or interface in org.apache.commons.compress.archivers.tar">setNames</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#setUserId(int)" title="class or interface in org.apache.commons.compress.archivers.tar">setUserId</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#setUserId(long)" title="class or interface in org.apache.commons.compress.archivers.tar">setUserId</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#setUserName(java.lang.String)" title="class or interface in org.apache.commons.compress.archivers.tar">setUserName</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#writeEntryHeader(byte[])" title="class or interface in org.apache.commons.compress.archivers.tar">writeEntryHeader</a>, <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#writeEntryHeader(byte[],%20org.apache.commons.compress.archivers.zip.ZipEncoding,%20boolean)" title="class or interface in org.apache.commons.compress.archivers.tar">writeEntryHeader</a></code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_java.lang.Object">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;java.lang.<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></h3>
+<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#clone()" title="class or interface in java.lang">clone</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#finalize()" title="class or interface in java.lang">finalize</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#getClass()" title="class or interface in java.lang">getClass</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notify()" title="class or interface in java.lang">notify</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notifyAll()" title="class or interface in java.lang">notifyAll</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait()" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long)" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long,%20int)" title="class or interface in java.lang">wait</a></code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_net.java.truecommons.cio.Entry">
+<!--   -->
+</a>
+<h3>Methods inherited from interface&nbsp;net.java.truecommons.cio.Entry</h3>
+<code>getName</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="details">
+<ul class="blockList">
+<li class="blockList">
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor_detail">
+<!--   -->
+</a>
+<h3>Constructor Detail</h3>
+<a name="TarDriverEntry(java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>TarDriverEntry</h4>
+<pre>public&nbsp;TarDriverEntry(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)</pre>
+</li>
+</ul>
+<a name="TarDriverEntry(java.lang.String, org.apache.commons.compress.archivers.tar.TarArchiveEntry)">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>TarDriverEntry</h4>
+<pre>protected&nbsp;TarDriverEntry(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+              <a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true" title="class or interface in org.apache.commons.compress.archivers.tar">TarArchiveEntry</a>&nbsp;template)</pre>
+</li>
+</ul>
+</li>
+</ul>
+<!-- ============ METHOD DETAIL ========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_detail">
+<!--   -->
+</a>
+<h3>Method Detail</h3>
+<a name="getModTime()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getModTime</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Date.html?is-external=true" title="class or interface in java.util">Date</a>&nbsp;getModTime()</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#getModTime()" title="class or interface in org.apache.commons.compress.archivers.tar">getModTime</a></code>&nbsp;in class&nbsp;<code><a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true" title="class or interface in org.apache.commons.compress.archivers.tar">TarArchiveEntry</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="getSize()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getSize</h4>
+<pre>public&nbsp;long&nbsp;getSize()</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code><a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/ArchiveEntry.html?is-external=true#getSize()" title="class or interface in org.apache.commons.compress.archivers">getSize</a></code>&nbsp;in interface&nbsp;<code><a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/ArchiveEntry.html?is-external=true" title="class or interface in org.apache.commons.compress.archivers">ArchiveEntry</a></code></dd>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#getSize()" title="class or interface in org.apache.commons.compress.archivers.tar">getSize</a></code>&nbsp;in class&nbsp;<code><a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true" title="class or interface in org.apache.commons.compress.archivers.tar">TarArchiveEntry</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="getSize(net.java.truecommons.cio.Entry.Size)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getSize</h4>
+<pre>public&nbsp;long&nbsp;getSize(net.java.truecommons.cio.Entry.Size&nbsp;type)</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>getSize</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.Entry</code></dd>
+</dl>
+</li>
+</ul>
+<a name="getTime(net.java.truecommons.cio.Entry.Access)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getTime</h4>
+<pre>public&nbsp;long&nbsp;getTime(net.java.truecommons.cio.Entry.Access&nbsp;type)</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>getTime</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.Entry</code></dd>
+</dl>
+</li>
+</ul>
+<a name="getType()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getType</h4>
+<pre>public&nbsp;net.java.truecommons.cio.Entry.Type&nbsp;getType()</pre>
+<div class="block"><strong>Description copied from interface:&nbsp;<code><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveEntry.html#getType()">FsArchiveEntry</a></code></strong></div>
+<div class="block">Returns the type of this archive entry.</div>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveEntry.html#getType()">getType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveEntry.html" title="interface in net.java.truevfs.kernel.spec">FsArchiveEntry</a></code></dd>
+<dt><span class="strong">Returns:</span></dt><dd>The type of this archive entry.</dd></dl>
+</li>
+</ul>
+<a name="isPermitted(net.java.truecommons.cio.Entry.Access, net.java.truecommons.cio.Entry.Entity)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isPermitted</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;isPermitted(net.java.truecommons.cio.Entry.Access&nbsp;type,
+                  net.java.truecommons.cio.Entry.Entity&nbsp;entity)</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>isPermitted</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.Entry</code></dd>
+</dl>
+</li>
+</ul>
+<a name="release()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>release</h4>
+<pre>public&nbsp;void&nbsp;release()
+             throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>release</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.shed.Releasable&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a>&gt;</code></dd>
+<dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></code></dd></dl>
+</li>
+</ul>
+<a name="setModTime(java.util.Date)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setModTime</h4>
+<pre>public&nbsp;void&nbsp;setModTime(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Date.html?is-external=true" title="class or interface in java.util">Date</a>&nbsp;time)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#setModTime(java.util.Date)" title="class or interface in org.apache.commons.compress.archivers.tar">setModTime</a></code>&nbsp;in class&nbsp;<code><a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true" title="class or interface in org.apache.commons.compress.archivers.tar">TarArchiveEntry</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="setModTime(long)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setModTime</h4>
+<pre>public&nbsp;void&nbsp;setModTime(long&nbsp;time)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#setModTime(long)" title="class or interface in org.apache.commons.compress.archivers.tar">setModTime</a></code>&nbsp;in class&nbsp;<code><a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true" title="class or interface in org.apache.commons.compress.archivers.tar">TarArchiveEntry</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="setPermitted(net.java.truecommons.cio.Entry.Access, net.java.truecommons.cio.Entry.Entity, java.lang.Boolean)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setPermitted</h4>
+<pre>public&nbsp;boolean&nbsp;setPermitted(net.java.truecommons.cio.Entry.Access&nbsp;type,
+                   net.java.truecommons.cio.Entry.Entity&nbsp;entity,
+                   <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;value)</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>setPermitted</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.MutableEntry</code></dd>
+</dl>
+</li>
+</ul>
+<a name="setSize(net.java.truecommons.cio.Entry.Size, long)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setSize</h4>
+<pre>public&nbsp;boolean&nbsp;setSize(net.java.truecommons.cio.Entry.Size&nbsp;type,
+              long&nbsp;size)</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>setSize</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.MutableEntry</code></dd>
+</dl>
+</li>
+</ul>
+<a name="setSize(long)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setSize</h4>
+<pre>public&nbsp;void&nbsp;setSize(long&nbsp;size)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true#setSize(long)" title="class or interface in org.apache.commons.compress.archivers.tar">setSize</a></code>&nbsp;in class&nbsp;<code><a href="http://commons.apache.org/compress/apidocs/org/apache/commons/compress/archivers/tar/TarArchiveEntry.html?is-external=true" title="class or interface in org.apache.commons.compress.archivers.tar">TarArchiveEntry</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="setTime(net.java.truecommons.cio.Entry.Access, long)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setTime</h4>
+<pre>public&nbsp;boolean&nbsp;setTime(net.java.truecommons.cio.Entry.Access&nbsp;type,
+              long&nbsp;time)</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>setTime</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.MutableEntry</code></dd>
+</dl>
+</li>
+</ul>
+<a name="toString()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>toString</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;toString()</pre>
+<div class="block">Returns a string representation of this object for debugging and logging
+ purposes.</div>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#toString()" title="class or interface in java.lang">toString</a></code>&nbsp;in class&nbsp;<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<!-- ========= END OF CLASS DATA ========= -->
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<div class="bottomNav"><a name="navbar_bottom">
+<!--   -->
+</a><a href="#skip-navbar_bottom" title="Skip navigation links"></a><a name="navbar_bottom_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/TarDriverEntry.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../../net/java/truevfs/comp/tardriver/TarDriver.html" title="class in net.java.truevfs.comp.tardriver"><span class="strong">Prev Class</span></a></li>
+<li><a href="../../../../../net/java/truevfs/comp/tardriver/TarException.html" title="class in net.java.truevfs.comp.tardriver"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../index.html?net/java/truevfs/comp/tardriver/TarDriverEntry.html" target="_top">Frames</a></li>
+<li><a href="TarDriverEntry.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_bottom">
+<li><a href="../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_bottom");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#fields_inherited_from_class_org.apache.commons.compress.archivers.tar.TarArchiveEntry">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_summary">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#constructor_detail">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_bottom">
+<!--   -->
+</a></div>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+<p class="legalCopy"><small>Copyright &#169; 2005&#x2013;2017 <a href="http://schlichtherle.de">Schlichtherle IT Services</a>. All rights reserved.</small></p>
+</body>
+</html>

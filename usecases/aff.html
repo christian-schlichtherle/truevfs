@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <link href="../css/prettify.css" type="text/css" rel="stylesheet"/>
+    <script src="../js/prettify.js" type="text/javascript"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>TrueVFS &#x2013; Application File Format</title>
+    <style type="text/css" media="all">
+      @import url("../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../css/print.css" type="text/css" media="print"/>
+    <meta name="author" content="Christian Schlichtherle"/>
+    <meta name="Date-Revision-yyyymmdd" content="20170919"/>
+    <meta http-equiv="Content-Language" content="en"/>
+          <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-25500668-2']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+                  <script>
+        (function() {
+          var cx = '003580521944097984334:8uinm6tpaz4';
+          var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+          gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+              '//www.google.com/cse/cse.js?cx=' + cx;
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+        })();
+      </script>
+                                                          
+<link title="The TrueZIP Blog - Announcements Feed" rel="alternate" type="application/rss+xml" href="http://truevfs.schlichtherle.de/category/announcements/feed/"/>
+                      
+  </head>
+  <body class="composite" onload="prettyPrint()">
+    <div id="banner">
+                    <div id="bannerLeft">
+                TrueVFS
+                </div>
+                                <div id="gcse-search-form" class="gcse-searchbox-only"></div>
+            <div class="clear"><hr/></div>
+    </div>
+    <div id="breadcrumbs">
+            
+                                  <div class="xleft">
+        <span id="projectVersion">Version: 0.12.0</span>
+                  |                         <a href="../index.html" title="TrueVFS">TrueVFS</a>
+      &raquo;
+      TrueVFS &#x2013; Application File Format
+              </div>
+            <div class="xright">        
+                        </div>
+      <div class="clear"><hr/></div>
+    </div>
+    <div id="leftColumn">
+      <div id="navcolumn">
+              
+                                                   <h5>Documentation</h5>
+                  <ul>
+                  <li class="none">
+                          <a href="../index.html" title="About">About</a>
+            </li>
+                  <li class="none">
+                          <a href="../features.html" title="Key Features">Key Features</a>
+            </li>
+                                                                                                                                                      <li class="expanded">
+                          <a href="../usecases/index.html" title="Use Cases">Use Cases</a>
+                    <ul>
+                      <li class="none">
+                          <a href="../usecases/sbt.html" title="Software Build Tool">Software Build Tool</a>
+            </li>
+                      <li class="none">
+                          <a href="../usecases/se.html" title="Search Engine">Search Engine</a>
+            </li>
+                      <li class="none">
+                          <a href="../usecases/ide.html" title="Integrated Development Environment">Integrated Development Environment</a>
+            </li>
+                      <li class="none">
+            <strong>Application File Format</strong>
+          </li>
+                      <li class="none">
+                          <a href="../usecases/eaff.html" title="Encrypted Application File Format">Encrypted Application File Format</a>
+            </li>
+              </ul>
+        </li>
+                                                                                                        <li class="collapsed">
+                          <a href="../kick-start/index.html" title="Getting Started">Getting Started</a>
+                  </li>
+                                                                                                                          <li class="collapsed">
+                          <a href="../help.html" title="Getting Help">Getting Help</a>
+                  </li>
+                  <li class="none">
+                          <a href="../concepts.html" title="Basic Concepts">Basic Concepts</a>
+            </li>
+                  <li class="none">
+                          <a href="../glossary.html" title="Glossary">Glossary</a>
+            </li>
+          </ul>
+                       <h5>External Resources</h5>
+                  <ul>
+                  <li class="none">
+                          <a href="http://illegalexception.schlichtherle.de" class="externalLink" title="Christian's Blog">Christian's Blog</a>
+            </li>
+          </ul>
+                       <h5>Parent Module</h5>
+                                 <h5>Sub-Modules</h5>
+                  <ul>
+                  <li class="none">
+                          <a href="../truevfs-access/index.html" title="TrueVFS Access">TrueVFS Access</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-access-swing/index.html" title="TrueVFS Access Swing">TrueVFS Access Swing</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-archetype/index.html" title="TrueVFS Archetype">TrueVFS Archetype</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-comp/index.html" title="TrueVFS Component">TrueVFS Component</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-driver/index.html" title="TrueVFS Driver">TrueVFS Driver</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-ext/index.html" title="TrueVFS Extension">TrueVFS Extension</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-it/index.html" title="TrueVFS Integration Tests">TrueVFS Integration Tests</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-kernel/index.html" title="TrueVFS Kernel">TrueVFS Kernel</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-profile/index.html" title="TrueVFS Profile">TrueVFS Profile</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-samples/index.html" title="TrueVFS Samples">TrueVFS Samples</a>
+            </li>
+          </ul>
+                       <h5>Reports</h5>
+                  <ul>
+                                                                                                                                                                                                                                                                                            <li class="collapsed">
+                          <a href="../project-info.html" title="Project Information">Project Information</a>
+                  </li>
+                                                                                      <li class="collapsed">
+                          <a href="../project-reports.html" title="Project Reports">Project Reports</a>
+                  </li>
+          </ul>
+                     
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+  <div class="paypalButton">
+    <input name="cmd" value="_s-xclick" type="hidden"/>
+    <input name="hosted_button_id" value="AGDEQWWKNZ6UL" type="hidden"/>
+    <input style="border: 0" alt="PayPal - The safer, easier way to pay online!" name="submit" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" type="image"/>
+  </div>
+</form>
+                                
+                              </div>
+    </div>
+    <div id="bodyColumn" class="content">
+      <div id="contentBox">
+                                      <div class="section">
+<h2><a name="Application_File_Format"></a>Application File Format</h2>
+<div class="section">
+<h3><a name="Motivation"></a>Motivation</h3>
+<p>Suppose you're writing a plug-in for the next generation application which shall use an archive file format with a custom file extension (extension) as a persistent container for some application data, e.g. a text document.</p>
+<p>Then, wouldn't it be nice if you wouldn't need to worry about how to read or write archive files using cumbersome archive type specific APIs?</p></div>
+<div class="section">
+<h3><a name="Accessing_Application_File_Formats"></a>Accessing Application File Formats</h3>
+<p>Thanks to the client API of the module <a href="../truevfs-access/index.html">TrueVFS Access</a>, here's your relief: The <a href="../apidocs/net/java/truevfs/access/TFile.html"><tt>TFile</tt></a>, <a href="../apidocs/net/java/truevfs/access/TFileInputStream.html"><tt>TFileInputStream</tt></a> and <a href="../apidocs/net/java/truevfs/access/TFileOutputStream.html"><tt>TFileOutputStream</tt></a> classes can read and write entries within an archive file as if they were plain files in regular directories in the file system.</p>
+<p>First, you need to register your custom application file format extension with an instance of an archive driver class like this:</p>
+<div class="source">
+<pre>TConfig.current().setArchiveDetector(
+    new TArchiveDetector(&quot;foo|bar&quot;, new JarDriver()));</pre></div>
+<p>Once this has been called, any new <tt>TFile</tt> object will recognize the file extensions <tt>foo</tt> and <tt>bar</tt>, whereby case is ignored, and assume the JAR file format to read or write these files.</p>
+<p>Note that TrueVFS automatically recognizes false positive archive files, so it cannot get confused by files with arbitrary content which accidently use the extensions of your custom application file format.</p>
+<p>Please also note the usage of the class <a href="../apidocs/net/java/truevfs/comp/zipdriver/JarDriver.html"><tt>JarDriver</tt></a> for accessing the JAR file format. The JAR file format is typically the best choice for custom application file formats because it supports compression, fast access and UTF-8 encoded entry names for maximum interoperability. In particular, the last point makes it superior to the ZIP file format.</p>
+<p>Now you can easily create or overwrite an entry in your custom application file format like this:</p>
+<div class="source">
+<pre>try (OutputStream out = new TFileOutputStream(&quot;file.foo/contents.xml&quot;)) {
+    ...;
+}</pre></div>
+<p>Alternatively, you could use a <a href="../apidocs/net/java/truevfs/access/TFileWriter.html"><tt>TFileWriter</tt></a>.</p>
+<p>This is how you could read the entry again:</p>
+<div class="source">
+<pre>try (InputStream in = new TFileInputStream(&quot;file.foo/contents.xml&quot;)) {
+    ...;
+}</pre></div>
+<p>Alternatively, you could use a <a href="../apidocs/net/java/truevfs/access/TFileReader.html"><tt>TFileReader</tt></a>.</p>
+<p>And finally, to delete a virtual directory tree - in this case your custom application file - you could use this:</p>
+<div class="source">
+<pre>new TFile(&quot;file.foo&quot;).rm_r();</pre></div>
+<p>Note that calling the method <tt>rm_r()</tt> is required to recursively delete the application file because the <tt>TFile</tt> object refers to a virtual directory, which cannot get deleted using similar methods like <tt>delete()</tt> or <tt>rm()</tt> unless it's empty.</p></div>
+<div class="section">
+<h3><a name="Committing_Changes__Cleaning_Up"></a>Committing Changes / Cleaning Up</h3>
+<p>If your application has created or changed one or more archive files, then these changes need to get committed sometime. Even if your application has done read-only acess to the virtual file system, some temporary files may have been created to speed up random access - this dependends on the driver implementation.</p>
+<p>If your application is only short-running, then there is actually nothing to do because the TrueVFS Kernel automatically registers and de-registers a JVM shutdown hook which will commit all changes when its run. Note that shutdown hooks are run even if the application terminates due to a <tt>Throwable</tt>.</p>
+<p>However, if your application is long running or wants to handle any exceptions, then you may want to manually call this operation - here's how to do this:</p>
+<div class="source">
+<pre>TVFS.umount();</pre></div>
+<p>As a side effect, once this operation succeeded, third parties (e.g. other processes) can safely access the processed archive files until the next time your application starts to operate on them again.</p>
+<div class="section">
+<h4><a name="Performance_Considerations"></a>Performance Considerations</h4>
+<p>Take care not to call <tt>TVFS.umount()</tt> in a loop which updates the same set of archive files because this would result in poor performance in the order of O(n*n) instead of just O(n), where n is the total number of archive entries.</p>
+<p>For more information, please refer to the Javadoc for <a href="../apidocs/net/java/truevfs/access/TVFS.html#umount"><tt>TVFS.umount()</tt></a>.</p></div></div></div>
+              </div>
+    </div>
+    <div class="clear"><hr/></div>
+    <div id="footer">
+      <div class="xright">
+              Copyright &#169;                    2005-2017
+                        <a href="http://schlichtherle.de">Schlichtherle IT Services</a>.
+            All Rights Reserved.      
+                                   <span id="publishDate">Last Published: 2017-09-19</span>
+                        </div>
+      <div class="clear"><hr/></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head><meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+<title>OdfDriver xref</title>
+<link type="text/css" rel="stylesheet" href="../../../../../stylesheet.css" />
+</head>
+<body>
+<div id="overview"><a href="../../../../../../apidocs/net/java/truevfs/driver/odf/OdfDriver.html">View Javadoc</a></div><pre>
+<a class="jxr_linenumber" name="L1" href="#L1">1</a>   <em class="jxr_comment">/*</em>
+<a class="jxr_linenumber" name="L2" href="#L2">2</a>   <em class="jxr_comment"> * Copyright (C) 2005-2015 Schlichtherle IT Services.</em>
+<a class="jxr_linenumber" name="L3" href="#L3">3</a>   <em class="jxr_comment"> * All rights reserved. Use is subject to license terms.</em>
+<a class="jxr_linenumber" name="L4" href="#L4">4</a>   <em class="jxr_comment"> */</em>
+<a class="jxr_linenumber" name="L5" href="#L5">5</a>   <strong class="jxr_keyword">package</strong> net.java.truevfs.driver.odf;
+<a class="jxr_linenumber" name="L6" href="#L6">6</a>   
+<a class="jxr_linenumber" name="L7" href="#L7">7</a>   <strong class="jxr_keyword">import</strong> java.io.IOException;
+<a class="jxr_linenumber" name="L8" href="#L8">8</a>   <strong class="jxr_keyword">import</strong> javax.annotation.CheckForNull;
+<a class="jxr_linenumber" name="L9" href="#L9">9</a>   <strong class="jxr_keyword">import</strong> javax.annotation.WillNotClose;
+<a class="jxr_linenumber" name="L10" href="#L10">10</a>  <strong class="jxr_keyword">import</strong> javax.annotation.concurrent.Immutable;
+<a class="jxr_linenumber" name="L11" href="#L11">11</a>  <strong class="jxr_keyword">import</strong> net.java.truevfs.comp.zipdriver.JarDriver;
+<a class="jxr_linenumber" name="L12" href="#L12">12</a>  <strong class="jxr_keyword">import</strong> net.java.truevfs.comp.zipdriver.JarDriverEntry;
+<a class="jxr_linenumber" name="L13" href="#L13">13</a>  <strong class="jxr_keyword">import</strong> net.java.truevfs.comp.zipdriver.ZipInputService;
+<a class="jxr_linenumber" name="L14" href="#L14">14</a>  <strong class="jxr_keyword">import</strong> net.java.truevfs.comp.zipdriver.ZipOutputService;
+<a class="jxr_linenumber" name="L15" href="#L15">15</a>  <strong class="jxr_keyword">import</strong> <strong class="jxr_keyword">static</strong> net.java.truevfs.kernel.spec.FsAccessOption.GROW;
+<a class="jxr_linenumber" name="L16" href="#L16">16</a>  <strong class="jxr_keyword">import</strong> net.java.truevfs.kernel.spec.FsModel;
+<a class="jxr_linenumber" name="L17" href="#L17">17</a>  <strong class="jxr_keyword">import</strong> net.java.truevfs.kernel.spec.FsOutputSocketSink;
+<a class="jxr_linenumber" name="L18" href="#L18">18</a>  <strong class="jxr_keyword">import</strong> net.java.truecommons.cio.InputService;
+<a class="jxr_linenumber" name="L19" href="#L19">19</a>  <strong class="jxr_keyword">import</strong> net.java.truecommons.cio.IoBufferPool;
+<a class="jxr_linenumber" name="L20" href="#L20">20</a>  <strong class="jxr_keyword">import</strong> net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
+<a class="jxr_linenumber" name="L21" href="#L21">21</a>  <strong class="jxr_keyword">import</strong> net.java.truecommons.cio.OutputService;
+<a class="jxr_linenumber" name="L22" href="#L22">22</a>  
+<a class="jxr_linenumber" name="L23" href="#L23">23</a>  <em class="jxr_javadoccomment">/**</em>
+<a class="jxr_linenumber" name="L24" href="#L24">24</a>  <em class="jxr_javadoccomment"> * An archive driver for application archive files according to the Open</em>
+<a class="jxr_linenumber" name="L25" href="#L25">25</a>  <em class="jxr_javadoccomment"> * Document Format (ODF) Specification, V1.0 and later.</em>
+<a class="jxr_linenumber" name="L26" href="#L26">26</a>  <em class="jxr_javadoccomment"> * This driver simply ensures that an entry named {@code mimetype}, if present</em>
+<a class="jxr_linenumber" name="L27" href="#L27">27</a>  <em class="jxr_javadoccomment"> * at all, is always written as the very first entry using the method</em>
+<a class="jxr_linenumber" name="L28" href="#L28">28</a>  <em class="jxr_javadoccomment"> * {@code STORED} rather than {@code DEFLATED} in the resulting archive file</em>
+<a class="jxr_linenumber" name="L29" href="#L29">29</a>  <em class="jxr_javadoccomment"> * in order to meet the requirements of the ODF Specification.</em>
+<a class="jxr_linenumber" name="L30" href="#L30">30</a>  <em class="jxr_javadoccomment"> * Other than this, ODF files are treated like regular JAR files.</em>
+<a class="jxr_linenumber" name="L31" href="#L31">31</a>  <em class="jxr_javadoccomment"> * In particular, this class does &lt;em&gt;not&lt;/em&gt; check an ODF file for the</em>
+<a class="jxr_linenumber" name="L32" href="#L32">32</a>  <em class="jxr_javadoccomment"> * existence of the {@code META-INF/manifest.xml} entry or any other entry.</em>
+<a class="jxr_linenumber" name="L33" href="#L33">33</a>  <em class="jxr_javadoccomment"> * &lt;p&gt;</em>
+<a class="jxr_linenumber" name="L34" href="#L34">34</a>  <em class="jxr_javadoccomment"> * When using this driver to create or modify an ODF file, then in order to</em>
+<a class="jxr_linenumber" name="L35" href="#L35">35</a>  <em class="jxr_javadoccomment"> * achieve best performance, the {@code mimetype} entry should always get</em>
+<a class="jxr_linenumber" name="L36" href="#L36">36</a>  <em class="jxr_javadoccomment"> * written first in order to avoid temp file buffering of all other entries.</em>
+<a class="jxr_linenumber" name="L37" href="#L37">37</a>  <em class="jxr_javadoccomment"> * &lt;p&gt;</em>
+<a class="jxr_linenumber" name="L38" href="#L38">38</a>  <em class="jxr_javadoccomment"> * Subclasses must be thread-safe and should be immutable!</em>
+<a class="jxr_linenumber" name="L39" href="#L39">39</a>  <em class="jxr_javadoccomment"> *</em>
+<a class="jxr_linenumber" name="L40" href="#L40">40</a>  <em class="jxr_javadoccomment"> * @see    &lt;a href="<a href="http://docs.oasis-open.org/office/v1.0/OpenDocument-v1.0-os.pdf" target="alexandria_uri">http://docs.oasis-open.org/office/v1.0/OpenDocument-v1.0-os.pdf</a>"&gt;Open Document Format for Office Applications (OpenDocument) v1.0; Section 17.4: MIME Type Stream&lt;/a&gt;</em>
+<a class="jxr_linenumber" name="L41" href="#L41">41</a>  <em class="jxr_javadoccomment"> * @see    &lt;a href="<a href="http://docs.oasis-open.org/office/v1.1/OS/OpenDocument-v1.1.pdf" target="alexandria_uri">http://docs.oasis-open.org/office/v1.1/OS/OpenDocument-v1.1.pdf</a>"&gt;Open Document Format for Office Applications (OpenDocument) v1.1; Section 17.4: MIME Type Stream&lt;/a&gt;</em>
+<a class="jxr_linenumber" name="L42" href="#L42">42</a>  <em class="jxr_javadoccomment"> * @see    &lt;a href="<a href="http://docs.oasis-open.org/office/v1.2/OpenDocument-v1.2-part3.pdf" target="alexandria_uri">http://docs.oasis-open.org/office/v1.2/OpenDocument-v1.2-part3.pdf</a>"&gt;Open Document Format for Office Applications (OpenDocument) Version 1.2; Part 3: Packages; Section 3.3: MIME Type Stream&lt;/a&gt;</em>
+<a class="jxr_linenumber" name="L43" href="#L43">43</a>  <em class="jxr_javadoccomment"> * @see    OdfOutputService</em>
+<a class="jxr_linenumber" name="L44" href="#L44">44</a>  <em class="jxr_javadoccomment"> * @author Christian Schlichtherle</em>
+<a class="jxr_linenumber" name="L45" href="#L45">45</a>  <em class="jxr_javadoccomment"> */</em>
+<a class="jxr_linenumber" name="L46" href="#L46">46</a>  @Immutable
+<a class="jxr_linenumber" name="L47" href="#L47">47</a>  <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">class</strong> <a href="../../../../../net/java/truevfs/driver/odf/OdfDriver.html">OdfDriver</a> <strong class="jxr_keyword">extends</strong> <a href="../../../../../net/java/truevfs/comp/zipdriver/JarDriver.html">JarDriver</a> {
+<a class="jxr_linenumber" name="L48" href="#L48">48</a>  
+<a class="jxr_linenumber" name="L49" href="#L49">49</a>      @Override
+<a class="jxr_linenumber" name="L50" href="#L50">50</a>      <strong class="jxr_keyword">protected</strong> OutputService&lt;JarDriverEntry&gt; newOutput(
+<a class="jxr_linenumber" name="L51" href="#L51">51</a>              <strong class="jxr_keyword">final</strong> <a href="../../../../../net/java/truevfs/kernel/spec/FsModel.html">FsModel</a> model,
+<a class="jxr_linenumber" name="L52" href="#L52">52</a>              <strong class="jxr_keyword">final</strong> <a href="../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html">FsOutputSocketSink</a> sink,
+<a class="jxr_linenumber" name="L53" href="#L53">53</a>              <strong class="jxr_keyword">final</strong> @CheckForNull @WillNotClose InputService&lt;JarDriverEntry&gt; input)
+<a class="jxr_linenumber" name="L54" href="#L54">54</a>      <strong class="jxr_keyword">throws</strong> IOException {
+<a class="jxr_linenumber" name="L55" href="#L55">55</a>          <strong class="jxr_keyword">final</strong> ZipInputService&lt;JarDriverEntry&gt; zis = (ZipInputService&lt;JarDriverEntry&gt;) input;
+<a class="jxr_linenumber" name="L56" href="#L56">56</a>          <strong class="jxr_keyword">final</strong> ZipOutputService&lt;JarDriverEntry&gt; zos = <strong class="jxr_keyword">new</strong> ZipOutputService&lt;&gt;(model, sink, zis, <strong class="jxr_keyword">this</strong>);
+<a class="jxr_linenumber" name="L57" href="#L57">57</a>          <strong class="jxr_keyword">final</strong> IoBufferPool pool = getPool();
+<a class="jxr_linenumber" name="L58" href="#L58">58</a>          <strong class="jxr_keyword">return</strong> <strong class="jxr_keyword">null</strong> != zis &amp;&amp; sink.getOptions().get(GROW)
+<a class="jxr_linenumber" name="L59" href="#L59">59</a>                  ? <strong class="jxr_keyword">new</strong> MultiplexingOutputService&lt;&gt;(pool, zos)
+<a class="jxr_linenumber" name="L60" href="#L60">60</a>                  : <strong class="jxr_keyword">new</strong> <a href="../../../../../net/java/truevfs/driver/odf/OdfOutputService.html">OdfOutputService</a>(pool, zos);
+<a class="jxr_linenumber" name="L61" href="#L61">61</a>      }
+<a class="jxr_linenumber" name="L62" href="#L62">62</a>  }
+</pre>
+<hr/>
+<div id="footer">Copyright &#169; 2005&#x2013;2017 <a href="http://schlichtherle.de">Schlichtherle IT Services</a>. All rights reserved.</div>
+</body>
+</html>

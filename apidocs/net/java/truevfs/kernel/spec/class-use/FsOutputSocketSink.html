@@ -1,0 +1,511 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- NewPage -->
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Uses of Class net.java.truevfs.kernel.spec.FsOutputSocketSink (TrueVFS 0.12.0 API)</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<script type="text/javascript"><!--
+    if (location.href.indexOf('is-external=true') == -1) {
+        parent.document.title="Uses of Class net.java.truevfs.kernel.spec.FsOutputSocketSink (TrueVFS 0.12.0 API)";
+    }
+//-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+<!-- ========= START OF TOP NAVBAR ======= -->
+<div class="topNav"><a name="navbar_top">
+<!--   -->
+</a><a href="#skip-navbar_top" title="Skip navigation links"></a><a name="navbar_top_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../../overview-summary.html">Overview</a></li>
+<li><a href="../package-summary.html">Package</a></li>
+<li><a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">Class</a></li>
+<li class="navBarCell1Rev">Use</li>
+<li><a href="../package-tree.html">Tree</a></li>
+<li><a href="../../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li>Prev</li>
+<li>Next</li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../../index.html?net/java/truevfs/kernel/spec/class-use/FsOutputSocketSink.html" target="_top">Frames</a></li>
+<li><a href="FsOutputSocketSink.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_top">
+<li><a href="../../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<a name="skip-navbar_top">
+<!--   -->
+</a></div>
+<!-- ========= END OF TOP NAVBAR ========= -->
+<div class="header">
+<h2 title="Uses of Class net.java.truevfs.kernel.spec.FsOutputSocketSink" class="title">Uses of Class<br>net.java.truevfs.kernel.spec.FsOutputSocketSink</h2>
+</div>
+<div class="classUseContainer">
+<ul class="blockList">
+<li class="blockList">
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing packages, and an explanation">
+<caption><span>Packages that use <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Package</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a href="#net.java.truevfs.comp.tardriver">net.java.truevfs.comp.tardriver</a></td>
+<td class="colLast">
+<div class="block">The archive driver family for TAR files.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="#net.java.truevfs.comp.zipdriver">net.java.truevfs.comp.zipdriver</a></td>
+<td class="colLast">
+<div class="block">The archive driver family for ZIP files.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="#net.java.truevfs.driver.odf">net.java.truevfs.driver.odf</a></td>
+<td class="colLast">
+<div class="block">Provides a file system driver for accessing the Open Document File format.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="#net.java.truevfs.driver.tar.bzip2">net.java.truevfs.driver.tar.bzip2</a></td>
+<td class="colLast">
+<div class="block">Provides a file system driver for accessing the BZIP2 compressed TAR file
+ format.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="#net.java.truevfs.driver.tar.gzip">net.java.truevfs.driver.tar.gzip</a></td>
+<td class="colLast">
+<div class="block">Provides a file system driver for accessing the GZIP compressed TAR file
+ format.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="#net.java.truevfs.driver.tar.xz">net.java.truevfs.driver.tar.xz</a></td>
+<td class="colLast">
+<div class="block">Provides a file system driver for accessing the XZ compressed TAR file
+ format.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="#net.java.truevfs.driver.zip.raes">net.java.truevfs.driver.zip.raes</a></td>
+<td class="colLast">
+<div class="block">Provides a file system driver for accessing the RAES encrypted ZIP file
+ format, alias ZIP.RAES or TZP.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="#net.java.truevfs.kernel.spec">net.java.truevfs.kernel.spec</a></td>
+<td class="colLast">
+<div class="block">Defines the API for accessing the (federated virtual) file system space.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<ul class="blockList">
+<li class="blockList"><a name="net.java.truevfs.comp.tardriver">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a> in <a href="../../../../../../net/java/truevfs/comp/tardriver/package-summary.html">net.java.truevfs.comp.tardriver</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/comp/tardriver/package-summary.html">net.java.truevfs.comp.tardriver</a> that return <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>protected <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></code></td>
+<td class="colLast"><span class="strong">TarDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/comp/tardriver/TarDriver.html#sink(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName)">sink</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+    <a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;controller,
+    <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>
+<div class="block">Sets <a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html#COMPRESS"><code>FsAccessOption.COMPRESS</code></a> in <code>options</code> before
+ forwarding the call to <code>controller</code>.</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/comp/tardriver/package-summary.html">net.java.truevfs.comp.tardriver</a> with parameters of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>protected net.java.truecommons.cio.OutputService&lt;<a href="../../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html" title="class in net.java.truevfs.comp.tardriver">TarDriverEntry</a>&gt;</code></td>
+<td class="colLast"><span class="strong">TarDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/comp/tardriver/TarDriver.html#newOutput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsOutputSocketSink,%20net.java.truecommons.cio.InputService)">newOutput</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+         <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a>&nbsp;sink,
+         net.java.truecommons.cio.InputService&lt;<a href="../../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html" title="class in net.java.truevfs.comp.tardriver">TarDriverEntry</a>&gt;&nbsp;input)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.comp.zipdriver">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a> in <a href="../../../../../../net/java/truevfs/comp/zipdriver/package-summary.html">net.java.truevfs.comp.zipdriver</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/comp/zipdriver/package-summary.html">net.java.truevfs.comp.zipdriver</a> that return <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>protected <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></code></td>
+<td class="colLast"><span class="strong">AbstractZipDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriver.html#sink(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName)">sink</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+    <a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;controller,
+    <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>
+<div class="block">This implementation modifies <code>options</code> in the following way before
+ it forwards the call to <code>controller</code>:
+ 
+ <a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html#STORE"><code>FsAccessOption.STORE</code></a> is set.</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/comp/zipdriver/package-summary.html">net.java.truevfs.comp.zipdriver</a> with parameters of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>protected net.java.truecommons.cio.OutputService&lt;<a href="../../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriver.html" title="type parameter in AbstractZipDriver">E</a>&gt;</code></td>
+<td class="colLast"><span class="strong">AbstractZipDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriver.html#newOutput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsOutputSocketSink,%20net.java.truecommons.cio.InputService)">newOutput</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+         <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a>&nbsp;sink,
+         net.java.truecommons.cio.InputService&lt;<a href="../../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriver.html" title="type parameter in AbstractZipDriver">E</a>&gt;&nbsp;input)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing constructors, and an explanation">
+<caption><span>Constructors in <a href="../../../../../../net/java/truevfs/comp/zipdriver/package-summary.html">net.java.truevfs.comp.zipdriver</a> with parameters of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colOne" scope="col">Constructor and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/comp/zipdriver/ZipOutputService.html#ZipOutputService(net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsOutputSocketSink,%20net.java.truevfs.comp.zipdriver.ZipInputService,%20net.java.truevfs.comp.zipdriver.AbstractZipDriver)">ZipOutputService</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+                <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a>&nbsp;sink,
+                <a href="../../../../../../net/java/truevfs/comp/zipdriver/ZipInputService.html" title="class in net.java.truevfs.comp.zipdriver">ZipInputService</a>&lt;<a href="../../../../../../net/java/truevfs/comp/zipdriver/ZipOutputService.html" title="type parameter in ZipOutputService">E</a>&gt;&nbsp;source,
+                <a href="../../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriver.html" title="class in net.java.truevfs.comp.zipdriver">AbstractZipDriver</a>&lt;<a href="../../../../../../net/java/truevfs/comp/zipdriver/ZipOutputService.html" title="type parameter in ZipOutputService">E</a>&gt;&nbsp;driver)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.driver.odf">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a> in <a href="../../../../../../net/java/truevfs/driver/odf/package-summary.html">net.java.truevfs.driver.odf</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/odf/package-summary.html">net.java.truevfs.driver.odf</a> with parameters of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>protected net.java.truecommons.cio.OutputService&lt;<a href="../../../../../../net/java/truevfs/comp/zipdriver/JarDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">JarDriverEntry</a>&gt;</code></td>
+<td class="colLast"><span class="strong">OdfDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/odf/OdfDriver.html#newOutput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsOutputSocketSink,%20net.java.truecommons.cio.InputService)">newOutput</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+         <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a>&nbsp;sink,
+         net.java.truecommons.cio.InputService&lt;<a href="../../../../../../net/java/truevfs/comp/zipdriver/JarDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">JarDriverEntry</a>&gt;&nbsp;input)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.driver.tar.bzip2">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a> in <a href="../../../../../../net/java/truevfs/driver/tar/bzip2/package-summary.html">net.java.truevfs.driver.tar.bzip2</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/tar/bzip2/package-summary.html">net.java.truevfs.driver.tar.bzip2</a> that return <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>protected <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></code></td>
+<td class="colLast"><span class="strong">TarBZip2Driver.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/tar/bzip2/TarBZip2Driver.html#sink(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName)">sink</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+    <a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;controller,
+    <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>
+<div class="block">Sets <a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html#STORE"><code>FsAccessOption.STORE</code></a> in <code>options</code> before
+ forwarding the call to <code>controller</code>.</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/tar/bzip2/package-summary.html">net.java.truevfs.driver.tar.bzip2</a> with parameters of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>protected net.java.truecommons.cio.OutputService&lt;<a href="../../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html" title="class in net.java.truevfs.comp.tardriver">TarDriverEntry</a>&gt;</code></td>
+<td class="colLast"><span class="strong">TarBZip2Driver.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/tar/bzip2/TarBZip2Driver.html#newOutput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsOutputSocketSink,%20net.java.truecommons.cio.InputService)">newOutput</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+         <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a>&nbsp;sink,
+         net.java.truecommons.cio.InputService&lt;<a href="../../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html" title="class in net.java.truevfs.comp.tardriver">TarDriverEntry</a>&gt;&nbsp;input)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.driver.tar.gzip">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a> in <a href="../../../../../../net/java/truevfs/driver/tar/gzip/package-summary.html">net.java.truevfs.driver.tar.gzip</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/tar/gzip/package-summary.html">net.java.truevfs.driver.tar.gzip</a> that return <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>protected <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></code></td>
+<td class="colLast"><span class="strong">TarGZipDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/tar/gzip/TarGZipDriver.html#sink(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName)">sink</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+    <a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;controller,
+    <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>
+<div class="block">Sets <a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html#STORE"><code>FsAccessOption.STORE</code></a> in <code>options</code> before
+ forwarding the call to <code>controller</code>.</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/tar/gzip/package-summary.html">net.java.truevfs.driver.tar.gzip</a> with parameters of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>protected net.java.truecommons.cio.OutputService&lt;<a href="../../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html" title="class in net.java.truevfs.comp.tardriver">TarDriverEntry</a>&gt;</code></td>
+<td class="colLast"><span class="strong">TarGZipDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/tar/gzip/TarGZipDriver.html#newOutput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsOutputSocketSink,%20net.java.truecommons.cio.InputService)">newOutput</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+         <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a>&nbsp;sink,
+         net.java.truecommons.cio.InputService&lt;<a href="../../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html" title="class in net.java.truevfs.comp.tardriver">TarDriverEntry</a>&gt;&nbsp;input)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.driver.tar.xz">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a> in <a href="../../../../../../net/java/truevfs/driver/tar/xz/package-summary.html">net.java.truevfs.driver.tar.xz</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/tar/xz/package-summary.html">net.java.truevfs.driver.tar.xz</a> that return <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>protected <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></code></td>
+<td class="colLast"><span class="strong">TarXZDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/tar/xz/TarXZDriver.html#sink(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName)">sink</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+    <a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;controller,
+    <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>
+<div class="block">Sets <a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html#STORE"><code>FsAccessOption.STORE</code></a> in <code>options</code> before
+ forwarding the call to <code>controller</code>.</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/tar/xz/package-summary.html">net.java.truevfs.driver.tar.xz</a> with parameters of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>protected net.java.truecommons.cio.OutputService&lt;<a href="../../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html" title="class in net.java.truevfs.comp.tardriver">TarDriverEntry</a>&gt;</code></td>
+<td class="colLast"><span class="strong">TarXZDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/tar/xz/TarXZDriver.html#newOutput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsOutputSocketSink,%20net.java.truecommons.cio.InputService)">newOutput</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+         <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a>&nbsp;sink,
+         net.java.truecommons.cio.InputService&lt;<a href="../../../../../../net/java/truevfs/comp/tardriver/TarDriverEntry.html" title="class in net.java.truevfs.comp.tardriver">TarDriverEntry</a>&gt;&nbsp;input)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.driver.zip.raes">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a> in <a href="../../../../../../net/java/truevfs/driver/zip/raes/package-summary.html">net.java.truevfs.driver.zip.raes</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/zip/raes/package-summary.html">net.java.truevfs.driver.zip.raes</a> that return <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>protected <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></code></td>
+<td class="colLast"><span class="strong">ZipRaesDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/raes/ZipRaesDriver.html#sink(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName)">sink</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+    <a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;controller,
+    <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>
+<div class="block">Sets <a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html#STORE"><code>FsAccessOption.STORE</code></a> in <code>options</code> before
+ forwarding the call to <code>controller</code>.</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/zip/raes/package-summary.html">net.java.truevfs.driver.zip.raes</a> with parameters of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>protected net.java.truecommons.cio.OutputService&lt;<a href="../../../../../../net/java/truevfs/comp/zipdriver/JarDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">JarDriverEntry</a>&gt;</code></td>
+<td class="colLast"><span class="strong">ZipRaesDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/raes/ZipRaesDriver.html#newOutput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsOutputSocketSink,%20net.java.truecommons.cio.InputService)">newOutput</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+         <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a>&nbsp;sink,
+         net.java.truecommons.cio.InputService&lt;<a href="../../../../../../net/java/truevfs/comp/zipdriver/JarDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">JarDriverEntry</a>&gt;&nbsp;input)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>protected <a href="../../../../../../net/java/truevfs/comp/zipdriver/ZipOutputService.html" title="class in net.java.truevfs.comp.zipdriver">ZipOutputService</a>&lt;<a href="../../../../../../net/java/truevfs/comp/zipdriver/JarDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">JarDriverEntry</a>&gt;</code></td>
+<td class="colLast"><span class="strong">ParanoidZipRaesDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/raes/ParanoidZipRaesDriver.html#newOutput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsOutputSocketSink,%20net.java.truecommons.cio.InputService)">newOutput</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+         <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a>&nbsp;sink,
+         net.java.truecommons.cio.InputService&lt;<a href="../../../../../../net/java/truevfs/comp/zipdriver/JarDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">JarDriverEntry</a>&gt;&nbsp;input)</code>
+<div class="block">Creates a new input service for writing archive entries for the given
+ <code>model</code> to the target archive file referenced by <code>sink</code>.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.kernel.spec">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a> in <a href="../../../../../../net/java/truevfs/kernel/spec/package-summary.html">net.java.truevfs.kernel.spec</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/kernel/spec/package-summary.html">net.java.truevfs.kernel.spec</a> that return <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>protected <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></code></td>
+<td class="colLast"><span class="strong">FsArchiveDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#sink(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName)">sink</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+    <a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;controller,
+    <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>
+<div class="block">Called to prepare writing an archive file artifact of this driver to
+ the node <code>name</code> in <code>controller</code> using <code>options</code> and
+ the nullable <code>template</code>.</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/kernel/spec/package-summary.html">net.java.truevfs.kernel.spec</a> with parameters of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>protected abstract net.java.truecommons.cio.OutputService&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&gt;</code></td>
+<td class="colLast"><span class="strong">FsArchiveDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newOutput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsOutputSocketSink,%20net.java.truecommons.cio.InputService)">newOutput</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+         <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a>&nbsp;sink,
+         net.java.truecommons.cio.InputService&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&gt;&nbsp;input)</code>
+<div class="block">Creates a new input service for writing archive entries for the given
+ <code>model</code> to the target archive file referenced by <code>sink</code>.</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing constructors, and an explanation">
+<caption><span>Constructors in <a href="../../../../../../net/java/truevfs/kernel/spec/package-summary.html">net.java.truevfs.kernel.spec</a> with parameters of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colOne" scope="col">Constructor and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html#FsOutputSocketSink(net.java.truevfs.kernel.spec.FsOutputSocketSink)">FsOutputSocketSink</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a>&nbsp;sink)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<div class="bottomNav"><a name="navbar_bottom">
+<!--   -->
+</a><a href="#skip-navbar_bottom" title="Skip navigation links"></a><a name="navbar_bottom_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../../overview-summary.html">Overview</a></li>
+<li><a href="../package-summary.html">Package</a></li>
+<li><a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">Class</a></li>
+<li class="navBarCell1Rev">Use</li>
+<li><a href="../package-tree.html">Tree</a></li>
+<li><a href="../../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li>Prev</li>
+<li>Next</li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../../index.html?net/java/truevfs/kernel/spec/class-use/FsOutputSocketSink.html" target="_top">Frames</a></li>
+<li><a href="FsOutputSocketSink.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_bottom">
+<li><a href="../../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_bottom");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<a name="skip-navbar_bottom">
+<!--   -->
+</a></div>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+<p class="legalCopy"><small>Copyright &#169; 2005&#x2013;2017 <a href="http://schlichtherle.de">Schlichtherle IT Services</a>. All rights reserved.</small></p>
+</body>
+</html>

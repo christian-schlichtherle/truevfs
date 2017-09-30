@@ -1,0 +1,730 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- NewPage -->
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>TFileSystemView (TrueVFS 0.12.0 API)</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<script type="text/javascript"><!--
+    if (location.href.indexOf('is-external=true') == -1) {
+        parent.document.title="TFileSystemView (TrueVFS 0.12.0 API)";
+    }
+//-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+<!-- ========= START OF TOP NAVBAR ======= -->
+<div class="topNav"><a name="navbar_top">
+<!--   -->
+</a><a href="#skip-navbar_top" title="Skip navigation links"></a><a name="navbar_top_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/TFileSystemView.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../../net/java/truevfs/access/swing/TFileChooser.html" title="class in net.java.truevfs.access.swing"><span class="strong">Prev Class</span></a></li>
+<li><a href="../../../../../net/java/truevfs/access/swing/TFileTree.html" title="class in net.java.truevfs.access.swing"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../index.html?net/java/truevfs/access/swing/TFileSystemView.html" target="_top">Frames</a></li>
+<li><a href="TFileSystemView.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_top">
+<li><a href="../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#fields_inherited_from_class_net.java.truevfs.access.swing.TDecoratingFileSystemView">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_summary">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#constructor_detail">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_top">
+<!--   -->
+</a></div>
+<!-- ========= END OF TOP NAVBAR ========= -->
+<!-- ======== START OF CLASS DATA ======== -->
+<div class="header">
+<div class="subTitle">net.java.truevfs.access.swing</div>
+<h2 title="Class TFileSystemView" class="title">Class TFileSystemView</h2>
+</div>
+<div class="contentContainer">
+<ul class="inheritance">
+<li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">java.lang.Object</a></li>
+<li>
+<ul class="inheritance">
+<li><a href="http://docs.oracle.com/javase/7/docs/api/javax/swing/filechooser/FileSystemView.html?is-external=true" title="class or interface in javax.swing.filechooser">javax.swing.filechooser.FileSystemView</a></li>
+<li>
+<ul class="inheritance">
+<li><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">net.java.truevfs.access.swing.TDecoratingFileSystemView</a></li>
+<li>
+<ul class="inheritance">
+<li>net.java.truevfs.access.swing.TFileSystemView</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="description">
+<ul class="blockList">
+<li class="blockList">
+<hr>
+<br>
+<pre>public class <span class="strong">TFileSystemView</span>
+extends <a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></pre>
+<div class="block">A custom file system fsv required to browse archive files like (virtual)
+ directories with a <a href="http://docs.oracle.com/javase/7/docs/api/javax/swing/JFileChooser.html?is-external=true" title="class or interface in javax.swing"><code>JFileChooser</code></a>.
+ This class is used by <code>TFileTreeCellRenderer</code>
+ to render files and directories in a <a href="../../../../../net/java/truevfs/access/swing/TFileTree.html" title="class in net.java.truevfs.access.swing"><code>TFileTree</code></a>.</div>
+<dl><dt><span class="strong">Author:</span></dt>
+  <dd>Christian Schlichtherle</dd></dl>
+</li>
+</ul>
+</div>
+<div class="summary">
+<ul class="blockList">
+<li class="blockList">
+<!-- =========== FIELD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field_summary">
+<!--   -->
+</a>
+<h3>Field Summary</h3>
+<ul class="blockList">
+<li class="blockList"><a name="fields_inherited_from_class_net.java.truevfs.access.swing.TDecoratingFileSystemView">
+<!--   -->
+</a>
+<h3>Fields inherited from class&nbsp;net.java.truevfs.access.swing.<a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></h3>
+<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#fsv">fsv</a></code></li>
+</ul>
+</li>
+</ul>
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor_summary">
+<!--   -->
+</a>
+<h3>Constructor Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Constructor Summary table, listing constructors, and an explanation">
+<caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colOne" scope="col">Constructor and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#TFileSystemView()">TFileSystemView</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#TFileSystemView(javax.swing.filechooser.FileSystemView)">TFileSystemView</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/javax/swing/filechooser/FileSystemView.html?is-external=true" title="class or interface in javax.swing.filechooser">FileSystemView</a>&nbsp;fileSystemView)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#TFileSystemView(javax.swing.filechooser.FileSystemView,%20net.java.truevfs.access.TArchiveDetector)">TFileSystemView</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/javax/swing/filechooser/FileSystemView.html?is-external=true" title="class or interface in javax.swing.filechooser">FileSystemView</a>&nbsp;fileSystemView,
+               <a href="../../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access">TArchiveDetector</a>&nbsp;detector)</code>&nbsp;</td>
+</tr>
+</table>
+</li>
+</ul>
+<!-- ========== METHOD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_summary">
+<!--   -->
+</a>
+<h3>Method Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
+<caption><span>Methods</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#createFileObject(java.io.File)">createFileObject</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</code>
+<div class="block">Wraps the given <code>file</code> in a <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access"><code>TFile</code></a> if its an archive file
+ or an archive entry.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#createFileObject(java.io.File,%20java.lang.String)">createFileObject</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;dir,
+                <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;filename)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#createFileObject(java.lang.String)">createFileObject</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;path)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#createNewFolder(java.io.File)">createNewFolder</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;parent)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#getChild(java.io.File,%20java.lang.String)">getChild</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;parent,
+        <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;child)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="../../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access">TArchiveDetector</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#getDetector()">getDetector</a></strong>()</code>
+<div class="block">Returns the nullable archive detector to use.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>[]</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#getFiles(java.io.File,%20boolean)">getFiles</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;dir,
+        boolean&nbsp;useFileHiding)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#getParentDirectory(java.io.File)">getParentDirectory</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#getSystemDisplayName(java.io.File)">getSystemDisplayName</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/javax/swing/Icon.html?is-external=true" title="class or interface in javax.swing">Icon</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#getSystemIcon(java.io.File)">getSystemIcon</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#getSystemTypeDescription(java.io.File)">getSystemTypeDescription</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#isComputerNode(java.io.File)">isComputerNode</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#isDrive(java.io.File)">isDrive</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#isFileSystem(java.io.File)">isFileSystem</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#isFileSystemRoot(java.io.File)">isFileSystemRoot</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#isFloppyDrive(java.io.File)">isFloppyDrive</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#isHiddenFile(java.io.File)">isHiddenFile</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#isParent(java.io.File,%20java.io.File)">isParent</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;folder,
+        <a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#isRoot(java.io.File)">isRoot</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#isTraversable(java.io.File)">isTraversable</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#setDetector(net.java.truevfs.access.TArchiveDetector)">setDetector</a></strong>(<a href="../../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access">TArchiveDetector</a>&nbsp;detector)</code>
+<div class="block">Sets the archive detector to use.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>protected <a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#unwrap(java.io.File)">unwrap</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</code>
+<div class="block">Ensures that the returned file object is an instance of <a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io"><code>File</code></a>,
+ not <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access"><code>TFile</code></a>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>protected <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileSystemView.html#wrap(java.io.File)">wrap</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</code>
+<div class="block">Ensures that the returned file object is an instance of <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access"><code>TFile</code></a>.</div>
+</td>
+</tr>
+</table>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_net.java.truevfs.access.swing.TDecoratingFileSystemView">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;net.java.truevfs.access.swing.<a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></h3>
+<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#createFileSystemRoot(java.io.File)">createFileSystemRoot</a>, <a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#getDefaultDirectory()">getDefaultDirectory</a>, <a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#getHomeDirectory()">getHomeDirectory</a>, <a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#getRoots()">getRoots</a>, <a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#toString()">toString</a></code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_javax.swing.filechooser.FileSystemView">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;javax.swing.filechooser.<a href="http://docs.oracle.com/javase/7/docs/api/javax/swing/filechooser/FileSystemView.html?is-external=true" title="class or interface in javax.swing.filechooser">FileSystemView</a></h3>
+<code><a href="http://docs.oracle.com/javase/7/docs/api/javax/swing/filechooser/FileSystemView.html?is-external=true#getFileSystemView()" title="class or interface in javax.swing.filechooser">getFileSystemView</a></code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_java.lang.Object">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;java.lang.<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></h3>
+<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#clone()" title="class or interface in java.lang">clone</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#equals(java.lang.Object)" title="class or interface in java.lang">equals</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#finalize()" title="class or interface in java.lang">finalize</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#getClass()" title="class or interface in java.lang">getClass</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#hashCode()" title="class or interface in java.lang">hashCode</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notify()" title="class or interface in java.lang">notify</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notifyAll()" title="class or interface in java.lang">notifyAll</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait()" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long)" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long,%20int)" title="class or interface in java.lang">wait</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="details">
+<ul class="blockList">
+<li class="blockList">
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor_detail">
+<!--   -->
+</a>
+<h3>Constructor Detail</h3>
+<a name="TFileSystemView()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>TFileSystemView</h4>
+<pre>public&nbsp;TFileSystemView()</pre>
+</li>
+</ul>
+<a name="TFileSystemView(javax.swing.filechooser.FileSystemView)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>TFileSystemView</h4>
+<pre>public&nbsp;TFileSystemView(<a href="http://docs.oracle.com/javase/7/docs/api/javax/swing/filechooser/FileSystemView.html?is-external=true" title="class or interface in javax.swing.filechooser">FileSystemView</a>&nbsp;fileSystemView)</pre>
+</li>
+</ul>
+<a name="TFileSystemView(javax.swing.filechooser.FileSystemView, net.java.truevfs.access.TArchiveDetector)">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>TFileSystemView</h4>
+<pre>public&nbsp;TFileSystemView(<a href="http://docs.oracle.com/javase/7/docs/api/javax/swing/filechooser/FileSystemView.html?is-external=true" title="class or interface in javax.swing.filechooser">FileSystemView</a>&nbsp;fileSystemView,
+               <a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/CheckForNull.html?is-external=true" title="class or interface in javax.annotation">@CheckForNull</a>
+               <a href="../../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access">TArchiveDetector</a>&nbsp;detector)</pre>
+</li>
+</ul>
+</li>
+</ul>
+<!-- ============ METHOD DETAIL ========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_detail">
+<!--   -->
+</a>
+<h3>Method Detail</h3>
+<a name="createFileObject(java.io.File)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>createFileObject</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;createFileObject(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</pre>
+<div class="block">Wraps the given <code>file</code> in a <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access"><code>TFile</code></a> if its an archive file
+ or an archive entry.
+ Otherwise returns the given <code>file</code>.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>file</code> - the file to wrap.</dd>
+<dt><span class="strong">Returns:</span></dt><dd><code>file</code> if it's not an archive file and not an archive
+         entry, otherwise a <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access"><code>TFile</code></a> which wraps the given
+         <code>file</code>.</dd></dl>
+</li>
+</ul>
+<a name="createFileObject(java.io.File, java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>createFileObject</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;createFileObject(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;dir,
+                    <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;filename)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#createFileObject(java.io.File,%20java.lang.String)">createFileObject</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="createFileObject(java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>createFileObject</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;createFileObject(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;path)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#createFileObject(java.lang.String)">createFileObject</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="createNewFolder(java.io.File)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>createNewFolder</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;createNewFolder(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;parent)
+                     throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#createNewFolder(java.io.File)">createNewFolder</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+<dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></code></dd></dl>
+</li>
+</ul>
+<a name="getChild(java.io.File, java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getChild</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;getChild(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;parent,
+            <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;child)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#getChild(java.io.File,%20java.lang.String)">getChild</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="getDetector()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getDetector</h4>
+<pre><a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/CheckForNull.html?is-external=true" title="class or interface in javax.annotation">@CheckForNull</a>
+public&nbsp;<a href="../../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access">TArchiveDetector</a>&nbsp;getDetector()</pre>
+<div class="block">Returns the nullable archive detector to use.</div>
+<dl><dt><span class="strong">Returns:</span></dt><dd>The nullable archive detector to use.</dd></dl>
+</li>
+</ul>
+<a name="getFiles(java.io.File, boolean)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getFiles</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>[]&nbsp;getFiles(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;dir,
+              boolean&nbsp;useFileHiding)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#getFiles(java.io.File,%20boolean)">getFiles</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="getParentDirectory(java.io.File)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getParentDirectory</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;getParentDirectory(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#getParentDirectory(java.io.File)">getParentDirectory</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="getSystemDisplayName(java.io.File)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getSystemDisplayName</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;getSystemDisplayName(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#getSystemDisplayName(java.io.File)">getSystemDisplayName</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="getSystemIcon(java.io.File)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getSystemIcon</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/javax/swing/Icon.html?is-external=true" title="class or interface in javax.swing">Icon</a>&nbsp;getSystemIcon(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#getSystemIcon(java.io.File)">getSystemIcon</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="getSystemTypeDescription(java.io.File)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getSystemTypeDescription</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;getSystemTypeDescription(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#getSystemTypeDescription(java.io.File)">getSystemTypeDescription</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="isComputerNode(java.io.File)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isComputerNode</h4>
+<pre>public&nbsp;boolean&nbsp;isComputerNode(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#isComputerNode(java.io.File)">isComputerNode</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="isDrive(java.io.File)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isDrive</h4>
+<pre>public&nbsp;boolean&nbsp;isDrive(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#isDrive(java.io.File)">isDrive</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="isFileSystem(java.io.File)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isFileSystem</h4>
+<pre>public&nbsp;boolean&nbsp;isFileSystem(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#isFileSystem(java.io.File)">isFileSystem</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="isFileSystemRoot(java.io.File)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isFileSystemRoot</h4>
+<pre>public&nbsp;boolean&nbsp;isFileSystemRoot(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#isFileSystemRoot(java.io.File)">isFileSystemRoot</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="isFloppyDrive(java.io.File)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isFloppyDrive</h4>
+<pre>public&nbsp;boolean&nbsp;isFloppyDrive(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#isFloppyDrive(java.io.File)">isFloppyDrive</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="isHiddenFile(java.io.File)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isHiddenFile</h4>
+<pre>public&nbsp;boolean&nbsp;isHiddenFile(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#isHiddenFile(java.io.File)">isHiddenFile</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="isParent(java.io.File, java.io.File)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isParent</h4>
+<pre>public&nbsp;boolean&nbsp;isParent(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;folder,
+               <a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#isParent(java.io.File,%20java.io.File)">isParent</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="isRoot(java.io.File)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isRoot</h4>
+<pre>public&nbsp;boolean&nbsp;isRoot(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#isRoot(java.io.File)">isRoot</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="isTraversable(java.io.File)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isTraversable</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;isTraversable(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html#isTraversable(java.io.File)">isTraversable</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/access/swing/TDecoratingFileSystemView.html" title="class in net.java.truevfs.access.swing">TDecoratingFileSystemView</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="setDetector(net.java.truevfs.access.TArchiveDetector)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setDetector</h4>
+<pre>public&nbsp;void&nbsp;setDetector(<a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/CheckForNull.html?is-external=true" title="class or interface in javax.annotation">@CheckForNull</a>
+               <a href="../../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access">TArchiveDetector</a>&nbsp;detector)</pre>
+<div class="block">Sets the archive detector to use.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>detector</code> - the archive detector to use.</dd></dl>
+</li>
+</ul>
+<a name="unwrap(java.io.File)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>unwrap</h4>
+<pre>protected&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;unwrap(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</pre>
+<div class="block">Ensures that the returned file object is an instance of <a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io"><code>File</code></a>,
+ not <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access"><code>TFile</code></a>.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>file</code> - the file to unwrap.</dd>
+<dt><span class="strong">Returns:</span></dt><dd>the originally wrapped file if <code>file</code> is an instance of
+         <code>TFile</code> or <code>file</code> otherwise.</dd></dl>
+</li>
+</ul>
+<a name="wrap(java.io.File)">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>wrap</h4>
+<pre>protected&nbsp;<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;wrap(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io">File</a>&nbsp;file)</pre>
+<div class="block">Ensures that the returned file object is an instance of <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access"><code>TFile</code></a>.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>file</code> - the file to wrap.</dd>
+<dt><span class="strong">Returns:</span></dt><dd><code>file</code> if it's already a <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access"><code>TFile</code></a> or a new
+         <code>TFile</code> which wraps it.</dd></dl>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<!-- ========= END OF CLASS DATA ========= -->
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<div class="bottomNav"><a name="navbar_bottom">
+<!--   -->
+</a><a href="#skip-navbar_bottom" title="Skip navigation links"></a><a name="navbar_bottom_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/TFileSystemView.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../../net/java/truevfs/access/swing/TFileChooser.html" title="class in net.java.truevfs.access.swing"><span class="strong">Prev Class</span></a></li>
+<li><a href="../../../../../net/java/truevfs/access/swing/TFileTree.html" title="class in net.java.truevfs.access.swing"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../index.html?net/java/truevfs/access/swing/TFileSystemView.html" target="_top">Frames</a></li>
+<li><a href="TFileSystemView.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_bottom">
+<li><a href="../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_bottom");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#fields_inherited_from_class_net.java.truevfs.access.swing.TDecoratingFileSystemView">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_summary">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#constructor_detail">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_bottom">
+<!--   -->
+</a></div>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+<p class="legalCopy"><small>Copyright &#169; 2005&#x2013;2017 <a href="http://schlichtherle.de">Schlichtherle IT Services</a>. All rights reserved.</small></p>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <link href="./css/prettify.css" type="text/css" rel="stylesheet"/>
+    <script src="./js/prettify.js" type="text/javascript"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>TrueVFS Kernel Specification &#x2013; TrueVFS Kernel Usage</title>
+    <style type="text/css" media="all">
+      @import url("./css/site.css");
+    </style>
+    <link rel="stylesheet" href="./css/print.css" type="text/css" media="print"/>
+    <meta name="author" content="Christian Schlichtherle"/>
+    <meta name="Date-Revision-yyyymmdd" content="20170919"/>
+    <meta http-equiv="Content-Language" content="en"/>
+          <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-25500668-1']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+                  <script>
+        (function() {
+          var cx = '003580521944097984334:8uinm6tpaz4';
+          var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+          gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+              '//www.google.com/cse/cse.js?cx=' + cx;
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+        })();
+      </script>
+                                                          
+<link title="The TrueZIP Blog - Announcements Feed" rel="alternate" type="application/rss+xml" href="http://truevfs.schlichtherle.de/category/announcements/feed/"/>
+                      
+  </head>
+  <body class="composite" onload="prettyPrint()">
+    <div id="banner">
+                    <div id="bannerLeft">
+                TrueVFS Kernel Specification
+                </div>
+                                <div id="gcse-search-form" class="gcse-searchbox-only"></div>
+            <div class="clear"><hr/></div>
+    </div>
+    <div id="breadcrumbs">
+            
+                                  <div class="xleft">
+        <span id="projectVersion">Version: 0.12.0</span>
+                  |                         <a href="../../index.html" title="TrueVFS">TrueVFS</a>
+      &raquo;
+                        <a href="../" title="TrueVFS Kernel">TrueVFS Kernel</a>
+      &raquo;
+                            <a href="./" title="TrueVFS Kernel Specification">TrueVFS Kernel Specification</a>
+      &raquo;
+      TrueVFS Kernel Specification &#x2013; TrueVFS Kernel Usage
+              </div>
+            <div class="xright">        
+                        </div>
+      <div class="clear"><hr/></div>
+    </div>
+    <div id="leftColumn">
+      <div id="navcolumn">
+              
+                                                   <h5>Documentation</h5>
+                  <ul>
+                  <li class="none">
+                          <a href="index.html" title="About">About</a>
+            </li>
+                  <li class="none">
+            <strong>Usage</strong>
+          </li>
+          </ul>
+                       <h5>Parent Module</h5>
+                  <ul>
+                  <li class="none">
+                          <a href="../index.html" title="TrueVFS Kernel">TrueVFS Kernel</a>
+            </li>
+          </ul>
+                       <h5>Sub-Modules</h5>
+                                 <h5>Reports</h5>
+                  <ul>
+                                                                                                                                                                                                                                                                          <li class="collapsed">
+                          <a href="project-info.html" title="Project Information">Project Information</a>
+                  </li>
+                                                                                      <li class="collapsed">
+                          <a href="project-reports.html" title="Project Reports">Project Reports</a>
+                  </li>
+          </ul>
+                     
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+  <div class="paypalButton">
+    <input name="cmd" value="_s-xclick" type="hidden"/>
+    <input name="hosted_button_id" value="AGDEQWWKNZ6UL" type="hidden"/>
+    <input style="border: 0" alt="PayPal - The safer, easier way to pay online!" name="submit" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" type="image"/>
+  </div>
+</form>
+                                
+                              </div>
+    </div>
+    <div id="bodyColumn" class="content">
+      <div id="contentBox">
+                                      <div class="section">
+<h2><a name="TrueVFS_Kernel_Usage"></a>TrueVFS Kernel Usage</h2>
+<div class="section">
+<h3><a name="Abstract"></a>Abstract</h3>
+<p>This article showcases the TrueVFS&#160;Kernel API in contrast to the <a href="../../truevfs-access/index.html">TrueVFS Access</a> API.</p></div>
+<div class="section">
+<h3><a name="Design"></a>Design</h3>
+<p>In contrast to the module <a href="../truevfs-access/index.html">TrueVFS Access</a>, the API of this module is more complex to use, yet very extensible because it relies on Dependency Injection for the resolution of <a href="../../apidocs/net/java/truevfs/kernel/FsDriver.html">file system drivers</a> and <a href="../../apidocs/net/java/truevfs/kernel/cio/IOPool.html">I/O entry pools</a>. It also provides service locators for <a href="../../apidocs/net/java/truevfs/kernel/sl/FsDriverLocator.html">file system driver providers</a> and <a href="../../apidocs/net/java/truevfs/kernel/sl/IOPoolLocator.html">I/O entry pool providers</a> in order to enable applications to resolve these dependencies easily at runtime.</p></div>
+<div class="section">
+<h3><a name="TrueVFS_Kernel_versus_TrueVFS_Access"></a>TrueVFS Kernel versus TrueVFS Access</h3>
+<p>The API of the TrueVFS Kernel module is considerably different to the API of the TrueVFS Access File* module: While the File* API primarily aims to &quot;make simple things easy&quot;, the Kernel API primarily aims to &quot;make complex things possible&quot;.</p>
+<p>This means that while the Kernel API offers more features than the File* API, it also requires more coding to get a job done. So when is it appropriate to code against the Kernel API instead of the File* API?</p>
+<ul>
+<li>If you don't want to rely on the service locator pattern which is employed by the File* API in order to enumerate the set of file system drivers which are available on the class path at run-time.</li>
+<li>If the type of the top level file system your application needs to access is not a platform file system (adressed by the &quot;file&quot; scheme), but any other file system type, e.g. a web service (adressed by the &quot;http&quot; scheme).</li>
+<li>If you need to access file system specific entry properties, e.g. the comment of an entry in a ZIP file.</li>
+<li>If you want to reduce the number of kernel calls required to query a set of properties for the same file system entry.</li></ul></div>
+<div class="section">
+<h3><a name="Basic_Operations"></a>Basic Operations</h3>
+<p>Suppose you'ld like to imitate the functionality of the <tt>cat(1)</tt> Unix command line utility. This utility simply concatenates the contents of each parameter path name on the standard output. E.g. the shell command...</p>
+<div class="source">
+<pre>$ cat fileA fileB</pre></div>
+<p>...would print the contents of <tt>fileA</tt> and then <tt>fileB</tt> to standard output.</p>
+<p>Here's how to copy the contents of the path name parameter <tt>resource</tt> to the standard output using the API of the module TrueVFS Access File*:</p>
+<div class="source">
+<pre>/**
+ * Copies the contents of the parameter resource to the standard output.
+ * &lt;p&gt;
+ * The set of archive file extensions detected by this method is determined
+ * by the current archive detector
+ * {@code TConfig.current().getArchiveDetector()}
+ * and the respective file system driver providers on the class path.
+ *
+ * @param  resource the path name string of the resource to copy.
+ * @throws IOException if accessing the resource results in an I/O error.
+ */
+static void pathCat(String resource) throws IOException {
+    new TFile(resource).output(System.out);
+}
+</pre></div>
+<p>Suppose that the modules TrueVFS Driver ZIP (Maven artifactId <tt>truevfs-driver-zip</tt>) and TrueVFS Driver File (<tt>truevfs-driver-file</tt>) are present on the class path at run-time. Furthermore, if the current directory is the root directory and the file <tt>file</tt> exists and the file <tt>archive.zip</tt> is a valid ZIP file, then the following path names could be addressed with the code above:</p>
+<ul>
+<li><tt>file</tt></li>
+<li><tt>/file</tt></li>
+<li><tt>archive.zip/entry</tt></li>
+<li><tt>/archive.zip/entry</tt></li></ul>
+<p>Basically any valid path name could be addressed with this code. If an application needs to address URIs, too, then the following code could be used instead:</p>
+<div class="source">
+<pre>/**
+ * Copies the contents of the parameter resource to the standard output.
+ * &lt;p&gt;
+ * The set of archive file extensions detected by this method is determined
+ * by the current archive detector
+ * {@code TConfig.current().getArchiveDetector()}
+ * and the respective file system driver providers on the class path.
+ *
+ * @param  resource the URI string of the resource to copy.
+ *         The URI must be file-based, i.e. the top level file system
+ *         scheme must be {@code file}.
+ * @throws IOException if accessing the resource results in an I/O error.
+ * @throws URISyntaxException if {@code resource} does not
+ *         conform to the syntax constraints for {@link URI}s.
+ */
+static void uriCat(String resource) throws IOException, URISyntaxException {
+    URI uri = new URI(resource);
+    TFile file = uri.isAbsolute() ? new TFile(uri) : new TFile(resource);
+    file.output(System.out);
+}
+</pre></div>
+<p>Using the same configuration like before, the following URIs could now be addressed with the code above:</p>
+<ul>
+<li><tt>file</tt></li>
+<li><tt>/file</tt></li>
+<li><tt>file:/file</tt></li>
+<li><tt>archive.zip/entry</tt></li>
+<li><tt>/archive.zip/entry</tt></li>
+<li><tt>zip:file:/archive.zip!/entry</tt></li></ul>
+<p>This adds a lot of flexibility, but the File* API still has one limitation: All URIs must be file-based, i.e. the scheme of their top level file system must be <tt>file</tt>. In particular, it's not possible to access a resource via HTTP(S).</p>
+<p>Now for comparison, let's implement the same functionality using the API of the module TrueVFS Kernel.</p>
+<div class="source">
+<pre>/**
+ * Copies the contents of the parameter resource to the standard output.
+ *
+ * @param  resource the URI string of the resource to copy.
+ * @throws IOException if accessing the resource results in an I/O error.
+ * @throws IllegalArgumentException if {@code resource} does not
+ *         conform to the syntax constraints for {@link URI}s.
+ */
+static void cat(String resource)
+throws IOException, URISyntaxException {
+    // Get a manager for the life cycle of controllers for federated
+    // file systems.
+    FsManager manager = FsManagerLocator.SINGLETON.get();
+    try {
+        // Search the class path for the set of all supported file system
+        // drivers and build a composite driver from it.
+        FsCompositeDriver driver = new FsSimpleCompositeDriver(
+                FsDriverMapLocator.SINGLETON);
+        // Resolve the source socket.
+        // Note that an absolute URI is required, so we may need to use the
+        // File class for transformation from a normal path name.
+        // Using the File class rather than the TFile class implies that
+        // the caller cannot specify an archive file in a path name.
+        // To overcome this limitation, you should use a TFile instead.
+        // Unfortunately, this would introduce a cyclic dependency on the
+        // module TrueVFS Access File*, so it's not an option for this sample.
+        URI uri = new URI(resource);
+        uri = uri.isAbsolute() ? uri : new File(resource).toURI();
+        FsNodePath path = FsNodePath.create(uri, FsUriModifier.CANONICALIZE);
+        InputSocket&lt;?&gt; socket = manager
+                .controller(driver, path.getMountPoint())
+                .input(BitField.noneOf(FsAccessOption.class), path.getNodeName());
+        try (InputStream in = socket.stream(null)) {
+            Streams.cat(in, System.out); // copy the data
+        }
+    } finally {
+        // Commit all unsynchronized changes to the contents of federated
+        // file systems, if any were accessed, and clean up temporary files
+        // used for caching.
+        new FsSync()
+                .manager(manager)
+                .options(FsSyncOptions.UMOUNT)
+                .run();
+    }
+}
+</pre></div>
+<p>Using the same configuration like before, this code could access the same URIs than before. However, this could access <i>any</i> URI scheme for which a file system driver is present on the class path at run-time, too. E.g. if the module TrueVFS Driver HTTP(S) (<tt>truevfs-driver-http</tt>) is present on the class path at run-time, even http(s)-based URIs could get accessed.</p></div></div>
+              </div>
+    </div>
+    <div class="clear"><hr/></div>
+    <div id="footer">
+      <div class="xright">
+              Copyright &#169;                    2005-2017
+                        <a href="http://schlichtherle.de">Schlichtherle IT Services</a>.
+            All Rights Reserved.      
+                                   <span id="publishDate">Last Published: 2017-09-19</span>
+                        </div>
+      <div class="clear"><hr/></div>
+    </div>
+  </body>
+</html>

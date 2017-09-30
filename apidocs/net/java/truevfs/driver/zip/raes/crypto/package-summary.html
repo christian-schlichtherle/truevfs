@@ -1,0 +1,331 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- NewPage -->
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>net.java.truevfs.driver.zip.raes.crypto (TrueVFS 0.12.0 API)</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<script type="text/javascript"><!--
+    if (location.href.indexOf('is-external=true') == -1) {
+        parent.document.title="net.java.truevfs.driver.zip.raes.crypto (TrueVFS 0.12.0 API)";
+    }
+//-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+<!-- ========= START OF TOP NAVBAR ======= -->
+<div class="topNav"><a name="navbar_top">
+<!--   -->
+</a><a href="#skip-navbar_top" title="Skip navigation links"></a><a name="navbar_top_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../../../overview-summary.html">Overview</a></li>
+<li class="navBarCell1Rev">Package</li>
+<li>Class</li>
+<li><a href="package-use.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../../../../net/java/truevfs/driver/zip/raes/package-summary.html">Prev Package</a></li>
+<li><a href="../../../../../../../net/java/truevfs/kernel/spec/package-summary.html">Next Package</a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../../../index.html?net/java/truevfs/driver/zip/raes/crypto/package-summary.html" target="_top">Frames</a></li>
+<li><a href="package-summary.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_top">
+<li><a href="../../../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<a name="skip-navbar_top">
+<!--   -->
+</a></div>
+<!-- ========= END OF TOP NAVBAR ========= -->
+<div class="header">
+<p><a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/Nonnull.html?is-external=true" title="class or interface in javax.annotation">@Nonnull</a>
+<a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/ParametersAreNonnullByDefault.html?is-external=true" title="class or interface in javax.annotation">@ParametersAreNonnullByDefault</a>
+</p>
+<h1 title="Package" class="title">Package&nbsp;net.java.truevfs.driver.zip.raes.crypto</h1>
+<div class="docSummary">
+<div class="block">Reads and writes files according to the Random Access Encryption
+ Specification (RAES).</div>
+</div>
+<p>See:&nbsp;<a href="#package_description">Description</a></p>
+</div>
+<div class="contentContainer">
+<ul class="blockList">
+<li class="blockList">
+<table class="packageSummary" border="0" cellpadding="3" cellspacing="0" summary="Interface Summary table, listing interfaces, and an explanation">
+<caption><span>Interface Summary</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Interface</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesParameters.html" title="interface in net.java.truevfs.driver.zip.raes.crypto">RaesParameters</a></td>
+<td class="colLast">
+<div class="block">A marker interface for RAES parameters.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesParametersProvider.html" title="interface in net.java.truevfs.driver.zip.raes.crypto">RaesParametersProvider</a></td>
+<td class="colLast">
+<div class="block">These <a href="../../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesParameters.html" title="interface in net.java.truevfs.driver.zip.raes.crypto"><code>RaesParameters</code></a> delegate to some other instance of a
+ sibling interface or itself in order to locate the parameters required to
+ read or write a RAES file of a given type.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../../../net/java/truevfs/driver/zip/raes/crypto/Type0RaesParameters.html" title="interface in net.java.truevfs.driver.zip.raes.crypto">Type0RaesParameters</a></td>
+<td class="colLast">
+<div class="block">The parameters of this interface are used with RAES <i>type 0</i> files.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="packageSummary" border="0" cellpadding="3" cellspacing="0" summary="Class Summary table, listing classes, and an explanation">
+<caption><span>Class Summary</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Class</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesOutputStream.html" title="class in net.java.truevfs.driver.zip.raes.crypto">RaesOutputStream</a></td>
+<td class="colLast">
+<div class="block">An <a href="http://docs.oracle.com/javase/7/docs/api/java/io/OutputStream.html?is-external=true" title="class or interface in java.io"><code>OutputStream</code></a> which produces a file with data ecnrypted according
+ to the Random Access Encryption Specification (RAES).</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesReadOnlyChannel.html" title="class in net.java.truevfs.driver.zip.raes.crypto">RaesReadOnlyChannel</a></td>
+<td class="colLast">
+<div class="block">This class implements a <a href="http://docs.oracle.com/javase/7/docs/api/java/nio/channels/SeekableByteChannel.html?is-external=true" title="class or interface in java.nio.channels"><code>SeekableByteChannel</code></a> for random read-only
+ access to the plain text data of a RAES encrypted file, where RAES means
+ Random Access Encryption Specification.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="packageSummary" border="0" cellpadding="3" cellspacing="0" summary="Exception Summary table, listing exceptions, and an explanation">
+<caption><span>Exception Summary</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Exception</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesAuthenticationException.html" title="class in net.java.truevfs.driver.zip.raes.crypto">RaesAuthenticationException</a></td>
+<td class="colLast">
+<div class="block">Thrown to indicate that a RAES file has been tampered with.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesException.html" title="class in net.java.truevfs.driver.zip.raes.crypto">RaesException</a></td>
+<td class="colLast">
+<div class="block">Indicates that there is an issue when reading or writing a RAES file which
+ is specific to the RAES file format.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesKeyException.html" title="class in net.java.truevfs.driver.zip.raes.crypto">RaesKeyException</a></td>
+<td class="colLast">
+<div class="block">Thrown to indicate that retrieving a key to encrypt or decrypt some pay load
+ data in an RAES file has failed for some reason.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesParametersException.html" title="class in net.java.truevfs.driver.zip.raes.crypto">RaesParametersException</a></td>
+<td class="colLast">
+<div class="block">Thrown to indicate that no suitable cryptographic parameters have been
+ provided or something is wrong with these parameters.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<a name="package_description">
+<!--   -->
+</a>
+<h2 title="Package net.java.truevfs.driver.zip.raes.crypto Description">Package net.java.truevfs.driver.zip.raes.crypto Description</h2>
+<div class="block">Reads and writes files according to the Random Access Encryption
+ Specification (RAES).
+ RAES is an extensible file format specification which enables fast,
+ transparent random read access to encrypted arbitrary data (the
+ <i>pay load</i>) with multistep authentication.
+ <p>
+ RAES is <b>extensible</b>, which means that the file header contains a
+ single byte to identify the <i>Type</i> of the RAES file.
+ Each data type specifies the cryptographic parameters required to decrypt or
+ encrypt and authenticate the <i>pay load</i> data when reading or writing
+ files of this type.
+ <p>
+ Currently, only Type-0 is specified, but more types may be added in future.
+ Note that it is an error for an implementation to process an unknown type.
+ <p>
+ RAES features <b>transparent random read access</b> to the encrypted data.
+ In order to do so, RAES has some invariants:
+ <ul>
+ <li>RAES uses only block ciphers which are operated in Counter Mode (CTR).
+     According to <a href="http://csrc.nist.gov/CryptoToolkit/modes/workshop1/papers/lipmaa-ctr.pdf">cryptanalysis</a>
+     by the US National Institute of Standards and Technology (NIST), CTR
+     mode is considered to provide a strong level of privacy for the
+     encrypted data.
+ <li>RAES provides two methods to authenticate the pay load:
+     <ol>
+     <li>The first, mandatory method is the <i>cipher Key and text Length
+         Authentication Code (KLAC)</i>.
+     <li>The second, optional method is the well-known
+         <i>Message Authentication Code</i> (MAC) on the full cipher text.
+     </ol>
+ </ul>
+ <p>
+ The mandatory KLAC method authenticates the cipher key and the length of the
+ cipher text only.
+ This is a very limited authentication which does not prevent an opponent to
+ modify the contents of the cipher text.
+ However, its processing time is constant (O(1)).
+ Hence, relying on this authentication method alone may be acceptable if the
+ pay load data provides another considerably secure means of authentication.
+ <p>
+ The optional MAC method authenticates the full cipher text.
+ This is secure and should be used whenever the pay load does not to provide
+ additional means of authentication.
+ However, its processing time is linear to the size of the file (O(n)).
+ Please note that this option does not require the cipher text to be
+ decrypted first, which features comparably fast processing.
+ <p>
+ An example of a pay load which offers an authentication method by itself is
+ the ZIP file format specification: Entries in a ZIP file are checksummed
+ with CRC-32, which is applied to decompressed (deflated) source data.
+ It is considered computationally infeasible to attack the integrity of a ZIP
+ file which contains only compressed (deflated) entries and has a
+ considerable size (say, at least 512KB) so that after decryption of the
+ archive <em>and</em> decompression (inflation) the CRC-32 value of an entry
+ still matches!
+ This should hold true even though CRC-32 is not at all a good cryptographic
+ hash function because of its frequent collisions, its linear output and
+ small output size.
+ It is the ZIP inflation algorithm which actually comes to its rescue!
+
+ <h3>RAES types</h3>
+ <p>
+ As said, RAES currently defines only <i>Type-0</i> files.
+ Type-0 has the following specifications:
+ <ul>
+ <li>The encryption scheme is password based according to
+     <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-5/index.html">PKCS #5</a>
+     V2.0 with the password base key derivation function (PBKDF) according to
+     <a href="http://www.rsasecurity.com/rsalabs/pkcs/pkcs-12/index.html">PKCS #12</a>
+     V1.0.
+     The latter allows to use Unicode password characters. </li>
+ <li>The cipher algorithm is the Advanced Encryption Standard (AES) with a
+     key length of 128, 192 or 256 bits. </li> <li> The salt is the same
+     length as the cipher key length.
+ <li>The digest used to derive the cipher key, Initialization Vector (IV) and
+     authentication codes is the Secure Hash Algorithm (SHA) Version 2 with
+     256 bits output length.
+ </ul>
+ <p>
+ As usual with PKCS #12 the Initialization Vector (IV) for the CTR mode is
+ derived from the password, the salt and the counter by the same Pseudo
+ Random Number Generation (PRNG) function which is also used to derive the
+ cipher key - so SHA-256. </p> <p> Type 0 also supports the use of key files
+ instead of passwords. If a key file is used for encryption, the first 512
+ bytes of the file are decoded into 16 bit Unicode characters in big endian
+ format (without the byte order indicator) so that the byte order is
+ preserved when the resulting character array is then again encoded into a
+ byte array according to PKCS #12.
+ <p>
+ A file which shall be used as a key file for <em>encryption</em> must not be
+ shorter than 512 bytes.
+ However, in order to provide a certain level of fault tolerance for bogus
+ RAES implementations, when using a key file for <em>decryption</em> an
+ implementation is only required to assert that no more than the first 512
+ bytes of the key file are used.
+ So the key file may actually be shorter.
+ <p>
+ As an optional step, an implementation should also check whether the key
+ file used for encryption is a reasonably good source of entropy.
+ The easiest way to achieve this is to use a compression API like
+ <a href="http://docs.oracle.com/javase/7/docs/api/java/util/zip/Deflater.html?is-external=true" title="class or interface in java.util.zip"><code>Deflater</code></a>.
+ After compression, the result should be no shorter than the maximum key size
+ (256 bits).
+ Assuming a worst-case overhead for the deflater's algorithm of 100%, the
+ minimum number of compressed bytes for the first 512 bytes of a key file
+ should be no less than 2 * 256 / 8 = 64 bytes.</div>
+</div>
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<div class="bottomNav"><a name="navbar_bottom">
+<!--   -->
+</a><a href="#skip-navbar_bottom" title="Skip navigation links"></a><a name="navbar_bottom_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../../../overview-summary.html">Overview</a></li>
+<li class="navBarCell1Rev">Package</li>
+<li>Class</li>
+<li><a href="package-use.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../../../../net/java/truevfs/driver/zip/raes/package-summary.html">Prev Package</a></li>
+<li><a href="../../../../../../../net/java/truevfs/kernel/spec/package-summary.html">Next Package</a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../../../index.html?net/java/truevfs/driver/zip/raes/crypto/package-summary.html" target="_top">Frames</a></li>
+<li><a href="package-summary.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_bottom">
+<li><a href="../../../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_bottom");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<a name="skip-navbar_bottom">
+<!--   -->
+</a></div>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+<p class="legalCopy"><small>Copyright &#169; 2005&#x2013;2017 <a href="http://schlichtherle.de">Schlichtherle IT Services</a>. All rights reserved.</small></p>
+</body>
+</html>

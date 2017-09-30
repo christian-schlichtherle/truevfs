@@ -1,0 +1,562 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <link href="./css/prettify.css" type="text/css" rel="stylesheet"/>
+    <script src="./js/prettify.js" type="text/javascript"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>TrueVFS Extension &#x2013; Project Dependency Management</title>
+    <style type="text/css" media="all">
+      @import url("./css/site.css");
+    </style>
+    <link rel="stylesheet" href="./css/print.css" type="text/css" media="print"/>
+    <meta name="Date-Revision-yyyymmdd" content="20170919"/>
+    <meta http-equiv="Content-Language" content="en"/>
+          <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-25500668-1']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+                  <script>
+        (function() {
+          var cx = '003580521944097984334:8uinm6tpaz4';
+          var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+          gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+              '//www.google.com/cse/cse.js?cx=' + cx;
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+        })();
+      </script>
+                                                          
+<link title="The TrueZIP Blog - Announcements Feed" rel="alternate" type="application/rss+xml" href="http://truevfs.schlichtherle.de/category/announcements/feed/"/>
+                      
+  </head>
+  <body class="composite" onload="prettyPrint()">
+    <div id="banner">
+                    <div id="bannerLeft">
+                TrueVFS Extension
+                </div>
+                                <div id="gcse-search-form" class="gcse-searchbox-only"></div>
+            <div class="clear"><hr/></div>
+    </div>
+    <div id="breadcrumbs">
+            
+                                  <div class="xleft">
+        <span id="projectVersion">Version: 0.12.0</span>
+                  |                         <a href="../index.html" title="TrueVFS">TrueVFS</a>
+      &raquo;
+                            <a href="./" title="TrueVFS Extension">TrueVFS Extension</a>
+      &raquo;
+      TrueVFS Extension &#x2013; Project Dependency Management
+              </div>
+            <div class="xright">        
+                        </div>
+      <div class="clear"><hr/></div>
+    </div>
+    <div id="leftColumn">
+      <div id="navcolumn">
+              
+                                                   <h5>Documentation</h5>
+                  <ul>
+                  <li class="none">
+                          <a href="index.html" title="About">About</a>
+            </li>
+          </ul>
+                       <h5>Parent Module</h5>
+                  <ul>
+                  <li class="none">
+                          <a href="../index.html" title="TrueVFS">TrueVFS</a>
+            </li>
+          </ul>
+                       <h5>Sub-Modules</h5>
+                  <ul>
+                  <li class="none">
+                          <a href="truevfs-ext-insight/index.html" title="TrueVFS Extension Insight">TrueVFS Extension Insight</a>
+            </li>
+                  <li class="none">
+                          <a href="truevfs-ext-logging/index.html" title="TrueVFS Extension Logging">TrueVFS Extension Logging</a>
+            </li>
+                  <li class="none">
+                          <a href="truevfs-ext-pacemaker/index.html" title="TrueVFS Extension Pacemaker">TrueVFS Extension Pacemaker</a>
+            </li>
+          </ul>
+                       <h5>Reports</h5>
+                  <ul>
+                                                                                                                                                                                                                                                                                    <li class="expanded">
+                          <a href="project-info.html" title="Project Information">Project Information</a>
+                    <ul>
+                      <li class="none">
+                          <a href="dependency-info.html" title="Dependency Information">Dependency Information</a>
+            </li>
+                      <li class="none">
+            <strong>Dependency Management</strong>
+          </li>
+                      <li class="none">
+                          <a href="distribution-management.html" title="Distribution Management">Distribution Management</a>
+            </li>
+                      <li class="none">
+                          <a href="index.html" title="About">About</a>
+            </li>
+                      <li class="none">
+                          <a href="issue-tracking.html" title="Issue Management">Issue Management</a>
+            </li>
+                      <li class="none">
+                          <a href="license.html" title="Licenses">Licenses</a>
+            </li>
+                      <li class="none">
+                          <a href="modules.html" title="Project Modules">Project Modules</a>
+            </li>
+                      <li class="none">
+                          <a href="plugin-management.html" title="Plugin Management">Plugin Management</a>
+            </li>
+                      <li class="none">
+                          <a href="plugins.html" title="Plugins">Plugins</a>
+            </li>
+                      <li class="none">
+                          <a href="team-list.html" title="Team">Team</a>
+            </li>
+                      <li class="none">
+                          <a href="source-repository.html" title="Source Code Management">Source Code Management</a>
+            </li>
+                      <li class="none">
+                          <a href="project-summary.html" title="Summary">Summary</a>
+            </li>
+              </ul>
+        </li>
+          </ul>
+                     
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+  <div class="paypalButton">
+    <input name="cmd" value="_s-xclick" type="hidden"/>
+    <input name="hosted_button_id" value="AGDEQWWKNZ6UL" type="hidden"/>
+    <input style="border: 0" alt="PayPal - The safer, easier way to pay online!" name="submit" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" type="image"/>
+  </div>
+</form>
+                                
+                              </div>
+    </div>
+    <div id="bodyColumn" class="content">
+      <div id="contentBox">
+                                      <div class="section">
+<h2><a name="Project_Dependency_Management"></a>Project Dependency Management</h2><a name="Project_Dependency_Management"></a>
+<div class="section">
+<h3><a name="compile"></a>compile</h3><a name="compile"></a>
+<p>The following is a list of compile dependencies in the DependencyManagement of this project. These dependencies can be included in the submodules to compile and run the submodule:</p>
+<table border="0" class="bodyTable">
+<tr class="a">
+<th>GroupId</th>
+<th>ArtifactId</th>
+<th>Version</th>
+<th>Type</th>
+<th>License</th></tr>
+<tr class="b">
+<td>ch.qos.logback</td>
+<td><a class="externalLink" href="http://logback.qos.ch/logback-classic">logback-classic</a></td>
+<td>1.2.3</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License - v 1.0</a>, <a class="externalLink" href="http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">GNU Lesser General Public License</a></td></tr>
+<tr class="a">
+<td>com.google.code.findbugs</td>
+<td><a class="externalLink" href="http://findbugs.sourceforge.net/">annotations</a></td>
+<td>3.0.1u2</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.gnu.org/licenses/lgpl.html">GNU Lesser Public License</a></td></tr>
+<tr class="b">
+<td>global.namespace.scala-plus</td>
+<td><a class="externalLink" href="https://github.com/christian-schlichtherle/scala-plus">scala-plus_2.11</a></td>
+<td>0.1</td>
+<td>jar</td>
+<td><a class="externalLink" href="https://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>javax.inject</td>
+<td><a class="externalLink" href="http://code.google.com/p/atinject/">javax.inject</a></td>
+<td>1</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache Software License, Version 2.0</a></td></tr>
+<tr class="b">
+<td>junit</td>
+<td><a class="externalLink" href="http://junit.org">junit</a></td>
+<td>4.12</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License 1.0</a></td></tr>
+<tr class="a">
+<td>net.java.truecommons</td>
+<td><a class="externalLink" href="http://truecommons.java.net/truecommons-annotations">truecommons-annotations</a></td>
+<td>2.5.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></td></tr>
+<tr class="b">
+<td>net.java.truecommons</td>
+<td><a class="externalLink" href="http://truecommons.java.net/truecommons-cio">truecommons-cio</a></td>
+<td>2.5.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></td></tr>
+<tr class="a">
+<td>net.java.truecommons</td>
+<td><a class="externalLink" href="http://truecommons.java.net/truecommons-io">truecommons-io</a></td>
+<td>2.5.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></td></tr>
+<tr class="b">
+<td>net.java.truecommons</td>
+<td><a class="externalLink" href="http://truecommons.java.net/truecommons-jmx">truecommons-jmx</a></td>
+<td>2.5.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></td></tr>
+<tr class="a">
+<td>net.java.truecommons</td>
+<td><a class="externalLink" href="http://truecommons.java.net/truecommons-key/truecommons-key-console">truecommons-key-console</a></td>
+<td>2.5.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></td></tr>
+<tr class="b">
+<td>net.java.truecommons</td>
+<td><a class="externalLink" href="http://truecommons.java.net/truecommons-key/truecommons-key-default">truecommons-key-default</a></td>
+<td>2.5.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></td></tr>
+<tr class="a">
+<td>net.java.truecommons</td>
+<td><a class="externalLink" href="http://truecommons.java.net/truecommons-key/truecommons-key-disable">truecommons-key-disable</a></td>
+<td>2.5.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></td></tr>
+<tr class="b">
+<td>net.java.truecommons</td>
+<td><a class="externalLink" href="http://truecommons.java.net/truecommons-key/truecommons-key-hurlfb">truecommons-key-hurlfb</a></td>
+<td>2.5.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></td></tr>
+<tr class="a">
+<td>net.java.truecommons</td>
+<td><a class="externalLink" href="http://truecommons.java.net/truecommons-key/truecommons-key-macosx">truecommons-key-macosx</a></td>
+<td>2.5.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></td></tr>
+<tr class="b">
+<td>net.java.truecommons</td>
+<td><a class="externalLink" href="http://truecommons.java.net/truecommons-key/truecommons-key-spec">truecommons-key-spec</a></td>
+<td>2.5.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></td></tr>
+<tr class="a">
+<td>net.java.truecommons</td>
+<td><a class="externalLink" href="http://truecommons.java.net/truecommons-key/truecommons-key-swing">truecommons-key-swing</a></td>
+<td>2.5.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></td></tr>
+<tr class="b">
+<td>net.java.truecommons</td>
+<td><a class="externalLink" href="http://truecommons.java.net/truecommons-logging">truecommons-logging</a></td>
+<td>2.5.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></td></tr>
+<tr class="a">
+<td>net.java.truecommons</td>
+<td><a class="externalLink" href="http://truecommons.java.net/truecommons-services">truecommons-services</a></td>
+<td>2.5.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></td></tr>
+<tr class="b">
+<td>net.java.truecommons</td>
+<td><a class="externalLink" href="http://truecommons.java.net/truecommons-shed">truecommons-shed</a></td>
+<td>2.5.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></td></tr>
+<tr class="a">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-access/">truevfs-access</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="b">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-access-swing/">truevfs-access-swing</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-comp/truevfs-comp-ibm437/">truevfs-comp-ibm437</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="b">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-comp/truevfs-comp-inst/">truevfs-comp-inst</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-comp/truevfs-comp-jmx/">truevfs-comp-jmx</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="b">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-comp/truevfs-comp-tardriver/">truevfs-comp-tardriver</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-comp/truevfs-comp-zip/">truevfs-comp-zip</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="b">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-comp/truevfs-comp-zipdriver/">truevfs-comp-zipdriver</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-driver/truevfs-driver-file/">truevfs-driver-file</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="b">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-driver/truevfs-driver-http/">truevfs-driver-http</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-driver/truevfs-driver-jar/">truevfs-driver-jar</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="b">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-driver/truevfs-driver-odf/">truevfs-driver-odf</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-driver/truevfs-driver-sfx/">truevfs-driver-sfx</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="b">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-driver/truevfs-driver-tar/">truevfs-driver-tar</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-driver/truevfs-driver-tar-bzip2/">truevfs-driver-tar-bzip2</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="b">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-driver/truevfs-driver-tar-gzip/">truevfs-driver-tar-gzip</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-driver/truevfs-driver-tar-xz/">truevfs-driver-tar-xz</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="b">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-driver/truevfs-driver-zip/">truevfs-driver-zip</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-driver/truevfs-driver-zip-raes/">truevfs-driver-zip-raes</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="b">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-ext/truevfs-ext-insight/">truevfs-ext-insight</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-ext/truevfs-ext-logging/">truevfs-ext-logging</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="b">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-ext/truevfs-ext-pacemaker/">truevfs-ext-pacemaker</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-kernel/truevfs-kernel-impl/">truevfs-kernel-impl</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="b">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-kernel/truevfs-kernel-spec/">truevfs-kernel-spec</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-profile/truevfs-profile-base/">truevfs-profile-base</a></td>
+<td>0.12.0</td>
+<td>pom</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="b">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-profile/truevfs-profile-default/">truevfs-profile-default</a></td>
+<td>0.12.0</td>
+<td>pom</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-profile/truevfs-profile-full/">truevfs-profile-full</a></td>
+<td>0.12.0</td>
+<td>pom</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="b">
+<td>net.java.truevfs</td>
+<td><a class="externalLink" href="http://truevfs.net/truevfs-samples/">truevfs-samples</a></td>
+<td>0.12.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>org.apache.commons</td>
+<td><a class="externalLink" href="http://commons.apache.org/proper/commons-compress/">commons-compress</a></td>
+<td>1.14</td>
+<td>jar</td>
+<td><a class="externalLink" href="https://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="b">
+<td>org.apache.httpcomponents</td>
+<td><a class="externalLink" href="http://hc.apache.org/httpcomponents-client">httpclient</a></td>
+<td>4.5.3</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache License, Version 2.0</a></td></tr>
+<tr class="a">
+<td>org.bouncycastle</td>
+<td><a class="externalLink" href="http://www.bouncycastle.org/java.html">bcprov-jdk15on</a></td>
+<td>1.58</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.bouncycastle.org/licence.html">Bouncy Castle Licence</a></td></tr>
+<tr class="b">
+<td>org.hamcrest</td>
+<td><a class="externalLink" href="https://github.com/hamcrest/JavaHamcrest/hamcrest-core">hamcrest-core</a></td>
+<td>1.3</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.opensource.org/licenses/bsd-license.php">New BSD License</a></td></tr>
+<tr class="a">
+<td>org.mockito</td>
+<td><a class="externalLink" href="https://github.com/mockito/mockito">mockito-core</a></td>
+<td>2.10.0</td>
+<td>jar</td>
+<td><a class="externalLink" href="https://github.com/mockito/mockito/blob/master/LICENSE">The MIT License</a></td></tr>
+<tr class="b">
+<td>org.netbeans</td>
+<td><a class="externalLink" href="http://jemmy.netbeans.org/">jemmy</a></td>
+<td>2.2.7.5</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.netbeans.org/about/legal/spl.html">Sun Public License 1.0</a></td></tr>
+<tr class="a">
+<td>org.objenesis</td>
+<td><a class="externalLink" href="http://objenesis.org">objenesis</a></td>
+<td>2.6</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2</a></td></tr>
+<tr class="b">
+<td>org.scala-lang</td>
+<td><a class="externalLink" href="http://www.scala-lang.org/">scala-library</a></td>
+<td>2.11.11</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.scala-lang.org/license.html">BSD 3-Clause</a></td></tr>
+<tr class="a">
+<td>org.scalacheck</td>
+<td><a class="externalLink" href="http://www.scalacheck.org">scalacheck_2.11</a></td>
+<td>1.13.5</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.opensource.org/licenses/bsd-license.php">BSD-style</a></td></tr>
+<tr class="b">
+<td>org.scalatest</td>
+<td><a class="externalLink" href="http://www.scalatest.org">scalatest_2.11</a></td>
+<td>3.0.4</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0">the Apache License, ASL Version 2.0</a></td></tr>
+<tr class="a">
+<td>org.slf4j</td>
+<td><a class="externalLink" href="http://www.slf4j.org">jcl-over-slf4j</a></td>
+<td>1.7.25</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.opensource.org/licenses/mit-license.php">MIT License</a></td></tr>
+<tr class="b">
+<td>org.slf4j</td>
+<td><a class="externalLink" href="http://www.slf4j.org">slf4j-api</a></td>
+<td>1.7.25</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.opensource.org/licenses/mit-license.php">MIT License</a></td></tr>
+<tr class="a">
+<td>org.slf4j</td>
+<td><a class="externalLink" href="http://www.slf4j.org">slf4j-simple</a></td>
+<td>1.7.25</td>
+<td>jar</td>
+<td><a class="externalLink" href="http://www.opensource.org/licenses/mit-license.php">MIT License</a></td></tr>
+<tr class="b">
+<td>org.tukaani</td>
+<td><a class="externalLink" href="http://tukaani.org/xz/java.html">xz</a></td>
+<td>1.6</td>
+<td>jar</td>
+<td>Public Domain</td></tr></table></div>
+<div class="section">
+<h3><a name="test"></a>test</h3><a name="test"></a>
+<p>The following is a list of test dependencies in the DependencyManagement of this project. These dependencies can be included in the submodules to compile and run unit tests for the submodule:</p>
+<table border="0" class="bodyTable">
+<tr class="a">
+<th>GroupId</th>
+<th>ArtifactId</th>
+<th>Version</th>
+<th>Type</th>
+<th>License</th></tr>
+<tr class="b">
+<td>net.java.truecommons</td>
+<td><a class="externalLink" href="http://truecommons.java.net/truecommons-io">truecommons-io</a></td>
+<td>2.5.0</td>
+<td>test-jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></td></tr>
+<tr class="a">
+<td>net.java.truecommons</td>
+<td><a class="externalLink" href="http://truecommons.java.net/truecommons-key/truecommons-key-spec">truecommons-key-spec</a></td>
+<td>2.5.0</td>
+<td>test-jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></td></tr>
+<tr class="b">
+<td>net.java.truecommons</td>
+<td><a class="externalLink" href="http://truecommons.java.net/truecommons-shed">truecommons-shed</a></td>
+<td>2.5.0</td>
+<td>test-jar</td>
+<td><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></td></tr></table></div></div>
+              </div>
+    </div>
+    <div class="clear"><hr/></div>
+    <div id="footer">
+      <div class="xright">
+              Copyright &#169;                    2005-2017
+                        <a href="http://schlichtherle.de">Schlichtherle IT Services</a>.
+            All Rights Reserved.      
+                                   <span id="publishDate">Last Published: 2017-09-19</span>
+                        </div>
+      <div class="clear"><hr/></div>
+    </div>
+  </body>
+</html>

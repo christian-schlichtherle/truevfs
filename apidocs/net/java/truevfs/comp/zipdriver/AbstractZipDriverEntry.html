@@ -1,0 +1,513 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- NewPage -->
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>AbstractZipDriverEntry (TrueVFS 0.12.0 API)</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<script type="text/javascript"><!--
+    if (location.href.indexOf('is-external=true') == -1) {
+        parent.document.title="AbstractZipDriverEntry (TrueVFS 0.12.0 API)";
+    }
+//-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+<!-- ========= START OF TOP NAVBAR ======= -->
+<div class="topNav"><a name="navbar_top">
+<!--   -->
+</a><a href="#skip-navbar_top" title="Skip navigation links"></a><a name="navbar_top_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/AbstractZipDriverEntry.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriver.html" title="class in net.java.truevfs.comp.zipdriver"><span class="strong">Prev Class</span></a></li>
+<li><a href="../../../../../net/java/truevfs/comp/zipdriver/CheckedJarDriver.html" title="class in net.java.truevfs.comp.zipdriver"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../index.html?net/java/truevfs/comp/zipdriver/AbstractZipDriverEntry.html" target="_top">Frames</a></li>
+<li><a href="AbstractZipDriverEntry.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_top">
+<li><a href="../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#fields_inherited_from_class_net.java.truevfs.comp.zip.ZipEntry">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_summary">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#constructor_detail">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_top">
+<!--   -->
+</a></div>
+<!-- ========= END OF TOP NAVBAR ========= -->
+<!-- ======== START OF CLASS DATA ======== -->
+<div class="header">
+<div class="subTitle">net.java.truevfs.comp.zipdriver</div>
+<h2 title="Class AbstractZipDriverEntry" class="title">Class AbstractZipDriverEntry</h2>
+</div>
+<div class="contentContainer">
+<ul class="inheritance">
+<li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">java.lang.Object</a></li>
+<li>
+<ul class="inheritance">
+<li><a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">net.java.truevfs.comp.zip.ZipEntry</a></li>
+<li>
+<ul class="inheritance">
+<li>net.java.truevfs.comp.zipdriver.AbstractZipDriverEntry</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="description">
+<ul class="blockList">
+<li class="blockList">
+<dl>
+<dt>All Implemented Interfaces:</dt>
+<dd><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Cloneable.html?is-external=true" title="class or interface in java.lang">Cloneable</a>, net.java.truecommons.cio.Entry, net.java.truecommons.cio.MutableEntry, <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveEntry.html" title="interface in net.java.truevfs.kernel.spec">FsArchiveEntry</a></dd>
+</dl>
+<dl>
+<dt>Direct Known Subclasses:</dt>
+<dd><a href="../../../../../net/java/truevfs/comp/zipdriver/JarDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">JarDriverEntry</a>, <a href="../../../../../net/java/truevfs/comp/zipdriver/ZipDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">ZipDriverEntry</a></dd>
+</dl>
+<hr>
+<br>
+<pre>public abstract class <span class="strong">AbstractZipDriverEntry</span>
+extends <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a>
+implements <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveEntry.html" title="interface in net.java.truevfs.kernel.spec">FsArchiveEntry</a></pre>
+<div class="block">ZIP archive entries apply the date/time conversion rules as defined by
+ <a href="../../../../../net/java/truevfs/comp/zip/DateTimeConverter.html#ZIP"><code>DateTimeConverter.ZIP</code></a>.</div>
+<dl><dt><span class="strong">Author:</span></dt>
+  <dd>Christian Schlichtherle</dd>
+<dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriverEntry.html#getDateTimeConverter()"><code>getDateTimeConverter()</code></a>, 
+<a href="../../../../../net/java/truevfs/comp/zipdriver/ZipDriver.html" title="class in net.java.truevfs.comp.zipdriver"><code>ZipDriver</code></a></dd></dl>
+</li>
+</ul>
+</div>
+<div class="summary">
+<ul class="blockList">
+<li class="blockList">
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="nested_class_summary">
+<!--   -->
+</a>
+<h3>Nested Class Summary</h3>
+<ul class="blockList">
+<li class="blockList"><a name="nested_classes_inherited_from_class_net.java.truecommons.cio.Entry">
+<!--   -->
+</a>
+<h3>Nested classes/interfaces inherited from interface&nbsp;net.java.truecommons.cio.Entry</h3>
+<code>net.java.truecommons.cio.Entry.Access, net.java.truecommons.cio.Entry.Entity, net.java.truecommons.cio.Entry.PosixEntity, net.java.truecommons.cio.Entry.Size, net.java.truecommons.cio.Entry.Type</code></li>
+</ul>
+</li>
+</ul>
+<!-- =========== FIELD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field_summary">
+<!--   -->
+</a>
+<h3>Field Summary</h3>
+<ul class="blockList">
+<li class="blockList"><a name="fields_inherited_from_class_net.java.truevfs.comp.zip.ZipEntry">
+<!--   -->
+</a>
+<h3>Fields inherited from class&nbsp;net.java.truevfs.comp.zip.<a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a></h3>
+<code><a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#BZIP2">BZIP2</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#DEFLATED">DEFLATED</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#MAX_DOS_TIME">MAX_DOS_TIME</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#MIN_DOS_TIME">MIN_DOS_TIME</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#PLATFORM_FAT">PLATFORM_FAT</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#PLATFORM_UNIX">PLATFORM_UNIX</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#STORED">STORED</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#UNKNOWN">UNKNOWN</a></code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="fields_inherited_from_class_net.java.truecommons.cio.Entry">
+<!--   -->
+</a>
+<h3>Fields inherited from interface&nbsp;net.java.truecommons.cio.Entry</h3>
+<code>ALL_ACCESS, ALL_POSIX_ACCESS, ALL_POSIX_ENTITIES, ALL_SIZES, ALL_TYPES, DIRECTORY_TYPE, FILE_TYPE, NO_ACCESS, NO_POSIX_ENTITIES, NO_SIZES, NO_TYPES, SPECIAL_TYPE, SYMLINK_TYPE, UNKNOWN</code></li>
+</ul>
+</li>
+</ul>
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor_summary">
+<!--   -->
+</a>
+<h3>Constructor Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Constructor Summary table, listing constructors, and an explanation">
+<caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier</th>
+<th class="colLast" scope="col">Constructor and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>protected </code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriverEntry.html#AbstractZipDriverEntry(java.lang.String)">AbstractZipDriverEntry</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>protected </code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriverEntry.html#AbstractZipDriverEntry(java.lang.String,%20net.java.truevfs.comp.zip.ZipEntry)">AbstractZipDriverEntry</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+                      <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a>&nbsp;template)</code>&nbsp;</td>
+</tr>
+</table>
+</li>
+</ul>
+<!-- ========== METHOD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_summary">
+<!--   -->
+</a>
+<h3>Method Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
+<caption><span>Methods</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>protected abstract <a href="../../../../../net/java/truevfs/comp/zip/DateTimeConverter.html" title="enum in net.java.truevfs.comp.zip">DateTimeConverter</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriverEntry.html#getDateTimeConverter()">getDateTimeConverter</a></strong>()</code>
+<div class="block">Returns a <a href="../../../../../net/java/truevfs/comp/zip/DateTimeConverter.html" title="enum in net.java.truevfs.comp.zip"><code>DateTimeConverter</code></a> for the conversion of Java time
+ to DOS date/time fields and vice versa.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>long</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriverEntry.html#getSize(net.java.truecommons.cio.Entry.Size)">getSize</a></strong>(net.java.truecommons.cio.Entry.Size&nbsp;type)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>long</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriverEntry.html#getTime(net.java.truecommons.cio.Entry.Access)">getTime</a></strong>(net.java.truecommons.cio.Entry.Access&nbsp;type)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>net.java.truecommons.cio.Entry.Type</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriverEntry.html#getType()">getType</a></strong>()</code>
+<div class="block">Returns the type of this archive entry.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriverEntry.html#isPermitted(net.java.truecommons.cio.Entry.Access,%20net.java.truecommons.cio.Entry.Entity)">isPermitted</a></strong>(net.java.truecommons.cio.Entry.Access&nbsp;type,
+           net.java.truecommons.cio.Entry.Entity&nbsp;entity)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriverEntry.html#setPermitted(net.java.truecommons.cio.Entry.Access,%20net.java.truecommons.cio.Entry.Entity,%20java.lang.Boolean)">setPermitted</a></strong>(net.java.truecommons.cio.Entry.Access&nbsp;type,
+            net.java.truecommons.cio.Entry.Entity&nbsp;entity,
+            <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;value)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriverEntry.html#setSize(net.java.truecommons.cio.Entry.Size,%20long)">setSize</a></strong>(net.java.truecommons.cio.Entry.Size&nbsp;type,
+       long&nbsp;size)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriverEntry.html#setTime(net.java.truecommons.cio.Entry.Access,%20long)">setTime</a></strong>(net.java.truecommons.cio.Entry.Access&nbsp;type,
+       long&nbsp;time)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriverEntry.html#toString()">toString</a></strong>()</code>
+<div class="block">Returns a string representation of this object for debugging and logging
+ purposes.</div>
+</td>
+</tr>
+</table>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_net.java.truevfs.comp.zip.ZipEntry">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;net.java.truevfs.comp.zip.<a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a></h3>
+<code><a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#clearEncryption()">clearEncryption</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#clone()">clone</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#getComment()">getComment</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#getCompressedSize()">getCompressedSize</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#getCrc()">getCrc</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#getExternalAttributes()">getExternalAttributes</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#getExtra()">getExtra</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#getMethod()">getMethod</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#getName()">getName</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#getPlatform()">getPlatform</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#getSize()">getSize</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#getTime()">getTime</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#isDirectory()">isDirectory</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#isEncrypted()">isEncrypted</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#setComment(java.lang.String)">setComment</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#setCompressedSize(long)">setCompressedSize</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#setCrc(long)">setCrc</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#setEncrypted(boolean)">setEncrypted</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#setExternalAttributes(long)">setExternalAttributes</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#setExtra(byte[])">setExtra</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#setMethod(int)">setMethod</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#setPlatform(int)">setPlatform</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#setSize(long)">setSize</a>, <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#setTime(long)">setTime</a></code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_java.lang.Object">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;java.lang.<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></h3>
+<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#equals(java.lang.Object)" title="class or interface in java.lang">equals</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#finalize()" title="class or interface in java.lang">finalize</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#getClass()" title="class or interface in java.lang">getClass</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#hashCode()" title="class or interface in java.lang">hashCode</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notify()" title="class or interface in java.lang">notify</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notifyAll()" title="class or interface in java.lang">notifyAll</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait()" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long)" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long,%20int)" title="class or interface in java.lang">wait</a></code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_net.java.truecommons.cio.Entry">
+<!--   -->
+</a>
+<h3>Methods inherited from interface&nbsp;net.java.truecommons.cio.Entry</h3>
+<code>getName</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="details">
+<ul class="blockList">
+<li class="blockList">
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor_detail">
+<!--   -->
+</a>
+<h3>Constructor Detail</h3>
+<a name="AbstractZipDriverEntry(java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>AbstractZipDriverEntry</h4>
+<pre>protected&nbsp;AbstractZipDriverEntry(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)</pre>
+</li>
+</ul>
+<a name="AbstractZipDriverEntry(java.lang.String, net.java.truevfs.comp.zip.ZipEntry)">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>AbstractZipDriverEntry</h4>
+<pre>protected&nbsp;AbstractZipDriverEntry(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+                      <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a>&nbsp;template)</pre>
+</li>
+</ul>
+</li>
+</ul>
+<!-- ============ METHOD DETAIL ========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_detail">
+<!--   -->
+</a>
+<h3>Method Detail</h3>
+<a name="getDateTimeConverter()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getDateTimeConverter</h4>
+<pre>protected abstract&nbsp;<a href="../../../../../net/java/truevfs/comp/zip/DateTimeConverter.html" title="enum in net.java.truevfs.comp.zip">DateTimeConverter</a>&nbsp;getDateTimeConverter()</pre>
+<div class="block"><strong>Description copied from class:&nbsp;<code><a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#getDateTimeConverter()">ZipEntry</a></code></strong></div>
+<div class="block">Returns a <a href="../../../../../net/java/truevfs/comp/zip/DateTimeConverter.html" title="enum in net.java.truevfs.comp.zip"><code>DateTimeConverter</code></a> for the conversion of Java time
+ to DOS date/time fields and vice versa.
+ <p>
+ The implementation in the class <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip"><code>ZipEntry</code></a> returns
+ <a href="../../../../../net/java/truevfs/comp/zip/DateTimeConverter.html#JAR"><code>DateTimeConverter.JAR</code></a>.</div>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#getDateTimeConverter()">getDateTimeConverter</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a></code></dd>
+<dt><span class="strong">Returns:</span></dt><dd>A <a href="../../../../../net/java/truevfs/comp/zip/DateTimeConverter.html" title="enum in net.java.truevfs.comp.zip"><code>DateTimeConverter</code></a> for the conversion of Java time
+         to DOS date/time fields and vice versa.</dd></dl>
+</li>
+</ul>
+<a name="getSize(net.java.truecommons.cio.Entry.Size)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getSize</h4>
+<pre>public&nbsp;long&nbsp;getSize(net.java.truecommons.cio.Entry.Size&nbsp;type)</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>getSize</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.Entry</code></dd>
+</dl>
+</li>
+</ul>
+<a name="getTime(net.java.truecommons.cio.Entry.Access)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getTime</h4>
+<pre>public&nbsp;long&nbsp;getTime(net.java.truecommons.cio.Entry.Access&nbsp;type)</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>getTime</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.Entry</code></dd>
+</dl>
+</li>
+</ul>
+<a name="getType()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getType</h4>
+<pre>public&nbsp;net.java.truecommons.cio.Entry.Type&nbsp;getType()</pre>
+<div class="block"><strong>Description copied from interface:&nbsp;<code><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveEntry.html#getType()">FsArchiveEntry</a></code></strong></div>
+<div class="block">Returns the type of this archive entry.</div>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveEntry.html#getType()">getType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveEntry.html" title="interface in net.java.truevfs.kernel.spec">FsArchiveEntry</a></code></dd>
+<dt><span class="strong">Returns:</span></dt><dd>The type of this archive entry.</dd></dl>
+</li>
+</ul>
+<a name="isPermitted(net.java.truecommons.cio.Entry.Access, net.java.truecommons.cio.Entry.Entity)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isPermitted</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;isPermitted(net.java.truecommons.cio.Entry.Access&nbsp;type,
+                  net.java.truecommons.cio.Entry.Entity&nbsp;entity)</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>isPermitted</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.Entry</code></dd>
+</dl>
+</li>
+</ul>
+<a name="setPermitted(net.java.truecommons.cio.Entry.Access, net.java.truecommons.cio.Entry.Entity, java.lang.Boolean)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setPermitted</h4>
+<pre>public&nbsp;boolean&nbsp;setPermitted(net.java.truecommons.cio.Entry.Access&nbsp;type,
+                   net.java.truecommons.cio.Entry.Entity&nbsp;entity,
+                   <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;value)</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>setPermitted</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.MutableEntry</code></dd>
+</dl>
+</li>
+</ul>
+<a name="setSize(net.java.truecommons.cio.Entry.Size, long)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setSize</h4>
+<pre>public&nbsp;boolean&nbsp;setSize(net.java.truecommons.cio.Entry.Size&nbsp;type,
+              long&nbsp;size)</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>setSize</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.MutableEntry</code></dd>
+</dl>
+</li>
+</ul>
+<a name="setTime(net.java.truecommons.cio.Entry.Access, long)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setTime</h4>
+<pre>public&nbsp;boolean&nbsp;setTime(net.java.truecommons.cio.Entry.Access&nbsp;type,
+              long&nbsp;time)</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>setTime</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.MutableEntry</code></dd>
+</dl>
+</li>
+</ul>
+<a name="toString()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>toString</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;toString()</pre>
+<div class="block">Returns a string representation of this object for debugging and logging
+ purposes.</div>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#toString()">toString</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a></code></dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<!-- ========= END OF CLASS DATA ========= -->
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<div class="bottomNav"><a name="navbar_bottom">
+<!--   -->
+</a><a href="#skip-navbar_bottom" title="Skip navigation links"></a><a name="navbar_bottom_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/AbstractZipDriverEntry.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriver.html" title="class in net.java.truevfs.comp.zipdriver"><span class="strong">Prev Class</span></a></li>
+<li><a href="../../../../../net/java/truevfs/comp/zipdriver/CheckedJarDriver.html" title="class in net.java.truevfs.comp.zipdriver"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../index.html?net/java/truevfs/comp/zipdriver/AbstractZipDriverEntry.html" target="_top">Frames</a></li>
+<li><a href="AbstractZipDriverEntry.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_bottom">
+<li><a href="../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_bottom");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#fields_inherited_from_class_net.java.truevfs.comp.zip.ZipEntry">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_summary">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#constructor_detail">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_bottom">
+<!--   -->
+</a></div>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+<p class="legalCopy"><small>Copyright &#169; 2005&#x2013;2017 <a href="http://schlichtherle.de">Schlichtherle IT Services</a>. All rights reserved.</small></p>
+</body>
+</html>

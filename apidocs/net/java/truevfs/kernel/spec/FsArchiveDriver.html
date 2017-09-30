@@ -1,0 +1,815 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- NewPage -->
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>FsArchiveDriver (TrueVFS 0.12.0 API)</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<script type="text/javascript"><!--
+    if (location.href.indexOf('is-external=true') == -1) {
+        parent.document.title="FsArchiveDriver (TrueVFS 0.12.0 API)";
+    }
+//-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+<!-- ========= START OF TOP NAVBAR ======= -->
+<div class="topNav"><a name="navbar_top">
+<!--   -->
+</a><a href="#skip-navbar_top" title="Skip navigation links"></a><a name="navbar_top_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/FsArchiveDriver.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../../net/java/truevfs/kernel/spec/FsAccessOptionsController.html" title="class in net.java.truevfs.kernel.spec"><span class="strong">Prev Class</span></a></li>
+<li><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveEntries.html" title="class in net.java.truevfs.kernel.spec"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../index.html?net/java/truevfs/kernel/spec/FsArchiveDriver.html" target="_top">Frames</a></li>
+<li><a href="FsArchiveDriver.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_top">
+<li><a href="../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#constructor_summary">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#constructor_detail">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_top">
+<!--   -->
+</a></div>
+<!-- ========= END OF TOP NAVBAR ========= -->
+<!-- ======== START OF CLASS DATA ======== -->
+<div class="header">
+<div class="subTitle">net.java.truevfs.kernel.spec</div>
+<h2 title="Class FsArchiveDriver" class="title">Class FsArchiveDriver&lt;E extends <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveEntry.html" title="interface in net.java.truevfs.kernel.spec">FsArchiveEntry</a>&gt;</h2>
+</div>
+<div class="contentContainer">
+<ul class="inheritance">
+<li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">java.lang.Object</a></li>
+<li>
+<ul class="inheritance">
+<li>net.java.truecommons.shed.UniqueObject</li>
+<li>
+<ul class="inheritance">
+<li><a href="../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">net.java.truevfs.kernel.spec.FsDriver</a></li>
+<li>
+<ul class="inheritance">
+<li>net.java.truevfs.kernel.spec.FsArchiveDriver&lt;E&gt;</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="description">
+<ul class="blockList">
+<li class="blockList">
+<dl><dt><span class="strong">Type Parameters:</span></dt><dd><code>E</code> - the type of the archive entries.</dd></dl>
+<dl>
+<dt>All Implemented Interfaces:</dt>
+<dd><a href="../../../../../net/java/truevfs/kernel/spec/FsController.Factory.html" title="interface in net.java.truevfs.kernel.spec">FsController.Factory</a>&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&gt;, <a href="../../../../../net/java/truevfs/kernel/spec/FsModel.Factory.html" title="interface in net.java.truevfs.kernel.spec">FsModel.Factory</a>&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&gt;</dd>
+</dl>
+<dl>
+<dt>Direct Known Subclasses:</dt>
+<dd><a href="../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriver.html" title="class in net.java.truevfs.comp.zipdriver">AbstractZipDriver</a>, <a href="../../../../../net/java/truevfs/comp/tardriver/TarDriver.html" title="class in net.java.truevfs.comp.tardriver">TarDriver</a></dd>
+</dl>
+<hr>
+<br>
+<pre><a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/concurrent.Immutable.html?is-external=true" title="class or interface in javax.annotation">@Immutable</a>
+public abstract class <span class="strong">FsArchiveDriver&lt;E extends <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveEntry.html" title="interface in net.java.truevfs.kernel.spec">FsArchiveEntry</a>&gt;</span>
+extends <a href="../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></pre>
+<div class="block">An abstract factory for components required for accessing archive files.
+ Implementations of this abstract base class are used to access specific
+ archive formats like ZIP, TAR et al.
+ <p>
+ Subclasses should be immutable.</div>
+<dl><dt><span class="strong">Author:</span></dt>
+  <dd>Christian Schlichtherle</dd></dl>
+</li>
+</ul>
+</div>
+<div class="summary">
+<ul class="blockList">
+<li class="blockList">
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor_summary">
+<!--   -->
+</a>
+<h3>Constructor Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Constructor Summary table, listing constructors, and an explanation">
+<caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colOne" scope="col">Constructor and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#FsArchiveDriver()">FsArchiveDriver</a></strong>()</code>&nbsp;</td>
+</tr>
+</table>
+</li>
+</ul>
+<!-- ========== METHOD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_summary">
+<!--   -->
+</a>
+<h3>Method Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
+<caption><span>Methods</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#checkEncodable(java.lang.String)">checkEncodable</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)</code>
+<div class="block">Ensures that the given entry name can get encoded by this driver's
+ <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#getCharset()">character set</a>.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#decorate(net.java.truevfs.kernel.spec.FsController)">decorate</a></strong>(<a href="../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;controller)</code>
+<div class="block">Decorates the given file system controller.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>abstract <a href="http://docs.oracle.com/javase/7/docs/api/java/nio/charset/Charset.html?is-external=true" title="class or interface in java.nio.charset">Charset</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#getCharset()">getCharset</a></strong>()</code>
+<div class="block">Returns the character set to use for encoding character based meta data
+ such as entry names or file comments to binary data when writing
+ an archive file.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>abstract net.java.truecommons.cio.IoBufferPool</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#getPool()">getPool</a></strong>()</code>
+<div class="block">Returns the pool for allocating temporary I/O buffers.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#getRedundantContentSupport()">getRedundantContentSupport</a></strong>()</code>
+<div class="block">Returns <code>true</code> if and only if the archive files produced by this
+ archive driver may contain redundant archive entry contents.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#getRedundantMetaDataSupport()">getRedundantMetaDataSupport</a></strong>()</code>
+<div class="block">Returns <code>true</code> if and only if the archive files produced by this
+ archive driver may contain redundant archive entry meta data.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#isArchiveDriver()">isArchiveDriver</a></strong>()</code>
+<div class="block">Returns <code>true</code> if and only if this is an archive driver, that is,
+ if file systems of this type must be a member of a parent file system.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newController(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsController)">newController</a></strong>(<a href="../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&nbsp;context,
+             <a href="../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+             <a href="../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;parent)</code>
+<div class="block">Returns a new file system controller for the mount point of the
+ given file system model.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>abstract <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newEntry(net.java.truecommons.shed.BitField,%20java.lang.String,%20net.java.truecommons.cio.Entry.Type,%20net.java.truecommons.cio.Entry)">newEntry</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+        <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+        net.java.truecommons.cio.Entry.Type&nbsp;type,
+        net.java.truecommons.cio.Entry&nbsp;template)</code>
+<div class="block">Returns a new entry for the given name.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newEntry(java.lang.String,%20net.java.truecommons.cio.Entry.Type,%20net.java.truecommons.cio.Entry)">newEntry</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+        net.java.truecommons.cio.Entry.Type&nbsp;type,
+        net.java.truecommons.cio.Entry&nbsp;template)</code>
+<div class="block">Equivalent to <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newEntry(net.java.truecommons.shed.BitField,%20java.lang.String,%20net.java.truecommons.cio.Entry.Type,%20net.java.truecommons.cio.Entry)"><code>newEntry(FsAccessOptions.NONE, name, type, template)</code></a>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>net.java.truecommons.cio.InputService&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&gt;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newInput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName)">newInput</a></strong>(<a href="../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+        net.java.truecommons.shed.BitField&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+        <a href="../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;controller,
+        <a href="../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>
+<div class="block">This method gets called by an archive controller in order to create a
+ new input service for its target archive file.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>protected abstract net.java.truecommons.cio.InputService&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&gt;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newInput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsInputSocketSource)">newInput</a></strong>(<a href="../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+        <a href="../../../../../net/java/truevfs/kernel/spec/FsInputSocketSource.html" title="class in net.java.truevfs.kernel.spec">FsInputSocketSource</a>&nbsp;source)</code>
+<div class="block">Creates a new input service for reading archive entries for the given
+ <code>model</code> from the target archive file referenced by <code>source</code>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>net.java.truecommons.cio.OutputService&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&gt;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newOutput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.cio.InputService)">newOutput</a></strong>(<a href="../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+         net.java.truecommons.shed.BitField&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+         <a href="../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;controller,
+         <a href="../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
+         net.java.truecommons.cio.InputService&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&gt;&nbsp;input)</code>
+<div class="block">This method gets called by an archive controller in order to create a
+ new output service for its target archive file.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>protected abstract net.java.truecommons.cio.OutputService&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&gt;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newOutput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsOutputSocketSink,%20net.java.truecommons.cio.InputService)">newOutput</a></strong>(<a href="../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+         <a href="../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a>&nbsp;sink,
+         net.java.truecommons.cio.InputService&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&gt;&nbsp;input)</code>
+<div class="block">Creates a new input service for writing archive entries for the given
+ <code>model</code> to the target archive file referenced by <code>sink</code>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#normalize(java.lang.String,%20net.java.truecommons.cio.Entry.Type)">normalize</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+         net.java.truecommons.cio.Entry.Type&nbsp;type)</code>
+<div class="block">Normalizes the given entry name so that it forms a valid entry name for
+ ZIP and TAR files by ensuring that the returned entry name ends with the
+ separator character <code>'/'</code> if and only if <code>type</code> is
+ <code>DIRECTORY</code>.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>protected <a href="../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#sink(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName)">sink</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+    <a href="../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;controller,
+    <a href="../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>
+<div class="block">Called to prepare writing an archive file artifact of this driver to
+ the node <code>name</code> in <code>controller</code> using <code>options</code> and
+ the nullable <code>template</code>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>protected <a href="../../../../../net/java/truevfs/kernel/spec/FsInputSocketSource.html" title="class in net.java.truevfs.kernel.spec">FsInputSocketSource</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#source(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName)">source</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+      <a href="../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;controller,
+      <a href="../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>
+<div class="block">Called to prepare reading an archive file artifact of this driver from
+ <code>name</code> in <code>controller</code> using <code>options</code>.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#toString()">toString</a></strong>()</code>
+<div class="block">Returns a string representation of this object for debugging and logging
+ purposes.</div>
+</td>
+</tr>
+</table>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_net.java.truevfs.kernel.spec.FsDriver">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;net.java.truevfs.kernel.spec.<a href="../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></h3>
+<code><a href="../../../../../net/java/truevfs/kernel/spec/FsDriver.html#decorate(net.java.truevfs.kernel.spec.FsModel)">decorate</a>, <a href="../../../../../net/java/truevfs/kernel/spec/FsDriver.html#newModel(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsMountPoint,%20net.java.truevfs.kernel.spec.FsModel)">newModel</a></code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_net.java.truecommons.shed.UniqueObject">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;net.java.truecommons.shed.UniqueObject</h3>
+<code>equals, hashCode</code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_java.lang.Object">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;java.lang.<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></h3>
+<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#clone()" title="class or interface in java.lang">clone</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#finalize()" title="class or interface in java.lang">finalize</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#getClass()" title="class or interface in java.lang">getClass</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notify()" title="class or interface in java.lang">notify</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notifyAll()" title="class or interface in java.lang">notifyAll</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait()" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long)" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long,%20int)" title="class or interface in java.lang">wait</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="details">
+<ul class="blockList">
+<li class="blockList">
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor_detail">
+<!--   -->
+</a>
+<h3>Constructor Detail</h3>
+<a name="FsArchiveDriver()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>FsArchiveDriver</h4>
+<pre>public&nbsp;FsArchiveDriver()</pre>
+</li>
+</ul>
+</li>
+</ul>
+<!-- ============ METHOD DETAIL ========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_detail">
+<!--   -->
+</a>
+<h3>Method Detail</h3>
+<a name="checkEncodable(java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>checkEncodable</h4>
+<pre>public final&nbsp;void&nbsp;checkEncodable(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)
+                          throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/CharConversionException.html?is-external=true" title="class or interface in java.io">CharConversionException</a></pre>
+<div class="block">Ensures that the given entry name can get encoded by this driver's
+ <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#getCharset()">character set</a>.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>name</code> - an entry name.</dd>
+<dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/io/CharConversionException.html?is-external=true" title="class or interface in java.io">CharConversionException</a></code> - If the entry name contains characters
+         which cannot get encoded.</dd></dl>
+</li>
+</ul>
+<a name="decorate(net.java.truevfs.kernel.spec.FsController)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>decorate</h4>
+<pre>public&nbsp;<a href="../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;decorate(<a href="../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;controller)</pre>
+<div class="block">Decorates the given file system controller.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>controller</code> - the file system controller to decorate.</dd>
+<dt><span class="strong">Returns:</span></dt><dd>The implementation in the class <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="class in net.java.truevfs.kernel.spec"><code>FsArchiveDriver</code></a>
+         unconditionally returns <code>controller</code>.</dd></dl>
+</li>
+</ul>
+<a name="getCharset()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getCharset</h4>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/nio/charset/Charset.html?is-external=true" title="class or interface in java.nio.charset">Charset</a>&nbsp;getCharset()</pre>
+<div class="block">Returns the character set to use for encoding character based meta data
+ such as entry names or file comments to binary data when writing
+ an archive file.
+ Depending on the archive file format, this may get used for decoding
+ binary data when reading an archive file, too.
+ <p>
+ This is an immutable property - multiple calls must return the same
+ object.</div>
+<dl><dt><span class="strong">Returns:</span></dt><dd>The character set to use for encoding character based meta data
+         such as entry names or file comments to binary data when writing
+         an archive file.</dd></dl>
+</li>
+</ul>
+<a name="getPool()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getPool</h4>
+<pre>public abstract&nbsp;net.java.truecommons.cio.IoBufferPool&nbsp;getPool()</pre>
+<div class="block">Returns the pool for allocating temporary I/O buffers.
+ <p>
+ This is an immutable property - multiple calls must return the same
+ object.</div>
+<dl><dt><span class="strong">Returns:</span></dt><dd>The pool to use for allocating temporary I/O buffers.</dd></dl>
+</li>
+</ul>
+<a name="getRedundantContentSupport()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getRedundantContentSupport</h4>
+<pre>public&nbsp;boolean&nbsp;getRedundantContentSupport()</pre>
+<div class="block">Returns <code>true</code> if and only if the archive files produced by this
+ archive driver may contain redundant archive entry contents.
+ If the return value is <code>true</code>, then an archive file may contain
+ redundant archive entry contents, but only the last contents written
+ should get used when reading the archive file.
+ <p>
+ This is an immutable property - multiple calls must return the same
+ value.
+ <p>
+ The default value of this property is <code>false</code> as defined by the
+ implementation in the class <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="class in net.java.truevfs.kernel.spec"><code>FsArchiveDriver</code></a>.</div>
+<dl><dt><span class="strong">Returns:</span></dt><dd><code>true</code> if and only if the archive files produced by this
+         archive driver may contain redundant archive entry contents.</dd></dl>
+</li>
+</ul>
+<a name="getRedundantMetaDataSupport()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getRedundantMetaDataSupport</h4>
+<pre>public&nbsp;boolean&nbsp;getRedundantMetaDataSupport()</pre>
+<div class="block">Returns <code>true</code> if and only if the archive files produced by this
+ archive driver may contain redundant archive entry meta data.
+ If the return value is <code>true</code>, then an archive file may contain
+ redundant archive entry meta data, but only the last meta data written
+ should get used when reading the archive file.
+ This usually implies the existence of a central directory in the
+ resulting archive file.
+ <p>
+ This is an immutable property - multiple calls must return the same
+ value.
+ <p>
+ The default value of this property is <code>false</code> as defined by the
+ implementation in the class <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="class in net.java.truevfs.kernel.spec"><code>FsArchiveDriver</code></a>.</div>
+<dl><dt><span class="strong">Returns:</span></dt><dd><code>true</code> if and only if the archive files produced by this
+         archive driver may contain redundant archive entry meta data.</dd></dl>
+</li>
+</ul>
+<a name="isArchiveDriver()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isArchiveDriver</h4>
+<pre>public final&nbsp;boolean&nbsp;isArchiveDriver()</pre>
+<div class="block">Returns <code>true</code> if and only if this is an archive driver, that is,
+ if file systems of this type must be a member of a parent file system.</div>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/kernel/spec/FsDriver.html#isArchiveDriver()">isArchiveDriver</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></code></dd>
+<dt><span class="strong">Returns:</span></dt><dd>The implementation in the class <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="class in net.java.truevfs.kernel.spec"><code>FsArchiveDriver</code></a>
+         unconditionally returns <code>true</code>.</dd></dl>
+</li>
+</ul>
+<a name="newController(net.java.truevfs.kernel.spec.FsManager, net.java.truevfs.kernel.spec.FsModel, net.java.truevfs.kernel.spec.FsController)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>newController</h4>
+<pre>public final&nbsp;<a href="../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;newController(<a href="../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&nbsp;context,
+                         <a href="../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+                         <a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/Nonnull.html?is-external=true" title="class or interface in javax.annotation">@Nonnull</a>
+                         <a href="../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;parent)</pre>
+<div class="block">Returns a new file system controller for the mount point of the
+ given file system model.
+ This is a pure function without side effects.
+ <p>
+ When called, you may assert the following precondition:
+ <pre><code>assert null == parent
+         ? null == model.getParent()
+         : parent.getModel().equals(model.getParent())
+ </code></pre>
+ <p>
+ The implementation in the class <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="class in net.java.truevfs.kernel.spec"><code>FsArchiveDriver</code></a> forwards the
+ call to the given file system manager.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>context</code> - the calling context.</dd><dd><code>model</code> - the file system model.</dd><dd><code>parent</code> - the nullable parent file system controller.</dd>
+<dt><span class="strong">Returns:</span></dt><dd>A new file system controller for the mount point of the
+         given file system model.</dd></dl>
+</li>
+</ul>
+<a name="newEntry(net.java.truecommons.shed.BitField, java.lang.String, net.java.truecommons.cio.Entry.Type, net.java.truecommons.cio.Entry)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>newEntry</h4>
+<pre>public abstract&nbsp;<a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&nbsp;newEntry(net.java.truecommons.shed.BitField&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+         <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+         net.java.truecommons.cio.Entry.Type&nbsp;type,
+         <a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/CheckForNull.html?is-external=true" title="class or interface in javax.annotation">@CheckForNull</a>
+         net.java.truecommons.cio.Entry&nbsp;template)</pre>
+<div class="block">Returns a new entry for the given name.
+ The implementation may change this name in order to form a valid
+ <code>entry name</code> for their particular requirements.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>options</code> - when called from <a href="../../../../../net/java/truevfs/kernel/spec/FsController.html#make(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.cio.Entry.Type,%20net.java.truecommons.cio.Entry)"><code>FsController.make(net.java.truecommons.shed.BitField&lt;net.java.truevfs.kernel.spec.FsAccessOption&gt;, net.java.truevfs.kernel.spec.FsNodeName, net.java.truecommons.cio.Entry.Type, net.java.truecommons.cio.Entry)</code></a>, this is its
+         <code>options</code> parameter, otherwise it's typically an empty set.</dd><dd><code>name</code> - the entry name.</dd><dd><code>type</code> - the entry type.</dd><dd><code>template</code> - if not <code>null</code>, then the new entry shall inherit
+         as much properties from this entry as possible - with the
+         exception of its name and type.</dd>
+<dt><span class="strong">Returns:</span></dt><dd>A new entry for the given name.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newEntry(java.lang.String,%20net.java.truecommons.cio.Entry.Type,%20net.java.truecommons.cio.Entry)"><code>newEntry(String, Entry.Type, Entry)</code></a></dd></dl>
+</li>
+</ul>
+<a name="newEntry(java.lang.String, net.java.truecommons.cio.Entry.Type, net.java.truecommons.cio.Entry)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>newEntry</h4>
+<pre>public final&nbsp;<a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&nbsp;newEntry(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+         net.java.truecommons.cio.Entry.Type&nbsp;type,
+         <a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/CheckForNull.html?is-external=true" title="class or interface in javax.annotation">@CheckForNull</a>
+         net.java.truecommons.cio.Entry&nbsp;template)</pre>
+<div class="block">Equivalent to <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newEntry(net.java.truecommons.shed.BitField,%20java.lang.String,%20net.java.truecommons.cio.Entry.Type,%20net.java.truecommons.cio.Entry)"><code>newEntry(FsAccessOptions.NONE, name, type, template)</code></a>.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>name</code> - the entry name.</dd><dd><code>type</code> - the entry type.</dd><dd><code>template</code> - if not <code>null</code>, then the new entry shall inherit
+         as much properties from this entry as possible - with the
+         exception of its name and type.</dd>
+<dt><span class="strong">Returns:</span></dt><dd>A new entry for the given name.</dd></dl>
+</li>
+</ul>
+<a name="newInput(net.java.truevfs.kernel.spec.FsModel, net.java.truecommons.shed.BitField, net.java.truevfs.kernel.spec.FsController, net.java.truevfs.kernel.spec.FsNodeName)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>newInput</h4>
+<pre><a href="http://findbugs.sourceforge.net/api/edu/umd/cs/findbugs/annotations/CreatesObligation.html?is-external=true" title="class or interface in edu.umd.cs.findbugs.annotations">@CreatesObligation</a>
+public&nbsp;net.java.truecommons.cio.InputService&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&gt;&nbsp;newInput(<a href="../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+                                                                  net.java.truecommons.shed.BitField&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+                                                                  <a href="../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;controller,
+                                                                  <a href="../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)
+                                                                         throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
+<div class="block">This method gets called by an archive controller in order to create a
+ new input service for its target archive file.
+ <p>
+ The implementation in <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="class in net.java.truevfs.kernel.spec"><code>FsArchiveDriver</code></a> simply forwards the call
+ to <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#source(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName)"><code>source(net.java.truecommons.shed.BitField&lt;net.java.truevfs.kernel.spec.FsAccessOption&gt;, net.java.truevfs.kernel.spec.FsController, net.java.truevfs.kernel.spec.FsNodeName)</code></a>
+ and <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newInput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsInputSocketSource)"><code>newInput(FsModel, FsInputSocketSource)</code></a>.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>model</code> - the file system model for the target archive file.</dd><dd><code>options</code> - the options for accessing the target archive file in the
+         parent file system.</dd><dd><code>controller</code> - the controller for the parent file system with the
+         target archive file.</dd><dd><code>name</code> - the node name of the target archive file in the parent
+         file system.</dd>
+<dt><span class="strong">Returns:</span></dt><dd>A new input service for reading the target archive file.
+         Note that this service does <em>not</em> need to be thread-safe!</dd>
+<dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></code> - on any I/O error.
+         If the file system node for the given model exists in the
+         parent file system and is <em>not</em> a <code>Entry.Type.SPECIAL</code>
+         type, then this exception is deemed to indicate a
+         <em>persistent false positive</em> archive file and gets cached
+         until the file system controller for the given model gets
+         <a href="../../../../../net/java/truevfs/kernel/spec/FsController.html#sync(net.java.truecommons.shed.BitField)">synced</a> again.
+         Otherwise, this exception is deemed to indicate a
+         <em>transient false positive</em> archive file and does not
+         get cached.</dd></dl>
+</li>
+</ul>
+<a name="newInput(net.java.truevfs.kernel.spec.FsModel, net.java.truevfs.kernel.spec.FsInputSocketSource)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>newInput</h4>
+<pre><a href="http://findbugs.sourceforge.net/api/edu/umd/cs/findbugs/annotations/CreatesObligation.html?is-external=true" title="class or interface in edu.umd.cs.findbugs.annotations">@CreatesObligation</a>
+protected abstract&nbsp;net.java.truecommons.cio.InputService&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&gt;&nbsp;newInput(<a href="../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+                                                                  <a href="../../../../../net/java/truevfs/kernel/spec/FsInputSocketSource.html" title="class in net.java.truevfs.kernel.spec">FsInputSocketSource</a>&nbsp;source)
+                                                                                     throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
+<div class="block">Creates a new input service for reading archive entries for the given
+ <code>model</code> from the target archive file referenced by <code>source</code>.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>model</code> - the file system model.</dd><dd><code>source</code> - the source for reading the target archive file.</dd>
+<dt><span class="strong">Returns:</span></dt><dd>A new input service.
+         Note that this service does <em>not</em> need to be thread-safe!</dd>
+<dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></code> - on any I/O error.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newInput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName)"><code>newInput(FsModel, BitField, FsController, FsNodeName)</code></a></dd></dl>
+</li>
+</ul>
+<a name="newOutput(net.java.truevfs.kernel.spec.FsModel, net.java.truecommons.shed.BitField, net.java.truevfs.kernel.spec.FsController, net.java.truevfs.kernel.spec.FsNodeName, net.java.truecommons.cio.InputService)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>newOutput</h4>
+<pre><a href="http://findbugs.sourceforge.net/api/edu/umd/cs/findbugs/annotations/CreatesObligation.html?is-external=true" title="class or interface in edu.umd.cs.findbugs.annotations">@CreatesObligation</a>
+public&nbsp;net.java.truecommons.cio.OutputService&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&gt;&nbsp;newOutput(<a href="../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+                                                                    net.java.truecommons.shed.BitField&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+                                                                    <a href="../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;controller,
+                                                                    <a href="../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
+                                                                    <a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/CheckForNull.html?is-external=true" title="class or interface in javax.annotation">@CheckForNull</a><a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/WillNotClose.html?is-external=true" title="class or interface in javax.annotation">@WillNotClose</a>
+                                                                    net.java.truecommons.cio.InputService&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&gt;&nbsp;input)
+                                                                           throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
+<div class="block">This method gets called by an archive controller in order to create a
+ new output service for its target archive file.
+ <p>
+ The implementation in <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="class in net.java.truevfs.kernel.spec"><code>FsArchiveDriver</code></a> simply forwards the call
+ to <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#sink(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName)"><code>sink(net.java.truecommons.shed.BitField&lt;net.java.truevfs.kernel.spec.FsAccessOption&gt;, net.java.truevfs.kernel.spec.FsController, net.java.truevfs.kernel.spec.FsNodeName)</code></a>
+ and <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newOutput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsOutputSocketSink,%20net.java.truecommons.cio.InputService)"><code>newOutput(FsModel, FsOutputSocketSink, InputService)</code></a>.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>model</code> - the file system model for the target archive file.</dd><dd><code>options</code> - the options for accessing the target archive file in the
+         parent file system.</dd><dd><code>controller</code> - the controller for the parent file system with the
+         target archive file.</dd><dd><code>name</code> - the node name of the target archive file in the parent
+         file system.</dd><dd><code>input</code> - the nullable <code>InputService</code> for the target archive
+         file.
+         If not <code>null</code>, then the target archive file is going to
+         get updated.
+         This parameter is guaranteed to be the product of this driver's
+         factory method
+         <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newInput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName)"><code>newInput(FsModel, BitField, FsController, FsNodeName)</code></a>.</dd>
+<dt><span class="strong">Returns:</span></dt><dd>A new output service for writing the target archive file.
+         Note that this service does <em>not</em> need to be thread-safe!</dd>
+<dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></code> - on any I/O error.</dd></dl>
+</li>
+</ul>
+<a name="newOutput(net.java.truevfs.kernel.spec.FsModel, net.java.truevfs.kernel.spec.FsOutputSocketSink, net.java.truecommons.cio.InputService)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>newOutput</h4>
+<pre><a href="http://findbugs.sourceforge.net/api/edu/umd/cs/findbugs/annotations/CreatesObligation.html?is-external=true" title="class or interface in edu.umd.cs.findbugs.annotations">@CreatesObligation</a>
+protected abstract&nbsp;net.java.truecommons.cio.OutputService&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&gt;&nbsp;newOutput(<a href="../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+                                                                    <a href="../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a>&nbsp;sink,
+                                                                    <a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/CheckForNull.html?is-external=true" title="class or interface in javax.annotation">@CheckForNull</a><a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/WillNotClose.html?is-external=true" title="class or interface in javax.annotation">@WillNotClose</a>
+                                                                    net.java.truecommons.cio.InputService&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&gt;&nbsp;input)
+                                                                                       throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
+<div class="block">Creates a new input service for writing archive entries for the given
+ <code>model</code> to the target archive file referenced by <code>sink</code>.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>model</code> - the file system model.</dd><dd><code>sink</code> - the sink for writing the target archive file.</dd><dd><code>input</code> - the nullable <code>InputService</code> for the target archive
+         file.
+         If not <code>null</code>, then the target archive file is going to
+         get updated.
+         This parameter is guaranteed to be the product of this driver's
+         factory method
+         <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newInput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName)"><code>newInput(FsModel, BitField, FsController, FsNodeName)</code></a>.</dd>
+<dt><span class="strong">Returns:</span></dt><dd>A new output service for writing the target archive file.
+         Note that this service does <em>not</em> need to be thread-safe!</dd>
+<dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></code> - on any I/O error.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newOutput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.cio.InputService)"><code>newOutput(FsModel, BitField, FsController, FsNodeName, InputService)</code></a></dd></dl>
+</li>
+</ul>
+<a name="normalize(java.lang.String, net.java.truecommons.cio.Entry.Type)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>normalize</h4>
+<pre>public static&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;normalize(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+               net.java.truecommons.cio.Entry.Type&nbsp;type)</pre>
+<div class="block">Normalizes the given entry name so that it forms a valid entry name for
+ ZIP and TAR files by ensuring that the returned entry name ends with the
+ separator character <code>'/'</code> if and only if <code>type</code> is
+ <code>DIRECTORY</code>.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>name</code> - an entry name.</dd><dd><code>type</code> - an entry type.</dd>
+<dt><span class="strong">Returns:</span></dt><dd>The normalized entry name.</dd></dl>
+</li>
+</ul>
+<a name="sink(net.java.truecommons.shed.BitField, net.java.truevfs.kernel.spec.FsController, net.java.truevfs.kernel.spec.FsNodeName)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>sink</h4>
+<pre>protected&nbsp;<a href="../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a>&nbsp;sink(net.java.truecommons.shed.BitField&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+                      <a href="../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;controller,
+                      <a href="../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</pre>
+<div class="block">Called to prepare writing an archive file artifact of this driver to
+ the node <code>name</code> in <code>controller</code> using <code>options</code> and
+ the nullable <code>template</code>.
+ <p>
+ This method is overridable to enable modifying the given options
+ before forwarding the call to the given controller.
+ The implementation in the class <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="class in net.java.truevfs.kernel.spec"><code>FsArchiveDriver</code></a> simply forwards
+ the call to the given controller with the given options unaltered.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>options</code> - the options for accessing the file system node.</dd><dd><code>controller</code> - the controller to use for writing an artifact of this
+         driver.</dd><dd><code>name</code> - the node name.</dd>
+<dt><span class="strong">Returns:</span></dt><dd>A sink for writing an artifact of this driver.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newOutput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.cio.InputService)"><code>newOutput(FsModel, BitField, FsController, FsNodeName, InputService)</code></a></dd></dl>
+</li>
+</ul>
+<a name="source(net.java.truecommons.shed.BitField, net.java.truevfs.kernel.spec.FsController, net.java.truevfs.kernel.spec.FsNodeName)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>source</h4>
+<pre>protected&nbsp;<a href="../../../../../net/java/truevfs/kernel/spec/FsInputSocketSource.html" title="class in net.java.truevfs.kernel.spec">FsInputSocketSource</a>&nbsp;source(net.java.truecommons.shed.BitField&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+                         <a href="../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;controller,
+                         <a href="../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</pre>
+<div class="block">Called to prepare reading an archive file artifact of this driver from
+ <code>name</code> in <code>controller</code> using <code>options</code>.
+ <p>
+ This method is overridable to enable modifying the given options
+ before forwarding the call to the given controller.
+ The implementation in the class <a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="class in net.java.truevfs.kernel.spec"><code>FsArchiveDriver</code></a> simply forwards
+ the call to the given controller with the given options unaltered.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>options</code> - the options for accessing the file system node.</dd><dd><code>controller</code> - the controller to use for reading an artifact of this
+         driver.</dd><dd><code>name</code> - the node name.</dd>
+<dt><span class="strong">Returns:</span></dt><dd>A source for reading an artifact of this driver.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newInput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsController,%20net.java.truevfs.kernel.spec.FsNodeName)"><code>newInput(FsModel, BitField, FsController, FsNodeName)</code></a></dd></dl>
+</li>
+</ul>
+<a name="toString()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>toString</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;toString()</pre>
+<div class="block">Returns a string representation of this object for debugging and logging
+ purposes.</div>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/kernel/spec/FsDriver.html#toString()">toString</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></code></dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<!-- ========= END OF CLASS DATA ========= -->
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<div class="bottomNav"><a name="navbar_bottom">
+<!--   -->
+</a><a href="#skip-navbar_bottom" title="Skip navigation links"></a><a name="navbar_bottom_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/FsArchiveDriver.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../../net/java/truevfs/kernel/spec/FsAccessOptionsController.html" title="class in net.java.truevfs.kernel.spec"><span class="strong">Prev Class</span></a></li>
+<li><a href="../../../../../net/java/truevfs/kernel/spec/FsArchiveEntries.html" title="class in net.java.truevfs.kernel.spec"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../index.html?net/java/truevfs/kernel/spec/FsArchiveDriver.html" target="_top">Frames</a></li>
+<li><a href="FsArchiveDriver.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_bottom">
+<li><a href="../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_bottom");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#constructor_summary">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#constructor_detail">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_bottom">
+<!--   -->
+</a></div>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+<p class="legalCopy"><small>Copyright &#169; 2005&#x2013;2017 <a href="http://schlichtherle.de">Schlichtherle IT Services</a>. All rights reserved.</small></p>
+</body>
+</html>

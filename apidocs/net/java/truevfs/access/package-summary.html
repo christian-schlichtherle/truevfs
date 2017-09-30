@@ -1,0 +1,463 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- NewPage -->
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>net.java.truevfs.access (TrueVFS 0.12.0 API)</title>
+<link rel="stylesheet" type="text/css" href="../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<script type="text/javascript"><!--
+    if (location.href.indexOf('is-external=true') == -1) {
+        parent.document.title="net.java.truevfs.access (TrueVFS 0.12.0 API)";
+    }
+//-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+<!-- ========= START OF TOP NAVBAR ======= -->
+<div class="topNav"><a name="navbar_top">
+<!--   -->
+</a><a href="#skip-navbar_top" title="Skip navigation links"></a><a name="navbar_top_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../overview-summary.html">Overview</a></li>
+<li class="navBarCell1Rev">Package</li>
+<li>Class</li>
+<li><a href="package-use.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li>Prev Package</li>
+<li><a href="../../../../net/java/truevfs/access/swing/package-summary.html">Next Package</a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../index.html?net/java/truevfs/access/package-summary.html" target="_top">Frames</a></li>
+<li><a href="package-summary.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_top">
+<li><a href="../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<a name="skip-navbar_top">
+<!--   -->
+</a></div>
+<!-- ========= END OF TOP NAVBAR ========= -->
+<div class="header">
+<p><a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/Nonnull.html?is-external=true" title="class or interface in javax.annotation">@Nonnull</a>
+<a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/ParametersAreNonnullByDefault.html?is-external=true" title="class or interface in javax.annotation">@ParametersAreNonnullByDefault</a>
+</p>
+<h1 title="Package" class="title">Package&nbsp;net.java.truevfs.access</h1>
+<div class="docSummary">
+<div class="block">Provides uniform, transparent, thread-safe, read/write access to archive
+ files as if they were virtual directories.</div>
+</div>
+<p>See:&nbsp;<a href="#package_description">Description</a></p>
+</div>
+<div class="contentContainer">
+<ul class="blockList">
+<li class="blockList">
+<table class="packageSummary" border="0" cellpadding="3" cellspacing="0" summary="Interface Summary table, listing interfaces, and an explanation">
+<caption><span>Interface Summary</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Interface</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/TFileSystemProvider.Parameter.html" title="interface in net.java.truevfs.access">TFileSystemProvider.Parameter</a></td>
+<td class="colLast">
+<div class="block">Keys for environment maps.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/TRex.html" title="interface in net.java.truevfs.access">TRex</a></td>
+<td class="colLast">
+<div class="block">Defines common properties and operations of <a href="../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access"><code>TFile</code></a> and <a href="../../../../net/java/truevfs/access/TPath.html" title="class in net.java.truevfs.access"><code>TPath</code></a>.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="packageSummary" border="0" cellpadding="3" cellspacing="0" summary="Class Summary table, listing classes, and an explanation">
+<caption><span>Class Summary</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Class</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/TApplication.html" title="class in net.java.truevfs.access">TApplication</a>&lt;E extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Exception.html?is-external=true" title="class or interface in java.lang">Exception</a>&gt;</td>
+<td class="colLast">
+<div class="block">A template class which aids in establishing the typical
+ <i>setup-work-sync</i> life cycle of a TrueVFS application.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access">TArchiveDetector</a></td>
+<td class="colLast">
+<div class="block">Detects a <em>prospective</em> archive file and declares its file system
+ scheme by mapping its file name extension to an archive driver.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/TConfig.html" title="class in net.java.truevfs.access">TConfig</a></td>
+<td class="colLast">
+<div class="block">A mutable container for configuration options with global or inheritable
+ thread local scope.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a></td>
+<td class="colLast">
+<div class="block">A replacement for the class <a href="http://docs.oracle.com/javase/7/docs/api/java/io/File.html?is-external=true" title="class or interface in java.io"><code>File</code></a> which provides transparent
+ read/write access to archive files and their entries as if they were
+ (virtual) directories and files.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/TFileComparator.html" title="class in net.java.truevfs.access">TFileComparator</a></td>
+<td class="colLast">
+<div class="block">Compares two files by their status and path name so that directories
+ are always ordered <em>before</em> other files.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/TFileInputStream.html" title="class in net.java.truevfs.access">TFileInputStream</a></td>
+<td class="colLast">
+<div class="block">A replacement for the class <a href="http://docs.oracle.com/javase/7/docs/api/java/io/FileInputStream.html?is-external=true" title="class or interface in java.io"><code>FileInputStream</code></a> for reading plain old
+ files or entries in an archive file.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/TFileOutputStream.html" title="class in net.java.truevfs.access">TFileOutputStream</a></td>
+<td class="colLast">
+<div class="block">A replacement for the class <a href="http://docs.oracle.com/javase/7/docs/api/java/io/FileOutputStream.html?is-external=true" title="class or interface in java.io"><code>FileOutputStream</code></a> for writing plain old
+ files or entries in an archive file.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/TFileReader.html" title="class in net.java.truevfs.access">TFileReader</a></td>
+<td class="colLast">
+<div class="block">A replacement for the class <a href="http://docs.oracle.com/javase/7/docs/api/java/io/FileReader.html?is-external=true" title="class or interface in java.io"><code>FileReader</code></a> for reading plain old files
+ or entries in an archive file.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/TFileSystem.html" title="class in net.java.truevfs.access">TFileSystem</a></td>
+<td class="colLast">
+<div class="block">A <a href="http://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystem.html?is-external=true" title="class or interface in java.nio.file"><code>FileSystem</code></a> implementation for use with NIO.2.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/TFileSystemProvider.html" title="class in net.java.truevfs.access">TFileSystemProvider</a></td>
+<td class="colLast">
+<div class="block">A <a href="http://docs.oracle.com/javase/7/docs/api/java/nio/file/spi/FileSystemProvider.html?is-external=true" title="class or interface in java.nio.file.spi"><code>FileSystemProvider</code></a> implementation for use with NIO.2.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/TFileWriter.html" title="class in net.java.truevfs.access">TFileWriter</a></td>
+<td class="colLast">
+<div class="block">A replacement for the class <a href="http://docs.oracle.com/javase/7/docs/api/java/io/FileWriter.html?is-external=true" title="class or interface in java.io"><code>FileWriter</code></a> for writing plain old files
+ or entries in an archive file.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/TPath.html" title="class in net.java.truevfs.access">TPath</a></td>
+<td class="colLast">
+<div class="block">A <a href="http://docs.oracle.com/javase/7/docs/api/java/nio/file/Path.html?is-external=true" title="class or interface in java.nio.file"><code>Path</code></a> implementation for use with NIO.2.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/TVFS.html" title="class in net.java.truevfs.access">TVFS</a></td>
+<td class="colLast">
+<div class="block">Static utility methods for virtual file system operations with global scope.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="packageSummary" border="0" cellpadding="3" cellspacing="0" summary="Enum Summary table, listing enums, and an explanation">
+<caption><span>Enum Summary</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Enum</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/ExpertFeature.Level.html" title="enum in net.java.truevfs.access">ExpertFeature.Level</a></td>
+<td class="colLast">
+<div class="block">The experience level required to safely use an expert feature.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/ExpertFeature.Reason.html" title="enum in net.java.truevfs.access">ExpertFeature.Reason</a></td>
+<td class="colLast">
+<div class="block">The reason why a feature should only be used by an expert.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="packageSummary" border="0" cellpadding="3" cellspacing="0" summary="Annotation Types Summary table, listing annotation types, and an explanation">
+<caption><span>Annotation Types Summary</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Annotation Type</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../net/java/truevfs/access/ExpertFeature.html" title="annotation in net.java.truevfs.access">ExpertFeature</a></td>
+<td class="colLast">
+<div class="block">Indicates a feature which requires a certain experience level for safe use.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<a name="package_description">
+<!--   -->
+</a>
+<h2 title="Package net.java.truevfs.access Description">Package net.java.truevfs.access Description</h2>
+<div class="block">Provides uniform, transparent, thread-safe, read/write access to archive
+ files as if they were virtual directories.
+
+ <h3>The TFile* Classes</h3>
+ <p>
+ This is the primary API for JSE&nbsp;6 compliant TrueVFS applications:
+ Like the API of the module TrueVFS Access Path, this API is just a facade for
+ the module TrueVFS Kernel.
+ In contrast to the TrueVFS Access Path API however, this API is limited to access
+ the platform file system and any archive files within the platform file
+ system.
+ In contrast to the TrueVFS Kernel API, both APIs are designed to be easy to
+ learn and convenient to use while providing a great level of flexibility.
+ Because all virtual file system state is managed by the TrueVFS Kernel
+ module, this module can concurrently access the same file systems than the
+ TrueVFS Access Path module.
+ <p>
+ For example, an application could access an entry within an archive file
+ using a <code>TFile</code> like this:
+ <pre><code>
+ File entry = new TFile("archive.zip/dir/HälloWörld.txt");
+ Writer writer = new TFileWriter(entry);
+ try {
+     writer.write("Hello world!\n");
+ } finally {
+     writer.close();
+ }
+ </code></pre>
+ <p>
+ This example presumes that the JARs of the file system driver modules
+ TrueVFS Driver File and TrueVFS Driver TAR are present on the run time class
+ path.
+ <p>
+ Mind that a <code>TFile</code> is a <code>File</code>, so you can use it
+ polymorphically.
+ However, you cannot use it with a plain <code>File(In|Out)putStream</code> or a
+ plain <code>File(Reader|Writer)</code> to access prospective archive entries
+ because these classes were not designed for this task.
+ You have to use a <code>TFile(In|Out)putStream</code> or a
+ <code>TFile(Reader|Writer)</code> instead.
+
+ <h3>The TPath Class and its Companions</h3>
+ <p>
+ This is the primary API for JSE&nbsp;7 compliant TrueVFS applications:
+ Like the API of the module TrueVFS Access File*, this API is just a facade for the
+ module TrueVFS Kernel.
+ In contrast to the TrueVFS Access File* API however, this API can access any
+ (virtual) file system, not just the platform file system and any archive
+ files within the platform file system.
+ In contrast to the TrueVFS Kernel API, both APIs are designed to be easy to
+ learn and convenient to use while providing a great level of flexibility.
+ Because all virtual file system state is managed by the TrueVFS Kernel
+ module, this module can concurrently access the same file systems than the
+ TrueVFS Access File* module.
+ <p>
+ For example, an application could access an entry within an archive file
+ which is located at a web site using a <code>TPath</code> like this:
+ <pre><code>
+ Path path = new TPath(new URI("http://acme.com/download/everything.tar.gz/README.TXT"));
+ try (InputStream in = Files.newInputStream(path)) {
+     // Read archive entry contents here.
+     ...
+ }
+ </code></pre>
+ <p>
+ This example presumes that the JARs of the file system driver modules
+ TrueVFS Driver HTTP(S) and TrueVFS Driver TAR are present on the run time
+ class path.
+ <p>
+ Mind that a <code>TPath</code> is a <code>Path</code>, so you can use it
+ polymorphically with the NIO.2 API.
+
+ <h4><a name="fspsl">File System Provider Service Location</a></h4>
+ <p>
+ This package provides a JSE&nbsp;7 compliant
+ <a href="http://docs.oracle.com/javase/7/docs/api/java/nio/file/spi/FileSystemProvider.html?is-external=true" title="class or interface in java.nio.file.spi"><code>file system provider</code></a>
+ implementation in its class
+ <a href="../../../../net/java/truevfs/access/TFileSystemProvider.html" title="class in net.java.truevfs.access"><code>TFileSystemProvider</code></a>.
+ If the JAR of this package is present on the run time class path, an
+ application can transparently access archive files without a compile time
+ dependency on this API.
+ However, some constraints apply in this case because the NIO.2 API does not
+ support file system federation:
+ <ul>
+ <li>A <code>FileSystemProvider</code> instance is limited to support exactly only
+     one <a href="http://docs.oracle.com/javase/7/docs/api/java/nio/file/spi/FileSystemProvider.html?is-external=true#getScheme()" title="class or interface in java.nio.file.spi"><code>file system
+     provider scheme</code></a>.
+     So the installed TrueVFS file system provider
+     <a href="../../../../net/java/truevfs/access/TFileSystemProvider.html#TFileSystemProvider()">instance</a> limits
+     the access to the platform file system, which is identified by the
+     custom URI <a href="http://docs.oracle.com/javase/7/docs/api/java/net/URI.html?is-external=true#getScheme()" title="class or interface in java.net"><code>scheme</code></a> "<code>tpath</code>".
+ <li>The TrueVFS file system provider instance competes with the
+     <code>ZipFileSystemProvider</code> instance provided by JSE&nbsp;7.
+     So when
+     <a href="http://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystems.html?is-external=true#newFileSystem(java.nio.file.Path,%20java.lang.ClassLoader)" title="class or interface in java.nio.file">probing</a>
+     ZIP or JAR files, it's undefined which provider will be used - see below.
+ <li>When using <a href="http://docs.oracle.com/javase/7/docs/api/java/nio/file/Paths.html?is-external=true#get(java.lang.String,%20java.lang.String...)" title="class or interface in java.nio.file"><code>Paths.get(String, String[])</code></a>, the
+     returned <a href="http://docs.oracle.com/javase/7/docs/api/java/nio/file/Path.html?is-external=true" title="class or interface in java.nio.file"><code>Path</code></a> instance is always associated with
+     the default file system provider, which depends on the JVM platform.
+ <li>When using a <code>Path</code> object to resolve another <code>Path</code> object,
+     e.g. by calling <a href="http://docs.oracle.com/javase/7/docs/api/java/nio/file/Path.html?is-external=true#resolve(java.nio.file.Path)" title="class or interface in java.nio.file"><code>Path.resolve(Path)</code></a>, then the new
+     <code>Path</code> object is typically associated with the same
+     <code>FileSystemProvider</code> object.
+     So unless the original <code>Path</code> object was an instance of
+     <code>TPath</code>, when traversing a directory tree which contains a
+     prospective archive file, the new <code>Path</code> object will not be a
+     <code>TPath</code> instance, too, and so the application will most likely not
+     be able to access the archive file transparently as if it were just a
+     plain directory.
+ </ul>
+ <p>
+ So the only way how an application can use the TrueVFS file system
+ provider instance without a compile time dependency is to use
+ <a href="http://docs.oracle.com/javase/7/docs/api/java/nio/file/FileSystems.html?is-external=true#newFileSystem(java.nio.file.Path,%20java.lang.ClassLoader)" title="class or interface in java.nio.file"><code>FileSystems.newFileSystem(java.nio.file.Path, java.lang.ClassLoader)</code></a>.
+ However, this is unlikely to get used in most applications.
+
+ <h3><a name="ru">Recommended Usage</a></h3>
+ <p>
+ To overcome these <a href="#fspsl">constraints</a>, an application should
+ not rely on File System Provider Service Location and directly create
+ <a href="../../../../net/java/truevfs/access/TPath.html" title="class in net.java.truevfs.access"><code>TPath</code></a> instances instead by calling
+ one of the public class constructors.
+ Once created, it's safe to use <code>TPath</code> instances polymorphically as
+ <a href="http://docs.oracle.com/javase/7/docs/api/java/nio/file/Path.html?is-external=true" title="class or interface in java.nio.file"><code>Path</code></a> instances.
+
+ <h3>General Constraints</h3>
+ <p>
+ Currently, the NIO.2 API provides some features which are not supported by
+ the implementation of this package, e.g. a file system permissions or watch
+ services.
+ Consequently, if an unsupported method is called, an
+ <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/UnsupportedOperationException.html?is-external=true" title="class or interface in java.lang"><code>UnsupportedOperationException</code></a> gets thrown.
+
+ <!--h3><a name="comparison"/><code>TFileSystemProvider</code> versus
+ <code>ZipFileSystemProvider</code></h3>
+ <p>
+ The following table compares the available features for accessing ZIP or JAR
+ files with TrueVFS's <code>TFileSystemProvider</code> and
+ <code>ZipFileSystemProvider</code> in JSE&nbsp;7.
+ This comparison does not apply to any other archive file format because
+ these are the only archive file formats supported by the
+ <code>ZipFileSystemProvider</code> in JSE&nbsp;7.
+ <table>
+ <caption>Feature Comparison</caption>
+ <thead>
+ <tr>
+   <td>Feature</td>
+   <td><a href="../../../../net/java/truevfs/access/TFileSystemProvider.html" title="class in net.java.truevfs.access"><code>TFileSystemProvider</code></a></td>
+   <td><code>ZipFileSystemProvider</code></td>
+   </tr>
+ </thead>
+ <tbody>
+ <tr>
+   <td>Configurable character sets.</td>
+   <td>Yes</td>
+   <td>No</td>
+ </tr>
+ <tr>
+   <td>Default character set for creating ZIP files.</td>
+   <td><code>CP437 (UTF-8 configurable)</code></td>
+   <td><code>UTF-8</code></td>
+ </tr>
+ <tr>
+   <td>Character set when reading ZIP files.</td>
+   <td><code>CP437 or UTF-8 (file dependent)</code></td>
+   <td><code>CP437 or UTF-8 (file dependent)</code></td>
+ </tr>
+ </tbody>
+ </table--></div>
+<dl><dt><span class="strong">Author:</span></dt>
+  <dd>Christian Schlichtherle</dd></dl>
+</div>
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<div class="bottomNav"><a name="navbar_bottom">
+<!--   -->
+</a><a href="#skip-navbar_bottom" title="Skip navigation links"></a><a name="navbar_bottom_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../overview-summary.html">Overview</a></li>
+<li class="navBarCell1Rev">Package</li>
+<li>Class</li>
+<li><a href="package-use.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li>Prev Package</li>
+<li><a href="../../../../net/java/truevfs/access/swing/package-summary.html">Next Package</a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../index.html?net/java/truevfs/access/package-summary.html" target="_top">Frames</a></li>
+<li><a href="package-summary.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_bottom">
+<li><a href="../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_bottom");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<a name="skip-navbar_bottom">
+<!--   -->
+</a></div>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+<p class="legalCopy"><small>Copyright &#169; 2005&#x2013;2017 <a href="http://schlichtherle.de">Schlichtherle IT Services</a>. All rights reserved.</small></p>
+</body>
+</html>

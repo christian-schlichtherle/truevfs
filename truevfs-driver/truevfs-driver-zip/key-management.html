@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <link href="./css/prettify.css" type="text/css" rel="stylesheet"/>
+    <script src="./js/prettify.js" type="text/javascript"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>TrueVFS Driver ZIP &#x2013; Key Management</title>
+    <style type="text/css" media="all">
+      @import url("./css/site.css");
+    </style>
+    <link rel="stylesheet" href="./css/print.css" type="text/css" media="print"/>
+    <meta name="author" content="Christian Schlichtherle"/>
+    <meta name="Date-Revision-yyyymmdd" content="20170919"/>
+    <meta http-equiv="Content-Language" content="en"/>
+          <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-25500668-1']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+                  <script>
+        (function() {
+          var cx = '003580521944097984334:8uinm6tpaz4';
+          var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+          gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+              '//www.google.com/cse/cse.js?cx=' + cx;
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+        })();
+      </script>
+                                                          
+<link title="The TrueZIP Blog - Announcements Feed" rel="alternate" type="application/rss+xml" href="http://truevfs.schlichtherle.de/category/announcements/feed/"/>
+                      
+  </head>
+  <body class="composite" onload="prettyPrint()">
+    <div id="banner">
+                    <div id="bannerLeft">
+                TrueVFS Driver ZIP
+                </div>
+                                <div id="gcse-search-form" class="gcse-searchbox-only"></div>
+            <div class="clear"><hr/></div>
+    </div>
+    <div id="breadcrumbs">
+            
+                                  <div class="xleft">
+        <span id="projectVersion">Version: 0.12.0</span>
+                  |                         <a href="../../index.html" title="TrueVFS">TrueVFS</a>
+      &raquo;
+                        <a href="../" title="TrueVFS Driver">TrueVFS Driver</a>
+      &raquo;
+                            <a href="./" title="TrueVFS Driver ZIP">TrueVFS Driver ZIP</a>
+      &raquo;
+      TrueVFS Driver ZIP &#x2013; Key Management
+              </div>
+            <div class="xright">        
+                        </div>
+      <div class="clear"><hr/></div>
+    </div>
+    <div id="leftColumn">
+      <div id="navcolumn">
+              
+                                                   <h5>Documentation</h5>
+                  <ul>
+                  <li class="none">
+                          <a href="index.html" title="About">About</a>
+            </li>
+                  <li class="none">
+            <strong>Key Management</strong>
+          </li>
+          </ul>
+                       <h5>Parent Module</h5>
+                  <ul>
+                  <li class="none">
+                          <a href="../index.html" title="TrueVFS Driver">TrueVFS Driver</a>
+            </li>
+          </ul>
+                       <h5>Sub-Modules</h5>
+                                 <h5>Reports</h5>
+                  <ul>
+                                                                                                                                                                                                                                                                          <li class="collapsed">
+                          <a href="project-info.html" title="Project Information">Project Information</a>
+                  </li>
+                                                                                      <li class="collapsed">
+                          <a href="project-reports.html" title="Project Reports">Project Reports</a>
+                  </li>
+          </ul>
+                     
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+  <div class="paypalButton">
+    <input name="cmd" value="_s-xclick" type="hidden"/>
+    <input name="hosted_button_id" value="AGDEQWWKNZ6UL" type="hidden"/>
+    <input style="border: 0" alt="PayPal - The safer, easier way to pay online!" name="submit" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" type="image"/>
+  </div>
+</form>
+                                
+                              </div>
+    </div>
+    <div id="bodyColumn" class="content">
+      <div id="contentBox">
+                                      <div class="section">
+<h2><a name="Key_Management"></a>Key Management</h2>
+<div class="section">
+<h3><a name="Abstract"></a>Abstract</h3>
+<p>This article shows how to set passwords for WinZip AES encrypted ZIP entries programmatically. Use whatever approach fits your needs best when you want to set the password programmatically instead of prompting the user for a key by means of the default Swing or Console based user interfaces.</p></div>
+<div class="section">
+<h3><a name="Introduction"></a>Introduction</h3>
+<p>At runtime, all WinZip AES encrypted ZIP entries are managed by an instance of a sub-class of the abstract archive driver implementation class <a href="../../apidocs/net/java/truevfs/comp/zipdriver/ZipDriver.html"><tt>ZipDriver</tt></a>. For custom encrypted application file formats, this should be an instance of the class <a href="../../apidocs/net/java/truevfs/comp/zipdriver/JarDriver.html"><tt>JarDriver</tt></a></p>
+<p>Whenever this archive driver class reads or writes a WinZip AES encrypted ZIP entry, it uses an instance of the interface <a href="../../apidocs/net/java/truevfs/key/spec/KeyManagerContainer.html"><tt>KeyManagerContainer</tt></a> in order to obtain an instance of the interface <a href="../../apidocs/net/java/truevfs/key/spec/KeyManager.html"><tt>KeyManager</tt></a> for the interface <a href="../../apidocs/net/java/truevfs/key/spec/param/AesPbeParameters.html"><tt>AesPbeParameters</tt></a> and finally obtain an instance of the interface <a href="../../apidocs/net/java/truevfs/key/spec/KeyProvider.html"><tt>KeyProvider</tt></a> for the prospective archive file.</p>
+<p>Because dependency injection is used all over the place in order to resolve the implementation classes of the interfaces <tt>KeyManagerContainer</tt>, <tt>KeyManager</tt> and <tt>KeyProvider</tt>, this architecture provides several ways to set passwords programmatically. In order to set a common password for all WinZip AES encrypted ZIP entries you need a custom <a href="../../apidocs/net/java/truevfs/access/TArchiveDetector.html"><tt>TArchiveDetector</tt></a> which you can either inject into any <a href="../../apidocs/net/java/truevfs/access/TFile.html"><tt>TFile</tt></a> constructor or install as the default archive detector by calling</p>
+<div class="source">
+<pre>Error during retrieving content skip as ignoreDownloadError activated.</pre></div></div>
+<div class="section">
+<h3><a name="Setting_Passwords_For_All_WinZip_AES_Entries_By_Implementing_A_Custom_Driver"></a>Setting Passwords For All WinZip AES Entries By Implementing A Custom Driver</h3>
+<p>This option bypasses the key manager by subclassing <a href="../../apidocs/net/java/truevfs/comp/zipdriver/JarDriver.html"><tt>JarDriver</tt></a> and overriding the relevant methods for dealing with WinZip AES parameters.</p>
+<div class="source">
+<pre>Error during retrieving content skip as ignoreDownloadError activated.</pre></div></div>
+<div class="section">
+<h3><a name="Setting_Passwords_For_All_WinZip_AES_Entries_By_Implementing_A_Custom_View"></a>Setting Passwords For All WinZip AES Entries By Implementing A Custom View</h3>
+<p>Another option is to use a prompting key manager by instantiating the class <a href="../../apidocs/net/java/truevfs/key/spec/PromptingKeyManagerContainer.html"><tt>PromptingKeyManagerContainer</tt></a> which applies the Model-View-Controller pattern to manage its key providers. Here I simply substitute the default view class with a custom implementation.</p>
+<div class="source">
+<pre>Error during retrieving content skip as ignoreDownloadError activated.</pre></div></div></div>
+              </div>
+    </div>
+    <div class="clear"><hr/></div>
+    <div id="footer">
+      <div class="xright">
+              Copyright &#169;                    2005-2017
+                        <a href="http://schlichtherle.de">Schlichtherle IT Services</a>.
+            All Rights Reserved.      
+                                   <span id="publishDate">Last Published: 2017-09-19</span>
+                        </div>
+      <div class="clear"><hr/></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,586 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- NewPage -->
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>HttpNode (TrueVFS 0.12.0 API)</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<script type="text/javascript"><!--
+    if (location.href.indexOf('is-external=true') == -1) {
+        parent.document.title="HttpNode (TrueVFS 0.12.0 API)";
+    }
+//-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+<!-- ========= START OF TOP NAVBAR ======= -->
+<div class="topNav"><a name="navbar_top">
+<!--   -->
+</a><a href="#skip-navbar_top" title="Skip navigation links"></a><a name="navbar_top_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/HttpNode.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../../net/java/truevfs/driver/http/HttpInputSocket.html" title="class in net.java.truevfs.driver.http"><span class="strong">Prev Class</span></a></li>
+<li><a href="../../../../../net/java/truevfs/driver/http/HttpOutputSocket.html" title="class in net.java.truevfs.driver.http"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../index.html?net/java/truevfs/driver/http/HttpNode.html" target="_top">Frames</a></li>
+<li><a href="HttpNode.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_top">
+<li><a href="../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#field_summary">Field</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li><a href="#field_detail">Field</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_top">
+<!--   -->
+</a></div>
+<!-- ========= END OF TOP NAVBAR ========= -->
+<!-- ======== START OF CLASS DATA ======== -->
+<div class="header">
+<div class="subTitle">net.java.truevfs.driver.http</div>
+<h2 title="Class HttpNode" class="title">Class HttpNode</h2>
+</div>
+<div class="contentContainer">
+<ul class="inheritance">
+<li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">java.lang.Object</a></li>
+<li>
+<ul class="inheritance">
+<li>net.java.truecommons.shed.UniqueObject</li>
+<li>
+<ul class="inheritance">
+<li><a href="../../../../../net/java/truevfs/kernel/spec/FsAbstractNode.html" title="class in net.java.truevfs.kernel.spec">net.java.truevfs.kernel.spec.FsAbstractNode</a></li>
+<li>
+<ul class="inheritance">
+<li>net.java.truevfs.driver.http.HttpNode</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="description">
+<ul class="blockList">
+<li class="blockList">
+<dl>
+<dt>All Implemented Interfaces:</dt>
+<dd>net.java.truecommons.cio.Entry, net.java.truecommons.cio.IoEntry&lt;<a href="../../../../../net/java/truevfs/driver/http/HttpNode.html" title="class in net.java.truevfs.driver.http">HttpNode</a>&gt;, <a href="../../../../../net/java/truevfs/kernel/spec/FsNode.html" title="interface in net.java.truevfs.kernel.spec">FsNode</a></dd>
+</dl>
+<hr>
+<br>
+<pre><a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/concurrent.Immutable.html?is-external=true" title="class or interface in javax.annotation">@Immutable</a>
+public class <span class="strong">HttpNode</span>
+extends <a href="../../../../../net/java/truevfs/kernel/spec/FsAbstractNode.html" title="class in net.java.truevfs.kernel.spec">FsAbstractNode</a>
+implements net.java.truecommons.cio.IoEntry&lt;<a href="../../../../../net/java/truevfs/driver/http/HttpNode.html" title="class in net.java.truevfs.driver.http">HttpNode</a>&gt;</pre>
+<div class="block">An HTTP(S) entry.</div>
+<dl><dt><span class="strong">Author:</span></dt>
+  <dd>Christian Schlichtherle</dd></dl>
+</li>
+</ul>
+</div>
+<div class="summary">
+<ul class="blockList">
+<li class="blockList">
+<!-- ======== NESTED CLASS SUMMARY ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="nested_class_summary">
+<!--   -->
+</a>
+<h3>Nested Class Summary</h3>
+<ul class="blockList">
+<li class="blockList"><a name="nested_classes_inherited_from_class_net.java.truecommons.cio.Entry">
+<!--   -->
+</a>
+<h3>Nested classes/interfaces inherited from interface&nbsp;net.java.truecommons.cio.Entry</h3>
+<code>net.java.truecommons.cio.Entry.Access, net.java.truecommons.cio.Entry.Entity, net.java.truecommons.cio.Entry.PosixEntity, net.java.truecommons.cio.Entry.Size, net.java.truecommons.cio.Entry.Type</code></li>
+</ul>
+</li>
+</ul>
+<!-- =========== FIELD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field_summary">
+<!--   -->
+</a>
+<h3>Field Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Field Summary table, listing fields, and an explanation">
+<caption><span>Fields</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Field and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>protected <a href="http://docs.oracle.com/javase/7/docs/api/java/net/URI.html?is-external=true" title="class or interface in java.net">URI</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/driver/http/HttpNode.html#uri">uri</a></strong></code>&nbsp;</td>
+</tr>
+</table>
+<ul class="blockList">
+<li class="blockList"><a name="fields_inherited_from_class_net.java.truecommons.cio.Entry">
+<!--   -->
+</a>
+<h3>Fields inherited from interface&nbsp;net.java.truecommons.cio.Entry</h3>
+<code>ALL_ACCESS, ALL_POSIX_ACCESS, ALL_POSIX_ENTITIES, ALL_SIZES, ALL_TYPES, DIRECTORY_TYPE, FILE_TYPE, NO_ACCESS, NO_POSIX_ENTITIES, NO_SIZES, NO_TYPES, SPECIAL_TYPE, SYMLINK_TYPE, UNKNOWN</code></li>
+</ul>
+</li>
+</ul>
+<!-- ========== METHOD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_summary">
+<!--   -->
+</a>
+<h3>Method Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
+<caption><span>Methods</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Set.html?is-external=true" title="class or interface in java.util">Set</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/driver/http/HttpNode.html#getMembers()">getMembers</a></strong>()</code>
+<div class="block">Returns a set of strings with the base names of the members of this
+ directory node or <code>null</code> if and only if this is not a directory
+ node.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/driver/http/HttpNode.html#getName()">getName</a></strong>()</code>
+<div class="block">Returns a string representation of the
+ <a href="../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec"><code>file system node name</code></a>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>long</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/driver/http/HttpNode.html#getSize(net.java.truecommons.cio.Entry.Size)">getSize</a></strong>(net.java.truecommons.cio.Entry.Size&nbsp;type)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>long</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/driver/http/HttpNode.html#getTime(net.java.truecommons.cio.Entry.Access)">getTime</a></strong>(net.java.truecommons.cio.Entry.Access&nbsp;type)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>net.java.truecommons.shed.BitField&lt;net.java.truecommons.cio.Entry.Type&gt;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/driver/http/HttpNode.html#getTypes()">getTypes</a></strong>()</code>
+<div class="block">Returns a bit field of types implemented by this file system node.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>net.java.truecommons.cio.InputSocket&lt;<a href="../../../../../net/java/truevfs/driver/http/HttpNode.html" title="class in net.java.truevfs.driver.http">HttpNode</a>&gt;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/driver/http/HttpNode.html#input()">input</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>protected net.java.truecommons.cio.InputSocket&lt;<a href="../../../../../net/java/truevfs/driver/http/HttpNode.html" title="class in net.java.truevfs.driver.http">HttpNode</a>&gt;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/driver/http/HttpNode.html#input(net.java.truecommons.shed.BitField)">input</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/driver/http/HttpNode.html#isPermitted(net.java.truecommons.cio.Entry.Access,%20net.java.truecommons.cio.Entry.Entity)">isPermitted</a></strong>(net.java.truecommons.cio.Entry.Access&nbsp;type,
+           net.java.truecommons.cio.Entry.Entity&nbsp;entity)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/driver/http/HttpNode.html#isType(net.java.truecommons.cio.Entry.Type)">isType</a></strong>(net.java.truecommons.cio.Entry.Type&nbsp;type)</code>
+<div class="block">Returns <code>true</code> if and only if this file system node implements
+ the given type.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>protected org.apache.http.client.methods.HttpUriRequest</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/driver/http/HttpNode.html#newGet()">newGet</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>protected org.apache.http.client.methods.HttpUriRequest</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/driver/http/HttpNode.html#newHead()">newHead</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>protected <a href="http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html?is-external=true" title="class or interface in java.io">InputStream</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/driver/http/HttpNode.html#newInputStream()">newInputStream</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>protected <a href="http://docs.oracle.com/javase/7/docs/api/java/io/OutputStream.html?is-external=true" title="class or interface in java.io">OutputStream</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/driver/http/HttpNode.html#newOutputStream()">newOutputStream</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>net.java.truecommons.cio.OutputSocket&lt;<a href="../../../../../net/java/truevfs/driver/http/HttpNode.html" title="class in net.java.truevfs.driver.http">HttpNode</a>&gt;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/driver/http/HttpNode.html#output()">output</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>protected net.java.truecommons.cio.OutputSocket&lt;<a href="../../../../../net/java/truevfs/driver/http/HttpNode.html" title="class in net.java.truevfs.driver.http">HttpNode</a>&gt;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../net/java/truevfs/driver/http/HttpNode.html#output(net.java.truecommons.shed.BitField,%20net.java.truecommons.cio.Entry)">output</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+      net.java.truecommons.cio.Entry&nbsp;template)</code>&nbsp;</td>
+</tr>
+</table>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_net.java.truevfs.kernel.spec.FsAbstractNode">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;net.java.truevfs.kernel.spec.<a href="../../../../../net/java/truevfs/kernel/spec/FsAbstractNode.html" title="class in net.java.truevfs.kernel.spec">FsAbstractNode</a></h3>
+<code><a href="../../../../../net/java/truevfs/kernel/spec/FsAbstractNode.html#toString()">toString</a></code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_net.java.truecommons.shed.UniqueObject">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;net.java.truecommons.shed.UniqueObject</h3>
+<code>equals, hashCode</code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_java.lang.Object">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;java.lang.<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></h3>
+<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#clone()" title="class or interface in java.lang">clone</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#finalize()" title="class or interface in java.lang">finalize</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#getClass()" title="class or interface in java.lang">getClass</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notify()" title="class or interface in java.lang">notify</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notifyAll()" title="class or interface in java.lang">notifyAll</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait()" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long)" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long,%20int)" title="class or interface in java.lang">wait</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="details">
+<ul class="blockList">
+<li class="blockList">
+<!-- ============ FIELD DETAIL =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field_detail">
+<!--   -->
+</a>
+<h3>Field Detail</h3>
+<a name="uri">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>uri</h4>
+<pre>protected final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/net/URI.html?is-external=true" title="class or interface in java.net">URI</a> uri</pre>
+</li>
+</ul>
+</li>
+</ul>
+<!-- ============ METHOD DETAIL ========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_detail">
+<!--   -->
+</a>
+<h3>Method Detail</h3>
+<a name="getMembers()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getMembers</h4>
+<pre><a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/Nullable.html?is-external=true" title="class or interface in javax.annotation">@Nullable</a>
+public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Set.html?is-external=true" title="class or interface in java.util">Set</a>&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&gt;&nbsp;getMembers()</pre>
+<div class="block"><strong>Description copied from interface:&nbsp;<code><a href="../../../../../net/java/truevfs/kernel/spec/FsNode.html#getMembers()">FsNode</a></code></strong></div>
+<div class="block">Returns a set of strings with the base names of the members of this
+ directory node or <code>null</code> if and only if this is not a directory
+ node.
+ Whether or not modifying the returned set is supported and the effect
+ on the file system is implementation specific.</div>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/kernel/spec/FsNode.html#getMembers()">getMembers</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/java/truevfs/kernel/spec/FsNode.html" title="interface in net.java.truevfs.kernel.spec">FsNode</a></code></dd>
+<dt><span class="strong">Returns:</span></dt><dd>A set of strings with the base names of the members of this
+         directory node or <code>null</code> if and only if this is not a
+         directory node.</dd></dl>
+</li>
+</ul>
+<a name="getName()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getName</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;getName()</pre>
+<div class="block"><strong>Description copied from interface:&nbsp;<code><a href="../../../../../net/java/truevfs/kernel/spec/FsNode.html#getName()">FsNode</a></code></strong></div>
+<div class="block">Returns a string representation of the
+ <a href="../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec"><code>file system node name</code></a>.</div>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>getName</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.Entry</code></dd>
+<dt><strong>Specified by:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/kernel/spec/FsNode.html#getName()">getName</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/java/truevfs/kernel/spec/FsNode.html" title="interface in net.java.truevfs.kernel.spec">FsNode</a></code></dd>
+<dt><span class="strong">Returns:</span></dt><dd>A string representation of the
+         <a href="../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec"><code>file system node name</code></a>.</dd></dl>
+</li>
+</ul>
+<a name="getSize(net.java.truecommons.cio.Entry.Size)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getSize</h4>
+<pre>public&nbsp;long&nbsp;getSize(net.java.truecommons.cio.Entry.Size&nbsp;type)</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>getSize</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.Entry</code></dd>
+</dl>
+</li>
+</ul>
+<a name="getTime(net.java.truecommons.cio.Entry.Access)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getTime</h4>
+<pre>public&nbsp;long&nbsp;getTime(net.java.truecommons.cio.Entry.Access&nbsp;type)</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>getTime</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.Entry</code></dd>
+</dl>
+</li>
+</ul>
+<a name="getTypes()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getTypes</h4>
+<pre>public&nbsp;net.java.truecommons.shed.BitField&lt;net.java.truecommons.cio.Entry.Type&gt;&nbsp;getTypes()</pre>
+<div class="block"><strong>Description copied from interface:&nbsp;<code><a href="../../../../../net/java/truevfs/kernel/spec/FsNode.html#getTypes()">FsNode</a></code></strong></div>
+<div class="block">Returns a bit field of types implemented by this file system node.
+ <p>
+ Some file system types allow a node to implement multiple types.
+ For example, a ZIP or TAR file may contain an archive entry with the
+ name <code>foo</code> and a directory archive entry with the name <code>foo/</code>.
+ Yes, this is strange, but sh*t happens!
+ In this case then, a virtual file system should collapse this into one
+ file system node which returns <code>true</code> for both
+ <code>isType(FILE)</code> and <code>isType(DIRECTORY)</code>.</div>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/kernel/spec/FsNode.html#getTypes()">getTypes</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/java/truevfs/kernel/spec/FsNode.html" title="interface in net.java.truevfs.kernel.spec">FsNode</a></code></dd>
+<dt><span class="strong">Returns:</span></dt><dd>A bit field of types implemented by this file system node.</dd></dl>
+</li>
+</ul>
+<a name="input()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>input</h4>
+<pre>public final&nbsp;net.java.truecommons.cio.InputSocket&lt;<a href="../../../../../net/java/truevfs/driver/http/HttpNode.html" title="class in net.java.truevfs.driver.http">HttpNode</a>&gt;&nbsp;input()</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>input</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.IoEntry&lt;<a href="../../../../../net/java/truevfs/driver/http/HttpNode.html" title="class in net.java.truevfs.driver.http">HttpNode</a>&gt;</code></dd>
+</dl>
+</li>
+</ul>
+<a name="input(net.java.truecommons.shed.BitField)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>input</h4>
+<pre>protected&nbsp;net.java.truecommons.cio.InputSocket&lt;<a href="../../../../../net/java/truevfs/driver/http/HttpNode.html" title="class in net.java.truevfs.driver.http">HttpNode</a>&gt;&nbsp;input(net.java.truecommons.shed.BitField&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options)</pre>
+</li>
+</ul>
+<a name="isPermitted(net.java.truecommons.cio.Entry.Access, net.java.truecommons.cio.Entry.Entity)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isPermitted</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Boolean.html?is-external=true" title="class or interface in java.lang">Boolean</a>&nbsp;isPermitted(net.java.truecommons.cio.Entry.Access&nbsp;type,
+                  net.java.truecommons.cio.Entry.Entity&nbsp;entity)</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>isPermitted</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.Entry</code></dd>
+</dl>
+</li>
+</ul>
+<a name="isType(net.java.truecommons.cio.Entry.Type)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isType</h4>
+<pre>public&nbsp;boolean&nbsp;isType(net.java.truecommons.cio.Entry.Type&nbsp;type)</pre>
+<div class="block"><strong>Description copied from interface:&nbsp;<code><a href="../../../../../net/java/truevfs/kernel/spec/FsNode.html#isType(net.java.truecommons.cio.Entry.Type)">FsNode</a></code></strong></div>
+<div class="block">Returns <code>true</code> if and only if this file system node implements
+ the given type.</div>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/kernel/spec/FsNode.html#isType(net.java.truecommons.cio.Entry.Type)">isType</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/java/truevfs/kernel/spec/FsNode.html" title="interface in net.java.truevfs.kernel.spec">FsNode</a></code></dd>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="../../../../../net/java/truevfs/kernel/spec/FsAbstractNode.html#isType(net.java.truecommons.cio.Entry.Type)">isType</a></code>&nbsp;in class&nbsp;<code><a href="../../../../../net/java/truevfs/kernel/spec/FsAbstractNode.html" title="class in net.java.truevfs.kernel.spec">FsAbstractNode</a></code></dd>
+<dt><span class="strong">Parameters:</span></dt><dd><code>type</code> - the type to test.</dd>
+<dt><span class="strong">Returns:</span></dt><dd><code>true</code> if and only if this file system node implements
+         the given type.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../../net/java/truevfs/kernel/spec/FsNode.html#getTypes()"><code>FsNode.getTypes()</code></a></dd></dl>
+</li>
+</ul>
+<a name="newGet()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>newGet</h4>
+<pre>protected&nbsp;org.apache.http.client.methods.HttpUriRequest&nbsp;newGet()</pre>
+</li>
+</ul>
+<a name="newHead()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>newHead</h4>
+<pre>protected&nbsp;org.apache.http.client.methods.HttpUriRequest&nbsp;newHead()</pre>
+</li>
+</ul>
+<a name="newInputStream()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>newInputStream</h4>
+<pre>protected&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html?is-external=true" title="class or interface in java.io">InputStream</a>&nbsp;newInputStream()
+                              throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
+<dl><dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></code></dd></dl>
+</li>
+</ul>
+<a name="newOutputStream()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>newOutputStream</h4>
+<pre>protected&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/io/OutputStream.html?is-external=true" title="class or interface in java.io">OutputStream</a>&nbsp;newOutputStream()
+                                throws <a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></pre>
+<dl><dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html?is-external=true" title="class or interface in java.io">IOException</a></code></dd></dl>
+</li>
+</ul>
+<a name="output()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>output</h4>
+<pre>public final&nbsp;net.java.truecommons.cio.OutputSocket&lt;<a href="../../../../../net/java/truevfs/driver/http/HttpNode.html" title="class in net.java.truevfs.driver.http">HttpNode</a>&gt;&nbsp;output()</pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code>output</code>&nbsp;in interface&nbsp;<code>net.java.truecommons.cio.IoEntry&lt;<a href="../../../../../net/java/truevfs/driver/http/HttpNode.html" title="class in net.java.truevfs.driver.http">HttpNode</a>&gt;</code></dd>
+</dl>
+</li>
+</ul>
+<a name="output(net.java.truecommons.shed.BitField, net.java.truecommons.cio.Entry)">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>output</h4>
+<pre>protected&nbsp;net.java.truecommons.cio.OutputSocket&lt;<a href="../../../../../net/java/truevfs/driver/http/HttpNode.html" title="class in net.java.truevfs.driver.http">HttpNode</a>&gt;&nbsp;output(net.java.truecommons.shed.BitField&lt;<a href="../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+                                                     <a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/CheckForNull.html?is-external=true" title="class or interface in javax.annotation">@CheckForNull</a>
+                                                     net.java.truecommons.cio.Entry&nbsp;template)</pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<!-- ========= END OF CLASS DATA ========= -->
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<div class="bottomNav"><a name="navbar_bottom">
+<!--   -->
+</a><a href="#skip-navbar_bottom" title="Skip navigation links"></a><a name="navbar_bottom_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/HttpNode.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../../net/java/truevfs/driver/http/HttpInputSocket.html" title="class in net.java.truevfs.driver.http"><span class="strong">Prev Class</span></a></li>
+<li><a href="../../../../../net/java/truevfs/driver/http/HttpOutputSocket.html" title="class in net.java.truevfs.driver.http"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../index.html?net/java/truevfs/driver/http/HttpNode.html" target="_top">Frames</a></li>
+<li><a href="HttpNode.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_bottom">
+<li><a href="../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_bottom");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#field_summary">Field</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li><a href="#field_detail">Field</a>&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_bottom">
+<!--   -->
+</a></div>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+<p class="legalCopy"><small>Copyright &#169; 2005&#x2013;2017 <a href="http://schlichtherle.de">Schlichtherle IT Services</a>. All rights reserved.</small></p>
+</body>
+</html>

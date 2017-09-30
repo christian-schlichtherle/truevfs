@@ -1,0 +1,748 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- NewPage -->
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>TConfig (TrueVFS 0.12.0 API)</title>
+<link rel="stylesheet" type="text/css" href="../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<script type="text/javascript"><!--
+    if (location.href.indexOf('is-external=true') == -1) {
+        parent.document.title="TConfig (TrueVFS 0.12.0 API)";
+    }
+//-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+<!-- ========= START OF TOP NAVBAR ======= -->
+<div class="topNav"><a name="navbar_top">
+<!--   -->
+</a><a href="#skip-navbar_top" title="Skip navigation links"></a><a name="navbar_top_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/TConfig.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access"><span class="strong">Prev Class</span></a></li>
+<li><a href="../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../index.html?net/java/truevfs/access/TConfig.html" target="_top">Frames</a></li>
+<li><a href="TConfig.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_top">
+<li><a href="../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_top">
+<!--   -->
+</a></div>
+<!-- ========= END OF TOP NAVBAR ========= -->
+<!-- ======== START OF CLASS DATA ======== -->
+<div class="header">
+<div class="subTitle">net.java.truevfs.access</div>
+<h2 title="Class TConfig" class="title">Class TConfig</h2>
+</div>
+<div class="contentContainer">
+<ul class="inheritance">
+<li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">java.lang.Object</a></li>
+<li>
+<ul class="inheritance">
+<li>net.java.truecommons.shed.Resource&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/IllegalStateException.html?is-external=true" title="class or interface in java.lang">IllegalStateException</a>&gt;</li>
+<li>
+<ul class="inheritance">
+<li>net.java.truevfs.access.TConfig</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="description">
+<ul class="blockList">
+<li class="blockList">
+<dl>
+<dt>All Implemented Interfaces:</dt>
+<dd><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/AutoCloseable.html?is-external=true" title="class or interface in java.lang">AutoCloseable</a></dd>
+</dl>
+<hr>
+<br>
+<pre><a href="http://findbugs.sourceforge.net/api/edu/umd/cs/findbugs/annotations/CleanupObligation.html?is-external=true" title="class or interface in edu.umd.cs.findbugs.annotations">@CleanupObligation</a>
+public final class <span class="strong">TConfig</span>
+extends net.java.truecommons.shed.Resource&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/IllegalStateException.html?is-external=true" title="class or interface in java.lang">IllegalStateException</a>&gt;</pre>
+<div class="block">A mutable container for configuration options with global or inheritable
+ thread local scope.
+ <p>
+ At any time, a thread can call <a href="../../../../net/java/truevfs/access/TConfig.html#current()"><code>current()</code></a> to get access to the
+ mutable <i>current configuration</i>.
+ If no configuration has been pushed onto the inheritable thread local
+ configuration stack before, then this will return the
+ <i>global configuration</i> which is shared by all threads.
+ As an implication, accessing the global configuration may not be thread-safe.
+ <p>
+ To create an <i>inheritable thread local configuration</i>, a thread may
+ call <a href="../../../../net/java/truevfs/access/TConfig.html#open()"><code>open()</code></a>.
+ This will copy the <i>current configuration</i> (which may be the global
+ configuration) and push the copy on top of the inheritable thread
+ local configuration stack.
+ <p>
+ Later, the thread can use <a href="../../../../net/java/truevfs/access/TConfig.html#close()"><code>close()</code></a> to pop this configuration
+ off the top of the inheritable thread local configuration stack again.
+ <p>
+ Finally, whenever a child thread gets started, it will share the
+ <em>same</em> current configuration with its parent thread.
+ If the parent's inheritable thread local configuration stack is empty, then
+ the child will share the global configuration as its current configuration
+ with its parent.
+ Note that the child thread cannot <a href="../../../../net/java/truevfs/access/TConfig.html#close()"><code>close()</code></a> the inherited current
+ configuration - this would result in an <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/IllegalStateException.html?is-external=true" title="class or interface in java.lang"><code>IllegalStateException</code></a>.
+
+ <h3><a name="examples">Examples</a></h3>
+
+ <h4><a name="global">Changing The Global Configuration</a></h4>
+ <p>
+ If the thread local configuration stack is empty, i.e. no <a href="../../../../net/java/truevfs/access/TConfig.html#open()"><code>open()</code></a>
+ without a corresponding <a href="../../../../net/java/truevfs/access/TConfig.html#close()"><code>close()</code></a> has been called before, then the
+ <a href="../../../../net/java/truevfs/access/TConfig.html#current()"><code>current()</code></a> method will return the global configuration.
+ This feature is intended to get used during application setup to change some
+ configuration options with global scope like this:
+ <pre><code>class MyApplication extends TApplication&lt;IOException&gt; {
+
+ &amp;#64;Override
+     protected void setup() {
+         // This should obtain the global configuration.
+         TConfig config = TConfig.current();
+         // Configure custom application file format.
+         config.setArchiveDetector(new TArchiveDetector("aff", new JarDriver()));
+         // Set FsAccessOption.GROW for appending-to rather than reassembling
+         // existing archive files.
+         config.setAccessPreference(FsAccessOption.GROW, true);
+     }
+
+     ...
+ }
+ </code></pre>
+
+ <h4><a name="local">Setting The Archive Detector For The Current Thread</a></h4>
+ <p>
+ If an application needs to change the configuration for just the current
+ thread rather than changing the global configuration, then the
+ <a href="../../../../net/java/truevfs/access/TConfig.html#open()"><code>open()</code></a> method needs to get called like this:
+ <pre><code>TFile file1 = new TFile("file.aff");
+ assert !file1.isArchive();
+
+ // First, push a new current configuration onto the inheritable thread local
+ // stack.
+ try (TConfig config = TConfig.open()) {
+     // Configure custom application file format "aff".
+     config.setArchiveDetector(new TArchiveDetector("aff", new JarDriver()));
+
+     // Now use the current configuration.
+     TFile file2 = new TFile("file.aff");
+     assert file2.isArchive();
+     // Do some I/O here.
+     ...
+ }
+ </code></pre>
+
+ <h4><a name="appending">Appending To Archive Files For The Current Thread</a></h4>
+ <p>
+ By default, TrueVFS is configured to produce the smallest possible archive
+ files.
+ This is achieved by selecting the maximum compression ratio in the archive
+ drivers and by performing an archive update whenever an existing archive
+ entry is going to get overwritten with new contents or updated with new meta
+ data in order to avoid the writing of redundant data to the resulting
+ archive file.
+ An archive update is basically a copy operation where all archive entries
+ which haven't been written yet get copied from the input archive file to the
+ output archive file.
+ However, while this strategy produces the smallest possible archive files,
+ it may yield bad performance if the number and contents of the archive
+ entries to create or update are pretty small compared to the total size of
+ the resulting archive file.
+ <p>
+ Therefore, you can change this strategy by setting the
+ <a href="../../../../net/java/truevfs/kernel/spec/FsAccessOption.html#GROW"><code>FsAccessOption.GROW</code></a> output option preference when writing archive
+ entry contents or updating their meta data.
+ When set, this output option allows archive files to grow by appending new
+ or updated archive entries to their end and inhibiting archive update
+ operations.
+ You can set this preference in the global configuration as shown above or
+ you can set it on a case-by-case basis as follows:
+ <pre><code>// We are going to append "entry" to "archive.zip".
+ TFile file = new TFile("archive.zip/entry");
+
+ // First, push a new current configuration on the inheritable thread local
+ // stack.
+ try (TConfig config = TConfig.open()) {
+     // Set FsAccessOption.GROW for appending-to rather than reassembling
+     // existing archive files.
+     config.setAccessPreference(FsAccessOption.GROW, true);
+
+     // Now use the current configuration and append the entry to the archive
+     // file even if it's already present.
+     try (TFileOutputStream out = new TFileOutputStream(file)) {
+         // Do some output here.
+         ...
+     }
+ }
+ </code></pre>
+ <p>
+ Note that it's specific to the archive file system driver if this output
+ option preference is supported or not.
+ If it's not supported, then it gets silently ignored, thereby falling back
+ to the default strategy of performing a full archive update whenever
+ required to avoid writing redundant archive entry data.
+ <p>
+ As of TrueVFS 0.11, the support is like this:
+ <ul>
+ <li>The drivers of the module TrueVFS Driver JAR fully support this output
+     option preference, so it's available for EAR, JAR, WAR files.</li>
+ <li>The drivers of the module TrueVFS Driver ZIP fully support this output
+     option preference, so it's available for ZIP files.</li>
+ <li>The drivers of the module TrueVFS Driver ZIP.RAES only allow redundant
+     archive entry contents and meta data.
+     You cannot append to an existing ZIP.RAES file, however.</li>
+ <li>The drivers of the module TrueVFS Driver TAR only allow redundant
+     archive entry contents.
+     You cannot append to an existing TAR file, however.</li>
+ </ul>
+
+ <h4><a name="unit-testing">Unit Testing</a></h4>
+ <p>
+ Using the thread local inheritable configuration stack comes in handy when
+ unit testing, e.g. with JUnit. Consider this pattern:
+ <pre><code>public class AppTest {
+
+     private TConfig config;
+
+     &amp;#64;Before
+     public void setUp() {
+         config = TConfig.open();
+         // Let's just recognize ZIP files.
+         config.setArchiveDetector(new TArchiveDetector("zip"));
+     }
+
+     &amp;#64;After
+     public void shutDown() {
+         config.close();
+     }
+
+     &amp;#64;Test
+     public void testMethod() {
+         // Test accessing some ZIP files here.
+         ...
+     }
+ }
+ </code></pre>
+ <p>
+ <b>Disclaimer</b>: Although this class internally uses an
+ <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/InheritableThreadLocal.html?is-external=true" title="class or interface in java.lang"><code>InheritableThreadLocal</code></a>, it does not leak memory in multi class
+ loader environments when used appropriately.</div>
+<dl><dt><span class="strong">Author:</span></dt>
+  <dd>Christian Schlichtherle</dd></dl>
+</li>
+</ul>
+</div>
+<div class="summary">
+<ul class="blockList">
+<li class="blockList">
+<!-- ========== METHOD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_summary">
+<!--   -->
+</a>
+<h3>Method Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
+<caption><span>Methods</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TConfig.html#close()">close</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static <a href="../../../../net/java/truevfs/access/TConfig.html" title="class in net.java.truevfs.access">TConfig</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TConfig.html#current()">current</a></strong>()</code>
+<div class="block">Returns the current configuration.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TConfig.html#equals(java.lang.Object)">equals</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;other)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TConfig.html#getAccessPreference(net.java.truevfs.kernel.spec.FsAccessOption)">getAccessPreference</a></strong>(<a href="../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&nbsp;option)</code>
+<div class="block">Returns <code>true</code> if and only if the given access option is set in
+ the access preferences.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>net.java.truecommons.shed.BitField&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;</code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TConfig.html#getAccessPreferences()">getAccessPreferences</a></strong>()</code>
+<div class="block">Returns the access preferences to apply for file system operations.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access">TArchiveDetector</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TConfig.html#getArchiveDetector()">getArchiveDetector</a></strong>()</code>
+<div class="block">Returns the <a href="../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access"><code>TArchiveDetector</code></a> to use for scanning path names for
+ prospective archive files.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>int</code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TConfig.html#hashCode()">hashCode</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TConfig.html#isLenient()">isLenient</a></strong>()</code>
+<div class="block">Returns the value of the property <code>lenient</code>, which is <code>true</code>
+ if and only if the access preference <a href="../../../../net/java/truevfs/kernel/spec/FsAccessOption.html#CREATE_PARENTS"><code>FsAccessOption.CREATE_PARENTS</code></a>
+ is set in the <a href="../../../../net/java/truevfs/access/TConfig.html#getAccessPreferences()">access preferences</a>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>protected void</code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TConfig.html#onBeforeClose()">onBeforeClose</a></strong>()</code>
+<div class="block">Pops this configuration off the inheritable thread local configuration
+ stack.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static <a href="../../../../net/java/truevfs/access/TConfig.html" title="class in net.java.truevfs.access">TConfig</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TConfig.html#open()">open</a></strong>()</code>
+<div class="block">Creates a new current configuration by copying the current configuration
+ and pushing the copy onto the inheritable thread local configuration
+ stack.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TConfig.html#setAccessPreference(net.java.truevfs.kernel.spec.FsAccessOption,%20boolean)">setAccessPreference</a></strong>(<a href="../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&nbsp;option,
+                   boolean&nbsp;set)</code>
+<div class="block">Sets or clears the given access option in the access preferences.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TConfig.html#setAccessPreferences(net.java.truecommons.shed.BitField)">setAccessPreferences</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;preferences)</code>
+<div class="block">Sets the access preferences to apply for file system operations.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TConfig.html#setArchiveDetector(net.java.truevfs.access.TArchiveDetector)">setArchiveDetector</a></strong>(<a href="../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access">TArchiveDetector</a>&nbsp;detector)</code>
+<div class="block">Sets the default <a href="../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access"><code>TArchiveDetector</code></a> to use for scanning path
+ names for prospective archive files.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TConfig.html#setLenient(boolean)">setLenient</a></strong>(boolean&nbsp;lenient)</code>
+<div class="block">Sets the value of the property <code>lenient</code>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TConfig.html#toString()">toString</a></strong>()</code>&nbsp;</td>
+</tr>
+</table>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_net.java.truecommons.shed.Resource">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;net.java.truecommons.shed.Resource</h3>
+<code>isOpen, onAfterClose</code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_java.lang.Object">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;java.lang.<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></h3>
+<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#clone()" title="class or interface in java.lang">clone</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#finalize()" title="class or interface in java.lang">finalize</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#getClass()" title="class or interface in java.lang">getClass</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notify()" title="class or interface in java.lang">notify</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notifyAll()" title="class or interface in java.lang">notifyAll</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait()" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long)" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long,%20int)" title="class or interface in java.lang">wait</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="details">
+<ul class="blockList">
+<li class="blockList">
+<!-- ============ METHOD DETAIL ========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_detail">
+<!--   -->
+</a>
+<h3>Method Detail</h3>
+<a name="close()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>close</h4>
+<pre><a href="http://findbugs.sourceforge.net/api/edu/umd/cs/findbugs/annotations/DischargesObligation.html?is-external=true" title="class or interface in edu.umd.cs.findbugs.annotations">@DischargesObligation</a>
+public&nbsp;void&nbsp;close()
+           throws <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/IllegalStateException.html?is-external=true" title="class or interface in java.lang">IllegalStateException</a></pre>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/AutoCloseable.html?is-external=true#close()" title="class or interface in java.lang">close</a></code>&nbsp;in interface&nbsp;<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/AutoCloseable.html?is-external=true" title="class or interface in java.lang">AutoCloseable</a></code></dd>
+<dt><strong>Overrides:</strong></dt>
+<dd><code>close</code>&nbsp;in class&nbsp;<code>net.java.truecommons.shed.Resource&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/IllegalStateException.html?is-external=true" title="class or interface in java.lang">IllegalStateException</a>&gt;</code></dd>
+<dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/IllegalStateException.html?is-external=true" title="class or interface in java.lang">IllegalStateException</a></code></dd></dl>
+</li>
+</ul>
+<a name="current()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>current</h4>
+<pre>public static&nbsp;<a href="../../../../net/java/truevfs/access/TConfig.html" title="class in net.java.truevfs.access">TConfig</a>&nbsp;current()</pre>
+<div class="block">Returns the current configuration.
+ First, this method peeks the inheritable thread local configuration
+ stack.
+ If no configuration has been <a href="../../../../net/java/truevfs/access/TConfig.html#open()"><code>open()</code></a>ed yet, the global
+ configuration gets returned.
+ Note that accessing the global configuration is not thread-safe!</div>
+<dl><dt><span class="strong">Returns:</span></dt><dd>The current configuration.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../net/java/truevfs/access/TConfig.html#open()"><code>open()</code></a></dd></dl>
+</li>
+</ul>
+<a name="equals(java.lang.Object)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>equals</h4>
+<pre>public&nbsp;boolean&nbsp;equals(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;other)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#equals(java.lang.Object)" title="class or interface in java.lang">equals</a></code>&nbsp;in class&nbsp;<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="getAccessPreference(net.java.truevfs.kernel.spec.FsAccessOption)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getAccessPreference</h4>
+<pre>public&nbsp;boolean&nbsp;getAccessPreference(<a href="../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&nbsp;option)</pre>
+<div class="block">Returns <code>true</code> if and only if the given access option is set in
+ the access preferences.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>option</code> - the access option to test.</dd>
+<dt><span class="strong">Returns:</span></dt><dd><code>true</code> if and only if the given access option is set in
+         the access preferences.</dd></dl>
+</li>
+</ul>
+<a name="getAccessPreferences()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getAccessPreferences</h4>
+<pre>public&nbsp;net.java.truecommons.shed.BitField&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;getAccessPreferences()</pre>
+<div class="block">Returns the access preferences to apply for file system operations.</div>
+<dl><dt><span class="strong">Returns:</span></dt><dd>The access preferences to apply for file system operations.</dd></dl>
+</li>
+</ul>
+<a name="getArchiveDetector()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getArchiveDetector</h4>
+<pre>public&nbsp;<a href="../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access">TArchiveDetector</a>&nbsp;getArchiveDetector()</pre>
+<div class="block">Returns the <a href="../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access"><code>TArchiveDetector</code></a> to use for scanning path names for
+ prospective archive files.</div>
+<dl><dt><span class="strong">Returns:</span></dt><dd>The <a href="../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access"><code>TArchiveDetector</code></a> to use for scanning path names for
+         prospective archive files.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../net/java/truevfs/access/TConfig.html#getArchiveDetector()"><code>getArchiveDetector()</code></a></dd></dl>
+</li>
+</ul>
+<a name="hashCode()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>hashCode</h4>
+<pre>public&nbsp;int&nbsp;hashCode()</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#hashCode()" title="class or interface in java.lang">hashCode</a></code>&nbsp;in class&nbsp;<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="isLenient()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>isLenient</h4>
+<pre>public&nbsp;boolean&nbsp;isLenient()</pre>
+<div class="block">Returns the value of the property <code>lenient</code>, which is <code>true</code>
+ if and only if the access preference <a href="../../../../net/java/truevfs/kernel/spec/FsAccessOption.html#CREATE_PARENTS"><code>FsAccessOption.CREATE_PARENTS</code></a>
+ is set in the <a href="../../../../net/java/truevfs/access/TConfig.html#getAccessPreferences()">access preferences</a>.
+ This property controls whether archive files and their member
+ directories get automatically created whenever required.
+ <p>
+ Consider the following path: <code>a/outer.zip/b/inner.zip/c</code>.
+ Now let's assume that <code>a</code> exists as a plain directory in the
+ platform file system, while all other segments of this path don't, and
+ that the module TrueVFS Driver ZIP is present on the run-time class path
+ in order to enable the detection of <code>outer.zip</code> and
+ <code>inner.zip</code> as prospective ZIP files.
+ <p>
+ Now, if this property is set to <code>false</code>, then a client application
+ needs to call <code>new TFile("a/outer.zip/b/inner.zip").mkdirs()</code>
+ before it can actually create the innermost entry <code>c</code> as a file
+ or directory.
+ More formally, before an application can access an entry in an archive
+ file system, all its parent directories need to exist, including archive
+ files.
+ <p>
+ This emulates the behaviour of the platform file system.
+ <p>
+ If this property is set to <code>true</code> however, then any missing
+ parent directories (including archive files) up to the outermost archive
+ file <code>outer.zip</code> get automatically created when using operations
+ to create the innermost entry <code>c</code>.
+ This enables applications to succeed with doing this:
+ <code>new TFile("a/outer.zip/b/inner.zip/c").createNewFile()</code>,
+ or that:
+ <code>new TFileOutputStream("a/outer.zip/b/inner.zip/c")</code>.
+ <p>
+ A most desirable side effect of <i>being lenient</i> is that it will
+ safe space in the target archive file.
+ This is because the directory entry <code>b</code> in this exaple does not
+ need to get output because there is no meta data associated with it.
+ This is called a <em>ghost directory</em>.
+ <p>
+ Note that in either case the parent directory of the outermost archive
+ file <code>a</code> must exist - TrueVFS does not automatically create
+ directories in the platform file system!</div>
+<dl><dt><span class="strong">Returns:</span></dt><dd>The value of the property <code>lenient</code>, which is <code>true</code>
+         if and only if the access preference
+         <a href="../../../../net/java/truevfs/kernel/spec/FsAccessOption.html#CREATE_PARENTS"><code>FsAccessOption.CREATE_PARENTS</code></a> is set in the
+         <a href="../../../../net/java/truevfs/access/TConfig.html#getAccessPreferences()">access accessPreferences</a>.</dd></dl>
+</li>
+</ul>
+<a name="onBeforeClose()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>onBeforeClose</h4>
+<pre>protected&nbsp;void&nbsp;onBeforeClose()
+                      throws <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/IllegalStateException.html?is-external=true" title="class or interface in java.lang">IllegalStateException</a></pre>
+<div class="block">Pops this configuration off the inheritable thread local configuration
+ stack.</div>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code>onBeforeClose</code>&nbsp;in class&nbsp;<code>net.java.truecommons.shed.Resource&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/IllegalStateException.html?is-external=true" title="class or interface in java.lang">IllegalStateException</a>&gt;</code></dd>
+<dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/IllegalStateException.html?is-external=true" title="class or interface in java.lang">IllegalStateException</a></code> - If this configuration is not the
+         <a href="../../../../net/java/truevfs/access/TConfig.html#current()">current configuration</a>.</dd></dl>
+</li>
+</ul>
+<a name="open()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>open</h4>
+<pre><a href="http://findbugs.sourceforge.net/api/edu/umd/cs/findbugs/annotations/CreatesObligation.html?is-external=true" title="class or interface in edu.umd.cs.findbugs.annotations">@CreatesObligation</a>
+public static&nbsp;<a href="../../../../net/java/truevfs/access/TConfig.html" title="class in net.java.truevfs.access">TConfig</a>&nbsp;open()</pre>
+<div class="block">Creates a new current configuration by copying the current configuration
+ and pushing the copy onto the inheritable thread local configuration
+ stack.</div>
+<dl><dt><span class="strong">Returns:</span></dt><dd>The new current configuration.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../net/java/truevfs/access/TConfig.html#current()"><code>current()</code></a></dd></dl>
+</li>
+</ul>
+<a name="setAccessPreference(net.java.truevfs.kernel.spec.FsAccessOption, boolean)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setAccessPreference</h4>
+<pre>public&nbsp;void&nbsp;setAccessPreference(<a href="../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&nbsp;option,
+                       boolean&nbsp;set)</pre>
+<div class="block">Sets or clears the given access option in the access preferences.
+ Changing this property will show effect upon the next access to the
+ virtual file system.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>option</code> - the access option to set or clear.</dd><dd><code>set</code> - <code>true</code> if you want the option to be set or
+        <code>false</code> if you want it to be cleared.</dd></dl>
+</li>
+</ul>
+<a name="setAccessPreferences(net.java.truecommons.shed.BitField)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setAccessPreferences</h4>
+<pre>public&nbsp;void&nbsp;setAccessPreferences(net.java.truecommons.shed.BitField&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;preferences)</pre>
+<div class="block">Sets the access preferences to apply for file system operations.
+ Changing this property will show effect upon the next access to the
+ virtual file system.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>preferences</code> - the access preferences.</dd>
+<dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/IllegalArgumentException.html?is-external=true" title="class or interface in java.lang">IllegalArgumentException</a></code> - if an option is present in
+         <code>accessPreferences</code> which is not present in
+         <a href="../../../../net/java/truevfs/kernel/spec/FsAccessOptions.html#ACCESS_PREFERENCES_MASK"><code>FsAccessOptions.ACCESS_PREFERENCES_MASK</code></a> or if both
+         <a href="../../../../net/java/truevfs/kernel/spec/FsAccessOption.html#STORE"><code>FsAccessOption.STORE</code></a> and
+         <a href="../../../../net/java/truevfs/kernel/spec/FsAccessOption.html#COMPRESS"><code>FsAccessOption.COMPRESS</code></a> have been set.</dd></dl>
+</li>
+</ul>
+<a name="setArchiveDetector(net.java.truevfs.access.TArchiveDetector)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setArchiveDetector</h4>
+<pre>public&nbsp;void&nbsp;setArchiveDetector(<a href="../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access">TArchiveDetector</a>&nbsp;detector)</pre>
+<div class="block">Sets the default <a href="../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access"><code>TArchiveDetector</code></a> to use for scanning path
+ names for prospective archive files.
+ Changing this property will show effect when a new <a href="../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access"><code>TFile</code></a> or
+ <a href="../../../../net/java/truevfs/access/TPath.html" title="class in net.java.truevfs.access"><code>TPath</code></a> gets created.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>detector</code> - the default <a href="../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access"><code>TArchiveDetector</code></a> to use for
+        scanning path names for prospective archive files.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../net/java/truevfs/access/TConfig.html#getArchiveDetector()"><code>getArchiveDetector()</code></a></dd></dl>
+</li>
+</ul>
+<a name="setLenient(boolean)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>setLenient</h4>
+<pre>public&nbsp;void&nbsp;setLenient(boolean&nbsp;lenient)</pre>
+<div class="block">Sets the value of the property <code>lenient</code>.
+ Changing this property will show effect upon the next access to the
+ virtual file system.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>lenient</code> - the value of the property <code>lenient</code>.</dd></dl>
+</li>
+</ul>
+<a name="toString()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>toString</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;toString()</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#toString()" title="class or interface in java.lang">toString</a></code>&nbsp;in class&nbsp;<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<!-- ========= END OF CLASS DATA ========= -->
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<div class="bottomNav"><a name="navbar_bottom">
+<!--   -->
+</a><a href="#skip-navbar_bottom" title="Skip navigation links"></a><a name="navbar_bottom_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/TConfig.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access"><span class="strong">Prev Class</span></a></li>
+<li><a href="../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../index.html?net/java/truevfs/access/TConfig.html" target="_top">Frames</a></li>
+<li><a href="TConfig.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_bottom">
+<li><a href="../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_bottom");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
+<li>Constr&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_bottom">
+<!--   -->
+</a></div>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+<p class="legalCopy"><small>Copyright &#169; 2005&#x2013;2017 <a href="http://schlichtherle.de">Schlichtherle IT Services</a>. All rights reserved.</small></p>
+</body>
+</html>

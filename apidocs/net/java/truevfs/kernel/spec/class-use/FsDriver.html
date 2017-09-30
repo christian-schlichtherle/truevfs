@@ -1,0 +1,995 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- NewPage -->
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Uses of Class net.java.truevfs.kernel.spec.FsDriver (TrueVFS 0.12.0 API)</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<script type="text/javascript"><!--
+    if (location.href.indexOf('is-external=true') == -1) {
+        parent.document.title="Uses of Class net.java.truevfs.kernel.spec.FsDriver (TrueVFS 0.12.0 API)";
+    }
+//-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+<!-- ========= START OF TOP NAVBAR ======= -->
+<div class="topNav"><a name="navbar_top">
+<!--   -->
+</a><a href="#skip-navbar_top" title="Skip navigation links"></a><a name="navbar_top_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../../overview-summary.html">Overview</a></li>
+<li><a href="../package-summary.html">Package</a></li>
+<li><a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">Class</a></li>
+<li class="navBarCell1Rev">Use</li>
+<li><a href="../package-tree.html">Tree</a></li>
+<li><a href="../../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li>Prev</li>
+<li>Next</li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../../index.html?net/java/truevfs/kernel/spec/class-use/FsDriver.html" target="_top">Frames</a></li>
+<li><a href="FsDriver.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_top">
+<li><a href="../../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<a name="skip-navbar_top">
+<!--   -->
+</a></div>
+<!-- ========= END OF TOP NAVBAR ========= -->
+<div class="header">
+<h2 title="Uses of Class net.java.truevfs.kernel.spec.FsDriver" class="title">Uses of Class<br>net.java.truevfs.kernel.spec.FsDriver</h2>
+</div>
+<div class="classUseContainer">
+<ul class="blockList">
+<li class="blockList">
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing packages, and an explanation">
+<caption><span>Packages that use <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Package</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a href="#net.java.truevfs.access">net.java.truevfs.access</a></td>
+<td class="colLast">
+<div class="block">Provides uniform, transparent, thread-safe, read/write access to archive
+ files as if they were virtual directories.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="#net.java.truevfs.comp.tardriver">net.java.truevfs.comp.tardriver</a></td>
+<td class="colLast">
+<div class="block">The archive driver family for TAR files.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="#net.java.truevfs.comp.zipdriver">net.java.truevfs.comp.zipdriver</a></td>
+<td class="colLast">
+<div class="block">The archive driver family for ZIP files.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="#net.java.truevfs.driver.file">net.java.truevfs.driver.file</a></td>
+<td class="colLast">
+<div class="block">Provides a file system driver for accessing the platform file system.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="#net.java.truevfs.driver.http">net.java.truevfs.driver.http</a></td>
+<td class="colLast">
+<div class="block">Provides a file system driver for read-only access to the web.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="#net.java.truevfs.driver.jar">net.java.truevfs.driver.jar</a></td>
+<td class="colLast">
+<div class="block">Provides a file system driver for accessing the JAR file format.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="#net.java.truevfs.driver.odf">net.java.truevfs.driver.odf</a></td>
+<td class="colLast">
+<div class="block">Provides a file system driver for accessing the Open Document File format.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="#net.java.truevfs.driver.sfx">net.java.truevfs.driver.sfx</a></td>
+<td class="colLast">
+<div class="block">Provides a file system driver for read-only access to the SelF eXtracting
+ ZIP file format, alias SFX.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="#net.java.truevfs.driver.tar">net.java.truevfs.driver.tar</a></td>
+<td class="colLast">
+<div class="block">Provides a file system driver for accessing the TAR file format.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="#net.java.truevfs.driver.tar.bzip2">net.java.truevfs.driver.tar.bzip2</a></td>
+<td class="colLast">
+<div class="block">Provides a file system driver for accessing the BZIP2 compressed TAR file
+ format.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="#net.java.truevfs.driver.tar.gzip">net.java.truevfs.driver.tar.gzip</a></td>
+<td class="colLast">
+<div class="block">Provides a file system driver for accessing the GZIP compressed TAR file
+ format.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="#net.java.truevfs.driver.tar.xz">net.java.truevfs.driver.tar.xz</a></td>
+<td class="colLast">
+<div class="block">Provides a file system driver for accessing the XZ compressed TAR file
+ format.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="#net.java.truevfs.driver.zip">net.java.truevfs.driver.zip</a></td>
+<td class="colLast">
+<div class="block">Provides a file system driver for accessing the ZIP file format.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="#net.java.truevfs.driver.zip.raes">net.java.truevfs.driver.zip.raes</a></td>
+<td class="colLast">
+<div class="block">Provides a file system driver for accessing the RAES encrypted ZIP file
+ format, alias ZIP.RAES or TZP.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="#net.java.truevfs.kernel.spec">net.java.truevfs.kernel.spec</a></td>
+<td class="colLast">
+<div class="block">Defines the API for accessing the (federated virtual) file system space.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="#net.java.truevfs.kernel.spec.sl">net.java.truevfs.kernel.spec.sl</a></td>
+<td class="colLast">
+<div class="block">Provides singletons to locate service providers on the class path.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="#net.java.truevfs.kernel.spec.spi">net.java.truevfs.kernel.spec.spi</a></td>
+<td class="colLast">
+<div class="block">Provides abstract classes for locatable service providers.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<ul class="blockList">
+<li class="blockList"><a name="net.java.truevfs.access">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/access/package-summary.html">net.java.truevfs.access</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/access/package-summary.html">net.java.truevfs.access</a> that return types with arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">TArchiveDetector.</span><code><strong><a href="../../../../../../net/java/truevfs/access/TArchiveDetector.html#get()">get</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">TArchiveDetector.</span><code><strong><a href="../../../../../../net/java/truevfs/access/TArchiveDetector.html#getDrivers()">getDrivers</a></strong>()</code>
+<div class="block">Returns the immutable map of file system drivers.</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing constructors, and an explanation">
+<caption><span>Constructors in <a href="../../../../../../net/java/truevfs/access/package-summary.html">net.java.truevfs.access</a> with parameters of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colOne" scope="col">Constructor and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(javax.inject.Provider,%20java.lang.String,%20net.java.truevfs.kernel.spec.FsDriver)">TArchiveDetector</a></strong>(javax.inject.Provider&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&gt;&nbsp;provider,
+                <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;extensions,
+                <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&nbsp;driver)</code>
+<div class="block">Constructs a new <code>TArchiveDetector</code> by
+ decorating the configuration of <code>provider</code> with
+ mappings for all canonicalized extensions in <code>extensions</code> to
+ <code>driver</code>.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(java.lang.String,%20net.java.truevfs.kernel.spec.FsDriver)">TArchiveDetector</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;extensions,
+                <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&nbsp;driver)</code>
+<div class="block">Equivalent to
+ <a href="../../../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(javax.inject.Provider,%20java.lang.String,%20net.java.truevfs.kernel.spec.FsDriver)"><code>TArchiveDetector(TArchiveDetector.NULL, extensions, driver)</code></a>.</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing constructors, and an explanation">
+<caption><span>Constructor parameters in <a href="../../../../../../net/java/truevfs/access/package-summary.html">net.java.truevfs.access</a> with type arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colOne" scope="col">Constructor and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(javax.inject.Provider,%20java.util.Map)">TArchiveDetector</a></strong>(javax.inject.Provider&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&gt;&nbsp;provider,
+                <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;config)</code>
+<div class="block">Constructs a new <code>TArchiveDetector</code> by decorating the given driver
+ provider with mappings for all entries in <code>config</code>.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(javax.inject.Provider,%20java.util.Map)">TArchiveDetector</a></strong>(javax.inject.Provider&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&gt;&nbsp;provider,
+                <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;config)</code>
+<div class="block">Constructs a new <code>TArchiveDetector</code> by decorating the given driver
+ provider with mappings for all entries in <code>config</code>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(javax.inject.Provider,%20java.lang.Object[][])">TArchiveDetector</a></strong>(javax.inject.Provider&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&gt;&nbsp;provider,
+                <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>[][]&nbsp;config)</code>
+<div class="block">Creates a new <code>TArchiveDetector</code> by
+ decorating the configuration of <code>provider</code> with
+ mappings for all entries in <code>config</code>.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(javax.inject.Provider,%20java.lang.String)">TArchiveDetector</a></strong>(javax.inject.Provider&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&gt;&nbsp;provider,
+                <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;extensions)</code>
+<div class="block">Constructs a new <code>TArchiveDetector</code> by filtering the given driver
+ provider for all canonicalized extensions in the <code>extensions</code> list.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(javax.inject.Provider,%20java.lang.String,%20net.java.truevfs.kernel.spec.FsDriver)">TArchiveDetector</a></strong>(javax.inject.Provider&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&gt;&nbsp;provider,
+                <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;extensions,
+                <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&nbsp;driver)</code>
+<div class="block">Constructs a new <code>TArchiveDetector</code> by
+ decorating the configuration of <code>provider</code> with
+ mappings for all canonicalized extensions in <code>extensions</code> to
+ <code>driver</code>.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.comp.tardriver">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/comp/tardriver/package-summary.html">net.java.truevfs.comp.tardriver</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing subclasses, and an explanation">
+<caption><span>Subclasses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/comp/tardriver/package-summary.html">net.java.truevfs.comp.tardriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Class and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/comp/tardriver/TarDriver.html" title="class in net.java.truevfs.comp.tardriver">TarDriver</a></strong></code>
+<div class="block">An archive driver for Tape Archive files (TAR).</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.comp.zipdriver">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/comp/zipdriver/package-summary.html">net.java.truevfs.comp.zipdriver</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing subclasses, and an explanation">
+<caption><span>Subclasses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/comp/zipdriver/package-summary.html">net.java.truevfs.comp.zipdriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Class and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriver.html" title="class in net.java.truevfs.comp.zipdriver">AbstractZipDriver</a>&lt;E extends <a href="../../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">AbstractZipDriverEntry</a>&gt;</strong></code>
+<div class="block">An abstract archive driver for the ZIP file format.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/comp/zipdriver/CheckedJarDriver.html" title="class in net.java.truevfs.comp.zipdriver">CheckedJarDriver</a></strong></code>
+<div class="block">An archive driver for JAR files which checks the CRC32 value for all ZIP
+ entries in input archives.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/comp/zipdriver/CheckedZipDriver.html" title="class in net.java.truevfs.comp.zipdriver">CheckedZipDriver</a></strong></code>
+<div class="block">An archive driver for ZIP files which checks the CRC32 values for all
+ ZIP entries in input archives.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/comp/zipdriver/JarDriver.html" title="class in net.java.truevfs.comp.zipdriver">JarDriver</a></strong></code>
+<div class="block">An archive driver for Java Archive files (JAR).</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/comp/zipdriver/ZipDriver.html" title="class in net.java.truevfs.comp.zipdriver">ZipDriver</a></strong></code>
+<div class="block">An archive driver for ZIP files.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.driver.file">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/file/package-summary.html">net.java.truevfs.driver.file</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing subclasses, and an explanation">
+<caption><span>Subclasses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/file/package-summary.html">net.java.truevfs.driver.file</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Class and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/driver/file/FileDriver.html" title="class in net.java.truevfs.driver.file">FileDriver</a></strong></code>
+<div class="block">A file system driver for the FILE scheme.</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/file/package-summary.html">net.java.truevfs.driver.file</a> that return types with arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">FileDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/file/FileDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Method parameters in <a href="../../../../../../net/java/truevfs/driver/file/package-summary.html">net.java.truevfs.driver.file</a> with type arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">FileDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/file/FileDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.driver.http">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/http/package-summary.html">net.java.truevfs.driver.http</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing subclasses, and an explanation">
+<caption><span>Subclasses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/http/package-summary.html">net.java.truevfs.driver.http</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Class and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/driver/http/HttpDriver.html" title="class in net.java.truevfs.driver.http">HttpDriver</a></strong></code>
+<div class="block">A file system driver for the HTTP(S) schemes.</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/http/package-summary.html">net.java.truevfs.driver.http</a> that return types with arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">HttpDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/http/HttpDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Method parameters in <a href="../../../../../../net/java/truevfs/driver/http/package-summary.html">net.java.truevfs.driver.http</a> with type arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">HttpDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/http/HttpDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.driver.jar">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/jar/package-summary.html">net.java.truevfs.driver.jar</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/jar/package-summary.html">net.java.truevfs.driver.jar</a> that return types with arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">JarDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/jar/JarDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Method parameters in <a href="../../../../../../net/java/truevfs/driver/jar/package-summary.html">net.java.truevfs.driver.jar</a> with type arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">JarDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/jar/JarDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.driver.odf">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/odf/package-summary.html">net.java.truevfs.driver.odf</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing subclasses, and an explanation">
+<caption><span>Subclasses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/odf/package-summary.html">net.java.truevfs.driver.odf</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Class and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/driver/odf/CheckedOdfDriver.html" title="class in net.java.truevfs.driver.odf">CheckedOdfDriver</a></strong></code>
+<div class="block">An archive driver for ODF files which checks the CRC32 value for all ZIP
+ entries in input archives.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/driver/odf/OdfDriver.html" title="class in net.java.truevfs.driver.odf">OdfDriver</a></strong></code>
+<div class="block">An archive driver for application archive files according to the Open
+ Document Format (ODF) Specification, V1.0 and later.</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/odf/package-summary.html">net.java.truevfs.driver.odf</a> that return types with arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">OdfDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/odf/OdfDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Method parameters in <a href="../../../../../../net/java/truevfs/driver/odf/package-summary.html">net.java.truevfs.driver.odf</a> with type arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">OdfDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/odf/OdfDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.driver.sfx">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/sfx/package-summary.html">net.java.truevfs.driver.sfx</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing subclasses, and an explanation">
+<caption><span>Subclasses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/sfx/package-summary.html">net.java.truevfs.driver.sfx</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Class and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/driver/sfx/CheckedReadOnlySfxDriver.html" title="class in net.java.truevfs.driver.sfx">CheckedReadOnlySfxDriver</a></strong></code>
+<div class="block">An archive driver for SFX/EXE files which checks the CRC32 value for all
+ ZIP entries in input archives.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/driver/sfx/ReadOnlySfxDriver.html" title="class in net.java.truevfs.driver.sfx">ReadOnlySfxDriver</a></strong></code>
+<div class="block">An archive driver which reads Self Executable (SFX/EXE) ZIP files,
+ but doesn't support to create or update them because this would spoil the
+ SFX code in its preamble.</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/sfx/package-summary.html">net.java.truevfs.driver.sfx</a> that return types with arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">SfxDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/sfx/SfxDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Method parameters in <a href="../../../../../../net/java/truevfs/driver/sfx/package-summary.html">net.java.truevfs.driver.sfx</a> with type arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">SfxDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/sfx/SfxDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.driver.tar">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/tar/package-summary.html">net.java.truevfs.driver.tar</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/tar/package-summary.html">net.java.truevfs.driver.tar</a> that return types with arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">TarDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/tar/TarDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Method parameters in <a href="../../../../../../net/java/truevfs/driver/tar/package-summary.html">net.java.truevfs.driver.tar</a> with type arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">TarDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/tar/TarDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.driver.tar.bzip2">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/tar/bzip2/package-summary.html">net.java.truevfs.driver.tar.bzip2</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing subclasses, and an explanation">
+<caption><span>Subclasses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/tar/bzip2/package-summary.html">net.java.truevfs.driver.tar.bzip2</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Class and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/driver/tar/bzip2/TarBZip2Driver.html" title="class in net.java.truevfs.driver.tar.bzip2">TarBZip2Driver</a></strong></code>
+<div class="block">An archive driver for BZIP2 compressed TAR files (TAR.BZIP2).</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/tar/bzip2/package-summary.html">net.java.truevfs.driver.tar.bzip2</a> that return types with arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">TarBZip2DriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/tar/bzip2/TarBZip2DriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Method parameters in <a href="../../../../../../net/java/truevfs/driver/tar/bzip2/package-summary.html">net.java.truevfs.driver.tar.bzip2</a> with type arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">TarBZip2DriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/tar/bzip2/TarBZip2DriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.driver.tar.gzip">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/tar/gzip/package-summary.html">net.java.truevfs.driver.tar.gzip</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing subclasses, and an explanation">
+<caption><span>Subclasses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/tar/gzip/package-summary.html">net.java.truevfs.driver.tar.gzip</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Class and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/driver/tar/gzip/TarGZipDriver.html" title="class in net.java.truevfs.driver.tar.gzip">TarGZipDriver</a></strong></code>
+<div class="block">An archive driver for GZIP compressed TAR files (TAR.GZIP).</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/tar/gzip/package-summary.html">net.java.truevfs.driver.tar.gzip</a> that return types with arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">TarGZipDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/tar/gzip/TarGZipDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Method parameters in <a href="../../../../../../net/java/truevfs/driver/tar/gzip/package-summary.html">net.java.truevfs.driver.tar.gzip</a> with type arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">TarGZipDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/tar/gzip/TarGZipDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.driver.tar.xz">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/tar/xz/package-summary.html">net.java.truevfs.driver.tar.xz</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing subclasses, and an explanation">
+<caption><span>Subclasses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/tar/xz/package-summary.html">net.java.truevfs.driver.tar.xz</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Class and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/driver/tar/xz/TarXZDriver.html" title="class in net.java.truevfs.driver.tar.xz">TarXZDriver</a></strong></code>
+<div class="block">An archive driver for XZ compressed TAR files (TAR.XZ).</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/tar/xz/package-summary.html">net.java.truevfs.driver.tar.xz</a> that return types with arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">TarXZDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/tar/xz/TarXZDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Method parameters in <a href="../../../../../../net/java/truevfs/driver/tar/xz/package-summary.html">net.java.truevfs.driver.tar.xz</a> with type arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">TarXZDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/tar/xz/TarXZDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.driver.zip">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/zip/package-summary.html">net.java.truevfs.driver.zip</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/zip/package-summary.html">net.java.truevfs.driver.zip</a> that return types with arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">ZipDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/ZipDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Method parameters in <a href="../../../../../../net/java/truevfs/driver/zip/package-summary.html">net.java.truevfs.driver.zip</a> with type arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">ZipDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/ZipDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.driver.zip.raes">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/zip/raes/package-summary.html">net.java.truevfs.driver.zip.raes</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing subclasses, and an explanation">
+<caption><span>Subclasses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/driver/zip/raes/package-summary.html">net.java.truevfs.driver.zip.raes</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Class and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/raes/ParanoidZipRaesDriver.html" title="class in net.java.truevfs.driver.zip.raes">ParanoidZipRaesDriver</a></strong></code>
+<div class="block">A paranoid archive driver for RAES encrypted ZIP files.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/raes/SafeZipRaesDriver.html" title="class in net.java.truevfs.driver.zip.raes">SafeZipRaesDriver</a></strong></code>
+<div class="block">A safe archive driver for RAES encrypted ZIP files (ZIP.RAES).</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/raes/ZipRaesDriver.html" title="class in net.java.truevfs.driver.zip.raes">ZipRaesDriver</a></strong></code>
+<div class="block">An abstract archive driver for RAES encrypted ZIP files which optionally
+ authenticates the cipher data of the input archive files presented to it.</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/driver/zip/raes/package-summary.html">net.java.truevfs.driver.zip.raes</a> that return types with arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">ZipRaesDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/raes/ZipRaesDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Method parameters in <a href="../../../../../../net/java/truevfs/driver/zip/raes/package-summary.html">net.java.truevfs.driver.zip.raes</a> with type arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">ZipRaesDriverMapModifier.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/raes/ZipRaesDriverMapModifier.html#apply(java.util.Map)">apply</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;map)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.kernel.spec">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/kernel/spec/package-summary.html">net.java.truevfs.kernel.spec</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing subclasses, and an explanation">
+<caption><span>Subclasses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/kernel/spec/package-summary.html">net.java.truevfs.kernel.spec</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Class and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code>class&nbsp;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="class in net.java.truevfs.kernel.spec">FsArchiveDriver</a>&lt;E extends <a href="../../../../../../net/java/truevfs/kernel/spec/FsArchiveEntry.html" title="interface in net.java.truevfs.kernel.spec">FsArchiveEntry</a>&gt;</strong></code>
+<div class="block">An abstract factory for components required for accessing archive files.</div>
+</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/kernel/spec/package-summary.html">net.java.truevfs.kernel.spec</a> that return types with arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">FsSimpleCompositeDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsSimpleCompositeDriver.html#get()">get</a></strong>()</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/kernel/spec/package-summary.html">net.java.truevfs.kernel.spec</a> with parameters of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a></code></td>
+<td class="colLast"><span class="strong">FsDecoratingManager.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsDecoratingManager.html#newModel(net.java.truevfs.kernel.spec.FsDriver,%20net.java.truevfs.kernel.spec.FsMountPoint,%20net.java.truevfs.kernel.spec.FsModel)">newModel</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&nbsp;context,
+        <a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a>&nbsp;mountPoint,
+        <a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;parent)</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing constructors, and an explanation">
+<caption><span>Constructor parameters in <a href="../../../../../../net/java/truevfs/kernel/spec/package-summary.html">net.java.truevfs.kernel.spec</a> with type arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colOne" scope="col">Constructor and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsSimpleCompositeDriver.html#FsSimpleCompositeDriver(net.java.truecommons.services.Container)">FsSimpleCompositeDriver</a></strong>(net.java.truecommons.services.Container&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&gt;&nbsp;container)</code>
+<div class="block">Constructs a new simple meta driver which will query the given
+ <code>provider</code> for an appropriate file system driver for the scheme
+ of a given mount point.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.kernel.spec.sl">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/kernel/spec/sl/package-summary.html">net.java.truevfs.kernel.spec.sl</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/kernel/spec/sl/package-summary.html">net.java.truevfs.kernel.spec.sl</a> that return types with arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">FsDriverMapLocator.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/sl/FsDriverMapLocator.html#get()">get</a></strong>()</code>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList"><a name="net.java.truevfs.kernel.spec.spi">
+<!--   -->
+</a>
+<h3>Uses of <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a> in <a href="../../../../../../net/java/truevfs/kernel/spec/spi/package-summary.html">net.java.truevfs.kernel.spec.spi</a></h3>
+<table border="0" cellpadding="3" cellspacing="0" summary="Use table, listing methods, and an explanation">
+<caption><span>Methods in <a href="../../../../../../net/java/truevfs/kernel/spec/spi/package-summary.html">net.java.truevfs.kernel.spec.spi</a> that return types with arguments of type <a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a></span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><span class="strong">FsDriverMapFactory.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/spi/FsDriverMapFactory.html#get()">get</a></strong>()</code>
+<div class="block">Returns a new empty map for subsequent modification.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<div class="bottomNav"><a name="navbar_bottom">
+<!--   -->
+</a><a href="#skip-navbar_bottom" title="Skip navigation links"></a><a name="navbar_bottom_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../../overview-summary.html">Overview</a></li>
+<li><a href="../package-summary.html">Package</a></li>
+<li><a href="../../../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">Class</a></li>
+<li class="navBarCell1Rev">Use</li>
+<li><a href="../package-tree.html">Tree</a></li>
+<li><a href="../../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li>Prev</li>
+<li>Next</li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../../index.html?net/java/truevfs/kernel/spec/class-use/FsDriver.html" target="_top">Frames</a></li>
+<li><a href="FsDriver.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_bottom">
+<li><a href="../../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_bottom");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<a name="skip-navbar_bottom">
+<!--   -->
+</a></div>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+<p class="legalCopy"><small>Copyright &#169; 2005&#x2013;2017 <a href="http://schlichtherle.de">Schlichtherle IT Services</a>. All rights reserved.</small></p>
+</body>
+</html>

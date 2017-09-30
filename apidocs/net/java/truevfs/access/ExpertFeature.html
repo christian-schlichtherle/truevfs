@@ -1,0 +1,276 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- NewPage -->
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>ExpertFeature (TrueVFS 0.12.0 API)</title>
+<link rel="stylesheet" type="text/css" href="../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<script type="text/javascript"><!--
+    if (location.href.indexOf('is-external=true') == -1) {
+        parent.document.title="ExpertFeature (TrueVFS 0.12.0 API)";
+    }
+//-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+<!-- ========= START OF TOP NAVBAR ======= -->
+<div class="topNav"><a name="navbar_top">
+<!--   -->
+</a><a href="#skip-navbar_top" title="Skip navigation links"></a><a name="navbar_top_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/ExpertFeature.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li>Prev Class</li>
+<li><a href="../../../../net/java/truevfs/access/ExpertFeature.Level.html" title="enum in net.java.truevfs.access"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../index.html?net/java/truevfs/access/ExpertFeature.html" target="_top">Frames</a></li>
+<li><a href="ExpertFeature.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_top">
+<li><a href="../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li><a href="#annotation_type_required_element_summary">Required</a>&nbsp;|&nbsp;</li>
+<li><a href="#annotation_type_optional_element_summary">Optional</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li><a href="#annotation_type_element_detail">Element</a></li>
+</ul>
+</div>
+<a name="skip-navbar_top">
+<!--   -->
+</a></div>
+<!-- ========= END OF TOP NAVBAR ========= -->
+<!-- ======== START OF CLASS DATA ======== -->
+<div class="header">
+<div class="subTitle">net.java.truevfs.access</div>
+<h2 title="Annotation Type ExpertFeature" class="title">Annotation Type ExpertFeature</h2>
+</div>
+<div class="contentContainer">
+<div class="description">
+<ul class="blockList">
+<li class="blockList">
+<hr>
+<br>
+<pre><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Documented.html?is-external=true" title="class or interface in java.lang.annotation">@Documented</a>
+<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Inherited.html?is-external=true" title="class or interface in java.lang.annotation">@Inherited</a>
+<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Target.html?is-external=true" title="class or interface in java.lang.annotation">@Target</a>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/Target.html?is-external=true#value()" title="class or interface in java.lang.annotation">value</a>={<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/ElementType.html?is-external=true#CONSTRUCTOR" title="class or interface in java.lang.annotation">CONSTRUCTOR</a>,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/annotation/ElementType.html?is-external=true#METHOD" title="class or interface in java.lang.annotation">METHOD</a>})
+public @interface <span class="strong">ExpertFeature</span></pre>
+<div class="block">Indicates a feature which requires a certain experience level for safe use.
+ In most cases, using an expert feature is a code smell and you should
+ refactor your code to avoid it in order to stay safe.
+ However, some valid use cases exist for an expert feature
+ (otherwise it should have been <code>@Deprecated</code>).
+ These use cases are not explained here because a true expert will know them!
+ <p>
+ As of TrueVFS 0.10, using an expert feature is not checked.
+ However, future versions of TrueVFS might include tools to issue a warning
+ whenever an expert feature is unintentionally used - similar to the way
+ <code>javac</code> treats the <code>@Deprecated</code> annotation.</div>
+<dl><dt><span class="strong">Since:</span></dt>
+  <dd>TrueVFS 0.10</dd>
+<dt><span class="strong">Author:</span></dt>
+  <dd>Christian Schlichtherle</dd></dl>
+</li>
+</ul>
+</div>
+<div class="summary">
+<ul class="blockList">
+<li class="blockList">
+<!-- =========== ANNOTATION TYPE REQUIRED MEMBER SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="annotation_type_required_element_summary">
+<!--   -->
+</a>
+<h3>Required Element Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Required Element Summary table, listing required elements, and an explanation">
+<caption><span>Required Elements</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Required Element and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="../../../../net/java/truevfs/access/ExpertFeature.Reason.html" title="enum in net.java.truevfs.access">ExpertFeature.Reason</a>[]</code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/ExpertFeature.html#value()">value</a></strong></code>
+<div class="block">Returns the reasons why this feature should only be used by an expert.</div>
+</td>
+</tr>
+</table>
+</li>
+</ul>
+<!-- =========== ANNOTATION TYPE OPTIONAL MEMBER SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="annotation_type_optional_element_summary">
+<!--   -->
+</a>
+<h3>Optional Element Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Optional Element Summary table, listing optional elements, and an explanation">
+<caption><span>Optional Elements</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Optional Element and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="../../../../net/java/truevfs/access/ExpertFeature.Level.html" title="enum in net.java.truevfs.access">ExpertFeature.Level</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/ExpertFeature.html#level()">level</a></strong></code>
+<div class="block">Returns the experience level required to safely use this feature.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/ExpertFeature.html#warning()">warning</a></strong></code>
+<div class="block">Returns a warning message for future use, for example in static code
+ analysis.</div>
+</td>
+</tr>
+</table>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="details">
+<ul class="blockList">
+<li class="blockList">
+<!-- ============ ANNOTATION TYPE MEMBER DETAIL =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="annotation_type_element_detail">
+<!--   -->
+</a>
+<h3>Element Detail</h3>
+<a name="value()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>value</h4>
+<pre>public abstract&nbsp;<a href="../../../../net/java/truevfs/access/ExpertFeature.Reason.html" title="enum in net.java.truevfs.access">ExpertFeature.Reason</a>[]&nbsp;value</pre>
+<div class="block">Returns the reasons why this feature should only be used by an expert.</div>
+</li>
+</ul>
+<a name="level()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>level</h4>
+<pre>public abstract&nbsp;<a href="../../../../net/java/truevfs/access/ExpertFeature.Level.html" title="enum in net.java.truevfs.access">ExpertFeature.Level</a>&nbsp;level</pre>
+<div class="block">Returns the experience level required to safely use this feature.</div>
+<dl>
+<dt>Default:</dt>
+<dd>net.java.truevfs.access.ExpertFeature.Level.MASTER</dd>
+</dl>
+</li>
+</ul>
+<a name="warning()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>warning</h4>
+<pre>public abstract&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;warning</pre>
+<div class="block">Returns a warning message for future use, for example in static code
+ analysis.</div>
+<dl>
+<dt>Default:</dt>
+<dd>"Using this %s requires %s experience because %s!"</dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<!-- ========= END OF CLASS DATA ========= -->
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<div class="bottomNav"><a name="navbar_bottom">
+<!--   -->
+</a><a href="#skip-navbar_bottom" title="Skip navigation links"></a><a name="navbar_bottom_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/ExpertFeature.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li>Prev Class</li>
+<li><a href="../../../../net/java/truevfs/access/ExpertFeature.Level.html" title="enum in net.java.truevfs.access"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../index.html?net/java/truevfs/access/ExpertFeature.html" target="_top">Frames</a></li>
+<li><a href="ExpertFeature.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_bottom">
+<li><a href="../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_bottom");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li><a href="#annotation_type_required_element_summary">Required</a>&nbsp;|&nbsp;</li>
+<li><a href="#annotation_type_optional_element_summary">Optional</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li><a href="#annotation_type_element_detail">Element</a></li>
+</ul>
+</div>
+<a name="skip-navbar_bottom">
+<!--   -->
+</a></div>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+<p class="legalCopy"><small>Copyright &#169; 2005&#x2013;2017 <a href="http://schlichtherle.de">Schlichtherle IT Services</a>. All rights reserved.</small></p>
+</body>
+</html>

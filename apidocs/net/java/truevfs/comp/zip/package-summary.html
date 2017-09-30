@@ -1,0 +1,363 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- NewPage -->
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>net.java.truevfs.comp.zip (TrueVFS 0.12.0 API)</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<script type="text/javascript"><!--
+    if (location.href.indexOf('is-external=true') == -1) {
+        parent.document.title="net.java.truevfs.comp.zip (TrueVFS 0.12.0 API)";
+    }
+//-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+<!-- ========= START OF TOP NAVBAR ======= -->
+<div class="topNav"><a name="navbar_top">
+<!--   -->
+</a><a href="#skip-navbar_top" title="Skip navigation links"></a><a name="navbar_top_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li class="navBarCell1Rev">Package</li>
+<li>Class</li>
+<li><a href="package-use.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../../net/java/truevfs/comp/tardriver/package-summary.html">Prev Package</a></li>
+<li><a href="../../../../../net/java/truevfs/comp/zip/crypto/package-summary.html">Next Package</a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../index.html?net/java/truevfs/comp/zip/package-summary.html" target="_top">Frames</a></li>
+<li><a href="package-summary.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_top">
+<li><a href="../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<a name="skip-navbar_top">
+<!--   -->
+</a></div>
+<!-- ========= END OF TOP NAVBAR ========= -->
+<div class="header">
+<p><a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/Nonnull.html?is-external=true" title="class or interface in javax.annotation">@Nonnull</a>
+<a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/ParametersAreNonnullByDefault.html?is-external=true" title="class or interface in javax.annotation">@ParametersAreNonnullByDefault</a>
+</p>
+<h1 title="Package" class="title">Package&nbsp;net.java.truevfs.comp.zip</h1>
+<div class="docSummary">
+<div class="block">Provides classes for reading and writing ZIP files.</div>
+</div>
+<p>See:&nbsp;<a href="#package_description">Description</a></p>
+</div>
+<div class="contentContainer">
+<ul class="blockList">
+<li class="blockList">
+<table class="packageSummary" border="0" cellpadding="3" cellspacing="0" summary="Interface Summary table, listing interfaces, and an explanation">
+<caption><span>Interface Summary</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Interface</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/WinZipAesParameters.html" title="interface in net.java.truevfs.comp.zip">WinZipAesParameters</a></td>
+<td class="colLast">
+<div class="block">The parameters of this interface are used with WinZip AES encrypted entries.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/ZipCharsetParameters.html" title="interface in net.java.truevfs.comp.zip">ZipCharsetParameters</a></td>
+<td class="colLast">
+<div class="block">Defines the default character set for accessing ZIP files.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/ZipCryptoParameters.html" title="interface in net.java.truevfs.comp.zip">ZipCryptoParameters</a></td>
+<td class="colLast">
+<div class="block">A marker interface for ZIP crypto parameters.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/ZipEntryFactory.html" title="interface in net.java.truevfs.comp.zip">ZipEntryFactory</a>&lt;E extends <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a>&gt;</td>
+<td class="colLast">
+<div class="block">A factory for <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip"><code>ZipEntry</code></a>s.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/ZipFileParameters.html" title="interface in net.java.truevfs.comp.zip">ZipFileParameters</a>&lt;E extends <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a>&gt;</td>
+<td class="colLast">
+<div class="block">Provides parameters for reading ZIP files.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/ZipOutputStreamParameters.html" title="interface in net.java.truevfs.comp.zip">ZipOutputStreamParameters</a></td>
+<td class="colLast">
+<div class="block">An interface for <a href="../../../../../net/java/truevfs/comp/zip/ZipOutputStream.html" title="class in net.java.truevfs.comp.zip"><code>ZipOutputStream</code></a> parameters.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/ZipParameters.html" title="interface in net.java.truevfs.comp.zip">ZipParameters</a></td>
+<td class="colLast">
+<div class="block">A marker interface for ZIP parameters.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/ZipParametersProvider.html" title="interface in net.java.truevfs.comp.zip">ZipParametersProvider</a></td>
+<td class="colLast">
+<div class="block">A provider of <a href="../../../../../net/java/truevfs/comp/zip/ZipParameters.html" title="interface in net.java.truevfs.comp.zip"><code>ZipParameters</code></a> for a given type.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="packageSummary" border="0" cellpadding="3" cellspacing="0" summary="Class Summary table, listing classes, and an explanation">
+<caption><span>Class Summary</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Class</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/AbstractZipFile.html" title="class in net.java.truevfs.comp.zip">AbstractZipFile</a>&lt;E extends <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a>&gt;</td>
+<td class="colLast">
+<div class="block">Provides unsafe (raw) access to a ZIP file using shared <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip"><code>ZipEntry</code></a>
+ instances.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/AbstractZipOutputStream.html" title="class in net.java.truevfs.comp.zip">AbstractZipOutputStream</a>&lt;E extends <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a>&gt;</td>
+<td class="colLast">
+<div class="block">Provides unsafe (raw) access to a ZIP file using shared <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip"><code>ZipEntry</code></a>
+ instances.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a></td>
+<td class="colLast">
+<div class="block">Replacement for <a href="http://docs.oracle.com/javase/7/docs/api/java/util/zip/ZipEntry.html?is-external=true" title="class or interface in java.util.zip"><code>java.util.zip.ZipEntry</code></a>.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/ZipFile.html" title="class in net.java.truevfs.comp.zip">ZipFile</a></td>
+<td class="colLast">
+<div class="block">Replacement for <a href="http://docs.oracle.com/javase/7/docs/api/java/util/zip/ZipFile.html?is-external=true" title="class or interface in java.util.zip"><code>java.util.zip.ZipFile</code></a>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/ZipOutputStream.html" title="class in net.java.truevfs.comp.zip">ZipOutputStream</a></td>
+<td class="colLast">
+<div class="block">Replacement for
+ <a href="http://docs.oracle.com/javase/7/docs/api/java/util/zip/ZipOutputStream.html?is-external=true" title="class or interface in java.util.zip"><code>java.util.zip.ZipOutputStream</code></a>.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="packageSummary" border="0" cellpadding="3" cellspacing="0" summary="Enum Summary table, listing enums, and an explanation">
+<caption><span>Enum Summary</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Enum</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/DateTimeConverter.html" title="enum in net.java.truevfs.comp.zip">DateTimeConverter</a></td>
+<td class="colLast">
+<div class="block">Converts Java time values to DOS date/time values and vice versa.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li class="blockList">
+<table class="packageSummary" border="0" cellpadding="3" cellspacing="0" summary="Exception Summary table, listing exceptions, and an explanation">
+<caption><span>Exception Summary</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Exception</th>
+<th class="colLast" scope="col">Description</th>
+</tr>
+<tbody>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/Crc32Exception.html" title="class in net.java.truevfs.comp.zip">Crc32Exception</a></td>
+<td class="colLast">
+<div class="block">Thrown to indicate a CRC32 mismatch between the declared value in the
+ Central File Header and the Data Descriptor or between the declared value
+ and the computed value from the decompressed data.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/ZipAuthenticationException.html" title="class in net.java.truevfs.comp.zip">ZipAuthenticationException</a></td>
+<td class="colLast">
+<div class="block">Thrown to indicate that an authenticated ZIP entry has been tampered with.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/ZipCryptoException.html" title="class in net.java.truevfs.comp.zip">ZipCryptoException</a></td>
+<td class="colLast">
+<div class="block">Thrown if there is an issue when reading or writing an encrypted ZIP file
+ or entry.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/ZipKeyException.html" title="class in net.java.truevfs.comp.zip">ZipKeyException</a></td>
+<td class="colLast">
+<div class="block">Thrown to indicate that retrieving a key to encrypt or decrypt or
+ authenticate a ZIP entry has failed for some reason.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><a href="../../../../../net/java/truevfs/comp/zip/ZipParametersException.html" title="class in net.java.truevfs.comp.zip">ZipParametersException</a></td>
+<td class="colLast">
+<div class="block">Thrown to indicate that no suitable ZIP parameters have been provided
+ or something is wrong with these parameters.</div>
+</td>
+</tr>
+</tbody>
+</table>
+</li>
+</ul>
+<a name="package_description">
+<!--   -->
+</a>
+<h2 title="Package net.java.truevfs.comp.zip Description">Package net.java.truevfs.comp.zip Description</h2>
+<div class="block">Provides classes for reading and writing ZIP files.
+ <p>
+ The classes in this package read and write ZIP files according to a subset
+ of PKWARE's
+ <a href="http://www.pkware.com/documents/casestudies/APPNOTE.TXT">
+ ZIP File Format Specification</a>,
+ Version 6.3.2 from September 28, 2007.
+ The subset has been selected in order to achieve the following objectives:
+ <ul>
+ <li>Full interoperability with ZIP files read or written by the package
+     <a href="http://docs.oracle.com/javase/7/docs/api/java/util/zip/package-summary.html?is-external=true"><code>java.util.zip</code></a> of Oracle's Java SE&nbsp;7 implementation.
+ <li>Support for
+     <a href="../../../../../net/java/truevfs/comp/zip/ZipOutputStream.html#ZipOutputStream(java.io.OutputStream,%20net.java.truevfs.comp.zip.ZipFile)"><code>appending</code></a>
+     to existing ZIP files.
+ <li>Support for
+     <a href="../../../../../net/java/truevfs/comp/zip/ZipFile.html#recoverLostEntries()"><code>recovering</code></a>
+     lost entries when reading a ZIP file.
+ <li>Support for
+     <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#isEncrypted()"><code>reading</code></a>
+     and
+     <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#setEncrypted(boolean)"><code>writing</code></a>
+     encrypted or authenticated ZIP entries.
+     Currently, only the
+     <a href="http://www.winzip.com/win/en/aes_info.htm">WinZip AES Specification</a>
+     is supported.
+     You need to implement the interface
+     <a href="../../../../../net/java/truevfs/comp/zip/WinZipAesParameters.html" title="interface in net.java.truevfs.comp.zip"><code>WinZipAesParameters</code></a>
+     and inject it for reading and writing to the
+     <a href="../../../../../net/java/truevfs/comp/zip/ZipFile.html#setCryptoParameters(net.java.truevfs.comp.zip.ZipCryptoParameters)"><code>ZipFile.setCryptoParameters(ZipCryptoParameters)</code></a>
+     and
+     <a href="../../../../../net/java/truevfs/comp/zip/ZipOutputStream.html#setCryptoParameters(net.java.truevfs.comp.zip.ZipCryptoParameters)"><code>ZipOutputStream.setCryptoParameters(ZipCryptoParameters)</code></a>
+     classes.
+ <li>Support for
+     <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#getMethod()"><code>reading</code></a>
+     and
+     <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#setMethod(int)"><code>writing</code></a>
+     BZIP2 compressed ZIP entries.
+ <li>Support for selectable character sets, in particular IBM Code Page 437
+     (alias IBM PC) for PKZIP compatibility and UTF-8 for Java Archive (JAR)
+     compatibility.
+     Note that using any other character set except CP437 or UTF-8 is
+     strongly discouraged because it will result in interoperability issues
+     with third party tools, especially when sharing archive files between
+     different locales!
+ <li>Support for
+     <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#getExternalAttributes()"><code>reading</code></a>
+     and
+     <a href="../../../../../net/java/truevfs/comp/zip/ZipEntry.html#setExternalAttributes(long)"><code>writing</code></a>
+     external file attributes.
+ <li>Support for reading and writing ZIP64 extensions with the following
+     restrictions:
+     <ol>
+     <li>The maximum file size is <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Long.html?is-external=true#MAX_VALUE" title="class or interface in java.lang"><code>Long.MAX_VALUE</code></a>.
+     <li>The maximum number of entries in the Central Directory is
+         <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Integer.html?is-external=true#MAX_VALUE" title="class or interface in java.lang"><code>Integer.MAX_VALUE</code></a>.
+     <li>The offsets in ZIP64 files must respect a preamble if present, i.e.
+         they must be exact.
+         This is in contrast to ZIP32 files where the offsets do not need to
+         respect a preamble if present.
+         Preambles are primarily used to contain self extracting (SFX)
+         executable code.
+     </ol>
+ <li><a href="../../../../../net/java/truevfs/comp/zip/ZipFile.html" title="class in net.java.truevfs.comp.zip"><code>ZipFile</code></a> supports reading archive
+     data from a <a href="http://docs.oracle.com/javase/7/docs/api/java/nio/channels/SeekableByteChannel.html?is-external=true" title="class or interface in java.nio.channels"><code>SeekableByteChannel</code></a>, which allows
+     to read archive data from composite data sources like e.g. RAES
+     encrypted ZIP files directly without the need to decrypt them to a
+     temporary file first.
+ </ul></div>
+</div>
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<div class="bottomNav"><a name="navbar_bottom">
+<!--   -->
+</a><a href="#skip-navbar_bottom" title="Skip navigation links"></a><a name="navbar_bottom_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../overview-summary.html">Overview</a></li>
+<li class="navBarCell1Rev">Package</li>
+<li>Class</li>
+<li><a href="package-use.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../../net/java/truevfs/comp/tardriver/package-summary.html">Prev Package</a></li>
+<li><a href="../../../../../net/java/truevfs/comp/zip/crypto/package-summary.html">Next Package</a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../index.html?net/java/truevfs/comp/zip/package-summary.html" target="_top">Frames</a></li>
+<li><a href="package-summary.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_bottom">
+<li><a href="../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_bottom");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<a name="skip-navbar_bottom">
+<!--   -->
+</a></div>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+<p class="legalCopy"><small>Copyright &#169; 2005&#x2013;2017 <a href="http://schlichtherle.de">Schlichtherle IT Services</a>. All rights reserved.</small></p>
+</body>
+</html>

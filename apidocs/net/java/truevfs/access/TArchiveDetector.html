@@ -1,0 +1,650 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- NewPage -->
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>TArchiveDetector (TrueVFS 0.12.0 API)</title>
+<link rel="stylesheet" type="text/css" href="../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<script type="text/javascript"><!--
+    if (location.href.indexOf('is-external=true') == -1) {
+        parent.document.title="TArchiveDetector (TrueVFS 0.12.0 API)";
+    }
+//-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+<!-- ========= START OF TOP NAVBAR ======= -->
+<div class="topNav"><a name="navbar_top">
+<!--   -->
+</a><a href="#skip-navbar_top" title="Skip navigation links"></a><a name="navbar_top_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/TArchiveDetector.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../net/java/truevfs/access/TApplication.html" title="class in net.java.truevfs.access"><span class="strong">Prev Class</span></a></li>
+<li><a href="../../../../net/java/truevfs/access/TConfig.html" title="class in net.java.truevfs.access"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../index.html?net/java/truevfs/access/TArchiveDetector.html" target="_top">Frames</a></li>
+<li><a href="TArchiveDetector.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_top">
+<li><a href="../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#field_summary">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_summary">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li><a href="#field_detail">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_detail">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_top">
+<!--   -->
+</a></div>
+<!-- ========= END OF TOP NAVBAR ========= -->
+<!-- ======== START OF CLASS DATA ======== -->
+<div class="header">
+<div class="subTitle">net.java.truevfs.access</div>
+<h2 title="Class TArchiveDetector" class="title">Class TArchiveDetector</h2>
+</div>
+<div class="contentContainer">
+<ul class="inheritance">
+<li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">java.lang.Object</a></li>
+<li>
+<ul class="inheritance">
+<li><a href="../../../../net/java/truevfs/kernel/spec/FsAbstractCompositeDriver.html" title="class in net.java.truevfs.kernel.spec">net.java.truevfs.kernel.spec.FsAbstractCompositeDriver</a></li>
+<li>
+<ul class="inheritance">
+<li>net.java.truevfs.access.TArchiveDetector</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="description">
+<ul class="blockList">
+<li class="blockList">
+<dl>
+<dt>All Implemented Interfaces:</dt>
+<dd>javax.inject.Provider&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&gt;, net.java.truecommons.services.Container&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&gt;, <a href="../../../../net/java/truevfs/kernel/spec/FsCompositeDriver.html" title="interface in net.java.truevfs.kernel.spec">FsCompositeDriver</a>, <a href="../../../../net/java/truevfs/kernel/spec/FsController.Factory.html" title="interface in net.java.truevfs.kernel.spec">FsController.Factory</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&gt;, <a href="../../../../net/java/truevfs/kernel/spec/FsModel.Factory.html" title="interface in net.java.truevfs.kernel.spec">FsModel.Factory</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&gt;</dd>
+</dl>
+<hr>
+<br>
+<pre><a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/concurrent.Immutable.html?is-external=true" title="class or interface in javax.annotation">@Immutable</a>
+public final class <span class="strong">TArchiveDetector</span>
+extends <a href="../../../../net/java/truevfs/kernel/spec/FsAbstractCompositeDriver.html" title="class in net.java.truevfs.kernel.spec">FsAbstractCompositeDriver</a></pre>
+<div class="block">Detects a <em>prospective</em> archive file and declares its file system
+ scheme by mapping its file name extension to an archive driver.
+ Note that this class does <em>not</em> access any file system!
+ <p>
+ The map of detectable archive file name extensions and corresponding archive
+ drivers is configured by the constructors of this class.
+ There are two types of constructors available:
+ <ol>
+ <li>Constructors which filter the driver map of a given file system driver
+     provider by a given list of file name extensions.
+     For example, the driver map of the provider
+     <a href="../../../../net/java/truevfs/kernel/spec/sl/FsDriverMapLocator.html#SINGLETON"><code>FsDriverMapLocator.SINGLETON</code></a> could be filtered by the file name
+     extension list <code>"tar|zip"</code> in order to recognize only TAR and ZIP
+     files.
+ <li>Constructors which decorate a given file system driver provider with a
+     given map of file system schemes to file system drivers.
+     This can get used to specify custom archive file name extensions or
+     archive drivers.
+     For example, the file name extension list <code>"foo|bar"</code> could be used
+     to detect a custom variant of the JAR file format (you need to provide
+     a custom archive driver then, too).
+ </ol>
+ <p>
+ Where a constructor expects a list of file name extensions as a parameter,
+ it must obeye the syntax constraints for <code>ExtensionSet</code>s.
+ As an example, the parameter <code>"zip|jar"</code> would cause
+ the archive detector to recognize ZIP and JAR files in a path.
+ The same would be true for <code>"||.ZiP||.JaR||ZIP||JAR||"</code>,
+ but this notation is discouraged because it's not in canonical form.</div>
+<dl><dt><span class="strong">Author:</span></dt>
+  <dd>Christian Schlichtherle</dd></dl>
+</li>
+</ul>
+</div>
+<div class="summary">
+<ul class="blockList">
+<li class="blockList">
+<!-- =========== FIELD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field_summary">
+<!--   -->
+</a>
+<h3>Field Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Field Summary table, listing fields, and an explanation">
+<caption><span>Fields</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Field and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>static <a href="../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access">TArchiveDetector</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TArchiveDetector.html#ALL">ALL</a></strong></code>
+<div class="block">This instance recognizes all archive file name extensions for which an
+ archive driver can get located on the class path by the file system
+ driver map locator singleton <a href="../../../../net/java/truevfs/kernel/spec/sl/FsDriverMapLocator.html#SINGLETON"><code>FsDriverMapLocator.SINGLETON</code></a>.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>static <a href="../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access">TArchiveDetector</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TArchiveDetector.html#NULL">NULL</a></strong></code>
+<div class="block">This instance never recognizes any archive files in a path.</div>
+</td>
+</tr>
+</table>
+</li>
+</ul>
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor_summary">
+<!--   -->
+</a>
+<h3>Constructor Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Constructor Summary table, listing constructors, and an explanation">
+<caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colOne" scope="col">Constructor and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><strong><a href="../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(javax.inject.Provider,%20java.util.Map)">TArchiveDetector</a></strong>(javax.inject.Provider&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&gt;&nbsp;provider,
+                <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;config)</code>
+<div class="block">Constructs a new <code>TArchiveDetector</code> by decorating the given driver
+ provider with mappings for all entries in <code>config</code>.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><strong><a href="../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(javax.inject.Provider,%20java.lang.Object[][])">TArchiveDetector</a></strong>(javax.inject.Provider&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&gt;&nbsp;provider,
+                <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>[][]&nbsp;config)</code>
+<div class="block">Creates a new <code>TArchiveDetector</code> by
+ decorating the configuration of <code>provider</code> with
+ mappings for all entries in <code>config</code>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><strong><a href="../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(javax.inject.Provider,%20java.lang.String)">TArchiveDetector</a></strong>(javax.inject.Provider&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&gt;&nbsp;provider,
+                <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;extensions)</code>
+<div class="block">Constructs a new <code>TArchiveDetector</code> by filtering the given driver
+ provider for all canonicalized extensions in the <code>extensions</code> list.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><strong><a href="../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(javax.inject.Provider,%20java.lang.String,%20net.java.truevfs.kernel.spec.FsDriver)">TArchiveDetector</a></strong>(javax.inject.Provider&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&gt;&nbsp;provider,
+                <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;extensions,
+                <a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&nbsp;driver)</code>
+<div class="block">Constructs a new <code>TArchiveDetector</code> by
+ decorating the configuration of <code>provider</code> with
+ mappings for all canonicalized extensions in <code>extensions</code> to
+ <code>driver</code>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><strong><a href="../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(java.lang.String)">TArchiveDetector</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;extensions)</code>
+<div class="block">Equivalent to
+ <a href="../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(javax.inject.Provider,%20java.lang.String)"><code>TArchiveDetector(FsDriverMapLocator.SINGLETON, extensions)</code></a>.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><strong><a href="../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(java.lang.String,%20net.java.truevfs.kernel.spec.FsDriver)">TArchiveDetector</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;extensions,
+                <a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&nbsp;driver)</code>
+<div class="block">Equivalent to
+ <a href="../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(javax.inject.Provider,%20java.lang.String,%20net.java.truevfs.kernel.spec.FsDriver)"><code>TArchiveDetector(TArchiveDetector.NULL, extensions, driver)</code></a>.</div>
+</td>
+</tr>
+</table>
+</li>
+</ul>
+<!-- ========== METHOD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_summary">
+<!--   -->
+</a>
+<h3>Method Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
+<caption><span>Methods</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TArchiveDetector.html#equals(java.lang.Object)">equals</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;other)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TArchiveDetector.html#get()">get</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;</code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TArchiveDetector.html#getDrivers()">getDrivers</a></strong>()</code>
+<div class="block">Returns the immutable map of file system drivers.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TArchiveDetector.html#getExtensions()">getExtensions</a></strong>()</code>
+<div class="block">Returns the <i>canonical extension list</i> for all archive file system
+ schemes recognized by this <code>TArchiveDetector</code>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>int</code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TArchiveDetector.html#hashCode()">hashCode</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TArchiveDetector.html#scheme(java.lang.String)">scheme</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;path)</code>
+<div class="block">Detects whether the given <code>path</code> name identifies a prospective
+ archive file by matching its file name extension against the set of
+ file system schemes in the file system driver map.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../net/java/truevfs/access/TArchiveDetector.html#toString()">toString</a></strong>()</code>&nbsp;</td>
+</tr>
+</table>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_net.java.truevfs.kernel.spec.FsAbstractCompositeDriver">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;net.java.truevfs.kernel.spec.<a href="../../../../net/java/truevfs/kernel/spec/FsAbstractCompositeDriver.html" title="class in net.java.truevfs.kernel.spec">FsAbstractCompositeDriver</a></h3>
+<code><a href="../../../../net/java/truevfs/kernel/spec/FsAbstractCompositeDriver.html#newController(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsController)">newController</a>, <a href="../../../../net/java/truevfs/kernel/spec/FsAbstractCompositeDriver.html#newModel(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsMountPoint,%20net.java.truevfs.kernel.spec.FsModel)">newModel</a></code></li>
+</ul>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_java.lang.Object">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;java.lang.<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></h3>
+<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#clone()" title="class or interface in java.lang">clone</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#finalize()" title="class or interface in java.lang">finalize</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#getClass()" title="class or interface in java.lang">getClass</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notify()" title="class or interface in java.lang">notify</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notifyAll()" title="class or interface in java.lang">notifyAll</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait()" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long)" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long,%20int)" title="class or interface in java.lang">wait</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="details">
+<ul class="blockList">
+<li class="blockList">
+<!-- ============ FIELD DETAIL =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field_detail">
+<!--   -->
+</a>
+<h3>Field Detail</h3>
+<a name="ALL">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>ALL</h4>
+<pre>public static final&nbsp;<a href="../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access">TArchiveDetector</a> ALL</pre>
+<div class="block">This instance recognizes all archive file name extensions for which an
+ archive driver can get located on the class path by the file system
+ driver map locator singleton <a href="../../../../net/java/truevfs/kernel/spec/sl/FsDriverMapLocator.html#SINGLETON"><code>FsDriverMapLocator.SINGLETON</code></a>.</div>
+</li>
+</ul>
+<a name="NULL">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>NULL</h4>
+<pre>public static final&nbsp;<a href="../../../../net/java/truevfs/access/TArchiveDetector.html" title="class in net.java.truevfs.access">TArchiveDetector</a> NULL</pre>
+<div class="block">This instance never recognizes any archive files in a path.
+ This can get used as the end of a chain of
+ <code>TArchiveDetector</code> instances or if archive files
+ shall be treated like regular files rather than (virtual) directories.</div>
+</li>
+</ul>
+</li>
+</ul>
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor_detail">
+<!--   -->
+</a>
+<h3>Constructor Detail</h3>
+<a name="TArchiveDetector(javax.inject.Provider, java.util.Map)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>TArchiveDetector</h4>
+<pre>public&nbsp;TArchiveDetector(javax.inject.Provider&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&gt;&nbsp;provider,
+                <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;config)</pre>
+<div class="block">Constructs a new <code>TArchiveDetector</code> by decorating the given driver
+ provider with mappings for all entries in <code>config</code>.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>provider</code> - the file system driver provider to decorate.</dd><dd><code>config</code> - a map of file system schemes to file system drivers.
+         <code>null</code> may be used to <i>shadow</i> a mapping for an equal
+         file system scheme in <code>provider</code> by removing it from the
+         resulting map for this detector.</dd>
+<dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/NullPointerException.html?is-external=true" title="class or interface in java.lang">NullPointerException</a></code> - if a required configuration element is
+         <code>null</code>.</dd>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/ClassCastException.html?is-external=true" title="class or interface in java.lang">ClassCastException</a></code> - if a configuration element is of the wrong
+         type.</dd>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/IllegalArgumentException.html?is-external=true" title="class or interface in java.lang">IllegalArgumentException</a></code> - if any other parameter precondition
+         does not hold.</dd><dt><span class="strong">See Also:</span></dt><dd><code>Syntax contraints for extension lists.</code></dd></dl>
+</li>
+</ul>
+<a name="TArchiveDetector(javax.inject.Provider, java.lang.Object[][])">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>TArchiveDetector</h4>
+<pre>public&nbsp;TArchiveDetector(javax.inject.Provider&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&gt;&nbsp;provider,
+                <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>[][]&nbsp;config)</pre>
+<div class="block">Creates a new <code>TArchiveDetector</code> by
+ decorating the configuration of <code>provider</code> with
+ mappings for all entries in <code>config</code>.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>provider</code> - the file system driver provider to decorate.</dd><dd><code>config</code> - an array of key-value pair arrays.
+         The first element of each inner array must either be a
+         <a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec"><code>file system scheme</code></a>, an object <code>o</code> which
+         can get converted to a set of file name extensions by calling
+         <code>new ExtensionSet(o.toString())</code>
+         or a <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Collection.html?is-external=true" title="class or interface in java.util"><code>collection</code></a> of these.
+         The second element of each inner array must either be a
+         <a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec"><code>file system driver object</code></a>, a
+         <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang"><code>file system driver class</code></a>, a
+         <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang"><code>fully qualified name of a file system driver class</code></a>,
+         or <code>null</code>.
+         <code>null</code> may be used to <i>shadow</i> a mapping for an equal
+         file system scheme in <code>provider</code> by removing it from the
+         resulting map for this detector.</dd>
+<dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/NullPointerException.html?is-external=true" title="class or interface in java.lang">NullPointerException</a></code> - if a required configuration element is
+         <code>null</code>.</dd>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/IllegalArgumentException.html?is-external=true" title="class or interface in java.lang">IllegalArgumentException</a></code> - if any other parameter precondition
+         does not hold.</dd><dt><span class="strong">See Also:</span></dt><dd><code>Syntax contraints for extension lists.</code></dd></dl>
+</li>
+</ul>
+<a name="TArchiveDetector(javax.inject.Provider, java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>TArchiveDetector</h4>
+<pre>public&nbsp;TArchiveDetector(javax.inject.Provider&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&gt;&nbsp;provider,
+                <a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/CheckForNull.html?is-external=true" title="class or interface in javax.annotation">@CheckForNull</a>
+                <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;extensions)</pre>
+<div class="block">Constructs a new <code>TArchiveDetector</code> by filtering the given driver
+ provider for all canonicalized extensions in the <code>extensions</code> list.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>provider</code> - the file system driver provider to filter.</dd><dd><code>extensions</code> - A list of file name extensions which shall identify
+         prospective archive files.
+         If this is <code>null</code>, no filtering is applied and all drivers
+         known by the given provider are available for use with this
+         archive detector.</dd>
+<dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/IllegalArgumentException.html?is-external=true" title="class or interface in java.lang">IllegalArgumentException</a></code> - If any of the extensions in the list
+         names a extension for which no file system driver is known by the
+         provider.</dd><dt><span class="strong">See Also:</span></dt><dd><code>Syntax constraints for extension lists.</code></dd></dl>
+</li>
+</ul>
+<a name="TArchiveDetector(javax.inject.Provider, java.lang.String, net.java.truevfs.kernel.spec.FsDriver)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>TArchiveDetector</h4>
+<pre>public&nbsp;TArchiveDetector(javax.inject.Provider&lt;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&gt;&nbsp;provider,
+                <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;extensions,
+                <a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/CheckForNull.html?is-external=true" title="class or interface in javax.annotation">@CheckForNull</a>
+                <a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&nbsp;driver)</pre>
+<div class="block">Constructs a new <code>TArchiveDetector</code> by
+ decorating the configuration of <code>provider</code> with
+ mappings for all canonicalized extensions in <code>extensions</code> to
+ <code>driver</code>.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>provider</code> - the file system driver provider to decorate.</dd><dd><code>extensions</code> - A list of file name extensions which shall identify
+         prospective archive files.
+         This must not be <code>null</code> and must not be empty.</dd><dd><code>driver</code> - the file system driver to map for the extension list.
+         <code>null</code> may be used to <i>shadow</i> a mapping for an equal
+         file system scheme in <code>provider</code> by removing it from the
+         resulting map for this detector.</dd>
+<dt><span class="strong">Throws:</span></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/NullPointerException.html?is-external=true" title="class or interface in java.lang">NullPointerException</a></code> - if a required configuration element is
+         <code>null</code>.</dd>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/IllegalArgumentException.html?is-external=true" title="class or interface in java.lang">IllegalArgumentException</a></code> - if any other parameter precondition
+         does not hold.</dd><dt><span class="strong">See Also:</span></dt><dd><code>Syntax contraints for extension lists.</code></dd></dl>
+</li>
+</ul>
+<a name="TArchiveDetector(java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>TArchiveDetector</h4>
+<pre>public&nbsp;TArchiveDetector(<a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/CheckForNull.html?is-external=true" title="class or interface in javax.annotation">@CheckForNull</a>
+                <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;extensions)</pre>
+<div class="block">Equivalent to
+ <a href="../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(javax.inject.Provider,%20java.lang.String)"><code>TArchiveDetector(FsDriverMapLocator.SINGLETON, extensions)</code></a>.</div>
+</li>
+</ul>
+<a name="TArchiveDetector(java.lang.String, net.java.truevfs.kernel.spec.FsDriver)">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>TArchiveDetector</h4>
+<pre>public&nbsp;TArchiveDetector(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;extensions,
+                <a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/CheckForNull.html?is-external=true" title="class or interface in javax.annotation">@CheckForNull</a>
+                <a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&nbsp;driver)</pre>
+<div class="block">Equivalent to
+ <a href="../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(javax.inject.Provider,%20java.lang.String,%20net.java.truevfs.kernel.spec.FsDriver)"><code>TArchiveDetector(TArchiveDetector.NULL, extensions, driver)</code></a>.</div>
+</li>
+</ul>
+</li>
+</ul>
+<!-- ============ METHOD DETAIL ========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_detail">
+<!--   -->
+</a>
+<h3>Method Detail</h3>
+<a name="equals(java.lang.Object)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>equals</h4>
+<pre>public&nbsp;boolean&nbsp;equals(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>&nbsp;other)</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#equals(java.lang.Object)" title="class or interface in java.lang">equals</a></code>&nbsp;in class&nbsp;<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="get()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>get</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;get()</pre>
+</li>
+</ul>
+<a name="getDrivers()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getDrivers</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;<a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>,<a href="../../../../net/java/truevfs/kernel/spec/FsDriver.html" title="class in net.java.truevfs.kernel.spec">FsDriver</a>&gt;&nbsp;getDrivers()</pre>
+<div class="block">Returns the immutable map of file system drivers.
+ This is equivalent to <a href="../../../../net/java/truevfs/access/TArchiveDetector.html#get()"><code>get()</code></a>.</div>
+<dl><dt><span class="strong">Returns:</span></dt><dd>the immutable map of file system drivers.</dd></dl>
+</li>
+</ul>
+<a name="getExtensions()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>getExtensions</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;getExtensions()</pre>
+<div class="block">Returns the <i>canonical extension list</i> for all archive file system
+ schemes recognized by this <code>TArchiveDetector</code>.</div>
+<dl><dt><span class="strong">Returns:</span></dt><dd>Either <code>""</code> to indicate an empty set or
+         a string of the form <code>"extension[|extension]*"</code>,
+         where <code>extension</code> is a combination of lower case
+         letters which does <em>not</em> start with a dot.
+         The string never contains empty or duplicated extensions and the
+         extensions are sorted in natural order.</dd><dt><span class="strong">See Also:</span></dt><dd><a href="../../../../net/java/truevfs/access/TArchiveDetector.html#TArchiveDetector(java.lang.String)"><code>TArchiveDetector(String)</code></a>, 
+<code>Syntax constraints for extension lists.</code></dd></dl>
+</li>
+</ul>
+<a name="hashCode()">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>hashCode</h4>
+<pre>public&nbsp;int&nbsp;hashCode()</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#hashCode()" title="class or interface in java.lang">hashCode</a></code>&nbsp;in class&nbsp;<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></dd>
+</dl>
+</li>
+</ul>
+<a name="scheme(java.lang.String)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>scheme</h4>
+<pre><a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/CheckForNull.html?is-external=true" title="class or interface in javax.annotation">@CheckForNull</a>
+public&nbsp;<a href="../../../../net/java/truevfs/kernel/spec/FsScheme.html" title="class in net.java.truevfs.kernel.spec">FsScheme</a>&nbsp;scheme(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;path)</pre>
+<div class="block">Detects whether the given <code>path</code> name identifies a prospective
+ archive file by matching its file name extension against the set of
+ file system schemes in the file system driver map.
+ If a match is found, the file name extension gets converted to a file
+ system scheme and returned.
+ Otherwise, <code>null</code> is returned.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>path</code> - the path name.</dd>
+<dt><span class="strong">Returns:</span></dt><dd>A file system scheme to declare the file system type of the
+         prospective archive file or <code>null</code> if no archive file name
+         extension has been detected.</dd></dl>
+</li>
+</ul>
+<a name="toString()">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>toString</h4>
+<pre>public&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;toString()</pre>
+<dl>
+<dt><strong>Overrides:</strong></dt>
+<dd><code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#toString()" title="class or interface in java.lang">toString</a></code>&nbsp;in class&nbsp;<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></code></dd>
+</dl>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<!-- ========= END OF CLASS DATA ========= -->
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<div class="bottomNav"><a name="navbar_bottom">
+<!--   -->
+</a><a href="#skip-navbar_bottom" title="Skip navigation links"></a><a name="navbar_bottom_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/TArchiveDetector.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li><a href="../../../../net/java/truevfs/access/TApplication.html" title="class in net.java.truevfs.access"><span class="strong">Prev Class</span></a></li>
+<li><a href="../../../../net/java/truevfs/access/TConfig.html" title="class in net.java.truevfs.access"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../index.html?net/java/truevfs/access/TArchiveDetector.html" target="_top">Frames</a></li>
+<li><a href="TArchiveDetector.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_bottom">
+<li><a href="../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_bottom");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#field_summary">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_summary">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li><a href="#field_detail">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_detail">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_bottom">
+<!--   -->
+</a></div>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+<p class="legalCopy"><small>Copyright &#169; 2005&#x2013;2017 <a href="http://schlichtherle.de">Schlichtherle IT Services</a>. All rights reserved.</small></p>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <link href="../css/prettify.css" type="text/css" rel="stylesheet"/>
+    <script src="../js/prettify.js" type="text/javascript"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>TrueVFS &#x2013; Tutorial</title>
+    <style type="text/css" media="all">
+      @import url("../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../css/print.css" type="text/css" media="print"/>
+    <meta name="author" content="Christian Schlichtherle"/>
+    <meta name="Date-Revision-yyyymmdd" content="20170919"/>
+    <meta http-equiv="Content-Language" content="en"/>
+          <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-25500668-2']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+                  <script>
+        (function() {
+          var cx = '003580521944097984334:8uinm6tpaz4';
+          var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+          gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+              '//www.google.com/cse/cse.js?cx=' + cx;
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+        })();
+      </script>
+                                                          
+<link title="The TrueZIP Blog - Announcements Feed" rel="alternate" type="application/rss+xml" href="http://truevfs.schlichtherle.de/category/announcements/feed/"/>
+                      
+  </head>
+  <body class="composite" onload="prettyPrint()">
+    <div id="banner">
+                    <div id="bannerLeft">
+                TrueVFS
+                </div>
+                                <div id="gcse-search-form" class="gcse-searchbox-only"></div>
+            <div class="clear"><hr/></div>
+    </div>
+    <div id="breadcrumbs">
+            
+                                  <div class="xleft">
+        <span id="projectVersion">Version: 0.12.0</span>
+                  |                         <a href="../index.html" title="TrueVFS">TrueVFS</a>
+      &raquo;
+      TrueVFS &#x2013; Tutorial
+              </div>
+            <div class="xright">        
+                        </div>
+      <div class="clear"><hr/></div>
+    </div>
+    <div id="leftColumn">
+      <div id="navcolumn">
+              
+                                                   <h5>Documentation</h5>
+                  <ul>
+                  <li class="none">
+                          <a href="../index.html" title="About">About</a>
+            </li>
+                  <li class="none">
+                          <a href="../features.html" title="Key Features">Key Features</a>
+            </li>
+                                                                                                                                            <li class="collapsed">
+                          <a href="../usecases/index.html" title="Use Cases">Use Cases</a>
+                  </li>
+                                                                                                                  <li class="expanded">
+                          <a href="../kick-start/index.html" title="Getting Started">Getting Started</a>
+                    <ul>
+                      <li class="none">
+                          <a href="../kick-start/maven.html" title="with an Archetype">with an Archetype</a>
+            </li>
+                      <li class="none">
+                          <a href="../kick-start/no-maven.html" title="without Maven">without Maven</a>
+            </li>
+                      <li class="none">
+            <strong>Tutorial</strong>
+          </li>
+              </ul>
+        </li>
+                                                                                                                          <li class="collapsed">
+                          <a href="../help.html" title="Getting Help">Getting Help</a>
+                  </li>
+                  <li class="none">
+                          <a href="../concepts.html" title="Basic Concepts">Basic Concepts</a>
+            </li>
+                  <li class="none">
+                          <a href="../glossary.html" title="Glossary">Glossary</a>
+            </li>
+          </ul>
+                       <h5>External Resources</h5>
+                  <ul>
+                  <li class="none">
+                          <a href="http://illegalexception.schlichtherle.de" class="externalLink" title="Christian's Blog">Christian's Blog</a>
+            </li>
+          </ul>
+                       <h5>Parent Module</h5>
+                                 <h5>Sub-Modules</h5>
+                  <ul>
+                  <li class="none">
+                          <a href="../truevfs-access/index.html" title="TrueVFS Access">TrueVFS Access</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-access-swing/index.html" title="TrueVFS Access Swing">TrueVFS Access Swing</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-archetype/index.html" title="TrueVFS Archetype">TrueVFS Archetype</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-comp/index.html" title="TrueVFS Component">TrueVFS Component</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-driver/index.html" title="TrueVFS Driver">TrueVFS Driver</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-ext/index.html" title="TrueVFS Extension">TrueVFS Extension</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-it/index.html" title="TrueVFS Integration Tests">TrueVFS Integration Tests</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-kernel/index.html" title="TrueVFS Kernel">TrueVFS Kernel</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-profile/index.html" title="TrueVFS Profile">TrueVFS Profile</a>
+            </li>
+                  <li class="none">
+                          <a href="../truevfs-samples/index.html" title="TrueVFS Samples">TrueVFS Samples</a>
+            </li>
+          </ul>
+                       <h5>Reports</h5>
+                  <ul>
+                                                                                                                                                                                                                                                                                            <li class="collapsed">
+                          <a href="../project-info.html" title="Project Information">Project Information</a>
+                  </li>
+                                                                                      <li class="collapsed">
+                          <a href="../project-reports.html" title="Project Reports">Project Reports</a>
+                  </li>
+          </ul>
+                     
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+  <div class="paypalButton">
+    <input name="cmd" value="_s-xclick" type="hidden"/>
+    <input name="hosted_button_id" value="AGDEQWWKNZ6UL" type="hidden"/>
+    <input style="border: 0" alt="PayPal - The safer, easier way to pay online!" name="submit" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" type="image"/>
+  </div>
+</form>
+                                
+                              </div>
+    </div>
+    <div id="bodyColumn" class="content">
+      <div id="contentBox">
+                                      <div class="section">
+<h2><a name="Tutorial"></a>Tutorial</h2>
+<p>TrueVFS provides CRUD (Create, Read, Update, Delete) operations for archive files while maintaining an easy-to-use file system API. This enables you to treat archive files as if they were virtual directories and archive entries as if they were virtual files within these virtual directories.</p>
+<p>The following tutorial assumes some preconditions:</p>
+<ul>
+<li>You need to have a basic knowledge of the <tt>java.io</tt> API (Application Programming Interface). If not, please refer to <a class="externalLink" href="http://docs.oracle.com/javase/tutorial/essential/io/">The Java Tutorials Lesson: Basic I/O</a> first.</li>
+<li>You need to have a working application skeleton with the required TrueVFS JARs on the class path. If not present, please refer to the page <a href="./index.html#Kick-Starting">Getting Started</a> first.</li></ul>
+<div class="section">
+<h3><a name="The_package_net.java.truevfs.access"></a>The package <tt>net.java.truevfs.access</tt></h3>
+<p>The module TrueVFS Access solely consists of the package <a href="../apidocs/net/java/truevfs/access/package-summary.html"><tt>net.java.truevfs.access</tt></a>. This package supports two I/O API styles:</p>
+<ul>
+<li> The old I/O API style (alias OIO, available since Java 1)) is supported by the classes <a href="../apidocs/net/java/truevfs/access/TFile.html"><tt>TFile</tt></a>, <a href="../apidocs/net/java/truevfs/access/TFileInputStream.html"><tt>TFileInputStream</tt></a>, <a href="../apidocs/net/java/truevfs/access/TFileOutputStream.html"><tt>TFileOutputStream</tt></a>, <a href="../apidocs/net/java/truevfs/access/TFileReader.html"><tt>TFileReader</tt></a> and <a href="../apidocs/net/java/truevfs/access/TFileWriter.html"><tt>TFileWriter</tt></a>, or just <tt>TFile*</tt> for short.</li>
+<li> The new I/O API style (alias NIO.2, specified in JSR&#160;203 and included in JSE&#160;7) is supported by the classes <a href="../apidocs/net/java/truevfs/access/TPath.html"><tt>TPath</tt></a>, <a href="../apidocs/net/java/truevfs/access/TFileSystem.html"><tt>TFileSystem</tt></a> and <a href="../apidocs/net/java/truevfs/access/TFileSystemProvider.html"><tt>TFileSystemProvider</tt></a>.</li></ul>
+<div class="section">
+<h4><a name="OIO_API_style"></a>OIO API style</h4>
+<p>Using the OIO API style, your starting point for almost all file system operations is the class <tt>TFile</tt>. This class inherits from <tt>java.io.File</tt>, so you can use it with other APIs for its super class. The class <a href="../apidocs/net/java/truevfs/access/swing/TFileChooser.html"><tt>TFileChooser</tt></a> in the module <a href="../truevfs-access-swing/index.html">TrueVFS&#160;Access&#160;Swing</a> uses this feature by subclassing <tt>javax.swing.JFileChooser</tt> so that you can browse archive files with it, too. However, you can't use a plain old <tt>java.io.FileInputStream</tt>, <tt>java.io.FileOutputStream</tt> et al with a <tt>TFile</tt> object. You have to use a <b>TFileInputStream</b>, <b>TFileOutputStream</b> et al instead.</p>
+<p>Although the <tt>TFile</tt> class extends <tt>File</tt>, it also provides many additional methods to overcome the known limitations of its super class, e.g. the additional methods throw an <tt>java.io.IOException</tt> on failure instead of simply returning a boolean value. So the OIO API style is by no means obsolete - see below.</p></div>
+<div class="section">
+<h4><a name="NIO.2_API_style"></a>NIO.2 API style</h4>
+<p>If you prefer the NIO.2 API style, then your starting point is the class <tt>TPath</tt>. The NIO.2 API overcomes many constraints of the OIO API. However, for the brevity of this tutorial, the NIO.2 API is not covered here. For more information, please refer to the documentation of the module <a href="../truevfs-access/index.html">TrueVFS&#160;Access</a>.</p></div></div>
+<div class="section">
+<h3><a name="Create"></a>Create</h3>
+<p>Creating an archive file works exactly like creating any other directory, so you could simply call <a href="../apidocs/net/java/truevfs/access/TFile.html#mkdir"><tt>TFile.mkdir()</tt></a> or <a href="../apidocs/net/java/truevfs/access/TFile.html#mkdirs"><tt>TFile.mkdirs()</tt></a> in order to create an archive file or a member directory.</p>
+<div class="source">
+<pre>File dir = new TFile(&quot;archive.zip/dir&quot;);
+dir.mkdirs(); // don't do this!</pre></div>
+<p>However, while this works as expected, it's actually sub-optimal: Explicitly creating a directory within an archive file may create an otherwise empty archive entry for the directory in the target archive file. This wastes space in the resulting archive file and therefore is not recommended. Instead, you should simply directly create the file entries within an archive file.</p>
+<p>The following example shows how to create an archive entry with the class <a href="../apidocs/net/java/truevfs/access/TFileWriter.html"><tt>TFileWriter</tt></a> without the need to create its containing archive file or the directory within this archive file first:</p>
+<div class="source">
+<pre>File entry = new TFile(&quot;archive.zip/dir/H&#xe4;lloW&#xf6;rld.txt&quot;);
+Writer writer = new TFileWriter(entry);
+try {
+    writer.write(&quot;Hello world!\n&quot;);
+} finally {
+    writer.close();
+}</pre></div>
+<p>Note the use of a finally-block to ensure that the writer gets always <tt>close()</tt>d. This is vital for any I/O resource (not just within TrueVFS) in order to ensure that any operating system resources get released as soon as possible, even in the event of an <tt>IOException</tt> or any other <tt>Throwable</tt>, e.g. an <tt>OutOfMemoryError</tt>. Please also consider that the <tt>close()</tt> method may throw an <tt>IOException</tt>, too. <b>It is an error to ignore this!</b> So please wrap the entire block in another try-catch block or else declare the enclosing method to potentially throw an <tt>IOException</tt>.</p>
+<p>Actually, it's a typical issue for long running Java applications to run out of file descriptors because the programmers haven't ensured to properly close their I/O resources. So please make sure you always close your I/O resources in a finally-block. In case you need some aid to check your code for this issue, I recommend to use <a class="externalLink" href="http://findbugs.sourceforge.net">FindBugs</a>.</p></div>
+<div class="section">
+<h3><a name="Read"></a>Read</h3>
+<p>Reading an archive entry is as easy as writing it - just use a class like <a href="../apidocs/net/java/truevfs/access/TFileReader.html"><tt>TFileReader</tt></a> and point it to the archive entry:</p>
+<div class="source">
+<pre>File entry = new TFile(&quot;archive.zip/dir/H&#xe4;lloW&#xf6;rld.txt&quot;);
+Reader reader = new TFileReader(entry);
+try {
+    // Do the processing here
+    ...
+} finally {
+    reader.close();
+}</pre></div>
+<p>Note again the use of a finally-block to ensure that the reader gets always <tt>close()</tt>d.</p>
+<p>OK, this is trivial, but how do you find the archive entry to read in the first place? Remember that the <tt>TFile</tt> class extends <tt>File</tt>, so you can simply use <a href="../apidocs/net/java/truevfs/access/TFile.html#list"><tt>TFile.list()</tt></a>, <a href="../apidocs/net/java/truevfs/access/TFile.html#listFiles"><tt>TFile.listFiles()</tt></a> etc.</p>
+<p>The following example prints the members of the previously created archive file to the standard output:</p>
+<div class="source">
+<pre>TFile archive = new TFile(&quot;archive.zip&quot;);
+for (String member : archive.list())
+  System.out.println(member);</pre></div>
+<p>Following the previous example, this would just print the string <tt>dir</tt> to the standard output. This is because <tt>File.list()</tt>, and hence <tt>TFile.list()</tt>, just list the immediate members of a (virtual) directory. You need to apply this method recursively to print an entire directory tree.</p></div>
+<div class="section">
+<h3><a name="Update"></a>Update</h3>
+<p>Overwriting the contents of an archive entry works in exactly the same way like creating it - just use a <tt>TFileOutputStream</tt> or a <tt>TFileWriter</tt> and point it to the respective archive entry with the help of a <tt>TFile</tt>.</p>
+<p>Of course a file system does not only store entry contents, but also some meta data, e.g. the last modification time. Just like with a real file system, you can easily update the last modification time of an archive entry by calling <a href="../apidocs/net/java/truevfs/access/TFile.html#setLastModifiedlong"><tt>TFile.setLastModified(long)</tt></a>.</p>
+<div class="source">
+<pre>File entry = new TFile(&quot;archive.zip/dir/H&#xe4;lloW&#xf6;rld.txt&quot;);
+entry.setLastModified(System.currentTimeMillis()); // sub-optimal!</pre></div>
+<p>However, there may be smarter ways to do this: Most times you want to set the last modification of a file system entry its because you are copying one file system entry to another and you want to preserve some meta data, too. In this case you should use the <a href="#Bulk_IO_Methods">Bulk I/O Methods</a> instead in order to benefit from their superior performance.</p></div>
+<div class="section">
+<h3><a name="Delete"></a>Delete</h3>
+<p>You may be guessing it already, so let it suffice to say that deleting an archive entry works in exactly the same way as with a regular file system entry - just call <a href="../apidocs/net/java/truevfs/access/TFile.html#delete"><tt>TFile.delete()</tt></a>.</p>
+<div class="source">
+<pre>File entry = new TFile(&quot;archive.zip/dir/H&#xe4;lloW&#xf6;rld.txt&quot;);
+boolean ok = entry.delete(); // sub-optimal!</pre></div>
+<p>One shortcoming of this method is that it just returns a boolean value to indicate success or failure. To overcome this, another method has been added which is aptly named <a href="../apidocs/net/java/truevfs/access/TFile.html#rm"><tt>TFile.rm()</tt></a>.</p>
+<div class="source">
+<pre>new TFile(&quot;archive.zip/dir/H&#xe4;lloW&#xf6;rld.txt&quot;).rm();</pre></div>
+<p>This method returns <tt>this</tt> for fluent programming and throws an <tt>IOException</tt> with the path name and a short description of what went wrong as its message.</p></div>
+<div class="section">
+<h3><a name="Bulk_IO_Methods"></a>Bulk I/O Methods</h3>
+<p>TrueVFS is not just about accessing archive files: The <tt>TFile</tt> class provides some very useful methods for standard tasks like copying, moving or removing entire directory trees. Here's how to create a TAR.GZ file from a ZIP file:</p>
+<div class="source">
+<pre>new TFile(&quot;archive.zip&quot;).cp_rp(new TFile(&quot;archive.tar.gz&quot;));</pre></div>
+<p>These methods are not only very convenient to use, they also provide superior performance because they apply multithreading and in the case of archive entries, use a feature called Raw Data Copying (RDC). For example when copying arbitrary file system entries, one thread reads the input entry while another thread writes the output entry. When copying ZIP entries from one ZIP file to another, then thanks to RDC the input entry does <i>not</i> get decompressed just in order to compress it again to the output entry; instead, the raw entry data gets copied from the input entry to the output entry directly.</p>
+<p>For more information about the available bulk I/O methods, please refer to the section <a href="../apidocs/net/java/truevfs/access/TFile.html#bulkIOMethods">Bulk I/O methods</a> of the <tt>TFile</tt> class Javadoc. For now, let's just clean up behind us:</p>
+<div class="source">
+<pre>new TFile(&quot;archive.zip&quot;).rm_r();    // remove recursively
+new TFile(&quot;archive.tar.gz&quot;).rm_r(); // dito</pre></div></div>
+<div class="section">
+<h3><a name="Customizing_the_Initial_Configuration"></a>Customizing the Initial Configuration</h3>
+<p>You may be wondering how TrueVFS gets configured to treat a file name with a <tt>tar.gz</tt> or <tt>zip</tt> extension as a TAR.GZ or ZIP file instead of a plain old file. For now, let it suffice to say that TrueVFS follows the convention-over-configuration principle as much as possible, so there are reasonable defaults for everything in order to relieve you from typical configuration tasks.</p>
+<p>For the previous examples to work, the JARs of the driver modules <a href="../truevfs-driver/truevfs-driver-tar/index.html">TrueVFS Driver TAR</a> and <a href="../truevfs-driver/truevfs-driver-zip/index.html">TrueVFS Driver ZIP</a> need to be present on the run time class path. You can do this by adding the Maven artifactId <tt>truevfs-driver-tar</tt> and <tt>truevfs-driver-zip</tt> as a dependency to the POM of your Maven build.</p>
+<p>For more information about configuring the client API, please refer to the article <a href="../truevfs-access/configuration.html">Configuring TrueVFS Access</a>.</p>
+<div class="section">
+<h4><a name="False_Positive_Archive_Files"></a>False Positive Archive Files</h4>
+<p>Sometimes a file system entry may have a suffix which is configured to get recognized as an archive file, however the file is not an archive file or not even a file, e.g. a directory. This is called a <i>false positive archive file</i> or <i>false positive</i> for short.</p>
+<p>TrueVFS safely detects any false positives and treats them according to their true state, that is, like a plain file or directory. This finding will be remembered until the next call to <tt>TVFS.umount()</tt>, so the performance impact is minimal.</p></div></div>
+<div class="section">
+<h3><a name="Committing_Changes__Cleaning_Up"></a>Committing Changes / Cleaning Up</h3>
+<p>If your application has created or changed one or more archive files, then these changes need to get committed sometime. Even if your application has done read-only acess to the virtual file system, some temporary files may have been created to speed up random access - this dependends on the driver implementation.</p>
+<p>If your application is only short-running, then there is actually nothing to do because the TrueVFS Kernel automatically registers and de-registers a JVM shutdown hook which will commit all changes when its run. Note that shutdown hooks are run even if the application terminates due to a <tt>Throwable</tt>.</p>
+<p>However, if your application is long running or wants to handle any exceptions, then you may want to manually call this operation - here's how to do this:</p>
+<div class="source">
+<pre>TVFS.umount();</pre></div>
+<p>As a side effect, once this operation succeeded, third parties (e.g. other processes) can safely access the processed archive files until the next time your application starts to operate on them again.</p>
+<div class="section">
+<h4><a name="Performance_Considerations"></a>Performance Considerations</h4>
+<p>Take care not to call <tt>TVFS.umount()</tt> in a loop which updates the same set of archive files because this would result in poor performance in the order of O(n*n) instead of just O(n), where n is the total number of archive entries.</p>
+<p>For more information, please refer to the Javadoc for <a href="../apidocs/net/java/truevfs/access/TVFS.html#umount"><tt>TVFS.umount()</tt></a>.</p></div></div></div>
+              </div>
+    </div>
+    <div class="clear"><hr/></div>
+    <div id="footer">
+      <div class="xright">
+              Copyright &#169;                    2005-2017
+                        <a href="http://schlichtherle.de">Schlichtherle IT Services</a>.
+            All Rights Reserved.      
+                                   <span id="publishDate">Last Published: 2017-09-19</span>
+                        </div>
+      <div class="clear"><hr/></div>
+    </div>
+  </body>
+</html>

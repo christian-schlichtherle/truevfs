@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <link href="./css/prettify.css" type="text/css" rel="stylesheet"/>
+    <script src="./js/prettify.js" type="text/javascript"></script>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>TrueVFS &#x2013; Basic Concepts</title>
+    <style type="text/css" media="all">
+      @import url("./css/site.css");
+    </style>
+    <link rel="stylesheet" href="./css/print.css" type="text/css" media="print"/>
+    <meta name="author" content="Christian Schlichtherle"/>
+    <meta name="Date-Revision-yyyymmdd" content="20170919"/>
+    <meta http-equiv="Content-Language" content="en"/>
+          <script type="text/javascript">
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-25500668-2']);
+      _gaq.push(['_trackPageview']);
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
+                  <script>
+        (function() {
+          var cx = '003580521944097984334:8uinm6tpaz4';
+          var gcse = document.createElement('script'); gcse.type = 'text/javascript'; gcse.async = true;
+          gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+              '//www.google.com/cse/cse.js?cx=' + cx;
+          var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(gcse, s);
+        })();
+      </script>
+                                                          
+<link title="The TrueZIP Blog - Announcements Feed" rel="alternate" type="application/rss+xml" href="http://truevfs.schlichtherle.de/category/announcements/feed/"/>
+                      
+  </head>
+  <body class="composite" onload="prettyPrint()">
+    <div id="banner">
+                    <div id="bannerLeft">
+                TrueVFS
+                </div>
+                                <div id="gcse-search-form" class="gcse-searchbox-only"></div>
+            <div class="clear"><hr/></div>
+    </div>
+    <div id="breadcrumbs">
+            
+                                  <div class="xleft">
+        <span id="projectVersion">Version: 0.12.0</span>
+                  |                         <a href="index.html" title="TrueVFS">TrueVFS</a>
+      &raquo;
+      TrueVFS &#x2013; Basic Concepts
+              </div>
+            <div class="xright">        
+                        </div>
+      <div class="clear"><hr/></div>
+    </div>
+    <div id="leftColumn">
+      <div id="navcolumn">
+              
+                                                   <h5>Documentation</h5>
+                  <ul>
+                  <li class="none">
+                          <a href="index.html" title="About">About</a>
+            </li>
+                  <li class="none">
+                          <a href="features.html" title="Key Features">Key Features</a>
+            </li>
+                                                                                                                                            <li class="collapsed">
+                          <a href="usecases/index.html" title="Use Cases">Use Cases</a>
+                  </li>
+                                                                                                        <li class="collapsed">
+                          <a href="kick-start/index.html" title="Getting Started">Getting Started</a>
+                  </li>
+                                                                                                                          <li class="collapsed">
+                          <a href="help.html" title="Getting Help">Getting Help</a>
+                  </li>
+                  <li class="none">
+            <strong>Basic Concepts</strong>
+          </li>
+                  <li class="none">
+                          <a href="glossary.html" title="Glossary">Glossary</a>
+            </li>
+          </ul>
+                       <h5>External Resources</h5>
+                  <ul>
+                  <li class="none">
+                          <a href="http://illegalexception.schlichtherle.de" class="externalLink" title="Christian's Blog">Christian's Blog</a>
+            </li>
+          </ul>
+                       <h5>Parent Module</h5>
+                                 <h5>Sub-Modules</h5>
+                  <ul>
+                  <li class="none">
+                          <a href="truevfs-access/index.html" title="TrueVFS Access">TrueVFS Access</a>
+            </li>
+                  <li class="none">
+                          <a href="truevfs-access-swing/index.html" title="TrueVFS Access Swing">TrueVFS Access Swing</a>
+            </li>
+                  <li class="none">
+                          <a href="truevfs-archetype/index.html" title="TrueVFS Archetype">TrueVFS Archetype</a>
+            </li>
+                  <li class="none">
+                          <a href="truevfs-comp/index.html" title="TrueVFS Component">TrueVFS Component</a>
+            </li>
+                  <li class="none">
+                          <a href="truevfs-driver/index.html" title="TrueVFS Driver">TrueVFS Driver</a>
+            </li>
+                  <li class="none">
+                          <a href="truevfs-ext/index.html" title="TrueVFS Extension">TrueVFS Extension</a>
+            </li>
+                  <li class="none">
+                          <a href="truevfs-it/index.html" title="TrueVFS Integration Tests">TrueVFS Integration Tests</a>
+            </li>
+                  <li class="none">
+                          <a href="truevfs-kernel/index.html" title="TrueVFS Kernel">TrueVFS Kernel</a>
+            </li>
+                  <li class="none">
+                          <a href="truevfs-profile/index.html" title="TrueVFS Profile">TrueVFS Profile</a>
+            </li>
+                  <li class="none">
+                          <a href="truevfs-samples/index.html" title="TrueVFS Samples">TrueVFS Samples</a>
+            </li>
+          </ul>
+                       <h5>Reports</h5>
+                  <ul>
+                                                                                                                                                                                                                                                                                            <li class="collapsed">
+                          <a href="project-info.html" title="Project Information">Project Information</a>
+                  </li>
+                                                                                      <li class="collapsed">
+                          <a href="project-reports.html" title="Project Reports">Project Reports</a>
+                  </li>
+          </ul>
+                     
+<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+  <div class="paypalButton">
+    <input name="cmd" value="_s-xclick" type="hidden"/>
+    <input name="hosted_button_id" value="AGDEQWWKNZ6UL" type="hidden"/>
+    <input style="border: 0" alt="PayPal - The safer, easier way to pay online!" name="submit" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" type="image"/>
+  </div>
+</form>
+                                
+                              </div>
+    </div>
+    <div id="bodyColumn" class="content">
+      <div id="contentBox">
+                                      <div class="section">
+<h2><a name="Basic_Concepts"></a>Basic Concepts</h2>
+<p>TrueVFS is a Java based plug-in framework for virtual file systems (VFS) which provides transparent access to archive files as if they were just plain directories.</p>
+<div class="section">
+<h3><a name="Overall_Architecture"></a>Overall Architecture</h3>
+<p>TrueVFS applies the (in)famous three-tier architecture pattern:</p>
+<ol style="list-style-type: decimal">
+<li>The <i>Access Tier</i> is a facade for the Kernel Tier which provides convenient-to-use client APIs for TrueVFS applications. No file system state is managed by this tier, which enables a TrueVFS application to work with any client API concurrently. This tier solely consists of the module <a href="./truevfs-access/index.html">TrueVFS&#160;Access</a>. In addition to the canonical term <i>access module</i>, this may also get referred to by the term <i>client API module</i> for better comprehensibility.</li>
+<li>The <i>Kernel Tier</i> manages all virtual file system state. It also provides multiplexing, caching and buffering for multithreaded environments so that the driver tier does not need to take care of this. This tier consists of the modules <a href="./truevfs-kernel/index.html">TrueVFS&#160;Kernel&#160;Specification</a> and <a href="./truevfs-kernel/index.html">TrueVFS&#160;Kernel&#160;Implementation</a>.</li>
+<li>The <i>Driver Tier</i> implements the I/O operations for their respective (archive) file system type. This tier consists of all file system driver modules, e.g. <a href="./truevfs-driver/truevfs-driver-file/index.html">TrueVFS&#160;Driver&#160;FILE</a>, <a href="./truevfs-driver/truevfs-driver-zip/index.html">TrueVFS&#160;Driver&#160;ZIP</a> et al.</li></ol></div>
+<div class="section">
+<h3><a name="Design_Paradigms"></a>Design Paradigms</h3>
+<p>The TrueVFS project employs some fundamental design paradigms which have proven to be beneficial. However, these are only guidelines - not rules - so they get applied with care.</p>
+<div class="section">
+<h4><a name="Convention_Over_Configuration"></a>Convention Over Configuration</h4>
+<p>The decomposition of this framework into separate modules enables users to easily configure the initial setup of the application's archive detection by simply putting the JARs of the required file system driver modules on the run time class path. This will cause the application to automatically detect the canonical file extensions for the archive files supported by the respective file system driver module - no configuration file editing is required!</p>
+<p>The application can simply accept this initial setup of its <a href="./apidocs/net/java/truevfs/access/TConfig.html#current">current configuration</a> or it can change it, e.g. update its <a href="./apidocs/net/java/truevfs/access/TConfig.html#setArchiveDetectornet.java.truevfs.access.TArchiveDetector">archive detection</a>. Check the <a href="./faq.html#file">FAQ</a> for the <a href="./truevfs-access/index.html">TrueVFS Access</a> API for a discussion of some options to adapt the archive detection to your needs.</p></div>
+<div class="section">
+<h4><a name="Service_Location"></a>Service Location</h4>
+<p>As an implication of the Convention Over Configuration design paradigm, the <a href="./truevfs-kernel/index.html">TrueVFS Kernel</a> module provides service locator singletons for the <a href="./apidocs/net/java/truevfs/kernel/spec/sl/FsManagerLocator.html">file system manager</a>, the <a href="./apidocs/net/java/truevfs/kernel/spec/sl/FsDriverMapLocator.html">file system driver map</a> and the <a href="./apidocs/net/java/truevfs/kernel/spec/sl/IoBufferPoolLocator.html">I/O buffer pool</a>.</p></div>
+<div class="section">
+<h4><a name="Dependency_Injection"></a>Dependency Injection</h4>
+<p>Although the service locator singletons are provided by the TrueVFS Kernel module, it does not actually use them. To the contrary, the TrueVFS Kernel module fully relies on the Dependency Injection design paradigm. This enables TrueVFS modules and TrueVFS applications to inject custom implementations or simply the service locator singletons as a dependency into the TrueVFS Kernel.</p>
+<p>For example, the file system manager service locator singleton and the file system driver service locator singleton are used by the module <a href="./truevfs-access/index.html">TrueVFS Access</a> in order to implement the Convention Over Configuration design paradigm. Likewise, the temporary I/O entry pool service locator singleton is used by the file system driver modules.</p>
+<p>No Dependency Injection framework is used in order to reduce TrueVFS's dependency on third party projects.</p>
+<p>Constructor injection is favored wherever possible in order to enable immutable objects.</p></div>
+<div class="section">
+<h4><a name="Immutable_Classes"></a>Immutable Classes</h4>
+<p>Immutable classes are favored wherever possible because they inherently provide support for multithreading, which is a key requirement for most TrueVFS Kernel classes.</p>
+<p>For example, the classes <a href="./apidocs/net/java/truevfs/kernel/spec/FsNodePath.html"><tt>FsNodePath</tt></a>, <a href="./apidocs/net/java/truevfs/kernel/spec/FsMountPoint.html"><tt>FsMountPoint</tt></a> and <a href="./apidocs/net/java/truevfs/kernel/spec/FsNodeName.html"><tt>FsNodeName</tt></a> are immutable so that their instances can get safely shared among many objects and threads.</p></div>
+<div class="section">
+<h4><a name="Loose_Coupling"></a>Loose Coupling</h4>
+<p>Programming against interfaces or abstract classes is preferred over implementation classes in order to ease exchanging implementation classes.</p>
+<p>For example, the abstract classes <a href="./apidocs/net/java/truevfs/kernel/spec/FsModel.html"><tt>FsModel</tt></a> and <a href="./apidocs/net/java/truevfs/kernel/spec/FsController.html"><tt>FsController</tt></a> participate in a variant of the MVC design pattern which is known as the Front Controller design pattern. The numerous implementation classes participate in the different file system driver modules in order to accommodate to the different contexts of non-federated and federated file system types and implement their specific behavior.</p></div>
+<div class="section">
+<h4><a name="Open_For_Extension_Closed_For_Modification"></a>Open For Extension, Closed For Modification</h4>
+<p>Abstract classes are favored over interfaces wherever the future addition of more methods is anticipated in order to enable binary backwards compatibility.</p>
+<p>Wherever reasonable, classes, methods and fields are declared (package) private and/or final in order to inhibit undesirable inheritance, enhance maintainability and/or enable true immutability.</p>
+<p>For example, the abstract classes <tt>FsModel</tt> and <tt>FsController</tt> provide final implementations for <tt>Object.equals(Object)</tt>, <tt>Object.hashCode()</tt> and <tt>Object.toString()</tt> because there is exactly only one reasonable implementation for any implementation class.</p></div>
+<div class="section">
+<h4><a name="Separation_Of_Concerns"></a>Separation Of Concerns</h4>
+<p>The design of interfaces and abstract classes aims for strong cohesion in order to ease implementation classes and enhance their extensibility and reusability. Where conflicts arise, the Law Of Demeter is sacrificed for strong cohesion.</p>
+<p>The set of overridable public methods of abstract classes and interfaces is reduced as much as reasonable in order to ease implementation classes.</p>
+<p>For example, the class <a href="./apidocs/net/java/truevfs/kernel/spec/FsDriver.html"><tt>FsDriver</tt></a> consists of only one abstract method <a href="./apidocs/net/java/truevfs/kernel/spec/FsDriver.html#newControllernet.java.truevfs.kernel.spec.FsManagernet.java.truevfs.kernel.spec.FsModelnet.java.truevfs.kernel.spec.FsController"><tt>FsDriver.newController(FsManager, FsModel, FsController)</tt></a> which needs to get implemented in any file system driver module. </p></div>
+<div class="section">
+<h4><a name="Composition_Over_Inheritance"></a>Composition Over Inheritance</h4>
+<p>The declaration of classes or methods as final forces the use of composition rather than inheritance which in turn enables dependency resolution at run time and thus enhances the overall extensibility of the architecture.</p></div></div></div>
+              </div>
+    </div>
+    <div class="clear"><hr/></div>
+    <div id="footer">
+      <div class="xright">
+              Copyright &#169;                    2005-2017
+                        <a href="http://schlichtherle.de">Schlichtherle IT Services</a>.
+            All Rights Reserved.      
+                                   <span id="publishDate">Last Published: 2017-09-19</span>
+                        </div>
+      <div class="clear"><hr/></div>
+    </div>
+  </body>
+</html>

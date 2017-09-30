@@ -1,0 +1,366 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!-- NewPage -->
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>KeyManagerRaesParameters (TrueVFS 0.12.0 API)</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<script type="text/javascript"><!--
+    if (location.href.indexOf('is-external=true') == -1) {
+        parent.document.title="KeyManagerRaesParameters (TrueVFS 0.12.0 API)";
+    }
+//-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+<!-- ========= START OF TOP NAVBAR ======= -->
+<div class="topNav"><a name="navbar_top">
+<!--   -->
+</a><a href="#skip-navbar_top" title="Skip navigation links"></a><a name="navbar_top_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/KeyManagerRaesParameters.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li>Prev Class</li>
+<li><a href="../../../../../../net/java/truevfs/driver/zip/raes/ParanoidZipRaesDriver.html" title="class in net.java.truevfs.driver.zip.raes"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../../index.html?net/java/truevfs/driver/zip/raes/KeyManagerRaesParameters.html" target="_top">Frames</a></li>
+<li><a href="KeyManagerRaesParameters.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_top">
+<li><a href="../../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#field_summary">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_summary">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li><a href="#field_detail">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_detail">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_top">
+<!--   -->
+</a></div>
+<!-- ========= END OF TOP NAVBAR ========= -->
+<!-- ======== START OF CLASS DATA ======== -->
+<div class="header">
+<div class="subTitle">net.java.truevfs.driver.zip.raes</div>
+<h2 title="Class KeyManagerRaesParameters" class="title">Class KeyManagerRaesParameters</h2>
+</div>
+<div class="contentContainer">
+<ul class="inheritance">
+<li><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">java.lang.Object</a></li>
+<li>
+<ul class="inheritance">
+<li>net.java.truevfs.driver.zip.raes.KeyManagerRaesParameters</li>
+</ul>
+</li>
+</ul>
+<div class="description">
+<ul class="blockList">
+<li class="blockList">
+<dl>
+<dt>All Implemented Interfaces:</dt>
+<dd><a href="../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesParameters.html" title="interface in net.java.truevfs.driver.zip.raes.crypto">RaesParameters</a>, <a href="../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesParametersProvider.html" title="interface in net.java.truevfs.driver.zip.raes.crypto">RaesParametersProvider</a></dd>
+</dl>
+<hr>
+<br>
+<pre><a href="http://docs.oracle.com/javase/7/docs/api/javax/annotation/concurrent.ThreadSafe.html?is-external=true" title="class or interface in javax.annotation">@ThreadSafe</a>
+public class <span class="strong">KeyManagerRaesParameters</span>
+extends <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a>
+implements <a href="../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesParametersProvider.html" title="interface in net.java.truevfs.driver.zip.raes.crypto">RaesParametersProvider</a></pre>
+<div class="block">An adapter which provides <a href="../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesParameters.html" title="interface in net.java.truevfs.driver.zip.raes.crypto"><code>RaesParameters</code></a> by using a
+ <code>KeyManager</code> for <code>AesPbeParameters</code>.
+ <p>
+ The current implementation supports only <a href="../../../../../../net/java/truevfs/driver/zip/raes/crypto/Type0RaesParameters.html" title="interface in net.java.truevfs.driver.zip.raes.crypto"><code>Type0RaesParameters</code></a>.</div>
+<dl><dt><span class="strong">Author:</span></dt>
+  <dd>Christian Schlichtherle</dd></dl>
+</li>
+</ul>
+</div>
+<div class="summary">
+<ul class="blockList">
+<li class="blockList">
+<!-- =========== FIELD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field_summary">
+<!--   -->
+</a>
+<h3>Field Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Field Summary table, listing fields, and an explanation">
+<caption><span>Fields</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Field and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>protected net.java.truecommons.key.spec.KeyManager&lt;net.java.truecommons.key.spec.common.AesPbeParameters&gt;</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/raes/KeyManagerRaesParameters.html#manager">manager</a></strong></code>
+<div class="block">The key manager for accessing RAES encrypted data.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>protected <a href="http://docs.oracle.com/javase/7/docs/api/java/net/URI.html?is-external=true" title="class or interface in java.net">URI</a></code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/raes/KeyManagerRaesParameters.html#raes">raes</a></strong></code>
+<div class="block">The resource URI of the RAES file.</div>
+</td>
+</tr>
+</table>
+</li>
+</ul>
+<!-- ======== CONSTRUCTOR SUMMARY ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor_summary">
+<!--   -->
+</a>
+<h3>Constructor Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Constructor Summary table, listing constructors, and an explanation">
+<caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colOne" scope="col">Constructor and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colOne"><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/raes/KeyManagerRaesParameters.html#KeyManagerRaesParameters(net.java.truecommons.key.spec.KeyManager,%20java.net.URI)">KeyManagerRaesParameters</a></strong>(net.java.truecommons.key.spec.KeyManager&lt;net.java.truecommons.key.spec.common.AesPbeParameters&gt;&nbsp;manager,
+                        <a href="http://docs.oracle.com/javase/7/docs/api/java/net/URI.html?is-external=true" title="class or interface in java.net">URI</a>&nbsp;raes)</code>
+<div class="block">Constructs new RAES parameters.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colOne"><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/raes/KeyManagerRaesParameters.html#KeyManagerRaesParameters(net.java.truecommons.key.spec.KeyManagerMap,%20java.net.URI)">KeyManagerRaesParameters</a></strong>(net.java.truecommons.key.spec.KeyManagerMap&nbsp;container,
+                        <a href="http://docs.oracle.com/javase/7/docs/api/java/net/URI.html?is-external=true" title="class or interface in java.net">URI</a>&nbsp;raes)</code>
+<div class="block">Constructs RAES parameters using the given key manager provider.</div>
+</td>
+</tr>
+</table>
+</li>
+</ul>
+<!-- ========== METHOD SUMMARY =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_summary">
+<!--   -->
+</a>
+<h3>Method Summary</h3>
+<table class="overviewSummary" border="0" cellpadding="3" cellspacing="0" summary="Method Summary table, listing methods, and an explanation">
+<caption><span>Methods</span><span class="tabEnd">&nbsp;</span></caption>
+<tr>
+<th class="colFirst" scope="col">Modifier and Type</th>
+<th class="colLast" scope="col">Method and Description</th>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>&lt;P extends <a href="../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesParameters.html" title="interface in net.java.truevfs.driver.zip.raes.crypto">RaesParameters</a>&gt;&nbsp;<br>P</code></td>
+<td class="colLast"><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/raes/KeyManagerRaesParameters.html#get(java.lang.Class)">get</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;P&gt;&nbsp;type)</code>
+<div class="block">Returns <a href="../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesParameters.html" title="interface in net.java.truevfs.driver.zip.raes.crypto"><code>RaesParameters</code></a> of the given <code>type</code>
+ or <code>null</code> if not available.</div>
+</td>
+</tr>
+</table>
+<ul class="blockList">
+<li class="blockList"><a name="methods_inherited_from_class_java.lang.Object">
+<!--   -->
+</a>
+<h3>Methods inherited from class&nbsp;java.lang.<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true" title="class or interface in java.lang">Object</a></h3>
+<code><a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#clone()" title="class or interface in java.lang">clone</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#equals(java.lang.Object)" title="class or interface in java.lang">equals</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#finalize()" title="class or interface in java.lang">finalize</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#getClass()" title="class or interface in java.lang">getClass</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#hashCode()" title="class or interface in java.lang">hashCode</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notify()" title="class or interface in java.lang">notify</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#notifyAll()" title="class or interface in java.lang">notifyAll</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#toString()" title="class or interface in java.lang">toString</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait()" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long)" title="class or interface in java.lang">wait</a>, <a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Object.html?is-external=true#wait(long,%20int)" title="class or interface in java.lang">wait</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="details">
+<ul class="blockList">
+<li class="blockList">
+<!-- ============ FIELD DETAIL =========== -->
+<ul class="blockList">
+<li class="blockList"><a name="field_detail">
+<!--   -->
+</a>
+<h3>Field Detail</h3>
+<a name="manager">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>manager</h4>
+<pre>protected final&nbsp;net.java.truecommons.key.spec.KeyManager&lt;net.java.truecommons.key.spec.common.AesPbeParameters&gt; manager</pre>
+<div class="block">The key manager for accessing RAES encrypted data.</div>
+</li>
+</ul>
+<a name="raes">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>raes</h4>
+<pre>protected final&nbsp;<a href="http://docs.oracle.com/javase/7/docs/api/java/net/URI.html?is-external=true" title="class or interface in java.net">URI</a> raes</pre>
+<div class="block">The resource URI of the RAES file.</div>
+</li>
+</ul>
+</li>
+</ul>
+<!-- ========= CONSTRUCTOR DETAIL ======== -->
+<ul class="blockList">
+<li class="blockList"><a name="constructor_detail">
+<!--   -->
+</a>
+<h3>Constructor Detail</h3>
+<a name="KeyManagerRaesParameters(net.java.truecommons.key.spec.KeyManager, java.net.URI)">
+<!--   -->
+</a>
+<ul class="blockList">
+<li class="blockList">
+<h4>KeyManagerRaesParameters</h4>
+<pre>public&nbsp;KeyManagerRaesParameters(net.java.truecommons.key.spec.KeyManager&lt;net.java.truecommons.key.spec.common.AesPbeParameters&gt;&nbsp;manager,
+                        <a href="http://docs.oracle.com/javase/7/docs/api/java/net/URI.html?is-external=true" title="class or interface in java.net">URI</a>&nbsp;raes)</pre>
+<div class="block">Constructs new RAES parameters.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>manager</code> - the key manager for accessing RAES encrypted data.</dd><dd><code>raes</code> - the resource URI of the RAES file.</dd></dl>
+</li>
+</ul>
+<a name="KeyManagerRaesParameters(net.java.truecommons.key.spec.KeyManagerMap, java.net.URI)">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>KeyManagerRaesParameters</h4>
+<pre>public&nbsp;KeyManagerRaesParameters(net.java.truecommons.key.spec.KeyManagerMap&nbsp;container,
+                        <a href="http://docs.oracle.com/javase/7/docs/api/java/net/URI.html?is-external=true" title="class or interface in java.net">URI</a>&nbsp;raes)</pre>
+<div class="block">Constructs RAES parameters using the given key manager provider.</div>
+<dl><dt><span class="strong">Parameters:</span></dt><dd><code>container</code> - the container of the key manager for accessing RAES
+         encrypted data.</dd><dd><code>raes</code> - the absolute URI of the RAES file.</dd></dl>
+</li>
+</ul>
+</li>
+</ul>
+<!-- ============ METHOD DETAIL ========== -->
+<ul class="blockList">
+<li class="blockList"><a name="method_detail">
+<!--   -->
+</a>
+<h3>Method Detail</h3>
+<a name="get(java.lang.Class)">
+<!--   -->
+</a>
+<ul class="blockListLast">
+<li class="blockList">
+<h4>get</h4>
+<pre>public&nbsp;&lt;P extends <a href="../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesParameters.html" title="interface in net.java.truevfs.driver.zip.raes.crypto">RaesParameters</a>&gt;&nbsp;P&nbsp;get(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Class.html?is-external=true" title="class or interface in java.lang">Class</a>&lt;P&gt;&nbsp;type)</pre>
+<div class="block">Returns <a href="../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesParameters.html" title="interface in net.java.truevfs.driver.zip.raes.crypto"><code>RaesParameters</code></a> of the given <code>type</code>
+ or <code>null</code> if not available.
+ <p>
+ If <code>type</code> is assignable from <a href="../../../../../../net/java/truevfs/driver/zip/raes/crypto/Type0RaesParameters.html" title="interface in net.java.truevfs.driver.zip.raes.crypto"><code>Type0RaesParameters</code></a>, then the
+ <code>KeyManager</code> for <code>AesPbeParameters</code> will getKeyManager used which
+ has been provided to the constructor.
+ <p>
+ Otherwise, <code>null</code> gets returned.</div>
+<dl>
+<dt><strong>Specified by:</strong></dt>
+<dd><code><a href="../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesParametersProvider.html#get(java.lang.Class)">get</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesParametersProvider.html" title="interface in net.java.truevfs.driver.zip.raes.crypto">RaesParametersProvider</a></code></dd>
+<dt><span class="strong">Type Parameters:</span></dt><dd><code>P</code> - the type of the RAES parameters.</dd><dt><span class="strong">Parameters:</span></dt><dd><code>type</code> - the <a href="../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesParameters.html" title="interface in net.java.truevfs.driver.zip.raes.crypto"><code>RaesParameters</code></a> interface class which's
+         implementation is searched.</dd>
+<dt><span class="strong">Returns:</span></dt><dd><a href="../../../../../../net/java/truevfs/driver/zip/raes/crypto/RaesParameters.html" title="interface in net.java.truevfs.driver.zip.raes.crypto"><code>RaesParameters</code></a> of the given <code>type</code>
+         or <code>null</code> if not available.</dd></dl>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<!-- ========= END OF CLASS DATA ========= -->
+<!-- ======= START OF BOTTOM NAVBAR ====== -->
+<div class="bottomNav"><a name="navbar_bottom">
+<!--   -->
+</a><a href="#skip-navbar_bottom" title="Skip navigation links"></a><a name="navbar_bottom_firstrow">
+<!--   -->
+</a>
+<ul class="navList" title="Navigation">
+<li><a href="../../../../../../overview-summary.html">Overview</a></li>
+<li><a href="package-summary.html">Package</a></li>
+<li class="navBarCell1Rev">Class</li>
+<li><a href="class-use/KeyManagerRaesParameters.html">Use</a></li>
+<li><a href="package-tree.html">Tree</a></li>
+<li><a href="../../../../../../index-files/index-1.html">Index</a></li>
+<li><a href="../../../../../../help-doc.html">Help</a></li>
+</ul>
+<div class="aboutLanguage"><em><script type="text/javascript">                 var _gaq = _gaq || [];                 _gaq.push(['_setAccount', 'UA-25500668-2']);                 _gaq.push(['_trackPageview']);                 (function() {                     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;                     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';                     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);                 })();             </script>                          <b>TrueVFS 0.12.0</b></em></div>
+</div>
+<div class="subNav">
+<ul class="navList">
+<li>Prev Class</li>
+<li><a href="../../../../../../net/java/truevfs/driver/zip/raes/ParanoidZipRaesDriver.html" title="class in net.java.truevfs.driver.zip.raes"><span class="strong">Next Class</span></a></li>
+</ul>
+<ul class="navList">
+<li><a href="../../../../../../index.html?net/java/truevfs/driver/zip/raes/KeyManagerRaesParameters.html" target="_top">Frames</a></li>
+<li><a href="KeyManagerRaesParameters.html" target="_top">No Frames</a></li>
+</ul>
+<ul class="navList" id="allclasses_navbar_bottom">
+<li><a href="../../../../../../allclasses-noframe.html">All Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_bottom");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+</div>
+<div>
+<ul class="subNavList">
+<li>Summary:&nbsp;</li>
+<li>Nested&nbsp;|&nbsp;</li>
+<li><a href="#field_summary">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_summary">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_summary">Method</a></li>
+</ul>
+<ul class="subNavList">
+<li>Detail:&nbsp;</li>
+<li><a href="#field_detail">Field</a>&nbsp;|&nbsp;</li>
+<li><a href="#constructor_detail">Constr</a>&nbsp;|&nbsp;</li>
+<li><a href="#method_detail">Method</a></li>
+</ul>
+</div>
+<a name="skip-navbar_bottom">
+<!--   -->
+</a></div>
+<!-- ======== END OF BOTTOM NAVBAR ======= -->
+<p class="legalCopy"><small>Copyright &#169; 2005&#x2013;2017 <a href="http://schlichtherle.de">Schlichtherle IT Services</a>. All rights reserved.</small></p>
+</body>
+</html>
