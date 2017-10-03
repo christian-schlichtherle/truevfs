@@ -42,7 +42,7 @@
             <name>TrueVFS Website</name>
             <!-- DON'T use ${project.groupId}, ${project.artifactId} here.
                  This would change in sub-modules! -->
-            <url>file://${env.HOME}/sites/christian-schlichtherle.bitbucket.io/truevfs</url>
+            <url>file://${env.HOME}/sites/christian-schlichtherle.github.io/truevfs</url>
         </site>
     </distributionManagement>
 
