@@ -31,9 +31,7 @@ cp -rp archive.zip archive.tar.gz
 
 * License
 
-    TrueVFS is open source software and is covered by the Eclipse Public
-    License, Version 1.0, so you can link to it in your closed source software
-    for free.
+    TrueVFS is open source software and is covered by the Apache License, Version 2.0.
     Please refer to the {{{./license.html}license agreement}} for details.
 
 * State Of Affairs
@@ -115,11 +113,3 @@ cp -rp archive.zip archive.tar.gz
       {{{./apidocs/net/java/truevfs/kernel/spec/FsDriver.html}<<<FsDriver>>>}}.
 
     []
-
-* Professional Services
-
-    Do you need any consultancy on using or integrating TrueVFS into your
-    application?
-    Or do you need any extensions or improvements to TrueVFS?
-    If you are interested in {{{./team-list.html}my}} professional services,
-    then please contact sales AT schlichtherle DOT de.
