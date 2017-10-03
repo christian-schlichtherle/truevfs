@@ -143,14 +143,14 @@
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a></code></td>
-<td class="colLast"><span class="strong">ZipOutputStream.</span><code><strong><a href="../../../../../../net/java/truevfs/comp/zip/ZipOutputStream.html#entry(java.lang.String)">entry</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)</code>
+<td class="colLast"><span class="strong">ZipFile.</span><code><strong><a href="../../../../../../net/java/truevfs/comp/zip/ZipFile.html#entry(java.lang.String)">entry</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)</code>
 <div class="block">Returns a clone of the entry for the given <code>name</code> or <code>null</code>
  if no entry with this name exists in this ZIP file.</div>
 </td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a></code></td>
-<td class="colLast"><span class="strong">ZipFile.</span><code><strong><a href="../../../../../../net/java/truevfs/comp/zip/ZipFile.html#entry(java.lang.String)">entry</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)</code>
+<td class="colLast"><span class="strong">ZipOutputStream.</span><code><strong><a href="../../../../../../net/java/truevfs/comp/zip/ZipOutputStream.html#entry(java.lang.String)">entry</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name)</code>
 <div class="block">Returns a clone of the entry for the given <code>name</code> or <code>null</code>
  if no entry with this name exists in this ZIP file.</div>
 </td>
@@ -172,15 +172,15 @@
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Iterator.html?is-external=true" title="class or interface in java.util">Iterator</a>&lt;<a href="../../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a>&gt;</code></td>
-<td class="colLast"><span class="strong">ZipOutputStream.</span><code><strong><a href="../../../../../../net/java/truevfs/comp/zip/ZipOutputStream.html#iterator()">iterator</a></strong>()</code>
-<div class="block">Returns a safe iteration of clones for all entries written to this ZIP
- file so far.</div>
+<td class="colLast"><span class="strong">ZipFile.</span><code><strong><a href="../../../../../../net/java/truevfs/comp/zip/ZipFile.html#iterator()">iterator</a></strong>()</code>
+<div class="block">Iterates through clones for all entries in this ZIP file.</div>
 </td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Iterator.html?is-external=true" title="class or interface in java.util">Iterator</a>&lt;<a href="../../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a>&gt;</code></td>
-<td class="colLast"><span class="strong">ZipFile.</span><code><strong><a href="../../../../../../net/java/truevfs/comp/zip/ZipFile.html#iterator()">iterator</a></strong>()</code>
-<div class="block">Iterates through clones for all entries in this ZIP file.</div>
+<td class="colLast"><span class="strong">ZipOutputStream.</span><code><strong><a href="../../../../../../net/java/truevfs/comp/zip/ZipOutputStream.html#iterator()">iterator</a></strong>()</code>
+<div class="block">Returns a safe iteration of clones for all entries written to this ZIP
+ file so far.</div>
 </td>
 </tr>
 </tbody>
@@ -243,9 +243,12 @@
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/comp/zipdriver/ZipDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">ZipDriverEntry</a></code></td>
-<td class="colLast"><span class="strong">ZipDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/comp/zipdriver/ZipDriver.html#newEntry(java.lang.String,%20net.java.truevfs.comp.zip.ZipEntry)">newEntry</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
-        <a href="../../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a>&nbsp;template)</code>&nbsp;</td>
+<td class="colFirst"><code>abstract <a href="../../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriver.html" title="type parameter in AbstractZipDriver">E</a></code></td>
+<td class="colLast"><span class="strong">AbstractZipDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriver.html#newEntry(java.lang.String,%20net.java.truevfs.comp.zip.ZipEntry)">newEntry</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+        <a href="../../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a>&nbsp;template)</code>
+<div class="block">Returns a new ZIP driver entry with the given <code>name</code> and all
+ other properties copied from the given template.</div>
+</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/comp/zipdriver/JarDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">JarDriverEntry</a></code></td>
@@ -253,12 +256,9 @@
         <a href="../../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a>&nbsp;template)</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>abstract <a href="../../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriver.html" title="type parameter in AbstractZipDriver">E</a></code></td>
-<td class="colLast"><span class="strong">AbstractZipDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/comp/zipdriver/AbstractZipDriver.html#newEntry(java.lang.String,%20net.java.truevfs.comp.zip.ZipEntry)">newEntry</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
-        <a href="../../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a>&nbsp;template)</code>
-<div class="block">Returns a new ZIP driver entry with the given <code>name</code> and all
- other properties copied from the given template.</div>
-</td>
+<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/comp/zipdriver/ZipDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">ZipDriverEntry</a></code></td>
+<td class="colLast"><span class="strong">ZipDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/comp/zipdriver/ZipDriver.html#newEntry(java.lang.String,%20net.java.truevfs.comp.zip.ZipEntry)">newEntry</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/String.html?is-external=true" title="class or interface in java.lang">String</a>&nbsp;name,
+        <a href="../../../../../../net/java/truevfs/comp/zip/ZipEntry.html" title="class in net.java.truevfs.comp.zip">ZipEntry</a>&nbsp;template)</code>&nbsp;</td>
 </tr>
 </tbody>
 </table>

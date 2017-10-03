@@ -617,12 +617,6 @@
 </tr>
 <tbody>
 <tr class="altColor">
-<td class="colFirst"><code>protected net.java.truecommons.cio.OutputService&lt;<a href="../../../../../../net/java/truevfs/comp/zipdriver/JarDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">JarDriverEntry</a>&gt;</code></td>
-<td class="colLast"><span class="strong">ZipRaesDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/raes/ZipRaesDriver.html#newOutput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsOutputSocketSink,%20net.java.truecommons.cio.InputService)">newOutput</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
-         <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a>&nbsp;sink,
-         net.java.truecommons.cio.InputService&lt;<a href="../../../../../../net/java/truevfs/comp/zipdriver/JarDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">JarDriverEntry</a>&gt;&nbsp;input)</code>&nbsp;</td>
-</tr>
-<tr class="rowColor">
 <td class="colFirst"><code>protected <a href="../../../../../../net/java/truevfs/comp/zipdriver/ZipOutputService.html" title="class in net.java.truevfs.comp.zipdriver">ZipOutputService</a>&lt;<a href="../../../../../../net/java/truevfs/comp/zipdriver/JarDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">JarDriverEntry</a>&gt;</code></td>
 <td class="colLast"><span class="strong">ParanoidZipRaesDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/raes/ParanoidZipRaesDriver.html#newOutput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsOutputSocketSink,%20net.java.truecommons.cio.InputService)">newOutput</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
          <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a>&nbsp;sink,
@@ -630,6 +624,12 @@
 <div class="block">Creates a new input service for writing archive entries for the given
  <code>model</code> to the target archive file referenced by <code>sink</code>.</div>
 </td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>protected net.java.truecommons.cio.OutputService&lt;<a href="../../../../../../net/java/truevfs/comp/zipdriver/JarDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">JarDriverEntry</a>&gt;</code></td>
+<td class="colLast"><span class="strong">ZipRaesDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/driver/zip/raes/ZipRaesDriver.html#newOutput(net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsOutputSocketSink,%20net.java.truecommons.cio.InputService)">newOutput</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
+         <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a>&nbsp;sink,
+         net.java.truecommons.cio.InputService&lt;<a href="../../../../../../net/java/truevfs/comp/zipdriver/JarDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">JarDriverEntry</a>&gt;&nbsp;input)</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>protected <a href="../../../../../../net/java/truevfs/comp/zipdriver/ZipInputService.html" title="class in net.java.truevfs.comp.zipdriver">ZipInputService</a>&lt;<a href="../../../../../../net/java/truevfs/comp/zipdriver/JarDriverEntry.html" title="class in net.java.truevfs.comp.zipdriver">JarDriverEntry</a>&gt;</code></td>
@@ -701,24 +701,24 @@
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a></code></td>
+<td class="colLast"><span class="strong">FsAbstractController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractController.html#getModel()">getModel</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a></code></td>
 <td class="colLast"><span class="strong">FsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html#getModel()">getModel</a></strong>()</code>
 <div class="block">Returns the file system model.</div>
 </td>
 </tr>
-<tr class="altColor">
-<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a></code></td>
-<td class="colLast"><span class="strong">FsAbstractController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractController.html#getModel()">getModel</a></strong>()</code>&nbsp;</td>
-</tr>
 <tr class="rowColor">
+<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a></code></td>
+<td class="colLast"><span class="strong">FsAbstractModel.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractModel.html#getParent()">getParent</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a></code></td>
 <td class="colLast"><span class="strong">FsModel.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html#getParent()">getParent</a></strong>()</code>
 <div class="block">Returns the parent file system model or <code>null</code> if and only if the
  file system is not federated, i.e.</div>
 </td>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a></code></td>
-<td class="colLast"><span class="strong">FsAbstractModel.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractModel.html#getParent()">getParent</a></strong>()</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a></code></td>
@@ -744,17 +744,17 @@
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a></code></td>
+<td class="colLast"><span class="strong">FsAbstractCompositeDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractCompositeDriver.html#newModel(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsMountPoint,%20net.java.truevfs.kernel.spec.FsModel)">newModel</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&nbsp;context,
+        <a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a>&nbsp;mountPoint,
+        <a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;parent)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a></code></td>
 <td class="colLast"><span class="strong">FsCompositeDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsCompositeDriver.html#newModel(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsMountPoint,%20net.java.truevfs.kernel.spec.FsModel)">newModel</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&nbsp;context,
         <a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a>&nbsp;mountPoint,
         <a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;parent)</code>
 <div class="block">Returns a new file system model for the given mount point.</div>
 </td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a></code></td>
-<td class="colLast"><span class="strong">FsAbstractCompositeDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractCompositeDriver.html#newModel(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsMountPoint,%20net.java.truevfs.kernel.spec.FsModel)">newModel</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&nbsp;context,
-        <a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a>&nbsp;mountPoint,
-        <a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;parent)</code>&nbsp;</td>
 </tr>
 </tbody>
 </table>
@@ -792,16 +792,13 @@
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a></code></td>
-<td class="colLast"><span class="strong">FsCompositeDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsCompositeDriver.html#newController(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsController)">newController</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&nbsp;context,
+<td class="colLast"><span class="strong">FsAbstractCompositeDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractCompositeDriver.html#newController(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsController)">newController</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&nbsp;context,
              <a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
-             <a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;parent)</code>
-<div class="block">Returns a new file system controller for the mount point of the
- given file system model.</div>
-</td>
+             <a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;parent)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a></code></td>
-<td class="colLast"><span class="strong">FsArchiveDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newController(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsController)">newController</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&nbsp;context,
+<td class="colLast"><span class="strong">FsCompositeDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsCompositeDriver.html#newController(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsController)">newController</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&nbsp;context,
              <a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
              <a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;parent)</code>
 <div class="block">Returns a new file system controller for the mount point of the
@@ -810,9 +807,12 @@
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a></code></td>
-<td class="colLast"><span class="strong">FsAbstractCompositeDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractCompositeDriver.html#newController(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsController)">newController</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&nbsp;context,
+<td class="colLast"><span class="strong">FsArchiveDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html#newController(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsModel,%20net.java.truevfs.kernel.spec.FsController)">newController</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&nbsp;context,
              <a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;model,
-             <a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;parent)</code>&nbsp;</td>
+             <a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html" title="interface in net.java.truevfs.kernel.spec">FsController</a>&nbsp;parent)</code>
+<div class="block">Returns a new file system controller for the mount point of the
+ given file system model.</div>
+</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>net.java.truecommons.cio.InputService&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&gt;</code></td>
@@ -856,17 +856,17 @@
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a></code></td>
+<td class="colLast"><span class="strong">FsAbstractCompositeDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractCompositeDriver.html#newModel(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsMountPoint,%20net.java.truevfs.kernel.spec.FsModel)">newModel</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&nbsp;context,
+        <a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a>&nbsp;mountPoint,
+        <a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;parent)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a></code></td>
 <td class="colLast"><span class="strong">FsCompositeDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsCompositeDriver.html#newModel(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsMountPoint,%20net.java.truevfs.kernel.spec.FsModel)">newModel</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&nbsp;context,
         <a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a>&nbsp;mountPoint,
         <a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;parent)</code>
 <div class="block">Returns a new file system model for the given mount point.</div>
 </td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a></code></td>
-<td class="colLast"><span class="strong">FsAbstractCompositeDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractCompositeDriver.html#newModel(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsMountPoint,%20net.java.truevfs.kernel.spec.FsModel)">newModel</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&nbsp;context,
-        <a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a>&nbsp;mountPoint,
-        <a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;parent)</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>net.java.truecommons.cio.OutputService&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsArchiveDriver.html" title="type parameter in FsArchiveDriver">E</a>&gt;</code></td>

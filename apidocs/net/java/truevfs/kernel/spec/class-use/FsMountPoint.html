@@ -117,11 +117,11 @@
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a></code></td>
-<td class="colLast"><span class="strong">TPath.</span><code><strong><a href="../../../../../../net/java/truevfs/access/TPath.html#getMountPoint()">getMountPoint</a></strong>()</code>&nbsp;</td>
+<td class="colLast"><span class="strong">TFile.</span><code><strong><a href="../../../../../../net/java/truevfs/access/TFile.html#getMountPoint()">getMountPoint</a></strong>()</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a></code></td>
-<td class="colLast"><span class="strong">TFile.</span><code><strong><a href="../../../../../../net/java/truevfs/access/TFile.html#getMountPoint()">getMountPoint</a></strong>()</code>&nbsp;</td>
+<td class="colLast"><span class="strong">TPath.</span><code><strong><a href="../../../../../../net/java/truevfs/access/TPath.html#getMountPoint()">getMountPoint</a></strong>()</code>&nbsp;</td>
 </tr>
 </tbody>
 </table>
@@ -223,6 +223,17 @@
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a></code></td>
+<td class="colLast"><span class="strong">FsAbstractController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractController.html#getMountPoint()">getMountPoint</a></strong>()</code>
+<div class="block">Returns the mount point of this (virtual) file system as
+ defined by the <a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractController.html#getModel()">model</a>.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a></code></td>
+<td class="colLast"><span class="strong">FsAbstractModel.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractModel.html#getMountPoint()">getMountPoint</a></strong>()</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a></code></td>
 <td class="colLast"><span class="strong">FsNodePath.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsNodePath.html#getMountPoint()">getMountPoint</a></strong>()</code>
 <div class="block">Returns the mount point component or <code>null</code> iff this path's
  <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodePath.html#getUri()"><code>URI</code></a> is not absolute.</div>
@@ -232,17 +243,6 @@
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a></code></td>
 <td class="colLast"><span class="strong">FsModel.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html#getMountPoint()">getMountPoint</a></strong>()</code>
 <div class="block">Returns the mount point of the file system.</div>
-</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a></code></td>
-<td class="colLast"><span class="strong">FsAbstractModel.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractModel.html#getMountPoint()">getMountPoint</a></strong>()</code>&nbsp;</td>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a></code></td>
-<td class="colLast"><span class="strong">FsAbstractController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractController.html#getMountPoint()">getMountPoint</a></strong>()</code>
-<div class="block">Returns the mount point of this (virtual) file system as
- defined by the <a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractController.html#getModel()">model</a>.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -287,9 +287,9 @@
           <a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a>&nbsp;mountPoint)</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>static <a href="../../../../../../net/java/truevfs/kernel/spec/FsPrefixMountPointFilter.html" title="class in net.java.truevfs.kernel.spec">FsPrefixMountPointFilter</a></code></td>
-<td class="colLast"><span class="strong">FsPrefixMountPointFilter.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsPrefixMountPointFilter.html#forPrefix(net.java.truevfs.kernel.spec.FsMountPoint)">forPrefix</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a>&nbsp;prefix)</code>
-<div class="block">Returns a prefix mount point filter for the given prefix mount point.</div>
+<td class="colFirst"><code>static <a href="../../../../../../net/java/truevfs/kernel/spec/FsControllerFilter.html" title="class in net.java.truevfs.kernel.spec">FsControllerFilter</a></code></td>
+<td class="colLast"><span class="strong">FsControllerFilter.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsControllerFilter.html#forPrefix(net.java.truevfs.kernel.spec.FsMountPoint)">forPrefix</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a>&nbsp;prefix)</code>
+<div class="block">Returns a controller filter for the given prefix mount point.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -299,9 +299,9 @@
 </td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>static <a href="../../../../../../net/java/truevfs/kernel/spec/FsControllerFilter.html" title="class in net.java.truevfs.kernel.spec">FsControllerFilter</a></code></td>
-<td class="colLast"><span class="strong">FsControllerFilter.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsControllerFilter.html#forPrefix(net.java.truevfs.kernel.spec.FsMountPoint)">forPrefix</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a>&nbsp;prefix)</code>
-<div class="block">Returns a controller filter for the given prefix mount point.</div>
+<td class="colFirst"><code>static <a href="../../../../../../net/java/truevfs/kernel/spec/FsPrefixMountPointFilter.html" title="class in net.java.truevfs.kernel.spec">FsPrefixMountPointFilter</a></code></td>
+<td class="colLast"><span class="strong">FsPrefixMountPointFilter.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsPrefixMountPointFilter.html#forPrefix(net.java.truevfs.kernel.spec.FsMountPoint)">forPrefix</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a>&nbsp;prefix)</code>
+<div class="block">Returns a prefix mount point filter for the given prefix mount point.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -328,17 +328,17 @@
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a></code></td>
+<td class="colLast"><span class="strong">FsAbstractCompositeDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractCompositeDriver.html#newModel(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsMountPoint,%20net.java.truevfs.kernel.spec.FsModel)">newModel</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&nbsp;context,
+        <a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a>&nbsp;mountPoint,
+        <a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;parent)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a></code></td>
 <td class="colLast"><span class="strong">FsCompositeDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsCompositeDriver.html#newModel(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsMountPoint,%20net.java.truevfs.kernel.spec.FsModel)">newModel</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&nbsp;context,
         <a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a>&nbsp;mountPoint,
         <a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;parent)</code>
 <div class="block">Returns a new file system model for the given mount point.</div>
 </td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a></code></td>
-<td class="colLast"><span class="strong">FsAbstractCompositeDriver.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractCompositeDriver.html#newModel(net.java.truevfs.kernel.spec.FsManager,%20net.java.truevfs.kernel.spec.FsMountPoint,%20net.java.truevfs.kernel.spec.FsModel)">newModel</a></strong>(<a href="../../../../../../net/java/truevfs/kernel/spec/FsManager.html" title="interface in net.java.truevfs.kernel.spec">FsManager</a>&nbsp;context,
-        <a href="../../../../../../net/java/truevfs/kernel/spec/FsMountPoint.html" title="class in net.java.truevfs.kernel.spec">FsMountPoint</a>&nbsp;mountPoint,
-        <a href="../../../../../../net/java/truevfs/kernel/spec/FsModel.html" title="interface in net.java.truevfs.kernel.spec">FsModel</a>&nbsp;parent)</code>&nbsp;</td>
 </tr>
 </tbody>
 </table>

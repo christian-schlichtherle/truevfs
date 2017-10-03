@@ -673,11 +673,17 @@ the order they are declared.</div>
 <tbody>
 <tr class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">FsDecoratingController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsDecoratingController.html#checkAccess(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.shed.BitField)">checkAccess</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+<td class="colLast"><span class="strong">FsAccessOptionsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOptionsController.html#checkAccess(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.shed.BitField)">checkAccess</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
            <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
            net.java.truecommons.shed.BitField&lt;net.java.truecommons.cio.Entry.Access&gt;&nbsp;types)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><span class="strong">FsDecoratingController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsDecoratingController.html#checkAccess(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.shed.BitField)">checkAccess</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+           <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
+           net.java.truecommons.shed.BitField&lt;net.java.truecommons.cio.Entry.Access&gt;&nbsp;types)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><span class="strong">FsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html#checkAccess(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.shed.BitField)">checkAccess</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
            <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
@@ -687,45 +693,22 @@ the order they are declared.</div>
  access <code>types</code>.</div>
 </td>
 </tr>
-<tr class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">FsAccessOptionsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOptionsController.html#checkAccess(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.shed.BitField)">checkAccess</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
-           <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
-           net.java.truecommons.shed.BitField&lt;net.java.truecommons.cio.Entry.Access&gt;&nbsp;types)</code>&nbsp;</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code>net.java.truecommons.cio.InputSocket&lt;? extends net.java.truecommons.cio.Entry&gt;</code></td>
-<td class="colLast"><span class="strong">FsDecoratingController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsDecoratingController.html#input(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">input</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
-     <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>&nbsp;</td>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code>net.java.truecommons.cio.InputSocket&lt;? extends net.java.truecommons.cio.Entry&gt;</code></td>
-<td class="colLast"><span class="strong">FsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html#input(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">input</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
-     <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>
-<div class="block">Returns an input socket for reading the contents of the file system
- node addressed by the given name from the file system.</div>
-</td>
-</tr>
 <tr class="rowColor">
 <td class="colFirst"><code>net.java.truecommons.cio.InputSocket&lt;? extends net.java.truecommons.cio.Entry&gt;</code></td>
 <td class="colLast"><span class="strong">FsAccessOptionsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOptionsController.html#input(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">input</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
      <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">FsDecoratingController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsDecoratingController.html#make(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.cio.Entry.Type,%20net.java.truecommons.cio.Entry)">make</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
-    <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
-    net.java.truecommons.cio.Entry.Type&nbsp;type,
-    net.java.truecommons.cio.Entry&nbsp;template)</code>&nbsp;</td>
+<td class="colFirst"><code>net.java.truecommons.cio.InputSocket&lt;? extends net.java.truecommons.cio.Entry&gt;</code></td>
+<td class="colLast"><span class="strong">FsDecoratingController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsDecoratingController.html#input(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">input</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+     <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">FsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html#make(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.cio.Entry.Type,%20net.java.truecommons.cio.Entry)">make</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
-    <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
-    net.java.truecommons.cio.Entry.Type&nbsp;type,
-    net.java.truecommons.cio.Entry&nbsp;template)</code>
-<div class="block">Creates or replaces and finally links a chain of one or more entries
- for the given node <code>name</code> into the file system.</div>
+<td class="colFirst"><code>net.java.truecommons.cio.InputSocket&lt;? extends net.java.truecommons.cio.Entry&gt;</code></td>
+<td class="colLast"><span class="strong">FsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html#input(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">input</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+     <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>
+<div class="block">Returns an input socket for reading the contents of the file system
+ node addressed by the given name from the file system.</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -734,6 +717,23 @@ the order they are declared.</div>
     <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
     net.java.truecommons.cio.Entry.Type&nbsp;type,
     net.java.truecommons.cio.Entry&nbsp;template)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><span class="strong">FsDecoratingController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsDecoratingController.html#make(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.cio.Entry.Type,%20net.java.truecommons.cio.Entry)">make</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+    <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
+    net.java.truecommons.cio.Entry.Type&nbsp;type,
+    net.java.truecommons.cio.Entry&nbsp;template)</code>&nbsp;</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><span class="strong">FsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html#make(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.cio.Entry.Type,%20net.java.truecommons.cio.Entry)">make</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+    <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
+    net.java.truecommons.cio.Entry.Type&nbsp;type,
+    net.java.truecommons.cio.Entry&nbsp;template)</code>
+<div class="block">Creates or replaces and finally links a chain of one or more entries
+ for the given node <code>name</code> into the file system.</div>
+</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>protected abstract net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;</code></td>
@@ -773,35 +773,20 @@ the order they are declared.</div>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsNode.html" title="interface in net.java.truevfs.kernel.spec">FsNode</a></code></td>
-<td class="colLast"><span class="strong">FsDecoratingController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsDecoratingController.html#node(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">node</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+<td class="colLast"><span class="strong">FsAccessOptionsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOptionsController.html#node(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">node</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
     <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsNode.html" title="interface in net.java.truevfs.kernel.spec">FsNode</a></code></td>
+<td class="colLast"><span class="strong">FsDecoratingController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsDecoratingController.html#node(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">node</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+    <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsNode.html" title="interface in net.java.truevfs.kernel.spec">FsNode</a></code></td>
 <td class="colLast"><span class="strong">FsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html#node(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">node</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
     <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>
 <div class="block">Returns the file system node for the given <code>name</code> or <code>null</code>
  if it doesn't exist.</div>
-</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code><a href="../../../../../../net/java/truevfs/kernel/spec/FsNode.html" title="interface in net.java.truevfs.kernel.spec">FsNode</a></code></td>
-<td class="colLast"><span class="strong">FsAccessOptionsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOptionsController.html#node(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">node</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
-    <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>&nbsp;</td>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code>net.java.truecommons.cio.OutputSocket&lt;? extends net.java.truecommons.cio.Entry&gt;</code></td>
-<td class="colLast"><span class="strong">FsDecoratingController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsDecoratingController.html#output(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.cio.Entry)">output</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
-      <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
-      net.java.truecommons.cio.Entry&nbsp;template)</code>&nbsp;</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code>net.java.truecommons.cio.OutputSocket&lt;? extends net.java.truecommons.cio.Entry&gt;</code></td>
-<td class="colLast"><span class="strong">FsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html#output(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.cio.Entry)">output</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
-      <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
-      net.java.truecommons.cio.Entry&nbsp;template)</code>
-<div class="block">Returns an output socket for writing the contents of the node addressed
- by the given name to the file system.</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -811,15 +796,18 @@ the order they are declared.</div>
       net.java.truecommons.cio.Entry&nbsp;template)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">FsDecoratingController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsDecoratingController.html#setReadOnly(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">setReadOnly</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
-           <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>&nbsp;</td>
+<td class="colFirst"><code>net.java.truecommons.cio.OutputSocket&lt;? extends net.java.truecommons.cio.Entry&gt;</code></td>
+<td class="colLast"><span class="strong">FsDecoratingController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsDecoratingController.html#output(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.cio.Entry)">output</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+      <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
+      net.java.truecommons.cio.Entry&nbsp;template)</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">FsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html#setReadOnly(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">setReadOnly</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
-           <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>
-<div class="block">Sets the named file system node as read-only.</div>
+<td class="colFirst"><code>net.java.truecommons.cio.OutputSocket&lt;? extends net.java.truecommons.cio.Entry&gt;</code></td>
+<td class="colLast"><span class="strong">FsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html#output(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.cio.Entry)">output</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+      <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
+      net.java.truecommons.cio.Entry&nbsp;template)</code>
+<div class="block">Returns an output socket for writing the contents of the node addressed
+ by the given name to the file system.</div>
 </td>
 </tr>
 <tr class="rowColor">
@@ -828,13 +816,32 @@ the order they are declared.</div>
            <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><span class="strong">FsDecoratingController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsDecoratingController.html#setReadOnly(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">setReadOnly</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+           <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><span class="strong">FsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html#setReadOnly(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">setReadOnly</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+           <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>
+<div class="block">Sets the named file system node as read-only.</div>
+</td>
+</tr>
+<tr class="altColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><span class="strong">FsAccessOptionsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOptionsController.html#setTime(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.shed.BitField,%20long)">setTime</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+       <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
+       net.java.truecommons.shed.BitField&lt;net.java.truecommons.cio.Entry.Access&gt;&nbsp;types,
+       long&nbsp;value)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><span class="strong">FsDecoratingController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsDecoratingController.html#setTime(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.shed.BitField,%20long)">setTime</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
        <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
        net.java.truecommons.shed.BitField&lt;net.java.truecommons.cio.Entry.Access&gt;&nbsp;types,
        long&nbsp;value)</code>&nbsp;</td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><span class="strong">FsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html#setTime(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.shed.BitField,%20long)">setTime</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
        <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
@@ -844,12 +851,17 @@ the order they are declared.</div>
  bit field for the file system node with the given name.</div>
 </td>
 </tr>
+<tr class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><span class="strong">FsAbstractController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractController.html#setTime(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20java.util.Map)">setTime</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+       <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
+       <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;net.java.truecommons.cio.Entry.Access,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Long.html?is-external=true" title="class or interface in java.lang">Long</a>&gt;&nbsp;times)</code>&nbsp;</td>
+</tr>
 <tr class="altColor">
 <td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><span class="strong">FsAccessOptionsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOptionsController.html#setTime(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20net.java.truecommons.shed.BitField,%20long)">setTime</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+<td class="colLast"><span class="strong">FsAccessOptionsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOptionsController.html#setTime(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20java.util.Map)">setTime</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
        <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
-       net.java.truecommons.shed.BitField&lt;net.java.truecommons.cio.Entry.Access&gt;&nbsp;types,
-       long&nbsp;value)</code>&nbsp;</td>
+       <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;net.java.truecommons.cio.Entry.Access,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Long.html?is-external=true" title="class or interface in java.lang">Long</a>&gt;&nbsp;times)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>boolean</code></td>
@@ -865,18 +877,6 @@ the order they are declared.</div>
 <div class="block">Makes an attempt to set the last access time of all types in the given
  map for the file system node with the given name.</div>
 </td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><span class="strong">FsAccessOptionsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOptionsController.html#setTime(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20java.util.Map)">setTime</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
-       <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
-       <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;net.java.truecommons.cio.Entry.Access,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Long.html?is-external=true" title="class or interface in java.lang">Long</a>&gt;&nbsp;times)</code>&nbsp;</td>
-</tr>
-<tr class="altColor">
-<td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><span class="strong">FsAbstractController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAbstractController.html#setTime(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName,%20java.util.Map)">setTime</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
-       <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name,
-       <a href="http://docs.oracle.com/javase/7/docs/api/java/util/Map.html?is-external=true" title="class or interface in java.util">Map</a>&lt;net.java.truecommons.cio.Entry.Access,<a href="http://docs.oracle.com/javase/7/docs/api/java/lang/Long.html?is-external=true" title="class or interface in java.lang">Long</a>&gt;&nbsp;times)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>protected <a href="../../../../../../net/java/truevfs/kernel/spec/FsOutputSocketSink.html" title="class in net.java.truevfs.kernel.spec">FsOutputSocketSink</a></code></td>
@@ -899,20 +899,20 @@ the order they are declared.</div>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">FsDecoratingController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsDecoratingController.html#unlink(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">unlink</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+<td class="colLast"><span class="strong">FsAccessOptionsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOptionsController.html#unlink(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">unlink</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
       <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><span class="strong">FsDecoratingController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsDecoratingController.html#unlink(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">unlink</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
+      <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>&nbsp;</td>
+</tr>
+<tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><span class="strong">FsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsController.html#unlink(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">unlink</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
       <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>
 <div class="block">Removes the named file system node from the file system.</div>
 </td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">FsAccessOptionsController.</span><code><strong><a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOptionsController.html#unlink(net.java.truecommons.shed.BitField,%20net.java.truevfs.kernel.spec.FsNodeName)">unlink</a></strong>(net.java.truecommons.shed.BitField&lt;<a href="../../../../../../net/java/truevfs/kernel/spec/FsAccessOption.html" title="enum in net.java.truevfs.kernel.spec">FsAccessOption</a>&gt;&nbsp;options,
-      <a href="../../../../../../net/java/truevfs/kernel/spec/FsNodeName.html" title="class in net.java.truevfs.kernel.spec">FsNodeName</a>&nbsp;name)</code>&nbsp;</td>
 </tr>
 </tbody>
 </table>

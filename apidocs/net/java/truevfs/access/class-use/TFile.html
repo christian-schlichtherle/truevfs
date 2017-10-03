@@ -246,13 +246,13 @@
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a></code></td>
-<td class="colLast"><span class="strong">TPath.</span><code><strong><a href="../../../../../net/java/truevfs/access/TPath.html#toFile()">toFile</a></strong>()</code>
-<div class="block">Returns a new <code>TFile</code> object for this path.</div>
-</td>
+<td class="colLast"><span class="strong">TFile.</span><code><strong><a href="../../../../../net/java/truevfs/access/TFile.html#toFile()">toFile</a></strong>()</code>&nbsp;</td>
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code><a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a></code></td>
-<td class="colLast"><span class="strong">TFile.</span><code><strong><a href="../../../../../net/java/truevfs/access/TFile.html#toFile()">toFile</a></strong>()</code>&nbsp;</td>
+<td class="colLast"><span class="strong">TPath.</span><code><strong><a href="../../../../../net/java/truevfs/access/TPath.html#toFile()">toFile</a></strong>()</code>
+<div class="block">Returns a new <code>TFile</code> object for this path.</div>
+</td>
 </tr>
 <tr class="rowColor">
 <td class="colFirst"><code><a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a></code></td>
@@ -351,15 +351,6 @@
 <tbody>
 <tr class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#cp_p(net.java.truevfs.access.TFile,%20net.java.truevfs.access.TFile)">cp_p</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;oldNode,
-    <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
-<div class="block">Copies <code>oldNode</code> to <code>node</code>
- preserving its last modification time
- and updates the tree accordingly.</div>
-</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code>void</code></td>
 <td class="colLast"><span class="strong">TFileTree.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTree.html#cp_p(net.java.truevfs.access.TFile,%20net.java.truevfs.access.TFile)">cp_p</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;oldNode,
     <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
 <div class="block">Forwards the call to the <a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html" title="class in net.java.truevfs.access.swing"><code>TFileTreeModel</code></a>
@@ -367,15 +358,16 @@
  is selected and visible.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#cp_r(net.java.truevfs.access.TFile,%20net.java.truevfs.access.TFile)">cp_r</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;oldNode,
+<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#cp_p(net.java.truevfs.access.TFile,%20net.java.truevfs.access.TFile)">cp_p</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;oldNode,
     <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
-<div class="block">Copies <code>oldNode</code> to <code>node</code> recursively
+<div class="block">Copies <code>oldNode</code> to <code>node</code>
+ preserving its last modification time
  and updates the tree accordingly.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><span class="strong">TFileTree.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTree.html#cp_r(net.java.truevfs.access.TFile,%20net.java.truevfs.access.TFile)">cp_r</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;oldNode,
     <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
@@ -384,16 +376,15 @@
  is selected and visible.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#cp_rp(net.java.truevfs.access.TFile,%20net.java.truevfs.access.TFile)">cp_rp</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;oldNode,
-     <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
+<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#cp_r(net.java.truevfs.access.TFile,%20net.java.truevfs.access.TFile)">cp_r</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;oldNode,
+    <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
 <div class="block">Copies <code>oldNode</code> to <code>node</code> recursively
- preserving its last modification time
  and updates the tree accordingly.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><span class="strong">TFileTree.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTree.html#cp_rp(net.java.truevfs.access.TFile,%20net.java.truevfs.access.TFile)">cp_rp</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;oldNode,
      <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
@@ -402,15 +393,16 @@
  is selected and visible.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#cp(java.io.InputStream,%20net.java.truevfs.access.TFile)">cp</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html?is-external=true" title="class or interface in java.io">InputStream</a>&nbsp;in,
-  <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
-<div class="block">Copies <code>in</code> to <code>node</code>
+<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#cp_rp(net.java.truevfs.access.TFile,%20net.java.truevfs.access.TFile)">cp_rp</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;oldNode,
+     <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
+<div class="block">Copies <code>oldNode</code> to <code>node</code> recursively
+ preserving its last modification time
  and updates the tree accordingly.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><span class="strong">TFileTree.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTree.html#cp(java.io.InputStream,%20net.java.truevfs.access.TFile)">cp</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html?is-external=true" title="class or interface in java.io">InputStream</a>&nbsp;in,
   <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
@@ -419,15 +411,15 @@
  is selected and visible.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#cp(net.java.truevfs.access.TFile,%20net.java.truevfs.access.TFile)">cp</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;oldNode,
+<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#cp(java.io.InputStream,%20net.java.truevfs.access.TFile)">cp</a></strong>(<a href="http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html?is-external=true" title="class or interface in java.io">InputStream</a>&nbsp;in,
   <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
-<div class="block">Copies <code>oldNode</code> to <code>node</code>
+<div class="block">Copies <code>in</code> to <code>node</code>
  and updates the tree accordingly.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><span class="strong">TFileTree.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTree.html#cp(net.java.truevfs.access.TFile,%20net.java.truevfs.access.TFile)">cp</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;oldNode,
   <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
@@ -436,14 +428,15 @@
  is selected and visible.</div>
 </td>
 </tr>
-<tr class="altColor">
-<td class="colFirst"><code>boolean</code></td>
-<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#createNewFile(net.java.truevfs.access.TFile)">createNewFile</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
-<div class="block">Creates <code>node</code> as a new file in the file system
+<tr class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#cp(net.java.truevfs.access.TFile,%20net.java.truevfs.access.TFile)">cp</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;oldNode,
+  <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
+<div class="block">Copies <code>oldNode</code> to <code>node</code>
  and updates the tree accordingly.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>boolean</code></td>
 <td class="colLast"><span class="strong">TFileTree.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTree.html#createNewFile(net.java.truevfs.access.TFile)">createNewFile</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
 <div class="block">Forwards the call to the <a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html" title="class in net.java.truevfs.access.swing"><code>TFileTreeModel</code></a>
@@ -451,15 +444,14 @@
  is selected and visible.</div>
 </td>
 </tr>
-<tr class="altColor">
-<td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#mkdir(net.java.truevfs.access.TFile,%20boolean)">mkdir</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node,
-     boolean&nbsp;recursive)</code>
-<div class="block">Ensures that <code>node</code> exists as a (virtual) directory in the
- (federated) file system and updates the tree accordingly.</div>
+<tr class="rowColor">
+<td class="colFirst"><code>boolean</code></td>
+<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#createNewFile(net.java.truevfs.access.TFile)">createNewFile</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
+<div class="block">Creates <code>node</code> as a new file in the file system
+ and updates the tree accordingly.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><span class="strong">TFileTree.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTree.html#mkdir(net.java.truevfs.access.TFile,%20boolean)">mkdir</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node,
      boolean&nbsp;recursive)</code>
@@ -468,21 +460,29 @@
  is selected and visible.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#mv(net.java.truevfs.access.TFile,%20net.java.truevfs.access.TFile)">mv</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;oldNode,
-  <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
-<div class="block">Moves <code>oldNode</code> to <code>node</code>
- and updates the tree accordingly.</div>
+<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#mkdir(net.java.truevfs.access.TFile,%20boolean)">mkdir</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node,
+     boolean&nbsp;recursive)</code>
+<div class="block">Ensures that <code>node</code> exists as a (virtual) directory in the
+ (federated) file system and updates the tree accordingly.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><span class="strong">TFileTree.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTree.html#mv(net.java.truevfs.access.TFile,%20net.java.truevfs.access.TFile)">mv</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;oldNode,
   <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
 <div class="block">Forwards the call to the <a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html" title="class in net.java.truevfs.access.swing"><code>TFileTreeModel</code></a>,
  restores the expanded paths, selects <code>node</code> and scrolls to
  it if necessary.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#mv(net.java.truevfs.access.TFile,%20net.java.truevfs.access.TFile)">mv</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;oldNode,
+  <a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
+<div class="block">Moves <code>oldNode</code> to <code>node</code>
+ and updates the tree accordingly.</div>
 </td>
 </tr>
 <tr class="altColor">
@@ -512,26 +512,19 @@
 </tr>
 <tr class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#refresh(net.java.truevfs.access.TFile)">refresh</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
-<div class="block">Alias for <a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#structureChanged(net.java.truevfs.access.TFile)"><code>TFileTreeModel.structureChanged(TFile)</code></a>.</div>
-</td>
-</tr>
-<tr class="rowColor">
-<td class="colFirst"><code>void</code></td>
 <td class="colLast"><span class="strong">TFileTree.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTree.html#refresh(net.java.truevfs.access.TFile)">refresh</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
 <div class="block">Refreshes the subtree for the given node,
  restores the expanded and selected paths and scrolls to the lead
  selection path if necessary.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#rm_r(net.java.truevfs.access.TFile)">rm_r</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
-<div class="block">Deletes the file or (probably not empty) directory <code>node</code>
- and updates the tree accordingly.</div>
+<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#refresh(net.java.truevfs.access.TFile)">refresh</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
+<div class="block">Alias for <a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#structureChanged(net.java.truevfs.access.TFile)"><code>TFileTreeModel.structureChanged(TFile)</code></a>.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><span class="strong">TFileTree.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTree.html#rm_r(net.java.truevfs.access.TFile)">rm_r</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
 <div class="block">Forwards the call to the <a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html" title="class in net.java.truevfs.access.swing"><code>TFileTreeModel</code></a>
@@ -539,19 +532,26 @@
  is selected and visible.</div>
 </td>
 </tr>
-<tr class="altColor">
+<tr class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#rm(net.java.truevfs.access.TFile)">rm</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
-<div class="block">Deletes the file or empty directory <code>node</code>
+<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#rm_r(net.java.truevfs.access.TFile)">rm_r</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
+<div class="block">Deletes the file or (probably not empty) directory <code>node</code>
  and updates the tree accordingly.</div>
 </td>
 </tr>
-<tr class="rowColor">
+<tr class="altColor">
 <td class="colFirst"><code>void</code></td>
 <td class="colLast"><span class="strong">TFileTree.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTree.html#rm(net.java.truevfs.access.TFile)">rm</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
 <div class="block">Forwards the call to the <a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html" title="class in net.java.truevfs.access.swing"><code>TFileTreeModel</code></a>
  and scrolls the tree so that the successor to the deleted node
  is selected and visible.</div>
+</td>
+</tr>
+<tr class="rowColor">
+<td class="colFirst"><code>void</code></td>
+<td class="colLast"><span class="strong">TFileTreeModel.</span><code><strong><a href="../../../../../net/java/truevfs/access/swing/TFileTreeModel.html#rm(net.java.truevfs.access.TFile)">rm</a></strong>(<a href="../../../../../net/java/truevfs/access/TFile.html" title="class in net.java.truevfs.access">TFile</a>&nbsp;node)</code>
+<div class="block">Deletes the file or empty directory <code>node</code>
+ and updates the tree accordingly.</div>
 </td>
 </tr>
 <tr class="altColor">
