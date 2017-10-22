@@ -394,10 +394,10 @@ lazy val it: Project = project
       JunitInterface % Test,
       MockitoCore % Test,
       Scalacheck % Test,
-      ScalaPlus,
+      ScalaPlus % Test,
       Scalatest % Test,
       TruecommonsIO % Test classifier "" classifier "tests",
-      TruecommonsKeyDefault,
+      TruecommonsKeyDefault % Test,
       TruecommonsKeySpec % Test classifier "" classifier "tests",
       TruecommonsShed % Test classifier "" classifier "tests"
     ),
