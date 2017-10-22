@@ -1,7 +1,4 @@
-[![Build Status](https://api.travis-ci.org/christian-schlichtherle/truevfs.svg)](https://travis-ci.org/christian-schlichtherle/truevfs)
-[![Maven Central](https://img.shields.io/maven-central/v/net.java.truevfs/truevfs-kernel-spec.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22net.java.truevfs%22)
-
-# TrueVFS
+# TrueVFS [![Maven Central](https://img.shields.io/maven-central/v/net.java.truevfs/truevfs-kernel-spec.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22net.java.truevfs%22) [![Build Status](https://api.travis-ci.org/christian-schlichtherle/truevfs.svg)](https://travis-ci.org/christian-schlichtherle/truevfs)
 
 TrueVFS is a virtual file system (VFS) for Java 7 which enables client applications to access archive files as if they 
 were virtual directories, including nested archive files in multithreaded environments.
