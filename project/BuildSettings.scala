@@ -113,7 +113,7 @@ object BuildSettings {
       javacOptions := DefaultOptions.javac ++ Seq(Opts.compile.deprecation, "-source", "1.7", "-target", "1.7", "-g"),
       javacOptions in doc := DefaultOptions.javac ++ Seq("-source", "1.7"),
       scalacOptions := DefaultOptions.scalac ++ Seq(Opts.compile.deprecation, "-feature", Opts.compile.unchecked),
-      scalaVersion := ScalaVersion_2_11
+      scalaVersion := ScalaVersion_2_10
     )
   }
 
