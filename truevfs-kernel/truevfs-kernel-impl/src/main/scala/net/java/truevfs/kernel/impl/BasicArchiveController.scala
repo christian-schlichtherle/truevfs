@@ -92,7 +92,7 @@ extends ArchiveController[E] {
       override def channel(peer: AnyOutputSocket): SeekableByteChannel = socket(peer) channel peer
 
       def socket(peer: AnyOutputSocket): InputSocket[E] = {
-        AbstractInputSocket target peer // may sync() if in same target archive file!
+        Option(peer) foreach (_ target ()) // may sync() if in same target archive file!
         input(target().getName)
       }
     } // Input
