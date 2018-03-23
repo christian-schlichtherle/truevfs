@@ -331,7 +331,6 @@ lazy val extInsight: Project = project
         |Add the JAR artifact of this module to the run time class path to make its services available for service location in the client API modules.""".stripMargin,
     libraryDependencies ++= Seq(
       JunitInterface % Test,
-      ScalaPlus % Test,
       Scalatest % Test
     ),
     name := "TrueVFS Extension Insight",
@@ -363,7 +362,6 @@ lazy val extPacemaker: Project = project
       JunitInterface % Test,
       MockitoCore % Test,
       Scalacheck % Test,
-      ScalaPlus,
       Scalatest % Test
     ),
     name := "TrueVFS Extension Pacemaker",
@@ -394,7 +392,6 @@ lazy val it: Project = project
       JunitInterface % Test,
       MockitoCore % Test,
       Scalacheck % Test,
-      ScalaPlus % Test,
       Scalatest % Test,
       TruecommonsIO % Test classifier "" classifier "tests",
       TruecommonsKeyDefault % Test,

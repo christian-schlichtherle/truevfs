@@ -31,7 +31,6 @@ object Dependencies {
   val MockitoCore: ModuleID = "org.mockito" % "mockito-core" % "2.16.0"
   val Scalacheck: ModuleID = "org.scalacheck" %% "scalacheck" % "1.13.5"
   def scalaLibrary(scalaVersion: String): ModuleID = "org.scala-lang" % "scala-library" % scalaVersion
-  val ScalaPlus: ModuleID = "global.namespace.scala-plus" %% "scala-plus" % "0.1"
   val Scalatest: ModuleID = "org.scalatest" %% "scalatest" % "3.0.5"
   val Slf4jSimple: ModuleID = "org.slf4j" % "slf4j-simple" % Slf4jVersion
   val TruecommonsAnnotations: ModuleID = "net.java.truecommons" % "truecommons-annotations" % TruecommonsVersion exclude("com.google.code.findbugs", "jsr305") exclude("net.jcip", "jcip-annotations")
