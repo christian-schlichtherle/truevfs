@@ -22,7 +22,7 @@ object Dependencies {
   val Slf4jVersion: String = "1.7.25"
 
   val BcprovJdk15on: ModuleID = "org.bouncycastle" % "bcprov-jdk15on" % "1.58"
-  val CommonsCompress: ModuleID = "org.apache.commons" % "commons-compress" % "1.16.1"
+  val CommonsCompress: ModuleID = "org.apache.commons" % "commons-compress" % "1.14"
   val FindbugsAnnotations: ModuleID = "com.google.code.findbugs" % "annotations" % "3.0.1u2" exclude("com.google.code.findbugs", "jsr305") exclude("net.jcip", "jcip-annotations")
   val Httpclient: ModuleID = "org.apache.httpcomponents" % "httpclient" % "4.5.5" exclude("commons-logging", "commons-logging")
   val JclOverSlf4j: ModuleID = "org.slf4j" % "jcl-over-slf4j" % Slf4jVersion
