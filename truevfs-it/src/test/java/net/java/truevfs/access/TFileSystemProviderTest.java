@@ -27,7 +27,7 @@ public class TFileSystemProviderTest extends MockArchiveDriverTestBase {
     public void setUp() throws IOException {
         super.setUp();
         try {
-            provider = TFileSystemProvider.class.newInstance();
+            provider = TFileSystemProvider.class.getDeclaredConstructor().newInstance();
         } catch (Exception ex) {
             throw new AssertionError(ex);
         }

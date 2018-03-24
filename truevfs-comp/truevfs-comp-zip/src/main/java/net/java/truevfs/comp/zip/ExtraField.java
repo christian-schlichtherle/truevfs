@@ -20,8 +20,7 @@ import static net.java.truevfs.comp.zip.Constants.EMPTY;
 @NotThreadSafe
 abstract class ExtraField {
 
-    private static final Map<Integer, Class<? extends ExtraField>>
-            registry = new HashMap<>();
+    private static final Map<Integer, Class<? extends ExtraField>> registry = new HashMap<>();
 
     /** The Header ID for a ZIP64 Extended Information extra field. */
     static final int ZIP64_HEADER_ID = 0x0001;
@@ -46,7 +45,7 @@ abstract class ExtraField {
     static void register(final Class<? extends ExtraField> c) {
         final ExtraField ef;
         try {
-            ef = (ExtraField) c.newInstance();
+            ef = c.getDeclaredConstructor().newInstance();
         } catch (NullPointerException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -73,9 +72,7 @@ abstract class ExtraField {
         final Class<? extends ExtraField> c = registry.get(headerId);
         final ExtraField ef;
         try {
-            ef = null != c
-                    ? (ExtraField) c.newInstance()
-                    : new DefaultExtraField(headerId);
+            ef = null != c ? c.getDeclaredConstructor().newInstance() : new DefaultExtraField(headerId);
         } catch (final Exception cannotHappen) {
             throw new AssertionError(cannotHappen);
         }
@@ -110,7 +107,9 @@ abstract class ExtraField {
     final byte[] getDataBlock() {
         final int size = getDataSize();
         assert UShort.check(size);
-        if (0 == size) return EMPTY;
+        if (0 == size) {
+            return EMPTY;
+        }
         final byte[] data = new byte[size];
         writeTo(data, 0);
         return data;
