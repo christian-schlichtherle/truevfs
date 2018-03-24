@@ -182,7 +182,7 @@ private object PaceManagerTest {
       throw new UnsupportedOperationException
 
     override def accept[X <: Exception, V <: Visitor[_ >: FsController, X]](filter: ControllerFilter, visitor: V): V = {
-      controllers filter filter.accept foreach visitor.visit
+      controllers filter (filter accept _) foreach (visitor visit _)
       visitor
     }
   }

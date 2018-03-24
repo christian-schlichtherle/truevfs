@@ -40,214 +40,214 @@ class CacheEntryTest extends WordSpec {
         back.setBuffer(mockEntryDataRead)
         cache .configure(new BrokenInputSocket(back))
               .configure(new BrokenOutputSocket(back))
-        pool should have size (0)
-        back.getBuffer should equal (mockEntryDataRead)
-        back getCount READ should be (0)
-        back getCount WRITE should be (0)
+        pool should have size 0
+        back.getBuffer shouldBe mockEntryDataRead
+        back getCount READ shouldBe 0
+        back getCount WRITE shouldBe 0
 
-        cache.dataSize should be (UNKNOWN)
+        cache.dataSize shouldBe UNKNOWN
 
         front = new MemoryBuffer(mockEntryName, initialCapacity)
-        front.getBuffer should be (null)
+        front.getBuffer shouldBe null
         intercept[IOException] {
           IoSockets copy (cache.input, front.output)
         }
-        pool should have size (0)
-        front.getBuffer should be (null)
-        back.getBuffer should equal (mockEntryDataRead)
-        back getCount READ should be (0)
-        back getCount WRITE should be (0)
-        cache.dataSize should be (UNKNOWN)
+        pool should have size 0
+        front.getBuffer shouldBe null
+        back.getBuffer shouldBe mockEntryDataRead
+        back getCount READ shouldBe 0
+        back getCount WRITE shouldBe 0
+        cache.dataSize shouldBe UNKNOWN
 
         cache .configure(back.input)
               .configure(back.output)
-        pool should have size (0)
-        front.getBuffer should be (null)
-        back.getBuffer should equal (mockEntryDataRead)
-        back getCount READ should be (0)
-        back getCount WRITE should be (0)
-        cache.dataSize should be (UNKNOWN)
+        pool should have size 0
+        front.getBuffer shouldBe null
+        back.getBuffer shouldBe mockEntryDataRead
+        back getCount READ shouldBe 0
+        back getCount WRITE shouldBe 0
+        cache.dataSize shouldBe UNKNOWN
 
         front = new MemoryBuffer(mockEntryName, initialCapacity)
-        pool should have size (0)
-        front.getBuffer should be (null)
+        pool should have size 0
+        front.getBuffer shouldBe null
         IoSockets copy (cache.input, front.output)
-        pool should have size (1)
-        front.getBuffer should equal (mockEntryDataRead)
-        back.getBuffer should equal (mockEntryDataRead)
-        back getCount READ should be (1)
-        back getCount WRITE should be (0)
-        cache.dataSize should be (mockEntryDataRead.limit)
+        pool should have size 1
+        front.getBuffer shouldBe mockEntryDataRead
+        back.getBuffer shouldBe mockEntryDataRead
+        back getCount READ shouldBe 1
+        back getCount WRITE shouldBe 0
+        cache.dataSize shouldBe mockEntryDataRead.limit()
 
         front = new MemoryBuffer(mockEntryName, initialCapacity)
         front.setBuffer(mockEntryDataWrite)
         cache .configure(new BrokenInputSocket(back))
               .configure(new BrokenOutputSocket(back))
-        pool should have size (1)
-        front.getBuffer should equal (mockEntryDataWrite)
-        back.getBuffer should equal (mockEntryDataRead)
-        back getCount READ should be (1)
-        back getCount WRITE should be (0)
-        cache.dataSize should be (mockEntryDataRead.limit)
+        pool should have size 1
+        front.getBuffer shouldBe mockEntryDataWrite
+        back.getBuffer shouldBe mockEntryDataRead
+        back getCount READ shouldBe 1
+        back getCount WRITE shouldBe 0
+        cache.dataSize shouldBe mockEntryDataRead.limit()
 
         intercept[IOException] {
           IoSockets copy (front.input, cache.output)
           if (WriteThrough ne strategy) {
-            back getCount WRITE should be (0)
+            back getCount WRITE shouldBe 0
             cache flush ()
           }
         }
-        pool should have size (1)
-        front.getBuffer should equal (mockEntryDataWrite)
-        back.getBuffer should equal (mockEntryDataRead)
-        back getCount READ should be (1)
-        back getCount WRITE should be (0)
-        cache.dataSize should be (mockEntryDataWrite.limit)
+        pool should have size 1
+        front.getBuffer shouldBe mockEntryDataWrite
+        back.getBuffer shouldBe mockEntryDataRead
+        back getCount READ shouldBe 1
+        back getCount WRITE shouldBe 0
+        cache.dataSize shouldBe mockEntryDataWrite.limit()
 
         cache .configure(back.input)
               .configure(back.output)
-        pool should have size (1)
-        front.getBuffer should equal (mockEntryDataWrite)
-        back.getBuffer should equal (mockEntryDataRead)
-        back getCount READ should be (1)
-        back getCount WRITE should be (0)
-        cache.dataSize should be (mockEntryDataWrite.limit)
+        pool should have size 1
+        front.getBuffer shouldBe mockEntryDataWrite
+        back.getBuffer shouldBe mockEntryDataRead
+        back getCount READ shouldBe 1
+        back getCount WRITE shouldBe 0
+        cache.dataSize shouldBe mockEntryDataWrite.limit()
 
         IoSockets copy (front.input, cache.output)
         if (WriteThrough ne strategy) {
-          back getCount WRITE should be (0)
+          back getCount WRITE shouldBe 0
           cache flush ()
         }
-        cache.dataSize should not be (UNKNOWN)
-        pool should have size (1)
-        front.getBuffer should equal (mockEntryDataWrite)
-        back.getBuffer should equal (mockEntryDataWrite)
-        back getCount READ should be (1)
-        back getCount WRITE should be (1)
-        cache.dataSize should be (mockEntryDataWrite.limit)
+        cache.dataSize should not be UNKNOWN
+        pool should have size 1
+        front.getBuffer shouldBe mockEntryDataWrite
+        back.getBuffer shouldBe mockEntryDataWrite
+        back getCount READ shouldBe 1
+        back getCount WRITE shouldBe 1
+        cache.dataSize shouldBe mockEntryDataWrite.limit()
 
         back = new MemoryBuffer(mockEntryName, initialCapacity)
         back.setBuffer(mockEntryDataRead)
         cache .configure(new BrokenInputSocket(back))
               .configure(new BrokenOutputSocket(back))
-        cache.dataSize should not be (UNKNOWN)
-        pool should have size (1)
-        front.getBuffer should equal (mockEntryDataWrite)
-        back.getBuffer should equal (mockEntryDataRead)
-        back getCount READ should be (0)
-        back getCount WRITE should be (0)
-        cache.dataSize should be (mockEntryDataWrite.limit)
+        cache.dataSize should not be UNKNOWN
+        pool should have size 1
+        front.getBuffer shouldBe mockEntryDataWrite
+        back.getBuffer shouldBe mockEntryDataRead
+        back getCount READ shouldBe 0
+        back getCount WRITE shouldBe 0
+        cache.dataSize shouldBe mockEntryDataWrite.limit()
 
         front = new MemoryBuffer(mockEntryName, initialCapacity)
         IoSockets copy (cache.input, front.output)
-        cache.dataSize should not be (UNKNOWN)
-        pool should have size (1)
-        front.getBuffer should equal (mockEntryDataWrite)
-        back.getBuffer should equal (mockEntryDataRead)
-        back getCount READ should be (0)
-        back getCount WRITE should be (0)
-        cache.dataSize should be (mockEntryDataWrite.limit)
+        cache.dataSize should not be UNKNOWN
+        pool should have size 1
+        front.getBuffer shouldBe mockEntryDataWrite
+        back.getBuffer shouldBe mockEntryDataRead
+        back getCount READ shouldBe 0
+        back getCount WRITE shouldBe 0
+        cache.dataSize shouldBe mockEntryDataWrite.limit()
 
         cache release ()
-        cache.dataSize should be (UNKNOWN)
-        pool should have size (0)
-        front.getBuffer should equal (mockEntryDataWrite)
-        back.getBuffer should equal (mockEntryDataRead)
-        back getCount READ should be (0)
-        back getCount WRITE should be (0)
-        cache.dataSize should be (UNKNOWN)
+        cache.dataSize shouldBe UNKNOWN
+        pool should have size 0
+        front.getBuffer shouldBe mockEntryDataWrite
+        back.getBuffer shouldBe mockEntryDataRead
+        back getCount READ shouldBe 0
+        back getCount WRITE shouldBe 0
+        cache.dataSize shouldBe UNKNOWN
 
         front = new MemoryBuffer(mockEntryName, initialCapacity)
         intercept[IOException] {
           IoSockets copy (cache.input, front.output)
         }
-        cache.dataSize should be (UNKNOWN)
-        pool should have size (0)
-        front.getBuffer should be (null)
-        back.getBuffer should equal (mockEntryDataRead)
-        back getCount READ should be (0)
-        back getCount WRITE should be (0)
-        cache.dataSize should be (UNKNOWN)
+        cache.dataSize shouldBe UNKNOWN
+        pool should have size 0
+        front.getBuffer shouldBe null
+        back.getBuffer shouldBe mockEntryDataRead
+        back getCount READ shouldBe 0
+        back getCount WRITE shouldBe 0
+        cache.dataSize shouldBe UNKNOWN
 
         cache .configure(back.input)
               .configure(back.output)
-        cache.dataSize should be (UNKNOWN)
-        pool should have size (0)
-        front.getBuffer should be (null)
-        back.getBuffer should equal (mockEntryDataRead)
-        back getCount READ should be (0)
-        back getCount WRITE should be (0)
-        cache.dataSize should be (UNKNOWN)
+        cache.dataSize shouldBe UNKNOWN
+        pool should have size 0
+        front.getBuffer shouldBe null
+        back.getBuffer shouldBe mockEntryDataRead
+        back getCount READ shouldBe 0
+        back getCount WRITE shouldBe 0
+        cache.dataSize shouldBe UNKNOWN
 
         IoSockets copy (cache.input, front.output)
-        cache.dataSize should not be (UNKNOWN)
-        pool should have size (1)
-        front.getBuffer should equal (mockEntryDataRead)
-        back.getBuffer should equal (mockEntryDataRead)
-        back getCount READ should be (1)
-        back getCount WRITE should be (0)
-        cache.dataSize should be (mockEntryDataRead.limit)
+        cache.dataSize should not be UNKNOWN
+        pool should have size 1
+        front.getBuffer shouldBe mockEntryDataRead
+        back.getBuffer shouldBe mockEntryDataRead
+        back getCount READ shouldBe 1
+        back getCount WRITE shouldBe 0
+        cache.dataSize shouldBe mockEntryDataRead.limit()
 
         front = new MemoryBuffer(mockEntryName, initialCapacity)
         front setBuffer mockEntryDataWrite
         cache .configure(new BrokenInputSocket(back))
               .configure(new BrokenOutputSocket(back))
-        cache.dataSize should not be (UNKNOWN)
-        pool should have size (1)
-        front.getBuffer should equal (mockEntryDataWrite)
-        back.getBuffer should equal (mockEntryDataRead)
-        back getCount READ should be (1)
-        back getCount WRITE should be (0)
-        cache.dataSize should be (mockEntryDataRead.limit)
+        cache.dataSize should not be UNKNOWN
+        pool should have size 1
+        front.getBuffer shouldBe mockEntryDataWrite
+        back.getBuffer shouldBe mockEntryDataRead
+        back getCount READ shouldBe 1
+        back getCount WRITE shouldBe 0
+        cache.dataSize shouldBe mockEntryDataRead.limit()
 
         intercept[IOException] {
           IoSockets copy (front.input, cache.output)
           if (WriteThrough ne strategy) {
-            back getCount WRITE should be (0)
+            back getCount WRITE shouldBe 0
             cache flush ()
           }
         }
-        cache.dataSize should not be (UNKNOWN)
-        pool should have size (1)
-        front.getBuffer should equal (mockEntryDataWrite)
-        back.getBuffer should equal (mockEntryDataRead)
-        back getCount READ should be (1)
-        back getCount WRITE should be (0)
-        cache.dataSize should be (mockEntryDataWrite.limit)
+        cache.dataSize should not be UNKNOWN
+        pool should have size 1
+        front.getBuffer shouldBe mockEntryDataWrite
+        back.getBuffer shouldBe mockEntryDataRead
+        back getCount READ shouldBe 1
+        back getCount WRITE shouldBe 0
+        cache.dataSize shouldBe mockEntryDataWrite.limit()
 
         cache .configure(back.input)
               .configure(back.output)
-        cache.dataSize should not be (UNKNOWN)
-        pool should have size (1)
-        front.getBuffer should equal (mockEntryDataWrite)
-        back.getBuffer should equal (mockEntryDataRead)
-        back getCount READ should be (1)
-        back getCount WRITE should be (0)
-        cache.dataSize should be (mockEntryDataWrite.limit)
+        cache.dataSize should not be UNKNOWN
+        pool should have size 1
+        front.getBuffer shouldBe mockEntryDataWrite
+        back.getBuffer shouldBe mockEntryDataRead
+        back getCount READ shouldBe 1
+        back getCount WRITE shouldBe 0
+        cache.dataSize shouldBe mockEntryDataWrite.limit()
 
         IoSockets copy (front.input, cache.output)
         if (WriteThrough ne strategy) {
-          back getCount WRITE should be (0)
+          back getCount WRITE shouldBe 0
           cache flush ()
         }
-        cache.dataSize should not be (UNKNOWN)
-        pool should have size (1)
-        front.getBuffer should equal (mockEntryDataWrite)
-        back.getBuffer should equal (mockEntryDataWrite)
-        back getCount READ should be (1)
-        back getCount WRITE should be (1)
-        cache.dataSize should be (mockEntryDataWrite.limit)
+        cache.dataSize should not be UNKNOWN
+        pool should have size 1
+        front.getBuffer shouldBe mockEntryDataWrite
+        back.getBuffer shouldBe mockEntryDataWrite
+        back getCount READ shouldBe 1
+        back getCount WRITE shouldBe 1
+        cache.dataSize shouldBe mockEntryDataWrite.limit()
 
         cache .configure(new BrokenInputSocket(back))
               .configure(new BrokenOutputSocket(back))
               .release()
-        cache.dataSize should be (UNKNOWN)
-        pool should have size (0)
-        front.getBuffer should equal (mockEntryDataWrite)
-        back.getBuffer should equal (mockEntryDataWrite)
-        back getCount READ should be (1)
-        back getCount WRITE should be (1)
-        cache.dataSize should be (UNKNOWN)
+        cache.dataSize shouldBe UNKNOWN
+        pool should have size 0
+        front.getBuffer shouldBe mockEntryDataWrite
+        back.getBuffer shouldBe mockEntryDataWrite
+        back getCount READ shouldBe 1
+        back getCount WRITE shouldBe 1
+        cache.dataSize shouldBe UNKNOWN
       }
     }
   }
@@ -259,7 +259,7 @@ private object CacheEntryTest {
     extends AbstractInputSocket[Entry] {
     require(null ne target)
 
-    override def stream(peer: AnyOutputSocket) = new InputStream {
+    override def stream(peer: AnyOutputSocket): InputStream = new InputStream {
       override def read = throw new IOException
     }
   }
@@ -268,7 +268,7 @@ private object CacheEntryTest {
     extends AbstractOutputSocket[Entry] {
     require(null ne target)
 
-    override def stream(peer: AnyInputSocket) = new OutputStream {
+    override def stream(peer: AnyInputSocket): OutputStream = new OutputStream {
       override def write(b: Int) { throw new IOException }
     }
   }
