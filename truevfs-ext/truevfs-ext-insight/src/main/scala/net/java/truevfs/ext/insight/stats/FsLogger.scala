@@ -30,19 +30,17 @@ private object FsLogger {
     while (true) {
       val expect = ref.get
       val update = next(expect)
-      if (ref.weakCompareAndSet(expect, update)) return update
+      if (ref.compareAndSet(expect, update)) {
+        return update
+      }
     }
     throw new AssertionError
   }
 
   /**
-   * Adds a hash value for the current thread to the referenced set and returns
-   * its size.
-   *
-   * @param  ref the atomic reference to the immutable set to use for logging.
-   * @return the resulting size of the set
+   * Adds a hash value for the current thread to the given set and returns its size.
    */
-  private def logCurrentThread(set: mutable.Set[Int]) = {
+  private def logCurrentThread(set: mutable.Set[Int]): Int = {
     set synchronized {
       (set += System identityHashCode Thread.currentThread).size
     }
@@ -74,26 +72,32 @@ final class FsLogger(val size: Int) {
   private def position = _position.get
 
   private def index(offset: Int) = {
-    if (offset < 0 || size <= offset) throw new IllegalArgumentException
+    if (offset < 0 || size <= offset) {
+      throw new IllegalArgumentException
+    }
     var index = position - offset
-    if (index < 0) index += size
+    if (index < 0) {
+      index += size
+    }
     index
   }
 
-  def format(offset: Int) = {
+  def format(offset: Int): String = {
     val max = size - 1
     if (offset < 0 || max < offset) throw new IllegalArgumentException
     "%%0%dd".format(length(max)).format(offset)
   }
 
-  def stats(offset: Int) = _stats.get(index(offset))
-  def current = stats(0)
+  def stats(offset: Int): FsStatistics = _stats.get(index(offset))
+  def current: FsStatistics = stats(0)
 
   private def update(next: FsStatistics => FsStatistics): FsStatistics = {
     while (true) {
       val expect = current
       val update = next(expect)
-      if (_stats weakCompareAndSet (position, expect, update)) return update
+      if (_stats compareAndSet (position, expect, update)) {
+        return update
+      }
     }
     throw new AssertionError
   }
@@ -109,7 +113,7 @@ final class FsLogger(val size: Int) {
     * @return A new object which reflects the updated statistics.
     * @throws IllegalArgumentException if any parameter value is negative.
     */
-  def logRead(nanos: Long, bytes: Int) = {
+  def logRead(nanos: Long, bytes: Int): IoStatistics = {
     val threads = logCurrentThread(_readThreads)
     update(_ logRead (nanos, bytes, threads)).readStats
   }
@@ -125,7 +129,7 @@ final class FsLogger(val size: Int) {
    * @return A new object which reflects the updated statistics.
    * @throws IllegalArgumentException if any parameter is negative.
    */
-  def logWrite(nanos: Long, bytes: Int) = {
+  def logWrite(nanos: Long, bytes: Int): IoStatistics = {
     val threads = logCurrentThread(_writeThreads)
     update(_ logWrite (nanos, bytes, threads)).writeStats
   }
@@ -140,12 +144,12 @@ final class FsLogger(val size: Int) {
    * @return A new object which reflects the updated statistics.
    * @throws IllegalArgumentException if any parameter value is negative.
    */
-  def logSync(nanos: Long) = {
+  def logSync(nanos: Long): SyncStatistics = {
     val threads = logCurrentThread(_syncThreads)
     update(_ logSync (nanos, threads)).syncStats
   }
 
-  def rotate() = {
+  def rotate(): Int = {
     val n = next()
     _stats.set(n, FsStatistics())
     _readThreads = mutable.Set.empty
@@ -157,7 +161,9 @@ final class FsLogger(val size: Int) {
   private def next() = {
     atomic(_position) { expect =>
       var update = expect + 1
-      if (size <= update) update -= size
+      if (size <= update) {
+        update -= size
+      }
       update
     }
   }

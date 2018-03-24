@@ -43,7 +43,7 @@ object SetPerformanceTest {
     while (true) {
       val expect = ref.get
       val update = next(expect)
-      if (ref.weakCompareAndSet(expect, update)) return update
+      if (ref.compareAndSet(expect, update)) return update
     }
     throw new AssertionError
   }
