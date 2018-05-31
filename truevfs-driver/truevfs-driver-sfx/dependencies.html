@@ -9,7 +9,7 @@
       @import url("./css/site.css");
     </style>
     <link rel="stylesheet" href="./css/print.css" type="text/css" media="print"/>
-    <meta name="Date-Revision-yyyymmdd" content="20171003"/>
+    <meta name="Date-Revision-yyyymmdd" content="20180601"/>
     <meta http-equiv="Content-Language" content="en"/>
           <script type="text/javascript">
       var _gaq = _gaq || [];
@@ -31,7 +31,7 @@
         })();
       </script>
                                                           
-<link title="The TrueZIP Blog - Announcements Feed" rel="alternate" type="application/rss+xml" href="http://truevfs.schlichtherle.de/category/announcements/feed/"/>
+<link rel="alternate" href="http://truevfs.schlichtherle.de/category/announcements/feed/" type="application/rss+xml" title="The TrueZIP Blog - Announcements Feed"/>
                       
   </head>
   <body class="composite" onload="prettyPrint()">
@@ -122,11 +122,11 @@
                   </li>
           </ul>
                      
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+<form method="post" action="https://www.paypal.com/cgi-bin/webscr">
   <div class="paypalButton">
-    <input name="cmd" value="_s-xclick" type="hidden"/>
-    <input name="hosted_button_id" value="AGDEQWWKNZ6UL" type="hidden"/>
-    <input style="border: 0" alt="PayPal - The safer, easier way to pay online!" name="submit" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" type="image"/>
+    <input name="cmd" type="hidden" value="_s-xclick"/>
+    <input name="hosted_button_id" type="hidden" value="AGDEQWWKNZ6UL"/>
+    <input src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" name="submit" alt="PayPal - The safer, easier way to pay online!" style="border: 0" type="image"/>
   </div>
 </form>
                                 
@@ -435,12 +435,12 @@ jar, tar, zip, dump, 7z, arj.</p>
 <p><b>Project Licenses: </b><a class="externalLink" href="http://www.apache.org/licenses/LICENSE-2.0.txt">The Apache Software License, Version 2.0</a></p></td></tr></table></div></li></ul></li></ul></li></ul></li></ul></div></div><a name="Licenses"></a>
 <div class="section">
 <h2><a name="Licenses"></a>Licenses</h2>
-<p><b>Bouncy Castle Licence: </b>Bouncy Castle Provider</p>
-<p><b>Apache License, Version 2.0: </b>Apache Commons Compress, TrueVFS Component ZIP, TrueVFS Component ZipDriver, TrueVFS Driver SFX, TrueVFS Kernel Specification</p>
 <p><b>Eclipse Public License, Version 1.0: </b>TrueCommons Annotations, TrueCommons Container I/O, TrueCommons I/O, TrueCommons KeyManager Specification, TrueCommons Logging, TrueCommons Services, TrueCommons Shed</p>
-<p><b>The Apache Software License, Version 2.0: </b>javax.inject</p>
 <p><b>MIT License: </b>SLF4J API Module</p>
-<p><b>GNU Lesser Public License: </b>FindBugs-Annotations</p></div><a name="Dependency_File_Details"></a>
+<p><b>Apache License, Version 2.0: </b>Apache Commons Compress, TrueVFS Component ZIP, TrueVFS Component ZipDriver, TrueVFS Driver SFX, TrueVFS Kernel Specification</p>
+<p><b>GNU Lesser Public License: </b>FindBugs-Annotations</p>
+<p><b>The Apache Software License, Version 2.0: </b>javax.inject</p>
+<p><b>Bouncy Castle Licence: </b>Bouncy Castle Provider</p></div><a name="Dependency_File_Details"></a>
 <div class="section">
 <h2><a name="Dependency_File_Details"></a>Dependency File Details</h2>
 <table border="0" class="bodyTable">
@@ -605,121 +605,121 @@ jar, tar, zip, dump, 7z, arj.</p>
 <th>Release</th>
 <th>Snapshot</th></tr>
 <tr class="b">
-<td>apache.snapshots</td>
-<td><a class="externalLink" href="https://repository.apache.org/snapshots">https://repository.apache.org/snapshots</a></td>
-<td>No</td>
-<td>Yes</td></tr>
+<td>central</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2">https://repo.maven.apache.org/maven2</a></td>
+<td>Yes</td>
+<td>No</td></tr>
 <tr class="a">
 <td>sonatype-nexus-snapshots</td>
 <td><a class="externalLink" href="https://oss.sonatype.org/content/repositories/snapshots/">https://oss.sonatype.org/content/repositories/snapshots/</a></td>
 <td>No</td>
 <td>Yes</td></tr>
 <tr class="b">
-<td>central</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2">https://repo.maven.apache.org/maven2</a></td>
-<td>Yes</td>
-<td>No</td></tr></table>
+<td>apache.snapshots</td>
+<td><a class="externalLink" href="https://repository.apache.org/snapshots">https://repository.apache.org/snapshots</a></td>
+<td>No</td>
+<td>Yes</td></tr></table>
 <p>Repository locations for each of the Dependencies.</p>
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Artifact</th>
-<th>apache.snapshots</th>
+<th>central</th>
 <th>sonatype-nexus-snapshots</th>
-<th>central</th></tr>
+<th>apache.snapshots</th></tr>
 <tr class="b">
 <td>com.google.code.findbugs:annotations:jar:3.0.1u2</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/com/google/code/findbugs/annotations/3.0.1u2/annotations-3.0.1u2.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/com/google/code/findbugs/annotations/3.0.1u2/annotations-3.0.1u2.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>javax.inject:javax.inject:jar:1</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/javax/inject/javax.inject/1/javax.inject-1.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/javax/inject/javax.inject/1/javax.inject-1.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truecommons:truecommons-annotations:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-annotations/2.5.0/truecommons-annotations-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-annotations/2.5.0/truecommons-annotations-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truecommons:truecommons-cio:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-cio/2.5.0/truecommons-cio-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-cio/2.5.0/truecommons-cio-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truecommons:truecommons-io:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-io/2.5.0/truecommons-io-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-io/2.5.0/truecommons-io-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truecommons:truecommons-key-spec:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-key-spec/2.5.0/truecommons-key-spec-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-key-spec/2.5.0/truecommons-key-spec-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truecommons:truecommons-logging:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-logging/2.5.0/truecommons-logging-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-logging/2.5.0/truecommons-logging-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truecommons:truecommons-services:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-services/2.5.0/truecommons-services-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-services/2.5.0/truecommons-services-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truecommons:truecommons-shed:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-shed/2.5.0/truecommons-shed-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-shed/2.5.0/truecommons-shed-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truevfs:truevfs-comp-zip:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-comp-zip/0.12.0/truevfs-comp-zip-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-comp-zip/0.12.0/truevfs-comp-zip-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truevfs:truevfs-comp-zipdriver:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-comp-zipdriver/0.12.0/truevfs-comp-zipdriver-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-comp-zipdriver/0.12.0/truevfs-comp-zipdriver-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truevfs:truevfs-kernel-spec:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-kernel-spec/0.12.0/truevfs-kernel-spec-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-kernel-spec/0.12.0/truevfs-kernel-spec-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>org.apache.commons:commons-compress:jar:1.14</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/apache/commons/commons-compress/1.14/commons-compress-1.14.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/apache/commons/commons-compress/1.14/commons-compress-1.14.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>org.bouncycastle:bcprov-jdk15on:jar:1.58</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk15on/1.58/bcprov-jdk15on-1.58.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk15on/1.58/bcprov-jdk15on-1.58.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>org.slf4j:slf4j-api:jar:1.7.25</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <th>Total</th>
-<th>apache.snapshots</th>
+<th>central</th>
 <th>sonatype-nexus-snapshots</th>
-<th>central</th></tr>
+<th>apache.snapshots</th></tr>
 <tr class="b">
 <td>15 (compile: 15)</td>
+<td>15</td>
 <td>0</td>
-<td>0</td>
-<td>15</td></tr></table></div>
+<td>0</td></tr></table></div>
               </div>
     </div>
     <div class="clear"><hr/></div>
     <div id="footer">
       <div class="xright">
-              Copyright &#169;                    2005-2017
+              Copyright &#169;                    2005-2018
                         <a href="http://schlichtherle.de">Schlichtherle IT Services</a>.
             All Rights Reserved.      
-                                   <span id="publishDate">Last Published: 2017-10-03</span>
+                                   <span id="publishDate">Last Published: 2018-06-01</span>
                         </div>
       <div class="clear"><hr/></div>
     </div>

@@ -9,7 +9,7 @@
       @import url("./css/site.css");
     </style>
     <link rel="stylesheet" href="./css/print.css" type="text/css" media="print"/>
-    <meta name="Date-Revision-yyyymmdd" content="20171003"/>
+    <meta name="Date-Revision-yyyymmdd" content="20180601"/>
     <meta http-equiv="Content-Language" content="en"/>
           <script type="text/javascript">
       var _gaq = _gaq || [];
@@ -31,7 +31,7 @@
         })();
       </script>
                                                           
-<link title="The TrueZIP Blog - Announcements Feed" rel="alternate" type="application/rss+xml" href="http://truevfs.schlichtherle.de/category/announcements/feed/"/>
+<link rel="alternate" href="http://truevfs.schlichtherle.de/category/announcements/feed/" type="application/rss+xml" title="The TrueZIP Blog - Announcements Feed"/>
                       
   </head>
   <body class="composite" onload="prettyPrint()">
@@ -113,11 +113,11 @@
         </li>
           </ul>
                      
-<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+<form method="post" action="https://www.paypal.com/cgi-bin/webscr">
   <div class="paypalButton">
-    <input name="cmd" value="_s-xclick" type="hidden"/>
-    <input name="hosted_button_id" value="AGDEQWWKNZ6UL" type="hidden"/>
-    <input style="border: 0" alt="PayPal - The safer, easier way to pay online!" name="submit" src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" type="image"/>
+    <input name="cmd" type="hidden" value="_s-xclick"/>
+    <input name="hosted_button_id" type="hidden" value="AGDEQWWKNZ6UL"/>
+    <input src="https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif" name="submit" alt="PayPal - The safer, easier way to pay online!" style="border: 0" type="image"/>
   </div>
 </form>
                                 
@@ -1048,16 +1048,16 @@ jar, tar, zip, dump, 7z, arj.</p>
 <p><b>Project Licenses: </b><a class="externalLink" href="http://www.eclipse.org/legal/epl-v10.html">Eclipse Public License, Version 1.0</a></p></td></tr></table></div></li></ul></li></ul></li></ul></div></div><a name="Licenses"></a>
 <div class="section">
 <h2><a name="Licenses"></a>Licenses</h2>
-<p><b>ASL, version 2: </b>Java Native Access</p>
-<p><b>LGPL, version 2.1: </b>Java Native Access</p>
-<p><b>Public Domain: </b>XZ for Java</p>
-<p><b>Bouncy Castle Licence: </b>Bouncy Castle Provider</p>
-<p><b>Apache License, Version 2.0: </b>Apache Commons Compress, Apache HttpClient, Apache HttpCore, Scala+, TrueVFS Access, TrueVFS Access Swing, TrueVFS Component IBM437, TrueVFS Component Instrumentation, TrueVFS Component JMX, TrueVFS Component TarDriver, TrueVFS Component ZIP, TrueVFS Component ZipDriver, TrueVFS Driver FILE, TrueVFS Driver HTTP(S), TrueVFS Driver JAR, TrueVFS Driver ODF, TrueVFS Driver SFX, TrueVFS Driver TAR, TrueVFS Driver TAR.BZIP2, TrueVFS Driver TAR.GZIP, TrueVFS Driver TAR.XZ, TrueVFS Driver ZIP, TrueVFS Driver ZIP.RAES, TrueVFS Extension Insight, TrueVFS Extension Logging, TrueVFS Extension Pacemaker, TrueVFS Kernel Implementation, TrueVFS Kernel Specification, TrueVFS Profile Base, TrueVFS Profile Default, TrueVFS Profile Full</p>
 <p><b>Eclipse Public License, Version 1.0: </b>TrueCommons Annotations, TrueCommons Container I/O, TrueCommons I/O, TrueCommons JMX, TrueCommons KeyManager Console, TrueCommons KeyManager Default, TrueCommons KeyManager HurlingWindowFeedback, TrueCommons KeyManager Mac OS X, TrueCommons KeyManager Specification, TrueCommons KeyManager Swing, TrueCommons Logging, TrueCommons Services, TrueCommons Shed</p>
 <p><b>MIT License: </b>JCL 1.2 implemented over SLF4J, SLF4J API Module</p>
-<p><b>The Apache Software License, Version 2.0: </b>Apache Commons Codec, javax.inject</p>
+<p><b>Apache License, Version 2.0: </b>Apache Commons Compress, Apache HttpClient, Apache HttpCore, Scala+, TrueVFS Access, TrueVFS Access Swing, TrueVFS Component IBM437, TrueVFS Component Instrumentation, TrueVFS Component JMX, TrueVFS Component TarDriver, TrueVFS Component ZIP, TrueVFS Component ZipDriver, TrueVFS Driver FILE, TrueVFS Driver HTTP(S), TrueVFS Driver JAR, TrueVFS Driver ODF, TrueVFS Driver SFX, TrueVFS Driver TAR, TrueVFS Driver TAR.BZIP2, TrueVFS Driver TAR.GZIP, TrueVFS Driver TAR.XZ, TrueVFS Driver ZIP, TrueVFS Driver ZIP.RAES, TrueVFS Extension Insight, TrueVFS Extension Logging, TrueVFS Extension Pacemaker, TrueVFS Kernel Implementation, TrueVFS Kernel Specification, TrueVFS Profile Base, TrueVFS Profile Default, TrueVFS Profile Full</p>
+<p><b>ASL, version 2: </b>Java Native Access</p>
+<p><b>Public Domain: </b>XZ for Java</p>
+<p><b>LGPL, version 2.1: </b>Java Native Access</p>
 <p><b>BSD 3-Clause: </b>Scala Library</p>
-<p><b>GNU Lesser Public License: </b>FindBugs-Annotations</p></div><a name="Dependency_File_Details"></a>
+<p><b>The Apache Software License, Version 2.0: </b>Apache Commons Codec, javax.inject</p>
+<p><b>GNU Lesser Public License: </b>FindBugs-Annotations</p>
+<p><b>Bouncy Castle Licence: </b>Bouncy Castle Provider</p></div><a name="Dependency_File_Details"></a>
 <div class="section">
 <h2><a name="Dependency_File_Details"></a>Dependency File Details</h2>
 <table border="0" class="bodyTable">
@@ -1583,212 +1583,212 @@ jar, tar, zip, dump, 7z, arj.</p>
 <th>Release</th>
 <th>Snapshot</th></tr>
 <tr class="b">
-<td>apache.snapshots</td>
-<td><a class="externalLink" href="http://repository.apache.org/snapshots">http://repository.apache.org/snapshots</a></td>
-<td>No</td>
-<td>Yes</td></tr>
+<td>central</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2">https://repo.maven.apache.org/maven2</a></td>
+<td>Yes</td>
+<td>No</td></tr>
 <tr class="a">
 <td>sonatype-nexus-snapshots</td>
 <td><a class="externalLink" href="https://oss.sonatype.org/content/repositories/snapshots/">https://oss.sonatype.org/content/repositories/snapshots/</a></td>
 <td>No</td>
 <td>Yes</td></tr>
 <tr class="b">
-<td>central</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2">https://repo.maven.apache.org/maven2</a></td>
-<td>Yes</td>
-<td>No</td></tr></table>
+<td>apache.snapshots</td>
+<td><a class="externalLink" href="http://repository.apache.org/snapshots">http://repository.apache.org/snapshots</a></td>
+<td>No</td>
+<td>Yes</td></tr></table>
 <p>Repository locations for each of the Dependencies.</p>
 <table border="0" class="bodyTable">
 <tr class="a">
 <th>Artifact</th>
-<th>apache.snapshots</th>
+<th>central</th>
 <th>sonatype-nexus-snapshots</th>
-<th>central</th></tr>
+<th>apache.snapshots</th></tr>
 <tr class="b">
 <td>com.google.code.findbugs:annotations:jar:3.0.1u2</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/com/google/code/findbugs/annotations/3.0.1u2/annotations-3.0.1u2.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/com/google/code/findbugs/annotations/3.0.1u2/annotations-3.0.1u2.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>commons-codec:commons-codec:jar:1.9</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/commons-codec/commons-codec/1.9/commons-codec-1.9.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/commons-codec/commons-codec/1.9/commons-codec-1.9.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>global.namespace.scala-plus:scala-plus_2.11:jar:0.1</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/global/namespace/scala-plus/scala-plus_2.11/0.1/scala-plus_2.11-0.1.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/global/namespace/scala-plus/scala-plus_2.11/0.1/scala-plus_2.11-0.1.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>javax.inject:javax.inject:jar:1</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/javax/inject/javax.inject/1/javax.inject-1.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/javax/inject/javax.inject/1/javax.inject-1.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.dev.jna:jna:jar:4.1.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/dev/jna/jna/4.1.0/jna-4.1.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/dev/jna/jna/4.1.0/jna-4.1.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truecommons:truecommons-annotations:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-annotations/2.5.0/truecommons-annotations-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-annotations/2.5.0/truecommons-annotations-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truecommons:truecommons-cio:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-cio/2.5.0/truecommons-cio-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-cio/2.5.0/truecommons-cio-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truecommons:truecommons-io:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-io/2.5.0/truecommons-io-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-io/2.5.0/truecommons-io-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truecommons:truecommons-jmx:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-jmx/2.5.0/truecommons-jmx-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-jmx/2.5.0/truecommons-jmx-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truecommons:truecommons-key-console:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-key-console/2.5.0/truecommons-key-console-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-key-console/2.5.0/truecommons-key-console-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truecommons:truecommons-key-default:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-key-default/2.5.0/truecommons-key-default-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-key-default/2.5.0/truecommons-key-default-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truecommons:truecommons-key-hurlfb:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-key-hurlfb/2.5.0/truecommons-key-hurlfb-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-key-hurlfb/2.5.0/truecommons-key-hurlfb-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truecommons:truecommons-key-macosx:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-key-macosx/2.5.0/truecommons-key-macosx-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-key-macosx/2.5.0/truecommons-key-macosx-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truecommons:truecommons-key-spec:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-key-spec/2.5.0/truecommons-key-spec-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-key-spec/2.5.0/truecommons-key-spec-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truecommons:truecommons-key-swing:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-key-swing/2.5.0/truecommons-key-swing-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-key-swing/2.5.0/truecommons-key-swing-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truecommons:truecommons-logging:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-logging/2.5.0/truecommons-logging-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-logging/2.5.0/truecommons-logging-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truecommons:truecommons-services:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-services/2.5.0/truecommons-services-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-services/2.5.0/truecommons-services-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truecommons:truecommons-shed:jar:2.5.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-shed/2.5.0/truecommons-shed-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truecommons/truecommons-shed/2.5.0/truecommons-shed-2.5.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truevfs:truevfs-access:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-access/0.12.0/truevfs-access-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-access/0.12.0/truevfs-access-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truevfs:truevfs-access-swing:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-access-swing/0.12.0/truevfs-access-swing-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-access-swing/0.12.0/truevfs-access-swing-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truevfs:truevfs-comp-ibm437:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-comp-ibm437/0.12.0/truevfs-comp-ibm437-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-comp-ibm437/0.12.0/truevfs-comp-ibm437-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truevfs:truevfs-comp-inst:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-comp-inst/0.12.0/truevfs-comp-inst-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-comp-inst/0.12.0/truevfs-comp-inst-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truevfs:truevfs-comp-jmx:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-comp-jmx/0.12.0/truevfs-comp-jmx-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-comp-jmx/0.12.0/truevfs-comp-jmx-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truevfs:truevfs-comp-tardriver:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-comp-tardriver/0.12.0/truevfs-comp-tardriver-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-comp-tardriver/0.12.0/truevfs-comp-tardriver-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truevfs:truevfs-comp-zip:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-comp-zip/0.12.0/truevfs-comp-zip-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-comp-zip/0.12.0/truevfs-comp-zip-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truevfs:truevfs-comp-zipdriver:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-comp-zipdriver/0.12.0/truevfs-comp-zipdriver-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-comp-zipdriver/0.12.0/truevfs-comp-zipdriver-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truevfs:truevfs-driver-file:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-file/0.12.0/truevfs-driver-file-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-file/0.12.0/truevfs-driver-file-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truevfs:truevfs-driver-http:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-http/0.12.0/truevfs-driver-http-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-http/0.12.0/truevfs-driver-http-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truevfs:truevfs-driver-jar:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-jar/0.12.0/truevfs-driver-jar-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-jar/0.12.0/truevfs-driver-jar-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truevfs:truevfs-driver-odf:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-odf/0.12.0/truevfs-driver-odf-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-odf/0.12.0/truevfs-driver-odf-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truevfs:truevfs-driver-sfx:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-sfx/0.12.0/truevfs-driver-sfx-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-sfx/0.12.0/truevfs-driver-sfx-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truevfs:truevfs-driver-tar:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-tar/0.12.0/truevfs-driver-tar-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-tar/0.12.0/truevfs-driver-tar-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truevfs:truevfs-driver-tar-bzip2:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-tar-bzip2/0.12.0/truevfs-driver-tar-bzip2-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-tar-bzip2/0.12.0/truevfs-driver-tar-bzip2-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truevfs:truevfs-driver-tar-gzip:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-tar-gzip/0.12.0/truevfs-driver-tar-gzip-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-tar-gzip/0.12.0/truevfs-driver-tar-gzip-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truevfs:truevfs-driver-tar-xz:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-tar-xz/0.12.0/truevfs-driver-tar-xz-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-tar-xz/0.12.0/truevfs-driver-tar-xz-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truevfs:truevfs-driver-zip:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-zip/0.12.0/truevfs-driver-zip-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-zip/0.12.0/truevfs-driver-zip-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truevfs:truevfs-driver-zip-raes:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-zip-raes/0.12.0/truevfs-driver-zip-raes-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-driver-zip-raes/0.12.0/truevfs-driver-zip-raes-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>net.java.truevfs:truevfs-ext-insight:jar:0.12.0</td>
 <td>-</td>
@@ -1811,9 +1811,9 @@ jar, tar, zip, dump, 7z, arj.</p>
 <td>-</td></tr>
 <tr class="a">
 <td>net.java.truevfs:truevfs-kernel-spec:jar:0.12.0</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-kernel-spec/0.12.0/truevfs-kernel-spec-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/net/java/truevfs/truevfs-kernel-spec/0.12.0/truevfs-kernel-spec-0.12.0.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>net.java.truevfs:truevfs-profile-base:pom:0.12.0</td>
 <td>-</td>
@@ -1826,63 +1826,63 @@ jar, tar, zip, dump, 7z, arj.</p>
 <td>-</td></tr>
 <tr class="b">
 <td>org.apache.commons:commons-compress:jar:1.14</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/apache/commons/commons-compress/1.14/commons-compress-1.14.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/apache/commons/commons-compress/1.14/commons-compress-1.14.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>org.apache.httpcomponents:httpclient:jar:4.5.3</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/apache/httpcomponents/httpclient/4.5.3/httpclient-4.5.3.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/apache/httpcomponents/httpclient/4.5.3/httpclient-4.5.3.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>org.apache.httpcomponents:httpcore:jar:4.4.6</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/apache/httpcomponents/httpcore/4.4.6/httpcore-4.4.6.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/apache/httpcomponents/httpcore/4.4.6/httpcore-4.4.6.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>org.bouncycastle:bcprov-jdk15on:jar:1.58</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk15on/1.58/bcprov-jdk15on-1.58.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/bouncycastle/bcprov-jdk15on/1.58/bcprov-jdk15on-1.58.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>org.scala-lang:scala-library:jar:2.11.11</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.11.11/scala-library-2.11.11.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/scala-lang/scala-library/2.11.11/scala-library-2.11.11.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>org.slf4j:jcl-over-slf4j:jar:1.7.25</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/slf4j/jcl-over-slf4j/1.7.25/jcl-over-slf4j-1.7.25.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/slf4j/jcl-over-slf4j/1.7.25/jcl-over-slf4j-1.7.25.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <td>org.slf4j:slf4j-api:jar:1.7.25</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="a">
 <td>org.tukaani:xz:jar:1.6</td>
+<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/tukaani/xz/1.6/xz-1.6.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td>
 <td>-</td>
-<td>-</td>
-<td><a class="externalLink" href="https://repo.maven.apache.org/maven2/org/tukaani/xz/1.6/xz-1.6.jar"><img alt="Found at https://repo.maven.apache.org/maven2" src="images/icon_success_sml.gif" /></a></td></tr>
+<td>-</td></tr>
 <tr class="b">
 <th>Total</th>
-<th>apache.snapshots</th>
+<th>central</th>
 <th>sonatype-nexus-snapshots</th>
-<th>central</th></tr>
+<th>apache.snapshots</th></tr>
 <tr class="a">
 <td>52 (compile: 14, runtime: 38)</td>
+<td>46</td>
 <td>0</td>
-<td>0</td>
-<td>46</td></tr></table></div>
+<td>0</td></tr></table></div>
               </div>
     </div>
     <div class="clear"><hr/></div>
     <div id="footer">
       <div class="xright">
-              Copyright &#169;                    2005-2017
+              Copyright &#169;                    2005-2018
                         <a href="http://schlichtherle.de">Schlichtherle IT Services</a>.
             All Rights Reserved.      
-                                   <span id="publishDate">Last Published: 2017-10-03</span>
+                                   <span id="publishDate">Last Published: 2018-06-01</span>
                         </div>
       <div class="clear"><hr/></div>
     </div>
