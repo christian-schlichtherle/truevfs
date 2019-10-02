@@ -13,7 +13,6 @@ import net.java.truecommons.io.DecoratingOutputStream;
 import net.java.truecommons.io.DisconnectingOutputStream;
 import net.java.truecommons.io.Sink;
 import net.java.truecommons.io.Streams;
-import net.java.truecommons.shed.SuppressedExceptionBuilder;
 import net.java.truevfs.kernel.spec.FsModel;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
@@ -29,7 +28,6 @@ import static net.java.truecommons.cio.Entry.UNKNOWN;
 import static net.java.truecommons.shed.HashMaps.OVERHEAD_SIZE;
 import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import static org.apache.commons.compress.archivers.tar.TarConstants.DEFAULT_BLKSIZE;
-import static org.apache.commons.compress.archivers.tar.TarConstants.DEFAULT_RCDSIZE;
 
 /**
  * An output service for writing TAR files.
@@ -45,34 +43,29 @@ import static org.apache.commons.compress.archivers.tar.TarConstants.DEFAULT_RCD
  * If the size of an entry is known in advance it's directly written to the
  * underlying {@code TarArchiveOutputStream} instead.
  *
- * @see    TarInputService
  * @author Christian Schlichtherle
+ * @see TarInputService
  */
 @NotThreadSafe
-public final class TarOutputService
-implements OutputService<TarDriverEntry> {
+public final class TarOutputService implements OutputService<TarDriverEntry> {
 
-    /** Maps entry names to tar entries [String -> TarDriverEntry]. */
-    private final Map<String, TarDriverEntry>
-            entries = new LinkedHashMap<>(initialCapacity(OVERHEAD_SIZE));
+    /**
+     * Maps entry names to tar entries [String -> TarDriverEntry].
+     */
+    private final Map<String, TarDriverEntry> entries = new LinkedHashMap<>(initialCapacity(OVERHEAD_SIZE));
 
     private final TarArchiveOutputStream taos;
     private final TarDriver driver;
     private boolean busy;
 
     @CreatesObligation
-    public TarOutputService(
-            final FsModel model,
-            final Sink sink,
-            final TarDriver driver)
-    throws IOException {
+    public TarOutputService(final FsModel model, final Sink sink, final TarDriver driver) throws IOException {
         Objects.requireNonNull(model);
         this.driver = Objects.requireNonNull(driver);
         final OutputStream out = sink.stream();
         try {
-            final TarArchiveOutputStream
-                    taos = this.taos = new TarArchiveOutputStream(out,
-                        DEFAULT_BLKSIZE, DEFAULT_RCDSIZE, driver.getEncoding());
+            final TarArchiveOutputStream taos =
+                    this.taos = new TarArchiveOutputStream(out, DEFAULT_BLKSIZE, driver.getEncoding());
             taos.setAddPaxHeadersForNonAsciiNames(driver.getAddPaxHeaderForNonAsciiNames());
             taos.setLongFileMode(driver.getLongFileMode());
             taos.setBigNumberMode(driver.getBigNumberMode());
@@ -101,7 +94,8 @@ implements OutputService<TarDriverEntry> {
     }
 
     @Override
-    public @CheckForNull TarDriverEntry entry(String name) {
+    public @CheckForNull
+    TarDriverEntry entry(String name) {
         return entries.get(name);
     }
 
@@ -109,15 +103,17 @@ implements OutputService<TarDriverEntry> {
     public OutputSocket<TarDriverEntry> output(final TarDriverEntry local) {
         Objects.requireNonNull(local);
         final class Output extends AbstractOutputSocket<TarDriverEntry> {
+
             @Override
             public TarDriverEntry target() {
                 return local;
             }
 
             @Override
-            public OutputStream stream(final InputSocket<? extends Entry> peer)
-            throws IOException {
-                if (isBusy()) throw new OutputBusyException(local.getName());
+            public OutputStream stream(final InputSocket<? extends Entry> peer) throws IOException {
+                if (isBusy()) {
+                    throw new OutputBusyException(local.getName());
+                }
                 if (local.isDirectory()) {
                     updateProperties(local, DirectoryTemplate.INSTANCE);
                     return new EntryOutputStream(local);
@@ -127,43 +123,51 @@ implements OutputService<TarDriverEntry> {
                         ? new BufferedEntryOutputStream(local)
                         : new EntryOutputStream(local);
             }
-        } // Output
+        }
         return new Output();
     }
 
-    void updateProperties(
-            final TarDriverEntry local,
-            final @CheckForNull Entry peer) {
-        if (UNKNOWN == local.getModTime().getTime())
+    private void updateProperties(final TarDriverEntry local, final @CheckForNull Entry peer) {
+        if (UNKNOWN == local.getModTime().getTime()) {
             local.setModTime(System.currentTimeMillis());
-        if (null != peer)
-            if (UNKNOWN == local.getSize())
-                local.setSize(peer.getSize(DATA));
+        }
+        if (null != peer && UNKNOWN == local.getSize()) {
+            local.setSize(peer.getSize(DATA));
+        }
     }
 
     private static final class DirectoryTemplate implements Entry {
+
         static final DirectoryTemplate INSTANCE = new DirectoryTemplate();
 
         @Override
-        public String getName() { return "/"; }
+        public String getName() {
+            return "/";
+        }
 
         @Override
-        public long getSize(Size type) { return 0; }
+        public long getSize(Size type) {
+            return 0;
+        }
 
         @Override
-        public long getTime(Access type) { return UNKNOWN; }
+        public long getTime(Access type) {
+            return UNKNOWN;
+        }
 
         @Override
         @SuppressFBWarnings("NP_BOOLEAN_RETURN_NULL")
-        public Boolean isPermitted(Access type, Entity entity) { return null; }
-    } // DirectoryTemplate
+        public Boolean isPermitted(Access type, Entity entity) {
+            return null;
+        }
+    }
 
     /**
      * Returns whether this TAR output service is busy writing an archive entry
      * or not.
      *
      * @return Whether this TAR output service is busy writing an archive entry
-     *         or not.
+     * or not.
      */
     private boolean isBusy() {
         return busy;
@@ -183,11 +187,11 @@ implements OutputService<TarDriverEntry> {
      */
     @CleanupObligation
     private final class EntryOutputStream extends DisconnectingOutputStream {
+
         boolean closed;
 
         @CreatesObligation
-        EntryOutputStream(final TarDriverEntry local)
-        throws IOException {
+        EntryOutputStream(final TarDriverEntry local) throws IOException {
             super(taos);
             taos.putArchiveEntry(local);
             entries.put(local.getName(), local);
@@ -202,12 +206,14 @@ implements OutputService<TarDriverEntry> {
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            if (closed) return;
+            if (closed) {
+                return;
+            }
             closed = true;
             busy = false;
             taos.closeArchiveEntry();
         }
-    } // EntryOutputStream
+    }
 
     /**
      * This entry output stream writes the entry to an I/O buffer.
@@ -215,16 +221,14 @@ implements OutputService<TarDriverEntry> {
      * output stream and finally deleted.
      */
     @CleanupObligation
-    private final class BufferedEntryOutputStream
-    extends DecoratingOutputStream {
+    private final class BufferedEntryOutputStream extends DecoratingOutputStream {
 
         final IoBuffer buffer;
         final TarDriverEntry local;
         boolean closed;
 
         @CreatesObligation
-        BufferedEntryOutputStream(final TarDriverEntry local)
-        throws IOException {
+        BufferedEntryOutputStream(final TarDriverEntry local) throws IOException {
             this.local = local;
             final IoBuffer buffer = this.buffer = getPool().allocate();
             try {
@@ -244,7 +248,10 @@ implements OutputService<TarDriverEntry> {
         @Override
         @DischargesObligation
         public void close() throws IOException {
-            if (closed) return;
+            assert null != out;
+            if (closed) {
+                return;
+            }
             closed = true;
             busy = false;
             out.close();
@@ -268,10 +275,12 @@ implements OutputService<TarDriverEntry> {
                 try {
                     buffer.release();
                 } catch (final Throwable t2) {
-                    if (null == t1) throw t2;
+                    if (null == t1) {
+                        throw t2;
+                    }
                     t1.addSuppressed(t2);
                 }
             }
         }
-    } // BufferedEntryOutputStream
+    }
 }
