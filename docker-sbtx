@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+declare -r image_tag="$1"
+shift
+[[ -z "$image_tag" ]] && { echo "Usage: $0 IMAGE_TAG [...]"; exit 1; }
+set -x
+exec docker run \
+    --interactive \
+    --rm \
+    --tty \
+    --volume "$HOME/.ivy2:/root/.ivy2" \
+    --volume "$HOME/.sbt:/root/.sbt" \
+    --volume "$PWD:/workdir" \
+    --workdir /workdir \
+    "openjdk:$image_tag" \
+    ./sbtx $@
