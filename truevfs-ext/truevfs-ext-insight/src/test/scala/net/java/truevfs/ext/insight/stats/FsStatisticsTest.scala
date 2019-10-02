@@ -11,7 +11,7 @@ import net.java.truevfs.ext.insight.stats.FsStatisticsTest._
 import org.junit.runner.RunWith
 import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatest.junit._
+import org.scalatestplus.junit.JUnitRunner
 import org.slf4j.LoggerFactory
 
 /** @author Christian Schlichtherle */

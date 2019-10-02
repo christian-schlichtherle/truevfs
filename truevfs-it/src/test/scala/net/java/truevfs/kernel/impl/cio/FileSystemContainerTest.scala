@@ -9,7 +9,7 @@ import net.java.truecommons.cio.Entry._
 import net.java.truevfs.kernel.impl.cio.FileSystemContainerTest._
 import org.junit.runner._
 import org.scalatest._
-import org.scalatest.junit._
+import org.scalatestplus.junit.JUnitRunner
 
 /** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])

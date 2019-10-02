@@ -17,8 +17,8 @@ import net.java.truevfs.kernel.spec.spi._
 import org.junit.runner._
 import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatest.junit._
-import org.scalatest.prop.PropertyChecks._
+import org.scalatestplus.junit.JUnitRunner
+import org.scalatest.prop.TableDrivenPropertyChecks._
 
 import scala.collection.JavaConverters._
 

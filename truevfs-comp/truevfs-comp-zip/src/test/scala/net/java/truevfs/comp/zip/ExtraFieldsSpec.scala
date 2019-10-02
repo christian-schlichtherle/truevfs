@@ -6,7 +6,7 @@ package net.java.truevfs.comp.zip
 
 import org.junit.runner._
 import org.scalatest._
-import org.scalatest.junit._
+import org.scalatestplus.junit.JUnitRunner
 
 import scala.util._
 

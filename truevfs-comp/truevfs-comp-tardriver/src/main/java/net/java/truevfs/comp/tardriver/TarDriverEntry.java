@@ -5,20 +5,22 @@
 package net.java.truevfs.comp.tardriver;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.IOException;
-import java.util.Date;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import static net.java.truecommons.cio.Entry.Access.WRITE;
-import static net.java.truecommons.cio.Entry.Size.DATA;
-import static net.java.truecommons.cio.Entry.Size.STORAGE;
-import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
-import static net.java.truecommons.cio.Entry.Type.FILE;
+import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.IoBuffer;
 import net.java.truecommons.shed.Releasable;
 import net.java.truevfs.kernel.spec.FsArchiveEntries;
 import net.java.truevfs.kernel.spec.FsArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.util.Date;
+
+import static net.java.truecommons.cio.Entry.Access.WRITE;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
+import static net.java.truecommons.cio.Entry.Type.FILE;
 
 /**
  * An entry in a TAR archive which implements the {@code FsArchiveEntry}
@@ -42,6 +44,8 @@ implements FsArchiveEntry, Releasable<IOException> {
     private static final int TOREAD  = 0004; // Read by other
     private static final int TOWRITE = 0002; // Write by other
     private static final int TOEXEC  = 0001; // Execute/search by other
+
+    private static byte UNKNOWN = Entry.UNKNOWN;
 
     private byte init; // bit flags for init state
     private @CheckForNull IoBuffer buffer;

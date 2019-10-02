@@ -14,12 +14,12 @@ import net.java.truevfs.driver.tar.bzip2.TarBZip2Driver;
 import net.java.truevfs.driver.tar.gzip.TarGZipDriver;
 import net.java.truevfs.driver.tar.xz.TarXZDriver;
 import net.java.truevfs.kernel.spec.FsAccessOption;
-import org.apache.commons.compress.utils.Charsets;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Path;
@@ -67,7 +67,9 @@ public enum TrueVFS {
     CAT {
         @Override
         void run(final Deque<String> args) throws IOException {
-            if (1 > args.size()) throw new NoSuchElementException();
+            if (1 > args.size()) {
+                throw new NoSuchElementException();
+            }
             for (final String arg : args) {
                 final TPath path = new TPath(arg);
                 try (InputStream in = newInputStream(path)) {
@@ -80,7 +82,9 @@ public enum TrueVFS {
     COMPACT {
         @Override
         void run(final Deque<String> args) throws IOException {
-            if (1 > args.size()) throw new NoSuchElementException();
+            if (1 > args.size()) {
+                throw new NoSuchElementException();
+            }
             for (final String arg : args) {
                 final TFile file = new TFile(arg);
                 if (file.isTopLevelArchive()) file.compact();
@@ -146,7 +150,9 @@ public enum TrueVFS {
         }
 
         @Override
-        String getUsage() { return LS.getUsage(); }
+        String getUsage() {
+            return LS.getUsage();
+        }
     },
 
     LLR {
@@ -158,19 +164,25 @@ public enum TrueVFS {
         }
 
         @Override
-        String getUsage() { return LS.getUsage(); }
+        String getUsage() {
+            return LS.getUsage();
+        }
     },
 
     MKDIR {
         @Override
         void run(final Deque<String> args) throws IOException {
-            final boolean recursive = options(args, MkdirOption.class)
-                    .get(MkdirOption.P);
-            if (args.size() < 1) throw new IllegalArgumentException();
+            final boolean recursive = options(args, MkdirOption.class).get(MkdirOption.P);
+            if (args.size() < 1) {
+                throw new IllegalArgumentException();
+            }
             for (final String arg : args) {
                 final TPath path = new TPath(arg);
-                if (recursive) createDirectories(path);
-                else           createDirectory(path);
+                if (recursive) {
+                    createDirectories(path);
+                } else {
+                    createDirectory(path);
+                }
             }
         }
     },
@@ -183,7 +195,9 @@ public enum TrueVFS {
         }
 
         @Override
-        String getUsage() { return MKDIR.getUsage(); }
+        String getUsage() {
+            return MKDIR.getUsage();
+        }
     },
 
     MV {
@@ -198,11 +212,16 @@ public enum TrueVFS {
         void run(final Deque<String> args) throws IOException {
             final boolean recursive = options(args, RmOption.class)
                     .get(RmOption.R);
-            if (1 > args.size()) throw new NoSuchElementException();
+            if (1 > args.size()) {
+                throw new NoSuchElementException();
+            }
             for (final String arg : args) {
                 final TPath path = new TPath(arg);
-                if (recursive) walkFileTree(path, new RmVisitor());
-                else           delete(path);
+                if (recursive) {
+                    walkFileTree(path, new RmVisitor());
+                } else {
+                    delete(path);
+                }
             }
         }
     },
@@ -215,7 +234,9 @@ public enum TrueVFS {
         }
 
         @Override
-        String getUsage() { return RM.getUsage(); }
+        String getUsage() {
+            return RM.getUsage();
+        }
     },
 
     SIZE {
@@ -234,9 +255,7 @@ public enum TrueVFS {
                 try {
                     createFile(path);
                 } catch (FileAlreadyExistsException ex) {
-                    setLastModifiedTime(
-                            path,
-                            FileTime.fromMillis(System.currentTimeMillis()));
+                    setLastModifiedTime(path, FileTime.fromMillis(System.currentTimeMillis()));
                 }
             }
         }
@@ -253,18 +272,14 @@ public enum TrueVFS {
      * Scans the given command parameters for options of the given class.
      * As a side effect, any found options are popped off the parameter stack.
      *
-     * @param  <T> the type of the enum class for the options.
-     * @param  args the command arguments.
-     * @param  option the enum class for the options.
+     * @param <T>    the type of the enum class for the options.
+     * @param args   the command arguments.
+     * @param option the enum class for the options.
      * @return a bit field of the options found.
      */
-    private static <T extends Enum<T>> BitField<T> options(
-            final Deque<String> args,
-            final Class<T> option) {
+    private static <T extends Enum<T>> BitField<T> options(final Deque<String> args, final Class<T> option) {
         BitField<T> options = BitField.noneOf(option);
-        for (   String arg;
-                null != (arg = args.peek()) && '-' == arg.charAt(0);
-                args.pop()) {
+        for (String arg; null != (arg = args.peek()) && '-' == arg.charAt(0); args.pop()) {
             arg = arg.substring(1).toUpperCase(Locale.ENGLISH);
             options = options.set(valueOf(option, arg));
         }
@@ -277,22 +292,24 @@ public enum TrueVFS {
             throws IOException {
         try (final TConfig config = TConfig.open()) {
             TArchiveDetector srcDetector;
-            if (options.get(CpOption.CP437IN))
+            if (options.get(CpOption.CP437IN)) {
                 srcDetector = newArchiveDetector(Charset.forName("IBM437"));
-            else if (options.get(CpOption.UTF8IN))
-                srcDetector = newArchiveDetector(Charsets.UTF_8);
-            else
+            } else if (options.get(CpOption.UTF8IN)) {
+                srcDetector = newArchiveDetector(StandardCharsets.UTF_8);
+            } else {
                 srcDetector = config.getArchiveDetector();
+            }
 
             TArchiveDetector dstDetector;
-            if (options.get(CpOption.UNZIP))
+            if (options.get(CpOption.UNZIP)) {
                 dstDetector = TArchiveDetector.NULL;
-            else if (options.get(CpOption.CP437OUT))
+            } else if (options.get(CpOption.CP437OUT)) {
                 dstDetector = newArchiveDetector(Charset.forName("IBM437"));
-            else if (options.get(CpOption.UTF8OUT))
-                dstDetector = newArchiveDetector(Charsets.UTF_8);
-            else
+            } else if (options.get(CpOption.UTF8OUT)) {
+                dstDetector = newArchiveDetector(StandardCharsets.UTF_8);
+            } else {
                 dstDetector = config.getArchiveDetector();
+            }
 
             config.setAccessPreferences(config.getAccessPreferences()
                     .set(FsAccessOption.STORE, options.get(CpOption.STORE))
@@ -302,39 +319,40 @@ public enum TrueVFS {
 
             final TFile last = new TFile(args.removeLast(), dstDetector);
             final boolean expandPath = last.isDirectory();
-            if (args.isEmpty() || 1 < args.size() && !expandPath)
+            if (args.isEmpty() || 1 < args.size() && !expandPath) {
                 throw new IllegalArgumentException();
+            }
 
             for (final String arg : args) {
                 final TFile src = new TFile(arg, srcDetector);
-                final TFile dst = expandPath
-                        ? new TFile(last, src.getName(), dstDetector)
-                        : last;
+                final TFile dst = expandPath ? new TFile(last, src.getName(), dstDetector) : last;
                 if (equals(MV)) {
                     try {
-                        if (dst.isFile()) dst.rm();
+                        if (dst.isFile()) {
+                            dst.rm();
+                        }
                         src.mv(dst);
                     } catch (final IOException ex) {
                         throw new IOException(message("cmt", src, dst), ex);
                     }
                 } else { // cp
-                    if (options.get(CpOption.R))
-                        if (options.get(CpOption.P))
+                    if (options.get(CpOption.R)) {
+                        if (options.get(CpOption.P)) {
                             TFile.cp_rp(src, dst, srcDetector, dstDetector);
-                        else
+                        } else {
                             TFile.cp_r(src, dst, srcDetector, dstDetector);
-                    else
-                    if (options.get(CpOption.P))
+                        }
+                    } else if (options.get(CpOption.P)) {
                         TFile.cp_p(src, dst);
-                    else
+                    } else {
                         TFile.cp(src, dst);
+                    }
                 }
             }
         }
     }
 
     private static TArchiveDetector newArchiveDetector(final Charset charset) {
-        assert null != charset;
         return new TArchiveDetector(
                 TArchiveDetector.ALL,
                 new Object[][]{
@@ -345,7 +363,8 @@ public enum TrueVFS {
                         {
                                 "exe",
                                 new ReadOnlySfxDriver() {
-                                    @Override public Charset getCharset() {
+                                    @Override
+                                    public Charset getCharset() {
                                         return charset;
                                     }
                                 }
@@ -353,7 +372,8 @@ public enum TrueVFS {
                         {
                                 "tar",
                                 new TarDriver() {
-                                    @Override public Charset getCharset() {
+                                    @Override
+                                    public Charset getCharset() {
                                         return charset;
                                     }
                                 }
@@ -361,7 +381,8 @@ public enum TrueVFS {
                         {
                                 "tar.bz2|tar.bzip2|tb2|tbz|tbz2",
                                 new TarBZip2Driver() {
-                                    @Override public Charset getCharset() {
+                                    @Override
+                                    public Charset getCharset() {
                                         return charset;
                                     }
                                 }
@@ -369,7 +390,8 @@ public enum TrueVFS {
                         {
                                 "tar.gz|tar.gzip|tgz",
                                 new TarGZipDriver() {
-                                    @Override public Charset getCharset() {
+                                    @Override
+                                    public Charset getCharset() {
                                         return charset;
                                     }
                                 }
@@ -377,7 +399,8 @@ public enum TrueVFS {
                         {
                                 "tar.xz|txz",
                                 new TarXZDriver() {
-                                    @Override public Charset getCharset() {
+                                    @Override
+                                    public Charset getCharset() {
                                         return charset;
                                     }
                                 }
@@ -385,7 +408,8 @@ public enum TrueVFS {
                         {
                                 "zip",
                                 new ZipDriver() {
-                                    @Override public Charset getCharset() {
+                                    @Override
+                                    public Charset getCharset() {
                                         return charset;
                                     }
                                 }
@@ -398,13 +422,20 @@ public enum TrueVFS {
             final BitField<LsOption> options,
             final Deque<String> args)
             throws IOException {
-        if (0 >= args.size()) args.push(".");
+        if (0 >= args.size()) {
+            args.push(".");
+        }
         final boolean multi = 1 < args.size();
         for (final String arg : args) {
             final TFile file = new TFile(arg);
-            if (multi) out.println(arg + ":");
-            if (file.isDirectory()) ls(options, file, "");
-            else ls(options, file, file.getPath());
+            if (multi) {
+                out.println(arg + ":");
+            }
+            if (file.isDirectory()) {
+                ls(options, file, "");
+            } else {
+                ls(options, file, file.getPath());
+            }
         }
     }
 
@@ -415,17 +446,20 @@ public enum TrueVFS {
             throws IOException {
         if (file.isDirectory()) {
             final TFile[] members = file.listFiles();
-            if (null == members)
+            if (null == members) {
                 throw new IOException(message("dina", path));
+            }
             // Sort directories to the start.
             Arrays.sort(members, new TFileComparator());
             for (final TFile member : members) {
                 String memberPath = member.getName();
-                if (!path.isEmpty())
+                if (!path.isEmpty()) {
                     memberPath = path + TFile.separator + memberPath;
+                }
                 ls(options, member.toPath(), memberPath);
-                if (options.get(LsOption.R) && member.isDirectory())
+                if (options.get(LsOption.R) && member.isDirectory()) {
                     ls(options, member, memberPath);
+                }
             }
         } else if (file.exists()) {
             ls(options, file.toPath(), path);
@@ -439,19 +473,26 @@ public enum TrueVFS {
             final TPath file,
             final String path)
             throws IOException {
-        final BasicFileAttributes attr =
-                readAttributes(file, BasicFileAttributes.class);
+        final BasicFileAttributes attr = readAttributes(file, BasicFileAttributes.class);
         final boolean detailed = options.get(LsOption.L);
-        if (detailed)
+        if (detailed) {
             out.printf("%,11d %tF %<tT ", attr.size(), attr.lastModifiedTime().toMillis());
+        }
         out.append(path);
         if (detailed) {
             if (attr.isDirectory()) {
-                if (attr.isRegularFile()) out.append('+'); // covariant
-                else out.append(TFile.separator);
+                if (attr.isRegularFile()) {
+                    out.append('+'); // covariant
+                } else {
+                    out.append(TFile.separator);
+                }
             }
-            if (attr.isSymbolicLink()) out.append('>');
-            if (attr.isOther()) out.append('?');
+            if (attr.isSymbolicLink()) {
+                out.append('>');
+            }
+            if (attr.isOther()) {
+                out.append('?');
+            }
         }
         out.println();
     }
@@ -468,7 +509,9 @@ public enum TrueVFS {
         } catch (final IllegalArgumentException | NoSuchElementException ex) {
             final StringBuilder builder = new StringBuilder(25 * 80);
             for (final TrueVFS truevfs : values()) {
-                if (0 != builder.length()) builder.append('\n');
+                if (0 != builder.length()) {
+                    builder.append('\n');
+                }
                 builder.append(truevfs.getSynopsis());
             }
             err.println(builder.toString());
@@ -486,8 +529,13 @@ public enum TrueVFS {
         return 0;
     }
 
-    String getSynopsis() { return message("synopsis", TrueVFS.class.getSimpleName()); }
-    String getUsage() { return message("usage"); }
+    String getSynopsis() {
+        return message("synopsis", TrueVFS.class.getSimpleName());
+    }
+
+    String getUsage() {
+        return message("usage");
+    }
 
     String message(String key, Object... args) {
         return String.format(
@@ -501,22 +549,25 @@ public enum TrueVFS {
      * Runs this command.
      * Implementations are free to modify the given deque.
      *
-     * @param  args the command arguments.
+     * @param args the command arguments.
      * @throws IOException on any I/O error.
      */
     abstract void run(Deque<String> args) throws IOException;
 
-    private enum LsOption { L, R }
-    private enum CpOption { P, R, UNZIP, CP437IN, CP437OUT, UTF8IN, UTF8OUT, STORE, COMPRESS, GROW, ENCRYPT }
-    private enum MkdirOption { P }
-    private enum RmOption { R }
+    private enum LsOption {L, R}
+
+    private enum CpOption {P, R, UNZIP, CP437IN, CP437OUT, UTF8IN, UTF8OUT, STORE, COMPRESS, GROW, ENCRYPT}
+
+    private enum MkdirOption {P}
+
+    private enum RmOption {R}
 
     private static class RmVisitor extends SimpleFileVisitor<Path> {
         @Override
         public FileVisitResult visitFile(
                 final Path file,
                 final BasicFileAttributes attrs)
-        throws IOException {
+                throws IOException {
             delete(file);
             return FileVisitResult.CONTINUE;
         }
@@ -525,8 +576,10 @@ public enum TrueVFS {
         public FileVisitResult postVisitDirectory(
                 final Path dir,
                 final @Nullable IOException exc)
-        throws IOException {
-            if (null != exc) throw exc;
+                throws IOException {
+            if (null != exc) {
+                throw exc;
+            }
             delete(dir);
             return FileVisitResult.CONTINUE;
         }

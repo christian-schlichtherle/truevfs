@@ -14,9 +14,8 @@ import net.java.truevfs.kernel.spec.mock.MockArchiveDriverEntry
 import org.junit.runner._
 import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatest.junit._
-import org.scalatest.prop.PropertyChecks._
-import org.scalatest.prop._
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks._
+import org.scalatestplus.junit.JUnitRunner
 
 /**
   * @author Christian Schlichtherle

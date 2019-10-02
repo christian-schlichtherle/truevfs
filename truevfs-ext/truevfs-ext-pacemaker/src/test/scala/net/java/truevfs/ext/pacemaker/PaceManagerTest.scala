@@ -16,9 +16,9 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatest.junit._
-import org.scalatest.mockito.MockitoSugar.mock
-import org.scalatest.prop.PropertyChecks._
+import org.scalatestplus.junit.JUnitRunner
+import org.scalatestplus.mockito.MockitoSugar.mock
+import org.scalatest.prop.TableDrivenPropertyChecks._
 
 import scala.language.implicitConversions
 

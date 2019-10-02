@@ -6,9 +6,9 @@ package net.java.truevfs.kernel.impl.util
 
 import org.junit.runner.RunWith
 import org.scalatest.WordSpec
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 import org.scalatest.Matchers._
-import org.scalatest.prop.PropertyChecks._
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks._
 import FileSystemTest._
 
 @RunWith(classOf[JUnitRunner])

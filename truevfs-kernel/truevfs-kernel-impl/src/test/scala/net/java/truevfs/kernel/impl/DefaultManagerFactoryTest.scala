@@ -7,7 +7,7 @@ package net.java.truevfs.kernel.impl
 import org.junit.runner._
 import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatest.junit._
+import org.scalatestplus.junit.JUnitRunner
 
 /**
   * @author Christian Schlichtherle

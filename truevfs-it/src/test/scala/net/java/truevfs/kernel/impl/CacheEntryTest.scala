@@ -16,8 +16,8 @@ import net.java.truevfs.kernel.impl.cio.EntryAspect._
 import org.junit.runner._
 import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatest.junit._
-import org.scalatest.prop.PropertyChecks._
+import org.scalatestplus.junit.JUnitRunner
+import org.scalatest.prop.TableDrivenPropertyChecks._
 
 /** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])

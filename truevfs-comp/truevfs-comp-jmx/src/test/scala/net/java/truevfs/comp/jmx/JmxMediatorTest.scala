@@ -10,7 +10,7 @@ import net.java.truevfs.comp.jmx.JmxMediatorTest._
 import org.junit.runner._
 import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatest.junit.JUnitRunner
+import org.scalatestplus.junit.JUnitRunner
 
 /** @author Christian Schlichtherle */
 @RunWith(classOf[JUnitRunner])
