@@ -113,21 +113,20 @@ public abstract class RaesReadOnlyChannel extends ReadOnlyChannel {
             final RaesParameters param,
             final @WillCloseWhenClosed SeekableByteChannel channel)
     throws RaesParametersException, RaesException, EOFException, IOException {
-        final PowerBuffer header = PowerBuffer
+        final PowerBuffer<?> header = PowerBuffer
                 .allocate(HEADER_MIN_LEN)
                 .littleEndian()
                 .load(channel.position(0));
-        if (SIGNATURE != header.getUInt())
+        if (SIGNATURE != header.getUInt()) {
             throw new RaesException("No RAES signature!");
-        final int type = header.getUByte();
-        switch (type) {
-            case 0:
-                return new Type0RaesReadOnlyChannel(
-                        parameters(Type0RaesParameters.class, param),
-                        channel);
-            default:
-                throw new RaesException("Unknown RAES type: " + type);
         }
+        final int type = header.getUByte();
+        if (type != 0) {
+            throw new RaesException("Unknown RAES type: " + type);
+        }
+        return new Type0RaesReadOnlyChannel(
+                parameters(Type0RaesParameters.class, param),
+                channel);
     }
 
     private static <P extends RaesParameters> P parameters(
