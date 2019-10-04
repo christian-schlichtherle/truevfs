@@ -18,8 +18,7 @@ import net.java.truecommons.shed.Resource;
  * A container for configuration options with global or inheritable thread
  * local scope.
  * <p>
- * A thread can call {@link #ioBufferPool()} to ioBufferPool access to the
- * <i>current configuration</i> at any time .
+ * A thread can call {@link #get()} to get access to the <i>current configuration</i> at any time .
  * If no configuration has been pushed onto the inheritable thread local
  * configuration stack before, this will return the <i>global configuration</i>
  * which is shared by all threads (hence its name).
@@ -91,7 +90,7 @@ public final class FsTestConfig extends Resource<IllegalStateException> {
      * stack.
      *
      * @return The new current configuration.
-     * @see    #ioBufferPool()
+     * @see    #get()
      */
     @CreatesObligation
     public static FsTestConfig push() {
@@ -99,10 +98,10 @@ public final class FsTestConfig extends Resource<IllegalStateException> {
     }
 
     /**
-     * Pops the {@link #ioBufferPool() current configuration} off the inheritable thread
+     * Pops the {@link #get() current configuration} off the inheritable thread
      * local configuration stack.
      *
-     * @throws IllegalStateException If the {@link #ioBufferPool() current configuration}
+     * @throws IllegalStateException If the {@link #get() current configuration}
      *         is the global configuration.
      */
     public static void pop() {
@@ -164,7 +163,7 @@ public final class FsTestConfig extends Resource<IllegalStateException> {
      * stack.
      *
      * @throws IllegalStateException If this configuration is not the
-     *         {@linkplain #current() current configuration}.
+     *         {@linkplain #get() current configuration}.
      */
     @Override protected void onBeforeClose() throws IllegalStateException {
         configs.popIf(this);
