@@ -396,6 +396,7 @@ lazy val it: Project = project
       Scalacheck % Test,
       ScalaPlus % Test,
       Scalatest % Test,
+      Slf4jSimple % Test,
       TruecommonsIO % Test classifier "" classifier "tests",
       TruecommonsKeyDefault % Test,
       TruecommonsKeySpec % Test classifier "" classifier "tests",
