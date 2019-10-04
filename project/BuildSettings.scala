@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import Dependencies._
 import sbt.Keys._
 import sbt._
@@ -22,7 +21,7 @@ import sbtrelease.ReleaseStateTransformations._
 
 object BuildSettings {
 
-  def releaseSettings: Seq[Setting[_]] = {
+  lazy val releaseSettings: Seq[Setting[_]] = {
     Seq(
       releaseCrossBuild := false,
       releaseProcess := Seq[ReleaseStep](
@@ -41,7 +40,7 @@ object BuildSettings {
     )
   }
 
-  private def commonSettings: Seq[Setting[_]] = {
+  private lazy val commonSettings: Seq[Setting[_]] = {
     Seq(
       homepage := Some(url("http://truevfs.net/")),
       licenses := Seq("Apache License, Version 2.0" -> url("https://www.apache.org/licenses/LICENSE-2.0")),
@@ -79,52 +78,47 @@ object BuildSettings {
           }
         )
       },
+      scalaVersion := ScalaVersion_2_12, // set here or otherwise `+publishSigned` will fail
       scmInfo := Some(ScmInfo(
         browseUrl = url("https://github.com/christian-schlichtherle/truevfs"),
-        connection = "scm:git:https://github.com/christian-schlichtherle/truevfs.git",
-        devConnection = Some("scm:git:https://github.com/christian-schlichtherle/truevfs.git")
+        connection = "scm:git:git@github.com/christian-schlichtherle/truevfs.git",
+        devConnection = Some("scm:git:git@github.com/christian-schlichtherle/truevfs.git")
       ))
     )
   }
 
-  def aggregateSettings: Seq[Setting[_]] = {
+  lazy val aggregateSettings: Seq[Setting[_]] = {
     commonSettings ++ Seq(
       crossPaths := false,
       publishArtifact := false
     )
   }
 
-  def artifactSettings: Seq[Setting[_]] = {
-    commonSettings ++ inConfig(Test)(Seq(
-      fork := true, // triggers `javaOptions`
-      javaOptions += "-ea"
-    )) ++ Seq(
-      // This is a `Set` in SBT 0.13.X and a `Seq` in SBT 1.X, so add them one-by-one to stay compatible.
-      dependencyOverrides += FindbugsAnnotations,
-      dependencyOverrides += Junit,
+  lazy val artifactSettings: Seq[Setting[_]] = {
+    commonSettings ++ Seq(
+      dependencyOverrides ++= Seq(FindbugsAnnotations, Junit),
       testOptions += Tests.Argument(TestFrameworks.JUnit, "-a", "-v")
     )
   }
 
-  def librarySettings: Seq[Setting[_]] = {
+  lazy val librarySettings: Seq[Setting[_]] = {
     artifactSettings ++ Seq(
       // Support testing Java projects with ScalaTest et al:
       compileOrder := CompileOrder.JavaThenScala,
-      javacOptions := DefaultOptions.javac ++ Seq(Opts.compile.deprecation, "-source", "1.7", "-target", "1.7", "-g"),
-      javacOptions in doc := DefaultOptions.javac ++ Seq("-source", "1.7"),
-      scalacOptions := DefaultOptions.scalac ++ Seq(Opts.compile.deprecation, "-feature", Opts.compile.unchecked),
-      scalaVersion := ScalaVersion_2_10
+      javacOptions := DefaultOptions.javac ++ Seq(Opts.compile.deprecation, "-Xlint", "-source", "1.8", "-target", "1.8", "-g"),
+      javacOptions in doc := DefaultOptions.javac ++ Seq("-source", "1.8"),
+      scalacOptions := DefaultOptions.scalac ++ Seq(Opts.compile.deprecation, "-feature", Opts.compile.unchecked, "-target:jvm-1.8")
     )
   }
 
-  def javaLibrarySettings: Seq[Setting[_]] = {
+  lazy val javaLibrarySettings: Seq[Setting[_]] = {
     librarySettings ++ Seq(
       autoScalaLibrary := false,
       crossPaths := false
     )
   }
 
-  def scalaLibrarySettings: Seq[Setting[_]] = {
+  lazy val scalaLibrarySettings: Seq[Setting[_]] = {
     librarySettings ++ Seq(
       crossScalaVersions := Seq(ScalaVersion_2_10, ScalaVersion_2_11, ScalaVersion_2_12)
     )

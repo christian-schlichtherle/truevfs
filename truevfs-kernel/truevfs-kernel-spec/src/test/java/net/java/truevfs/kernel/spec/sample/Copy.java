@@ -32,6 +32,7 @@ import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
  * @author     Christian Schlichtherle
  * @version    $Id$
  */
+@Deprecated
 public final class Copy {
 
     /** You cannot instantiate this class. */

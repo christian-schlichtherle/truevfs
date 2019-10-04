@@ -309,7 +309,7 @@ extends FsArchiveDriverTestBase<D> {
         final InputSocket<E> input = service.input(name(i));
 
         {
-            final PowerBuffer buf = PowerBuffer.allocate(getDataLength());
+            final PowerBuffer<?> buf = PowerBuffer.allocate(getDataLength());
             SeekableByteChannel channel;
             try {
                 channel = input.channel(null);
