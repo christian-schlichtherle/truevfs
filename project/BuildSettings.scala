@@ -95,7 +95,9 @@ object BuildSettings {
   }
 
   lazy val artifactSettings: Seq[Setting[_]] = {
-    commonSettings ++ Seq(
+    commonSettings ++ inConfig(Test)(Seq(
+      fork := true // isolate side effects to global state
+    )) ++ Seq(
       dependencyOverrides ++= Seq(FindbugsAnnotations, Junit),
       testOptions += Tests.Argument(TestFrameworks.JUnit, "-a", "-v")
     )
