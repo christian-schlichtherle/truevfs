@@ -15,7 +15,7 @@ env:
   - COMPILE_IMAGE_TAG=8-jdk TEST_IMAGE_TAG=8-jdk
   - COMPILE_IMAGE_TAG=8-jdk TEST_IMAGE_TAG=12-jdk
 
-install: ./docker-sbtx $COMPILE_IMAGE_TAG +test:compile
+install: ./docker-sbtx $COMPILE_IMAGE_TAG -no-colors +test:compile
 
 language: minimal
 
@@ -23,4 +23,4 @@ language: minimal
 services:
   - docker
 
-script: ./docker-sbtx $TEST_IMAGE_TAG +test
+script: ./docker-sbtx $TEST_IMAGE_TAG -no-colors +test
