@@ -85,7 +85,7 @@ implements InputService<TarDriverEntry> {
             final FsModel model,
             final Source source,
             final TarDriver driver)
-    throws EOFException, IOException {
+    throws IOException {
         Objects.requireNonNull(model);
         this.driver = Objects.requireNonNull(driver);
         try (final InputStream in = source.stream()) {
@@ -148,12 +148,11 @@ implements InputService<TarDriverEntry> {
      *
      * @param  in the stream to read from.
      * @return A stream which holds all the data {@code in} did.
-     * @throws EOFException on unexpected end-of-file.
      * @throws IOException on any I/O error.
      */
     private TarArchiveInputStream newValidatedTarArchiveInputStream(
             final @WillNotClose InputStream in)
-    throws EOFException, IOException {
+    throws IOException {
         final byte[] buf = new byte[DEFAULT_RCDSIZE];
         final InputStream vin = readAhead(in, buf);
         // If the record is the null record, the TAR file is empty and we're

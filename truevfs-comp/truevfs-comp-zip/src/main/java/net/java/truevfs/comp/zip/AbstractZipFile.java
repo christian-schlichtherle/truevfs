@@ -1041,10 +1041,10 @@ implements Closeable, Iterable<E> {
     @Override
     @DischargesObligation
     public void close() throws IOException {
-        final SeekableByteChannel channel = this.channel;
-        if (null != channel) {
-            channel.close();
-            this.channel = null;
+        final SeekableByteChannel c = channel;
+        if (null != c) {
+            c.close();
+            channel = null;
         }
     }
 

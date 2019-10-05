@@ -42,8 +42,7 @@ public final class FsThrowManager {
     public Throwable trigger(final Class<?> from, final Throwable toThrow) {
         Objects.requireNonNull(from);
         wrap(toThrow); // test
-        // DON'T put wrap(toThrow)! We want the stack trace of the call to
-        // check(*), not of the call to this method!
+        // DON'T put wrap(toThrow): We want the stack trace of the call to check(*), not the call to this method!
         return throwables.put(from, toThrow);
     }
 

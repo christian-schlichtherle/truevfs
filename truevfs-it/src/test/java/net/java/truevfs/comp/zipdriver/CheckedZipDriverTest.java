@@ -11,8 +11,7 @@ import net.java.truevfs.kernel.spec.FsTestConfig;
 /**
  * @author Christian Schlichtherle
  */
-public final class CheckedZipDriverTest
-extends FsArchiveDriverTestSuite<ZipDriverEntry, CheckedZipDriver> {
+public final class CheckedZipDriverTest extends FsArchiveDriverTestSuite<ZipDriverEntry, CheckedZipDriver> {
 
     @Override
     protected CheckedZipDriver newArchiveDriver() {
@@ -25,5 +24,7 @@ extends FsArchiveDriverTestSuite<ZipDriverEntry, CheckedZipDriver> {
     }
 
     @Override
-    protected String getUnencodableName() { return "\u2297"; }
+    protected String getUnencodableName() {
+        return "\u2297";
+    }
 }

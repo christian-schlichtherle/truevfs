@@ -4,16 +4,15 @@
  */
 package net.java.truevfs.driver.odf;
 
+import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.comp.zipdriver.JarDriverEntry;
 import net.java.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 import net.java.truevfs.kernel.spec.FsTestConfig;
-import net.java.truecommons.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle
  */
-public final class OdfDriverTest
-extends FsArchiveDriverTestSuite<JarDriverEntry, OdfDriver> {
+public final class OdfDriverTest extends FsArchiveDriverTestSuite<JarDriverEntry, OdfDriver> {
 
     @Override
     protected OdfDriver newArchiveDriver() {

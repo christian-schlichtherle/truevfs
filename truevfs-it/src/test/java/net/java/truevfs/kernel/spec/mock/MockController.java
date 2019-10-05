@@ -15,6 +15,7 @@ import java.util.concurrent.ConcurrentMap;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
+
 import net.java.truecommons.cio.*;
 import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.cio.Entry.Type;
@@ -29,14 +30,16 @@ import net.java.truevfs.kernel.spec.io.ThrowingSeekableChannel;
  */
 @ThreadSafe
 public class MockController
-extends FsAbstractController {
+        extends FsAbstractController {
 
-    private final @Nullable FsController parent;
+    private final @Nullable
+    FsController parent;
     @SuppressWarnings("CollectionWithoutInitialCapacity")
     private final ConcurrentMap<FsNodeName, IoEntry<?>>
             map = new ConcurrentHashMap<>();
     private final FsTestConfig config;
-    private volatile @CheckForNull FsThrowManager control;
+    private volatile @CheckForNull
+    FsThrowManager control;
 
     public MockController(FsModel model, @CheckForNull FsController parent) {
         this(model, parent, null);
@@ -45,13 +48,13 @@ extends FsAbstractController {
     /**
      * Constructs a new mock controller.
      *
-     * @param model The file system model.
+     * @param model  The file system model.
      * @param parent The parent file system controller.
      * @param config The mocking configuration.
      */
-    public MockController(  final FsModel model,
-                            final @CheckForNull FsController parent,
-                            final @CheckForNull FsTestConfig config) {
+    public MockController(final FsModel model,
+                          final @CheckForNull FsController parent,
+                          final @CheckForNull FsTestConfig config) {
         super(model);
         assert null == model.getParent()
                 ? null == parent
@@ -85,7 +88,7 @@ extends FsAbstractController {
     public FsNode node(
             final BitField<FsAccessOption> options,
             final FsNodeName name)
-    throws IOException {
+            throws IOException {
         checkAllExceptions(this);
         assert null != name;
         assert null != options;
@@ -97,7 +100,7 @@ extends FsAbstractController {
             final BitField<FsAccessOption> options,
             final FsNodeName name,
             final BitField<Access> types)
-    throws IOException {
+            throws IOException {
         checkAllExceptions(this);
         assert null != name;
         assert null != options;
@@ -109,7 +112,7 @@ extends FsAbstractController {
     public void setReadOnly(
             final BitField<FsAccessOption> options,
             final FsNodeName name)
-    throws IOException {
+            throws IOException {
         checkAllExceptions(this);
         assert null != name;
         throw new UnsupportedOperationException();
@@ -120,7 +123,7 @@ extends FsAbstractController {
             final BitField<FsAccessOption> options,
             final FsNodeName name,
             final Map<Access, Long> times)
-    throws IOException {
+            throws IOException {
         checkAllExceptions(this);
         assert null != name;
         assert null != times;
@@ -133,7 +136,7 @@ extends FsAbstractController {
             final BitField<FsAccessOption> options,
             final FsNodeName name,
             final BitField<Access> types, long value)
-    throws IOException {
+            throws IOException {
         checkAllExceptions(this);
         assert null != name;
         assert null != types;
@@ -150,30 +153,30 @@ extends FsAbstractController {
         assert null != options;
 
         class Input extends DelegatingInputSocket<Entry> {
+
             @Override
             protected InputSocket<? extends Entry> socket()
-            throws IOException {
+                    throws IOException {
                 checkAllExceptions(this);
                 final IoEntry<?> buffer = map.get(name);
-                if (null == buffer)
+                if (null == buffer) {
                     throw new NoSuchFileException(name.toString());
+                }
                 return buffer.input();
             }
 
             @Override
             public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
-            throws IOException {
-                return new ThrowingSeekableChannel(socket().channel(peer),
-                        config.getThrowControl());
+                    throws IOException {
+                return new ThrowingSeekableChannel(socket().channel(peer), config.getThrowControl());
             }
 
             @Override
             public InputStream stream(OutputSocket<? extends Entry> peer)
-            throws IOException {
-                return new ThrowingInputStream(socket().stream(peer),
-                        config.getThrowControl());
+                    throws IOException {
+                return new ThrowingInputStream(socket().stream(peer), config.getThrowControl());
             }
-        } // Input
+        }
 
         return new Input();
     }
@@ -188,32 +191,29 @@ extends FsAbstractController {
         assert null != options;
 
         class Output extends DelegatingOutputSocket<Entry> {
+
             @Override
             protected OutputSocket<? extends Entry> socket()
-            throws IOException {
+                    throws IOException {
                 checkAllExceptions(this);
-                final IoEntry<?> n = new MemoryBuffer(
-                        name.toString(), config.getDataSize());
+                final IoEntry<?> n = new MemoryBuffer(name.toString(), config.getDataSize());
                 IoEntry<?> o = map.get(name);
-                if (null == o)
+                if (null == o) {
                     o = map.putIfAbsent(name, n);
+                }
                 return (null != o ? o : n).output();
             }
 
             @Override
-            public SeekableByteChannel channel(InputSocket<? extends Entry> peer)
-            throws IOException {
-                return new ThrowingSeekableChannel(socket().channel(peer),
-                        config.getThrowControl());
+            public SeekableByteChannel channel(InputSocket<? extends Entry> peer) throws IOException {
+                return new ThrowingSeekableChannel(socket().channel(peer), config.getThrowControl());
             }
 
             @Override
-            public OutputStream stream(InputSocket<? extends Entry> peer)
-            throws IOException {
-                return new ThrowingOutputStream(socket().stream(peer),
-                        config.getThrowControl());
+            public OutputStream stream(InputSocket<? extends Entry> peer) throws IOException {
+                return new ThrowingOutputStream(socket().stream(peer), config.getThrowControl());
             }
-        } // Output
+        }
 
         return new Output();
     }
@@ -224,7 +224,7 @@ extends FsAbstractController {
             final FsNodeName name,
             final Type type,
             final Entry template)
-    throws IOException {
+            throws IOException {
         checkAllExceptions(this);
         assert null != name;
         assert null != type;
@@ -236,7 +236,7 @@ extends FsAbstractController {
     public void unlink(
             final BitField<FsAccessOption> options,
             final FsNodeName name)
-    throws IOException {
+            throws IOException {
         checkAllExceptions(this);
         assert null != name;
         assert null != options;

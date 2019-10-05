@@ -4,15 +4,14 @@
  */
 package net.java.truevfs.comp.tardriver;
 
+import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 import net.java.truevfs.kernel.spec.FsTestConfig;
-import net.java.truecommons.cio.IoBufferPool;
 
 /**
  * @author Christian Schlichtherle
  */
-public final class TarDriverTest
-extends FsArchiveDriverTestSuite<TarDriverEntry, TarDriver> {
+public final class TarDriverTest extends FsArchiveDriverTestSuite<TarDriverEntry, TarDriver> {
 
     @Override
     protected TarDriver newArchiveDriver() {

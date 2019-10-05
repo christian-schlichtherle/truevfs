@@ -20,12 +20,12 @@ import javax.annotation.CheckForNull;
 import java.io.*;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.java.truecommons.cio.Entry.Access.*;
 import static net.java.truecommons.cio.Entry.Size.DATA;
 import static net.java.truecommons.cio.Entry.Size.STORAGE;
@@ -37,28 +37,24 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.*;
 
 /**
- * @param  <E> The type of the archive entries.
- * @param  <D> The type of the archive driver.
+ * @param <E> The type of the archive entries.
+ * @param <D> The type of the archive driver.
  * @author Christian Schlichtherle
  */
-public abstract class FsArchiveDriverTestSuite<
-        E extends FsArchiveEntry,
-        D extends FsArchiveDriver<E>>
-extends FsArchiveDriverTestBase<D> {
+public abstract class FsArchiveDriverTestSuite<E extends FsArchiveEntry, D extends FsArchiveDriver<E>>
+        extends FsArchiveDriverTestBase<D> {
 
-    private static final Logger
-            logger = LoggerFactory.getLogger(FsArchiveDriverTestSuite.class);
+    private static final Logger logger = LoggerFactory.getLogger(FsArchiveDriverTestSuite.class);
 
-    private static final FsNodeName
-            name = FsNodeName.create(URI.create("archive"));
-
-    private static final Charset UTF8 = Charset.forName("UTF-8");
+    private static final FsNodeName name = FsNodeName.create(URI.create("archive"));
 
     private static final String US_ASCII_CHARACTERS;
+
     static {
         final StringBuilder builder = new StringBuilder(128);
-        for (char c = 0; c <= 127; c++)
+        for (char c = 0; c < 128; c++) {
             builder.append(c);
+        }
         US_ASCII_CHARACTERS = builder.toString();
     }
 
@@ -74,8 +70,7 @@ extends FsArchiveDriverTestBase<D> {
         config.setPool(null); // reset
         model = newArchiveModel();
         parent = newParentController(model.getParent());
-        assert !UTF8.equals(getArchiveDriver().getCharset())
-                || null == getUnencodableName() : "Bad test setup!";
+        assert !UTF_8.equals(getArchiveDriver().getCharset()) || null == getUnencodableName() : "Bad test setup!";
     }
 
     /**
@@ -83,9 +78,10 @@ extends FsArchiveDriverTestBase<D> {
      * encodable in entry names for this archive type.
      *
      * @return An unencodable name or {@code null} if all characters are
-     *         encodable in entry names for this archive type.
+     * encodable in entry names for this archive type.
      */
-    protected abstract @CheckForNull String getUnencodableName();
+    protected abstract @CheckForNull
+    String getUnencodableName();
 
     @Test
     public void testCharsetMustNotBeNull() {
@@ -95,13 +91,13 @@ extends FsArchiveDriverTestBase<D> {
     @Test
     public void testUnencodableCharacters() {
         final String name = getUnencodableName();
-        if (null != name)
+        if (null != name) {
             assertFalse(getArchiveDriver().getCharset().newEncoder().canEncode(name));
+        }
     }
 
     @Test
-    public void testAllUsAsciiCharactersMustBeEncodable()
-    throws CharConversionException {
+    public void testAllUsAsciiCharactersMustBeEncodable() {
         getArchiveDriver().getCharset().newEncoder().canEncode(US_ASCII_CHARACTERS);
     }
 
@@ -119,8 +115,9 @@ extends FsArchiveDriverTestBase<D> {
     public void testIoPoolShouldBeConstant() {
         final IoBufferPool p1 = getArchiveDriver().getPool();
         final IoBufferPool p2 = getArchiveDriver().getPool();
-        if (p1 != p2)
+        if (p1 != p2) {
             logger.warn("{} returns different I/O buffer pools upon multiple invocations of getPool()!", getArchiveDriver().getClass());
+        }
     }
 
     /*@Test(expected = NullPointerException.class)
@@ -155,8 +152,7 @@ extends FsArchiveDriverTestBase<D> {
 
     @Test
     public void testNewControllerMustMeetPostConditions() {
-        final FsController<?> c = getArchiveDriver()
-                .newController(newManager(), model, parent);
+        final FsController<?> c = getArchiveDriver().newController(newManager(), model, parent);
         assertNotNull(c);
         assertEquals(model.getMountPoint(), c.getModel().getMountPoint());
         assertSame(parent, c.getParent());
@@ -218,13 +214,13 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private void output(final int numEntries) throws IOException {
-        final OutputService<E> service = getArchiveDriver()
-                .newOutput(model, NONE, parent, name, null);
+        final OutputService<E> service = getArchiveDriver().newOutput(model, NONE, parent, name, null);
         try {
             final Closeable[] streams = new Closeable[numEntries];
             try {
-                for (int i = 0; i < streams.length; i++)
+                for (int i = 0; i < streams.length; i++) {
                     streams[i] = output(service, i);
+                }
             } finally {
                 close(streams);
             }
@@ -238,8 +234,9 @@ extends FsArchiveDriverTestBase<D> {
                 service.close();
                 //fail();
             } catch (final IOException got) {
-                if (!contains(got, expected))
+                if (!contains(got, expected)) {
                     throw got;
+                }
             } finally {
                 clear(TestCloseable.class);
             }
@@ -248,8 +245,7 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     @CreatesObligation
-    private OutputStream output(final OutputService<E> service, final int i)
-    throws IOException {
+    private OutputStream output(final OutputService<E> service, final int i) throws IOException {
         final String name = name(i);
         final E entry = newEntry(name);
         final OutputSocket<E> output = service.output(entry);
@@ -272,8 +268,7 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private void input(final int numEntries) throws IOException {
-        final InputService<E> service = getArchiveDriver()
-                .newInput(model, NONE, parent, name);
+        final InputService<E> service = getArchiveDriver().newInput(model, NONE, parent, name);
         try {
             check(service, numEntries);
             final Closeable[] streams = new Closeable[numEntries];
@@ -295,8 +290,9 @@ extends FsArchiveDriverTestBase<D> {
                 service.close();
                 //fail();
             } catch (final IOException got) {
-                if (!contains(got, expected))
+                if (!contains(got, expected)) {
                     throw got;
+                }
             } finally {
                 clear(TestCloseable.class);
             }
@@ -305,7 +301,7 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private InputStream input(final InputService<E> service, final int i)
-    throws IOException {
+            throws IOException {
         final InputSocket<E> input = service.input(name(i));
 
         {
@@ -339,7 +335,9 @@ extends FsArchiveDriverTestBase<D> {
                 assertEquals(-1, in.read());
                 failure = false;
             } finally {
-                if (failure) in.close();
+                if (failure) {
+                    in.close();
+                }
             }
             return in;
         }
@@ -348,8 +346,9 @@ extends FsArchiveDriverTestBase<D> {
     private static void close(final Closeable[] resources) throws IOException {
         IOException ex = null;
         for (final Closeable resource : resources) {
-            if (null == resource)
+            if (null == resource) {
                 continue;
+            }
             try {
                 try {
                     resource.close();
@@ -357,14 +356,16 @@ extends FsArchiveDriverTestBase<D> {
                     resource.close(); // must be idempotent on side effects
                 }
             } catch (final IOException ex2) {
-                if (null != ex)
+                if (null != ex) {
                     ex.addSuppressed(ex2);
-                else
+                } else {
                     ex = ex2;
+                }
             }
         }
-        if (null != ex)
+        if (null != ex) {
             throw ex;
+        }
     }
 
     private <E extends FsArchiveEntry> void check(
@@ -429,7 +430,7 @@ extends FsArchiveDriverTestBase<D> {
         final FsModel parent = newNonArchiveModel();
         return newModel(
                 FsMountPoint.create(URI.create(
-                    "scheme:" + parent.getMountPoint() + name + "!/")),
+                        "scheme:" + parent.getMountPoint() + name + "!/")),
                 parent);
     }
 
@@ -439,8 +440,7 @@ extends FsArchiveDriverTestBase<D> {
                 null);
     }
 
-    protected FsModel newModel( FsMountPoint mountPoint,
-                                @CheckForNull FsModel parent) {
+    protected FsModel newModel(FsMountPoint mountPoint, @CheckForNull FsModel parent) {
         return new FsTestModel(mountPoint, parent);
     }
 
@@ -472,6 +472,7 @@ extends FsArchiveDriverTestBase<D> {
     }
 
     private final class ParentController extends MockController {
+
         ParentController(FsModel model, @CheckForNull FsController parent) {
             super(model, parent, FsTestConfig.get());
         }
@@ -484,22 +485,21 @@ extends FsArchiveDriverTestBase<D> {
             Objects.requireNonNull(options);
 
             final class Input extends DecoratingInputSocket<Entry> {
+
                 Input() {
                     super(ParentController.super.input(options, name));
                 }
 
                 @Override
-                public InputStream stream(OutputSocket<? extends Entry> peer)
-                throws IOException {
+                public InputStream stream(OutputSocket<? extends Entry> peer) throws IOException {
                     return new TestInputStream(socket().stream(peer));
                 }
 
                 @Override
-                public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
-                throws IOException {
+                public SeekableByteChannel channel(OutputSocket<? extends Entry> peer) throws IOException {
                     return new TestSeekableChannel(socket().channel(peer));
                 }
-            } // Input
+            }
 
             return new Input();
         }
@@ -513,34 +513,32 @@ extends FsArchiveDriverTestBase<D> {
             Objects.requireNonNull(options);
 
             final class Output extends DecoratingOutputSocket<Entry> {
+
                 Output() {
                     super(ParentController.super.output(options, name, template));
                 }
 
                 @Override
-                public SeekableByteChannel channel(InputSocket<? extends Entry> peer)
-                throws IOException {
+                public SeekableByteChannel channel(InputSocket<? extends Entry> peer) throws IOException {
                     return new TestSeekableChannel(socket().channel(peer));
                 }
 
                 @Override
-                public OutputStream stream(InputSocket<? extends Entry> peer)
-                throws IOException {
+                public OutputStream stream(InputSocket<? extends Entry> peer) throws IOException {
                     return new TestOutputStream(socket().stream(peer));
                 }
-            } // Output
+            }
 
             return new Output();
         }
-    } // ParentController
+    }
 
     @SuppressWarnings("MarkerInterface")
     private interface TestCloseable extends Closeable {
     }
 
-    private final class TestInputStream
-    extends DecoratingInputStream
-    implements TestCloseable {
+    private final class TestInputStream extends DecoratingInputStream implements TestCloseable {
+
         TestInputStream(InputStream in) {
             super(in);
         }
@@ -550,11 +548,10 @@ extends FsArchiveDriverTestBase<D> {
             checkAllExceptions(this);
             in.close();
         }
-    } // TestInputStream
+    }
 
-    private final class TestOutputStream
-    extends DecoratingOutputStream
-    implements TestCloseable {
+    private final class TestOutputStream extends DecoratingOutputStream implements TestCloseable {
+
         TestOutputStream(OutputStream out) {
             super(out);
         }
@@ -564,11 +561,10 @@ extends FsArchiveDriverTestBase<D> {
             checkAllExceptions(this);
             out.close();
         }
-    } // TestOutputStream
+    }
 
-    private final class TestSeekableChannel
-    extends DecoratingSeekableChannel
-    implements TestCloseable {
+    private final class TestSeekableChannel extends DecoratingSeekableChannel implements TestCloseable {
+
         TestSeekableChannel(SeekableByteChannel channel) {
             super(channel);
         }
@@ -578,5 +574,5 @@ extends FsArchiveDriverTestBase<D> {
             checkAllExceptions(this);
             channel.close();
         }
-    } // TestSeekableChannel
+    }
 }
