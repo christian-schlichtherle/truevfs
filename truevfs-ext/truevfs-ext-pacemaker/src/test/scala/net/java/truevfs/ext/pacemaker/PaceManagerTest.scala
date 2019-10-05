@@ -9,21 +9,18 @@ import java.net._
 import net.java.truecommons.shed.{Filter, _}
 import net.java.truevfs.ext.pacemaker.PaceManagerTest.{Expectation, _}
 import net.java.truevfs.kernel.spec._
-import org.junit.runner._
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatestplus.junit.JUnitRunner
-import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatestplus.mockito.MockitoSugar.mock
 
 import scala.language.implicitConversions
 
 /** @author Christian Schlichtherle */
-@RunWith(classOf[JUnitRunner])
 class PaceManagerTest extends WordSpec with OneInstancePerTest {
 
   "A PaceManager" should {

@@ -4,14 +4,11 @@
  */
 package net.java.truevfs.comp.zip
 
-import org.junit.runner._
 import org.scalatest._
-import org.scalatestplus.junit.JUnitRunner
 
 import scala.util._
 
 /** @author Christian Schlichtherle */
-@RunWith(classOf[JUnitRunner])
 class ExtraFieldsSpec extends WordSpec {
 
   "A collection of extra fields" should {

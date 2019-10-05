@@ -4,10 +4,8 @@
  */
 package net.java.truevfs.kernel.spec.sl
 
-import org.junit.runner._
 import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatestplus.junit.JUnitRunner
 
 /**
   * Tests if the class path has been properly configured so that any file
@@ -15,7 +13,6 @@ import org.scalatestplus.junit.JUnitRunner
   *
   * @author Christian Schlichtherle
   */
-@RunWith(classOf[JUnitRunner])
 class FsDriverMapLocatorIT extends WordSpec {
 
   "The file system driver map locator singleton" should {

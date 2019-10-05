@@ -4,15 +4,12 @@
  */
 package net.java.truevfs.kernel.impl
 
-import org.junit.runner._
 import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatestplus.junit.JUnitRunner
 
 /**
   * @author Christian Schlichtherle
   */
-@RunWith(classOf[JUnitRunner])
 class DefaultManagerFactoryTest extends WordSpec {
 
   "A default file system manager factory" should {

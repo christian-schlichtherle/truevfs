@@ -8,18 +8,15 @@ import java.io.File._
 import java.net._
 
 import net.java.truevfs.kernel.spec._
-import org.junit.runner._
 import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatestplus.junit.JUnitRunner
-import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.TableFor3
+import org.scalatestplus.mockito.MockitoSugar.mock
 
 /**
  * @author Christian Schlichtherle
  */
-@RunWith(classOf[JUnitRunner])
 class TUriResolverSpec extends WordSpec {
 
   "TUriResolver.parent(FsNodePath)" should {

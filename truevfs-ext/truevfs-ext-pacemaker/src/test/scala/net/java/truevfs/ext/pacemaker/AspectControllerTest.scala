@@ -7,15 +7,12 @@ package net.java.truevfs.ext.pacemaker
 import net.java.truecommons.cio.{Entry, _}
 import net.java.truevfs.ext.pacemaker.AspectControllerTest._
 import net.java.truevfs.kernel.spec._
-import org.junit.runner._
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest._
-import org.scalatestplus.junit.JUnitRunner
 import org.scalatestplus.mockito.MockitoSugar.mock
 
 /** @author Christian Schlichtherle */
-@RunWith(classOf[JUnitRunner])
 class AspectControllerTest extends WordSpec with OneInstancePerTest {
 
   def calling = afterWord("calling")

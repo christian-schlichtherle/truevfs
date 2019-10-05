@@ -5,19 +5,16 @@
 package net.java.truevfs.access
 
 import net.java.truevfs.kernel.spec._
-import org.junit.runner._
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
-import org.scalatestplus.junit.JUnitRunner
-import org.scalatestplus.mockito.MockitoSugar.mock
 import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatestplus.mockito.MockitoSugar.mock
 
 import scala.collection.JavaConverters._
 
 /**
  * @author Christian Schlichtherle
  */
-@RunWith(classOf[JUnitRunner])
 class TArchiveDetectorSpec extends WordSpec {
 
   "A TArchiveDetector" should {

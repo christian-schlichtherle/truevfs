@@ -8,18 +8,15 @@ import java.io.File._
 import java.net._
 
 import net.java.truevfs.access.TUriHelper._
-import org.junit.runner._
+import net.java.truevfs.access.TUriHelperSpec._
 import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatestplus.junit.JUnitRunner
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.TableFor2
-import TUriHelperSpec._
 
 /**
   * @author Christian Schlichtherle
   */
-@RunWith(classOf[JUnitRunner])
 class TUriHelperSpec extends WordSpec {
 
   "Checking a URI" should {

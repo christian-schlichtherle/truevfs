@@ -101,10 +101,12 @@ object BuildSettings {
       // However, the setting also disables debugging the tests by debugging the SBT process because they are now
       // running in a different process:
       fork := true,
-      javaOptions += "-enableassertions"
+      javaOptions += "-enableassertions",
+      logBuffered := false, // http://www.scalatest.org/user_guide/using_scalatest_with_sbt
+      testOptions += Tests.Argument(TestFrameworks.JUnit, "-a", "-v"),
+      testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oF")
     )) ++ Seq(
-      dependencyOverrides ++= Seq(FindbugsAnnotations, Junit),
-      testOptions += Tests.Argument(TestFrameworks.JUnit, "-a", "-v")
+      dependencyOverrides ++= Seq(FindbugsAnnotations, Junit)
     )
   }
 

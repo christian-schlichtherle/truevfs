@@ -14,10 +14,8 @@ import net.java.truevfs.kernel.spec.FsAccessOption._
 import net.java.truevfs.kernel.spec.mock.MockArchiveDriver
 import net.java.truevfs.kernel.spec.sl._
 import net.java.truevfs.kernel.spec.spi._
-import org.junit.runner._
 import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatestplus.junit.JUnitRunner
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
 import scala.collection.JavaConverters._
@@ -28,7 +26,6 @@ import scala.collection.JavaConverters._
   *
   * @author Christian Schlichtherle
   */
-@RunWith(classOf[JUnitRunner])
 class TConfigTest extends WordSpec {
 
   private def inNewChild[V](operation: => V) {

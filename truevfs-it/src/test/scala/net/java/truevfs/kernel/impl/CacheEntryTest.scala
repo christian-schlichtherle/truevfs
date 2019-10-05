@@ -13,14 +13,11 @@ import net.java.truecommons.cio.{Entry, _}
 import net.java.truevfs.kernel.impl.CacheEntry.Strategy._
 import net.java.truevfs.kernel.impl.CacheEntryTest._
 import net.java.truevfs.kernel.impl.cio.EntryAspect._
-import org.junit.runner._
 import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatestplus.junit.JUnitRunner
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
 /** @author Christian Schlichtherle */
-@RunWith(classOf[JUnitRunner])
 class CacheEntryTest extends WordSpec {
 
   private val initialCapacity = 32
