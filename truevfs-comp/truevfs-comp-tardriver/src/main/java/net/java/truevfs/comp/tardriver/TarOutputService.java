@@ -54,6 +54,7 @@ public final class TarOutputService implements OutputService<TarDriverEntry> {
      */
     private final Map<String, TarDriverEntry> entries = new LinkedHashMap<>(initialCapacity(OVERHEAD_SIZE));
 
+    private final OutputStream out;
     private final TarArchiveOutputStream taos;
     private final TarDriver driver;
     private boolean busy;
@@ -62,13 +63,13 @@ public final class TarOutputService implements OutputService<TarDriverEntry> {
     public TarOutputService(final FsModel model, final Sink sink, final TarDriver driver) throws IOException {
         Objects.requireNonNull(model);
         this.driver = Objects.requireNonNull(driver);
-        final OutputStream out = sink.stream();
+        out = sink.stream();
         try {
-            final TarArchiveOutputStream taos =
-                    this.taos = new TarArchiveOutputStream(out, DEFAULT_BLKSIZE, driver.getEncoding());
+            final TarArchiveOutputStream taos = new TarArchiveOutputStream(out, DEFAULT_BLKSIZE, driver.getEncoding());
             taos.setAddPaxHeadersForNonAsciiNames(driver.getAddPaxHeaderForNonAsciiNames());
             taos.setLongFileMode(driver.getLongFileMode());
             taos.setBigNumberMode(driver.getBigNumberMode());
+            this.taos = taos;
         } catch (final Throwable ex) {
             try {
                 out.close();
@@ -176,6 +177,7 @@ public final class TarOutputService implements OutputService<TarDriverEntry> {
     @Override
     public void close() throws IOException {
         taos.close();
+        out.close(); // idempotence
     }
 
     /**
