@@ -96,7 +96,12 @@ object BuildSettings {
 
   lazy val artifactSettings: Seq[Setting[_]] = {
     commonSettings ++ inConfig(Test)(Seq(
-      fork := true // isolate side effects to global state
+      // Forking a VM for the tests isolates side effects to the global state as is maintained for archive file systems.
+      // Without this setting, once an error in the code corrupted the global state, subsequent tests will all fail.
+      // However, the setting also disables debugging the tests by debugging the SBT process because they are now
+      // running in a different process:
+      fork := true,
+      javaOptions += "-enableassertions"
     )) ++ Seq(
       dependencyOverrides ++= Seq(FindbugsAnnotations, Junit),
       testOptions += Tests.Argument(TestFrameworks.JUnit, "-a", "-v")
