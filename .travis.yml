@@ -1,26 +1,26 @@
+---
 before_cache:
-- find $HOME/.sbt -name "*.lock" | xargs rm
-- find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
+  - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
+  - find $HOME/.sbt -name "*.lock" | xargs rm
 
 cache:
   directories:
-  - $HOME/.ivy2/cache
+  - $HOME/.ivy2
   - $HOME/.sbt
 
-dist: trusty
+dist: xenial
 
+# Don't use slim or alpine images here - the SBT Wrapper runs a shell script which wouldn't always work then:
 env:
-- SCALA_VERSION_2_10=2.10.0 SCALA_VERSION_2_11=2.11.0 SCALA_VERSION_2_12=2.12.0
-- SCALA_VERSION_2_10=2.10.7 SCALA_VERSION_2_11=2.11.12 SCALA_VERSION_2_12=2.12.5
+  - COMPILE_IMAGE_TAG=8-jdk TEST_IMAGE_TAG=8-jdk
+  - COMPILE_IMAGE_TAG=8-jdk TEST_IMAGE_TAG=12-jdk
 
-git:
-  depth: 3
+install: ./docker-sbtx $COMPILE_IMAGE_TAG -no-colors +test:compile
 
-jdk:
-- openjdk8
-- oraclejdk8
-- oraclejdk9
+language: minimal
 
-language: scala
+# Run the build in Docker to shield it from changes in the Travis environment:
+services:
+  - docker
 
-script: sbt +test
+script: ./docker-sbtx $TEST_IMAGE_TAG -no-colors +test

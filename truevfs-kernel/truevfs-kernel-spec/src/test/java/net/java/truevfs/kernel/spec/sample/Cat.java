@@ -31,6 +31,7 @@ import java.net.URISyntaxException;
  * @author     Christian Schlichtherle
  * @version    $Id$
  */
+@Deprecated
 public final class Cat {
 
     /** You cannot instantiate this class. */

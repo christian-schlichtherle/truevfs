@@ -10,7 +10,6 @@ import net.java.truevfs.kernel.spec.mock.MockDriverMapContainer;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -33,7 +32,9 @@ public abstract class FsManagerTestSuite {
     private FsManager manager;
 
     @Before
-    public void setUp() { manager = newManager(); }
+    public void setUp() {
+        manager = newManager();
+    }
 
     protected abstract FsManager newManager();
 
@@ -47,20 +48,20 @@ public abstract class FsManagerTestSuite {
     }
 
     @Test
-    public void testForward() throws InterruptedException {
-        for (final String[] params : new String[][] {
-            {
-                "file:/",
-                "zip:file:/öuter.zip!/",
-                "zip:zip:file:/öuter.zip!/inner.zip!/",
-                "zip:zip:zip:file:/öuter.zip!/inner.zip!/nüts.zip!/",
-            },
-            {
-                "file:/",
-                "zip:file:/föo.zip!/",
-                "zip:zip:file:/föo.zip!/bär.zip!/",
-                "zip:zip:zip:file:/föo.zip!/bär.zip!/bäz.zip!/",
-            },
+    public void testForward() {
+        for (final String[] params : new String[][]{
+                {
+                        "file:/",
+                        "zip:file:/öuter.zip!/",
+                        "zip:zip:file:/öuter.zip!/inner.zip!/",
+                        "zip:zip:zip:file:/öuter.zip!/inner.zip!/nüts.zip!/",
+                },
+                {
+                        "file:/",
+                        "zip:file:/föo.zip!/",
+                        "zip:zip:file:/föo.zip!/bär.zip!/",
+                        "zip:zip:zip:file:/föo.zip!/bär.zip!/bäz.zip!/",
+                },
         }) {
             FsController parent = null;
             for (final String param : params) {
@@ -74,26 +75,27 @@ public abstract class FsManagerTestSuite {
             }
             assertThat(count(ACCEPT_ANY), is(params.length));
             assertThat(count(ACCEPT_NONE), is(0));
+            //noinspection UnusedAssignment
             parent = null; // enable GC
             waitForAllManagersToGetGarbageCollected();
         }
     }
 
     @Test
-    public void testBackward() throws InterruptedException {
-        for (final String[] params : new String[][] {
-            {
-                "zip:zip:zip:file:/öuter.zip!/inner.zip!/nüts.zip!/",
-                "zip:zip:file:/öuter.zip!/inner.zip!/",
-                "zip:file:/öuter.zip!/",
-                "file:/",
-            },
-            {
-                "zip:zip:zip:file:/föo.zip!/bär.zip!/bäz.zip!/",
-                "zip:zip:file:/föo.zip!/bär.zip!/",
-                "zip:file:/föo.zip!/",
-                "file:/",
-            },
+    public void testBackward() {
+        for (final String[] params : new String[][]{
+                {
+                        "zip:zip:zip:file:/öuter.zip!/inner.zip!/nüts.zip!/",
+                        "zip:zip:file:/öuter.zip!/inner.zip!/",
+                        "zip:file:/öuter.zip!/",
+                        "file:/",
+                },
+                {
+                        "zip:zip:zip:file:/föo.zip!/bär.zip!/bäz.zip!/",
+                        "zip:zip:file:/föo.zip!/bär.zip!/",
+                        "zip:file:/föo.zip!/",
+                        "file:/",
+                },
         }) {
             FsController top = null;
             FsController member = null;
@@ -124,7 +126,9 @@ public abstract class FsManagerTestSuite {
             assertThat(count(ACCEPT_ANY, new ControllerVisitor()), is(params.length));
             assertThat(it.hasNext(), is(false));
 
+            //noinspection UnusedAssignment
             member = null; // enable GC
+            //noinspection UnusedAssignment
             top = null; // enable GC
             waitForAllManagersToGetGarbageCollected();
         }
@@ -138,15 +142,15 @@ public abstract class FsManagerTestSuite {
 
     @Test
     public void testFiltering() {
-        for (final String[][] params : new String[][][] {
-            // { { /* filter mount point */ }, { /* input set */ }, { /* output set */ } },
-            { { "tar:file:/bar.tar!/" }, { "file:/", "tar:file:/bar.tar!/", "tar.gz:file:/bar.tar.gz!/" }, { "tar:file:/bar.tar!/" } },
-            { { "tar:zip:file:/foo.zip!/bar.tar!/" }, { "file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { } },
-            { { "file:/foo.zip/bar.tar/" }, { "file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { } },
-            { { "tar:file:/foo!/" }, { "file:/", "zip:file:/foo!/", "tar:file:/bar!/" }, { "zip:file:/foo!/" } },
-            { { "zip:file:/foo.zip!/" }, { "file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { "zip:file:/foo.zip!/" } },
-            { { "file:/foo.zip/" }, { "file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { } },
-            { { "file:/" }, { "file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" }, { "file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/" } },
+        for (final String[][] params : new String[][][]{
+                // { { /* filter mount point */ }, { /* input set */ }, { /* output set */ } },
+                {{"tar:file:/bar.tar!/"}, {"file:/", "tar:file:/bar.tar!/", "tar.gz:file:/bar.tar.gz!/"}, {"tar:file:/bar.tar!/"}},
+                {{"tar:zip:file:/foo.zip!/bar.tar!/"}, {"file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/"}, {}},
+                {{"file:/foo.zip/bar.tar/"}, {"file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/"}, {}},
+                {{"tar:file:/foo!/"}, {"file:/", "zip:file:/foo!/", "tar:file:/bar!/"}, {"zip:file:/foo!/"}},
+                {{"zip:file:/foo.zip!/"}, {"file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/"}, {"zip:file:/foo.zip!/"}},
+                {{"file:/foo.zip/"}, {"file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/"}, {}},
+                {{"file:/"}, {"file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/"}, {"file:/", "zip:file:/foo.zip!/", "tar:file:/bar.tar!/"}},
         }) {
             assert params[0].length == 1;
 
@@ -199,12 +203,17 @@ public abstract class FsManagerTestSuite {
     }
 }
 
-class CountingVisitor
-extends AtomicInteger implements Visitor<FsController, RuntimeException> {
+class CountingVisitor implements Visitor<FsController, RuntimeException> {
+
+    private final AtomicInteger count = new AtomicInteger();
 
     @Override
     public void visit(final FsController controller) {
         assertNotNull(controller);
-        incrementAndGet();
+        count.incrementAndGet();
+    }
+
+    public int get() {
+        return count.get();
     }
 }

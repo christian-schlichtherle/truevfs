@@ -5,6 +5,7 @@
 package net.java.truevfs.comp.zip;
 
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -19,10 +20,12 @@ import javax.annotation.Nullable;
 import javax.annotation.WillCloseWhenClosed;
 import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.NotThreadSafe;
+
 import net.java.truecommons.io.DecoratingOutputStream;
 import net.java.truecommons.io.LittleEndianOutputStream;
 import net.java.truecommons.io.Sink;
 import net.java.truecommons.shed.HashMaps;
+
 import static net.java.truevfs.comp.zip.Constants.*;
 import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
 import static net.java.truevfs.comp.zip.WinZipAesExtraField.VV_AE_1;
@@ -30,6 +33,7 @@ import static net.java.truevfs.comp.zip.WinZipAesExtraField.VV_AE_2;
 import static net.java.truevfs.comp.zip.WinZipAesUtils.overhead;
 import static net.java.truevfs.comp.zip.ZipEntry.*;
 import static net.java.truevfs.comp.zip.ZipParametersUtils.parameters;
+
 import net.java.truecommons.key.spec.common.AesKeyStrength;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
@@ -40,28 +44,37 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
  * <b>Warning:</b> This class is <em>not</em> intended for public use
  * - its API may change at will without prior notification!
  *
- * @param  <E> the type of the ZIP entries.
- * @see    AbstractZipFile
+ * @param <E> the type of the ZIP entries.
  * @author Christian Schlichtherle
+ * @see AbstractZipFile
  */
 @NotThreadSafe
 public abstract class AbstractZipOutputStream<E extends ZipEntry>
-extends DecoratingOutputStream
-implements Iterable<E> {
+        extends DecoratingOutputStream
+        implements Iterable<E> {
 
     private final LittleEndianOutputStream leos;
 
-    /** The charset to use for entry names and comments. */
+    /**
+     * The charset to use for entry names and comments.
+     */
     private final Charset charset;
 
-    /** Default compression method for next entry. */
+    /**
+     * Default compression method for next entry.
+     */
     private int method;
 
-    /** Default compression level for the methods DEFLATED and BZIP2. */
+    /**
+     * Default compression level for the methods DEFLATED and BZIP2.
+     */
     private int level;
 
-    /** The encoded file comment. */
-    private @CheckForNull byte[] comment;
+    /**
+     * The encoded file comment.
+     */
+    private @CheckForNull
+    byte[] comment;
 
     /**
      * The list of ZIP entries started to be written so far.
@@ -69,34 +82,40 @@ implements Iterable<E> {
      */
     private final Map<String, E> entries;
 
-    /** Start of central directory. */
+    /**
+     * Start of central directory.
+     */
     private long cdOffset;
 
     private boolean finished;
 
-    /** Current ZIP entry. */
-    private @Nullable ZipEntry entry;
+    /**
+     * Current ZIP entry.
+     */
+    private @Nullable
+    ZipEntry entry;
 
-    private @Nullable OutputMethod processor;
+    private @Nullable
+    OutputMethod processor;
 
     /**
      * Constructs a raw ZIP output stream which decorates the given output
      * stream and optionally apppends to the given raw ZIP file.
      *
-     * @param  sink the sink to write the ZIP file to.
-     *         If {@code appendee} is not {@code null}, then this must be set
-     *         up so that it appends to the same ZIP file from which
-     *         {@code appendee} is reading.
-     * @param  appendee the nullable raw ZIP file to append to.
-     *         This may already be closed.
-     * @param  param the parameters for writing the ZIP file.
+     * @param sink     the sink to write the ZIP file to.
+     *                 If {@code appendee} is not {@code null}, then this must be set
+     *                 up so that it appends to the same ZIP file from which
+     *                 {@code appendee} is reading.
+     * @param appendee the nullable raw ZIP file to append to.
+     *                 This may already be closed.
+     * @param param    the parameters for writing the ZIP file.
      */
     @CreatesObligation
     protected AbstractZipOutputStream(
             final Sink sink,
             final @CheckForNull @WillNotClose AbstractZipFile<E> appendee,
             final ZipOutputStreamParameters param)
-    throws IOException {
+            throws IOException {
         final OutputStream out = sink.stream();
         try {
             this.out = this.leos = null != appendee
@@ -175,9 +194,9 @@ implements Iterable<E> {
      * Note that the returned entry is shared with this instance - it is an
      * error to change its state!
      *
-     * @param  name the name of the ZIP entry.
+     * @param name the name of the ZIP entry.
      * @return The entry for the given {@code name} or {@code null} if no entry
-     *         with this name exists in this ZIP file.
+     * with this name exists in this ZIP file.
      */
     public E entry(String name) {
         return entries.get(name);
@@ -188,7 +207,8 @@ implements Iterable<E> {
      *
      * @return The file comment.
      */
-    public @Nullable String getComment() {
+    public @Nullable
+    String getComment() {
         final byte[] comment = this.comment;
         //return null == comment ? null : new String(comment, charset);
         return null == comment ? null : decode(comment);
@@ -197,9 +217,9 @@ implements Iterable<E> {
     /**
      * Sets the file comment.
      *
-     * @param  comment the file comment.
+     * @param comment the file comment.
      * @throws IllegalArgumentException if the encoded comment is longer than
-     *         {@link UShort#MAX_VALUE} bytes.
+     *                                  {@link UShort#MAX_VALUE} bytes.
      */
     public void setComment(final @CheckForNull String comment) {
         if (null != comment && !comment.isEmpty()) {
@@ -231,10 +251,10 @@ implements Iterable<E> {
      * Legal values are {@link ZipEntry#STORED}, {@link ZipEntry#DEFLATED}
      * and {@link ZipEntry#BZIP2}.
      *
-     * @param  method the default compression method for entries.
+     * @param method the default compression method for entries.
      * @throws IllegalArgumentException if the method is invalid.
-     * @see    #getMethod
-     * @see    ZipEntry#setMethod
+     * @see #getMethod
+     * @see ZipEntry#setMethod
      */
     public void setMethod(final int method) {
         setMethod0(method);
@@ -252,7 +272,7 @@ implements Iterable<E> {
      * {@link ZipEntry#DEFLATED} or {@link ZipEntry#BZIP2}.
      *
      * @return The compression level for entries.
-     * @see    #setLevel
+     * @see #setLevel
      */
     public int getLevel() {
         return level;
@@ -265,11 +285,13 @@ implements Iterable<E> {
      * Legal values are {@link Deflater#DEFAULT_COMPRESSION} or range from
      * {@link Deflater#NO_COMPRESSION} to {@link Deflater#BEST_COMPRESSION}.
      *
-     * @param  level the compression level for entries.
+     * @param level the compression level for entries.
      * @throws IllegalArgumentException if the compression level is invalid.
-     * @see    #getLevel
+     * @see #getLevel
      */
-    public void setLevel(int level) { setLevel0(level); }
+    public void setLevel(int level) {
+        setLevel0(level);
+    }
 
     private void setLevel0(int level) {
         if ((level < Deflater.NO_COMPRESSION || Deflater.BEST_COMPRESSION < level)
@@ -280,10 +302,11 @@ implements Iterable<E> {
 
     /**
      * Returns the parameters for encryption or authentication of entries.
-     *
+     * <p>
      * Returns The parameters for encryption or authentication of entries.
      */
-    protected abstract @CheckForNull ZipCryptoParameters getCryptoParameters();
+    protected abstract @CheckForNull
+    ZipCryptoParameters getCryptoParameters();
 
     /**
      * Returns the total number of (compressed) bytes this stream has written
@@ -320,21 +343,21 @@ implements Iterable<E> {
      * java.util.zip.ZipOutputStream} which would throw a {@link ZipException}
      * in this method when another entry with the same name is to be written.
      *
-     * @param  entry The entry to write.
-     * @param  process Whether or not the entry contents should get processed,
-     *         e.g. deflated.
-     *         This should be set to {@code false} if and only if the
-     *         application is going to copy entries from an input ZIP file to
-     *         an output ZIP file.
-     *         The entries' CRC-32, compressed size and uncompressed
-     *         size properties must be set in advance.
+     * @param entry   The entry to write.
+     * @param process Whether or not the entry contents should get processed,
+     *                e.g. deflated.
+     *                This should be set to {@code false} if and only if the
+     *                application is going to copy entries from an input ZIP file to
+     *                an output ZIP file.
+     *                The entries' CRC-32, compressed size and uncompressed
+     *                size properties must be set in advance.
      * @throws ZipException If and only if writing the entry is impossible
-     *         because the resulting file would not comply to the ZIP file
-     *         format specification.
-     * @throws IOException On any I/O error.
+     *                      because the resulting file would not comply to the ZIP file
+     *                      format specification.
+     * @throws IOException  On any I/O error.
      */
     public void putNextEntry(final E entry, final boolean process)
-    throws ZipException, IOException {
+            throws ZipException, IOException {
         closeEntry();
         final OutputMethod method = newOutputMethod(entry, process);
         method.init(entry.clone()); // test!
@@ -356,7 +379,7 @@ implements Iterable<E> {
     private OutputMethod newOutputMethod(
             final ZipEntry entry,
             final boolean process)
-    throws ZipException {
+            throws ZipException {
         // HC SVNT DRACONES!
         OutputMethod processor = new RawOutputMethod(process);
         if (!process) {
@@ -409,27 +432,27 @@ implements Iterable<E> {
     /**
      * Returns a new {@code EncryptedOutputMethod}.
      *
-     * @param  processor the output method to decorate.
-     * @param  param the {@link ZipCryptoParameters} used to determine and
-     *         configure the type of the encrypted ZIP file.
-     *         If the run time class of this parameter matches multiple
-     *         parameter interfaces, it is at the discretion of this
-     *         implementation which one is picked and hence which type of
-     *         encrypted ZIP file is created.
-     *         If you need more control over this, pass in an instance which's
-     *         run time class just implements the
-     *         {@link ZipParametersProvider} interface.
-     *         Instances of this interface are queried to find crypto
-     *         parameters which match a known encrypted ZIP file type.
-     *         This algorithm is recursively applied.
+     * @param processor the output method to decorate.
+     * @param param     the {@link ZipCryptoParameters} used to determine and
+     *                  configure the type of the encrypted ZIP file.
+     *                  If the run time class of this parameter matches multiple
+     *                  parameter interfaces, it is at the discretion of this
+     *                  implementation which one is picked and hence which type of
+     *                  encrypted ZIP file is created.
+     *                  If you need more control over this, pass in an instance which's
+     *                  run time class just implements the
+     *                  {@link ZipParametersProvider} interface.
+     *                  Instances of this interface are queried to find crypto
+     *                  parameters which match a known encrypted ZIP file type.
+     *                  This algorithm is recursively applied.
      * @return A new {@code EncryptedOutputMethod}.
      * @throws ZipParametersException if {@code param} is {@code null} or
-     *         no suitable crypto parameters can get found.
+     *                                no suitable crypto parameters can get found.
      */
     private EncryptedOutputMethod newEncryptedOutputMethod(
             final RawOutputMethod processor,
             @CheckForNull ZipParameters param)
-    throws ZipParametersException {
+            throws ZipParametersException {
         assert null != processor;
         while (null != param) {
             // Order is important here to support multiple interface implementations!
@@ -450,9 +473,9 @@ implements Iterable<E> {
      * Writes all necessary data for this entry to the underlying stream.
      *
      * @throws ZipException If and only if writing the entry is impossible
-     *         because the resulting file would not comply to the ZIP file
-     *         format specification.
-     * @throws IOException On any I/O error.
+     *                      because the resulting file would not comply to the ZIP file
+     *                      format specification.
+     * @throws IOException  On any I/O error.
      */
     public void closeEntry() throws IOException {
         final ZipEntry entry = this.entry;
@@ -479,20 +502,23 @@ implements Iterable<E> {
      * </ul>
      *
      * @throws ZipException If and only if writing the entry is impossible
-     *         because the resulting file would not comply to the ZIP file
-     *         format specification.
-     * @throws IOException On any I/O error.
+     *                      because the resulting file would not comply to the ZIP file
+     *                      format specification.
+     * @throws IOException  On any I/O error.
      */
     public void finish() throws IOException {
-        if (this.finished)
+        if (this.finished) {
             return;
+        }
         closeEntry();
         final LittleEndianOutputStream leos = this.leos;
         this.cdOffset = leos.size();
         final Iterator<E> i = this.entries.values().iterator();
-        while (i.hasNext())
-            if (!writeCentralFileHeader(i.next()))
+        while (i.hasNext()) {
+            if (!writeCentralFileHeader(i.next())) {
                 i.remove();
+            }
+        }
         writeEndOfCentralDirectory();
         this.finished = true;
     }
@@ -501,11 +527,11 @@ implements Iterable<E> {
      * Writes a Central File Header record.
      *
      * @return {@code false} if and only if the record has been skipped,
-     *         i.e. not written for some other reason than an I/O error.
+     * i.e. not written for some other reason than an I/O error.
      * @throws IOException On any I/O error.
      */
     private boolean writeCentralFileHeader(final ZipEntry entry)
-    throws IOException {
+            throws IOException {
         final long csize = entry.getCompressedSize();
         final long size = entry.getSize();
         // This test MUST NOT include the CRC-32 because VV_AE_2 sets it to
@@ -580,13 +606,13 @@ implements Iterable<E> {
         final long cdOffset = this.cdOffset;
         final long cdSize = leos.size() - cdOffset;
         final boolean cdEntriesZip64 = cdEntries > UShort.MAX_VALUE || FORCE_ZIP64_EXT;
-        final boolean cdSizeZip64    = cdSize    > UInt  .MAX_VALUE || FORCE_ZIP64_EXT;
-        final boolean cdOffsetZip64  = cdOffset  > UInt  .MAX_VALUE || FORCE_ZIP64_EXT;
+        final boolean cdSizeZip64 = cdSize > UInt.MAX_VALUE || FORCE_ZIP64_EXT;
+        final boolean cdOffsetZip64 = cdOffset > UInt.MAX_VALUE || FORCE_ZIP64_EXT;
         final int cdEntries16 = cdEntriesZip64 ? UShort.MAX_VALUE : (int) cdEntries;
-        final long cdSize32   = cdSizeZip64    ? UInt  .MAX_VALUE : cdSize;
-        final long cdOffset32 = cdOffsetZip64  ? UInt  .MAX_VALUE : cdOffset;
+        final long cdSize32 = cdSizeZip64 ? UInt.MAX_VALUE : cdSize;
+        final long cdOffset32 = cdOffsetZip64 ? UInt.MAX_VALUE : cdOffset;
         final boolean zip64 // ZIP64 extensions?
-                =  cdEntriesZip64
+                = cdEntriesZip64
                 || cdSizeZip64
                 || cdOffsetZip64;
         if (zip64) {
@@ -679,9 +705,11 @@ implements Iterable<E> {
         out.close();
     }
 
-    /** Adjusts the number of written bytes in the offset for appending mode. */
+    /**
+     * Adjusts the number of written bytes in the offset for appending mode.
+     */
     private static final class AppendingLittleEndianOutputStream
-    extends LittleEndianOutputStream {
+            extends LittleEndianOutputStream {
         AppendingLittleEndianOutputStream(
                 final @WillCloseWhenClosed OutputStream out,
                 final @WillNotClose AbstractZipFile<?> appendee) {
@@ -693,9 +721,12 @@ implements Iterable<E> {
     private final class RawOutputMethod implements OutputMethod {
         final boolean process;
 
-        /** Start of entry data. */
+        /**
+         * Start of entry data.
+         */
         private long dataStart;
-        @Nullable ZipEntry entry;
+        @Nullable
+        ZipEntry entry;
 
         RawOutputMethod(final boolean process) {
             this.process = process;
@@ -705,8 +736,8 @@ implements Iterable<E> {
         public void init(final ZipEntry entry) throws ZipException {
             {
                 final long size = encode(entry.getName()).length
-                                + entry.getRawExtraFields().length
-                                + encode(entry.getRawComment()).length;
+                        + entry.getRawExtraFields().length
+                        + encode(entry.getRawComment()).length;
                 if (UShort.MAX_VALUE < size)
                     throw new ZipException(entry.getName()
                             + " (the total size of "
@@ -746,8 +777,8 @@ implements Iterable<E> {
             // See appendix D of PKWARE's ZIP File Format Specification.
             final boolean utf8 = UTF8.equals(charset);
             final int general = (encrypted ? GPBF_ENCRYPTED : 0)
-                              | (dd        ? GPBF_DATA_DESCRIPTOR : 0)
-                              | (utf8      ? GPBF_UTF8 : 0);
+                    | (dd ? GPBF_DATA_DESCRIPTOR : 0)
+                    | (utf8 ? GPBF_UTF8 : 0);
             // Start changes.
             AbstractZipOutputStream.this.finished = false;
             // local file header signature     4 bytes  (0x04034b50)
@@ -837,9 +868,12 @@ implements Iterable<E> {
     private final class WinZipAesOutputMethod extends EncryptedOutputMethod {
         final WinZipAesParameters generalParam;
         boolean suppressCrc;
-        @Nullable WinZipAesEntryParameters entryParam;
-        @Nullable WinZipAesOutputStream out;
-        @Nullable ZipEntry entry;
+        @Nullable
+        WinZipAesEntryParameters entryParam;
+        @Nullable
+        WinZipAesOutputStream out;
+        @Nullable
+        ZipEntry entry;
 
         WinZipAesOutputMethod(
                 RawOutputMethod processor,
@@ -938,16 +972,19 @@ implements Iterable<E> {
     } // WinZipAesOutputMethod
 
     private final class BZip2OutputMethod extends DecoratingOutputMethod {
-        @Nullable BZip2CompressorOutputStream cout;
-        @Nullable LittleEndianOutputStream dout;
-        @Nullable ZipEntry entry;
+        @Nullable
+        BZip2CompressorOutputStream cout;
+        @Nullable
+        LittleEndianOutputStream dout;
+        @Nullable
+        ZipEntry entry;
 
         BZip2OutputMethod(OutputMethod processor) {
             super(processor);
         }
 
         @Override
-        public void init(final ZipEntry entry) throws ZipException  {
+        public void init(final ZipEntry entry) throws ZipException {
             entry.setCompressedSize(UNKNOWN);
             this.method.init(entry);
             this.entry = entry;
@@ -976,7 +1013,7 @@ implements Iterable<E> {
 
         @Override
         public void finish()
-        throws IOException {
+                throws IOException {
             this.dout.flush(); // superfluous - should not buffer
             this.cout.finish();
             this.entry.setRawSize(this.dout.size());
@@ -985,15 +1022,17 @@ implements Iterable<E> {
     } // BZip2OutputMethod
 
     private final class DeflaterOutputMethod extends DecoratingOutputMethod {
-        @Nullable ZipDeflaterOutputStream out;
-        @Nullable ZipEntry entry;
+        @Nullable
+        ZipDeflaterOutputStream out;
+        @Nullable
+        ZipEntry entry;
 
         DeflaterOutputMethod(OutputMethod processor) {
             super(processor);
         }
 
         @Override
-        public void init(final ZipEntry entry) throws ZipException  {
+        public void init(final ZipEntry entry) throws ZipException {
             entry.setCompressedSize(UNKNOWN);
             this.method.init(entry);
             this.entry = entry;
@@ -1024,7 +1063,8 @@ implements Iterable<E> {
     } // DeflaterOutputMethod
 
     private abstract class Crc32OutputMethod extends DecoratingOutputMethod {
-        @Nullable Crc32OutputStream out;
+        @Nullable
+        Crc32OutputStream out;
 
         Crc32OutputMethod(OutputMethod processor) {
             super(processor);

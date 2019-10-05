@@ -325,7 +325,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
     }
 
     /**
-     * This implementation modifies {@code options} in the following way before
+     * This implementation transforms {@code options} in the following way before
      * it forwards the call to {@code controller}:
      * <ol>
      * <li>{@link FsAccessOption#STORE} is set.
@@ -348,10 +348,10 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
         // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
         // opportunity to get its own preferences to sort out such a conflict.
         options = options.set(STORE);
-        if (options.get(GROW))
+        if (options.get(GROW)) {
             options = options.set(APPEND).clear(CACHE);
-        return new FsOutputSocketSink(options,
-                controller.output(options, name, null));
+        }
+        return new FsOutputSocketSink(options, controller.output(options, name, null));
     }
 
     @Override

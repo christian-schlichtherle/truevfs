@@ -4,19 +4,16 @@ import java.util.concurrent.Callable
 
 import net.java.truecommons.shed.ConcurrencyUtils
 import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory
-import org.junit.runner.RunWith
+import net.java.truevfs.kernel.impl.ShutdownFuseTest._
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.inOrder
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
-import org.scalatest.junit.JUnitRunner
-import org.scalatest.mockito.MockitoSugar.mock
-import ShutdownFuseTest._
+import org.scalatestplus.mockito.MockitoSugar.mock
 
 /**
  * @author Christian Schlichtherle
  */
-@RunWith(classOf[JUnitRunner])
 class ShutdownFuseTest extends WordSpec {
 
   "A shutdown fuse with a mock thread registry" when {

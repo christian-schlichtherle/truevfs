@@ -5,13 +5,10 @@
 package net.java.truevfs.ext.insight.stats
 
 import net.java.truevfs.ext.insight.stats.FsLoggerTest._
-import org.junit.runner.RunWith
 import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatest.junit.JUnitRunner
 
 /** @author Christian Schlichtherle */
-@RunWith(classOf[JUnitRunner])
 class FsLoggerTest extends WordSpec {
 
   def create = new FsLogger

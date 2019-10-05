@@ -13,9 +13,9 @@ import net.java.truevfs.access.TFile2Test._
 import net.java.truevfs.kernel.spec._
 import org.junit._
 import org.scalatest.Matchers._
-import org.scalatest.junit.JUnitSuite
-import org.scalatest.mockito.MockitoSugar.mock
-import org.scalatest.prop.PropertyChecks._
+import org.scalatestplus.junit.JUnitSuite
+import org.scalatestplus.mockito.MockitoSugar.mock
+import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.slf4j._
 
 /** @author Christian Schlichtherle */

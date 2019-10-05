@@ -7,10 +7,9 @@ package net.java.truevfs.kernel.spec.mock;
 import net.java.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 
 /**
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
-public final class MockArchiveDriverTest
-extends FsArchiveDriverTestSuite<MockArchiveDriverEntry, MockArchiveDriver> {
+public final class MockArchiveDriverTest extends FsArchiveDriverTestSuite<MockArchiveDriverEntry, MockArchiveDriver> {
 
     @Override
     protected MockArchiveDriver newArchiveDriver() {

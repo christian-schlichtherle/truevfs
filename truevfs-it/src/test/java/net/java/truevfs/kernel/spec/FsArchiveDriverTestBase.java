@@ -51,8 +51,8 @@ public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
     }
 
     protected final D getArchiveDriver() {
-        final D driver = this.driver;
-        return null != driver ? driver : (this.driver = newArchiveDriver());
+        final D d = driver;
+        return null != d ? d : (driver = newArchiveDriver());
     }
 
     protected abstract D newArchiveDriver();

@@ -11,8 +11,7 @@ import net.java.truevfs.kernel.spec.FsTestConfig;
 /**
  * @author Christian Schlichtherle
  */
-public final class JarDriverTest
-extends FsArchiveDriverTestSuite<JarDriverEntry, JarDriver> {
+public final class JarDriverTest extends FsArchiveDriverTestSuite<JarDriverEntry, JarDriver> {
 
     @Override
     protected JarDriver newArchiveDriver() {
@@ -25,5 +24,7 @@ extends FsArchiveDriverTestSuite<JarDriverEntry, JarDriver> {
     }
 
     @Override
-    protected String getUnencodableName() { return null; }
+    protected String getUnencodableName() {
+        return null;
+    }
 }

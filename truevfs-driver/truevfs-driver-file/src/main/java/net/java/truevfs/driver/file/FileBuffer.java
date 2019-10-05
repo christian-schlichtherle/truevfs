@@ -34,9 +34,12 @@ final class FileBuffer extends FileNode {
     }
 
     @Override
-    @SuppressWarnings(value = "FinalizeDeclaration")
+    @SuppressWarnings({ "FinalizeDeclaration", "deprecation" })
     protected void finalize() throws Throwable {
-        try { pool(null); }
-        finally { super.finalize(); }
+        try {
+            pool(null);
+        } finally {
+            super.finalize();
+        }
     }
 }

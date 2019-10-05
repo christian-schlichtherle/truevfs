@@ -144,12 +144,11 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
 
     @Override
     protected OutputService<TarDriverEntry> newOutput(
-            final FsModel model,
-            final FsOutputSocketSink sink,
-            final @CheckForNull @WillNotClose InputService<TarDriverEntry> input)
+            FsModel model,
+            FsOutputSocketSink sink,
+            @CheckForNull @WillNotClose InputService<TarDriverEntry> input)
     throws IOException {
-        return new MultiplexingOutputService<>(getPool(),
-                new TarOutputService(model, sink, this));
+        return new MultiplexingOutputService<>(getPool(), new TarOutputService(model, sink, this));
     }
 
     /**

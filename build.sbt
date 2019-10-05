@@ -393,6 +393,7 @@ lazy val it: Project = project
       MockitoCore % Test,
       Scalacheck % Test,
       Scalatest % Test,
+      Slf4jSimple % Test,
       TruecommonsIO % Test classifier "" classifier "tests",
       TruecommonsKeyDefault % Test,
       TruecommonsKeySpec % Test classifier "" classifier "tests",

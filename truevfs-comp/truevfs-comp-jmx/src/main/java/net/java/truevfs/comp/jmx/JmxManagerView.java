@@ -22,16 +22,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * A view for a {@linkplain FsManager file system manager}.
  *
- * @param  <M> the type of the file system manager.
+ * @param <M> the type of the file system manager.
  * @author Christian Schlichtherle
  */
 @ThreadSafe
 public class JmxManagerView<M extends FsManager>
-extends StandardMBean implements JmxManagerMXBean {
+        extends StandardMBean implements JmxManagerMXBean {
 
     protected final M manager;
 
-    public JmxManagerView(M manager) { this(JmxManagerMXBean.class, manager); }
+    public JmxManagerView(M manager) {
+        this(JmxManagerMXBean.class, manager);
+    }
 
     protected JmxManagerView(
             final Class<? extends JmxManagerMXBean> type,
@@ -48,27 +50,22 @@ extends StandardMBean implements JmxManagerMXBean {
     @Override
     protected String getDescription(final MBeanAttributeInfo info) {
         switch (info.getName()) {
-        case "FileSystemsMounted":
-            return "The number of file systems which have been mounted.";
-        case "FileSystemsTotal":
-            return "The total number of file systems.";
-        case "TopLevelArchiveFileSystemsMounted":
-            return "The number of top level archive file systems which have been mounted.";
-        case "TopLevelArchiveFileSystemsTotal":
-            return "The total number of top level archive file systems.";
-        default:
-            return null;
+            case "FileSystemsMounted":
+                return "The number of file systems which have been mounted.";
+            case "FileSystemsTotal":
+                return "The total number of file systems.";
+            case "TopLevelArchiveFileSystemsMounted":
+                return "The number of top level archive file systems which have been mounted.";
+            case "TopLevelArchiveFileSystemsTotal":
+                return "The total number of top level archive file systems.";
+            default:
+                return null;
         }
     }
 
     @Override
-    protected String getDescription(final MBeanOperationInfo info) {
-        switch (info.getName()) {
-        case "sync":
-            return "Synchronizes all file systems and eventually unmounts them.";
-        default:
-            return null;
-        }
+    protected String getDescription(MBeanOperationInfo info) {
+        return "sync".equals(info.getName()) ? "Synchronizes all file systems and eventually unmounts them." : null;
     }
 
     @Override
@@ -102,7 +99,7 @@ extends StandardMBean implements JmxManagerMXBean {
 }
 
 final class MountedFileSystemsFilter
-implements Filter<FsController> {
+        implements Filter<FsController> {
 
     @Override
     public boolean accept(FsController controller) {
@@ -111,7 +108,7 @@ implements Filter<FsController> {
 }
 
 final class TotalTopLevelArchiveFileSystemsFilter
-implements Filter<FsController> {
+        implements Filter<FsController> {
 
     @Override
     public boolean accept(final FsController controller) {
@@ -120,11 +117,12 @@ implements Filter<FsController> {
     }
 }
 
-final class MountedTopLevelArchiveFileSystemsFilter
-implements Filter<FsController> {
+final class MountedTopLevelArchiveFileSystemsFilter implements Filter<FsController> {
 
-    final Filter<FsController> mountedFileSystemsFilter = new MountedFileSystemsFilter();
-    final Filter<FsController> totalTopLevelArchiveFileSystemsFilter = new TotalTopLevelArchiveFileSystemsFilter();
+    private final Filter<FsController> mountedFileSystemsFilter = new MountedFileSystemsFilter();
+
+    private final Filter<FsController> totalTopLevelArchiveFileSystemsFilter =
+            new TotalTopLevelArchiveFileSystemsFilter();
 
     @Override
     public boolean accept(FsController controller) {
@@ -133,9 +131,16 @@ implements Filter<FsController> {
     }
 }
 
-final class CountingVisitor
-extends AtomicInteger implements Visitor<FsController, RuntimeException> {
+final class CountingVisitor implements Visitor<FsController, RuntimeException> {
+
+    private final AtomicInteger count = new AtomicInteger();
 
     @Override
-    public void visit(FsController controller) { incrementAndGet(); }
+    public void visit(FsController controller) {
+        count.incrementAndGet();
+    }
+
+    int get() {
+        return count.get();
+    }
 }

@@ -366,10 +366,8 @@ implements Serializable, Comparable<FsMountPoint> {
      * @return The scheme component.
      */
     public FsScheme getScheme() {
-        final FsScheme scheme = this.scheme;
-        return null != scheme
-                ? scheme
-                : (this.scheme = FsScheme.create(uri.getScheme()));
+        final FsScheme s = scheme;
+        return null != s ? s : (scheme = FsScheme.create(uri.getScheme()));
     }
 
     /**

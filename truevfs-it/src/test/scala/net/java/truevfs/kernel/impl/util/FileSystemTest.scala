@@ -4,14 +4,11 @@
  */
 package net.java.truevfs.kernel.impl.util
 
-import org.junit.runner.RunWith
-import org.scalatest.WordSpec
-import org.scalatest.junit.JUnitRunner
+import net.java.truevfs.kernel.impl.util.FileSystemTest._
 import org.scalatest.Matchers._
-import org.scalatest.prop.PropertyChecks._
-import FileSystemTest._
+import org.scalatest.WordSpec
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks._
 
-@RunWith(classOf[JUnitRunner])
 class FileSystemTest extends WordSpec {
 
   private def newFileSystem = FileSystem[Entry]('/')

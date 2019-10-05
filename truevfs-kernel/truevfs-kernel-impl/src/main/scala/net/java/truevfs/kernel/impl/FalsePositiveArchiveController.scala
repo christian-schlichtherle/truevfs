@@ -200,7 +200,7 @@ private final class FalsePositiveArchiveController(controller: FsController)
 
   private object TryChild extends State {
 
-    def apply[V](name: FsNodeName)(operation: Operation[V]) = operation(controller, name)
+    def apply[V](name: FsNodeName)(operation: Operation[V]): V = operation(controller, name)
   }
 
   private case class UseParent(original: FalsePositiveArchiveException) extends State {

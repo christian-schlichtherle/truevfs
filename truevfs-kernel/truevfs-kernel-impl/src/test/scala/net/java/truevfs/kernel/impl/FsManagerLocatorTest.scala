@@ -5,13 +5,10 @@
 package net.java.truevfs.kernel.impl
 
 import net.java.truevfs.kernel.spec.sl._
-import org.junit.runner._
-import org.scalatest._
-import org.scalatest.junit._
 import org.scalatest.Matchers._
+import org.scalatest._
 
 /** @author Christian Schlichtherle */
-@RunWith(classOf[JUnitRunner])
 class FsManagerLocatorTest extends WordSpec {
 
   "The file system manager locator singleton" should {

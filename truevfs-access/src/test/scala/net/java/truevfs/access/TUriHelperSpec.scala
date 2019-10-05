@@ -8,17 +8,15 @@ import java.io.File._
 import java.net._
 
 import net.java.truevfs.access.TUriHelper._
-import org.junit.runner._
+import net.java.truevfs.access.TUriHelperSpec._
 import org.scalatest.Matchers._
 import org.scalatest._
-import org.scalatest.junit._
-import org.scalatest.prop.PropertyChecks._
+import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.TableFor2
 
 /**
   * @author Christian Schlichtherle
   */
-@RunWith(classOf[JUnitRunner])
 class TUriHelperSpec extends WordSpec {
 
   "Checking a URI" should {
@@ -39,13 +37,17 @@ class TUriHelperSpec extends WordSpec {
   // See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7198297 :
   "Fixing a URI" should {
     "be required unless bug 7198297 has been fixed in the JDK" in {
-      (new URI("x/") resolve "..").getRawSchemeSpecificPart should be (null)
-      (new URI("x/") resolve "..").getSchemeSpecificPart should be (null)
+      sys props "java.version" match {
+        case VersionRegex(v) if v.toFloat >= 9F => pending
+        case _ =>
+          (new URI("x/") resolve "..").getRawSchemeSpecificPart should be(null)
+          (new URI("x/") resolve "..").getSchemeSpecificPart should be(null)
+      }
     }
 
-    "should successfully work around bug 7198297" in {
-      fix(new URI("x/") resolve "..").getRawSchemeSpecificPart should not be null
-      fix(new URI("x/") resolve "..").getSchemeSpecificPart should not be null
+    "successfully work around bug 7198297" in {
+      fix(new URI("x/") resolve "..").getRawSchemeSpecificPart shouldBe ""
+      fix(new URI("x/") resolve "..").getSchemeSpecificPart shouldBe ""
     }
   }
 
@@ -80,4 +82,9 @@ class TUriHelperSpec extends WordSpec {
       }
     }
   }
+}
+
+object TUriHelperSpec {
+
+  private val VersionRegex = """(\d+\.\d+).*""".r.anchored
 }

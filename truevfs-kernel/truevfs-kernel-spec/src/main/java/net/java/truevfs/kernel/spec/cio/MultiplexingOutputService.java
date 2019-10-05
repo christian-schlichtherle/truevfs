@@ -44,12 +44,12 @@ import static net.java.truecommons.cio.Entry.UNKNOWN;
  * Note that this implies that {@code close()}ing an entry or this container
  * may fail with an {@link IOException}.
  *
- * @param  <E> the type of the mutable entries.
+ * @param <E> the type of the mutable entries.
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
 public class MultiplexingOutputService<E extends MutableEntry>
-extends DecoratingOutputService<E> {
+        extends DecoratingOutputService<E> {
 
     private final IoBufferPool pool;
 
@@ -60,14 +60,16 @@ extends DecoratingOutputService<E> {
     private final Map<String, BufferedEntryOutputStream>
             buffers = new LinkedHashMap<>();
 
-    /** @see #isBusy */
+    /**
+     * @see #isBusy
+     */
     private boolean busy;
 
     /**
      * Constructs a new multiplexed output service.
      *
      * @param output the decorated output service.
-     * @param pool the pool for buffering entry data.
+     * @param pool   the pool for buffering entry data.
      */
     public MultiplexingOutputService(
             final IoBufferPool pool,
@@ -108,7 +110,8 @@ extends DecoratingOutputService<E> {
     }
 
     @Override
-    public @CheckForNull E entry(String name) {
+    public @CheckForNull
+    E entry(String name) {
         final E entry = container.entry(name);
         if (null != entry) return entry;
         final BufferedEntryOutputStream out = buffers.get(name);
@@ -119,16 +122,20 @@ extends DecoratingOutputService<E> {
     public OutputSocket<E> output(final E local) {
         Objects.requireNonNull(local);
         final class Output extends DecoratingOutputSocket<E> {
-            Output() { super(container.output(local)); }
+            Output() {
+                super(container.output(local));
+            }
 
             @Override
-            public E target() { return local; }
+            public E target() {
+                return local;
+            }
 
             @Override
             public OutputStream stream(InputSocket<? extends Entry> peer)
-            throws IOException {
+                    throws IOException {
                 return isBusy() ? new BufferedEntryOutputStream(socket(), peer)
-                                : new EntryOutputStream(socket().stream(peer));
+                        : new EntryOutputStream(socket().stream(peer));
             }
         } // Output
         return new Output();
@@ -139,7 +146,7 @@ extends DecoratingOutputService<E> {
      * entry or not.
      *
      * @return Whether the container output archive is busy writing an archive
-     *         entry or not.
+     * entry or not.
      */
     public boolean isBusy() {
         return busy;
@@ -148,21 +155,27 @@ extends DecoratingOutputService<E> {
     @Override
     @DischargesObligation
     public void close() throws IOException {
-        if (isBusy())
+        if (isBusy()) {
             throw new IOException("This multiplexing output service is still busy with writing a stream!");
+        }
         storeBuffers();
         assert buffers.isEmpty();
         container.close();
     }
 
     final void storeBuffers() throws IOException {
-        if (isBusy()) return;
-        for (Iterator<BufferedEntryOutputStream> i = buffers.values().iterator(); i.hasNext(); )
-            if (i.next().storeBuffer())
-                i.remove();
+        if (!isBusy()) {
+            for (Iterator<BufferedEntryOutputStream> i = buffers.values().iterator(); i.hasNext(); ) {
+                if (i.next().storeBuffer()) {
+                    i.remove();
+                }
+            }
+        }
     }
 
-    /** This entry output stream writes directly to this output service. */
+    /**
+     * This entry output stream writes directly to this output service.
+     */
     private final class EntryOutputStream extends DecoratingOutputStream {
 
         boolean closed;
@@ -192,7 +205,7 @@ extends DecoratingOutputService<E> {
      */
     @CleanupObligation
     private final class BufferedEntryOutputStream
-    extends DecoratingOutputStream {
+            extends DecoratingOutputStream {
 
         final InputSocket<?> input;
         final OutputSocket<? extends E> output;
@@ -204,32 +217,42 @@ extends DecoratingOutputService<E> {
         BufferedEntryOutputStream(
                 final OutputSocket<? extends E> output,
                 final @CheckForNull InputSocket<? extends Entry> input)
-        throws IOException {
+                throws IOException {
             // HC SVNT DRACONES!
             final E local = (this.output = output).target();
             final Entry _peer = null != input ? input.target() : null;
             final IoBuffer buffer = this.buffer = pool.allocate();
             final Entry peer = null != _peer ? _peer : buffer;
             final class InputProxy extends DecoratingInputSocket<Entry> {
-                InputProxy() { super(buffer.input()); }
+                InputProxy() {
+                    super(buffer.input());
+                }
 
                 @Override
-                public Entry target() { return peer; }
+                public Entry target() {
+                    return peer;
+                }
             } // InputProxy
             try {
                 this.input = new InputProxy();
                 this.out = buffer.output().stream(null);
             } catch (final Throwable ex) {
-                try { buffer.release(); }
-                catch (final Throwable ex2) { ex.addSuppressed(ex2); }
+                try {
+                    buffer.release();
+                } catch (final Throwable ex2) {
+                    ex.addSuppressed(ex2);
+                }
                 throw ex;
             }
             buffers.put(local.getName(), this);
         }
 
         E getTarget() {
-            try { return output.target(); }
-            catch (final IOException ex) { throw new AssertionError(ex); }
+            try {
+                return output.target();
+            } catch (final IOException ex) {
+                throw new AssertionError(ex);
+            }
         }
 
         @Override

@@ -9,12 +9,15 @@ import net.java.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 /**
  * @author Christian Schlichtherle
  */
-public final class WinZipAesDriverTest
-extends FsArchiveDriverTestSuite<ZipDriverEntry, ZipDriver> {
+public final class WinZipAesDriverTest extends FsArchiveDriverTestSuite<ZipDriverEntry, ZipDriver> {
 
     @Override
-    protected ZipDriver newArchiveDriver() { return new TestWinZipAesDriver(); }
+    protected ZipDriver newArchiveDriver() {
+        return new TestWinZipAesDriver();
+    }
 
     @Override
-    protected String getUnencodableName() { return "\u2297"; }
+    protected String getUnencodableName() {
+        return "\u2297";
+    }
 }

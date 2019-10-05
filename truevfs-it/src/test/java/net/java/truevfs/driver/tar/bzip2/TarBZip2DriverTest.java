@@ -10,8 +10,7 @@ import net.java.truevfs.kernel.spec.FsArchiveDriverTestSuite;
 /**
  * @author Christian Schlichtherle
  */
-public final class TarBZip2DriverTest
-extends FsArchiveDriverTestSuite<TarDriverEntry, TarBZip2Driver> {
+public final class TarBZip2DriverTest extends FsArchiveDriverTestSuite<TarDriverEntry, TarBZip2Driver> {
 
     @Override
     protected TarBZip2Driver newArchiveDriver() {
