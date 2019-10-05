@@ -13,7 +13,7 @@ dist: xenial
 # Don't use slim or alpine images here - the SBT Wrapper runs a shell script which wouldn't always work then:
 env:
   - COMPILE_IMAGE_TAG=8-jdk TEST_IMAGE_TAG=8-jdk
-  - COMPILE_IMAGE_TAG=8-jdk TEST_IMAGE_TAG=13-jdk
+  - COMPILE_IMAGE_TAG=8-jdk TEST_IMAGE_TAG=12-jdk
 
 install: ./docker-sbtx $COMPILE_IMAGE_TAG +test:compile
 
