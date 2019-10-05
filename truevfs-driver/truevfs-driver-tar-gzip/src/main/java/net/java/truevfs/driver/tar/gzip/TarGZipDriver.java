@@ -4,12 +4,8 @@
  */
 package net.java.truevfs.driver.tar.gzip;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.zip.Deflater;
-import java.util.zip.GZIPInputStream;
-import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.cio.InputService;
+import net.java.truecommons.cio.OutputService;
 import net.java.truecommons.io.AbstractSink;
 import net.java.truecommons.io.AbstractSource;
 import net.java.truecommons.io.Streams;
@@ -18,16 +14,20 @@ import net.java.truevfs.comp.tardriver.TarDriver;
 import net.java.truevfs.comp.tardriver.TarDriverEntry;
 import net.java.truevfs.comp.tardriver.TarInputService;
 import net.java.truevfs.comp.tardriver.TarOutputService;
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import static net.java.truevfs.kernel.spec.FsAccessOption.STORE;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsInputSocketSource;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsNodeName;
-import net.java.truevfs.kernel.spec.FsOutputSocketSink;
-import net.java.truecommons.cio.InputService;
+import net.java.truevfs.kernel.spec.*;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
-import net.java.truecommons.cio.OutputService;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.WillNotClose;
+import javax.annotation.concurrent.Immutable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.zip.Deflater;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
+
+import static net.java.truevfs.kernel.spec.FsAccessOption.STORE;
 
 /**
  * An archive driver for GZIP compressed TAR files (TAR.GZIP).
@@ -67,14 +67,16 @@ public class TarGZipDriver extends TarDriver {
     protected InputService<TarDriverEntry> newInput(
             final FsModel model,
             final FsInputSocketSource source)
-    throws IOException {
-        final class Source extends AbstractSource {
+            throws IOException {
+
+        class Source extends AbstractSource {
+
             @Override
             public InputStream stream() throws IOException {
                 final InputStream in = source.stream();
                 try {
                     return new GZIPInputStream(in, getBufferSize());
-                } catch(final Throwable ex) {
+                } catch (final Throwable ex) {
                     try {
                         in.close();
                     } catch (final Throwable ex2) {
@@ -83,7 +85,7 @@ public class TarGZipDriver extends TarDriver {
                     throw ex;
                 }
             }
-        } // Source
+        }
 
         return new TarInputService(model, new Source(), this);
     }
@@ -92,27 +94,28 @@ public class TarGZipDriver extends TarDriver {
     protected OutputService<TarDriverEntry> newOutput(
             final FsModel model,
             final FsOutputSocketSink sink,
-            final InputService<TarDriverEntry> input)
-    throws IOException {
-        final class Sink extends AbstractSink {
+            final @CheckForNull @WillNotClose InputService<TarDriverEntry> input)
+            throws IOException {
+
+        class Sink extends AbstractSink {
+
             @Override
             public OutputStream stream() throws IOException {
                 final OutputStream out = sink.stream();
                 try {
-                    return new GZIPOutputStream(out, getBufferSize(), getLevel());
-                } catch(final Throwable ex) {
+                    return new FixedGZIPOutputStream(out, getBufferSize(), getLevel());
+                } catch (final Throwable t1) {
                     try {
                         out.close();
-                    } catch (final Throwable ex2) {
-                        ex.addSuppressed(ex2);
+                    } catch (Throwable t2) {
+                        t1.addSuppressed(t2);
                     }
-                    throw ex;
+                    throw t1;
                 }
             }
-        } // Sink
+        }
 
-        return new MultiplexingOutputService<>(getPool(),
-                new TarOutputService(model, new Sink(), this));
+        return new MultiplexingOutputService<>(getPool(), new TarOutputService(model, new Sink(), this));
     }
 
     /**
@@ -127,17 +130,29 @@ public class TarGZipDriver extends TarDriver {
         // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
         // opportunity to apply its own preferences to sort out such a conflict.
         options = options.set(STORE);
-        return new FsOutputSocketSink(options,
-                controller.output(options, name, null));
+        return new FsOutputSocketSink(options, controller.output(options, name, null));
     }
 
-    /** Extends its super class to set the deflater level. */
-    private static final class GZIPOutputStream
-    extends java.util.zip.GZIPOutputStream {
-        GZIPOutputStream(OutputStream out, int size, int level)
-        throws IOException {
+    /**
+     * Extends its super class to set the deflater level.
+     */
+    private static final class FixedGZIPOutputStream extends GZIPOutputStream {
+
+        private boolean closed;
+
+        FixedGZIPOutputStream(OutputStream out, int size, int level) throws IOException {
             super(out, size);
             def.setLevel(level);
         }
-    } // GZIPOutputStream
+
+        @Override
+        public void close() throws IOException {
+            if (closed) {
+                out.close(); // enable recovery
+            } else {
+                closed = true;
+                super.close();
+            }
+        }
+    }
 }

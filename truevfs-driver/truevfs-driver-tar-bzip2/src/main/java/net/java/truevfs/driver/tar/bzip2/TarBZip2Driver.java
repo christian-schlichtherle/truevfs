@@ -16,11 +16,10 @@ import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.WillNotClose;
 import javax.annotation.concurrent.Immutable;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 
 import static net.java.truevfs.kernel.spec.FsAccessOption.STORE;
 
@@ -62,8 +61,10 @@ public class TarBZip2Driver extends TarDriver {
     protected InputService<TarDriverEntry> newInput(
             final FsModel model,
             final FsInputSocketSource source)
-    throws IOException {
-        final class Source extends AbstractSource {
+            throws IOException {
+
+        class Source extends AbstractSource {
+
             @Override
             public InputStream stream() throws IOException {
                 final InputStream in = source.stream();
@@ -79,7 +80,8 @@ public class TarBZip2Driver extends TarDriver {
                     throw ex;
                 }
             }
-        } // Source
+        }
+
         return new TarInputService(model, new Source(), this);
     }
 
@@ -87,9 +89,11 @@ public class TarBZip2Driver extends TarDriver {
     protected OutputService<TarDriverEntry> newOutput(
             final FsModel model,
             final FsOutputSocketSink sink,
-            final InputService<TarDriverEntry> input)
-    throws IOException {
-        final class Sink extends AbstractSink {
+            final @CheckForNull @WillNotClose InputService<TarDriverEntry> input)
+            throws IOException {
+
+        class Sink extends AbstractSink {
+
             @Override
             public OutputStream stream() throws IOException {
                 final OutputStream out = sink.stream();
@@ -97,18 +101,18 @@ public class TarBZip2Driver extends TarDriver {
                     return new FixedBZip2CompressorOutputStream(
                             new FixedBufferedOutputStream(out, getBufferSize()),
                             getLevel());
-                } catch (final Throwable ex) {
+                } catch (final Throwable t1) {
                     try {
                         out.close();
-                    } catch (final Throwable ex2) {
-                        ex.addSuppressed(ex2);
+                    } catch (Throwable t2) {
+                        t1.addSuppressed(t2);
                     }
-                    throw ex;
+                    throw t1;
                 }
             }
-        } // Sink
-        return new MultiplexingOutputService<>(getPool(),
-                new TarOutputService(model, new Sink(), this));
+        }
+
+        return new MultiplexingOutputService<>(getPool(), new TarOutputService(model, new Sink(), this));
     }
 
     /**
@@ -123,27 +127,27 @@ public class TarBZip2Driver extends TarDriver {
         // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
         // opportunity to apply its own preferences to sort out such a conflict.
         options = options.set(STORE);
-        return new FsOutputSocketSink(options,
-                controller.output(options, name, null));
+        return new FsOutputSocketSink(options, controller.output(options, name, null));
     }
 
     private static final class FixedBZip2CompressorOutputStream extends BZip2CompressorOutputStream {
 
-        final FixedBufferedOutputStream out;
+        final OutputStream out;
+        boolean closed;
 
-        FixedBZip2CompressorOutputStream(final FixedBufferedOutputStream out, final int level) throws IOException {
+        FixedBZip2CompressorOutputStream(final OutputStream out, final int level) throws IOException {
             super(out, level);
             this.out = out;
         }
 
         @Override
         public void close() throws IOException {
-            // Workaround for super class implementation which fails to close the decorated stream on a subsequent call
-            // if the initial attempt failed with a throwable - see http://java.net/jira/browse/TRUEZIP-234 .
-            out.setIgnoreClose(true);
-            super.close();
-            out.setIgnoreClose(false);
-            out.close();
+            if (closed) {
+                out.close(); // enable recovery
+            } else {
+                closed = true;
+                super.close();
+            }
         }
     }
 }
