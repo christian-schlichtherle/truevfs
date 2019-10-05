@@ -13,5 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 addSbtPlugin("com.github.gseitz" % "sbt-release" % "1.0.11")
