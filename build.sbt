@@ -330,6 +330,7 @@ lazy val extInsight: Project = project
       """Instruments the TrueVFS Kernel for statistics monitoring via JMX.
         |Add the JAR artifact of this module to the run time class path to make its services available for service location in the client API modules.""".stripMargin,
     libraryDependencies ++= Seq(
+      FunIoBIOS % Test,
       JunitInterface % Test,
       Scalatest % Test
     ),
@@ -389,6 +390,7 @@ lazy val it: Project = project
     description :=
       """Provides integration tests for TrueVFS.""".stripMargin,
     libraryDependencies ++= Seq(
+      FunIoBIOS % Test,
       JunitInterface % Test,
       MockitoCore % Test,
       Scalacheck % Test,

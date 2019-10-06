@@ -24,6 +24,7 @@ object Dependencies {
   val BcprovJdk15on: ModuleID = "org.bouncycastle" % "bcprov-jdk15on" % "1.63"
   val CommonsCompress: ModuleID = "org.apache.commons" % "commons-compress" % "1.19"
   val FindbugsAnnotations: ModuleID = "com.google.code.findbugs" % "annotations" % "3.0.1u2" exclude("com.google.code.findbugs", "jsr305") exclude("net.jcip", "jcip-annotations")
+  val FunIoBIOS: ModuleID = "global.namespace.fun-io" % "fun-io-bios" % "2.2.0"
   val Httpclient: ModuleID = "org.apache.httpcomponents" % "httpclient" % "4.5.10" exclude("commons-logging", "commons-logging")
   val JclOverSlf4j: ModuleID = "org.slf4j" % "jcl-over-slf4j" % Slf4jVersion
   val Junit: ModuleID = "junit" % "junit" % "4.12"

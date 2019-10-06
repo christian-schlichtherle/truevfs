@@ -6,7 +6,7 @@ package net.java.truevfs.access
 
 import java.util.concurrent._
 
-import global.namespace.scala.plus.ResourceLoan._
+import global.namespace.fun.io.api.Socket
 import net.java.truecommons.services._
 import net.java.truecommons.shed._
 import net.java.truevfs.access.TConfig._
@@ -26,20 +26,28 @@ import scala.collection.JavaConverters._
   *
   * @author Christian Schlichtherle
   */
-class TConfigTest extends WordSpec {
+class TConfigSpec extends WordSpec {
+
+  private lazy val configSocket: Socket[TConfig] = () => TConfig.open()
 
   private def inNewChild[V](operation: => V) {
     var ex: Throwable = null
     val r = new Runnable() {
+
       def run() {
-        try { operation }
-        catch { case ex2: Throwable => ex = ex2 }
+        try {
+          operation
+        } catch {
+          case ex2: Throwable => ex = ex2
+        }
       }
     }
     val t = new Thread(r)
-    t start ()
-    t join ()
-    if (null != ex) throw new ExecutionException(ex)
+    t.start()
+    t.join()
+    if (null != ex) {
+      throw new ExecutionException(ex)
+    }
   }
 
   "The TConfig class" should {
@@ -48,26 +56,32 @@ class TConfigTest extends WordSpec {
     }
 
     "throw an  IllegalStateException when calling close() without a prior call to open()" in {
-      intercept[IllegalStateException] { current close () }
+      intercept[IllegalStateException] {
+        current.close()
+      }
     }
 
     "correctly implement current()/open()/close()" in {
       val c1 = current
-      loan(open()) to { c2 =>
-        c2 should not be theSameInstanceAs (c1)
-        c2 should equal (c1)
+      configSocket accept { c2 =>
+        c2 should not be theSameInstanceAs(c1)
+        c2 should equal(c1)
         current should be theSameInstanceAs c2
         inNewChild {
           current should be theSameInstanceAs c2
-          intercept[IllegalStateException] { current close () }
+          intercept[IllegalStateException] {
+            current.close()
+          }
         }
-        loan(open()) to { c3 =>
-          c3 should not be theSameInstanceAs (c2)
-          c3 should equal (c2)
+        configSocket accept { c3 =>
+          c3 should not be theSameInstanceAs(c2)
+          c3 should equal(c2)
           current should be theSameInstanceAs c3
           inNewChild {
             current should be theSameInstanceAs c3
-            intercept[IllegalStateException] { current close () }
+            intercept[IllegalStateException] {
+              current.close()
+            }
           }
         }
         current should be theSameInstanceAs c2
@@ -80,17 +94,19 @@ class TConfigTest extends WordSpec {
     "be correctly initialized" in {
       GLOBAL.getManager should be theSameInstanceAs FsManagerLocator.SINGLETON.get
       GLOBAL.getArchiveDetector should be theSameInstanceAs TArchiveDetector.ALL
-      GLOBAL.getAccessPreferences should equal (BitField.of(CREATE_PARENTS))
+      GLOBAL.getAccessPreferences should equal(BitField.of(CREATE_PARENTS))
     }
 
     "throw an IllegalStateException" when {
       "calling close()" in {
-        intercept[IllegalStateException] { GLOBAL close () }
+        intercept[IllegalStateException] {
+          GLOBAL.close()
+        }
       }
 
       "calling close() in an open()/close() block" in {
         intercept[IllegalStateException] {
-          loan(open()) to { _ => GLOBAL close () }
+          configSocket accept { _ => GLOBAL.close() }
         }
       }
     }
@@ -98,20 +114,24 @@ class TConfigTest extends WordSpec {
 
   "A TConfig" should {
     "update its mutable property for a file system manager" in {
-      loan(open()) to { config =>
-        intercept[NullPointerException] { config setManager null }
+      configSocket accept { config =>
+        intercept[NullPointerException] {
+          config setManager null
+        }
         config.getManager should be theSameInstanceAs FsManagerLocator.SINGLETON.get
         val manager = new ServiceLocator(classOf[FsManagerLocator])
-        .factory(classOf[FsManagerFactory], classOf[FsManagerDecorator])
-        .get
+          .factory(classOf[FsManagerFactory], classOf[FsManagerDecorator])
+          .get
         config setManager manager
         config.getManager should be theSameInstanceAs manager
       }
     }
 
     "update its mutable property for an archive detector" in {
-      loan(open()) to { config =>
-        intercept[NullPointerException] { config setArchiveDetector null }
+      configSocket accept { config =>
+        intercept[NullPointerException] {
+          config setArchiveDetector null
+        }
         config.getArchiveDetector should be theSameInstanceAs TArchiveDetector.ALL
         val detector = new TArchiveDetector("mok", new MockArchiveDriver())
         config setArchiveDetector detector
@@ -120,9 +140,11 @@ class TConfigTest extends WordSpec {
     }
 
     "update its mutable property for access preferences" in {
-      loan(open()) to { config =>
-        intercept[NullPointerException] { config setAccessPreferences null }
-        config.getAccessPreferences should equal (BitField.of(CREATE_PARENTS))
+      configSocket accept { config =>
+        intercept[NullPointerException] {
+          config setAccessPreferences null
+        }
+        config.getAccessPreferences should equal(BitField.of(CREATE_PARENTS))
         val preferences = BitField.of(CACHE)
         config setAccessPreferences preferences
         config.getAccessPreferences should be theSameInstanceAs preferences
@@ -130,14 +152,16 @@ class TConfigTest extends WordSpec {
     }
 
     "provide the correct default value of its property for access preferences" in {
-      loan(open()) to { config =>
-        intercept[NullPointerException] { config setAccessPreferences null }
-        config.getAccessPreferences should equal (BitField.of(CREATE_PARENTS))
+      configSocket accept { config =>
+        intercept[NullPointerException] {
+          config setAccessPreferences null
+        }
+        config.getAccessPreferences should equal(BitField.of(CREATE_PARENTS))
       }
     }
 
     "correctly update its property for access preferences with legal values" in {
-      loan(open()) to { config =>
+      configSocket accept { config =>
         val legal = Table(
           "preferences",
           BitField.of(CACHE),
@@ -152,17 +176,17 @@ class TConfigTest extends WordSpec {
           config.getAccessPreferences should be theSameInstanceAs preferences
           for (preference <- preferences.asScala) {
             config.setAccessPreference(preference, false)
-            config.getAccessPreferences should equal (preferences.clear(preference))
+            config.getAccessPreferences should equal(preferences.clear(preference))
             config.setAccessPreference(preference, true)
-            config.getAccessPreferences should equal (preferences)
-            config.getAccessPreferences should not be theSameInstanceAs (preferences)
+            config.getAccessPreferences should equal(preferences)
+            config.getAccessPreferences should not be theSameInstanceAs(preferences)
           }
         }
       }
     }
 
     "refuse to update its property for access preferences with illegal values" in {
-      loan(open()) to { config =>
+      configSocket accept { config =>
         val illegal = Table(
           "preferences",
           BitField.of(EXCLUSIVE),
