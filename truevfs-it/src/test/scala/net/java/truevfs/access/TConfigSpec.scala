@@ -7,9 +7,11 @@ package net.java.truevfs.access
 import java.util.concurrent._
 
 import global.namespace.fun.io.api.Socket
+import global.namespace.fun.io.scala.api._
 import net.java.truecommons.services._
 import net.java.truecommons.shed._
 import net.java.truevfs.access.TConfig._
+import net.java.truevfs.access.TConfigSpec._
 import net.java.truevfs.kernel.spec.FsAccessOption._
 import net.java.truevfs.kernel.spec.mock.MockArchiveDriver
 import net.java.truevfs.kernel.spec.sl._
@@ -21,34 +23,11 @@ import org.scalatest.prop.TableDrivenPropertyChecks._
 import scala.collection.JavaConverters._
 
 /** DO NOT MODIFY THE GLOBAL CONFIGURATION IN THESE TESTS!
-  * Its global scope makes it available to any other test running in parallel,
-  * if any.
+  * Its global scope makes it available to any other test running in parallel.
   *
   * @author Christian Schlichtherle
   */
 class TConfigSpec extends WordSpec {
-
-  private lazy val configSocket: Socket[TConfig] = () => TConfig.open()
-
-  private def inNewChild[V](operation: => V) {
-    var ex: Throwable = null
-    val r = new Runnable() {
-
-      def run() {
-        try {
-          operation
-        } catch {
-          case ex2: Throwable => ex = ex2
-        }
-      }
-    }
-    val t = new Thread(r)
-    t.start()
-    t.join()
-    if (null != ex) {
-      throw new ExecutionException(ex)
-    }
-  }
 
   "The TConfig class" should {
     "have the GLOBAL configuration as its current() configuration by default" in {
@@ -206,6 +185,31 @@ class TConfigSpec extends WordSpec {
           }
         }
       }
+    }
+  }
+}
+
+private object TConfigSpec {
+
+  private lazy val configSocket: Socket[TConfig] = () => TConfig.open()
+
+  private def inNewChild[V](operation: => V) {
+    var ex: Throwable = null
+    val r = new Runnable() {
+
+      def run() {
+        try {
+          operation
+        } catch {
+          case ex2: Throwable => ex = ex2
+        }
+      }
+    }
+    val t = new Thread(r)
+    t.start()
+    t.join()
+    if (null != ex) {
+      throw new ExecutionException(ex)
     }
   }
 }

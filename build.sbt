@@ -391,6 +391,7 @@ lazy val it: Project = project
       """Provides integration tests for TrueVFS.""".stripMargin,
     libraryDependencies ++= Seq(
       FunIoBIOS % Test,
+      FunIoScalaApi % Test,
       JunitInterface % Test,
       MockitoCore % Test,
       Scalacheck % Test,

@@ -4,10 +4,11 @@
  */
 package net.java.truevfs.access
 
-import java.net.{Socket => _, _}
+import java.net.URI
 
 import global.namespace.fun.io.api.Socket
 import global.namespace.fun.io.bios.BIOS
+import global.namespace.fun.io.scala.api._
 import net.java.truevfs.access.TFile2Spec._
 import net.java.truevfs.kernel.spec._
 import org.scalatest.Matchers._

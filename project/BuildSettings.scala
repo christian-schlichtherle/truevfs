@@ -78,7 +78,7 @@ object BuildSettings {
           }
         )
       },
-      scalaVersion := ScalaVersion_2_12, // set here or otherwise `+publishSigned` will fail
+      scalaVersion := ScalaVersion_2_13, // set here or otherwise `+publishSigned` will fail
       scmInfo := Some(ScmInfo(
         browseUrl = url("https://github.com/christian-schlichtherle/truevfs"),
         connection = "scm:git:git@github.com/christian-schlichtherle/truevfs.git",
@@ -129,7 +129,7 @@ object BuildSettings {
 
   lazy val scalaLibrarySettings: Seq[Setting[_]] = {
     librarySettings ++ Seq(
-      crossScalaVersions := Seq(ScalaVersion_2_10, ScalaVersion_2_11, ScalaVersion_2_12)
+      crossScalaVersions := Seq(ScalaVersion_2_10, ScalaVersion_2_11, ScalaVersion_2_12, ScalaVersion_2_13)
     )
   }
 }

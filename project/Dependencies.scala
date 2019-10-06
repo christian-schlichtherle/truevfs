@@ -18,13 +18,15 @@ import sbt._
 
 object Dependencies {
 
+  val FunIoVersion: String = "2.2.0"
   val TruecommonsVersion: String = "2.5.0"
   val Slf4jVersion: String = "1.7.28"
 
   val BcprovJdk15on: ModuleID = "org.bouncycastle" % "bcprov-jdk15on" % "1.63"
   val CommonsCompress: ModuleID = "org.apache.commons" % "commons-compress" % "1.19"
   val FindbugsAnnotations: ModuleID = "com.google.code.findbugs" % "annotations" % "3.0.1u2" exclude("com.google.code.findbugs", "jsr305") exclude("net.jcip", "jcip-annotations")
-  val FunIoBIOS: ModuleID = "global.namespace.fun-io" % "fun-io-bios" % "2.2.0"
+  val FunIoBIOS: ModuleID = "global.namespace.fun-io" % "fun-io-bios" % FunIoVersion
+  val FunIoScalaApi: ModuleID = "global.namespace.fun-io" %% "fun-io-scala-api" % FunIoVersion
   val Httpclient: ModuleID = "org.apache.httpcomponents" % "httpclient" % "4.5.10" exclude("commons-logging", "commons-logging")
   val JclOverSlf4j: ModuleID = "org.slf4j" % "jcl-over-slf4j" % Slf4jVersion
   val Junit: ModuleID = "junit" % "junit" % "4.12"
@@ -51,5 +53,5 @@ object Dependencies {
   val ScalaVersion_2_10: String = sys.env.getOrElse("SCALA_VERSION_2_10", "2.10.7")
   val ScalaVersion_2_11: String = sys.env.getOrElse("SCALA_VERSION_2_11", "2.11.12")
   val ScalaVersion_2_12: String = sys.env.getOrElse("SCALA_VERSION_2_12", "2.12.10")
-//  val ScalaVersion_2_13: String = sys.env.getOrElse("SCALA_VERSION_2_13", "2.13.1")
+  val ScalaVersion_2_13: String = sys.env.getOrElse("SCALA_VERSION_2_13", "2.13.1")
 }
