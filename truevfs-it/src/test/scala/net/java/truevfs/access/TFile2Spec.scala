@@ -21,7 +21,7 @@ class TFile2Spec extends WordSpec {
 
   "A TFile" should {
     "be round-trip encodable using object serialization and XML" in {
-      configSocket.accept { config =>
+      configSocket.accept { config: TConfig =>
         setUp(config)
         forAll(uris) { uri =>
           val original = new TFile(URI.create(uri))

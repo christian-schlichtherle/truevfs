@@ -42,7 +42,7 @@ class TConfigSpec extends WordSpec {
 
     "correctly implement current()/open()/close()" in {
       val c1 = current
-      configSocket accept { c2 =>
+      configSocket accept { c2: TConfig =>
         c2 should not be theSameInstanceAs(c1)
         c2 should equal(c1)
         current should be theSameInstanceAs c2
@@ -52,7 +52,7 @@ class TConfigSpec extends WordSpec {
             current.close()
           }
         }
-        configSocket accept { c3 =>
+        configSocket accept { c3: TConfig =>
           c3 should not be theSameInstanceAs(c2)
           c3 should equal(c2)
           current should be theSameInstanceAs c3
@@ -85,7 +85,7 @@ class TConfigSpec extends WordSpec {
 
       "calling close() in an open()/close() block" in {
         intercept[IllegalStateException] {
-          configSocket accept { _ => GLOBAL.close() }
+          configSocket accept { _: TConfig => GLOBAL.close() }
         }
       }
     }
@@ -93,7 +93,7 @@ class TConfigSpec extends WordSpec {
 
   "A TConfig" should {
     "update its mutable property for a file system manager" in {
-      configSocket accept { config =>
+      configSocket accept { config: TConfig =>
         intercept[NullPointerException] {
           config setManager null
         }
@@ -107,7 +107,7 @@ class TConfigSpec extends WordSpec {
     }
 
     "update its mutable property for an archive detector" in {
-      configSocket accept { config =>
+      configSocket accept { config: TConfig =>
         intercept[NullPointerException] {
           config setArchiveDetector null
         }
@@ -119,7 +119,7 @@ class TConfigSpec extends WordSpec {
     }
 
     "update its mutable property for access preferences" in {
-      configSocket accept { config =>
+      configSocket accept { config: TConfig =>
         intercept[NullPointerException] {
           config setAccessPreferences null
         }
@@ -131,7 +131,7 @@ class TConfigSpec extends WordSpec {
     }
 
     "provide the correct default value of its property for access preferences" in {
-      configSocket accept { config =>
+      configSocket accept { config: TConfig =>
         intercept[NullPointerException] {
           config setAccessPreferences null
         }
@@ -140,7 +140,7 @@ class TConfigSpec extends WordSpec {
     }
 
     "correctly update its property for access preferences with legal values" in {
-      configSocket accept { config =>
+      configSocket accept { config: TConfig =>
         val legal = Table(
           "preferences",
           BitField.of(CACHE),
@@ -165,7 +165,7 @@ class TConfigSpec extends WordSpec {
     }
 
     "refuse to update its property for access preferences with illegal values" in {
-      configSocket accept { config =>
+      configSocket accept { config: TConfig =>
         val illegal = Table(
           "preferences",
           BitField.of(EXCLUSIVE),
