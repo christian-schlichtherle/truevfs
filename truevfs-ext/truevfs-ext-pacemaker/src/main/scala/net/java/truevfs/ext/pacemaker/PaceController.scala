@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.ext.pacemaker
 
-import global.namespace.scala.plus.OnTryFinally._
 import net.java.truecommons.shed._
 import net.java.truevfs.kernel.spec._
 
@@ -16,14 +15,28 @@ import net.java.truevfs.kernel.spec._
   * @author Christian Schlichtherle
   */
 private class PaceController(manager: PaceManager, controller: FsController)
-extends AspectController(controller) {
+  extends AspectController(controller) {
 
-  override def apply[V](operation: () => V) =
-    onTry {
+  override def apply[V](operation: () => V): V = {
+    var t1: Throwable = null
+    try {
       operation()
-    } onFinally {
-      manager recordAccess getMountPoint
+    } catch {
+      case t2: Throwable => t1 = t2; throw t2
+    } finally {
+      try {
+        manager recordAccess getMountPoint
+      } catch {
+        case t2: Throwable =>
+          t1 match {
+            case null => throw t2
+            case _ => t1.addSuppressed(t2)
+          }
+      }
     }
+  }
 
-  override def sync(options: BitField[FsSyncOption]) { controller sync options } // skip apply!
+  override def sync(options: BitField[FsSyncOption]) {
+    controller sync options
+  } // skip apply!
 }
