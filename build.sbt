@@ -36,7 +36,8 @@ lazy val access: Project = project
       JunitInterface % Test,
       MockitoCore % Test,
       Scalacheck % Test,
-      Scalatest % Test
+      Scalatest % Test,
+      Slf4jSimple % Test
     ),
     name := "TrueVFS Access",
     normalizedName := "truevfs-access"
@@ -102,6 +103,7 @@ lazy val compJmx: Project = project
     libraryDependencies ++= Seq(
       JunitInterface % Test,
       Scalatest % Test,
+      Slf4jSimple % Test,
       TruecommonsJMX
     ),
     name := "TrueVFS Component JMX",
@@ -182,7 +184,8 @@ lazy val driverFile: Project = project
       """Provides a file system driver for accessing the platform file system.
         |Add the JAR artifact of this module to the run time class path to make its file system drivers available for service location in the client API modules.""".stripMargin,
     libraryDependencies ++= Seq(
-      JunitInterface % Test
+      JunitInterface % Test,
+      Slf4jSimple % Test
     ),
     name := "TrueVFS Driver FILE",
     normalizedName := "truevfs-driver-file"
@@ -442,6 +445,7 @@ lazy val kernelSpec: Project = project
         |Provides a service provider API for a singleton file system manager, an I/O buffer pool and a file system driver map.""".stripMargin,
     libraryDependencies ++= Seq(
       JunitInterface % Test,
+      Slf4jSimple % Test,
       TruecommonsAnnotations,
       TruecommonsCIO,
       TruecommonsIO,
