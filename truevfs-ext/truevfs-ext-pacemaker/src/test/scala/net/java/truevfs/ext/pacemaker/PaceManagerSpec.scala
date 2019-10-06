@@ -7,7 +7,7 @@ package net.java.truevfs.ext.pacemaker
 import java.net._
 
 import net.java.truecommons.shed.{Filter, _}
-import net.java.truevfs.ext.pacemaker.PaceManagerTest.{Expectation, _}
+import net.java.truevfs.ext.pacemaker.PaceManagerSpec.{Expectation, _}
 import net.java.truevfs.kernel.spec._
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
@@ -21,7 +21,7 @@ import org.scalatestplus.mockito.MockitoSugar.mock
 import scala.language.implicitConversions
 
 /** @author Christian Schlichtherle */
-class PaceManagerTest extends WordSpec with OneInstancePerTest {
+class PaceManagerSpec extends WordSpec with OneInstancePerTest {
 
   "A PaceManager" should {
     val mediator = new PaceMediator
@@ -135,14 +135,12 @@ class PaceManagerTest extends WordSpec with OneInstancePerTest {
         }
       }
 
-      new FsSync()
-        .manager(manager)
-        .run()
+      new FsSync().manager(manager).run()
     }
   }
 }
 
-private object PaceManagerTest {
+private object PaceManagerSpec {
 
   type ArchiveDriver = FsArchiveDriver[_ <: FsArchiveEntry]
   type ControllerFilter = Filter[_ >: FsController]

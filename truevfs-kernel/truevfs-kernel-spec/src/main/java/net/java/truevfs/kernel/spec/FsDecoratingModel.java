@@ -14,7 +14,9 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public abstract class FsDecoratingModel extends FsAbstractModel {
 
-    /** The decorated file system model. */
+    /**
+     * The decorated file system model.
+     */
     protected final FsModel model;
 
     protected FsDecoratingModel(final FsModel model) {
@@ -23,10 +25,14 @@ public abstract class FsDecoratingModel extends FsAbstractModel {
     }
 
     @Override
-    public boolean isMounted() { return model.isMounted(); }
+    public boolean isMounted() {
+        return model.isMounted();
+    }
 
     @Override
-    public void setMounted(boolean touched) { model.setMounted(touched); }
+    public void setMounted(boolean mounted) {
+        model.setMounted(mounted);
+    }
 
     /**
      * Returns a string representation of this object for debugging and logging
@@ -34,9 +40,6 @@ public abstract class FsDecoratingModel extends FsAbstractModel {
      */
     @Override
     public String toString() {
-        return String.format("%s@%x[model=%s]",
-                getClass().getName(),
-                hashCode(),
-                model);
+        return String.format("%s@%x[model=%s]", getClass().getName(), hashCode(), model);
     }
 }

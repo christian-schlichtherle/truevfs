@@ -14,18 +14,17 @@ import net.java.truevfs.kernel.spec._
   *
   * @author Christian Schlichtherle
   */
-private class PaceController(manager: PaceManager, controller: FsController)
-  extends AspectController(controller) {
+private class PaceController(manager: PaceManager, controller: FsController) extends AspectController(controller) {
 
-  override def apply[V](operation: () => V): V = {
+  override def apply[V](op: () => V): V = {
     var t1: Throwable = null
     try {
-      operation()
+      op()
     } catch {
       case t2: Throwable => t1 = t2; throw t2
     } finally {
       try {
-        manager recordAccess getMountPoint
+        manager.recordAccess(getMountPoint)
       } catch {
         case t2: Throwable =>
           t1 match {
@@ -36,7 +35,5 @@ private class PaceController(manager: PaceManager, controller: FsController)
     }
   }
 
-  override def sync(options: BitField[FsSyncOption]): Unit = {
-    controller sync options
-  } // skip apply!
+  override def sync(options: BitField[FsSyncOption]): Unit = controller.sync(options) // skip apply!
 }

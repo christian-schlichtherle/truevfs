@@ -16,9 +16,9 @@ private final class PaceManagerView(manager: PaceManager)
   extends JmxManagerView[PaceManager](classOf[PaceManagerMXBean], manager)
     with PaceManagerMXBean {
 
-  protected override def getDescription(info: MBeanInfo): String = "A pace maker for the file system manager."
+  override protected def getDescription(info: MBeanInfo): String = "A pace maker for the file system manager."
 
-  protected override def getDescription(info: MBeanAttributeInfo): String = {
+  override protected def getDescription(info: MBeanAttributeInfo): String = {
     info.getName match {
       case "MaximumFileSystemsMounted" => "The maximum number of mounted file systems."
       case _ => super.getDescription(info)
@@ -27,7 +27,5 @@ private final class PaceManagerView(manager: PaceManager)
 
   override def getMaximumFileSystemsMounted: Int = manager.maximumSize
 
-  override def setMaximumFileSystemsMounted(maximumSize: Int): Unit = {
-    manager.maximumSize = maximumSize
-  }
+  override def setMaximumFileSystemsMounted(maximumSize: Int): Unit = manager.maximumSize = maximumSize
 }

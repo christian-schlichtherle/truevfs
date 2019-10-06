@@ -5,7 +5,7 @@ import java.util.concurrent.locks.{Lock, ReadWriteLock, ReentrantReadWriteLock}
 import java.util.{concurrent => juc}
 import java.{util => ju}
 
-import net.java.truecommons.shed.HashMaps
+import net.java.truecommons.shed.HashMaps.initialCapacity
 
 import scala.collection.JavaConverters._
 
@@ -40,7 +40,7 @@ private final class LruCache[I <: AnyRef](initialMaximumSize: Int) {
     _maximumSize = maximumSize
   }
 
-  def add(item: I): Boolean = writeLocked { _cached put (item, true) }
+  def add(item: I): Boolean = writeLocked(_cached.put(item, value = true))
 
   /** Records access to the given mount point.
     * This method has no effect if the given mount point is not present in this
@@ -49,13 +49,12 @@ private final class LruCache[I <: AnyRef](initialMaximumSize: Int) {
   def recordAccess(item: I): Unit = {
     // The lookup needs to be write-locked because the access-ordered cache map
     // may get structurally modified as a side effect.
-    writeLocked { _cached get item }
+    writeLocked(_cached get item)
   }
 
-  def remove(item: I): Boolean = writeLocked { _cached remove item }
+  def remove(item: I): Boolean = writeLocked(_cached remove item)
 
-  def exists(predicate: I => Boolean): Boolean =
-    readLocked { _cached exists predicate }
+  def exists(predicate: I => Boolean): Boolean = readLocked(_cached exists predicate)
 
   private def readLocked[V]: (=> V) => V = locked[V](_readLock)
 
@@ -71,26 +70,26 @@ private final class LruCache[I <: AnyRef](initialMaximumSize: Int) {
   }
 
   private final class CacheMap
-    extends ju.LinkedHashMap[I, Boolean](HashMaps initialCapacity initialMaximumSize, 0.75f, true) {
+    extends ju.LinkedHashMap[I, Boolean](initialCapacity(initialMaximumSize), 0.75f, true) {
 
     override def removeEldestEntry(entry: Entry[I, Boolean]): Boolean =
       if (size > maximumSize) {
-        _evicted put (entry.getKey, entry.getValue)
+        _evicted.put(entry.getKey, entry.getValue)
         true
       } else {
         false
       }
 
     override def put(key: I, value: Boolean): Boolean = {
-      _evicted remove key
+      _evicted.remove(key)
       super.put(key, value)
     }
 
     override def remove(key: Object): Boolean = {
-      _evicted remove key
+      _evicted.remove(key)
       super.remove(key)
     }
 
-    def exists(predicate: I => Boolean): Boolean = keySet.asScala exists predicate
+    def exists(predicate: I => Boolean): Boolean = keySet.asScala.exists(predicate)
   }
 }

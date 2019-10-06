@@ -21,8 +21,9 @@ package object pacemaker {
   /** The name of the system property which determines the initial maximum
     * number of mounted archive file systems.
     */
-  val maximumFileSystemsMountedPropertyKey: String =
+  val maximumFileSystemsMountedPropertyKey: String = {
     classOf[PaceManagerMXBean].getPackage.getName + ".maximumFileSystemsMounted"
+  }
 
   /** The minimum value for the maximum number of mounted archive file systems.
     * This value must not be less than two or otherwise you couldn't even copy
@@ -43,8 +44,10 @@ package object pacemaker {
     * is set to a value which is greater than
     * `maximumFileSystemsMountedMinimumValue`.
     */
-  val maximumFileSystemsMountedDefaultValue: Int =
-    math.max(maximumFileSystemsMountedMinimumValue,
-      Integer getInteger (maximumFileSystemsMountedPropertyKey,
-        maximumFileSystemsMountedMinimumValue))
+  val maximumFileSystemsMountedDefaultValue: Int = {
+    math.max(
+      maximumFileSystemsMountedMinimumValue,
+      Integer.getInteger(maximumFileSystemsMountedPropertyKey, maximumFileSystemsMountedMinimumValue)
+    )
+  }
 }

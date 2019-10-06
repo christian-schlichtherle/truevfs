@@ -363,7 +363,8 @@ lazy val extPacemaker: Project = project
       JunitInterface % Test,
       MockitoCore % Test,
       Scalacheck % Test,
-      Scalatest % Test
+      Scalatest % Test,
+      Slf4jSimple % Test
     ),
     name := "TrueVFS Extension Pacemaker",
     normalizedName := "truevfs-ext-pacemaker"
@@ -425,6 +426,7 @@ lazy val kernelImpl: Project = project
       JunitInterface % Test,
       MockitoCore % Test,
       Scalatest % Test,
+      Slf4jSimple % Test,
       TruecommonsShed % Test classifier "" classifier "tests"
     ),
     name := "TrueVFS Kernel Implementation",

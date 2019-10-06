@@ -4,6 +4,8 @@
  */
 package net.java.truevfs.ext.pacemaker
 
+import java.util
+
 import net.java.truevfs.comp.inst._
 import net.java.truevfs.comp.jmx._
 import net.java.truevfs.kernel.spec._
@@ -13,28 +15,29 @@ import net.java.truevfs.kernel.spec._
   *
   * @author Christian Schlichtherle
   */
-private class PaceMediator extends JmxMediator[PaceMediator] {
+private final class PaceMediator extends JmxMediator[PaceMediator] {
 
-  final val cachedMountPoints = new LruCache[FsMountPoint](maximumFileSystemsMountedDefaultValue)
-  final val evictedMountPoints = cachedMountPoints.evicted
+  val cachedMountPoints: LruCache[FsMountPoint] = new LruCache[FsMountPoint](maximumFileSystemsMountedDefaultValue)
+  val evictedMountPoints: util.Set[FsMountPoint] = cachedMountPoints.evicted
 
-  final def maximumSize: Int = cachedMountPoints.maximumSize
-  final def maximumSize_=(maximumSize: Int): Unit = {
+  def maximumSize: Int = cachedMountPoints.maximumSize
+
+  def maximumSize_=(maximumSize: Int): Unit = {
     require(maximumSize >= maximumFileSystemsMountedMinimumValue)
     cachedMountPoints.maximumSize = maximumSize
   }
 
-  final override def instrument(subject: FsManager): PaceManager =
-    activate(new PaceManager(this, subject))
+  override def instrument(subject: FsManager): PaceManager = activate(new PaceManager(this, subject))
 
-  final override def instrument(context: InstrumentingManager[PaceMediator], subject: FsController): FsController =
+  override def instrument(context: InstrumentingManager[PaceMediator], subject: FsController): FsController = {
     new PaceController(context.asInstanceOf[PaceManager], subject)
+  }
 
-  final override def instrument(context: InstrumentingManager[PaceMediator], subject: FsCompositeDriver): FsCompositeDriver =
+  override def instrument(context: InstrumentingManager[PaceMediator], subject: FsCompositeDriver): FsCompositeDriver = {
     new InstrumentingCompositeDriver(this, subject)
+  }
 
-  final override def instrument(context: InstrumentingCompositeDriver[PaceMediator], subject: FsModel): FsModel =
+  override def instrument(context: InstrumentingCompositeDriver[PaceMediator], subject: FsModel): FsModel = {
     new PaceModel(this, subject)
+  }
 }
-
-private object PaceMediator extends PaceMediator

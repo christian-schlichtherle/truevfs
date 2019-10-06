@@ -23,10 +23,10 @@ private abstract class AspectController(controller: FsController) extends FsDeco
   /**
     * Applies the aspect to the given file system operation.
     *
-    * @param  operation the file system operation to apply an aspect to.
+    * @param  op the file system operation to apply an aspect to.
     * @return The return value of the file system operation.
     */
-  protected def apply[V](operation: () => V): V
+  protected def apply[V](op: () => V): V
 
   override def node(options: AccessOptions, name: FsNodeName): FsNode = {
     apply(() => controller node(options, name))

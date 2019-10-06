@@ -16,23 +16,23 @@ import org.scalatest._
 import org.scalatestplus.mockito.MockitoSugar.mock
 
 /** @author Christian Schlichtherle */
-class PaceControllerTest extends WordSpec with OneInstancePerTest {
+class PaceControllerSpec extends WordSpec with OneInstancePerTest {
 
   "A PaceController" when {
     val manager = mock[PaceManager]
     val mountPoint = new FsMountPoint(new URI("file:///"))
     val model = mock[FsModel]
-    when(model.getMountPoint) thenReturn mountPoint
+    when(model.getMountPoint).thenReturn(mountPoint)
     val delegate = mock[FsController]
-    when(delegate.getModel) thenReturn model
+    when(delegate.getModel).thenReturn(model)
     val controller = spy(new PaceController(manager, delegate))
 
     "apply()ing its aspect" should {
       def verifyAspect(): Unit = {
-        val io = Mockito inOrder (delegate, manager)
+        val io = Mockito.inOrder(delegate, manager)
         import io._
-        verify(delegate) checkAccess (FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)
-        verify(manager) recordAccess mountPoint
+        verify(delegate).checkAccess(FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)
+        verify(manager).recordAccess(mountPoint)
         verifyNoMoreInteractions()
       }
 
@@ -42,7 +42,7 @@ class PaceControllerTest extends WordSpec with OneInstancePerTest {
       }
 
       "call PaceManager.recordAccess(delegate) even if an IOException is thrown" in {
-        when(delegate checkAccess (FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)) thenThrow new IOException()
+        when(delegate.checkAccess(FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)) thenThrow new IOException()
         intercept[IOException] {
           controller.checkAccess(FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)
         }
@@ -52,13 +52,14 @@ class PaceControllerTest extends WordSpec with OneInstancePerTest {
 
     "calling its sync(*) method" should {
       "not apply() its aspect" in {
-        controller sync null
-        verify(controller, never()) apply any()
+        controller.sync(null)
+        verify(controller, never()).apply(any())
+        ()
       }
 
       "forward the call to the decorated controller" in {
-        controller sync null
-        verify(delegate) sync null
+        controller.sync(null)
+        verify(delegate).sync(null)
       }
     }
   }
