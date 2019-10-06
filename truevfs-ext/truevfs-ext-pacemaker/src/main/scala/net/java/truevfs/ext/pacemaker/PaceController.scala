@@ -36,7 +36,7 @@ private class PaceController(manager: PaceManager, controller: FsController)
     }
   }
 
-  override def sync(options: BitField[FsSyncOption]) {
+  override def sync(options: BitField[FsSyncOption]): Unit = {
     controller sync options
   } // skip apply!
 }

@@ -5,8 +5,9 @@
 package net.java.truevfs.kernel.impl
 
 import java.util.concurrent.locks._
-import javax.annotation.concurrent._
 
+import javax.annotation.concurrent._
+import net.java.truecommons.cio.IoBufferPool
 import net.java.truecommons.shed.Link.Type._
 import net.java.truecommons.shed.{Filter, Link, Visitor}
 import net.java.truevfs.kernel.impl.DefaultManager._
@@ -80,7 +81,7 @@ extends FsAbstractManager
     }
   }
 
-  override def accept[X <: Exception, V <: Visitor[_ >: FsController, X]](filter: Filter[_ >: FsController], visitor: V) = {
+  override def accept[X <: Exception, V <: Visitor[_ >: FsController, X]](filter: Filter[_ >: FsController], visitor: V): V = {
     var allUnmounted = true
     try {
       manager withFilter { controller =>
@@ -96,13 +97,14 @@ extends FsAbstractManager
       }
     } finally {
       if (allUnmounted)
-        syncOnShutdown disarm ()
+        syncOnShutdown.disarm()
     }
     visitor
   }
 
   private case class withFilter(filter: FsController => Boolean) {
-    def accept(visitor: FsController => Unit) {
+
+    def accept(visitor: FsController => Unit): Unit = {
       readLocked { controllers.values flatMap { link => Option(link.get) } }
         .filter(filter)
         .toIndexedSeq
@@ -114,12 +116,11 @@ extends FsAbstractManager
   /** A model which schedules its controller for synchronization by observing
     * its property `mounted` - see method `sync(BitField)`.
     */
-  private final class ManagedModel(model: FsModel)
-  extends FsDecoratingModel(model) {
+  private final class ManagedModel(model: FsModel) extends FsDecoratingModel(model) {
 
-    private[this] var _controller: FsController = _
+    private var _controller: FsController = _
 
-    def init(controller: FsController) {
+    def init(controller: FsController): Unit = {
       assert(null ne controller)
       assert(!model.isMounted)
       _controller = controller
@@ -130,11 +131,11 @@ extends FsAbstractManager
      * Schedules the file system controller for synchronization according
      * to the given mount status.
      */
-    override def setMounted(mounted: Boolean) {
+    override def setMounted(mounted: Boolean): Unit = {
       writeLocked {
         if (model.isMounted != mounted) {
           if (mounted) {
-            syncOnShutdown arm ()
+            syncOnShutdown.arm()
           }
           schedule(mandatory = mounted)
           model setMounted mounted
@@ -142,13 +143,13 @@ extends FsAbstractManager
       }
     }
 
-    def schedule(mandatory: Boolean) {
+    def schedule(mandatory: Boolean): Unit = {
       assert(writeLockedByCurrentThread)
       controllers += getMountPoint -> (
         (if (mandatory) STRONG else WEAK) newLink _controller
       )
     }
-  } // ManagedModel
+  }
 }
 
 private object DefaultManager {
@@ -174,11 +175,11 @@ private object DefaultManager {
      with CacheController[E]
      with SyncController[E]
      with LockController[E] {
-    override val pool = driver.getPool
+
+    override val pool: IoBufferPool = driver.getPool
+
     require(null ne pool)
   }
 
-  private object ReverseControllerOrdering
-  extends FsControllerComparator
-     with Ordering[FsController]
+  private object ReverseControllerOrdering extends FsControllerComparator with Ordering[FsController]
 }

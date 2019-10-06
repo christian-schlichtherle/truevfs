@@ -23,7 +23,7 @@ extends ReadWriteLockAspect[ReentrantReadWriteLock] {
     * @return `true` if and only if the read lock is held by the
     *         current thread.
     */
-  final def readLockedByCurrentThread = 0 != lock.getReadHoldCount
+  final def readLockedByCurrentThread: Boolean = 0 != lock.getReadHoldCount
 
   /** Returns `true` if and only if the write lock is held by the current
     * thread.
@@ -32,7 +32,7 @@ extends ReadWriteLockAspect[ReentrantReadWriteLock] {
     * @return `true` if and only if the write lock is held by the current
     *         thread.
     */
-   final def writeLockedByCurrentThread = lock.isWriteLockedByCurrentThread
+   final def writeLockedByCurrentThread: Boolean = lock.isWriteLockedByCurrentThread
 
   /** Checks that the write lock is held by the current thread.
     * Use this method for lock control.
@@ -41,7 +41,7 @@ extends ReadWriteLockAspect[ReentrantReadWriteLock] {
     *         current thread.
     * @see    #writeLockedByCurrentThread
     */
-  final def checkWriteLockedByCurrentThread() {
+  final def checkWriteLockedByCurrentThread(): Unit = {
     if (!writeLockedByCurrentThread) throw NeedsWriteLockException()
   }
 }

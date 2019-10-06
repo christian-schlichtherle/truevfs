@@ -15,10 +15,12 @@ import org.slf4j._
 private final class LogInputChannel(
   override val context: InputSocket[_ <: Entry],
   channel: SeekableByteChannel
-) extends ReadOnlyChannel(channel) with LogCloseable with Immutable {
-  override def logger = LogInputChannel.logger
+) extends ReadOnlyChannel(channel) with LogCloseable {
+
+  override def logger: Logger = LogInputChannel.logger
 }
 
 private object LogInputChannel {
-  private val logger = LoggerFactory.getLogger(classOf[LogInputChannel])
+
+  val logger: Logger = LoggerFactory.getLogger(classOf[LogInputChannel])
 }

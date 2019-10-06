@@ -40,7 +40,7 @@ private object TFile2Spec {
 
   val configSocket: Socket[TConfig] = () => TConfig.open()
 
-  def setUp(config: TConfig) {
+  def setUp(config: TConfig): Unit = {
     val manager = mock[FsManager]
     val driver = mock[FsDriver]
     val archiveDriver = mock[FsArchiveDriver[FsArchiveEntry]]

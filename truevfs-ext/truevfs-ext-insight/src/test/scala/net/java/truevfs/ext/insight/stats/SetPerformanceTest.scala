@@ -17,7 +17,7 @@ object SetPerformanceTest {
   private val operations = 1000 * 1000
   private val interval = 100
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     for (i <- 1 to iterations) {
       printf("\nIteration %d:\n", i)
       printf("Immutable Set: %s\n", format(() => immutableSet()))
@@ -34,34 +34,40 @@ object SetPerformanceTest {
     System.nanoTime - start
   }
 
-  private def immutableSet() {
-    var set = new AtomicReference(immutable.Set[Long]())
-    for (_ <- 1 to operations) atomic(set)(update)
+  private def immutableSet(): Unit = {
+    val set = new AtomicReference(immutable.Set[Long]())
+    for (_ <- 1 to operations) {
+      atomic(set)(update)
+    }
   }
 
   private def atomic[V](ref: AtomicReference[V])(next: V => V): V = {
     while (true) {
       val expect = ref.get
       val update = next(expect)
-      if (ref.compareAndSet(expect, update)) return update
+      if (ref.compareAndSet(expect, update)) {
+        return update
+      }
     }
     throw new AssertionError
   }
 
-  private def update(set: immutable.Set[Long]) = {
+  private def update(set: immutable.Set[Long]): Predef.Set[Long] = {
     set + (Random nextInt interval)
   }
 
-  private def mutableSet() {
+  private def mutableSet(): Unit = {
     val set = mutable.Set[Long]()
-    for (_ <- 1 to operations) isolated(set)(update)
+    for (_ <- 1 to operations) {
+      isolated(set)(update)
+    }
   }
 
-  private def isolated[V <: AnyRef](obj: V)(operation: V => Unit) {
+  private def isolated[V <: AnyRef](obj: V)(operation: V => Unit): Unit = {
     obj synchronized { operation(obj) }
   }
 
-  private def update(set: mutable.Set[Long]) {
+  private def update(set: mutable.Set[Long]): Unit = {
     set += Random nextInt interval
   }
 }

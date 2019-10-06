@@ -11,15 +11,21 @@ import net.java.truecommons.cio.Entry._
 /**
   * @author Christian Schlichtherle
   */
-trait EntryAspect[E <: Entry]
-extends GenEntryAspect[E] with EntryLike {
+trait EntryAspect[E <: Entry] extends GenEntryAspect[E] with EntryLike {
+
   type IndexedProperty[-A, B] = A => B
 
-  final def size = entry.getSize(_)
-  final def time = entry.getTime(_)
-  final def permission(tµpe: Access) = { entity =>
+  final def size: Size => Long = entry.getSize(_)
+
+  final def time: Access => Long = entry.getTime(_)
+
+  final def permission(tµpe: Access): Entity => Option[Boolean] = { entity =>
     val p = entry.isPermitted(tµpe, entity)
-    if (null ne p) Option(p) else None
+    if (null ne p) {
+      Option(p)
+    } else {
+      None
+    }
   }
 }
 
@@ -27,5 +33,9 @@ extends GenEntryAspect[E] with EntryLike {
   * @author Christian Schlichtherle
   */
 object EntryAspect {
-  implicit def apply[E <: Entry](e: E) = new EntryAspect[E] { def entry = e }
+
+  implicit def apply[E <: Entry](e: E): EntryAspect[E] = new EntryAspect[E] {
+
+    def entry: E = e
+  }
 }

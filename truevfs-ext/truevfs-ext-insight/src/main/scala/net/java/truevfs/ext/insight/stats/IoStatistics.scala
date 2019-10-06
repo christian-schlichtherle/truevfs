@@ -25,7 +25,7 @@ final case class IoStatistics private (
   bytesTotal: Long,
   threadsTotal: Int,
   timeMillis: Long = System.currentTimeMillis
-) extends Immutable {
+) {
 
   require(0 <= (sequenceNumber | nanosecondsTotal | bytesTotal | threadsTotal | timeMillis))
 

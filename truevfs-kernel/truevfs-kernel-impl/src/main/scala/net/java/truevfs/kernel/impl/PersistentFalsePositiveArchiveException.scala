@@ -18,4 +18,4 @@ import java.io._
   * @author Christian Schlichtherle
   */
 private class PersistentFalsePositiveArchiveException(cause: IOException)
-extends FalsePositiveArchiveException(cause) with Immutable
+extends FalsePositiveArchiveException(cause)

@@ -11,13 +11,19 @@ import net.java.truecommons.shed._
   *
   * @author Christian Schlichtherle
   */
-private final class NeedsWriteLockException private ()
-extends ControlFlowException(false) with Immutable
+private final class NeedsWriteLockException private() extends ControlFlowException(false)
 
 private object NeedsWriteLockException {
+
   import ControlFlowException._
 
   private[this] val instance = new NeedsWriteLockException
 
-  def apply(): NeedsWriteLockException = if (isTraceable) new NeedsWriteLockException else instance
+  def apply(): NeedsWriteLockException = {
+    if (isTraceable) {
+      new NeedsWriteLockException
+    } else {
+      instance
+    }
+  }
 }

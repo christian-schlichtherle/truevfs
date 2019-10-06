@@ -7,24 +7,25 @@ package net.java.truevfs.kernel.impl
 import java.io.{CharConversionException, IOException}
 import java.net._
 import java.nio.file._
+import java.util
 import java.util.Locale
-import javax.annotation.concurrent._
 
+import javax.annotation.concurrent._
 import net.java.truecommons.cio.Entry.Access._
 import net.java.truecommons.cio.Entry.Type._
 import net.java.truecommons.cio.Entry._
 import net.java.truecommons.cio._
 import net.java.truecommons.shed.HashMaps._
 import net.java.truecommons.shed.Paths._
-import net.java.truecommons.shed._
+import net.java.truecommons.shed.{BitField, PathNormalizer, PathSplitter}
 import net.java.truevfs.kernel.impl.ArchiveFileSystem._
 import net.java.truevfs.kernel.spec.FsAccessOption._
 import net.java.truevfs.kernel.spec.FsAccessOptions._
 import net.java.truevfs.kernel.spec.FsNodeName._
 import net.java.truevfs.kernel.spec._
 
-import scala.{None, Option, Some}
 import scala.annotation._
+import scala.collection.JavaConverters._
 
 /** A read/write virtual file system for archive entries.
   *
@@ -32,8 +33,9 @@ import scala.annotation._
   * @author Christian Schlichtherle
   */
 @NotThreadSafe
-private class ArchiveFileSystem[E <: FsArchiveEntry] private (final override val model: ArchiveModel[E], master: EntryTable[E])
-extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
+private class ArchiveFileSystem[E <: FsArchiveEntry] private(final override val model: ArchiveModel[E], master: EntryTable[E])
+  extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] {
+  fs =>
 
   private val splitter = new Splitter
 
@@ -44,8 +46,9 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     this(model, new EntryTable[E](OVERHEAD_SIZE))
     val root = newEntry(RootPath, DIRECTORY, None)
     val time = System.currentTimeMillis()
-    for (access <- ALL_ACCESS)
+    for (access <- ALL_ACCESS) {
       root.setTime(access, time)
+    }
     master.add(RootPath, root)
     touched = true
   }
@@ -62,8 +65,9 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
           ae.getName.replace('\\', SEPARATOR_CHAR)), // fix illegal Windoze file name separators
         SEPARATOR_CHAR)
       master.add(path, ae)
-      if (isValidEntryName(path))
+      if (isValidEntryName(path)) {
         paths ::= path
+      }
     }
     // Setup root file system entry, potentially replacing its previous
     // mapping from the source archive.
@@ -71,8 +75,9 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     // Now perform a file system check to create missing parent directories
     // and populate directories with their members - this must be done
     // separately!
-    for (path <- paths)
+    for (path <- paths) {
       fix(path)
+    }
   }
 
   private def fullPath(name: FsNodeName) = path(name).toString
@@ -89,7 +94,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     * @param name the entry name.
     */
   @tailrec
-  private def fix(name: String) {
+  private def fix(name: String): Unit = {
     // When recursing into this method, it may be called with the root
     // directory as its parameter, so we may NOT skip the following test.
     if (!isRoot(name)) {
@@ -126,14 +131,15 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     }
   }
 
-  def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) {
-    if (master.get(name.getPath).isEmpty)
+  def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]): Unit = {
+    if (master.get(name.getPath).isEmpty) {
       throw new NoSuchFileException(fullPath(name))
+    }
   }
 
-  def setReadOnly(options: AccessOptions, name: FsNodeName) {
+  def setReadOnly(options: AccessOptions, name: FsNodeName): Unit = {
     throw new FileSystemException(fullPath(name), null,
-        "Cannot set read-only state!")
+      "Cannot set read-only state!")
   }
 
   def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]): Boolean = {
@@ -145,15 +151,17 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     touch(options)
     val ae = cn.getEntry
     var ok = true
-    for ((access, value) <- times)
-        ok &= 0 <= value && ae.setTime(access, value)
+    for ((access, value) <- times) {
+      ok &= 0 <= value && ae.setTime(access, value)
+    }
     ok
   }
 
   def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long): Boolean = {
-    if (0 > value)
+    if (0 > value) {
       throw new IllegalArgumentException(fullPath(name)
-                                         + " (negative access time)")
+        + " (negative access time)")
+    }
     val cn = master.get(name.getPath) match {
       case Some(ce) => ce
       case _ => throw new NoSuchFileException(fullPath(name))
@@ -162,8 +170,9 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     touch(options)
     val ae = cn.getEntry
     var ok = true
-    for (tµpe <- types)
-        ok &= ae.setTime(tµpe, value)
+    for (tµpe <- types) {
+      ok &= ae.setTime(tµpe, value)
+    }
     ok
   }
 
@@ -178,15 +187,15 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     * modification time of the created and linked archive file system entries
     * to the system's current time at the moment of the call to this method.
     *
-    * @param  name the archive file system entry name.
-    * @param  tµpe the type of the archive file system entry to create.
-    * @param  options if `CREATE_PARENTS` is set, any missing parent
-    *         directories will be created and linked into this file
-    *         system with its last modification time set to the system's
-    *         current time.
+    * @param  name     the archive file system entry name.
+    * @param  tµpe     the type of the archive file system entry to create.
+    * @param  options  if `CREATE_PARENTS` is set, any missing parent
+    *                  directories will be created and linked into this file
+    *                  system with its last modification time set to the system's
+    *                  current time.
     * @param  template if not `None`, then the archive file system entry
-    *         at the end of the chain shall inherit as much properties from
-    *         this entry as possible - with the exception of its name and type.
+    *                  at the end of the chain shall inherit as much properties from
+    *                  this entry as possible - with the exception of its name and type.
     * @throws IOException on any I/O error.
     * @return A new archive file system operation on a chain of one or more
     *         archive file system entries for the given path name which will
@@ -197,19 +206,23 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     */
   def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]): Make = {
     require(null ne tµpe)
-    if (FILE.ne(tµpe) && DIRECTORY.ne(tµpe)) // TODO: Add support for other types.
+    if (FILE.ne(tµpe) && DIRECTORY.ne(tµpe)) { // TODO: Add support for other types.
       throw new FileSystemException(fullPath(name), null,
-                                    "Can only create file or directory entries, but not a " + typeName(tµpe) + " entry!")
+        "Can only create file or directory entries, but not a " + typeName(tµpe) + " entry!")
+    }
     val np = name.getPath
     master.get(np).foreach { ce =>
-      if (!ce.isType(FILE))
+      if (!ce.isType(FILE)) {
         throw new FileAlreadyExistsException(fullPath(name), null,
-                                            "Cannot replace a " + typeName(ce) + " entry!")
-      if (FILE ne tµpe)
+          "Cannot replace a " + typeName(ce) + " entry!")
+      }
+      if (FILE ne tµpe) {
         throw new FileAlreadyExistsException(fullPath(name), null,
-                                            "Can only replace a file entry with a file entry, but not a " + typeName(tµpe) + " entry!")
-      if (options.get(EXCLUSIVE))
+          "Can only replace a file entry with a file entry, but not a " + typeName(tµpe) + " entry!")
+      }
+      if (options.get(EXCLUSIVE)) {
         throw new FileAlreadyExistsException(fullPath(name))
+      }
     }
     val t = template match {
       case Some(cn: FsCovariantNode[_]) => Some(cn.get(tµpe))
@@ -219,21 +232,20 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
   }
 
   /** Represents a `make` transaction.
-    * The transaction get committed by calling `commit`.
-    * The state of the archive file system will not change until this method
-    * gets called.
-    * The head of the chain of covariant file system entries to commit can get
-    * obtained by calling `head`.
+    * The transaction gets committed by calling `commit`.
+    * The state of the archive file system will not change until this method gets called.
+    * The head of the chain of covariant file system entries to commit can get obtained by calling `head`.
     *
-    * TODO: The current implementation yields a potential issue: The state of
-    * the file system may get altered between the construction of this
-    * transaction and the call to its `commit` method.
-    * However, the change may render this operation illegal and so the file
-    * system may get corrupted upon a call to `commit`.
-    * To avoid this, the caller must not allow concurrent changes to this
-    * archive file system.
+    * TODO:
+    *   The current implementation yields a potential issue:
+    *   The state of the file system may get altered between the construction of this transaction and the call to its
+    *   `commit` method.
+    *   However, the change may render this operation illegal and so the file system may get corrupted upon a call to
+    *   `commit`.
+    *   To avoid this, the caller must not allow concurrent changes to this archive file system.
     */
   final class Make(options: AccessOptions, path: String, tµpe: Type, template: Option[Entry]) {
+
     private var time: Long = UNKNOWN
     private val segments = newSegments(path, tµpe, template)
 
@@ -248,8 +260,9 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
       // Lookup parent entry, creating it if necessary and allowed.
       master.get(pp) match {
         case Some(pcn) =>
-          if (!pcn.isType(DIRECTORY))
+          if (!pcn.isType(DIRECTORY)) {
             throw new NotDirectoryException(fullPath(path))
+          }
           var segments = List[Segment[E]]()
           segments ::= Segment(None, pcn)
           val mcn = new FsCovariantNode[E](path)
@@ -264,19 +277,19 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
             segments ::= Segment(Some(mn), mcn)
             segments
           } else {
-            throw new NoSuchFileException(fullPath(path), null,
-                                          "Missing parent directory entry!")
+            throw new NoSuchFileException(fullPath(path), null, "Missing parent directory entry!")
           }
       }
     }
 
-    def commit() {
+    def commit(): Unit = {
       touch(options)
       val size = commit(segments)
       assert(2 <= size)
       val mae = segments.head.entry.getEntry
-      if (UNKNOWN == mae.getTime(WRITE))
+      if (UNKNOWN == mae.getTime(WRITE)) {
         mae.setTime(WRITE, getTimeMillis)
+      }
     }
 
     private def commit(segments: List[Segment[E]]): Int = {
@@ -288,9 +301,9 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
             val pae = pcn.get(DIRECTORY)
             val mae = mcn.getEntry
             master.add(mcn.getName, mae)
-            if (master.get(pcn.getName).get.add(mn.get)
-                && UNKNOWN != pae.getTime(WRITE)) // never touch ghost directories!
-                  pae.setTime(WRITE, getTimeMillis)
+            if (master.get(pcn.getName).get.add(mn.get) && UNKNOWN != pae.getTime(WRITE)) { // never touch ghost directories!
+              pae.setTime(WRITE, getTimeMillis)
+            }
           }
           1 + parentSize
         case _ =>
@@ -299,7 +312,9 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     }
 
     private def getTimeMillis = {
-      if (UNKNOWN == time) time = System.currentTimeMillis
+      if (UNKNOWN == time) {
+        time = System.currentTimeMillis
+      }
       time
     }
 
@@ -316,7 +331,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     * @param  name the archive file system entry name.
     * @throws IOException on any I/O error.
     */
-  def unlink(options: AccessOptions, name: FsNodeName) {
+  def unlink(options: AccessOptions, name: FsNodeName): Unit = {
     // Test.
     val np = name.getPath
     val mcn = master.get(np) match {
@@ -324,9 +339,9 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
       case _ => throw new NoSuchFileException(fullPath(name))
     }
     if (mcn.isType(DIRECTORY)) {
-        val size = mcn.getMembers.size
-        if (0 != size)
-          throw new DirectoryNotEmptyException(fullPath(name))
+      val size = mcn.getMembers.size
+      if (0 != size)
+        throw new DirectoryNotEmptyException(fullPath(name))
     }
     if (name.isRoot) {
       // Removing the root entry MUST get silently ignored in order to
@@ -355,10 +370,11 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     val pcn = master.get(pp).get
     val ok = pcn.remove(splitter.getMemberName)
     assert(ok, "The parent directory of \"" + fullPath(name)
-                + "\" does not contain this entry - archive file system is corrupted!")
+      + "\" does not contain this entry - archive file system is corrupted!")
     val pae = pcn.get(DIRECTORY)
-    if (UNKNOWN != pae.getTime(WRITE)) // never touch ghost directories!
-        pae.setTime(WRITE, System.currentTimeMillis)
+    if (UNKNOWN != pae.getTime(WRITE)) { // never touch ghost directories!
+      pae.setTime(WRITE, System.currentTimeMillis)
+    }
   }
 
   /** Returns a new archive entry.
@@ -366,11 +382,11 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     * Note that this is just a factory method and the returned file system entry
     * is not (yet) linked into this (virtual) archive file system.
     *
-    * @param  name the entry name.
-    * @param  tµpe the entry type.
+    * @param  name     the entry name.
+    * @param  tµpe     the entry type.
     * @param  template if not `None`, then the new entry shall inherit
-    *         as much properties from this entry as possible - with the
-    *         exception of its name and type.
+    *                  as much properties from this entry as possible - with the
+    *                  exception of its name and type.
     * @return A new entry for the given name.
     */
   private def newEntry(name: String, tµpe: Type, template: Option[Entry]) = {
@@ -385,16 +401,16 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
     * Note that this is just a factory method and the returned file system entry
     * is not (yet) linked into this (virtual) archive file system.
     *
-    * @param  name the entry name.
-    * @param  options a bit field of access options.
-    * @param  tµpe the entry type.
+    * @param  name     the entry name.
+    * @param  options  a bit field of access options.
+    * @param  tµpe     the entry type.
     * @param  template if not `None`, then the new entry shall inherit
-    *         as much properties from this entry as possible - with the
-    *         exception of its name and type.
+    *                  as much properties from this entry as possible - with the
+    *                  exception of its name and type.
     * @return A new entry for the given name.
     * @throws CharConversionException If the entry name contains characters
-    *         which cannot get encoded.
-    * @see    #make
+    *                                 which cannot get encoded.
+    * @see #make
     */
   private def newEntry(options: AccessOptions, name: String, tµpe: Type, template: Option[Entry]) = {
     assert(!isRoot(name))
@@ -405,6 +421,7 @@ extends ArchiveModelAspect[E] with Iterable[FsCovariantNode[E]] { fs =>
 }
 
 private object ArchiveFileSystem {
+
   private val RootPath = ROOT.getPath
 
   /** Returns a new empty archive file system and ensures its integrity.
@@ -416,8 +433,9 @@ private object ArchiveFileSystem {
     * @param  model the archive model to use.
     * @return A new archive file system.
     */
-  def apply[E <: FsArchiveEntry](model: ArchiveModel[E]) =
+  def apply[E <: FsArchiveEntry](model: ArchiveModel[E]): ArchiveFileSystem[E] = {
     new ArchiveFileSystem(model)
+  }
 
   /** Returns a new archive file system which populates its entries from
     * the given `archive` and ensures its integrity.
@@ -436,15 +454,15 @@ private object ArchiveFileSystem {
     * `archive`.
     *
     * @tparam E The type of the archive entries.
-    * @param  model the archive model to use.
-    * @param  archive The archive entry container to read the entries for
-    *         the population of the archive file system.
+    * @param  model        the archive model to use.
+    * @param  archive      The archive entry container to read the entries for
+    *                      the population of the archive file system.
     * @param  rootTemplate The optional template to use for the root entry of
-    *         the returned archive file system.
-    * @param  readOnly If not empty, any subsequent
-    *         modifying operation on the file system will result in a
-    *         [[net.java.truevfs.kernel.spec.FsReadOnlyFileSystemException]]
-    *         with the contained [[java.lang.Throwable]] as its cause.
+    *                      the returned archive file system.
+    * @param  readOnly     If not empty, any subsequent
+    *                      modifying operation on the file system will result in a
+    *                      [[net.java.truevfs.kernel.spec.FsReadOnlyFileSystemException]]
+    *                      with the contained [[java.lang.Throwable]] as its cause.
     * @return A new archive file system.
     */
   def apply[E <: FsArchiveEntry](model: ArchiveModel[E], archive: Container[E], rootTemplate: Entry, readOnly: Option[Throwable]): ArchiveFileSystem[E] = {
@@ -456,36 +474,32 @@ private object ArchiveFileSystem {
 
   private def typeName(entry: FsCovariantNode[_ <: Entry]): String = {
     val types = entry.getTypes
-    if (1 == types.cardinality)
+    if (1 == types.cardinality) {
       typeName(types.iterator.next)
-    else
+    } else {
       types.toString.toLowerCase(Locale.ROOT)
+    }
   }
 
   private def typeName(tµpe: Type) = tµpe.toString.toLowerCase(Locale.ROOT)
 
-  private def isValidEntryName(path: String) =
+  private def isValidEntryName(path: String) = {
     !isAbsolute(path, SEPARATOR_CHAR) &&
       !(".." + SEPARATOR).startsWith(path.substring(0, math.min(3, path.length)))
+  }
 
   /** The master archive entry table.
     *
     * @tparam E The type of the archive entries.
     */
-  final class EntryTable[E <: FsArchiveEntry](_initialSize: Int)
-  extends Iterable[FsCovariantNode[E]] {
+  final class EntryTable[E <: FsArchiveEntry](_initialSize: Int) extends Iterable[FsCovariantNode[E]] {
 
     /** The map of covariant file system entries.
       *
-      * Note that the archive entries in the covariant file system entries
-      * in this map are shared with the constructor parameter  `archive` of
-      * the archive file system object.
+      * Note that the archive entries in the covariant file system entries in this map are shared with the constructor
+      * parameter `archive` of the archive file system object.
       */
-    private[this] val map = new collection.mutable.LinkedHashMap[String, FsCovariantNode[E]] {
-      // See https://issues.scala-lang.org/browse/SI-5804 .
-      table = new Array(initialCapacity(_initialSize))
-      threshold = (table.length * 3L / 4).toInt
-    }
+    private[this] val map = new util.LinkedHashMap[String, FsCovariantNode[E]](initialCapacity(_initialSize)).asScala
 
     override def size: Int = map.size
 
@@ -511,21 +525,20 @@ private object ArchiveFileSystem {
   private final class Splitter extends PathSplitter(SEPARATOR_CHAR, false) {
     override def getParentPath: String = {
       val path = super.getParentPath
-      if (null ne path)
+      if (null ne path) {
         path
-      else
+      } else {
         RootPath
+      }
     }
   }
 
   /** A case class which represents a path segment for use by
     * [[net.java.truevfs.kernel.impl.ArchiveFileSystem.Make]].
     *
-    * @param name the nullable member name for the covariant file system entry.
+    * @param name  the nullable member name for the covariant file system entry.
     * @param entry the covariant file system entry for the nullable member name.
     */
-  private final case class Segment[E <: FsArchiveEntry](
-    name: Option[String],
-    entry: FsCovariantNode[E])
+  private final case class Segment[E <: FsArchiveEntry](name: Option[String], entry: FsCovariantNode[E])
 }
 

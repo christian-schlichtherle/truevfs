@@ -5,17 +5,7 @@
 package net.java.truevfs.kernel.spec.mock;
 
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.util.*;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.cio.*;
-import static net.java.truecommons.cio.Entry.ALL_ACCESS;
-import static net.java.truecommons.cio.Entry.ALL_SIZES;
 import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.cio.Entry.Size;
 import net.java.truecommons.io.DecoratingOutputStream;
@@ -25,22 +15,34 @@ import net.java.truevfs.kernel.spec.FsThrowManager;
 import net.java.truevfs.kernel.spec.cio.ThrowingInputService;
 import net.java.truevfs.kernel.spec.cio.ThrowingOutputService;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.NotThreadSafe;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.NoSuchFileException;
+import java.util.*;
+
+import static net.java.truecommons.cio.Entry.ALL_ACCESS;
+import static net.java.truecommons.cio.Entry.ALL_SIZES;
+
 /**
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class MockArchive
-implements Container<MockArchiveDriverEntry> {
+public class MockArchive implements Container<MockArchiveDriverEntry> {
 
     final Map<String, MockArchiveDriverEntry> entries;
     private final FsTestConfig config;
-    private @CheckForNull FsThrowManager control;
+    private @CheckForNull
+    FsThrowManager control;
 
     public static MockArchive create(@CheckForNull FsTestConfig config) {
         if (null == config) config = FsTestConfig.get();
         return new MockArchive(
                 new LinkedHashMap<String, MockArchiveDriverEntry>(
-                    HashMaps.initialCapacity(config.getNumEntries())),
+                        HashMaps.initialCapacity(config.getNumEntries())),
                 config);
     }
 
@@ -104,7 +106,7 @@ implements Container<MockArchiveDriverEntry> {
     }
 
     private static final class MockInputService
-    extends MockArchive implements InputService<MockArchiveDriverEntry> {
+            extends MockArchive implements InputService<MockArchiveDriverEntry> {
 
         MockInputService(
                 Map<String, MockArchiveDriverEntry> entries,
@@ -117,10 +119,10 @@ implements Container<MockArchiveDriverEntry> {
             Objects.requireNonNull(name);
 
             final class Input
-            extends AbstractInputSocket<MockArchiveDriverEntry> {
+                    extends AbstractInputSocket<MockArchiveDriverEntry> {
                 @Override
                 public MockArchiveDriverEntry target()
-                throws IOException {
+                        throws IOException {
                     final MockArchiveDriverEntry entry = entries.get(name);
                     if (null == entry)
                         throw new NoSuchFileException(name, null, "Entry not found!");
@@ -129,13 +131,13 @@ implements Container<MockArchiveDriverEntry> {
 
                 @Override
                 public InputStream stream(OutputSocket<? extends Entry> peer)
-                throws IOException {
+                        throws IOException {
                     return socket().stream(peer);
                 }
 
                 @Override
                 public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
-                throws IOException {
+                        throws IOException {
                     return socket().channel(peer);
                 }
 
@@ -149,11 +151,12 @@ implements Container<MockArchiveDriverEntry> {
 
         @Override
         @DischargesObligation
-        public void close() { }
+        public void close() {
+        }
     } // MockInputService
 
     private static final class MockOutputService
-    extends MockArchive implements OutputService<MockArchiveDriverEntry> {
+            extends MockArchive implements OutputService<MockArchiveDriverEntry> {
         boolean busy;
 
         MockOutputService(
@@ -168,7 +171,7 @@ implements Container<MockArchiveDriverEntry> {
             Objects.requireNonNull(entry);
 
             final class Output
-            extends AbstractOutputSocket<MockArchiveDriverEntry> {
+                    extends AbstractOutputSocket<MockArchiveDriverEntry> {
                 @Override
                 public MockArchiveDriverEntry target() {
                     return entry;
@@ -176,7 +179,7 @@ implements Container<MockArchiveDriverEntry> {
 
                 @Override
                 public OutputStream stream(final InputSocket<? extends Entry> peer)
-                throws IOException {
+                        throws IOException {
                     final class Stream extends DecoratingOutputStream {
                         boolean closed;
 
@@ -230,6 +233,7 @@ implements Container<MockArchiveDriverEntry> {
 
         @Override
         @DischargesObligation
-        public void close() { }
+        public void close() {
+        }
     } // MockOutputService
 }

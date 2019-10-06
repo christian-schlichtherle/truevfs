@@ -4,22 +4,21 @@
  */
 package net.java.truevfs.kernel.impl
 
-import net.java.truecommons.io._
-import net.java.truecommons.logging._
-import net.java.truecommons.shed._
 import java.io._
 import java.nio.channels._
 import java.nio.file._
+
 import javax.annotation.concurrent._
-import net.java.truevfs.kernel.spec._
-import net.java.truevfs.kernel.spec.FsAccessOption._
-import net.java.truevfs.kernel.spec.FsAccessOptions._
-import net.java.truecommons.cio._
-import net.java.truecommons.cio.Entry._
 import net.java.truecommons.cio.Entry.Access._
 import net.java.truecommons.cio.Entry.Type._
-
-import scala.{None, Option, Some}
+import net.java.truecommons.cio.Entry._
+import net.java.truecommons.cio._
+import net.java.truecommons.io._
+import net.java.truecommons.logging._
+import net.java.truecommons.shed.BitField
+import net.java.truevfs.kernel.spec.FsAccessOption._
+import net.java.truevfs.kernel.spec.FsAccessOptions._
+import net.java.truevfs.kernel.spec._
 
 /** An abstract base class for any archive file system controller which
   * provide all the essential services required for accessing a prospective
@@ -42,22 +41,20 @@ import scala.{None, Option, Some}
   * @author Christian Schlichtherle
   */
 @NotThreadSafe
-private abstract class BasicArchiveController[E <: FsArchiveEntry]
-extends ArchiveController[E] {
+private abstract class BasicArchiveController[E <: FsArchiveEntry] extends ArchiveController[E] {
   controller: ArchiveModelAspect[E] =>
 
   import BasicArchiveController._
 
   private def fullPath(name: FsNodeName) = path(name).toString
 
-  def node(options: AccessOptions, name: FsNodeName): Option[FsNode] =
-    autoMount(options) node (options, name)
+  def node(options: AccessOptions, name: FsNodeName): Option[FsNode] = autoMount(options) node (options, name)
 
-  def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]): Unit =
+  def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]): Unit = {
     autoMount(options) checkAccess (options, name, types)
+  }
 
-  def setReadOnly(options: AccessOptions, name: FsNodeName): Unit =
-    autoMount(NONE) setReadOnly (options, name)
+  def setReadOnly(options: AccessOptions, name: FsNodeName): Unit = autoMount(NONE) setReadOnly (options, name)
 
   def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]): Boolean = {
     checkSync(options, name, CREATE) // alias for UPDATE
@@ -73,7 +70,8 @@ extends ArchiveController[E] {
     require(null ne options)
     require(null ne name)
 
-    final class Input extends AbstractInputSocket[E] {
+    new AbstractInputSocket[E] {
+
       def target(): E = {
         checkSync(options, name, READ)
         autoMount(options) node (options, name) match {
@@ -92,13 +90,11 @@ extends ArchiveController[E] {
       override def channel(peer: AnyOutputSocket): SeekableByteChannel = socket(peer) channel peer
 
       def socket(peer: AnyOutputSocket): InputSocket[E] = {
-        Option(peer) foreach (_ target ()) // may sync() if in same target archive file!
+        Option(peer) foreach (_.target()) // may sync() if in same target archive file!
         input(target().getName)
       }
-    } // Input
-
-    new Input
-  }: AnyInputSocket
+    }
+  }
 
   def input(name: String): InputSocket[E]
 
@@ -106,7 +102,7 @@ extends ArchiveController[E] {
     require(null ne options)
     require(null ne name)
 
-    final class Output extends AbstractOutputSocket[FsArchiveEntry] {
+    new AbstractOutputSocket[FsArchiveEntry] {
       def target(): FsArchiveEntry = {
         val ae = make().head.getEntry
         if (options get APPEND) {
@@ -152,7 +148,7 @@ extends ArchiveController[E] {
         } finally {
           in foreach { in =>
             try {
-              in close ()
+              in.close()
             } catch {
               case t: Throwable =>
                 ex match {
@@ -184,14 +180,12 @@ extends ArchiveController[E] {
         }
         None
       }
-    } // Output
-
-    new Output
-  }: AnyOutputSocket
+    }
+  }
 
   def output(options: AccessOptions, entry: E): OutputSocket[E]
 
-  def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) {
+  def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]): Unit = {
     if (name.isRoot) { // TODO: Is this case differentiation still required?
       try {
         autoMount(options) // detect false positives!
@@ -212,7 +206,7 @@ extends ArchiveController[E] {
     }
   }
 
-  def unlink(options: AccessOptions, name: FsNodeName) {
+  def unlink(options: AccessOptions, name: FsNodeName): Unit = {
     checkSync(options, name, DELETE)
     val fs = autoMount(options)
     fs.unlink(options, name)
@@ -234,7 +228,7 @@ extends ArchiveController[E] {
     * @throws NeedsSyncException If a sync operation is required before the
     *         intended access could succeed.
     */
-  def checkSync(options: AccessOptions, name: FsNodeName, intention: Access)
+  def checkSync(options: AccessOptions, name: FsNodeName, intention: Access): Unit
 
   /** Returns the (virtual) archive file system mounted from the target
     * archive file.
@@ -251,6 +245,7 @@ extends ArchiveController[E] {
 }
 
 private object BasicArchiveController {
+
   private val logger = new LocalizedLogger(classOf[BasicArchiveController[_]])
 
   private final class ProxyEntry(entry: FsArchiveEntry)

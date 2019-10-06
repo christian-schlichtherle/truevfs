@@ -21,12 +21,17 @@ final case class SyncStatistics private (
   nanosecondsTotal: Long,
   threadsTotal: Int,
   timeMillis: Long = System.currentTimeMillis
-) extends Immutable {
+) {
 
   require(0 <= (sequenceNumber | nanosecondsTotal | threadsTotal | timeMillis))
 
-  def nanosecondsPerOperation =
-    if (0 == sequenceNumber) 0L else nanosecondsTotal / sequenceNumber
+  def nanosecondsPerOperation: Long = {
+    if (0 == sequenceNumber) {
+      0L
+    } else {
+      nanosecondsTotal / sequenceNumber
+    }
+  }
 
   /**
     * Logs a sync operation with the given sample data and returns a new

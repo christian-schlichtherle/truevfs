@@ -17,12 +17,12 @@ private object LockOn {
     * @param lock the lock to acquire.
     * @param operation the operation to run.
     */
-  def apply[V](lock: Lock)(operation: => V) = {
-    lock lock ()
+  def apply[V](lock: Lock)(operation: => V): V = {
+    lock.lock()
     try {
       operation
     } finally {
-      lock unlock ()
+      lock.unlock()
     }
   }
 }

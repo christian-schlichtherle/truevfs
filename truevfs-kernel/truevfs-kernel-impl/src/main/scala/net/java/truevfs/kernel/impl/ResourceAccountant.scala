@@ -32,6 +32,7 @@ import scala.collection.JavaConverters._
 @ThreadSafe
 private final class ResourceAccountant(override val lock: Lock)
 extends LockAspect[Lock] {
+
   import ResourceAccountant._
 
   private[this] val condition = lock.newCondition
@@ -40,7 +41,7 @@ extends LockAspect[Lock] {
     * 
     * @param resource the closeable resource to start accounting for.
     */
-  def startAccountingFor(@WillCloseWhenClosed resource: Closeable) {
+  def startAccountingFor(@WillCloseWhenClosed resource: Closeable): Unit = {
     accounts += resource -> Account(this)
   }
 
@@ -50,8 +51,8 @@ extends LockAspect[Lock] {
     * 
     * @param resource the closeable resource to stop accounting for.
     */
-  def stopAccountingFor(@WillNotClose resource: Closeable) {
-    accounts remove resource foreach { _ => locked (condition signalAll ()) }
+  def stopAccountingFor(@WillNotClose resource: Closeable): Unit = {
+    accounts remove resource foreach { _ => locked (condition.signalAll()) }
   }
 
   /** Waits until all closeable resources which have been started accounting
@@ -78,7 +79,7 @@ extends LockAspect[Lock] {
     *        threads once the lock has been acquired.
     *        If this is non-positive, then there is no timeout for waiting.
     */
-  def awaitClosingOfOtherThreadsResources(timeout: Long) {
+  def awaitClosingOfOtherThreadsResources(timeout: Long): Unit = {
     locked {
       try {
         if (0 < timeout) {
@@ -87,7 +88,7 @@ extends LockAspect[Lock] {
             toWait = condition awaitNanos toWait
         } else {
           while (resources.needsWaiting)
-            condition await ()
+            condition.await()
         }
       } catch {
         case _: InterruptedException =>
@@ -109,12 +110,13 @@ extends LockAspect[Lock] {
     * 
     * @return The number of closeable resources which have been accounted for.
     */
-  def resources = {
+  def resources: Resources = {
     val currentThread = Thread.currentThread
     var local, total = 0
     for (account <- accounts.values if account.accountant eq this) {
-      if (account.owner eq currentThread)
+      if (account.owner eq currentThread) {
         local += 1
+      }
       total += 1
     }
     Resources(local, total)
@@ -126,9 +128,9 @@ extends LockAspect[Lock] {
     * closeable resources again unless the caller also locks the lock provided
     * to the constructor - use with care!
     */
-  def closeAllResources[X <: Exception](handler: ExceptionHandler[_ >: IOException, X]) {
+  def closeAllResources[X <: Exception](handler: ExceptionHandler[_ >: IOException, X]): Unit = {
     assert(null != handler)
-    lock lock ()
+    lock.lock()
     try {
       for ((closeable, account) <- accounts if account.accountant eq this) {
         accounts -= closeable
@@ -137,7 +139,7 @@ extends LockAspect[Lock] {
           // map, but it can cause no ConcurrentModificationException because
           // the entry is already removed and a ConcurrentHashMap doesn't do
           // that anyway.
-          closeable close ()
+          closeable.close()
         } catch {
           case ex: IOException =>
             handler warn ex // may throw an exception!
@@ -145,13 +147,13 @@ extends LockAspect[Lock] {
       }
     } finally {
       try {
-        condition signalAll ()
+        condition.signalAll()
       } finally {
-        lock unlock ()
+        lock.unlock()
       }
     }
   }
-} // class ResourceAccountant
+}
 
 private object ResourceAccountant {
 
@@ -167,10 +169,12 @@ private object ResourceAccountant {
   }
 
   private final case class Account(accountant: ResourceAccountant) {
-    val owner = Thread.currentThread
+
+    val owner: Thread = Thread.currentThread
   }
 
   final case class Resources(local: Int, total: Int) {
-    def needsWaiting = local < total
+
+    def needsWaiting: Boolean = local < total
   }
-} // object ResourceAccountant
+}

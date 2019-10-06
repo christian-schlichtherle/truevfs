@@ -5,8 +5,9 @@
 package net.java.truevfs.ext.insight.stats
 
 object FsStatistics {
+
   /** Returns file system statistics with all properties set to zero. */
-  def apply() = {
+  def apply(): FsStatistics = {
     val io = IoStatistics()
     val sync = SyncStatistics()
     new FsStatistics(io, io, sync) // cannot cache because of timeMillis!
@@ -24,7 +25,8 @@ final case class FsStatistics private (
   writeStats: IoStatistics,
   syncStats: SyncStatistics,
   timeMillis: Long = System.currentTimeMillis
-) extends Immutable {
+) {
+
   require(0 <= timeMillis)
   require(null ne readStats)
   require(null ne writeStats)
@@ -68,7 +70,7 @@ final case class FsStatistics private (
   def logSync(nanosDelta: Long, threadsTotal: Int) =
     new FsStatistics(readStats, writeStats, syncStats.log(nanosDelta, threadsTotal), timeMillis)
 
-  def equalsIgnoreTime(that: FsStatistics) =
+  def equalsIgnoreTime(that: FsStatistics): Boolean =
     this.readStats.equalsIgnoreTime(that.readStats) &&
       this.writeStats.equalsIgnoreTime(that.writeStats) &&
       this.syncStats.equalsIgnoreTime(that.syncStats)

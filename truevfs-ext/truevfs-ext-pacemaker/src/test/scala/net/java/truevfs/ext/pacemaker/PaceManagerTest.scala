@@ -98,7 +98,7 @@ class PaceManagerTest extends WordSpec with OneInstancePerTest {
           reset(controller)
           when(controller.getModel) thenReturn model
           doAnswer(new Answer[Unit] {
-            override def answer(invocation: InvocationOnMock) {
+            override def answer(invocation: InvocationOnMock): Unit = {
               controller.getModel setMounted false
             }
           }) when controller sync any()
@@ -109,8 +109,9 @@ class PaceManagerTest extends WordSpec with OneInstancePerTest {
         // system operation had been performed.
         {
           val controller = controllers(mountPoint)
-          if (null != mountPoint.getParent)
+          if (null != mountPoint.getParent) {
             controller.getModel setMounted true
+          }
         }
         expectation match {
           case Synced(_*) | Shelved(_*) =>
@@ -124,10 +125,11 @@ class PaceManagerTest extends WordSpec with OneInstancePerTest {
 
         // Verify sync() attempts on managed controllers.
         forAll(Table("controller", controllers.values.toSeq: _*)) { controller =>
-          if (expectation(controller))
+          if (expectation(controller)) {
             verify(controller, atLeastOnce()) sync FsSyncOptions.NONE
-          else
+          } else {
             verify(controller, never()) sync any()
+          }
           verify(controller, org.mockito.Mockito.atLeast(0)).getModel
           verifyNoMoreInteractions(controller)
         }
@@ -146,11 +148,10 @@ private object PaceManagerTest {
   type ControllerFilter = Filter[_ >: FsController]
   type ControllerVisitor[X <: Exception] = Visitor[_ >: FsController, X]
 
-  implicit def parseMountPoint(string: String): FsMountPoint =
-    new FsMountPoint(new URI(string))
+  implicit def parseMountPoint(string: String): FsMountPoint = new FsMountPoint(new URI(string))
 
   def model(mediator: PaceMediator, mountPoint: FsMountPoint): FsModel = {
-    val parent =
+    val parent = {
       if (null != mountPoint.getParent) {
         val parent = mock[FsModel]
         when(parent.getMountPoint) thenReturn mountPoint.getParent
@@ -158,7 +159,8 @@ private object PaceManagerTest {
       } else {
         null
       }
-    mediator instrument (null, new DefaultModel(mountPoint, parent))
+    }
+    mediator.instrument(null, new DefaultModel(mountPoint, parent))
   }
 
   def mockController(model: FsModel): FsController = {
@@ -169,13 +171,14 @@ private object PaceManagerTest {
 
   private final class TestManager(var controllers: Iterable[FsController] = Iterable.empty[FsController])
   extends FsAbstractManager {
-    override def newModel(context: FsDriver, mountPoint: FsMountPoint, parent: FsModel) =
+
+    override def newModel(context: FsDriver, mountPoint: FsMountPoint, parent: FsModel): FsModel =
       throw new UnsupportedOperationException
 
-    override def newController(context: ArchiveDriver, model: FsModel, parent: FsController) =
+    override def newController(context: ArchiveDriver, model: FsModel, parent: FsController): FsController =
       throw new UnsupportedOperationException
 
-    override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint) =
+    override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint): FsController =
       throw new UnsupportedOperationException
 
     override def accept[X <: Exception, V <: Visitor[_ >: FsController, X]](filter: ControllerFilter, visitor: V): V = {
@@ -184,31 +187,32 @@ private object PaceManagerTest {
     }
   }
 
-  private sealed abstract class Expectation(mountPoints: FsMountPoint*)
-  extends (FsController => Boolean) {
+  private sealed abstract class Expectation(mountPoints: FsMountPoint*) extends (FsController => Boolean) {
+
     private val set = mountPoints.toSet
-    override def apply(controller: FsController): Boolean =
-      set contains controller.getModel.getMountPoint
-    def stub(controller: FsController)
+
+    override def apply(controller: FsController): Boolean = set contains controller.getModel.getMountPoint
+
+    def stub(controller: FsController): Unit
   }
 
-  private final case class Synced(mountPoints: FsMountPoint*)
-  extends Expectation(mountPoints: _*) {
-    override def stub(controller: FsController) { }
+  private final case class Synced(mountPoints: FsMountPoint*) extends Expectation(mountPoints: _*) {
+
+    override def stub(controller: FsController): Unit = { }
   }
 
-  private final case class Shelved(mountPoints: FsMountPoint*)
-  extends Expectation(mountPoints: _*) {
-    override def stub(controller: FsController) {
+  private final case class Shelved(mountPoints: FsMountPoint*) extends Expectation(mountPoints: _*) {
+
+    override def stub(controller: FsController): Unit = {
       doThrow(
         new FsSyncException(controller.getModel.getMountPoint, new FsOpenResourceException(1, 1))
       ) when controller sync any()
     }
   }
 
-  private final case class Discarded(mountPoints: FsMountPoint*)
-  extends Expectation(mountPoints: _*) {
-    override def stub(controller: FsController) {
+  private final case class Discarded(mountPoints: FsMountPoint*) extends Expectation(mountPoints: _*) {
+
+    override def stub(controller: FsController): Unit = {
       doThrow(
         new FsSyncException(controller.getModel.getMountPoint, new Exception)
       ) when controller sync any()
@@ -221,6 +225,7 @@ private object PaceManagerTest {
     private var mounted: Boolean = _
 
     override def isMounted: Boolean = mounted
-    override def setMounted(mounted: Boolean) { this.mounted = mounted }
+
+    override def setMounted(mounted: Boolean): Unit = { this.mounted = mounted }
   }
 }

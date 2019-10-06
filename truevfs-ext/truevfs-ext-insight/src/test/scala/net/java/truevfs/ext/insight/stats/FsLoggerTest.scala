@@ -22,8 +22,9 @@ class FsLoggerTest extends WordSpec {
       "provide empty statistics for all offsets" in {
         val empty = FsStatistics()
         val logger = create
-        for (offset <- 0 until logger.size)
+        for (offset <- 0 until logger.size) {
           logger stats offset equalsIgnoreTime empty should equal (true)
+        }
       }
 
       "throw a RuntimeException when accessing negative offsets" in {
@@ -54,10 +55,10 @@ class FsLoggerTest extends WordSpec {
         val readStats = logger logRead (nanos, bytes)
         val current = logger.current
         current.readStats should be theSameInstanceAs readStats
-        current.readStats equalsIgnoreTime expected.readStats should equal (true)
-        current.writeStats should equal (expected.writeStats)
-        current.syncStats should equal (expected.syncStats)
-        current.timeMillis should be (expected.timeMillis)
+        current.readStats equalsIgnoreTime expected.readStats shouldBe true
+        current.writeStats shouldBe expected.writeStats
+        current.syncStats shouldBe expected.syncStats
+        current.timeMillis shouldBe expected.timeMillis
       }
     }
 
@@ -68,11 +69,11 @@ class FsLoggerTest extends WordSpec {
         Thread sleep 1
         val writeStats = logger logWrite (nanos, bytes)
         val current = logger.current
-        current.readStats should equal (expected.readStats)
+        current.readStats shouldBe expected.readStats
         current.writeStats should be theSameInstanceAs writeStats
-        current.writeStats equalsIgnoreTime expected.writeStats should equal (true)
-        current.syncStats should equal (expected.syncStats)
-        current.timeMillis should be (expected.timeMillis)
+        current.writeStats equalsIgnoreTime expected.writeStats shouldBe true
+        current.syncStats shouldBe expected.syncStats
+        current.timeMillis shouldBe expected.timeMillis
       }
     }
 
@@ -83,11 +84,11 @@ class FsLoggerTest extends WordSpec {
         Thread sleep 1
         val syncStats = logger logSync nanos
         val current = logger.current
-        current.readStats should equal (expected.readStats)
-        current.writeStats should equal (expected.writeStats)
+        current.readStats shouldBe expected.readStats
+        current.writeStats shouldBe expected.writeStats
         current.syncStats should be theSameInstanceAs syncStats
-        current.syncStats equalsIgnoreTime expected.syncStats should equal (true)
-        current.timeMillis should be (expected.timeMillis)
+        current.syncStats equalsIgnoreTime expected.syncStats shouldBe true
+        current.timeMillis shouldBe expected.timeMillis
       }
     }
 
@@ -97,15 +98,15 @@ class FsLoggerTest extends WordSpec {
 
       "rotate its current position" in {
         for (i <- 0 until size) {
-          val position = logger rotate ()
+          val position = logger.rotate()
           val next = (i + 1) % size
-          position should equal (next)
+          position shouldBe next
         }
       }
 
       "maintain offset zero as its current position" in {
         for (i <- 0 until size) {
-          logger rotate ()
+          logger.rotate()
           val current = logger.current
           logger stats 0 should be theSameInstanceAs current
         }
@@ -114,7 +115,7 @@ class FsLoggerTest extends WordSpec {
       "move the old statistics to offset 1" in {
         for (i <- 0 until size) {
           val oldStats = logger.current
-          logger rotate ()
+          logger.rotate()
           val newStats = logger.current
           newStats should not be theSameInstanceAs (oldStats)
           logger stats 1 should be theSameInstanceAs oldStats
@@ -123,9 +124,9 @@ class FsLoggerTest extends WordSpec {
 
       "clear the statistics at the new position" in {
         for (i <- 0 until size) {
-          logger rotate ()
+          logger.rotate()
           val newStats = logger.current
-          newStats equalsIgnoreTime FsStatistics() should equal (true)
+          newStats equalsIgnoreTime FsStatistics() shouldBe true
         }
       }
     }
@@ -133,6 +134,7 @@ class FsLoggerTest extends WordSpec {
 }
 
 object FsLoggerTest {
+
   private val nanos = 1000 * 1000
   private val bytes = 1024
 }

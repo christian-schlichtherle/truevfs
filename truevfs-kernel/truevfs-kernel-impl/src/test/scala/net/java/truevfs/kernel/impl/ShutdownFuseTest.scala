@@ -6,6 +6,7 @@ import net.java.truecommons.shed.ConcurrencyUtils
 import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory
 import net.java.truevfs.kernel.impl.ShutdownFuseTest._
 import org.mockito.ArgumentMatchers.any
+import org.mockito.InOrder
 import org.mockito.Mockito.inOrder
 import org.scalatest.Matchers._
 import org.scalatest.WordSpec
@@ -20,45 +21,45 @@ class ShutdownFuseTest extends WordSpec {
     "just constructed" should {
       "add the shutdown hook" in new Fixture {
         io verify registry add any[Thread]
-        io verifyNoMoreInteractions()
+        io.verifyNoMoreInteractions()
       }
     }
 
     "disarmed" should {
       "add and remove the shutdown hook" in new Fixture {
-        fuse disarm()
+        fuse.disarm()
         io verify registry add any[Thread]
         io verify registry remove any[Thread]
-        io verifyNoMoreInteractions()
+        io.verifyNoMoreInteractions()
       }
     }
 
     "armed" should {
       "add the shutdown hook" in new Fixture {
-        fuse arm()
+        fuse.arm()
         io verify registry add any[Thread]
-        io verifyNoMoreInteractions()
+        io.verifyNoMoreInteractions()
       }
     }
 
     "disarmed and armed again" should {
       "add, remove and add the shutdown hook again" in new Fixture {
-        fuse disarm()
-        fuse arm()
+        fuse.disarm()
+        fuse.arm()
         io verify registry add any[Thread]
         io verify registry remove any[Thread]
         io verify registry add any[Thread]
-        io verifyNoMoreInteractions()
+        io.verifyNoMoreInteractions()
       }
     }
 
     "armed and disarmed again" should {
       "add and remove the shutdown hook" in new Fixture {
-        fuse arm()
-        fuse disarm()
+        fuse.arm()
+        fuse.disarm()
         io verify registry add any[Thread]
         io verify registry remove any[Thread]
-        io verifyNoMoreInteractions()
+        io.verifyNoMoreInteractions()
       }
     }
 
@@ -66,7 +67,7 @@ class ShutdownFuseTest extends WordSpec {
       "register and execute the shutdown hook" in new Fixture {
         blowUp()
         io verify registry add any[Thread]
-        io verifyNoMoreInteractions()
+        io.verifyNoMoreInteractions()
       }
     }
   }
@@ -78,8 +79,8 @@ class ShutdownFuseTest extends WordSpec {
         val fuse = ShutdownFuse { /* no-op */ }
         runConcurrently(ConcurrencyUtils.NUM_CPU_THREADS) { _ =>
           for (i <- 1 to 10) {
-            fuse disarm()
-            fuse arm()
+            fuse.disarm()
+            fuse.arm()
           }
         }
       }
@@ -89,34 +90,40 @@ class ShutdownFuseTest extends WordSpec {
 
 private object ShutdownFuseTest {
 
-  def runConcurrently(numThreads: Int)(fun: Int => Unit) {
-    startConcurrently(numThreads)(fun) join ()
+  def runConcurrently(numThreads: Int)(fun: Int => Unit): Unit = {
+    startConcurrently(numThreads)(fun).join()
   }
 
-  def startConcurrently(numThreads: Int)(fun: Int => Unit) = {
+  def startConcurrently(numThreads: Int)(fun: Int => Unit): ConcurrencyUtils.TaskJoiner = {
     ConcurrencyUtils start (
       numThreads,
       new TaskFactory {
-        override def newTask(threadNum: Int) = new Callable[Unit] {
-          override def call() { fun(threadNum) }
+
+        override def newTask(threadNum: Int): Callable[Unit] = new Callable[Unit] {
+
+          override def call(): Unit = { fun(threadNum) }
         }
       }
       )
   }
 
   trait Fixture {
-    val registry = mock[ShutdownFuse.ThreadRegistry]
-    val io = inOrder(registry)
+
+    val registry: ShutdownFuse.ThreadRegistry = mock[ShutdownFuse.ThreadRegistry]
+
+    val io: InOrder = inOrder(registry)
+
     private[this] var executed: Boolean = _
+
     val fuse: ShutdownFuse = ShutdownFuse(registry = registry) {
-      fuse disarm () // must cause no harm!
+      fuse.disarm() // must cause no harm!
       executed = true
     }
 
-    def blowUp() {
-      executed should equal (false)
-      fuse blowUp ()
-      executed should equal (true)
+    def blowUp(): Unit = {
+      executed shouldBe false
+      fuse.blowUp()
+      executed shouldBe true
     }
   }
 }

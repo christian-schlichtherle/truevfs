@@ -10,8 +10,10 @@ private trait LogResource {
 
   def logger: Logger
 
-  def log(message: String, parameter: AnyRef) {
+  def log(message: String, parameter: AnyRef): Unit = {
     logger debug (message, parameter)
-    if (logger.isTraceEnabled) logger trace ("Stack trace:", new Throwable)
+    if (logger.isTraceEnabled) {
+      logger.trace("Stack trace:", new Throwable)
+    }
   }
 }

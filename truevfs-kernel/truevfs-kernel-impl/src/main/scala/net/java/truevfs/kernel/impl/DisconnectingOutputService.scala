@@ -8,6 +8,8 @@ import net.java.truecommons.io._
 import edu.umd.cs.findbugs.annotations._
 import java.io._
 import java.nio.channels._
+import java.util
+
 import javax.annotation._
 import javax.annotation.concurrent._
 import net.java.truecommons.cio._
@@ -21,47 +23,65 @@ import net.java.truecommons.cio._
   * when called.
   *
   * @tparam E the type of the entries.
-  * @see    DisconnectingInputService
+  * @see DisconnectingInputService
   * @author Christian Schlichtherle
   */
 @NotThreadSafe
-private class DisconnectingOutputService[E <: Entry]
-(@WillCloseWhenClosed output: OutputService[E])
-extends DecoratingOutputService[E](output)
-with CheckedCloseable {
+private class DisconnectingOutputService[E <: Entry](@WillCloseWhenClosed output: OutputService[E])
+  extends DecoratingOutputService[E](output)
+    with CheckedCloseable {
 
-  override def size = checked(container.size)
-  override def iterator = checked(container.iterator)
-  override def entry(name: String) = checked(container entry name)
+  override def size: Int = checked(container.size)
+
+  override def iterator: util.Iterator[E] = checked(container.iterator)
+
+  override def entry(name: String): E = checked(container entry name)
 
   override def output(entry: E): OutputSocket[E] = {
-    final class Output extends AbstractOutputSocket[E] {
-      private[this] val socket = container output entry
+    new AbstractOutputSocket[E] {
 
-      override def target() = checked(socket target ())
+      private val socket = container output entry
 
-      override def stream(peer: AnyInputSocket) =
+      override def target(): E = checked(socket.target())
+
+      override def stream(peer: AnyInputSocket): OutputStream = {
         new DisconnectingOutputStreamImpl(checked(socket stream peer))
+      }
 
-      override def channel(peer: AnyInputSocket) =
+      override def channel(peer: AnyInputSocket): SeekableByteChannel = {
         new DisconnectingSeekableChannelImpl(checked(socket channel peer))
+      }
     }
-    new Output
   }
 
-  override protected def check() { if (!isOpen) throw new ClosedOutputException }
-
-  private final class DisconnectingOutputStreamImpl
-  (@WillCloseWhenClosed out: OutputStream)
-  extends DisconnectingOutputStream(out) {
-    override def isOpen = DisconnectingOutputService.this.isOpen
-    @DischargesObligation override def close() = if (isOpen) out close ()
+  override protected def check(): Unit = {
+    if (!isOpen) {
+      throw new ClosedOutputException
+    }
   }
 
-  private final class DisconnectingSeekableChannelImpl
-  (@WillCloseWhenClosed channel: SeekableByteChannel)
-  extends DisconnectingSeekableChannel(channel) {
-    override def isOpen = DisconnectingOutputService.this.isOpen
-    @DischargesObligation override def close() = if (isOpen) channel close ()
+  private final class DisconnectingOutputStreamImpl(@WillCloseWhenClosed out: OutputStream)
+    extends DisconnectingOutputStream(out) {
+
+    override def isOpen: Boolean = DisconnectingOutputService.this.isOpen
+
+    @DischargesObligation override def close(): Unit = {
+      if (isOpen) {
+        out.close()
+      }
+    }
   }
+
+  private final class DisconnectingSeekableChannelImpl(@WillCloseWhenClosed channel: SeekableByteChannel)
+    extends DisconnectingSeekableChannel(channel) {
+
+    override def isOpen: Boolean = DisconnectingOutputService.this.isOpen
+
+    @DischargesObligation override def close(): Unit = {
+      if (isOpen) {
+        channel.close()
+      }
+    }
+  }
+
 }

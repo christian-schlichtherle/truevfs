@@ -32,5 +32,5 @@ trait PaceManagerMXBean extends JmxManagerMXBean {
     * @throws IllegalArgumentException if `maxMounted` is less than
     *         `MAXIMUM_FILE_SYSTEMS_MOUNTED_MINIMUM_VALUE`.
     */
-  def setMaximumFileSystemsMounted(maxMounted: Int)
+  def setMaximumFileSystemsMounted(maxMounted: Int): Unit
 }

@@ -17,13 +17,14 @@ import net.java.truevfs.kernel.impl.ShutdownFuse._
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private final class ShutdownFuse private (registry: ThreadRegistry)(hook: => Unit) {
+private final class ShutdownFuse private(registry: ThreadRegistry)(hook: => Unit) {
 
   @volatile
   private[this] var _armed: Boolean = _
 
   private[this] val _thread = new Thread {
-    override def run() {
+
+    override def run(): Unit = {
       // HC SVNT DRACONES!
       // MUST void any calls to disarm() during shutdown hook execution!
       onDisarm {
@@ -33,13 +34,21 @@ private final class ShutdownFuse private (registry: ThreadRegistry)(hook: => Uni
   }
 
   /** Arms this shutdown fuse. */
-  def arm() { onArm { registry add _thread } }
+  def arm(): Unit = {
+    onArm {
+      registry add _thread
+    }
+  }
 
   /** Disarms this shutdown fuse. */
-  def disarm() { onDisarm { registry remove _thread } }
+  def disarm(): Unit = {
+    onDisarm {
+      registry remove _thread
+    }
+  }
 
   @inline
-  private[this] def onArm(block: => Unit) {
+  private[this] def onArm(block: => Unit): Unit = {
     onCondition(!_armed) {
       _armed = true
       block
@@ -47,7 +56,7 @@ private final class ShutdownFuse private (registry: ThreadRegistry)(hook: => Uni
   }
 
   @inline
-  private[this] def onDisarm(block: => Unit) {
+  private[this] def onDisarm(block: => Unit): Unit = {
     onCondition(_armed) {
       _armed = false
       block
@@ -55,12 +64,20 @@ private final class ShutdownFuse private (registry: ThreadRegistry)(hook: => Uni
   }
 
   @inline
-  private[this] def onCondition(condition: => Boolean)(block: => Unit) {
-    if (condition) { synchronized { if (condition) { block } } }
+  private[this] def onCondition(condition: => Boolean)(block: => Unit): Unit = {
+    if (condition) {
+      synchronized {
+        if (condition) {
+          block
+        }
+      }
+    }
   }
 
   /** For testing only! */
-  private[impl] def blowUp() { _thread run () }
+  private[impl] def blowUp(): Unit = {
+    _thread.run()
+  }
 }
 
 private object ShutdownFuse {
@@ -69,21 +86,24 @@ private object ShutdownFuse {
   def apply(hook: => Unit): ShutdownFuse = apply()(hook)
 
   @inline
-  def apply(armed: Boolean = true, registry: ThreadRegistry = DefaultThreadRegistry)(hook: => Unit) = {
+  def apply(armed: Boolean = true, registry: ThreadRegistry = DefaultThreadRegistry)(hook: => Unit): ShutdownFuse = {
     val fuse = new ShutdownFuse(registry)(hook)
-    if (armed)
-      fuse arm ()
+    if (armed) {
+      fuse.arm()
+    }
     fuse
   }
 
   sealed trait ThreadRegistry {
-    def add(thread: Thread)
-    def remove(thread: Thread)
+
+    def add(thread: Thread): Unit
+
+    def remove(thread: Thread): Unit
   }
 
   object DefaultThreadRegistry extends ThreadRegistry {
 
-    def add(thread: Thread) {
+    def add(thread: Thread): Unit = {
       try {
         Runtime.getRuntime addShutdownHook thread
       } catch {
@@ -91,7 +111,7 @@ private object ShutdownFuse {
       }
     }
 
-    def remove(thread: Thread) {
+    def remove(thread: Thread): Unit = {
       try {
         Runtime.getRuntime removeShutdownHook thread
       } catch {
@@ -99,4 +119,5 @@ private object ShutdownFuse {
       }
     }
   }
+
 }

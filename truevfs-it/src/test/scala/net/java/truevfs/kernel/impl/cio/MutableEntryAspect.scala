@@ -12,29 +12,42 @@ import net.java.truevfs.kernel.impl.util._
 /**
   * @author Christian Schlichtherle
   */
-trait MutableEntryAspect[E <: MutableEntry]
-extends GenEntryAspect[E] with MutableEntryLike {
+trait MutableEntryAspect[E <: MutableEntry] extends GenEntryAspect[E] with MutableEntryLike {
+
   type IndexedProperty[-A, B] = MutableIndexedProperty[A, B]
 
-  final def size = new MutableIndexedProperty[Size, Long] {
-    def apply(tµpe: Size) = entry.getSize(tµpe)
-    def update(tµpe: Size, value: Long) { entry.setSize(tµpe, value) }
+  final def size: MutableIndexedProperty[Size, Long] = {
+    new MutableIndexedProperty[Size, Long] {
+
+      def apply(tµpe: Size): Long = entry.getSize(tµpe)
+
+      def update(tµpe: Size, value: Long): Unit = { entry.setSize(tµpe, value) }
+    }
   }
 
-  final def time = new MutableIndexedProperty[Access, Long] {
-    def apply(tµpe: Access) = entry.getTime(tµpe)
-    def update(tµpe: Access, value: Long) { entry.setTime(tµpe, value) }
+  final def time: MutableIndexedProperty[Access, Long] = {
+    new MutableIndexedProperty[Access, Long] {
+
+      def apply(tµpe: Access): Long = entry.getTime(tµpe)
+
+      def update(tµpe: Access, value: Long): Unit = { entry.setTime(tµpe, value) }
+    }
   }
 
-  final def permission(tµpe: Access) = {
+  final def permission(tµpe: Access): MutableIndexedProperty[Entity, Option[Boolean]] = {
     new MutableIndexedProperty[Entity, Option[Boolean]] {
-      def apply(entity: Entity) = {
+
+      def apply(entity: Entity): Option[Boolean] = {
         val p = entry.isPermitted(tµpe, entity)
-        if (null ne p) Option(p) else None
+        if (null ne p) {
+          Option(p)
+        } else {
+          None
+        }
       }
 
-      def update(entity: Entity, value: Option[Boolean]) {
-        entry.setPermitted(tµpe, entity, value.map(Boolean.box(_)).orNull)
+      override def update(entity: Entity, value: Option[Boolean]): Unit = {
+        entry.setPermitted(tµpe, entity, value.map(Boolean.box).orNull)
       }
     }
   }
@@ -44,6 +57,10 @@ extends GenEntryAspect[E] with MutableEntryLike {
   * @author Christian Schlichtherle
   */
 object MutableEntryAspect {
-  implicit def apply[E <: MutableEntry](e: E) =
-    new MutableEntryAspect[E] { def entry = e }
+
+  implicit def apply[E <: MutableEntry](e: E): MutableEntryAspect[E] = {
+    new MutableEntryAspect[E] {
+      def entry: E = e
+    }
+  }
 }

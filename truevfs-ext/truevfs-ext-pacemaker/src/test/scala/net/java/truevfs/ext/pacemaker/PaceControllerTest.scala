@@ -28,7 +28,7 @@ class PaceControllerTest extends WordSpec with OneInstancePerTest {
     val controller = spy(new PaceController(manager, delegate))
 
     "apply()ing its aspect" should {
-      def verifyAspect() {
+      def verifyAspect(): Unit = {
         val io = Mockito inOrder (delegate, manager)
         import io._
         verify(delegate) checkAccess (FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)
@@ -37,14 +37,14 @@ class PaceControllerTest extends WordSpec with OneInstancePerTest {
       }
 
       "call PaceManager.recordAccess(delegate) if the operation succeeds" in {
-        controller checkAccess (FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)
+        controller.checkAccess(FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)
         verifyAspect()
       }
 
       "call PaceManager.recordAccess(delegate) even if an IOException is thrown" in {
         when(delegate checkAccess (FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)) thenThrow new IOException()
         intercept[IOException] {
-          controller checkAccess (FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)
+          controller.checkAccess(FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)
         }
         verifyAspect()
       }
@@ -54,7 +54,6 @@ class PaceControllerTest extends WordSpec with OneInstancePerTest {
       "not apply() its aspect" in {
         controller sync null
         verify(controller, never()) apply any()
-        ()
       }
 
       "forward the call to the decorated controller" in {

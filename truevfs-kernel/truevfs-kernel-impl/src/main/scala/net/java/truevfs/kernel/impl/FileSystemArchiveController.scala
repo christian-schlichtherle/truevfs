@@ -34,7 +34,7 @@ extends BasicArchiveController[E] with MountState[E] {
 
   final def fileSystem: Option[ArchiveFileSystem[E]] = mountState.fileSystem
 
-  final def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]]) {
+  final def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]]): Unit = {
     mountState.fileSystem = fileSystem
   }
 
@@ -58,7 +58,7 @@ extends BasicArchiveController[E] with MountState[E] {
    *         system's current time.
    * @throws IOException on any I/O error.
    */
-  def mount(options: AccessOptions, autoCreate: Boolean)
+  def mount(options: AccessOptions, autoCreate: Boolean): Unit
 
   private final class ResetFileSystem extends MountState[E] {
 
@@ -70,7 +70,7 @@ extends BasicArchiveController[E] with MountState[E] {
 
     def fileSystem: Option[ArchiveFileSystem[E]] = None
 
-    def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]]) {
+    def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]]): Unit = {
       // Passing in None may happen by sync(*).
       fileSystem.foreach { fs => mountState = new MountedFileSystem(fs) }
     }
@@ -80,9 +80,9 @@ extends BasicArchiveController[E] with MountState[E] {
 
     def autoMount(options: AccessOptions, autoCreate: Boolean): ArchiveFileSystem[E] = fs
 
-    def fileSystem: Option[ArchiveFileSystem[E]]  = Some(fs)
+    def fileSystem: Option[ArchiveFileSystem[E]] = Some(fs)
 
-    def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]]) {
+    def fileSystem_=(fileSystem: Option[ArchiveFileSystem[E]]): Unit = {
       fileSystem match {
         case Some(_) => throw new IllegalStateException("File system already mounted!")
         case _ => mountState = new ResetFileSystem

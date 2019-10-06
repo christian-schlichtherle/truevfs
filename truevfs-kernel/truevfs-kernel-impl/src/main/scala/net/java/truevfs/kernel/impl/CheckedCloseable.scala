@@ -23,9 +23,11 @@ private trait CheckedCloseable extends Closeable {
     * abstract super class.
     */
   @DischargesObligation
-  final abstract override def close() { closed = true; super.close() }
+  final abstract override def close(): Unit = { closed = true; super.close() }
 
-  final def isOpen = !closed;
-  protected def check() { if (!isOpen) throw new ClosedStreamException }
-  protected final def checked[V](operation: => V) = { check(); operation }
+  final def isOpen: Boolean = !closed;
+
+  protected def check(): Unit = { if (!isOpen) throw new ClosedStreamException }
+
+  protected final def checked[V](operation: => V): V = { check(); operation }
 }

@@ -21,7 +21,7 @@ extends FsDecoratingModel(model) with ReentrantReadWriteLockAspect {
     * 
     * @param name the node name.
     */
-  final def path(name: FsNodeName) = new FsNodePath(getMountPoint, name)
+  final def path(name: FsNodeName): FsNodePath = new FsNodePath(getMountPoint, name)
 
-  def touch(options: AccessOptions)
+  def touch(options: AccessOptions): Unit
 }

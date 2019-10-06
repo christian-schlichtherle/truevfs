@@ -4,12 +4,12 @@
  */
 package net.java.truevfs.kernel.impl
 
+import net.java.truecommons.cio.Entry._
+import net.java.truecommons.cio._
 import net.java.truecommons.shed._
 import net.java.truevfs.kernel.spec._
-import net.java.truecommons.cio._
-import net.java.truecommons.cio.Entry._
 
-import scala.{None, Option, Some}
+import scala.Option
 
 /** Provides read/write access to an archive file system.
   * This is a mirror of [[net.java.truevfs.kernel.spec.FsController]] which has
@@ -26,15 +26,15 @@ private trait ArchiveController[E <: FsArchiveEntry] {
   def model: ArchiveModel[E]
 
   def node(options: AccessOptions, name: FsNodeName): Option[FsNode]
-  def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access])
-  def setReadOnly(options: AccessOptions, name: FsNodeName)
+  def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]): Unit
+  def setReadOnly(options: AccessOptions, name: FsNodeName): Unit
   def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]): Boolean
   def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long): Boolean
   def input(options: AccessOptions, name: FsNodeName): AnyInputSocket
   def output(options: AccessOptions, name: FsNodeName, template: Option[Entry]): AnyOutputSocket
-  def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry])
-  def unlink(options: AccessOptions, name: FsNodeName)
-  def sync(options: SyncOptions)
+  def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]): Unit
+  def unlink(options: AccessOptions, name: FsNodeName): Unit
+  def sync(options: SyncOptions): Unit
 
   /** Two archive controllers are considered equal if and only if they are
     * identical.

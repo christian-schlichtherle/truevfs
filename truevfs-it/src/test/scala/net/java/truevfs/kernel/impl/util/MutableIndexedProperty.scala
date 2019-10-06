@@ -5,5 +5,6 @@
 package net.java.truevfs.kernel.impl.util
 
 trait MutableIndexedProperty[-A, B] extends (A => B) {
-  def update(index: A, value: B)
+
+  def update(index: A, value: B): Unit
 }

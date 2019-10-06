@@ -13,7 +13,7 @@ import net.java.truecommons.cio._
 /**
  * @author Christian Schlichtherle
  */
-private class LogMediator extends Mediator[LogMediator] with Immutable {
+private class LogMediator extends Mediator[LogMediator] {
 
   override def instrument(subject: FsManager): FsManager =
     new InstrumentingManager[LogMediator](this, subject)

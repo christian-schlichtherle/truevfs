@@ -15,10 +15,12 @@ import org.slf4j._
 private final class LogOutputStream(
   override val context: OutputSocket[_ <: Entry],
   out: OutputStream
-) extends DecoratingOutputStream(out) with LogCloseable with Immutable {
+) extends DecoratingOutputStream(out) with LogCloseable {
+
   override def logger = LogOutputStream.logger
 }
 
 private object LogOutputStream {
+
   private val logger = LoggerFactory.getLogger(classOf[LogOutputStream])
 }

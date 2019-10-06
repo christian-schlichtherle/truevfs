@@ -54,13 +54,13 @@ class TUriHelperSpec extends WordSpec {
   "Testing a URI for an absolute path" should {
     "work correctly" in {
       if ('\\' == separatorChar) {
-        dinnerForOne(Table(
+        assertHasAbsolutePath(Table(
             ("uri", "result"),
             ("C%3A/", true),
             ("C%3A", false)
           ))
       }
-      dinnerForOne(Table(
+      assertHasAbsolutePath(Table(
           ("uri", "result"),
           ("foo:/", true),
           ("foo:/bar", true),
@@ -75,9 +75,9 @@ class TUriHelperSpec extends WordSpec {
           ("//host/share", true)
         ))
 
-      def dinnerForOne(table: TableFor2[String, Boolean]) {
+      def assertHasAbsolutePath(table: TableFor2[String, Boolean]): Unit = {
         forAll(table) { (uri, result) =>
-          hasAbsolutePath(new URI(uri)) should be (result)
+          hasAbsolutePath(new URI(uri)) shouldBe result
         }
       }
     }

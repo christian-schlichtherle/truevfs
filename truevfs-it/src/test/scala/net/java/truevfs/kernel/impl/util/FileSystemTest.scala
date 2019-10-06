@@ -67,7 +67,7 @@ class FileSystemTest extends WordSpec {
     }
   }
 
-  private def check(path: String, entry: Entry) {
+  private def check(path: String, entry: Entry): Unit = {
     val fs = newFileSystem
     fs += path -> entry
     fs(path) should be theSameInstanceAs entry

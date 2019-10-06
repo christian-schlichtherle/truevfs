@@ -14,16 +14,17 @@ import org.slf4j._
 private final class LogBuffer(director: LogMediator, buffer: IoBuffer)
 extends InstrumentingBuffer[LogMediator](director, buffer) with LogResource {
 
-  override def logger = LogBuffer.logger
+  override def logger: Logger = LogBuffer.logger
 
   log("Allocated {}", entry)
 
-  override def release {
+  override def release: Unit = {
     log("Releasing {}", entry)
     entry.release
   }
 }
 
 private object LogBuffer {
+
   private val logger = LoggerFactory.getLogger(classOf[LogBuffer])
 }

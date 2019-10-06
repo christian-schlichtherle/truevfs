@@ -17,8 +17,7 @@ import net.java.truevfs.kernel.spec._
   *
   * @author Christian Schlichtherle
   */
-private abstract class I5tMediator(val subject: String)
-extends JmxMediator[I5tMediator] with Immutable {
+private abstract class I5tMediator(val subject: String) extends JmxMediator[I5tMediator] {
 
   assert(null ne subject)
 
@@ -35,7 +34,7 @@ extends JmxMediator[I5tMediator] with Immutable {
       mediator activateStats origin
   }
 
-  def rotateStats(origin: JmxComponent): Unit = { activateStats(logger rotate ()) }
+  def rotateStats(origin: JmxComponent): Unit = { activateStats(logger.rotate()) }
 
   final def rotateAllStats(origin: JmxComponent): Unit = {
     for (mediator <- mediators)

@@ -99,7 +99,7 @@ private final class FalsePositiveArchiveController(controller: FsController)
         _socket
       }
 
-      override def target(): Entry = apply(name)(socket(_, _) target ())
+      override def target(): Entry = apply(name)(socket(_, _).target())
 
       override def stream(peer: AnyOutputSocket): InputStream = apply(name)(socket(_, _) stream peer)
 
@@ -123,7 +123,7 @@ private final class FalsePositiveArchiveController(controller: FsController)
         _socket
       }
 
-      override def target(): Entry = apply(name)(socket(_, _) target ())
+      override def target(): Entry = apply(name)(socket(_, _).target())
 
       override def stream(peer: AnyInputSocket): OutputStream = apply(name)(socket(_, _) stream peer)
 
@@ -135,7 +135,7 @@ private final class FalsePositiveArchiveController(controller: FsController)
   override def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Entry): Unit =
     apply(name)(_ make (options, _, tµpe, template))
 
-  override def unlink(options: AccessOptions, name: FsNodeName) {
+  override def unlink(options: AccessOptions, name: FsNodeName): Unit = {
     val operation: Operation[Unit] = { (c, n) =>
       c unlink (options, n)
       if (n.isRoot) {
@@ -158,7 +158,7 @@ private final class FalsePositiveArchiveController(controller: FsController)
     }
   }
 
-  override def sync(options: SyncOptions) {
+  override def sync(options: SyncOptions): Unit = {
     // HC SVNT DRACONES!
     try {
       controller sync options

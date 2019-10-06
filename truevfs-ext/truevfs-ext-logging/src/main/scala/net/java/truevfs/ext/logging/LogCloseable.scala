@@ -11,14 +11,14 @@ private trait LogCloseable extends Closeable with LogResource {
 
   log("Opened {}")
 
-  abstract override def close {
+  abstract override def close(): Unit = {
     log("Closing {}")
     super.close
   }
 
-  def log(message: String) {
+  def log(message: String): Unit = {
     try {
-      log(message, context target ())
+      log(message, context.target())
     } catch {
       case ex: IOException =>
         logger trace ("Couldn't resolve resource target: ", ex)

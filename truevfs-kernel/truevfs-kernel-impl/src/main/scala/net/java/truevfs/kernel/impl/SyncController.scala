@@ -4,25 +4,29 @@
  */
 package net.java.truevfs.kernel.impl
 
-import net.java.truecommons.io._
-import net.java.truecommons.shed._
-import net.java.truevfs.kernel.spec._
-import net.java.truevfs.kernel.spec._
-import net.java.truevfs.kernel.spec.FsSyncOption._
-import net.java.truevfs.kernel.spec.FsSyncOptions._
-import net.java.truecommons.cio._
-import net.java.truecommons.cio.Entry._
 import java.io._
 import java.nio.channels._
+
 import javax.annotation.concurrent._
+import net.java.truecommons.cio.Entry._
+import net.java.truecommons.cio._
+import net.java.truecommons.io._
+import net.java.truecommons.shed._
+import net.java.truevfs.kernel.spec.FsSyncOption._
+import net.java.truevfs.kernel.spec.FsSyncOptions._
+import net.java.truevfs.kernel.spec._
+
 import scala.Option
 
 private object SyncController {
   private val NOT_WAIT_CLOSE_IO = BitField.of(WAIT_CLOSE_IO).not
 
-  final def modify(options: SyncOptions) =
-    if (1 < LockingStrategy.lockCount) options and NOT_WAIT_CLOSE_IO
-    else options
+  final def modify(options: SyncOptions): SyncOptions =
+    if (1 < LockingStrategy.lockCount) {
+      options and NOT_WAIT_CLOSE_IO
+    } else {
+      options
+    }
 }
 
 /** Performs a `sync` operation if required.
@@ -36,80 +40,90 @@ private object SyncController {
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private trait SyncController[E <: FsArchiveEntry]
-extends ArchiveController[E] {
+private trait SyncController[E <: FsArchiveEntry] extends ArchiveController[E] {
   controller: ArchiveModelAspect[E] =>
 
-  abstract override def node(options: AccessOptions, name: FsNodeName) =
+  abstract override def node(options: AccessOptions, name: FsNodeName): Option[FsNode] = {
     apply(super.node(options, name))
+  }
 
-  abstract override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
+  abstract override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]): Unit = {
     apply(super.checkAccess(options, name, types))
+  }
 
-  abstract override def setReadOnly(options: AccessOptions, name: FsNodeName) =
+  abstract override def setReadOnly(options: AccessOptions, name: FsNodeName): Unit = {
     apply(super.setReadOnly(options, name))
+  }
 
-  abstract override def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]) =
+  abstract override def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]): Boolean = {
     apply(super.setTime(options, name, times))
+  }
 
-  abstract override def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long) =
+  abstract override def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long): Boolean = {
     apply(super.setTime(options, name, types, value))
+  }
 
-  abstract override def input(options: AccessOptions, name: FsNodeName) = {
-    final class Input extends AbstractInputSocket[Entry] {
+  abstract override def input(options: AccessOptions, name: FsNodeName): AnyInputSocket = {
+    new AbstractInputSocket[Entry] {
+
       private[this] val socket = SyncController.super.input(options, name)
 
-      override def target() = apply(socket.target())
+      override def target(): Entry = apply(socket.target())
 
-      override def stream(peer: AnyOutputSocket) =
-        apply(new SyncInputStream(socket stream peer))
+      override def stream(peer: AnyOutputSocket): SyncInputStream = apply(new SyncInputStream(socket stream peer))
 
-      override def channel(peer: AnyOutputSocket) =
+      override def channel(peer: AnyOutputSocket): SyncSeekableChannel = {
         apply(new SyncSeekableChannel(socket channel peer))
+      }
     }
-    new Input
-  }: AnyInputSocket
+  }
 
-  abstract override def output(options: AccessOptions, name: FsNodeName, template: Option[Entry]) = {
-    final class Output extends AbstractOutputSocket[Entry] {
+  abstract override def output(options: AccessOptions, name: FsNodeName, template: Option[Entry]): AnyOutputSocket = {
+    new AbstractOutputSocket[Entry] {
+
       private[this] val socket = SyncController.super.output(options, name, template)
 
-      override def target = apply(socket.target)
+      override def target: Entry = apply(socket.target)
 
-      override def stream(peer: AnyInputSocket) =
+      override def stream(peer: AnyInputSocket): SyncOutputStream = {
         apply(new SyncOutputStream(socket stream peer))
+      }
 
-      override def channel(peer: AnyInputSocket) =
+      override def channel(peer: AnyInputSocket): SyncSeekableChannel = {
         apply(new SyncSeekableChannel(socket channel peer))
+      }
     }
-    new Output
-  }: AnyOutputSocket
-
-  private class SyncInputStream(in: InputStream)
-  extends DecoratingInputStream(in) {
-    override def close = apply(in.close())
   }
 
-  private class SyncOutputStream(out: OutputStream)
-  extends DecoratingOutputStream(out) {
-    override def close = apply(out.close())
+  private class SyncInputStream(in: InputStream) extends DecoratingInputStream(in) {
+
+    override def close(): Unit = apply(in.close())
   }
 
-  private class SyncSeekableChannel(channel: SeekableByteChannel)
-  extends DecoratingSeekableChannel(channel) {
-    override def close = apply(channel.close())
+  private class SyncOutputStream(out: OutputStream) extends DecoratingOutputStream(out) {
+
+    override def close(): Unit = apply(out.close())
   }
 
-  abstract override def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) =
+  private class SyncSeekableChannel(channel: SeekableByteChannel) extends DecoratingSeekableChannel(channel) {
+
+    override def close(): Unit = apply(channel.close())
+  }
+
+  abstract override def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]): Unit = {
     apply(super.make(options, name, tµpe, template))
+  }
 
-  abstract override def unlink(options: AccessOptions, name: FsNodeName) =
+  abstract override def unlink(options: AccessOptions, name: FsNodeName): Unit = {
     apply {
       // HC SVNT DRACONES!
       super.unlink(options, name)
       // Eventually make the file system controller chain eligible for GC.
-      if (name.isRoot) super.sync(RESET)
+      if (name.isRoot) {
+        super.sync(RESET)
+      }
     }
+  }
 
   /**
    * Syncs the super class controller if needed and applies the given file
@@ -129,7 +143,7 @@ extends ArchiveController[E] {
         return operation
       } catch {
         case opEx: NeedsSyncException =>
-          checkWriteLockedByCurrentThread
+          checkWriteLockedByCurrentThread()
           try {
             doSync(SYNC)
           } catch {
@@ -142,7 +156,7 @@ extends ArchiveController[E] {
     throw new AssertionError("unreachable statement")
   }
 
-  abstract override def sync(options: SyncOptions) {
+  abstract override def sync(options: SyncOptions): Unit = {
     assert(writeLockedByCurrentThread)
     assert(!readLockedByCurrentThread)
 
@@ -161,9 +175,9 @@ extends ArchiveController[E] {
    *         synchronized with constraints, e.g. if an unclosed archive entry
    *         stream gets forcibly closed.
    * @throws FsSyncException if any error conditions apply.
-   * @throws NeedsLockRetryException
+   * @throws NeedsLockRetryException if a lock retry is needed.
    */
-  private def doSync(options: SyncOptions) {
+  private def doSync(options: SyncOptions): Unit = {
     // HC SVNT DRACONES!
     val modified = SyncController modify options
     var done = false
@@ -174,7 +188,7 @@ extends ArchiveController[E] {
       } catch {
         case ex: FsSyncException =>
           ex.getCause match {
-            case _: FsOpenResourceException if (modified ne options) =>
+            case _: FsOpenResourceException if modified ne options =>
               assert(!ex.isInstanceOf[FsSyncWarningException])
               // Swallow ex.
               throw NeedsLockRetryException()

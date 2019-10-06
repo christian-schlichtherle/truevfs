@@ -5,7 +5,6 @@
 package net.java.truevfs.kernel.impl
 
 import net.java.truecommons.shed._
-import net.java.truecommons.shed._
 
 /** Indicates that a file system controller needs to get `sync`ed before the
   * operation can get retried.
@@ -13,13 +12,19 @@ import net.java.truecommons.shed._
   * @see    SyncController
   * @author Christian Schlichtherle
   */
-private final class NeedsSyncException private ()
-extends ControlFlowException(false) with Immutable
+private final class NeedsSyncException private() extends ControlFlowException(false)
 
 private object NeedsSyncException {
+
   import ControlFlowException._
 
   private[this] val instance = new NeedsSyncException
 
-  def apply() = if (isTraceable) new NeedsSyncException else instance
+  def apply(): NeedsSyncException = {
+    if (isTraceable) {
+      new NeedsSyncException
+    } else {
+      instance
+    }
+  }
 }

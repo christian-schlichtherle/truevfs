@@ -16,15 +16,17 @@ private final class PaceModel(mediator: PaceMediator, model: FsModel)
 
   private val cachedMountPoints = mediator.cachedMountPoints
 
-  override def setMounted(isMounted: Boolean) {
+  override def setMounted(isMounted: Boolean): Unit = {
     val wasMounted = model.isMounted
     model setMounted isMounted
     if (wasMounted) {
-      if (!isMounted)
+      if (!isMounted) {
         cachedMountPoints remove getMountPoint
+      }
     } else {
-      if (isMounted)
+      if (isMounted) {
         cachedMountPoints add getMountPoint
+      }
     }
   }
 }

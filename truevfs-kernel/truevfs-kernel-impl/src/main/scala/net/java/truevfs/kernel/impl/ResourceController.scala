@@ -22,45 +22,48 @@ private object ResourceController {
 
 /** Accounts input and output resources returned by its decorated controller.
   *
-  * @see    ResourceManager
+  * @see ResourceManager
   * @author Christian Schlichtherle
   */
 @NotThreadSafe
-private trait ResourceController[E <: FsArchiveEntry]
-extends ArchiveController[E] {
+private trait ResourceController[E <: FsArchiveEntry] extends ArchiveController[E] {
   controller: ArchiveModelAspect[E] =>
 
   import ResourceController._
 
   private[this] val accountant = new ResourceAccountant(writeLock)
 
-  abstract override def input(options: AccessOptions, name: FsNodeName) = {
-    final class Input extends DelegatingInputSocket[Entry] {
-      val socket = ResourceController.super.input(options, name)
+  abstract override def input(options: AccessOptions, name: FsNodeName): AnyInputSocket = {
+    new DelegatingInputSocket[Entry] {
 
-      override def stream(peer: AnyOutputSocket) =
+      val socket: AnyInputSocket = ResourceController.super.input(options, name)
+
+      override def stream(peer: AnyOutputSocket): ResourceInputStream = {
         new ResourceInputStream(socket.stream(peer))
+      }
 
-      override def channel(peer: AnyOutputSocket) =
+      override def channel(peer: AnyOutputSocket): ResourceSeekableChannel = {
         new ResourceSeekableChannel(socket.channel(peer))
+      }
     }
-    new Input
-  }: AnyInputSocket
+  }
 
-  abstract override def output(options: AccessOptions, name: FsNodeName, template: Option[Entry]) = {
-    final class Output extends DelegatingOutputSocket[Entry] {
-      val socket = ResourceController.super.output(options, name, template)
+  abstract override def output(options: AccessOptions, name: FsNodeName, template: Option[Entry]): AnyOutputSocket = {
+    new DelegatingOutputSocket[Entry] {
 
-      override def stream(peer: AnyInputSocket) =
+      val socket: AnyOutputSocket = ResourceController.super.output(options, name, template)
+
+      override def stream(peer: AnyInputSocket): ResourceOutputStream = {
         new ResourceOutputStream(socket.stream(peer))
+      }
 
-      override def channel(peer: AnyInputSocket) =
+      override def channel(peer: AnyInputSocket): ResourceSeekableChannel = {
         new ResourceSeekableChannel(socket.channel(peer))
+      }
     }
-    new Output
-  }: AnyOutputSocket
+  }
 
-  abstract override def sync(options: SyncOptions) {
+  abstract override def sync(options: SyncOptions): Unit = {
     assert(writeLockedByCurrentThread)
     assert(!readLockedByCurrentThread)
 
@@ -73,17 +76,19 @@ extends ArchiveController[E] {
 
     val builder = new FsSyncExceptionBuilder
     try {
-      if (0 != beforeWait.local && !(options get FORCE_CLOSE_IO))
+      if (0 != beforeWait.local && !(options get FORCE_CLOSE_IO)) {
         throw new FsOpenResourceException(beforeWait.local, beforeWait.total)
-      accountant awaitClosingOfOtherThreadsResources
-      (if (options get WAIT_CLOSE_IO) 0 else waitTimeoutMillis)
+      }
+      accountant awaitClosingOfOtherThreadsResources (if (options get WAIT_CLOSE_IO) 0 else waitTimeoutMillis)
       val afterWait = accountant.resources
-      if (0 != afterWait.total)
+      if (0 != afterWait.total) {
         throw new FsOpenResourceException(afterWait.local, afterWait.total)
+      }
     } catch {
       case e: FsOpenResourceException =>
-        if (!(options get FORCE_CLOSE_IO))
+        if (!(options get FORCE_CLOSE_IO)) {
           throw builder fail new FsSyncException(mountPoint, e)
+        }
         builder warn new FsSyncWarningException(mountPoint, e)
     }
     closeResources(builder)
@@ -92,41 +97,46 @@ extends ArchiveController[E] {
       // the write lock, so the state of the virtual file system may have
       // completely changed and thus we need to restart the sync
       // operation unless an exception occured.
-      builder check ()
+      builder.check()
       throw NeedsSyncException()
     }
-    try { super.sync(options) }
-    catch { case ex: FsSyncException => throw builder fail ex }
-    builder check ()
+    try {
+      super.sync(options)
+    } catch {
+      case ex: FsSyncException => throw builder fail ex
+    }
+    builder.check()
   }
 
   /** Closes and disconnects all entry streams of the output and input archive.
     *
     * @param builder the exception handling strategy.
     */
-  private def closeResources(builder: FsSyncExceptionBuilder) {
+  private def closeResources(builder: FsSyncExceptionBuilder): Unit = {
 
-    final class IOExceptionHandler
-    extends ExceptionHandler[IOException, RuntimeException] {
-      def fail(e: IOException) = throw new AssertionError(e)
-      def warn(e: IOException) {
+    class IOExceptionHandler extends ExceptionHandler[IOException, RuntimeException] {
+
+      def fail(e: IOException): Nothing = throw new AssertionError(e)
+
+      def warn(e: IOException): Unit = {
         builder warn new FsSyncWarningException(mountPoint, e)
       }
-    } // IOExceptionHandler
+    }
 
     accountant closeAllResources new IOExceptionHandler
   }
 
   private class ResourceInputStream(in: InputStream)
-  extends DecoratingInputStream(in) with Resource
+    extends DecoratingInputStream(in) with Resource
 
   private class ResourceOutputStream(out: OutputStream)
-  extends DecoratingOutputStream(out) with Resource
+    extends DecoratingOutputStream(out) with Resource
 
   private class ResourceSeekableChannel(channel: SeekableByteChannel)
-  extends DecoratingSeekableChannel(channel) with Resource
+    extends DecoratingSeekableChannel(channel) with Resource
 
   private trait Resource extends Closeable {
+
     accountant startAccountingFor this
 
     /**
@@ -135,11 +145,20 @@ extends ArchiveController[E] {
       *
       * @see http://java.net/jira/browse/TRUEZIP-279 .
       */
-    abstract override def close() {
+    abstract override def close(): Unit = {
       var cfe = false
-      try     { super.close() }
-      catch   { case e: ControlFlowException => cfe = true; throw e }
-      finally { if (!cfe) accountant stopAccountingFor this }
+      try {
+        super.close()
+      } catch {
+        case e: ControlFlowException =>
+          cfe = true
+          throw e
+      } finally {
+        if (!cfe) {
+          accountant stopAccountingFor this
+        }
+      }
     }
   }
+
 }

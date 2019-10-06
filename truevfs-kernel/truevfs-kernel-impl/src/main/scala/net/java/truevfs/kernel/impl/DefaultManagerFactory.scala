@@ -11,8 +11,7 @@ import net.java.truevfs.kernel.spec.spi._
   *
   * @author Christian Schlichtherle
   */
-final class DefaultManagerFactory
-extends FsManagerFactory with Immutable {
+final class DefaultManagerFactory extends FsManagerFactory {
 
   override def get: FsManager = new DefaultManager
 

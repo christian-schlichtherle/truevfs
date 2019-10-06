@@ -20,7 +20,7 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks._
   */
 class ArchiveEntryAspectTest extends WordSpec {
 
-  private def forAllNameAndType(test: (FsArchiveEntry, ArchiveEntryAspect[_]) => Unit) {
+  private def forAllNameAndType(test: (FsArchiveEntry, ArchiveEntryAspect[_]) => Unit): Unit = {
     forAll { name: String =>
       whenever (null ne name) {
         forAll(Table("type", FILE, DIRECTORY)) { tµpe =>
@@ -35,89 +35,89 @@ class ArchiveEntryAspectTest extends WordSpec {
   "An entry aspect" should {
     "have the same name and type than its associated entry" in {
       forAllNameAndType { (e, a) =>
-        a.name should be (e.getName)
-        a.tµpe should be (e.getType)
+        a.name shouldBe e.getName
+        a.tµpe shouldBe e.getType
       }
     }
 
     "properly decorate its associated entry" in {
       forAllNameAndType { (e, a) =>
         a.dataSize = UNKNOWN
-        a.dataSize should be (UNKNOWN)
+        a.dataSize shouldBe UNKNOWN
         a.dataSize = 0
-        a.dataSize should be (0)
-        a.dataSize should be (e.getSize(DATA))
+        a.dataSize shouldBe 0
+        a.dataSize shouldBe e.getSize(DATA)
 
         a.storageSize = UNKNOWN
-        a.storageSize should be (UNKNOWN)
+        a.storageSize shouldBe UNKNOWN
         a.storageSize = 0
-        a.storageSize should be (0)
-        a.storageSize should be (e.getSize(STORAGE))
+        a.storageSize shouldBe 0
+        a.storageSize shouldBe e.getSize(STORAGE)
 
         a.createTime = UNKNOWN
-        a.createTime should be (UNKNOWN)
+        a.createTime shouldBe UNKNOWN
         a.createTime = 0
-        a.createTime should be (0)
-        a.createTime should be (e.getTime(CREATE))
+        a.createTime shouldBe 0
+        a.createTime shouldBe e.getTime(CREATE)
 
         a.readTime = UNKNOWN
-        a.readTime should be (UNKNOWN)
+        a.readTime shouldBe UNKNOWN
         a.readTime = 0
-        a.readTime should be (0)
-        a.readTime should be (e.getTime(READ))
+        a.readTime shouldBe 0
+        a.readTime shouldBe e.getTime(READ)
 
         a.writeTime = UNKNOWN
-        a.writeTime should be (UNKNOWN)
+        a.writeTime shouldBe UNKNOWN
         a.writeTime = 0
-        a.writeTime should be (0)
-        a.writeTime should be (e.getTime(WRITE))
+        a.writeTime shouldBe 0
+        a.writeTime shouldBe e.getTime(WRITE)
 
         a.executeTime = UNKNOWN
-        a.executeTime should be (UNKNOWN)
+        a.executeTime shouldBe UNKNOWN
         a.executeTime = 0
-        a.executeTime should be (0)
-        a.executeTime should be (e.getTime(EXECUTE))
+        a.executeTime shouldBe 0
+        a.executeTime shouldBe e.getTime(EXECUTE)
 
         forAll(Table("PosixEntity", USER, GROUP, OTHER)) { entity =>
           a.createPermission(entity) = None // unknown
-          a.createPermission(entity) should be (None)
+          a.createPermission(entity) shouldBe None
           a.createPermission(entity) = Option(false) // not permitted
-          a.createPermission(entity) should be (Option(false))
+          a.createPermission(entity) shouldBe Option(false)
           a.createPermission(entity) = Option(true) // permitted
-          a.createPermission(entity) should be (Option(true))
-          a.createPermission(entity) should be (Option(e.isPermitted(CREATE, entity)))
+          a.createPermission(entity) shouldBe Option(true)
+          a.createPermission(entity) shouldBe Option(e.isPermitted(CREATE, entity))
 
           a.readPermission(entity) = None // unknown
-          a.readPermission(entity) should be (None)
+          a.readPermission(entity) shouldBe None
           a.readPermission(entity) = Option(false) // not permitted
-          a.readPermission(entity) should be (Option(false))
+          a.readPermission(entity) shouldBe Option(false)
           a.readPermission(entity) = Option(true) // permitted
-          a.readPermission(entity) should be (Option(true))
-          a.readPermission(entity) should be (Option(e.isPermitted(READ, entity)))
+          a.readPermission(entity) shouldBe Option(true)
+          a.readPermission(entity) shouldBe Option(e.isPermitted(READ, entity))
 
           a.writePermission(entity) = None // unknown
-          a.writePermission(entity) should be (None)
+          a.writePermission(entity) shouldBe None
           a.writePermission(entity) = Option(false) // not permitted
-          a.writePermission(entity) should be (Option(false))
+          a.writePermission(entity) shouldBe Option(false)
           a.writePermission(entity) = Option(true) // permitted
-          a.writePermission(entity) should be (Option(true))
-          a.writePermission(entity) should be (Option(e.isPermitted(WRITE, entity)))
+          a.writePermission(entity) shouldBe Option(true)
+          a.writePermission(entity) shouldBe Option(e.isPermitted(WRITE, entity))
 
           a.executePermission(entity) = None // unknown
-          a.executePermission(entity) should be (None)
+          a.executePermission(entity) shouldBe None
           a.executePermission(entity) = Option(false) // not permitted
-          a.executePermission(entity) should be (Option(false))
+          a.executePermission(entity) shouldBe Option(false)
           a.executePermission(entity) = Option(true) // permitted
-          a.executePermission(entity) should be (Option(true))
-          a.executePermission(entity) should be (Option(e.isPermitted(EXECUTE, entity)))
+          a.executePermission(entity) shouldBe Option(true)
+          a.executePermission(entity) shouldBe Option(e.isPermitted(EXECUTE, entity))
 
           a.deletePermission(entity) = None // unknown
-          a.deletePermission(entity) should be (None)
+          a.deletePermission(entity) shouldBe None
           a.deletePermission(entity) = Option(false) // not permitted
-          a.deletePermission(entity) should be (Option(false))
+          a.deletePermission(entity) shouldBe Option(false)
           a.deletePermission(entity) = Option(true) // permitted
-          a.deletePermission(entity) should be (Option(true))
-          a.deletePermission(entity) should be (Option(e.isPermitted(DELETE, entity)))
+          a.deletePermission(entity) shouldBe Option(true)
+          a.deletePermission(entity) shouldBe Option(e.isPermitted(DELETE, entity))
         }
       }
     }

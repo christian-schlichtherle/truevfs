@@ -4,16 +4,16 @@
  */
 package net.java.truevfs.kernel.spec.mock;
 
-import java.io.IOException;
-import java.util.EnumMap;
-import java.util.Objects;
-import javax.annotation.CheckForNull;
 import net.java.truecommons.cio.Entry;
-import net.java.truecommons.cio.Entry.Type;
 import net.java.truecommons.cio.IoBuffer;
 import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.FsArchiveEntries;
 import net.java.truevfs.kernel.spec.FsArchiveEntry;
+
+import javax.annotation.CheckForNull;
+import java.io.IOException;
+import java.util.EnumMap;
+import java.util.Objects;
 
 /**
  * @author Christian Schlichtherle

@@ -193,11 +193,11 @@ private object TConfigSpec {
 
   private lazy val configSocket: Socket[TConfig] = () => TConfig.open()
 
-  private def inNewChild[V](operation: => V) {
+  private def inNewChild[V](operation: => V): Unit = {
     var ex: Throwable = null
     val r = new Runnable() {
 
-      def run() {
+      def run(): Unit = {
         try {
           operation
         } catch {

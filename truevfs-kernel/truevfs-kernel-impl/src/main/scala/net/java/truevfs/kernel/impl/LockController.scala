@@ -4,16 +4,17 @@
  */
 package net.java.truevfs.kernel.impl
 
-import net.java.truecommons.io._
-import net.java.truecommons.shed._
-import net.java.truevfs.kernel.spec._
-import net.java.truevfs.kernel.spec._
-import net.java.truecommons.cio._
-import net.java.truecommons.cio.Entry._;
-import net.java.truevfs.kernel.impl.LockingStrategy._
 import java.io._
 import java.nio.channels._
+
 import javax.annotation.concurrent._
+import net.java.truecommons.cio.Entry._
+import net.java.truecommons.cio._
+import net.java.truecommons.io._
+import net.java.truecommons.shed._
+import net.java.truevfs.kernel.impl.LockingStrategy._
+import net.java.truevfs.kernel.spec._
+
 import scala.Option
 
 /** Provides read/write locking for multi-threaded access by its clients.
@@ -37,86 +38,96 @@ import scala.Option
   * @author Christian Schlichtherle
   */
 @ThreadSafe
-private trait LockController[E <: FsArchiveEntry]
-extends ArchiveController[E] {
+private trait LockController[E <: FsArchiveEntry] extends ArchiveController[E] {
   controller: ArchiveModelAspect[E] =>
 
-  abstract override def node(options: AccessOptions, name: FsNodeName) =
+  abstract override def node(options: AccessOptions, name: FsNodeName): Option[FsNode] = {
     timedReadOrWriteLocked(super.node(options, name))
+  }
 
-  abstract override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]) =
+  abstract override def checkAccess(options: AccessOptions, name: FsNodeName, types: BitField[Access]): Unit = {
     timedReadOrWriteLocked(super.checkAccess(options, name, types))
+  }
 
-  abstract override def setReadOnly(options: AccessOptions, name: FsNodeName) =
+  abstract override def setReadOnly(options: AccessOptions, name: FsNodeName): Unit = {
     timedLocked(writeLock)(super.setReadOnly(options, name))
+  }
 
-  abstract override def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]) =
+  abstract override def setTime(options: AccessOptions, name: FsNodeName, times: Map[Access, Long]): Boolean = {
     timedLocked(writeLock)(super.setTime(options, name, times))
+  }
 
-  abstract override def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long) =
+  abstract override def setTime(options: AccessOptions, name: FsNodeName, types: BitField[Access], value: Long): Boolean = {
     timedLocked(writeLock)(super.setTime(options, name, types, value))
+  }
 
-  abstract override def input(options: AccessOptions, name: FsNodeName) = {
-    final class Input extends AbstractInputSocket[Entry] {
-      private[this] val socket = LockController.super.input(options, name)
+  abstract override def input(options: AccessOptions, name: FsNodeName): AnyInputSocket = {
+    new AbstractInputSocket[Entry] {
 
-      override def target() = fastLocked(writeLock)(socket target ())
+      private val socket = LockController.super.input(options, name)
 
-      override def stream(peer: AnyOutputSocket) =
+      override def target(): Entry = fastLocked(writeLock)(socket.target())
+
+      override def stream(peer: AnyOutputSocket): LockInputStream =
         timedLocked(writeLock)(new LockInputStream(socket stream peer))
 
-      override def channel(peer: AnyOutputSocket) =
+      override def channel(peer: AnyOutputSocket): LockSeekableChannel =
         timedLocked(writeLock)(new LockSeekableChannel(socket channel peer))
     }
-    new Input
-  }: AnyInputSocket
+  }
 
-  abstract override def output(options: AccessOptions, name: FsNodeName, template: Option[Entry]) = {
-    final class Output extends AbstractOutputSocket[Entry] {
-      private[this] val socket = LockController.super.output(options, name, template)
+  abstract override def output(options: AccessOptions, name: FsNodeName, template: Option[Entry]): AnyOutputSocket = {
+    new AbstractOutputSocket[Entry] {
 
-      override def target() = fastLocked(writeLock)(socket target ())
+      private val socket = LockController.super.output(options, name, template)
 
-      override def stream(peer: AnyInputSocket) =
+      override def target(): Entry = fastLocked(writeLock)(socket.target())
+
+      override def stream(peer: AnyInputSocket): LockOutputStream =
         timedLocked(writeLock)(new LockOutputStream(socket stream peer))
 
-      override def channel(peer: AnyInputSocket) =
+      override def channel(peer: AnyInputSocket): LockSeekableChannel =
         timedLocked(writeLock)(new LockSeekableChannel(socket channel peer))
     }
-    new Output
-  }: AnyOutputSocket
+  }
 
-  abstract override def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) =
+  abstract override def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]): Unit = {
     timedLocked(writeLock)(super.make(options, name, tµpe, template))
+  }
 
-  abstract override def unlink(options: AccessOptions, name: FsNodeName) =
+  abstract override def unlink(options: AccessOptions, name: FsNodeName): Unit = {
     timedLocked(writeLock)(super.unlink(options, name))
+  }
 
-  abstract override def sync(options: SyncOptions) =
-    timedLocked(writeLock)(super.sync(options))
+  abstract override def sync(options: SyncOptions): Unit = timedLocked(writeLock)(super.sync(options))
 
   private def timedReadOrWriteLocked[V](operation: => V) = {
     try {
       timedLocked(readLock)(operation)
     } catch {
       case ex: NeedsWriteLockException =>
-        if (readLockedByCurrentThread) throw ex
+        if (readLockedByCurrentThread) {
+          throw ex
+        }
         timedLocked(writeLock)(operation)
     }
   }
 
   private class LockInputStream(in: InputStream)
   extends DecoratingInputStream(in) {
-    override def close = deadLocked(writeLock)(in.close)
+
+    override def close(): Unit = deadLocked(writeLock)(in.close())
   }
 
   private class LockOutputStream(out: OutputStream)
   extends DecoratingOutputStream(out) {
-    override def close = deadLocked(writeLock)(out.close)
+
+    override def close(): Unit = deadLocked(writeLock)(out.close())
   }
 
   private class LockSeekableChannel(channel: SeekableByteChannel)
   extends DecoratingSeekableChannel(channel) {
-    override def close = deadLocked(writeLock)(channel.close)
+
+    override def close(): Unit = deadLocked(writeLock)(channel.close())
   }
 }

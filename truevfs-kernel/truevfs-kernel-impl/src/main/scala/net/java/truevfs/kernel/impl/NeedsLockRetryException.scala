@@ -9,16 +9,22 @@ import net.java.truecommons.shed._
 /** Indicates that all file system locks need to get released before the
   * operation can get retried.
   *
-  * @see    LockController
+  * @see LockController
   * @author Christian Schlichtherle
   */
-private final class NeedsLockRetryException private ()
-extends ControlFlowException(false) with Immutable
+private final class NeedsLockRetryException private() extends ControlFlowException(false)
 
 private object NeedsLockRetryException {
+
   import ControlFlowException._
 
   private[this] val instance = new NeedsLockRetryException
 
-  def apply() = if (isTraceable) new NeedsLockRetryException else instance
+  def apply(): NeedsLockRetryException = {
+    if (isTraceable) {
+      new NeedsLockRetryException
+    } else {
+      instance
+    }
+  }
 }

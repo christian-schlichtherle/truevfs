@@ -10,15 +10,15 @@ import net.java.truecommons.cio._
 import org.slf4j._
 
 /**
- * @author Christian Schlichtherle
- */
-private final class LogInputStream(
-  override val context: InputSocket[_ <: Entry],
-  in: InputStream
-) extends DecoratingInputStream(in) with LogCloseable with Immutable {
-  override def logger = LogInputStream.logger
+  * @author Christian Schlichtherle
+  */
+private final class LogInputStream(val context: InputSocket[_ <: Entry], in: InputStream)
+  extends DecoratingInputStream(in) with LogCloseable {
+
+  override def logger: Logger = LogInputStream.logger
 }
 
 private object LogInputStream {
+
   private val logger = LoggerFactory.getLogger(classOf[LogInputStream])
 }

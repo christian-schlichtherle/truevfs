@@ -20,10 +20,10 @@ extends JmxManager[PaceMediator](mediator, manager) {
   private val cachedMountPoints = mediator.cachedMountPoints
   private val evictedMountPoints = mediator.evictedMountPoints
 
-  def maximumSize = mediator.maximumSize
-  def maximumSize_=(maximumSize: Int) { mediator.maximumSize = maximumSize }
+  def maximumSize: Int = mediator.maximumSize
+  def maximumSize_=(maximumSize: Int): Unit = { mediator.maximumSize = maximumSize }
 
-  override def newView = new PaceManagerView(this)
+  override def newView: PaceManagerView = new PaceManagerView(this)
 
   /**
    * Records access to a file system after the fact and tries to unmount the
@@ -34,17 +34,17 @@ extends JmxManager[PaceMediator](mediator, manager) {
    *
    * @param mountPoint the mount point of the accessed file system.
    */
-  def recordAccess(mountPoint: FsMountPoint) {
+  def recordAccess(mountPoint: FsMountPoint): Unit = {
     cachedMountPoints recordAccess mountPoint
     unmountEvictedArchiveFileSystems()
   }
 
-  private def unmountEvictedArchiveFileSystems() {
+  private def unmountEvictedArchiveFileSystems(): Unit = {
     val iterator = evictedMountPoints.iterator
     if (iterator.hasNext) {
       val builder = new FsSyncExceptionBuilder
       do {
-        val evictedMountPoint = iterator next ()
+        val evictedMountPoint = iterator.next()
         val evictedMountPointFilter = FsPrefixMountPointFilter forPrefix evictedMountPoint
         // Check that neither the evicted file system nor any of its child file
         // systems is actually mounted.
@@ -54,7 +54,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
               .manager(manager)
               .filter(FsControllerFilter forPrefix evictedMountPoint)
               .run()
-            iterator remove ()
+            iterator.remove()
           } catch {
             case e: FsSyncException =>
               e.getCause match {
@@ -69,7 +69,7 @@ extends JmxManager[PaceMediator](mediator, manager) {
                 case _ =>
                   // Prevent retrying this operation - it would most likely
                   // yield the same result.
-                  iterator remove ()
+                  iterator.remove()
 
                   // Mark the exception for subsequent rethrowing at the end of
                   // this method.
@@ -78,12 +78,12 @@ extends JmxManager[PaceMediator](mediator, manager) {
           }
         }
       } while (iterator.hasNext)
-      builder check ()
+      builder.check()
     }
   }
 }
 
 private object PaceManager {
 
-  val logger = new LocalizedLogger(classOf[PaceManager])
+  private val logger = new LocalizedLogger(classOf[PaceManager])
 }

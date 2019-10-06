@@ -14,6 +14,7 @@ extends FsAbstractModel(mountPoint, parent) {
 
   @volatile private var mounted: Boolean = _
 
-  override def isMounted = mounted
-  override def setMounted(mounted: Boolean) { this.mounted = mounted }
+  override def isMounted: Boolean = mounted
+
+  override def setMounted(mounted: Boolean): Unit = { this.mounted = mounted }
 }

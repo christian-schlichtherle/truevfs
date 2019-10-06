@@ -4,6 +4,8 @@
  */
 package net.java.truevfs.kernel.impl.cio
 
+import java.util
+
 import collection.JavaConverters._
 import net.java.truecommons.cio._
 import net.java.truevfs.kernel.impl.util._
@@ -15,15 +17,15 @@ class FileSystemContainer[E >: Null <: Entry] extends Container[E] {
 
   private[this] var map = FileSystem[E]('/')
 
-  final override def size = map.size
+  final override def size: Int = map.size
 
-  final override def iterator = map.valuesIterator.asJava
+  final override def iterator: util.Iterator[E] = map.valuesIterator.asJava
 
-  final override def entry(name: String) = (map get name).orNull
+  final override def entry(name: String): E = (map get name).orNull
 
-  def link(name: String, entry: E) = map link (name, entry)
+  def link(name: String, entry: E): FileSystem.Node[String, E] = map link (name, entry)
 
-  def unlink(name: String) = map unlink name
+  def unlink(name: String): Unit = map unlink name
   
-  override def close() { map = null }
+  override def close(): Unit = { map = null }
 }

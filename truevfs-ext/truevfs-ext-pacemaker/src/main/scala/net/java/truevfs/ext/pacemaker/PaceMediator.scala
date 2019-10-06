@@ -13,7 +13,7 @@ import net.java.truevfs.kernel.spec._
   *
   * @author Christian Schlichtherle
   */
-private class PaceMediator extends JmxMediator[PaceMediator] with Immutable {
+private class PaceMediator extends JmxMediator[PaceMediator] {
 
   final val cachedMountPoints = new LruCache[FsMountPoint](maximumFileSystemsMountedDefaultValue)
   final val evictedMountPoints = cachedMountPoints.evicted

@@ -7,12 +7,13 @@ package net.java.truevfs.kernel.spec;
 import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import edu.umd.cs.findbugs.annotations.DischargesObligation;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.cio.IoBufferPool;
 import net.java.truecommons.cio.MemoryBufferPool;
 import net.java.truecommons.shed.InheritableThreadLocalStack;
 import net.java.truecommons.shed.Resource;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A container for configuration options with global or inheritable thread

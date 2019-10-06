@@ -91,7 +91,7 @@ class CacheEntryTest extends WordSpec {
           IoSockets copy (front.input, cache.output)
           if (WriteThrough ne strategy) {
             back getCount WRITE shouldBe 0
-            cache flush ()
+            cache.flush()
           }
         }
         pool should have size 1
@@ -113,7 +113,7 @@ class CacheEntryTest extends WordSpec {
         IoSockets copy (front.input, cache.output)
         if (WriteThrough ne strategy) {
           back getCount WRITE shouldBe 0
-          cache flush ()
+          cache.flush()
         }
         cache.dataSize should not be UNKNOWN
         pool should have size 1
@@ -145,7 +145,7 @@ class CacheEntryTest extends WordSpec {
         back getCount WRITE shouldBe 0
         cache.dataSize shouldBe mockEntryDataWrite.limit()
 
-        cache release ()
+        cache.release()
         cache.dataSize shouldBe UNKNOWN
         pool should have size 0
         front.getBuffer shouldBe mockEntryDataWrite
@@ -156,7 +156,7 @@ class CacheEntryTest extends WordSpec {
 
         front = new MemoryBuffer(mockEntryName, initialCapacity)
         intercept[IOException] {
-          IoSockets copy (cache.input, front.output)
+          IoSockets.copy(cache.input, front.output)
         }
         cache.dataSize shouldBe UNKNOWN
         pool should have size 0
@@ -201,7 +201,7 @@ class CacheEntryTest extends WordSpec {
           IoSockets copy (front.input, cache.output)
           if (WriteThrough ne strategy) {
             back getCount WRITE shouldBe 0
-            cache flush ()
+            cache.flush()
           }
         }
         cache.dataSize should not be UNKNOWN
@@ -225,7 +225,7 @@ class CacheEntryTest extends WordSpec {
         IoSockets copy (front.input, cache.output)
         if (WriteThrough ne strategy) {
           back getCount WRITE shouldBe 0
-          cache flush ()
+          cache.flush()
         }
         cache.dataSize should not be UNKNOWN
         pool should have size 1
@@ -252,21 +252,24 @@ class CacheEntryTest extends WordSpec {
 
 /** @author Christian Schlichtherle */
 private object CacheEntryTest {
-  class BrokenInputSocket(override val target: Entry)
-    extends AbstractInputSocket[Entry] {
+
+  class BrokenInputSocket(override val target: Entry) extends AbstractInputSocket[Entry] {
+
     require(null ne target)
 
     override def stream(peer: AnyOutputSocket): InputStream = new InputStream {
-      override def read = throw new IOException
+
+      override def read: Int = throw new IOException
     }
   }
 
-  class BrokenOutputSocket(override val target: Entry)
-    extends AbstractOutputSocket[Entry] {
+  class BrokenOutputSocket(override val target: Entry) extends AbstractOutputSocket[Entry] {
+
     require(null ne target)
 
     override def stream(peer: AnyInputSocket): OutputStream = new OutputStream {
-      override def write(b: Int) { throw new IOException }
+
+      override def write(b: Int): Unit = { throw new IOException }
     }
   }
 }

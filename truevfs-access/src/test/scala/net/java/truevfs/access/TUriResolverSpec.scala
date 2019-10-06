@@ -150,7 +150,7 @@ class TUriResolverSpec extends WordSpec {
           ("mok:file:/foo.mok!/", "../bar.mok/", "mok:file:/bar.mok!/")
         ))
 
-      def test(table: TableFor3[String, String, String]) {
+      def test(table: TableFor3[String, String, String]): Unit = {
         apply { resolver =>
           forAll(table) { (_base, _uri, _expected) =>
             val base = new FsNodePath(new URI(_base))
@@ -163,7 +163,7 @@ class TUriResolverSpec extends WordSpec {
     }
   }
 
-  private def apply[V](fun: TUriResolver => V) = {
+  private def apply[V](fun: TUriResolver => V): V = {
     fun(
       new TUriResolver(
         new TArchiveDetector(

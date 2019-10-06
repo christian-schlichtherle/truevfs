@@ -15,7 +15,8 @@ import org.slf4j._
 private final class LogOutputChannel(
   override val context: OutputSocket[_ <: Entry],
   channel: SeekableByteChannel)
-extends DecoratingSeekableChannel(channel) with LogCloseable with Immutable {
+extends DecoratingSeekableChannel(channel) with LogCloseable {
+
   override def logger = LogOutputChannel.logger
 }
 

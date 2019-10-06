@@ -6,7 +6,6 @@ package net.java.truevfs.kernel.impl
 
 import net.java.truecommons.io._
 import net.java.truecommons.logging._
-import net.java.truecommons.shed._
 import java.io._
 import java.nio.channels._
 import javax.annotation.concurrent._
@@ -15,27 +14,26 @@ import net.java.truevfs.kernel.spec.FsAccessOption._
 import net.java.truevfs.kernel.spec.FsSyncOption._
 import net.java.truevfs.kernel.spec.FsSyncOptions._
 import net.java.truecommons.cio._
-import net.java.truecommons.cio.Entry._;
-import net.java.truecommons.cio.Entry.Type._;
-import scala.Option
+import net.java.truecommons.cio.Entry._
+import net.java.truecommons.cio.Entry.Type._
 
 /** A selective cache for file system entries.
   * Decorating a file system controller with this class has the following
   * effects:
   *
   * - Caching and buffering for an entry needs to get activated by using the
-  *   methods `input` or `output` with the access option
-  *   [[net.java.truevfs.kernel.impl.FsAccessOption.CACHE]].
+  * methods `input` or `output` with the access option
+  * [[net.java.truevfs.kernel.spec.FsAccessOption.CACHE]].
   * - Unless a write operation succeeds, upon each read operation the entry
-  *   data gets copied from the backing store for buffering purposes only.
+  * data gets copied from the backing store for buffering purposes only.
   * - Upon a successful write operation, the entry data gets cached for
-  *   subsequent read operations until the file system gets `sync`ed again.
+  * subsequent read operations until the file system gets `sync`ed again.
   * - Entry data written to the cache is not written to the backing store
-  *   until the file system gets `sync`ed - this is a ''write back'' strategy.
+  * until the file system gets `sync`ed - this is a ''write back'' strategy.
   * - As a side effect, caching decouples the underlying storage from its
-  *   clients, allowing it to create, read, update or delete the entry data
-  *   while some clients are still busy on reading or writing the copied
-  *   entry data.
+  * clients, allowing it to create, read, update or delete the entry data
+  * while some clients are still busy on reading or writing the copied
+  * entry data.
   *
   * '''TO THE FUTURE ME:'''
   * FOR TRUEZIP 7.5, IT TOOK ME TWO MONTHS OF CONSECUTIVE CODING, TESTING,
@@ -50,8 +48,7 @@ import scala.Option
   * @author Christian Schlichtherle
   */
 @NotThreadSafe
-private trait CacheController[E <: FsArchiveEntry]
-extends ArchiveController[E] {
+private trait CacheController[E <: FsArchiveEntry] extends ArchiveController[E] {
   controller: ArchiveModelAspect[E] =>
 
   import CacheController._
@@ -60,55 +57,59 @@ extends ArchiveController[E] {
 
   private[this] val caches = new java.util.HashMap[FsNodeName, EntryCache]
 
-  abstract override def input(options: AccessOptions, name: FsNodeName) = {
+  abstract override def input(options: AccessOptions, name: FsNodeName): AnyInputSocket = {
     /** This class requires ON-DEMAND LOOKUP of its delegate socket! */
-    class Input extends DelegatingInputSocket[Entry] {
+    new DelegatingInputSocket[Entry] {
       override def socket(): AnyInputSocket = {
         assert(writeLockedByCurrentThread)
         var cache = caches get name
         if (null eq cache) {
-            if (!(options get CACHE))
-              return CacheController.super.input(options, name)
+          if (!(options get CACHE)) {
+            return CacheController.super.input(options, name)
+          }
           cache = new EntryCache(name)
         }
         cache input options
       }
     }
-    new Input
-  }: AnyInputSocket
+  }
 
-  abstract override def output(options: AccessOptions, name: FsNodeName, template: Option[Entry]) = {
+  abstract override def output(options: AccessOptions, name: FsNodeName, template: Option[Entry]): AnyOutputSocket = {
     /** This class requires ON-DEMAND LOOKUP of its delegate socket! */
-    class Output extends DelegatingOutputSocket[Entry] {
+    new DelegatingOutputSocket[Entry] {
       override def socket(): AnyOutputSocket = {
         assert(writeLockedByCurrentThread)
         var cache = caches get name
         if (null eq cache) {
-            if (!(options get CACHE))
-              return CacheController.super.output(options, name, template)
+          if (!(options get CACHE)) {
+            return CacheController.super.output(options, name, template)
+          }
           cache = new EntryCache(name)
         }
-        cache output (options, template)
+        cache.output(options, template)
       }
     }
-    new Output
-  }: AnyOutputSocket
+  }
 
-  abstract override def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]) {
+  abstract override def make(options: AccessOptions, name: FsNodeName, tµpe: Type, template: Option[Entry]): Unit = {
     assert(writeLockedByCurrentThread)
     super.make(options, name, tµpe, template)
     val cache = caches remove name
-    if (null ne cache) cache clear ()
+    if (null ne cache) {
+      cache.clear()
+    }
   }
 
-  abstract override def unlink(options: AccessOptions, name: FsNodeName) {
+  abstract override def unlink(options: AccessOptions, name: FsNodeName): Unit = {
     assert(writeLockedByCurrentThread)
     super.unlink(options, name)
     val cache = caches remove name
-    if (null ne cache) cache clear()
+    if (null ne cache) {
+      cache.clear()
+    }
   }
 
-  abstract override def sync(options: SyncOptions) {
+  abstract override def sync(options: SyncOptions): Unit = {
     assert(writeLockedByCurrentThread)
     assert(!readLockedByCurrentThread)
 
@@ -117,7 +118,7 @@ extends ArchiveController[E] {
     if (caches.isEmpty) mounted = false
   }
 
-  private def syncCacheEntries(options: SyncOptions) {
+  private def syncCacheEntries(options: SyncOptions): Unit = {
     // HC SVNT DRACONES!
     if (0 >= caches.size()) return
     val flush = !(options get ABORT_CHANGES)
@@ -126,119 +127,129 @@ extends ArchiveController[E] {
     val builder = new FsSyncExceptionBuilder
     val i = caches.values.iterator
     while (i.hasNext) {
-      val cache = i next ()
+      val cache = i.next()
       if (flush) {
         try {
-          cache flush ()
+          cache.flush()
         } catch {
           case ex: IOException =>
             throw builder fail new FsSyncException(mountPoint, ex)
         }
       }
       if (clear) {
-        i remove ()
+        i.remove()
         try {
-          cache clear ()
+          cache.clear()
         } catch {
           case ex: IOException =>
             builder warn new FsSyncWarningException(mountPoint, ex)
         }
       }
     }
-    builder check ()
+    builder.check()
   }
 
   /** A cache for the contents of an individual archive entry. */
   private final class EntryCache(val name: FsNodeName) {
-    val cache = CacheEntry.Strategy.WriteBack.newCacheEntry(pool)
 
-    def flush() { cache flush () }
+    private val cache: CacheEntry = CacheEntry.Strategy.WriteBack.newCacheEntry(pool)
 
-    def clear() { cache release () }
+    def flush(): Unit = {
+      cache.flush()
+    }
 
-    def register() { caches put (name, this) }
+    def clear(): Unit = {
+      cache.release()
+    }
 
-    def input(options: AccessOptions) = {
+    def register(): Unit = {
+      caches.put(name, this)
+    }
+
+    def input(options: AccessOptions): AnyInputSocket = {
+
       /** This class requires LAZY INITIALIZATION of its channel, but NO
         * automatic decoupling on exceptions!
         */
-      final class Input extends DelegatingInputSocket[Entry] {
+      class Input extends DelegatingInputSocket[Entry] {
+
         private[this] val _options = options clear CACHE // consume
 
-        override lazy val socket = CacheController.super.input(_options, name)
+        override lazy val socket: AnyInputSocket = CacheController.super.input(_options, name)
 
-        override def stream(peer: AnyOutputSocket) = {
+        override def stream(peer: AnyOutputSocket): InputStream = {
           assert(writeLockedByCurrentThread)
 
-          final class Stream extends DecoratingInputStream(socket stream peer) {
+          new DecoratingInputStream(socket stream peer) {
             assert(mounted)
 
-            override def close() {
+            override def close(): Unit = {
               assert(writeLockedByCurrentThread)
-              in close ()
+              in.close()
               register()
             }
           }
-          new Stream
         }
 
         override def channel(peer: AnyOutputSocket) = throw new AssertionError
       }
+
       cache.configure(new Input).input
     }
 
-    def output(options: AccessOptions, template: Option[Entry]) = {
+    def output(options: AccessOptions, template: Option[Entry]): AnyOutputSocket = {
+
       /** This class requires LAZY INITIALIZATION of its channel, but NO
         * automatic decoupling on exceptions!
         */
-      final class Output extends DelegatingOutputSocket[Entry] {
+      class Output extends DelegatingOutputSocket[Entry] {
+
         private[this] val _options = options clear CACHE // consume
 
-        override lazy val socket = cache
-          .configure(CacheController.super.output(
-              _options clear EXCLUSIVE, name, template))
+        override lazy val socket: AnyOutputSocket = cache
+          .configure(CacheController.super.output(_options clear EXCLUSIVE, name, template))
           .output
 
-        override def stream(peer: AnyInputSocket) = {
+        override def stream(peer: AnyInputSocket): OutputStream = {
           assert(writeLockedByCurrentThread)
           preOutput()
 
-          final class Stream extends DecoratingOutputStream(socket stream peer) {
+          new DecoratingOutputStream(socket stream peer) {
             register()
 
-            override def close() {
+            override def close(): Unit = {
               assert(writeLockedByCurrentThread)
-              out close ()
+              out.close()
               postOutput()
             }
           }
-          new Stream
         }
 
-        override def channel(peer: AnyInputSocket) = {
+        override def channel(peer: AnyInputSocket): SeekableByteChannel = {
           assert(writeLockedByCurrentThread)
           preOutput()
 
-          final class Channel extends DecoratingSeekableChannel(socket channel peer) {
+          new DecoratingSeekableChannel(socket channel peer) {
             register()
 
-            override def close() {
+            override def close(): Unit = {
               assert(writeLockedByCurrentThread)
-              channel close ()
+              channel.close()
               postOutput()
             }
           }
-          new Channel
         }
 
-        def preOutput() { make(_options, template) }
+        def preOutput(): Unit = {
+          make(_options, template)
+        }
 
-        def postOutput() {
+        def postOutput(): Unit = {
           make(_options clear EXCLUSIVE, template orElse Option(cache))
           register()
         }
 
-        def make(options: AccessOptions, template: Option[Entry]) {
+        def make(options: AccessOptions, template: Option[Entry]): Unit = {
           var makeOpts = options
           while (true) {
             try {
@@ -293,17 +304,17 @@ extends ArchiveController[E] {
                         val oldMknodOpts = makeOpts
                         makeOpts = oldMknodOpts set GROW
                         if (makeOpts eq oldMknodOpts) {
-                            // Finally, the make failed because the entry
-                            // has already been output to the target archive
-                            // file - so what?!
-                            // This should mark only a volatile issue because
-                            // the next sync() will sort it out once all the
-                            // I/O resources have been closed.
-                            // Let's log the sync exception - mind that it has
-                            // suppressed the make exception - and continue
-                            // anyway...
-                            logger debug ("ignoring", syncEx)
-                            return
+                          // Finally, the make failed because the entry
+                          // has already been output to the target archive
+                          // file - so what?!
+                          // This should mark only a volatile issue because
+                          // the next sync() will sort it out once all the
+                          // I/O resources have been closed.
+                          // Let's log the sync exception - mind that it has
+                          // suppressed the make exception - and continue
+                          // anyway...
+                          logger debug("ignoring", syncEx)
+                          return
                         }
                       case _ =>
                         // Too bad, sync() failed because of a more
@@ -316,12 +327,15 @@ extends ArchiveController[E] {
           }
           assert(false)
         }
-      } // Output
+      }
+
       new Output
     }
-  } // EntryCache
+  }
+
 }
 
 private object CacheController {
-  private val logger = new LocalizedLogger(classOf[CacheController[_]]);
+
+  val logger = new LocalizedLogger(classOf[CacheController[_]])
 }

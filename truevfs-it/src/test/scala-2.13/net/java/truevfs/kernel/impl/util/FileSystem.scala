@@ -9,7 +9,7 @@ import java.{util => ju}
 
 import net.java.truevfs.kernel.impl.util.FileSystem._
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.collection._
 
 /**
@@ -39,24 +39,25 @@ import scala.collection._
 final class FileSystem[K >: Null, V](
   implicit val composition: Composition[K],
   val directoryFactory: DirectoryFactory[K]
-) extends mutable.Map[K, V] with mutable.MapLike[K, V, FileSystem[K, V]] {
+) extends mutable.Map[K, V] {
 
   private[this] var _root: INode[K, V] = _
+
   private var _size: Int = _
 
   reset()
 
   implicit private def self: FileSystem[K, V] = this
 
-  private def reset() { _root = new Root; _size = 0}
+  private def reset(): Unit = { _root = new Root; _size = 0}
 
-  override def size = _size
+  override def size: Int = _size
 
-  override def clear() = reset()
+  override def clear(): Unit = reset()
 
-  override def empty = new FileSystem[K, V]
+  override def empty: FileSystem[K, V] = new FileSystem[K, V]
 
-  override def iterator = iterator(None, _root)
+  override def iterator: Iterator[(K, V)] = iterator(None, _root)
 
   private def iterator(path: Option[K], node: Node[K, V]): Iterator[(K, V)] = {
     node.entry.map(path.orNull -> _).iterator ++ node.iterator.flatMap {
@@ -66,13 +67,13 @@ final class FileSystem[K >: Null, V](
 
   def list(path: K): Option[Iterator[(K, V)]] = list(Option(path))
 
-  private def list(path: Option[K]) = {
+  private def list(path: Option[K]): Option[Iterator[(K, V)]] = {
     node(path) map (_.iterator flatMap {
       case (segment, node) => node.entry map (composition(path, segment) -> _)
     })
   }
 
-  override def get(path: K) = node(path) flatMap (_.entry)
+  override def get(path: K): Option[V] = node(path) flatMap (_.entry)
 
   def node(path: K): Option[Node[K, V]] = node(Option(path))
 
@@ -88,7 +89,7 @@ final class FileSystem[K >: Null, V](
     }
   }
 
-  override def +=(kv: (K, V)) = { link(kv._1, kv._2); this }
+  override def addOne(kv: (K, V)): this.type = { link(kv._1, kv._2); this }
 
   def link(path: K, entry: V): Node[K, V] = link(Option(path), Some(entry))
 
@@ -105,11 +106,11 @@ final class FileSystem[K >: Null, V](
     }
   }
 
-  override def -=(path: K) = { unlink(path); this }
+  override def subtractOne(path: K): this.type = { unlink(path); this }
 
   def unlink(path: K): Unit = unlink(Option(path))
 
-  private def unlink(optPath: Option[K]) {
+  private def unlink(optPath: Option[K]): Unit = {
     optPath match {
       case Some(path) =>
         path match {
@@ -124,7 +125,7 @@ final class FileSystem[K >: Null, V](
     }
   }
 
-  override def stringPrefix = "FileSystem"
+  override def className: String = "FileSystem"
 }
 
 /**
@@ -135,22 +136,31 @@ object FileSystem {
   def apply[K >: Null, V](
     composition: Composition[K],
     directoryFactory: DirectoryFactory[K]
-  ) = new FileSystem[K, V]()(composition, directoryFactory)
+  ): FileSystem[K, V] = new FileSystem[K, V]()(composition, directoryFactory)
 
   def apply[V](
     separator: Char,
     directoryFactory: DirectoryFactory[String] = new SortedDirectoryFactory
-  ) = apply[String, V](new StringComposition(separator), directoryFactory)
+  ): FileSystem[String, V] = apply[String, V](new StringComposition(separator), directoryFactory)
 
   /** A file system node. */
   sealed abstract class Node[K >: Null, +V] extends Iterable[(K, Node[K, V])] {
+
     def path: Option[K]
-    final def isRoot = path.isEmpty
+
+    final def isRoot: Boolean = path.isEmpty
+
     def entry: Option[V]
-    final def isGhost = entry.isEmpty
-    final def isLeaf = isEmpty
-    final override def stringPrefix = "Node"
-    final override def toString() = stringPrefix + "(path=" + path + ", isLeaf=" + isLeaf + ", entry=" + entry + ")"
+
+    final def isGhost: Boolean = entry.isEmpty
+
+    final def isLeaf: Boolean = isEmpty
+
+    final override def className: String = "Node"
+
+    final override def toString(): String = {
+      className + "(path=" + path + ", isLeaf=" + isLeaf + ", entry=" + entry + ")"
+    }
   }
 
   private class INode[K >: Null, V] protected (
@@ -163,11 +173,13 @@ object FileSystem {
 
     if (_entry.isDefined) fs._size += 1
 
-    override def iterator = _members.iterator
-    override def foreach[U](f: ((K, Node[K, V])) => U): Unit = _members foreach f
-    override def size = _members.size
+    override def iterator: Iterator[(K, INode[K, V])] = _members.iterator
 
-    override def path = address._2
+    override def foreach[U](f: ((K, Node[K, V])) => U): Unit = _members foreach f
+
+    override def size: Int = _members.size
+
+    override def path: Option[K] = address._2
 
     def address: (FileSystem[K, V], Option[K]) = {
       val (node, segment) = parent.get
@@ -175,9 +187,9 @@ object FileSystem {
       fs -> Some(fs composition (path, segment))
     }
 
-    override def entry = _entry
+    override def entry: Option[V] = _entry
 
-    def entry_=(entry: Option[V])(implicit fs: FileSystem[K, V]) {
+    def entry_=(entry: Option[V])(implicit fs: FileSystem[K, V]): Unit = {
       // HC SVNT DRACONES!
       if (_entry.isDefined) {
         if (entry.isEmpty)
@@ -189,9 +201,9 @@ object FileSystem {
       _entry = entry
     }
 
-    def get(segment: K) = _members get segment
+    def get(segment: K): Option[INode[K, V]] = _members get segment
 
-    def link(segment: K, entry: Option[V])(implicit fs: FileSystem[K, V]) = {
+    def link(segment: K, entry: Option[V])(implicit fs: FileSystem[K, V]): INode[K, V] = {
       _members get segment match {
         case Some(node) =>
           if (entry.isDefined) node.entry = entry
@@ -203,22 +215,23 @@ object FileSystem {
       }
     }
 
-    def unlink(segment: K)(implicit fs: FileSystem[K, V]) {
+    def unlink(segment: K)(implicit fs: FileSystem[K, V]): Unit = {
       _members get segment foreach { node =>
         node.entry = None
         if (node.isLeaf) _members -= segment
       }
     }
 
-    def isDead = isGhost && isLeaf
+    def isDead: Boolean = isGhost && isLeaf
   }
 
-  private final class Root[K >: Null, V](implicit fs: FileSystem[K, V])
-  extends INode[K, V](None, None) {
-    override def address = fs -> None
+  private final class Root[K >: Null, V](implicit fs: FileSystem[K, V]) extends INode[K, V](None, None) {
+
+    override def address: (FileSystem[K, V], None.type) = fs -> None
   }
 
   trait Composition[K] extends ((Option[K], K) => K) {
+
     /** The composition method for injection. */
     override def apply(parent: Option[K], segment: K): K
 
@@ -231,16 +244,16 @@ object FileSystem {
     def unapply(path: K): Some[(Option[K], K)]
   }
 
-  final class StringComposition(separator: Char)
-  extends Composition[String] {
-    override def apply(optParent: Option[String], segment: String) = {
+  final class StringComposition(separator: Char) extends Composition[String] {
+
+    override def apply(optParent: Option[String], segment: String): String = {
       optParent match {
         case Some(parent) => parent + segment
         case None => segment
       }
     }
 
-    override def unapply(path: String) = {
+    override def unapply(path: String): Some[(Option[String], String)] = {
       val i = path.lastIndexOf(separator)
       if (0 <= i) {
         // Don't share sub-strings with the FileSystem!
@@ -252,19 +265,23 @@ object FileSystem {
     }
   }
 
-  trait DirectoryFactory[K] {
+  sealed trait DirectoryFactory[K] {
+
     def create[V]: mutable.Map[K, V]
   }
 
   final class HashedDirectoryFactory[K] extends DirectoryFactory[K] {
-    def create[V] = new mutable.HashMap
+
+    def create[V]: mutable.Map[K, V] = new mutable.HashMap
   }
 
   final class SortedDirectoryFactory[K : Ordering] extends DirectoryFactory[K] {
-    def create[V] = new ju.TreeMap[K, V](implicitly[Comparator[K]]).asScala
+
+    def create[V]: mutable.Map[K, V] = new ju.TreeMap[K, V](implicitly[Comparator[K]]).asScala
   }
 
   final class LinkedDirectoryFactory[K] extends DirectoryFactory[K] {
-    def create[V] = new mutable.LinkedHashMap
+
+    override def create[V]: mutable.Map[K, V] = new mutable.LinkedHashMap
   }
 }

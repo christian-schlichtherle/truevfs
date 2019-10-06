@@ -4,20 +4,25 @@
  */
 package net.java.truevfs.kernel.spec.mock;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.NoSuchFileException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.cio.*;
+import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.Entry.Type;
+import net.java.truecommons.cio.InputService;
+import net.java.truecommons.cio.IoBufferPool;
+import net.java.truecommons.cio.OutputService;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.HashMaps;
 import net.java.truevfs.kernel.spec.*;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.WillNotClose;
+import javax.annotation.concurrent.ThreadSafe;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.NoSuchFileException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * @author Christian Schlichtherle
@@ -25,26 +30,22 @@ import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
 @ThreadSafe
 public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
 
-    public static final Charset MOCK_CHARSET = Charset.forName("UTF-8");
-
     private final FsTestConfig config;
-    private final ConcurrentMap<FsMountPoint, MockArchive>
-            containers;
+    private final ConcurrentMap<FsMountPoint, MockArchive> containers;
 
     public MockArchiveDriver() {
         this.config = FsTestConfig.get();
-        this.containers = new ConcurrentHashMap<>(
-                HashMaps.initialCapacity(config.getNumEntries()));
+        this.containers = new ConcurrentHashMap<>(HashMaps.initialCapacity(config.getNumEntries()));
     }
 
     /**
      * {@inheritDoc}
      *
-     * @return {@link #MOCK_CHARSET}.
+     * @return {@link StandardCharsets#UTF_8}.
      */
     @Override
     public Charset getCharset() {
-        return MOCK_CHARSET;
+        return StandardCharsets.UTF_8;
     }
 
     @Override
@@ -56,11 +57,12 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     protected InputService<MockArchiveDriverEntry> newInput(
             final FsModel model,
             final FsInputSocketSource input)
-    throws IOException {
+            throws IOException {
         final FsMountPoint mp = model.getMountPoint();
         final MockArchive c = containers.get(mp);
-        if (null == c)
+        if (null == c) {
             throw new NoSuchFileException(mp.toString());
+        }
         return c.newInputService();
     }
 
@@ -68,8 +70,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     protected OutputService<MockArchiveDriverEntry> newOutput(
             final FsModel model,
             final FsOutputSocketSink sink,
-            final @CheckForNull @WillNotClose InputService<MockArchiveDriverEntry> input)
-    throws IOException {
+            final @CheckForNull @WillNotClose InputService<MockArchiveDriverEntry> input) {
         final FsMountPoint mp = model.getMountPoint();
         final MockArchive n = MockArchive.create(config);
         MockArchive o = containers.get(mp);

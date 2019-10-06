@@ -11,15 +11,18 @@ import net.java.truecommons.cio.Entry._
 /**
   * @author Christian Schlichtherle
   */
-trait ArchiveEntryAspect[E <: FsArchiveEntry]
-extends MutableEntryAspect[E] {
-  def tµpe = entry.getType
+trait ArchiveEntryAspect[E <: FsArchiveEntry] extends MutableEntryAspect[E] {
+
+  def tµpe: Type = entry.getType
 }
 
 /**
   * @author Christian Schlichtherle
   */
 object ArchiveEntryAspect {
-  implicit def apply[E <: FsArchiveEntry](e: E) =
-    new ArchiveEntryAspect[E] { def entry = e }
+
+  implicit def apply[E <: FsArchiveEntry](e: E): ArchiveEntryAspect[E] = new ArchiveEntryAspect[E] {
+
+    def entry: E = e
+  }
 }

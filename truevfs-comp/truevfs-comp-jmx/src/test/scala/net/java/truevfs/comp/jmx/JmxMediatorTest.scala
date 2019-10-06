@@ -42,13 +42,18 @@ private object JmxMediatorTest {
 
   private[this] val mbs = MBeanServerFactory.newMBeanServer
 
-  private class TestMediator extends JmxMediator[TestMediator] with Immutable {
-    override def getMBeanServer = mbs
+  private class TestMediator extends JmxMediator[TestMediator] {
+
+    override def getMBeanServer: MBeanServer = mbs
   }
 
-  trait MessengerMXBean { def getMessage: String }
+  trait MessengerMXBean {
+
+    def getMessage: String
+  }
 
   class Messenger extends MessengerMXBean {
+
     override def getMessage = "Hello world!"
   }
 }
