@@ -5,8 +5,8 @@ before_cache:
 
 cache:
   directories:
-  - $HOME/.ivy2
-  - $HOME/.sbt
+    - $HOME/.ivy2
+    - $HOME/.sbt
 
 dist: xenial
 
