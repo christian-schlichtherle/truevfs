@@ -116,6 +116,9 @@ object BuildSettings {
       compileOrder := CompileOrder.JavaThenScala,
       javacOptions := DefaultOptions.javac ++ Seq(Opts.compile.deprecation, "-Xlint", "-source", "1.8", "-target", "1.8", "-g"),
       javacOptions in doc := DefaultOptions.javac ++ Seq("-source", "1.8"),
+      packageOptions in(Compile, packageBin) += Package.ManifestAttributes("Automatic-Module-Name" ->
+        ("net.java." + normalizedName.value.replace('-', '.'))
+      ),
       scalacOptions := DefaultOptions.scalac ++ Seq(Opts.compile.deprecation, "-feature", Opts.compile.unchecked, "-target:jvm-1.8")
     )
   }
