@@ -344,7 +344,7 @@ lazy val extInsight: Project = project
 lazy val extLogging: Project = project
   .in(file("truevfs-ext/truevfs-ext-logging"))
   .dependsOn(compInst)
-  .settings(scalaLibrarySettings)
+  .settings(javaLibrarySettings)
   .settings(
     description :=
       """Instruments the TrueVFS Kernel for logging via SLF4J.
