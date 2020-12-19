@@ -31,6 +31,7 @@ object Dependencies {
   val JclOverSlf4j: ModuleID = "org.slf4j" % "jcl-over-slf4j" % Slf4jVersion
   val Junit: ModuleID = "junit" % "junit" % "4.12"
   val JunitInterface: ModuleID = "com.novocode" % "junit-interface" % "0.11"
+  val Lombok: ModuleID = "org.projectlombok" % "lombok" % "1.18.16"
   val MockitoCore: ModuleID = "org.mockito" % "mockito-core" % "3.1.0"
   val Scalacheck: ModuleID = "org.scalacheck" %% "scalacheck" % "1.14.2"
   def scalaLibrary(scalaVersion: String): ModuleID = "org.scala-lang" % "scala-library" % scalaVersion

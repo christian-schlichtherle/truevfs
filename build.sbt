@@ -327,13 +327,14 @@ lazy val ext: Project = project
 lazy val extInsight: Project = project
   .in(file("truevfs-ext/truevfs-ext-insight"))
   .dependsOn(compJmx)
-  .settings(scalaLibrarySettings)
+  .settings(javaLibrarySettings)
   .settings(
     description :=
       """Instruments the TrueVFS Kernel for statistics monitoring via JMX.
         |Add the JAR artifact of this module to the run time class path to make its services available for service location in the client API modules.""".stripMargin,
     libraryDependencies ++= Seq(
       FunIoBIOS % Test,
+      Lombok,
       JunitInterface % Test,
       Scalatest % Test
     ),
