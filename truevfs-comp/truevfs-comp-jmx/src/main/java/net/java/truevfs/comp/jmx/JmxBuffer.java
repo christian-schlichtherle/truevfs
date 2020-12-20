@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2015 Schlichtherle IT Services.
+ * Copyright (C) 2005-2020 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
 package net.java.truevfs.comp.jmx;
@@ -24,8 +24,9 @@ extends InstrumentingBuffer<M> implements JmxComponent {
         super(mediator, entry);
     }
 
-    private ObjectName objectName() {
-        return mediator.nameBuilder(IoBuffer.class)
+    private ObjectName getObjectName() {
+        return mediator
+                .nameBuilder(IoBuffer.class)
                 .put("name", ObjectName.quote(getName()))
                 .get();
     }
@@ -33,11 +34,11 @@ extends InstrumentingBuffer<M> implements JmxComponent {
     protected Object newView() { return new JmxBufferView<>(entry); }
 
     @Override
-    public void activate() { mediator.register(objectName(), newView()); }
+    public void activate() { mediator.register(getObjectName(), newView()); }
 
     @Override
     public void release() throws IOException {
         try { entry.release(); }
-        finally { mediator.deregister(objectName()); }
+        finally { mediator.deregister(getObjectName()); }
     }
 }

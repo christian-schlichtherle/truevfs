@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2015 Schlichtherle IT Services.
+ * Copyright (C) 2005-2020 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
 package net.java.truevfs.comp.jmx;
@@ -23,12 +23,12 @@ extends InstrumentingManager<M> implements JmxComponent {
         super(mediator, manager);
     }
 
-    private ObjectName objectName() {
+    private ObjectName getObjectName() {
         return mediator.nameBuilder(FsManager.class).get();
     }
 
     protected Object newView() { return new JmxManagerView<>(manager); }
 
     @Override
-    public void activate() { mediator.register(objectName(), newView()); }
+    public void activate() { mediator.register(getObjectName(), newView()); }
 }

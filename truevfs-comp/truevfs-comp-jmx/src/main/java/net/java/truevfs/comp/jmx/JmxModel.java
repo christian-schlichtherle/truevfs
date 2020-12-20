@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2015 Schlichtherle IT Services.
+ * Copyright (C) 2005-2020 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
 package net.java.truevfs.comp.jmx;
@@ -24,13 +24,13 @@ extends InstrumentingModel<M> implements JmxComponent {
 
     public JmxModel(M mediator, FsModel model) {
         super(mediator, model);
-        this.objectName = objectName();
+        this.objectName = getObjectName();
     }
 
-    private ObjectName objectName() {
-        return mediator.nameBuilder(FsModel.class)
-                .put("mountPoint", ObjectName.quote(
-                    model.getMountPoint().toHierarchicalUri().toString()))
+    private ObjectName getObjectName() {
+        return mediator
+                .nameBuilder(FsModel.class)
+                .put("mountPoint", ObjectName.quote(model.getMountPoint().toHierarchicalUri().toString()))
                 .get();
     }
 
