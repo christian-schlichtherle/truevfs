@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2015 Schlichtherle IT Services.
+ * Copyright (C) 2005-2020 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
 package net.java.truevfs.kernel.spec;
@@ -24,11 +24,7 @@ public final class FsSync {
 
     public FsSync manager(final FsManager manager) {
         requireNonNull(manager);
-        this.managerProvider = new Provider<FsManager>() {
-
-            @Override
-            public FsManager get() { return manager; }
-        };
+        this.managerProvider = () -> manager;
         return this;
     }
 
