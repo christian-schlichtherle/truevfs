@@ -30,16 +30,16 @@ class PaceManagerSpec extends WordSpec with OneInstancePerTest {
 
     "have a property for the maximum mounted file systems" which {
       "has two as its default value" in {
-        manager.maximumSize should be (2)
+        manager.getMaximumSize should be (2)
       }
 
       "ignores a lower value" in {
-        intercept[IllegalArgumentException] { manager.maximumSize = 1 }
+        intercept[IllegalArgumentException] { manager.setMaximumSize(1) }
       }
 
       "accepts a higher value" in {
-        manager.maximumSize = 3
-        manager.maximumSize should be (3)
+        manager.setMaximumSize(3)
+        manager.getMaximumSize should be (3)
       }
     }
 

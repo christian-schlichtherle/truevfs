@@ -5,6 +5,7 @@
 package net.java.truevfs.ext.pacemaker
 
 import net.java.truecommons.cio.{Entry, _}
+import net.java.truevfs.ext.pacemaker.AspectController.Op
 import net.java.truevfs.ext.pacemaker.AspectControllerSpec._
 import net.java.truevfs.kernel.spec._
 import org.mockito.ArgumentMatchers._
@@ -118,12 +119,6 @@ class AspectControllerSpec extends WordSpec with OneInstancePerTest {
         verify(controller).apply(any())
         verify(delegate).unlink(null, null)
       }
-
-      "sync(*)" in {
-        controller.sync(null)
-        verify(controller).apply(any())
-        verify(delegate).sync(null)
-      }
     }
   }
 }
@@ -132,6 +127,6 @@ private object AspectControllerSpec {
 
   private class TestController(controller: FsController) extends AspectController(controller) {
 
-    override def apply[V](op: () => V): V = op()
+    override def apply[V](op: Op[V]): V = op()
   }
 }
