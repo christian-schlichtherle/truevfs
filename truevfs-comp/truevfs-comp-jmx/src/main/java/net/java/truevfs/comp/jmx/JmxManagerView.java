@@ -26,18 +26,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxManagerView<M extends FsManager>
-        extends StandardMBean implements JmxManagerMXBean {
+public class JmxManagerView<M extends FsManager> extends StandardMBean implements JmxManagerMXBean {
 
     protected final M manager;
 
     public JmxManagerView(M manager) {
-        this(JmxManagerMXBean.class, manager);
+        this(manager, JmxManagerMXBean.class);
     }
 
-    protected JmxManagerView(
-            final Class<? extends JmxManagerMXBean> type,
-            final M manager) {
+    protected JmxManagerView(final M manager, final Class<? extends JmxManagerMXBean> type) {
         super(type, true);
         this.manager = Objects.requireNonNull(manager);
     }

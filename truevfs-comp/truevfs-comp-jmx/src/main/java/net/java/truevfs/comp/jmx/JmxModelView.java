@@ -35,19 +35,16 @@ import static net.java.truecommons.cio.Entry.UNKNOWN;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxModelView<M extends FsModel>
-extends StandardMBean implements JmxModelMXBean {
+public class JmxModelView<M extends FsModel> extends StandardMBean implements JmxModelMXBean {
 
     private static final FsCompositeDriver
             DRIVER = new FsSimpleCompositeDriver(FsDriverMapLocator.SINGLETON);
 
     protected final M model;
 
-    public JmxModelView(M model) { this(JmxModelMXBean.class, model); }
+    public JmxModelView(M model) { this(model, JmxModelMXBean.class); }
 
-    protected JmxModelView(
-            final Class<? extends JmxModelMXBean> type,
-            final M model) {
+    protected JmxModelView(final M model, final Class<? extends JmxModelMXBean> type) {
         super(type, true);
         this.model = Objects.requireNonNull(model);
     }

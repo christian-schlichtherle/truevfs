@@ -23,16 +23,13 @@ import net.java.truecommons.cio.IoBuffer;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class JmxBufferView<B extends IoBuffer>
-extends StandardMBean implements JmxBufferMXBean {
+public class JmxBufferView<B extends IoBuffer> extends StandardMBean implements JmxBufferMXBean {
 
     protected final B buffer;
 
-    public JmxBufferView(B buffer) { this(JmxBufferMXBean.class, buffer); }
+    public JmxBufferView(B buffer) { this(buffer, JmxBufferMXBean.class); }
 
-    protected JmxBufferView(
-            final Class<? extends JmxBufferMXBean> type,
-            final B buffer) {
+    protected JmxBufferView(final B buffer, final Class<? extends JmxBufferMXBean> type) {
         super(type, true);
         this.buffer = Objects.requireNonNull(buffer);
     }

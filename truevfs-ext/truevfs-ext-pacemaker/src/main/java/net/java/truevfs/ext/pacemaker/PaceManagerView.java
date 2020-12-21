@@ -18,7 +18,7 @@ import javax.management.MBeanInfo;
 final class PaceManagerView extends JmxManagerView<PaceManager> implements PaceManagerMXBean {
 
     public PaceManagerView(PaceManager manager) {
-        super(PaceManagerMXBean.class, manager);
+        super(manager, PaceManagerMXBean.class);
     }
 
     @Override
