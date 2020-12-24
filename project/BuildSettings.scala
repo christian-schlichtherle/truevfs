@@ -113,7 +113,7 @@ object BuildSettings {
   lazy val librarySettings: Seq[Setting[_]] = {
     artifactSettings ++ Seq(
       // Support testing Java projects with ScalaTest et al:
-      compileOrder := CompileOrder.JavaThenScala,
+      compileOrder := CompileOrder.Mixed,
       javacOptions := DefaultOptions.javac ++ Seq(Opts.compile.deprecation, "-Xlint", "-source", "11", "-target", "11", "-g"),
       javacOptions in doc := DefaultOptions.javac ++ Seq("-source", "11"),
       packageOptions in(Compile, packageBin) += Package.ManifestAttributes("Automatic-Module-Name" ->
