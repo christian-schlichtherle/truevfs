@@ -428,6 +428,7 @@ lazy val kernelImpl: Project = project
         |You can override it by providing another file system manager factory implementation with a higher priority on the class path.""".stripMargin,
     libraryDependencies ++= Seq(
       JunitInterface % Test,
+      Lombok,
       MockitoCore % Test,
       Scalatest % Test,
       Slf4jSimple % Test,
