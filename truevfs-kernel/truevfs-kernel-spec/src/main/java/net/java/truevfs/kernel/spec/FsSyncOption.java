@@ -46,8 +46,8 @@ public enum FsSyncOption {
      * proceeds to update the file system anyway and finally throws an
      * {@link FsSyncWarningException} with a
      * {@link FsOpenResourceException} as its cause to indicate that any
-     * subsequent operations on these resources will fail with an
-     * {@link ClosedInputException} or {@link ClosedOutputException}
+     * subsequent operations on these resources will fail with a
+     * {@link ClosedInputException} or a {@link ClosedOutputException}
      * respectively because they have been forced to close.
      * <p>
      * If this option is not set however, the file system is <em>not</em>
