@@ -180,7 +180,7 @@ extends ConfiguredClientTestBase<D> {
             final ReferenceQueue<FsController> queue)
     throws IOException, InterruptedException {
         final Reference<FsController> reference;
-        try (@SuppressWarnings("unused") Closeable ignored = factory.create(entry)) {
+        try (Closeable ignored = factory.create(entry)) {
             reference = new WeakReference<>(controller(new TFile(entry).getNodePath()), queue);
             System.gc();
             assertNull(queue.remove(TIMEOUT_MILLIS));

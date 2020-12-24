@@ -4,11 +4,11 @@
  */
 package net.java.truevfs.kernel.impl.cio
 
-import java.util
-
-import collection.JavaConverters._
 import net.java.truecommons.cio._
 import net.java.truevfs.kernel.impl.util._
+
+import java.util
+import scala.jdk.CollectionConverters._
 
 /**
   * @author Christian Schlichtherle

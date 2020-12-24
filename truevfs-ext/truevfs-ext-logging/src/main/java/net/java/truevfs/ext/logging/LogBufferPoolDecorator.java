@@ -12,7 +12,7 @@ import net.java.truevfs.kernel.spec.spi.IoBufferPoolDecorator;
  * @deprecated This class is reserved for exclusive use by the
  * {@link net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator} singleton!
  */
-@Deprecated(since = "1")
+@Deprecated
 public final class LogBufferPoolDecorator extends IoBufferPoolDecorator {
 
     @Override

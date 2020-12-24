@@ -8,7 +8,7 @@ import net.java.truevfs.kernel.spec.spi.FsManagerDecorator;
  * @deprecated This class is reserved for exclusive use by the {@link net.java.truevfs.kernel.spec.sl.FsManagerLocator}
  * singleton!
  */
-@Deprecated(since = "1")
+@Deprecated
 public final class LogManagerDecorator extends FsManagerDecorator {
 
     @Override

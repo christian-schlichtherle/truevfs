@@ -127,6 +127,6 @@ private object AspectControllerSpec {
 
   private class TestController(controller: FsController) extends AspectController(controller) {
 
-    override def apply[V](op: Op[V]): V = op()
+    override def apply[V](op: Op[V]): V = op.call()
   }
 }

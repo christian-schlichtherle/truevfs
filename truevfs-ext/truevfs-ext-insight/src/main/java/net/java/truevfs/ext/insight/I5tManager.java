@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.ext.insight;
 
+import lombok.val;
 import net.java.truecommons.shed.Filter;
 import net.java.truecommons.shed.Visitor;
 import net.java.truevfs.comp.jmx.JmxManager;
@@ -38,7 +39,7 @@ final class I5tManager extends JmxManager<I5tMediator> {
             {
                 manager.<X, Visitor<FsController, X>>accept(
                         controller -> {
-                            final var accepted = filter.accept(controller);
+                            val accepted = filter.accept(controller);
                             allUnmounted &= accepted;
                             return accepted;
                         },

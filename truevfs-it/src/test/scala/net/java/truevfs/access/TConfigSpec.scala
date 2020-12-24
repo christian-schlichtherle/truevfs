@@ -4,10 +4,7 @@
  */
 package net.java.truevfs.access
 
-import java.util.concurrent._
-
 import global.namespace.fun.io.api.Socket
-import global.namespace.fun.io.scala.api._
 import net.java.truecommons.services._
 import net.java.truecommons.shed._
 import net.java.truevfs.access.TConfig._
@@ -20,7 +17,8 @@ import org.scalatest.Matchers._
 import org.scalatest._
 import org.scalatest.prop.TableDrivenPropertyChecks._
 
-import scala.collection.JavaConverters._
+import java.util.concurrent._
+import scala.jdk.CollectionConverters._
 
 /** DO NOT MODIFY THE GLOBAL CONFIGURATION IN THESE TESTS!
   * Its global scope makes it available to any other test running in parallel.

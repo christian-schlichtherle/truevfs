@@ -10,7 +10,7 @@ import org.scalatest.WordSpec
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatestplus.mockito.MockitoSugar.mock
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 /**
  * @author Christian Schlichtherle

@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.ext.pacemaker;
 
+import lombok.val;
 import net.java.truecommons.logging.LocalizedLogger;
 import net.java.truevfs.comp.jmx.JmxManager;
 import net.java.truevfs.kernel.spec.*;
@@ -59,12 +60,12 @@ class PaceManager extends JmxManager<PaceMediator> {
     }
 
     private void unmountEvictedArchiveFileSystems() throws FsSyncException {
-        final var iterator = evictedMountPoints.iterator();
+        val iterator = evictedMountPoints.iterator();
         if (iterator.hasNext()) {
-            final var builder = new FsSyncExceptionBuilder();
+            val builder = new FsSyncExceptionBuilder();
             do {
-                final var evictedMountPoint = iterator.next();
-                final var evictedMountPointFilter = FsPrefixMountPointFilter.forPrefix(evictedMountPoint);
+                val evictedMountPoint = iterator.next();
+                val evictedMountPointFilter = FsPrefixMountPointFilter.forPrefix(evictedMountPoint);
                 // Check that neither the evicted file system nor any of its child file systems are actually mounted:
                 if (!(cachedMountPoints.exists(evictedMountPointFilter::accept))) {
                     try {

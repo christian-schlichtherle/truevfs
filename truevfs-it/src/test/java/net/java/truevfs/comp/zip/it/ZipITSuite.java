@@ -454,7 +454,7 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
             try (ZipFile zf = new ZipFile(file)) {
                 try {
                     // Open checked input stream and join immediately.
-                    try (@SuppressWarnings("unused") InputStream ignored = zf.getCheckedInputStream(name)) {
+                    try (InputStream ignored = zf.getCheckedInputStream(name)) {
                         if (tweakDD ^ tweakCFH)
                             fail("Expected CRC32Exception!");
                     }

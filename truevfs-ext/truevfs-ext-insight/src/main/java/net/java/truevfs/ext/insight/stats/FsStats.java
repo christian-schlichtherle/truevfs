@@ -26,8 +26,8 @@ public final class FsStats implements Serializable {
      * Returns file system statistics with all properties set to zero.
      */
     public static FsStats getInstance() {
-        final var io = IoStats.getInstance();
-        final var sync = SyncStats.getInstance();
+        val io = IoStats.getInstance();
+        val sync = SyncStats.getInstance();
         return new FsStats(io, io, sync); // cannot cache because of timeMillis!
     }
 

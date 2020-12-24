@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.ext.insight;
 
+import lombok.val;
 import net.java.truevfs.comp.inst.InstrumentingOutputStream;
 import net.java.truevfs.comp.jmx.JmxComponent;
 
@@ -30,14 +31,14 @@ final class I5tOutputStream extends InstrumentingOutputStream<I5tMediator> imple
 
     @Override
     public void write(final int b) throws IOException {
-        final var start = System.nanoTime();
+        val start = System.nanoTime();
         out.write(b);
         mediator.logWrite(System.nanoTime() - start, 1);
     }
 
     @Override
     public void write(final byte[] b, final int off, final int len) throws IOException {
-        final var start = System.nanoTime();
+        val start = System.nanoTime();
         out.write(b, off, len);
         mediator.logWrite(System.nanoTime() - start, len);
     }

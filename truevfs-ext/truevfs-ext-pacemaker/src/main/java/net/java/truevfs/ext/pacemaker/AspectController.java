@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 /**
  * Calls a template method to apply an aspect to all file system operations except {@link #sync(BitField)}.
@@ -35,9 +36,9 @@ abstract class AspectController extends FsDecoratingController {
      */
     abstract <T> T apply(Op<T> op) throws IOException;
 
-    interface Op<T> {
+    interface Op<T> extends Callable<T> {
 
-        T apply() throws IOException;
+        T call() throws IOException;
     }
 
     @CheckForNull

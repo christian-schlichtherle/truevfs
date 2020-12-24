@@ -4,6 +4,8 @@
  */
 package net.java.truevfs.ext.insight.stats;
 
+import lombok.val;
+
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,7 +35,7 @@ public final class FsLogger {
     @SuppressWarnings("StatementWithEmptyBody")
     private static int length(final int x) {
         assert 0 <= x;
-        var i = 0;
+        int i = 0;
         while (x > maxValues[i++]) {
         }
         return i;
@@ -78,7 +80,7 @@ public final class FsLogger {
     }
 
     public String format(final int offset) {
-        final var max = size() - 1;
+        val max = size() - 1;
         if (offset < 0 || max < offset) {
             throw new IllegalArgumentException();
         }
@@ -93,7 +95,7 @@ public final class FsLogger {
         if (offset < 0 || size() <= offset) {
             throw new IllegalArgumentException();
         }
-        var index = position() - offset;
+        int index = position() - offset;
         if (index < 0) {
             index += size();
         }
@@ -141,7 +143,7 @@ public final class FsLogger {
      * @throws IllegalArgumentException if any parameter value is negative.
      */
     public IoStats logRead(final long nanos, final int bytes) {
-        final var threads = logCurrentThread(readThreads);
+        val threads = logCurrentThread(readThreads);
         return update(stats -> stats.logRead(nanos, bytes, threads)).getReadStats();
     }
 
@@ -157,7 +159,7 @@ public final class FsLogger {
      * @throws IllegalArgumentException if any parameter is negative.
      */
     public IoStats logWrite(final long nanos, final int bytes) {
-        final var threads = logCurrentThread(writeThreads);
+        val threads = logCurrentThread(writeThreads);
         return update(stats -> stats.logWrite(nanos, bytes, threads)).getWriteStats();
     }
 
@@ -172,12 +174,12 @@ public final class FsLogger {
      * @throws IllegalArgumentException if any parameter value is negative.
      */
     public SyncStats logSync(final long nanos) {
-        final var threads = logCurrentThread(syncThreads);
+        val threads = logCurrentThread(syncThreads);
         return update(stats -> stats.logSync(nanos, threads)).getSyncStats();
     }
 
     public int rotate() {
-        final var n = next();
+        val n = next();
         stats.set(n, FsStats.getInstance());
         readThreads = new HashSet<>();
         writeThreads = new HashSet<>();

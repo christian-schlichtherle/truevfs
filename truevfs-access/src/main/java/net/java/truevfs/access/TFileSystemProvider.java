@@ -422,13 +422,11 @@ public final class TFileSystemProvider extends FileSystemProvider {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    private static TPath promote(Path path) {
+    private static TPath promote(final Path path) {
         try {
             return (TPath) path;
-        } catch (ClassCastException ex) {
-            throw (ProviderMismatchException) new ProviderMismatchException(
-                        ex.toString())
-                    .initCause(ex);
+        } catch (ClassCastException e) {
+            throw (ProviderMismatchException) new ProviderMismatchException(e.toString()).initCause(e);
         }
     }
 

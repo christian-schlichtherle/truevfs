@@ -14,7 +14,7 @@ import static net.java.truevfs.ext.insight.I5tMediators.syncOperationsMediator;
  * @deprecated This class is reserved for exclusive use by the {@link net.java.truevfs.kernel.spec.sl.FsManagerLocator}
  * singleton!
  */
-@Deprecated(since = "1")
+@Deprecated
 public final class I5tManagerDecorator extends FsManagerDecorator {
 
     @Override

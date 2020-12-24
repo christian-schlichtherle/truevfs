@@ -24,7 +24,7 @@ public final class IoStats implements Serializable {
     private static final long serialVersionUID = 0;
 
     private static final BigInteger tenPowNine = BigInteger.TEN.pow(9); // 1_000_000_000
-    private static final BigInteger twoPowTen = BigInteger.TWO.pow(10); // 1_024
+    private static final BigInteger twoPowTen = BigInteger.valueOf(2).pow(10); // 1_024
 
     /**
      * Returns I/O statistics with all properties set to zero.

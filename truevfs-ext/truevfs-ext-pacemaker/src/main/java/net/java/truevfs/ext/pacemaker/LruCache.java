@@ -93,6 +93,8 @@ final class LruCache<T> {
 
     private final class CacheMap extends LinkedHashMap<T, Boolean> {
 
+        private static final long serialVersionUID = 0;
+
         CacheMap() {
             super(initialCapacity(maximumSize), 0.75f, true);
         }

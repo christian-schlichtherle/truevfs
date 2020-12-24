@@ -257,7 +257,7 @@ private object CacheEntryTest {
 
     require(null ne target)
 
-    override def stream(peer: AnyOutputSocket): InputStream = new InputStream {
+    override def stream(peer: OutputSocket[_ <: Entry]): InputStream = new InputStream {
 
       override def read: Int = throw new IOException
     }
@@ -267,7 +267,7 @@ private object CacheEntryTest {
 
     require(null ne target)
 
-    override def stream(peer: AnyInputSocket): OutputStream = new OutputStream {
+    override def stream(peer: InputSocket[_ <: Entry]): OutputStream = new OutputStream {
 
       override def write(b: Int): Unit = { throw new IOException }
     }

@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.ext.insight;
 
+import lombok.val;
 import net.java.truevfs.comp.inst.InstrumentingSeekableChannel;
 import net.java.truevfs.comp.jmx.JmxComponent;
 
@@ -31,8 +32,8 @@ final class I5tSeekableChannel extends InstrumentingSeekableChannel<I5tMediator>
 
     @Override
     public int read(final ByteBuffer dst) throws IOException {
-        final var start = System.nanoTime();
-        final var ret = channel.read(dst);
+        val start = System.nanoTime();
+        val ret = channel.read(dst);
         if (0 <= ret) {
             mediator.logRead(System.nanoTime() - start, ret);
         }
@@ -41,8 +42,8 @@ final class I5tSeekableChannel extends InstrumentingSeekableChannel<I5tMediator>
 
     @Override
     public int write(final ByteBuffer src) throws IOException {
-        final var start = System.nanoTime();
-        final var ret = channel.write(src);
+        val start = System.nanoTime();
+        val ret = channel.write(src);
         mediator.logWrite(System.nanoTime() - start, ret);
         return ret;
     }

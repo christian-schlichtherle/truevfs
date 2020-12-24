@@ -29,7 +29,7 @@ class PaceController extends AspectController {
     <T> T apply(final Op<T> op) throws IOException {
         IOException t1 = null;
         try {
-            return op.apply();
+            return op.call();
         } catch (final IOException t2) {
             t1 = t2;
             throw t2;

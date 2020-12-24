@@ -1,5 +1,7 @@
 package net.java.truevfs.ext.insight;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -15,7 +17,7 @@ interface I5tMediators {
 
     I5tSyncMediator syncOperationsMediator = new I5tSyncMediator("Sync Operations");
 
-    List<I5tMediator> mediators = List.of(
+    List<I5tMediator> mediators = Collections.unmodifiableList(Arrays.asList(
             syncOperationsMediator, applicationIoMediator, kernelIoMediator, bufferIoMediator
-    );
+    ));
 }

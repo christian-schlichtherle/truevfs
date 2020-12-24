@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.ext.pacemaker;
 
+import lombok.val;
 import net.java.truevfs.comp.inst.InstrumentingModel;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsMountPoint;
@@ -24,7 +25,7 @@ final class PaceModel extends InstrumentingModel<PaceMediator> {
 
     @Override
     public void setMounted(final boolean isMounted) {
-        final var wasMounted = model.isMounted();
+        val wasMounted = model.isMounted();
         model.setMounted(isMounted);
         if (wasMounted) {
             if (!isMounted) {

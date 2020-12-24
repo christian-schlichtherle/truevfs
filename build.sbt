@@ -334,7 +334,7 @@ lazy val extInsight: Project = project
         |Add the JAR artifact of this module to the run time class path to make its services available for service location in the client API modules.""".stripMargin,
     libraryDependencies ++= Seq(
       FunIoBIOS % Test,
-      Lombok,
+      Lombok % Provided,
       JunitInterface % Test,
       Scalatest % Test
     ),
@@ -350,6 +350,9 @@ lazy val extLogging: Project = project
     description :=
       """Instruments the TrueVFS Kernel for logging via SLF4J.
         |Add the JAR artifact of this module to the run time class path to make its services available for service location in the client API modules.""".stripMargin,
+    libraryDependencies ++= Seq(
+      Lombok % Provided,
+    ),
     name := "TrueVFS Extension Logging",
     normalizedName := "truevfs-ext-logging"
   )
@@ -357,7 +360,7 @@ lazy val extLogging: Project = project
 lazy val extPacemaker: Project = project
   .in(file("truevfs-ext/truevfs-ext-pacemaker"))
   .dependsOn(compJmx)
-  .settings(scalaLibrarySettings)
+  .settings(javaLibrarySettings)
   .settings(
     description :=
       """Constraints the number of concurrently mounted archive file systems in order to save some heap space.
@@ -365,6 +368,7 @@ lazy val extPacemaker: Project = project
         |Add the JAR artifact of this module to the run time class path to make its services available for service location in the client API modules.""".stripMargin,
     libraryDependencies ++= Seq(
       JunitInterface % Test,
+      Lombok % Provided,
       MockitoCore % Test,
       Scalacheck % Test,
       Scalatest % Test,
@@ -421,14 +425,14 @@ lazy val kernel: Project = project
 lazy val kernelImpl: Project = project
   .in(file("truevfs-kernel/truevfs-kernel-impl"))
   .dependsOn(kernelSpec)
-  .settings(scalaLibrarySettings)
+  .settings(javaLibrarySettings)
   .settings(
     description :=
       """Implements the API for accessing the federated virtual file system space.
         |You can override it by providing another file system manager factory implementation with a higher priority on the class path.""".stripMargin,
     libraryDependencies ++= Seq(
       JunitInterface % Test,
-      Lombok,
+      Lombok % Provided,
       MockitoCore % Test,
       Scalatest % Test,
       Slf4jSimple % Test,
@@ -470,7 +474,7 @@ lazy val profileBase: Project = project
     driverJar % Runtime,
     driverZip % "runtime->runtime",
     kernelImpl % Runtime
-  ).settings(scalaLibrarySettings)
+  ).settings(javaLibrarySettings)
   .settings(
     description :=
       """Bundles dependencies to support the most prominent use cases.
@@ -495,7 +499,7 @@ lazy val profileDefault: Project = project
     driverTarXz % Runtime,
     driverZipRaes % Runtime,
     profileBase % "compile;runtime->runtime"
-  ).settings(scalaLibrarySettings)
+  ).settings(javaLibrarySettings)
   .settings(
     description :=
       """Bundles dependencies to support accessing all TrueVFS features without the slight negative performance impact of some excluded modules.
@@ -515,7 +519,7 @@ lazy val profileFull: Project = project
     extLogging % Runtime,
     extPacemaker % Runtime,
     profileDefault % "compile;runtime->runtime"
-  ).settings(scalaLibrarySettings)
+  ).settings(javaLibrarySettings)
   .settings(
     description :=
       """Bundles dependencies to support all TrueVFS features.
@@ -543,7 +547,7 @@ lazy val samples: Project = project
     driverZip % "compile;runtime->runtime",
     driverZipRaes,
     kernelImpl % Runtime
-  ).settings(scalaLibrarySettings)
+  ).settings(javaLibrarySettings)
   .settings(
     description :=
       """Sample applications to demonstrate the usage of TrueVFS modules to support many, even esoteric use cases.""".stripMargin,
