@@ -99,7 +99,7 @@ final class DefaultManager extends FsAbstractManager implements ReentrantReadWri
 
                 @Override
                 public FsController call() throws RuntimeException {
-                    return DefaultManager.this.controller0(driver, mountPoint);
+                    return controller0(driver, mountPoint);
                 }
             });
         }

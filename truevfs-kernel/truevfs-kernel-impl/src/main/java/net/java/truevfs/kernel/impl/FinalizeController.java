@@ -198,10 +198,10 @@ final class FinalizeController extends FsDecoratingController {
                     // Log and swallow:
                     logger.warn("finalizeFailed", t);
                 }
-            } else if (!e.isPresent()) {
-                logger.trace("closeCleared");
-            } else {
+            } else if (e.isPresent()) {
                 logger.trace("closeFailed", e.get());
+            } else {
+                logger.trace("closeCleared");
             }
         }
     }

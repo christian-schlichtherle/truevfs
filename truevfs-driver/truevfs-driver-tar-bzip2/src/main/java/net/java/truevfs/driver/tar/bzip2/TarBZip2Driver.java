@@ -71,13 +71,13 @@ public class TarBZip2Driver extends TarDriver {
                 try {
                     return new BZip2CompressorInputStream(
                             new BufferedInputStream(in, getBufferSize()));
-                } catch (final Throwable ex) {
+                } catch (final Throwable t1) {
                     try {
                         in.close();
-                    } catch (final Throwable ex2) {
-                        ex.addSuppressed(ex2);
+                    } catch (final Throwable t2) {
+                        t1.addSuppressed(t2);
                     }
-                    throw ex;
+                    throw t1;
                 }
             }
         }

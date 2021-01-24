@@ -76,13 +76,13 @@ public class TarGZipDriver extends TarDriver {
                 final InputStream in = source.stream();
                 try {
                     return new GZIPInputStream(in, getBufferSize());
-                } catch (final Throwable ex) {
+                } catch (final Throwable t1) {
                     try {
                         in.close();
-                    } catch (final Throwable ex2) {
-                        ex.addSuppressed(ex2);
+                    } catch (final Throwable t2) {
+                        t1.addSuppressed(t2);
                     }
-                    throw ex;
+                    throw t1;
                 }
             }
         }
@@ -138,7 +138,7 @@ public class TarGZipDriver extends TarDriver {
      */
     private static final class FixedGZIPOutputStream extends GZIPOutputStream {
 
-        private boolean closed;
+        boolean closed;
 
         FixedGZIPOutputStream(OutputStream out, int size, int level) throws IOException {
             super(out, size);
