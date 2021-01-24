@@ -130,9 +130,5 @@ object BuildSettings {
     )
   }
 
-  lazy val scalaLibrarySettings: Seq[Setting[_]] = {
-    librarySettings ++ Seq(
-      crossScalaVersions := Seq(ScalaVersion_2_10, ScalaVersion_2_11, ScalaVersion_2_12, ScalaVersion_2_13)
-    )
-  }
+  lazy val scalaLibrarySettings: Seq[Setting[_]] = librarySettings
 }
