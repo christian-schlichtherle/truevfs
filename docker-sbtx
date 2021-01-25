@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Copyright © 2005-2015 Schlichtherle IT Services.
+# Copyright © 2005 - 2021 Schlichtherle IT Services.
 # All rights reserved. Use is subject to license terms.
 #
 declare -r image_tag="$1"

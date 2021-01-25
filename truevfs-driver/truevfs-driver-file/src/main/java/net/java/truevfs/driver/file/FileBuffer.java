@@ -1,6 +1,6 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright © 2005 - 2021 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
  */
 package net.java.truevfs.driver.file;
 
