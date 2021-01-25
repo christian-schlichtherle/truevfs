@@ -36,15 +36,6 @@ class TUriHelperSpec extends WordSpec {
 
   // See http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=7198297 :
   "Fixing a URI" should {
-    "be required unless bug 7198297 has been fixed in the JDK" in {
-      sys props "java.version" match {
-        case VersionRegex(v) if v.toFloat >= 9F => pending
-        case _ =>
-          (new URI("x/") resolve "..").getRawSchemeSpecificPart should be(null)
-          (new URI("x/") resolve "..").getSchemeSpecificPart should be(null)
-      }
-    }
-
     "successfully work around bug 7198297" in {
       fix(new URI("x/") resolve "..").getRawSchemeSpecificPart shouldBe ""
       fix(new URI("x/") resolve "..").getSchemeSpecificPart shouldBe ""
