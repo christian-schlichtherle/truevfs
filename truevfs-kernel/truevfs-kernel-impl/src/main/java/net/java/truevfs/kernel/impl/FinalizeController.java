@@ -176,8 +176,6 @@ final class FinalizeController extends FsDecoratingController {
             try {
                 closeable.close();
                 ioException = Optional.empty();
-            } catch (ControlFlowException t) {
-                throw new AssertionError(t);
             } catch (IOException e) {
                 ioException = Optional.of(e);
                 throw e;
