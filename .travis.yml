@@ -1,26 +1,28 @@
+#
+# Copyright © 2005-2015 Schlichtherle IT Services.
+# All rights reserved. Use is subject to license terms.
+#
 ---
-before_cache:
-  - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm
-  - find $HOME/.sbt -name "*.lock" | xargs rm
-
 cache:
   directories:
-    - $HOME/.ivy2
-    - $HOME/.sbt
+    - project/.boot
+    - project/.coursier
+    - project/.ivy
+    - project/.sbtboot
 
-dist: xenial
+dist: focal
 
-# Don't use slim or alpine images here - the SBT Wrapper runs a shell script which wouldn't always work then:
+# Don't use -slim or -alpine image tags here - the SBT Wrapper runs a shell script which wouldn't always work then:
 env:
   - COMPILE_IMAGE_TAG=8-jdk TEST_IMAGE_TAG=8-jdk
-  - COMPILE_IMAGE_TAG=8-jdk TEST_IMAGE_TAG=15-jdk
+  - COMPILE_IMAGE_TAG=11-jdk TEST_IMAGE_TAG=15-jdk
 
-install: ./docker-sbtx $COMPILE_IMAGE_TAG -no-colors +test:compile
+install: ./docker-sbtx $COMPILE_IMAGE_TAG -batch +test:compile
 
 language: minimal
 
-# Run the build in Docker to shield it from changes in the Travis environment:
+# Run the build in Docker to protect it from changes in the environment:
 services:
   - docker
 
-script: ./docker-sbtx $TEST_IMAGE_TAG -no-colors +test
+script: ./docker-sbtx $TEST_IMAGE_TAG -batch +test

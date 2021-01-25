@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-
+#
+# Copyright © 2005-2015 Schlichtherle IT Services.
+# All rights reserved. Use is subject to license terms.
+#
 declare -r image_tag="$1"
 shift
 [[ -z "$image_tag" ]] && { echo "Usage: $0 IMAGE_TAG [...]"; exit 1; }
@@ -8,9 +11,7 @@ exec docker run \
     --interactive \
     --rm \
     --tty \
-    --volume "$HOME/.ivy2:/root/.ivy2" \
-    --volume "$HOME/.sbt:/root/.sbt" \
     --volume "$PWD:/workdir" \
     --workdir /workdir \
     "openjdk:$image_tag" \
-    ./sbtx $@
+    ./sbtx -no-share "$@"
