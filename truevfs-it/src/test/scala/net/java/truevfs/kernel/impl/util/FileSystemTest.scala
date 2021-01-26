@@ -37,9 +37,9 @@ class FileSystemTest extends WordSpec {
             fs(parentPath) should be theSameInstanceAs parentEntry
             fs.size should be >= 1
             val iterator = fs.iterator
-            iterator.hasNext should equal (true)
-            iterator.next should be ((parentPath, parentEntry ))
-            iterator.hasNext should equal (false)
+            iterator.hasNext shouldBe true
+            iterator.next() shouldBe parentPath -> parentEntry
+            iterator.hasNext shouldBe false
             forAll { memberName: String =>
               whenever (isMemberName(memberName)) {
                 val path = parentPath + '/' + memberName
@@ -48,19 +48,19 @@ class FileSystemTest extends WordSpec {
                 fs(path) should be theSameInstanceAs entry
                 fs.size should be >= 2
                 val iterator = fs.iterator
-                iterator.hasNext should equal (true)
-                iterator.next should be ((parentPath, parentEntry ))
-                iterator.hasNext should equal (true)
-                iterator.next should be ((path, entry))
-                iterator.hasNext should equal (false)
-                fs.remove(path) should be (Some(entry))
-                fs.get(path) should be (None)
-                fs.remove(path) should be (None)
+                iterator.hasNext shouldBe true
+                iterator.next() shouldBe parentPath -> parentEntry
+                iterator.hasNext shouldBe true
+                iterator.next() shouldBe path -> entry
+                iterator.hasNext shouldBe false
+                fs.remove(path) shouldBe Some(entry)
+                fs.get(path) shouldBe None
+                fs.remove(path) shouldBe None
               }
             }
-            fs.remove(parentPath) should be (Some(parentEntry ))
-            fs.get(parentPath) should be (None)
-            fs.remove(parentPath) should be (None)
+            fs.remove(parentPath) shouldBe Some(parentEntry)
+            fs.get(parentPath) shouldBe None
+            fs.remove(parentPath) shouldBe None
           }
         }
       }
@@ -73,11 +73,11 @@ class FileSystemTest extends WordSpec {
     fs(path) should be theSameInstanceAs entry
     fs should have size 1
     val iterator = fs.iterator
-    iterator.hasNext should equal (true)
-    iterator.next should be (path -> entry)
-    iterator.hasNext should equal (false)
-    fs.remove(path) should be (Some(entry))
-    fs.get(path) should be (None)
+    iterator.hasNext shouldBe true
+    iterator.next() shouldBe path -> entry
+    iterator.hasNext shouldBe false
+    fs.remove(path) shouldBe Some(entry)
+    fs.get(path) shouldBe None
   }
 
   "A file system" should {
