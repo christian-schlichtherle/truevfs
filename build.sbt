@@ -431,6 +431,7 @@ lazy val kernelImpl: Project = project
       """Implements the API for accessing the federated virtual file system space.
         |You can override it by providing another file system manager factory implementation with a higher priority on the class path.""".stripMargin,
     libraryDependencies ++= Seq(
+      Bali % Provided,
       JunitInterface % Test,
       Lombok % Provided,
       MockitoCore % Test,
@@ -450,6 +451,7 @@ lazy val kernelSpec: Project = project
       """Specifies the API for accessing the federated virtual file system space.
         |Provides a service provider API for a singleton file system manager, an I/O buffer pool and a file system driver map.""".stripMargin,
     libraryDependencies ++= Seq(
+      Bali % Provided,
       JunitInterface % Test,
       Slf4jSimple % Test,
       TruecommonsAnnotations,

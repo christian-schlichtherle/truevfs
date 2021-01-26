@@ -12,30 +12,32 @@ import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
-interface ArchiveControllerAdapter extends FsController {
+import static bali.CachingStrategy.NOT_THREAD_SAFE;
+
+interface DelegatingArchiveController<E extends FsArchiveEntry> extends ArchiveController<E> {
 
     @Lookup(param = "controller")
-    ArchiveController<?> getController();
+    ArchiveController<E> getController();
 
-    @Lookup(param = "parent")
+    @Cache(NOT_THREAD_SAFE)
     @Override
-    FsController getParent();
-
-    @Cache
-    @Override
-    default FsModel getModel() {
+    default ArchiveModel<E> getModel() {
         return getController().getModel();
     }
 
+    @Cache(NOT_THREAD_SAFE)
     @Override
-    default FsNode node(BitField<FsAccessOption> options, FsNodeName name) throws IOException {
-        return getController().node(options, name).orElse(null);
+    default FsController getParent() {
+        return getController().getParent();
+    }
+
+    @Override
+    default Optional<? extends FsNode> node(BitField<FsAccessOption> options, FsNodeName name) throws IOException {
+        return getController().node(options, name);
     }
 
     @Override
@@ -54,8 +56,8 @@ interface ArchiveControllerAdapter extends FsController {
     }
 
     @Override
-    default boolean setTime(BitField<FsAccessOption> options, FsNodeName name, BitField<Entry.Access> types, long value) throws IOException {
-        return getController().setTime(options, name, types, value);
+    default boolean setTime(BitField<FsAccessOption> options, FsNodeName name, BitField<Entry.Access> types, long time) throws IOException {
+        return getController().setTime(options, name, types, time);
     }
 
     @Override
@@ -64,13 +66,13 @@ interface ArchiveControllerAdapter extends FsController {
     }
 
     @Override
-    default OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, @CheckForNull Entry template) {
-        return getController().output(options, name, Optional.ofNullable(template));
+    default OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<Entry> template) {
+        return getController().output(options, name, template);
     }
 
     @Override
-    default void make(BitField<FsAccessOption> options, FsNodeName name, Entry.Type type, @CheckForNull Entry template) throws IOException {
-        getController().make(options, name, type, Optional.ofNullable(template));
+    default void make(BitField<FsAccessOption> options, FsNodeName name, Entry.Type type, Optional<Entry> template) throws IOException {
+        getController().make(options, name, type, template);
     }
 
     @Override

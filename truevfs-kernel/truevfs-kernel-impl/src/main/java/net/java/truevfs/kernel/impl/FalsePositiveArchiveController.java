@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.kernel.impl;
 
+import bali.Cache;
 import net.java.truecommons.cio.*;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.ControlFlowException;
@@ -55,24 +56,25 @@ import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
  * @see FalsePositiveArchiveException
  */
 @ThreadSafe
-final class FalsePositiveArchiveController extends FsDecoratingController {
+abstract class FalsePositiveArchiveController implements FsDelegatingController {
 
     private final State tryChild = new State() {
 
         @Override
         public <T> T apply(FsNodeName name, Op<T> op) throws IOException {
-            return op.call(controller, name);
+            return op.call(getController(), name);
         }
     };
 
-    private final FsController parent;
-    private final FsNodePath path;
     private volatile State state = tryChild;
 
-    FalsePositiveArchiveController(final FsController controller) {
-        super(controller);
-        this.parent = controller.getParent();
-        this.path = getMountPoint().getPath();
+    @Cache
+    public FsNodePath getPath() {
+        return getMountPoint().getPath();
+    }
+
+    private FsNodeName parent(FsNodeName name) {
+        return getPath().resolve(name).getNodeName();
     }
 
     @CheckForNull
@@ -206,10 +208,10 @@ final class FalsePositiveArchiveController extends FsDecoratingController {
         final Op<Void> op = (c, n) -> {
             c.unlink(options, n);
             if (n.isRoot()) {
-                assert c == controller;
+                assert c == getController();
                 // Unlink target archive file from parent file system.
                 // This operation isn't lock protected, so it's not atomic!
-                parent.unlink(options, parent(n));
+                getParent().unlink(options, parent(n));
             }
             return null;
         };
@@ -230,7 +232,7 @@ final class FalsePositiveArchiveController extends FsDecoratingController {
     public void sync(final BitField<FsSyncOption> options) throws FsSyncException {
         // HC SVNT DRACONES!
         try {
-            controller.sync(options);
+            getController().sync(options);
         } catch (final FsSyncException | ControlFlowException e) {
             assert state == tryChild;
             throw e;
@@ -250,10 +252,6 @@ final class FalsePositiveArchiveController extends FsDecoratingController {
             }
             return state.apply(name, op);
         }
-    }
-
-    private FsNodeName parent(FsNodeName name) {
-        return path.resolve(name).getNodeName();
     }
 
     @FunctionalInterface
@@ -281,7 +279,7 @@ final class FalsePositiveArchiveController extends FsDecoratingController {
         @Override
         public <T> T apply(final FsNodeName name, final Op<T> op) throws IOException {
             try {
-                return op.call(parent, parent(name));
+                return op.call(getParent(), parent(name));
             } catch (FalsePositiveArchiveException e) {
                 throw new AssertionError(e);
             } catch (final IOException e) {

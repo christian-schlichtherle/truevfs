@@ -4,6 +4,8 @@
  */
 package net.java.truevfs.kernel.impl;
 
+import bali.Cache;
+import bali.Lookup;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.cio.Entry.Type;
@@ -15,6 +17,9 @@ import net.java.truevfs.kernel.spec.*;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import static bali.CachingStrategy.NOT_THREAD_SAFE;
 
 /**
  * Provides read/write access to an archive file system.
@@ -24,6 +29,17 @@ import java.util.Optional;
  * @author Christian Schlichtherle
  */
 interface ArchiveController<E extends FsArchiveEntry> extends ArchiveModelAspect<E>, ReentrantReadWriteLockAspect {
+
+    /**
+     * Returns the parent filesystem controller.
+     */
+    @Lookup(param = "parent")
+    FsController getParent();
+
+    @Cache(NOT_THREAD_SAFE)
+    default ReentrantReadWriteLock getLock() {
+        return getModel().getLock();
+    }
 
     Optional<? extends FsNode> node(BitField<FsAccessOption> options, FsNodeName name) throws IOException;
 

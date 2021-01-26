@@ -47,18 +47,13 @@ import static net.java.truevfs.kernel.spec.FsSyncOptions.SYNC;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-final class CacheController<E extends FsArchiveEntry> extends DecoratingArchiveController<E> {
+abstract class CacheController<E extends FsArchiveEntry> implements DelegatingArchiveController<E> {
 
     private static final Logger logger = new LocalizedLogger(CacheController.class);
 
     private final Map<FsNodeName, EntryCache> caches = new HashMap<>();
 
-    private final IoBufferPool pool;
-
-    CacheController(IoBufferPool pool, ArchiveController<E> controller) {
-        super(controller);
-        this.pool = pool;
-    }
+    abstract IoBufferPool getPool();
 
     @Override
     public InputSocket<? extends Entry> input(BitField<FsAccessOption> options, FsNodeName name) {
@@ -72,7 +67,7 @@ final class CacheController<E extends FsArchiveEntry> extends DecoratingArchiveC
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
                     if (!options.get(CACHE)) {
-                        return controller.input(options, name);
+                        return getController().input(options, name);
                     }
                     cache = new EntryCache(name);
                 }
@@ -93,7 +88,7 @@ final class CacheController<E extends FsArchiveEntry> extends DecoratingArchiveC
                 EntryCache cache = caches.get(name);
                 if (null == cache) {
                     if (!options.get(CACHE)) {
-                        return controller.output(options, name, template);
+                        return getController().output(options, name, template);
                     }
                     cache = new EntryCache(name);
                 }
@@ -106,7 +101,7 @@ final class CacheController<E extends FsArchiveEntry> extends DecoratingArchiveC
     public void make(final BitField<FsAccessOption> options, final FsNodeName name, final Entry.Type type, final Optional<Entry> template) throws IOException {
         assert writeLockedByCurrentThread();
 
-        controller.make(options, name, type, template);
+        getController().make(options, name, type, template);
         val cache = caches.remove(name);
         if (null != cache) {
             cache.clear();
@@ -117,7 +112,7 @@ final class CacheController<E extends FsArchiveEntry> extends DecoratingArchiveC
     public void unlink(final BitField<FsAccessOption> options, final FsNodeName name) throws IOException {
         assert writeLockedByCurrentThread();
 
-        controller.unlink(options, name);
+        getController().unlink(options, name);
         val cache = caches.remove(name);
         if (null != cache) {
             cache.clear();
@@ -130,7 +125,7 @@ final class CacheController<E extends FsArchiveEntry> extends DecoratingArchiveC
         assert !readLockedByCurrentThread();
 
         syncCacheEntries(options);
-        controller.sync(options.clear(CLEAR_CACHE));
+        getController().sync(options.clear(CLEAR_CACHE));
         if (caches.isEmpty()) {
             setMounted(false);
         }
@@ -171,7 +166,7 @@ final class CacheController<E extends FsArchiveEntry> extends DecoratingArchiveC
      */
     private final class EntryCache {
 
-        final CacheEntry cache = CacheEntry.Strategy.WriteBack.newCacheEntry(pool);
+        final CacheEntry cache = CacheEntry.Strategy.WriteBack.newCacheEntry(getPool());
         final FsNodeName name;
 
         EntryCache(final FsNodeName name) {
@@ -196,7 +191,7 @@ final class CacheController<E extends FsArchiveEntry> extends DecoratingArchiveC
 
                 final BitField<FsAccessOption> _options = options.clear(CACHE); // consume
 
-                final InputSocket<? extends Entry> socket = controller.input(_options, name);
+                final InputSocket<? extends Entry> socket = getController().input(_options, name);
 
                 @Override
                 protected InputSocket<? extends Entry> socket() throws IOException {
@@ -238,7 +233,7 @@ final class CacheController<E extends FsArchiveEntry> extends DecoratingArchiveC
                 final BitField<FsAccessOption> _options = options.clear(CACHE); // consume
 
                 final OutputSocket<? extends Entry> socket = cache
-                        .configure(controller.output(_options.clear(EXCLUSIVE), name, template))
+                        .configure(getController().output(_options.clear(EXCLUSIVE), name, template))
                         .output();
 
                 @Override
@@ -299,7 +294,7 @@ final class CacheController<E extends FsArchiveEntry> extends DecoratingArchiveC
                     BitField<FsAccessOption> makeOpts = options;
                     while (true) {
                         try {
-                            controller.make(makeOpts, name, FILE, template);
+                            getController().make(makeOpts, name, FILE, template);
                             return;
                         } catch (final NeedsSyncException makeEx) {
                             // In this context, this exception means that the entry has already been written to the
@@ -320,7 +315,7 @@ final class CacheController<E extends FsArchiveEntry> extends DecoratingArchiveC
                             // Even if we were asked to create the entry EXCLUSIVEly, we first need to try to get the
                             // cache in sync() with the virtual file system again and retry the make().
                             try {
-                                controller.sync(syncOpts);
+                                getController().sync(syncOpts);
                                 // sync() succeeded, now repeat the make().
                             } catch (final FsSyncException syncEx) {
                                 syncEx.addSuppressed(makeEx);

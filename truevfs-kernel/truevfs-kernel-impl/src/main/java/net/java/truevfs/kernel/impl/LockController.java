@@ -40,11 +40,7 @@ import static net.java.truevfs.kernel.impl.LockingStrategy.*;
  * @see LockingStrategy
  */
 @ThreadSafe
-final class LockController<E extends FsArchiveEntry> extends DecoratingArchiveController<E> {
-
-    LockController(ArchiveController<E> controller) {
-        super(controller);
-    }
+abstract class LockController<E extends FsArchiveEntry> implements DelegatingArchiveController<E> {
 
     @Override
     public Optional<? extends FsNode> node(BitField<FsAccessOption> options, FsNodeName name) throws IOException {
@@ -52,7 +48,7 @@ final class LockController<E extends FsArchiveEntry> extends DecoratingArchiveCo
 
             @Override
             public Optional<? extends FsNode> call() throws IOException {
-                return controller.node(options, name);
+                return getController().node(options, name);
             }
         });
     }
@@ -63,7 +59,7 @@ final class LockController<E extends FsArchiveEntry> extends DecoratingArchiveCo
 
             @Override
             public Void call() throws IOException {
-                controller.checkAccess(options, name, types);
+                getController().checkAccess(options, name, types);
                 return null;
             }
         });
@@ -75,7 +71,7 @@ final class LockController<E extends FsArchiveEntry> extends DecoratingArchiveCo
 
             @Override
             public Void call() throws IOException {
-                controller.setReadOnly(options, name);
+                getController().setReadOnly(options, name);
                 return null;
             }
         });
@@ -87,7 +83,7 @@ final class LockController<E extends FsArchiveEntry> extends DecoratingArchiveCo
 
             @Override
             public Boolean call() throws IOException {
-                return controller.setTime(options, name, times);
+                return getController().setTime(options, name, times);
             }
         });
     }
@@ -98,7 +94,7 @@ final class LockController<E extends FsArchiveEntry> extends DecoratingArchiveCo
 
             @Override
             public Boolean call() throws IOException {
-                return controller.setTime(options, name, types, time);
+                return getController().setTime(options, name, types, time);
             }
         });
     }
@@ -107,7 +103,7 @@ final class LockController<E extends FsArchiveEntry> extends DecoratingArchiveCo
     public InputSocket<? extends Entry> input(BitField<FsAccessOption> options, FsNodeName name) {
         return new AbstractInputSocket<Entry>() {
 
-            final InputSocket<? extends Entry> socket = controller.input(options, name);
+            final InputSocket<? extends Entry> socket = getController().input(options, name);
 
             @Override
             public Entry target() throws IOException {
@@ -147,7 +143,7 @@ final class LockController<E extends FsArchiveEntry> extends DecoratingArchiveCo
     public OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<Entry> template) {
         return new AbstractOutputSocket<Entry>() {
 
-            final OutputSocket<? extends Entry> socket = controller.output(options, name, template);
+            final OutputSocket<? extends Entry> socket = getController().output(options, name, template);
 
             @Override
             public Entry target() throws IOException {
@@ -189,7 +185,7 @@ final class LockController<E extends FsArchiveEntry> extends DecoratingArchiveCo
 
             @Override
             public Void call() throws IOException {
-                controller.make(options, name, type, template);
+                getController().make(options, name, type, template);
                 return null;
             }
         });
@@ -201,7 +197,7 @@ final class LockController<E extends FsArchiveEntry> extends DecoratingArchiveCo
 
             @Override
             public Void call() throws IOException {
-                controller.unlink(options, name);
+                getController().unlink(options, name);
                 return null;
             }
         });
@@ -213,7 +209,7 @@ final class LockController<E extends FsArchiveEntry> extends DecoratingArchiveCo
 
             @Override
             public Void call() throws FsSyncException {
-                controller.sync(options);
+                getController().sync(options);
                 return null;
             }
         });

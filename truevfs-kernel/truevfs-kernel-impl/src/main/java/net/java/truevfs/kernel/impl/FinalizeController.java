@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.kernel.impl;
 
+import bali.Lookup;
 import lombok.val;
 import net.java.truecommons.cio.*;
 import net.java.truecommons.io.DecoratingInputStream;
@@ -14,7 +15,7 @@ import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.ControlFlowException;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsDecoratingController;
+import net.java.truevfs.kernel.spec.FsDelegatingController;
 import net.java.truevfs.kernel.spec.FsNodeName;
 import org.slf4j.Logger;
 
@@ -33,19 +34,15 @@ import java.util.Optional;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-final class FinalizeController extends FsDecoratingController {
+abstract class FinalizeController implements FsDelegatingController {
 
     private static final Logger logger = new LocalizedLogger(FinalizeController.class);
-
-    FinalizeController(FsController controller) {
-        super(controller);
-    }
 
     @Override
     public InputSocket<? extends Entry> input(BitField<FsAccessOption> options, FsNodeName name) {
         return new DelegatingInputSocket<Entry>() {
 
-            final InputSocket<? extends Entry> socket = controller.input(options, name);
+            final InputSocket<? extends Entry> socket = getController().input(options, name);
 
             @Override
             protected InputSocket<? extends Entry> socket() throws IOException {
@@ -68,7 +65,7 @@ final class FinalizeController extends FsDecoratingController {
     public OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, @CheckForNull Entry template) {
         return new DelegatingOutputSocket<Entry>() {
 
-            final OutputSocket<? extends Entry> socket = controller.output(options, name, template);
+            final OutputSocket<? extends Entry> socket = getController().output(options, name, template);
 
             @Override
             protected OutputSocket<? extends Entry> socket() throws IOException {

@@ -4,10 +4,14 @@
  */
 package net.java.truevfs.kernel.impl;
 
+import bali.Cache;
+import bali.Lookup;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
 
 import java.io.IOException;
+
+import static bali.CachingStrategy.NOT_THREAD_SAFE;
 
 /**
  * A generic mixin which provides some features of its associated {@link #getModel()}.
@@ -19,6 +23,7 @@ interface ArchiveModelAspect<E extends FsArchiveEntry> {
     /**
      * Returns the archive model.
      */
+    @Lookup(param = "model")
     ArchiveModel<E> getModel();
 
     /**
@@ -44,10 +49,6 @@ interface ArchiveModelAspect<E extends FsArchiveEntry> {
         getModel().setMounted(mounted);
     }
 
-    default FsArchiveDriver<E> getDriver() {
-        return getModel().getDriver();
-    }
-
     /**
      * Composes the node path from the mountpoint of this model and the given node name.
      *
@@ -59,5 +60,13 @@ interface ArchiveModelAspect<E extends FsArchiveEntry> {
 
     default void touch(BitField<FsAccessOption> options) throws IOException {
         getModel().touch(options);
+    }
+
+    /**
+     * Returns the archive driver.
+     */
+    @Cache(NOT_THREAD_SAFE)
+    default FsArchiveDriver<E> getDriver() {
+        return getModel().getDriver();
     }
 }

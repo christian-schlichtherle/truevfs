@@ -34,16 +34,12 @@ import static net.java.truevfs.kernel.spec.FsSyncOptions.SYNC;
  * @see NeedsSyncException
  */
 @ThreadSafe
-final class SyncController<E extends FsArchiveEntry> extends DecoratingArchiveController<E> {
+abstract class SyncController<E extends FsArchiveEntry> implements DelegatingArchiveController<E> {
 
     private static final BitField<FsSyncOption> NOT_WAIT_CLOSE_IO = BitField.of(FsSyncOption.WAIT_CLOSE_IO).not();
 
     static BitField<FsSyncOption> modify(BitField<FsSyncOption> options) {
         return 1 >= LockingStrategy.lockCount() ? options : options.and(NOT_WAIT_CLOSE_IO);
-    }
-
-    SyncController(ArchiveController<E> controller) {
-        super(controller);
     }
 
     @Override
@@ -52,7 +48,7 @@ final class SyncController<E extends FsArchiveEntry> extends DecoratingArchiveCo
 
             @Override
             public Optional<? extends FsNode> call() throws IOException {
-                return controller.node(options, name);
+                return getController().node(options, name);
             }
         });
     }
@@ -63,7 +59,7 @@ final class SyncController<E extends FsArchiveEntry> extends DecoratingArchiveCo
 
             @Override
             public Void call() throws IOException {
-                controller.checkAccess(options, name, types);
+                getController().checkAccess(options, name, types);
                 return null;
             }
         });
@@ -75,7 +71,7 @@ final class SyncController<E extends FsArchiveEntry> extends DecoratingArchiveCo
 
             @Override
             public Void call() throws IOException {
-                controller.setReadOnly(options, name);
+                getController().setReadOnly(options, name);
                 return null;
             }
         });
@@ -87,7 +83,7 @@ final class SyncController<E extends FsArchiveEntry> extends DecoratingArchiveCo
 
             @Override
             public Boolean call() throws IOException {
-                return controller.setTime(options, name, times);
+                return getController().setTime(options, name, times);
             }
         });
     }
@@ -98,7 +94,7 @@ final class SyncController<E extends FsArchiveEntry> extends DecoratingArchiveCo
 
             @Override
             public Boolean call() throws IOException {
-                return controller.setTime(options, name, types, time);
+                return getController().setTime(options, name, types, time);
             }
         });
     }
@@ -107,7 +103,7 @@ final class SyncController<E extends FsArchiveEntry> extends DecoratingArchiveCo
     public InputSocket<? extends Entry> input(BitField<FsAccessOption> options, FsNodeName name) {
         return new AbstractInputSocket<Entry>() {
 
-            final InputSocket<? extends Entry> socket = controller.input(options, name);
+            final InputSocket<? extends Entry> socket = getController().input(options, name);
 
             @Override
             public Entry target() throws IOException {
@@ -148,7 +144,7 @@ final class SyncController<E extends FsArchiveEntry> extends DecoratingArchiveCo
     public OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<Entry> template) {
         return new AbstractOutputSocket<Entry>() {
 
-            final OutputSocket<? extends Entry> socket = controller.output(options, name, template);
+            final OutputSocket<? extends Entry> socket = getController().output(options, name, template);
 
             @Override
             public Entry target() throws IOException {
@@ -191,7 +187,7 @@ final class SyncController<E extends FsArchiveEntry> extends DecoratingArchiveCo
 
             @Override
             public Void call() throws IOException {
-                controller.make(options, name, type, template);
+                getController().make(options, name, type, template);
                 return null;
             }
         });
@@ -204,10 +200,10 @@ final class SyncController<E extends FsArchiveEntry> extends DecoratingArchiveCo
             @Override
             public Void call() throws IOException {
                 // HC SVNT DRACONES!
-                controller.unlink(options, name);
+                getController().unlink(options, name);
                 // Eventually make the file system controller chain eligible for GC.
                 if (name.isRoot()) {
-                    controller.sync(RESET);
+                    getController().sync(RESET);
                 }
                 return null;
             }
@@ -264,7 +260,7 @@ final class SyncController<E extends FsArchiveEntry> extends DecoratingArchiveCo
         boolean done = false;
         do {
             try {
-                controller.sync(modified);
+                getController().sync(modified);
                 done = true;
             } catch (final FsSyncException e) {
                 if (e.getCause() instanceof FsOpenResourceException && modified != options) {

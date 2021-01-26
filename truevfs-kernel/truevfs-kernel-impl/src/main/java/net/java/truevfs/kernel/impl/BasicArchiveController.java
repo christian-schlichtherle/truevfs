@@ -49,9 +49,7 @@ import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-abstract class BasicArchiveController<E extends FsArchiveEntry>
-        extends AbstractArchiveController<E>
-        implements ArchiveModelAspect<E> {
+abstract class BasicArchiveController<E extends FsArchiveEntry> implements ArchiveController<E> {
 
     private static final Logger logger = new LocalizedLogger(BasicArchiveController.class);
 

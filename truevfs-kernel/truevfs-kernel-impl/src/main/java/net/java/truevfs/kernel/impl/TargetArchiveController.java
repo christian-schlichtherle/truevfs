@@ -4,6 +4,8 @@
  */
 package net.java.truevfs.kernel.impl;
 
+import bali.Cache;
+import bali.Lookup;
 import lombok.val;
 import net.java.truecommons.cio.*;
 import net.java.truecommons.io.ClosedInputException;
@@ -22,9 +24,9 @@ import java.nio.file.NoSuchFileException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
 
+import static bali.CachingStrategy.NOT_THREAD_SAFE;
 import static net.java.truecommons.cio.Entry.ALL_SIZES;
 import static net.java.truecommons.cio.Entry.Access.READ;
 import static net.java.truecommons.cio.Entry.Access.WRITE;
@@ -49,7 +51,7 @@ import static net.java.truevfs.kernel.spec.FsSyncOption.ABORT_CHANGES;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-final class TargetArchiveController<E extends FsArchiveEntry> extends FileSystemArchiveController<E> {
+abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSystemArchiveController<E> {
 
     private static final BitField<FsAccessOption> MOUNT_OPTIONS = BitField.of(CACHE);
     private static final BitField<Entry.Access> WRITE_ACCESS = BitField.of(WRITE);
@@ -65,26 +67,8 @@ final class TargetArchiveController<E extends FsArchiveEntry> extends FileSystem
      */
     private Optional<OutputArchive<E>> _outputArchive = Optional.empty();
 
-    private final ArchiveModel<E> model;
-    private final FsController parent;
-    private final ReentrantReadWriteLock lock;
-
-    /**
-     * The entry name of the target archive file in the parent file system.
-     */
-    private final FsNodeName name;
-
-    TargetArchiveController(final FsArchiveDriver<E> driver, final FsModel model, final FsController parent) {
-        if ((this.model = new TargetArchiveModel(driver, model)).getParent() != (this.parent = parent).getModel()) {
-            throw new IllegalArgumentException("Parent/member mismatch!");
-        }
-        assert null != getMountPoint().getPath();
-        this.name = getMountPoint().getPath().getNodeName();
-        this.lock = getModel().getLock();
-        assert invariants();
-    }
-
     private boolean invariants() {
+        assert getModel().getParent() == getParent().getModel();
         val fs = getFileSystem();
         assert !_inputArchive.isPresent() || fs.isPresent();
         assert !_outputArchive.isPresent() || fs.isPresent();
@@ -92,14 +76,27 @@ final class TargetArchiveController<E extends FsArchiveEntry> extends FileSystem
         return true;
     }
 
+    @Lookup(param = "driver")
+    @Override
+    public abstract FsArchiveDriver<E> getDriver();
+
+    @Lookup(param = "model")
+    abstract FsModel getUnderlyingModel();
+
+    @Cache(NOT_THREAD_SAFE)
     @Override
     public ArchiveModel<E> getModel() {
-        return model;
+        return new TargetArchiveModel(getDriver(), getUnderlyingModel());
     }
 
-    @Override
-    public ReentrantReadWriteLock getLock() {
-        return lock;
+    /**
+     * The entry name of the target archive file in the parent file system.
+     */
+    @Cache
+    FsNodeName getName() {
+        val path = getMountPoint().getPath();
+        assert null != path;
+        return path.getNodeName();
     }
 
     private Optional<InputArchive<E>> getInputArchive() {
@@ -143,7 +140,7 @@ final class TargetArchiveController<E extends FsArchiveEntry> extends FileSystem
         // Check parent file system node.
         final FsNode pn;
         try {
-            pn = parent.node(options, name);
+            pn = getParent().node(options, getName());
         } catch (FalsePositiveArchiveException e) {
             throw new AssertionError(e);
         } catch (IOException e) {
@@ -162,7 +159,7 @@ final class TargetArchiveController<E extends FsArchiveEntry> extends FileSystem
                 outputArchive(options);
                 fs = ArchiveFileSystem.apply(getModel());
             } else {
-                throw new FalsePositiveArchiveException(new NoSuchFileException(name.toString()));
+                throw new FalsePositiveArchiveException(new NoSuchFileException(getName().toString()));
             }
         } else {
             // ro must be init first because the parent filesystem controller could be a
@@ -173,7 +170,7 @@ final class TargetArchiveController<E extends FsArchiveEntry> extends FileSystem
             val ro = checkReadOnly().map(e -> (Supplier<IOException>) () -> e);
             final InputService<E> is;
             try {
-                is = getDriver().newInput(getModel(), MOUNT_OPTIONS, parent, name);
+                is = getDriver().newInput(getModel(), MOUNT_OPTIONS, getParent(), getName());
             } catch (FalsePositiveArchiveException e) {
                 throw new AssertionError(e);
             } catch (IOException e) {
@@ -193,7 +190,7 @@ final class TargetArchiveController<E extends FsArchiveEntry> extends FileSystem
 
     private Optional<IOException> checkReadOnly() {
         try {
-            parent.checkAccess(MOUNT_OPTIONS, name, WRITE_ACCESS);
+            getParent().checkAccess(MOUNT_OPTIONS, getName(), WRITE_ACCESS);
             return Optional.empty();
         } catch (FalsePositiveArchiveException e) {
             throw new AssertionError(e);
@@ -215,7 +212,7 @@ final class TargetArchiveController<E extends FsArchiveEntry> extends FileSystem
         val is = getInputArchive().map(InputArchive::getDriverProduct).orElse(null);
         final OutputService<E> os;
         try {
-            os = getDriver().newOutput(getModel(), options.and(ACCESS_PREFERENCES_MASK).set(CACHE), parent, name, is);
+            os = getDriver().newOutput(getModel(), options.and(ACCESS_PREFERENCES_MASK).set(CACHE), getParent(), getName(), is);
         } catch (FalsePositiveArchiveException e) {
             throw new AssertionError(e);
         } catch (final ControlFlowException e) {

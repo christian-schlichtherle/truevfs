@@ -78,6 +78,7 @@ object BuildSettings {
           }
         )
       },
+      resolvers += Resolver.mavenLocal,
       scalaVersion := ScalaVersion_2_13, // set here or otherwise `+publishSigned` will fail
       scmInfo := Some(ScmInfo(
         browseUrl = url("https://github.com/christian-schlichtherle/truevfs"),

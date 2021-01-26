@@ -22,6 +22,7 @@ object Dependencies {
   val TruecommonsVersion: String = "2.5.0"
   val Slf4jVersion: String = "1.7.30"
 
+  val Bali: ModuleID = "global.namespace.bali" % "bali-java" % "0.7.0"
   val BcprovJdk15on: ModuleID = "org.bouncycastle" % "bcprov-jdk15on" % "1.68"
   val CommonsCompress: ModuleID = "org.apache.commons" % "commons-compress" % "1.20"
   val FindbugsAnnotations: ModuleID = "com.google.code.findbugs" % "annotations" % "3.0.1u2" exclude("com.google.code.findbugs", "jsr305") exclude("net.jcip", "jcip-annotations")

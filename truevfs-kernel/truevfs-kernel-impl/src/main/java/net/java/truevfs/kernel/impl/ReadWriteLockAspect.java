@@ -4,6 +4,8 @@
  */
 package net.java.truevfs.kernel.impl;
 
+import bali.Lookup;
+
 import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -19,6 +21,7 @@ interface ReadWriteLockAspect<L extends ReadWriteLock> {
     /**
      * Returns the read/write lock.
      */
+    @Lookup(param = "lock")
     L getLock();
 
     /**

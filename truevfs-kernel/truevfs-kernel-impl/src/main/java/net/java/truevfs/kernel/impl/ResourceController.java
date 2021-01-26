@@ -32,21 +32,17 @@ import static net.java.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
  * @see ResourceAccountant
  */
 @NotThreadSafe
-final class ResourceController<E extends FsArchiveEntry> extends DecoratingArchiveController<E> {
+abstract class ResourceController<E extends FsArchiveEntry> implements DelegatingArchiveController<E> {
 
     private static final int waitTimeoutMillis = LockingStrategy.acquireTimeoutMillis;
 
     private final ResourceAccountant accountant = new ResourceAccountant(writeLock());
 
-    ResourceController(ArchiveController<E> controller) {
-        super(controller);
-    }
-
     @Override
     public InputSocket<? extends Entry> input(BitField<FsAccessOption> options, FsNodeName name) {
         return new DelegatingInputSocket<Entry>() {
 
-            final InputSocket<? extends Entry> socket = controller.input(options, name);
+            final InputSocket<? extends Entry> socket = getController().input(options, name);
 
             @Override
             protected InputSocket<? extends Entry> socket() throws IOException {
@@ -69,7 +65,7 @@ final class ResourceController<E extends FsArchiveEntry> extends DecoratingArchi
     public OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<Entry> template) {
         return new DelegatingOutputSocket<Entry>() {
 
-            final OutputSocket<? extends Entry> socket = controller.output(options, name, template);
+            final OutputSocket<? extends Entry> socket = getController().output(options, name, template);
 
             @Override
             protected OutputSocket<? extends Entry> socket() throws IOException {
@@ -96,7 +92,7 @@ final class ResourceController<E extends FsArchiveEntry> extends DecoratingArchi
         // HC SVNT DRACONES!
         val beforeWait = accountant.resources();
         if (0 == beforeWait.getTotal()) {
-            super.sync(options);
+            getController().sync(options);
             return;
         }
 
@@ -125,7 +121,7 @@ final class ResourceController<E extends FsArchiveEntry> extends DecoratingArchi
             throw NeedsSyncException.apply();
         }
         try {
-            super.sync(options);
+            getController().sync(options);
         } catch (FsSyncException e) {
             throw builder.fail(e);
         }

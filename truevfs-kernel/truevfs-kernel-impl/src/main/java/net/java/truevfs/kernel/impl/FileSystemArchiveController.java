@@ -25,7 +25,7 @@ import java.util.Optional;
 @NotThreadSafe
 abstract class FileSystemArchiveController<E extends FsArchiveEntry>
         extends BasicArchiveController<E>
-        implements MountState<E>, ReentrantReadWriteLockAspect {
+        implements MountState<E> {
 
     /**
      * The mount state of the archive file system.

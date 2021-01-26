@@ -54,31 +54,7 @@ final class DefaultManager extends FsAbstractManager implements ReentrantReadWri
 
     @Override
     public FsController newController(FsArchiveDriver<? extends FsArchiveEntry> driver, FsModel model, FsController parent) {
-        assert null != parent;
-        assert model.getParent() == parent.getModel();
-        assert !(model instanceof ArchiveModel);
-        // HC SVNT DRACONES!
-        // The FalsePositiveArchiveController decorates the FinalizeController so that it does not need to resolve
-        // operations on false positive archive files.
-        // The FinalizeController decorates the LockController so that any streams or channels referencing archive files
-        // eligible for garbage collection get automatically closed.
-        // The LockController decorates the SyncController so that the extended controller (chain) doesn't need to be thread
-        // safe.
-        // The SyncController decorates the CacheController because the selective entry cache needs to get flushed on a
-        // NeedsSyncException.
-        // The CacheController decorates the ResourceController because the cache entries terminate streams and channels and
-        // shall not stop the extended controller (chain) from getting synced.
-        // The ResourceController decorates the TargetArchiveController so that trying to sync the file system while any
-        // stream or channel to the latter is open gets detected and properly dealt with.
-        return new FalsePositiveArchiveController(
-                new FinalizeController(
-                        driver.decorate(
-                                new ArchiveControllerAdapter(parent,
-                                        new LockController<>(
-                                                new SyncController<>(
-                                                        new CacheController<>(driver.getPool(),
-                                                                new ResourceController<>(
-                                                                        new TargetArchiveController<>(driver, model, parent)))))))));
+        return ControllerModuleFactory.INSTANCE.module(driver).newControllerChain(model, parent);
     }
 
     @Override
