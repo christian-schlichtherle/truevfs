@@ -26,7 +26,7 @@ lazy val root: Project = project
 
 lazy val access: Project = project
   .in(file("truevfs-access"))
-  .dependsOn(driverFile % Runtime, kernelSpec)
+  .dependsOn(driverFile % Runtime, kernelImpl % "compile;runtime->runtime")
   .settings(javaLibrarySettings)
   .settings(
     description :=
@@ -393,7 +393,6 @@ lazy val it: Project = project
     driverTarXz,
     driverZip % "compile;runtime->runtime",
     driverZipRaes,
-    kernelImpl
   ).settings(scalaLibrarySettings)
   .settings(
     description :=
