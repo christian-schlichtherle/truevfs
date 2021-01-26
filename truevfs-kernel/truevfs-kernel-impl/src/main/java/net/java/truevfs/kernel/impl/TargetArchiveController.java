@@ -92,7 +92,7 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
     /**
      * The entry name of the target archive file in the parent file system.
      */
-    @Cache
+    @Cache(NOT_THREAD_SAFE)
     FsNodeName getName() {
         val path = getMountPoint().getPath();
         assert null != path;

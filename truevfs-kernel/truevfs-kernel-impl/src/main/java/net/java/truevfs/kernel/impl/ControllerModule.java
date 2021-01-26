@@ -14,6 +14,8 @@ import net.java.truevfs.kernel.spec.FsArchiveEntry;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsModel;
 
+import static bali.CachingStrategy.NOT_THREAD_SAFE;
+
 @Module
 interface ControllerModule<E extends FsArchiveEntry> {
 
@@ -24,7 +26,7 @@ interface ControllerModule<E extends FsArchiveEntry> {
         return getDriver().decorate(controller);
     }
 
-    @Cache
+    @Cache(NOT_THREAD_SAFE)
     default IoBufferPool getPool() {
         return getDriver().getPool();
     }

@@ -18,6 +18,7 @@ import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
 
+import static bali.CachingStrategy.NOT_THREAD_SAFE;
 import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
 
 /**
@@ -68,7 +69,7 @@ abstract class FalsePositiveArchiveController implements FsDelegatingController 
 
     private volatile State state = tryChild;
 
-    @Cache
+    @Cache(NOT_THREAD_SAFE)
     public FsNodePath getPath() {
         return getMountPoint().getPath();
     }

@@ -13,10 +13,11 @@ import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
+
+import static bali.CachingStrategy.NOT_THREAD_SAFE;
 
 interface ArchiveControllerAdapter extends FsController {
 
@@ -27,7 +28,7 @@ interface ArchiveControllerAdapter extends FsController {
     @Override
     FsController getParent();
 
-    @Cache
+    @Cache(NOT_THREAD_SAFE)
     @Override
     default FsModel getModel() {
         return getController().getModel();
