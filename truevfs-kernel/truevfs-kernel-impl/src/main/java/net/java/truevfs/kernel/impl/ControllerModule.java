@@ -32,7 +32,7 @@ interface ControllerModule<E extends FsArchiveEntry> {
     }
 
     @Make(ArchiveControllerAdapter.class)
-    FsController newArchiveControllerAdapter(FsController parent, ArchiveController<E> controller);
+    FsController newArchiveControllerAdapter(ArchiveController<E> controller);
 
     @Make(CacheController.class)
     ArchiveController<E> newCacheController(ArchiveController<E> controller);
@@ -57,7 +57,7 @@ interface ControllerModule<E extends FsArchiveEntry> {
         return newFalsePositiveArchiveController(
                 newFinalizeController(
                         driverDecorate(
-                                newArchiveControllerAdapter(parent,
+                                newArchiveControllerAdapter(
                                         newLockController(
                                                 newSyncController(
                                                         newCacheController(

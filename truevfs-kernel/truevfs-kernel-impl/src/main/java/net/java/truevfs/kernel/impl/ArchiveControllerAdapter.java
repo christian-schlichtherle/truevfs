@@ -24,14 +24,16 @@ interface ArchiveControllerAdapter extends FsController {
     @Lookup(param = "controller")
     ArchiveController<?> getController();
 
-    @Lookup(param = "parent")
-    @Override
-    FsController getParent();
-
     @Cache(NOT_THREAD_SAFE)
     @Override
     default FsModel getModel() {
         return getController().getModel();
+    }
+
+    @Cache(NOT_THREAD_SAFE)
+    @Override
+    default FsController getParent() {
+        return getController().getParent();
     }
 
     @Override
