@@ -4,13 +4,15 @@
  */
 package net.java.truevfs.access;
 
+import net.java.truevfs.kernel.spec.FsMountPoint;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.FileSystems;
-import net.java.truevfs.kernel.spec.FsMountPoint;
+
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author  Christian Schlichtherle

@@ -12,6 +12,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URISyntaxException;
 import java.util.Locale;
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.slf4j.Logger;

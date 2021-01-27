@@ -4,17 +4,19 @@
  */
 package net.java.truevfs.access;
 
+import net.java.truevfs.kernel.spec.FsMountPoint;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import net.java.truevfs.kernel.spec.FsMountPoint;
+
 import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
-import org.junit.Test;
 
 /**
  * @author  Christian Schlichtherle

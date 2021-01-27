@@ -4,18 +4,21 @@
  */
 package net.java.truevfs.access;
 
-import java.io.File;
-import java.util.Locale;
-import java.util.Map;
-import javax.annotation.Nullable;
 import net.java.truecommons.shed.ExtensionSet;
-import net.java.truevfs.kernel.spec.mock.MockArchiveDriver;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.*;
+import net.java.truevfs.kernel.spec.mock.MockArchiveDriver;
 import org.junit.Test;
+
+import javax.annotation.Nullable;
+import java.io.File;
+import java.util.Locale;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle

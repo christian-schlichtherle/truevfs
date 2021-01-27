@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static net.java.truecommons.shed.Filter.ACCEPT_ANY;
 import static net.java.truecommons.shed.Filter.ACCEPT_NONE;
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 
 /**

@@ -37,6 +37,7 @@ import static net.java.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
 import static net.java.truevfs.kernel.spec.FsSyncOptions.SYNC;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 
 /**
@@ -175,6 +176,7 @@ extends ConfiguredClientTestBase<D> {
         assert null == reference.get();
     }
 
+    @SuppressWarnings("try")
     private Reference<FsController> assertReferenceForResource(
             final Factory<? extends Closeable, ? super String, ? extends IOException> factory,
             final String entry,

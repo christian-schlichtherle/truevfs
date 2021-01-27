@@ -4,11 +4,14 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.net.URI;
-import javax.annotation.CheckForNull;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
 import org.junit.Test;
+
+import javax.annotation.CheckForNull;
+import java.net.URI;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * @author Christian Schlichtherle

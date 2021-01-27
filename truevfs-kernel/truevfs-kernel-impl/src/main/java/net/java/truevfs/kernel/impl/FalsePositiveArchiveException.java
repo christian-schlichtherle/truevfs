@@ -19,6 +19,8 @@ import java.io.IOException;
  */
 class FalsePositiveArchiveException extends ControlFlowException {
 
+    private static final long serialVersionUID = 0;
+
     FalsePositiveArchiveException(IOException cause) {
         super(cause);
     }

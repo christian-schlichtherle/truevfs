@@ -422,6 +422,7 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
      * @throws IOException On any I/O error.
      */
     @Test
+    @SuppressWarnings("try")
     public void testBadGetCheckedInputStream() throws IOException {
         if (FORCE_ZIP64_EXT)
             fail("TODO: Adapt this test so that it works when ZIP64 extensions have been forced to use!");

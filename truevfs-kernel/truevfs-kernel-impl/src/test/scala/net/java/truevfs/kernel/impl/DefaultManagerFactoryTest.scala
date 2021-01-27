@@ -7,12 +7,15 @@ package net.java.truevfs.kernel.impl
 import org.scalatest.Matchers._
 import org.scalatest._
 
+import scala.annotation.nowarn
+
 /**
   * @author Christian Schlichtherle
   */
 class DefaultManagerFactoryTest extends WordSpec {
 
   "A default file system manager factory" should {
+    @nowarn
     val service = new DefaultManagerFactory
 
     "provide a default file system manager" in {

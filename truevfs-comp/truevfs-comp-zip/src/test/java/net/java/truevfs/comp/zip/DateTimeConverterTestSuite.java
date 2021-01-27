@@ -4,20 +4,21 @@
  */
 package net.java.truevfs.comp.zip;
 
-import net.java.truevfs.comp.zip.DateTimeConverter;
 import net.java.truecommons.shed.ConcurrencyUtils;
-import static net.java.truecommons.shed.ConcurrencyUtils.*;
 import net.java.truecommons.shed.ConcurrencyUtils.TaskFactory;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.concurrent.Callable;
+
+import static net.java.truecommons.shed.ConcurrencyUtils.NUM_CPU_THREADS;
 import static net.java.truevfs.comp.zip.DateTimeConverter.MAX_DOS_TIME;
 import static net.java.truevfs.comp.zip.DateTimeConverter.MIN_DOS_TIME;
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle

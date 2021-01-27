@@ -172,8 +172,9 @@ public final class TFileSystemProvider extends FileSystemProvider {
      *         {@link TConfig#current() current configuration}.
      */
     @Override
+    @SuppressWarnings("try")
     public TFileSystem newFileSystem(Path path, Map<String, ?> configuration) {
-        try (@SuppressWarnings("unused") TConfig ignored = open(configuration)) {
+        try (TConfig ignored = open(configuration)) {
             final TPath p = new TPath(path);
             if (null == p.getMountPoint().getParent())
                 throw new UnsupportedOperationException("No prospective archive file detected."); // don't be greedy!
@@ -204,8 +205,9 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * @throws IllegalArgumentException if the given {@code uri} is opaque.
      */
     @Override
+    @SuppressWarnings("try")
     public TFileSystem newFileSystem(URI uri, Map<String, ?> configuration) {
-        try (@SuppressWarnings("unused") TConfig ignored = open(configuration)) {
+        try (TConfig ignored = open(configuration)) {
             return getFileSystem(uri);
         }
     }

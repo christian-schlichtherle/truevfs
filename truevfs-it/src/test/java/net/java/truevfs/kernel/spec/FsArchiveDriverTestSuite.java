@@ -34,6 +34,7 @@ import static net.java.truecommons.cio.Entry.UNKNOWN;
 import static net.java.truecommons.shed.Throwables.contains;
 import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 
 /**

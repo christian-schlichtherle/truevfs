@@ -20,6 +20,8 @@ import java.io.IOException;
  */
 final class PersistentFalsePositiveArchiveException extends FalsePositiveArchiveException {
 
+    private static final long serialVersionUID = 0;
+
     PersistentFalsePositiveArchiveException(IOException cause) {
         super(cause);
     }

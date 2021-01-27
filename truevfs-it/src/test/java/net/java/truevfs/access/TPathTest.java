@@ -4,20 +4,22 @@
  */
 package net.java.truevfs.access;
 
-import static java.io.File.separatorChar;
+import net.java.truecommons.shed.Paths;
+import net.java.truevfs.kernel.spec.FsNodePath;
+import org.junit.Test;
+
 import java.net.URI;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.ServiceConfigurationError;
-import net.java.truecommons.shed.Paths;
+
+import static java.io.File.separatorChar;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
-import net.java.truevfs.kernel.spec.FsNodePath;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
-import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle

@@ -4,15 +4,17 @@
  */
 package net.java.truevfs.kernel.spec.cio;
 
-import java.io.IOException;
-import java.util.Iterator;
-import static net.java.truecommons.cio.Entry.Type.FILE;
 import net.java.truecommons.cio.OutputSocket;
 import net.java.truevfs.kernel.spec.mock.MockArchive;
 import net.java.truevfs.kernel.spec.mock.MockArchiveDriverEntry;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.util.Iterator;
+
+import static net.java.truecommons.cio.Entry.Type.FILE;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author Christian Schlichtherle

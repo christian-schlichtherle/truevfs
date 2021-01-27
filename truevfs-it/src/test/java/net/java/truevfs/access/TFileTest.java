@@ -4,22 +4,22 @@
  */
 package net.java.truevfs.access;
 
-import java.beans.ExceptionListener;
-import java.beans.XMLDecoder;
-import java.beans.XMLEncoder;
-import java.io.*;
-import static java.io.File.separator;
-import static java.io.File.separatorChar;
-import java.lang.reflect.UndeclaredThrowableException;
-import java.net.URI;
-import java.util.ServiceConfigurationError;
-import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
 import net.java.truevfs.kernel.spec.FsNodePath;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.util.ServiceConfigurationError;
+
+import static java.io.File.separator;
+import static java.io.File.separatorChar;
+import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.*;
 
 /**
  * Tests archive type independent features of the {@link TFile} class.
