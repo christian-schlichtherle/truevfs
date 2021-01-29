@@ -41,39 +41,6 @@ public interface FsDelegatingController extends FsController {
         return getController().getModel();
     }
 
-    /**
-     * Returns the mount point of this (virtual) file system as
-     * defined by the {@linkplain #getModel() model}.
-     *
-     * @return The mount point of this (virtual) file system as
-     * defined by the {@linkplain #getModel() model}.
-     */
-    default FsMountPoint getMountPoint() {
-        return getModel().getMountPoint();
-    }
-
-    /**
-     * Returns the {@code mounted} property of the
-     * {@linkplain #getModel() file system model}.
-     *
-     * @return the {@code mounted} property of the
-     * {@linkplain #getModel() file system model}.
-     */
-    default boolean isMounted() {
-        return getModel().isMounted();
-    }
-
-    /**
-     * Sets the {@code mounted} property of the
-     * {@linkplain #getModel() file system model}.
-     *
-     * @param mounted the {@code mounted} property of the
-     *                {@linkplain #getModel() file system model}.
-     */
-    default void setMounted(boolean mounted) {
-        getModel().setMounted(mounted);
-    }
-
     @Override
     default @CheckForNull
     FsNode node(

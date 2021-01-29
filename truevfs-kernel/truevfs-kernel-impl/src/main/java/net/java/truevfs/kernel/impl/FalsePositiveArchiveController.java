@@ -70,8 +70,8 @@ abstract class FalsePositiveArchiveController implements FsDelegatingController 
     private volatile State state = tryChild;
 
     @Cache(NOT_THREAD_SAFE)
-    public FsNodePath getPath() {
-        return getMountPoint().getPath();
+    FsNodePath getPath() {
+        return getModel().getMountPoint().getPath();
     }
 
     private FsNodeName parent(FsNodeName name) {

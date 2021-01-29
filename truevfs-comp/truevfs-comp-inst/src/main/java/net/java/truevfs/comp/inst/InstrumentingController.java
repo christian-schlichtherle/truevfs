@@ -21,14 +21,11 @@ import net.java.truevfs.kernel.spec.FsNodeName;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-public class InstrumentingController<M extends Mediator<M>>
-extends FsDecoratingController {
+public class InstrumentingController<M extends Mediator<M>> extends FsDecoratingController {
 
     protected final M mediator;
 
-    public InstrumentingController(
-            final M mediator,
-            final FsController controller) {
+    public InstrumentingController(final M mediator, final FsController controller) {
         super(controller);
         this.mediator = Objects.requireNonNull(mediator);
     }
@@ -38,7 +35,7 @@ extends FsDecoratingController {
             BitField<FsAccessOption> options,
             FsNodeName name) {
         return mediator.instrument(this,
-                controller.input(options, name));
+                getController().input(options, name));
     }
 
     @Override
@@ -47,6 +44,6 @@ extends FsDecoratingController {
             FsNodeName name,
             @CheckForNull Entry template) {
         return mediator.instrument(this,
-                controller.output(options, name, template));
+                getController().output(options, name, template));
     }
 }

@@ -4,16 +4,15 @@
  */
 package net.java.truevfs.ext.pacemaker
 
-import java.io.IOException
-import java.net.URI
-
 import net.java.truecommons.cio.Entry
 import net.java.truevfs.kernel.spec._
-import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest._
 import org.scalatestplus.mockito.MockitoSugar.mock
+
+import java.io.IOException
+import java.net.URI
 
 /** @author Christian Schlichtherle */
 class PaceControllerSpec extends WordSpec with OneInstancePerTest {
@@ -25,7 +24,7 @@ class PaceControllerSpec extends WordSpec with OneInstancePerTest {
     when(model.getMountPoint).thenReturn(mountPoint)
     val delegate = mock[FsController]
     when(delegate.getModel).thenReturn(model)
-    val controller = spy(new PaceController(manager, delegate))
+    val controller = new PaceController(manager, delegate)
 
     "apply()ing its aspect" should {
       def verifyAspect(): Unit = {
@@ -51,15 +50,13 @@ class PaceControllerSpec extends WordSpec with OneInstancePerTest {
     }
 
     "calling its sync(*) method" should {
-      "not apply() its aspect" in {
-        controller.sync(null)
-        verify(controller, never()).apply(any())
-        ()
-      }
-
-      "forward the call to the decorated controller" in {
+      "forward the call to the decorated controller and not apply() its aspect" in {
+        val io = Mockito.inOrder(delegate, manager)
+        import io._
         controller.sync(null)
         verify(delegate).sync(null)
+        verify(manager, never()).recordAccess(mountPoint)
+        verifyNoMoreInteractions()
       }
     }
   }
