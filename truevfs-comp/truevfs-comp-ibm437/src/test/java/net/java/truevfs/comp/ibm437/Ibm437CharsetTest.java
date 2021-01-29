@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.comp.ibm437;
 
-import net.java.truevfs.comp.ibm437.Ibm437Charset;
 import java.nio.charset.Charset;
 
 /**
