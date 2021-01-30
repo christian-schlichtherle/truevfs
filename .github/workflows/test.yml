@@ -14,7 +14,7 @@ jobs:
       - uses: actions/cache@v2.1.3
         with:
           path: project/.*
-          key: sbt-${{ hashFiles('*.sbt', 'project/*') }}
+          key: sbt-java${{ matrix.java }}-${{ hashFiles('*.sbt', 'project/*') }}
       - run: bash sbtx -no-share -batch test
     strategy:
       matrix:
