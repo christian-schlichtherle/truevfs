@@ -150,7 +150,7 @@ class ArchiveFileSystem<E extends FsArchiveEntry>
     private void fix(String name) {
         while (!isRoot(name)) {
             splitter.split(name);
-            val pp = splitter.getParentPath();
+            val pp = splitter.getParentPath().get();
             val mn = splitter.getMemberName();
             val pcn = master
                     .get(pp)
@@ -363,7 +363,7 @@ class ArchiveFileSystem<E extends FsArchiveEntry>
                 final Optional<Entry> template
         ) throws IOException {
             splitter.split(path);
-            val pp = splitter.getParentPath(); // may equal ROOT_PATH
+            val pp = splitter.getParentPath().get(); // may equal ROOT_PATH
             val mn = splitter.getMemberName();
             // Lookup parent entry, creating it if necessary and allowed:
             val opcn = master.get(pp);
@@ -479,7 +479,7 @@ class ArchiveFileSystem<E extends FsArchiveEntry>
             }
         }
         splitter.split(np);
-        val pp = splitter.getParentPath();
+        val pp = splitter.getParentPath().get();
         val pcn = master.get(pp).get();
         val ok = pcn.remove(splitter.getMemberName());
         assert ok : "The parent directory of \"" + fullPath(name) + "\" does not contain this entry - archive file system is corrupted!";
@@ -587,9 +587,9 @@ class ArchiveFileSystem<E extends FsArchiveEntry>
 
         @Nonnull
         @Override
-        public String getParentPath() {
+        public Optional<String> getParentPath() {
             val path = super.getParentPath();
-            return null != path ? path : RootPath;
+            return path.isPresent() ? path : Optional.of(RootPath);
         }
     }
 

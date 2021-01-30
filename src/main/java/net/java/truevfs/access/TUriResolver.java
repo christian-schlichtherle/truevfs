@@ -6,6 +6,7 @@ package net.java.truevfs.access;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.shed.PathSplitter;
@@ -42,7 +43,6 @@ final class TUriResolver {
      * @param detector the archive detector to use for scanning.
      */
     TUriResolver(TArchiveDetector detector) {
-        assert null != detector;
         this.detector = detector;
     }
 
@@ -82,9 +82,10 @@ final class TUriResolver {
                     DOT_DOT_SEPARATOR.startsWith(path.substring(0, max));
                     ) {
                 base = parent(base);
-                uri = new UriBuilder(uri)
+                uri = new UriBuilder()
+                        .uri(uri)
                         .path(path = path.substring(max))
-                        .getUri();
+                        .toUriChecked();
                 if (null == base)
                     throw new QuotedUriSyntaxException(uri,
                             "Illegal start of path component");
@@ -101,7 +102,7 @@ final class TUriResolver {
                             .scheme(baseUri.getScheme())
                             .authority(authority)
                             .path(rootPath)
-                            .getUri());
+                            .toUriChecked());
                 path = path.substring(ppl);
             } else {
                 root = base;
@@ -115,17 +116,17 @@ final class TUriResolver {
 
     private FsNodePath resolve(final String path) throws URISyntaxException {
         splitter.split(path);
-        final String pp = splitter.getParentPath();
+        final Optional<String> pp = splitter.getParentPath();
         final FsNodeName nn;
         final FsNodePath np;
-        if (null != pp) {
+        if (pp.isPresent()) {
             nn = new FsNodeName(
-                    builder.path(splitter.getMemberName()).getUri(),
+                    builder.path(splitter.getMemberName()).toUriChecked(),
                     NULL);
-            np = resolve(pp);
+            np = resolve(pp.get());
         } else {
             nn = new FsNodeName(
-                    builder.path(path).query(memberQuery).getUri(),
+                    builder.path(path).query(memberQuery).toUriChecked(),
                     CANONICALIZE);
             np = root;
         }
@@ -136,7 +137,7 @@ final class TUriResolver {
         } else {
             final String npup = npu.getPath();
             if (!npup.endsWith(SEPARATOR))
-                npu = new UriBuilder(npu).path(npup + SEPARATOR_CHAR).getUri();
+                npu = new UriBuilder().uri(npu).path(npup + SEPARATOR_CHAR).toUriChecked();
             rnp = new FsNodePath(new FsMountPoint(npu), nn);
         }
         final FsScheme s = detector.scheme(nn.toString());
@@ -150,10 +151,8 @@ final class TUriResolver {
      * @param  path a file system node path.
      * @return The parent file system node path or null if {@code path} does
      *         not name a parent.
-     * @throws URISyntaxException
      */
-    static @Nullable FsNodePath parent(FsNodePath path)
-    throws URISyntaxException {
+    static @Nullable FsNodePath parent(FsNodePath path) throws URISyntaxException {
         FsMountPoint mp = path.getMountPoint();
         FsNodeName  en = path.getNodeName();
         if (en.isRoot()) {

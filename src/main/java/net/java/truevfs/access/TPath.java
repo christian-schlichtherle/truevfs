@@ -370,12 +370,12 @@ public final class TPath implements Path, TRex {
                     final int j = p.indexOf(SEPARATOR_CHAR, 2);
                     if (-1 != j) {
                         // E.g. "//host/share[/path]"
-                        ub.setAuthority(p.substring(2, j)); // "host"
+                        ub.authority(p.substring(2, j)); // "host"
                         p = p.substring(j); // "/share[/path]"
                     }
                 }
             }
-            return ub.path(p).getUri();
+            return ub.path(p).toUriChecked();
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -389,7 +389,7 @@ public final class TPath implements Path, TRex {
             final String q = uri.getPath();
             final String p = cutTrailingSeparators(q, pl);
             // Mind contract of cutTrailingSeparators(String, int).
-            return p == q ? uri : new UriBuilder(uri).path(p).getUri();
+            return p == q ? uri : new UriBuilder().uri(uri).path(p).toUriChecked();
         } catch (final URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -692,9 +692,10 @@ public final class TPath implements Path, TRex {
         } else if ((namePath = name.getPath()).endsWith(SEPARATOR)) {
             name = name.resolve(other);
         } else {
-            name = new UriBuilder(name)
+            name = new UriBuilder()
+                    .uri(name)
                     .path(namePath + SEPARATOR_CHAR)
-                    .toUri()
+                    .toUriUnchecked()
                     .resolve(other);
         }
         final TArchiveDetector detector = TConfig.current().getArchiveDetector();
@@ -735,9 +736,10 @@ public final class TPath implements Path, TRex {
     public URI getUri() {
         URI n = getName();
         String s = n.getScheme();
-        return new UriBuilder(getNodePath().toHierarchicalUri())
+        return new UriBuilder()
+                .uri(getNodePath().toHierarchicalUri())
                 .scheme(null != s ? s : TFileSystemProvider.get(n).getScheme())
-                .toUri();
+                .toUriUnchecked();
     }
 
     @Override

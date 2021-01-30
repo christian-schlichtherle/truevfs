@@ -133,7 +133,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
 
     URI relativize(URI name) {
         return name.isAbsolute()
-                ? new UriBuilder(name).scheme(null).toUri()
+                ? new UriBuilder().uri(name).scheme(null).toUriUnchecked()
                 : name;
     }
 

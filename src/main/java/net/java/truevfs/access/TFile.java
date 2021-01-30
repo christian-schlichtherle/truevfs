@@ -395,8 +395,6 @@ public final class TFile extends File implements TRex {
      * This refers to the file system controller if and only if this file
      * refers to a prospective archive file, otherwise it's {@code null}.
      * This field should be considered to be {@code final}!
-     *
-     * @see #readObject
      */
     @SuppressFBWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private transient volatile @CheckForNull FsController controller;
@@ -757,7 +755,7 @@ public final class TFile extends File implements TRex {
                                 .path(
                                     path.substring(iapl + 1) // cut off leading separatorChar
                                         .replace(separatorChar, SEPARATOR_CHAR))
-                                .getUri(),
+                                .toUriChecked(),
                             CANONICALIZE);
                 } catch (URISyntaxException ex) {
                     throw new AssertionError(ex);
@@ -787,7 +785,7 @@ public final class TFile extends File implements TRex {
             nodeName = 0 >= nodeNameBuf.length()
                     ? null
                     : new FsNodeName(
-                        new UriBuilder().path(nodeNameBuf.toString()).getUri(),
+                        new UriBuilder().path(nodeNameBuf.toString()).toUriChecked(),
                         CANONICALIZE);
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
@@ -809,7 +807,7 @@ public final class TFile extends File implements TRex {
         }
 
         splitter.split(path);
-        final String parent = splitter.getParentPath();
+        final String parent = splitter.getParentPath().get();
         final String member = splitter.getMemberName();
 
         if (0 == member.length() || ".".equals(member)) {

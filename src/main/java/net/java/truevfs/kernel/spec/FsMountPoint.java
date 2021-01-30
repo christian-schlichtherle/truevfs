@@ -249,7 +249,7 @@ implements Serializable, Comparable<FsMountPoint> {
         this.uri = new UriBuilder(true)
                 .scheme(scheme.toString())
                 .path(pu.getScheme() + ':' + pu.getRawSchemeSpecificPart() + SEPARATOR)
-                .toUri();
+                .toUriChecked();
         this.scheme = scheme;
         this.path = path;
 
@@ -294,7 +294,7 @@ implements Serializable, Comparable<FsMountPoint> {
                 URI nuri = new UriBuilder(true)
                         .scheme(uri.getScheme())
                         .path(pu.getScheme() + ':' + pu.getRawSchemeSpecificPart() + SEPARATOR)
-                        .toUri();
+                        .toUriChecked();
                 if (!uri.equals(nuri))
                     uri = nuri;
             }

@@ -54,7 +54,7 @@ final class TUriHelper {
         // assert null == new URI("foo/").resolve(new URI("..")).getRawSchemeSpecificPart();
         if (null == ssp
                 || null == a && ssp.startsWith(SEPARATOR + SEPARATOR)) // empty authority
-            return new UriBuilder(uri).toUri();
+            return new UriBuilder().uri(uri).toUriUnchecked();
         return uri;
     }
 

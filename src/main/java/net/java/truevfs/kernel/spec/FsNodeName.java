@@ -313,12 +313,13 @@ implements Serializable, Comparable<FsNodeName> {
                     : pup.endsWith(SEPARATOR)
                         ? pu.resolve(mu)
                         : mu.getPath().isEmpty()
-                            ? new UriBuilder(pu, true)
+                            ? new UriBuilder(true)
+                                .uri(pu)
                                 .query(mu.getRawQuery())
-                                .getUri()
+                                .toUriChecked()
                             : new UriBuilder(true)
                                 .path(pup + SEPARATOR_CHAR)
-                                .getUri()
+                                .toUriChecked()
                                 .resolve(mu);
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);

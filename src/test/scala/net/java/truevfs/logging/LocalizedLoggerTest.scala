@@ -2,24 +2,21 @@
  * Copyright (C) 2005-2015 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truecommons3.logging
+package net.java.truecommons.logging
+
+import net.java.truecommons.logging.Disambiguate._
+import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito._
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar.mock
+import org.slf4j._
 
 import java.util._
 
-import net.java.truecommons3.logging.Disambiguate._
-import org.junit.runner._
-import org.mockito.Matchers._
-import org.mockito.Mockito._
-import org.scalatest._
-import org.scalatest.junit._
-import org.scalatest.mock.MockitoSugar.mock
-import org.slf4j._
-
 /** @author Christian Schlichtherle */
-@RunWith(classOf[JUnitRunner])
-class LocalizedLoggerTest extends WordSpec {
+class LocalizedLoggerTest extends AnyWordSpec {
 
-  import net.java.truecommons3.logging.LocalizedLoggerTest._
+  import net.java.truecommons.logging.LocalizedLoggerTest._
 
   def create(delegate: Logger) = new LocalizedLogger(delegate, bundle)
 
@@ -46,7 +43,7 @@ class LocalizedLoggerTest extends WordSpec {
       "resolve a message with one parameter and forward the logging call" in {
         reset(delegate)
         when(delegate.isTraceEnabled) thenReturn true
-        logger trace ("1", "one")
+        logger trace("1", "one")
         verify(delegate) trace "one"
       }
 
@@ -60,7 +57,7 @@ class LocalizedLoggerTest extends WordSpec {
       "resolve a message with three parameters and forward the logging call" in {
         reset(delegate)
         when(delegate.isTraceEnabled) thenReturn true
-        logger trace ("3", "one", "two", "three")
+        logger trace("3", "one", "two", "three")
         verify(delegate) trace "one two three"
       }
     }
@@ -84,7 +81,7 @@ class LocalizedLoggerTest extends WordSpec {
       "resolve a message with one parameter and forward the logging call" in {
         reset(delegate)
         when(delegate.isDebugEnabled) thenReturn true
-        logger debug ("1", "one")
+        logger debug("1", "one")
         verify(delegate) debug "one"
       }
 
@@ -98,7 +95,7 @@ class LocalizedLoggerTest extends WordSpec {
       "resolve a message with three parameters and forward the logging call" in {
         reset(delegate)
         when(delegate.isDebugEnabled) thenReturn true
-        logger debug ("3", "one", "two", "three")
+        logger debug("3", "one", "two", "three")
         verify(delegate) debug "one two three"
       }
     }
@@ -122,7 +119,7 @@ class LocalizedLoggerTest extends WordSpec {
       "resolve a message with one parameter and forward the logging call" in {
         reset(delegate)
         when(delegate.isInfoEnabled) thenReturn true
-        logger info ("1", "one")
+        logger info("1", "one")
         verify(delegate) info "one"
       }
 
@@ -136,7 +133,7 @@ class LocalizedLoggerTest extends WordSpec {
       "resolve a message with three parameters and forward the logging call" in {
         reset(delegate)
         when(delegate.isInfoEnabled) thenReturn true
-        logger info ("3", "one", "two", "three")
+        logger info("3", "one", "two", "three")
         verify(delegate) info "one two three"
       }
     }
@@ -160,7 +157,7 @@ class LocalizedLoggerTest extends WordSpec {
       "resolve a message with one parameter and forward the logging call" in {
         reset(delegate)
         when(delegate.isWarnEnabled) thenReturn true
-        logger warn ("1", "one")
+        logger warn("1", "one")
         verify(delegate) warn "one"
       }
 
@@ -174,7 +171,7 @@ class LocalizedLoggerTest extends WordSpec {
       "resolve a message with three parameters and forward the logging call" in {
         reset(delegate)
         when(delegate.isWarnEnabled) thenReturn true
-        logger warn ("3", "one", "two", "three")
+        logger warn("3", "one", "two", "three")
         verify(delegate) warn "one two three"
       }
     }
@@ -198,7 +195,7 @@ class LocalizedLoggerTest extends WordSpec {
       "resolve a message with one parameter and forward the logging call" in {
         reset(delegate)
         when(delegate.isErrorEnabled) thenReturn true
-        logger error ("1", "one")
+        logger error("1", "one")
         verify(delegate) error "one"
       }
 
@@ -212,7 +209,7 @@ class LocalizedLoggerTest extends WordSpec {
       "resolve a message with three parameters and forward the logging call" in {
         reset(delegate)
         when(delegate.isErrorEnabled) thenReturn true
-        logger error ("3", "one", "two", "three")
+        logger error("3", "one", "two", "three")
         verify(delegate) error "one two three"
       }
     }

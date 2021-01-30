@@ -4,17 +4,18 @@
  */
 package net.java.truevfs.kernel.spec;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import net.java.truecommons.shed.QuotedUriSyntaxException;
+import net.java.truecommons.shed.UriBuilder;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 import java.beans.ConstructorProperties;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import net.java.truecommons.shed.QuotedUriSyntaxException;
-import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
 import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
@@ -130,14 +131,14 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
  * This class supports serialization with both
  * {@link java.io.ObjectOutputStream} and {@link java.beans.XMLEncoder}.
  *
- * @see    FsMountPoint
- * @see    FsNodeName
- * @see    FsScheme
  * @author Christian Schlichtherle
+ * @see FsMountPoint
+ * @see FsNodeName
+ * @see FsScheme
  */
 @Immutable
 public final class FsNodePath
-implements Serializable, Comparable<FsNodePath> {
+        implements Serializable, Comparable<FsNodePath> {
 
     private static final long serialVersionUID = 5798435461242930648L;
 
@@ -146,11 +147,13 @@ implements Serializable, Comparable<FsNodePath> {
     @SuppressFBWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private URI uri; // not final for serialization only!
 
-    private transient @Nullable FsMountPoint mountPoint;
+    private transient @Nullable
+    FsMountPoint mountPoint;
 
     private transient FsNodeName nodeName;
 
-    private transient volatile @Nullable URI hierarchical;
+    private transient volatile @Nullable
+    URI hierarchical;
 
     /**
      * Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NULL)}.
@@ -167,11 +170,11 @@ implements Serializable, Comparable<FsNodePath> {
      * and wraps any thrown {@link URISyntaxException} in an
      * {@link IllegalArgumentException}.
      *
-     * @param  uri the {@link #getUri() URI}.
-     * @param  modifier the URI modifier.
-     * @throws IllegalArgumentException if {@code uri} does not conform to the
-     *         syntax constraints for paths.
+     * @param uri      the {@link #getUri() URI}.
+     * @param modifier the URI modifier.
      * @return A new path.
+     * @throws IllegalArgumentException if {@code uri} does not conform to the
+     *                                  syntax constraints for paths.
      */
     public static FsNodePath
     create(URI uri, FsUriModifier modifier) {
@@ -205,13 +208,13 @@ implements Serializable, Comparable<FsNodePath> {
     /**
      * Constructs a new path by parsing the given URI.
      *
-     * @param  uri the non-{@code null} {@link #getUri() URI}.
-     * @param  modifier the URI modifier.
+     * @param uri      the non-{@code null} {@link #getUri() URI}.
+     * @param modifier the URI modifier.
      * @throws URISyntaxException if {@code uri} does not conform to the
-     *         syntax constraints for paths.
+     *                            syntax constraints for paths.
      */
     public FsNodePath(URI uri, FsUriModifier modifier)
-    throws URISyntaxException {
+            throws URISyntaxException {
         parse(uri, modifier);
     }
 
@@ -219,8 +222,8 @@ implements Serializable, Comparable<FsNodePath> {
      * Constructs a new path by composing its URI from the given nullable mount
      * point and node name.
      *
-     * @param  mountPoint the nullable {@link #getMountPoint() mount point}.
-     * @param  nodeName the {@link #getNodeName() node name}.
+     * @param mountPoint the nullable {@link #getMountPoint() mount point}.
+     * @param nodeName   the {@link #getNodeName() node name}.
      */
     public FsNodePath(
             final @CheckForNull FsMountPoint mountPoint,
@@ -243,15 +246,15 @@ implements Serializable, Comparable<FsNodePath> {
                 final int enuql = null == enuq ? 0 : enuq.length() + 1;
                 final StringBuilder ssp =
                         new StringBuilder(mpusspl + enupl + enuql)
-                        .append(mpussp)
-                        .append(enup);
+                                .append(mpussp)
+                                .append(enup);
                 if (null != enuq)
                     ssp.append('?').append(enuq);
                 this.uri = new UriBuilder(true)
                         .scheme(mpu.getScheme())
                         .path(ssp.toString())
                         .fragment(enu.getRawFragment())
-                        .getUri();
+                        .toUriChecked();
             } catch (URISyntaxException ex) {
                 throw new AssertionError(ex);
             }
@@ -265,12 +268,12 @@ implements Serializable, Comparable<FsNodePath> {
     }
 
     private void writeObject(ObjectOutputStream out)
-    throws IOException {
+            throws IOException {
         out.writeObject(uri.toString());
     }
 
     private void readObject(ObjectInputStream in)
-    throws IOException, ClassNotFoundException {
+            throws IOException, ClassNotFoundException {
         try {
             parse(new URI(in.readObject().toString()), NULL);
         } catch (URISyntaxException ex) {
@@ -280,7 +283,7 @@ implements Serializable, Comparable<FsNodePath> {
     }
 
     private void parse(URI uri, final FsUriModifier modifier)
-    throws URISyntaxException {
+            throws URISyntaxException {
         uri = modifier.modify(uri, NODE_PATH);
         if (null != uri.getRawFragment())
             throw new QuotedUriSyntaxException(uri, "Fragment component not allowed");
@@ -290,17 +293,17 @@ implements Serializable, Comparable<FsNodePath> {
             if (0 > i)
                 throw new QuotedUriSyntaxException(uri,
                         "Missing mount point separator \"" + FsMountPoint.SEPARATOR + '"');
-            final UriBuilder b = new UriBuilder(true);
             mountPoint = new FsMountPoint(
-                    b.scheme(uri.getScheme())
-                     .path(ssp.substring(0, i + 2))
-                     .toUri(),
+                    new UriBuilder(true)
+                            .scheme(uri.getScheme())
+                            .path(ssp.substring(0, i + 2))
+                            .toUriChecked(),
                     modifier);
             nodeName = new FsNodeName(
-                    b.clear()
-                     .pathQuery(ssp.substring(i + 2))
-                     .fragment(uri.getRawFragment())
-                     .toUri(),
+                    new UriBuilder(true)
+                            .pathQuery(ssp.substring(i + 2))
+                            .fragment(uri.getRawFragment())
+                            .toUriChecked(),
                     modifier);
             if (NULL != modifier) {
                 URI mpu = mountPoint.getUri();
@@ -349,7 +352,9 @@ implements Serializable, Comparable<FsNodePath> {
      *
      * @return The URI for this node path.
      */
-    public URI getUri() { return uri; }
+    public URI getUri() {
+        return uri;
+    }
 
     /**
      * Returns a URI which is recursively transformed from the URI of this
@@ -362,7 +367,7 @@ implements Serializable, Comparable<FsNodePath> {
      * {@code file:/archive/node}.
      *
      * @return A URI which is recursively transformed from the URI of this
-     *         path so that it's absolute and hierarchical.
+     * path so that it's absolute and hierarchical.
      */
     public URI toHierarchicalUri() {
         final URI hierarchical = this.hierarchical;
@@ -373,10 +378,11 @@ implements Serializable, Comparable<FsNodePath> {
             try {
                 return this.hierarchical = enu.toString().isEmpty()
                         ? mpu
-                        : new UriBuilder(mpu, true)
-                            .path(mpu.getRawPath() + FsNodeName.SEPARATOR)
-                            .getUri()
-                            .resolve(enu);
+                        : new UriBuilder(true)
+                        .uri(mpu)
+                        .path(mpu.getRawPath() + FsNodeName.SEPARATOR)
+                        .toUriChecked()
+                        .resolve(enu);
             } catch (URISyntaxException ex) {
                 throw new AssertionError(ex);
             }
@@ -391,7 +397,10 @@ implements Serializable, Comparable<FsNodePath> {
      *
      * @return The nullable mount point.
      */
-    public @Nullable FsMountPoint getMountPoint() { return mountPoint; }
+    public @Nullable
+    FsMountPoint getMountPoint() {
+        return mountPoint;
+    }
 
     /**
      * Returns the node name component.
@@ -399,12 +408,14 @@ implements Serializable, Comparable<FsNodePath> {
      *
      * @return The node name component.
      */
-    public FsNodeName getNodeName() { return nodeName; }
+    public FsNodeName getNodeName() {
+        return nodeName;
+    }
 
     /**
      * Resolves the given node name against this path.
      *
-     * @param  nodeName a node name relative to this path.
+     * @param nodeName a node name relative to this path.
      * @return A new path with an absolute URI.
      */
     public FsNodePath
@@ -433,18 +444,22 @@ implements Serializable, Comparable<FsNodePath> {
     public boolean equals(@CheckForNull Object that) {
         return this == that
                 || that instanceof FsNodePath
-                    && this.uri.equals(((FsNodePath) that).uri);
+                && this.uri.equals(((FsNodePath) that).uri);
     }
 
     /**
      * Returns a hash code which is consistent with {@link #equals(Object)}.
      */
     @Override
-    public int hashCode() { return uri.hashCode(); }
+    public int hashCode() {
+        return uri.hashCode();
+    }
 
     /**
      * Equivalent to calling {@link URI#toString()} on {@link #getUri()}.
      */
     @Override
-    public String toString() { return uri.toString(); }
+    public String toString() {
+        return uri.toString();
+    }
 }

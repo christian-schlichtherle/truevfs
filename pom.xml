@@ -50,7 +50,6 @@
         <bali.version>0.8.0</bali.version>
         <fun-io.version>2.4.1</fun-io.version>
         <service-wight.version>0.6.0</service-wight.version>
-        <truecommons.version>2.5.0</truecommons.version>
         <truevfs.version>0.14.0</truevfs.version>
     </properties>
 
@@ -92,82 +91,14 @@
                 <version>${service-wight.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truecommons</groupId>
-                <artifactId>truecommons-cio</artifactId>
-                <version>${truecommons.version}</version>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>1</version>
             </dependency>
             <dependency>
-                <groupId>net.java.truecommons</groupId>
-                <artifactId>truecommons-io</artifactId>
-                <version>${truecommons.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.truecommons</groupId>
-                <artifactId>truecommons-io</artifactId>
-                <classifier>tests</classifier>
-                <version>${truecommons.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.truecommons</groupId>
-                <artifactId>truecommons-jmx</artifactId>
-                <version>${truecommons.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.truecommons</groupId>
-                <artifactId>truecommons-key-console</artifactId>
-                <version>${truecommons.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.truecommons</groupId>
-                <artifactId>truecommons-key-default</artifactId>
-                <version>${truecommons.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.truecommons</groupId>
-                <artifactId>truecommons-key-hurlfb</artifactId>
-                <version>${truecommons.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.truecommons</groupId>
-                <artifactId>truecommons-key-macosx</artifactId>
-                <version>${truecommons.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.truecommons</groupId>
-                <artifactId>truecommons-key-spec</artifactId>
-                <version>${truecommons.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.truecommons</groupId>
-                <artifactId>truecommons-key-spec</artifactId>
-                <classifier>tests</classifier>
-                <version>${truecommons.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.truecommons</groupId>
-                <artifactId>truecommons-key-swing</artifactId>
-                <version>${truecommons.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.truecommons</groupId>
-                <artifactId>truecommons-logging</artifactId>
-                <version>${truecommons.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.truecommons</groupId>
-                <artifactId>truecommons-services</artifactId>
-                <version>${truecommons.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.truecommons</groupId>
-                <artifactId>truecommons-shed</artifactId>
-                <version>${truecommons.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.truecommons</groupId>
-                <artifactId>truecommons-shed</artifactId>
-                <classifier>tests</classifier>
-                <version>${truecommons.version}</version>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna</artifactId>
+                <version>4.1.0</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -189,6 +120,11 @@
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk15on</artifactId>
                 <version>1.68</version>
+            </dependency>
+            <dependency>
+                <groupId>org.netbeans</groupId>
+                <artifactId>jemmy</artifactId>
+                <version>2.2.7.5</version>
             </dependency>
             <!-- for httpclient -->
             <dependency>
@@ -226,55 +162,12 @@
             <artifactId>service-wight-core</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-cio</artifactId>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-io</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-io</artifactId>
-            <classifier>tests</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-jmx</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-key-default</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-key-spec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-key-spec</artifactId>
-            <classifier>tests</classifier>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-services</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-shed</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-shed</artifactId>
-            <classifier>tests</classifier>
-            <scope>test</scope>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -289,6 +182,11 @@
             <artifactId>bcprov-jdk15on</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.netbeans</groupId>
+            <artifactId>jemmy</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
@@ -296,6 +194,10 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

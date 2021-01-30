@@ -19,7 +19,7 @@ import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
  * Modifies a URI when parsing a file system {@linkplain FsNodePath node path},
  * a {@linkplain FsMountPoint mount point} or an
  * {@linkplain FsNodeName node name}.
- * 
+ *
  * @author Christian Schlichtherle
  */
 @Immutable
@@ -52,8 +52,8 @@ public enum FsUriModifier {
     /**
      * An idempotent function which modifies a URI.
      *
-     * @param  uri the URI to modify.
-     * @param  fix the post-fix to apply if required.
+     * @param uri the URI to modify.
+     * @param fix the post-fix to apply if required.
      * @return the modified URI.
      */
     abstract URI modify(URI uri, PostFix fix) throws URISyntaxException;
@@ -102,7 +102,7 @@ public enum FsUriModifier {
                             a = p.substring(2, i);
                             p = p.substring(i);
                         }
-                        uri = new UriBuilder(uri, true).authority(a).path(p).getUri();
+                        uri = new UriBuilder(true).uri(uri).authority(a).path(p).toUriChecked();
                     }
                     uri = uri.normalize();
                 }
@@ -110,15 +110,13 @@ public enum FsUriModifier {
                 String a = uri.getRawAuthority();
                 String p = uri.getRawPath(), q = p;
                 for (int l; p.endsWith(SEPARATOR)
-                        && (   1 <=(l = p.length()) && null == s
-                            || 2 <= l && ':' != p.charAt(l - 2)
-                            || 3 <= l && !p.startsWith(SEPARATOR)
-                            || 4 <  l && p.startsWith(SEPARATOR)
-                            || null != a); )
+                        && (1 <= (l = p.length()) && null == s
+                        || 2 <= l && ':' != p.charAt(l - 2)
+                        || 3 <= l && !p.startsWith(SEPARATOR)
+                        || 4 < l && p.startsWith(SEPARATOR)
+                        || null != a); )
                     p = p.substring(0, l - 1);
-                return p != q
-                        ? new UriBuilder(uri, true).path(p).getUri()
-                        : uri;
+                return p == q ? uri : new UriBuilder(true).uri(uri).path(p).toUriChecked();
             }
         },
 
@@ -154,16 +152,14 @@ public enum FsUriModifier {
                     p = p.substring(1);
                 while (p.endsWith(SEPARATOR))
                     p = p.substring(0, p.length() - 1);
-                return p == q
-                        ? uri
-                        : new UriBuilder(uri, true).path(p).getUri();
+                return p == q ? uri : new UriBuilder(true).uri(uri).path(p).toUriChecked();
             }
         };
 
         /**
          * An idempotent function which modifies the given URI.
          *
-         * @param  uri the URI to modify.
+         * @param uri the URI to modify.
          * @return the modified URI.
          */
         abstract URI modify(URI uri) throws URISyntaxException;

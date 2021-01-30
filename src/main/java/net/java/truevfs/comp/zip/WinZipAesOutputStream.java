@@ -4,10 +4,6 @@
  */
 package net.java.truevfs.comp.zip;
 
-import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.Arrays;
-import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.io.DecoratingOutputStream;
 import net.java.truecommons.io.LittleEndianOutputStream;
 import net.java.truecommons.key.spec.KeyStrength;
@@ -24,15 +20,19 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.util.io.TeeOutputStream;
 
+import javax.annotation.concurrent.NotThreadSafe;
+import java.io.IOException;
+import java.security.SecureRandom;
+import java.util.Arrays;
+
 /**
  * Encrypts ZIP entry contents according the WinZip AES specification.
  *
- * @see     <a href="http://www.winzip.com/win/en/aes_info.htm">AES Encryption Information: Encryption Specification AE-1 and AE-2 (WinZip Computing, S.L.)</a>
- * @see     <a href="http://www.winzip.com/win/en/aes_tips.htm">AES Coding Tips for Developers (WinZip Computing, S.L.)</a>
- * @see     <a href="http://www.gladman.me.uk/cryptography_technology/fileencrypt/">A Password Based File Encyption Utility (Dr. Gladman)</a>
- * @see     <a href="http://www.ietf.org/rfc/rfc2898.txt">RFC 2898: PKCS #5: Password-Based Cryptography Specification Version 2.0 (IETF et al.)</a>
- * @see     AbstractZipOutputStream$WinZipAesOutputMethod
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
+ * @see <a href="http://www.winzip.com/win/en/aes_info.htm">AES Encryption Information: Encryption Specification AE-1 and AE-2 (WinZip Computing, S.L.)</a>
+ * @see <a href="http://www.winzip.com/win/en/aes_tips.htm">AES Coding Tips for Developers (WinZip Computing, S.L.)</a>
+ * @see <a href="http://www.gladman.me.uk/cryptography_technology/fileencrypt/">A Password Based File Encyption Utility (Dr. Gladman)</a>
+ * @see <a href="http://www.ietf.org/rfc/rfc2898.txt">RFC 2898: PKCS #5: Password-Based Cryptography Specification Version 2.0 (IETF et al.)</a>
  */
 @NotThreadSafe
 final class WinZipAesOutputStream extends DecoratingOutputStream {
@@ -50,7 +50,9 @@ final class WinZipAesOutputStream extends DecoratingOutputStream {
 
     static final int PWD_VERIFIER_BITS = 16;
 
-    /** The message authentication code (MAC) output stream. */
+    /**
+     * The message authentication code (MAC) output stream.
+     */
     private final MacOutputStream mos;
 
     /**
@@ -62,7 +64,7 @@ final class WinZipAesOutputStream extends DecoratingOutputStream {
     WinZipAesOutputStream(
             final WinZipAesEntryParameters param,
             final LittleEndianOutputStream leos)
-    throws IOException {
+            throws IOException {
         assert null != param;
         try {
             assert null != leos;
@@ -90,7 +92,7 @@ final class WinZipAesOutputStream extends DecoratingOutputStream {
             assert AES_BLOCK_SIZE_BITS <= keyStrengthBits;
             final KeyParameter keyParam =
                     (KeyParameter) gen.generateDerivedParameters(
-                        2 * keyStrengthBits + PWD_VERIFIER_BITS);
+                            2 * keyStrengthBits + PWD_VERIFIER_BITS);
             Arrays.fill(passwd, (byte) 0); // must not wipe before generator use!
 
             // Can you believe they "forgot" the nonce in the CTR mode IV?! :-(
@@ -132,7 +134,7 @@ final class WinZipAesOutputStream extends DecoratingOutputStream {
     }
 
     private void writePasswordVerifier(WinZipAesEntryParameters param, KeyParameter keyParam)
-    throws IOException {
+            throws IOException {
         leos.write(
                 keyParam.getKey(),
                 2 * param.getKeyStrength().getBytes(),
