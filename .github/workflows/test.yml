@@ -15,7 +15,7 @@ jobs:
         with:
           path: project/.*
           key: sbt-java${{ matrix.java }}-${{ hashFiles('*.sbt', 'project/*') }}
-      - run: bash sbtx -no-share -batch test
+      - run: ./sbtx -no-share -batch test
     strategy:
       matrix:
         java: [8, 15]
