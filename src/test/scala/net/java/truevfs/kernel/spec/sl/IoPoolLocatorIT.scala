@@ -4,20 +4,19 @@
  */
 package net.java.truevfs.kernel.spec.sl
 
-import org.scalatest.Matchers._
-import org.scalatest._
+import org.scalatest.matchers.should.Matchers._
+import org.scalatest.wordspec.AnyWordSpec
 
 /**
-  * Tests if the class path has been properly configured so that any I/O buffer
-  * pool is locatable at RUNTIME!
-  *
-  * @author Christian Schlichtherle
-  */
-class IoPoolLocatorIT extends WordSpec {
+ * Tests if the class path has been properly configured so that any I/O buffer pool is locatable at RUNTIME!
+ *
+ * @author Christian Schlichtherle
+ */
+class IoPoolLocatorIT extends AnyWordSpec {
 
   "The I/O buffer pool locator singleton" should {
     "provide an I/O buffer pool" in {
-      (IoBufferPoolLocator.SINGLETON.get: AnyRef) should not be null
+      IoBufferPoolLocator.SINGLETON.get should not be null
     }
   }
 }

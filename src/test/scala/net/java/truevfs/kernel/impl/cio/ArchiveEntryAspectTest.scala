@@ -11,14 +11,15 @@ import net.java.truecommons.cio.Entry.Type._
 import net.java.truecommons.cio.Entry._
 import net.java.truevfs.kernel.spec._
 import net.java.truevfs.kernel.spec.mock.MockArchiveDriverEntry
-import org.scalatest.Matchers._
-import org.scalatest._
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks._
+import org.scalatest.matchers.should.Matchers._
+import org.scalatest.prop.TableDrivenPropertyChecks.{whenever, _}
+import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 
 /**
   * @author Christian Schlichtherle
   */
-class ArchiveEntryAspectTest extends WordSpec {
+class ArchiveEntryAspectTest extends AnyWordSpec {
 
   private def forAllNameAndType(test: (FsArchiveEntry, ArchiveEntryAspect[_]) => Unit): Unit = {
     forAll { name: String =>

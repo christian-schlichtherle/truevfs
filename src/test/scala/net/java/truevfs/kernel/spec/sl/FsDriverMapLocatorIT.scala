@@ -4,16 +4,16 @@
  */
 package net.java.truevfs.kernel.spec.sl
 
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 import org.scalatest._
+import org.scalatest.wordspec.AnyWordSpec
 
 /**
-  * Tests if the class path has been properly configured so that any file
-  * system drivers are locatable at RUNTIME!
+  * Tests if the class path has been properly configured so that any file system drivers are locatable at RUNTIME!
   *
   * @author Christian Schlichtherle
   */
-class FsDriverMapLocatorIT extends WordSpec {
+class FsDriverMapLocatorIT extends AnyWordSpec {
 
   "The file system driver map locator singleton" should {
     "provide some file system drivers" in {

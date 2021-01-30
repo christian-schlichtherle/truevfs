@@ -4,25 +4,27 @@
  */
 package net.java.truevfs.kernel.impl
 
-import java.io._
-import java.nio._
-
 import net.java.truecommons.cio.Entry.Access._
 import net.java.truecommons.cio.Entry._
 import net.java.truecommons.cio.{Entry, _}
 import net.java.truevfs.kernel.impl.CacheEntry.Strategy._
 import net.java.truevfs.kernel.impl.CacheEntryTest._
 import net.java.truevfs.kernel.impl.cio.EntryAspect._
-import org.scalatest.Matchers._
-import org.scalatest._
+import org.scalatest.matchers.should.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatest.wordspec.AnyWordSpec
+
+import java.io._
+import java.nio._
 
 /** @author Christian Schlichtherle */
-class CacheEntryTest extends WordSpec {
+class CacheEntryTest extends AnyWordSpec {
 
   private val initialCapacity = 32
   private val mockEntryName = "mock"
+
   private def mockEntryDataRead = ByteBuffer.wrap("read".getBytes).asReadOnlyBuffer
+
   private def mockEntryDataWrite = ByteBuffer.wrap("write".getBytes).asReadOnlyBuffer
 
   "A cache entry" should {
@@ -35,8 +37,7 @@ class CacheEntryTest extends WordSpec {
 
         back = new MemoryBuffer(mockEntryName, initialCapacity)
         back.setBuffer(mockEntryDataRead)
-        cache .configure(new BrokenInputSocket(back))
-              .configure(new BrokenOutputSocket(back))
+        cache.configure(new BrokenInputSocket(back)).configure(new BrokenOutputSocket(back))
         pool should have size 0
         back.getBuffer shouldBe mockEntryDataRead
         back getCount READ shouldBe 0
@@ -47,7 +48,7 @@ class CacheEntryTest extends WordSpec {
         front = new MemoryBuffer(mockEntryName, initialCapacity)
         front.getBuffer shouldBe null
         intercept[IOException] {
-          IoSockets copy (cache.input, front.output)
+          IoSockets copy(cache.input, front.output)
         }
         pool should have size 0
         front.getBuffer shouldBe null
@@ -56,8 +57,8 @@ class CacheEntryTest extends WordSpec {
         back getCount WRITE shouldBe 0
         cache.dataSize shouldBe UNKNOWN
 
-        cache .configure(back.input)
-              .configure(back.output)
+        cache.configure(back.input)
+          .configure(back.output)
         pool should have size 0
         front.getBuffer shouldBe null
         back.getBuffer shouldBe mockEntryDataRead
@@ -68,7 +69,7 @@ class CacheEntryTest extends WordSpec {
         front = new MemoryBuffer(mockEntryName, initialCapacity)
         pool should have size 0
         front.getBuffer shouldBe null
-        IoSockets copy (cache.input, front.output)
+        IoSockets copy(cache.input, front.output)
         pool should have size 1
         front.getBuffer shouldBe mockEntryDataRead
         back.getBuffer shouldBe mockEntryDataRead
@@ -78,8 +79,8 @@ class CacheEntryTest extends WordSpec {
 
         front = new MemoryBuffer(mockEntryName, initialCapacity)
         front.setBuffer(mockEntryDataWrite)
-        cache .configure(new BrokenInputSocket(back))
-              .configure(new BrokenOutputSocket(back))
+        cache.configure(new BrokenInputSocket(back))
+          .configure(new BrokenOutputSocket(back))
         pool should have size 1
         front.getBuffer shouldBe mockEntryDataWrite
         back.getBuffer shouldBe mockEntryDataRead
@@ -88,7 +89,7 @@ class CacheEntryTest extends WordSpec {
         cache.dataSize shouldBe mockEntryDataRead.limit()
 
         intercept[IOException] {
-          IoSockets copy (front.input, cache.output)
+          IoSockets copy(front.input, cache.output)
           if (WriteThrough ne strategy) {
             back getCount WRITE shouldBe 0
             cache.flush()
@@ -101,8 +102,8 @@ class CacheEntryTest extends WordSpec {
         back getCount WRITE shouldBe 0
         cache.dataSize shouldBe mockEntryDataWrite.limit()
 
-        cache .configure(back.input)
-              .configure(back.output)
+        cache.configure(back.input)
+          .configure(back.output)
         pool should have size 1
         front.getBuffer shouldBe mockEntryDataWrite
         back.getBuffer shouldBe mockEntryDataRead
@@ -110,7 +111,7 @@ class CacheEntryTest extends WordSpec {
         back getCount WRITE shouldBe 0
         cache.dataSize shouldBe mockEntryDataWrite.limit()
 
-        IoSockets copy (front.input, cache.output)
+        IoSockets copy(front.input, cache.output)
         if (WriteThrough ne strategy) {
           back getCount WRITE shouldBe 0
           cache.flush()
@@ -125,8 +126,8 @@ class CacheEntryTest extends WordSpec {
 
         back = new MemoryBuffer(mockEntryName, initialCapacity)
         back.setBuffer(mockEntryDataRead)
-        cache .configure(new BrokenInputSocket(back))
-              .configure(new BrokenOutputSocket(back))
+        cache.configure(new BrokenInputSocket(back))
+          .configure(new BrokenOutputSocket(back))
         cache.dataSize should not be UNKNOWN
         pool should have size 1
         front.getBuffer shouldBe mockEntryDataWrite
@@ -136,7 +137,7 @@ class CacheEntryTest extends WordSpec {
         cache.dataSize shouldBe mockEntryDataWrite.limit()
 
         front = new MemoryBuffer(mockEntryName, initialCapacity)
-        IoSockets copy (cache.input, front.output)
+        IoSockets copy(cache.input, front.output)
         cache.dataSize should not be UNKNOWN
         pool should have size 1
         front.getBuffer shouldBe mockEntryDataWrite
@@ -166,8 +167,8 @@ class CacheEntryTest extends WordSpec {
         back getCount WRITE shouldBe 0
         cache.dataSize shouldBe UNKNOWN
 
-        cache .configure(back.input)
-              .configure(back.output)
+        cache.configure(back.input)
+          .configure(back.output)
         cache.dataSize shouldBe UNKNOWN
         pool should have size 0
         front.getBuffer shouldBe null
@@ -176,7 +177,7 @@ class CacheEntryTest extends WordSpec {
         back getCount WRITE shouldBe 0
         cache.dataSize shouldBe UNKNOWN
 
-        IoSockets copy (cache.input, front.output)
+        IoSockets copy(cache.input, front.output)
         cache.dataSize should not be UNKNOWN
         pool should have size 1
         front.getBuffer shouldBe mockEntryDataRead
@@ -187,8 +188,8 @@ class CacheEntryTest extends WordSpec {
 
         front = new MemoryBuffer(mockEntryName, initialCapacity)
         front setBuffer mockEntryDataWrite
-        cache .configure(new BrokenInputSocket(back))
-              .configure(new BrokenOutputSocket(back))
+        cache.configure(new BrokenInputSocket(back))
+          .configure(new BrokenOutputSocket(back))
         cache.dataSize should not be UNKNOWN
         pool should have size 1
         front.getBuffer shouldBe mockEntryDataWrite
@@ -198,7 +199,7 @@ class CacheEntryTest extends WordSpec {
         cache.dataSize shouldBe mockEntryDataRead.limit()
 
         intercept[IOException] {
-          IoSockets copy (front.input, cache.output)
+          IoSockets copy(front.input, cache.output)
           if (WriteThrough ne strategy) {
             back getCount WRITE shouldBe 0
             cache.flush()
@@ -212,8 +213,8 @@ class CacheEntryTest extends WordSpec {
         back getCount WRITE shouldBe 0
         cache.dataSize shouldBe mockEntryDataWrite.limit()
 
-        cache .configure(back.input)
-              .configure(back.output)
+        cache.configure(back.input)
+          .configure(back.output)
         cache.dataSize should not be UNKNOWN
         pool should have size 1
         front.getBuffer shouldBe mockEntryDataWrite
@@ -222,7 +223,7 @@ class CacheEntryTest extends WordSpec {
         back getCount WRITE shouldBe 0
         cache.dataSize shouldBe mockEntryDataWrite.limit()
 
-        IoSockets copy (front.input, cache.output)
+        IoSockets copy(front.input, cache.output)
         if (WriteThrough ne strategy) {
           back getCount WRITE shouldBe 0
           cache.flush()
@@ -235,9 +236,9 @@ class CacheEntryTest extends WordSpec {
         back getCount WRITE shouldBe 1
         cache.dataSize shouldBe mockEntryDataWrite.limit()
 
-        cache .configure(new BrokenInputSocket(back))
-              .configure(new BrokenOutputSocket(back))
-              .release()
+        cache.configure(new BrokenInputSocket(back))
+          .configure(new BrokenOutputSocket(back))
+          .release()
         cache.dataSize shouldBe UNKNOWN
         pool should have size 0
         front.getBuffer shouldBe mockEntryDataWrite
@@ -269,7 +270,10 @@ private object CacheEntryTest {
 
     override def stream(peer: InputSocket[_ <: Entry]): OutputStream = new OutputStream {
 
-      override def write(b: Int): Unit = { throw new IOException }
+      override def write(b: Int): Unit = {
+        throw new IOException
+      }
     }
   }
+
 }

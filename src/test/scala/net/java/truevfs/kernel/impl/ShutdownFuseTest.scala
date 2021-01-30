@@ -9,14 +9,12 @@ import net.java.truevfs.kernel.impl.ShutdownFuseTest._
 import org.mockito.ArgumentMatchers.any
 import org.mockito.InOrder
 import org.mockito.Mockito.inOrder
-import org.scalatest.Matchers._
-import org.scalatest.WordSpec
+import org.scalatest.matchers.should.Matchers._
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 
-/**
-  * @author Christian Schlichtherle
-  */
-class ShutdownFuseTest extends WordSpec {
+/** @author Christian Schlichtherle */
+class ShutdownFuseTest extends AnyWordSpec {
 
   "A shutdown fuse with a mock thread registry" when {
     "just constructed" should {

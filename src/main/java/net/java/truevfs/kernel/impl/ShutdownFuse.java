@@ -84,7 +84,7 @@ final class ShutdownFuse {
         thread.run();
     }
 
-    interface ThreadRegistry {
+    public interface ThreadRegistry {
 
         ThreadRegistry INSTANCE = new ThreadRegistry() {
         };

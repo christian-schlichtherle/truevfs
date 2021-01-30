@@ -5,11 +5,11 @@
 package net.java.truevfs.ext.insight.stats
 
 import global.namespace.fun.io.bios.BIOS
-import org.scalatest.Matchers._
-import org.scalatest._
+import org.scalatest.matchers.should.Matchers._
+import org.scalatest.wordspec.AnyWordSpec
 
 /** @author Christian Schlichtherle */
-class FsStatsSpec extends WordSpec {
+class FsStatsSpec extends AnyWordSpec {
 
   private val original = FsStats
     .getInstance

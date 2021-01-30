@@ -5,11 +5,11 @@
 package net.java.truevfs.ext.insight.stats
 
 import net.java.truevfs.ext.insight.stats.FsLoggerSpec._
-import org.scalatest.Matchers._
-import org.scalatest._
+import org.scalatest.matchers.should.Matchers._
+import org.scalatest.wordspec.AnyWordSpec
 
 /** @author Christian Schlichtherle */
-class FsLoggerSpec extends WordSpec {
+class FsLoggerSpec extends AnyWordSpec {
 
   def create = new FsLogger
 
@@ -23,7 +23,7 @@ class FsLoggerSpec extends WordSpec {
         val empty = FsStats.getInstance
         val logger = create
         for (offset <- 0 until logger.size) {
-          logger stats offset equalsIgnoreTime empty should equal (true)
+          logger stats offset equalsIgnoreTime empty should equal(true)
         }
       }
 
@@ -43,16 +43,16 @@ class FsLoggerSpec extends WordSpec {
 
     "formatting offsets" should {
       "consider the size of the logger" in {
-        new FsLogger(100).format(0) should be ("00")
+        new FsLogger(100).format(0) should be("00")
       }
     }
 
     "logging read operations" should {
       "reflect the update at the current position" in {
         val logger = create
-        val expected = logger.current logRead (nanos, bytes, 1)
+        val expected = logger.current logRead(nanos, bytes, 1)
         Thread sleep 1
-        val readStats = logger logRead (nanos, bytes)
+        val readStats = logger logRead(nanos, bytes)
         val current = logger.current
         current.getReadStats should be theSameInstanceAs readStats
         current.getReadStats equalsIgnoreTime expected.getReadStats shouldBe true
@@ -65,9 +65,9 @@ class FsLoggerSpec extends WordSpec {
     "logging write operations" should {
       "reflect the update at the current position" in {
         val logger = create
-        val expected = logger.current logWrite (nanos, bytes, 1)
+        val expected = logger.current logWrite(nanos, bytes, 1)
         Thread sleep 1
-        val writeStats = logger logWrite (nanos, bytes)
+        val writeStats = logger logWrite(nanos, bytes)
         val current = logger.current
         current.getReadStats shouldBe expected.getReadStats
         current.getWriteStats should be theSameInstanceAs writeStats
@@ -80,7 +80,7 @@ class FsLoggerSpec extends WordSpec {
     "logging sync operations" should {
       "reflect the update at the current position" in {
         val logger = create
-        val expected = logger.current logSync (nanos, 1)
+        val expected = logger.current logSync(nanos, 1)
         Thread sleep 1
         val syncStats = logger logSync nanos
         val current = logger.current
@@ -117,7 +117,7 @@ class FsLoggerSpec extends WordSpec {
           val oldStats = logger.current
           logger.rotate()
           val newStats = logger.current
-          newStats should not be theSameInstanceAs (oldStats)
+          newStats should not be theSameInstanceAs(oldStats)
           logger stats 1 should be theSameInstanceAs oldStats
         }
       }

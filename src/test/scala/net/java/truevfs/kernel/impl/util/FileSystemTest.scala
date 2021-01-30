@@ -5,11 +5,11 @@
 package net.java.truevfs.kernel.impl.util
 
 import net.java.truevfs.kernel.impl.util.FileSystemTest._
-import org.scalatest.Matchers._
-import org.scalatest.WordSpec
+import org.scalatest.matchers.should.Matchers._
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks._
 
-class FileSystemTest extends WordSpec {
+class FileSystemTest extends AnyWordSpec {
 
   private def newFileSystem = FileSystem[Entry]('/')
 
@@ -18,12 +18,12 @@ class FileSystemTest extends WordSpec {
       "have appropriate properties" in {
         val fs = newFileSystem
         forAll { path: String =>
-          whenever (isPath(path)) {
-            fs.remove(path) should be (None)
+          whenever(isPath(path)) {
+            fs.remove(path) should be(None)
           }
         }
         fs should have size 0
-        fs.iterator.hasNext should equal (false)
+        fs.iterator.hasNext should equal(false)
       }
     }
 
@@ -31,7 +31,7 @@ class FileSystemTest extends WordSpec {
       "have appropriate properties" in {
         val fs = newFileSystem
         forAll { parentPath: String =>
-          whenever (isParentPath(parentPath)) {
+          whenever(isParentPath(parentPath)) {
             val parentEntry = Entry(parentPath)
             fs += parentPath -> parentEntry
             fs(parentPath) should be theSameInstanceAs parentEntry
@@ -41,7 +41,7 @@ class FileSystemTest extends WordSpec {
             iterator.next() shouldBe parentPath -> parentEntry
             iterator.hasNext shouldBe false
             forAll { memberName: String =>
-              whenever (isMemberName(memberName)) {
+              whenever(isMemberName(memberName)) {
                 val path = parentPath + '/' + memberName
                 val entry = Entry(path)
                 fs += path -> entry
@@ -87,7 +87,7 @@ class FileSystemTest extends WordSpec {
 
     "accept null entries" in {
       forAll { path: String =>
-        whenever (isPath(path)) {
+        whenever(isPath(path)) {
           check(path, null)
         }
       }
@@ -123,17 +123,17 @@ class FileSystemTest extends WordSpec {
           case List(path) =>
             val result = collection.mutable.LinkedHashMap[String, Entry]()
             fs.list(path) foreach (_ foreach {
-                case (pathKey, entryValue) => result += pathKey -> entryValue
+              case (pathKey, entryValue) => result += pathKey -> entryValue
             })
             result
-          case Add(path)    => fs += path -> Entry(path); fs
+          case Add(path) => fs += path -> Entry(path); fs
           case Remove(path) => fs -= path; fs
-          case NoOp()       => fs
+          case NoOp() => fs
         }
         result should have size expected.size
         for (path <- expected)
-          result(path).path should be (path)
-        result.values map (_.path) should equal (expected)
+          result(path).path should be(path)
+        result.values map (_.path) should equal(expected)
       }
     }
   }
@@ -150,4 +150,5 @@ object FileSystemTest {
   private def isPath(path: String) = null != path
 
   private final case class Entry(path: String)
+
 }

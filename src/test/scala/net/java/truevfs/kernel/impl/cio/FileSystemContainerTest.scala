@@ -7,10 +7,10 @@ package net.java.truevfs.kernel.impl.cio
 import net.java.truecommons.cio.Entry
 import net.java.truecommons.cio.Entry._
 import net.java.truevfs.kernel.impl.cio.FileSystemContainerTest._
-import org.scalatest._
+import org.scalatest.wordspec.AnyWordSpec
 
 /** @author Christian Schlichtherle */
-class FileSystemContainerTest extends WordSpec {
+class FileSystemContainerTest extends AnyWordSpec {
 
   private def newContainer = new FileSystemContainer[DummyEntry]
 
@@ -27,8 +27,12 @@ private object FileSystemContainerTest {
 
   final class DummyEntry extends Entry {
     override def getName = null
+
     override def getSize(size: Size) = UNKNOWN
+
     override def getTime(access: Access) = UNKNOWN
+
     override def isPermitted(tµpe: Access, entity: Entity) = null
   }
+
 }

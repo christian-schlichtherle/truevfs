@@ -4,16 +4,15 @@
  */
 package net.java.truevfs.kernel.spec.sl
 
-import org.scalatest.Matchers._
-import org.scalatest._
+import org.scalatest.matchers.should.Matchers._
+import org.scalatest.wordspec.AnyWordSpec
 
 /**
-  * Tests if the class path has been properly configured so that any file
-  * system manager is locatable at RUNTIME!
-  *
-  * @author Christian Schlichtherle
-  */
-class FsManagerLocatorIT extends WordSpec {
+ * Tests if the class path has been properly configured so that any file system manager is locatable at RUNTIME!
+ *
+ * @author Christian Schlichtherle
+ */
+class FsManagerLocatorIT extends AnyWordSpec {
 
   "The file system manager locator singleton" should {
     "provide a file system manager" in {

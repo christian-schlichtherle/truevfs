@@ -4,20 +4,19 @@
  */
 package net.java.truevfs.access
 
+import net.java.truevfs.access.TUriHelper._
+import org.scalatest.matchers.should.Matchers._
+import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatest.prop.TableFor2
+import org.scalatest.wordspec.AnyWordSpec
+
 import java.io.File._
 import java.net._
 
-import net.java.truevfs.access.TUriHelper._
-import net.java.truevfs.access.TUriHelperSpec._
-import org.scalatest.Matchers._
-import org.scalatest._
-import org.scalatest.prop.TableDrivenPropertyChecks._
-import org.scalatest.prop.TableFor2
-
 /**
-  * @author Christian Schlichtherle
-  */
-class TUriHelperSpec extends WordSpec {
+ * @author Christian Schlichtherle
+ */
+class TUriHelperSpec extends AnyWordSpec {
 
   "Checking a URI" should {
     "result in a URISyntaxException" when {
@@ -28,7 +27,7 @@ class TUriHelperSpec extends WordSpec {
         )
         forAll(table) { _uri =>
           val uri = new URI(_uri)
-          intercept[URISyntaxException] (check(uri))
+          intercept[URISyntaxException](check(uri))
         }
       }
     }
@@ -46,25 +45,25 @@ class TUriHelperSpec extends WordSpec {
     "work correctly" in {
       if ('\\' == separatorChar) {
         assertHasAbsolutePath(Table(
-            ("uri", "result"),
-            ("C%3A/", true),
-            ("C%3A", false)
-          ))
+          ("uri", "result"),
+          ("C%3A/", true),
+          ("C%3A", false)
+        ))
       }
       assertHasAbsolutePath(Table(
-          ("uri", "result"),
-          ("foo:/", true),
-          ("foo:/bar", true),
-          ("foo:bar", false),
-          ("/", true),
-          ("/foo", true),
-          ("foo", false),
-          ("/foo/", true),
-          ("foo/", false),
-          ("//host", true),
-          ("//host/", true),
-          ("//host/share", true)
-        ))
+        ("uri", "result"),
+        ("foo:/", true),
+        ("foo:/bar", true),
+        ("foo:bar", false),
+        ("/", true),
+        ("/foo", true),
+        ("foo", false),
+        ("/foo/", true),
+        ("foo/", false),
+        ("//host", true),
+        ("//host/", true),
+        ("//host/share", true)
+      ))
 
       def assertHasAbsolutePath(table: TableFor2[String, Boolean]): Unit = {
         forAll(table) { (uri, result) =>

@@ -5,8 +5,8 @@
 package net.java.truevfs.access
 
 import net.java.truevfs.kernel.spec._
-import org.scalatest.Matchers._
-import org.scalatest.WordSpec
+import org.scalatest.matchers.should.Matchers._
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatestplus.mockito.MockitoSugar.mock
 
@@ -15,7 +15,7 @@ import scala.jdk.CollectionConverters._
 /**
  * @author Christian Schlichtherle
  */
-class TArchiveDetectorSpec extends WordSpec {
+class TArchiveDetectorSpec extends AnyWordSpec {
 
   "A TArchiveDetector" should {
     "retain drivers in the map which are not accepted by the extension set" in {

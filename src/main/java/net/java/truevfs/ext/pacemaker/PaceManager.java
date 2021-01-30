@@ -19,7 +19,7 @@ import java.util.Set;
  * @author Christian Schlichtherle
  */
 @ThreadSafe
-class PaceManager extends JmxManager<PaceMediator> {
+public class PaceManager extends JmxManager<PaceMediator> {
 
     private static final Logger logger = new LocalizedLogger(PaceManager.class);
 
@@ -54,7 +54,7 @@ class PaceManager extends JmxManager<PaceMediator> {
      *
      * @param mountPoint the mount point of the accessed file system.
      */
-    void recordAccess(FsMountPoint mountPoint) throws FsSyncException {
+    public void recordAccess(FsMountPoint mountPoint) throws FsSyncException {
         cachedMountPoints.recordAccess(mountPoint);
         unmountEvictedArchiveFileSystems();
     }

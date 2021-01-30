@@ -6,18 +6,18 @@ package net.java.truevfs.access
 
 import java.io.File._
 import java.net._
-
 import net.java.truevfs.kernel.spec._
-import org.scalatest.Matchers._
+import org.scalatest.matchers.should.Matchers._
 import org.scalatest._
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.TableFor3
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 
 /**
  * @author Christian Schlichtherle
  */
-class TUriResolverSpec extends WordSpec {
+class TUriResolverSpec extends AnyWordSpec {
 
   "TUriResolver.parent(FsNodePath)" should {
     "return the correct parent file system node path" in {
@@ -41,7 +41,7 @@ class TUriResolverSpec extends WordSpec {
         val nodePath = new FsNodePath(new URI(_nodePath))
         val parentNodePath = Option(_parentNodePath)
           .map(s => new FsNodePath(new URI(s)))
-        Option(TUriResolver parent nodePath) should equal (parentNodePath)
+        Option(TUriResolver parent nodePath) should equal(parentNodePath)
       }
     }
   }
@@ -59,12 +59,12 @@ class TUriResolverSpec extends WordSpec {
       )
       apply { resolver =>
         forAll(table) { (_base, _uri) =>
-            val base = Option(_base) map (s => new FsNodePath(new URI(s)))
-            val uri = Option(_uri) map (s => new URI(s))
-            if (base.isEmpty || uri.isEmpty)
-              intercept[NullPointerException] (resolver.resolve(base.orNull, uri.orNull))
-            else
-              intercept[IllegalArgumentException] (resolver.resolve(base.get, uri.get))
+          val base = Option(_base) map (s => new FsNodePath(new URI(s)))
+          val uri = Option(_uri) map (s => new URI(s))
+          if (base.isEmpty || uri.isEmpty)
+            intercept[NullPointerException](resolver.resolve(base.orNull, uri.orNull))
+          else
+            intercept[IllegalArgumentException](resolver.resolve(base.get, uri.get))
         }
       }
     }
@@ -72,83 +72,83 @@ class TUriResolverSpec extends WordSpec {
     "correctly resolve legal parameters" in {
       if ('\\' == separatorChar) {
         test(Table(
-            ("base", "uri", "resolved"),
-
-            ( "file:/", "//foo/bar", "file://foo/bar"),
-            ( "file:/", "//foo/bar/", "file://foo/bar/"),
-            ( "file:/", "c%3A/foo", "file:/c:/foo"),
-            ( "file:/", "c%3A/foo", "file:/c:/foo"),
-            ( "file:///c:/", "//foo/bar", "file://foo/bar"),
-            ( "file:///c:/", "//foo/bar/", "file://foo/bar/"),
-            ( "file:///c:/", "c%3A/foo", "file:/c:/foo"),
-            ( "file:///c:/", "c%3A/foo", "file:/c:/foo"),
-            ( "file://host/share/", "//foo/bar", "file://foo/bar"),
-            ( "file://host/share/", "//foo/bar/", "file://foo/bar/"),
-            ( "file://host/share/", "c%3A/foo", "file:/c:/foo"),
-            ( "file://host/share/", "c%3A/foo", "file:/c:/foo")
-          ))
-      }
-      test(Table(
           ("base", "uri", "resolved"),
 
-          ("foo", "bar", "foo/bar"),
-          ("foo", "..", ""),
-          ("foo/bar", "../..", ""),
-          ("scheme:/foo", "..", "scheme:/"),
-          ("scheme:/foo/bar", "", "scheme:/foo/bar"),
-          ("scheme:/foo/bar", "..", "scheme:/foo/"),
-          ("scheme:/foo/bar", "../..", "scheme:/"),
-          ("scheme:/foo.mok/bar.mok", "../..", "scheme:/"),
-          ("mok:mok:scheme:/foo.mok!/bar.mok!/", "", "mok:mok:scheme:/foo.mok!/bar.mok!/"),
-          ("mok:mok:scheme:/foo.mok!/bar.mok!/", "..", "mok:scheme:/foo.mok!/"),
-          ("mok:mok:scheme:/foo.mok!/bar.mok!/", "../..", "scheme:/"),
-          ("mok:mok:scheme:/foo.mok!/x/bar.mok!/y", "", "mok:mok:scheme:/foo.mok!/x/bar.mok!/y"),
-          ("mok:mok:scheme:/foo.mok!/x/bar.mok!/y", "..", "mok:mok:scheme:/foo.mok!/x/bar.mok!/"),
-          ("mok:mok:scheme:/foo.mok!/x/bar.mok!/y", "../..", "mok:scheme:/foo.mok!/x"),
-          ("mok:mok:scheme:/foo.mok!/x/bar.mok!/y", "../../..", "mok:scheme:/foo.mok!/"),
-          ("mok:mok:scheme:/foo.mok!/x/bar.mok!/y", "../../../..", "scheme:/"),
-
-          ("file:/foo", "mok:/bar", "mok:/bar"),
-
-          ("file:/foo", "/bar", "file:/bar"),
-          ("file:/foo", "/bar/", "file:/bar"),
-          ("file:/foo", "/bar.mok", "mok:file:/bar.mok!/"),
-          ("file:/foo", "/bar.mok/", "mok:file:/bar.mok!/"),
-          ("file:/foo", "bar", "file:/foo/bar"),
-          ("file:/foo", "bar/", "file:/foo/bar"),
-          ("file:/foo", "bar.mok", "mok:file:/foo/bar.mok!/"),
-          ("file:/foo", "bar.mok/", "mok:file:/foo/bar.mok!/"),
-          ("file:/foo", "../bar", "file:/bar"),
-          ("file:/foo", "../bar/", "file:/bar"),
-          ("file:/foo", "../bar.mok", "mok:file:/bar.mok!/"),
-          ("file:/foo", "../bar.mok/", "mok:file:/bar.mok!/"),
-
-          ("file:/foo/", "/bar", "file:/bar"),
-          ("file:/foo/", "/bar/", "file:/bar"),
-          ("file:/foo/", "/bar.mok", "mok:file:/bar.mok!/"),
-          ("file:/foo/", "/bar.mok/", "mok:file:/bar.mok!/"),
-          ("file:/foo/", "bar", "file:/foo/bar"),
-          ("file:/foo/", "bar/", "file:/foo/bar"),
-          ("file:/foo/", "bar.mok", "mok:file:/foo/bar.mok!/"),
-          ("file:/foo/", "bar.mok/", "mok:file:/foo/bar.mok!/"),
-          ("file:/foo/", "../bar", "file:/bar"),
-          ("file:/foo/", "../bar/", "file:/bar"),
-          ("file:/foo/", "../bar.mok", "mok:file:/bar.mok!/"),
-          ("file:/foo/", "../bar.mok/", "mok:file:/bar.mok!/"),
-
-          ("mok:file:/foo.mok!/", "/bar", "file:/bar"),
-          ("mok:file:/foo.mok!/", "/bar/", "file:/bar"),
-          ("mok:file:/foo.mok!/", "/bar.mok", "mok:file:/bar.mok!/"),
-          ("mok:file:/foo.mok!/", "/bar.mok/", "mok:file:/bar.mok!/"),
-          ("mok:file:/foo.mok!/", "bar", "mok:file:/foo.mok!/bar"),
-          ("mok:file:/foo.mok!/", "bar/", "mok:file:/foo.mok!/bar"),
-          ("mok:file:/foo.mok!/", "bar.mok", "mok:mok:file:/foo.mok!/bar.mok!/"),
-          ("mok:file:/foo.mok!/", "bar.mok/", "mok:mok:file:/foo.mok!/bar.mok!/"),
-          ("mok:file:/foo.mok!/", "../bar", "file:/bar"),
-          ("mok:file:/foo.mok!/", "../bar/", "file:/bar"),
-          ("mok:file:/foo.mok!/", "../bar.mok", "mok:file:/bar.mok!/"),
-          ("mok:file:/foo.mok!/", "../bar.mok/", "mok:file:/bar.mok!/")
+          ("file:/", "//foo/bar", "file://foo/bar"),
+          ("file:/", "//foo/bar/", "file://foo/bar/"),
+          ("file:/", "c%3A/foo", "file:/c:/foo"),
+          ("file:/", "c%3A/foo", "file:/c:/foo"),
+          ("file:///c:/", "//foo/bar", "file://foo/bar"),
+          ("file:///c:/", "//foo/bar/", "file://foo/bar/"),
+          ("file:///c:/", "c%3A/foo", "file:/c:/foo"),
+          ("file:///c:/", "c%3A/foo", "file:/c:/foo"),
+          ("file://host/share/", "//foo/bar", "file://foo/bar"),
+          ("file://host/share/", "//foo/bar/", "file://foo/bar/"),
+          ("file://host/share/", "c%3A/foo", "file:/c:/foo"),
+          ("file://host/share/", "c%3A/foo", "file:/c:/foo")
         ))
+      }
+      test(Table(
+        ("base", "uri", "resolved"),
+
+        ("foo", "bar", "foo/bar"),
+        ("foo", "..", ""),
+        ("foo/bar", "../..", ""),
+        ("scheme:/foo", "..", "scheme:/"),
+        ("scheme:/foo/bar", "", "scheme:/foo/bar"),
+        ("scheme:/foo/bar", "..", "scheme:/foo/"),
+        ("scheme:/foo/bar", "../..", "scheme:/"),
+        ("scheme:/foo.mok/bar.mok", "../..", "scheme:/"),
+        ("mok:mok:scheme:/foo.mok!/bar.mok!/", "", "mok:mok:scheme:/foo.mok!/bar.mok!/"),
+        ("mok:mok:scheme:/foo.mok!/bar.mok!/", "..", "mok:scheme:/foo.mok!/"),
+        ("mok:mok:scheme:/foo.mok!/bar.mok!/", "../..", "scheme:/"),
+        ("mok:mok:scheme:/foo.mok!/x/bar.mok!/y", "", "mok:mok:scheme:/foo.mok!/x/bar.mok!/y"),
+        ("mok:mok:scheme:/foo.mok!/x/bar.mok!/y", "..", "mok:mok:scheme:/foo.mok!/x/bar.mok!/"),
+        ("mok:mok:scheme:/foo.mok!/x/bar.mok!/y", "../..", "mok:scheme:/foo.mok!/x"),
+        ("mok:mok:scheme:/foo.mok!/x/bar.mok!/y", "../../..", "mok:scheme:/foo.mok!/"),
+        ("mok:mok:scheme:/foo.mok!/x/bar.mok!/y", "../../../..", "scheme:/"),
+
+        ("file:/foo", "mok:/bar", "mok:/bar"),
+
+        ("file:/foo", "/bar", "file:/bar"),
+        ("file:/foo", "/bar/", "file:/bar"),
+        ("file:/foo", "/bar.mok", "mok:file:/bar.mok!/"),
+        ("file:/foo", "/bar.mok/", "mok:file:/bar.mok!/"),
+        ("file:/foo", "bar", "file:/foo/bar"),
+        ("file:/foo", "bar/", "file:/foo/bar"),
+        ("file:/foo", "bar.mok", "mok:file:/foo/bar.mok!/"),
+        ("file:/foo", "bar.mok/", "mok:file:/foo/bar.mok!/"),
+        ("file:/foo", "../bar", "file:/bar"),
+        ("file:/foo", "../bar/", "file:/bar"),
+        ("file:/foo", "../bar.mok", "mok:file:/bar.mok!/"),
+        ("file:/foo", "../bar.mok/", "mok:file:/bar.mok!/"),
+
+        ("file:/foo/", "/bar", "file:/bar"),
+        ("file:/foo/", "/bar/", "file:/bar"),
+        ("file:/foo/", "/bar.mok", "mok:file:/bar.mok!/"),
+        ("file:/foo/", "/bar.mok/", "mok:file:/bar.mok!/"),
+        ("file:/foo/", "bar", "file:/foo/bar"),
+        ("file:/foo/", "bar/", "file:/foo/bar"),
+        ("file:/foo/", "bar.mok", "mok:file:/foo/bar.mok!/"),
+        ("file:/foo/", "bar.mok/", "mok:file:/foo/bar.mok!/"),
+        ("file:/foo/", "../bar", "file:/bar"),
+        ("file:/foo/", "../bar/", "file:/bar"),
+        ("file:/foo/", "../bar.mok", "mok:file:/bar.mok!/"),
+        ("file:/foo/", "../bar.mok/", "mok:file:/bar.mok!/"),
+
+        ("mok:file:/foo.mok!/", "/bar", "file:/bar"),
+        ("mok:file:/foo.mok!/", "/bar/", "file:/bar"),
+        ("mok:file:/foo.mok!/", "/bar.mok", "mok:file:/bar.mok!/"),
+        ("mok:file:/foo.mok!/", "/bar.mok/", "mok:file:/bar.mok!/"),
+        ("mok:file:/foo.mok!/", "bar", "mok:file:/foo.mok!/bar"),
+        ("mok:file:/foo.mok!/", "bar/", "mok:file:/foo.mok!/bar"),
+        ("mok:file:/foo.mok!/", "bar.mok", "mok:mok:file:/foo.mok!/bar.mok!/"),
+        ("mok:file:/foo.mok!/", "bar.mok/", "mok:mok:file:/foo.mok!/bar.mok!/"),
+        ("mok:file:/foo.mok!/", "../bar", "file:/bar"),
+        ("mok:file:/foo.mok!/", "../bar/", "file:/bar"),
+        ("mok:file:/foo.mok!/", "../bar.mok", "mok:file:/bar.mok!/"),
+        ("mok:file:/foo.mok!/", "../bar.mok/", "mok:file:/bar.mok!/")
+      ))
 
       def test(table: TableFor3[String, String, String]): Unit = {
         apply { resolver =>
@@ -156,7 +156,7 @@ class TUriResolverSpec extends WordSpec {
             val base = new FsNodePath(new URI(_base))
             val uri = new URI(_uri)
             val expected = new FsNodePath(new URI(_expected))
-            resolver resolve (base, uri) should equal (expected)
+            resolver resolve(base, uri) should equal(expected)
           }
         }
       }

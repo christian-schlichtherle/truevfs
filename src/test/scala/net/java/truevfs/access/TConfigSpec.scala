@@ -14,19 +14,20 @@ import net.java.truevfs.kernel.spec.FsManager
 import net.java.truevfs.kernel.spec.mock.MockArchiveDriver
 import net.java.truevfs.kernel.spec.sl._
 import net.java.truevfs.kernel.spec.spi._
-import org.scalatest.Matchers._
-import org.scalatest._
+import org.scalatest.matchers.should.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatest.wordspec.AnyWordSpec
 
 import java.util.concurrent._
 import scala.jdk.CollectionConverters._
 
-/** DO NOT MODIFY THE GLOBAL CONFIGURATION IN THESE TESTS!
-  * Its global scope makes it available to any other test running in parallel.
-  *
-  * @author Christian Schlichtherle
-  */
-class TConfigSpec extends WordSpec {
+/**
+ * DO NOT MODIFY THE GLOBAL CONFIGURATION IN THESE TESTS!
+ * Its global scope makes it available to any other test running in parallel.
+ *
+ * @author Christian Schlichtherle
+ */
+class TConfigSpec extends AnyWordSpec {
 
   "The TConfig class" should {
     "have the GLOBAL configuration as its current() configuration by default" in {

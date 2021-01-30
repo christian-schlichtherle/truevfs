@@ -4,13 +4,13 @@
  */
 package net.java.truevfs.comp.ibm437
 
-import org.scalatest.Matchers._
-import org.scalatest.WordSpec
+import org.scalatest.matchers.should.Matchers._
+import org.scalatest.wordspec.AnyWordSpec
 
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
-abstract class OctetCharsetSuite extends WordSpec {
+abstract class OctetCharsetSuite extends AnyWordSpec {
 
   val charset: Charset
 

@@ -4,13 +4,13 @@
  */
 package net.java.truevfs.kernel.impl
 
-import org.scalatest.Matchers._
-import org.scalatest._
+import org.scalatest.matchers.should.Matchers._
+import org.scalatest.wordspec.AnyWordSpec
 
 /**
-  * @author Christian Schlichtherle
-  */
-class DefaultManagerFactoryTest extends WordSpec {
+ * @author Christian Schlichtherle
+ */
+class DefaultManagerFactoryTest extends AnyWordSpec {
 
   "A default file system manager factory" should {
     val service = new DefaultManagerFactory

@@ -8,16 +8,17 @@ import net.java.truecommons.cio.Entry
 import net.java.truevfs.kernel.spec._
 import org.mockito.Mockito
 import org.mockito.Mockito._
-import org.scalatest._
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 
 import java.io.IOException
 import java.net.URI
 
 /** @author Christian Schlichtherle */
-class PaceControllerSpec extends WordSpec with OneInstancePerTest {
+class PaceControllerSpec extends AnyWordSpec {
 
-  "A PaceController" when {
+  private trait Fixture {
+
     val manager = mock[PaceManager]
     val mountPoint = new FsMountPoint(new URI("file:///"))
     val model = mock[FsModel]
@@ -26,21 +27,23 @@ class PaceControllerSpec extends WordSpec with OneInstancePerTest {
     when(delegate.getModel).thenReturn(model)
     val controller = new PaceController(manager, delegate)
 
-    "apply()ing its aspect" should {
-      def verifyAspect(): Unit = {
-        val io = Mockito.inOrder(delegate, manager)
-        import io._
-        verify(delegate).checkAccess(FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)
-        verify(manager).recordAccess(mountPoint)
-        verifyNoMoreInteractions()
-      }
+    def verifyAspect(): Unit = {
+      val io = Mockito.inOrder(delegate, manager)
+      import io._
+      verify(delegate).checkAccess(FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)
+      verify(manager).recordAccess(mountPoint)
+      verifyNoMoreInteractions()
+    }
+  }
 
-      "call PaceManager.recordAccess(delegate) if the operation succeeds" in {
+  "A PaceController" when {
+    "apply()ing its aspect" should {
+      "call PaceManager.recordAccess(delegate) if the operation succeeds" in new Fixture {
         controller.checkAccess(FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)
         verifyAspect()
       }
 
-      "call PaceManager.recordAccess(delegate) even if an IOException is thrown" in {
+      "call PaceManager.recordAccess(delegate) even if an IOException is thrown" in new Fixture {
         when(delegate.checkAccess(FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)) thenThrow new IOException()
         intercept[IOException] {
           controller.checkAccess(FsAccessOptions.NONE, FsNodeName.ROOT, Entry.NO_ACCESS)
@@ -50,7 +53,7 @@ class PaceControllerSpec extends WordSpec with OneInstancePerTest {
     }
 
     "calling its sync(*) method" should {
-      "forward the call to the decorated controller and not apply() its aspect" in {
+      "forward the call to the decorated controller and not apply() its aspect" in new Fixture {
         val io = Mockito.inOrder(delegate, manager)
         import io._
         controller.sync(null)

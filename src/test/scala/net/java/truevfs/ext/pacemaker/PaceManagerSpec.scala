@@ -4,8 +4,6 @@
  */
 package net.java.truevfs.ext.pacemaker
 
-import java.net._
-
 import net.java.truecommons.shed.{Filter, _}
 import net.java.truevfs.ext.pacemaker.PaceManagerSpec.{Expectation, _}
 import net.java.truevfs.kernel.spec._
@@ -13,42 +11,49 @@ import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
-import org.scalatest.Matchers._
-import org.scalatest._
+import org.scalatest.matchers.should.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 
+import java.net._
 import scala.language.implicitConversions
 
 /** @author Christian Schlichtherle */
-class PaceManagerSpec extends WordSpec with OneInstancePerTest {
+class PaceManagerSpec extends AnyWordSpec {
 
-  "A PaceManager" should {
+  private trait Fixture {
+
     val mediator = new PaceMediator
     val delegate = new TestManager
     val manager = new PaceManager(mediator, delegate)
+  }
 
+  "A PaceManager" should {
     "have a property for the maximum mounted file systems" which {
-      "has two as its default value" in {
-        manager.getMaximumSize should be (2)
+      "has two as its default value" in new Fixture {
+        manager.getMaximumSize should be(2)
       }
 
-      "ignores a lower value" in {
-        intercept[IllegalArgumentException] { manager.setMaximumSize(1) }
+      "ignores a lower value" in new Fixture {
+        intercept[IllegalArgumentException] {
+          manager.setMaximumSize(1)
+        }
       }
 
-      "accepts a higher value" in {
+      "accepts a higher value" in new Fixture {
         manager.setMaximumSize(3)
-        manager.getMaximumSize should be (3)
+        manager.getMaximumSize should be(3)
       }
     }
 
-    "unmount the least recently accessed archive file systems which exceed the maximum number of mounted archive file systems" in {
+    "unmount the least recently accessed archive file systems which exceed the maximum number of mounted archive file systems" in new Fixture {
       val controllers = {
         implicit def mapping(string: String): (FsMountPoint, FsController) = {
           val mountPoint = parseMountPoint(string)
           (mountPoint, mockController(model(mediator, mountPoint)))
         }
+
         collection.mutable.LinkedHashMap[FsMountPoint, FsController](
           "p:/",
           "a:p:/1!/",
@@ -168,7 +173,7 @@ private object PaceManagerSpec {
   }
 
   private final class TestManager(var controllers: Iterable[FsController] = Iterable.empty[FsController])
-  extends FsAbstractManager {
+    extends FsAbstractManager {
 
     override def newModel(context: FsDriver, mountPoint: FsMountPoint, parent: FsModel): FsModel =
       throw new UnsupportedOperationException
@@ -196,7 +201,7 @@ private object PaceManagerSpec {
 
   private final case class Synced(mountPoints: FsMountPoint*) extends Expectation(mountPoints: _*) {
 
-    override def stub(controller: FsController): Unit = { }
+    override def stub(controller: FsController): Unit = {}
   }
 
   private final case class Shelved(mountPoints: FsMountPoint*) extends Expectation(mountPoints: _*) {
@@ -224,6 +229,9 @@ private object PaceManagerSpec {
 
     override def isMounted: Boolean = mounted
 
-    override def setMounted(mounted: Boolean): Unit = { this.mounted = mounted }
+    override def setMounted(mounted: Boolean): Unit = {
+      this.mounted = mounted
+    }
   }
+
 }

@@ -4,12 +4,12 @@
  */
 package net.java.truevfs.comp.zip
 
-import org.scalatest._
+import org.scalatest.wordspec.AnyWordSpec
 
 import scala.util._
 
 /** @author Christian Schlichtherle */
-class ExtraFieldsSpec extends WordSpec {
+class ExtraFieldsSpec extends AnyWordSpec {
 
   "A collection of extra fields" should {
     val fields = new ExtraFields

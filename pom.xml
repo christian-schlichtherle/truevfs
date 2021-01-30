@@ -21,7 +21,7 @@
     <parent>
         <groupId>global.namespace.parent-pom</groupId>
         <artifactId>parent-pom</artifactId>
-        <version>13</version>
+        <version>14</version>
     </parent>
 
     <groupId>global.namespace.truevfs</groupId>
@@ -49,7 +49,6 @@
 
         <bali.version>0.8.0</bali.version>
         <fun-io.version>2.4.1</fun-io.version>
-        <scalatest.version>3.0.9</scalatest.version>
         <service-wight.version>0.6.0</service-wight.version>
         <truecommons.version>2.5.0</truecommons.version>
         <truevfs.version>0.14.0</truevfs.version>

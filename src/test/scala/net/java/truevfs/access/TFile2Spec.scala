@@ -4,19 +4,19 @@
  */
 package net.java.truevfs.access
 
-import java.net.URI
-
 import global.namespace.fun.io.api.Socket
 import global.namespace.fun.io.bios.BIOS
 import net.java.truevfs.access.TFile2Spec._
 import net.java.truevfs.kernel.spec._
-import org.scalatest.Matchers._
-import org.scalatest.WordSpec
+import org.scalatest.matchers.should.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 
+import java.net.URI
+
 /** @author Christian Schlichtherle */
-class TFile2Spec extends WordSpec {
+class TFile2Spec extends AnyWordSpec {
 
   "A TFile" should {
     "be round-trip encodable using object serialization and XML" in {
