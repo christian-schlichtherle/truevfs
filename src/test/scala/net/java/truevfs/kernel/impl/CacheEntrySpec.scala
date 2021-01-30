@@ -8,7 +8,7 @@ import net.java.truecommons.cio.Entry.Access._
 import net.java.truecommons.cio.Entry._
 import net.java.truecommons.cio.{Entry, _}
 import net.java.truevfs.kernel.impl.CacheEntry.Strategy._
-import net.java.truevfs.kernel.impl.CacheEntryTest._
+import net.java.truevfs.kernel.impl.CacheEntrySpec._
 import net.java.truevfs.kernel.impl.cio.EntryAspect._
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks._
@@ -18,7 +18,7 @@ import java.io._
 import java.nio._
 
 /** @author Christian Schlichtherle */
-class CacheEntryTest extends AnyWordSpec {
+class CacheEntrySpec extends AnyWordSpec {
 
   private val initialCapacity = 32
   private val mockEntryName = "mock"
@@ -252,7 +252,7 @@ class CacheEntryTest extends AnyWordSpec {
 }
 
 /** @author Christian Schlichtherle */
-private object CacheEntryTest {
+private object CacheEntrySpec {
 
   class BrokenInputSocket(override val target: Entry) extends AbstractInputSocket[Entry] {
 

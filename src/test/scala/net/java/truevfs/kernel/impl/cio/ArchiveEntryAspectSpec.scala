@@ -19,7 +19,7 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks.forAll
 /**
   * @author Christian Schlichtherle
   */
-class ArchiveEntryAspectTest extends AnyWordSpec {
+class ArchiveEntryAspectSpec extends AnyWordSpec {
 
   private def forAllNameAndType(test: (FsArchiveEntry, ArchiveEntryAspect[_]) => Unit): Unit = {
     forAll { name: String =>

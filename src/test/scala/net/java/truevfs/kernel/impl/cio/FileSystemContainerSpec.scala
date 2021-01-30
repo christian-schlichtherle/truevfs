@@ -6,11 +6,11 @@ package net.java.truevfs.kernel.impl.cio
 
 import net.java.truecommons.cio.Entry
 import net.java.truecommons.cio.Entry._
-import net.java.truevfs.kernel.impl.cio.FileSystemContainerTest._
+import net.java.truevfs.kernel.impl.cio.FileSystemContainerSpec._
 import org.scalatest.wordspec.AnyWordSpec
 
 /** @author Christian Schlichtherle */
-class FileSystemContainerTest extends AnyWordSpec {
+class FileSystemContainerSpec extends AnyWordSpec {
 
   private def newContainer = new FileSystemContainer[DummyEntry]
 
@@ -23,7 +23,7 @@ class FileSystemContainerTest extends AnyWordSpec {
   }
 }
 
-private object FileSystemContainerTest {
+private object FileSystemContainerSpec {
 
   final class DummyEntry extends Entry {
     override def getName = null

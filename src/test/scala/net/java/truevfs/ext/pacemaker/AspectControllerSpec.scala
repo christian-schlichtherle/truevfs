@@ -6,6 +6,7 @@ package net.java.truevfs.ext.pacemaker
 
 import net.java.truecommons.cio.{Entry, _}
 import net.java.truevfs.ext.pacemaker.AspectController.Op
+import net.java.truevfs.ext.pacemaker.AspectControllerSpec.TestController
 import net.java.truevfs.kernel.spec._
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
@@ -133,12 +134,11 @@ class AspectControllerSpec extends AnyWordSpec {
   }
 }
 
-object AspectControllerSpec {
+private object AspectControllerSpec {
 
+  class TestController(controller: FsController) extends AspectController(controller) {
 
-}
+    override def apply[V](op: Op[V]): V = op.call()
+  }
 
-class TestController(controller: FsController) extends AspectController(controller) {
-
-  override def apply[V](op: Op[V]): V = op.call()
 }

@@ -245,22 +245,7 @@
         </dependency>
         <dependency>
             <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-key-console</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
             <artifactId>truecommons-key-default</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-key-hurlfb</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-key-macosx</artifactId>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -272,11 +257,6 @@
             <artifactId>truecommons-key-spec</artifactId>
             <classifier>tests</classifier>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>net.java.truecommons</groupId>
-            <artifactId>truecommons-key-swing</artifactId>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>net.java.truecommons</groupId>

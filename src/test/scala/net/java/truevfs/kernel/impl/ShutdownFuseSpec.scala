@@ -5,7 +5,7 @@
 package net.java.truevfs.kernel.impl
 
 import net.java.truecommons.shed.ConcurrencyUtils
-import net.java.truevfs.kernel.impl.ShutdownFuseTest._
+import net.java.truevfs.kernel.impl.ShutdownFuseSpec._
 import org.mockito.ArgumentMatchers.any
 import org.mockito.InOrder
 import org.mockito.Mockito.inOrder
@@ -14,7 +14,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 
 /** @author Christian Schlichtherle */
-class ShutdownFuseTest extends AnyWordSpec {
+class ShutdownFuseSpec extends AnyWordSpec {
 
   "A shutdown fuse with a mock thread registry" when {
     "just constructed" should {
@@ -84,7 +84,7 @@ class ShutdownFuseTest extends AnyWordSpec {
   }
 }
 
-private object ShutdownFuseTest {
+private object ShutdownFuseSpec {
 
   def runConcurrently(numThreads: Int)(fun: Int => Unit): Unit = startConcurrently(numThreads)(fun).join()
 

@@ -4,14 +4,14 @@
  */
 package net.java.truevfs.comp.jmx
 
-import net.java.truevfs.comp.jmx.JmxMediatorTest._
+import net.java.truevfs.comp.jmx.JmxMediatorSpec._
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
 
 import javax.management._
 
 /** @author Christian Schlichtherle */
-class JmxMediatorTest extends AnyWordSpec {
+class JmxMediatorSpec extends AnyWordSpec {
 
   private trait Fixture {
 
@@ -44,7 +44,7 @@ class JmxMediatorTest extends AnyWordSpec {
   }
 }
 
-private object JmxMediatorTest {
+private object JmxMediatorSpec {
 
   private[this] val mbs = MBeanServerFactory.newMBeanServer
 

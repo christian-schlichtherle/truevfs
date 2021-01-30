@@ -160,8 +160,7 @@ extends ConfiguredClientTestBase<D> {
         assertTrue(new TFile(entry).createNewFile());
         TVFS.umount(new TFile(entry).getTopLevelArchive());
         final ReferenceQueue<FsController> queue = new ReferenceQueue<>();
-        final Reference<FsController> reference =
-                assertReferenceForResource(factory, entry, queue);
+        final Reference<FsController> reference = assertReferenceForResource(factory, entry, queue);
         System.gc();
         assertNull(queue.remove(TIMEOUT_MILLIS));
         assertSame(reference.get(), controller(new TFile(entry).getNodePath()));

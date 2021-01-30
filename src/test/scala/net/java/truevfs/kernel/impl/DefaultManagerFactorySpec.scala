@@ -10,7 +10,7 @@ import org.scalatest.wordspec.AnyWordSpec
 /**
  * @author Christian Schlichtherle
  */
-class DefaultManagerFactoryTest extends AnyWordSpec {
+class DefaultManagerFactorySpec extends AnyWordSpec {
 
   "A default file system manager factory" should {
     val service = new DefaultManagerFactory

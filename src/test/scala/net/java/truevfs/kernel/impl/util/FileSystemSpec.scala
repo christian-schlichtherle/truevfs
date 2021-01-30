@@ -4,12 +4,12 @@
  */
 package net.java.truevfs.kernel.impl.util
 
-import net.java.truevfs.kernel.impl.util.FileSystemTest._
+import net.java.truevfs.kernel.impl.util.FileSystemSpec._
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks._
 
-class FileSystemTest extends AnyWordSpec {
+class FileSystemSpec extends AnyWordSpec {
 
   private def newFileSystem = FileSystem[Entry]('/')
 
@@ -139,13 +139,13 @@ class FileSystemTest extends AnyWordSpec {
   }
 }
 
-object FileSystemTest {
+object FileSystemSpec {
 
   private def isParentPath(parentPath: String) =
-    null != parentPath && !parentPath.isEmpty && !parentPath.endsWith("/")
+    null != parentPath && parentPath.nonEmpty && !parentPath.endsWith("/")
 
   private def isMemberName(memberName: String) =
-    null != memberName && !memberName.isEmpty && !memberName.contains('/')
+    null != memberName && memberName.nonEmpty && !memberName.contains('/')
 
   private def isPath(path: String) = null != path
 
