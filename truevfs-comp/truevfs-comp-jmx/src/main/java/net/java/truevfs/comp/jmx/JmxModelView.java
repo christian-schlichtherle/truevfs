@@ -37,8 +37,7 @@ import static net.java.truecommons.cio.Entry.UNKNOWN;
 @ThreadSafe
 public class JmxModelView<M extends FsModel> extends StandardMBean implements JmxModelMXBean {
 
-    private static final FsCompositeDriver
-            DRIVER = new FsSimpleCompositeDriver(FsDriverMapLocator.SINGLETON);
+    private static final FsCompositeDriver DRIVER = new FsSimpleCompositeDriver(FsDriverMapLocator.SINGLETON);
 
     protected final M model;
 

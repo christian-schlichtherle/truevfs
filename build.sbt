@@ -37,7 +37,8 @@ lazy val access: Project = project
       MockitoCore % Test,
       Scalacheck % Test,
       Scalatest % Test,
-      Slf4jSimple % Test
+      Slf4jSimple % Test,
+      TrueCommonsServices,
     ),
     name := "TrueVFS Access",
     normalizedName := "truevfs-access"
@@ -75,8 +76,10 @@ lazy val compIbm437: Project = project
       """Provides the IBM437 character set alias CP437 for use with genuine ZIP files.
         |Add the JAR artifact of this module to the run time class path to make its file system drivers available for service location in the client API modules.""".stripMargin,
     libraryDependencies ++= Seq(
+      FindbugsAnnotations,
       JunitInterface % Test,
-      TruecommonsAnnotations
+      Scalatest % Test,
+      ServiceWightAnnotation,
     ),
     name := "TrueVFS Component IBM437",
     normalizedName := "truevfs-comp-ibm437"
@@ -104,7 +107,7 @@ lazy val compJmx: Project = project
       JunitInterface % Test,
       Scalatest % Test,
       Slf4jSimple % Test,
-      TruecommonsJMX
+      TrueCommonsJMX
     ),
     name := "TrueVFS Component JMX",
     normalizedName := "truevfs-comp-jmx"
@@ -136,11 +139,11 @@ lazy val compZip: Project = project
       FindbugsAnnotations,
       JunitInterface % Test,
       Scalatest % Test,
-      TruecommonsIO,
-      TruecommonsIO % Test classifier "tests",
-      TruecommonsKeySpec,
-      TruecommonsShed,
-      TruecommonsShed % Test classifier "tests"
+      TrueCommonsIO,
+      TrueCommonsIO % Test classifier "tests",
+      TrueCommonsKeySpec,
+      TrueCommonsShed,
+      TrueCommonsShed % Test classifier "tests"
     ),
     name := "TrueVFS Component ZIP",
     normalizedName := "truevfs-comp-zip"
@@ -352,6 +355,7 @@ lazy val extLogging: Project = project
         |Add the JAR artifact of this module to the run time class path to make its services available for service location in the client API modules.""".stripMargin,
     libraryDependencies ++= Seq(
       Lombok % Provided,
+      TrueCommonsLogging,
     ),
     name := "TrueVFS Extension Logging",
     normalizedName := "truevfs-ext-logging"
@@ -405,10 +409,10 @@ lazy val it: Project = project
       Scalacheck % Test,
       Scalatest % Test,
       Slf4jSimple % Test,
-      TruecommonsIO % Test classifier "" classifier "tests",
-      TruecommonsKeyDefault % Test,
-      TruecommonsKeySpec % Test classifier "" classifier "tests",
-      TruecommonsShed % Test classifier "" classifier "tests"
+      TrueCommonsIO % Test classifier "" classifier "tests",
+      TrueCommonsKeyDefault % Test,
+      TrueCommonsKeySpec % Test classifier "" classifier "tests",
+      TrueCommonsShed % Test classifier "" classifier "tests"
     ),
     name := "TrueVFS Integration Tests",
     normalizedName := "truevfs-it",
@@ -436,7 +440,8 @@ lazy val kernelImpl: Project = project
       MockitoCore % Test,
       Scalatest % Test,
       Slf4jSimple % Test,
-      TruecommonsShed % Test classifier "" classifier "tests"
+      TrueCommonsLogging,
+      TrueCommonsShed % Test classifier "" classifier "tests"
     ),
     name := "TrueVFS Kernel Implementation",
     normalizedName := "truevfs-kernel-impl"
@@ -451,12 +456,12 @@ lazy val kernelSpec: Project = project
         |Provides a service provider API for a singleton file system manager, an I/O buffer pool and a file system driver map.""".stripMargin,
     libraryDependencies ++= Seq(
       Bali % Provided,
+      FindbugsAnnotations,
       JunitInterface % Test,
+      ServiceWightCore,
       Slf4jSimple % Test,
-      TruecommonsAnnotations,
-      TruecommonsCIO,
-      TruecommonsIO,
-      TruecommonsServices
+      TrueCommonsCIO,
+      TrueCommonsIO,
     ),
     name := "TrueVFS Kernel Specification",
     normalizedName := "truevfs-kernel-spec"
@@ -481,9 +486,9 @@ lazy val profileBase: Project = project
       """Bundles dependencies to support the most prominent use cases.
         |Provides the file system drivers for JAR and ZIP.""".stripMargin,
     libraryDependencies ++= Seq(
-      TruecommonsKeyConsole % Runtime,
-      TruecommonsKeyDefault % Runtime,
-      TruecommonsKeySwing % Runtime
+      TrueCommonsKeyConsole % Runtime,
+      TrueCommonsKeyDefault % Runtime,
+      TrueCommonsKeySwing % Runtime
     ),
     name := "TrueVFS Profile Base",
     normalizedName := "truevfs-profile-base"
@@ -506,7 +511,7 @@ lazy val profileDefault: Project = project
       """Bundles dependencies to support accessing all TrueVFS features without the slight negative performance impact of some excluded modules.
         |Depends on the base configuration profile and adds the file system drivers for HTTP(S), ODF, TAR, TAR.BZIP2, TAR.GZIP, TAR.XZ and ZIP.RAES.""".stripMargin,
     libraryDependencies ++= Seq(
-      TruecommonsKeyMacosx % Runtime
+      TrueCommonsKeyMacosx % Runtime
     ),
     name := "TrueVFS Profile Default",
     normalizedName := "truevfs-profile-default"
@@ -527,7 +532,7 @@ lazy val profileFull: Project = project
         |Should not be used in production environments because of its slightly negative performance impact.
         |Depends on the default configuration profile and adds the file system driver for SFX and the extensions Insight, Logging and Pacemaker.""".stripMargin,
     libraryDependencies ++= Seq(
-      TruecommonsKeyHurlfb % Runtime
+      TrueCommonsKeyHurlfb % Runtime
     ),
     name := "TrueVFS Profile Full",
     normalizedName := "truevfs-profile-full"
@@ -554,11 +559,11 @@ lazy val samples: Project = project
       """Sample applications to demonstrate the usage of TrueVFS modules to support many, even esoteric use cases.""".stripMargin,
     libraryDependencies ++= Seq(
       Slf4jSimple % Runtime,
-      TruecommonsKeyConsole % Runtime,
-      TruecommonsKeyDefault % Runtime,
-      TruecommonsKeyHurlfb % Runtime,
-      TruecommonsKeyMacosx % Runtime,
-      TruecommonsKeySwing % Runtime
+      TrueCommonsKeyConsole % Runtime,
+      TrueCommonsKeyDefault % Runtime,
+      TrueCommonsKeyHurlfb % Runtime,
+      TrueCommonsKeyMacosx % Runtime,
+      TrueCommonsKeySwing % Runtime
     ),
     name := "TrueVFS Samples",
     normalizedName := "truevfs-samples"

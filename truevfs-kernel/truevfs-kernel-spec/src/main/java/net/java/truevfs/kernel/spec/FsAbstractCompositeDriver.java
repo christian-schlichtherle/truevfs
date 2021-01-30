@@ -4,10 +4,11 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.util.*;
 import javax.annotation.CheckForNull;
 import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.services.Container;
+import java.util.Map;
+import java.util.ServiceConfigurationError;
+import java.util.function.Supplier;
 
 /**
  * An abstract composite driver.
@@ -20,8 +21,7 @@ import net.java.truecommons.services.Container;
  * @author Christian Schlichtherle
  */
 @Immutable
-public abstract class FsAbstractCompositeDriver
-implements FsCompositeDriver, Container<Map<FsScheme, FsDriver>> {
+public abstract class FsAbstractCompositeDriver implements FsCompositeDriver, Supplier<Map<FsScheme, FsDriver>> {
 
     @Override
     public final FsModel newModel(

@@ -4,22 +4,23 @@
  */
 package net.java.truevfs.kernel.spec.spi;
 
-import net.java.truecommons.annotations.ServiceSpecification;
-import net.java.truecommons.services.LocatableFactory;
+import global.namespace.service.wight.annotation.ServiceImplementation;
+import global.namespace.service.wight.annotation.ServiceInterface;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 
+import java.util.function.Supplier;
+
 /**
- * An abstract service for creating file system managers.
- * Factory services are subject to service location by the
+ * A service for creating file system managers.
+ * Subclasses annotated with {@link ServiceImplementation} are subject to service location by the
  * {@link FsManagerLocator#SINGLETON}.
  * <p>
- * If multiple factory services are locatable on the class path at run time,
- * the service with the greatest {@linkplain #getPriority() priority} gets
- * selected.
+ * If multiple factory services are located on the class path at run time, the service with the greatest
+ * {@linkplain ServiceImplementation#priority()} gets selected.
  *
  * @author Christian Schlichtherle
  */
-@ServiceSpecification
-public abstract class FsManagerFactory
-extends LocatableFactory<FsManager> { }
+@ServiceInterface
+public interface FsManagerFactory extends Supplier<FsManager> {
+}

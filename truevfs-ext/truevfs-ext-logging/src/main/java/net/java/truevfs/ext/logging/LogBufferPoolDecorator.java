@@ -4,27 +4,18 @@
  */
 package net.java.truevfs.ext.logging;
 
+import global.namespace.service.wight.annotation.ServiceImplementation;
 import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.spi.IoBufferPoolDecorator;
 
 /**
  * @author Christian Schlichtherle
- * @deprecated This class is reserved for exclusive use by the
- * {@link net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator} singleton!
  */
-@Deprecated
-public final class LogBufferPoolDecorator extends IoBufferPoolDecorator {
+@ServiceImplementation(priority = -300)
+public final class LogBufferPoolDecorator implements IoBufferPoolDecorator {
 
     @Override
     public IoBufferPool apply(IoBufferPool pool) {
         return LogMediator.SINGLETON.instrument(pool);
-    }
-
-    /**
-     * Returns {@code -300}.
-     */
-    @Override
-    public int getPriority() {
-        return -300;
     }
 }

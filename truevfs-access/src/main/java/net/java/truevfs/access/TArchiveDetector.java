@@ -4,27 +4,29 @@
  */
 package net.java.truevfs.access;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.util.*;
-import java.util.Map.Entry;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
-import javax.inject.Provider;
 import net.java.truecommons.services.Loader;
 import net.java.truecommons.shed.ExtensionSet;
 import net.java.truecommons.shed.HashMaps;
-import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import net.java.truevfs.kernel.spec.FsAbstractCompositeDriver;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.concurrent.Immutable;
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Supplier;
+
+import static net.java.truecommons.shed.HashMaps.initialCapacity;
+
 /**
  * Detects a <em>prospective</em> archive file and declares its file system
  * scheme by mapping its file name extension to an archive driver.
  * Note that this class does <em>not</em> access any file system!
-  * <p>
+ * <p>
  * The map of detectable archive file name extensions and corresponding archive
  * drivers is configured by the constructors of this class.
  * There are two types of constructors available:
@@ -72,8 +74,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
     public static final TArchiveDetector ALL = new TArchiveDetector(null);
 
     @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
-    private static ExtensionSet extensions(
-            final Provider<Map<FsScheme, FsDriver>> provider) {
+    private static ExtensionSet extensions(final Supplier<Map<FsScheme, FsDriver>> provider) {
         if (provider instanceof TArchiveDetector)
             return new ExtensionSet(((TArchiveDetector) provider).extensions);
         final Map<FsScheme, FsDriver> map = provider.get();
@@ -107,7 +108,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
                         set.add(new FsScheme(q));
             else if (o instanceof FsScheme) set.add((FsScheme) o);
             else for (final String p : new ExtensionSet(o.toString()))
-                set.add(new FsScheme(p));
+                    set.add(new FsScheme(p));
         } catch (final URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -125,7 +126,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     /**
      * Equivalent to
-     * {@link #TArchiveDetector(Provider, String)
+     * {@link #TArchiveDetector(Supplier, String)
      * TArchiveDetector(FsDriverMapLocator.SINGLETON, extensions)}.
      */
     public TArchiveDetector(@CheckForNull String extensions) {
@@ -136,18 +137,18 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      * Constructs a new {@code TArchiveDetector} by filtering the given driver
      * provider for all canonicalized extensions in the {@code extensions} list.
      *
-     * @param  provider the file system driver provider to filter.
-     * @param  extensions A list of file name extensions which shall identify
-     *         prospective archive files.
-     *         If this is {@code null}, no filtering is applied and all drivers
-     *         known by the given provider are available for use with this
-     *         archive detector.
+     * @param provider   the file system driver provider to filter.
+     * @param extensions A list of file name extensions which shall identify
+     *                   prospective archive files.
+     *                   If this is {@code null}, no filtering is applied and all drivers
+     *                   known by the given provider are available for use with this
+     *                   archive detector.
      * @throws IllegalArgumentException If any of the extensions in the list
-     *         names a extension for which no file system driver is known by the
-     *         provider.
-     * @see    ExtensionSet Syntax constraints for extension lists.
+     *                                  names a extension for which no file system driver is known by the
+     *                                  provider.
+     * @see ExtensionSet Syntax constraints for extension lists.
      */
-    public TArchiveDetector(final Provider<Map<FsScheme, FsDriver>> provider,
+    public TArchiveDetector(final Supplier<Map<FsScheme, FsDriver>> provider,
                             final @CheckForNull String extensions) {
         final ExtensionSet available = extensions(provider);
         ExtensionSet accepted;
@@ -169,7 +170,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     /**
      * Equivalent to
-     * {@link #TArchiveDetector(Provider, String, FsDriver)
+     * {@link #TArchiveDetector(Supplier, String, FsDriver)
      * TArchiveDetector(TArchiveDetector.NULL, extensions, driver)}.
      */
     public TArchiveDetector(String extensions, @CheckForNull FsDriver driver) {
@@ -182,24 +183,24 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      * mappings for all canonicalized extensions in {@code extensions} to
      * {@code driver}.
      *
-     * @param  provider the file system driver provider to decorate.
-     * @param  extensions A list of file name extensions which shall identify
-     *         prospective archive files.
-     *         This must not be {@code null} and must not be empty.
-     * @param  driver the file system driver to map for the extension list.
-     *         {@code null} may be used to <i>shadow</i> a mapping for an equal
-     *         file system scheme in {@code provider} by removing it from the
-     *         resulting map for this detector.
-     * @throws NullPointerException if a required configuration element is
-     *         {@code null}.
+     * @param provider   the file system driver provider to decorate.
+     * @param extensions A list of file name extensions which shall identify
+     *                   prospective archive files.
+     *                   This must not be {@code null} and must not be empty.
+     * @param driver     the file system driver to map for the extension list.
+     *                   {@code null} may be used to <i>shadow</i> a mapping for an equal
+     *                   file system scheme in {@code provider} by removing it from the
+     *                   resulting map for this detector.
+     * @throws NullPointerException     if a required configuration element is
+     *                                  {@code null}.
      * @throws IllegalArgumentException if any other parameter precondition
-     *         does not hold.
-     * @see    ExtensionSet Syntax contraints for extension lists.
+     *                                  does not hold.
+     * @see ExtensionSet Syntax contraints for extension lists.
      */
-    public TArchiveDetector(Provider<Map<FsScheme, FsDriver>> provider,
+    public TArchiveDetector(Supplier<Map<FsScheme, FsDriver>> provider,
                             String extensions,
                             @CheckForNull FsDriver driver) {
-        this(provider, new Object[][] {{ extensions, driver }});
+        this(provider, new Object[][]{{extensions, driver}});
     }
 
     /**
@@ -207,28 +208,28 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      * decorating the configuration of {@code provider} with
      * mappings for all entries in {@code config}.
      *
-     * @param  provider the file system driver provider to decorate.
-     * @param  config an array of key-value pair arrays.
-     *         The first element of each inner array must either be a
-     *         {@link FsScheme file system scheme}, an object {@code o} which
-     *         can get converted to a set of file name extensions by calling
-     *         {@link ExtensionSet#ExtensionSet(String) new ExtensionSet(o.toString())}
-     *         or a {@link Collection collection} of these.
-     *         The second element of each inner array must either be a
-     *         {@link FsDriver file system driver object}, a
-     *         {@link Class file system driver class}, a
-     *         {@link String fully qualified name of a file system driver class},
-     *         or {@code null}.
-     *         {@code null} may be used to <i>shadow</i> a mapping for an equal
-     *         file system scheme in {@code provider} by removing it from the
-     *         resulting map for this detector.
-     * @throws NullPointerException if a required configuration element is
-     *         {@code null}.
+     * @param provider the file system driver provider to decorate.
+     * @param config   an array of key-value pair arrays.
+     *                 The first element of each inner array must either be a
+     *                 {@link FsScheme file system scheme}, an object {@code o} which
+     *                 can get converted to a set of file name extensions by calling
+     *                 {@link ExtensionSet#ExtensionSet(String) new ExtensionSet(o.toString())}
+     *                 or a {@link Collection collection} of these.
+     *                 The second element of each inner array must either be a
+     *                 {@link FsDriver file system driver object}, a
+     *                 {@link Class file system driver class}, a
+     *                 {@link String fully qualified name of a file system driver class},
+     *                 or {@code null}.
+     *                 {@code null} may be used to <i>shadow</i> a mapping for an equal
+     *                 file system scheme in {@code provider} by removing it from the
+     *                 resulting map for this detector.
+     * @throws NullPointerException     if a required configuration element is
+     *                                  {@code null}.
      * @throws IllegalArgumentException if any other parameter precondition
-     *         does not hold.
-     * @see    ExtensionSet Syntax contraints for extension lists.
+     *                                  does not hold.
+     * @see ExtensionSet Syntax contraints for extension lists.
      */
-    public TArchiveDetector(Provider<Map<FsScheme, FsDriver>> provider, Object[][] config) {
+    public TArchiveDetector(Supplier<Map<FsScheme, FsDriver>> provider, Object[][] config) {
         this(provider, map(config));
     }
 
@@ -236,20 +237,20 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      * Constructs a new {@code TArchiveDetector} by decorating the given driver
      * provider with mappings for all entries in {@code config}.
      *
-     * @param  provider the file system driver provider to decorate.
-     * @param  config a map of file system schemes to file system drivers.
-     *         {@code null} may be used to <i>shadow</i> a mapping for an equal
-     *         file system scheme in {@code provider} by removing it from the
-     *         resulting map for this detector.
-     * @throws NullPointerException if a required configuration element is
-     *         {@code null}.
-     * @throws ClassCastException if a configuration element is of the wrong
-     *         type.
+     * @param provider the file system driver provider to decorate.
+     * @param config   a map of file system schemes to file system drivers.
+     *                 {@code null} may be used to <i>shadow</i> a mapping for an equal
+     *                 file system scheme in {@code provider} by removing it from the
+     *                 resulting map for this detector.
+     * @throws NullPointerException     if a required configuration element is
+     *                                  {@code null}.
+     * @throws ClassCastException       if a configuration element is of the wrong
+     *                                  type.
      * @throws IllegalArgumentException if any other parameter precondition
-     *         does not hold.
-     * @see    ExtensionSet Syntax contraints for extension lists.
+     *                                  does not hold.
+     * @see ExtensionSet Syntax contraints for extension lists.
      */
-    public TArchiveDetector(final Provider<Map<FsScheme, FsDriver>> provider,
+    public TArchiveDetector(final Supplier<Map<FsScheme, FsDriver>> provider,
                             final Map<FsScheme, FsDriver> config) {
         final ExtensionSet extensions = extensions(provider);
         final Map<FsScheme, FsDriver> available = provider.get();
@@ -276,15 +277,17 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      * schemes recognized by this {@code TArchiveDetector}.
      *
      * @return Either {@code ""} to indicate an empty set or
-     *         a string of the form {@code "extension[|extension]*"},
-     *         where {@code extension} is a combination of lower case
-     *         letters which does <em>not</em> start with a dot.
-     *         The string never contains empty or duplicated extensions and the
-     *         extensions are sorted in natural order.
-     * @see    #TArchiveDetector(String)
-     * @see    ExtensionSet Syntax constraints for extension lists.
+     * a string of the form {@code "extension[|extension]*"},
+     * where {@code extension} is a combination of lower case
+     * letters which does <em>not</em> start with a dot.
+     * The string never contains empty or duplicated extensions and the
+     * extensions are sorted in natural order.
+     * @see #TArchiveDetector(String)
+     * @see ExtensionSet Syntax constraints for extension lists.
      */
-    public String getExtensions() { return extensions.toString(); }
+    public String getExtensions() {
+        return extensions.toString();
+    }
 
     /**
      * Returns the immutable map of file system drivers.
@@ -293,11 +296,15 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      * @return the immutable map of file system drivers.
      */
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<FsScheme, FsDriver> getDrivers() { return drivers; }
+    public Map<FsScheme, FsDriver> getDrivers() {
+        return drivers;
+    }
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<FsScheme, FsDriver> get() { return drivers; }
+    public Map<FsScheme, FsDriver> get() {
+        return drivers;
+    }
 
     /**
      * Detects whether the given {@code path} name identifies a prospective
@@ -307,12 +314,13 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      * system scheme and returned.
      * Otherwise, {@code null} is returned.
      *
-     * @param  path the path name.
+     * @param path the path name.
      * @return A file system scheme to declare the file system type of the
-     *         prospective archive file or {@code null} if no archive file name
-     *         extension has been detected.
+     * prospective archive file or {@code null} if no archive file name
+     * extension has been detected.
      */
-    public @CheckForNull FsScheme scheme(String path) {
+    public @CheckForNull
+    FsScheme scheme(String path) {
         // An archive file name extension may contain a dot (e.g. "tar.gz"), so
         // we can't just look for the last dot in the file name and look up the
         // remainder in the key set of the archive driver map.
@@ -322,7 +330,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
         int i = path.lastIndexOf(File.separatorChar) + 1;
         path = path.substring(i);
         final int l = path.length();
-        for (i = 0; 0 < (i = path.indexOf('.', i) + 1) && i < l ;) {
+        for (i = 0; 0 < (i = path.indexOf('.', i) + 1) && i < l; ) {
             final String scheme = path.substring(i);
             if (extensions.contains(scheme)) {
                 try {

@@ -4,27 +4,18 @@
  */
 package net.java.truevfs.ext.pacemaker;
 
+import global.namespace.service.wight.annotation.ServiceImplementation;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.spi.FsManagerDecorator;
 
 /**
  * @author Christian Schlichtherle
- * @deprecated This class is reserved for exclusive use by the {@link net.java.truevfs.kernel.spec.sl.FsManagerLocator}
- * singleton!
  */
-@Deprecated
-public final class PaceManagerDecorator extends FsManagerDecorator {
+@ServiceImplementation(priority = -100)
+public final class PaceManagerDecorator implements FsManagerDecorator {
 
     @Override
     public FsManager apply(FsManager manager) {
         return new PaceMediator().instrument(manager);
-    }
-
-    /**
-     * Returns {@code -100}.
-     */
-    @Override
-    public int getPriority() {
-        return -100;
     }
 }

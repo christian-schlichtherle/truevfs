@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
+
 import net.java.truecommons.services.Container;
 import net.java.truecommons.shed.ExtensionSet;
 import net.java.truecommons.shed.HashMaps;
@@ -20,7 +22,7 @@ import net.java.truevfs.kernel.spec.FsScheme;
  * @author Christian Schlichtherle
  */
 public final class MockDriverMapContainer
-implements Container<Map<FsScheme, FsDriver>> {
+implements Supplier<Map<FsScheme, FsDriver>> {
     private final Map<FsScheme, FsDriver> drivers;
 
     public MockDriverMapContainer(final String extensions) {

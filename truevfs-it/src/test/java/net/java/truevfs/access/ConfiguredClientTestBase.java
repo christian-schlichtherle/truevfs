@@ -4,31 +4,26 @@
  */
 package net.java.truevfs.access;
 
+import global.namespace.service.wight.core.ServiceLocator;
+import net.java.truecommons.shed.ExtensionSet;
+import net.java.truevfs.kernel.spec.*;
+import net.java.truevfs.kernel.spec.spi.FsManagerDecorator;
+import net.java.truevfs.kernel.spec.spi.FsManagerFactory;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
-import net.java.truecommons.services.Factory;
-import net.java.truecommons.services.ServiceLocator;
-import net.java.truecommons.shed.ExtensionSet;
-import net.java.truevfs.kernel.spec.FsArchiveDriver;
-import net.java.truevfs.kernel.spec.FsArchiveDriverTestBase;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsManager;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsNodePath;
-import net.java.truevfs.kernel.spec.FsScheme;
-import net.java.truevfs.kernel.spec.spi.FsManagerDecorator;
-import net.java.truevfs.kernel.spec.spi.FsManagerFactory;
-import org.slf4j.LoggerFactory;
+import java.util.function.Supplier;
 
 /**
- * @param  <D> the type of the archive driver.
+ * @param <D> the type of the archive driver.
  * @author Christian Schlichtherle
  */
 public abstract class ConfiguredClientTestBase<D extends FsArchiveDriver<?>>
-extends FsArchiveDriverTestBase<D> {
+        extends FsArchiveDriverTestBase<D> {
 
     /**
      * Controls if each test case should use its own file system manager.
@@ -57,15 +52,12 @@ extends FsArchiveDriverTestBase<D> {
     protected static final String[] NO_STRINGS = new String[0];
     private static final String ARCHIVE_DETECTOR = "archiveDetector";
 
-    private static volatile Factory<FsManager> managerFactory;
+    private static volatile Supplier<FsManager> managerFactory;
 
     private static FsManager newManager() {
-        final Factory<FsManager> f =
-                ConfiguredClientTestBase.managerFactory;
+        final Supplier<FsManager> f = ConfiguredClientTestBase.managerFactory;
         return (null != f ? f : (ConfiguredClientTestBase.managerFactory =
-                new ServiceLocator(ConfiguredClientTestBase.class)
-                        .factory(FsManagerFactory.class, FsManagerDecorator.class)))
-                .get();
+                new ServiceLocator().provider(FsManagerFactory.class, FsManagerDecorator.class))).get();
     }
 
     private TConfig config;
@@ -109,18 +101,24 @@ extends FsArchiveDriverTestBase<D> {
         return FsScheme.create(new ExtensionSet(getExtensionList()).iterator().next());
     }
 
-    protected final String getExtension() { return "." + getScheme(); }
+    protected final String getExtension() {
+        return "." + getScheme();
+    }
 
-    protected final TConfig getConfig() { return config; }
+    protected final TConfig getConfig() {
+        return config;
+    }
 
     @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    protected final Map<String, ?> getEnvironment() { return environment; }
+    protected final Map<String, ?> getEnvironment() {
+        return environment;
+    }
 
     protected final FsController controller(FsNodePath nodePath) {
         return getConfig()
                 .getManager()
                 .controller(
-                    getConfig().getArchiveDetector(),
-                    nodePath.getMountPoint());
+                        getConfig().getArchiveDetector(),
+                        nodePath.getMountPoint());
     }
 }

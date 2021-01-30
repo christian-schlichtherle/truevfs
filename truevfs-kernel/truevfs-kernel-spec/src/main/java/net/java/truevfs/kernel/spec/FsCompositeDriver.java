@@ -4,14 +4,14 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.util.ServiceConfigurationError;
-import javax.annotation.CheckForNull;
 import net.java.truecommons.shed.ImplementationsShouldExtend;
 
+import javax.annotation.CheckForNull;
+import java.util.ServiceConfigurationError;
+
 /**
- * Queries the scheme of the mount point of the given file system model in
- * order to lookup the appropriate file system driver which is then used to
- * create the requested thread-safe file system controller.
+ * Queries the scheme of the mount point of the given file system model in order to lookup the appropriate file system
+ * driver which is then used to create the requested thread-safe file system controller.
  * <p>
  * Implementations should be immutable.
  *
@@ -19,8 +19,7 @@ import net.java.truecommons.shed.ImplementationsShouldExtend;
  * @author Christian Schlichtherle
  */
 @ImplementationsShouldExtend(FsAbstractCompositeDriver.class)
-public interface FsCompositeDriver
-extends FsModel.Factory<FsManager>, FsController.Factory<FsManager> {
+public interface FsCompositeDriver extends FsModel.Factory<FsManager>, FsController.Factory<FsManager> {
 
     /**
      * {@inheritDoc}

@@ -4,10 +4,11 @@
  */
 package net.java.truevfs.driver.file;
 
-import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.annotations.ServiceImplementation;
+import global.namespace.service.wight.annotation.ServiceImplementation;
 import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.spi.IoBufferPoolFactory;
+
+import javax.annotation.concurrent.Immutable;
 
 /**
  * Creates {@linkplain FileBufferPool temp file based I/O buffer pools}.
@@ -15,13 +16,11 @@ import net.java.truevfs.kernel.spec.spi.IoBufferPoolFactory;
  * @author Christian Schlichtherle
  */
 @Immutable
-@ServiceImplementation
-public final class FileBufferPoolFactory extends IoBufferPoolFactory {
+@ServiceImplementation(priority = -100)
+public final class FileBufferPoolFactory implements IoBufferPoolFactory {
 
     @Override
-    public IoBufferPool get() { return new FileBufferPool(); }
-
-    /** @return -100 */
-    @Override
-    public int getPriority() { return -100; }
+    public IoBufferPool get() {
+        return new FileBufferPool();
+    }
 }

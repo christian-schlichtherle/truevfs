@@ -4,6 +4,21 @@
  */
 package net.java.truevfs.access;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import global.namespace.service.wight.annotation.ServiceImplementation;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.IoSockets;
+import net.java.truecommons.cio.OutputSocket;
+import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.UriBuilder;
+import net.java.truevfs.kernel.spec.FsAccessOption;
+import net.java.truevfs.kernel.spec.FsMountPoint;
+import net.java.truevfs.kernel.spec.FsNode;
+import net.java.truevfs.kernel.spec.FsNodePath;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
+import javax.annotation.concurrent.ThreadSafe;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,26 +36,12 @@ import java.nio.file.spi.FileSystemProvider;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import net.java.truecommons.annotations.ServiceImplementation;
 import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
 import static net.java.truecommons.cio.Entry.Type.FILE;
-import net.java.truecommons.cio.InputSocket;
-import net.java.truecommons.cio.IoSockets;
-import net.java.truecommons.cio.OutputSocket;
-import net.java.truecommons.shed.BitField;
-import net.java.truecommons.shed.UriBuilder;
-import static net.java.truevfs.access.TUriHelper.*;
-import net.java.truevfs.kernel.spec.FsAccessOption;
+import static net.java.truevfs.access.TUriHelper.hasAbsolutePath;
 import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsNode;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
-import net.java.truevfs.kernel.spec.FsNodePath;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link FileSystemProvider} implementation for use with NIO.2.
@@ -65,8 +66,7 @@ public final class TFileSystemProvider extends FileSystemProvider {
     private final String scheme;
     private final FsNodePath root;
 
-    private Map<FsMountPoint, WeakReference<TFileSystem>>
-            fileSystems = new WeakHashMap<>();
+    private Map<FsMountPoint, WeakReference<TFileSystem>> fileSystems = new WeakHashMap<>();
 
     /**
      * Obtains a file system provider for the given {@link TPath} URI.

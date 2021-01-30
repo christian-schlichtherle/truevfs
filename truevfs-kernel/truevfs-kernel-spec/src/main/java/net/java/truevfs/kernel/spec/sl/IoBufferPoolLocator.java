@@ -4,39 +4,40 @@
  */
 package net.java.truevfs.kernel.spec.sl;
 
-import javax.annotation.concurrent.Immutable;
+import global.namespace.service.wight.core.ServiceLocator;
 import net.java.truecommons.cio.IoBufferPool;
-import net.java.truecommons.services.Container;
-import net.java.truecommons.services.ServiceLocator;
 import net.java.truevfs.kernel.spec.spi.IoBufferPoolDecorator;
 import net.java.truevfs.kernel.spec.spi.IoBufferPoolFactory;
 
+import javax.annotation.concurrent.Immutable;
+import java.util.function.Supplier;
+
 /**
- * A container of the singleton I/O buffer pool.
- * The I/O buffer pool is created by using a {@link ServiceLocator} to search for
- * advertised implementations of the factory service specification class
- * {@link IoBufferPoolFactory}
- * and the decorator service specification class
+ * A supplier of the singleton I/O buffer pool.
+ * The I/O buffer pool is created by using a {@link ServiceLocator} to search for published implementations of the
+ * factory service interface {@link IoBufferPoolFactory} and the decorator service interface
  * {@link IoBufferPoolDecorator}.
  *
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class IoBufferPoolLocator implements Container<IoBufferPool> {
+public final class IoBufferPoolLocator implements Supplier<IoBufferPool> {
 
-    /** The singleton instance of this class. */
+    /**
+     * The singleton instance of this class.
+     */
     public static final IoBufferPoolLocator SINGLETON = new IoBufferPoolLocator();
 
-    private IoBufferPoolLocator() { }
+    private IoBufferPoolLocator() {
+    }
 
     @Override
-    public IoBufferPool get() { return Lazy.pool; }
+    public IoBufferPool get() {
+        return Lazy.pool;
+    }
 
-    /** A static data utility class used for lazy initialization. */
     private static final class Lazy {
-        static final IoBufferPool pool
-                = new ServiceLocator(IoBufferPoolLocator.class)
-                .factory(IoBufferPoolFactory.class, IoBufferPoolDecorator.class)
-                .get();
+        static final IoBufferPool pool =
+                new ServiceLocator().provider(IoBufferPoolFactory.class, IoBufferPoolDecorator.class).get();
     }
 }

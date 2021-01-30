@@ -4,22 +4,23 @@
  */
 package net.java.truevfs.kernel.spec.spi;
 
-import net.java.truecommons.annotations.ServiceSpecification;
+import global.namespace.service.wight.annotation.ServiceImplementation;
+import global.namespace.service.wight.annotation.ServiceInterface;
 import net.java.truecommons.cio.IoBufferPool;
-import net.java.truecommons.services.LocatableFactory;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 
+import java.util.function.Supplier;
+
 /**
- * An abstract service for creating I/O buffer pools.
- * Factory services are subject to service location by the
+ * A service for creating I/O buffer pools.
+ * Subclasses annotated with {@link ServiceImplementation} are subject to service location by the
  * {@link IoBufferPoolLocator#SINGLETON}.
  * <p>
- * If multiple factory services are locatable on the class path at run time,
- * the service with the greatest {@linkplain #getPriority() priority} gets
- * selected.
+ * If multiple factory services are located on the class path at run time, the service with the greatest
+ * {@linkplain ServiceImplementation#priority()} gets selected.
  *
  * @author Christian Schlichtherle
  */
-@ServiceSpecification
-public abstract class IoBufferPoolFactory
-extends LocatableFactory<IoBufferPool> { }
+@ServiceInterface
+public interface IoBufferPoolFactory extends Supplier<IoBufferPool> {
+}

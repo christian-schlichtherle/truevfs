@@ -79,7 +79,7 @@ object BuildSettings {
         )
       },
       resolvers += Resolver.mavenLocal,
-      scalaVersion := ScalaVersion_2_13, // set here or otherwise `+publishSigned` will fail
+      scalaVersion := Versions.Scala_2_13, // set here or otherwise `+publishSigned` will fail
       scmInfo := Some(ScmInfo(
         browseUrl = url("https://github.com/christian-schlichtherle/truevfs"),
         connection = "scm:git:git@github.com/christian-schlichtherle/truevfs.git",

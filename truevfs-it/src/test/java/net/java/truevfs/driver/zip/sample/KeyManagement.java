@@ -4,9 +4,13 @@
  */
 package net.java.truevfs.driver.zip.sample;
 
-import java.nio.charset.Charset;
-import java.util.Map;
-import javax.inject.Provider;
+import net.java.truecommons.key.spec.KeyManagerMap;
+import net.java.truecommons.key.spec.UnknownKeyException;
+import net.java.truecommons.key.spec.common.AesKeyStrength;
+import net.java.truecommons.key.spec.common.AesPbeParameters;
+import net.java.truecommons.key.spec.prompting.PromptingKey.Controller;
+import net.java.truecommons.key.spec.prompting.PromptingKey.View;
+import net.java.truecommons.key.spec.prompting.PromptingKeyManagerMap;
 import net.java.truevfs.access.TArchiveDetector;
 import net.java.truevfs.access.TConfig;
 import net.java.truevfs.comp.zip.WinZipAesParameters;
@@ -17,13 +21,10 @@ import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsScheme;
-import net.java.truecommons.key.spec.KeyManagerMap;
-import net.java.truecommons.key.spec.UnknownKeyException;
-import net.java.truecommons.key.spec.common.AesKeyStrength;
-import net.java.truecommons.key.spec.common.AesPbeParameters;
-import net.java.truecommons.key.spec.prompting.PromptingKey.Controller;
-import net.java.truecommons.key.spec.prompting.PromptingKey.View;
-import net.java.truecommons.key.spec.prompting.PromptingKeyManagerMap;
+
+import java.nio.charset.Charset;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Provides static utility methods to set passwords for WinZip AES encrypted
@@ -37,7 +38,8 @@ import net.java.truecommons.key.spec.prompting.PromptingKeyManagerMap;
 public final class KeyManagement {
 
     /* Can't touch this - hammer time! */
-    private KeyManagement() { }
+    private KeyManagement() {
+    }
 
     static void install(TArchiveDetector detector) {
 // START SNIPPET: install
@@ -46,6 +48,7 @@ public final class KeyManagement {
     }
 
 // START SNIPPET: newArchiveDetector1
+
     /**
      * Returns a new archive detector which uses the given password for all
      * WinZip AES encrypted ZIP entries with the given list of extensions.
@@ -56,23 +59,22 @@ public final class KeyManagement {
      * It's recommended to overwrite the parameter array with any non-password
      * data after calling this method.
      *
-     * @param  provider the file system driver provider to decorate.
-     * @param  extensions A list of file name extensions which shall identify
-     *         prospective archive files.
-     *         This must not be {@code null} and must not be empty.
-     * @param  password the password byte array to be copied for internal use.
-     *         The bytes should be limited to seven bits only, see
-     *         {@link WinZipAesParameters}.
+     * @param provider   the file system driver provider to decorate.
+     * @param extensions A list of file name extensions which shall identify
+     *                   prospective archive files.
+     *                   This must not be {@code null} and must not be empty.
+     * @param password   the password byte array to be copied for internal use.
+     *                   The bytes should be limited to seven bits only, see
+     *                   {@link WinZipAesParameters}.
      * @return A new archive detector which uses the given password for all
-     *         WinZip AES encrypted ZIP entries with the given list of
-     *         extensions.
+     * WinZip AES encrypted ZIP entries with the given list of
+     * extensions.
      */
     public static TArchiveDetector newArchiveDetector1(
-            Provider<Map<FsScheme, FsDriver>> provider,
+            Supplier<Map<FsScheme, FsDriver>> provider,
             String extensions,
             byte[] password) {
-        return new TArchiveDetector(provider,
-                extensions, new CustomZipDriver1(password));
+        return new TArchiveDetector(provider, extensions, new CustomZipDriver1(password));
     }
 
     private static final class CustomZipDriver1 extends ZipDriver {
@@ -127,8 +129,7 @@ public final class KeyManagement {
         }
     } // CustomZipDriver1
 
-    private static final class CustomWinZipAesParameters
-    implements WinZipAesParameters {
+    private static final class CustomWinZipAesParameters implements WinZipAesParameters {
 
         final byte[] password;
 
@@ -138,13 +139,13 @@ public final class KeyManagement {
 
         @Override
         public byte[] getWritePassword(String name)
-        throws ZipKeyException {
+                throws ZipKeyException {
             return password.clone();
         }
 
         @Override
         public byte[] getReadPassword(String name, boolean invalid)
-        throws ZipKeyException {
+                throws ZipKeyException {
             if (invalid)
                 throw new ZipKeyException(name + " (invalid password)");
             return password.clone();
@@ -152,13 +153,13 @@ public final class KeyManagement {
 
         @Override
         public AesKeyStrength getKeyStrength(String arg0)
-        throws ZipKeyException {
+                throws ZipKeyException {
             return AesKeyStrength.BITS_128;
         }
 
         @Override
         public void setKeyStrength(String name, AesKeyStrength keyStrength)
-        throws ZipKeyException {
+                throws ZipKeyException {
             // We have been using only 128 bits to create archive entries.
             assert AesKeyStrength.BITS_128 == keyStrength;
         }
@@ -166,6 +167,7 @@ public final class KeyManagement {
 // END SNIPPET: newArchiveDetector1
 
 // START SNIPPET: newArchiveDetector2
+
     /**
      * Returns a new archive detector which uses the given password for all
      * WinZip AES encrypted ZIP entries with the given list of extensions.
@@ -176,23 +178,22 @@ public final class KeyManagement {
      * It's recommended to overwrite the parameter array with any non-password
      * data after calling this method.
      *
-     * @param  provider the file system driver provider to decorate.
-     * @param  extensions A list of file name extensions which shall identify
-     *         prospective archive files.
-     *         This must not be {@code null} and must not be empty.
-     * @param  password the password char array to be copied for internal use.
-     *         The characters should be limited to US-ASCII, see
-     *         {@link WinZipAesParameters}.
+     * @param provider   the file system driver provider to decorate.
+     * @param extensions A list of file name extensions which shall identify
+     *                   prospective archive files.
+     *                   This must not be {@code null} and must not be empty.
+     * @param password   the password char array to be copied for internal use.
+     *                   The characters should be limited to US-ASCII, see
+     *                   {@link WinZipAesParameters}.
      * @return A new archive detector which uses the given password for all
-     *         WinZip AES encrypted ZIP entries with the given list of
-     *         extensions.
+     * WinZip AES encrypted ZIP entries with the given list of
+     * extensions.
      */
     public static TArchiveDetector newArchiveDetector2(
-            Provider<Map<FsScheme, FsDriver>> provider,
+            Supplier<Map<FsScheme, FsDriver>> provider,
             String extensions,
             char[] password) {
-        return new TArchiveDetector(provider,
-                    extensions, new CustomZipDriver2(password));
+        return new TArchiveDetector(provider, extensions, new CustomZipDriver2(password));
     }
 
     private static final class CustomZipDriver2 extends ZipDriver {
@@ -206,14 +207,18 @@ public final class KeyManagement {
         }
 
         @Override
-        public KeyManagerMap getKeyManagerMap() { return map; }
+        public KeyManagerMap getKeyManagerMap() {
+            return map;
+        }
     } // CustomZipDriver2
 
     private static final class CustomView
-    implements View<AesPbeParameters> {
+            implements View<AesPbeParameters> {
         final char[] password;
 
-        CustomView(char[] password) { this.password = password.clone(); }
+        CustomView(char[] password) {
+            this.password = password.clone();
+        }
 
         /**
          * You need to create a new key because the key manager may eventually
@@ -228,7 +233,7 @@ public final class KeyManagement {
 
         @Override
         public void promptKeyForWriting(Controller<AesPbeParameters> controller)
-        throws UnknownKeyException {
+                throws UnknownKeyException {
             // You might as well call controller.getResource() here in order to
             // programmatically set the parameters for individual resource URIs.
             // Note that this would typically return the hierarchical URI of
@@ -241,7 +246,7 @@ public final class KeyManagement {
         public void promptKeyForReading(
                 Controller<AesPbeParameters> controller,
                 boolean invalid)
-        throws UnknownKeyException {
+                throws UnknownKeyException {
             if (invalid) throw new UnknownKeyException();
             // You might as well call controller.getResource() here in order to
             // programmatically set the parameters for individual resource URIs.

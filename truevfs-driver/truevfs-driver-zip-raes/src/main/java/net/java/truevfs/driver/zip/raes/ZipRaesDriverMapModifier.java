@@ -4,39 +4,40 @@
  */
 package net.java.truevfs.driver.zip.raes;
 
-import java.util.Map;
-import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.annotations.ServiceImplementation;
+import global.namespace.service.wight.annotation.ServiceImplementation;
 import net.java.truecommons.shed.ExtensionSet;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
+
+import javax.annotation.concurrent.Immutable;
+import java.util.Map;
 
 /**
  * Maps a file system driver for accessing the RAES encrypted ZIP file format,
  * alias ZIP.RAES or TZP.
  * The modified map will contain the following entries:
  * <p>
-<table border=1 cellpadding=5 summary="">
-<thead>
-<tr>
-<th>URI Schemes / Archive File Extensions</th>
-<th>File System Driver Class</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>{@code tzp}, {@code zip.rae}, {@code zip.raes}</td>
-<td>{@link SafeZipRaesDriver}</td>
-</tr>
-</tbody>
-</table>
+ * <table border=1 cellpadding=5 summary="">
+ * <thead>
+ * <tr>
+ * <th>URI Schemes / Archive File Extensions</th>
+ * <th>File System Driver Class</th>
+ * </tr>
+ * </thead>
+ * <tbody>
+ * <tr>
+ * <td>{@code tzp}, {@code zip.rae}, {@code zip.raes}</td>
+ * <td>{@link SafeZipRaesDriver}</td>
+ * </tr>
+ * </tbody>
+ * </table>
  *
- * @author  Christian Schlichtherle
+ * @author Christian Schlichtherle
  */
 @Immutable
-@ServiceImplementation
-public final class ZipRaesDriverMapModifier extends FsDriverMapModifier {
+@ServiceImplementation(priority = -100)
+public final class ZipRaesDriverMapModifier implements FsDriverMapModifier {
 
     @Override
     public Map<FsScheme, FsDriver> apply(final Map<FsScheme, FsDriver> map) {
@@ -53,7 +54,7 @@ public final class ZipRaesDriverMapModifier extends FsDriverMapModifier {
         // If you were completely paranoid, you would even want to
         // use encrypted byte arrays or wipe them with nulls after
         // use.
-        // However, then you would have to write this yourself! ;-)
+        // However, the latter is currently not supported.
         /*final FsDriver driver = new ParanoidZipRaesDriver(new ByteArrayIOPoolProvider(2048));*/
 
         // If you're just a bit paranoid, then use this driver:
@@ -78,12 +79,7 @@ public final class ZipRaesDriverMapModifier extends FsDriverMapModifier {
         // archive entries whenever required.
         final FsDriver driver = new SafeZipRaesDriver();
 
-        for (final String extension : new ExtensionSet("tzp|zip.rae|zip.raes"))
-            map.put(FsScheme.create(extension), driver);
+        new ExtensionSet("tzp|zip.rae|zip.raes").forEach(e -> map.put(FsScheme.create(e), driver));
         return map;
     }
-
-    /** @return -100 */
-    @Override
-    public int getPriority() { return -100; }
 }

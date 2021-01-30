@@ -48,8 +48,7 @@ import static net.java.truecommons.cio.Entry.UNKNOWN;
  * @author Christian Schlichtherle
  */
 @NotThreadSafe
-public class MultiplexingOutputService<E extends MutableEntry>
-        extends DecoratingOutputService<E> {
+public class MultiplexingOutputService<E extends MutableEntry> extends DecoratingOutputService<E> {
 
     private final IoBufferPool pool;
 

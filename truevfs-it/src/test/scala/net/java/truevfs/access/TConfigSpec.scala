@@ -5,11 +5,12 @@
 package net.java.truevfs.access
 
 import global.namespace.fun.io.api.Socket
-import net.java.truecommons.services._
+import global.namespace.service.wight.core.ServiceLocator
 import net.java.truecommons.shed._
 import net.java.truevfs.access.TConfig._
 import net.java.truevfs.access.TConfigSpec._
 import net.java.truevfs.kernel.spec.FsAccessOption._
+import net.java.truevfs.kernel.spec.FsManager
 import net.java.truevfs.kernel.spec.mock.MockArchiveDriver
 import net.java.truevfs.kernel.spec.sl._
 import net.java.truevfs.kernel.spec.spi._
@@ -96,8 +97,8 @@ class TConfigSpec extends WordSpec {
           config setManager null
         }
         config.getManager should be theSameInstanceAs FsManagerLocator.SINGLETON.get
-        val manager = new ServiceLocator(classOf[FsManagerLocator])
-          .factory(classOf[FsManagerFactory], classOf[FsManagerDecorator])
+        val manager: FsManager = new ServiceLocator()
+          .provider[FsManager, FsManagerFactory, FsManagerDecorator](classOf[FsManagerFactory], classOf[FsManagerDecorator])
           .get
         config setManager manager
         config.getManager should be theSameInstanceAs manager

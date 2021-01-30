@@ -9,7 +9,7 @@ import net.java.truecommons.shed.Filter;
 import net.java.truecommons.shed.Visitor;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 
-import javax.inject.Provider;
+import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
@@ -18,7 +18,7 @@ import static java.util.Objects.requireNonNull;
  */
 public final class FsSync {
 
-    private Provider<FsManager> managerProvider = FsManagerLocator.SINGLETON;
+    private Supplier<FsManager> managerProvider = FsManagerLocator.SINGLETON;
     private Filter<? super FsController> filter = Filter.ACCEPT_ANY;
     private BitField<FsSyncOption> options = FsSyncOptions.NONE;
 
@@ -48,12 +48,11 @@ public final class FsSync {
      * controllers get synced, even if a controller fails with an
      * {@link FsSyncException}.
      *
-     * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         apply.
-     *         This implies that the respective file system controller has been
-     *         {@link FsController#sync sync()}ed with constraints, e.g. if an
-     *         open archive entry stream or channel gets forcibly closed.
-     * @throws FsSyncException if any error conditions apply.
+     * @throws FsSyncWarningException if <em>only</em> warning conditions apply.
+     *                                This implies that the respective file system controller has been
+     *                                {@link FsController#sync sync()}ed with constraints, e.g. if an open archive entry
+     *                                stream or channel gets forcibly closed.
+     * @throws FsSyncException        if any error conditions apply.
      */
     public void run() throws FsSyncException {
 
@@ -78,5 +77,7 @@ public final class FsSync {
         manager().accept(filter, new SyncVisitor()).check();
     }
 
-    private FsManager manager() { return managerProvider.get(); }
+    private FsManager manager() {
+        return managerProvider.get();
+    }
 }

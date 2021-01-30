@@ -4,10 +4,10 @@
  */
 package net.java.truevfs.kernel.spec;
 
+import javax.annotation.concurrent.Immutable;
 import java.util.Map;
 import java.util.Objects;
-import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.services.Container;
+import java.util.function.Supplier;
 
 /**
  * Uses a given file system driver provider to lookup the appropriate driver
@@ -16,10 +16,9 @@ import net.java.truecommons.services.Container;
  * @author Christian Schlichtherle
  */
 @Immutable
-public final class FsSimpleCompositeDriver
-extends FsAbstractCompositeDriver {
+public final class FsSimpleCompositeDriver extends FsAbstractCompositeDriver {
 
-    private final Container<Map<FsScheme, FsDriver>> container;
+    private final Supplier<Map<FsScheme, FsDriver>> container;
 
     /**
      * Constructs a new simple meta driver which will query the given
@@ -28,8 +27,7 @@ extends FsAbstractCompositeDriver {
      *
      * @param container the driver map container.
      */
-    public FsSimpleCompositeDriver(
-            final Container<Map<FsScheme, FsDriver>> container) {
+    public FsSimpleCompositeDriver(final Supplier<Map<FsScheme, FsDriver>> container) {
         this.container = Objects.requireNonNull(container);
     }
 
