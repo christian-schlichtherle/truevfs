@@ -2,10 +2,9 @@
  * Copyright (C) 2005-2015 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truecommons.services;
+package net.java.truecommons.shed;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -24,7 +23,6 @@ import java.util.ServiceLoader;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class Loader {
 
     private final ClassLoader primary;
@@ -35,7 +33,7 @@ public final class Loader {
      * to the former.
      *
      * @param loader the nullable primary class loader.
-     *        If this is {@code null}, then the system class loader is used.
+     *               If this is {@code null}, then the system class loader is used.
      */
     public Loader(final @Nullable ClassLoader loader) {
         this.primary = null != loader ? loader : ClassLoader.getSystemClassLoader();
@@ -44,13 +42,13 @@ public final class Loader {
     /**
      * Returns a new iterable collection of URLs for the given resource name.
      *
-     * @param  name The fully qualified name of the resources to locate.
+     * @param name The fully qualified name of the resources to locate.
      * @return A concatenated enumeration for the resource on the class path.
      * @throws ServiceConfigurationError if locating the resources fails for
-     *         some reason.
+     *                                   some reason.
      */
     public Iterable<URL> resourcesFor(final String name)
-    throws ServiceConfigurationError {
+            throws ServiceConfigurationError {
         final class IterableResources implements Iterable<URL> {
             @Override
             public Iterator<URL> iterator() {
@@ -66,6 +64,7 @@ public final class Loader {
     }
 
     private static final class EnumerationIterator<E> implements Iterator<E> {
+
         private final Enumeration<E> e;
 
         EnumerationIterator(final Enumeration<E> e) {
@@ -86,7 +85,7 @@ public final class Loader {
         public void remove() {
             throw new UnsupportedOperationException();
         }
-    } // EnumerationIterator
+    }
 
     /**
      * Returns a new iterable collection of instances of all implementation
@@ -100,8 +99,8 @@ public final class Loader {
      * <code>{@link ServiceLoader#load(Class, ClassLoader) ServiceLoader.load(spec, cl)}.iterator()</code>,
      * where {@code cl} is the resolved class loader.
      *
-     * @param  <S> the type of the services.
-     * @param  spec the specification class of the services.
+     * @param <S>  the type of the services.
+     * @param spec the specification class of the services.
      * @return A new iterable collection of all services on the class path.
      */
     public <S> Iterable<S> instancesOf(final Class<S> spec) {
@@ -138,26 +137,24 @@ public final class Loader {
      *     service provider implementation is acceptable.
      * </ol>
      *
-     * @param  <S> the type of the service.
-     * @param  spec the specification class of the service.
-     * @param  impl the default implementation class of the service.
+     * @param <S>  the type of the service.
+     * @param spec the specification class of the service.
+     * @param impl the default implementation class of the service.
      * @return A new instance of the service or {@code null}
-     *         if no implementation class is known.
+     * if no implementation class is known.
      * @throws ServiceConfigurationError if loading or instantiating
-     *         the implementation class fails for some reason.
+     *                                   the implementation class fails for some reason.
      */
-    public @Nullable <S> S instanceOf(
-            final Class<S> spec,
-            final @Nullable Class<? extends S> impl)
-    throws ServiceConfigurationError {
+    public @Nullable
+    <S> S instanceOf(final Class<S> spec, final @Nullable Class<? extends S> impl) throws ServiceConfigurationError {
         final String name = System.getProperty(spec.getName(),
                 null == impl ? null : impl.getName());
-        if (null == name) return null;
+        if (null == name) {
+            return null;
+        }
         try {
             return impl.cast(classFor(name).newInstance());
-        } catch (final InstantiationException ex) {
-            throw new ServiceConfigurationError(ex.toString(), ex);
-        } catch (final IllegalAccessException ex) {
+        } catch (final InstantiationException | IllegalAccessException ex) {
             throw new ServiceConfigurationError(ex.toString(), ex);
         }
     }
@@ -165,20 +162,20 @@ public final class Loader {
     /**
      * Loads a class according to the algorithm described in the class Javadoc.
      *
-     * @param  name The fully qualified name of the class to classFor.
+     * @param name The fully qualified name of the class to classFor.
      * @return The loaded class.
      * @throws ServiceConfigurationError if loading the class fails for some
-     *         reason.
+     *                                   reason.
      */
-    public Class<?> classFor(final String name)
-    throws ServiceConfigurationError {
+    public Class<?> classFor(final String name) throws ServiceConfigurationError {
         try {
             try {
                 return primary.loadClass(name);
             } catch (final ClassNotFoundException ex) {
-                final ClassLoader secondary
-                        = Thread.currentThread().getContextClassLoader();
-                if (primary == secondary) throw ex; // there's no point in trying this twice.
+                final ClassLoader secondary = Thread.currentThread().getContextClassLoader();
+                if (primary == secondary) {
+                    throw ex; // there's no point in trying this twice.
+                }
                 return secondary.loadClass(name);
             }
         } catch (final ClassNotFoundException ex2) {
@@ -209,32 +206,25 @@ public final class Loader {
      * </li>
      * </ol>
      *
-     * @param  <T> the desired type of the object.
-     * @param  object the object to promote.
-     * @param  type the class describing the desired type.
+     * @param <T>    the desired type of the object.
+     * @param object the object to promote.
+     * @param type   the class describing the desired type.
      * @return an object of the desired type or {@code null} if and only if
-     *         {@code object} is {@code null}.
+     * {@code object} is {@code null}.
      * @throws IllegalArgumentException if any promotion step fails.
      */
-    public static @Nullable <T> T promote(
-            @Nullable Object object,
-            final Class<T> type)
-    throws IllegalArgumentException {
+    public static @Nullable
+    <T> T promote(@Nullable Object object, final Class<T> type) throws IllegalArgumentException {
         try {
-            if (object instanceof String && !type.equals(String.class))
-                object = new Loader(type.getClassLoader())
-                        .classFor((String) object);
-            if (object instanceof Class<?> && !type.equals(Class.class))
+            if (object instanceof String && !type.equals(String.class)) {
+                object = new Loader(type.getClassLoader()).classFor((String) object);
+            }
+            if (object instanceof Class<?> && !type.equals(Class.class)) {
                 object = ((Class<?>) object).newInstance();
+            }
             return type.cast(object);
-        } catch (final ServiceConfigurationError ex) {
-            throw new IllegalArgumentException(ex);
-        } catch (final InstantiationException ex) {
-            throw new IllegalArgumentException(ex);
-        } catch (final IllegalAccessException ex) {
-            throw new IllegalArgumentException(ex);
-        } catch (final ClassCastException ex) {
-            throw new IllegalArgumentException(ex);
+        } catch (ServiceConfigurationError | InstantiationException | IllegalAccessException | ClassCastException e) {
+            throw new IllegalArgumentException(e);
         }
     }
 }

@@ -2,7 +2,7 @@
  * Copyright (C) 2005-2015 Schlichtherle IT Services.
  * All rights reserved. Use is subject to license terms.
  */
-package net.java.truecommons.services
+package net.java.truecommons.shed
 
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks._
@@ -13,7 +13,7 @@ import java.util.Collections
 import scala.jdk.CollectionConverters._
 
 /** @author Christian Schlichtherle */
-class UnifiedClassLoaderTest extends AnyWordSpec {
+class UnifiedClassLoaderSpec extends AnyWordSpec {
 
   abstract class TestClassLoader extends ClassLoader {
     final override def getResources(name: String) =

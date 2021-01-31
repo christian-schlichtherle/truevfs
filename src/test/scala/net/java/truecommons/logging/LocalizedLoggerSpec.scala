@@ -14,9 +14,9 @@ import org.slf4j._
 import java.util._
 
 /** @author Christian Schlichtherle */
-class LocalizedLoggerTest extends AnyWordSpec {
+class LocalizedLoggerSpec extends AnyWordSpec {
 
-  import net.java.truecommons.logging.LocalizedLoggerTest._
+  import net.java.truecommons.logging.LocalizedLoggerSpec._
 
   def create(delegate: Logger) = new LocalizedLogger(delegate, bundle)
 
@@ -216,9 +216,11 @@ class LocalizedLoggerTest extends AnyWordSpec {
   }
 }
 
-object LocalizedLoggerTest {
-  val bundle = new ListResourceBundle {
-    override def getContents = Array(
+object LocalizedLoggerSpec {
+
+  val bundle: ResourceBundle = new ListResourceBundle {
+
+    override def getContents: Array[Array[AnyRef]] = Array(
       Array("0", ""),
       Array("1", "%s"),
       Array("2", "%s %s"),

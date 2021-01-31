@@ -4,7 +4,7 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truecommons.services.Loader;
+import net.java.truecommons.shed.Loader;
 import net.java.truecommons.shed.ExtensionSet;
 import net.java.truecommons.shed.HashMaps;
 import net.java.truevfs.kernel.spec.FsAbstractCompositeDriver;
@@ -75,25 +75,30 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     private static ExtensionSet extensions(final Supplier<Map<FsScheme, FsDriver>> provider) {
-        if (provider instanceof TArchiveDetector)
+        if (provider instanceof TArchiveDetector) {
             return new ExtensionSet(((TArchiveDetector) provider).extensions);
+        }
         final Map<FsScheme, FsDriver> map = provider.get();
         final ExtensionSet set = new ExtensionSet();
-        for (final Entry<FsScheme, FsDriver> entry : map.entrySet())
-            if (entry.getValue().isArchiveDriver())
+        for (final Entry<FsScheme, FsDriver> entry : map.entrySet()) {
+            if (entry.getValue().isArchiveDriver()) {
                 set.add(entry.getKey().toString());
+            }
+        }
         return set;
     }
 
     private static Map<FsScheme, FsDriver> map(final Object[][] config) {
-        final Map<FsScheme, FsDriver> drivers = new HashMap<>(
-                HashMaps.initialCapacity(config.length) * 2); // heuristics
+        final Map<FsScheme, FsDriver> drivers = new HashMap<>(HashMaps.initialCapacity(config.length) * 2); // heuristics
         for (final Object[] param : config) {
             final Collection<FsScheme> schemes = schemes(param[0]);
-            if (schemes.isEmpty())
+            if (schemes.isEmpty()) {
                 throw new IllegalArgumentException("No file system schemes!");
+            }
             final FsDriver driver = Loader.promote(param[1], FsDriver.class);
-            for (final FsScheme scheme : schemes) drivers.put(scheme, driver);
+            for (FsScheme scheme : schemes) {
+                drivers.put(scheme, driver);
+            }
         }
         return Collections.unmodifiableMap(drivers);
     }
@@ -101,14 +106,23 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
     private static Collection<FsScheme> schemes(final Object o) {
         final Collection<FsScheme> set = new TreeSet<>();
         try {
-            if (o instanceof Collection<?>)
-                for (final Object p : (Collection<?>) o)
-                    if (p instanceof FsScheme) set.add((FsScheme) p);
-                    else for (final String q : new ExtensionSet(p.toString()))
-                        set.add(new FsScheme(q));
-            else if (o instanceof FsScheme) set.add((FsScheme) o);
-            else for (final String p : new ExtensionSet(o.toString()))
+            if (o instanceof Collection<?>) {
+                for (final Object p : (Collection<?>) o) {
+                    if (p instanceof FsScheme) {
+                        set.add((FsScheme) p);
+                    } else {
+                        for (String q : new ExtensionSet(p.toString())) {
+                            set.add(new FsScheme(q));
+                        }
+                    }
+                }
+            } else if (o instanceof FsScheme) {
+                set.add((FsScheme) o);
+            } else {
+                for (String p : new ExtensionSet(o.toString())) {
                     set.add(new FsScheme(p));
+                }
+            }
         } catch (final URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -254,8 +268,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
                             final Map<FsScheme, FsDriver> config) {
         final ExtensionSet extensions = extensions(provider);
         final Map<FsScheme, FsDriver> available = provider.get();
-        final Map<FsScheme, FsDriver> drivers = new HashMap<>(
-                initialCapacity(available.size() + config.size()));
+        final Map<FsScheme, FsDriver> drivers = new HashMap<>(initialCapacity(available.size() + config.size()));
         drivers.putAll(available);
         for (final Map.Entry<FsScheme, FsDriver> entry : config.entrySet()) {
             final FsScheme scheme = entry.getKey();
@@ -334,8 +347,8 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
             final String scheme = path.substring(i);
             if (extensions.contains(scheme)) {
                 try {
-                    return new FsScheme(scheme); // TODO: http://java.net/jira/browse/TRUEZIP-132
-                } catch (URISyntaxException noSchemeNoArchiveBadLuck) {
+                    return new FsScheme(scheme); // TODO: Support 7z
+                } catch (URISyntaxException ignored) {
                 }
             }
         }
@@ -344,12 +357,15 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     @Override
     @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
-    public boolean equals(Object other) {
-        if (this == other) return true;
-        if (!(other instanceof TArchiveDetector)) return false;
-        final TArchiveDetector that = (TArchiveDetector) other;
-        return this.extensions.equals(that.extensions)
-                && this.drivers.equals(that.drivers);
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof TArchiveDetector)) {
+            return false;
+        }
+        final TArchiveDetector that = (TArchiveDetector) obj;
+        return this.extensions.equals(that.extensions) && this.drivers.equals(that.drivers);
     }
 
     @Override
@@ -362,9 +378,6 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     @Override
     public String toString() {
-        return String.format("%s[extensions=%s, drivers=%s]",
-                getClass().getName(),
-                extensions,
-                drivers);
+        return String.format("%s[extensions=%s, drivers=%s]", getClass().getName(), extensions, drivers);
     }
 }
