@@ -55,14 +55,4 @@ public class BuffersTest {
             assertThat(obb, is(ibb));
         }
     }
-
-    @Test
-    public void testNullConversions() {
-        assertNull(byteBuffer((String) null));
-        assertNull(byteBuffer((char[]) null));
-        assertNull(byteBuffer((CharBuffer) null));
-        assertNull(string((ByteBuffer) null));
-        assertNull(charArray((ByteBuffer) null));
-        assertNull(charBuffer((ByteBuffer) null));
-    }
 }

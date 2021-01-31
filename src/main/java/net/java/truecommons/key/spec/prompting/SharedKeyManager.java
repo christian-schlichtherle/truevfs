@@ -4,67 +4,63 @@
  */
 package net.java.truecommons.key.spec.prompting;
 
-import net.java.truecommons.shed.Option;
 import net.java.truecommons.shed.UniqueObject;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
-
-import static net.java.truecommons.shed.Option.apply;
+import java.util.Optional;
 
 /**
- * @param  <K> the type of the prompting keys.
- * @since  TrueCommons 2.2
+ * @param <K> the type of the prompting keys.
  * @author Christian Schlichtherle
  */
-@SuppressWarnings("LoopStatementThatDoesntLoop")
-@ThreadSafe
-final class SharedKeyManager<K extends PromptingKey<K>>
-extends UniqueObject {
+final class SharedKeyManager<K extends PromptingKey<K>> extends UniqueObject {
 
     private final Map<URI, SharedKeyProvider<K>> providers = new HashMap<>();
 
-    private Option<SharedKeyProvider<K>> get(URI uri) {
-        return apply(providers.get(uri));
+    private Optional<SharedKeyProvider<K>> get(URI uri) {
+        return Optional.ofNullable(providers.get(uri));
     }
 
-    private Option<SharedKeyProvider<K>> put(URI uri, SharedKeyProvider<K> p) {
-        return apply(providers.put(uri, p));
+    private Optional<SharedKeyProvider<K>> put(URI uri, SharedKeyProvider<K> p) {
+        return Optional.ofNullable(providers.put(uri, p));
     }
 
-    private Option<SharedKeyProvider<K>> remove(URI uri) {
-        return apply(providers.remove(uri));
+    private Optional<SharedKeyProvider<K>> remove(URI uri) {
+        return Optional.ofNullable(providers.remove(uri));
     }
 
-    synchronized SharedKeyProvider<K> provider(final URI uri) {
-        for (final SharedKeyProvider<K> p : get(uri))
+    synchronized SharedKeyProvider<K> provider(URI uri) {
+        return get(uri).orElseGet(() -> {
+            final SharedKeyProvider<K> p = new SharedKeyProvider<K>();
+            put(uri, p);
+            p.link();
             return p;
-        final SharedKeyProvider<K> p = new SharedKeyProvider<K>();
-        put(uri, p);
-        p.link();
-        return p;
+        });
     }
 
-    synchronized void release(final URI uri) {
-        for (final SharedKeyProvider<K> p : get(uri))
-            p.release();
+    synchronized void release(URI uri) {
+        get(uri).ifPresent(SharedKeyProvider::release);
     }
 
     synchronized void link(final URI originUri, final URI targetUri) {
-        for (final SharedKeyProvider<K> originProvider : get(originUri)) {
-            for (final SharedKeyProvider<K> targetProvider : put(targetUri, originProvider)) {
-                if (targetProvider == originProvider)
+        final Optional<SharedKeyProvider<K>> optOriginProvider = get(originUri);
+        if (optOriginProvider.isPresent()) {
+            final SharedKeyProvider<K> originProvider = optOriginProvider.get();
+            final Optional<SharedKeyProvider<K>> optTargetProvider = put(targetUri, originProvider);
+            if (optTargetProvider.isPresent()) {
+                final SharedKeyProvider<K> targetProvider = optTargetProvider.get();
+                if (targetProvider == originProvider) {
                     return;
+                }
                 targetProvider.unlink();
             }
             originProvider.link();
         }
     }
 
-    synchronized void unlink(final URI uri) {
-        for (final SharedKeyProvider<K> p : remove(uri))
-            p.unlink();
+    synchronized void unlink(URI uri) {
+        remove(uri).ifPresent(SharedKeyProvider::unlink);
     }
 }

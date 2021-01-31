@@ -4,7 +4,7 @@
  */
 package net.java.truecommons.key.spec;
 
-import net.java.truecommons.shed.Option;
+import net.java.truecommons.shed.Buffers;
 
 import javax.annotation.Nullable;
 import java.beans.Transient;
@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.ByteBuffer;
 import java.util.Objects;
+import java.util.Optional;
 
 import static net.java.truecommons.shed.Buffers.copy;
 import static net.java.truecommons.shed.Buffers.fill;
@@ -27,21 +28,22 @@ import static net.java.truecommons.shed.Buffers.fill;
  * @since TrueCommons 2.2
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public abstract class AbstractSecretKey<K extends AbstractSecretKey<K>>
 extends AbstractKey<K> implements SecretKey<K> {
 
-    private transient Option<ByteBuffer> secret = Option.none();
+    private transient Optional<ByteBuffer> optSecret = Optional.empty();
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        secret = Option.none();
+        optSecret = Optional.empty();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    @SuppressWarnings({"AccessingNonPublicFieldOfAnotherObject", "unchecked"})
     public K clone() {
         final AbstractSecretKey<K> clone = super.clone();
-        clone.secret = Option.apply(copy(this.secret.orNull()));
+        clone.optSecret = this.optSecret.map(Buffers::copy);
         return (K) clone;
     }
 
@@ -49,9 +51,8 @@ extends AbstractKey<K> implements SecretKey<K> {
     public void reset() { doReset(); }
 
     private void doReset() {
-        for (ByteBuffer bb : secret)
-            fill(bb, (byte) 0);
-        secret = Option.none();
+        optSecret.ifPresent(bb -> fill(bb, (byte) 0));
+        optSecret = Optional.empty();
     }
 
     @Override
@@ -65,35 +66,37 @@ extends AbstractKey<K> implements SecretKey<K> {
      * Returns {@code true} if and only if the secret data is not {@code null}.
      */
     @Transient
-    public final boolean isSecretSet() { return !secret.isEmpty(); }
+    public final boolean isSecretSet() { return optSecret.isPresent(); }
 
     @Transient
     @Override
     public final @Nullable ByteBuffer getSecret() {
-        return copy(secret.orNull());
+        return optSecret.map(Buffers::copy).orElse(null);
     }
 
     @Override
     public final void setSecret(final @Nullable ByteBuffer secret) {
         doReset();
-        this.secret = Option.apply(copy(secret));
+        this.optSecret = Optional.ofNullable(secret).map(Buffers::copy);
     }
 
     @Override
     @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     public boolean equals(final @Nullable Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (!super.equals(obj))
+        }
+        if (!super.equals(obj)) {
             return false;
+        }
         final AbstractSecretKey<?> that = (AbstractSecretKey<?>) obj;
-        return Objects.equals(this.secret, that.secret);
+        return Objects.equals(this.optSecret, that.optSecret);
     }
 
     @Override
     public int hashCode() {
         int c = 17;
-        c = 31 * c + Objects.hashCode(secret);
+        c = 31 * c + Objects.hashCode(optSecret);
         return c;
     }
 
@@ -103,7 +106,6 @@ extends AbstractKey<K> implements SecretKey<K> {
      */
     @Override
     public String toString() {
-        return String.format("%s[secretSet=%b]",
-                super.toString(), isSecretSet());
+        return String.format("%s[secretSet=%b]", super.toString(), isSecretSet());
     }
 }

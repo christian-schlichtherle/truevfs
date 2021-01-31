@@ -10,6 +10,7 @@ import org.scalatest.wordspec.AnyWordSpec
 
 import java.nio.ByteOrder._
 import java.nio._
+import scala.annotation.nowarn
 
 /** @author Christian Schlichtherle */
 class PowerBufferSpec extends AnyWordSpec with ParallelTestExecution {
@@ -256,7 +257,7 @@ class PowerBufferSpec extends AnyWordSpec with ParallelTestExecution {
     mb position 1
     ib.position() should be(0)
     intercept[UnsupportedOperationException] {
-      ib position 1
+      ib position 1: @nowarn
     }
     ib.asMutableBuffer position 1
     ib.position() should be(0)

@@ -7,6 +7,7 @@ package net.java.truecommons.key.macosx.keychain;
 import net.java.truecommons.key.macosx.keychain.Keychain.AttributeClass;
 import net.java.truecommons.key.macosx.keychain.Keychain.Item;
 import net.java.truecommons.key.macosx.keychain.Keychain.Visitor;
+import net.java.truecommons.shed.Buffers;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -15,11 +16,12 @@ import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import static net.java.truecommons.key.macosx.keychain.Keychain.AttributeClass.*;
 import static net.java.truecommons.key.macosx.keychain.Keychain.ItemClass.GENERIC_PASSWORD;
 import static net.java.truecommons.shed.Buffers.byteBuffer;
-import static net.java.truecommons.shed.Buffers.string;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -47,7 +49,7 @@ public class KeychainIT {
 
     @Test
     public void createAndDeleteItemWithoutSearchAttributes()
-    throws KeychainException {
+            throws KeychainException {
         kc.createItem(GENERIC_PASSWORD,
                 build("createAndDeleteItemWithoutSearchAttributes").get(),
                 byteBuffer("töp secret"));
@@ -58,7 +60,7 @@ public class KeychainIT {
 
     @Test
     public void createAndDeleteItemWithSearchAttributes()
-    throws KeychainException {
+            throws KeychainException {
         kc.createItem(GENERIC_PASSWORD,
                 build("createAndDeleteItemWithSearchAttributes").get(),
                 byteBuffer("töp secret"));
@@ -71,7 +73,7 @@ public class KeychainIT {
 
     @Test
     public void createItemAndModifyServiceAttributeAndDelete()
-    throws KeychainException {
+            throws KeychainException {
         kc.createItem(GENERIC_PASSWORD,
                 build("öld createItemAndModifyServiceAttributeAndDelete").get(),
                 byteBuffer("töp secret"));
@@ -87,11 +89,11 @@ public class KeychainIT {
 
     @Test
     public void createItemAndModifyGenericAttributeAndDelete()
-    throws KeychainException {
+            throws KeychainException {
         kc.createItem(GENERIC_PASSWORD,
                 build("createItemAndModifyGenericAttributeAndDelete")
-                    .put(GENERIC, "öld generic")
-                    .get(),
+                        .put(GENERIC, "öld generic")
+                        .get(),
                 byteBuffer("töp secret"));
         final ModifyAttribute modify = new ModifyAttribute(
                 "createItemAndModifyGenericAttributeAndDelete",
@@ -101,15 +103,15 @@ public class KeychainIT {
         final Delete delete = new Delete("createItemAndModifyGenericAttributeAndDelete");
         kc.visitItems(GENERIC_PASSWORD,
                 build("createItemAndModifyGenericAttributeAndDelete")
-                    .put(GENERIC, "nëw generic")
-                    .get(),
+                        .put(GENERIC, "nëw generic")
+                        .get(),
                 delete);
         assertTrue(delete.deleted);
     }
 
     @Test
     public void createItemAndModifyPasswordAndDelete()
-    throws KeychainException {
+            throws KeychainException {
         kc.createItem(GENERIC_PASSWORD,
                 build("createItemAndModifyPasswordAndDelete").get(),
                 byteBuffer("öld secret"));
@@ -143,6 +145,14 @@ public class KeychainIT {
                 .put(ALIAS, "alias"); // not supported when reading
     }
 
+    private static String string(@Nullable ByteBuffer bb) {
+        return Optional
+                .ofNullable(bb)
+                .map(Buffers::charBuffer)
+                .map(Objects::toString)
+                .orElse(null);
+    }
+
     private static class MapBuilder {
 
         private Map<AttributeClass, ByteBuffer> map = new EnumMap<>(AttributeClass.class);
@@ -156,14 +166,17 @@ public class KeychainIT {
         }
 
         @SuppressWarnings("ReturnOfCollectionOrArrayField")
-        Map<AttributeClass, ByteBuffer> get() { return map; }
+        Map<AttributeClass, ByteBuffer> get() {
+            return map;
+        }
     }
 
     private static class ModifyAttribute implements Visitor {
 
         final String service;
         final AttributeClass id;
-        final @Nullable String string;
+        final @Nullable
+        String string;
         boolean modified;
 
         ModifyAttribute(
@@ -213,10 +226,14 @@ public class KeychainIT {
     private static class Delete implements Visitor {
 
         final String service;
-        final @Nullable String data;
+        final @Nullable
+        String data;
         boolean deleted;
 
-        Delete(final String service) { this(service, null); }
+        Delete(final String service) {
+            this(service, null);
+        }
+
         Delete(final String service, final @Nullable String data) {
             this.service = service;
             this.data = data;

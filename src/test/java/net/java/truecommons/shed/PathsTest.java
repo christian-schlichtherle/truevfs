@@ -4,18 +4,20 @@
  */
 package net.java.truecommons.shed;
 
+import org.junit.Test;
+
 import java.io.File;
 import java.net.URI;
+import java.util.Optional;
+
 import static net.java.truecommons.shed.Paths.cutTrailingSeparators;
 import static org.junit.Assert.*;
-import org.junit.Test;
 
 /**
  * @author Christian Schlichtherle
  */
 public class PathsTest {
 
-    @SuppressWarnings("RedundantStringConstructorCall")
     @Test
     public void testCutTrailingSeparators() {
         String path;
@@ -132,7 +134,7 @@ public class PathsTest {
 
     private void assertSplit(final String path) {
         final File file = new File(path);
-        final Option<String> parent = Option.apply(file.getParent());
+        final Optional<String> parent = Optional.ofNullable(file.getParent());
         final String member = file.getName();
 
         final PathSplitter splitter = Paths.split(path, File.separatorChar, false);

@@ -6,7 +6,6 @@ package net.java.truecommons.key.macosx;
 
 import net.java.truecommons.key.spec.common.AesKeyStrength;
 import net.java.truecommons.key.spec.common.AesPbeParameters;
-import net.java.truecommons.shed.Option;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +23,7 @@ import static org.junit.Assert.assertNull;
  */
 public class OsxKeyManagerTest {
 
-    private static final Logger
-            logger = LoggerFactory.getLogger(OsxKeyManagerTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(OsxKeyManagerTest.class);
 
     @Test
     public void testXmlSerialization() {
@@ -33,11 +31,11 @@ public class OsxKeyManagerTest {
         original.setChangeRequested(true);
         original.setKeyStrength(AesKeyStrength.BITS_256);
         original.setPassword("föo".toCharArray());
-        final ByteBuffer xml = serialize(Option.apply(original)).get(); // must not serialize password!
+        final ByteBuffer xml = serialize(original); // must not serialize password!
 
         logger.trace("Serialized form ({} bytes):\n{}", xml.remaining(), string(xml));
 
-        final AesPbeParameters clone = (AesPbeParameters) deserialize(Option.apply(xml)).get();
+        final AesPbeParameters clone = deserialize(xml);
         assertNull(clone.getPassword());
         original.setPassword(null);
         assertEquals(original, clone);

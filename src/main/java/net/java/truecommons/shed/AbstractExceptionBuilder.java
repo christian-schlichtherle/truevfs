@@ -4,34 +4,35 @@
  */
 package net.java.truecommons.shed;
 
+import java.util.Optional;
+
 import static java.util.Objects.requireNonNull;
 
 /**
  * Abstract implementation of an exception builder.
- * Subclasses must implement {@link #update(Throwable, Option)} and may
- * override {@link #post(Throwable)}.
+ * Subclasses must implement {@link #update(Throwable, Optional)} and may override {@link #post(Throwable)}.
  *
- * @param  <I> the type of the input exceptions.
- * @param  <O> the type of the assembled (output) exceptions.
+ * @param <I> the type of the input exceptions.
+ * @param <O> the type of the assembled (output) exceptions.
  * @author Christian Schlichtherle
  */
-@SuppressWarnings("LoopStatementThatDoesntLoop")
-public abstract class AbstractExceptionBuilder< I extends Throwable,
-                                                O extends Throwable>
-implements ExceptionBuilder<I, O> {
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+public abstract class AbstractExceptionBuilder<I extends Throwable,
+        O extends Throwable>
+        implements ExceptionBuilder<I, O> {
 
-    private Option<O> assembly = Option.none();
+    private Optional<O> assembly = Optional.empty();
 
     /**
      * {@inheritDoc}
      *
-     * @see #update(Throwable, Option)
+     * @see #update(Throwable, Optional)
      * @see #post(Throwable)
      */
     @Override
     public final O fail(I input) {
         final O assembly = update(input);
-        this.assembly = Option.none();
+        this.assembly = Optional.empty();
         return post(assembly);
     }
 
@@ -42,21 +43,24 @@ implements ExceptionBuilder<I, O> {
      * the given exception to the assembly for subsequent rethrowing upon a
      * call to {@link #check()}.
      *
-     * @see #update(Throwable, Option)
+     * @see #update(Throwable, Optional)
      */
     @Override
-    public final void warn(I input) { assembly = Option.some(update(input)); }
+    public final void warn(I input) {
+        assembly = Optional.of(update(input));
+    }
 
     /**
      * {@inheritDoc}
      *
-     * @see    #post(Throwable)
+     * @see #post(Throwable)
      */
     @Override
     public final void check() throws O {
-        final Option<O> assembly = this.assembly;
-        for (final O t : assembly) {
-            this.assembly = Option.none();
+        final Optional<O> assembly = this.assembly;
+        if (assembly.isPresent()) {
+            final O t = assembly.get();
+            this.assembly = Optional.empty();
             throw post(t);
         }
     }
@@ -68,11 +72,11 @@ implements ExceptionBuilder<I, O> {
     /**
      * Updates the given result of the assembly with the given input exception.
      *
-     * @param  input the input exception to handle.
-     * @param  assembly the optional previous result of the assembled exception.
+     * @param input    the input exception to handle.
+     * @param assembly the optional previous result of the assembled exception.
      * @return The next assembled (output) exception, never {@code null}.
      */
-    protected abstract O update(I input, Option<O> assembly);
+    protected abstract O update(I input, Optional<O> assembly);
 
     /**
      * This function gets called to post-process the given result of the
@@ -81,8 +85,10 @@ implements ExceptionBuilder<I, O> {
      * The implementation in the class {@link AbstractExceptionBuilder} simply
      * returns {@code assembly}.
      *
-     * @param  assembly the assembled (output) exception.
+     * @param assembly the assembled (output) exception.
      * @return The result of the optional post-processing.
      */
-    protected O post(O assembly) { return assembly; }
+    protected O post(O assembly) {
+        return assembly;
+    }
 }

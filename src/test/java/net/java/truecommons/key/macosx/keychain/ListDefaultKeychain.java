@@ -20,17 +20,19 @@ public class ListDefaultKeychain {
         final boolean data = 0 < args.length && "-data".equals(args[0]);
 
         final Visitor visitor = new Visitor() {
+
             final PrintStream out = System.out;
 
             @Override
             public void visit(final Item item) {
                 try {
                     out.printf("\nClass: %s\n", item.getItemClass());
-                    for (final Entry<AttributeClass, ByteBuffer> entry
-                            : item.getAttributeMap().entrySet())
-                        out.printf("Attribute: %s=%s\n",
-                                entry.getKey(), string(entry.getValue()));
-                    if (data) out.printf("Data: %s\n", string(item.getSecret()));
+                    for (Entry<AttributeClass, ByteBuffer> entry : item.getAttributeMap().entrySet()) {
+                        out.printf("Attribute: %s=%s\n", entry.getKey(), string(entry.getValue()));
+                    }
+                    if (data) {
+                        out.printf("Data: %s\n", string(item.getSecret()));
+                    }
                 } catch (final KeychainException ex) {
                     ex.printStackTrace();
                 }

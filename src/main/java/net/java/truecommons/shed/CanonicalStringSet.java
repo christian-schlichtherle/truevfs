@@ -259,11 +259,11 @@ public class CanonicalStringSet extends AbstractSet<String> {
         String map(Object o);
     } // Canonicalizer
 
-    @SuppressWarnings("LoopStatementThatDoesntLoop")
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final class CanonicalStringIterator implements Iterator<String> {
 
         private final StringTokenizer tokenizer;
-        private Option<String> canonical = Option.none();
+        private Optional<String> canonical = Optional.empty();
 
         private CanonicalStringIterator(final String list) {
             tokenizer = new StringTokenizer(list, "" + separator); // NOI18N
@@ -271,20 +271,23 @@ public class CanonicalStringSet extends AbstractSet<String> {
         }
 
         void advance() {
-            while (tokenizer.hasMoreTokens())
-                if (!(canonical = Option.apply(canonicalizer.map(tokenizer.nextToken()))).isEmpty())
+            while (tokenizer.hasMoreTokens()) {
+                if ((canonical = Optional.ofNullable(canonicalizer.map(tokenizer.nextToken()))).isPresent()) {
                     return;
-            canonical = Option.none();
+                }
+            }
+            canonical = Optional.empty();
         }
 
         @Override
         public boolean hasNext() {
-            return !canonical.isEmpty();
+            return canonical.isPresent();
         }
 
         @Override
         public String next() {
-            for (final String s : canonical) {
+            if (canonical.isPresent()) {
+                final String s = canonical.get();
                 advance();
                 return s;
             }

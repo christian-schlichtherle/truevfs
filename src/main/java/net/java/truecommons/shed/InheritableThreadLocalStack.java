@@ -6,6 +6,7 @@ package net.java.truecommons.shed;
 
 import java.lang.ref.WeakReference;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 /**
  * An inheritable thread local stack of items.
@@ -25,16 +26,17 @@ import java.util.NoSuchElementException;
  * <p>
  * This class is thread-safe.
  *
- * @param  <T> The type of the items in the inheritable thread local stack.
+ * @param <T> The type of the items in the inheritable thread local stack.
  * @author Christian Schlichtherle
  */
-@SuppressWarnings("LoopStatementThatDoesntLoop")
 public final class InheritableThreadLocalStack<T> {
 
-    private final InheritableThreadLocal<Option<Node<T>>> nodes
-            = new InheritableThreadLocal<Option<Node<T>>>() {
+    private final InheritableThreadLocal<Optional<Node<T>>> nodes = new InheritableThreadLocal<Optional<Node<T>>>() {
+
         @Override
-        protected Option<Node<T>> initialValue() { return Option.none(); }
+        protected Optional<Node<T>> initialValue() {
+            return Optional.empty();
+        }
     };
 
     /**
@@ -43,7 +45,7 @@ public final class InheritableThreadLocalStack<T> {
      * @return {@code true} if this stack is empty.
      */
     public boolean isEmpty() {
-        return nodes.get().isEmpty();
+        return !nodes.get().isPresent();
     }
 
     /**
@@ -51,30 +53,30 @@ public final class InheritableThreadLocalStack<T> {
      *
      * @return The top item of this stack or {@code null} if it's empty.
      */
-    public T peek() { return peekOrElse(null); }
+    public T peek() {
+        return peekOrElse(null);
+    }
 
     /**
      * Returns the nullable top item on this stack unless it's empty,
      * in which case {@code elze} gets returned.
      *
-     * @param  elze the nullable default item.
+     * @param elze the nullable default item.
      * @return The nullable top item on this stack unless it's empty,
-     *         in which case {@code elze} gets returned.
+     * in which case {@code elze} gets returned.
      */
-    public T peekOrElse(final T elze) {
-        for (Node<T> n : nodes.get())
-            return n.item;
-        return elze;
+    public T peekOrElse(T elze) {
+        return nodes.get().map(n -> n.item).orElse(elze);
     }
 
     /**
      * Pushes the given item onto this stack.
      *
-     * @param  item the nullable item to push onto this stack.
+     * @param item the nullable item to push onto this stack.
      * @return {@code item} - for fluent programming.
      */
     public T push(final T item) {
-        nodes.set(Option.some(new Node<>(nodes.get(), item)));
+        nodes.set(Optional.of(new Node<>(nodes.get(), item)));
         return item;
     }
 
@@ -85,10 +87,13 @@ public final class InheritableThreadLocalStack<T> {
      * @throws NoSuchElementException if this stack is empty.
      */
     public T pop() {
-        for (final Node<T> n : nodes.get()) {
-            if (!Thread.currentThread().equals(n.get()))
+        final Optional<Node<T>> optNode = nodes.get();
+        if (optNode.isPresent()) {
+            final Node<T> n = optNode.get();
+            if (!Thread.currentThread().equals(n.get())) {
                 throw new NoSuchElementException();
-            nodes.set(n.previous); // may be Option.none()
+            }
+            nodes.set(n.previous); // may be Optional.empty()
             return n.item;
         }
         throw new NoSuchElementException();
@@ -98,9 +103,9 @@ public final class InheritableThreadLocalStack<T> {
      * Removes and returns the nullable top item on this stack
      * if it's identical to the given item.
      *
-     * @param  expected The expected top item on this stack.
+     * @param expected The expected top item on this stack.
      * @throws IllegalStateException If the given item is not the top
-     *         item on this stack.
+     *                               item on this stack.
      */
     public void popIf(final T expected) {
         try {
@@ -114,17 +119,18 @@ public final class InheritableThreadLocalStack<T> {
         }
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private static final class Node<T> extends WeakReference<Thread> {
 
-        final Option<Node<T>> previous;
+        final Optional<Node<T>> previous;
+
         T item;
 
         /**
-         *
          * @param previous the optional previous node.
-         * @param item the nullable item.
+         * @param item     the nullable item.
          */
-        Node(final Option<Node<T>> previous, final T item) {
+        Node(final Optional<Node<T>> previous, final T item) {
             super(Thread.currentThread());
             this.previous = previous;
             this.item = item;

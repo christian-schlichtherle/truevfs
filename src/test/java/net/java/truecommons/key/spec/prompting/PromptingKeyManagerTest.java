@@ -11,6 +11,7 @@ import net.java.truecommons.key.spec.KeyManagerTestSuite;
  */
 public class PromptingKeyManagerTest extends KeyManagerTestSuite<PromptingKeyManager<?>> {
 
+    @SuppressWarnings("unchecked")
     @Override
     protected PromptingKeyManager<?> newKeyManager() {
         return new PromptingKeyManager(new TestView<>());

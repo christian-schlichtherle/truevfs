@@ -8,10 +8,10 @@ import net.java.truecommons.annotations.ServiceImplementation;
 import net.java.truecommons.key.spec.KeyManager;
 import net.java.truecommons.key.spec.common.AesPbeParameters;
 import net.java.truecommons.key.spec.spi.KeyManagerMapModifier;
-import net.java.truecommons.shed.Option;
 
 import javax.annotation.concurrent.Immutable;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ServiceConfigurationError;
 
 /**
@@ -32,7 +32,10 @@ extends KeyManagerMapModifier {
     public Map<Class<?>, KeyManager<?>> apply(
             final Map<Class<?>, KeyManager<?>> map) {
         if ("Mac OS X".equals(System.getProperty("os.name"))) {
-            for (final KeyManager<AesPbeParameters> km : Option.apply((KeyManager<AesPbeParameters>) map.get(AesPbeParameters.class))) {
+            final Optional<KeyManager<AesPbeParameters>> okm =
+                    Optional.ofNullable((KeyManager<AesPbeParameters>) map.get(AesPbeParameters.class));
+            if (okm.isPresent()) {
+                final KeyManager<AesPbeParameters> km = okm.get();
                 map.put(AesPbeParameters.class, new OsxKeyManager<>(km, AesPbeParameters.class));
                 return map;
             }

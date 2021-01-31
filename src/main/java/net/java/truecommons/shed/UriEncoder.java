@@ -23,19 +23,19 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * <a href="http://www.ietf.org/rfc/rfc2732.txt">RFC&nbsp;2732</a>
  * for IPv6 addresses.
  *
- * @see <a href="http://www.ietf.org/rfc/rfc2396.txt">
- *      RFC&nbsp;2396: Uniform Resource Identifiers (URI): Generic Syntax</a>
- * @see <a href="http://www.ietf.org/rfc/rfc2732.txt">
- *      RFC&nbsp;2732: Format for Literal IPv6 Addresses in URL's</a>
- * @see UriBuilder
  * @author Christian Schlichtherle
+ * @see <a href="http://www.ietf.org/rfc/rfc2396.txt">
+ * RFC&nbsp;2396: Uniform Resource Identifiers (URI): Generic Syntax</a>
+ * @see <a href="http://www.ietf.org/rfc/rfc2732.txt">
+ * RFC&nbsp;2732: Format for Literal IPv6 Addresses in URL's</a>
+ * @see UriBuilder
  */
-@SuppressWarnings("LoopStatementThatDoesntLoop")
+@SuppressWarnings({"rawtypes", "OptionalUsedAsFieldOrParameterType"})
 final class UriEncoder {
 
     private static final char[] HEX = {
-        '0', '1', '2', '3', '4', '5', '6', '7',
-        '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+            '0', '1', '2', '3', '4', '5', '6', '7',
+            '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
     };
 
     private static final String ALPHANUM_CHARS =
@@ -52,36 +52,42 @@ final class UriEncoder {
     /**
      * Constructs a new URI encoder which uses the UTF-8 character set to
      * escape non-US-ASCII characters.
-     * Equivalent to {@link #UriEncoder(Option, boolean) UriEncoder(UTF8, false)}.
+     * Equivalent to {@link #UriEncoder(Optional, boolean) UriEncoder(UTF8, false)}.
      */
-    UriEncoder() { this(Option.some(UTF_8), false); }
+    UriEncoder() {
+        this(Optional.of(UTF_8), false);
+    }
 
     /**
      * Constructs a new URI codec which uses the UTF-8 character set to encode
      * non-US-ASCII characters.
-     * Equivalent to {@link #UriEncoder(Option, boolean) UriEncoder(UTF8, false)}.
+     * Equivalent to {@link #UriEncoder(Optional, boolean) UriEncoder(UTF8, false)}.
      *
      * @param raw If {@code true}, then the {@code '%'} character doesn't get
-     *        quoted.
+     *            quoted.
      */
-    UriEncoder(boolean raw) { this(Option.some(UTF_8), raw); }
+    UriEncoder(boolean raw) {
+        this(Optional.of(UTF_8), raw);
+    }
 
     /**
      * Constructs a new URI codec which uses the given character set to encode
      * non-US-ASCII characters.
-     * Equivalent to {@link #UriEncoder(Option, boolean) UriEncoder(charset, false)}.
+     * Equivalent to {@link #UriEncoder(Optional, boolean) UriEncoder(charset, false)}.
      *
      * @param charset the character set to use for encoding non-US-ASCII
-     *        characters.
-     *        If this parameter is {@code null},
-     *        then non-US-ASCII characters will get encoded to {@code UTF-8}
-     *        if and only if {@link Character#isISOControl(char)} or
-     *        {@link Character#isSpaceChar(char)} is {@code true},
-     *        so that most non-US-ASCII character would get preserved.
-     *        Note that providing any other value than {@code null} or
-     *        {@code UTF-8} will void interoperability with most applications.
+     *                characters.
+     *                If this parameter is {@code null},
+     *                then non-US-ASCII characters will get encoded to {@code UTF-8}
+     *                if and only if {@link Character#isISOControl(char)} or
+     *                {@link Character#isSpaceChar(char)} is {@code true},
+     *                so that most non-US-ASCII character would get preserved.
+     *                Note that providing any other value than {@code null} or
+     *                {@code UTF-8} will void interoperability with most applications.
      */
-    UriEncoder(Option<Charset> charset) { this(charset, false); }
+    UriEncoder(Optional<Charset> charset) {
+        this(charset, false);
+    }
 
     /**
      * Constructs a new URI codec which uses the given character set to escape
@@ -89,25 +95,28 @@ final class UriEncoder {
      * <p>
      *
      * @param charset the character set to use for encoding non-US-ASCII
-     *        characters.
-     *        If this parameter is {@code null},
-     *        then non-US-ASCII characters will get encoded to {@code UTF-8}
-     *        if and only if {@link Character#isISOControl(char)} or
-     *        {@link Character#isSpaceChar(char)} is {@code true},
-     *        so that most non-US-ASCII character would get preserved.
-     *        Note that providing any other value than {@code null} or
-     *        {@code UTF_8} will void interoperability with most applications.
-     * @param raw If {@code true}, then the {@code '%'} character doesn't get
-     *        quoted.
+     *                characters.
+     *                If this parameter is {@code null},
+     *                then non-US-ASCII characters will get encoded to {@code UTF-8}
+     *                if and only if {@link Character#isISOControl(char)} or
+     *                {@link Character#isSpaceChar(char)} is {@code true},
+     *                so that most non-US-ASCII character would get preserved.
+     *                Note that providing any other value than {@code null} or
+     *                {@code UTF_8} will void interoperability with most applications.
+     * @param raw     If {@code true}, then the {@code '%'} character doesn't get
+     *                quoted.
      */
-    UriEncoder(Option<Charset> charset, final boolean raw) {
-        if (!(this.encode = !charset.isEmpty()))
-            charset = Option.some(UTF_8);
+    UriEncoder(Optional<Charset> charset, final boolean raw) {
+        if (!(this.encode = charset.isPresent())) {
+            charset = Optional.of(UTF_8);
+        }
         this.encoder = charset.get().newEncoder();
         this.raw = raw;
     }
 
-    boolean isRaw() {return raw; }
+    boolean isRaw() {
+        return raw;
+    }
 
     /**
      * Encodes all characters in the string {@code dS} which are illegal within
@@ -117,20 +126,21 @@ final class UriEncoder {
      * escape sequences again, that is, each occurence of the character
      * {@code '%'} is substituted with the string {@code "%25"} again.
      *
-     * @param  component the URI component to encode.
-     * @param  ds the decoded string to encode.
+     * @param component the URI component to encode.
+     * @param ds        the decoded string to encode.
      * @return The encoded string.
      * @throws IllegalArgumentException on any encoding error with a
-     *         {@link URISyntaxException} as its
-     *         {@link IllegalArgumentException#getCause() cause}.
-     *         This exception should never occur if the character set of this
-     *         codec is UTF-8.
+     *                                  {@link URISyntaxException} as its
+     *                                  {@link IllegalArgumentException#getCause() cause}.
+     *                                  This exception should never occur if the character set of this
+     *                                  codec is UTF-8.
      */
     String encode(Encoding component, String ds) {
         stringBuilder.setLength(0);
         try {
-            if (encode(component, ds, stringBuilder))
+            if (encode(component, ds, stringBuilder)) {
                 return stringBuilder.toString();
+            }
         } catch (URISyntaxException ex) {
             throw new IllegalArgumentException(ex);
         }
@@ -145,38 +155,40 @@ final class UriEncoder {
      * any escape sequences again, that is, each occurence of the character
      * {@code '%'} is substituted with the string {@code "%25"} again.
      *
-     * @param  component the URI component to encode.
-     * @param  ds the decoded string to encode.
-     * @param  esb the encoded string builder to which all encoded characters
-     *             shall get appended.
+     * @param component the URI component to encode.
+     * @param ds        the decoded string to encode.
+     * @param esb       the encoded string builder to which all encoded characters
+     *                  shall get appended.
      * @return Whether or not any characters in {@code ds} had to be encoded.
      * @throws URISyntaxException on any encoding error.
-     *         This exception should never occur if the character set of this
-     *         codec is UTF-8.
-     *         If it occurs however, {@code esb} is left in an undefined state.
+     *                            This exception should never occur if the character set of this
+     *                            codec is UTF-8.
+     *                            If it occurs however, {@code esb} is left in an undefined state.
      */
     boolean encode(final Encoding component, final String ds, final StringBuilder esb)
-    throws URISyntaxException {
-        final CharBuffer dcb = CharBuffer.wrap(ds); // decoded character buffer
-        final Optional[] oess = component.escapes;    // optional escape sequences
-        Option<ByteBuffer> oebb = Option.none();    // optional encoded byte buffer
+            throws URISyntaxException {
+        final CharBuffer dcb = CharBuffer.wrap(ds);     // decoded character buffer
+        final Optional[] oess = component.escapes;      // optional escape sequences
+        Optional<ByteBuffer> oebb = Optional.empty();   // optional encoded byte buffer
         while (dcb.hasRemaining()) {
             dcb.mark();
             final char dc = dcb.get(); // decoded character
             if (dc < 0x80) {
-                final Optional<String> oes = oess[dc]; // optional escape sequence
+                final Optional oes = oess[dc]; // optional escape sequence
                 if (!(!oes.isPresent() || '%' == dc && isRaw())) {
-                    if (oebb.isEmpty())
-                        oebb = Option.some(ByteBuffer.allocate(3));
+                    if (!oebb.isPresent()) {
+                        oebb = Optional.of(ByteBuffer.allocate(3));
+                    }
                     esb.append(oes.get());
-                }  else {
+                } else {
                     esb.append(dc);
                 }
             } else if (Character.isISOControl(dc) ||
-                       Character.isSpaceChar(dc)  ||
-                       encode) {
-                if (oebb.isEmpty())
-                    oebb = Option.some(ByteBuffer.allocate(3));
+                    Character.isSpaceChar(dc) ||
+                    encode) {
+                if (!oebb.isPresent()) {
+                    oebb = Optional.of(ByteBuffer.allocate(3));
+                }
                 final int p = dcb.position();
                 dcb.reset();
                 dcb.limit(p);
@@ -196,7 +208,7 @@ final class UriEncoder {
                 esb.append(dc);
             }
         }
-        return !oebb.isEmpty();
+        return oebb.isPresent();
     }
 
     private static void quote(char dc, StringBuilder eS) {
@@ -208,7 +220,7 @@ final class UriEncoder {
             final byte eb = eB.get();
             eS.append('%');
             eS.append(HEX[(eb >> 4) & 0xf]);
-            eS.append(HEX[ eb       & 0xf]);
+            eS.append(HEX[eb & 0xf]);
         }
     }
 
@@ -225,7 +237,9 @@ final class UriEncoder {
          */
         ANY(DEFAULT_LEGAL_CHARS),
 
-        /** Encoding for exclusive use with the URI authority component. */
+        /**
+         * Encoding for exclusive use with the URI authority component.
+         */
         AUTHORITY(DEFAULT_LEGAL_CHARS + ":[]"),
 
         /**
@@ -246,10 +260,14 @@ final class UriEncoder {
          */
         ABSOLUTE_PATH(DEFAULT_LEGAL_CHARS + ":/"),
 
-        /** Encoding for exclusive use with the URI query component. */
+        /**
+         * Encoding for exclusive use with the URI query component.
+         */
         QUERY(DEFAULT_LEGAL_CHARS + ":/?"),
 
-        /** Encoding for exclusive use with the URI fragment component. */
+        /**
+         * Encoding for exclusive use with the URI fragment component.
+         */
         FRAGMENT(DEFAULT_LEGAL_CHARS + ":/?");
 
         private final Optional[] escapes = new Optional[0x80];

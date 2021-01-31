@@ -10,6 +10,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
+import java.util.Optional;
 
 import static java.nio.charset.CoderResult.OVERFLOW;
 import static java.nio.charset.CoderResult.UNDERFLOW;
@@ -22,14 +23,14 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * <a href="http://www.ietf.org/rfc/rfc2732.txt">RFC&nbsp;2732</a>
  * for IPv6 addresses.
  *
- * @see <a href="http://www.ietf.org/rfc/rfc2396.txt">
- *      RFC&nbsp;2396: Uniform Resource Identifiers (URI): Generic Syntax</a>
- * @see <a href="http://www.ietf.org/rfc/rfc2732.txt">
- *      RFC&nbsp;2732: Format for Literal IPv6 Addresses in URL's</a>
- * @see UriEncoder
  * @author Christian Schlichtherle
+ * @see <a href="http://www.ietf.org/rfc/rfc2396.txt">
+ * RFC&nbsp;2396: Uniform Resource Identifiers (URI): Generic Syntax</a>
+ * @see <a href="http://www.ietf.org/rfc/rfc2732.txt">
+ * RFC&nbsp;2732: Format for Literal IPv6 Addresses in URL's</a>
+ * @see UriEncoder
  */
-@SuppressWarnings("LoopStatementThatDoesntLoop")
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 final class UriDecoder {
 
     private final StringBuilder stringBuilder = new StringBuilder();
@@ -39,22 +40,23 @@ final class UriDecoder {
      * Constructs a new URI decoder which uses the UTF-8 character set to
      * decode non-US-ASCII characters.
      */
-    UriDecoder() { this(Option.<Charset>none()); }
+    UriDecoder() {
+        this(Optional.empty());
+    }
 
     /**
      * Constructs a new URI decoder which uses the given character set to
      * decode non-US-ASCII characters.
-     * 
-     * @param charset the character set to use for encoding non-US-ASCII
-     *        characters.
-     *        If this parameter is {@code null}, then it defaults to
-     *        {@code UTF-8}.
-     *        Note that providing any other value than {@code null} or
-     *        {@code UTF-8} will void interoperability with most applications.
+     *
+     * @param charset the character set to use for encoding non-US-ASCII characters.
+     *                If this parameter is {@code null}, then it defaults to {@code UTF-8}.
+     *                Note that providing any other value than {@code null} or {@code UTF-8} will void interoperability
+     *                with most applications.
      */
-    UriDecoder(Option<Charset> charset) {
-        if (charset.isEmpty())
-            charset = Option.some(UTF_8);
+    UriDecoder(Optional<Charset> charset) {
+        if (!charset.isPresent()) {
+            charset = Optional.of(UTF_8);
+        }
         this.decoder = charset.get().newDecoder();
     }
 
@@ -63,12 +65,11 @@ final class UriDecoder {
      * each occurence of "%<i>XX</i>", where <i>X</i> is a hexadecimal digit,
      * gets substituted with the corresponding single byte and the resulting
      * string gets decoded using the character set provided to the constructor.
-     * 
-     * @param  es the encoded string to decode.
+     *
+     * @param es the encoded string to decode.
      * @return The decoded string.
-     * @throws IllegalArgumentException on any decoding error with a
-     *         {@link URISyntaxException} as its
-     *         {@link IllegalArgumentException#getCause() cause}.
+     * @throws IllegalArgumentException on any decoding error with a {@link URISyntaxException} as its
+     *                                  {@link IllegalArgumentException#getCause() cause}.
      */
     String decode(String es) {
         stringBuilder.setLength(0);
@@ -87,34 +88,34 @@ final class UriDecoder {
      * gets substituted with the corresponding single byte and the resulting
      * string gets decoded to the string builder {@code dS} using the character
      * set provided to the constructor.
-     * 
-     * @param es the encoded string to decode.
+     *
+     * @param es  the encoded string to decode.
      * @param dsb the string builder to which all decoded characters shall get
      *            appended.
      * @return Whether or not any characters in {@code es} had to be decoded.
      * @throws URISyntaxException on any decoding error.
-     *         This exception will leave {@code dsb} in an undefined state.
+     *                            This exception will leave {@code dsb} in an undefined state.
      */
     boolean decode(final String es, final StringBuilder dsb)
-    throws URISyntaxException {
-        final CharBuffer ecb = CharBuffer.wrap(es); // encoded character buffer
-        Option<ByteBuffer> oebb = Option.none();    // optional encoded byte buffer
-        Option<CharBuffer> odcb = Option.none();    // optional decoded character buffer
+            throws URISyntaxException {
+        final CharBuffer ecb = CharBuffer.wrap(es);     // encoded character buffer
+        Optional<ByteBuffer> oebb = Optional.empty();   // optional encoded byte buffer
+        Optional<CharBuffer> odcb = Optional.empty();   // optional decoded character buffer
         while (true) {
             ecb.mark();
             final int ec = ecb.hasRemaining() ? (ecb.get() & 0xFFFF) : -1; // encoded character (unsigned!)
             if ('%' == ec) {
-                if (oebb.isEmpty()) {
+                if (!oebb.isPresent()) {
                     final int capacity = (ecb.remaining() + 1) / 3;
-                    oebb = Option.some(ByteBuffer.allocate(capacity));
-                    odcb = Option.some(CharBuffer.allocate(capacity));
+                    oebb = Optional.of(ByteBuffer.allocate(capacity));
+                    odcb = Optional.of(CharBuffer.allocate(capacity));
                 }
                 final int eb = dequote(ecb); // encoded byte
                 if (eb < 0)
                     throw new URISyntaxException(es, "illegal escape sequence", ecb.reset().position());
                 oebb.get().put((byte) eb);
             } else {
-                if (!oebb.isEmpty() && 0 < oebb.get().position()) {
+                if (oebb.isPresent() && 0 < oebb.get().position()) {
                     oebb.get().flip();
                     { // Decode ebb -> dcb.
                         CoderResult cr;
@@ -134,7 +135,7 @@ final class UriDecoder {
                 dsb.append((char) ec);
             }
         }
-        return !oebb.isEmpty();
+        return oebb.isPresent();
     }
 
     private static int dequote(final CharBuffer ecb) {

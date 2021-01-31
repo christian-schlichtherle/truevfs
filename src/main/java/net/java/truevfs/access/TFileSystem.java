@@ -4,6 +4,16 @@
  */
 package net.java.truevfs.access;
 
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.Entry.Access;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.OutputSocket;
+import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.FilteringIterator;
+import net.java.truevfs.kernel.spec.*;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,45 +23,26 @@ import java.nio.file.*;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.attribute.*;
 import java.util.*;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
-import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.cio.Entry;
-import net.java.truecommons.cio.Entry.Access;
+
 import static net.java.truecommons.cio.Entry.Access.*;
 import static net.java.truecommons.cio.Entry.Size.DATA;
 import static net.java.truecommons.cio.Entry.Type.*;
 import static net.java.truecommons.cio.Entry.UNKNOWN;
-import net.java.truecommons.cio.InputSocket;
-import net.java.truecommons.cio.OutputSocket;
-import net.java.truecommons.shed.BitField;
-import net.java.truecommons.shed.FilteringIterator;
-import net.java.truevfs.kernel.spec.FsAccessOption;
 import static net.java.truevfs.kernel.spec.FsAccessOption.CACHE;
 import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsNode;
-import net.java.truevfs.kernel.spec.FsNodeName;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
-import net.java.truevfs.kernel.spec.FsSyncException;
-import net.java.truevfs.kernel.spec.FsSyncOption;
 import static net.java.truevfs.kernel.spec.FsSyncOptions.UMOUNT;
-import net.java.truevfs.kernel.spec.FsSyncWarningException;
 
 /**
  * A {@link FileSystem} implementation for use with NIO.2.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public final class TFileSystem extends FileSystem {
 
     private final FsController controller;
     private final TFileSystemProvider provider;
 
-    @SuppressWarnings("deprecation")
     TFileSystem(final TPath path) {
         assert null != path;
         this.controller = TConfig
@@ -69,7 +60,9 @@ public final class TFileSystem extends FileSystem {
         return true;
     }
 
-    private FsController getController() { return controller; }
+    private FsController getController() {
+        return controller;
+    }
 
     FsMountPoint getMountPoint() {
         return getController().getModel().getMountPoint();
@@ -92,13 +85,13 @@ public final class TFileSystem extends FileSystem {
      * {@link #sync(BitField) sync(FsSyncOptions.UMOUNT)}.
      *
      * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         apply.
-     *         This implies that the respective parent file system has been
-     *         synchronized with constraints, e.g. if an unclosed archive entry
-     *         stream gets forcibly closed.
-     * @throws FsSyncException if any error conditions apply.
-     *         This implies some loss of data!
-     * @see    #sync(BitField)
+     *                                apply.
+     *                                This implies that the respective parent file system has been
+     *                                synchronized with constraints, e.g. if an unclosed archive entry
+     *                                stream gets forcibly closed.
+     * @throws FsSyncException        if any error conditions apply.
+     *                                This implies some loss of data!
+     * @see #sync(BitField)
      */
     @Override
     public void close() throws FsSyncWarningException, FsSyncException {
@@ -110,25 +103,23 @@ public final class TFileSystem extends FileSystem {
      * federated child file systems to their respective parent file system with
      * respect to the given options.
      *
-     * @param  options a bit field of options for the synchronization operation.
+     * @param options a bit field of options for the synchronization operation.
      * @throws IllegalArgumentException if the combination of synchronization
-     *         options is illegal, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if
-     *         {@code FsSyncOption.ABORT_CHANGES} is set.
-     * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         apply.
-     *         This implies that the respective parent file system has been
-     *         synchronized with constraints, e.g. if
-     *         {@code FsSyncOption.FORCE_CLOSE_INPUT} or
-     *         {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
-     *         archive entry stream gets forcibly closed.
-     * @throws FsSyncException if any error conditions apply.
-     *         This implies some loss of data!
+     *                                  options is illegal, e.g. if
+     *                                  {@code FsSyncOption.FORCE_CLOSE_INPUT} is cleared and
+     *                                  {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set or if
+     *                                  {@code FsSyncOption.ABORT_CHANGES} is set.
+     * @throws FsSyncWarningException   if <em>only</em> warning conditions
+     *                                  apply.
+     *                                  This implies that the respective parent file system has been
+     *                                  synchronized with constraints, e.g. if
+     *                                  {@code FsSyncOption.FORCE_CLOSE_INPUT} or
+     *                                  {@code FsSyncOption.FORCE_CLOSE_OUTPUT} is set and an unclosed
+     *                                  archive entry stream gets forcibly closed.
+     * @throws FsSyncException          if any error conditions apply.
+     *                                  This implies some loss of data!
      */
-    @SuppressWarnings("deprecation")
-    public void sync(BitField<FsSyncOption> options)
-    throws FsSyncWarningException, FsSyncException {
+    public void sync(BitField<FsSyncOption> options) throws FsSyncWarningException, FsSyncException {
         TVFS.sync(getMountPoint(), options);
     }
 
@@ -168,7 +159,9 @@ public final class TFileSystem extends FileSystem {
                 new TPath(getMountPoint().toHierarchicalUri().resolve(SEPARATOR)));
     }
 
-    /** @throws UnsupportedOperationException always */
+    /**
+     * @throws UnsupportedOperationException always
+     */
     @Override
     public Iterable<FileStore> getFileStores() {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -193,26 +186,32 @@ public final class TFileSystem extends FileSystem {
      * discarded.
      *
      * @param first the first sub path string.
-     * @param more optional sub path strings.
+     * @param more  optional sub path strings.
      */
     @Override
     public TPath getPath(String first, String... more) {
         return new TPath(this, first, more);
     }
 
-    /** @throws UnsupportedOperationException always */
+    /**
+     * @throws UnsupportedOperationException always
+     */
     @Override
     public PathMatcher getPathMatcher(String syntaxAndPattern) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    /** @throws UnsupportedOperationException always */
+    /**
+     * @throws UnsupportedOperationException always
+     */
     @Override
     public UserPrincipalLookupService getUserPrincipalLookupService() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    /** @throws UnsupportedOperationException always */
+    /**
+     * @throws UnsupportedOperationException always
+     */
     @Override
     public WatchService newWatchService() throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -222,7 +221,7 @@ public final class TFileSystem extends FileSystem {
             final TPath path,
             final Set<? extends OpenOption> options,
             final FileAttribute<?>... attrs)
-    throws IOException {
+            throws IOException {
         final FsNodeName name = path.getNodeName();
         final FsController controller = getController();
         if (options.isEmpty() || options.contains(StandardOpenOption.READ)) {
@@ -249,29 +248,25 @@ public final class TFileSystem extends FileSystem {
     }
 
     InputStream newInputStream(TPath path, OpenOption... options)
-    throws IOException {
+            throws IOException {
         return getController()
                 .input(path.inputOptions(options), path.getNodeName())
                 .stream(null);
     }
 
     OutputStream newOutputStream(TPath path, OpenOption... options)
-    throws IOException {
+            throws IOException {
         return getController()
                 .output(path.outputOptions(options), path.getNodeName(), null)
                 .stream(null);
     }
 
-    DirectoryStream<Path> newDirectoryStream(
-            final TPath path,
-            final Filter<? super Path> filter)
-    throws IOException {
+    DirectoryStream<Path> newDirectoryStream(final TPath path, final Filter<? super Path> filter) throws IOException {
         final FsNode entry = stat(path);
         final Set<String> set;
         if (null == entry || null == (set = entry.getMembers()))
             throw new NotDirectoryException(path.toString());
 
-        @NotThreadSafe
         class Adapter implements Iterator<Path> {
             final Iterator<String> it = set.iterator();
 
@@ -289,11 +284,13 @@ public final class TFileSystem extends FileSystem {
             public void remove() {
                 throw new UnsupportedOperationException("Not supported yet.");
             }
-        } // Adapter
+        }
 
-        @NotThreadSafe
         class FilterIterator extends FilteringIterator<Path> {
-            FilterIterator() { super(new Adapter()); }
+
+            FilterIterator() {
+                super(new Adapter());
+            }
 
             @Override
             protected boolean accept(Path element) {
@@ -303,12 +300,11 @@ public final class TFileSystem extends FileSystem {
                     throw new DirectoryIteratorException(ex);
                 }
             }
-        } // FilterIterator
+        }
 
-        return  new Stream(new FilterIterator());
+        return new Stream(new FilterIterator());
     }
 
-    @NotThreadSafe
     private static final class Stream implements DirectoryStream<Path> {
         final Iterator<Path> it;
         boolean consumed;
@@ -329,10 +325,10 @@ public final class TFileSystem extends FileSystem {
         public void close() {
             consumed = true;
         }
-    } // Stream
+    }
 
     void createDirectory(final TPath path, final FileAttribute<?>... attrs)
-    throws IOException {
+            throws IOException {
         if (0 < attrs.length)
             throw new UnsupportedOperationException();
         final FsController controller = getController();
@@ -359,19 +355,19 @@ public final class TFileSystem extends FileSystem {
         return getController().node(path.getAccessPreferences(), path.getNodeName());
     }
 
-    InputSocket<?> input(   TPath path,
-                            BitField<FsAccessOption> options) {
+    InputSocket<?> input(TPath path,
+                         BitField<FsAccessOption> options) {
         return getController().input(options, path.getNodeName());
     }
 
-    OutputSocket<?> output( TPath path,
-                            BitField<FsAccessOption> options,
-                            @CheckForNull Entry template) {
+    OutputSocket<?> output(TPath path,
+                           BitField<FsAccessOption> options,
+                           @CheckForNull Entry template) {
         return getController().output(options, path.getNodeName(), template);
     }
 
     void checkAccess(final TPath path, final AccessMode... modes)
-    throws IOException {
+            throws IOException {
         final FsNodeName name = path.getNodeName();
         final BitField<FsAccessOption> options = path.getAccessPreferences();
         final BitField<Access> types = types(modes);
@@ -382,15 +378,15 @@ public final class TFileSystem extends FileSystem {
         final EnumSet<Access> access = EnumSet.noneOf(Access.class);
         for (final AccessMode mode : modes) {
             switch (mode) {
-            case READ:
-                access.add(READ);
-                break;
-            case WRITE:
-                access.add(WRITE);
-                break;
-            case EXECUTE:
-                access.add(EXECUTE);
-                break;
+                case READ:
+                    access.add(READ);
+                    break;
+                case WRITE:
+                    access.add(WRITE);
+                    break;
+                case EXECUTE:
+                    access.add(EXECUTE);
+                    break;
             }
         }
         return BitField.copyOf(access);
@@ -410,7 +406,7 @@ public final class TFileSystem extends FileSystem {
             TPath path,
             Class<A> type,
             LinkOption... options)
-    throws IOException {
+            throws IOException {
         if (type.isAssignableFrom(BasicFileAttributes.class))
             return type.cast(new FsNodeAttributes(path));
         throw new UnsupportedOperationException();
@@ -434,10 +430,10 @@ public final class TFileSystem extends FileSystem {
         }
 
         @Override
-        public void setTimes(   final FileTime lastModifiedTime,
-                                final FileTime lastAccessTime,
-                                final FileTime createTime)
-        throws IOException {
+        public void setTimes(final FileTime lastModifiedTime,
+                             final FileTime lastAccessTime,
+                             final FileTime createTime)
+                throws IOException {
             final FsController controller = getController();
             final Map<Access, Long> times = new EnumMap<>(Access.class);
             if (null != lastModifiedTime)
@@ -450,7 +446,7 @@ public final class TFileSystem extends FileSystem {
                     path.getAccessPreferences(), path.getNodeName(),
                     times);
         }
-    } // FsNodeAttributeView
+    }
 
     private final class FsNodeAttributes implements BasicFileAttributes {
         private final FsNode entry;
@@ -502,10 +498,12 @@ public final class TFileSystem extends FileSystem {
             return UNKNOWN == size ? 0 : size;
         }
 
-        /** @throws UnsupportedOperationException always */
+        /**
+         * @throws UnsupportedOperationException always
+         */
         @Override
         public Object fileKey() {
             throw new UnsupportedOperationException("Not supported yet.");
         }
-    } // FsNodeAttributes
+    }
 }

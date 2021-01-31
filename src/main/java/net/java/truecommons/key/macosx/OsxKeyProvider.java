@@ -7,29 +7,27 @@ package net.java.truecommons.key.macosx;
 import net.java.truecommons.key.spec.KeyProvider;
 import net.java.truecommons.key.spec.UnknownKeyException;
 import net.java.truecommons.key.spec.prompting.AbstractPromptingPbeParameters;
-import net.java.truecommons.shed.Option;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.ThreadSafe;
 import java.net.URI;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Interacts with the {@link OsxKeyManager} to persist passwords into Apple's
  * Keychain Services API.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
+ * @since TrueCommons 2.2
  */
-@SuppressWarnings("LoopStatementThatDoesntLoop")
 @ThreadSafe
-final class OsxKeyProvider<P extends AbstractPromptingPbeParameters<P, ?>>
-implements KeyProvider<P> {
+final class OsxKeyProvider<P extends AbstractPromptingPbeParameters<P, ?>> implements KeyProvider<P> {
 
     private final OsxKeyManager<P> manager;
     private final URI resource;
     private final KeyProvider<P> provider;
-    private volatile Option<P> param = Option.none();
+    private volatile Optional<P> param = Optional.empty();
 
     OsxKeyProvider(
             final OsxKeyManager<P> manager,
@@ -42,38 +40,43 @@ implements KeyProvider<P> {
 
     @Override
     public P getKeyForWriting() throws UnknownKeyException {
-        Option<P> op = param;
-        if (op.isEmpty())
+        Optional<P> op = param;
+        if (!op.isPresent())
             op = manager.getKey(resource);
-        for (P p : op)
-            if (!p.isChangeRequested())
+        if (op.isPresent()) {
+            final P p = op.get();
+            if (!p.isChangeRequested()) {
                 return p.clone();
-        final Option<P> np = Option.some(provider.getKeyForWriting());
+            }
+        }
+        final Optional<P> np = Optional.of(provider.getKeyForWriting());
         if (!np.equals(op))
             manager.setKey(resource, np);
         return (param = np).get();
     }
 
     @Override
-    public P getKeyForReading(final boolean invalid)
-    throws UnknownKeyException {
+    public P getKeyForReading(final boolean invalid) throws UnknownKeyException {
         if (!invalid) {
-            Option<P> op = param;
-            if (op.isEmpty())
+            Optional<P> op = param;
+            if (!op.isPresent()) {
                 op = manager.getKey(resource);
-            for (P p : op)
-                return p.clone();
+            }
+            if (op.isPresent()) {
+                return op.get().clone();
+            }
         }
         return provider.getKeyForReading(invalid);
     }
 
     @Override
     public void setKey(final @Nullable P key) {
-        final Option<P> op = param;
-        final Option<P> np = Option.apply(key);
+        final Optional<P> op = param;
+        final Optional<P> np = Optional.ofNullable(key);
         provider.setKey(key);
-        if (!Objects.equals(np, op))
+        if (!Objects.equals(np, op)) {
             manager.setKey(resource, np);
+        }
         param = np;
     }
 }

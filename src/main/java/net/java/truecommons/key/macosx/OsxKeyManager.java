@@ -15,7 +15,6 @@ import net.java.truecommons.key.spec.KeyManager;
 import net.java.truecommons.key.spec.KeyProvider;
 import net.java.truecommons.key.spec.prompting.AbstractPromptingPbeParameters;
 import net.java.truecommons.logging.LocalizedLogger;
-import net.java.truecommons.shed.Option;
 
 import javax.annotation.concurrent.ThreadSafe;
 import java.beans.XMLDecoder;
@@ -28,6 +27,7 @@ import java.nio.ByteBuffer;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import static net.java.truecommons.key.macosx.keychain.Keychain.AttributeClass.GENERIC;
 import static net.java.truecommons.key.macosx.keychain.Keychain.AttributeClass.SERVICE;
@@ -37,13 +37,13 @@ import static net.java.truecommons.shed.Buffers.*;
 /**
  * Uses Apple's Keychain Services API to persist passwords.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
+ * @since TrueCommons 2.2
  */
-@SuppressWarnings("LoopStatementThatDoesntLoop")
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @ThreadSafe
 public final class OsxKeyManager<P extends AbstractPromptingPbeParameters<P, ?>>
-extends AbstractKeyManager<P> {
+        extends AbstractKeyManager<P> {
 
     private static final String KEYCHAIN = "TrueCommons KeyManager";
     private static final String ACCOUNT = KEYCHAIN;
@@ -70,7 +70,7 @@ extends AbstractKeyManager<P> {
 
     @Override
     public void link(final URI originUri, final URI targetUri) {
-        final Option<P> param = getKey(originUri);
+        final Optional<P> param = getKey(originUri);
         manager.link(originUri, targetUri);
         setKey(targetUri, param);
     }
@@ -78,43 +78,38 @@ extends AbstractKeyManager<P> {
     @Override
     public void unlink(final URI uri) {
         manager.unlink(uri);
-        setKey(uri, Option.<P>none());
+        setKey(uri, Optional.empty());
     }
 
-    Option<P> getKey(final URI uri) {
+    Optional<P> getKey(final URI uri) {
         final GetKeyAction action = new GetKeyAction();
         runAction(uri, action);
-        return action.param;
+        return action.optParam;
     }
 
-    void setKey(final URI uri, final Option<P> optionalParam) {
+    void setKey(URI uri, Optional<P> optionalParam) {
         runAction(uri, new SetKeyAction(optionalParam));
     }
 
-    static Option<ByteBuffer> serialize(final Option<?> optionalObject) {
-        for (final Object object : optionalObject) {
-            try (final ByteArrayOutputStream bos = new ByteArrayOutputStream(512)) {
-                try (XMLEncoder encoder = new XMLEncoder(bos)) {
-                    encoder.writeObject(object);
-                }
-                bos.flush(); // redundant
-                return Option.some(copy(ByteBuffer.wrap(bos.toByteArray())));
-            } catch (IOException e) {
-                throw new IllegalArgumentException(e);
+    static ByteBuffer serialize(final Object object) {
+        try (final ByteArrayOutputStream bos = new ByteArrayOutputStream(512)) {
+            try (XMLEncoder encoder = new XMLEncoder(bos)) {
+                encoder.writeObject(object);
             }
+            bos.flush(); // redundant
+            return copy(ByteBuffer.wrap(bos.toByteArray()));
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
         }
-        return Option.none();
     }
 
-    static Option<?> deserialize(final Option<ByteBuffer> optionalXml) {
-        for (final ByteBuffer xml : optionalXml) {
-            final byte[] array = new byte[xml.remaining()]; // cannot use bb.array()!
-            xml.duplicate().get(array);
-            try (XMLDecoder decoder = new XMLDecoder(new ByteArrayInputStream(array))) {
-                return Option.apply(decoder.readObject());
-            }
+    @SuppressWarnings("unchecked")
+    static <T> T deserialize(final ByteBuffer xml) {
+        final byte[] array = new byte[xml.remaining()]; // cannot use bb.array()!
+        xml.duplicate().get(array);
+        try (XMLDecoder decoder = new XMLDecoder(new ByteArrayInputStream(array))) {
+            return (T) decoder.readObject();
         }
-        return Option.none();
     }
 
     private void runAction(final URI uri, final Action action) {
@@ -130,8 +125,9 @@ extends AbstractKeyManager<P> {
                     }
 
                     @Override
-                    public void setAttribute(final AttributeClass key, final Option<ByteBuffer> optionalValue) {
-                        for (final ByteBuffer value : optionalValue) {
+                    public void setAttribute(final AttributeClass key, final Optional<ByteBuffer> optionalValue) {
+                        if (optionalValue.isPresent()) {
+                            final ByteBuffer value = optionalValue.get();
                             attributes.put(key, value);
                             return;
                         }
@@ -160,18 +156,20 @@ extends AbstractKeyManager<P> {
         void run(Controller controller) throws KeychainException;
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private interface Controller {
 
-        void setAttribute(AttributeClass key, Option<ByteBuffer> optionalValue);
+        void setAttribute(AttributeClass key, Optional<ByteBuffer> optionalValue);
 
         void createItem(ByteBuffer secret) throws KeychainException;
 
         void visitItems(Visitor visitor) throws KeychainException;
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final class GetKeyAction implements Action, Visitor {
 
-        Option<P> param = Option.none();
+        Optional<P> optParam = Optional.empty();
 
         @Override
         public void run(Controller controller) throws KeychainException {
@@ -179,19 +177,18 @@ extends AbstractKeyManager<P> {
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public void visit(final Item item) throws KeychainException {
-            param = (Option<P>) deserialize(Option.apply(item.getAttribute(GENERIC)));
-            if (param.isEmpty())
-                param = Option.some(newKey());
-            for (final P p : param) {
-                assert null == p.getSecret();
-                final ByteBuffer secret = item.getSecret();
-                try {
-                    p.setSecret(secret);
-                } finally {
-                    fill(secret, (byte) 0);
-                }
+            optParam = Optional.ofNullable(item.getAttribute(GENERIC)).map(OsxKeyManager::deserialize);
+            if (!optParam.isPresent()) {
+                optParam = Optional.of(newKey());
+            }
+            final P p = optParam.get();
+            assert null == p.getSecret();
+            final ByteBuffer secret = item.getSecret();
+            try {
+                p.setSecret(secret);
+            } finally {
+                fill(secret, (byte) 0);
             }
         }
 
@@ -206,20 +203,22 @@ extends AbstractKeyManager<P> {
 
     private final class SetKeyAction implements Action {
 
-        private final Option<P> optionalParam;
+        private final Optional<P> optParam;
 
-        public SetKeyAction(final Option<P> optionalParam) {
-            this.optionalParam = optionalParam;
+        SetKeyAction(final Optional<P> optParam) {
+            this.optParam = optParam;
         }
 
         @Override
         public void run(final Controller controller) throws KeychainException {
-            for (final P param : optionalParam) {
-                for (final ByteBuffer newSecret : Option.apply(param.getSecret())) {
+            if (optParam.isPresent()) {
+                final P param = optParam.get();
+                final Optional<ByteBuffer> optSecret = Optional.ofNullable(param.getSecret());
+                if (optSecret.isPresent()) {
+                    final ByteBuffer secret = optSecret.get();
                     try {
-                        final Option<ByteBuffer> newXml = serialize(optionalParam);
-                        @SuppressWarnings("unchecked")
-                        final Option<P> newParam = (Option<P>) deserialize(newXml); // rip off transient fields
+                        final ByteBuffer newXml = serialize(param);
+                        final P newParam = deserialize(newXml); // rip off transient fields
 
                         class UpdateVisitor implements Visitor {
                             @Override
@@ -227,28 +226,28 @@ extends AbstractKeyManager<P> {
                                 {
                                     final ByteBuffer oldSecret =
                                             item.getSecret();
-                                    if (!newSecret.equals(oldSecret))
-                                        item.setSecret(newSecret);
+                                    if (!secret.equals(oldSecret))
+                                        item.setSecret(secret);
                                 }
                                 {
-                                    final Option<ByteBuffer> oldXml = Option.apply(item.getAttribute(GENERIC));
-                                    @SuppressWarnings("unchecked")
-                                    final Option<P> oldParam = (Option<P>) deserialize(oldXml);
-                                    if (!newParam.equals(oldParam))
-                                        item.setAttribute(GENERIC, newXml.get());
+                                    final Optional<ByteBuffer> oldXml = Optional.ofNullable(item.getAttribute(GENERIC));
+                                    final Optional<P> oldParam = oldXml.map(OsxKeyManager::deserialize);
+                                    if (!Optional.of(newParam).equals(oldParam)) {
+                                        item.setAttribute(GENERIC, newXml);
+                                    }
                                 }
                             }
                         }
 
                         try {
-                            controller.setAttribute(GENERIC, newXml);
-                            controller.createItem(newSecret);
+                            controller.setAttribute(GENERIC, Optional.of(newXml));
+                            controller.createItem(secret);
                         } catch (final DuplicateItemException ex) {
-                            controller.setAttribute(GENERIC, Option.<ByteBuffer>none());
+                            controller.setAttribute(GENERIC, Optional.empty());
                             controller.visitItems(new UpdateVisitor());
                         }
                     } finally {
-                        fill(newSecret, (byte) 0);
+                        fill(secret, (byte) 0);
                     }
 
                     return;

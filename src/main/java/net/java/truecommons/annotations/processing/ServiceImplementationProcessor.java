@@ -45,12 +45,7 @@ import net.java.truecommons.annotations.ServiceSpecification;
 public final class ServiceImplementationProcessor extends ServiceAnnnotationProcessor {
 
     private static final Comparator<TypeElement> TYPE_ELEMENT_COMPARATOR =
-            new Comparator<TypeElement>() {
-                @Override
-                public int compare(TypeElement o1, TypeElement o2) {
-                    return o1.getQualifiedName().toString().compareTo(o2.getQualifiedName().toString());
-                }
-            };
+            Comparator.comparing(o -> o.getQualifiedName().toString());
 
     private boolean verbose;
 

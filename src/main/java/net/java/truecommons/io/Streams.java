@@ -95,9 +95,7 @@ public class Streams {
      *           This method always closes this stream.
      * @param out the output stream.
      *           This method always closes this stream.
-     * @deprecated Use {@link #copy(Source, Sink)} instead.
      */
-    @Deprecated
     public static void copy(InputStream in, OutputStream out)
     throws IOException {
         try (InputStream in2 = in; OutputStream out2 = out) {

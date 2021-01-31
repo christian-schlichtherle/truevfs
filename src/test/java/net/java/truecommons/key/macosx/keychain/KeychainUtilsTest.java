@@ -5,7 +5,6 @@
 package net.java.truecommons.key.macosx.keychain;
 
 import net.java.truecommons.key.macosx.keychain.Keychain.AttributeClass;
-import net.java.truecommons.shed.Option;
 import org.junit.Test;
 
 import java.nio.ByteBuffer;
@@ -30,7 +29,7 @@ public class KeychainUtilsTest {
         int count = 0;
         for (final AttributeClass id : AttributeClass.values())
             input.put(id, ByteBuffer.allocateDirect(++count));
-        final Map<AttributeClass, ByteBuffer> output = map(list(Option.some(input))).get();
+        final Map<AttributeClass, ByteBuffer> output = map(list(input));
         assertThat(output.size(), is(input.size()));
         for (final AttributeClass id : AttributeClass.values()) {
             final ByteBuffer ib = input.get(id), ob = output.get(id);
