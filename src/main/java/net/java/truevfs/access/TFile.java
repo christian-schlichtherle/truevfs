@@ -354,7 +354,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 @Immutable
 public final class TFile extends File implements TRex {
 
-    private static final long serialVersionUID = 3617072259051821745L;
+    private static final long serialVersionUID = 0;
 
     /** The prefix of a UNC (a Windows concept). */
     private static final String UNC_PREFIX = separator + separator;

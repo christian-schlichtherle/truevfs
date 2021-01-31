@@ -52,11 +52,12 @@ final class CoreFoundation {
     //
 
     public static class CFIndex extends NativeLong {
+
         private static final long serialVersionUID = 0;
 
         public CFIndex() { }
         CFIndex(long value) { super(value); }
-    } // CFindex
+    }
 
     @SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
     public static class CFRange extends Structure {

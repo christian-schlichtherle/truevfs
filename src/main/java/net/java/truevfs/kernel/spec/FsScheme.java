@@ -30,7 +30,7 @@ import net.java.truecommons.shed.UriBuilder;
 @Immutable
 public final class FsScheme implements Serializable, Comparable<FsScheme> {
 
-    private static final long serialVersionUID = 2765230379628276648L;
+    private static final long serialVersionUID = 0;
 
     private final String scheme;
 

@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
  */
 final class AuthenticationException extends Exception {
 
-    private static final long serialVersionUID = 0L;
+    private static final long serialVersionUID = 0;
 
     AuthenticationException(@Nullable String message) { super(message); }
 

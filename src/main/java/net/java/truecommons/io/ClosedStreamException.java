@@ -15,5 +15,5 @@ import java.nio.channels.ClosedChannelException;
  */
 public class ClosedStreamException extends IOException {
 
-    private static final long serialVersionUID = 3438364894193766238L;
+    private static final long serialVersionUID = 0;
 }

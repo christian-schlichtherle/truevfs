@@ -19,7 +19,7 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public final class TFileComparator implements Comparator<File>, Serializable {
 
-    private static final long serialVersionUID = 1234567890123456789L;
+    private static final long serialVersionUID = 0;
 
     /**
      * A collator for file names which considers case according to the

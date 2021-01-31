@@ -33,7 +33,7 @@ import java.util.ResourceBundle;
  */
 final class ReadKeyPanel extends KeyPanel {
 
-    private static final long serialVersionUID = 0L;
+    private static final long serialVersionUID = 0;
 
     private static final ResourceBundle
             resources = ResourceBundle.getBundle(ReadKeyPanel.class.getName());

@@ -26,7 +26,7 @@ import java.util.ResourceBundle;
  */
 public final class AuthenticationPanel extends JPanel {
 
-    private static final long serialVersionUID = 0L;
+    private static final long serialVersionUID = 0;
 
     private static final ResourceBundle resources = ResourceBundle
             .getBundle(AuthenticationPanel.class.getName());

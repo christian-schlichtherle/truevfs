@@ -21,7 +21,8 @@ import net.java.truecommons.key.swing.util.EnhancedPanel;
 @NotThreadSafe
 @SuppressWarnings({ "UseOfObsoleteCollectionType", "unchecked", "rawtypes" })
 final class KeyStrengthPanel<S extends KeyStrength> extends EnhancedPanel {
-    private static final long serialVersionUID = 5629581723148235643L;
+
+    private static final long serialVersionUID = 0;
 
     private static final ResourceBundle resources
             = ResourceBundle.getBundle(KeyStrengthPanel.class.getName());

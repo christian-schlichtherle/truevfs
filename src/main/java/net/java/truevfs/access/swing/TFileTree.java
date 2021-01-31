@@ -38,7 +38,7 @@ import java.util.Objects;
  */
 public final class TFileTree extends JTree {
 
-    private static final long serialVersionUID = 1064787562479927601L;
+    private static final long serialVersionUID = 0;
 
     /** The name of the property {@code displayingExtensions}. */
     private static final String PROPERTY_DISPLAYING_EXTENSIONS = "displayingExtensions"; // NOI18N
@@ -602,7 +602,8 @@ public final class TFileTree extends JTree {
 
     private final class Controller
     implements TreeExpansionListener, CellEditorListener, Serializable {
-        private static final long serialVersionUID = 6402557248752695675L;
+
+        private static final long serialVersionUID = 0;
 
         @Override
         public void treeCollapsed(TreeExpansionEvent evt) {

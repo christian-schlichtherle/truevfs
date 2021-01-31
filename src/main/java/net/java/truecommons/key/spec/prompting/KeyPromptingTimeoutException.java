@@ -18,7 +18,8 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public class KeyPromptingTimeoutException extends UnknownKeyException {
-    private static final long serialVersionUID = 7656348612765052586L;
+
+    private static final long serialVersionUID = 0;
 
     public KeyPromptingTimeoutException() {
         super("Key prompting has timed out!");

@@ -21,7 +21,7 @@ import javax.swing.JPanel;
  */
 public class EnhancedPanel extends JPanel  {
 
-    private static final long serialVersionUID = 6984576810262891640L;
+    private static final long serialVersionUID = 0;
 
     /**
      * Creates a new {@code EnhancedPanel} with the specified layout

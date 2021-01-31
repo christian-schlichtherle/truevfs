@@ -12,7 +12,8 @@ import java.net.URISyntaxException;
  * @author Christian Schlichtherle
  */
 public class QuotedUriSyntaxException extends URISyntaxException {
-    private static final long serialVersionUID = 2452323414521345231L;
+
+    private static final long serialVersionUID = 0;
 
     /**
      * Constructs a new quoted input URI syntax exception.

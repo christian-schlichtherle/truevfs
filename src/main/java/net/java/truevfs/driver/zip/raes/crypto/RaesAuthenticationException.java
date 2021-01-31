@@ -13,7 +13,8 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public class RaesAuthenticationException extends RaesException {
-    private static final long serialVersionUID = 2362389234686232732L;
+
+    private static final long serialVersionUID = 0;
 
     /**
      * Constructs a RAES exception with

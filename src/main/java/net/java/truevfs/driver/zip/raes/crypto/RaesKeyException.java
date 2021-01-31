@@ -14,7 +14,8 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public class RaesKeyException extends RaesParametersException {
-    private static final long serialVersionUID = 1375629384612351398L;
+
+    private static final long serialVersionUID = 0;
     
     /**
      * Constructs a RAES key exception with

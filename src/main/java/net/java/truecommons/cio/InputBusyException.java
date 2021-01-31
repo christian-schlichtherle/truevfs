@@ -19,7 +19,8 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public class InputBusyException extends BusyException {
-    private static final long serialVersionUID = 1983745618753823654L;
+
+    private static final long serialVersionUID = 0;
 
     public InputBusyException(@Nullable String message) {
         super(message);

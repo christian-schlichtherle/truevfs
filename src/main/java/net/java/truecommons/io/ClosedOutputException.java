@@ -12,5 +12,5 @@ package net.java.truecommons.io;
  */
 public class ClosedOutputException extends ClosedStreamException {
 
-    private static final long serialVersionUID = 4563928734723923649L;
+    private static final long serialVersionUID = 0;
 }

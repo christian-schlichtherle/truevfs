@@ -17,7 +17,8 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public class FsReadOnlyFileSystemException extends FileSystemException {
-    private static final long serialVersionUID = 987645923519873262L;
+
+    private static final long serialVersionUID = 0;
 
     public FsReadOnlyFileSystemException(FsMountPoint mountPoint) {
         super(mountPoint.toString());

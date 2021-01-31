@@ -18,7 +18,8 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public class KeyPromptingInterruptedException extends UnknownKeyException  {
-    private static final long serialVersionUID = 7656348607356445644L;
+
+    private static final long serialVersionUID = 0;
 
     public KeyPromptingInterruptedException() {
         super("Key prompting has been interrupted!");

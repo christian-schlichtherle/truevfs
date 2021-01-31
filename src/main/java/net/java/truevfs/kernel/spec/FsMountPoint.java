@@ -135,7 +135,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
 public final class FsMountPoint
 implements Serializable, Comparable<FsMountPoint> {
 
-    private static final long serialVersionUID = 5723957985634276648L;
+    private static final long serialVersionUID = 0;
 
     /**
      * The separator which is used to split opaque path names into

@@ -138,7 +138,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_NAME;
 public final class FsNodeName
 implements Serializable, Comparable<FsNodeName> {
 
-    private static final long serialVersionUID = 3453442253468244275L;
+    private static final long serialVersionUID = 0;
 
     /**
      * The separator string for file names in an node name,

@@ -25,7 +25,7 @@ import java.util.Iterator;
 public final class BitField<E extends Enum<E>>
 implements Iterable<E>, Serializable {
 
-    private static final long serialVersionUID = 3203876204846746524L;
+    private static final long serialVersionUID = 0;
 
     private final EnumSet<E> bits;
 

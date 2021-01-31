@@ -38,7 +38,7 @@ import java.io.Serializable;
  */
 public abstract class AbstractComboBoxBrowser<E> implements Serializable {
 
-    private static final long serialVersionUID = 1065103960246722893L;
+    private static final long serialVersionUID = 0;
 
     private final Listener listener = new Listener();
 

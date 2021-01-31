@@ -33,7 +33,7 @@ import java.util.Objects;
  */
 public class FileComboBoxBrowser extends AbstractComboBoxBrowser<String> {
 
-    private static final long serialVersionUID = -6878885832542209810L;
+    private static final long serialVersionUID = 0;
 
     private transient @Nullable FileSystemView fsv;
     private transient @Nullable File dir;

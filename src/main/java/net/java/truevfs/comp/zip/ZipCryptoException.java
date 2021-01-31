@@ -16,7 +16,8 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public class ZipCryptoException extends ZipException {
-    private static final long serialVersionUID = 2783693745683625471L;
+
+    private static final long serialVersionUID = 0;
 
     /**
      * Constructs a ZIP crypto exception with

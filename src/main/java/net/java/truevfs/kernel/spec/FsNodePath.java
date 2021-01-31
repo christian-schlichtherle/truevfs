@@ -140,7 +140,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
 public final class FsNodePath
         implements Serializable, Comparable<FsNodePath> {
 
-    private static final long serialVersionUID = 5798435461242930648L;
+    private static final long serialVersionUID = 0;
 
     private static final URI DOT = URI.create(".");
 

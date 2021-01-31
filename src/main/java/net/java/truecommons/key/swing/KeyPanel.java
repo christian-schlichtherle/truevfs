@@ -21,7 +21,7 @@ import java.net.URI;
  */
 abstract class KeyPanel extends EnhancedPanel {
 
-    private static final long serialVersionUID = 0L;
+    private static final long serialVersionUID = 0;
 
     private @Nullable Feedback feedback;
 

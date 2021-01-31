@@ -20,7 +20,8 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  * @author Christian Schlichtherle
  */
 final class TFileTreeCellRenderer extends DefaultTreeCellRenderer {
-    private static final long serialVersionUID = 1045639746091876245L;
+
+    private static final long serialVersionUID = 0;
 
     private transient @CheckForNull TFileSystemView fileSystemView;
 

@@ -19,7 +19,8 @@ import java.util.zip.ZipException;
  * @author  Christian Schlichtherle
  */
 public class Crc32Exception extends ZipException {
-    private static final long serialVersionUID = 1656298435298526391L;
+
+    private static final long serialVersionUID = 0;
 
     private final long expected, actual;
 

@@ -15,7 +15,8 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public class TarException extends IOException {
-    private static final long serialVersionUID = 8928709487265227047L;
+
+    private static final long serialVersionUID = 0;
 
     public TarException(String message) {
         super(message);

@@ -19,7 +19,7 @@ import javax.annotation.Nullable;
  */
 public class KeyPromptingCancelledException extends PersistentUnknownKeyException {
 
-    private static final long serialVersionUID = 7645927619378423566L;
+    private static final long serialVersionUID = 0;
 
     public KeyPromptingCancelledException() {
         super("Key prompting has been cancelled!");

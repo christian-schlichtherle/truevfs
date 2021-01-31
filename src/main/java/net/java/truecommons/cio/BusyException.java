@@ -20,7 +20,8 @@ import java.io.FileNotFoundException;
  */
 @ThreadSafe
 public class BusyException extends FileNotFoundException {
-    private static final long serialVersionUID = 2056108562576389242L;
+
+    private static final long serialVersionUID = 0;
 
     public BusyException(@Nullable String message) {
         super(message);

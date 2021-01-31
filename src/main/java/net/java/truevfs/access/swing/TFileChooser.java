@@ -21,7 +21,8 @@ import javax.swing.filechooser.FileSystemView;
  * @author Christian Schlichtherle
  */
 public final class TFileChooser extends JFileChooser {
-    private static final long serialVersionUID = 936528972682036204L;
+
+    private static final long serialVersionUID = 0;
 
     public TFileChooser() {
         this(null, null);

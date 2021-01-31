@@ -13,7 +13,8 @@ import java.io.File;
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class FileComboBoxPanel extends JPanel {
-    private static final long serialVersionUID = 1065812374938719922L;
+
+    private static final long serialVersionUID = 0;
 
     /** Creates new form FileComboBoxPanel */
     public FileComboBoxPanel() {

@@ -15,7 +15,7 @@ import javax.annotation.Nullable;
  */
 public class PersistentUnknownKeyException extends UnknownKeyException {
 
-    private static final long serialVersionUID = 2463586348235337265L;
+    private static final long serialVersionUID = 0;
 
     public PersistentUnknownKeyException() { }
 

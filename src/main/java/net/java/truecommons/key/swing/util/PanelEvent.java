@@ -27,7 +27,7 @@ import java.util.Objects;
  */
 public class PanelEvent extends AWTEvent {
 
-    private static final long serialVersionUID = -7614118389065035365L;
+    private static final long serialVersionUID = 0;
 
     /** The id for Ancestor Window Shown Event. */
     public static final int ANCESTOR_WINDOW_SHOWN  = RESERVED_ID_MAX + 1;
