@@ -13,6 +13,7 @@ import net.java.truevfs.kernel.spec.FsAccessOption;
 import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Optional;
 
 /**
  * An output socket for HTTP(S) entries.
@@ -40,8 +41,7 @@ public class HttpOutputSocket extends AbstractOutputSocket<HttpNode> {
     }
 
     @Override
-    public OutputStream stream(final InputSocket<? extends Entry> peer)
-    throws IOException {
+    public OutputStream stream(final Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
         return entry.newOutputStream();
     }
 }

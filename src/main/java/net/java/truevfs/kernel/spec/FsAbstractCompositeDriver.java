@@ -19,7 +19,8 @@ import java.util.function.Supplier;
  *
  * @author Christian Schlichtherle
  */
-public abstract class FsAbstractCompositeDriver implements FsCompositeDriver, Supplier<Map<FsScheme, FsDriver>> {
+public abstract class FsAbstractCompositeDriver
+        implements FsCompositeDriver, Supplier<Map<FsScheme, ? extends FsDriver>> {
 
     @Override
     public final FsModel newModel(

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -94,7 +95,7 @@ class LockOutputService<E extends Entry> extends DecoratingOutputService<E> impl
             }
 
             @Override
-            public OutputStream stream(InputSocket<? extends Entry> peer) throws IOException {
+            public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
                 return new LockOutputStream(lock, locked(new Op<OutputStream, IOException>() {
 
                     @Override
@@ -105,7 +106,8 @@ class LockOutputService<E extends Entry> extends DecoratingOutputService<E> impl
             }
 
             @Override
-            public SeekableByteChannel channel(InputSocket<? extends Entry> peer) throws IOException {
+            public SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer)
+                    throws IOException {
                 return new LockSeekableChannel(lock, locked(new Op<SeekableByteChannel, IOException>() {
 
                     @Override

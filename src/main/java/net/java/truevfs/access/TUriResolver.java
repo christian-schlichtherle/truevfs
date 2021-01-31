@@ -141,8 +141,10 @@ final class TUriResolver {
                 npu = new UriBuilder().uri(npu).path(npup + SEPARATOR_CHAR).toUriChecked();
             rnp = new FsNodePath(new FsMountPoint(npu), nn);
         }
-        final FsScheme s = detector.scheme(nn.toString());
-        if (null != s) rnp = new FsNodePath(new FsMountPoint(s, rnp), ROOT);
+        final Optional<FsScheme> s = detector.scheme(nn.toString());
+        if (s.isPresent()) {
+            rnp = new FsNodePath(new FsMountPoint(s.get(), rnp), ROOT);
+        }
         return rnp;
     }
 

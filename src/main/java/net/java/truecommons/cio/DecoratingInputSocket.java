@@ -4,7 +4,6 @@
  */
 package net.java.truecommons.cio;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -13,21 +12,16 @@ import java.util.Objects;
  * <p>
  * Implementations should be immutable.
  *
- * @param <E> the type of the {@linkplain #target() target entry} for I/O
- *            operations.
+ * @param <E> the type of the {@linkplain #target() target entry} for I/O operations.
  * @author Christian Schlichtherle
  * @see DecoratingOutputSocket
  */
 public abstract class DecoratingInputSocket<E extends Entry> extends DelegatingInputSocket<E> {
 
     /**
-     * The nullable decorated input socket.
+     * The decorated input socket.
      */
-    protected @Nullable
-    InputSocket<? extends E> socket;
-
-    protected DecoratingInputSocket() {
-    }
+    protected InputSocket<? extends E> socket;
 
     protected DecoratingInputSocket(final InputSocket<? extends E> socket) {
         this.socket = Objects.requireNonNull(socket);

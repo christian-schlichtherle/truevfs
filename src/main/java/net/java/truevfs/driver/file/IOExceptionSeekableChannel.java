@@ -6,10 +6,10 @@ package net.java.truevfs.driver.file;
 
 import net.java.truecommons.io.DecoratingSeekableChannel;
 
-import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
+import java.util.Optional;
 
 /**
  * A decorating seekable byte channel which saves the last {@link IOException}
@@ -18,11 +18,11 @@ import java.nio.channels.SeekableByteChannel;
  *
  * @author Christian Schlichtherle
  */
-abstract class IOExceptionSeekableChannel
-extends DecoratingSeekableChannel {
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+abstract class IOExceptionSeekableChannel extends DecoratingSeekableChannel {
 
     /** The nullable last I/O exception. */
-    @CheckForNull IOException exception;
+    Optional<IOException> exception = Optional.empty();
 
     /**
      * Constructs a new I/O exception seekable byte channel.
@@ -34,20 +34,22 @@ extends DecoratingSeekableChannel {
     }
 
     @Override
-    public int read(ByteBuffer dst) throws IOException {
+    public int read(final ByteBuffer dst) throws IOException {
         try {
             return channel.read(dst);
-        } catch (IOException ex) {
-            throw exception = ex;
+        } catch (IOException e) {
+            exception = Optional.of(e);
+            throw e;
         }
     }
 
     @Override
-    public int write(ByteBuffer src) throws IOException {
+    public int write(final ByteBuffer src) throws IOException {
         try {
             return channel.write(src);
-        } catch (IOException ex) {
-            throw exception = ex;
+        } catch (IOException e) {
+            exception = Optional.of(e);
+            throw e;
         }
     }
 
@@ -55,18 +57,20 @@ extends DecoratingSeekableChannel {
     public long position() throws IOException {
         try {
             return channel.position();
-        } catch (IOException ex) {
-            throw exception = ex;
+        } catch (IOException e) {
+            exception = Optional.of(e);
+            throw e;
         }
     }
 
     @Override
-    public SeekableByteChannel position(long newPosition) throws IOException {
+    public SeekableByteChannel position(final long newPosition) throws IOException {
         try {
             channel.position(newPosition);
             return this;
-        } catch (IOException ex) {
-            throw exception = ex;
+        } catch (IOException e) {
+            exception = Optional.of(e);
+            throw e;
         }
     }
 
@@ -74,18 +78,20 @@ extends DecoratingSeekableChannel {
     public long size() throws IOException {
         try {
             return channel.size();
-        } catch (IOException ex) {
-            throw exception = ex;
+        } catch (IOException e) {
+            exception = Optional.of(e);
+            throw e;
         }
     }
 
     @Override
-    public SeekableByteChannel truncate(long size) throws IOException {
+    public SeekableByteChannel truncate(final long size) throws IOException {
         try {
             channel.truncate(size);
             return this;
-        } catch (IOException ex) {
-            throw exception = ex;
+        } catch (IOException e) {
+            exception = Optional.of(e);
+            throw e;
         }
     }
 
@@ -93,8 +99,9 @@ extends DecoratingSeekableChannel {
     public void close() throws IOException {
         try {
             channel.close();
-        } catch (IOException ex) {
-            throw exception = ex;
+        } catch (IOException e) {
+            exception = Optional.of(e);
+            throw e;
         }
     }
 }

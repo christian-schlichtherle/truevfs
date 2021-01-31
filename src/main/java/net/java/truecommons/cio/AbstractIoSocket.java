@@ -31,7 +31,6 @@ public abstract class AbstractIoSocket<E extends Entry> extends UniqueObject imp
         } catch (final IOException ex) {
             target = ex;
         }
-        return String.format("%s@%x[target=%s]",
-                getClass().getName(), hashCode(), target);
+        return String.format("%s@%x[target=%s]", getClass().getName(), hashCode(), target);
     }
 }

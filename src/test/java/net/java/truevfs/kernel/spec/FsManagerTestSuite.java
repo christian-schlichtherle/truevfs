@@ -28,8 +28,8 @@ import static org.junit.Assert.*;
  */
 public abstract class FsManagerTestSuite {
 
-    private final FsCompositeDriver driver = new FsSimpleCompositeDriver(
-            new MockDriverMapContainer("file|tar|tar.gz|zip"));
+    private final FsCompositeDriver driver =
+            new FsSimpleCompositeDriver(new MockDriverMapContainer("file|tar|tar.gz|zip"));
     private FsManager manager;
 
     @Before

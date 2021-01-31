@@ -16,6 +16,7 @@ import org.scalatest.wordspec.AnyWordSpec
 
 import java.io._
 import java.nio._
+import java.util.Optional
 
 /** @author Christian Schlichtherle */
 class CacheEntrySpec extends AnyWordSpec {
@@ -258,7 +259,7 @@ private object CacheEntrySpec {
 
     require(null ne target)
 
-    override def stream(peer: OutputSocket[_ <: Entry]): InputStream = new InputStream {
+    override def stream(peer: Optional[_ <: OutputSocket[_ <: Entry]]): InputStream = new InputStream {
 
       override def read: Int = throw new IOException
     }
@@ -268,7 +269,7 @@ private object CacheEntrySpec {
 
     require(null ne target)
 
-    override def stream(peer: InputSocket[_ <: Entry]): OutputStream = new OutputStream {
+    override def stream(peer: Optional[_ <: InputSocket[_ <: Entry]]): OutputStream = new OutputStream {
 
       override def write(b: Int): Unit = {
         throw new IOException

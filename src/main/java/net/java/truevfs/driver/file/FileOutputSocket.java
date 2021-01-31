@@ -21,6 +21,7 @@ import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.Boolean.TRUE;
@@ -182,11 +183,11 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
     }
 
     @Override
-    public SeekableByteChannel channel(final InputSocket<? extends Entry> peer)
-    throws IOException {
+    public SeekableByteChannel channel(final Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
         final FileNode buffer = begin();
 
-        final class Channel extends IOExceptionSeekableChannel {
+        class Channel extends IOExceptionSeekableChannel {
+
             boolean closed;
 
             Channel() throws IOException {
@@ -198,9 +199,9 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
                 if (closed) return;
                 super.close();
                 closed = true;
-                FileOutputSocket.this.close(buffer, null == exception);
+                FileOutputSocket.this.close(buffer, !exception.isPresent());
             }
-        } // Channel
+        }
 
         try {
             append(buffer);
@@ -211,8 +212,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
     }
 
     @Override
-    public OutputStream stream(final InputSocket<? extends Entry> peer)
-    throws IOException {
+    public OutputStream stream(final Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
         final FileNode buffer = begin();
 
         final class Stream extends IOExceptionOutputStream {

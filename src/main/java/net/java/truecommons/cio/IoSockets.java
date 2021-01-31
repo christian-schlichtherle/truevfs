@@ -12,15 +12,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
+import java.util.Optional;
 
 /**
  * Provides utility methods for {@link IoSocket}s.
  *
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class IoSockets {
 
-    /** Can't touch this - hammer time! */
     private IoSockets() { }
 
     /**
@@ -38,20 +39,17 @@ public final class IoSockets {
      */
     public static void copy(InputSocket<?> input, OutputSocket<?> output)
     throws IOException {
-        Streams.copy(   new InputAdapter(input, output),
-                        new OutputAdapter(output, input));
+        Streams.copy(new InputAdapter(input, output), new OutputAdapter(output, input));
     }
 
     private static class InputAdapter implements Source {
 
         final InputSocket<? extends Entry> input;
-        final OutputSocket<? extends Entry> output;
+        final Optional<? extends OutputSocket<? extends Entry>> output;
 
-        InputAdapter(
-                final InputSocket<? extends Entry> input,
-                final OutputSocket<? extends Entry> output) {
+        InputAdapter(final InputSocket<? extends Entry> input, final OutputSocket<? extends Entry> output) {
             this.input = input;
-            this.output = output;
+            this.output = Optional.of(output);
         }
 
         @Override
@@ -63,18 +61,18 @@ public final class IoSockets {
         public SeekableByteChannel channel() throws IOException {
             return input.channel(output);
         }
-    } // InputAdapter
+    }
 
     private static class OutputAdapter implements Sink {
 
         final OutputSocket<? extends Entry> output;
-        final InputSocket<? extends Entry> input;
+        final Optional<? extends InputSocket<? extends Entry>> input;
 
         OutputAdapter(
                 final OutputSocket<? extends Entry> output,
                 final InputSocket<? extends Entry> input) {
             this.output = output;
-            this.input = input;
+            this.input = Optional.of(input);
         }
 
         @Override
@@ -86,5 +84,5 @@ public final class IoSockets {
         public SeekableByteChannel channel() throws IOException {
             return output.channel(input);
         }
-    } // OutputAdapter
+    }
 }

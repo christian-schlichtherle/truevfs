@@ -4,17 +4,18 @@
  */
 package net.java.truevfs.access;
 
+import lombok.val;
 import net.java.truecommons.shed.ExtensionSet;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
-import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.mock.MockArchiveDriver;
 import org.junit.Test;
 
-import javax.annotation.Nullable;
 import java.io.File;
+import java.util.Collections;
 import java.util.Locale;
-import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -23,248 +24,100 @@ import static org.junit.Assert.*;
 /**
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class TArchiveDetectorTest {
 
-    private final FsArchiveDriver<?> driver = new MockArchiveDriver();
+    private final Optional<FsArchiveDriver<?>> driver = Optional.of(new MockArchiveDriver());
     private final TArchiveDetector
-            ALL  = new TArchiveDetector("tar.gz|zip", driver),
-            NULL = new TArchiveDetector(ALL, ""), // test decoration
-            MOK  = new TArchiveDetector(NULL, "mok", driver); // test decoration
+            ALL = new TArchiveDetector("tar.gz|zip", driver),
+            NULL = new TArchiveDetector("", ALL), // test decoration
+            MOK = new TArchiveDetector("mok", driver, NULL); // test decoration
 
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    public void testIllegalConstructors() throws Throwable {
-        for (TArchiveDetector delegate : new TArchiveDetector[] {
-            NULL,
-            ALL,
-        }) {
+    public void testIllegalConstructors() {
+        val tests = new Supplier<?>[]{
+                () -> new TArchiveDetector("DRIVER"),
+                () -> new TArchiveDetector("DEFAULT"),
+                () -> new TArchiveDetector("NULL"),
+                () -> new TArchiveDetector("ALL"),
+                () -> new TArchiveDetector("unknownExtension"),
+                () -> new TArchiveDetector("", driver), // empty extension set
+                () -> new TArchiveDetector(".", driver), // empty extension set
+                () -> new TArchiveDetector("|", driver), // empty extension set
+                () -> new TArchiveDetector("|.", driver), // empty extension set
+                () -> new TArchiveDetector("||", driver), // empty extension set
+                () -> new TArchiveDetector("||.", driver), // empty extension set
+                () -> new TArchiveDetector("|.|", driver), // empty extension set
+                () -> new TArchiveDetector("|.|.", driver), // empty extension set
+        };
+        for (val test : tests) {
             try {
-                new TArchiveDetector(delegate, new Object[][] {
-                    { "foo", "java.lang.Object", },
-                    { "bar", "java.io.FilterInputStream", },
-                });
-                fail("Expected IllegalArgumentException");
-            } catch (IllegalArgumentException expected) {
-            }
-        }
-
-        assertIllegalConstructors(NullPointerException.class,
-                new Object[][] {
-                    { null, null },
-                    { null, driver },
-                    //{ "xyz", null },
-                    { null, null, null },
-                    { null, null, driver },
-                    { null, "xyz", null },
-                    { null, "xyz", driver },
-                    { NULL, null, null },
-                    { NULL, null, driver },
-                    //{ TArchiveDetector.NULL, "xyz", null },
-                    { null, new Object[][] {{ "xyz", MockArchiveDriver.class }} },
-                    { NULL, null },
-                    { NULL, new Object[][] {{ null, null }} },
-                    { NULL, new Object[][] {{ null, "" }} },
-                    { NULL, new Object[][] {{ null, "xyz" }} },
-                    //{ TArchiveDetector.NULL, new Object[] { "xyz", null } },
-               });
-
-        assertIllegalConstructors(IllegalArgumentException.class,
-                new Object[][] {
-                    { "DRIVER" },
-                    { "DEFAULT" },
-                    { "NULL" },
-                    { "ALL" },
-                    { "unknownExtension" },
-                    { "", driver }, // empty extension set
-                    { ".", driver }, // empty extension set
-                    { "|", driver }, // empty extension set
-                    { "|.", driver }, // empty extension set
-                    { "||", driver }, // empty extension set
-                    { "||.", driver }, // empty extension set
-                    { "|.|", driver }, // empty extension set
-                    { "|.|.", driver }, // empty extension set
-                    { NULL, "", driver }, // empty extension set
-                    { NULL, ".", driver }, // empty extension set
-                    { NULL, "|", driver }, // empty extension set
-                    { NULL, "|.", driver }, // empty extension set
-                    { NULL, "||", driver }, // empty extension set
-                    { NULL, "||.", driver }, // empty extension set
-                    { NULL, "|.|", driver }, // empty extension set
-                    { NULL, "|.|.", driver }, // empty extension set
-                    { NULL, new Object[][] {{ "", driver }} }, // empty extension set
-                    { NULL, new Object[][] {{ ".", driver }} }, // empty extension set
-                    { NULL, new Object[][] {{ "|", driver }} }, // empty extension set
-                    { NULL, new Object[][] {{ "|.", driver }} }, // empty extension set
-                    { NULL, new Object[][] {{ "||", driver }} }, // empty extension set
-                    { NULL, new Object[][] {{ "||.", driver }} }, // empty extension set
-                    { NULL, new Object[][] {{ "|.|", driver }} }, // empty extension set
-                    { NULL, new Object[][] {{ "|.|.", driver }} }, // empty extension set
-                    { NULL, new Object[][] {{ "anyExtension", "" }} }, // empty class name
-                    { NULL, new Object[][] {{ "anyExtension", "xyz" }} }, // not a class name
-                    { NULL, new Object[][] {{ MockArchiveDriver.class, driver }} }, // not a extension list
-                    { NULL, new Object[][] {{ driver, driver }} }, // not a extension list
-                    { NULL, new Object[][] {{ "anyExtension", new Object() }} }, // not an archive driver
-                    { NULL, new Object[][] {{ "anyExtension", Object.class }} }, // not an archive driver class
-                });
-    }
-
-    @SuppressWarnings({ "unchecked", "ResultOfObjectAllocationIgnored" })
-    private void assertIllegalConstructors(
-            final Class<? extends Throwable> expected,
-            final Object[][] list)
-    throws Throwable {
-        for (int i = 0; i < list.length; i++) {
-            final Object[] args = list[i];
-            Object arg0 = args[0], arg1, arg2;
-            try {
-                switch (args.length) {
-                    case 1:
-                        new TArchiveDetector((String) arg0);
-                        fail("Index " + i);
-                        break;
-
-                    case 2:
-                        arg1 = args[1];
-                        if (arg0 != null) {
-                            if (arg1 != null) {
-                                if (arg0 instanceof String)
-                                    new TArchiveDetector((String) arg0, (FsArchiveDriver<?>) arg1);
-                                else if (arg1 instanceof Object[][])
-                                    new TArchiveDetector((TArchiveDetector) arg0, (Object[][]) arg1);
-                                else
-                                    new TArchiveDetector((TArchiveDetector) arg0, (Map<FsScheme, FsDriver>) arg1);
-                                fail("Index " + i);
-                            } else {
-                                assert arg0 != null;
-                                assert arg1 == null;
-                                if (arg0 instanceof String) {
-                                    new TArchiveDetector((String) arg0, null);
-                                    fail("Index " + i);
-                                } else {
-                                    try {
-                                        new TArchiveDetector((TArchiveDetector) arg0, (Object[][]) null);
-                                        fail("Index " + i);
-                                    } catch (Throwable failure) {
-                                        assertTrue(expected.isAssignableFrom(failure.getClass()));
-                                    }
-                                    try {
-                                        new TArchiveDetector((TArchiveDetector) arg0, (Map<FsScheme, FsDriver>) null);
-                                        fail("Index " + i);
-                                    } catch (Throwable failure) {
-                                        assertTrue(expected.isAssignableFrom(failure.getClass()));
-                                    }
-                                }
-                            }
-                        } else {
-                            assert arg0 == null;
-                            if (arg1 != null) {
-                                if (arg1 instanceof FsArchiveDriver<?>)
-                                    new TArchiveDetector(null, (FsArchiveDriver<?>) arg1);
-                                else if (arg1 instanceof Object[][])
-                                    new TArchiveDetector(null, (Object[][]) arg1);
-                                else
-                                    new TArchiveDetector(null, (Map<FsScheme, FsDriver>) arg1);
-                                fail("Index " + i);
-                            } else {
-                                assert arg0 == null;
-                                assert arg1 == null;
-                                try {
-                                    new TArchiveDetector((String) null, null);
-                                    fail("Index " + i);
-                                } catch (Throwable failure) {
-                                    assertTrue(expected.isAssignableFrom(failure.getClass()));
-                                }
-                                try {
-                                    new TArchiveDetector(null, (Object[][]) null);
-                                    fail("Index " + i);
-                                } catch (Throwable failure) {
-                                    assertTrue(expected.isAssignableFrom(failure.getClass()));
-                                }
-                                try {
-                                    new TArchiveDetector(null, (Map<FsScheme, FsDriver>) null);
-                                    fail("Index " + i);
-                                } catch (Throwable failure) {
-                                    assertTrue(expected.isAssignableFrom(failure.getClass()));
-                                }
-                            }
-                        }
-                        break;
-
-                    case 3:
-                        arg1 = args[1];
-                        arg2 = args[2];
-                        new TArchiveDetector((TArchiveDetector) arg0, (String) arg1, (FsArchiveDriver<?>) arg2);
-                        fail("Index " + i);
-                        break;
-
-                    default:
-                        throw new AssertionError();
-                }
-            } catch (final Throwable ex) {
-                if (!expected.isAssignableFrom(ex.getClass()))
-                    throw ex;
+                test.get();
+                fail();
+            } catch (final IllegalArgumentException ignored) {
             }
         }
     }
 
     @Test
     public void testGetExtensions() {
-        assertExtensions(new String[] {
-            "zip", "zip",
-            "zip", ".zip",
-            "zip", "|zip",
-            "zip", "zip|",
-            "zip", "zip|zip",
-            "zip", "zip|.zip",
-            "zip", "zip||zip",
-            "zip", "zip|zip|",
-            "zip", ".zip|",
-            "zip", ".zip|zip",
-            "zip", ".zip|.zip",
-            "zip", ".zip||zip",
-            "zip", ".zip|zip|",
-            "zip", "|zip|",
-            "zip", "|zip|zip",
-            "zip", "|zip|.zip",
-            "zip", "|zip||zip",
-            "zip", "|zip|zip|",
+        assertExtensions(new String[]{
+                "zip", "zip",
+                "zip", ".zip",
+                "zip", "|zip",
+                "zip", "zip|",
+                "zip", "zip|zip",
+                "zip", "zip|.zip",
+                "zip", "zip||zip",
+                "zip", "zip|zip|",
+                "zip", ".zip|",
+                "zip", ".zip|zip",
+                "zip", ".zip|.zip",
+                "zip", ".zip||zip",
+                "zip", ".zip|zip|",
+                "zip", "|zip|",
+                "zip", "|zip|zip",
+                "zip", "|zip|.zip",
+                "zip", "|zip||zip",
+                "zip", "|zip|zip|",
 
-            "zip", "ZIP",
-            "zip", ".ZIP",
-            "zip", "|ZIP",
-            "zip", "ZIP|",
-            "zip", "ZIP|ZIP",
-            "zip", "ZIP|.ZIP",
-            "zip", "ZIP||ZIP",
-            "zip", "ZIP|ZIP|",
-            "zip", ".ZIP|",
-            "zip", ".ZIP|ZIP",
-            "zip", ".ZIP|.ZIP",
-            "zip", ".ZIP||ZIP",
-            "zip", ".ZIP|ZIP|",
-            "zip", "|ZIP|",
-            "zip", "|ZIP|ZIP",
-            "zip", "|ZIP|.ZIP",
-            "zip", "|ZIP||ZIP",
-            "zip", "|ZIP|ZIP|",
+                "zip", "ZIP",
+                "zip", ".ZIP",
+                "zip", "|ZIP",
+                "zip", "ZIP|",
+                "zip", "ZIP|ZIP",
+                "zip", "ZIP|.ZIP",
+                "zip", "ZIP||ZIP",
+                "zip", "ZIP|ZIP|",
+                "zip", ".ZIP|",
+                "zip", ".ZIP|ZIP",
+                "zip", ".ZIP|.ZIP",
+                "zip", ".ZIP||ZIP",
+                "zip", ".ZIP|ZIP|",
+                "zip", "|ZIP|",
+                "zip", "|ZIP|ZIP",
+                "zip", "|ZIP|.ZIP",
+                "zip", "|ZIP||ZIP",
+                "zip", "|ZIP|ZIP|",
 
-            "tar.gz|zip", "TAR.GZ|ZIP",
-            "tar.gz|zip", "ZIP|TAR.GZ",
-            "tar.gz|zip", "|ZIP|TAR.GZ",
-            "tar.gz|zip", "ZIP|TAR.GZ|",
-            "tar.gz|zip", "|ZIP|TAR.GZ|",
-            "tar.gz|zip", "||ZIP|TAR.GZ|",
-            "tar.gz|zip", "|ZIP||TAR.GZ|",
-            "tar.gz|zip", "|ZIP|TAR.GZ||",
+                "tar.gz|zip", "TAR.GZ|ZIP",
+                "tar.gz|zip", "ZIP|TAR.GZ",
+                "tar.gz|zip", "|ZIP|TAR.GZ",
+                "tar.gz|zip", "ZIP|TAR.GZ|",
+                "tar.gz|zip", "|ZIP|TAR.GZ|",
+                "tar.gz|zip", "||ZIP|TAR.GZ|",
+                "tar.gz|zip", "|ZIP||TAR.GZ|",
+                "tar.gz|zip", "|ZIP|TAR.GZ||",
 
-            "tar.gz|zip", ".TAR.GZ|.ZIP",
-            "tar.gz|zip", ".ZIP|.TAR.GZ",
-            "tar.gz|zip", "|.ZIP|.TAR.GZ",
-            "tar.gz|zip", ".ZIP|.TAR.GZ|",
-            "tar.gz|zip", "|.ZIP|.TAR.GZ|",
-            "tar.gz|zip", "||.ZIP|.TAR.GZ|",
-            "tar.gz|zip", "|.ZIP||.TAR.GZ|",
-            "tar.gz|zip", "|.ZIP|.TAR.GZ||",
+                "tar.gz|zip", ".TAR.GZ|.ZIP",
+                "tar.gz|zip", ".ZIP|.TAR.GZ",
+                "tar.gz|zip", "|.ZIP|.TAR.GZ",
+                "tar.gz|zip", ".ZIP|.TAR.GZ|",
+                "tar.gz|zip", "|.ZIP|.TAR.GZ|",
+                "tar.gz|zip", "||.ZIP|.TAR.GZ|",
+                "tar.gz|zip", "|.ZIP||.TAR.GZ|",
+                "tar.gz|zip", "|.ZIP|.TAR.GZ||",
         });
     }
 
@@ -273,64 +126,60 @@ public final class TArchiveDetectorTest {
             final String result = args[i++];
             final String extensions = args[i++];
             TArchiveDetector
-            detector = new TArchiveDetector(extensions, driver);
+                    detector = new TArchiveDetector(extensions, driver);
             assertEquals(result, detector.getExtensions());
-            detector = new TArchiveDetector(NULL, extensions, driver);
-            assertEquals(result, detector.getExtensions());
-            detector = new TArchiveDetector(NULL, new Object[][] {{ extensions, driver }});
+            detector = new TArchiveDetector(extensions, driver, NULL);
             assertEquals(result, detector.getExtensions());
         }
     }
 
     @Test
     public void testNullMapping() {
-        for (TArchiveDetector delegate : new TArchiveDetector[] {
-            NULL,
-            ALL,
+        for (TArchiveDetector delegate : new TArchiveDetector[]{
+                NULL,
+                ALL,
         }) {
-            TArchiveDetector detector = new TArchiveDetector(
-                    delegate, "zip", null); // remove zip extension
+            TArchiveDetector detector = new TArchiveDetector("zip", Optional.empty(), delegate); // remove zip extension
             assertFalse(new ExtensionSet(detector.getExtensions()).contains("zip"));
-            detector = new TArchiveDetector(
-                    delegate, ".ZIP", null); // remove zip extension
+            detector = new TArchiveDetector(".ZIP", Optional.empty(), delegate); // remove zip extension
             assertFalse(new ExtensionSet(detector.getExtensions()).contains("zip"));
         }
     }
 
     @Test
     public void testGetDriver() {
-        assertScheme(new String[][] {
-            { null, "" },
-            { null, "." },
-            { null, ".all" },
-            { null, ".default" },
-            { null, ".ear" },
-            { null, ".exe" },
-            { null, ".file" },
-            { null, ".null" },
-            { null, ".z" },
-            { null, "test" },
-            { null, "test." },
-            { null, "test.all" },
-            { null, "test.default" },
-            { null, "test.null" },
-            { null, "test.z" },
+        assertScheme(new String[][]{
+                {null, ""},
+                {null, "."},
+                {null, ".all"},
+                {null, ".default"},
+                {null, ".ear"},
+                {null, ".exe"},
+                {null, ".file"},
+                {null, ".null"},
+                {null, ".z"},
+                {null, "test"},
+                {null, "test."},
+                {null, "test.all"},
+                {null, "test.default"},
+                {null, "test.null"},
+                {null, "test.z"},
         }, NULL, MOK, ALL);
 
-        assertScheme(new String[][] {
-            { null, ".tar.gz" },
-            { null, ".zip" },
-            { null, "test.tar.gz" },
-            { null, "test.zip" },
+        assertScheme(new String[][]{
+                {null, ".tar.gz"},
+                {null, ".zip"},
+                {null, "test.tar.gz"},
+                {null, "test.zip"},
         }, NULL, MOK);
 
-        assertScheme(new String[][] {
-            { "tar.gz", ".tar.gz" },
-            { "tar.gz", "test.tar.gz" },
-            { "tar.gz", "foo" + File.separator + "test.123.tar.gz" },
-            { "zip", ".zip" },
-            { "zip", "test.zip" },
-            { "zip", "foo" + File.separator + "test.123.zip" },
+        assertScheme(new String[][]{
+                {"tar.gz", ".tar.gz"},
+                {"tar.gz", "test.tar.gz"},
+                {"tar.gz", "foo" + File.separator + "test.123.tar.gz"},
+                {"zip", ".zip"},
+                {"zip", "test.zip"},
+                {"zip", "foo" + File.separator + "test.123.zip"},
         }, ALL);
     }
 
@@ -346,12 +195,12 @@ public final class TArchiveDetectorTest {
             }
 
             for (String[] test : tests) {
-                final FsScheme scheme = test[0] == null ? null : FsScheme.create(test[0]);
+                final Optional<FsScheme> scheme = Optional.ofNullable(test[0]).map(FsScheme::create);
                 final String path = test[1];
                 assertScheme(detector, scheme, path);
 
                 // Add level of indirection in order to test caching.
-                detector = new TArchiveDetector(detector, new Object[0][0]);
+                detector = new TArchiveDetector(Collections.emptyMap(), detector);
                 assertScheme(detector, scheme, path);
             }
         }
@@ -359,7 +208,7 @@ public final class TArchiveDetectorTest {
 
     private void assertScheme(
             final TArchiveDetector detector,
-            final @Nullable FsScheme scheme,
+            final Optional<FsScheme> scheme,
             final String path) {
         final String lpath = path.toLowerCase(Locale.ROOT);
         final String upath = path.toUpperCase(Locale.ROOT);

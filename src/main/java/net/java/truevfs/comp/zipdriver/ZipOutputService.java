@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedOutputStream;
 
@@ -37,6 +38,7 @@ import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
  * @see    ZipInputService
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class ZipOutputService<E extends AbstractZipDriverEntry>
 extends AbstractZipOutputStream<E> implements OutputService<E> {
 
@@ -131,21 +133,25 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
     @Override
     public OutputSocket<E> output(final E local) { // local target
         Objects.requireNonNull(local);
-        final class Output extends AbstractOutputSocket<E> {
+
+        class Output extends AbstractOutputSocket<E> {
+
             @Override
             public E target() {
                 return local;
             }
 
             @Override
-            public OutputStream stream(InputSocket<? extends Entry> peer)
-            throws IOException {
-                if (isBusy()) throw new OutputBusyException(local.getName());
+            public OutputStream stream(final Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
+                if (isBusy()) {
+                    throw new OutputBusyException(local.getName());
+                }
                 if (local.isDirectory()) {
-                    updateProperties(local, DirectoryTemplate.INSTANCE);
+                    updateProperties(local, Optional.of(DirectoryTemplate.INSTANCE));
                     return new EntryOutputStream(local, false);
                 }
-                final boolean rdc = updateProperties(local, target(peer));
+                final boolean rdc = updateProperties(local,
+                        peer.isPresent() ? Optional.of(peer.get().target()) : Optional.empty());
                 if (STORED == local.getMethod()) {
                     if (UNKNOWN == local.getCrc()
                             || UNKNOWN == local.getSize()
@@ -157,30 +163,31 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
                 return new EntryOutputStream(local, rdc);
             }
         }
+
         return new Output();
     }
 
-    boolean updateProperties(
-            final E local,
-            final @CheckForNull Entry peer) {
+    private boolean updateProperties(final E local, final Optional<? extends Entry> peer) {
         boolean rdc = false;
         if (UNKNOWN == local.getTime())
             local.setTime(System.currentTimeMillis());
-        if (null != peer) {
-            if (UNKNOWN == local.getSize())
-                local.setSize(peer.getSize(DATA));
-            if (peer instanceof AbstractZipDriverEntry) {
+        if (peer.isPresent()) {
+            final Entry remote = peer.get();
+            if (UNKNOWN == local.getSize()){
+                local.setSize(remote.getSize(DATA));
+            }
+            if (remote instanceof AbstractZipDriverEntry) {
                 // Set up entry attributes for Raw Data Copying (RDC).
-                final AbstractZipDriverEntry zpeer = (AbstractZipDriverEntry) peer;
-                rdc = driver.rdc(this, local, zpeer);
+                final AbstractZipDriverEntry zremote = (AbstractZipDriverEntry) remote;
+                rdc = driver.rdc(this, local, zremote);
                 if (rdc) {
-                    local.setPlatform(zpeer.getPlatform());
-                    local.setEncrypted(zpeer.isEncrypted());
-                    local.setMethod(zpeer.getMethod());
-                    local.setCrc(zpeer.getCrc());
-                    local.setSize(zpeer.getSize());
-                    local.setCompressedSize(zpeer.getCompressedSize());
-                    local.setExtra(zpeer.getExtra());
+                    local.setPlatform(zremote.getPlatform());
+                    local.setEncrypted(zremote.isEncrypted());
+                    local.setMethod(zremote.getMethod());
+                    local.setCrc(zremote.getCrc());
+                    local.setSize(zremote.getSize());
+                    local.setCompressedSize(zremote.getCompressedSize());
+                    local.setExtra(zremote.getExtra());
                 }
             }
         }
@@ -341,7 +348,7 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
             final long length = buffer.getSize(DATA);
             local.setSize(length);
             local.setCompressedSize(length);
-            ZipOutputService.this.updateProperties(local, buffer);
+            ZipOutputService.this.updateProperties(local, Optional.of(buffer));
         }
 
         @SuppressWarnings("ThrowFromFinallyBlock")
@@ -365,5 +372,5 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
                 }
             }
         }
-    } // BufferedEntryOutputStream
+    }
 }

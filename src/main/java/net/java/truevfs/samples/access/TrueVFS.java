@@ -354,7 +354,6 @@ public enum TrueVFS {
 
     private static TArchiveDetector newArchiveDetector(final Charset charset) {
         return new TArchiveDetector(
-                TArchiveDetector.ALL,
                 new Object[][]{
                         {
                                 "ear|jar|war",
@@ -414,7 +413,7 @@ public enum TrueVFS {
                                     }
                                 }
                         },
-                }
+                }, TArchiveDetector.ALL
         );
     }
 

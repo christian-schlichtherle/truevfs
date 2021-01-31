@@ -13,6 +13,7 @@ import net.java.truevfs.kernel.spec.FsAccessOption;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
+import java.util.Optional;
 
 import static java.nio.file.Files.newByteChannel;
 import static java.nio.file.Files.newInputStream;
@@ -40,13 +41,13 @@ final class FileInputSocket extends AbstractInputSocket<FileNode> {
     }
 
     @Override
-    public InputStream stream(OutputSocket<? extends Entry> peer)
+    public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer)
     throws IOException {
         return newInputStream(node.getPath());
     }
 
     @Override
-    public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
+    public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer)
     throws IOException {
         return newByteChannel(node.getPath());
     }

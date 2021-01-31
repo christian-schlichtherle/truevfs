@@ -5,13 +5,15 @@
 package net.java.truevfs.driver.file;
 
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
-import static org.junit.Assert.assertTrue;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Christian Schlichtherle
  */
 public class IoBufferPoolLocatorTest {
+
     @Test
     public void testIoPool() {
         assertTrue(IoBufferPoolLocator.SINGLETON.get() instanceof FileBufferPool);

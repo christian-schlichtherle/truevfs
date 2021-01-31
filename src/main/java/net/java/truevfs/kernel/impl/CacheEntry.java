@@ -415,12 +415,13 @@ final class CacheEntry implements Entry, Releasable<IOException>, Flushable, Clo
                 }
 
                 @Override
-                public InputStream stream(OutputSocket<? extends Entry> peer) throws IOException {
+                public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
                     return new CacheInputStream(socket.stream(peer));
                 }
 
                 @Override
-                public SeekableByteChannel channel(OutputSocket<? extends Entry> peer) throws IOException {
+                public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer)
+                        throws IOException {
                     return new CacheReadOnlyChannel(socket.channel(peer));
                 }
             };
@@ -438,12 +439,13 @@ final class CacheEntry implements Entry, Releasable<IOException>, Flushable, Clo
                 }
 
                 @Override
-                public OutputStream stream(InputSocket<? extends Entry> peer) throws IOException {
+                public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
                     return new CacheOutputStream(socket.stream(peer));
                 }
 
                 @Override
-                public SeekableByteChannel channel(InputSocket<? extends Entry> peer) throws IOException {
+                public SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer)
+                        throws IOException {
                     return new CacheSeekableChannel(socket.channel(peer));
                 }
             };

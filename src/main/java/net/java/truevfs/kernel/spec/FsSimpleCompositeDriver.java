@@ -16,7 +16,7 @@ import java.util.function.Supplier;
  */
 public final class FsSimpleCompositeDriver extends FsAbstractCompositeDriver {
 
-    private final Supplier<Map<FsScheme, FsDriver>> container;
+    private final Supplier<Map<FsScheme, ? extends FsDriver>> container;
 
     /**
      * Constructs a new simple meta driver which will query the given
@@ -25,12 +25,12 @@ public final class FsSimpleCompositeDriver extends FsAbstractCompositeDriver {
      *
      * @param container the driver map container.
      */
-    public FsSimpleCompositeDriver(final Supplier<Map<FsScheme, FsDriver>> container) {
+    public FsSimpleCompositeDriver(final Supplier<Map<FsScheme, ? extends FsDriver>> container) {
         this.container = Objects.requireNonNull(container);
     }
 
     @Override
-    public Map<FsScheme, FsDriver> get() {
+    public Map<FsScheme, ? extends FsDriver> get() {
         return container.get();
     }
 }

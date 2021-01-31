@@ -5,6 +5,7 @@
 package net.java.truevfs.kernel.spec;
 
 import java.util.Formatter;
+
 import static net.java.truecommons.cio.Entry.*;
 
 /**
@@ -14,7 +15,6 @@ import static net.java.truecommons.cio.Entry.*;
  */
 public final class FsArchiveEntries {
 
-    /* Can't touch this - hammer time! */
     private FsArchiveEntries() { }
 
     /**

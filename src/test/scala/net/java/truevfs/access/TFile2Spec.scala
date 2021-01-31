@@ -43,13 +43,10 @@ private object TFile2Spec {
     val manager = mock[FsManager]
     val driver = mock[FsDriver]
     val archiveDriver = mock[FsArchiveDriver[FsArchiveEntry]]
-    val detector = new TArchiveDetector(
-      TArchiveDetector.NULL,
-      Array(
-        Array("file", driver),
-        Array("a1|a2|a3", archiveDriver)
-      )
-    )
+    val detector = new TArchiveDetector(Array(
+            Array("file", driver),
+            Array("a1|a2|a3", archiveDriver)
+          ), TArchiveDetector.NULL)
     config setManager manager
     config setArchiveDetector detector
   }

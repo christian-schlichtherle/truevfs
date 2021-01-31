@@ -197,7 +197,8 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
                 }
 
                 @Override
-                public InputStream stream(final OutputSocket<? extends Entry> peer) throws IOException {
+                public InputStream stream(final Optional<? extends OutputSocket<? extends Entry>> peer)
+                        throws IOException {
                     assert writeLockedByCurrentThread();
                     return new DecoratingInputStream(socket().stream(peer)) {
 
@@ -215,7 +216,8 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
                 }
 
                 @Override
-                public SeekableByteChannel channel(OutputSocket<? extends Entry> peer) throws IOException {
+                public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer)
+                        throws IOException {
                     throw new AssertionError();
                 }
             }
@@ -240,7 +242,8 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
                 }
 
                 @Override
-                public OutputStream stream(final InputSocket<? extends Entry> peer) throws IOException {
+                public OutputStream stream(final Optional<? extends InputSocket<? extends Entry>> peer)
+                        throws IOException {
                     assert writeLockedByCurrentThread();
                     preOutput();
 
@@ -260,7 +263,8 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
                 }
 
                 @Override
-                public SeekableByteChannel channel(final InputSocket<? extends Entry> peer) throws IOException {
+                public SeekableByteChannel channel(final Optional<? extends InputSocket<? extends Entry>> peer)
+                        throws IOException {
                     assert writeLockedByCurrentThread();
                     preOutput();
 

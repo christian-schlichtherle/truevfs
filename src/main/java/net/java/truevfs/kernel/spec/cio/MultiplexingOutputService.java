@@ -14,10 +14,7 @@ import net.java.truecommons.shed.SuppressedExceptionBuilder;
 import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static net.java.truecommons.cio.Entry.ALL_ACCESS;
 import static net.java.truecommons.cio.Entry.Size.DATA;
@@ -125,9 +122,9 @@ public class MultiplexingOutputService<E extends MutableEntry> extends Decoratin
             }
 
             @Override
-            public OutputStream stream(InputSocket<? extends Entry> peer)
-                    throws IOException {
-                return isBusy() ? new BufferedEntryOutputStream(socket(), peer)
+            public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
+                return isBusy()
+                        ? new BufferedEntryOutputStream(socket(), peer)
                         : new EntryOutputStream(socket().stream(peer));
             }
         } // Output
@@ -194,6 +191,7 @@ public class MultiplexingOutputService<E extends MutableEntry> extends Decoratin
      * When the stream gets closed, the I/O buffer is then copied to this
      * output service and finally deleted unless this output service is still busy.
      */
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final class BufferedEntryOutputStream
             extends DecoratingOutputStream {
 
@@ -202,17 +200,18 @@ public class MultiplexingOutputService<E extends MutableEntry> extends Decoratin
         final IoBuffer buffer;
         boolean closed;
 
-        @SuppressWarnings("LeakingThisInConstructor")
         BufferedEntryOutputStream(
                 final OutputSocket<? extends E> output,
-                final @CheckForNull InputSocket<? extends Entry> input)
+                final Optional<? extends InputSocket<? extends Entry>> input)
                 throws IOException {
             // HC SVNT DRACONES!
             final E local = (this.output = output).target();
-            final Entry _peer = null != input ? input.target() : null;
             final IoBuffer buffer = this.buffer = pool.allocate();
-            final Entry peer = null != _peer ? _peer : buffer;
+            final Entry peer = (input.isPresent()
+                    ? Optional.<Entry>of(input.get().target())
+                    : Optional.<Entry>empty()).orElse(buffer);
             final class InputProxy extends DecoratingInputSocket<Entry> {
+
                 InputProxy() {
                     super(buffer.input());
                 }
@@ -221,10 +220,10 @@ public class MultiplexingOutputService<E extends MutableEntry> extends Decoratin
                 public Entry target() {
                     return peer;
                 }
-            } // InputProxy
+            }
             try {
                 this.input = new InputProxy();
-                this.out = buffer.output().stream(null);
+                this.out = buffer.output().stream(Optional.empty());
             } catch (final Throwable ex) {
                 try {
                     buffer.release();

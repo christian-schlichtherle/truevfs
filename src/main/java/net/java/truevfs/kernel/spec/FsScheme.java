@@ -50,8 +50,8 @@ public final class FsScheme implements Serializable, Comparable<FsScheme> {
     public static FsScheme create(String scheme) {
         try {
             return new FsScheme(scheme);
-        } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
         }
     }
 

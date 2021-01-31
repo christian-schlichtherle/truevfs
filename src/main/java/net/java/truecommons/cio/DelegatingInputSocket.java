@@ -4,20 +4,19 @@
  */
 package net.java.truecommons.cio;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
+import java.util.Optional;
 
 /**
  * Delegates all methods to another input socket.
  * <p>
  * Implementations should be immutable.
  *
- * @param  <E> the type of the {@linkplain #target() target entry} for I/O
- *         operations.
- * @see    DelegatingOutputSocket
+ * @param <E> the type of the {@linkplain #target() target entry} for I/O operations.
  * @author Christian Schlichtherle
+ * @see DelegatingOutputSocket
  */
 public abstract class DelegatingInputSocket<E extends Entry> extends AbstractInputSocket<E> {
 
@@ -35,15 +34,12 @@ public abstract class DelegatingInputSocket<E extends Entry> extends AbstractInp
     }
 
     @Override
-    public InputStream stream(@Nullable OutputSocket<? extends Entry> peer)
-    throws IOException {
+    public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
         return socket().stream(peer);
     }
 
     @Override
-    public SeekableByteChannel channel(
-            @Nullable OutputSocket<? extends Entry> peer)
-    throws IOException {
+    public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
         return socket().channel(peer);
     }
 }

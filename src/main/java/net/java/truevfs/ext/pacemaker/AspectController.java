@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 /**
@@ -92,12 +93,12 @@ abstract class AspectController extends FsDecoratingController {
         }
 
         @Override
-        public InputStream stream(OutputSocket<? extends Entry> peer) throws IOException {
+        public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
             return apply(() -> socket.stream(peer));
         }
 
         @Override
-        public SeekableByteChannel channel(OutputSocket<? extends Entry> peer) throws IOException {
+        public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
             return apply(() -> socket.channel(peer));
         }
     }
@@ -121,12 +122,12 @@ abstract class AspectController extends FsDecoratingController {
         }
 
         @Override
-        public OutputStream stream(InputSocket<? extends Entry> peer) throws IOException {
+        public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
             return apply(() -> socket.stream(peer));
         }
 
         @Override
-        public SeekableByteChannel channel(InputSocket<? extends Entry> peer) throws IOException {
+        public SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
             return apply(() -> socket.channel(peer));
         }
     }

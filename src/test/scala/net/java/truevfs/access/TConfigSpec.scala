@@ -18,6 +18,7 @@ import org.scalatest.matchers.should.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.wordspec.AnyWordSpec
 
+import java.util.Optional
 import java.util.concurrent._
 import scala.jdk.CollectionConverters._
 
@@ -112,7 +113,7 @@ class TConfigSpec extends AnyWordSpec {
           config setArchiveDetector null
         }
         config.getArchiveDetector should be theSameInstanceAs TArchiveDetector.ALL
-        val detector = new TArchiveDetector("mok", new MockArchiveDriver())
+        val detector = new TArchiveDetector("mok", Optional.of(new MockArchiveDriver()))
         config setArchiveDetector detector
         config.getArchiveDetector should be theSameInstanceAs detector
       }

@@ -86,6 +86,5 @@ public final class FsSyncOptions {
         return 0 == options.length ? NONE : BitField.of(options[0], options);
     }
 
-    /* Can't touch this - hammer time! */
     private FsSyncOptions() { }
 }

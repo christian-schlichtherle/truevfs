@@ -19,10 +19,7 @@ import javax.annotation.CheckForNull;
 import java.io.*;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.java.truecommons.cio.Entry.Access.*;
@@ -490,12 +487,12 @@ public abstract class FsArchiveDriverTestSuite<E extends FsArchiveEntry, D exten
                 }
 
                 @Override
-                public InputStream stream(OutputSocket<? extends Entry> peer) throws IOException {
+                public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
                     return new TestInputStream(socket().stream(peer));
                 }
 
                 @Override
-                public SeekableByteChannel channel(OutputSocket<? extends Entry> peer) throws IOException {
+                public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
                     return new TestSeekableChannel(socket().channel(peer));
                 }
             }
@@ -518,12 +515,13 @@ public abstract class FsArchiveDriverTestSuite<E extends FsArchiveEntry, D exten
                 }
 
                 @Override
-                public SeekableByteChannel channel(InputSocket<? extends Entry> peer) throws IOException {
+                public SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer)
+                        throws IOException {
                     return new TestSeekableChannel(socket().channel(peer));
                 }
 
                 @Override
-                public OutputStream stream(InputSocket<? extends Entry> peer) throws IOException {
+                public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
                     return new TestOutputStream(socket().stream(peer));
                 }
             }

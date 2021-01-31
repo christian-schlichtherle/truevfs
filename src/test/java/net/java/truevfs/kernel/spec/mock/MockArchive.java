@@ -127,13 +127,12 @@ public class MockArchive implements Container<MockArchiveDriverEntry> {
                 }
 
                 @Override
-                public InputStream stream(OutputSocket<? extends Entry> peer)
-                        throws IOException {
+                public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
                     return socket().stream(peer);
                 }
 
                 @Override
-                public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
+                public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer)
                         throws IOException {
                     return socket().channel(peer);
                 }
@@ -166,15 +165,15 @@ public class MockArchive implements Container<MockArchiveDriverEntry> {
                 final MockArchiveDriverEntry entry) {
             Objects.requireNonNull(entry);
 
-            final class Output
-                    extends AbstractOutputSocket<MockArchiveDriverEntry> {
+            final class Output extends AbstractOutputSocket<MockArchiveDriverEntry> {
+
                 @Override
                 public MockArchiveDriverEntry target() {
                     return entry;
                 }
 
                 @Override
-                public OutputStream stream(final InputSocket<? extends Entry> peer)
+                public OutputStream stream(final Optional<? extends InputSocket<? extends Entry>> peer)
                         throws IOException {
                     final class Stream extends DecoratingOutputStream {
                         boolean closed;

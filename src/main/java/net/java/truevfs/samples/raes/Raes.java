@@ -7,16 +7,17 @@ package net.java.truevfs.samples.raes;
 import net.java.truecommons.io.AbstractSink;
 import net.java.truecommons.io.AbstractSource;
 import net.java.truecommons.io.Streams;
+import net.java.truecommons.key.spec.sl.KeyManagerMapLocator;
+import net.java.truevfs.driver.zip.raes.KeyManagerRaesParameters;
+import net.java.truevfs.driver.zip.raes.crypto.RaesOutputStream;
+import net.java.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import net.java.truevfs.driver.zip.raes.KeyManagerRaesParameters;
-import net.java.truevfs.driver.zip.raes.crypto.RaesOutputStream;
-import net.java.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
-import net.java.truecommons.key.spec.sl.KeyManagerMapLocator;
 
 /**
  * Saves and restores the contents of arbitrary files to and from the RAES
@@ -30,7 +31,6 @@ import net.java.truecommons.key.spec.sl.KeyManagerMapLocator;
  */
 public final class Raes {
 
-    /** Can't touch this - hammer time! */
     private Raes() { }
 
     /**

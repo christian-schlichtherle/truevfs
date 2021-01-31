@@ -47,6 +47,7 @@ import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
  * @param <E> the type of the archive entries.
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 abstract class BasicArchiveController<E extends FsArchiveEntry> implements ArchiveController<E> {
 
     private static final Logger logger = new LocalizedLogger(BasicArchiveController.class);
@@ -106,18 +107,18 @@ abstract class BasicArchiveController<E extends FsArchiveEntry> implements Archi
             }
 
             @Override
-            public InputStream stream(OutputSocket<? extends Entry> peer) throws IOException {
+            public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
                 return socket(peer).stream(peer);
             }
 
             @Override
-            public SeekableByteChannel channel(OutputSocket<? extends Entry> peer) throws IOException {
+            public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
                 return socket(peer).channel(peer);
             }
 
-            InputSocket<E> socket(final OutputSocket<? extends Entry> peer) throws IOException {
-                if (null != peer) {
-                    peer.target(); // may sync() if in same target archive file!
+            InputSocket<E> socket(final Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
+                if (peer.isPresent()) {
+                    peer.get().target(); // may sync() if in same target archive file!
                 }
                 return input(target().getName());
             }
@@ -149,7 +150,7 @@ abstract class BasicArchiveController<E extends FsArchiveEntry> implements Archi
             }
 
             @Override
-            public OutputStream stream(final InputSocket<? extends Entry> peer) throws IOException {
+            public OutputStream stream(final Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
                 val tx = make();
                 val ae = tx.head().getEntry();
                 val in = append();

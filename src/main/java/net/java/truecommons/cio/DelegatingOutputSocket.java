@@ -4,10 +4,10 @@
  */
 package net.java.truecommons.cio;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
+import java.util.Optional;
 
 /**
  * Delegates all methods to another output socket.
@@ -34,15 +34,12 @@ public abstract class DelegatingOutputSocket<E extends Entry> extends AbstractOu
     }
 
     @Override
-    public OutputStream stream(@Nullable InputSocket<? extends Entry> peer)
-            throws IOException {
+    public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
         return socket().stream(peer);
     }
 
     @Override
-    public SeekableByteChannel channel(
-            @Nullable InputSocket<? extends Entry> peer)
-            throws IOException {
+    public SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
         return socket().channel(peer);
     }
 }

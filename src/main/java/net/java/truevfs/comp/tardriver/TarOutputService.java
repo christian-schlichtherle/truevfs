@@ -41,6 +41,7 @@ import static org.apache.commons.compress.archivers.tar.TarConstants.DEFAULT_BLK
  * @author Christian Schlichtherle
  * @see TarInputService
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class TarOutputService implements OutputService<TarDriverEntry> {
 
     /**
@@ -96,7 +97,8 @@ public final class TarOutputService implements OutputService<TarDriverEntry> {
     @Override
     public OutputSocket<TarDriverEntry> output(final TarDriverEntry local) {
         Objects.requireNonNull(local);
-        final class Output extends AbstractOutputSocket<TarDriverEntry> {
+
+        class Output extends AbstractOutputSocket<TarDriverEntry> {
 
             @Override
             public TarDriverEntry target() {
@@ -104,29 +106,30 @@ public final class TarOutputService implements OutputService<TarDriverEntry> {
             }
 
             @Override
-            public OutputStream stream(final InputSocket<? extends Entry> peer) throws IOException {
+            public OutputStream stream(final Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
                 if (isBusy()) {
                     throw new OutputBusyException(local.getName());
                 }
                 if (local.isDirectory()) {
-                    updateProperties(local, DirectoryTemplate.INSTANCE);
+                    updateProperties(local, Optional.of(DirectoryTemplate.INSTANCE));
                     return new EntryOutputStream(local);
                 }
-                updateProperties(local, target(peer));
+                updateProperties(local, peer.isPresent() ? Optional.of(peer.get().target()) : Optional.empty());
                 return UNKNOWN == local.getSize()
                         ? new BufferedEntryOutputStream(local)
                         : new EntryOutputStream(local);
             }
         }
+
         return new Output();
     }
 
-    private void updateProperties(final TarDriverEntry local, final @CheckForNull Entry peer) {
+    private void updateProperties(final TarDriverEntry local, final Optional<? extends Entry> peer) {
         if (UNKNOWN == local.getModTime().getTime()) {
             local.setModTime(System.currentTimeMillis());
         }
-        if (null != peer && UNKNOWN == local.getSize()) {
-            local.setSize(peer.getSize(DATA));
+        if (peer.isPresent() && UNKNOWN == local.getSize()) {
+            local.setSize(peer.get().getSize(DATA));
         }
     }
 
@@ -243,7 +246,7 @@ public final class TarOutputService implements OutputService<TarDriverEntry> {
             closed = true;
             busy = false;
             out.close();
-            updateProperties(local, buffer);
+            updateProperties(local, Optional.ofNullable(buffer));
             storeBuffer();
         }
 

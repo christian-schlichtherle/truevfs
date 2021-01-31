@@ -4,15 +4,15 @@
  */
 package net.java.truevfs.access
 
-import java.io.File._
-import java.net._
 import net.java.truevfs.kernel.spec._
 import org.scalatest.matchers.should.Matchers._
-import org.scalatest._
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.prop.TableFor3
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
+
+import java.io.File._
+import java.net._
 
 /**
  * @author Christian Schlichtherle
@@ -166,13 +166,10 @@ class TUriResolverSpec extends AnyWordSpec {
   private def apply[V](fun: TUriResolver => V): V = {
     fun(
       new TUriResolver(
-        new TArchiveDetector(
-          TArchiveDetector.NULL,
-          Array(
-            Array("file", mock[FsDriver]),
-            Array("mok", mock[FsArchiveDriver[_]])
-          )
-        )
+        new TArchiveDetector(Array(
+                    Array("file", mock[FsDriver]),
+                    Array("mok", mock[FsArchiveDriver[_]])
+                  ), TArchiveDetector.NULL)
       )
     )
   }

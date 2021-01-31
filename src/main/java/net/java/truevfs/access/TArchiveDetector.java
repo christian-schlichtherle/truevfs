@@ -4,22 +4,18 @@
  */
 package net.java.truevfs.access;
 
+import lombok.val;
 import net.java.truecommons.shed.ExtensionSet;
-import net.java.truecommons.shed.HashMaps;
-import net.java.truecommons.shed.Loader;
 import net.java.truevfs.kernel.spec.FsAbstractCompositeDriver;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
 
-import javax.annotation.CheckForNull;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.function.Supplier;
-
-import static net.java.truecommons.shed.HashMaps.initialCapacity;
+import java.util.stream.Collectors;
 
 /**
  * Detects a <em>prospective</em> archive file and declares its file system
@@ -54,7 +50,15 @@ import static net.java.truecommons.shed.HashMaps.initialCapacity;
  *
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public final class TArchiveDetector extends FsAbstractCompositeDriver {
+
+    /**
+     * This instance recognizes all archive file name extensions for which an
+     * archive driver can get located on the class path by the file system
+     * driver map locator singleton {@link FsDriverMapLocator#SINGLETON}.
+     */
+    public static final TArchiveDetector ALL = new TArchiveDetector();
 
     /**
      * This instance never recognizes any archive files in a path.
@@ -64,65 +68,57 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      */
     public static final TArchiveDetector NULL = new TArchiveDetector("");
 
-    /**
-     * This instance recognizes all archive file name extensions for which an
-     * archive driver can get located on the class path by the file system
-     * driver map locator singleton {@link FsDriverMapLocator#SINGLETON}.
-     */
-    public static final TArchiveDetector ALL = new TArchiveDetector(null);
-
-    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
-    private static ExtensionSet extensions(final Supplier<Map<FsScheme, FsDriver>> provider) {
+    private static ExtensionSet extensions(final Supplier<Map<FsScheme, ? extends FsDriver>> provider) {
         if (provider instanceof TArchiveDetector) {
             return new ExtensionSet(((TArchiveDetector) provider).extensions);
+        } else {
+            val drivers = provider.get();
+            return drivers
+                    .entrySet()
+                    .stream()
+                    .filter(entry -> entry.getValue().isArchiveDriver())
+                    .map(entry -> entry.getKey().toString())
+                    .collect(Collectors.toCollection(ExtensionSet::new));
         }
-        final Map<FsScheme, FsDriver> map = provider.get();
-        final ExtensionSet set = new ExtensionSet();
-        for (final Entry<FsScheme, FsDriver> entry : map.entrySet()) {
-            if (entry.getValue().isArchiveDriver()) {
-                set.add(entry.getKey().toString());
-            }
-        }
-        return set;
     }
 
-    private static Map<FsScheme, FsDriver> map(final Object[][] config) {
-        final Map<FsScheme, FsDriver> drivers = new HashMap<>(HashMaps.initialCapacity(config.length) * 2); // heuristics
-        for (final Object[] param : config) {
-            final Collection<FsScheme> schemes = schemes(param[0]);
+    private static Map<FsScheme, Optional<? extends FsDriver>> map(final Object[][] config) {
+        val drivers = new TreeMap<FsScheme, Optional<FsDriver>>();
+        for (val param : config) {
+            val schemes = schemes(param[0]);
             if (schemes.isEmpty()) {
-                throw new IllegalArgumentException("No file system schemes!");
+                throw new IllegalArgumentException("No file system schemes given.");
             }
-            final FsDriver driver = Loader.promote(param[1], FsDriver.class);
-            for (FsScheme scheme : schemes) {
-                drivers.put(scheme, driver);
+            Object param1 = param[1];
+            if (param1 instanceof Class<?>) {
+                try {
+                    param1 = ((Class<?>) param1).newInstance();
+                } catch (InstantiationException | IllegalAccessException e) {
+                    throw new IllegalArgumentException("Cannot instantiate prospective file system driver class.", e);
+                }
             }
+            val driver = param1 instanceof FsDriver
+                    ? Optional.of((FsDriver) param1)
+                    : Optional.<FsDriver>empty();
+            schemes.forEach(scheme -> drivers.put(scheme, driver));
         }
         return Collections.unmodifiableMap(drivers);
     }
 
     private static Collection<FsScheme> schemes(final Object o) {
-        final Collection<FsScheme> set = new TreeSet<>();
-        try {
-            if (o instanceof Collection<?>) {
-                for (final Object p : (Collection<?>) o) {
-                    if (p instanceof FsScheme) {
-                        set.add((FsScheme) p);
-                    } else {
-                        for (String q : new ExtensionSet(p.toString())) {
-                            set.add(new FsScheme(q));
-                        }
-                    }
-                }
-            } else if (o instanceof FsScheme) {
-                set.add((FsScheme) o);
-            } else {
-                for (String p : new ExtensionSet(o.toString())) {
-                    set.add(new FsScheme(p));
+        val set = new TreeSet<FsScheme>();
+        if (o instanceof Collection<?>) {
+            for (val p : (Collection<?>) o) {
+                if (p instanceof FsScheme) {
+                    set.add((FsScheme) p);
+                } else {
+                    new ExtensionSet(p.toString()).stream().map(FsScheme::create).forEach(set::add);
                 }
             }
-        } catch (final URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
+        } else if (o instanceof FsScheme) {
+            set.add((FsScheme) o);
+        } else {
+            new ExtensionSet(o.toString()).stream().map(FsScheme::create).forEach(set::add);
         }
         return set;
     }
@@ -134,93 +130,86 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      */
     private final ExtensionSet extensions;
 
-    private final Map<FsScheme, FsDriver> drivers;
+    private final Map<FsScheme, ? extends FsDriver> drivers;
 
     /**
-     * Equivalent to
-     * {@link #TArchiveDetector(Supplier, String)
-     * TArchiveDetector(FsDriverMapLocator.SINGLETON, extensions)}.
+     * Equivalent to {@link #TArchiveDetector(String, TArchiveDetector)
+     * TArchiveDetector(extensions, TArchiveDetector.ALL)}.
      */
-    public TArchiveDetector(@CheckForNull String extensions) {
-        this(FsDriverMapLocator.SINGLETON, extensions);
+    public TArchiveDetector(String extensions) {
+        this(extensions, TArchiveDetector.ALL);
+    }
+
+    private TArchiveDetector() {
+        this(Optional.empty(), FsDriverMapLocator.SINGLETON);
     }
 
     /**
-     * Constructs a new {@code TArchiveDetector} by filtering the given driver
-     * provider for all canonicalized extensions in the {@code extensions} list.
+     * Constructs a new {@code TArchiveDetector} by filtering the given driver provider for all canonical extensions in
+     * the {@code extensions} list.
      *
-     * @param provider   the file system driver provider to filter.
-     * @param extensions A list of file name extensions which shall identify
-     *                   prospective archive files.
-     *                   If this is {@code null}, no filtering is applied and all drivers
-     *                   known by the given provider are available for use with this
-     *                   archive detector.
-     * @throws IllegalArgumentException If any of the extensions in the list
-     *                                  names a extension for which no file system driver is known by the
-     *                                  provider.
+     * @param extensions A list of file name extensions which shall identify prospective archive files.
+     * @param detector   the archive detector to filter.
+     * @throws IllegalArgumentException If any of the extensions in the list names a extension for which no file system
+     *                                  driver is known by the provider.
      * @see ExtensionSet Syntax constraints for extension lists.
      */
-    public TArchiveDetector(final Supplier<Map<FsScheme, FsDriver>> provider,
-                            final @CheckForNull String extensions) {
-        final ExtensionSet available = extensions(provider);
+    public TArchiveDetector(String extensions, TArchiveDetector detector) {
+        this(Optional.of(extensions), detector);
+    }
+
+    private TArchiveDetector(final Optional<String> extensions,
+                             final Supplier<Map<FsScheme, ? extends FsDriver>> provider) {
+        val available = extensions(provider);
         ExtensionSet accepted;
-        if (null == extensions) {
-            accepted = available;
-        } else {
-            accepted = new ExtensionSet(extensions);
+        if (extensions.isPresent()) {
+            val e = extensions.get();
+            accepted = new ExtensionSet(e);
             if (accepted.retainAll(available)) {
-                accepted = new ExtensionSet(extensions);
+                accepted = new ExtensionSet(e);
                 accepted.removeAll(available);
                 assert !accepted.isEmpty();
                 throw new IllegalArgumentException(
                         "\"" + accepted + "\" (no archive driver installed for these extensions)");
             }
+        } else {
+            accepted = available;
         }
         this.extensions = accepted;
-        this.drivers = provider.get();
+        this.drivers = (provider instanceof TArchiveDetector)
+                ? provider.get()
+                : Collections.unmodifiableMap(new TreeMap<>(provider.get()));
     }
 
     /**
-     * Equivalent to
-     * {@link #TArchiveDetector(Supplier, String, FsDriver)
-     * TArchiveDetector(TArchiveDetector.NULL, extensions, driver)}.
+     * Equivalent to {@link #TArchiveDetector(String, Optional, TArchiveDetector)
+     * TArchiveDetector(extensions, driver, TArchiveDetector.NULL)}.
      */
-    public TArchiveDetector(String extensions, @CheckForNull FsDriver driver) {
-        this(NULL, extensions, driver);
+    public TArchiveDetector(String extensions, Optional<? extends FsDriver> driver) {
+        this(extensions, driver, NULL);
     }
 
     /**
-     * Constructs a new {@code TArchiveDetector} by
-     * decorating the configuration of {@code provider} with
-     * mappings for all canonicalized extensions in {@code extensions} to
-     * {@code driver}.
+     * Constructs a new {@code TArchiveDetector} by decorating the configuration of {@code provider} with mappings for
+     * all canonical extensions in {@code extensions} to {@code driver}.
      *
-     * @param provider   the file system driver provider to decorate.
-     * @param extensions A list of file name extensions which shall identify
+     * @param extensions A non-empty list of file name extensions which shall identify
      *                   prospective archive files.
-     *                   This must not be {@code null} and must not be empty.
-     * @param driver     the file system driver to map for the extension list.
-     *                   {@code null} may be used to <i>shadow</i> a mapping for an equal
-     *                   file system scheme in {@code provider} by removing it from the
-     *                   resulting map for this detector.
-     * @throws NullPointerException     if a required configuration element is
-     *                                  {@code null}.
-     * @throws IllegalArgumentException if any other parameter precondition
-     *                                  does not hold.
+     * @param driver     the optional file system driver to map for the extension list.
+     *                   If a file system driver is not present, the mapping for the corresponding file system schemes
+     *                   is removed from the resulting detector.
+     * @param detector   the archive detector to decorate.
+     * @throws IllegalArgumentException if any parameter precondition does not hold.
      * @see ExtensionSet Syntax contraints for extension lists.
      */
-    public TArchiveDetector(Supplier<Map<FsScheme, FsDriver>> provider,
-                            String extensions,
-                            @CheckForNull FsDriver driver) {
-        this(provider, new Object[][]{{extensions, driver}});
+    public TArchiveDetector(String extensions, Optional<? extends FsDriver> driver, TArchiveDetector detector) {
+        this(new Object[][]{{extensions, driver.orElse(null)}}, detector);
     }
 
     /**
-     * Creates a new {@code TArchiveDetector} by
-     * decorating the configuration of {@code provider} with
-     * mappings for all entries in {@code config}.
+     * Creates a new {@code TArchiveDetector} by decorating the configuration of {@code provider} with mappings for all
+     * entries in {@code config}.
      *
-     * @param provider the file system driver provider to decorate.
      * @param config   an array of key-value pair arrays.
      *                 The first element of each inner array must either be a
      *                 {@link FsScheme file system scheme}, an object {@code o} which
@@ -229,51 +218,43 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      *                 or a {@link Collection collection} of these.
      *                 The second element of each inner array must either be a
      *                 {@link FsDriver file system driver object}, a
-     *                 {@link Class file system driver class}, a
-     *                 {@link String fully qualified name of a file system driver class},
-     *                 or {@code null}.
+     *                 {@link Class file system driver class} or {@code null}.
      *                 {@code null} may be used to <i>shadow</i> a mapping for an equal
      *                 file system scheme in {@code provider} by removing it from the
      *                 resulting map for this detector.
+     * @param detector the archive detector to decorate.
      * @throws NullPointerException     if a required configuration element is
      *                                  {@code null}.
      * @throws IllegalArgumentException if any other parameter precondition
      *                                  does not hold.
      * @see ExtensionSet Syntax contraints for extension lists.
      */
-    public TArchiveDetector(Supplier<Map<FsScheme, FsDriver>> provider, Object[][] config) {
-        this(provider, map(config));
+    public TArchiveDetector(Object[][] config, TArchiveDetector detector) {
+        this(map(config), detector);
     }
 
     /**
-     * Constructs a new {@code TArchiveDetector} by decorating the given driver
-     * provider with mappings for all entries in {@code config}.
+     * Constructs a new {@code TArchiveDetector} by decorating the given driver provider with mappings for all entries
+     * in {@code config}.
      *
-     * @param provider the file system driver provider to decorate.
-     * @param config   a map of file system schemes to file system drivers.
-     *                 {@code null} may be used to <i>shadow</i> a mapping for an equal
-     *                 file system scheme in {@code provider} by removing it from the
-     *                 resulting map for this detector.
-     * @throws NullPointerException     if a required configuration element is
-     *                                  {@code null}.
-     * @throws ClassCastException       if a configuration element is of the wrong
-     *                                  type.
-     * @throws IllegalArgumentException if any other parameter precondition
-     *                                  does not hold.
+     * @param config   a map of file system schemes to optional file system drivers.
+     *                 If a file system driver is not present, the mapping for the corresponding file system schemes
+     *                 is removed from the resulting detector.
+     * @param detector the archive detector to decorate.
+     * @throws IllegalArgumentException if any parameter precondition does not hold.
      * @see ExtensionSet Syntax contraints for extension lists.
      */
-    public TArchiveDetector(final Supplier<Map<FsScheme, FsDriver>> provider,
-                            final Map<FsScheme, FsDriver> config) {
-        final ExtensionSet extensions = extensions(provider);
-        final Map<FsScheme, FsDriver> available = provider.get();
-        final Map<FsScheme, FsDriver> drivers = new HashMap<>(initialCapacity(available.size() + config.size()));
-        drivers.putAll(available);
-        for (final Map.Entry<FsScheme, FsDriver> entry : config.entrySet()) {
-            final FsScheme scheme = entry.getKey();
-            final FsDriver driver = entry.getValue();
-            if (null != driver) {
+    public TArchiveDetector(final Map<FsScheme, Optional<? extends FsDriver>> config,
+                            final TArchiveDetector detector) {
+        val extensions = extensions(detector);
+        val available = detector.get();
+        val drivers = new TreeMap<FsScheme, FsDriver>(available);
+        for (val entry : config.entrySet()) {
+            val scheme = entry.getKey();
+            val driver = entry.getValue();
+            if (driver.isPresent()) {
                 extensions.add(scheme.toString());
-                drivers.put(scheme, driver);
+                drivers.put(scheme, driver.get());
             } else {
                 extensions.remove(scheme.toString());
                 //drivers.remove(scheme); // keep the driver!
@@ -306,14 +287,12 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      *
      * @return the immutable map of file system drivers.
      */
-    @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<FsScheme, FsDriver> getDrivers() {
+    public Map<FsScheme, ? extends FsDriver> getDrivers() {
         return drivers;
     }
 
     @Override
-    @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<FsScheme, FsDriver> get() {
+    public Map<FsScheme, ? extends FsDriver> get() {
         return drivers;
     }
 
@@ -330,8 +309,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
      * prospective archive file or {@code null} if no archive file name
      * extension has been detected.
      */
-    public @CheckForNull
-    FsScheme scheme(String path) {
+    public Optional<FsScheme> scheme(String path) {
         // An archive file name extension may contain a dot (e.g. "tar.gz"), so
         // we can't just look for the last dot in the file name and look up the
         // remainder in the key set of the archive driver map.
@@ -340,21 +318,20 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
         path = path.replace('/', File.separatorChar);
         int i = path.lastIndexOf(File.separatorChar) + 1;
         path = path.substring(i);
-        final int l = path.length();
+        val l = path.length();
         for (i = 0; 0 < (i = path.indexOf('.', i) + 1) && i < l; ) {
             final String scheme = path.substring(i);
             if (extensions.contains(scheme)) {
                 try {
-                    return new FsScheme(scheme); // TODO: Support 7z
+                    return Optional.of(new FsScheme(scheme)); // TODO: Support 7z
                 } catch (URISyntaxException ignored) {
                 }
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
-    @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     public boolean equals(final Object obj) {
         if (this == obj) {
             return true;
@@ -362,7 +339,7 @@ public final class TArchiveDetector extends FsAbstractCompositeDriver {
         if (!(obj instanceof TArchiveDetector)) {
             return false;
         }
-        final TArchiveDetector that = (TArchiveDetector) obj;
+        val that = (TArchiveDetector) obj;
         return this.extensions.equals(that.extensions) && this.drivers.equals(that.drivers);
     }
 

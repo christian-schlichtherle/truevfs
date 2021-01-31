@@ -16,16 +16,14 @@ public final class KeyManagementIT extends KeyManagementITSuite {
     @Override
     protected TArchiveDetector newArchiveDetector1(String extension, String password) {
         return KeyManagement.newArchiveDetector1(
-                TConfig.current().getArchiveDetector(),
-                extension,
-                password.toCharArray());
+                extension, password.toCharArray(), TConfig.current().getArchiveDetector()
+        );
     }
 
     @Override
     protected TArchiveDetector newArchiveDetector2(String extension, String password) {
         return KeyManagement.newArchiveDetector2(
-                TConfig.current().getArchiveDetector(),
-                extension,
-                password.toCharArray());
+                extension, password.toCharArray(), TConfig.current().getArchiveDetector()
+        );
     }
 }

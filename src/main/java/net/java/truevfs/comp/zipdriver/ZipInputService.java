@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.NoSuchFileException;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * An input service for reading ZIP files.
@@ -68,6 +69,7 @@ extends AbstractZipFile<E> implements InputService<E> {
     public InputSocket<E> input(final String name) {
         Objects.requireNonNull(name);
         final class Input extends AbstractInputSocket<E> {
+
             @Override
             public E target() throws IOException {
                 final E entry = entry(name);
@@ -79,10 +81,9 @@ extends AbstractZipFile<E> implements InputService<E> {
             }
 
             @Override
-            public InputStream stream(OutputSocket<? extends Entry> output)
-            throws IOException {
+            public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> output) throws IOException {
                 final E local = target();
-                final Entry peer = target(output);
+                final Entry peer = output.isPresent() ? output.get().target() : null;
                 final AbstractZipDriverEntry zpeer = peer instanceof AbstractZipDriverEntry
                         ? (AbstractZipDriverEntry) peer
                         : null;

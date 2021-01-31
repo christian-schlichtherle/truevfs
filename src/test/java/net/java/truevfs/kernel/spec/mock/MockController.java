@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.file.NoSuchFileException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -164,13 +165,13 @@ public class MockController
             }
 
             @Override
-            public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
+            public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer)
                     throws IOException {
                 return new ThrowingSeekableChannel(socket().channel(peer), config.getThrowControl());
             }
 
             @Override
-            public InputStream stream(OutputSocket<? extends Entry> peer)
+            public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer)
                     throws IOException {
                 return new ThrowingInputStream(socket().stream(peer), config.getThrowControl());
             }
@@ -191,8 +192,7 @@ public class MockController
         class Output extends DelegatingOutputSocket<Entry> {
 
             @Override
-            protected OutputSocket<? extends Entry> socket()
-                    throws IOException {
+            protected OutputSocket<? extends Entry> socket() throws IOException {
                 checkAllExceptions(this);
                 final IoEntry<?> n = new MemoryBuffer(name.toString(), config.getDataSize());
                 IoEntry<?> o = map.get(name);
@@ -203,12 +203,13 @@ public class MockController
             }
 
             @Override
-            public SeekableByteChannel channel(InputSocket<? extends Entry> peer) throws IOException {
+            public SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer)
+                    throws IOException {
                 return new ThrowingSeekableChannel(socket().channel(peer), config.getThrowControl());
             }
 
             @Override
-            public OutputStream stream(InputSocket<? extends Entry> peer) throws IOException {
+            public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
                 return new ThrowingOutputStream(socket().stream(peer), config.getThrowControl());
             }
         }

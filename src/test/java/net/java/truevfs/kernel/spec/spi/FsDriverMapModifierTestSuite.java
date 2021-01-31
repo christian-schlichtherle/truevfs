@@ -19,7 +19,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * @author Christian Schlichtherle
  */
 public abstract class FsDriverMapModifierTestSuite {
+
     protected abstract String getExtensions();
+
     protected abstract FsDriverMapModifier newModifier();
 
     @Test
@@ -33,12 +35,10 @@ public abstract class FsDriverMapModifierTestSuite {
 
     @Test
     public void testIsLocatable() {
-        final Map<FsScheme, FsDriver>
-                modified = newModifier().apply(new FsDriverMapFactory().get());
-        final Map<FsScheme, FsDriver>
-                located = FsDriverMapLocator.SINGLETON.get();
-        for (final FsScheme scheme : modified.keySet())
-            assertThat( located.get(scheme),
-                        instanceOf(modified.get(scheme).getClass()));
+        final Map<FsScheme, FsDriver> modified = newModifier().apply(new FsDriverMapFactory().get());
+        final Map<FsScheme, ? extends FsDriver> located = FsDriverMapLocator.SINGLETON.get();
+        for (FsScheme scheme : modified.keySet()) {
+            assertThat( located.get(scheme), instanceOf(modified.get(scheme).getClass()));
+        }
     }
 }

@@ -4,19 +4,6 @@
  */
 package net.java.truevfs.driver.zip.raes.sample;
 
-import java.util.Map;
-import java.util.function.Supplier;
-import javax.inject.Provider;
-import net.java.truevfs.access.TArchiveDetector;
-import net.java.truevfs.access.TConfig;
-import net.java.truevfs.driver.zip.raes.SafeZipRaesDriver;
-import net.java.truevfs.driver.zip.raes.crypto.RaesKeyException;
-import net.java.truevfs.driver.zip.raes.crypto.RaesParameters;
-import net.java.truevfs.driver.zip.raes.crypto.Type0RaesParameters;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsDriver;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truecommons.key.spec.KeyManagerMap;
 import net.java.truecommons.key.spec.UnknownKeyException;
 import net.java.truecommons.key.spec.common.AesKeyStrength;
@@ -24,6 +11,16 @@ import net.java.truecommons.key.spec.common.AesPbeParameters;
 import net.java.truecommons.key.spec.prompting.PromptingKey.Controller;
 import net.java.truecommons.key.spec.prompting.PromptingKey.View;
 import net.java.truecommons.key.spec.prompting.PromptingKeyManagerMap;
+import net.java.truevfs.access.TArchiveDetector;
+import net.java.truevfs.access.TConfig;
+import net.java.truevfs.driver.zip.raes.SafeZipRaesDriver;
+import net.java.truevfs.driver.zip.raes.crypto.RaesKeyException;
+import net.java.truevfs.driver.zip.raes.crypto.RaesParameters;
+import net.java.truevfs.driver.zip.raes.crypto.Type0RaesParameters;
+import net.java.truevfs.kernel.spec.FsController;
+import net.java.truevfs.kernel.spec.FsModel;
+
+import java.util.Optional;
 
 /**
  * Provides static utility methods to set passwords for RAES encrypted ZIP
@@ -36,8 +33,8 @@ import net.java.truecommons.key.spec.prompting.PromptingKeyManagerMap;
  */
 public final class KeyManagement {
 
-    /* Can't touch this - hammer time! */
-    private KeyManagement() { }
+    private KeyManagement() {
+    }
 
     static void install(TArchiveDetector detector) {
 // START SNIPPET: install
@@ -46,30 +43,27 @@ public final class KeyManagement {
     }
 
 // START SNIPPET: newArchiveDetector1
+
     /**
-     * Returns a new archive detector which uses the given password for all
-     * RAES encrypted ZIP files with the given list of extensions.
+     * Returns a new archive detector which uses the given password for all RAES encrypted ZIP files with the given list
+     * of extensions.
      * <p>
      * When used for encryption, the AES key strength will be set to 128 bits.
      * <p>
      * A protective copy of the given password char array is made.
-     * It's recommended to overwrite the parameter array with any non-password
-     * data after calling this method.
+     * It's recommended to overwrite the parameter array with any non-password data after calling this method.
      *
-     * @param  provider the file system driver provider to decorate.
-     * @param  extensions A list of file name extensions which shall identify
-     *         prospective archive files.
-     *         This must not be {@code null} and must not be empty.
-     * @param  password the password char array to be copied for internal use.
+     * @param extensions A list of file name extensions which shall identify prospective archive files.
+     *                   This must not be {@code null} and must not be empty.
+     * @param password   the password char array to be copied for internal use.
+     * @param detector   the archive detector to decorate.
      * @return A new archive detector which uses the given password for all
-     *         RAES encrypted ZIP files with the given list of extensions.
+     * RAES encrypted ZIP files with the given list of extensions.
      */
-    public static TArchiveDetector newArchiveDetector1(
-            Supplier<Map<FsScheme, FsDriver>> provider,
-            String extensions,
-            char[] password) {
-        return new TArchiveDetector(provider,
-                extensions, new CustomZipRaesDriver1(password));
+    public static TArchiveDetector newArchiveDetector1(String extensions,
+                                                       char[] password,
+                                                       TArchiveDetector detector) {
+        return new TArchiveDetector(extensions, Optional.of(new CustomZipRaesDriver1(password)), detector);
     }
 
     private static final class CustomZipRaesDriver1 extends SafeZipRaesDriver {
@@ -105,7 +99,7 @@ public final class KeyManagement {
     } // CustomZipRaesDriver
 
     private static final class CustomRaesParameters
-    implements Type0RaesParameters {
+            implements Type0RaesParameters {
 
         final char[] password;
 
@@ -115,26 +109,26 @@ public final class KeyManagement {
 
         @Override
         public char[] getPasswordForWriting()
-        throws RaesKeyException {
+                throws RaesKeyException {
             return password.clone();
         }
 
         @Override
         public char[] getPasswordForReading(boolean invalid)
-        throws RaesKeyException {
+                throws RaesKeyException {
             if (invalid) throw new RaesKeyException("Invalid password!");
             return password.clone();
         }
 
         @Override
         public AesKeyStrength getKeyStrength()
-        throws RaesKeyException {
+                throws RaesKeyException {
             return AesKeyStrength.BITS_128;
         }
 
         @Override
         public void setKeyStrength(AesKeyStrength keyStrength)
-        throws RaesKeyException {
+                throws RaesKeyException {
             // We have been using only 128 bits to create archive entries.
             assert AesKeyStrength.BITS_128 == keyStrength;
         }
@@ -142,30 +136,28 @@ public final class KeyManagement {
 // END SNIPPET: newArchiveDetector1
 
 // START SNIPPET: newArchiveDetector2
+
     /**
-     * Returns a new archive detector which uses the given password for all
-     * RAES encrypted ZIP files with the given list of extensions.
+     * Returns a new archive detector which uses the given password for all RAES encrypted ZIP files with the given list
+     * of extensions.
      * <p>
      * When used for encryption, the AES key strength will be set to 128 bits.
      * <p>
      * A protective copy of the given password char array is made.
-     * It's recommended to overwrite the parameter array with any non-password
-     * data after calling this method.
+     * It's recommended to overwrite the parameter array with any non-password data after calling this method.
      *
-     * @param  provider the file system driver provider to decorate.
-     * @param  extensions A list of file name extensions which shall identify
-     *         prospective archive files.
-     *         This must not be {@code null} and must not be empty.
-     * @param  password the password char array to be copied for internal use.
-     * @return A new archive detector which uses the given password for all
-     *         RAES encrypted ZIP files with the given list of extensions.
+     * @param extensions A list of file name extensions which shall identify prospective archive files.
+     *                   This must not be {@code null} and must not be empty.
+     * @param password   the password char array to be copied for internal use.
+     * @param detector   the archive detector to decorate.
+     * @return A new archive detector which uses the given password for all RAES encrypted ZIP files with the given list
+     * of extensions.
      */
     public static TArchiveDetector newArchiveDetector2(
-            Supplier<Map<FsScheme, FsDriver>> provider,
             String extensions,
-            char[] password) {
-        return new TArchiveDetector(provider,
-                    extensions, new CustomZipRaesDriver2(password));
+            char[] password,
+            TArchiveDetector detector) {
+        return new TArchiveDetector(extensions, Optional.of(new CustomZipRaesDriver2(password)), detector);
     }
 
     private static final class CustomZipRaesDriver2 extends SafeZipRaesDriver {
@@ -179,15 +171,19 @@ public final class KeyManagement {
         }
 
         @Override
-        public KeyManagerMap getKeyManagerMap() { return map; }
+        public KeyManagerMap getKeyManagerMap() {
+            return map;
+        }
     } // CustomZipRaesDriver2
 
     private static final class CustomView
-    implements View<AesPbeParameters> {
+            implements View<AesPbeParameters> {
 
         final char[] password;
 
-        CustomView(char[] password) { this.password = password.clone(); }
+        CustomView(char[] password) {
+            this.password = password.clone();
+        }
 
         /**
          * You need to create a new key because the key manager may eventually
@@ -202,7 +198,7 @@ public final class KeyManagement {
 
         @Override
         public void promptKeyForWriting(Controller<AesPbeParameters> controller)
-        throws UnknownKeyException {
+                throws UnknownKeyException {
             // You might as well call controller.getResource() here in order to
             // programmatically set the parameters for individual resource URIs.
             // Note that this would typically return the hierarchical URI of
@@ -215,7 +211,7 @@ public final class KeyManagement {
         public void promptKeyForReading(
                 Controller<AesPbeParameters> controller,
                 boolean invalid)
-        throws UnknownKeyException {
+                throws UnknownKeyException {
             if (invalid) throw new UnknownKeyException();
             // You might as well call controller.getResource() here in order to
             // programmatically set the parameters for individual resource URIs.

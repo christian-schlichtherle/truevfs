@@ -18,13 +18,10 @@ import net.java.truevfs.comp.zip.ZipKeyException;
 import net.java.truevfs.comp.zipdriver.AbstractZipDriverEntry;
 import net.java.truevfs.comp.zipdriver.ZipDriver;
 import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsScheme;
 
 import java.nio.charset.Charset;
-import java.util.Map;
-import java.util.function.Supplier;
+import java.util.Optional;
 
 /**
  * Provides static utility methods to set passwords for WinZip AES encrypted
@@ -37,7 +34,6 @@ import java.util.function.Supplier;
  */
 public final class KeyManagement {
 
-    /* Can't touch this - hammer time! */
     private KeyManagement() {
     }
 
@@ -59,22 +55,19 @@ public final class KeyManagement {
      * It's recommended to overwrite the parameter array with any non-password
      * data after calling this method.
      *
-     * @param provider   the file system driver provider to decorate.
      * @param extensions A list of file name extensions which shall identify
      *                   prospective archive files.
      *                   This must not be {@code null} and must not be empty.
      * @param password   the password byte array to be copied for internal use.
      *                   The bytes should be limited to seven bits only, see
      *                   {@link WinZipAesParameters}.
+     * @param detector   the archive detector to decorate.
      * @return A new archive detector which uses the given password for all
      * WinZip AES encrypted ZIP entries with the given list of
      * extensions.
      */
-    public static TArchiveDetector newArchiveDetector1(
-            Supplier<Map<FsScheme, FsDriver>> provider,
-            String extensions,
-            byte[] password) {
-        return new TArchiveDetector(provider, extensions, new CustomZipDriver1(password));
+    public static TArchiveDetector newArchiveDetector1(String extensions, byte[] password, TArchiveDetector detector) {
+        return new TArchiveDetector(extensions, Optional.of(new CustomZipDriver1(password)), detector);
     }
 
     private static final class CustomZipDriver1 extends ZipDriver {
@@ -178,22 +171,19 @@ public final class KeyManagement {
      * It's recommended to overwrite the parameter array with any non-password
      * data after calling this method.
      *
-     * @param provider   the file system driver provider to decorate.
      * @param extensions A list of file name extensions which shall identify
      *                   prospective archive files.
      *                   This must not be {@code null} and must not be empty.
      * @param password   the password char array to be copied for internal use.
      *                   The characters should be limited to US-ASCII, see
      *                   {@link WinZipAesParameters}.
+     * @param detector   the archive detector to decorate.
      * @return A new archive detector which uses the given password for all
      * WinZip AES encrypted ZIP entries with the given list of
      * extensions.
      */
-    public static TArchiveDetector newArchiveDetector2(
-            Supplier<Map<FsScheme, FsDriver>> provider,
-            String extensions,
-            char[] password) {
-        return new TArchiveDetector(provider, extensions, new CustomZipDriver2(password));
+    public static TArchiveDetector newArchiveDetector2(String extensions, char[] password, TArchiveDetector detector) {
+        return new TArchiveDetector(extensions, Optional.of(new CustomZipDriver2(password)), detector);
     }
 
     private static final class CustomZipDriver2 extends ZipDriver {

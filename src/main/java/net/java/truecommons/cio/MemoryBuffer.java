@@ -15,6 +15,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.util.EnumMap;
 import java.util.Objects;
+import java.util.Optional;
 
 import static net.java.truecommons.cio.Entry.Access.READ;
 import static net.java.truecommons.cio.Entry.Access.WRITE;
@@ -199,27 +200,28 @@ public class MemoryBuffer implements IoBuffer {
     }
 
     private final class Input extends AbstractInputSocket<MemoryBuffer> {
+
         @Override
         public MemoryBuffer target() throws IOException {
             return MemoryBuffer.this;
         }
 
         @Override
-        public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
+        public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer)
         throws IOException {
             return new DataInputChannel();
         }
     }
 
     private final class Output extends AbstractOutputSocket<MemoryBuffer> {
+
         @Override
         public MemoryBuffer target() throws IOException {
             return MemoryBuffer.this;
         }
 
         @Override
-        public SeekableByteChannel channel(InputSocket<? extends Entry> peer)
-        throws IOException {
+        public SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
             return new DataOutputChannel();
         }
     }

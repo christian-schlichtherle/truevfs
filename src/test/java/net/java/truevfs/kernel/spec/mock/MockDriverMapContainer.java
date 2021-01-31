@@ -20,22 +20,20 @@ import java.util.function.Supplier;
  *
  * @author Christian Schlichtherle
  */
-public final class MockDriverMapContainer
-implements Supplier<Map<FsScheme, FsDriver>> {
-    private final Map<FsScheme, FsDriver> drivers;
+public final class MockDriverMapContainer implements Supplier<Map<FsScheme, ? extends FsDriver>> {
+
+    private final Map<FsScheme, ? extends FsDriver> drivers;
 
     public MockDriverMapContainer(final String extensions) {
         final Set<String> set = new ExtensionSet(extensions);
         final Map<FsScheme, FsDriver> map = new LinkedHashMap<>(HashMaps.initialCapacity(set.size()));
         final FsDriver driver = new MockDriver();
-        for (final String extension : set)
-            map.put(FsScheme.create(extension), driver);
+        set.forEach(extension -> map.put(FsScheme.create(extension), driver));
         drivers = Collections.unmodifiableMap(map);
     }
 
     @Override
-    @SuppressWarnings("ReturnOfCollectionOrArrayField")
-    public Map<FsScheme, FsDriver> get() {
+    public Map<FsScheme, ? extends FsDriver> get() {
         return drivers;
     }
 }

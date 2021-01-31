@@ -240,7 +240,7 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
             }
 
             @Override
-            public InputStream stream(OutputSocket<? extends Entry> peer) throws IOException {
+            public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
                 return syncOn(ClosedInputException.class, new Op<InputStream, IOException>() {
 
                     @Override
@@ -251,7 +251,7 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
             }
 
             @Override
-            public SeekableByteChannel channel(OutputSocket<? extends Entry> peer) throws IOException {
+            public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
                 return syncOn(ClosedInputException.class, new Op<SeekableByteChannel, IOException>() {
 
                     @Override
@@ -280,7 +280,7 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
             }
 
             @Override
-            public OutputStream stream(InputSocket<? extends Entry> peer) throws IOException {
+            public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
                 return syncOn(ClosedOutputException.class, new Op<OutputStream, IOException>() {
 
                     @Override
@@ -291,7 +291,8 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
             }
 
             @Override
-            public SeekableByteChannel channel(InputSocket<? extends Entry> peer) throws IOException {
+            public SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer)
+                    throws IOException {
                 return syncOn(ClosedOutputException.class, new Op<SeekableByteChannel, IOException>() {
 
                     @Override

@@ -12,7 +12,6 @@ package net.java.truecommons.io;
  */
 class ThreadGroups {
 
-    /* Can't touch this - hammer time! */
     private ThreadGroups() { }
 
     /**

@@ -12,6 +12,7 @@ import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Objects;
+import java.util.Optional;
 
 import static net.java.truecommons.cio.Entry.UNKNOWN;
 import static net.java.truevfs.comp.zip.ZipEntry.STORED;
@@ -55,8 +56,7 @@ public class OdfOutputService extends MultiplexingOutputService<JarDriverEntry> 
             }
 
             @Override
-            public OutputStream stream(InputSocket<? extends Entry> peer)
-            throws IOException {
+            public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
                 if (MIMETYPE.equals(entry.getName())) {
                     mimetype = true;
                     if (UNKNOWN == entry.getMethod())

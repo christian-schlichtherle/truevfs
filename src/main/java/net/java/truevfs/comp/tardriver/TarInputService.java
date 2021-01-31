@@ -201,6 +201,7 @@ implements InputService<TarDriverEntry> {
         Objects.requireNonNull(name);
 
         final class Input extends AbstractInputSocket<TarDriverEntry> {
+
             @Override
             public TarDriverEntry target() throws IOException {
                 final TarDriverEntry entry = entry(name);
@@ -212,13 +213,13 @@ implements InputService<TarDriverEntry> {
             }
 
             @Override
-            public InputStream stream(OutputSocket<? extends Entry> peer)
+            public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer)
             throws IOException {
                 return socket().stream(peer);
             }
 
             @Override
-            public SeekableByteChannel channel(OutputSocket<? extends Entry> peer)
+            public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer)
             throws IOException {
                 return socket().channel(peer);
             }

@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Iterator;
+import java.util.Optional;
 
 /**
  * Decorates another output service in order to disconnect any resources when this output service gets closed.
@@ -99,7 +100,7 @@ final class DisconnectingOutputService<E extends Entry> extends DecoratingOutput
             }
 
             @Override
-            public OutputStream stream(InputSocket<? extends Entry> peer) throws IOException {
+            public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
                 return new DisconnectingOutputStreamImpl(cc.checked(new Op<OutputStream, IOException>() {
 
                     @Override
@@ -110,7 +111,7 @@ final class DisconnectingOutputService<E extends Entry> extends DecoratingOutput
             }
 
             @Override
-            public SeekableByteChannel channel(InputSocket<? extends Entry> peer) throws IOException {
+            public SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
                 return new DisconnectingSeekableChannelImpl(cc.checked(new Op<SeekableByteChannel, IOException>() {
 
                     @Override

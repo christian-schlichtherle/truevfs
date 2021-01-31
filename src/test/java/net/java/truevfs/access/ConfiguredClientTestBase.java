@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -80,7 +81,7 @@ public abstract class ConfiguredClientTestBase<D extends FsArchiveDriver<?>>
         if (ISOLATE_FS_MANAGER) {
             config.setManager(newManager());
         }
-        final TArchiveDetector detector = new TArchiveDetector(getExtensionList(), getArchiveDriver());
+        final TArchiveDetector detector = new TArchiveDetector(getExtensionList(), Optional.of(getArchiveDriver()));
         environment = Collections.singletonMap(ARCHIVE_DETECTOR, detector);
         config.setArchiveDetector(detector);
         config.setLenient(true);

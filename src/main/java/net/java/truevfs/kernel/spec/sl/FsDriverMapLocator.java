@@ -21,7 +21,7 @@ import java.util.function.Supplier;
  *
  * @author Christian Schlichtherle
  */
-public final class FsDriverMapLocator implements Supplier<Map<FsScheme, FsDriver>> {
+public final class FsDriverMapLocator implements Supplier<Map<FsScheme, ? extends FsDriver>> {
 
     /**
      * The singleton instance of this class.
@@ -32,12 +32,12 @@ public final class FsDriverMapLocator implements Supplier<Map<FsScheme, FsDriver
     }
 
     @Override
-    public Map<FsScheme, FsDriver> get() {
+    public Map<FsScheme, ? extends FsDriver> get() {
         return Lazy.drivers;
     }
 
     private static final class Lazy {
-        static final Map<FsScheme, FsDriver> drivers = Collections.unmodifiableMap(
+        static final Map<FsScheme, ? extends FsDriver> drivers = Collections.unmodifiableMap(
                 new ServiceLocator().provider(FsDriverMapFactory.class, FsDriverMapModifier.class).get());
     }
 }

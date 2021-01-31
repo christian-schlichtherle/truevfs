@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
+import java.util.Optional;
 
 import static bali.CachingStrategy.NOT_THREAD_SAFE;
 import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
@@ -142,12 +143,12 @@ abstract class FalsePositiveArchiveController implements FsDelegatingController 
             }
 
             @Override
-            public InputStream stream(OutputSocket<? extends Entry> peer) throws IOException {
+            public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
                 return apply(name, (c, n) -> socket(c, n).stream(peer));
             }
 
             @Override
-            public SeekableByteChannel channel(OutputSocket<? extends Entry> peer) throws IOException {
+            public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
                 return apply(name, (c, n) -> socket(c, n).channel(peer));
             }
         };
@@ -178,12 +179,13 @@ abstract class FalsePositiveArchiveController implements FsDelegatingController 
             }
 
             @Override
-            public OutputStream stream(InputSocket<? extends Entry> peer) throws IOException {
+            public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
                 return apply(name, (c, n) -> socket(c, n).stream(peer));
             }
 
             @Override
-            public SeekableByteChannel channel(InputSocket<? extends Entry> peer) throws IOException {
+            public SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer)
+                    throws IOException {
                 return apply(name, (c, n) -> socket(c, n).channel(peer));
             }
         };

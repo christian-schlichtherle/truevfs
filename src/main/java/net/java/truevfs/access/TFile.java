@@ -855,7 +855,7 @@ public final class TFile extends File implements TRex {
                 }
             }
 
-            final boolean isArchive = null != detector.scheme(path);
+            final boolean isArchive = detector.scheme(path).isPresent();
             if (0 < enclEntryNameBuf.length()) {
                 if (isArchive) {
                     enclArchive = new TFile(path, detector); // use the same configuration for the parent directory
@@ -1290,19 +1290,20 @@ public final class TFile extends File implements TRex {
             return controller;
         final File file = this.file;
         final String path = Paths.normalize(file.getPath(), separatorChar);
-        final FsScheme scheme = getArchiveDetector().scheme(path);
+        final Optional<FsScheme> scheme = getArchiveDetector().scheme(path);
         // See http://java.net/jira/browse/TRUEZIP-154 .
-        if (null == scheme)
+        if (!scheme.isPresent()) {
             throw new ServiceConfigurationError(
                     "Unknown file system scheme for path \""
-                    + path
-                    + "\"! Check run-time class path configuration.");
+                            + path
+                            + "\"! Check run-time class path configuration.");
+        }
         final FsMountPoint mountPoint;
         try {
             final TFile enclArchive = this.enclArchive;
             final FsNodeName nodeName = this.nodeName;
             assert (null != enclArchive) == (null != nodeName);
-            mountPoint = new FsMountPoint(scheme, null == enclArchive
+            mountPoint = new FsMountPoint(scheme.get(), null == enclArchive
                     ? new FsNodePath(   file)
                     : new FsNodePath(   enclArchive .getController()
                                                 .getModel()
@@ -1559,7 +1560,7 @@ public final class TFile extends File implements TRex {
         final FsController controller = this.controller;
         if (null != controller)
             return controller.getModel().getMountPoint().getScheme();
-        return getArchiveDetector().scheme(file.getPath());
+        return getArchiveDetector().scheme(file.getPath()).orElse(null);
     }
 
     /**

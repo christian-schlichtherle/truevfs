@@ -12,6 +12,7 @@ import net.java.truevfs.kernel.spec.FsAccessOption;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
+import java.util.Optional;
 
 /**
  * An input socket for HTTP(S) entries.
@@ -37,14 +38,12 @@ public class HttpInputSocket extends AbstractInputSocket<HttpNode> {
     }
 
     @Override
-    public InputStream stream(final OutputSocket<? extends Entry> peer)
-    throws IOException {
+    public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
         return entry.newInputStream();
     }
 
     @Override
-    public SeekableByteChannel channel(final OutputSocket<? extends Entry> peer)
-    throws IOException {
+    public SeekableByteChannel channel(final Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
         final IoBuffer buffer = entry.getPool().allocate();
         try {
             IoSockets.copy(entry.input(), buffer.output());

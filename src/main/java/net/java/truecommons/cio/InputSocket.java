@@ -4,11 +4,11 @@
  */
 package net.java.truecommons.cio;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.NonWritableChannelException;
 import java.nio.channels.SeekableByteChannel;
+import java.util.Optional;
 
 /**
  * A <em>stateless</em> factory for input streams and seekable byte channels
@@ -21,6 +21,7 @@ import java.nio.channels.SeekableByteChannel;
  * @see    OutputSocket
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public interface InputSocket<E extends Entry> extends IoSocket<E> {
 
     /**
@@ -32,8 +33,7 @@ public interface InputSocket<E extends Entry> extends IoSocket<E> {
      * @return A new input stream for reading bytes.
      * @throws IOException on any I/O error.
      */
-    InputStream stream(@Nullable OutputSocket<? extends Entry> peer)
-    throws IOException;
+    InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException;
 
     /**
      * <b>Optional operation:</b> Returns a new seekable byte channel for
@@ -51,6 +51,5 @@ public interface InputSocket<E extends Entry> extends IoSocket<E> {
      * @throws UnsupportedOperationException if this operation is not supported.
      * @throws IOException on any I/O error.
      */
-    SeekableByteChannel channel(@Nullable OutputSocket<? extends Entry> peer)
-    throws IOException;
+    SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException;
 }

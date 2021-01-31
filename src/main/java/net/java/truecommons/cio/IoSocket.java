@@ -51,15 +51,12 @@ public interface IoSocket<E extends Entry> {
     /**
      * Resolves the <i>target</i> for I/O operations.
      * <p>
-     * Note that this interface contract does <em>not</em> state any other
-     * terms or conditions for the returned entry.
-     * In particular, the returned object may or may not be a defensive copy
-     * and it may or may not reflect the effect of subsequent I/O operations.
-     * So a client may only assume that the returned entry accurately reflects
-     * the state of its represented entity <em>before</em> the client does
-     * subsequent I/O.
-     * Implementations may add some constraints to ease the situation for
-     * clients.
+     * Note that this interface contract does <em>not</em> state any other terms or conditions for the returned entry.
+     * In particular, the returned object may or may not be a defensive copy and it may or may not reflect the effect of
+     * subsequent I/O operations.
+     * So a client may only assume that the returned entry accurately reflects the state of its represented entity
+     * <em>before</em> the client does subsequent I/O.
+     * Implementations may add some constraints to ease the situation for clients.
      *
      * @return The local target for I/O operations.
      * @throws IOException on any I/O error.

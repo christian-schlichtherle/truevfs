@@ -6,9 +6,9 @@ package net.java.truevfs.driver.file;
 
 import net.java.truecommons.io.DecoratingOutputStream;
 
-import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Optional;
 
 /**
  * A decorating output stream which saves the last {@link IOException}
@@ -16,10 +16,11 @@ import java.io.OutputStream;
  *
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 abstract class IOExceptionOutputStream extends DecoratingOutputStream {
 
     /** The nullable last I/O exception. */
-    @CheckForNull IOException exception;
+    Optional<IOException> exception = Optional.empty();
 
     /**
      * Constructs a new I/O exception output stream.
@@ -31,20 +32,22 @@ abstract class IOExceptionOutputStream extends DecoratingOutputStream {
     }
 
     @Override
-    public void write(int b) throws IOException {
+    public void write(final int b) throws IOException {
         try {
             out.write(b);
-        } catch (IOException ex) {
-            throw exception = ex;
+        } catch (IOException e) {
+            exception = Optional.of(e);
+            throw e;
         }
     }
 
     @Override
-    public void write(byte[] b, int off, int len) throws IOException {
+    public void write(final byte[] b, final int off, final int len) throws IOException {
         try {
             out.write(b, off, len);
-        } catch (IOException ex) {
-            throw exception = ex;
+        } catch (IOException e) {
+            exception = Optional.of(e);
+            throw e;
         }
     }
 
@@ -52,8 +55,9 @@ abstract class IOExceptionOutputStream extends DecoratingOutputStream {
     public void flush() throws IOException {
         try {
             out.flush();
-        } catch (IOException ex) {
-            throw exception = ex;
+        } catch (IOException e) {
+            exception = Optional.of(e);
+            throw e;
         }
     }
 
@@ -61,8 +65,9 @@ abstract class IOExceptionOutputStream extends DecoratingOutputStream {
     public void close() throws IOException {
         try {
             out.close();
-        } catch (IOException ex) {
-            throw exception = ex;
+        } catch (IOException e) {
+            exception = Optional.of(e);
+            throw e;
         }
     }
 }

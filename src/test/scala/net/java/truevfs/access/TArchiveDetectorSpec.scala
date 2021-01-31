@@ -6,10 +6,11 @@ package net.java.truevfs.access
 
 import net.java.truevfs.kernel.spec._
 import org.scalatest.matchers.should.Matchers._
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 
+import java.util.Optional
 import scala.jdk.CollectionConverters._
 
 /**
@@ -25,32 +26,29 @@ class TArchiveDetectorSpec extends AnyWordSpec {
       )
       forAll(table) { (sequence, accept, test) =>
         val map = {
-          sequence map (FsScheme.create(_) -> mock[FsArchiveDriver[FsArchiveEntry]])
-        }.toMap[FsScheme, FsDriver]
-        val detector = new TArchiveDetector(
-          new TArchiveDetector(TArchiveDetector.NULL, map.asJava),
-          accept)
-        val scheme = FsScheme create test
-        detector scheme test should be (null)
-        detector.get get scheme should not be null
+          sequence.map(FsScheme.create(_) -> Optional.of(mock[FsArchiveDriver[FsArchiveEntry]]))
+        }.toMap[FsScheme, Optional[_ <: FsDriver]]
+        val detector = new TArchiveDetector(accept, new TArchiveDetector(map.asJava, TArchiveDetector.NULL))
+        val scheme = FsScheme.create(test)
+        detector.scheme(test).isPresent shouldBe false
+        detector.get.get(scheme) shouldNot be(null)
       }
     }
 
-    "retain drivers in the map which have been replaced by a null value mapping" in {
+    "retain drivers in the map which have been replaced by an empty mapping" in {
       val table = Table(
         ("sequence", "accept", "test"),
         (Seq("a", "b"), "a", "b")
       )
       forAll(table) { (sequence, accept, test) =>
         val map = {
-          sequence map (FsScheme.create(_) -> mock[FsArchiveDriver[FsArchiveEntry]])
-        }.toMap[FsScheme, FsDriver]
-        val scheme = FsScheme create test
-        val detector = new TArchiveDetector(
-          new TArchiveDetector(TArchiveDetector.NULL, map.asJava),
-          Map(scheme -> (null: FsDriver)).asJava)
-        detector.scheme(test) should be (null)
-        detector.get get scheme should not be null
+          sequence.map(FsScheme.create(_) -> Optional.of(mock[FsArchiveDriver[FsArchiveEntry]]))
+        }.toMap[FsScheme, Optional[_ <: FsDriver]]
+        val scheme = FsScheme.create(test)
+        val config: Map[FsScheme, Optional[_ <: FsDriver]] = Map(scheme -> Optional.empty[FsDriver]())
+        val detector = new TArchiveDetector(config.asJava, new TArchiveDetector(map.asJava, TArchiveDetector.NULL))
+        detector.scheme(test).isPresent shouldBe false
+        detector.get.get(scheme) shouldNot be(null)
       }
     }
   }

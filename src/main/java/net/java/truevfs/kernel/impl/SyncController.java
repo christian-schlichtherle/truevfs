@@ -115,7 +115,7 @@ abstract class SyncController<E extends FsArchiveEntry> implements DelegatingArc
             }
 
             @Override
-            public InputStream stream(OutputSocket<? extends Entry> peer) throws IOException {
+            public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
                 return apply(new Op<InputStream, IOException>() {
 
                     @Override
@@ -126,7 +126,7 @@ abstract class SyncController<E extends FsArchiveEntry> implements DelegatingArc
             }
 
             @Override
-            public SeekableByteChannel channel(OutputSocket<? extends Entry> peer) throws IOException {
+            public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
                 return apply(new Op<SeekableByteChannel, IOException>() {
 
                     @Override
@@ -156,7 +156,7 @@ abstract class SyncController<E extends FsArchiveEntry> implements DelegatingArc
             }
 
             @Override
-            public OutputStream stream(InputSocket<? extends Entry> peer) throws IOException {
+            public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
                 return apply(new Op<OutputStream, IOException>() {
 
                     @Override
@@ -167,7 +167,8 @@ abstract class SyncController<E extends FsArchiveEntry> implements DelegatingArc
             }
 
             @Override
-            public SeekableByteChannel channel(InputSocket<? extends Entry> peer) throws IOException {
+            public SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer)
+                    throws IOException {
                 return apply(new Op<SeekableByteChannel, IOException>() {
 
                     @Override

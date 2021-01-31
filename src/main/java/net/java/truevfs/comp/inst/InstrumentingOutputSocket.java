@@ -9,11 +9,11 @@ import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.OutputSocket;
 
-import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @param  <M> the type of the mediator.
@@ -37,15 +37,12 @@ extends DecoratingOutputSocket<E> {
     }
 
     @Override
-    public OutputStream stream(@CheckForNull InputSocket<? extends Entry> peer)
-    throws IOException {
+    public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
         return mediator.instrument(this, socket.stream(peer));
     }
 
     @Override
-    public SeekableByteChannel channel(
-            @CheckForNull InputSocket<? extends Entry> peer)
-    throws IOException {
+    public SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
         return mediator.instrument(this, socket.channel(peer));
     }
 }

@@ -46,12 +46,13 @@ abstract class FinalizeController implements FsDelegatingController {
             }
 
             @Override
-            public InputStream stream(OutputSocket<? extends Entry> peer) throws IOException {
+            public InputStream stream(Optional<? extends OutputSocket<? extends Entry>> peer) throws IOException {
                 return new FinalizeInputStream(socket.stream(peer));
             }
 
             @Override
-            public SeekableByteChannel channel(OutputSocket<? extends Entry> peer) throws IOException {
+            public SeekableByteChannel channel(Optional<? extends OutputSocket<? extends Entry>> peer)
+                    throws IOException {
                 return new FinalizeSeekableChannel(socket.channel(peer));
             }
         };
@@ -69,12 +70,13 @@ abstract class FinalizeController implements FsDelegatingController {
             }
 
             @Override
-            public OutputStream stream(InputSocket<? extends Entry> peer) throws IOException {
+            public OutputStream stream(Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
                 return new FinalizeOutputStream(socket.stream(peer));
             }
 
             @Override
-            public SeekableByteChannel channel(InputSocket<? extends Entry> peer) throws IOException {
+            public SeekableByteChannel channel(Optional<? extends InputSocket<? extends Entry>> peer)
+                    throws IOException {
                 return new FinalizeSeekableChannel(socket.channel(peer));
             }
         };
