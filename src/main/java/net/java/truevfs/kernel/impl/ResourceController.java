@@ -14,7 +14,6 @@ import net.java.truecommons.shed.ControlFlowException;
 import net.java.truecommons.shed.ExceptionHandler;
 import net.java.truevfs.kernel.spec.*;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +30,6 @@ import static net.java.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
  * @author Christian Schlichtherle
  * @see ResourceAccountant
  */
-@NotThreadSafe
 abstract class ResourceController<E extends FsArchiveEntry> implements DelegatingArchiveController<E> {
 
     private static final int waitTimeoutMillis = LockingStrategy.acquireTimeoutMillis;

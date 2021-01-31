@@ -4,9 +4,9 @@
  */
 package net.java.truecommons.cio;
 
-import java.io.IOException;
-import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.UniqueObject;
+
+import java.io.IOException;
 
 /**
  * Abstract base class for I/O sockets.
@@ -17,9 +17,7 @@ import net.java.truecommons.shed.UniqueObject;
  *         operations.
  * @author Christian Schlichtherle
  */
-@Immutable
-public abstract class AbstractIoSocket<E extends Entry>
-extends UniqueObject implements IoSocket<E> {
+public abstract class AbstractIoSocket<E extends Entry> extends UniqueObject implements IoSocket<E> {
 
     /**
      * Returns a string representation of this object for debugging and logging

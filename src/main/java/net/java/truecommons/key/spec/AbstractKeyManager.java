@@ -4,7 +4,6 @@
  */
 package net.java.truecommons.key.spec;
 
-import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.UniqueObject;
 
 /**
@@ -18,7 +17,6 @@ import net.java.truecommons.shed.UniqueObject;
  * @param  <K> The type of the keys.
  * @author Christian Schlichtherle
  */
-@Immutable
 public abstract class AbstractKeyManager<K>
 extends UniqueObject implements KeyManager<K> {
 

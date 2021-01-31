@@ -8,7 +8,6 @@ import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import net.java.truevfs.kernel.spec.FsArchiveEntry;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -22,7 +21,6 @@ import java.util.Optional;
  * @param <E> the type of the archive entries.
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 abstract class FileSystemArchiveController<E extends FsArchiveEntry>
         extends BasicArchiveController<E>
         implements MountState<E> {

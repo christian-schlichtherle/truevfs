@@ -4,31 +4,31 @@
  */
 package net.java.truevfs.driver.file;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import static java.io.File.separatorChar;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.Entry.Access;
+import net.java.truecommons.cio.Entry.Type;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.OutputSocket;
+import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.*;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.*;
-import static java.nio.file.Files.*;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.FileTime;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.Map;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.cio.Entry;
-import net.java.truecommons.cio.Entry.Access;
+
+import static java.io.File.separatorChar;
+import static java.nio.file.Files.*;
 import static net.java.truecommons.cio.Entry.Access.*;
-import net.java.truecommons.cio.Entry.Type;
 import static net.java.truecommons.cio.Entry.UNKNOWN;
-import net.java.truecommons.cio.InputSocket;
-import net.java.truecommons.cio.OutputSocket;
-import net.java.truecommons.shed.BitField;
-import net.java.truevfs.kernel.spec.*;
-import static net.java.truevfs.kernel.spec.FsAccessOption.*;
+import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
 import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
 
 /**
@@ -37,7 +37,6 @@ import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 final class FileController extends FsAbstractController {
 
     private static final String TWO_SEPARATORS = SEPARATOR + SEPARATOR;
@@ -101,7 +100,6 @@ final class FileController extends FsAbstractController {
         file.getFileSystem().provider().checkAccess(file, modes);
     }
 
-    @SuppressFBWarnings("SF_SWITCH_NO_DEFAULT")
     private static AccessMode[] modes(final BitField<Access> types) {
         final EnumSet<AccessMode> modes = EnumSet.noneOf(AccessMode.class);
         for (final Access type : types) {

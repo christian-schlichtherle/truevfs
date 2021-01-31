@@ -4,14 +4,13 @@
  */
 package net.java.truevfs.driver.zip.raes.crypto;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.IOException;
-import java.io.OutputStream;
-import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.io.DecoratingOutputStream;
 import net.java.truecommons.io.Sink;
 import net.java.truecommons.key.spec.KeyStrength;
 import org.bouncycastle.crypto.Mac;
+
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * An {@link OutputStream} which produces a file with data ecnrypted according
@@ -20,7 +19,6 @@ import org.bouncycastle.crypto.Mac;
  * @see    RaesReadOnlyChannel
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public abstract class RaesOutputStream extends DecoratingOutputStream {
 
     /**
@@ -67,7 +65,6 @@ public abstract class RaesOutputStream extends DecoratingOutputStream {
      * @throws RaesParametersException if the RAES parameters type is unknown.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public static RaesOutputStream create(
             final RaesParameters param,
             final Sink sink)

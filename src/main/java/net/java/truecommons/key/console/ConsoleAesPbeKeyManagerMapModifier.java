@@ -10,7 +10,6 @@ import net.java.truecommons.key.spec.common.AesPbeParameters;
 import net.java.truecommons.key.spec.prompting.PromptingKeyManager;
 import net.java.truecommons.key.spec.spi.KeyManagerMapModifier;
 
-import javax.annotation.concurrent.Immutable;
 import java.util.Map;
 
 /**
@@ -18,7 +17,6 @@ import java.util.Map;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 @ServiceImplementation(priority = -300)
 public final class ConsoleAesPbeKeyManagerMapModifier implements KeyManagerMapModifier {
 

@@ -4,17 +4,16 @@
  */
 package net.java.truevfs.comp.zipdriver;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.NoSuchFileException;
-import java.util.Objects;
-import javax.annotation.concurrent.NotThreadSafe;
+import net.java.truecommons.cio.*;
 import net.java.truevfs.comp.zip.AbstractZipFile;
 import net.java.truevfs.comp.zip.ZipCryptoParameters;
 import net.java.truevfs.kernel.spec.FsInputSocketSource;
 import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truecommons.cio.*;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.NoSuchFileException;
+import java.util.Objects;
 
 /**
  * An input service for reading ZIP files.
@@ -23,7 +22,6 @@ import net.java.truecommons.cio.*;
  * @see    ZipOutputService
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public final class ZipInputService<E extends AbstractZipDriverEntry>
 extends AbstractZipFile<E> implements InputService<E> {
 
@@ -31,7 +29,6 @@ extends AbstractZipFile<E> implements InputService<E> {
     private final FsModel model;
     private ZipCryptoParameters param;
 
-    @CreatesObligation
     public ZipInputService(
             final FsModel model,
             final FsInputSocketSource source,

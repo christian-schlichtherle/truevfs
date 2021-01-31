@@ -15,8 +15,6 @@ import net.java.truevfs.kernel.spec.*;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.ThreadSafe;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -27,7 +25,6 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
 
     private final FsTestConfig config;
@@ -70,7 +67,7 @@ public class MockArchiveDriver extends FsArchiveDriver<MockArchiveDriverEntry> {
     protected OutputService<MockArchiveDriverEntry> newOutput(
             final FsModel model,
             final FsOutputSocketSink sink,
-            final @CheckForNull @WillNotClose InputService<MockArchiveDriverEntry> input) {
+            final @CheckForNull InputService<MockArchiveDriverEntry> input) {
         final FsMountPoint mp = model.getMountPoint();
         final MockArchive n = MockArchive.create(config);
         MockArchive o = containers.get(mp);

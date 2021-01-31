@@ -8,5 +8,4 @@
  * It's up to the client modules to inject these service locators into this
  * module if they want to.
  */
-@javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truevfs.kernel.spec.sl;

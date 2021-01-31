@@ -4,13 +4,9 @@
  */
 package net.java.truevfs.comp.zip;
 
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.ZipException;
-import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A method for writing a ZIP entry.
@@ -19,8 +15,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  *
  * @author  Christian Schlichtherle
  */
-@NotThreadSafe
-@CleanupObligation
 interface OutputMethod {
 
     /**
@@ -45,7 +39,6 @@ interface OutputMethod {
      * @return The decorated output stream.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     OutputStream start() throws IOException;
 
     /**
@@ -53,6 +46,5 @@ interface OutputMethod {
      *
      * @throws IOException on any I/O error.
      */
-    @DischargesObligation
     void finish() throws IOException;
 }

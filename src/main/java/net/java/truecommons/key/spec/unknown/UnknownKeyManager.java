@@ -4,18 +4,17 @@
  */
 package net.java.truecommons.key.spec.unknown;
 
-import java.net.URI;
-import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.key.spec.AbstractKeyManager;
 import net.java.truecommons.key.spec.KeyManager;
 import net.java.truecommons.key.spec.KeyProvider;
+
+import java.net.URI;
 
 /**
  * This key manager fails to resolve any keys.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public final class UnknownKeyManager extends AbstractKeyManager<Object> {
 
     /** The singleton instance of this class. */

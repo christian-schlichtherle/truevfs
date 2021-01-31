@@ -10,7 +10,6 @@ import net.java.truecommons.shed.Link;
 import net.java.truecommons.shed.Visitor;
 import net.java.truevfs.kernel.spec.*;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.stream.Collectors;
@@ -23,7 +22,6 @@ import static net.java.truecommons.shed.Link.Type.WEAK;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 final class DefaultManager extends FsAbstractManager implements ReentrantReadWriteLockAspect {
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();

@@ -4,19 +4,19 @@
  */
 package net.java.truecommons.key.swing;
 
-import java.io.IOException;
-import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.key.spec.common.AesPbeParameters;
-import static org.junit.Assert.*;
 import org.junit.Test;
-import static org.mockito.Mockito.*;
 import org.netbeans.jemmy.operators.JCheckBoxOperator;
 import org.netbeans.jemmy.operators.JPasswordFieldOperator;
+
+import java.io.IOException;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public final class ReadKeyPanelIT extends KeyPanelTestSuite<ReadKeyPanel> {
 
     public ReadKeyPanelIT() throws IOException, InterruptedException { }

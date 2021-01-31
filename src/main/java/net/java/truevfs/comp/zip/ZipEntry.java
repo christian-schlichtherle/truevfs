@@ -4,10 +4,10 @@
  */
 package net.java.truevfs.comp.zip;
 
-import java.util.Formatter;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
+import java.util.Formatter;
+
 import static net.java.truevfs.comp.zip.Constants.EMPTY;
 import static net.java.truevfs.comp.zip.Constants.FORCE_ZIP64_EXT;
 import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
@@ -33,7 +33,6 @@ import static net.java.truevfs.comp.zip.LittleEndian.writeLong;
  * @author  Christian Schlichtherle
  */
 // TODO: Consider implementing net.java.truevfs.kernel.entry.Entry.
-@NotThreadSafe
 public class ZipEntry implements Cloneable {
 
     // Bit masks for initialized fields.

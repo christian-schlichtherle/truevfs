@@ -4,20 +4,18 @@
  */
 package net.java.truecommons.key.swing;
 
-import java.util.Objects;
-import java.util.ResourceBundle;
-import javax.annotation.concurrent.NotThreadSafe;
-import javax.swing.ComboBoxModel;
-import javax.swing.DefaultComboBoxModel;
 import net.java.truecommons.key.spec.KeyStrength;
 import net.java.truecommons.key.swing.util.EnhancedPanel;
+
+import javax.swing.*;
+import java.util.Objects;
+import java.util.ResourceBundle;
 
 /**
  * A panel which allows the user to select the key strength for a cipher.
  *
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 @SuppressWarnings({ "UseOfObsoleteCollectionType", "unchecked", "rawtypes" })
 final class KeyStrengthPanel<S extends KeyStrength> extends EnhancedPanel {
 

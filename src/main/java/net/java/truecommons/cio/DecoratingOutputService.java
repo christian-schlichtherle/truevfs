@@ -4,9 +4,7 @@
  */
 package net.java.truecommons.cio;
 
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
-import javax.annotation.WillCloseWhenClosed;
 
 /**
  * An abstract decorator for an output service.
@@ -20,7 +18,7 @@ extends DecoratingContainer<E, OutputService<E>> implements OutputService<E> {
 
     protected DecoratingOutputService() { }
 
-    protected DecoratingOutputService(@WillCloseWhenClosed OutputService<E> output) {
+    protected DecoratingOutputService(OutputService<E> output) {
         super(output);
     }
 
@@ -28,6 +26,5 @@ extends DecoratingContainer<E, OutputService<E>> implements OutputService<E> {
     public OutputSocket<E> output(E entry) { return container.output(entry); }
 
     @Override
-    @DischargesObligation
     public void close() throws IOException { container.close(); }
 }

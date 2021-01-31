@@ -4,8 +4,6 @@
  */
 package net.java.truevfs.comp.zipdriver;
 
-import javax.annotation.concurrent.Immutable;
-
 /**
  * An archive driver for ZIP files which checks the CRC32 values for all
  * ZIP entries in input archives.
@@ -24,7 +22,6 @@ import javax.annotation.concurrent.Immutable;
  * 
  * @author Christian Schlichtherle
  */
-@Immutable
 public class CheckedZipDriver extends ZipDriver {
 
     /**

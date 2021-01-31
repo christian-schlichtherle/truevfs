@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.driver.sfx;
 
-import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.comp.zipdriver.ZipDriverEntry;
 import net.java.truevfs.comp.zipdriver.ZipInputService;
 
@@ -26,7 +25,6 @@ import net.java.truevfs.comp.zipdriver.ZipInputService;
  * 
  * @author Christian Schlichtherle
  */
-@Immutable
 public class CheckedReadOnlySfxDriver extends ReadOnlySfxDriver {
 
     /**

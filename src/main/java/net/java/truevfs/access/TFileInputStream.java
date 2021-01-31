@@ -4,13 +4,12 @@
  */
 package net.java.truevfs.access;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.*;
-import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.io.DecoratingInputStream;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import net.java.truevfs.kernel.spec.FsAccessOptions;
+
+import java.io.*;
 
 /**
  * A replacement for the class {@link FileInputStream} for reading plain old
@@ -63,7 +62,6 @@ import net.java.truevfs.kernel.spec.FsAccessOptions;
  * @see    TFileOutputStream
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class TFileInputStream extends DecoratingInputStream {
 
     /**
@@ -73,7 +71,6 @@ public final class TFileInputStream extends DecoratingInputStream {
      * @param  path the path of the file or archive entry.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public TFileInputStream(String path) throws IOException {
         this(new TFile(path));
     }
@@ -87,7 +84,6 @@ public final class TFileInputStream extends DecoratingInputStream {
      *         entry.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public TFileInputStream(String path, FsAccessOption... options)
     throws IOException {
         this(new TFile(path), options);
@@ -100,7 +96,6 @@ public final class TFileInputStream extends DecoratingInputStream {
      * @param  file the file or archive entry.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public TFileInputStream(File file) throws IOException {
         this(file, FsAccessOptions.NONE);
     }
@@ -114,7 +109,6 @@ public final class TFileInputStream extends DecoratingInputStream {
      *         entry.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public TFileInputStream(File file, FsAccessOption... options)
     throws IOException {
         this(file, FsAccessOptions.of(options));
@@ -129,7 +123,6 @@ public final class TFileInputStream extends DecoratingInputStream {
      *         entry.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public TFileInputStream(File file, BitField<FsAccessOption> options)
     throws IOException {
         super(TBIO.input(

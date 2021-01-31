@@ -4,53 +4,29 @@
  */
 package net.java.truevfs.comp.tardriver;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PushbackInputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truecommons.cio.AbstractInputSocket;
-import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.*;
 import net.java.truecommons.cio.Entry.Type;
-import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
-import static net.java.truecommons.cio.Entry.Type.FILE;
-import net.java.truecommons.cio.InputService;
-import net.java.truecommons.cio.InputSocket;
-import net.java.truecommons.cio.IoBuffer;
-import net.java.truecommons.cio.IoBufferPool;
-import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.io.Source;
 import net.java.truecommons.io.Streams;
 import net.java.truecommons.shed.ExceptionBuilder;
-import static net.java.truecommons.shed.HashMaps.OVERHEAD_SIZE;
-import static net.java.truecommons.shed.HashMaps.initialCapacity;
 import net.java.truecommons.shed.SuppressedExceptionBuilder;
 import net.java.truevfs.kernel.spec.FsArchiveDriver;
 import net.java.truevfs.kernel.spec.FsModel;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
-import static org.apache.commons.compress.archivers.tar.TarConstants.DEFAULT_BLKSIZE;
-import static org.apache.commons.compress.archivers.tar.TarConstants.DEFAULT_RCDSIZE;
-import static org.apache.commons.compress.archivers.tar.TarConstants.GIDLEN;
-import static org.apache.commons.compress.archivers.tar.TarConstants.MODELEN;
-import static org.apache.commons.compress.archivers.tar.TarConstants.MODTIMELEN;
-import static org.apache.commons.compress.archivers.tar.TarConstants.NAMELEN;
-import static org.apache.commons.compress.archivers.tar.TarConstants.SIZELEN;
-import static org.apache.commons.compress.archivers.tar.TarConstants.UIDLEN;
 import org.apache.commons.compress.archivers.tar.TarUtils;
+
+import javax.annotation.CheckForNull;
+import java.io.*;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.NoSuchFileException;
+import java.util.*;
+
+import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
+import static net.java.truecommons.cio.Entry.Type.FILE;
+import static net.java.truecommons.shed.HashMaps.OVERHEAD_SIZE;
+import static net.java.truecommons.shed.HashMaps.initialCapacity;
+import static org.apache.commons.compress.archivers.tar.TarConstants.*;
 
 /**
  * An input service for reading TAR files.
@@ -65,7 +41,6 @@ import org.apache.commons.compress.archivers.tar.TarUtils;
  * @see    TarOutputService
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public final class TarInputService
 implements InputService<TarDriverEntry> {
 
@@ -80,7 +55,6 @@ implements InputService<TarDriverEntry> {
 
     private final TarDriver driver;
 
-    @CreatesObligation
     public TarInputService(
             final FsModel model,
             final Source source,
@@ -102,7 +76,7 @@ implements InputService<TarDriverEntry> {
         }
     }
 
-    private void unpack(final @WillNotClose TarArchiveInputStream tain)
+    private void unpack(final TarArchiveInputStream tain)
     throws IOException {
         final TarDriver driver = this.driver;
         final IoBufferPool pool = driver.getPool();
@@ -151,7 +125,7 @@ implements InputService<TarDriverEntry> {
      * @throws IOException on any I/O error.
      */
     private TarArchiveInputStream newValidatedTarArchiveInputStream(
-            final @WillNotClose InputStream in)
+            final InputStream in)
     throws IOException {
         final byte[] buf = new byte[DEFAULT_RCDSIZE];
         final InputStream vin = readAhead(in, buf);
@@ -190,7 +164,7 @@ implements InputService<TarDriverEntry> {
      * @throws IOException on any I/O error.
      */
     private static InputStream readAhead(
-            final @WillNotClose InputStream in,
+            final InputStream in,
             final byte[] buf)
     throws EOFException, IOException {
         if (in.markSupported()) {

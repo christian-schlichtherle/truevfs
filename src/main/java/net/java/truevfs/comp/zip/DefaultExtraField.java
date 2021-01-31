@@ -4,9 +4,9 @@
  */
 package net.java.truevfs.comp.zip;
 
-import static java.lang.System.arraycopy;
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.NotThreadSafe;
+
+import static java.lang.System.arraycopy;
 
 /**
  * Default implementation for an Extra Field in a Local or Central Header of a
@@ -14,7 +14,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  *
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 final class DefaultExtraField extends ExtraField {
 
     private final short headerId;

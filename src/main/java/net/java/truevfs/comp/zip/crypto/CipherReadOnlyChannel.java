@@ -4,13 +4,10 @@
  */
 package net.java.truevfs.comp.zip.crypto;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import net.java.truecommons.io.ReadOnlyChannel;
 import net.java.truecommons.io.Streams;
 import org.bouncycastle.crypto.Mac;
 
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
@@ -31,7 +28,6 @@ import static java.lang.Math.min;
 // net.java.truecommons.io.BufferedReadOnlyChannel which has been tuned for
 // performance.
 //
-@NotThreadSafe
 public final class CipherReadOnlyChannel extends ReadOnlyChannel {
 
     private static final long INVALID = Long.MIN_VALUE;
@@ -71,10 +67,9 @@ public final class CipherReadOnlyChannel extends ReadOnlyChannel {
      * @param cipher the initialized, seekable block cipher.
      * @param channel the seekable byte channel.
      */
-    @CreatesObligation
     public CipherReadOnlyChannel(
             final SeekableBlockCipher cipher,
-            final @WillCloseWhenClosed SeekableByteChannel channel) {
+            final SeekableByteChannel channel) {
         this(cipher, channel, Streams.BUFFER_SIZE);
     }
 
@@ -87,10 +82,9 @@ public final class CipherReadOnlyChannel extends ReadOnlyChannel {
      *        The value gets rounded down to a multiple of the cipher's
      *        blocksize or the cipher's blocksize, whatever is larger.
      */
-    @CreatesObligation
     public CipherReadOnlyChannel(
             final SeekableBlockCipher cipher,
-            final @WillCloseWhenClosed SeekableByteChannel channel,
+            final SeekableByteChannel channel,
             int bufferSize) {
         super(Objects.requireNonNull(channel));
         this.cipher = Objects.requireNonNull(cipher);

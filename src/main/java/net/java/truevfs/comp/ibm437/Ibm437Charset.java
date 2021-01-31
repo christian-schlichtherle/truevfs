@@ -4,8 +4,6 @@
  */
 package net.java.truevfs.comp.ibm437;
 
-import javax.annotation.concurrent.Immutable;
-
 /**
  * The {@code IBM437} character set, also known as {@code CP437}.
  * This is the original character set used to encode entry names and file
@@ -13,7 +11,6 @@ import javax.annotation.concurrent.Immutable;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 final class Ibm437Charset extends OctetCharset {
 
     private static final String NAME = "IBM437";

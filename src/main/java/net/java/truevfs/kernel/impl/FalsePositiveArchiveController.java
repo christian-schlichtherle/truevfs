@@ -11,7 +11,6 @@ import net.java.truecommons.shed.ControlFlowException;
 import net.java.truevfs.kernel.spec.*;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -56,7 +55,6 @@ import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
  * @author Christian Schlichtherle
  * @see FalsePositiveArchiveException
  */
-@ThreadSafe
 abstract class FalsePositiveArchiveController implements FsDelegatingController {
 
     private final State tryChild = new State() {

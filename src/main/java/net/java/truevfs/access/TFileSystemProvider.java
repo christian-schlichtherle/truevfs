@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.access;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import global.namespace.service.wight.annotation.ServiceImplementation;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.IoSockets;
@@ -18,7 +17,6 @@ import net.java.truevfs.kernel.spec.FsNodePath;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,7 +46,6 @@ import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 @ServiceImplementation(FileSystemProvider.class)
 public final class TFileSystemProvider extends FileSystemProvider {
 
@@ -99,7 +96,6 @@ public final class TFileSystemProvider extends FileSystemProvider {
      * file system provider class with the service location feature of the
      * NIO.2 API!
      */
-    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     @SuppressWarnings("LeakingThisInConstructor")
     @Deprecated
     public TFileSystemProvider() {

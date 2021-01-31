@@ -8,8 +8,6 @@ import lombok.val;
 import net.java.truevfs.comp.inst.InstrumentingOutputStream;
 import net.java.truevfs.comp.jmx.JmxComponent;
 
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -18,10 +16,9 @@ import java.io.OutputStream;
  *
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 final class I5tOutputStream extends InstrumentingOutputStream<I5tMediator> implements JmxComponent {
 
-    I5tOutputStream(I5tMediator mediator, @WillCloseWhenClosed OutputStream out) {
+    I5tOutputStream(I5tMediator mediator, OutputStream out) {
         super(mediator, out);
     }
 

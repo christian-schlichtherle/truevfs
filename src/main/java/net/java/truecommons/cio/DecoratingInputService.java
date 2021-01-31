@@ -4,9 +4,7 @@
  */
 package net.java.truecommons.cio;
 
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import java.io.IOException;
-import javax.annotation.WillCloseWhenClosed;
 
 /**
  * An abstract decorator for an input service.
@@ -20,7 +18,7 @@ extends DecoratingContainer<E, InputService<E>> implements InputService<E> {
 
     protected DecoratingInputService() { }
 
-    protected DecoratingInputService(@WillCloseWhenClosed InputService<E> input) {
+    protected DecoratingInputService(InputService<E> input) {
         super(input);
     }
 
@@ -28,6 +26,5 @@ extends DecoratingContainer<E, InputService<E>> implements InputService<E> {
     public InputSocket<E> input(String name) { return container.input(name); }
 
     @Override
-    @DischargesObligation
     public void close() throws IOException { container.close(); }
 }

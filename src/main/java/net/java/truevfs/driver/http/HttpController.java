@@ -4,27 +4,27 @@
  */
 package net.java.truevfs.driver.http;
 
-import java.io.IOException;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.shed.BitField;
-import net.java.truevfs.kernel.spec.*;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.Entry.Access;
-import static net.java.truecommons.cio.Entry.Access.READ;
 import net.java.truecommons.cio.Entry.Type;
-import static net.java.truecommons.cio.Entry.Type.FILE;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.IoBufferPool;
 import net.java.truecommons.cio.OutputSocket;
+import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.*;
 import org.apache.http.HttpResponse;
+
+import javax.annotation.CheckForNull;
+import java.io.IOException;
+
+import static net.java.truecommons.cio.Entry.Access.READ;
+import static net.java.truecommons.cio.Entry.Type.FILE;
 
 /**
  * A file system controller for the HTTP(S) schemes.
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public class HttpController extends FsAbstractController {
 
     private static final BitField<Access> READ_ONLY = BitField.of(READ);

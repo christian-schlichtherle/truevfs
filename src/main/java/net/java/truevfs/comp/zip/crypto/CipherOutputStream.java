@@ -4,14 +4,11 @@
  */
 package net.java.truevfs.comp.zip.crypto;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import net.java.truecommons.io.DecoratingOutputStream;
 import org.bouncycastle.crypto.BufferedBlockCipher;
 import org.bouncycastle.crypto.InvalidCipherTextException;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Objects;
@@ -32,7 +29,6 @@ import java.util.Objects;
  * @see    CipherReadOnlyChannel
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public final class CipherOutputStream extends DecoratingOutputStream {
 
     /** The buffered block cipher used for processing the output. */
@@ -51,10 +47,9 @@ public final class CipherOutputStream extends DecoratingOutputStream {
      * @param cipher the block cipher.
      * @param out the output stream.
      */
-    @CreatesObligation
     public CipherOutputStream(
             final BufferedBlockCipher cipher,
-            final @WillCloseWhenClosed OutputStream out) {
+            final OutputStream out) {
         super(Objects.requireNonNull(out));
         this.cipher = Objects.requireNonNull(cipher);
     }

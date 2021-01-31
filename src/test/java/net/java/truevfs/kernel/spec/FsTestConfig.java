@@ -4,16 +4,12 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import net.java.truecommons.cio.IoBufferPool;
 import net.java.truecommons.cio.MemoryBufferPool;
 import net.java.truecommons.shed.InheritableThreadLocalStack;
 import net.java.truecommons.shed.Resource;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A container for configuration options with global or inheritable thread
@@ -47,8 +43,6 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
-@CleanupObligation
 public final class FsTestConfig extends Resource<IllegalStateException> {
 
     public static final int DEFAULT_NUM_ENTRIES = 10;
@@ -93,7 +87,6 @@ public final class FsTestConfig extends Resource<IllegalStateException> {
      * @return The new current configuration.
      * @see    #get()
      */
-    @CreatesObligation
     public static FsTestConfig push() {
         return configs.push(new FsTestConfig(get()));
     }
@@ -156,7 +149,6 @@ public final class FsTestConfig extends Resource<IllegalStateException> {
     }
 
     @Override
-    @DischargesObligation
     public void close() throws IllegalStateException { super.close(); }
 
     /**

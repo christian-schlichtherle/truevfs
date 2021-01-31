@@ -5,7 +5,6 @@
 package net.java.truecommons.cio;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -15,14 +14,11 @@ import java.nio.channels.SeekableByteChannel;
  * <p>
  * Implementations should be immutable.
  *
- * @param  <E> the type of the {@linkplain #target() target entry} for I/O
- *         operations.
- * @see    DelegatingInputSocket
+ * @param <E> the type of the {@linkplain #target() target entry} for I/O operations.
  * @author Christian Schlichtherle
+ * @see DelegatingInputSocket
  */
-@Immutable
-public abstract class DelegatingOutputSocket<E extends Entry>
-extends AbstractOutputSocket<E> {
+public abstract class DelegatingOutputSocket<E extends Entry> extends AbstractOutputSocket<E> {
 
     /**
      * Returns the delegate output socket.
@@ -39,14 +35,14 @@ extends AbstractOutputSocket<E> {
 
     @Override
     public OutputStream stream(@Nullable InputSocket<? extends Entry> peer)
-    throws IOException {
+            throws IOException {
         return socket().stream(peer);
     }
 
     @Override
     public SeekableByteChannel channel(
             @Nullable InputSocket<? extends Entry> peer)
-    throws IOException {
+            throws IOException {
         return socket().channel(peer);
     }
 }

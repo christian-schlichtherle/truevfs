@@ -4,12 +4,14 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.beans.*;
+import net.java.truecommons.shed.UriBuilder;
+
+import java.beans.ConstructorProperties;
+import java.beans.XMLDecoder;
+import java.beans.XMLEncoder;
 import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.util.Locale;
-import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.shed.UriBuilder;
 
 /**
  * Addresses a file system scheme.
@@ -27,7 +29,6 @@ import net.java.truecommons.shed.UriBuilder;
  * @see    FsNodeName
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class FsScheme implements Serializable, Comparable<FsScheme> {
 
     private static final long serialVersionUID = 0;

@@ -11,7 +11,6 @@ import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
 
-import javax.annotation.concurrent.Immutable;
 import java.util.Map;
 
 /**
@@ -36,7 +35,6 @@ import java.util.Map;
  * @author Christian Schlichtherle
  * @see <a href="http://docs.oasis-open.org/office/v1.2/OpenDocument-v1.2-part1.pdf">Open Document Format for Office Applications (OpenDocument) Version 1.2; Part 1: OpenDocument Schema; Appendix C: MIME Types and File Name Extensions (Non Normative)</a>
  */
-@Immutable
 @ServiceImplementation(priority = -100)
 public final class JarDriverMapModifier implements FsDriverMapModifier {
 

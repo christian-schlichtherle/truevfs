@@ -13,7 +13,6 @@ import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.shed.BitField;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
 import java.io.IOException;
 import java.util.Map;
 
@@ -22,7 +21,6 @@ import java.util.Map;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public interface FsDelegatingController extends FsController {
 
     /**

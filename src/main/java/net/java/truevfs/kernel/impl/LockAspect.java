@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.kernel.impl;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -12,7 +11,6 @@ import java.util.concurrent.locks.Lock;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 interface LockAspect<L extends Lock> {
 
     /**

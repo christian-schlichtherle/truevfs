@@ -5,14 +5,12 @@
 package net.java.truevfs.comp.zip;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Thrown to indicate that an authenticated ZIP entry has been tampered with.
  *
  * @author  Christian Schlichtherle
  */
-@ThreadSafe
 public class ZipAuthenticationException extends ZipCryptoException {
 
     private static final long serialVersionUID = 0;

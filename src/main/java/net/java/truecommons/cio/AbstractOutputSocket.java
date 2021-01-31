@@ -7,7 +7,6 @@ package net.java.truecommons.cio;
 import net.java.truecommons.io.ChannelOutputStream;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -17,28 +16,27 @@ import java.nio.channels.SeekableByteChannel;
  * <p>
  * Subclasses should be immutable.
  *
- * @param  <E> the type of the {@linkplain #target() target entry} for I/O
- *         operations.
- * @see    AbstractInputSocket
+ * @param <E> the type of the {@linkplain #target() target entry} for I/O
+ *            operations.
  * @author Christian Schlichtherle
+ * @see AbstractInputSocket
  */
-@Immutable
-public abstract class AbstractOutputSocket<E extends Entry>
-extends AbstractIoSocket<E> implements OutputSocket<E> {
+public abstract class AbstractOutputSocket<E extends Entry> extends AbstractIoSocket<E> implements OutputSocket<E> {
 
     /**
      * Returns the target of the given nullable peer socket or null.
      * This method is provided for convenience.
      *
-     * @param  <E> the type of the peer socket's local target.
-     * @param  peer the nullable peer socket.
+     * @param <E>  the type of the peer socket's local target.
+     * @param peer the nullable peer socket.
      * @return {@code null} if the given reference is null or the target of the
-     *         given peer socket otherwise.
+     * given peer socket otherwise.
      * @throws IOException if resolving the peer's local target fails.
      */
-    protected static @Nullable <E extends Entry> E target(
+    protected static @Nullable
+    <E extends Entry> E target(
             @Nullable InputSocket<E> peer)
-    throws IOException {
+            throws IOException {
         return null == peer ? null : peer.target();
     }
 
@@ -54,7 +52,7 @@ extends AbstractIoSocket<E> implements OutputSocket<E> {
      */
     @Override
     public OutputStream stream(InputSocket<? extends Entry> peer)
-    throws IOException {
+            throws IOException {
         return new ChannelOutputStream(channel(peer));
     }
 
@@ -62,12 +60,12 @@ extends AbstractIoSocket<E> implements OutputSocket<E> {
      * {@inheritDoc}
      *
      * @throws UnsupportedOperationException the implementation in the class
-     *         {@link OutputSocket} <em>always</em> throws an exception of
-     *         this type.
+     *                                       {@link OutputSocket} <em>always</em> throws an exception of
+     *                                       this type.
      */
     @Override
     public SeekableByteChannel channel(InputSocket<? extends Entry> peer)
-    throws IOException {
+            throws IOException {
         throw new UnsupportedOperationException();
     }
 }

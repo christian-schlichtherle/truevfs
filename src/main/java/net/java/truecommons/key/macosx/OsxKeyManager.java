@@ -16,7 +16,6 @@ import net.java.truecommons.key.spec.KeyProvider;
 import net.java.truecommons.key.spec.prompting.AbstractPromptingPbeParameters;
 import net.java.truecommons.logging.LocalizedLogger;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.ByteArrayInputStream;
@@ -40,7 +39,6 @@ import static net.java.truecommons.shed.Buffers.*;
  * @author Christian Schlichtherle
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-@ThreadSafe
 public final class OsxKeyManager<P extends AbstractPromptingPbeParameters<P, ?>>
         extends AbstractKeyManager<P> {
 

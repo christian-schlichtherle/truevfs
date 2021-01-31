@@ -4,14 +4,11 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 /**
  * An abstract decorator for a file system controller.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public abstract class FsDecoratingController extends FsAbstractController implements FsDelegatingController {
 
     /** The decorated file system controller. */

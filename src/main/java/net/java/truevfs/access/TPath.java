@@ -4,28 +4,39 @@
  */
 package net.java.truevfs.access;
 
-import java.io.*;
-import static java.io.File.*;
-import java.net.*;
-import java.nio.channels.*;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.OutputSocket;
+import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.Paths;
+import net.java.truecommons.shed.QuotedUriSyntaxException;
+import net.java.truecommons.shed.UriBuilder;
+import net.java.truevfs.kernel.spec.*;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.file.*;
 import java.nio.file.DirectoryStream.Filter;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchEvent.Modifier;
-import java.nio.file.attribute.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.FileAttributeView;
 import java.util.*;
-import javax.annotation.*;
-import javax.annotation.concurrent.*;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import net.java.truecommons.cio.*;
-import net.java.truecommons.shed.*;
-import static net.java.truecommons.shed.HashMaps.*;
-import net.java.truecommons.shed.Paths;
-import static net.java.truevfs.access.ExpertFeature.Level.*;
-import static net.java.truevfs.access.ExpertFeature.Reason.*;
+import static java.io.File.separator;
+import static java.io.File.separatorChar;
+import static net.java.truecommons.shed.HashMaps.initialCapacity;
+import static net.java.truevfs.access.ExpertFeature.Level.INTERMEDIATE;
+import static net.java.truevfs.access.ExpertFeature.Reason.INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA;
 import static net.java.truevfs.access.TUriHelper.*;
-import net.java.truevfs.kernel.spec.*;
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 import static net.java.truevfs.kernel.spec.FsNodeName.*;
 
@@ -83,8 +94,6 @@ import static net.java.truevfs.kernel.spec.FsNodeName.*;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
-@SuppressFBWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
 public final class TPath implements Path, TRex {
 
     private static final TPathComparator COMPARATOR = '\\' == separatorChar
@@ -381,7 +390,6 @@ public final class TPath implements Path, TRex {
         }
     }
 
-    @SuppressFBWarnings("ES_COMPARING_STRINGS_WITH_EQ")
     private static URI name(URI uri) {
         try {
             uri = fix(check(uri));
@@ -999,7 +1007,6 @@ public final class TPath implements Path, TRex {
      * {@code TPath} object is just used for resolving another {@code TPath}
      * object.
      */
-    @SuppressFBWarnings("SE_COMPARATOR_SHOULD_BE_SERIALIZABLE")
     private static class TPathComparator implements Comparator<TPath> {
         @Override
         public int compare(TPath p1, TPath p2) {
@@ -1033,7 +1040,6 @@ public final class TPath implements Path, TRex {
      * {@code TPath} object is just used for resolving another {@code TPath}
      * object.
      */
-    @SuppressFBWarnings("SE_COMPARATOR_SHOULD_BE_SERIALIZABLE")
     private static final class WindowsTPathComparator extends TPathComparator {
         @Override
         public int compare(TPath p1, TPath p2) {

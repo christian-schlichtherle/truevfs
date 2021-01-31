@@ -11,12 +11,9 @@ import net.java.truevfs.comp.jmx.JmxManager;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 /**
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 final class I5tManager extends JmxManager<I5tMediator> {
 
     I5tManager(I5tMediator mediator, FsManager manager) {

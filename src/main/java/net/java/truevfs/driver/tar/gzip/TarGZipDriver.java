@@ -18,8 +18,6 @@ import net.java.truevfs.kernel.spec.*;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.Immutable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,7 +34,6 @@ import static net.java.truevfs.kernel.spec.FsAccessOption.STORE;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public class TarGZipDriver extends TarDriver {
 
     /**
@@ -94,7 +91,7 @@ public class TarGZipDriver extends TarDriver {
     protected OutputService<TarDriverEntry> newOutput(
             final FsModel model,
             final FsOutputSocketSink sink,
-            final @CheckForNull @WillNotClose InputService<TarDriverEntry> input)
+            final @CheckForNull InputService<TarDriverEntry> input)
             throws IOException {
 
         class Sink extends AbstractSink {

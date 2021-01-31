@@ -4,18 +4,12 @@
  */
 package net.java.truevfs.comp.zip;
 
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import net.java.truecommons.io.*;
 import net.java.truecommons.shed.HashMaps;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Closeable;
 import java.io.EOFException;
 import java.io.IOException;
@@ -57,8 +51,6 @@ import static net.java.truevfs.comp.zip.ZipParametersUtils.parameters;
  * @see    AbstractZipOutputStream
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
-@CleanupObligation
 public abstract class AbstractZipFile<E extends ZipEntry>
 implements Closeable, Iterable<E> {
 
@@ -122,7 +114,6 @@ implements Closeable, Iterable<E> {
      * @throws IOException on any I/O error.
      * @see    #recoverLostEntries()
      */
-    @CreatesObligation
     protected AbstractZipFile(
             final Source source,
             final ZipFileParameters<E> param)
@@ -132,7 +123,7 @@ implements Closeable, Iterable<E> {
         try {
             length = channel.size();
             charset = param.getCharset();
-            final @WillNotClose SeekableByteChannel
+            final SeekableByteChannel
                     bchannel = new SafeBufferedReadOnlyChannel(channel, length);
             if (!param.getPreambled()) checkZipFileSignature(bchannel);
             final int numEntries = findCentralDirectory(bchannel, param.getPostambled());
@@ -780,7 +771,6 @@ implements Closeable, Iterable<E> {
      *
      * @throws ZipException If this ZIP file has been closed.
      */
-    @CreatesObligation
     public InputStream getPreambleInputStream() throws IOException {
         return new ChannelInputStream(
                 new EntryReadOnlyChannel(0, preamble));
@@ -808,7 +798,6 @@ implements Closeable, Iterable<E> {
      *
      * @throws ZipException If this ZIP file has been closed.
      */
-    @CreatesObligation
     public InputStream getPostambleInputStream() throws IOException {
         channel();
         return new ChannelInputStream(
@@ -840,7 +829,6 @@ implements Closeable, Iterable<E> {
      * Equivalent to {@link #getInputStream(String, Boolean, boolean)
      * getInputStream(name, null, true)}.
      */
-    @CreatesObligation
     public final @Nullable InputStream getInputStream(String name)
     throws IOException {
         return getInputStream(name, null, true);
@@ -850,7 +838,6 @@ implements Closeable, Iterable<E> {
      * Equivalent to {@link #getInputStream(String, Boolean, boolean)
      * getInputStream(name, true, true)}.
      */
-    @CreatesObligation
     public final @Nullable InputStream getCheckedInputStream(String name)
     throws IOException {
         return getInputStream(name, true, true);
@@ -899,7 +886,6 @@ implements Closeable, Iterable<E> {
      *         Format Specification.
      * @throws IOException If the entry cannot get read from this ZipFile.
      */
-    @CreatesObligation
     protected @Nullable InputStream getInputStream(
             final String name,
             @CheckForNull Boolean check,
@@ -1039,7 +1025,6 @@ implements Closeable, Iterable<E> {
      * @throws IOException if an error occurs closing the file.
      */
     @Override
-    @DischargesObligation
     public void close() throws IOException {
         final SeekableByteChannel c = channel;
         if (null != c) {
@@ -1057,7 +1042,6 @@ implements Closeable, Iterable<E> {
     private final class EntryReadOnlyChannel extends ReadOnlyChannel {
         boolean closed;
 
-        @CreatesObligation
         EntryReadOnlyChannel(final long start, final long size)
         throws IOException {
             super(new IntervalReadOnlyChannel(channel(), start, size));
@@ -1082,9 +1066,8 @@ implements Closeable, Iterable<E> {
     extends BufferedReadOnlyChannel {
         final long size;
 
-        @CreatesObligation
         SafeBufferedReadOnlyChannel(
-                final @WillCloseWhenClosed SeekableByteChannel channel,
+                final SeekableByteChannel channel,
                 final long size) {
             super(channel);
             this.size = size;

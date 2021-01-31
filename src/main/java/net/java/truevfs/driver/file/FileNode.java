@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.driver.file;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.IoBuffer;
@@ -17,7 +16,6 @@ import net.java.truevfs.kernel.spec.FsNodeName;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Path;
@@ -38,7 +36,6 @@ import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 class FileNode extends FsAbstractNode implements IoBuffer {
 
     private static final Path CURRENT_DIRECTORY = Paths.get(".");
@@ -46,7 +43,6 @@ class FileNode extends FsAbstractNode implements IoBuffer {
     private final Path path;
     private final String name;
 
-    @SuppressFBWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     volatile @CheckForNull FileBufferPool pool;
 
     FileNode(final Path path) {
@@ -149,7 +145,6 @@ class FileNode extends FsAbstractNode implements IoBuffer {
     }
 
     @Override
-    @SuppressFBWarnings("NP_BOOLEAN_RETURN_NULL")
     public Boolean isPermitted(final Access type, final Entity entity) {
         if (!(entity instanceof PosixEntity)) return null;
         try {

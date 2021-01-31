@@ -4,8 +4,6 @@
  */
 package net.java.truecommons.cio;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -34,7 +32,6 @@ public interface OutputSocket<E extends Entry> extends IoSocket<E> {
      * @return A new output stream for writing bytes.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     OutputStream stream(@Nullable InputSocket<? extends Entry> peer)
     throws IOException;
 
@@ -54,7 +51,6 @@ public interface OutputSocket<E extends Entry> extends IoSocket<E> {
      * @throws UnsupportedOperationException if this operation is not supported.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     SeekableByteChannel channel(@Nullable InputSocket<? extends Entry> peer)
     throws IOException;
 }

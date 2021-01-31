@@ -4,17 +4,15 @@
  */
 package net.java.truecommons.cio;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Objects;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * An abstract decorator for an I/O buffer pool.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public abstract class DecoratingIoBufferPool extends IoBufferPool {
     protected @Nullable IoBufferPool pool;
 

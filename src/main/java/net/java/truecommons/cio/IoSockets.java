@@ -8,7 +8,6 @@ import net.java.truecommons.io.Sink;
 import net.java.truecommons.io.Source;
 import net.java.truecommons.io.Streams;
 
-import javax.annotation.concurrent.Immutable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -19,7 +18,6 @@ import java.nio.channels.SeekableByteChannel;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class IoSockets {
 
     /** Can't touch this - hammer time! */

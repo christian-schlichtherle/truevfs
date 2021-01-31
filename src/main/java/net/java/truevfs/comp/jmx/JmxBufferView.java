@@ -4,17 +4,18 @@
  */
 package net.java.truevfs.comp.jmx;
 
-import java.util.Date;
-import java.util.Objects;
-import javax.annotation.concurrent.ThreadSafe;
+import net.java.truecommons.cio.IoBuffer;
+
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.StandardMBean;
+import java.util.Date;
+import java.util.Objects;
+
 import static net.java.truecommons.cio.Entry.Access.*;
 import static net.java.truecommons.cio.Entry.Size.DATA;
 import static net.java.truecommons.cio.Entry.Size.STORAGE;
 import static net.java.truecommons.cio.Entry.UNKNOWN;
-import net.java.truecommons.cio.IoBuffer;
 
 /**
  * A view for an {@linkplain IoBuffer I/O buffer}.
@@ -22,7 +23,6 @@ import net.java.truecommons.cio.IoBuffer;
  * @param  <B> the type of the I/O buffer.
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class JmxBufferView<B extends IoBuffer> extends StandardMBean implements JmxBufferMXBean {
 
     protected final B buffer;

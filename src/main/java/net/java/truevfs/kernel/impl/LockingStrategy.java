@@ -6,7 +6,6 @@ package net.java.truevfs.kernel.impl;
 
 import lombok.val;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -21,7 +20,6 @@ import java.util.concurrent.locks.Lock;
  * @author Christian Schlichtherle
  * @see NeedsLockRetryException
  */
-@ThreadSafe
 enum LockingStrategy {
 
     /**

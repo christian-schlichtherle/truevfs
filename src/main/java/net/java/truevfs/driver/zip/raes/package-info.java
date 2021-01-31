@@ -13,5 +13,4 @@
  * Note that RAES is not specific to ZIP files - any kind of content may get
  * encrypted.
  */
-@javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truevfs.driver.zip.raes;

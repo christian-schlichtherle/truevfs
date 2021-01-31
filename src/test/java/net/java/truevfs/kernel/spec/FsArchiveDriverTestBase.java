@@ -7,7 +7,6 @@ package net.java.truevfs.kernel.spec;
 import org.junit.After;
 import org.junit.Before;
 
-import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.io.IOException;
 import java.util.Random;
 
@@ -27,7 +26,6 @@ public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
     private volatile D driver;
 
     @Before
-    @OverridingMethodsMustInvokeSuper
     public void setUp() throws IOException {
         data = DATA.clone();
         final FsTestConfig config = FsTestConfig.push();
@@ -36,7 +34,6 @@ public abstract class FsArchiveDriverTestBase<D extends FsArchiveDriver<?>> {
     }
 
     @After
-    @OverridingMethodsMustInvokeSuper
     public void tearDown() {
         FsTestConfig.pop();
     }

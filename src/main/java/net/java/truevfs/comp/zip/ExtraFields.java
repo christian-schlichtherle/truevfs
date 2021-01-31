@@ -4,11 +4,11 @@
  */
 package net.java.truevfs.comp.zip;
 
-import java.util.Map;
-import java.util.TreeMap;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
+import java.util.Map;
+import java.util.TreeMap;
+
 import static net.java.truevfs.comp.zip.Constants.EMPTY;
 import static net.java.truevfs.comp.zip.LittleEndian.readUShort;
 import static net.java.truevfs.comp.zip.LittleEndian.writeShort;
@@ -19,7 +19,6 @@ import static net.java.truevfs.comp.zip.LittleEndian.writeShort;
  *
  * @author  Christian Schlichtherle
  */
-@NotThreadSafe
 final class ExtraFields implements Cloneable {
 
     /**

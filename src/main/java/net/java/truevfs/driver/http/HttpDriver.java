@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.driver.http;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsDriver;
@@ -16,7 +15,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
 import java.io.IOException;
 
 /**
@@ -27,10 +25,8 @@ import java.io.IOException;
  * @see     #newClient()
  * @author  Christian Schlichtherle
  */
-@Immutable
 public class HttpDriver extends FsDriver {
 
-    @SuppressFBWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private volatile @CheckForNull HttpClient client;
 
     final IoBufferPool getPool() {

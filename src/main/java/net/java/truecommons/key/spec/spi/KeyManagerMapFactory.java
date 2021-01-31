@@ -4,14 +4,14 @@
  */
 package net.java.truecommons.key.spec.spi;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.function.Supplier;
-import javax.annotation.concurrent.Immutable;
 import global.namespace.service.wight.annotation.ServiceImplementation;
 import global.namespace.service.wight.annotation.ServiceInterface;
 import net.java.truecommons.key.spec.KeyManager;
 import net.java.truecommons.key.spec.sl.KeyManagerMapLocator;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * A service for creating maps of classes to nullable key managers.
@@ -22,7 +22,6 @@ import net.java.truecommons.key.spec.sl.KeyManagerMapLocator;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 @ServiceInterface
 @ServiceImplementation(priority = -100)
 public class KeyManagerMapFactory implements Supplier<Map<Class<?>, KeyManager<?>>> {

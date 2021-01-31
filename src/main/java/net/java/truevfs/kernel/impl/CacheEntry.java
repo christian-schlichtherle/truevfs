@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.kernel.impl;
 
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import lombok.val;
 import net.java.truecommons.cio.*;
 import net.java.truecommons.io.DecoratingInputStream;
@@ -15,7 +14,6 @@ import net.java.truecommons.shed.Pool;
 import net.java.truecommons.shed.Releasable;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.*;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Optional;
@@ -38,8 +36,6 @@ import java.util.function.Function;
  *
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
-@CleanupObligation
 final class CacheEntry implements Entry, Releasable<IOException>, Flushable, Closeable {
 
     private final IoBufferPool pool;

@@ -5,7 +5,6 @@
 package net.java.truevfs.comp.tardriver;
 
 import java.io.IOException;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Indicates that there is an issue when reading or writing a TAR file which
@@ -13,7 +12,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * 
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class TarException extends IOException {
 
     private static final long serialVersionUID = 0;

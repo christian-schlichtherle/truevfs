@@ -5,7 +5,6 @@
 package net.java.truevfs.kernel.spec;
 
 import java.io.IOException;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Indicates that a call to {@link FsController#sync} cannot succeed because
@@ -17,7 +16,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * 
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class FsOpenResourceException extends IOException {
 
     private static final long serialVersionUID = 0;

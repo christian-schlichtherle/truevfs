@@ -4,9 +4,6 @@
  */
 package net.java.truevfs.kernel.spec.cio;
 
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import net.java.truecommons.cio.*;
 import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.io.DecoratingOutputStream;
@@ -15,8 +12,6 @@ import net.java.truecommons.shed.ExceptionBuilder;
 import net.java.truecommons.shed.SuppressedExceptionBuilder;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Iterator;
@@ -47,7 +42,6 @@ import static net.java.truecommons.cio.Entry.UNKNOWN;
  * @param <E> the type of the mutable entries.
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public class MultiplexingOutputService<E extends MutableEntry> extends DecoratingOutputService<E> {
 
     private final IoBufferPool pool;
@@ -72,7 +66,7 @@ public class MultiplexingOutputService<E extends MutableEntry> extends Decoratin
      */
     public MultiplexingOutputService(
             final IoBufferPool pool,
-            final @WillCloseWhenClosed OutputService<E> output) {
+            final OutputService<E> output) {
         super(output);
         this.pool = Objects.requireNonNull(pool);
     }
@@ -152,7 +146,6 @@ public class MultiplexingOutputService<E extends MutableEntry> extends Decoratin
     }
 
     @Override
-    @DischargesObligation
     public void close() throws IOException {
         if (isBusy()) {
             throw new IOException("This multiplexing output service is still busy with writing a stream!");
@@ -179,13 +172,12 @@ public class MultiplexingOutputService<E extends MutableEntry> extends Decoratin
 
         boolean closed;
 
-        EntryOutputStream(final @WillCloseWhenClosed OutputStream out) {
+        EntryOutputStream(final OutputStream out) {
             super(out);
             busy = true;
         }
 
         @Override
-        @DischargesObligation
         public void close() throws IOException {
             if (!closed) {
                 closed = true;
@@ -202,7 +194,6 @@ public class MultiplexingOutputService<E extends MutableEntry> extends Decoratin
      * When the stream gets closed, the I/O buffer is then copied to this
      * output service and finally deleted unless this output service is still busy.
      */
-    @CleanupObligation
     private final class BufferedEntryOutputStream
             extends DecoratingOutputStream {
 
@@ -211,7 +202,6 @@ public class MultiplexingOutputService<E extends MutableEntry> extends Decoratin
         final IoBuffer buffer;
         boolean closed;
 
-        @CreatesObligation
         @SuppressWarnings("LeakingThisInConstructor")
         BufferedEntryOutputStream(
                 final OutputSocket<? extends E> output,
@@ -255,7 +245,6 @@ public class MultiplexingOutputService<E extends MutableEntry> extends Decoratin
         }
 
         @Override
-        @DischargesObligation
         public void close() throws IOException {
             final ExceptionBuilder<IOException, IOException>
                     builder = new SuppressedExceptionBuilder<>();

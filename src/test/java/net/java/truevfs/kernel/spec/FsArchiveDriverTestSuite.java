@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import net.java.truecommons.cio.*;
 import net.java.truecommons.io.DecoratingInputStream;
 import net.java.truecommons.io.DecoratingOutputStream;
@@ -245,7 +244,6 @@ public abstract class FsArchiveDriverTestSuite<E extends FsArchiveEntry, D exten
         }
     }
 
-    @CreatesObligation
     private OutputStream output(final OutputService<E> service, final int i) throws IOException {
         final String name = name(i);
         final E entry = newEntry(name);

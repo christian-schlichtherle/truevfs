@@ -4,15 +4,12 @@
  */
 package net.java.truevfs.comp.zip;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 /**
  * Provides static utility methods for reading and writing integer values in
  * little endian format from or to byte arrays.
  *
  * @author  Christian Schlichtherle
  */
-@ThreadSafe
 final class LittleEndian {
 
     private LittleEndian() { }

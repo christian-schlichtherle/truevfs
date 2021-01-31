@@ -10,7 +10,6 @@ import com.sun.jna.ptr.PointerByReference;
 import net.java.truecommons.key.macosx.keychain.Security.*;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 import java.nio.ByteBuffer;
 import java.util.EnumMap;
 import java.util.Map;
@@ -33,7 +32,6 @@ import static net.java.truecommons.shed.Buffers.byteBuffer;
  * @author Christian Schlichtherle
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-@ThreadSafe
 final class KeychainImpl extends Keychain {
 
     private Optional<SecKeychainRef> optRef;

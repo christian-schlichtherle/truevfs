@@ -8,7 +8,6 @@ import net.java.truecommons.shed.Filter;
 import net.java.truecommons.shed.Visitor;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 import java.util.Objects;
 
 /**
@@ -16,7 +15,6 @@ import java.util.Objects;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public abstract class FsDecoratingManager extends FsAbstractManager {
 
     /** The decorated file system manager. */

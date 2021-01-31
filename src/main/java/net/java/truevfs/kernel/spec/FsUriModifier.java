@@ -4,11 +4,9 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.shed.QuotedUriSyntaxException;
 import net.java.truecommons.shed.UriBuilder;
 
-import javax.annotation.concurrent.Immutable;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -22,7 +20,6 @@ import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public enum FsUriModifier {
 
     /**
@@ -87,7 +84,6 @@ public enum FsUriModifier {
          */
         NODE_PATH {
             @Override
-            @SuppressFBWarnings("ES_COMPARING_STRINGS_WITH_EQ")
             URI modify(URI uri) throws URISyntaxException {
                 if (uri.isOpaque()
                         || !uri.isAbsolute()
@@ -140,7 +136,6 @@ public enum FsUriModifier {
          */
         NODE_NAME {
             @Override
-            @SuppressFBWarnings("ES_COMPARING_STRINGS_WITH_EQ")
             URI modify(URI uri) throws URISyntaxException {
                 uri = uri.normalize();
                 if (uri.isAbsolute()

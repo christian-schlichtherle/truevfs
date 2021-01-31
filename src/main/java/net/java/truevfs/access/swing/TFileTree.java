@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.access.swing;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truevfs.access.TFile;
 import net.java.truevfs.access.TFileComparator;
 import org.slf4j.LoggerFactory;
@@ -98,7 +97,6 @@ public final class TFileTree extends JTree {
      *         of {@link TFileTreeModel}.
      */
     @Override
-    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     public void setModel(TreeModel model) {
         super.setModel((TFileTreeModel) Objects.requireNonNull(model));
     }

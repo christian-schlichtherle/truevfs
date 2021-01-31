@@ -4,13 +4,10 @@
  */
 package net.java.truevfs.kernel.impl;
 
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import net.java.truecommons.cio.*;
 import net.java.truecommons.io.LockOutputStream;
 import net.java.truecommons.io.LockSeekableChannel;
 
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.ThreadSafe;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -26,12 +23,11 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Christian Schlichtherle
  * @see LockInputService
  */
-@ThreadSafe
 class LockOutputService<E extends Entry> extends DecoratingOutputService<E> implements LockAspect<Lock> {
 
     private final Lock lock = new ReentrantLock();
 
-    LockOutputService(@WillCloseWhenClosed OutputService<E> output) {
+    LockOutputService(OutputService<E> output) {
         super(output);
     }
 
@@ -41,7 +37,6 @@ class LockOutputService<E extends Entry> extends DecoratingOutputService<E> impl
         return lock;
     }
 
-    @DischargesObligation
     @Override
     public void close() throws IOException {
         locked(new Op<Object, IOException>() {

@@ -7,7 +7,6 @@ package net.java.truevfs.comp.jmx;
 import net.java.truevfs.comp.inst.InstrumentingModel;
 import net.java.truevfs.kernel.spec.FsModel;
 
-import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 
 /**
@@ -16,7 +15,6 @@ import javax.management.ObjectName;
  * @param  <M> the type of the JMX mediator.
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class JmxModel<M extends JmxMediator<M>>
 extends InstrumentingModel<M> implements JmxComponent {
 

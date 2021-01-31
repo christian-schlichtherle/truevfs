@@ -4,16 +4,15 @@
  */
 package net.java.truevfs.driver.zip.raes;
 
-import java.io.IOException;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.cio.InputService;
 import net.java.truevfs.comp.zipdriver.JarDriverEntry;
 import net.java.truevfs.comp.zipdriver.ZipInputService;
 import net.java.truevfs.comp.zipdriver.ZipOutputService;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsOutputSocketSink;
-import net.java.truecommons.cio.InputService;
+
+import javax.annotation.CheckForNull;
+import java.io.IOException;
 
 /**
  * A paranoid archive driver for RAES encrypted ZIP files.
@@ -33,7 +32,6 @@ import net.java.truecommons.cio.InputService;
  * @see    SafeZipRaesDriver
  * @author Christian Schlichtherle
  */
-@Immutable
 public class ParanoidZipRaesDriver extends ZipRaesDriver {
 
     @Override
@@ -54,7 +52,7 @@ public class ParanoidZipRaesDriver extends ZipRaesDriver {
     protected final ZipOutputService<JarDriverEntry> newOutput(
             final FsModel model,
             final FsOutputSocketSink sink,
-            final @CheckForNull @WillNotClose InputService<JarDriverEntry> input)
+            final @CheckForNull InputService<JarDriverEntry> input)
     throws IOException {
         final ZipInputService<JarDriverEntry> zis = (ZipInputService<JarDriverEntry>) input;
         return new ZipOutputService<>(model, new RaesSocketSink(model, sink), zis, this);

@@ -4,16 +4,15 @@
  */
 package net.java.truevfs.kernel.spec;
 
+import net.java.truecommons.shed.QuotedUriSyntaxException;
+import net.java.truecommons.shed.UriBuilder;
+
+import javax.annotation.CheckForNull;
 import java.beans.ConstructorProperties;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import net.java.truecommons.shed.QuotedUriSyntaxException;
-import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
 import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_NAME;
 
@@ -134,7 +133,6 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_NAME;
  * @see    FsNode#getName()
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class FsNodeName
 implements Serializable, Comparable<FsNodeName> {
 
@@ -171,7 +169,6 @@ implements Serializable, Comparable<FsNodeName> {
         }
     }
 
-    @SuppressFBWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private URI uri; // not final for serialization only!
 
     /**

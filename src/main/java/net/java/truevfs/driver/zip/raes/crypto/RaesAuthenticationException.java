@@ -4,14 +4,11 @@
  */
 package net.java.truevfs.driver.zip.raes.crypto;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 /**
  * Thrown to indicate that a RAES file has been tampered with.
  *
  * @author  Christian Schlichtherle
  */
-@ThreadSafe
 public class RaesAuthenticationException extends RaesException {
 
     private static final long serialVersionUID = 0;

@@ -7,7 +7,6 @@ package net.java.truecommons.jmx.qonm;
 import net.java.truecommons.jmx.AbstractObjectNameModifier;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import java.util.Hashtable;
@@ -18,8 +17,6 @@ import java.util.Objects;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
-@SuppressWarnings("UseOfObsoleteCollectionType")
 public class QualifierObjectNameModifier extends AbstractObjectNameModifier {
 
     private final String key, value;
@@ -72,13 +69,15 @@ public class QualifierObjectNameModifier extends AbstractObjectNameModifier {
 
     private enum KeyPropertyListStrategy {
         GET {
-            @Override Hashtable<String, String> apply(ObjectName name) {
+            @Override
+            Hashtable<String, String> apply(ObjectName name) {
                 return name.getKeyPropertyList();
             }
         },
 
         COPY {
-            @Override Hashtable<String, String> apply(ObjectName name) {
+            @Override
+            Hashtable<String, String> apply(ObjectName name) {
                 return new Hashtable<>(name.getKeyPropertyList());
             }
         };

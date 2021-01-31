@@ -5,7 +5,6 @@
 package net.java.truevfs.comp.zip;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Provides constants and static utility methods for unsigned long integer
@@ -13,7 +12,6 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 final class ULong {
 
     /**

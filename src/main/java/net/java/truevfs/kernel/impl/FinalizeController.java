@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.kernel.impl;
 
-import bali.Lookup;
 import lombok.val;
 import net.java.truecommons.cio.*;
 import net.java.truecommons.io.DecoratingInputStream;
@@ -14,13 +13,11 @@ import net.java.truecommons.logging.LocalizedLogger;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.ControlFlowException;
 import net.java.truevfs.kernel.spec.FsAccessOption;
-import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsDelegatingController;
 import net.java.truevfs.kernel.spec.FsNodeName;
 import org.slf4j.Logger;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +30,6 @@ import java.util.Optional;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 abstract class FinalizeController implements FsDelegatingController {
 
     private static final Logger logger = new LocalizedLogger(FinalizeController.class);

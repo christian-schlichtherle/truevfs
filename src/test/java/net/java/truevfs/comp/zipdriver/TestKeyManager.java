@@ -4,20 +4,18 @@
  */
 package net.java.truevfs.comp.zipdriver;
 
-import java.net.URI;
-import javax.annotation.concurrent.ThreadSafe;
-
 import net.java.truecommons.key.spec.AbstractKeyManager;
 import net.java.truecommons.key.spec.KeyProvider;
 import net.java.truecommons.key.spec.prompting.PromptingKey;
 import net.java.truecommons.key.spec.prompting.PromptingKey.View;
 import net.java.truecommons.key.spec.prompting.PromptingKeyManager;
 
+import java.net.URI;
+
 /**
  * @param  <K> the type of the safe keys.
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public final class TestKeyManager<K extends PromptingKey<K>>
 extends AbstractKeyManager<K> {
 

@@ -4,23 +4,20 @@
  */
 package net.java.truevfs.comp.zipdriver;
 
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.Objects;
-import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.comp.zip.WinZipAesParameters;
-import net.java.truevfs.comp.zip.ZipCryptoParameters;
-import net.java.truevfs.comp.zip.ZipKeyException;
-import net.java.truevfs.comp.zip.ZipParameters;
-import net.java.truevfs.comp.zip.ZipParametersProvider;
-import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truecommons.key.spec.KeyManager;
 import net.java.truecommons.key.spec.KeyManagerMap;
 import net.java.truecommons.key.spec.KeyProvider;
 import net.java.truecommons.key.spec.UnknownKeyException;
 import net.java.truecommons.key.spec.common.AesKeyStrength;
 import net.java.truecommons.key.spec.common.AesPbeParameters;
+import net.java.truevfs.comp.zip.*;
+import net.java.truevfs.kernel.spec.FsModel;
 import org.bouncycastle.crypto.PBEParametersGenerator;
+
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Objects;
+
 import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS5PasswordToBytes;
 
 /**
@@ -31,7 +28,6 @@ import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS5PasswordToByte
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class KeyManagerZipCryptoParameters
 implements ZipParametersProvider, ZipCryptoParameters {
 

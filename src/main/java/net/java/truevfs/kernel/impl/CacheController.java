@@ -14,7 +14,6 @@ import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
 import org.slf4j.Logger;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -46,7 +45,6 @@ import static net.java.truevfs.kernel.spec.FsSyncOptions.SYNC;
  *
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 abstract class CacheController<E extends FsArchiveEntry> implements DelegatingArchiveController<E> {
 
     private static final Logger logger = new LocalizedLogger(CacheController.class);

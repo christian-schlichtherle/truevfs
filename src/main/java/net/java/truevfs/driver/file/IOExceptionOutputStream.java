@@ -4,12 +4,11 @@
  */
 package net.java.truevfs.driver.file;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import net.java.truecommons.io.DecoratingOutputStream;
+
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.OutputStream;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillCloseWhenClosed;
-import net.java.truecommons.io.DecoratingOutputStream;
 
 /**
  * A decorating output stream which saves the last {@link IOException}
@@ -27,8 +26,7 @@ abstract class IOExceptionOutputStream extends DecoratingOutputStream {
      *
      * @param out the nullable output stream to decorate.
      */
-    @CreatesObligation
-    IOExceptionOutputStream(@WillCloseWhenClosed OutputStream out) {
+    IOExceptionOutputStream(OutputStream out) {
         super(out);
     }
 

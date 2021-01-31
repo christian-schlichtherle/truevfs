@@ -5,7 +5,6 @@
 package net.java.truecommons.io;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Closeable;
 import java.io.IOException;
 import java.nio.channels.Channel;

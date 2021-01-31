@@ -4,11 +4,11 @@
  */
 package net.java.truevfs.driver.file;
 
-import java.io.IOException;
-import static java.nio.file.Files.deleteIfExists;
-import java.nio.file.Path;
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.NotThreadSafe;
+import java.io.IOException;
+import java.nio.file.Path;
+
+import static java.nio.file.Files.deleteIfExists;
 
 /**
  * A pooled file buffer.
@@ -16,7 +16,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  * @see    FileBufferPool
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 final class FileBuffer extends FileNode {
 
     FileBuffer(final Path path, final FileBufferPool pool) {

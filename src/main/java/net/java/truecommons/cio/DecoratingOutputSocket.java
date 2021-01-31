@@ -4,10 +4,9 @@
  */
 package net.java.truecommons.cio;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Objects;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * An abstract decorator for an output socket.
@@ -19,9 +18,7 @@ import javax.annotation.concurrent.Immutable;
  * @see    DecoratingInputSocket
  * @author Christian Schlichtherle
  */
-@Immutable
-public abstract class DecoratingOutputSocket<E extends Entry>
-extends DelegatingOutputSocket<E> {
+public abstract class DecoratingOutputSocket<E extends Entry> extends DelegatingOutputSocket<E> {
 
     /** The nullable decorated output socket. */
     protected @Nullable OutputSocket<? extends E> socket;

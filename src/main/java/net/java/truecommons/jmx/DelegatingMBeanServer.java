@@ -4,18 +4,16 @@
  */
 package net.java.truecommons.jmx;
 
-import java.io.ObjectInputStream;
-import java.util.Set;
-import javax.annotation.concurrent.Immutable;
 import javax.management.*;
 import javax.management.loading.ClassLoaderRepository;
+import java.io.ObjectInputStream;
+import java.util.Set;
 
 /**
  * An MBean server which delegates all methods to another MBean server.
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public abstract class DelegatingMBeanServer implements MBeanServer {
 
     /** Returns the delegate MBean server. */

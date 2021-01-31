@@ -7,7 +7,6 @@ package net.java.truecommons.cio;
 import net.java.truecommons.io.ChannelInputStream;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -22,9 +21,7 @@ import java.nio.channels.SeekableByteChannel;
  * @see    AbstractOutputSocket
  * @author Christian Schlichtherle
  */
-@Immutable
-public abstract class AbstractInputSocket<E extends Entry>
-extends AbstractIoSocket<E> implements InputSocket<E> {
+public abstract class AbstractInputSocket<E extends Entry> extends AbstractIoSocket<E> implements InputSocket<E> {
 
     /**
      * Returns the target of the given nullable peer socket or null.

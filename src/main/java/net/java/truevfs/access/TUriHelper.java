@@ -4,20 +4,21 @@
  */
 package net.java.truevfs.access;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.Paths;
 import net.java.truecommons.shed.QuotedUriSyntaxException;
 import net.java.truecommons.shed.UriBuilder;
-import static net.java.truevfs.kernel.spec.FsNodeName.*;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 
 /**
  * Utility functions for {@link URI}s which represent file system path names.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 final class TUriHelper {
     static final URI SEPARATOR_URI = URI.create(SEPARATOR);
     static final URI DOT_URI = URI.create(".");

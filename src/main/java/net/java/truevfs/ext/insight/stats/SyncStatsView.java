@@ -4,14 +4,11 @@
  */
 package net.java.truevfs.ext.insight.stats;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 /**
  * An MXBean interface for {@link SyncStats}.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public interface SyncStatsView {
 
     String getSubject();

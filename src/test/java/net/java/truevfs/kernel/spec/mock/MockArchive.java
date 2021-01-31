@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.kernel.spec.mock;
 
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import net.java.truecommons.cio.*;
 import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.cio.Entry.Size;
@@ -16,7 +15,6 @@ import net.java.truevfs.kernel.spec.cio.ThrowingInputService;
 import net.java.truevfs.kernel.spec.cio.ThrowingOutputService;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -30,7 +28,6 @@ import static net.java.truecommons.cio.Entry.ALL_SIZES;
 /**
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public class MockArchive implements Container<MockArchiveDriverEntry> {
 
     final Map<String, MockArchiveDriverEntry> entries;
@@ -150,7 +147,6 @@ public class MockArchive implements Container<MockArchiveDriverEntry> {
         }
 
         @Override
-        @DischargesObligation
         public void close() {
         }
     } // MockInputService
@@ -232,7 +228,6 @@ public class MockArchive implements Container<MockArchiveDriverEntry> {
         }
 
         @Override
-        @DischargesObligation
         public void close() {
         }
     } // MockOutputService

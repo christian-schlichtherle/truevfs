@@ -4,9 +4,8 @@
  */
 package net.java.truevfs.comp.zip;
 
-import java.util.zip.ZipException;
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
+import java.util.zip.ZipException;
 
 /**
  * Thrown to indicate that no suitable ZIP parameters have been provided
@@ -14,7 +13,6 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @author  Christian Schlichtherle
  */
-@ThreadSafe
 public class ZipParametersException extends ZipException {
 
     private static final long serialVersionUID = 0;

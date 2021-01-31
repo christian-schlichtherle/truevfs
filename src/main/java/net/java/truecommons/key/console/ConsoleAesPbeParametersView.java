@@ -4,7 +4,6 @@
  */
 package net.java.truecommons.key.console;
 
-import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.key.spec.common.AesKeyStrength;
 import net.java.truecommons.key.spec.common.AesPbeParameters;
 
@@ -13,7 +12,6 @@ import net.java.truecommons.key.spec.common.AesPbeParameters;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 final class ConsoleAesPbeParametersView
 extends ConsolePromptingPbeParametersView<AesPbeParameters, AesKeyStrength> {
 

@@ -4,18 +4,17 @@
  */
 package net.java.truevfs.driver.odf;
 
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
+import net.java.truecommons.cio.*;
+import net.java.truevfs.comp.zipdriver.JarDriverEntry;
+import net.java.truevfs.comp.zipdriver.ZipOutputService;
+import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Objects;
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.NotThreadSafe;
-import static net.java.truevfs.comp.zip.ZipEntry.STORED;
-import net.java.truevfs.comp.zipdriver.JarDriverEntry;
-import net.java.truevfs.comp.zipdriver.ZipOutputService;
+
 import static net.java.truecommons.cio.Entry.UNKNOWN;
-import net.java.truecommons.cio.*;
-import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
+import static net.java.truevfs.comp.zip.ZipEntry.STORED;
 
 /**
  * Created by {@link OdfDriver} to meet the special requirements of
@@ -23,7 +22,6 @@ import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
  *
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public class OdfOutputService extends MultiplexingOutputService<JarDriverEntry> {
 
     /** The name of the entry to receive tender, loving care. */
@@ -40,7 +38,7 @@ public class OdfOutputService extends MultiplexingOutputService<JarDriverEntry> 
      */
     public OdfOutputService(
             IoBufferPool pool,
-            @WillCloseWhenClosed ZipOutputService<JarDriverEntry> output) {
+            ZipOutputService<JarDriverEntry> output) {
         super(pool, output);
     }
 
@@ -77,7 +75,6 @@ public class OdfOutputService extends MultiplexingOutputService<JarDriverEntry> 
     }
 
     @Override
-    @DischargesObligation
     public void close() throws IOException {
         mimetype = true; // trigger writing temps
         super.close();

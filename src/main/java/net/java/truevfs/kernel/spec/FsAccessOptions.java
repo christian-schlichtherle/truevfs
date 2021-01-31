@@ -4,8 +4,8 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.BitField;
+
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 
 /**
@@ -14,7 +14,6 @@ import static net.java.truevfs.kernel.spec.FsAccessOption.*;
  * @see    FsAccessOption
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class FsAccessOptions {
 
     /** A bit field with no access options set. */

@@ -4,7 +4,6 @@
  */
 package net.java.truecommons.jmx;
 
-import javax.annotation.concurrent.Immutable;
 import javax.management.ObjectInstance;
 
 /**
@@ -12,7 +11,6 @@ import javax.management.ObjectInstance;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public abstract class AbstractObjectNameModifier implements ObjectNameModifier {
 
     /**

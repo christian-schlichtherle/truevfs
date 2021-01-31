@@ -5,7 +5,6 @@
 package net.java.truevfs.driver.zip.raes;
 
 import java.io.IOException;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * A safe archive driver for RAES encrypted ZIP files (ZIP.RAES).
@@ -32,7 +31,6 @@ import javax.annotation.concurrent.Immutable;
  * @see     ParanoidZipRaesDriver
  * @author  Christian Schlichtherle
  */
-@Immutable
 public class SafeZipRaesDriver extends ZipRaesDriver {
 
     private static final long AUTHENTICATION_TRIGGER = 512 * 1024;

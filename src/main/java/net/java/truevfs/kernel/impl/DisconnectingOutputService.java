@@ -4,15 +4,12 @@
  */
 package net.java.truevfs.kernel.impl;
 
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import net.java.truecommons.cio.*;
 import net.java.truecommons.io.ClosedOutputException;
 import net.java.truecommons.io.ClosedStreamException;
 import net.java.truecommons.io.DisconnectingOutputStream;
 import net.java.truecommons.io.DisconnectingSeekableChannel;
 
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -28,7 +25,6 @@ import java.util.Iterator;
  * @author Christian Schlichtherle
  * @see DisconnectingInputService
  */
-@NotThreadSafe
 final class DisconnectingOutputService<E extends Entry> extends DecoratingOutputService<E> {
 
     private final CheckedCloseable cc = new CheckedCloseable(container) {
@@ -39,11 +35,10 @@ final class DisconnectingOutputService<E extends Entry> extends DecoratingOutput
         }
     };
 
-    DisconnectingOutputService(@WillCloseWhenClosed OutputService<E> output) {
+    DisconnectingOutputService(OutputService<E> output) {
         super(output);
     }
 
-    @DischargesObligation
     @Override
     public void close() throws IOException {
         cc.close();
@@ -129,7 +124,7 @@ final class DisconnectingOutputService<E extends Entry> extends DecoratingOutput
 
     private final class DisconnectingOutputStreamImpl extends DisconnectingOutputStream {
 
-        DisconnectingOutputStreamImpl(@WillCloseWhenClosed OutputStream out) {
+        DisconnectingOutputStreamImpl(OutputStream out) {
             super(out);
         }
 
@@ -138,7 +133,6 @@ final class DisconnectingOutputService<E extends Entry> extends DecoratingOutput
             return cc.isOpen();
         }
 
-        @DischargesObligation
         @Override
         public void close() throws IOException {
             if (isOpen()) {
@@ -149,7 +143,7 @@ final class DisconnectingOutputService<E extends Entry> extends DecoratingOutput
 
     private final class DisconnectingSeekableChannelImpl extends DisconnectingSeekableChannel {
 
-        DisconnectingSeekableChannelImpl(@WillCloseWhenClosed SeekableByteChannel channel) {
+        DisconnectingSeekableChannelImpl(SeekableByteChannel channel) {
             super(channel);
         }
 
@@ -158,7 +152,6 @@ final class DisconnectingOutputService<E extends Entry> extends DecoratingOutput
             return cc.isOpen();
         }
 
-        @DischargesObligation
         @Override
         public void close() throws IOException {
             if (isOpen()) {

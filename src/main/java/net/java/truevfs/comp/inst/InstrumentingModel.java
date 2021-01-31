@@ -4,16 +4,15 @@
  */
 package net.java.truevfs.comp.inst;
 
-import java.util.Objects;
-import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.kernel.spec.FsDecoratingModel;
 import net.java.truevfs.kernel.spec.FsModel;
+
+import java.util.Objects;
 
 /**
  * @param  <M> the type of the mediator.
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class InstrumentingModel<M extends Mediator<M>>
 extends FsDecoratingModel {
 

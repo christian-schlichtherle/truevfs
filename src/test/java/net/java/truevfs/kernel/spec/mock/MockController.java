@@ -4,18 +4,6 @@
  */
 package net.java.truevfs.kernel.spec.mock;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.nio.file.NoSuchFileException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
-
 import net.java.truecommons.cio.*;
 import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.cio.Entry.Type;
@@ -25,10 +13,20 @@ import net.java.truevfs.kernel.spec.io.ThrowingInputStream;
 import net.java.truevfs.kernel.spec.io.ThrowingOutputStream;
 import net.java.truevfs.kernel.spec.io.ThrowingSeekableChannel;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.file.NoSuchFileException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 /**
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class MockController
         extends FsAbstractController {
 

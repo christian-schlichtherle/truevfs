@@ -4,11 +4,11 @@
  */
 package net.java.truevfs.comp.ibm437;
 
+import global.namespace.service.wight.annotation.ServiceImplementation;
+
 import java.nio.charset.Charset;
 import java.nio.charset.spi.CharsetProvider;
 import java.util.*;
-import javax.annotation.concurrent.Immutable;
-import global.namespace.service.wight.annotation.ServiceImplementation;
 
 /**
  * Provides the {@code IBM437} alias {@code CP437} character set.
@@ -20,7 +20,6 @@ import global.namespace.service.wight.annotation.ServiceImplementation;
  * @see    <a href="http://www.pkware.com/documents/casestudies/APPNOTE.TXT">ZIP File Format Specification</a>
  * @author Christian Schlichtherle
  */
-@Immutable
 @ServiceImplementation(CharsetProvider.class)
 public final class Ibm437CharsetProvider extends CharsetProvider {
 

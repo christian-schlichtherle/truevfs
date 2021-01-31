@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.OverridingMethodsMustInvokeSuper;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
@@ -62,7 +61,6 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
     private byte[] data;
 
     @Before
-    @OverridingMethodsMustInvokeSuper
     public void setUp() throws IOException {
         file = createTempFile(TEMP_FILE_PREFIX, null);
         delete(file);
@@ -78,7 +76,6 @@ public abstract class ZipITSuite implements ZipEntryFactory<ZipEntry> {
     }
 
     @After
-    @OverridingMethodsMustInvokeSuper
     public void tearDown() {
         try {
             deleteIfExists(file);

@@ -4,8 +4,8 @@
  */
 package net.java.truevfs.comp.zip;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.key.spec.common.AesKeyStrength;
+
 import static net.java.truecommons.key.spec.common.AesKeyStrength.BITS_128;
 import static net.java.truevfs.comp.zip.LittleEndian.readUShort;
 import static net.java.truevfs.comp.zip.LittleEndian.writeShort;
@@ -18,7 +18,6 @@ import static net.java.truevfs.comp.zip.LittleEndian.writeShort;
  * @see     RawZipOutputStream$WinZipAesOutputMethod
  * @author  Christian Schlichtherle
  */
-@NotThreadSafe
 final class WinZipAesExtraField extends ExtraField {
 
     private static final int DATA_SIZE = 7;

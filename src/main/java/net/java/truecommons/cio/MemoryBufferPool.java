@@ -7,8 +7,6 @@ package net.java.truecommons.cio;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.annotation.concurrent.NotThreadSafe;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * A pool of I/O buffers which share their contents with
@@ -16,7 +14,6 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public final class MemoryBufferPool extends IoBufferPool {
 
     private static final String BUFFER_NAME = "buffer-";
@@ -55,7 +52,6 @@ public final class MemoryBufferPool extends IoBufferPool {
         return active.get();
     }
 
-    @NotThreadSafe
     private final class Buffer extends MemoryBuffer {
 
         private boolean released;

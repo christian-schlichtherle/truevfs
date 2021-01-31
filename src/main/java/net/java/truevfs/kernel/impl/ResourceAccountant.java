@@ -9,9 +9,6 @@
  import net.java.truecommons.shed.ExceptionHandler;
  import net.java.truecommons.shed.HashMaps;
 
- import javax.annotation.WillCloseWhenClosed;
- import javax.annotation.WillNotClose;
- import javax.annotation.concurrent.ThreadSafe;
  import java.io.Closeable;
  import java.io.IOException;
  import java.util.Map;
@@ -33,7 +30,6 @@
   * @author Christian Schlichtherle
   * @see ResourceController
   */
- @ThreadSafe
  final class ResourceAccountant implements LockAspect<Lock> {
 
      private final Lock lock;
@@ -87,7 +83,7 @@
       *
       * @param resource the closeable resource to start accounting for.
       */
-     void startAccountingFor(@WillCloseWhenClosed Closeable resource) {
+     void startAccountingFor(Closeable resource) {
          accounts.put(resource, new Account(this));
      }
 
@@ -98,7 +94,7 @@
       *
       * @param resource the closeable resource to stop accounting for.
       */
-     void stopAccountingFor(@WillNotClose Closeable resource) {
+     void stopAccountingFor(Closeable resource) {
          if (null != accounts.remove(resource)) {
              locked(new Op<Object, RuntimeException>() {
 

@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.comp.zip;
 
-import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.key.spec.common.AesKeyStrength;
 
 /**
@@ -12,7 +11,6 @@ import net.java.truecommons.key.spec.common.AesKeyStrength;
  *
  * @author  Christian Schlichtherle
  */
-@ThreadSafe
 final class WinZipAesEntryParameters {
 
     private final WinZipAesParameters param;

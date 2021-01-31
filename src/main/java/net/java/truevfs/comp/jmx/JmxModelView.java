@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.comp.jmx;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.Entry.Size;
 import net.java.truecommons.shed.BitField;
@@ -12,7 +11,6 @@ import net.java.truevfs.kernel.spec.*;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 
-import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
@@ -34,7 +32,6 @@ import static net.java.truecommons.cio.Entry.UNKNOWN;
  * @param  <M> the type of the file system model.
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class JmxModelView<M extends FsModel> extends StandardMBean implements JmxModelMXBean {
 
     private static final FsCompositeDriver DRIVER = new FsSimpleCompositeDriver(FsDriverMapLocator.SINGLETON);
@@ -200,7 +197,6 @@ public class JmxModelView<M extends FsModel> extends StandardMBean implements Jm
             public long getTime(Access type) { return UNKNOWN; }
 
             @Override
-            @SuppressFBWarnings("NP_BOOLEAN_RETURN_NULL")
             public Boolean isPermitted(Access type, Entity entity) {
                 return null;
             }

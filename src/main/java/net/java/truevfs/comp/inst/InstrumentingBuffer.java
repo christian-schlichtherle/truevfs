@@ -4,18 +4,17 @@
  */
 package net.java.truevfs.comp.inst;
 
-import java.util.Objects;
-import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.cio.DecoratingIoBuffer;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.IoBuffer;
 import net.java.truecommons.cio.OutputSocket;
 
+import java.util.Objects;
+
 /**
  * @param  <M> the type of the mediator.
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class InstrumentingBuffer<M extends Mediator<M>>
 extends DecoratingIoBuffer {
 

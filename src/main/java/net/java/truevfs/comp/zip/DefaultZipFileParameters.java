@@ -5,14 +5,12 @@
 package net.java.truevfs.comp.zip;
 
 import java.nio.charset.Charset;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * The default implementation of {@link ZipFileParameters}.
  *
  * @author  Christian Schlichtherle
  */
-@ThreadSafe
 final class DefaultZipFileParameters
 extends DefaultZipCharsetParameters
 implements ZipFileParameters<ZipEntry> {

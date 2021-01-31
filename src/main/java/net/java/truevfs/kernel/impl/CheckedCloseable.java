@@ -4,18 +4,15 @@
  */
 package net.java.truevfs.kernel.impl;
 
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import lombok.SneakyThrows;
 import net.java.truecommons.io.ClosedStreamException;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.Closeable;
 import java.io.IOException;
 
 /**
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 class CheckedCloseable implements Closeable {
 
     private final Closeable closeable;
@@ -29,7 +26,6 @@ class CheckedCloseable implements Closeable {
      * Closes this object.
      * Subsequent calls to this method will just forward the call to the delegate closeable.
      */
-    @DischargesObligation
     @Override
     public final void close() throws IOException {
         closed = true;

@@ -5,12 +5,10 @@
 package net.java.truevfs.kernel.spec;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class FsTestModel extends FsAbstractModel {
 
     private volatile boolean mounted;

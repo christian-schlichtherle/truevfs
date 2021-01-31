@@ -4,21 +4,21 @@
  */
 package net.java.truevfs.driver.odf;
 
-import java.io.IOException;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.cio.InputService;
+import net.java.truecommons.cio.IoBufferPool;
+import net.java.truecommons.cio.OutputService;
 import net.java.truevfs.comp.zipdriver.JarDriver;
 import net.java.truevfs.comp.zipdriver.JarDriverEntry;
 import net.java.truevfs.comp.zipdriver.ZipInputService;
 import net.java.truevfs.comp.zipdriver.ZipOutputService;
-import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsOutputSocketSink;
-import net.java.truecommons.cio.InputService;
-import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
-import net.java.truecommons.cio.OutputService;
+
+import javax.annotation.CheckForNull;
+import java.io.IOException;
+
+import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
 
 /**
  * An archive driver for application archive files according to the Open
@@ -43,14 +43,13 @@ import net.java.truecommons.cio.OutputService;
  * @see    OdfOutputService
  * @author Christian Schlichtherle
  */
-@Immutable
 public class OdfDriver extends JarDriver {
 
     @Override
     protected OutputService<JarDriverEntry> newOutput(
             final FsModel model,
             final FsOutputSocketSink sink,
-            final @CheckForNull @WillNotClose InputService<JarDriverEntry> input)
+            final @CheckForNull InputService<JarDriverEntry> input)
     throws IOException {
         final ZipInputService<JarDriverEntry> zis = (ZipInputService<JarDriverEntry>) input;
         final ZipOutputService<JarDriverEntry> zos = new ZipOutputService<>(model, sink, zis, this);

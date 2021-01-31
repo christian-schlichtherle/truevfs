@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.driver.odf;
 
-import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.comp.zipdriver.JarDriverEntry;
 import net.java.truevfs.comp.zipdriver.ZipInputService;
 
@@ -26,7 +25,6 @@ import net.java.truevfs.comp.zipdriver.ZipInputService;
  * 
  * @author Christian Schlichtherle
  */
-@Immutable
 public class CheckedOdfDriver extends OdfDriver {
 
     /**

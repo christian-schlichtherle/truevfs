@@ -5,14 +5,12 @@
 package net.java.truevfs.comp.zip;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Provides static utility methods for ZIP parameters.
  * 
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 final class ZipParametersUtils {
 
     private ZipParametersUtils() {

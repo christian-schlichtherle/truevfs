@@ -6,7 +6,6 @@ package net.java.truevfs.kernel.impl;
 
 import bali.Lookup;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
@@ -15,7 +14,6 @@ import java.util.concurrent.locks.ReadWriteLock;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 interface ReadWriteLockAspect<L extends ReadWriteLock> {
 
     /**

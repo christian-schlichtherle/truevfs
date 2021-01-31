@@ -110,5 +110,4 @@
  * minimum number of compressed bytes for the first 512 bytes of a key file
  * should be no less than 2 * 256 / 8 = 64 bytes.
  */
-@javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truevfs.driver.zip.raes.crypto;

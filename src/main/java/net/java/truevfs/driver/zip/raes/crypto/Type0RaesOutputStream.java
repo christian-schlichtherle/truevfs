@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.driver.zip.raes.crypto;
 
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import net.java.truecommons.io.LittleEndianOutputStream;
 import net.java.truecommons.io.Sink;
 import net.java.truecommons.key.spec.common.AesKeyStrength;
@@ -21,7 +20,6 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.util.io.TeeOutputStream;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.SecureRandom;
@@ -34,7 +32,6 @@ import static net.java.truevfs.driver.zip.raes.crypto.Constants.*;
  *
  * @author  Christian Schlichtherle
  */
-@NotThreadSafe
 final class Type0RaesOutputStream extends RaesOutputStream {
 
     /**
@@ -186,7 +183,6 @@ final class Type0RaesOutputStream extends RaesOutputStream {
     }
 
     @Override
-    @DischargesObligation
     public void close() throws IOException {
         finish();
         out.close();

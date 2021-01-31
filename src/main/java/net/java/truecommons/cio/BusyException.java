@@ -5,7 +5,6 @@
 package net.java.truecommons.cio;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 import java.io.FileNotFoundException;
 
 /**
@@ -18,7 +17,6 @@ import java.io.FileNotFoundException;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class BusyException extends FileNotFoundException {
 
     private static final long serialVersionUID = 0;

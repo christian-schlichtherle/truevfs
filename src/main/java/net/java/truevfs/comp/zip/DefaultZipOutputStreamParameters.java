@@ -5,16 +5,15 @@
 package net.java.truevfs.comp.zip;
 
 import net.java.truecommons.shed.HashMaps;
+
 import java.nio.charset.Charset;
 import java.util.zip.Deflater;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Default implementation of {@link ZipOutputStreamParameters}.
  * 
  * @author  Christian Schlichtherle
  */
-@ThreadSafe
 class DefaultZipOutputStreamParameters
 extends DefaultZipCharsetParameters
 implements ZipOutputStreamParameters {

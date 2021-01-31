@@ -4,8 +4,15 @@
  */
 package net.java.truevfs.comp.zip;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import net.java.truecommons.io.DecoratingOutputStream;
+import net.java.truecommons.io.LittleEndianOutputStream;
+import net.java.truecommons.io.Sink;
+import net.java.truecommons.key.spec.common.AesKeyStrength;
+import net.java.truecommons.shed.HashMaps;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -15,16 +22,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.zip.Deflater;
 import java.util.zip.ZipException;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.NotThreadSafe;
-
-import net.java.truecommons.io.DecoratingOutputStream;
-import net.java.truecommons.io.LittleEndianOutputStream;
-import net.java.truecommons.io.Sink;
-import net.java.truecommons.shed.HashMaps;
 
 import static net.java.truevfs.comp.zip.Constants.*;
 import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
@@ -33,9 +30,6 @@ import static net.java.truevfs.comp.zip.WinZipAesExtraField.VV_AE_2;
 import static net.java.truevfs.comp.zip.WinZipAesUtils.overhead;
 import static net.java.truevfs.comp.zip.ZipEntry.*;
 import static net.java.truevfs.comp.zip.ZipParametersUtils.parameters;
-
-import net.java.truecommons.key.spec.common.AesKeyStrength;
-import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
 /**
  * Provides unsafe (raw) access to a ZIP file using shared {@link ZipEntry}
@@ -48,7 +42,6 @@ import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream
  * @author Christian Schlichtherle
  * @see AbstractZipFile
  */
-@NotThreadSafe
 public abstract class AbstractZipOutputStream<E extends ZipEntry>
         extends DecoratingOutputStream
         implements Iterable<E> {
@@ -110,10 +103,9 @@ public abstract class AbstractZipOutputStream<E extends ZipEntry>
      *                 This may already be closed.
      * @param param    the parameters for writing the ZIP file.
      */
-    @CreatesObligation
     protected AbstractZipOutputStream(
             final Sink sink,
-            final @CheckForNull @WillNotClose AbstractZipFile<E> appendee,
+            final @CheckForNull AbstractZipFile<E> appendee,
             final ZipOutputStreamParameters param)
             throws IOException {
         final OutputStream out = sink.stream();
@@ -711,8 +703,8 @@ public abstract class AbstractZipOutputStream<E extends ZipEntry>
     private static final class AppendingLittleEndianOutputStream
             extends LittleEndianOutputStream {
         AppendingLittleEndianOutputStream(
-                final @WillCloseWhenClosed OutputStream out,
-                final @WillNotClose AbstractZipFile<?> appendee) {
+                final OutputStream out,
+                final AbstractZipFile<?> appendee) {
             super(out);
             super.written = appendee.getOffsetMapper().unmap(appendee.length());
         }

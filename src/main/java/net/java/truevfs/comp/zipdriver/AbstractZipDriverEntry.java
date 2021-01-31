@@ -4,16 +4,16 @@
  */
 package net.java.truevfs.comp.zipdriver;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.cio.Entry;
-import static net.java.truecommons.cio.Entry.Access.WRITE;
-import static net.java.truecommons.cio.Entry.Size.DATA;
-import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
-import static net.java.truecommons.cio.Entry.Type.FILE;
 import net.java.truevfs.comp.zip.DateTimeConverter;
 import net.java.truevfs.comp.zip.ZipEntry;
 import net.java.truevfs.kernel.spec.FsArchiveEntries;
 import net.java.truevfs.kernel.spec.FsArchiveEntry;
+
+import static net.java.truecommons.cio.Entry.Access.WRITE;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
+import static net.java.truecommons.cio.Entry.Type.FILE;
 
 /**
  * ZIP archive entries apply the date/time conversion rules as defined by
@@ -80,7 +80,6 @@ public abstract class AbstractZipDriverEntry extends ZipEntry implements FsArchi
     }
 
     @Override
-    @SuppressFBWarnings("NP_BOOLEAN_RETURN_NULL")
     public Boolean isPermitted(Access type, Entity entity) { return null; }
 
     @Override

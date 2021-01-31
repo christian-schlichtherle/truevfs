@@ -4,7 +4,6 @@
  */
 package net.java.truecommons.key.spec.common;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.key.spec.prompting.AbstractPromptingPbeParameters;
 
 /**
@@ -13,7 +12,6 @@ import net.java.truecommons.key.spec.prompting.AbstractPromptingPbeParameters;
  *
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public final class AesPbeParameters
 extends AbstractPromptingPbeParameters<AesPbeParameters, AesKeyStrength> {
 

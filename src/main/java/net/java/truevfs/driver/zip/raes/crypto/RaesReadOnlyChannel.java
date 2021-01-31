@@ -4,19 +4,18 @@
  */
 package net.java.truevfs.driver.zip.raes.crypto;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.EOFException;
-import java.io.IOException;
-import java.nio.channels.SeekableByteChannel;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.io.PowerBuffer;
 import net.java.truecommons.io.ReadOnlyChannel;
 import net.java.truecommons.io.Source;
+import net.java.truecommons.key.spec.common.AesKeyStrength;
+
+import javax.annotation.CheckForNull;
+import java.io.EOFException;
+import java.io.IOException;
+import java.nio.channels.SeekableByteChannel;
+
 import static net.java.truevfs.driver.zip.raes.crypto.Constants.HEADER_MIN_LEN;
 import static net.java.truevfs.driver.zip.raes.crypto.Constants.SIGNATURE;
-import net.java.truecommons.key.spec.common.AesKeyStrength;
 
 /**
  * This class implements a {@link SeekableByteChannel} for random read-only
@@ -49,7 +48,6 @@ import net.java.truecommons.key.spec.common.AesKeyStrength;
  * @see    RaesOutputStream
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public abstract class RaesReadOnlyChannel extends ReadOnlyChannel {
 
     /**
@@ -71,7 +69,6 @@ public abstract class RaesReadOnlyChannel extends ReadOnlyChannel {
      * @throws EOFException on unexpected end-of-file.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public static RaesReadOnlyChannel create(
             final RaesParameters param,
             final Source source)
@@ -108,10 +105,9 @@ public abstract class RaesReadOnlyChannel extends ReadOnlyChannel {
      * @throws EOFException on unexpected end-of-file.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     private static RaesReadOnlyChannel create(
             final RaesParameters param,
-            final @WillCloseWhenClosed SeekableByteChannel channel)
+            final SeekableByteChannel channel)
     throws RaesParametersException, RaesException, EOFException, IOException {
         final PowerBuffer<?> header = PowerBuffer
                 .allocate(HEADER_MIN_LEN)

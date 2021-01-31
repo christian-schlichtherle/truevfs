@@ -13,7 +13,6 @@ import net.java.truevfs.kernel.spec.*;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -48,7 +47,6 @@ import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
  * @param <E> the type of the archive entries.
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 abstract class BasicArchiveController<E extends FsArchiveEntry> implements ArchiveController<E> {
 
     private static final Logger logger = new LocalizedLogger(BasicArchiveController.class);

@@ -4,14 +4,16 @@
  */
 package net.java.truevfs.kernel.spec.mock;
 
+import net.java.truevfs.kernel.spec.FsController;
+import net.java.truevfs.kernel.spec.FsDriver;
+import net.java.truevfs.kernel.spec.FsManager;
+import net.java.truevfs.kernel.spec.FsModel;
+
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.kernel.spec.*;
 
 /**
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class MockDriver extends FsDriver {
 
     @Override

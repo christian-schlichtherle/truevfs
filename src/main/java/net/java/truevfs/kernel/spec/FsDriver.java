@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.UniqueObject;
 
 /**
@@ -15,7 +14,6 @@ import net.java.truecommons.shed.UniqueObject;
  * @see    FsCompositeDriver
  * @author Christian Schlichtherle
  */
-@Immutable
 public abstract class FsDriver
         extends UniqueObject
         implements FsModel.Factory<FsManager>, FsController.Factory<FsManager> {

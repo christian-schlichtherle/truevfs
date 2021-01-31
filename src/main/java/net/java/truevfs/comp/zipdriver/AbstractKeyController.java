@@ -4,20 +4,21 @@
  */
 package net.java.truevfs.comp.zipdriver;
 
-import java.io.IOException;
-import java.net.URI;
-import java.util.Objects;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.Entry.Access;
-import static net.java.truecommons.cio.Entry.Type.SPECIAL;
+import net.java.truecommons.key.spec.KeyManager;
+import net.java.truecommons.key.spec.KeyManagerMap;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.ControlFlowException;
 import net.java.truevfs.kernel.spec.*;
+
+import javax.annotation.CheckForNull;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Objects;
+
+import static net.java.truecommons.cio.Entry.Type.SPECIAL;
 import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
-import net.java.truecommons.key.spec.KeyManager;
-import net.java.truecommons.key.spec.KeyManagerMap;
 
 /**
  * This file system controller decorates another file system controller in
@@ -25,7 +26,6 @@ import net.java.truecommons.key.spec.KeyManagerMap;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public abstract class AbstractKeyController extends FsDecoratingController {
 
     private static final String ROOT_PATH = ROOT.getPath();

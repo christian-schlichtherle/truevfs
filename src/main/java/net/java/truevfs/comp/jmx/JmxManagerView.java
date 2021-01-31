@@ -11,7 +11,6 @@ import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsSync;
 import net.java.truevfs.kernel.spec.FsSyncException;
 
-import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
@@ -25,7 +24,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @param <M> the type of the file system manager.
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class JmxManagerView<M extends FsManager> extends StandardMBean implements JmxManagerMXBean {
 
     protected final M manager;

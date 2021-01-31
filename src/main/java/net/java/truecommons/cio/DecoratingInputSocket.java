@@ -4,29 +4,30 @@
  */
 package net.java.truecommons.cio;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Objects;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * An abstract decorator for an input socket.
  * <p>
  * Implementations should be immutable.
  *
- * @param  <E> the type of the {@linkplain #target() target entry} for I/O
- *         operations.
- * @see    DecoratingOutputSocket
+ * @param <E> the type of the {@linkplain #target() target entry} for I/O
+ *            operations.
  * @author Christian Schlichtherle
+ * @see DecoratingOutputSocket
  */
-@Immutable
-public abstract class DecoratingInputSocket<E extends Entry>
-extends DelegatingInputSocket<E> {
+public abstract class DecoratingInputSocket<E extends Entry> extends DelegatingInputSocket<E> {
 
-    /** The nullable decorated input socket. */
-    protected @Nullable InputSocket<? extends E> socket;
+    /**
+     * The nullable decorated input socket.
+     */
+    protected @Nullable
+    InputSocket<? extends E> socket;
 
-    protected DecoratingInputSocket() { }
+    protected DecoratingInputSocket() {
+    }
 
     protected DecoratingInputSocket(final InputSocket<? extends E> socket) {
         this.socket = Objects.requireNonNull(socket);

@@ -6,7 +6,6 @@ package net.java.truevfs.ext.insight.stats;
 
 import lombok.val;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,7 +20,6 @@ import static java.util.Locale.ENGLISH;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public final class FsLogger {
 
     private static final String defaultSizePropertyKey = FsLogger.class + ".defaultSize";

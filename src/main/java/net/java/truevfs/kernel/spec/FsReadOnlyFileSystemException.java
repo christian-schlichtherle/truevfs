@@ -5,7 +5,6 @@
 package net.java.truevfs.kernel.spec;
 
 import java.nio.file.FileSystemException;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Indicates that an I/O operation was trying to modify a read-only file system.
@@ -15,7 +14,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * subclass of {@code FileSystemException} while the latter is a subclass of
  * {@link java.lang.UnsupportedOperationException}.
  */
-@ThreadSafe
 public class FsReadOnlyFileSystemException extends FileSystemException {
 
     private static final long serialVersionUID = 0;

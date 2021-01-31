@@ -4,14 +4,11 @@
  */
 package net.java.truevfs.ext.insight;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 /**
  * A mediator for the instrumentation of the TrueVFS Kernel with JMX.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 final class I5tIoMediator extends I5tMediator {
 
     I5tIoMediator(String subject) {

@@ -9,7 +9,6 @@ import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.spi.FsManagerDecorator;
 import net.java.truevfs.kernel.spec.spi.FsManagerFactory;
 
-import javax.annotation.concurrent.Immutable;
 import java.util.function.Supplier;
 
 /**
@@ -19,7 +18,6 @@ import java.util.function.Supplier;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class FsManagerLocator implements Supplier<FsManager> {
 
     /**

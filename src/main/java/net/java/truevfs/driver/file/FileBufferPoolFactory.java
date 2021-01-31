@@ -8,14 +8,11 @@ import global.namespace.service.wight.annotation.ServiceImplementation;
 import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.spi.IoBufferPoolFactory;
 
-import javax.annotation.concurrent.Immutable;
-
 /**
  * Creates {@linkplain FileBufferPool temp file based I/O buffer pools}.
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 @ServiceImplementation(priority = -100)
 public final class FileBufferPoolFactory implements IoBufferPoolFactory {
 

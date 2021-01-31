@@ -5,7 +5,6 @@
 package net.java.truecommons.key.macosx.keychain;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Optional;
@@ -23,7 +22,6 @@ import static net.java.truecommons.key.macosx.keychain.Security.*;
  * @author Christian Schlichtherle
  */
 @SuppressWarnings("PackageVisibleInnerClass")
-@ThreadSafe
 public abstract class Keychain implements AutoCloseable {
 
     /**

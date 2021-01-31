@@ -6,7 +6,6 @@ package net.java.truevfs.kernel.spec;
 
 import net.java.truecommons.shed.PriorityExceptionBuilder;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import java.util.Comparator;
 
 /**
@@ -16,7 +15,6 @@ import java.util.Comparator;
  *
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public final class FsSyncExceptionBuilder
 extends PriorityExceptionBuilder<FsSyncException> {
 

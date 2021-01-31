@@ -5,7 +5,6 @@
 package net.java.truecommons.cio;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -20,9 +19,7 @@ import java.nio.channels.SeekableByteChannel;
  * @see    DelegatingOutputSocket
  * @author Christian Schlichtherle
  */
-@Immutable
-public abstract class DelegatingInputSocket<E extends Entry>
-extends AbstractInputSocket<E> {
+public abstract class DelegatingInputSocket<E extends Entry> extends AbstractInputSocket<E> {
 
     /**
      * Returns the delegate input socket.

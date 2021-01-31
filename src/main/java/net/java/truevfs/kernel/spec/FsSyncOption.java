@@ -4,11 +4,11 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.io.IOException;
-import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.io.ClosedInputException;
 import net.java.truecommons.io.ClosedOutputException;
 import net.java.truecommons.shed.BitField;
+
+import java.io.IOException;
 
 /**
  * Defines options for (virtual) file system synchronization.
@@ -17,7 +17,6 @@ import net.java.truecommons.shed.BitField;
  * @see    FsSyncOptions
  * @author Christian Schlichtherle
  */
-@Immutable
 public enum FsSyncOption {
 
     /**

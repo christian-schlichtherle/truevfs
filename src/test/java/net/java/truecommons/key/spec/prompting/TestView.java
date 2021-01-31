@@ -9,7 +9,6 @@ import net.java.truecommons.key.spec.prompting.PromptingKey.Controller;
 import net.java.truecommons.key.spec.prompting.PromptingKey.View;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 import java.net.URI;
 import java.util.Objects;
 import java.util.Random;
@@ -23,7 +22,6 @@ import static net.java.truecommons.key.spec.prompting.TestView.Action.ENTER;
  * @param  <K> The type of the safe key.
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public final class TestView<K extends PromptingKey<K>> implements View<K> {
 
     private volatile @Nullable URI resource;

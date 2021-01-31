@@ -5,7 +5,6 @@
 package net.java.truevfs.comp.zip;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Thrown to indicate that retrieving a key to encrypt or decrypt or
@@ -13,7 +12,6 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class ZipKeyException extends ZipParametersException {
 
     private static final long serialVersionUID = 0;

@@ -6,14 +6,11 @@ package net.java.truevfs.ext.insight;
 
 import net.java.truevfs.ext.insight.stats.IoStats;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 /**
  * A controller for {@link IoStats}.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 final class I5tIoStatsController extends I5tStatsController {
 
     I5tIoStatsController(I5tMediator mediator, int offset) {

@@ -17,7 +17,6 @@ import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsModel;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -30,7 +29,6 @@ import static net.java.truevfs.ext.insight.I5tMediators.*;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 abstract class I5tMediator extends JmxMediator<I5tMediator> {
 
     private final FsLogger logger = new FsLogger();

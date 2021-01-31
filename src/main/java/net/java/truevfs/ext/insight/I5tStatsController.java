@@ -9,7 +9,6 @@ import net.java.truevfs.ext.insight.stats.FsStats;
 import net.java.truevfs.ext.insight.stats.IoStats;
 import net.java.truevfs.ext.insight.stats.SyncStats;
 
-import javax.annotation.concurrent.ThreadSafe;
 import javax.management.ObjectName;
 
 import static java.util.Locale.ENGLISH;
@@ -19,7 +18,6 @@ import static java.util.Locale.ENGLISH;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 abstract class I5tStatsController implements JmxComponent {
 
     private final I5tMediator mediator;

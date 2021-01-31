@@ -5,7 +5,6 @@
 package net.java.truecommons.cio;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Indicates that an entity (an entry or container) could not get read
@@ -17,7 +16,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * @see    OutputBusyException
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class InputBusyException extends BusyException {
 
     private static final long serialVersionUID = 0;

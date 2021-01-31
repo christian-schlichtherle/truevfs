@@ -12,5 +12,4 @@
  * @see    <a href="http://www.pkware.com/documents/casestudies/APPNOTE.TXT">ZIP File Format Specification</a>
  * @author Christian Schlichtherle
  */
-@javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truevfs.comp.ibm437;

@@ -4,16 +4,18 @@
  */
 package net.java.truevfs.driver.file;
 
+import net.java.truevfs.kernel.spec.FsController;
+import net.java.truevfs.kernel.spec.FsDriver;
+import net.java.truevfs.kernel.spec.FsManager;
+import net.java.truevfs.kernel.spec.FsModel;
+
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
-import net.java.truevfs.kernel.spec.*;
 
 /**
  * A file system driver for the FILE scheme.
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class FileDriver extends FsDriver {
 
     @Override

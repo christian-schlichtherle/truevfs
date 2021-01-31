@@ -4,13 +4,10 @@
  */
 package net.java.truevfs.comp.zip;
 
-import javax.annotation.concurrent.NotThreadSafe;
-
 /**
  * A marker interface for ZIP parameters.
  * 
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public interface ZipParameters {
 }

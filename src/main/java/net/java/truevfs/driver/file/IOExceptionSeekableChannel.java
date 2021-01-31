@@ -4,13 +4,12 @@
  */
 package net.java.truevfs.driver.file;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import net.java.truecommons.io.DecoratingSeekableChannel;
+
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillCloseWhenClosed;
-import net.java.truecommons.io.DecoratingSeekableChannel;
 
 /**
  * A decorating seekable byte channel which saves the last {@link IOException}
@@ -30,8 +29,7 @@ extends DecoratingSeekableChannel {
      *
      * @param channel the nullable seekable byte channel to decorate.
      */
-    @CreatesObligation
-    IOExceptionSeekableChannel(@WillCloseWhenClosed SeekableByteChannel channel) {
+    IOExceptionSeekableChannel(SeekableByteChannel channel) {
         super(channel);
     }
 

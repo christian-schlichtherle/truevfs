@@ -4,17 +4,16 @@
  */
 package net.java.truevfs.comp.inst;
 
+import net.java.truecommons.io.DecoratingOutputStream;
+
 import java.io.OutputStream;
 import java.util.Objects;
-import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.io.DecoratingOutputStream;
 
 /**
  * @param  <M> the type of the mediator.
  * @see    InstrumentingInputStream
  * @author Christian Schlichtherle
  */
-@Immutable
 public class InstrumentingOutputStream<M extends Mediator<M>>
 extends DecoratingOutputStream {
 

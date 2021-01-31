@@ -4,16 +4,15 @@
  */
 package net.java.truevfs.comp.jmx;
 
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.cio.IoBuffer;
+
+import javax.annotation.Nullable;
 
 /**
  * An MXBean interface for an {@linkplain IoBuffer I/O buffer}.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public interface JmxBufferMXBean {
     String           getName();
     long             getSizeOfData();

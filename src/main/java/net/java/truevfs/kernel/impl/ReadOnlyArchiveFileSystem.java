@@ -12,7 +12,6 @@ import net.java.truevfs.kernel.spec.FsArchiveEntry;
 import net.java.truevfs.kernel.spec.FsNodeName;
 import net.java.truevfs.kernel.spec.FsReadOnlyFileSystemException;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
@@ -28,7 +27,6 @@ import static net.java.truecommons.cio.Entry.Access.READ;
  * @param <E> The type of the archive entries.
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 final class ReadOnlyArchiveFileSystem<E extends FsArchiveEntry> extends ArchiveFileSystem<E> {
 
     private static final BitField<Entry.Access> READ_ONLY = BitField.of(READ);

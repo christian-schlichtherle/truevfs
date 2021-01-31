@@ -12,7 +12,6 @@ import net.java.truecommons.io.DecoratingSeekableChannel;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,7 +32,6 @@ import static net.java.truevfs.kernel.spec.FsSyncOptions.SYNC;
  * @author Christian Schlichtherle
  * @see NeedsSyncException
  */
-@ThreadSafe
 abstract class SyncController<E extends FsArchiveEntry> implements DelegatingArchiveController<E> {
 
     private static final BitField<FsSyncOption> NOT_WAIT_CLOSE_IO = BitField.of(FsSyncOption.WAIT_CLOSE_IO).not();

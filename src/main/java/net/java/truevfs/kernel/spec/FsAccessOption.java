@@ -5,7 +5,6 @@
 package net.java.truevfs.kernel.spec;
 
 import java.io.IOException;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * Defines common access options for I/O operations.
@@ -19,7 +18,6 @@ import javax.annotation.concurrent.Immutable;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public enum FsAccessOption {
 
     /** Whether or not a file system node must be exclusively created. */

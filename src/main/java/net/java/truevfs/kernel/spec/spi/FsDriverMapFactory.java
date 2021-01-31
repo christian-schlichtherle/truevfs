@@ -10,7 +10,6 @@ import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
 
-import javax.annotation.concurrent.Immutable;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;

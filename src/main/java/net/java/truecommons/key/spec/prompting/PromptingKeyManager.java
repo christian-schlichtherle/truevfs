@@ -8,7 +8,6 @@ import net.java.truecommons.key.spec.AbstractKeyManager;
 import net.java.truecommons.key.spec.KeyProvider;
 import net.java.truecommons.key.spec.prompting.PromptingKey.View;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.net.URI;
 
 import static java.util.Objects.requireNonNull;
@@ -20,7 +19,6 @@ import static java.util.Objects.requireNonNull;
  * @see    PromptingKeyManagerMap
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public final class PromptingKeyManager<K extends PromptingKey<K>>
 extends AbstractKeyManager<K> {
 

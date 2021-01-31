@@ -4,7 +4,6 @@
  */
 package net.java.truecommons.cio;
 
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import net.java.truecommons.shed.UniqueObject;
 
 import javax.annotation.Nullable;
@@ -42,7 +41,6 @@ extends UniqueObject implements Container<E> {
     public @Nullable E entry(String name) { return container.entry(name); }
 
     @Override
-    @DischargesObligation
     public void close() throws Exception { container.close(); }
 
     /**

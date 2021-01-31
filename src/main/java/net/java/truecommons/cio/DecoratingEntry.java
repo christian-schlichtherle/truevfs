@@ -4,10 +4,10 @@
  */
 package net.java.truecommons.cio;
 
-import java.util.Objects;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.UniqueObject;
+
+import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * An abstract decorator for an entry.
@@ -15,7 +15,6 @@ import net.java.truecommons.shed.UniqueObject;
  * @param  <E> the type of the decorated entry.
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public abstract class DecoratingEntry<E extends Entry>
 extends UniqueObject implements Entry {
 

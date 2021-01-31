@@ -8,7 +8,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Converts Java time values to DOS date/time values and vice versa.
@@ -20,7 +19,6 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public enum DateTimeConverter {
 
     /**

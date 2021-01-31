@@ -4,15 +4,12 @@
  */
 package net.java.truevfs.kernel.impl;
 
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
 import net.java.truecommons.cio.*;
 import net.java.truecommons.io.ClosedInputException;
 import net.java.truecommons.io.ClosedStreamException;
 import net.java.truecommons.io.DisconnectingInputStream;
 import net.java.truecommons.io.DisconnectingSeekableChannel;
 
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
@@ -28,7 +25,6 @@ import java.util.Iterator;
  * @author Christian Schlichtherle
  * @see DisconnectingOutputService
  */
-@NotThreadSafe
 final class DisconnectingInputService<E extends Entry> extends DecoratingInputService<E> {
 
     private final CheckedCloseable cc = new CheckedCloseable(container) {
@@ -39,11 +35,10 @@ final class DisconnectingInputService<E extends Entry> extends DecoratingInputSe
         }
     };
 
-    DisconnectingInputService(@WillCloseWhenClosed InputService<E> input) {
+    DisconnectingInputService(InputService<E> input) {
         super(input);
     }
 
-    @DischargesObligation
     @Override
     public void close() throws IOException {
         cc.close();
@@ -129,7 +124,7 @@ final class DisconnectingInputService<E extends Entry> extends DecoratingInputSe
 
     private final class DisconnectingInputStreamImpl extends DisconnectingInputStream {
 
-        DisconnectingInputStreamImpl(@WillCloseWhenClosed InputStream in) {
+        DisconnectingInputStreamImpl(InputStream in) {
             super(in);
         }
 
@@ -138,7 +133,6 @@ final class DisconnectingInputService<E extends Entry> extends DecoratingInputSe
             return cc.isOpen();
         }
 
-        @DischargesObligation
         @Override
         public void close() throws IOException {
             if (isOpen()) {
@@ -149,7 +143,7 @@ final class DisconnectingInputService<E extends Entry> extends DecoratingInputSe
 
     private final class DisconnectingSeekableChannelImpl extends DisconnectingSeekableChannel {
 
-        DisconnectingSeekableChannelImpl(@WillCloseWhenClosed SeekableByteChannel channel) {
+        DisconnectingSeekableChannelImpl(SeekableByteChannel channel) {
             super(channel);
         }
 
@@ -158,7 +152,6 @@ final class DisconnectingInputService<E extends Entry> extends DecoratingInputSe
             return cc.isOpen();
         }
 
-        @DischargesObligation
         @Override
         public void close() throws IOException {
             if (isOpen()) {

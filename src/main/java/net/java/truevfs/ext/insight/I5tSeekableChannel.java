@@ -8,8 +8,6 @@ import lombok.val;
 import net.java.truevfs.comp.inst.InstrumentingSeekableChannel;
 import net.java.truevfs.comp.jmx.JmxComponent;
 
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
@@ -19,10 +17,9 @@ import java.nio.channels.SeekableByteChannel;
  *
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 final class I5tSeekableChannel extends InstrumentingSeekableChannel<I5tMediator> implements JmxComponent {
 
-    public I5tSeekableChannel(I5tMediator mediator, @WillCloseWhenClosed SeekableByteChannel channel) {
+    public I5tSeekableChannel(I5tMediator mediator, SeekableByteChannel channel) {
         super(mediator, channel);
     }
 

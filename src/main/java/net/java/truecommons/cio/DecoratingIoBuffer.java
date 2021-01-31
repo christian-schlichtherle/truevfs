@@ -5,14 +5,12 @@
 package net.java.truecommons.cio;
 
 import java.io.IOException;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * An abstract decorator for an I/O buffer.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public abstract class DecoratingIoBuffer
 extends DecoratingEntry<IoBuffer> implements IoBuffer {
 

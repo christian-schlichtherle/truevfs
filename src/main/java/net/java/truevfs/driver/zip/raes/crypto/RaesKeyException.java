@@ -4,15 +4,12 @@
  */
 package net.java.truevfs.driver.zip.raes.crypto;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 /**
  * Thrown to indicate that retrieving a key to encrypt or decrypt some pay load
  * data in an RAES file has failed for some reason.
  *
  * @author  Christian Schlichtherle
  */
-@ThreadSafe
 public class RaesKeyException extends RaesParametersException {
 
     private static final long serialVersionUID = 0;

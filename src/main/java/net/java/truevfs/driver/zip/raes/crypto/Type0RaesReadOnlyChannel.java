@@ -4,25 +4,15 @@
  */
 package net.java.truevfs.driver.zip.raes.crypto;
 
-import java.io.EOFException;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Arrays;
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.io.IntervalReadOnlyChannel;
 import net.java.truecommons.io.MutableBuffer;
+import net.java.truecommons.key.spec.common.AesKeyStrength;
+import net.java.truecommons.key.spec.util.SuspensionPenalty;
 import net.java.truevfs.comp.zip.crypto.CipherReadOnlyChannel;
 import net.java.truevfs.comp.zip.crypto.CtrBlockCipher;
 import net.java.truevfs.comp.zip.crypto.SeekableBlockCipher;
-import static net.java.truevfs.driver.zip.raes.crypto.Constants.AES_BLOCK_SIZE_BITS;
-import static net.java.truevfs.driver.zip.raes.crypto.Constants.TYPE_0_HEADER_LEN_WO_SALT;
-import net.java.truecommons.key.spec.common.AesKeyStrength;
-import net.java.truecommons.key.spec.util.SuspensionPenalty;
 import org.bouncycastle.crypto.Mac;
 import org.bouncycastle.crypto.PBEParametersGenerator;
-import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS12PasswordToBytes;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.engines.AESEngine;
 import org.bouncycastle.crypto.generators.PKCS12ParametersGenerator;
@@ -30,12 +20,21 @@ import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 
+import java.io.EOFException;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
+import java.util.Arrays;
+
+import static net.java.truevfs.driver.zip.raes.crypto.Constants.AES_BLOCK_SIZE_BITS;
+import static net.java.truevfs.driver.zip.raes.crypto.Constants.TYPE_0_HEADER_LEN_WO_SALT;
+import static org.bouncycastle.crypto.PBEParametersGenerator.PKCS12PasswordToBytes;
+
 /**
  * Reads a type 0 RAES file.
  *
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 final class Type0RaesReadOnlyChannel extends RaesReadOnlyChannel {
 
     /** The key strength. */
@@ -51,7 +50,7 @@ final class Type0RaesReadOnlyChannel extends RaesReadOnlyChannel {
 
     Type0RaesReadOnlyChannel(
             final Type0RaesParameters param,
-            final @WillCloseWhenClosed SeekableByteChannel channel)
+            final SeekableByteChannel channel)
     throws IOException {
         assert null != param;
         assert null != channel;

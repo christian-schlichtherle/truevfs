@@ -5,7 +5,6 @@
 package net.java.truecommons.key.macosx.keychain;
 
 import com.sun.jna.*;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Arrays;
 import java.util.List;
@@ -58,7 +57,6 @@ final class CoreFoundation {
         CFIndex(long value) { super(value); }
     }
 
-    @SuppressFBWarnings("URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD")
     public static class CFRange extends Structure {
         public CFIndex location, length;
 

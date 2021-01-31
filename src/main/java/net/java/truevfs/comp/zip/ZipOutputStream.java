@@ -4,7 +4,10 @@
  */
 package net.java.truevfs.comp.zip;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import net.java.truecommons.io.OneTimeSink;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -12,11 +15,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truecommons.io.OneTimeSink;
 
 /**
  * Replacement for
@@ -41,7 +39,6 @@ import net.java.truecommons.io.OneTimeSink;
  * @see     ZipFile
  * @author  Christian Schlichtherle
  */
-@NotThreadSafe
 public class ZipOutputStream extends AbstractZipOutputStream<ZipEntry> {
 
     /**
@@ -62,8 +59,7 @@ public class ZipOutputStream extends AbstractZipOutputStream<ZipEntry> {
      * @param  out The output stream to write the ZIP file to.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
-    public ZipOutputStream(@WillCloseWhenClosed OutputStream out)
+    public ZipOutputStream(OutputStream out)
     throws IOException {
         super(new OneTimeSink(out), null, DEFAULT_PARAM);
     }
@@ -76,8 +72,7 @@ public class ZipOutputStream extends AbstractZipOutputStream<ZipEntry> {
      * @param  charset the character set to use.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
-    public ZipOutputStream(@WillCloseWhenClosed OutputStream out, Charset charset)
+    public ZipOutputStream(OutputStream out, Charset charset)
     throws IOException {
         super(  new OneTimeSink(out), null,
                 new DefaultZipOutputStreamParameters(charset));
@@ -95,9 +90,8 @@ public class ZipOutputStream extends AbstractZipOutputStream<ZipEntry> {
      *         This may already be closed.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public ZipOutputStream(
-            @WillCloseWhenClosed OutputStream out,
+            OutputStream out,
             ZipFile appendee)
     throws IOException {
         super(new OneTimeSink(out), Objects.requireNonNull(appendee), DEFAULT_PARAM);

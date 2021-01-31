@@ -4,16 +4,16 @@
  */
 package net.java.truevfs.comp.inst;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Objects;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.cio.DecoratingOutputSocket;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.OutputSocket;
+
+import javax.annotation.CheckForNull;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
+import java.util.Objects;
 
 /**
  * @param  <M> the type of the mediator.
@@ -22,7 +22,6 @@ import net.java.truecommons.cio.OutputSocket;
  * @see    InstrumentingInputSocket
  * @author Christian Schlichtherle
  */
-@Immutable
 public class InstrumentingOutputSocket<
         M extends Mediator<M>,
         E extends Entry>

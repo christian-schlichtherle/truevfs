@@ -4,11 +4,12 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.util.*;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
-import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
 import net.java.truecommons.shed.BitField;
+
+import javax.annotation.Nullable;
+import java.util.*;
+
+import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
 
 /**
  * A covariant file system node maintains a map of
@@ -20,7 +21,6 @@ import net.java.truecommons.shed.BitField;
  * @param  <E> the type of the mapped archive entries.
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public final class FsCovariantNode<E extends FsArchiveEntry>
 extends FsAbstractNode implements Cloneable {
 

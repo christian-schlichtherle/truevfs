@@ -4,37 +4,31 @@
  */
 package net.java.truevfs.comp.tardriver;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.cio.Entry;
-import static net.java.truecommons.cio.Entry.ALL_POSIX_ACCESS;
-import static net.java.truecommons.cio.Entry.ALL_POSIX_ENTITIES;
 import net.java.truecommons.cio.Entry.Access;
-import static net.java.truecommons.cio.Entry.Access.WRITE;
 import net.java.truecommons.cio.Entry.PosixEntity;
-import static net.java.truecommons.cio.Entry.Size.DATA;
 import net.java.truecommons.cio.Entry.Type;
 import net.java.truecommons.cio.InputService;
 import net.java.truecommons.cio.IoBufferPool;
 import net.java.truecommons.cio.OutputService;
 import net.java.truecommons.shed.BitField;
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import static net.java.truevfs.kernel.spec.FsAccessOption.CACHE;
-import static net.java.truevfs.kernel.spec.FsAccessOption.COMPRESS;
-import net.java.truevfs.kernel.spec.FsArchiveDriver;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsInputSocketSource;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsNodeName;
-import net.java.truevfs.kernel.spec.FsOutputSocketSink;
+import net.java.truevfs.kernel.spec.*;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.archivers.tar.TarConstants;
+
+import javax.annotation.CheckForNull;
+import java.io.IOException;
+import java.nio.charset.Charset;
+
+import static net.java.truecommons.cio.Entry.ALL_POSIX_ACCESS;
+import static net.java.truecommons.cio.Entry.ALL_POSIX_ENTITIES;
+import static net.java.truecommons.cio.Entry.Access.WRITE;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import static net.java.truevfs.kernel.spec.FsAccessOption.CACHE;
+import static net.java.truevfs.kernel.spec.FsAccessOption.COMPRESS;
 
 /**
  * An archive driver for Tape Archive files (TAR).
@@ -47,7 +41,6 @@ import org.apache.commons.compress.archivers.tar.TarConstants;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
 
     /**
@@ -142,7 +135,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
     protected OutputService<TarDriverEntry> newOutput(
             FsModel model,
             FsOutputSocketSink sink,
-            @CheckForNull @WillNotClose InputService<TarDriverEntry> input)
+            @CheckForNull InputService<TarDriverEntry> input)
     throws IOException {
         return new MultiplexingOutputService<>(getPool(), new TarOutputService(model, sink, this));
     }

@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.ext.insight.stats;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.util.Date;
 
 import static java.lang.Math.max;
@@ -14,7 +13,6 @@ import static java.lang.Math.max;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public interface FsStatsView extends IoStatsView, SyncStatsView {
 
     FsStats getStats();

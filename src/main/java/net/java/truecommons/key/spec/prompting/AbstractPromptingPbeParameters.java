@@ -4,10 +4,10 @@
  */
 package net.java.truecommons.key.spec.prompting;
 
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.key.spec.AbstractPbeParameters;
 import net.java.truecommons.key.spec.KeyStrength;
+
+import javax.annotation.Nullable;
 
 /**
  * A JavaBean with properties for prompting for password based encryption (PBE)
@@ -21,7 +21,6 @@ import net.java.truecommons.key.spec.KeyStrength;
  * @param  <S> the type of the key strength.
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public abstract class AbstractPromptingPbeParameters<
         P extends AbstractPromptingPbeParameters<P, S>,
         S extends KeyStrength>

@@ -4,17 +4,18 @@
  */
 package net.java.truevfs.driver.file;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.channels.SeekableByteChannel;
-import static java.nio.file.Files.newByteChannel;
-import static java.nio.file.Files.newInputStream;
-import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truecommons.shed.BitField;
-import net.java.truevfs.kernel.spec.FsAccessOption;
 import net.java.truecommons.cio.AbstractInputSocket;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.OutputSocket;
+import net.java.truecommons.shed.BitField;
+import net.java.truevfs.kernel.spec.FsAccessOption;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.channels.SeekableByteChannel;
+
+import static java.nio.file.Files.newByteChannel;
+import static java.nio.file.Files.newInputStream;
 
 /**
  * An input socket for a file entry.
@@ -22,7 +23,6 @@ import net.java.truecommons.cio.OutputSocket;
  * @see    FileOutputSocket
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 final class FileInputSocket extends AbstractInputSocket<FileNode> {
 
     private final FileNode node;

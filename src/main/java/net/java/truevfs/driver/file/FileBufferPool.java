@@ -4,35 +4,30 @@
  */
 package net.java.truevfs.driver.file;
 
+import net.java.truecommons.cio.IoBufferPool;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import static java.nio.file.Files.createDirectories;
-import static java.nio.file.Files.exists;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
-import static java.nio.file.attribute.PosixFilePermission.GROUP_READ;
-import static java.nio.file.attribute.PosixFilePermission.GROUP_WRITE;
-import static java.nio.file.attribute.PosixFilePermission.OTHERS_READ;
-import static java.nio.file.attribute.PosixFilePermission.OTHERS_WRITE;
-import static java.nio.file.attribute.PosixFilePermission.OWNER_READ;
-import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.EnumSet;
 import java.util.Set;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.cio.IoBufferPool;
+
+import static java.nio.file.Files.createDirectories;
+import static java.nio.file.Files.exists;
+import static java.nio.file.attribute.PosixFilePermission.*;
 
 /**
  * This I/O pool creates and deletes temporary files as {@link FileBuffer}s.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 final class FileBufferPool extends IoBufferPool {
 
     private static final Path TEMP_DIR

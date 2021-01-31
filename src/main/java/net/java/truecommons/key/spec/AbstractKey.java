@@ -4,9 +4,8 @@
  */
 package net.java.truecommons.key.spec;
 
-import java.io.Serializable;
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
+import java.io.Serializable;
 
 /**
  * A JavaBean with basic properties for life cycle management.
@@ -18,7 +17,6 @@ import javax.annotation.concurrent.Immutable;
  * @param  <K> the type of this safe key.
  * @author Christian Schlichtherle
  */
-@Immutable
 public abstract class AbstractKey<K extends AbstractKey<K>>
 implements Key<K>, Serializable {
 

@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.access.it;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.io.ClosedInputException;
 import net.java.truecommons.io.ClosedOutputException;
 import net.java.truecommons.io.Streams;
@@ -309,7 +308,6 @@ extends ConfiguredClientTestBase<D> {
         assertCreateNewEnhancedFile();
     }
 
-    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     private void assertCreateNewPlainFile() throws IOException {
         final Path archive = createTempFile();
         delete(archive);
@@ -323,7 +321,6 @@ extends ConfiguredClientTestBase<D> {
         assertCreateNewFile(archive, file1, file2);
     }
 
-    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     private void assertCreateNewEnhancedFile() throws IOException {
         final TPath file1 = archive.resolve("test.txt");
         final TPath file2 = file1.resolve("test.txt");
@@ -339,7 +336,6 @@ extends ConfiguredClientTestBase<D> {
         assertCreateNewFile(archive, file1, file2);
     }
 
-    @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_BAD_PRACTICE")
     private void assertCreateNewFile(   final Path dir,
                                         final Path file1,
                                         final Path file2)
@@ -523,7 +519,6 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    @SuppressFBWarnings("OS_OPEN_STREAM")
     @Test
     public void testBusyFileInputStream()
     throws IOException, InterruptedException {
@@ -592,7 +587,6 @@ extends ConfiguredClientTestBase<D> {
     }
 
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
-    @SuppressFBWarnings("OS_OPEN_STREAM")
     @Test
     public void testBusyFileOutputStream()
     throws IOException, InterruptedException {

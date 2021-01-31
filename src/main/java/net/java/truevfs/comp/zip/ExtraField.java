@@ -6,7 +6,7 @@ package net.java.truevfs.comp.zip;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.annotation.concurrent.NotThreadSafe;
+
 import static net.java.truevfs.comp.zip.Constants.EMPTY;
 
 /**
@@ -17,7 +17,6 @@ import static net.java.truevfs.comp.zip.Constants.EMPTY;
  *
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 abstract class ExtraField {
 
     private static final Map<Integer, Class<? extends ExtraField>> registry = new HashMap<>();

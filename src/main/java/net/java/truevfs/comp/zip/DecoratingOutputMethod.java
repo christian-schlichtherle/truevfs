@@ -4,11 +4,9 @@
  */
 package net.java.truevfs.comp.zip;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.zip.ZipException;
-import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A decorator for output methods.
@@ -17,7 +15,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  *
  * @author  Christian Schlichtherle
  */
-@NotThreadSafe
 abstract class DecoratingOutputMethod implements OutputMethod {
     final OutputMethod method;
 
@@ -32,7 +29,6 @@ abstract class DecoratingOutputMethod implements OutputMethod {
     }
 
     @Override
-    @CreatesObligation
     public OutputStream start() throws IOException {
         return method.start();
     }

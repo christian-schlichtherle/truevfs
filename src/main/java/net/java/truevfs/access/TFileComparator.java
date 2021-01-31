@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.Serializable;
 import java.text.Collator;
 import java.util.Comparator;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * Compares two files by their status and path name so that directories
@@ -16,7 +15,6 @@ import javax.annotation.concurrent.Immutable;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class TFileComparator implements Comparator<File>, Serializable {
 
     private static final long serialVersionUID = 0;

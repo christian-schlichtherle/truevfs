@@ -4,18 +4,15 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import javax.annotation.concurrent.NotThreadSafe;
+
 import static net.java.truecommons.shed.Throwables.wrap;
 
 /**
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
-@CleanupObligation
 public final class FsThrowManager {
 
     private final Map<Class<?>, Throwable> throwables;

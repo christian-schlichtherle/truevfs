@@ -4,12 +4,12 @@
  */
 package net.java.truevfs.driver.zip.raes;
 
-import java.io.IOException;
-import javax.annotation.concurrent.Immutable;
+import net.java.truecommons.key.spec.common.AesPbeParameters;
 import net.java.truevfs.comp.zipdriver.AbstractKeyController;
 import net.java.truevfs.driver.zip.raes.crypto.RaesKeyException;
 import net.java.truevfs.kernel.spec.FsController;
-import net.java.truecommons.key.spec.common.AesPbeParameters;
+
+import java.io.IOException;
 
 /**
  * This file system controller decorates another file system controller in
@@ -18,7 +18,6 @@ import net.java.truecommons.key.spec.common.AesPbeParameters;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 final class ZipRaesKeyController extends AbstractKeyController {
 
     ZipRaesKeyController(FsController controller, ZipRaesDriver driver) {

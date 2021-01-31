@@ -4,10 +4,10 @@
  */
 package net.java.truecommons.cio;
 
-import java.io.IOException;
-import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.shed.Pool;
 import net.java.truecommons.shed.UniqueObject;
+
+import java.io.IOException;
 
 /**
  * An abstract pool for allocating I/O buffers, which can get used as a
@@ -19,7 +19,6 @@ import net.java.truecommons.shed.UniqueObject;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public abstract class IoBufferPool
 extends UniqueObject implements Pool<IoBuffer, IOException> {
 

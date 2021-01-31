@@ -4,12 +4,6 @@
  */
 package net.java.truevfs.kernel.spec.cio;
 
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
-import java.io.IOException;
-import java.util.Iterator;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.cio.DecoratingOutputService;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.OutputService;
@@ -17,24 +11,27 @@ import net.java.truecommons.cio.OutputSocket;
 import net.java.truevfs.kernel.spec.FsTestConfig;
 import net.java.truevfs.kernel.spec.FsThrowManager;
 
+import javax.annotation.CheckForNull;
+import java.io.IOException;
+import java.util.Iterator;
+
 /**
  * @param   <E> The type of the entries served to the decorated output service.
  * @see     ThrowingInputService
  * @author  Christian Schlichtherle
  */
-@ThreadSafe
 public class ThrowingOutputService<E extends Entry>
 extends DecoratingOutputService<E> {
     private final FsTestConfig config;
     private volatile @CheckForNull FsThrowManager control;
 
     public ThrowingOutputService(
-            final @WillCloseWhenClosed OutputService<E> service) {
+            final OutputService<E> service) {
         this(service, null);
     }
 
     public ThrowingOutputService(
-            final @WillCloseWhenClosed OutputService<E> service,
+            final OutputService<E> service,
             final @CheckForNull FsTestConfig config) {
         super(service);
         this.config = null != config ? config : FsTestConfig.get();
@@ -74,7 +71,6 @@ extends DecoratingOutputService<E> {
     }
 
     @Override
-    @DischargesObligation
     public void close() throws IOException {
         checkAllExceptions();
         container.close();

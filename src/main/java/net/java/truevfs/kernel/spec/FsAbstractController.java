@@ -4,13 +4,13 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Objects;
-import javax.annotation.concurrent.ThreadSafe;
 import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.UniqueObject;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * An abstract file system controller which implements the {@link #getModel()}
@@ -20,7 +20,6 @@ import net.java.truecommons.shed.UniqueObject;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public abstract class FsAbstractController
 extends UniqueObject implements FsController {
 

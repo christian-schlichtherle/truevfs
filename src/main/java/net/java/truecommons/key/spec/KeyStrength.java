@@ -4,8 +4,6 @@
  */
 package net.java.truecommons.key.spec;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 /**
  * Defines the key strengths for a cipher.
  * <p>
@@ -13,7 +11,6 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @author  Christian Schlichtherle
  */
-@ThreadSafe
 public interface KeyStrength {
 
     /**

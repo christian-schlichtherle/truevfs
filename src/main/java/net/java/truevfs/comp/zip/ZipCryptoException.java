@@ -6,7 +6,6 @@ package net.java.truevfs.comp.zip;
 
 import javax.annotation.CheckForNull;
 import java.util.zip.ZipException;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Thrown if there is an issue when reading or writing an encrypted ZIP file
@@ -14,7 +13,6 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @author  Christian Schlichtherle
  */
-@ThreadSafe
 public class ZipCryptoException extends ZipException {
 
     private static final long serialVersionUID = 0;

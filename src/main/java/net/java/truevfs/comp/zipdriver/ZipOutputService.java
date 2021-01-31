@@ -4,24 +4,17 @@
  */
 package net.java.truevfs.comp.zipdriver;
 
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.cio.*;
 import net.java.truecommons.io.DecoratingOutputStream;
 import net.java.truecommons.io.DisconnectingOutputStream;
 import net.java.truecommons.io.Streams;
 import net.java.truecommons.shed.CompoundIterator;
-import net.java.truecommons.shed.SuppressedExceptionBuilder;
 import net.java.truevfs.comp.zip.AbstractZipOutputStream;
 import net.java.truevfs.comp.zip.ZipCryptoParameters;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsOutputSocketSink;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -44,7 +37,6 @@ import static net.java.truevfs.kernel.spec.FsAccessOption.GROW;
  * @see    ZipInputService
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public final class ZipOutputService<E extends AbstractZipDriverEntry>
 extends AbstractZipOutputStream<E> implements OutputService<E> {
 
@@ -54,11 +46,10 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
     private @CheckForNull E bufferedEntry;
     private ZipCryptoParameters param;
 
-    @CreatesObligation
     public ZipOutputService(
             final FsModel model,
             final FsOutputSocketSink sink,
-            final @CheckForNull @WillNotClose ZipInputService<E> source,
+            final @CheckForNull ZipInputService<E> source,
             final AbstractZipDriver<E> driver)
     throws IOException {
         super(  sink,
@@ -216,7 +207,6 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
         public long getTime(Access type) { return UNKNOWN; }
 
         @Override
-        @SuppressFBWarnings("NP_BOOLEAN_RETURN_NULL")
         public Boolean isPermitted(Access type, Entity entity) { return null; }
     } // DirectoryTemplate
 
@@ -280,11 +270,9 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
      * These preconditions are checked by
      * {@link #output(AbstractZipDriverEntry)}.
      */
-    @CleanupObligation
     private final class EntryOutputStream extends DisconnectingOutputStream {
         boolean closed;
 
-        @CreatesObligation
         EntryOutputStream(final E local, final boolean rdc)
         throws IOException {
             super(ZipOutputService.this);
@@ -297,7 +285,6 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
         }
 
         @Override
-        @DischargesObligation
         public void close() throws IOException {
             if (closed) return;
             closed = true;
@@ -311,7 +298,6 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
      * When the stream gets closed, the I/O buffer is then copied to this
      * output service and finally deleted.
      */
-    @CleanupObligation
     private final class BufferedEntryOutputStream
     extends DecoratingOutputStream {
 
@@ -319,7 +305,6 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
         final E local;
         boolean closed;
 
-        @CreatesObligation
         BufferedEntryOutputStream(final E local)
         throws IOException {
             assert STORED == local.getMethod();
@@ -340,7 +325,6 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
         }
 
         @Override
-        @DischargesObligation
         public void close() throws IOException {
             if (closed) return;
             closed = true;

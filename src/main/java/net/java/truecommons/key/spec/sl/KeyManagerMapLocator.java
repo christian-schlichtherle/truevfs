@@ -4,14 +4,14 @@
  */
 package net.java.truecommons.key.spec.sl;
 
-import java.util.Collections;
-import java.util.Map;
-import javax.annotation.concurrent.Immutable;
+import global.namespace.service.wight.core.ServiceLocator;
 import net.java.truecommons.key.spec.AbstractKeyManagerMap;
 import net.java.truecommons.key.spec.KeyManager;
 import net.java.truecommons.key.spec.spi.KeyManagerMapFactory;
 import net.java.truecommons.key.spec.spi.KeyManagerMapModifier;
-import global.namespace.service.wight.core.ServiceLocator;
+
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * A container of the singleton immutable map of all known file system schemes
@@ -24,24 +24,28 @@ import global.namespace.service.wight.core.ServiceLocator;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class KeyManagerMapLocator extends AbstractKeyManagerMap {
 
-    /** The singleton instance of this class. */
+    /**
+     * The singleton instance of this class.
+     */
     public static final KeyManagerMapLocator
             SINGLETON = new KeyManagerMapLocator();
 
-    private KeyManagerMapLocator() { }
+    private KeyManagerMapLocator() {
+    }
 
     @Override
     public Map<Class<?>, KeyManager<?>> get() {
         return Lazy.managers;
     }
 
-    /** A static data utility class used for lazy initialization. */
+    /**
+     * A static data utility class used for lazy initialization.
+     */
     private static final class Lazy {
         static final Map<Class<?>, KeyManager<?>> managers
                 = Collections.unmodifiableMap(
-                    new ServiceLocator().provider(KeyManagerMapFactory.class, KeyManagerMapModifier.class).get());
+                new ServiceLocator().provider(KeyManagerMapFactory.class, KeyManagerMapModifier.class).get());
     }
 }

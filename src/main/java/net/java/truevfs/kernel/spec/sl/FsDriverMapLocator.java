@@ -10,7 +10,6 @@ import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapFactory;
 import net.java.truevfs.kernel.spec.spi.FsDriverMapModifier;
 
-import javax.annotation.concurrent.Immutable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -22,7 +21,6 @@ import java.util.function.Supplier;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class FsDriverMapLocator implements Supplier<Map<FsScheme, FsDriver>> {
 
     /**

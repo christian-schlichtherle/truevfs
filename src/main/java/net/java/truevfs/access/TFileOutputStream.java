@@ -4,13 +4,12 @@
  */
 package net.java.truevfs.access;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.*;
-import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.io.DecoratingOutputStream;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import net.java.truevfs.kernel.spec.FsAccessOptions;
+
+import java.io.*;
 
 /**
  * A replacement for the class {@link FileOutputStream} for writing plain old
@@ -64,7 +63,6 @@ import net.java.truevfs.kernel.spec.FsAccessOptions;
  * @see    TFileInputStream
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class TFileOutputStream extends DecoratingOutputStream {
 
     /**
@@ -74,7 +72,6 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      * @param  path the path of the file or archive entry.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public TFileOutputStream(String path) throws IOException {
         this(path, false);
     }
@@ -88,7 +85,6 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      *         entry rather than replacing it.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public TFileOutputStream(String path, boolean append) throws IOException {
         this(new TFile(path), append);
     }
@@ -102,7 +98,6 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      *         entry.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public TFileOutputStream(String path, FsAccessOption... options)
     throws IOException {
         this(new TFile(path), options);
@@ -115,7 +110,6 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      * @param  file the file or archive entry.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public TFileOutputStream(File file) throws IOException {
         this(file, false);
     }
@@ -129,7 +123,6 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      *         entry rather than replacing it.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public TFileOutputStream(File file, boolean append) throws IOException {
         this(file, FsAccessOptions.NONE.set(FsAccessOption.APPEND, append));
     }
@@ -143,7 +136,6 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      *         entry.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public TFileOutputStream(File file, FsAccessOption... options)
     throws IOException {
         this(file, FsAccessOptions.of(options));
@@ -158,7 +150,6 @@ public final class TFileOutputStream extends DecoratingOutputStream {
      *         entry.
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public TFileOutputStream(File file, BitField<FsAccessOption> options)
     throws IOException {
         super(TBIO.output(

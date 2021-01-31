@@ -4,19 +4,19 @@
  */
 package net.java.truecommons.jmx.mmbs;
 
+import net.java.truecommons.jmx.DelegatingMBeanServer;
+import net.java.truecommons.jmx.ObjectNameModifier;
+import net.java.truecommons.shed.HashMaps;
+
+import javax.management.*;
 import java.io.ObjectInputStream;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
-import javax.annotation.concurrent.Immutable;
-import javax.management.*;
-import net.java.truecommons.jmx.*;
-import net.java.truecommons.shed.HashMaps;
 
 /**
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class MultiplexingMBeanServer extends DelegatingMBeanServer {
 
     private final MBeanServer mbs;

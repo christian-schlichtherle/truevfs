@@ -4,20 +4,11 @@
  */
 package net.java.truevfs.comp.zipdriver;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.Objects;
-import java.util.zip.Deflater;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.cio.*;
-import static net.java.truecommons.cio.Entry.Access.WRITE;
-import static net.java.truecommons.cio.Entry.Size.DATA;
+import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.Entry.Type;
-import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
+import net.java.truecommons.cio.InputService;
+import net.java.truecommons.cio.IoBufferPool;
+import net.java.truecommons.cio.OutputService;
 import net.java.truecommons.key.spec.KeyManagerMap;
 import net.java.truecommons.key.spec.KeyProvider;
 import net.java.truecommons.key.spec.sl.KeyManagerMapLocator;
@@ -26,14 +17,25 @@ import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.HashMaps;
 import net.java.truevfs.comp.zip.ZipCryptoParameters;
 import net.java.truevfs.comp.zip.ZipEntry;
-import static net.java.truevfs.comp.zip.ZipEntry.*;
 import net.java.truevfs.comp.zip.ZipFileParameters;
 import net.java.truevfs.comp.zip.ZipOutputStreamParameters;
 import net.java.truevfs.kernel.spec.*;
-import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
 import net.java.truevfs.kernel.spec.sl.IoBufferPoolLocator;
 import org.slf4j.Logger;
+
+import javax.annotation.CheckForNull;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.Objects;
+import java.util.zip.Deflater;
+
+import static net.java.truecommons.cio.Entry.Access.WRITE;
+import static net.java.truecommons.cio.Entry.Size.DATA;
+import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
+import static net.java.truevfs.comp.zip.ZipEntry.*;
+import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 
 /**
  * An abstract archive driver for the ZIP file format.
@@ -43,7 +45,6 @@ import org.slf4j.Logger;
  * @param  <E> the type of the ZIP driver entries.
  * @author Christian Schlichtherle
  */
-@Immutable
 public abstract class AbstractZipDriver<E extends AbstractZipDriverEntry>
 extends FsArchiveDriver<E>
 implements ZipOutputStreamParameters, ZipFileParameters<E> {
@@ -176,15 +177,15 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
      * @param input the origin of the entry.
      * @return {@code entry.isEncrypted()}.
      */
-    public boolean check(E local, @WillNotClose ZipInputService<E> input) {
+    public boolean check(E local, ZipInputService<E> input) {
         return local.isEncrypted();
     }
 
-    final boolean rdc(@WillNotClose ZipInputService<E> input, E local, AbstractZipDriverEntry peer) {
+    final boolean rdc(ZipInputService<E> input, E local, AbstractZipDriverEntry peer) {
         return rdc(local, peer);
     }
 
-    final boolean rdc(@WillNotClose ZipOutputService<E> output, E local, AbstractZipDriverEntry peer) {
+    final boolean rdc(ZipOutputService<E> output, E local, AbstractZipDriverEntry peer) {
         return rdc(peer, local);
     }
 
@@ -307,17 +308,15 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
         return zis;
     }
 
-    @CreatesObligation
     protected ZipInputService<E> newZipInput(FsModel model, FsInputSocketSource source) throws IOException {
         return new ZipInputService<>(model, source, this);
     }
 
     @Override
-    @CreatesObligation
     protected OutputService<E> newOutput(
             FsModel model,
             FsOutputSocketSink sink,
-            final @CheckForNull @WillNotClose InputService<E> input)
+            final @CheckForNull InputService<E> input)
     throws IOException {
         final ZipInputService<E> zis = (ZipInputService<E>) input;
         return new MultiplexingOutputService<>(getPool(),

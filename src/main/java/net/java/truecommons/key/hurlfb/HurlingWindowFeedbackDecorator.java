@@ -4,7 +4,6 @@
  */
 package net.java.truecommons.key.hurlfb;
 
-import javax.annotation.concurrent.Immutable;
 import global.namespace.service.wight.annotation.ServiceImplementation;
 import net.java.truecommons.key.swing.feedback.Feedback;
 import net.java.truecommons.key.swing.spi.InvalidKeyFeedbackDecorator;

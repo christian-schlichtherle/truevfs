@@ -10,7 +10,6 @@ import net.java.truecommons.key.spec.common.AesPbeParameters;
 import net.java.truecommons.key.spec.spi.KeyManagerMapModifier;
 import net.java.truecommons.key.spec.unknown.UnknownKeyManager;
 
-import javax.annotation.concurrent.Immutable;
 import java.util.Map;
 
 /**
@@ -22,7 +21,6 @@ import java.util.Map;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 @ServiceImplementation(priority = Integer.MIN_VALUE)
 public final class DefaultAesPbeKeyManagerMapModifier implements KeyManagerMapModifier {
 

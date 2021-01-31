@@ -17,7 +17,6 @@ import net.java.truecommons.key.swing.sl.UnknownKeyFeedbackLocator;
 import net.java.truecommons.key.swing.util.Windows;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -35,7 +34,6 @@ import java.util.zip.Deflater;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 abstract class SwingPromptingPbeParametersView<
         P extends PromptingPbeParameters<P, S>,
         S extends KeyStrength>

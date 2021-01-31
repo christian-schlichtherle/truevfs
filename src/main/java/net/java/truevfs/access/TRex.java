@@ -4,11 +4,11 @@
  */
 package net.java.truevfs.access;
 
-import java.net.URI;
-import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.kernel.spec.FsMountPoint;
 import net.java.truevfs.kernel.spec.FsNodeName;
 import net.java.truevfs.kernel.spec.FsNodePath;
+
+import java.net.URI;
 
 /**
  * Defines common properties and operations of {@link TFile} and {@link TPath}.
@@ -18,7 +18,6 @@ import net.java.truevfs.kernel.spec.FsNodePath;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public interface TRex {
 
     //

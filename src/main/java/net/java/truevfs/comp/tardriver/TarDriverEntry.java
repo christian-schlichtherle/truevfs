@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.comp.tardriver;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.IoBuffer;
 import net.java.truecommons.shed.Releasable;
@@ -156,7 +155,6 @@ implements FsArchiveEntry, Releasable<IOException> {
     }
 
     @Override
-    @SuppressFBWarnings("NP_BOOLEAN_RETURN_NULL")
     public Boolean isPermitted(final Access type, final Entity entity) {
         if (!(entity instanceof PosixEntity)) return null;
         switch ((PosixEntity) entity) {

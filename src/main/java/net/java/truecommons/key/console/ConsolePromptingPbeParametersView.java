@@ -4,14 +4,12 @@
  */
 package net.java.truecommons.key.console;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.key.spec.KeyStrength;
 import net.java.truecommons.key.spec.prompting.KeyPromptingDisabledException;
 import net.java.truecommons.key.spec.prompting.PromptingKey;
 import net.java.truecommons.key.spec.prompting.PromptingKey.Controller;
 import net.java.truecommons.key.spec.prompting.PromptingPbeParameters;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.io.Console;
 import java.io.PrintWriter;
 import java.net.URI;
@@ -25,7 +23,6 @@ import java.util.ResourceBundle;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 abstract class ConsolePromptingPbeParametersView<
         P extends PromptingPbeParameters<P, S>,
         S extends KeyStrength>
@@ -46,7 +43,6 @@ implements PromptingKey.View<P> {
      * The last resource ID used when prompting.
      * Initialized to the empty string.
      */
-    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     private static URI lastResource = URI.create(""); // NOI18N
 
     private static final String YES = resources.getString("yes");

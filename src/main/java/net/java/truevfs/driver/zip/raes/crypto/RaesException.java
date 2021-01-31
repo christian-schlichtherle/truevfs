@@ -5,7 +5,6 @@
 package net.java.truevfs.driver.zip.raes.crypto;
 
 import java.io.IOException;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Indicates that there is an issue when reading or writing a RAES file which
@@ -13,7 +12,6 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class RaesException extends IOException {
 
     private static final long serialVersionUID = 0;

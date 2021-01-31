@@ -4,17 +4,16 @@
  */
 package net.java.truevfs.kernel.spec;
 
+import net.java.truecommons.shed.QuotedUriSyntaxException;
+import net.java.truecommons.shed.UriBuilder;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.beans.ConstructorProperties;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import net.java.truecommons.shed.QuotedUriSyntaxException;
-import net.java.truecommons.shed.UriBuilder;
 import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
 import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
 
@@ -130,8 +129,6 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.MOUNT_POINT;
  * @see    FsScheme
  * @author Christian Schlichtherle
  */
-@Immutable
-@SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
 public final class FsMountPoint
 implements Serializable, Comparable<FsMountPoint> {
 
@@ -145,7 +142,6 @@ implements Serializable, Comparable<FsMountPoint> {
      */
     public static final String SEPARATOR = "!" + FsNodeName.SEPARATOR;
 
-    @SuppressFBWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private URI uri; // not final for serialization only!
 
     private transient @Nullable FsNodePath path;

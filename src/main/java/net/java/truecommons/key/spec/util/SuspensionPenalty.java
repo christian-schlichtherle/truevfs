@@ -4,8 +4,6 @@
  */
 package net.java.truecommons.key.spec.util;
 
-import javax.annotation.concurrent.Immutable;
-
 /**
  * A utility class for enforcing a suspension penalty of at least
  * {@link #MIN_KEY_RETRY_DELAY} milliseconds between two subsequent key
@@ -13,7 +11,6 @@ import javax.annotation.concurrent.Immutable;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public class SuspensionPenalty {
 
     /**
@@ -22,7 +19,8 @@ public class SuspensionPenalty {
      */
     public static final int MIN_KEY_RETRY_DELAY = 3 * 1000;
 
-    private SuspensionPenalty() { }
+    private SuspensionPenalty() {
+    }
 
     /**
      * Call this method in a key verification loop in order to enforce a
@@ -30,10 +28,10 @@ public class SuspensionPenalty {
      * {@value #MIN_KEY_RETRY_DELAY} milliseconds.
      * Interrupting the current thread does not show any effect on this method.
      *
-     * @param  last the last try time.
-     *         This should be zero upon the first call.
-     *         Subsequent calls should provide the return value of the last
-     *         call.
+     * @param last the last try time.
+     *             This should be zero upon the first call.
+     *             Subsequent calls should provide the return value of the last
+     *             call.
      * @return The new try time.
      */
     public static long enforce(final long last) {
@@ -51,7 +49,7 @@ public class SuspensionPenalty {
     /**
      * Uninterruptibly pauses the current thread for the given time interval.
      *
-     * @param  millis the milliseconds to pause the current thread.
+     * @param millis the milliseconds to pause the current thread.
      * @throws IllegalArgumentException if {@code millis} is negative.
      */
     @SuppressWarnings("SleepWhileInLoop")

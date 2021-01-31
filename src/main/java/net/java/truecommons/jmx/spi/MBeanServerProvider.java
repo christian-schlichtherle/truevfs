@@ -8,7 +8,6 @@ import global.namespace.service.wight.annotation.ServiceImplementation;
 import global.namespace.service.wight.annotation.ServiceInterface;
 import net.java.truecommons.jmx.sl.MBeanServerLocator;
 
-import javax.annotation.concurrent.Immutable;
 import javax.management.MBeanServer;
 import java.lang.management.ManagementFactory;
 import java.util.function.Supplier;
@@ -26,7 +25,6 @@ import java.util.function.Supplier;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 @ServiceInterface
 @ServiceImplementation(priority = -100)
 public class MBeanServerProvider implements Supplier<MBeanServer> {

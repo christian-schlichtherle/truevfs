@@ -17,7 +17,6 @@ import net.java.truevfs.kernel.spec.FsCovariantNode;
 import net.java.truevfs.kernel.spec.FsNodeName;
 
 import javax.annotation.Nonnull;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.net.URI;
@@ -44,7 +43,6 @@ import static net.java.truevfs.kernel.spec.FsNodeName.*;
  * @param <E> the type of the archive entries.
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 class ArchiveFileSystem<E extends FsArchiveEntry>
         extends AbstractCollection<FsCovariantNode<E>>
         implements ArchiveModelAspect<E> {

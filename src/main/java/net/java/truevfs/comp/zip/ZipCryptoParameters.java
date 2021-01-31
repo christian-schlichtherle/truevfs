@@ -4,8 +4,6 @@
  */
 package net.java.truevfs.comp.zip;
 
-import javax.annotation.concurrent.NotThreadSafe;
-
 /**
  * A marker interface for ZIP crypto parameters.
  * Crypto parameters are required for writing and reading entries which
@@ -21,7 +19,6 @@ import javax.annotation.concurrent.NotThreadSafe;
  * 
  * @author  Christian Schlichtherle
  */
-@NotThreadSafe
 @SuppressWarnings("MarkerInterface")
 public interface ZipCryptoParameters extends ZipParameters {
 }

@@ -4,10 +4,6 @@
  */
 package net.java.truevfs.comp.tardriver;
 
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.cio.*;
 import net.java.truecommons.io.DecoratingOutputStream;
 import net.java.truecommons.io.DisconnectingOutputStream;
@@ -17,7 +13,6 @@ import net.java.truevfs.kernel.spec.FsModel;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -46,7 +41,6 @@ import static org.apache.commons.compress.archivers.tar.TarConstants.DEFAULT_BLK
  * @author Christian Schlichtherle
  * @see TarInputService
  */
-@NotThreadSafe
 public final class TarOutputService implements OutputService<TarDriverEntry> {
 
     /**
@@ -59,7 +53,6 @@ public final class TarOutputService implements OutputService<TarDriverEntry> {
     private final TarDriver driver;
     private boolean busy;
 
-    @CreatesObligation
     public TarOutputService(final FsModel model, final Sink sink, final TarDriver driver) throws IOException {
         Objects.requireNonNull(model);
         this.driver = Objects.requireNonNull(driver);
@@ -157,7 +150,6 @@ public final class TarOutputService implements OutputService<TarDriverEntry> {
         }
 
         @Override
-        @SuppressFBWarnings("NP_BOOLEAN_RETURN_NULL")
         public Boolean isPermitted(Access type, Entity entity) {
             return null;
         }
@@ -187,12 +179,10 @@ public final class TarOutputService implements OutputService<TarDriverEntry> {
      * write the entry header.
      * These preconditions are checked by {@link #output(TarDriverEntry)}.
      */
-    @CleanupObligation
     private final class EntryOutputStream extends DisconnectingOutputStream {
 
         boolean closed;
 
-        @CreatesObligation
         EntryOutputStream(final TarDriverEntry local) throws IOException {
             super(taos);
             taos.putArchiveEntry(local);
@@ -206,7 +196,6 @@ public final class TarOutputService implements OutputService<TarDriverEntry> {
         }
 
         @Override
-        @DischargesObligation
         public void close() throws IOException {
             if (closed) {
                 return;
@@ -222,14 +211,12 @@ public final class TarOutputService implements OutputService<TarDriverEntry> {
      * When the stream is closed, the temporary file is then copied to this
      * output stream and finally deleted.
      */
-    @CleanupObligation
     private final class BufferedEntryOutputStream extends DecoratingOutputStream {
 
         final IoBuffer buffer;
         final TarDriverEntry local;
         boolean closed;
 
-        @CreatesObligation
         BufferedEntryOutputStream(final TarDriverEntry local) throws IOException {
             this.local = local;
             final IoBuffer buffer = this.buffer = getPool().allocate();
@@ -248,7 +235,6 @@ public final class TarOutputService implements OutputService<TarDriverEntry> {
         }
 
         @Override
-        @DischargesObligation
         public void close() throws IOException {
             assert null != out;
             if (closed) {

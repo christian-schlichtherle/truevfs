@@ -7,7 +7,6 @@ package net.java.truecommons.key.spec.prompting;
 import net.java.truecommons.key.spec.UnknownKeyException;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Thrown to indicate that prompting for a key to open or create a
@@ -15,7 +14,6 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class KeyPromptingTimeoutException extends UnknownKeyException {
 
     private static final long serialVersionUID = 0;

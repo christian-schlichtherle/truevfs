@@ -11,7 +11,6 @@ import net.java.truecommons.io.DecoratingSeekableChannel;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,7 +38,6 @@ import static net.java.truevfs.kernel.impl.LockingStrategy.*;
  * @author Christian Schlichtherle
  * @see LockingStrategy
  */
-@ThreadSafe
 abstract class LockController<E extends FsArchiveEntry> implements DelegatingArchiveController<E> {
 
     @Override

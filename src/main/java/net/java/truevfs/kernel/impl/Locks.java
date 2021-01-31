@@ -4,8 +4,6 @@
  */
 package net.java.truevfs.kernel.impl;
 
-import net.jcip.annotations.Immutable;
-
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -13,7 +11,6 @@ import java.util.concurrent.locks.Lock;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 final class Locks {
 
     /**

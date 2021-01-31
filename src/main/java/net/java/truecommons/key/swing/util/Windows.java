@@ -5,7 +5,6 @@
 package net.java.truecommons.key.swing.util;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
 import javax.swing.*;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
@@ -19,7 +18,6 @@ import java.lang.ref.WeakReference;
  *
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public class Windows {
 
     private static final String PROPERTY_FOCUSED_WINDOW = "focusedWindow";

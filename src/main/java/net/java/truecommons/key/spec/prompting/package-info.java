@@ -12,5 +12,4 @@
  *
  * @author Christian Schlichtherle
  */
-@javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truecommons.key.spec.prompting;

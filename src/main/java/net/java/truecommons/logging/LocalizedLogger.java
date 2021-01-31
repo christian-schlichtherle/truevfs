@@ -4,13 +4,13 @@
  */
 package net.java.truecommons.logging;
 
-import java.text.MessageFormat;
-import java.util.Formatter;
-import java.util.ResourceBundle;
-import javax.annotation.concurrent.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
+
+import java.text.MessageFormat;
+import java.util.Formatter;
+import java.util.ResourceBundle;
 
 /**
  * A localized logger.
@@ -22,7 +22,6 @@ import org.slf4j.Marker;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public final class LocalizedLogger implements Logger {
 
     private final Logger logger;

@@ -9,7 +9,5 @@
  *
  * @author Christian Schlichtherle
  */
-@Nonnull @ParametersAreNonnullByDefault
 package net.java.truecommons.key.macosx.keychain;
 
-import javax.annotation.*;

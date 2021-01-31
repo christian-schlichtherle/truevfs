@@ -7,7 +7,6 @@ package net.java.truevfs.kernel.spec;
 import net.java.truecommons.shed.UniqueObject;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
 import java.util.Objects;
 
 import static java.util.Locale.ENGLISH;
@@ -20,7 +19,6 @@ import static java.util.Locale.ENGLISH;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public abstract class FsAbstractModel
 extends UniqueObject implements FsModel {
 

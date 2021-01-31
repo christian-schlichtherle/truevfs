@@ -9,7 +9,6 @@ import net.java.truevfs.ext.insight.stats.FsStatsView;
 import net.java.truevfs.ext.insight.stats.IoStats;
 import net.java.truevfs.ext.insight.stats.SyncStats;
 
-import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.StandardMBean;
@@ -19,7 +18,6 @@ import javax.management.StandardMBean;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 abstract class I5tStatsView extends StandardMBean implements FsStatsView  {
 
     private final I5tStatsController controller;

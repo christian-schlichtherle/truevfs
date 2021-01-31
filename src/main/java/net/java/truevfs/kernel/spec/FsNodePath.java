@@ -4,13 +4,11 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.shed.QuotedUriSyntaxException;
 import net.java.truecommons.shed.UriBuilder;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 import java.beans.ConstructorProperties;
 import java.io.*;
 import java.net.URI;
@@ -136,7 +134,6 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
  * @see FsNodeName
  * @see FsScheme
  */
-@Immutable
 public final class FsNodePath
         implements Serializable, Comparable<FsNodePath> {
 
@@ -144,7 +141,6 @@ public final class FsNodePath
 
     private static final URI DOT = URI.create(".");
 
-    @SuppressFBWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private URI uri; // not final for serialization only!
 
     private transient @Nullable

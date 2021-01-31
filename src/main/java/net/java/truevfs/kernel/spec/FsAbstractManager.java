@@ -6,8 +6,6 @@ package net.java.truevfs.kernel.spec;
 
 import net.java.truecommons.shed.UniqueObject;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 /**
  * An abstract file system manager.
  * <p>
@@ -15,6 +13,5 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public abstract class FsAbstractManager
 extends UniqueObject implements FsManager { }

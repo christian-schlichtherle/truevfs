@@ -4,21 +4,11 @@
  */
 package net.java.truevfs.comp.zip;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.EOFException;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Arrays;
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.io.IntervalReadOnlyChannel;
 import net.java.truecommons.io.MutableBuffer;
 import net.java.truecommons.io.ReadOnlyChannel;
 import net.java.truecommons.key.spec.common.AesKeyStrength;
 import net.java.truecommons.key.spec.util.SuspensionPenalty;
-import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
-import static net.java.truevfs.comp.zip.WinZipAesOutputStream.*;
 import net.java.truevfs.comp.zip.crypto.CipherReadOnlyChannel;
 import net.java.truevfs.comp.zip.crypto.SeekableBlockCipher;
 import org.bouncycastle.crypto.Mac;
@@ -28,6 +18,15 @@ import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+
+import java.io.EOFException;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SeekableByteChannel;
+import java.util.Arrays;
+
+import static net.java.truevfs.comp.zip.ExtraField.WINZIP_AES_ID;
+import static net.java.truevfs.comp.zip.WinZipAesOutputStream.*;
 
 /**
  * Decrypts ZIP entry contents according the WinZip AES specification.
@@ -41,7 +40,6 @@ import org.bouncycastle.crypto.params.ParametersWithIV;
  * @see     RawZipOutputStream$WinZipAesOutputMethod
  * @author  Christian Schlichtherle
  */
-@NotThreadSafe
 final class WinZipAesReadOnlyChannel extends ReadOnlyChannel {
 
     private static final int MAC_SIZE = newMac().getMacSize();
@@ -58,9 +56,8 @@ final class WinZipAesReadOnlyChannel extends ReadOnlyChannel {
 
     private final ZipEntry entry;
 
-    @CreatesObligation
     WinZipAesReadOnlyChannel(
-            final @WillCloseWhenClosed SeekableByteChannel channel,
+            final SeekableByteChannel channel,
             final WinZipAesEntryParameters param)
     throws IOException {
         super(channel);

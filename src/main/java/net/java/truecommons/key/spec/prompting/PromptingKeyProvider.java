@@ -11,8 +11,6 @@ import net.java.truecommons.key.spec.prompting.PromptingKey.Controller;
 import net.java.truecommons.key.spec.prompting.PromptingKey.View;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
-import javax.annotation.concurrent.ThreadSafe;
 import java.net.URI;
 
 /**
@@ -25,7 +23,6 @@ import java.net.URI;
  * @see    PromptingKeyManager
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 final class PromptingKeyProvider<K extends PromptingKey<K>>
 extends AbstractKeyProvider<K> {
 
@@ -96,7 +93,6 @@ extends AbstractKeyProvider<K> {
     /**
      * Proxies access to the key for {@link View} implementations.
      */
-    @NotThreadSafe
     private abstract class AbstractController implements Controller<K> {
 
         @Override
@@ -112,7 +108,6 @@ extends AbstractKeyProvider<K> {
      * The controller to use when prompting for a key to write a protected
      * resource.
      */
-    @NotThreadSafe
     private final class WriteController extends AbstractController {
 
         @Override
@@ -123,7 +118,6 @@ extends AbstractKeyProvider<K> {
      * The controller to use when prompting for a key to read a protected
      * resource.
      */
-    @NotThreadSafe
     private final class ReadController extends AbstractController {
 
         @Override

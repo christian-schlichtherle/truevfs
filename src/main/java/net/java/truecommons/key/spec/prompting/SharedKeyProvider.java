@@ -10,14 +10,12 @@ import net.java.truecommons.key.spec.util.SuspensionPenalty;
 import net.java.truecommons.shed.UniqueObject;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * @param  <K> the type of the prompting keys.
  * @see    SharedKeyManager
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 final class SharedKeyProvider<K extends PromptingKey<K>>
 extends UniqueObject {
 

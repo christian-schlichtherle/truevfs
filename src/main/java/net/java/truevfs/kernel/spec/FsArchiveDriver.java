@@ -4,17 +4,24 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.*;
-import java.nio.charset.*;
-import javax.annotation.*;
-import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.cio.*;
+import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.Entry.Type;
-import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
+import net.java.truecommons.cio.InputService;
+import net.java.truecommons.cio.IoBufferPool;
+import net.java.truecommons.cio.OutputService;
 import net.java.truecommons.shed.BitField;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import java.io.CharConversionException;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+
+import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
 import static net.java.truecommons.shed.Paths.cutTrailingSeparators;
-import static net.java.truevfs.kernel.spec.FsNodeName.*;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR;
+import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 
 /**
  * An abstract factory for components required for accessing archive files.
@@ -26,7 +33,6 @@ import static net.java.truevfs.kernel.spec.FsNodeName.*;
  * @param  <E> the type of the archive entries.
  * @author Christian Schlichtherle
  */
-@Immutable
 public abstract class FsArchiveDriver<E extends FsArchiveEntry>
 extends FsDriver {
 
@@ -177,7 +183,6 @@ extends FsDriver {
      *         <em>transient false positive</em> archive file and does not
      *         get cached.
      */
-    @CreatesObligation
     public InputService<E> newInput(
             FsModel model,
             BitField<FsAccessOption> options,
@@ -198,7 +203,6 @@ extends FsDriver {
      * @throws IOException on any I/O error.
      * @see    #newInput(FsModel, BitField, FsController, FsNodeName)
      */
-    @CreatesObligation
     protected abstract InputService<E> newInput(
             FsModel model,
             FsInputSocketSource source)
@@ -230,13 +234,12 @@ extends FsDriver {
      *         Note that this service does <em>not</em> need to be thread-safe!
      * @throws IOException on any I/O error.
      */
-    @CreatesObligation
     public OutputService<E> newOutput(
             FsModel model,
             BitField<FsAccessOption> options,
             FsController controller,
             FsNodeName name,
-            @CheckForNull @WillNotClose InputService<E> input)
+            @CheckForNull InputService<E> input)
     throws IOException {
         return newOutput(model, sink(options, controller, name), input);
     }
@@ -259,11 +262,10 @@ extends FsDriver {
      * @throws IOException on any I/O error.
      * @see    #newOutput(FsModel, BitField, FsController, FsNodeName, InputService)
      */
-    @CreatesObligation
     protected abstract OutputService<E> newOutput(
             FsModel model,
             FsOutputSocketSink sink,
-            @CheckForNull @WillNotClose InputService<E> input)
+            @CheckForNull InputService<E> input)
     throws IOException;
 
     /**

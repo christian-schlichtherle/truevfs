@@ -11,14 +11,12 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.util.Arrays;
-import javax.annotation.concurrent.Immutable;
 
 /**
  * A memory efficient base class for simple 8 bit (octet) character sets.
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public abstract class OctetCharset extends Charset {
 
     /**

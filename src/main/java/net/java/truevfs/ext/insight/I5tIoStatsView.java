@@ -7,7 +7,6 @@ package net.java.truevfs.ext.insight;
 import net.java.truevfs.ext.insight.stats.IoStats;
 import net.java.truevfs.ext.insight.stats.IoStatsView;
 
-import javax.annotation.concurrent.ThreadSafe;
 import javax.management.MBeanInfo;
 
 /**
@@ -15,7 +14,6 @@ import javax.management.MBeanInfo;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 final class I5tIoStatsView extends I5tStatsView {
 
     I5tIoStatsView(I5tIoStatsController controller) {

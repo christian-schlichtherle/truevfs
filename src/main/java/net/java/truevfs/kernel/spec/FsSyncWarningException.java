@@ -5,7 +5,6 @@
 package net.java.truevfs.kernel.spec;
 
 import java.io.IOException;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * Indicates an exceptional condition when synchronizing the changes in a
@@ -15,7 +14,6 @@ import javax.annotation.concurrent.ThreadSafe;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class FsSyncWarningException extends FsSyncException {
 
     private static final long serialVersionUID = 0;

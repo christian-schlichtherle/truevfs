@@ -11,7 +11,6 @@ import net.java.truevfs.comp.inst.Mediator;
 import org.slf4j.Logger;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
 import javax.management.*;
 
 /**
@@ -20,7 +19,6 @@ import javax.management.*;
  * @param  <This> the type of this mediator.
  * @author Christian Schlichtherle
  */
-@Immutable
 public abstract class JmxMediator<This extends JmxMediator<This>>
 extends Mediator<This> {
 

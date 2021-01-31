@@ -4,19 +4,19 @@
  */
 package net.java.truevfs.driver.zip.raes;
 
-import java.net.URI;
-import java.util.Objects;
-import javax.annotation.concurrent.ThreadSafe;
-import net.java.truevfs.driver.zip.raes.crypto.RaesKeyException;
-import net.java.truevfs.driver.zip.raes.crypto.RaesParameters;
-import net.java.truevfs.driver.zip.raes.crypto.RaesParametersProvider;
-import net.java.truevfs.driver.zip.raes.crypto.Type0RaesParameters;
 import net.java.truecommons.key.spec.KeyManager;
 import net.java.truecommons.key.spec.KeyManagerMap;
 import net.java.truecommons.key.spec.KeyProvider;
 import net.java.truecommons.key.spec.UnknownKeyException;
 import net.java.truecommons.key.spec.common.AesKeyStrength;
 import net.java.truecommons.key.spec.common.AesPbeParameters;
+import net.java.truevfs.driver.zip.raes.crypto.RaesKeyException;
+import net.java.truevfs.driver.zip.raes.crypto.RaesParameters;
+import net.java.truevfs.driver.zip.raes.crypto.RaesParametersProvider;
+import net.java.truevfs.driver.zip.raes.crypto.Type0RaesParameters;
+
+import java.net.URI;
+import java.util.Objects;
 
 /**
  * An adapter which provides {@link RaesParameters} by using a
@@ -26,7 +26,6 @@ import net.java.truecommons.key.spec.common.AesPbeParameters;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class KeyManagerRaesParameters
 implements RaesParametersProvider {
 

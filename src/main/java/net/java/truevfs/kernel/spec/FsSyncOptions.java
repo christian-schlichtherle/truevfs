@@ -4,8 +4,8 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.shed.BitField;
+
 import static net.java.truevfs.kernel.spec.FsSyncOption.*;
 
 /**
@@ -15,7 +15,6 @@ import static net.java.truevfs.kernel.spec.FsSyncOption.*;
  * @see    FsSyncOption
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class FsSyncOptions {
 
     /** A bit field with no synchronization options set. */

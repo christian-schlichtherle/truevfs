@@ -5,15 +5,13 @@
 package net.java.truevfs.kernel.spec.io;
 
 import net.java.truecommons.io.DecoratingSeekableChannel;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+import net.java.truevfs.kernel.spec.FsTestConfig;
+import net.java.truevfs.kernel.spec.FsThrowManager;
+
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.NotThreadSafe;
-import net.java.truevfs.kernel.spec.FsTestConfig;
-import net.java.truevfs.kernel.spec.FsThrowManager;
 
 /**
  * A decorating seekable byte channel which supports throwing exceptions
@@ -21,20 +19,17 @@ import net.java.truevfs.kernel.spec.FsThrowManager;
  * 
  * @author  Christian Schlichtherle
  */
-@NotThreadSafe
 public final class ThrowingSeekableChannel extends DecoratingSeekableChannel {
 
     private final FsThrowManager control;
 
-    @CreatesObligation
     public ThrowingSeekableChannel(
-            @WillCloseWhenClosed SeekableByteChannel sbc) {
+            SeekableByteChannel sbc) {
         this(sbc, null);
     }
 
-    @CreatesObligation
     public ThrowingSeekableChannel(
-            final @WillCloseWhenClosed SeekableByteChannel channel,
+            final SeekableByteChannel channel,
             final @CheckForNull FsThrowManager control) {
         super(channel);
         this.control = null != control

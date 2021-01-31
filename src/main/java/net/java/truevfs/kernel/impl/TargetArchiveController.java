@@ -15,7 +15,6 @@ import net.java.truecommons.shed.ControlFlowException;
 import net.java.truevfs.kernel.spec.*;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -50,7 +49,6 @@ import static net.java.truevfs.kernel.spec.FsSyncOption.ABORT_CHANGES;
  * @param <E> the type of the archive entries.
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSystemArchiveController<E> {
 
     private static final BitField<FsAccessOption> MOUNT_OPTIONS = BitField.of(CACHE);

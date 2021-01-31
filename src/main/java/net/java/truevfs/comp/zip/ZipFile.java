@@ -4,24 +4,25 @@
  */
 package net.java.truevfs.comp.zip;
 
+import net.java.truecommons.io.AbstractSource;
+import net.java.truecommons.io.LockInputStream;
+import net.java.truecommons.io.OneTimeSource;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.Charset;
-import static java.nio.file.Files.newByteChannel;
 import java.nio.file.Path;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.ZipException;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
-import net.java.truecommons.io.AbstractSource;
-import net.java.truecommons.io.LockInputStream;
-import net.java.truecommons.io.OneTimeSource;
+
+import static java.nio.file.Files.newByteChannel;
 
 /**
  * Replacement for {@link java.util.zip.ZipFile java.util.zip.ZipFile}.
@@ -43,7 +44,6 @@ import net.java.truecommons.io.OneTimeSource;
  * @see    ZipOutputStream
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class ZipFile extends AbstractZipFile<ZipEntry> {
 
     /** The lock on which this object synchronizes. */

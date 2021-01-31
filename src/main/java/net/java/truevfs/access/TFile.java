@@ -4,7 +4,6 @@
  */
 package net.java.truevfs.access;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.cio.Entry.Size;
 import net.java.truecommons.io.Streams;
@@ -16,9 +15,6 @@ import net.java.truevfs.kernel.spec.*;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
-import javax.annotation.WillClose;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.Immutable;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -351,7 +347,6 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class TFile extends File implements TRex {
 
     private static final long serialVersionUID = 0;
@@ -396,7 +391,6 @@ public final class TFile extends File implements TRex {
      * refers to a prospective archive file, otherwise it's {@code null}.
      * This field should be considered to be {@code final}!
      */
-    @SuppressFBWarnings("JCIP_FIELD_ISNT_FINAL_IN_IMMUTABLE_CLASS")
     private transient volatile @CheckForNull FsController controller;
 
     /**
@@ -2446,9 +2440,7 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
-    public static void cp(  final @WillClose InputStream in,
-                            final @WillClose OutputStream out)
-    throws IOException {
+    public static void cp(final InputStream in, final OutputStream out) throws IOException {
         Streams.copy(in, out);
     }
 
@@ -2505,11 +2497,10 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
-    public static void cp(final @WillClose InputStream in, final File dst)
-    throws IOException {
+    public static void cp(final InputStream in, final File dst) throws IOException {
         Objects.requireNonNull(in);
 
-        @WillClose TFileOutputStream out = null;
+        TFileOutputStream out = null;
         try {
             out = new TFileOutputStream(dst);
         } finally {
@@ -2578,11 +2569,11 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
-    public static void cp(final File src, final @WillClose OutputStream out)
+    public static void cp(final File src, final OutputStream out)
     throws IOException {
         Objects.requireNonNull(out);
 
-        @WillClose TFileInputStream in = null;
+        TFileInputStream in = null;
         try {
             in = new TFileInputStream(src);
         } finally {
@@ -3041,7 +3032,7 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
-    public void input(final @WillNotClose InputStream in) throws IOException {
+    public void input(final InputStream in) throws IOException {
         Objects.requireNonNull(in);
         try {
             try (TFileOutputStream out = new TFileOutputStream(this)) {
@@ -3103,7 +3094,7 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     @FsAssertion(atomic=NO, consistent=YES, isolated=NO, durable=NOT_APPLICABLE)
-    public void output(final @WillNotClose OutputStream out) throws IOException {
+    public void output(final OutputStream out) throws IOException {
         Objects.requireNonNull(out);
         try (TFileInputStream in = new TFileInputStream(this)) {
             Streams.cat(in, out);
@@ -3169,9 +3160,7 @@ public final class TFile extends File implements TRex {
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
     @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
-    public static void cat( @WillNotClose InputStream in,
-                            @WillNotClose OutputStream out)
-    throws IOException {
+    public static void cat(InputStream in, OutputStream out) throws IOException {
         Streams.cat(in, out);
     }
 

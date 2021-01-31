@@ -10,7 +10,6 @@ import net.java.truevfs.comp.jmx.JmxManager;
 import net.java.truevfs.kernel.spec.*;
 import org.slf4j.Logger;
 
-import javax.annotation.concurrent.ThreadSafe;
 import java.util.Set;
 
 /**
@@ -18,7 +17,6 @@ import java.util.Set;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class PaceManager extends JmxManager<PaceMediator> {
 
     private static final Logger logger = new LocalizedLogger(PaceManager.class);

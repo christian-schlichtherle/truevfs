@@ -4,9 +4,6 @@
  */
 package net.java.truevfs.kernel.impl;
 
-import lombok.val;
-
-import javax.annotation.concurrent.ThreadSafe;
 import java.util.function.Supplier;
 
 /**
@@ -18,7 +15,6 @@ import java.util.function.Supplier;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 final class ShutdownFuse {
 
     private final Thread thread;

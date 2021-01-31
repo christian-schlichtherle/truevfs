@@ -20,7 +20,6 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
 import org.bouncycastle.util.io.TeeOutputStream;
 
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -34,7 +33,6 @@ import java.util.Arrays;
  * @see <a href="http://www.gladman.me.uk/cryptography_technology/fileencrypt/">A Password Based File Encyption Utility (Dr. Gladman)</a>
  * @see <a href="http://www.ietf.org/rfc/rfc2898.txt">RFC 2898: PKCS #5: Password-Based Cryptography Specification Version 2.0 (IETF et al.)</a>
  */
-@NotThreadSafe
 final class WinZipAesOutputStream extends DecoratingOutputStream {
 
     /**

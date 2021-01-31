@@ -72,5 +72,4 @@
  *     temporary file first.
  * </ul>
  */
-@javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truevfs.comp.zip;

@@ -4,16 +4,12 @@
  */
 package net.java.truevfs.driver.zip.raes.crypto;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.ThreadSafe;
-
 /**
  * Thrown to indicate that no suitable cryptographic parameters have been
  * provided or something is wrong with these parameters.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public class RaesParametersException extends RaesException {
 
     private static final long serialVersionUID = 0;

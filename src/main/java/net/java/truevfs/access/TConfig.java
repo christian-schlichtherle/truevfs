@@ -4,19 +4,18 @@
  */
 package net.java.truevfs.access;
 
-import edu.umd.cs.findbugs.annotations.CleanupObligation;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import edu.umd.cs.findbugs.annotations.DischargesObligation;
-import java.util.Objects;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.InheritableThreadLocalStack;
 import net.java.truecommons.shed.Resource;
 import net.java.truevfs.kernel.spec.FsAccessOption;
-import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 import net.java.truevfs.kernel.spec.FsAccessOptions;
-import static net.java.truevfs.kernel.spec.FsAccessOptions.ACCESS_PREFERENCES_MASK;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
+
+import java.util.Objects;
+
+import static net.java.truevfs.kernel.spec.FsAccessOption.*;
+import static net.java.truevfs.kernel.spec.FsAccessOptions.ACCESS_PREFERENCES_MASK;
 
 /**
  * A mutable container for configuration options with global or inheritable
@@ -196,7 +195,6 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
  *
  * @author Christian Schlichtherle
  */
-@CleanupObligation
 public final class TConfig extends Resource<IllegalStateException> {
 
     private static final BitField<FsAccessOption>
@@ -228,7 +226,6 @@ public final class TConfig extends Resource<IllegalStateException> {
      * @return The new current configuration.
      * @see    #current()
      */
-    @CreatesObligation
     public static TConfig open() { return configs.push(new TConfig(current())); }
 
     // I don't think these fields should be volatile.
@@ -432,7 +429,6 @@ public final class TConfig extends Resource<IllegalStateException> {
     }
 
     @Override
-    @DischargesObligation
     public void close() throws IllegalStateException { super.close(); }
 
     /**

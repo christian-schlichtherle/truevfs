@@ -4,17 +4,17 @@
  */
 package net.java.truevfs.comp.inst;
 
-import static java.util.Objects.requireNonNull;
-import java.util.ServiceConfigurationError;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
 import net.java.truevfs.kernel.spec.*;
+
+import javax.annotation.CheckForNull;
+import java.util.ServiceConfigurationError;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * @param  <M> the type of the mediator.
  * @author Christian Schlichtherle
  */
-@Immutable
 public class InstrumentingCompositeDriver<M extends Mediator<M>>
 implements FsCompositeDriver {
 

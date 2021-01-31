@@ -4,21 +4,21 @@
  */
 package net.java.truecommons.key.swing;
 
-import java.io.IOException;
-import javax.annotation.concurrent.NotThreadSafe;
-import javax.swing.JComponent;
 import net.java.truecommons.key.spec.common.AesKeyStrength;
 import net.java.truecommons.key.spec.common.AesPbeParameters;
-import static org.junit.Assert.*;
 import org.junit.Test;
-import static org.mockito.Mockito.*;
 import org.netbeans.jemmy.operators.JComboBoxOperator;
 import org.netbeans.jemmy.operators.JPasswordFieldOperator;
+
+import javax.swing.*;
+import java.io.IOException;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public final class WriteKeyPanelIT extends KeyPanelTestSuite<WriteKeyPanel> {
 
     public WriteKeyPanelIT() throws IOException, InterruptedException { }

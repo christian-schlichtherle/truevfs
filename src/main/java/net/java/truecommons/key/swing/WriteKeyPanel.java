@@ -4,7 +4,6 @@
  */
 package net.java.truecommons.key.swing;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import net.java.truecommons.key.spec.prompting.PromptingPbeParameters;
 
 import javax.annotation.Nullable;
@@ -74,7 +73,6 @@ final class WriteKeyPanel extends KeyPanel {
     }
 
     @Override
-    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     public void setResource(final URI resource) {
         final @Nullable URI lastResource = view.getLastResource();
         if (null != lastResource && !resource.equals(lastResource)) {

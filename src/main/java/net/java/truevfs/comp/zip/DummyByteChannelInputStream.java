@@ -5,10 +5,9 @@
 package net.java.truevfs.comp.zip;
 
 import net.java.truecommons.io.ChannelInputStream;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
+
 import java.io.IOException;
 import java.nio.channels.SeekableByteChannel;
-import javax.annotation.WillCloseWhenClosed;
 
 /**
  * An adapter from a seekable byte channel to an input stream which adds a
@@ -20,9 +19,8 @@ import javax.annotation.WillCloseWhenClosed;
 final class DummyByteChannelInputStream extends ChannelInputStream {
     private boolean added;
 
-    @CreatesObligation
     DummyByteChannelInputStream(
-            @WillCloseWhenClosed SeekableByteChannel channel) {
+            SeekableByteChannel channel) {
         super(channel);
     }
 

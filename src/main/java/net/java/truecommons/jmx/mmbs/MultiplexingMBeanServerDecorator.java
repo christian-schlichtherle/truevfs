@@ -4,12 +4,11 @@
  */
 package net.java.truecommons.jmx.mmbs;
 
-import javax.annotation.concurrent.Immutable;
-import javax.management.MBeanServer;
-
 import global.namespace.service.wight.annotation.ServiceImplementation;
 import net.java.truecommons.jmx.sl.ObjectNameModifierLocator;
 import net.java.truecommons.jmx.spi.MBeanServerDecorator;
+
+import javax.management.MBeanServer;
 
 /**
  * Decorates the given MBean server with a {@link MultiplexingMBeanServer} if
@@ -17,7 +16,6 @@ import net.java.truecommons.jmx.spi.MBeanServerDecorator;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 @ServiceImplementation(priority = -100)
 public final class MultiplexingMBeanServerDecorator implements MBeanServerDecorator {
 

@@ -9,7 +9,6 @@ import net.java.truecommons.cio.IoBufferPool;
 import net.java.truevfs.kernel.spec.spi.IoBufferPoolDecorator;
 import net.java.truevfs.kernel.spec.spi.IoBufferPoolFactory;
 
-import javax.annotation.concurrent.Immutable;
 import java.util.function.Supplier;
 
 /**
@@ -20,7 +19,6 @@ import java.util.function.Supplier;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class IoBufferPoolLocator implements Supplier<IoBufferPool> {
 
     /**

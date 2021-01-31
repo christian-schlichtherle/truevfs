@@ -4,12 +4,6 @@
  */
 package net.java.truevfs.driver.zip.raes;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.channels.SeekableByteChannel;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillNotClose;
-import javax.annotation.concurrent.Immutable;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.Entry.Type;
 import net.java.truecommons.cio.InputService;
@@ -22,14 +16,15 @@ import net.java.truevfs.comp.zipdriver.ZipOutputService;
 import net.java.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import net.java.truevfs.driver.zip.raes.crypto.RaesParameters;
 import net.java.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
-import net.java.truevfs.kernel.spec.FsAccessOption;
-import static net.java.truevfs.kernel.spec.FsAccessOption.*;
-import net.java.truevfs.kernel.spec.FsController;
-import net.java.truevfs.kernel.spec.FsInputSocketSource;
-import net.java.truevfs.kernel.spec.FsModel;
-import net.java.truevfs.kernel.spec.FsNodeName;
-import net.java.truevfs.kernel.spec.FsOutputSocketSink;
+import net.java.truevfs.kernel.spec.*;
 import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
+
+import javax.annotation.CheckForNull;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
+
+import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 
 /**
  * An abstract archive driver for RAES encrypted ZIP files which optionally
@@ -39,7 +34,6 @@ import net.java.truevfs.kernel.spec.cio.MultiplexingOutputService;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public abstract class ZipRaesDriver extends JarDriver {
 
     /**
@@ -144,7 +138,7 @@ public abstract class ZipRaesDriver extends JarDriver {
     protected OutputService<JarDriverEntry> newOutput(
             final FsModel model,
             final FsOutputSocketSink sink,
-            final @CheckForNull @WillNotClose InputService<JarDriverEntry> input)
+            final @CheckForNull InputService<JarDriverEntry> input)
     throws IOException {
         final ZipInputService<JarDriverEntry> zis = (ZipInputService<JarDriverEntry>) input;
         return new MultiplexingOutputService<>(getPool(),

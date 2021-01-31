@@ -5,7 +5,6 @@
 package net.java.truevfs.kernel.spec;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
 import java.util.function.Supplier;
@@ -20,7 +19,6 @@ import java.util.function.Supplier;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public abstract class FsAbstractCompositeDriver implements FsCompositeDriver, Supplier<Map<FsScheme, FsDriver>> {
 
     @Override

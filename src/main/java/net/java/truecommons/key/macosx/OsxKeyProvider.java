@@ -9,7 +9,6 @@ import net.java.truecommons.key.spec.UnknownKeyException;
 import net.java.truecommons.key.spec.prompting.AbstractPromptingPbeParameters;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 import java.net.URI;
 import java.util.Objects;
 import java.util.Optional;
@@ -20,7 +19,6 @@ import java.util.Optional;
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 final class OsxKeyProvider<P extends AbstractPromptingPbeParameters<P, ?>> implements KeyProvider<P> {
 
     private final OsxKeyManager<P> manager;

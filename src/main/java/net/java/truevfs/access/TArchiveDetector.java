@@ -4,16 +4,15 @@
  */
 package net.java.truevfs.access;
 
-import net.java.truecommons.shed.Loader;
 import net.java.truecommons.shed.ExtensionSet;
 import net.java.truecommons.shed.HashMaps;
+import net.java.truecommons.shed.Loader;
 import net.java.truevfs.kernel.spec.FsAbstractCompositeDriver;
 import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsScheme;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -55,7 +54,6 @@ import static net.java.truecommons.shed.HashMaps.initialCapacity;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 public final class TArchiveDetector extends FsAbstractCompositeDriver {
 
     /**

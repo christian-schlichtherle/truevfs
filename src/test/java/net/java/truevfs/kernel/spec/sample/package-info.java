@@ -5,5 +5,4 @@
 /**
  * Demonstrates the usage of the API of the module TrueVFS&nbsp;Kernel.
  */
-@javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
 package net.java.truevfs.kernel.spec.sample;

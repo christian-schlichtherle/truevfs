@@ -4,6 +4,16 @@
  */
 package net.java.truevfs.access;
 
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.InputSocket;
+import net.java.truecommons.cio.IoSockets;
+import net.java.truecommons.cio.OutputSocket;
+import net.java.truecommons.shed.BitField;
+import net.java.truecommons.shed.Paths;
+import net.java.truevfs.kernel.spec.FsAccessOption;
+import net.java.truevfs.kernel.spec.FsNodePath;
+
+import javax.annotation.CheckForNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
@@ -11,17 +21,8 @@ import java.nio.file.FileSystemException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.util.Arrays;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.shed.BitField;
-import net.java.truecommons.shed.Paths;
-import net.java.truevfs.kernel.spec.FsAccessOption;
+
 import static net.java.truevfs.kernel.spec.FsAccessOption.CREATE_PARENTS;
-import net.java.truevfs.kernel.spec.FsNodePath;
-import net.java.truecommons.cio.Entry;
-import net.java.truecommons.cio.InputSocket;
-import net.java.truecommons.cio.IoSockets;
-import net.java.truecommons.cio.OutputSocket;
 
 /**
  * Provides fast bulk I/O operations for {@link File}s and {@link TFile}s.
@@ -32,7 +33,6 @@ import net.java.truecommons.cio.OutputSocket;
  *
  * @author Christian Schlichtherle
  */
-@Immutable
 final class TBIO {
 
     /**

@@ -4,17 +4,16 @@
  */
 package net.java.truevfs.comp.jmx;
 
-import javax.annotation.Nullable;
-import javax.annotation.concurrent.ThreadSafe;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsSyncException;
+
+import javax.annotation.Nullable;
 
 /**
  * An MXBean interface for a {@linkplain FsModel file system model}.
  *
  * @author Christian Schlichtherle
  */
-@ThreadSafe
 public interface JmxModelMXBean {
     boolean          isMounted();
     String           getMountPoint();

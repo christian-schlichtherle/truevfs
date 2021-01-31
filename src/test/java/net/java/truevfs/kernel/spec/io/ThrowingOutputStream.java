@@ -5,14 +5,12 @@
 package net.java.truevfs.kernel.spec.io;
 
 import net.java.truecommons.io.DecoratingOutputStream;
-import edu.umd.cs.findbugs.annotations.CreatesObligation;
-import java.io.IOException;
-import java.io.OutputStream;
-import javax.annotation.CheckForNull;
-import javax.annotation.WillCloseWhenClosed;
-import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truevfs.kernel.spec.FsTestConfig;
 import net.java.truevfs.kernel.spec.FsThrowManager;
+
+import javax.annotation.CheckForNull;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * A decorating output stream which supports throwing exceptions according to
@@ -21,18 +19,15 @@ import net.java.truevfs.kernel.spec.FsThrowManager;
  * @see     ThrowingInputStream
  * @author  Christian Schlichtherle
  */
-@NotThreadSafe
 public final class ThrowingOutputStream extends DecoratingOutputStream {
 
     private final FsThrowManager control;
 
-    @CreatesObligation
-    public ThrowingOutputStream(@WillCloseWhenClosed OutputStream out) {
+    public ThrowingOutputStream(OutputStream out) {
         this(out, null);
     }
 
-    @CreatesObligation
-    public ThrowingOutputStream(final @WillCloseWhenClosed OutputStream out,
+    public ThrowingOutputStream(final OutputStream out,
                                 final @CheckForNull FsThrowManager control) {
         super(out);
         this.control = null != control

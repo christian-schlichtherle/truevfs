@@ -4,15 +4,15 @@
  */
 package net.java.truevfs.driver.http;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import javax.annotation.CheckForNull;
-import javax.annotation.concurrent.NotThreadSafe;
 import net.java.truecommons.cio.AbstractOutputSocket;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAccessOption;
+
+import javax.annotation.CheckForNull;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * An output socket for HTTP(S) entries.
@@ -21,7 +21,6 @@ import net.java.truevfs.kernel.spec.FsAccessOption;
  * @see    HttpInputSocket
  * @author Christian Schlichtherle
  */
-@NotThreadSafe
 public class HttpOutputSocket extends AbstractOutputSocket<HttpNode> {
 
     private final HttpNode entry;
