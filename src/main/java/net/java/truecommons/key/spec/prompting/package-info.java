@@ -10,7 +10,6 @@
  * Different modules are provided to adapt to concrete user interface
  * technologies, e.g. Swing or the Console.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault

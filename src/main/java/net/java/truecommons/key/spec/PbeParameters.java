@@ -15,7 +15,6 @@ import javax.annotation.Nullable;
  *
  * @param  <P> the type of these PBE parameters.
  * @param  <S> the type of the key strength.
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @ImplementationsShouldExtend(AbstractPbeParameters.class)

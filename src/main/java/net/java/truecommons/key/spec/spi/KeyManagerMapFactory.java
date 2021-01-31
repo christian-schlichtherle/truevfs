@@ -20,7 +20,6 @@ import net.java.truecommons.key.spec.sl.KeyManagerMapLocator;
  * manager map and subsequently modify it by the
  * {@link KeyManagerMapModifier} implementations found on the class path.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @Immutable

@@ -14,7 +14,6 @@ import net.java.truecommons.jmx.*;
 import net.java.truecommons.shed.HashMaps;
 
 /**
- * @since  TrueCommons 2.3
  * @author Christian Schlichtherle
  */
 @Immutable

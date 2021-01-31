@@ -8,7 +8,6 @@
  * {@linkplain net.java.truecommons.cio.Container containers},
  * e.g.&#160;file systems, archive files or I/O buffer pools.
  *
- * @since  TrueCommons 2.1 (spin-off from TrueVFS Kernel Specification 0.9.3)
  * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault

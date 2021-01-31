@@ -36,7 +36,6 @@
  * {@link net.java.truecommons.key.spec.sl.KeyManagerMapLocator#SINGLETON} by
  * searching the class path at run time.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault

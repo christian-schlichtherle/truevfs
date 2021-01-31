@@ -300,7 +300,6 @@ public interface FsController {
      * Implementations should be safe for multi-threaded access.
      *
      * @param  <Context> The type of the calling context.
-     * @since  TrueVFS 0.11
      * @author Christian Schlichtherle
      */
     interface Factory<Context> {

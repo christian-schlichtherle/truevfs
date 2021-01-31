@@ -19,7 +19,6 @@ import net.java.truecommons.key.spec.KeyStrength;
  *
  * @param  <P> the type of these prompting PBE parameters.
  * @param  <S> the type of the key strength.
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @NotThreadSafe

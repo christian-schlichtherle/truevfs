@@ -17,7 +17,6 @@ import java.lang.ref.WeakReference;
  * A utility class for window management.
  * This class cannot get instantiated.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @NotThreadSafe

@@ -5,7 +5,6 @@
 /**
  * Provides singletons to locate service providers on the class path.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault

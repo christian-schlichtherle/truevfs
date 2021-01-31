@@ -11,7 +11,6 @@ import javax.swing.JPanel;
 /**
  * An abstract decorator for a feedback.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 public abstract class DecoratingFeedback implements Feedback {

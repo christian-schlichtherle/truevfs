@@ -11,7 +11,6 @@ import java.security.GeneralSecurityException;
  * Thrown to indicate that the retrieval of the key to (over)write or read a
  * protected resource has failed.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 public class UnknownKeyException extends GeneralSecurityException {

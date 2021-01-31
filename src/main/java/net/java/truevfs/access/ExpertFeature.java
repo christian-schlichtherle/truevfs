@@ -22,7 +22,6 @@ import net.java.truevfs.kernel.spec.*;
  * whenever an expert feature is unintentionally used - similar to the way
  * {@code javac} treats the {@code @Deprecated} annotation.
  *
- * @since  TrueVFS 0.10
  * @author Christian Schlichtherle
  */
 @Documented

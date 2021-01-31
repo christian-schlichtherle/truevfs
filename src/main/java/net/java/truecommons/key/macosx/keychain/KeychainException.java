@@ -10,7 +10,6 @@ import static net.java.truecommons.key.macosx.keychain.Security.message;
 /**
  * Indicates an error when using Apple's Keychain Services API.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 public class KeychainException extends Exception {

@@ -9,7 +9,6 @@ package net.java.truecommons.shed;
  *
  * @param  <I> The type of items to {@link #visit}.
  * @param  <X> The type of exceptions to be thrown by {@link #visit}.
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 public interface Visitor<I, X extends Exception> {

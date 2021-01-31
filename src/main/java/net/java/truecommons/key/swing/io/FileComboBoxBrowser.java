@@ -28,7 +28,6 @@ import java.util.Objects;
     box.setEditable(true);
  * </pre>
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 public class FileComboBoxBrowser extends AbstractComboBoxBrowser<String> {

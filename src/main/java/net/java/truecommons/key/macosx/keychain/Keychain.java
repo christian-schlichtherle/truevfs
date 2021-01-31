@@ -21,7 +21,6 @@ import static net.java.truecommons.key.macosx.keychain.Security.*;
  * Implementations need to safe for multi-threading.
  *
  * @author Christian Schlichtherle
- * @since TrueCommons 2.2
  */
 @SuppressWarnings("PackageVisibleInnerClass")
 @ThreadSafe

@@ -5,7 +5,6 @@
 /**
  * Provides hurling window feedback when entering a wrong password.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault

@@ -7,7 +7,6 @@
  * <a href="https://developer.apple.com/library/mac/#documentation/security/Reference/keychainservices/Reference/reference.html">Keychain Services API</a>
  * for Java.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @Nonnull @ParametersAreNonnullByDefault

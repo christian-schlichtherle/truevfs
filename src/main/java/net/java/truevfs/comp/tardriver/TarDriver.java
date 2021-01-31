@@ -77,8 +77,6 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      * {@code true}.
      * In older versions, the behaviour was as if this method returned
      * {@code false}.
-     *
-     * @since TrueVFS 0.10.7
      */
     public boolean getAddPaxHeaderForNonAsciiNames() {
         return true;
@@ -103,8 +101,6 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
      * {@link TarArchiveOutputStream#BIGNUMBER_POSIX}.
      * In older versions, the behaviour was as if this method returned
      * {@link TarArchiveOutputStream#BIGNUMBER_ERROR}.
-     *
-     * @since TrueVFS 0.10.7
      */
     public int getBigNumberMode() {
         return TarArchiveOutputStream.BIGNUMBER_POSIX;

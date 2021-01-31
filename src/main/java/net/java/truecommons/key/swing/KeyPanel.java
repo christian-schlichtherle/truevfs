@@ -16,7 +16,6 @@ import java.net.URI;
 /**
  * Abstract panel for prompting for authentication keys.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 abstract class KeyPanel extends EnhancedPanel {

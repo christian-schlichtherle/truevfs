@@ -12,7 +12,6 @@ import org.scalatest.wordspec.AnyWordSpec
 import javax.management._
 
 /**
- * @since TrueCommons 2.3
  * @author Christian Schlichtherle
  */
 class MultiplexingMBeanServerTest extends AnyWordSpec {

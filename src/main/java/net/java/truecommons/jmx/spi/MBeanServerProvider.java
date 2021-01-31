@@ -24,7 +24,6 @@ import java.util.function.Supplier;
  * The implementation in this class simply provides the
  * {@linkplain ManagementFactory#getPlatformMBeanServer() platform MBean server}.
  *
- * @since  TrueCommons 2.3
  * @author Christian Schlichtherle
  */
 @Immutable

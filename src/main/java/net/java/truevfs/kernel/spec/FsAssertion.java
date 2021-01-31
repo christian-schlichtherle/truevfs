@@ -19,7 +19,6 @@ import static java.lang.annotation.ElementType.*;
  * their atomicity, consistency, isolation and durability - see
  * {@link FsController}.
  *
- * @since  TrueVFS 0.10
  * @author Christian Schlichtherle
  */
 @Documented

@@ -21,7 +21,6 @@ import net.java.truecommons.key.spec.util.SuspensionPenalty;
  * {@link JOptionPane} which has the OK button set as its default button.
  * This is to inhibit the use of a GUI robot for exhaustive password searching.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 final class TemporarilyDisableDefaultButtonFeedback

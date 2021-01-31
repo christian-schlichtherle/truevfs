@@ -19,7 +19,6 @@ import java.util.function.Supplier;
  * If multiple factory services are locatable on the class path at run time, the service with the greatest
  * {@linkplain ServiceImplementation#priority()} gets selected.
  *
- * @since  TrueCommons 2.3
  * @author Christian Schlichtherle
  */
 @ServiceInterface

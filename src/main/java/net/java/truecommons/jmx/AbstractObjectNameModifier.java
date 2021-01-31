@@ -10,7 +10,6 @@ import javax.management.ObjectInstance;
 /**
  * An abstract object name modifier.
  *
- * @since  TrueCommons 2.3
  * @author Christian Schlichtherle
  */
 @Immutable

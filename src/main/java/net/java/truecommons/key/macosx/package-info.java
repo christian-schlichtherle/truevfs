@@ -8,7 +8,6 @@
  * persisting {@link net.java.truecommons.key.spec.common.AesPbeParameters}
  * with Apple's Keychain Services API.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault

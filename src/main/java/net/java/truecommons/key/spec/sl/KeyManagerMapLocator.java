@@ -22,7 +22,6 @@ import global.namespace.service.wight.core.ServiceLocator;
  * and the modifier service specification class
  * {@link KeyManagerMapModifier}.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @Immutable

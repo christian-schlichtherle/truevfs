@@ -27,7 +27,6 @@ import static net.java.truecommons.shed.Buffers.charArray;
  * @param <P> the type of these PBE parameters.
  * @param <S> the type of the key strength.
  * @author Christian Schlichtherle
- * @since TrueCommons 2.2
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public abstract class AbstractPbeParameters<

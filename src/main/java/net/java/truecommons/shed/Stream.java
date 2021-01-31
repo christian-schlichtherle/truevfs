@@ -25,7 +25,6 @@ package net.java.truecommons.shed;
  * exception.
  * 
  * @param  <T> The type of the elements in the stream.
- * @since  TrueCommons 1.0.12
  * @author Christian Schlichtherle
  */
 public interface Stream<T> extends Iterable<T>, AutoCloseable {

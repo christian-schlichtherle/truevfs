@@ -71,9 +71,7 @@ public final class FsScheme implements Serializable, Comparable<FsScheme> {
      * Returns the scheme as a string.
      *
      * @return The scheme as a string.
-     * @since  TrueVFS 0.10
-     * @deprecated This method is solely provided to support
-     *             {@link XMLEncoder}/{@link XMLDecoder}.
+     * @deprecated This method is solely provided to support {@link XMLEncoder}/{@link XMLDecoder}.
      *             Applications should call {@link #toString()} instead.
      */
     @Deprecated

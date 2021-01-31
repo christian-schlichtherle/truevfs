@@ -15,7 +15,6 @@ import javax.swing.JPanel;
  * the implementation of this interface is not expected to do anything in
  * particular.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 public interface Feedback {

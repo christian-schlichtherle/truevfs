@@ -8,7 +8,6 @@
  * It's up to the other modules to inject these service locators into this
  * module if they want to.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault

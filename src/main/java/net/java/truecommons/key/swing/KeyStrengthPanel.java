@@ -15,7 +15,6 @@ import net.java.truecommons.key.swing.util.EnhancedPanel;
 /**
  * A panel which allows the user to select the key strength for a cipher.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @NotThreadSafe

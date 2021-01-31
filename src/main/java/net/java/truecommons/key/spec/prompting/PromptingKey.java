@@ -17,7 +17,6 @@ import java.net.URI;
  *
  * @param  <K> the type of this prompting key.
  * @see    PromptingKeyProvider
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 public interface PromptingKey<K extends PromptingKey<K>>

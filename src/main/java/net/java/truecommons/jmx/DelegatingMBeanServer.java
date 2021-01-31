@@ -13,7 +13,6 @@ import javax.management.loading.ClassLoaderRepository;
 /**
  * An MBean server which delegates all methods to another MBean server.
  *
- * @since  TrueCommons 2.3
  * @author Christian Schlichtherle
  */
 @Immutable

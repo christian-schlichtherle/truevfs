@@ -16,7 +16,6 @@ import java.util.Objects;
 /**
  * Adds a key-value qualifier to an object name.
  *
- * @since  TrueCommons 2.3
  * @author Christian Schlichtherle
  */
 @Immutable

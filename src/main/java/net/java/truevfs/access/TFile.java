@@ -2783,7 +2783,6 @@ public final class TFile extends File implements TRex {
      *         files <em>within</em> the source and destination directory
      *         trees.
      * @throws IOException if any I/O error occurs.
-     * @since  TrueZIP 7.2
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */
@@ -2904,7 +2903,6 @@ public final class TFile extends File implements TRex {
      *         files <em>within</em> the source and destination directory
      *         trees.
      * @throws IOException if any I/O error occurs.
-     * @since  TrueZIP 7.2
      * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
      * @see    <a href="#traversal">Traversing Directory Trees</a>
      */

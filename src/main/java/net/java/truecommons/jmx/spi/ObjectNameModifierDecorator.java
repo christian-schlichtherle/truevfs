@@ -20,7 +20,6 @@ import java.util.function.UnaryOperator;
  * their {@linkplain ServiceImplementation#priority()} so that the product of the decorator service with the greatest
  * number becomes the head of the resulting product chain.
  *
- * @since  TrueCommons 2.3
  * @author Christian Schlichtherle
  */
 @ServiceInterface

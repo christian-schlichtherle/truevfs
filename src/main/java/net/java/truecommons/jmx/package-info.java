@@ -5,7 +5,6 @@
 /**
  * Provides components for safely interfacing with JMX in a library module.
  *
- * @since  TrueCommons 2.3
  * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault

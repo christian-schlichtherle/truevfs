@@ -6,7 +6,6 @@
  * Provides the
  * {@link net.java.truecommons.key.disable.DisableAesPbeKeyManagerMapModifier}.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault

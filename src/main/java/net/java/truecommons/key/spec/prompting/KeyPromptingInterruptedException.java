@@ -13,7 +13,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * Thrown to indicate that prompting for a key to open or create a
  * protected resource has been interrupted.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @ThreadSafe

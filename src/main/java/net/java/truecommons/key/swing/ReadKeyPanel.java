@@ -28,7 +28,6 @@ import java.util.ResourceBundle;
  * This is very convenient for the user if she inadvertently entered a wrong
  * key or shares the same key for multiple protected resources.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 final class ReadKeyPanel extends KeyPanel {

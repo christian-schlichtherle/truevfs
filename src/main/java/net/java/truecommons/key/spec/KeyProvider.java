@@ -76,7 +76,6 @@ import javax.annotation.Nullable;
  *
  * @param <K> The type of the keys.
  * @see KeyManager
- * @since TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @ImplementationsShouldExtend(AbstractKeyProvider.class)

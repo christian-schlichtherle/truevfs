@@ -21,7 +21,6 @@ import java.util.function.UnaryOperator;
  * number becomes the head of the resulting product chain.
  *
  * @author Christian Schlichtherle
- * @since TrueCommons 2.3
  */
 @ServiceInterface
 public interface MBeanServerDecorator extends UnaryOperator<MBeanServer> {

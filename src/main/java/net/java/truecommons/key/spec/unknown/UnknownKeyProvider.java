@@ -11,7 +11,6 @@ import net.java.truecommons.key.spec.UnknownKeyException;
 /**
  * This key provider fails to resolve any keys.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 final class UnknownKeyProvider extends AbstractKeyProvider<Object> {

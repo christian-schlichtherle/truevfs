@@ -31,7 +31,6 @@ import static net.java.truecommons.shed.Buffers.byteBuffer;
  * In particular, no two threads can concurrently visit items.
  *
  * @author Christian Schlichtherle
- * @since TrueCommons 2.2
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @ThreadSafe

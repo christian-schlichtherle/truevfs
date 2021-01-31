@@ -16,7 +16,6 @@ import net.java.truecommons.shed.UniqueObject;
  * Implementations must be safe for multi-threading.
  *
  * @param  <K> The type of the keys.
- * @since TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @Immutable

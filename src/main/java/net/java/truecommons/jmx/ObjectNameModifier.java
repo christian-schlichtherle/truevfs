@@ -13,7 +13,6 @@ import javax.management.ObjectName;
  * <p>
  * Implementations need to be safe for multi-threading.
  *
- * @since  TrueCommons 2.3
  * @author Christian Schlichtherle
  */
 public interface ObjectNameModifier {

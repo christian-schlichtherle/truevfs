@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 /**
  * Thrown to indicate that password authentication failed for some reason.
  *
- * @since  TrueCommons 2.2.2
  * @author Christian Schlichtherle
  */
 final class AuthenticationException extends Exception {

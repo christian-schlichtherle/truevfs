@@ -23,7 +23,6 @@ import net.java.truecommons.key.swing.feedback.Feedback;
  * "Swing Hacks" by Joshua Marinacci & Chris Adamson, published by O'Reilly
  * in 2005.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 final class HurlingWindowFeedback

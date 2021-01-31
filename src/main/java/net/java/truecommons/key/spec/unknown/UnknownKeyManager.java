@@ -13,7 +13,6 @@ import net.java.truecommons.key.spec.KeyProvider;
 /**
  * This key manager fails to resolve any keys.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @ThreadSafe

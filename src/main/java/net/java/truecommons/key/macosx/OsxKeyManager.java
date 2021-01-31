@@ -38,7 +38,6 @@ import static net.java.truecommons.shed.Buffers.*;
  * Uses Apple's Keychain Services API to persist passwords.
  *
  * @author Christian Schlichtherle
- * @since TrueCommons 2.2
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @ThreadSafe

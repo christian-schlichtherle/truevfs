@@ -24,7 +24,6 @@ import static net.java.truecommons.key.macosx.keychain.CoreFoundation.decode;
  * Exposes some parts of Apple's native Keychain Services API.
  *
  * @see    <a href="https://developer.apple.com/library/mac/#documentation/security/Reference/keychainservices/Reference/reference.html">Mac Developer Library: Keychain Services Reference</a>
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @SuppressWarnings({ "PackageVisibleInnerClass", "PackageVisibleField" })

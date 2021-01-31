@@ -15,7 +15,6 @@ import javax.annotation.concurrent.ThreadSafe;
 /**
  * @param  <K> the type of the prompting keys.
  * @see    SharedKeyManager
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @ThreadSafe

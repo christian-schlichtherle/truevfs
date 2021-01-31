@@ -25,7 +25,6 @@ import static net.java.truecommons.shed.Buffers.fill;
  * Subclasses do not need to be safe for multi-threading.
  *
  * @param  <K> the type of this safe key.
- * @since TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")

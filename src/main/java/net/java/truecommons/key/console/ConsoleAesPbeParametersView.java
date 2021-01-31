@@ -11,7 +11,6 @@ import net.java.truecommons.key.spec.common.AesPbeParameters;
 /**
  * A console based user interface for prompting for passwords.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @ThreadSafe

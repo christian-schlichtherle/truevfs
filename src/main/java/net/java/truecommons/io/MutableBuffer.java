@@ -18,7 +18,6 @@ import java.util.Objects;
  * {@link #asReadOnlyBuffer()}.
  *
  * @see    #asImmutableBuffer()
- * @since  TrueCommons 2.1
  * @author Christian Schlichtherle
  */
 public final class MutableBuffer extends PowerBuffer<MutableBuffer> {

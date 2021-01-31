@@ -11,7 +11,6 @@ import net.java.truecommons.key.spec.prompting.AbstractPromptingPbeParameters;
  * A JavaBean which holds password based encryption parameters for use with the
  * AES cipher.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @NotThreadSafe

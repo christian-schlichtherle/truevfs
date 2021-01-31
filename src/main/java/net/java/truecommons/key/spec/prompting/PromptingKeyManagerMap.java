@@ -19,7 +19,6 @@ import net.java.truecommons.key.spec.prompting.PromptingKey.View;
  * This class is provided for convenience and may be used to ease the
  * implementation of a custom view for key prompting.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @Immutable

@@ -33,7 +33,6 @@ import java.util.zip.Deflater;
 /**
  * A Swing based user interface for prompting for passwords or key files.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @ThreadSafe

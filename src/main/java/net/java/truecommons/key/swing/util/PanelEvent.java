@@ -22,7 +22,6 @@ import java.util.Objects;
  * again, whereby it is ensured that only a single event is fired for each
  * cause. The super class is kept for backwards compatibility only.
  *
- * @since  TrueCommons 2.2
  * @author  Christian Schlichtherle
  */
 public class PanelEvent extends AWTEvent {

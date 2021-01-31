@@ -21,7 +21,6 @@ import static net.java.truecommons.key.macosx.keychain.Security.kSecFormatUnknow
  * Utilities for Apple's Keychain Services API.
  *
  * @author Christian Schlichtherle
- * @since TrueCommons 2.2
  */
 final class KeychainUtils {
 

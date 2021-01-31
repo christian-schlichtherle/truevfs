@@ -10,7 +10,6 @@ import javax.annotation.Nullable;
  * Thrown to indicate that the retrieval of the key to (over)write or read a
  * protected resource has failed and that this exception is cacheable.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 public class PersistentUnknownKeyException extends UnknownKeyException {

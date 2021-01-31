@@ -23,7 +23,6 @@ import java.net.URI;
  *
  * @param  <K> the type of the prompting keys.
  * @see    PromptingKeyManager
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @ThreadSafe

@@ -33,7 +33,6 @@ import java.io.Serializable;
  * for a vanilla {@code JComboBox}).
  *
  * @param <E> the type of the elements of this combo box browser.
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 public abstract class AbstractComboBoxBrowser<E> implements Serializable {

@@ -19,7 +19,6 @@ import java.util.Optional;
  * Keychain Services API.
  *
  * @author Christian Schlichtherle
- * @since TrueCommons 2.2
  */
 @ThreadSafe
 final class OsxKeyProvider<P extends AbstractPromptingPbeParameters<P, ?>> implements KeyProvider<P> {

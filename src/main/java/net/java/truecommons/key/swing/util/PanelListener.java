@@ -10,7 +10,6 @@ import java.util.EventListener;
  * Used to notify listeners of an {@link net.java.truecommons.key.swing.util.EnhancedPanel}
  * that its ancestor window is shown or hidden.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 public interface PanelListener extends EventListener {

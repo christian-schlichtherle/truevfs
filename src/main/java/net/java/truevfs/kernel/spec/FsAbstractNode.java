@@ -11,7 +11,6 @@ import net.java.truecommons.shed.UniqueObject;
  * An abstract file system node is a node which can implement multiple types
  * and list directory members.
  *
- * @since  TrueVFS 0.10
  * @author Christian Schlichtherle
  */
 public abstract class FsAbstractNode

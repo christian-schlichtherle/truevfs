@@ -12,7 +12,6 @@ import javax.management.ObjectName;
 /**
  * A builder for {@link ObjectName}s.
  *
- * @since  TrueCommons 2.3
  * @author Christian Schlichtherle
  */
 public final class ObjectNameBuilder implements Provider<ObjectName> {

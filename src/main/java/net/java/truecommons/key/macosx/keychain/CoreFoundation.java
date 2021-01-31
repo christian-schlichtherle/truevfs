@@ -15,7 +15,6 @@ import java.util.List;
  *
  * @see    <a href="https://developer.apple.com/library/mac/#documentation/CoreFoundation/Reference/CFBaseUtils/Reference/reference.html">Mac Developer Library: Base Utilities Reference</a>
  * @see    <a href="https://developer.apple.com/library/mac/#documentation/CoreFoundation/Reference/CFTypeRef/Reference/reference.html">Mac Developer Library: CFType Reference</a>
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @SuppressWarnings({ "PackageVisibleInnerClass", "PackageVisibleField" })

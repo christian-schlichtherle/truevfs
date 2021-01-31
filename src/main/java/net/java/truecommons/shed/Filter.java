@@ -8,7 +8,6 @@ package net.java.truecommons.shed;
  * A generic filter for items of any type.
  *
  * @param  <T> The type of the items to filter.
- * @since  TrueCommons 1.0.11
  * @author Christian Schlichtherle
  */
 public interface Filter<T> {

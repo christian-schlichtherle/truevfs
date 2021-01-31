@@ -55,7 +55,6 @@ class EncryptionJarDriver extends JarDriver {
  * Mind that this is just sample code - for encryption, you should generally
  * prefer the TrueZIP Driver ZIP.RAES for its increased security level!
  *
- * @since  TrueVFS 0.9.2
  * @author Christian Schlichtherle
  */
 public abstract class FsAccessOptionsController extends FsDecoratingController {

@@ -11,7 +11,6 @@ import net.java.truecommons.key.spec.KeyStrength;
 /**
  * Enumerates the AES cipher key strenghts.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @Immutable

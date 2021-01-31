@@ -8,7 +8,6 @@
  * This can be used as a fall-back solution when no other key manager is
  * present on the class path at run time.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault

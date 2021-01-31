@@ -23,7 +23,6 @@ import java.util.ResourceBundle;
 /**
  * A console based user interface for prompting for passwords.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @ThreadSafe

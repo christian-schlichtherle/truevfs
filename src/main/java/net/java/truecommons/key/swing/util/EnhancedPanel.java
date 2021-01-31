@@ -16,7 +16,6 @@ import javax.swing.JPanel;
 /**
  * Provides methods to fire {@link PanelEvent}s.
  *
- * @since  TrueCommons 2.2
  * @author  Christian Schlichtherle
  */
 public class EnhancedPanel extends JPanel  {

@@ -19,7 +19,6 @@ import net.java.truecommons.shed.ImplementationsShouldExtend;
  *
  * @param <K> The type of the keys.
  * @see KeyManagerMap
- * @since TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @ImplementationsShouldExtend(AbstractKeyManager.class)

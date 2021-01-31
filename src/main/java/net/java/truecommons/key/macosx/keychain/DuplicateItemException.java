@@ -7,7 +7,6 @@ package net.java.truecommons.key.macosx.keychain;
 /**
  * Indicates that an item is already present in a keychain.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 public class DuplicateItemException extends KeychainException {

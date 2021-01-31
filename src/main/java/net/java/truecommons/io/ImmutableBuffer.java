@@ -47,7 +47,6 @@ import java.nio.channels.WritableByteChannel;
  * This class is immutable.
  *
  * @see    #asMutableBuffer()
- * @since  TrueCommons 2.1
  * @author Christian Schlichtherle
  */
 public final class ImmutableBuffer extends PowerBuffer<ImmutableBuffer> {

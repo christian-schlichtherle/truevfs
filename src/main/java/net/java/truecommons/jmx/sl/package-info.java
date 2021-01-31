@@ -8,7 +8,6 @@
  * and
  * {@linkplain net.java.truecommons.jmx.sl.ObjectNameModifierLocator object name modifiers}.
  *
- * @since  TrueCommons 2.3
  * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault

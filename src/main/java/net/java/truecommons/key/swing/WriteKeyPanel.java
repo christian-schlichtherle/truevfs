@@ -24,7 +24,6 @@ import java.util.ResourceBundle;
  * resource.
  * It currently supports password and key file authentication.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 final class WriteKeyPanel extends KeyPanel {

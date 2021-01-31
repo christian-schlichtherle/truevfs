@@ -14,7 +14,6 @@ import javax.annotation.Nullable;
  * This is normally caused by the client application, but will also happen
  * if the JVM is running in headless mode.
  *
- * @since  TrueCommons 2.2
  * @author  Christian Schlichtherle
  */
 public class KeyPromptingDisabledException extends PersistentUnknownKeyException  {

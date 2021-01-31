@@ -11,7 +11,6 @@ import net.java.truecommons.key.spec.common.AesPbeParameters;
 /**
  * A Swing based user interface to prompt for passwords or key files.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @ThreadSafe

@@ -11,7 +11,6 @@ import javax.annotation.concurrent.Immutable;
  * {@link #MIN_KEY_RETRY_DELAY} milliseconds between two subsequent key
  * verifications.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @Immutable

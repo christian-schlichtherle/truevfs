@@ -11,7 +11,6 @@ import net.java.truecommons.key.swing.spi.InvalidKeyFeedbackDecorator;
  * Decorates any given feedback with a
  * {@link TemporarilyDisableDefaultButtonFeedback}.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @ServiceImplementation(priority = -200)

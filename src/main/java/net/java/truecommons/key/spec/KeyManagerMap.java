@@ -16,7 +16,6 @@ import net.java.truecommons.shed.ImplementationsShouldExtend;
  * <p>
  * Implementations must be safe for multi-threading.
  *
- * @since TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @ImplementationsShouldExtend(AbstractKeyManagerMap.class)

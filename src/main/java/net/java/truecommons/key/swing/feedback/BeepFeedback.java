@@ -10,7 +10,6 @@ import javax.swing.JPanel;
 /**
  * Provides feedback by beeping using the default toolkit.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 public final class BeepFeedback implements Feedback {

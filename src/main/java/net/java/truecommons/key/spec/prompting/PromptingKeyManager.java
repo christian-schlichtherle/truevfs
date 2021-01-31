@@ -18,7 +18,6 @@ import static java.util.Objects.requireNonNull;
  *
  * @param  <K> the type of the prompting keys.
  * @see    PromptingKeyManagerMap
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @ThreadSafe

@@ -9,7 +9,6 @@
  * file size must be 512 bytes or more, of which only the first 512 bytes are
  * used.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault

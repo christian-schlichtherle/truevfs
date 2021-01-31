@@ -14,7 +14,6 @@ import javax.annotation.Nullable;
  * This is normally caused by user input, for example if the user has closed
  * the prompting dialog.
  *
- * @since  TrueCommons 2.2
  * @author  Christian Schlichtherle
  */
 public class KeyPromptingCancelledException extends PersistentUnknownKeyException {

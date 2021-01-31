@@ -21,7 +21,6 @@ import java.util.ResourceBundle;
  * A panel displaying a password panel or a key file panel in order to let
  * the user select an authentication method and enter a key.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 public final class AuthenticationPanel extends JPanel {

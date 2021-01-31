@@ -11,7 +11,6 @@ import javax.annotation.concurrent.ThreadSafe;
  * <p>
  * Implementations must be thread-safe!
  *
- * @since  TrueCommons 2.2
  * @author  Christian Schlichtherle
  */
 @ThreadSafe

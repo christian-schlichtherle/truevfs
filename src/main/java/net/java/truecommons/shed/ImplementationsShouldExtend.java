@@ -14,7 +14,6 @@ import java.lang.annotation.Target;
  * backwards compatibility when additional methods get added to the annotated
  * interface.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @Documented

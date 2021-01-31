@@ -6,7 +6,6 @@
  * Provides interfaces and implementations for visual and audible feedback for
  * entering wrong passwords.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @javax.annotation.Nonnull @javax.annotation.ParametersAreNonnullByDefault
