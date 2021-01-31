@@ -4,12 +4,12 @@
  */
 package net.java.truecommons.jmx.sl;
 
-import javax.annotation.concurrent.Immutable;
-import javax.management.MBeanServer;
+import global.namespace.service.wight.core.ServiceLocator;
 import net.java.truecommons.jmx.spi.MBeanServerDecorator;
 import net.java.truecommons.jmx.spi.MBeanServerProvider;
-import net.java.truecommons.services.Container;
-import net.java.truecommons.services.ServiceLocator;
+
+import javax.management.MBeanServer;
+import java.util.function.Supplier;
 
 /**
  * A container of the singleton MBean server.
@@ -19,11 +19,9 @@ import net.java.truecommons.services.ServiceLocator;
  * and the decorator service specification class
  * {@link MBeanServerDecorator}.
  *
- * @since  TrueCommons 2.3
  * @author Christian Schlichtherle
  */
-@Immutable
-public final class MBeanServerLocator implements Container<MBeanServer> {
+public final class MBeanServerLocator implements Supplier<MBeanServer> {
 
     /** The singleton instance of this class. */
     public static final MBeanServerLocator SINGLETON = new MBeanServerLocator();
@@ -35,9 +33,7 @@ public final class MBeanServerLocator implements Container<MBeanServer> {
 
     /** A static data utility class used for lazy initialization. */
     private static final class Lazy {
-        static final MBeanServer mbs
-                = new ServiceLocator(MBeanServerLocator.class)
-                .container(MBeanServerProvider.class, MBeanServerDecorator.class)
-                .get();
+        static final MBeanServer mbs =
+                new ServiceLocator().provider(MBeanServerProvider.class, MBeanServerDecorator.class).get();
     }
 }

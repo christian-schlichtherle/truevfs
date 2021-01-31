@@ -4,8 +4,7 @@
  */
 package net.java.truecommons.key.swing.feedback;
 
-import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.annotations.ServiceImplementation;
+import global.namespace.service.wight.annotation.ServiceImplementation;
 import net.java.truecommons.key.swing.spi.InvalidKeyFeedbackDecorator;
 
 /**
@@ -15,17 +14,11 @@ import net.java.truecommons.key.swing.spi.InvalidKeyFeedbackDecorator;
  * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
-@Immutable
-@ServiceImplementation
-public final class TemporarilyDisableDefaultButtonFeedbackDecorator
-extends InvalidKeyFeedbackDecorator {
+@ServiceImplementation(priority = -200)
+public final class TemporarilyDisableDefaultButtonFeedbackDecorator implements InvalidKeyFeedbackDecorator {
 
     @Override
     public Feedback apply(Feedback feedback) {
         return new TemporarilyDisableDefaultButtonFeedback(feedback);
     }
-
-    /** Returns -200. */
-    @Override
-    public int getPriority() { return -200; }
 }

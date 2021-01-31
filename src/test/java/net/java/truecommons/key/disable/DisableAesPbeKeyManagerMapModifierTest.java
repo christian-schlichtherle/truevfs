@@ -4,16 +4,17 @@
  */
 package net.java.truecommons.key.disable;
 
+import global.namespace.service.wight.annotation.ServiceImplementation;
 import net.java.truecommons.key.spec.common.AesPbeParameters;
 import net.java.truecommons.key.spec.spi.KeyManagerMapModifier;
 import net.java.truecommons.key.spec.spi.KeyManagerMapModifierTestSuite;
 
 import java.util.Collections;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 public class DisableAesPbeKeyManagerMapModifierTest
@@ -31,6 +32,6 @@ extends KeyManagerMapModifierTestSuite {
 
     @Override
     public void testPriority() {
-        assertTrue(modifier.getPriority() == Integer.MAX_VALUE);
+        assertEquals(modifier.getClass().getAnnotation(ServiceImplementation.class).priority(), Integer.MAX_VALUE);
     }
 }

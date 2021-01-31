@@ -6,12 +6,12 @@ package net.java.truecommons.key.spec.spi;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.annotations.ServiceImplementation;
-import net.java.truecommons.annotations.ServiceSpecification;
+import global.namespace.service.wight.annotation.ServiceImplementation;
+import global.namespace.service.wight.annotation.ServiceInterface;
 import net.java.truecommons.key.spec.KeyManager;
 import net.java.truecommons.key.spec.sl.KeyManagerMapLocator;
-import net.java.truecommons.services.LocatableFactory;
 
 /**
  * A service for creating maps of classes to nullable key managers.
@@ -24,10 +24,9 @@ import net.java.truecommons.services.LocatableFactory;
  * @author Christian Schlichtherle
  */
 @Immutable
-@ServiceSpecification
-@ServiceImplementation
-public class KeyManagerMapFactory
-extends LocatableFactory<Map<Class<?>, KeyManager<?>>> {
+@ServiceInterface
+@ServiceImplementation(priority = -100)
+public class KeyManagerMapFactory implements Supplier<Map<Class<?>, KeyManager<?>>> {
 
     /**
      * Returns a new empty map for subsequent modification.
@@ -37,17 +36,5 @@ extends LocatableFactory<Map<Class<?>, KeyManager<?>>> {
     @Override
     public Map<Class<?>, KeyManager<?>> get() {
         return new HashMap<>(32);
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * If the {@linkplain #getClass() runtime class} of this object is
-     * {@link KeyManagerMapFactory}, then {@code -100} gets returned.
-     * Otherwise, zero gets returned.
-     */
-    @Override
-    public int getPriority() {
-        return KeyManagerMapFactory.class.equals(getClass()) ? -100 : 0;
     }
 }

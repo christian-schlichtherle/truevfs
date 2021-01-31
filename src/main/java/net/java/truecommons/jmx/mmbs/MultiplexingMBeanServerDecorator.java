@@ -6,7 +6,8 @@ package net.java.truecommons.jmx.mmbs;
 
 import javax.annotation.concurrent.Immutable;
 import javax.management.MBeanServer;
-import net.java.truecommons.annotations.ServiceImplementation;
+
+import global.namespace.service.wight.annotation.ServiceImplementation;
 import net.java.truecommons.jmx.sl.ObjectNameModifierLocator;
 import net.java.truecommons.jmx.spi.MBeanServerDecorator;
 
@@ -14,13 +15,11 @@ import net.java.truecommons.jmx.spi.MBeanServerDecorator;
  * Decorates the given MBean server with a {@link MultiplexingMBeanServer} if
  * and only if this class is <em>not</em> defined by the system class loader.
  *
- * @since  TrueCommons 2.3
  * @author Christian Schlichtherle
  */
 @Immutable
-@ServiceImplementation
-public final class MultiplexingMBeanServerDecorator
-extends MBeanServerDecorator {
+@ServiceImplementation(priority = -100)
+public final class MultiplexingMBeanServerDecorator implements MBeanServerDecorator {
 
     @Override
     public MBeanServer apply(final MBeanServer mbs) {
@@ -33,8 +32,4 @@ extends MBeanServerDecorator {
                 ? new MultiplexingMBeanServer(mbs, ObjectNameModifierLocator.SINGLETON.get())
                 : mbs;
     }
-
-    /** @return -100 */
-    @Override
-    public int getPriority() { return -100; }
 }

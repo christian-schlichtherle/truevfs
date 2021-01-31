@@ -4,7 +4,7 @@
  */
 package net.java.truecommons.key.def;
 
-import net.java.truecommons.annotations.ServiceImplementation;
+import global.namespace.service.wight.annotation.ServiceImplementation;
 import net.java.truecommons.key.spec.KeyManager;
 import net.java.truecommons.key.spec.common.AesPbeParameters;
 import net.java.truecommons.key.spec.spi.KeyManagerMapModifier;
@@ -17,25 +17,18 @@ import java.util.Map;
  * This modifier maps the {@link AesPbeParameters} class to the
  * {@linkplain UnknownKeyManager#SINGLETON unknown key manager} singleton
  * which fails to resolve any keys.
- * Note that the {@link #getPriority} of this modifier is
- * {@link Integer#MIN_VALUE}, so any other modifier on the class path takes
- * precedence.
+ * Note that the {@link ServiceImplementation#priority()} of this modifier is {@link Integer#MIN_VALUE}, so any other
+ * modifier on the class path takes precedence.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @Immutable
-@ServiceImplementation
-public final class DefaultAesPbeKeyManagerMapModifier
-extends KeyManagerMapModifier {
+@ServiceImplementation(priority = Integer.MIN_VALUE)
+public final class DefaultAesPbeKeyManagerMapModifier implements KeyManagerMapModifier {
 
     @Override
     public Map<Class<?>, KeyManager<?>> apply(final Map<Class<?>, KeyManager<?>> map) {
         map.put(AesPbeParameters.class, UnknownKeyManager.SINGLETON);
         return map;
     }
-
-    /** @return {@link Integer#MIN_VALUE} */
-    @Override
-    public int getPriority() { return Integer.MIN_VALUE; }
 }

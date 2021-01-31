@@ -4,26 +4,25 @@
  */
 package net.java.truecommons.key.swing;
 
-import java.awt.GraphicsEnvironment;
-import java.util.Map;
-import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.annotations.ServiceImplementation;
+import global.namespace.service.wight.annotation.ServiceImplementation;
 import net.java.truecommons.key.spec.KeyManager;
 import net.java.truecommons.key.spec.common.AesPbeParameters;
 import net.java.truecommons.key.spec.prompting.PromptingKeyManager;
 import net.java.truecommons.key.spec.spi.KeyManagerMapModifier;
 
+import javax.annotation.concurrent.Immutable;
+import java.awt.*;
+import java.util.Map;
+
 /**
  * A service provider for a Swing prompting key manager for
  * {@link AesPbeParameters}.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @Immutable
-@ServiceImplementation
-public final class SwingAesPbeKeyManagerMapModifier
-extends KeyManagerMapModifier {
+@ServiceImplementation(priority = -200)
+public final class SwingAesPbeKeyManagerMapModifier implements KeyManagerMapModifier {
 
     @Override
     public Map<Class<?>, KeyManager<?>> apply(Map<Class<?>, KeyManager<?>> map) {
@@ -32,8 +31,4 @@ extends KeyManagerMapModifier {
                     new PromptingKeyManager<>(new SwingAesPbeParametersView()));
         return map;
     }
-
-    /** @return -200 */
-    @Override
-    public int getPriority() { return -200; }
 }

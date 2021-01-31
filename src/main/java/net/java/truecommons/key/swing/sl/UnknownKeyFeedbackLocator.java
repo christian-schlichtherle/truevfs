@@ -4,11 +4,12 @@
  */
 package net.java.truecommons.key.swing.sl;
 
+import global.namespace.service.wight.core.ServiceLocator;
 import net.java.truecommons.key.swing.feedback.Feedback;
 import net.java.truecommons.key.swing.spi.FeedbackFactory;
 import net.java.truecommons.key.swing.spi.UnknownKeyFeedbackDecorator;
-import net.java.truecommons.services.Container;
-import net.java.truecommons.services.ServiceLocator;
+
+import java.util.function.Supplier;
 
 /**
  * A container of the singleton visual and/or audible feedback to the user
@@ -19,10 +20,9 @@ import net.java.truecommons.services.ServiceLocator;
  * and the decorator service specification class
  * {@link UnknownKeyFeedbackDecorator}.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
-public final class UnknownKeyFeedbackLocator implements Container<Feedback> {
+public final class UnknownKeyFeedbackLocator implements Supplier<Feedback> {
 
     /** The singleton instance of this class. */
     public static final UnknownKeyFeedbackLocator
@@ -38,8 +38,6 @@ public final class UnknownKeyFeedbackLocator implements Container<Feedback> {
     /** A static data utility class used for lazy initialization. */
     private static final class Lazy {
         static final Feedback feedback =
-                new ServiceLocator(UnknownKeyFeedbackLocator.class)
-                .factory(FeedbackFactory.class, UnknownKeyFeedbackDecorator.class)
-                .get();
+                new ServiceLocator().provider(FeedbackFactory.class, UnknownKeyFeedbackDecorator.class).get();
     }
 }

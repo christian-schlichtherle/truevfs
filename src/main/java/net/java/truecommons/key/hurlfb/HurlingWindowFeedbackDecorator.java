@@ -5,7 +5,7 @@
 package net.java.truecommons.key.hurlfb;
 
 import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.annotations.ServiceImplementation;
+import global.namespace.service.wight.annotation.ServiceImplementation;
 import net.java.truecommons.key.swing.feedback.Feedback;
 import net.java.truecommons.key.swing.spi.InvalidKeyFeedbackDecorator;
 
@@ -13,20 +13,13 @@ import net.java.truecommons.key.swing.spi.InvalidKeyFeedbackDecorator;
  * Decorates any given feedback with a
  * {@link HurlingWindowFeedback}.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
-@Immutable
-@ServiceImplementation
-public final class HurlingWindowFeedbackDecorator
-extends InvalidKeyFeedbackDecorator {
+@ServiceImplementation(priority = -100)
+public final class HurlingWindowFeedbackDecorator implements InvalidKeyFeedbackDecorator {
 
     @Override
     public Feedback apply(Feedback feedback) {
         return new HurlingWindowFeedback(feedback);
     }
-
-    /** Returns -100. */
-    @Override
-    public int getPriority() { return -100; }
 }

@@ -4,7 +4,7 @@
  */
 package net.java.truecommons.key.macosx;
 
-import net.java.truecommons.annotations.ServiceImplementation;
+import global.namespace.service.wight.annotation.ServiceImplementation;
 import net.java.truecommons.key.spec.KeyManager;
 import net.java.truecommons.key.spec.common.AesPbeParameters;
 import net.java.truecommons.key.spec.spi.KeyManagerMapModifier;
@@ -15,17 +15,13 @@ import java.util.Optional;
 import java.util.ServiceConfigurationError;
 
 /**
- * Adds the {@link OsxKeyManager} to the map if and only if this JVM is running
- * on Mac OS X.
+ * Adds the {@link OsxKeyManager} to the map if and only if this JVM is running on Mac OS X.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
-@SuppressWarnings("LoopStatementThatDoesntLoop")
 @Immutable
-@ServiceImplementation
-public final class OsxAesPbeKeyManagerMapModifier
-extends KeyManagerMapModifier {
+@ServiceImplementation(priority = -100)
+public final class OsxAesPbeKeyManagerMapModifier implements KeyManagerMapModifier {
 
     @Override
     @SuppressWarnings("unchecked")
@@ -45,8 +41,4 @@ extends KeyManagerMapModifier {
             return map;
         }
     }
-
-    /** @return -100 */
-    @Override
-    public int getPriority() { return -100; }
 }

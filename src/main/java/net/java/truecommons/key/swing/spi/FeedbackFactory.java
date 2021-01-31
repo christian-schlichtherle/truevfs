@@ -4,12 +4,12 @@
  */
 package net.java.truecommons.key.swing.spi;
 
-import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.annotations.ServiceImplementation;
-import net.java.truecommons.annotations.ServiceSpecification;
+import global.namespace.service.wight.annotation.ServiceImplementation;
+import global.namespace.service.wight.annotation.ServiceInterface;
 import net.java.truecommons.key.swing.feedback.BeepFeedback;
 import net.java.truecommons.key.swing.feedback.Feedback;
-import net.java.truecommons.services.LocatableFactory;
+
+import java.util.function.Supplier;
 
 /**
  * A service for creating visual and/or audible feedback to the user
@@ -19,32 +19,15 @@ import net.java.truecommons.services.LocatableFactory;
  * Instead, you should implement a custom {@link UnknownKeyFeedbackDecorator}
  * or {@link InvalidKeyFeedbackDecorator} and advertise them on the class path.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
-@Immutable
-@ServiceSpecification
-@ServiceImplementation
-public class FeedbackFactory
-extends LocatableFactory<Feedback> {
+@ServiceInterface
+@ServiceImplementation(priority = -100)
+public class FeedbackFactory implements Supplier<Feedback> {
 
     /**
      * Returns a new {@link BeepFeedback}.
-     *
-     * @return A new {@link BeepFeedback}.
      */
     @Override
     public Feedback get() { return new BeepFeedback(); }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * If the {@linkplain #getClass() runtime class} of this object is
-     * {@link FeedbackFactory}, then {@code -100} gets returned.
-     * Otherwise, zero gets returned.
-     */
-    @Override
-    public int getPriority() {
-        return FeedbackFactory.class.equals(getClass()) ? -100 : 0;
-    }
 }

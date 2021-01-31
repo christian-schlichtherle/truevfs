@@ -4,6 +4,8 @@
  */
 package net.java.truecommons.key.spec.spi;
 
+import global.namespace.service.wight.annotation.ServiceImplementation;
+import lombok.val;
 import net.java.truecommons.key.spec.KeyManager;
 import net.java.truecommons.key.spec.sl.KeyManagerMapLocator;
 import org.junit.Before;
@@ -39,17 +41,15 @@ public abstract class KeyManagerMapModifierTestSuite {
 
     @Test
     public void testPriority() {
-        assertTrue(modifier.getPriority() < 0);
+        assertTrue(modifier.getClass().getAnnotation(ServiceImplementation.class).priority() < 0);
     }
 
     @Test
     public void testIsLocatable() {
-        final Map<Class<?>, KeyManager<?>>
-                modified = modifier.apply(new KeyManagerMapFactory().get());
-        final Map<Class<?>, KeyManager<?>>
-                located = KeyManagerMapLocator.SINGLETON.get();
-        for (final Class<?> clazz : modified.keySet())
-            assertThat(located.get(clazz),
-                    instanceOf(modified.get(clazz).getClass()));
+        val modified = modifier.apply(new KeyManagerMapFactory().get());
+        val located = KeyManagerMapLocator.SINGLETON.get();
+        for (Class<?> klass : modified.keySet()) {
+            assertThat(located.get(klass), instanceOf(modified.get(klass).getClass()));
+        }
     }
 }

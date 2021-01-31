@@ -11,7 +11,7 @@ import net.java.truecommons.key.spec.AbstractKeyManagerMap;
 import net.java.truecommons.key.spec.KeyManager;
 import net.java.truecommons.key.spec.spi.KeyManagerMapFactory;
 import net.java.truecommons.key.spec.spi.KeyManagerMapModifier;
-import net.java.truecommons.services.ServiceLocator;
+import global.namespace.service.wight.core.ServiceLocator;
 
 /**
  * A container of the singleton immutable map of all known file system schemes
@@ -43,8 +43,6 @@ public final class KeyManagerMapLocator extends AbstractKeyManagerMap {
     private static final class Lazy {
         static final Map<Class<?>, KeyManager<?>> managers
                 = Collections.unmodifiableMap(
-                    new ServiceLocator(KeyManagerMapLocator.class)
-                    .factory(KeyManagerMapFactory.class, KeyManagerMapModifier.class)
-                    .get());
+                    new ServiceLocator().provider(KeyManagerMapFactory.class, KeyManagerMapModifier.class).get());
     }
 }

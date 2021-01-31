@@ -4,25 +4,23 @@
  */
 package net.java.truecommons.key.console;
 
-import java.util.Map;
-import javax.annotation.concurrent.Immutable;
-import net.java.truecommons.annotations.ServiceImplementation;
+import global.namespace.service.wight.annotation.ServiceImplementation;
 import net.java.truecommons.key.spec.KeyManager;
 import net.java.truecommons.key.spec.common.AesPbeParameters;
 import net.java.truecommons.key.spec.prompting.PromptingKeyManager;
 import net.java.truecommons.key.spec.spi.KeyManagerMapModifier;
 
+import javax.annotation.concurrent.Immutable;
+import java.util.Map;
+
 /**
- * A service provider for a console prompting key manager for
- * {@link AesPbeParameters}.
+ * A service provider for a console prompting key manager for {@link AesPbeParameters}.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
 @Immutable
-@ServiceImplementation
-public final class ConsoleAesPbeKeyManagerMapModifier
-extends KeyManagerMapModifier {
+@ServiceImplementation(priority = -300)
+public final class ConsoleAesPbeKeyManagerMapModifier implements KeyManagerMapModifier {
 
     @Override
     public Map<Class<?>, KeyManager<?>> apply(final Map<Class<?>, KeyManager<?>> map) {
@@ -31,8 +29,4 @@ extends KeyManagerMapModifier {
                     new PromptingKeyManager<>(new ConsoleAesPbeParametersView()));
         return map;
     }
-
-    /** @return -300 */
-    @Override
-    public int getPriority() { return -300; }
 }

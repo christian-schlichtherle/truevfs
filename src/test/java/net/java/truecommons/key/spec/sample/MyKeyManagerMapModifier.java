@@ -4,20 +4,22 @@
  */
 package net.java.truecommons.key.spec.sample;
 
-import java.util.Map;
 import net.java.truecommons.key.spec.KeyManager;
 import net.java.truecommons.key.spec.common.AesPbeParameters;
 import net.java.truecommons.key.spec.prompting.PromptingKeyManager;
 import net.java.truecommons.key.spec.spi.KeyManagerMapModifier;
 
-/** @author Christian Schlichtherle */
+import java.util.Map;
+
+/**
+ * @author Christian Schlichtherle
+ */
 //@ServiceImplementation
-public class MyKeyManagerMapModifier extends KeyManagerMapModifier {
+public class MyKeyManagerMapModifier implements KeyManagerMapModifier {
 
     @Override
     public Map<Class<?>, KeyManager<?>> apply(Map<Class<?>, KeyManager<?>> map) {
-        map.put(AesPbeParameters.class,
-                new PromptingKeyManager<>(new MyPromptingKeyView()));
+        map.put(AesPbeParameters.class, new PromptingKeyManager<>(new MyPromptingKeyView()));
         return map;
     }
 }

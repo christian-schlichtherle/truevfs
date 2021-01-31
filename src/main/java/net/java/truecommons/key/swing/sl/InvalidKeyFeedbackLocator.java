@@ -4,11 +4,12 @@
  */
 package net.java.truecommons.key.swing.sl;
 
+import global.namespace.service.wight.core.ServiceLocator;
 import net.java.truecommons.key.swing.feedback.Feedback;
 import net.java.truecommons.key.swing.spi.FeedbackFactory;
 import net.java.truecommons.key.swing.spi.InvalidKeyFeedbackDecorator;
-import net.java.truecommons.services.Container;
-import net.java.truecommons.services.ServiceLocator;
+
+import java.util.function.Supplier;
 
 /**
  * A container of the singleton visual and/or audible feedback to the user
@@ -19,27 +20,29 @@ import net.java.truecommons.services.ServiceLocator;
  * and the decorator service specification class
  * {@link InvalidKeyFeedbackDecorator}.
  *
- * @since  TrueCommons 2.2
  * @author Christian Schlichtherle
  */
-public final class InvalidKeyFeedbackLocator implements Container<Feedback> {
+public final class InvalidKeyFeedbackLocator implements Supplier<Feedback> {
 
-    /** The singleton instance of this class. */
+    /**
+     * The singleton instance of this class.
+     */
     public static final InvalidKeyFeedbackLocator
             SINGLETON = new InvalidKeyFeedbackLocator();
 
-    private InvalidKeyFeedbackLocator() { }
+    private InvalidKeyFeedbackLocator() {
+    }
 
     @Override
     public Feedback get() {
         return Lazy.feedback;
     }
 
-    /** A static data utility class used for lazy initialization. */
+    /**
+     * A static data utility class used for lazy initialization.
+     */
     private static final class Lazy {
         static final Feedback feedback =
-                new ServiceLocator(InvalidKeyFeedbackLocator.class)
-                .factory(FeedbackFactory.class, InvalidKeyFeedbackDecorator.class)
-                .get();
+                new ServiceLocator().provider(FeedbackFactory.class, InvalidKeyFeedbackDecorator.class).get();
     }
 }

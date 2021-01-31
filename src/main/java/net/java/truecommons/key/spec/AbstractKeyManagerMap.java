@@ -4,13 +4,12 @@
  */
 package net.java.truecommons.key.spec;
 
-import net.java.truecommons.services.Container;
 import net.java.truecommons.shed.UniqueObject;
 
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
+import java.util.function.Supplier;
 
 /**
  * An abstract key manager map.
@@ -20,13 +19,11 @@ import java.util.ServiceConfigurationError;
  * <p>
  * Implementations must be safe for multi-threading.
  *
- * @since TrueCommons 2.2
  * @author Christian Schlichtherle
  */
-@Immutable
 public abstract class AbstractKeyManagerMap
 extends UniqueObject
-implements KeyManagerMap, Container<Map<Class<?>, KeyManager<?>>> {
+implements KeyManagerMap, Supplier<Map<Class<?>, KeyManager<?>>> {
 
     @Override
     @SuppressWarnings("unchecked")

@@ -4,17 +4,16 @@
  */
 package net.java.truevfs.kernel.spec.mock;
 
+import net.java.truecommons.shed.ExtensionSet;
+import net.java.truecommons.shed.HashMaps;
+import net.java.truevfs.kernel.spec.FsDriver;
+import net.java.truevfs.kernel.spec.FsScheme;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
-
-import net.java.truecommons.services.Container;
-import net.java.truecommons.shed.ExtensionSet;
-import net.java.truecommons.shed.HashMaps;
-import net.java.truevfs.kernel.spec.FsDriver;
-import net.java.truevfs.kernel.spec.FsScheme;
 
 /**
  * Creates maps with a mock driver.
