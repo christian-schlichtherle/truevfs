@@ -6,8 +6,8 @@ package global.namespace.truevfs.driver.zip.raes.crypto;
 
 import global.namespace.truevfs.comp.io.AbstractSink;
 import global.namespace.truevfs.comp.io.AbstractSource;
-import global.namespace.truevfs.comp.io.ReadOnlyChannelITSuite;
 import global.namespace.truevfs.comp.io.Streams;
+import global.namespace.truevfs.it.io.ReadOnlyChannelITSuite;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

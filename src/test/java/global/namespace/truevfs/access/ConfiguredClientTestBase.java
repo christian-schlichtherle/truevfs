@@ -23,8 +23,7 @@ import java.util.function.Supplier;
  * @param <D> the type of the archive driver.
  * @author Christian Schlichtherle
  */
-public abstract class ConfiguredClientTestBase<D extends FsArchiveDriver<?>>
-        extends FsArchiveDriverTestBase<D> {
+public abstract class ConfiguredClientTestBase<D extends FsArchiveDriver<?>> extends FsArchiveDriverTestBase<D> {
 
     /**
      * Controls if each test case should use its own file system manager.
