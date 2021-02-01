@@ -13,7 +13,6 @@ import net.java.truecommons.shed.Paths;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import net.java.truevfs.kernel.spec.FsNodePath;
 
-import javax.annotation.CheckForNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
@@ -21,6 +20,7 @@ import java.nio.file.FileSystemException;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.NotDirectoryException;
 import java.util.Arrays;
+import java.util.Optional;
 
 import static net.java.truevfs.kernel.spec.FsAccessOption.CREATE_PARENTS;
 
@@ -33,6 +33,7 @@ import static net.java.truevfs.kernel.spec.FsAccessOption.CREATE_PARENTS;
  *
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 final class TBIO {
 
     /**
@@ -212,7 +213,7 @@ final class TBIO {
                 TConfig.current().getAccessPreferences();
         final InputSocket<?> input = input(preferences, src);
         final OutputSocket<?> output = output(preferences, dst,
-                preserve ? input.target() : null);
+                preserve ? Optional.of(input.target()) : Optional.empty());
         IoSockets.copy(input, output);
     }
 
@@ -281,7 +282,7 @@ final class TBIO {
         return  TConfig
                 .current()
                 .getManager()
-                .controller(detector(file), path.getMountPoint())
+                .controller(detector(file), path.getMountPoint().get())
                 .input(options, path.getNodeName());
     }
 
@@ -297,7 +298,7 @@ final class TBIO {
     static OutputSocket<?> output(
             final BitField<FsAccessOption> options,
             final File file,
-            final @CheckForNull Entry template) {
+            final Optional<? extends Entry> template) {
         if (file instanceof TFile) {
             final TFile tfile = (TFile) file;
             final TFile archive = tfile.getInnerArchive();
@@ -312,7 +313,7 @@ final class TBIO {
         return TConfig
                 .current()
                 .getManager()
-                .controller(detector(file), path.getMountPoint())
+                .controller(detector(file), path.getMountPoint().get())
                 .output(    options.clear(CREATE_PARENTS),
                             path.getNodeName(),
                             template);

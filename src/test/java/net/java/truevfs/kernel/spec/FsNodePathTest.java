@@ -4,6 +4,11 @@
  */
 package net.java.truevfs.kernel.spec;
 
+import lombok.val;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.beans.ExceptionListener;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
@@ -11,18 +16,18 @@ import java.io.*;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Optional;
+
 import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.Assert.fail;
 
 /**
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class FsNodePathTest {
 
     private static final Logger
@@ -37,18 +42,18 @@ public class FsNodePathTest {
             }
         };
 
-        for (final String[] params : new String[][] {
-            { "zip:zip:file:/föö%20bär!/föö%20bär!/föö%20bär", },
-            { "zip:file:/föö%20bär!/föö%20bär", },
-            { "file:/föö%20bär/föö%20bär", },
-            { "zip:file:/foo!/bar", },
-            { "file:/foo/bar", },
-            { "file:/foo/bar", },
-            { "föö%20bär", },
-            { "föö/bär", },
-            { "föö", },
-            { "föö?bär", },
-            { "", },
+        for (final String[] params : new String[][]{
+                {"zip:zip:file:/föö%20bär!/föö%20bär!/föö%20bär",},
+                {"zip:file:/föö%20bär!/föö%20bär",},
+                {"file:/föö%20bär/föö%20bär",},
+                {"zip:file:/foo!/bar",},
+                {"file:/foo/bar",},
+                {"file:/foo/bar",},
+                {"föö%20bär",},
+                {"föö/bär",},
+                {"föö",},
+                {"föö?bär",},
+                {"",},
         }) {
             final FsNodePath original = FsNodePath.create(URI.create(params[0]));
             assertThat(original.toString(), equalTo(params[0]));
@@ -134,85 +139,85 @@ public class FsNodePathTest {
         }
 
         try {
-            new FsNodePath((FsMountPoint) null, null);
+            new FsNodePath((Optional<FsMountPoint>) null, null);
             fail();
         } catch (NullPointerException expected) {
         }
 
-        for (final String param : new String[] {
-            "/../foo#boo",
-            "/../foo#",
-            "/../foo",
-            "/./foo",
-            "//foo",
-            "/foo",
-            "/foo/bar",
-            "/foo/bar/",
-            "/",
-            "foo#fragmentDefined",
-            "foo/",
-            "foo//",
-            "foo/.",
-            "foo/./",
-            "foo/..",
-            "foo/../",
-            "foo:/bar/.",
-            "foo:/bar/..",
-            "foo:bar",
-            "foo:bar:",
-            "foo:bar:/",
-            "foo:bar:/baz",
-            "foo:bar:/baz!",
-            "foo:bar:/baz/",
-            "foo:bar:/baz!//",
-            "foo:bar:/baz!/.",
-            "foo:bar:/baz!/./",
-            "foo:bar:/baz!/..",
-            "foo:bar:/baz!/../",
-            "foo:bar:/baz!/bang/.",
-            "foo:bar:/baz!/bang/./",
-            "foo:bar:/baz!/bang/..",
-            "foo:bar:/baz!/bang/../",
-            "foo:bar:baz:/bang",
-            "foo:bar:baz:/bang!",
-            "foo:bar:baz:/bang/",
-            "foo:bar:baz:/bang!/",
-            "foo:bar:baz:/bang!/boom",
-            "foo:bar:/baz/.!/",
-            "foo:bar:/baz/./!/",
-            "foo:bar:/baz/..!/",
-            "foo:bar:/baz/../!/",
+        for (final String param : new String[]{
+                "/../foo#boo",
+                "/../foo#",
+                "/../foo",
+                "/./foo",
+                "//foo",
+                "/foo",
+                "/foo/bar",
+                "/foo/bar/",
+                "/",
+                "foo#fragmentDefined",
+                "foo/",
+                "foo//",
+                "foo/.",
+                "foo/./",
+                "foo/..",
+                "foo/../",
+                "foo:/bar/.",
+                "foo:/bar/..",
+                "foo:bar",
+                "foo:bar:",
+                "foo:bar:/",
+                "foo:bar:/baz",
+                "foo:bar:/baz!",
+                "foo:bar:/baz/",
+                "foo:bar:/baz!//",
+                "foo:bar:/baz!/.",
+                "foo:bar:/baz!/./",
+                "foo:bar:/baz!/..",
+                "foo:bar:/baz!/../",
+                "foo:bar:/baz!/bang/.",
+                "foo:bar:/baz!/bang/./",
+                "foo:bar:/baz!/bang/..",
+                "foo:bar:/baz!/bang/../",
+                "foo:bar:baz:/bang",
+                "foo:bar:baz:/bang!",
+                "foo:bar:baz:/bang/",
+                "foo:bar:baz:/bang!/",
+                "foo:bar:baz:/bang!/boom",
+                "foo:bar:/baz/.!/",
+                "foo:bar:/baz/./!/",
+                "foo:bar:/baz/..!/",
+                "foo:bar:/baz/../!/",
 
-            "foo:bar:/baz/../!/bang/",
-            "foo:bar:/baz/..!/bang/",
-            "foo:bar:/baz/./!/bang/",
-            "foo:bar:/baz/.!/bang/",
-            "foo:bar:/../baz/!/bang/",
-            "foo:bar:/./baz/!/bang/",
-            "foo:bar://baz/!/bang/", // baz is authority!
-            "foo:bar://baz!/bang/", // baz is authority!
+                "foo:bar:/baz/../!/bang/",
+                "foo:bar:/baz/..!/bang/",
+                "foo:bar:/baz/./!/bang/",
+                "foo:bar:/baz/.!/bang/",
+                "foo:bar:/../baz/!/bang/",
+                "foo:bar:/./baz/!/bang/",
+                "foo:bar://baz/!/bang/", // baz is authority!
+                "foo:bar://baz!/bang/", // baz is authority!
 
-            "foo:bar:/!/bang/",
+                "foo:bar:/!/bang/",
 
-            "foo:bar:/baz/../!/bang",
-            "foo:bar:/baz/..!/bang",
-            "foo:bar:/baz/./!/bang",
-            "foo:bar:/baz/.!/bang",
-            "foo:bar:/../baz/!/bang",
-            "foo:bar:/./baz/!/bang",
-            "foo:bar://baz/!/bang", // baz is authority!
-            "foo:bar://baz!/bang", // baz is authority!
+                "foo:bar:/baz/../!/bang",
+                "foo:bar:/baz/..!/bang",
+                "foo:bar:/baz/./!/bang",
+                "foo:bar:/baz/.!/bang",
+                "foo:bar:/../baz/!/bang",
+                "foo:bar:/./baz/!/bang",
+                "foo:bar://baz/!/bang", // baz is authority!
+                "foo:bar://baz!/bang", // baz is authority!
 
-            "foo:bar:/!/bang",
+                "foo:bar:/!/bang",
 
-            "foo:bar:/baz/!/",
-            "foo:bar:/baz/?bang!/?plonk",
-            "foo:bar:/baz//!/",
-            "foo:bar:/baz/./!/",
-            "foo:bar:/baz/..!/",
-            "foo:bar:/baz/../!/",
+                "foo:bar:/baz/!/",
+                "foo:bar:/baz/?bang!/?plonk",
+                "foo:bar:/baz//!/",
+                "foo:bar:/baz/./!/",
+                "foo:bar:/baz/..!/",
+                "foo:bar:/baz/../!/",
 
-            "//authority/defined",
+                "//authority/defined",
         }) {
             final URI uri = URI.create(param);
 
@@ -233,76 +238,78 @@ public class FsNodePathTest {
     @Test
     @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithValidUri() {
-        for (final String[] params : new String[][] {
-            //{ $path, $mountPoint, $nodeName },
-            { "foo:bar:baz:/bä%20ng!/bö%20öm!/plö%20nk", "foo:bar:baz:/bä%20ng!/bö%20öm!/", "plö%20nk" },
-            { "foo:bar:baz:/bäng!/bööm!/plönk", "foo:bar:baz:/bäng!/bööm!/", "plönk" },
-            { "foo:bar:baz:/bang!/boom!/plonk", "foo:bar:baz:/bang!/boom!/", "plonk" },
-            { "foo:bar:baz:/bang!/boom!/", "foo:bar:baz:/bang!/boom!/", "" },
+        for (final String[] params : new String[][]{
+                //{ $path, $mountPoint, $nodeName },
+                {"foo:bar:baz:/bä%20ng!/bö%20öm!/plö%20nk", "foo:bar:baz:/bä%20ng!/bö%20öm!/", "plö%20nk"},
+                {"foo:bar:baz:/bäng!/bööm!/plönk", "foo:bar:baz:/bäng!/bööm!/", "plönk"},
+                {"foo:bar:baz:/bang!/boom!/plonk", "foo:bar:baz:/bang!/boom!/", "plonk"},
+                {"foo:bar:baz:/bang!/boom!/", "foo:bar:baz:/bang!/boom!/", ""},
 
-            { "foo:bar:/baz!/bang/../", "foo:bar:/baz!/", "" },
-            { "foo:bar:/baz!/bang/..", "foo:bar:/baz!/", "" },
-            //{ "foo:bar:/baz!/bang/./", "foo:bar:/baz!/", "bang/" },
-            //{ "foo:bar:/baz!/bang/.", "foo:bar:/baz!/", "bang/" },
+                {"foo:bar:/baz!/bang/../", "foo:bar:/baz!/", ""},
+                {"foo:bar:/baz!/bang/..", "foo:bar:/baz!/", ""},
+                //{ "foo:bar:/baz!/bang/./", "foo:bar:/baz!/", "bang/" },
+                //{ "foo:bar:/baz!/bang/.", "foo:bar:/baz!/", "bang/" },
 
-            //{ "foo:bar:/baz!/bang/", "foo:bar:/baz!/", "bang/" },
+                //{ "foo:bar:/baz!/bang/", "foo:bar:/baz!/", "bang/" },
 
-            { "foo:bar:/baz!/bang", "foo:bar:/baz!/", "bang" },
+                {"foo:bar:/baz!/bang", "foo:bar:/baz!/", "bang"},
 
-            { "foo:bar:/baz!/./", "foo:bar:/baz!/", "" },
-            { "foo:bar:/baz!/.", "foo:bar:/baz!/", "" },
-            { "foo:bar:/baz!/", "foo:bar:/baz!/", "" },
-            { "foo:bar:/baz?bang!/?plonk", "foo:bar:/baz?bang!/", "?plonk" },
+                {"foo:bar:/baz!/./", "foo:bar:/baz!/", ""},
+                {"foo:bar:/baz!/.", "foo:bar:/baz!/", ""},
+                {"foo:bar:/baz!/", "foo:bar:/baz!/", ""},
+                {"foo:bar:/baz?bang!/?plonk", "foo:bar:/baz?bang!/", "?plonk"},
 
-            //{ "foo:bar:/baz!/bang//", "foo:bar:/baz!/", "bang/" },
-            //{ "foo:bar:/baz!/bang/.", "foo:bar:/baz!/", "bang/" },
-            //{ "foo:bar:/baz!/bang/./", "foo:bar:/baz!/", "bang/" },
-            { "foo:bar:/baz!/bang/..", "foo:bar:/baz!/", "" },
-            { "foo:bar:/baz!/bang/../", "foo:bar:/baz!/", "" },
+                //{ "foo:bar:/baz!/bang//", "foo:bar:/baz!/", "bang/" },
+                //{ "foo:bar:/baz!/bang/.", "foo:bar:/baz!/", "bang/" },
+                //{ "foo:bar:/baz!/bang/./", "foo:bar:/baz!/", "bang/" },
+                {"foo:bar:/baz!/bang/..", "foo:bar:/baz!/", ""},
+                {"foo:bar:/baz!/bang/../", "foo:bar:/baz!/", ""},
 
-            { "", null, "", },
-            { "foo", null, "foo" },
-            //{ "foo/", null, "foo/" },
-            //{ "foo//", null, "foo/" },
-            //{ "foo/.", null, "foo/" },
-            //{ "foo/./", null, "foo/" },
-            { "foo/..", null, "" },
-            { "foo/../", null, "" },
-            { "foo/bar", null, "foo/bar" },
-            //{ "foo/bar/", null, "foo/bar/" },
-            { "foo:/", "foo:/", "" },
-            { "foo:/bar", "foo:/", "bar" },
-            { "foo:/bar/", "foo:/", "bar" },
-            { "foo:/bar//", "foo:/", "bar" },
-            { "foo:/bar/.", "foo:/", "bar" },
-            { "foo:/bar/./", "foo:/", "bar" },
-            { "foo:/bar/..", "foo:/", "" },
-            { "foo:/bar/../", "foo:/", "" },
-            { "foo:/bar/baz", "foo:/bar/", "baz" },
-            { "foo:/bar/baz?bang", "foo:/bar/", "baz?bang" },
-            { "foo:/bar/baz/", "foo:/bar/", "baz" },
-            { "foo:/bar/baz/?bang", "foo:/bar/", "baz?bang" },
+                {"", null, "",},
+                {"foo", null, "foo"},
+                //{ "foo/", null, "foo/" },
+                //{ "foo//", null, "foo/" },
+                //{ "foo/.", null, "foo/" },
+                //{ "foo/./", null, "foo/" },
+                {"foo/..", null, ""},
+                {"foo/../", null, ""},
+                {"foo/bar", null, "foo/bar"},
+                //{ "foo/bar/", null, "foo/bar/" },
+                {"foo:/", "foo:/", ""},
+                {"foo:/bar", "foo:/", "bar"},
+                {"foo:/bar/", "foo:/", "bar"},
+                {"foo:/bar//", "foo:/", "bar"},
+                {"foo:/bar/.", "foo:/", "bar"},
+                {"foo:/bar/./", "foo:/", "bar"},
+                {"foo:/bar/..", "foo:/", ""},
+                {"foo:/bar/../", "foo:/", ""},
+                {"foo:/bar/baz", "foo:/bar/", "baz"},
+                {"foo:/bar/baz?bang", "foo:/bar/", "baz?bang"},
+                {"foo:/bar/baz/", "foo:/bar/", "baz"},
+                {"foo:/bar/baz/?bang", "foo:/bar/", "baz?bang"},
 
-            { "file:////host/share/file", "file://host/share/", "file" },
-            { "file://host/share/file", "file://host/share/", "file" },
+                {"file:////host/share/file", "file://host/share/", "file"},
+                {"file://host/share/file", "file://host/share/", "file"},
 
-            { "file:///foo/c%3A//", "file:/foo/", "c%3A" },
-            { "file:/foo/c%3A//", "file:/foo/", "c%3A" },
-            //{ "file:////c://", "file:/c:/", "" },
-            { "file:///c://", "file:/c:/", "" },
-            { "file:/c://", "file:/c:/", "" },
-            { "file:/c%3A", "file:/", "c%3A" },
-            { "föö/", null, "föö" },
-            { "/föö", null, "föö" },
-            //{ "//föö", null, "föö" },
-            { "///föö", null, "föö" },
-            { "////föö", null, "föö" },
-            { "/föö/", null, "föö" },
-            { "/C%3A/", null, "C%3A" },
-            { "C%3A/", null, "C%3A" },
+                {"file:///foo/c%3A//", "file:/foo/", "c%3A"},
+                {"file:/foo/c%3A//", "file:/foo/", "c%3A"},
+                //{ "file:////c://", "file:/c:/", "" },
+                {"file:///c://", "file:/c:/", ""},
+                {"file:/c://", "file:/c:/", ""},
+                {"file:/c%3A", "file:/", "c%3A"},
+                {"föö/", null, "föö"},
+                {"/föö", null, "föö"},
+                //{ "//föö", null, "föö" },
+                {"///föö", null, "föö"},
+                {"////föö", null, "föö"},
+                {"/föö/", null, "föö"},
+                {"/C%3A/", null, "C%3A"},
+                {"C%3A/", null, "C%3A"},
         }) {
             FsNodePath path = FsNodePath.create(URI.create(params[0]), CANONICALIZE);
-            final FsMountPoint mountPoint = null == params[1] ? null : FsMountPoint.create(URI.create(params[1]));
+            val mountPoint = null == params[1]
+                    ? Optional.<FsMountPoint>empty()
+                    : Optional.of(FsMountPoint.create(URI.create(params[1])));
             final FsNodeName nodeName = FsNodeName.create(URI.create(params[2]));
             assertPath(path, mountPoint, nodeName);
             path = new FsNodePath(mountPoint, nodeName);
@@ -311,12 +318,9 @@ public class FsNodePathTest {
     }
 
     private void assertPath(final FsNodePath path,
-                            final FsMountPoint mountPoint,
+                            final Optional<FsMountPoint> mountPoint,
                             final FsNodeName nodeName) {
-        if (null != mountPoint)
-            assertThat(path.getMountPoint(), equalTo(mountPoint));
-        else
-            assertThat(path.getMountPoint(), nullValue());
+        assertThat(path.getMountPoint(), equalTo(mountPoint));
         assertThat(path.getNodeName(), equalTo(nodeName));
         assertThat(path.toString(), equalTo(path.getUri().toString()));
         assertThat(FsNodePath.create(path.getUri()), equalTo(path));
@@ -325,40 +329,40 @@ public class FsNodePathTest {
 
     @Test
     public void testSpaces() {
-        for (final String[] params : new String[][] {
-            { "foo:bar:baz:/%20!/%20/%20!/%20/%20", " ", " / ", " / ", },
-            { "foo:bar:baz:/%20a%20!/%20b%20!/%20c%20", " a ", " b ", " c ", },
+        for (final String[] params : new String[][]{
+                {"foo:bar:baz:/%20!/%20/%20!/%20/%20", " ", " / ", " / ",},
+                {"foo:bar:baz:/%20a%20!/%20b%20!/%20c%20", " a ", " b ", " c ",},
         }) {
-            FsNodePath path = FsNodePath.create(URI.create(params[0]));
+            Optional<FsNodePath> path = Optional.of(FsNodePath.create(URI.create(params[0])));
             for (int i = params.length; 0 < --i; ) {
-                assertThat(path.getNodeName().getPath(), equalTo(params[i]));
-                path = path.getMountPoint().getPath();
+                assertThat(path.get().getNodeName().getPath(), equalTo(params[i]));
+                path = path.get().getMountPoint().get().getPath();
             }
         }
     }
 
     @Test
     public void testToHierarchicalUri() {
-        for (final String[] params : new String[][] {
-            { "foo:bar:baz:/x/bö%20m?plö%20k!/bä%20g?zö%20k!/", "baz:/x/bö%20m/bä%20g?zö%20k" },
-            { "bar:baz:/x/bö%20m?plö%20k!/bä%20g?zö%20k", "baz:/x/bö%20m/bä%20g?zö%20k" },
-            { "foo:bar:baz:/x/bööm?plönk!/bäng?zönk!/", "baz:/x/bööm/bäng?zönk" },
-            { "bar:baz:/x/bööm?plönk!/bäng?zönk", "baz:/x/bööm/bäng?zönk" },
-            { "foo:bar:baz:/boom?plonk!/bang?zonk!/", "baz:/boom/bang?zonk" },
-            { "bar:baz:/boom?plonk!/bang?zonk", "baz:/boom/bang?zonk" },
-            { "bar:baz:/boom?plonk!/?zonk", "baz:/boom/?zonk" },
-            { "bar:baz:/boom?plonk!/bang", "baz:/boom/bang" },
-            { "bar:baz:/boom?plonk!/", "baz:/boom?plonk" },
-            { "foo:bar:baz:/boom!/bang!/", "baz:/boom/bang" },
-            { "bar:baz:/boom!/bang", "baz:/boom/bang" },
-            { "foo:bar:/baz?boom!/", "bar:/baz?boom" },
-            { "bar:/baz?boom", "bar:/baz?boom" },
-            { "foo:bar:/baz!/", "bar:/baz" },
-            { "bar:/baz", "bar:/baz" },
-            { "foo:/bar/?boom", "foo:/bar/?boom" },
-            { "bar?boom", "bar?boom" },
-            { "foo:/bar/", "foo:/bar/" },
-            { "bar", "bar" },
+        for (final String[] params : new String[][]{
+                {"foo:bar:baz:/x/bö%20m?plö%20k!/bä%20g?zö%20k!/", "baz:/x/bö%20m/bä%20g?zö%20k"},
+                {"bar:baz:/x/bö%20m?plö%20k!/bä%20g?zö%20k", "baz:/x/bö%20m/bä%20g?zö%20k"},
+                {"foo:bar:baz:/x/bööm?plönk!/bäng?zönk!/", "baz:/x/bööm/bäng?zönk"},
+                {"bar:baz:/x/bööm?plönk!/bäng?zönk", "baz:/x/bööm/bäng?zönk"},
+                {"foo:bar:baz:/boom?plonk!/bang?zonk!/", "baz:/boom/bang?zonk"},
+                {"bar:baz:/boom?plonk!/bang?zonk", "baz:/boom/bang?zonk"},
+                {"bar:baz:/boom?plonk!/?zonk", "baz:/boom/?zonk"},
+                {"bar:baz:/boom?plonk!/bang", "baz:/boom/bang"},
+                {"bar:baz:/boom?plonk!/", "baz:/boom?plonk"},
+                {"foo:bar:baz:/boom!/bang!/", "baz:/boom/bang"},
+                {"bar:baz:/boom!/bang", "baz:/boom/bang"},
+                {"foo:bar:/baz?boom!/", "bar:/baz?boom"},
+                {"bar:/baz?boom", "bar:/baz?boom"},
+                {"foo:bar:/baz!/", "bar:/baz"},
+                {"bar:/baz", "bar:/baz"},
+                {"foo:/bar/?boom", "foo:/bar/?boom"},
+                {"bar?boom", "bar?boom"},
+                {"foo:/bar/", "foo:/bar/"},
+                {"bar", "bar"},
         }) {
             final FsNodePath path = FsNodePath.create(URI.create(params[0]));
             final URI hierarchical = path.toHierarchicalUri();

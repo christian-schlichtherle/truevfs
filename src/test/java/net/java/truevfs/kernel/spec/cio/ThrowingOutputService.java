@@ -25,8 +25,7 @@ extends DecoratingOutputService<E> {
     private final FsTestConfig config;
     private volatile @CheckForNull FsThrowManager control;
 
-    public ThrowingOutputService(
-            final OutputService<E> service) {
+    public ThrowingOutputService(OutputService<E> service) {
         this(service, null);
     }
 

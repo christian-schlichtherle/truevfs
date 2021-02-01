@@ -139,7 +139,7 @@ abstract class LockController<E extends FsArchiveEntry> implements DelegatingArc
     }
 
     @Override
-    public OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<Entry> template) {
+    public OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<? extends Entry> template) {
         return new AbstractOutputSocket<Entry>() {
 
             final OutputSocket<? extends Entry> socket = getController().output(options, name, template);
@@ -180,7 +180,7 @@ abstract class LockController<E extends FsArchiveEntry> implements DelegatingArc
     }
 
     @Override
-    public void make(BitField<FsAccessOption> options, FsNodeName name, Entry.Type type, Optional<Entry> template) throws IOException {
+    public void make(BitField<FsAccessOption> options, FsNodeName name, Entry.Type type, Optional<? extends Entry> template) throws IOException {
         timedLocked.using(writeLock()).call(new Op<Void, IOException>() {
 
             @Override

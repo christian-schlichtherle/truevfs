@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
 public interface JmxModelMXBean {
     boolean          isMounted();
     String           getMountPoint();
-    String           getMountPointOfParent();
+    @Nullable String           getMountPointOfParent();
     long             getSizeOfData();
     long             getSizeOfStorage();
     @Nullable String getTimeCreatedDate();

@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.access;
 
+import lombok.val;
 import net.java.truecommons.shed.PathSplitter;
 import net.java.truecommons.shed.QuotedUriSyntaxException;
 import net.java.truecommons.shed.UriBuilder;
@@ -66,11 +67,11 @@ final class TUriResolver {
      * No {@code ".."} segments may remain after resolving.
      * A query component is copied to the result.
      *
-     * @param  base the base file system node path for resolving.
-     * @param  uri the URI to resolve for prospective archive files.
+     * @param base the base file system node path for resolving.
+     * @param uri  the URI to resolve for prospective archive files.
      * @return the file system node path combined from the given {@code base}
-     *         and {@code uri}, possibly decorated as an opaque URI to address
-     *         prospective archive files.
+     * and {@code uri}, possibly decorated as an opaque URI to address
+     * prospective archive files.
      * @throws IllegalArgumentException if any precondition is violated.
      */
     FsNodePath resolve(FsNodePath base, URI uri) {
@@ -78,10 +79,10 @@ final class TUriResolver {
             uri = fix(check(uri).normalize());
             if (uri.isAbsolute()) return new FsNodePath(uri, CANONICALIZE);
             String path = uri.getPath();
-            for (   int max;
-                    1 < (max = Math.min(path.length(), DOT_DOT_SEPARATOR.length())) &&
-                    DOT_DOT_SEPARATOR.startsWith(path.substring(0, max));
-                    ) {
+            for (int max;
+                 1 < (max = Math.min(path.length(), DOT_DOT_SEPARATOR.length())) &&
+                         DOT_DOT_SEPARATOR.startsWith(path.substring(0, max));
+            ) {
                 base = parent(base);
                 uri = new UriBuilder()
                         .uri(uri)
@@ -100,10 +101,10 @@ final class TUriResolver {
                         : baseUri.getPath() + path.substring(0, ppl);
                 root = new FsNodePath(
                         new UriBuilder()
-                            .scheme(baseUri.getScheme())
-                            .authority(authority)
-                            .path(rootPath)
-                            .toUriChecked());
+                                .scheme(baseUri.getScheme())
+                                .authority(authority)
+                                .path(rootPath)
+                                .toUriChecked());
                 path = path.substring(ppl);
             } else {
                 root = base;
@@ -139,11 +140,11 @@ final class TUriResolver {
             final String npup = npu.getPath();
             if (!npup.endsWith(SEPARATOR))
                 npu = new UriBuilder().uri(npu).path(npup + SEPARATOR_CHAR).toUriChecked();
-            rnp = new FsNodePath(new FsMountPoint(npu), nn);
+            rnp = new FsNodePath(Optional.of(new FsMountPoint(npu)), nn);
         }
         final Optional<FsScheme> s = detector.scheme(nn.toString());
         if (s.isPresent()) {
-            rnp = new FsNodePath(new FsMountPoint(s.get(), rnp), ROOT);
+            rnp = new FsNodePath(Optional.of(new FsMountPoint(s.get(), rnp)), ROOT);
         }
         return rnp;
     }
@@ -151,24 +152,30 @@ final class TUriResolver {
     /**
      * Returns the nullable parent of the given file system node path.
      *
-     * @param  path a file system node path.
+     * @param path a file system node path.
      * @return The parent file system node path or null if {@code path} does
-     *         not name a parent.
+     * not name a parent.
      */
-    static @Nullable FsNodePath parent(FsNodePath path) throws URISyntaxException {
-        FsMountPoint mp = path.getMountPoint();
-        FsNodeName  en = path.getNodeName();
+    static @Nullable
+    FsNodePath parent(FsNodePath path) throws URISyntaxException {
+        val mp = path.getMountPoint();
+        FsNodeName en = path.getNodeName();
         if (en.isRoot()) {
-            if (null == mp) return null;
-            path = mp.getPath();
-            if (null != path) return parent(path);
-            URI mpu = mp.getUri();
-            URI pu = mpu.resolve(DOT_DOT_URI);
-            if (mpu.getRawPath().length() <= pu.getRawPath().length())
+            if (!mp.isPresent()) {
                 return null;
+            }
+            path = mp.get().getPath().orElse(null);
+            if (null != path) {
+                return parent(path);
+            }
+            val mpu = mp.get().getUri();
+            val pu = mpu.resolve(DOT_DOT_URI);
+            if (mpu.getRawPath().length() <= pu.getRawPath().length()) {
+                return null;
+            }
             return new FsNodePath(pu);
         } else {
-            URI pu = en.getUri().resolve(DOT_URI);
+            val pu = en.getUri().resolve(DOT_URI);
             en = new FsNodeName(pu, CANONICALIZE);
             return new FsNodePath(mp, en);
         }

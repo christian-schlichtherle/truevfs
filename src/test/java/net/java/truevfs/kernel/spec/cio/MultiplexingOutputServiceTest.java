@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Optional;
 
 import static net.java.truecommons.cio.Entry.Type.FILE;
 import static org.hamcrest.CoreMatchers.*;
@@ -34,7 +35,7 @@ public class MultiplexingOutputServiceTest {
             final OutputSocket<MockArchiveDriverEntry> socket = service
                     .output(new MockArchiveDriverEntry(name, FILE));
             assertThat(service.entry(name), nullValue());
-            socket.stream(null);
+            socket.stream(Optional.empty());
             assertThat(service.entry(name), notNullValue());
             assertThat(service.isBusy(), is(true));
         }

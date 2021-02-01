@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.comp.zipdriver;
 
+import lombok.val;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.key.spec.KeyManager;
@@ -12,10 +13,10 @@ import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.ControlFlowException;
 import net.java.truevfs.kernel.spec.*;
 
-import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Objects;
+import java.util.Optional;
 
 import static net.java.truecommons.cio.Entry.Type.SPECIAL;
 import static net.java.truevfs.kernel.spec.FsNodeName.ROOT;
@@ -38,8 +39,8 @@ public abstract class AbstractKeyController extends FsDecoratingController {
      * Constructs a new key manager controller.
      *
      * @param controller the non-{@code null} file system controller to
-     *        decorate.
-     * @param driver the ZIP driver.
+     *                   decorate.
+     * @param driver     the ZIP driver.
      */
     protected AbstractKeyController(
             final FsController controller,
@@ -52,71 +53,79 @@ public abstract class AbstractKeyController extends FsDecoratingController {
 
     protected abstract Class<? extends IOException> getKeyExceptionType();
 
-    private @CheckForNull IOException findKeyException(Throwable ex) {
-        final Class<? extends IOException> clazz = getKeyExceptionType();
+    private Optional<? extends IOException> findKeyException(Throwable ex) {
+        val clazz = getKeyExceptionType();
         do {
-            if (clazz.isInstance(ex))
-                return clazz.cast(ex);
+            if (clazz.isInstance(ex)) {
+                return Optional.of(clazz.cast(ex));
+            }
         } while (null != (ex = ex.getCause()));
-        return null;
+        return Optional.empty();
     }
 
     @Override
-    public final FsNode node(
+    public final Optional<? extends FsNode> node(
             final BitField<FsAccessOption> options,
-            final FsNodeName name)
-    throws IOException {
+            final FsNodeName name
+    ) throws IOException {
         try {
             return controller.node(options, name);
         } catch (final ControlFlowException ex) {
-            if (!name.isRoot() || null == findKeyException(ex))
+            if (!name.isRoot() || !findKeyException(ex).isPresent()) {
                 throw ex;
-            Entry node = getParent().node(
-                    options, getModel()
-                                 .getMountPoint()
-                                 .getPath()
-                                 .resolve(name)
-                                 .getNodeName());
-            // We're not holding any locks, so it's possible that someone else
-            // has concurrently modified the parent file system.
-            if (null == node)
-                return null;
-            // The entry is inaccessible for some reason.
-            // This may be because the cipher key is not available.
-            // Now mask the entry as a special file.
-            if (node instanceof FsCovariantNode<?>)
-                node = ((FsCovariantNode<?>) node).getEntry();
-            final FsCovariantNode<FsArchiveEntry>
-                    special = new FsCovariantNode<>(ROOT_PATH);
-            special.put(SPECIAL, driver.newEntry(ROOT_PATH, SPECIAL, node));
-            return special;
+            }
+            val op = getParent();
+            assert op.isPresent();
+            val p = op.get();
+            val ompp = getMountPoint().getPath();
+            assert ompp.isPresent();
+            val mpp = ompp.get();
+            val on = p.node(options, mpp.resolve(name).getNodeName());
+            if (on.isPresent()) {
+                Entry n = on.get();
+                // The entry is inaccessible for some reason.
+                // This may be because the cipher key is not available.
+                // Now mask the entry as a special file:
+                if (n instanceof FsCovariantNode<?>) {
+                    n = ((FsCovariantNode<?>) n).getEntry();
+                }
+                final FsCovariantNode<FsArchiveEntry> special = new FsCovariantNode<>(ROOT_PATH);
+                special.put(SPECIAL, driver.newEntry(ROOT_PATH, SPECIAL, n));
+                return Optional.of(special);
+            }
+            // We're not holding any locks, so it's possible that someone else has concurrently modified the parent file
+            // system.
+            return Optional.empty();
         }
     }
 
     @Override
     public void checkAccess(
-            final BitField<FsAccessOption> options, final FsNodeName name, final BitField<Access> types)
-    throws IOException {
+            final BitField<FsAccessOption> options,
+            final FsNodeName name,
+            final BitField<Access> types
+    ) throws IOException {
         try {
             controller.checkAccess(options, name, types);
         } catch (final ControlFlowException ex) {
-            if (!name.isRoot() || null == findKeyException(ex))
+            if (!name.isRoot() || !findKeyException(ex).isPresent()) {
                 throw ex;
-            getParent().checkAccess(
-                    options, getModel()
-                                 .getMountPoint()
-                                 .getPath()
-                                 .resolve(name)
-                                 .getNodeName(),
-                    types);
+            }
+            val op = getParent();
+            assert op.isPresent();
+            val p = op.get();
+            val ompp = getMountPoint().getPath();
+            assert ompp.isPresent();
+            val mpp = ompp.get();
+            p.checkAccess(options, mpp.resolve(name).getNodeName(), types);
         }
     }
 
     @Override
     public final void unlink(
             final BitField<FsAccessOption> options,
-            final FsNodeName name)
-    throws IOException {
+            final FsNodeName name
+    ) throws IOException {
         try {
             controller.unlink(options, name);
         } catch (final ControlFlowException ex) {
@@ -126,10 +135,12 @@ public abstract class AbstractKeyController extends FsDecoratingController {
             // file system.
             // This prevents the application from inadvertently deleting an
             // encrypted ZIP file just because the user cancelled key prompting.
-            final IOException keyEx = findKeyException(ex);
-            if (null == keyEx)
+            final Optional<? extends IOException> keyEx = findKeyException(ex);
+            if (keyEx.isPresent()) {
+                throw keyEx.get();
+            } else {
                 throw ex;
-            throw keyEx;
+            }
         }
         final FsModel model = getModel();
         final URI mpu = driver.mountPointUri(model);
@@ -150,7 +161,9 @@ public abstract class AbstractKeyController extends FsDecoratingController {
         builder.check();
     }
 
-    private KeyManager<?> keyManager() { return keyManagerMap().manager(getKeyType()); }
+    private KeyManager<?> keyManager() {
+        return keyManagerMap().manager(getKeyType());
+    }
 
     private KeyManagerMap keyManagerMap() {
         final KeyManagerMap keyManagerMap = this.keyManagerMap;

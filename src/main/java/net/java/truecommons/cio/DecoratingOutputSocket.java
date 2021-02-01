@@ -4,7 +4,6 @@
  */
 package net.java.truecommons.cio;
 
-import java.io.IOException;
 import java.util.Objects;
 
 /**
@@ -28,7 +27,7 @@ public abstract class DecoratingOutputSocket<E extends Entry> extends Delegating
     }
 
     @Override
-    protected OutputSocket<? extends E> socket() throws IOException {
+    protected OutputSocket<? extends E> socket() {
         return socket;
     }
 

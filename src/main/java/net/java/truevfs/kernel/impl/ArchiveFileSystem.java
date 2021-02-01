@@ -43,6 +43,7 @@ import static net.java.truevfs.kernel.spec.FsNodeName.*;
  * @param <E> the type of the archive entries.
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 class ArchiveFileSystem<E extends FsArchiveEntry>
         extends AbstractCollection<FsCovariantNode<E>>
         implements ArchiveModelAspect<E> {
@@ -292,7 +293,7 @@ class ArchiveFileSystem<E extends FsArchiveEntry>
             final BitField<FsAccessOption> options,
             final FsNodeName name,
             final Entry.Type type,
-            final Optional<Entry> template
+            final Optional<? extends Entry> template
     ) throws IOException {
         requireNonNull(type);
         // TODO: Add support for other entry types:

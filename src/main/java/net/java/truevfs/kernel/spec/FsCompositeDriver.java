@@ -6,7 +6,7 @@ package net.java.truevfs.kernel.spec;
 
 import net.java.truecommons.shed.ImplementationsShouldExtend;
 
-import javax.annotation.CheckForNull;
+import java.util.Optional;
 import java.util.ServiceConfigurationError;
 
 /**
@@ -32,10 +32,11 @@ public interface FsCompositeDriver extends FsModel.Factory<FsManager>, FsControl
      * @throws ServiceConfigurationError if no appropriate file system driver
      *         is known for the scheme of the given mount point.
      */
-    @Override FsModel newModel(
+    @Override
+    FsModel newModel(
             FsManager context,
             FsMountPoint mountPoint,
-            @CheckForNull FsModel parent);
+            Optional<? extends FsModel> parent);
 
     /**
      * {@inheritDoc}
@@ -48,9 +49,10 @@ public interface FsCompositeDriver extends FsModel.Factory<FsManager>, FsControl
      * @throws ServiceConfigurationError if no appropriate file system driver
      *         is known for the scheme of the mount point of the given model.
      */
-    @Override FsController newController(
+    @Override
+    FsController newController(
             FsManager context,
             FsModel model,
-            @CheckForNull FsController parent)
+            Optional<? extends FsController> parent)
     throws ServiceConfigurationError;
 }

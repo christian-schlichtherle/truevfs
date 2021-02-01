@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.access;
 
+import lombok.val;
 import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.cio.Entry.Size;
 import net.java.truecommons.io.Streams;
@@ -351,13 +352,17 @@ public final class TFile extends File implements TRex {
 
     private static final long serialVersionUID = 0;
 
-    /** The prefix of a UNC (a Windows concept). */
+    /**
+     * The prefix of a UNC (a Windows concept).
+     */
     private static final String UNC_PREFIX = separator + separator;
 
-    /** The file system roots. */
+    /**
+     * The file system roots.
+     */
     private static final Set<File>
             ROOTS = Collections.unmodifiableSet(
-                new TreeSet<>(Arrays.asList(listRoots())));
+            new TreeSet<>(Arrays.asList(listRoots())));
 
     private static final File CURRENT_DIRECTORY = new File(".");
 
@@ -379,19 +384,25 @@ public final class TFile extends File implements TRex {
      */
     private transient File file;
 
-    /** The configuration to use. */
+    /**
+     * The configuration to use.
+     */
     private transient TArchiveDetector detector;
 
-    private transient @CheckForNull TFile innerArchive;
-    private transient @CheckForNull TFile enclArchive;
-    private transient @CheckForNull FsNodeName nodeName;
+    private transient @CheckForNull
+    TFile innerArchive;
+    private transient @CheckForNull
+    TFile enclArchive;
+    private transient @CheckForNull
+    FsNodeName nodeName;
 
     /**
      * This refers to the file system controller if and only if this file
      * refers to a prospective archive file, otherwise it's {@code null}.
      * This field should be considered to be {@code final}!
      */
-    private transient volatile @CheckForNull FsController controller;
+    private transient volatile @CheckForNull
+    FsController controller;
 
     /**
      * Constructs a new {@code TFile} instance which wraps the given
@@ -402,25 +413,27 @@ public final class TFile extends File implements TRex {
      * to scan the entire path name for prospective archive files.
      *
      * @param file the file object to decorate.
-     *        If this is an instance of this class, most of its fields current
-     *        copied.
+     *             If this is an instance of this class, most of its fields current
+     *             copied.
      */
-    public TFile(File file) { this(file, (TArchiveDetector) null); }
+    public TFile(File file) {
+        this(file, (TArchiveDetector) null);
+    }
 
     /**
      * Constructs a new {@code TFile} instance which uses the given archive
      * detector to scan its path name for prospective archive files.
      *
-     * @param file the file object to decorate.
-     *        If this is an instance of this class, most of its fields get
-     *        copied.
+     * @param file     the file object to decorate.
+     *                 If this is an instance of this class, most of its fields get
+     *                 copied.
      * @param detector the archive detector to use for scanning the path name
-     *        for prospective archive files.
-     *        If this parameter is {@code null} and {@code file} is
-     *        an instance of this class, then its archive detector gets used.
-     *        If this parameter is {@code null} and {@code file} is <em>not</em>
-     *        an instance of this class, then the current archive detector gets
-     *        resolved by calling {@code TConfig.current().getArchiveDetector()}.
+     *                 for prospective archive files.
+     *                 If this parameter is {@code null} and {@code file} is
+     *                 an instance of this class, then its archive detector gets used.
+     *                 If this parameter is {@code null} and {@code file} is <em>not</em>
+     *                 an instance of this class, then the current archive detector gets
+     *                 resolved by calling {@code TConfig.current().getArchiveDetector()}.
      */
     @ExpertFeature(INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
@@ -454,18 +467,20 @@ public final class TFile extends File implements TRex {
      *
      * @param path the path name.
      */
-    public TFile(String path) { this(path, (TArchiveDetector) null); }
+    public TFile(String path) {
+        this(path, (TArchiveDetector) null);
+    }
 
     /**
      * Constructs a new {@code TFile} instance which uses the given archive
      * detector to scan its path name for prospective archive files.
      *
-     * @param path the path name.
+     * @param path     the path name.
      * @param detector the archive detector to use for scanning the path name
-     *        for prospective archive files.
-     *        If this parameter is {@code null}, then the default archive
-     *        detector gets resolved by calling
-     *        {@code TConfig.current().getArchiveDetector()}.
+     *                 for prospective archive files.
+     *                 If this parameter is {@code null}, then the default archive
+     *                 detector gets resolved by calling
+     *                 {@code TConfig.current().getArchiveDetector()}.
      */
     @ExpertFeature(INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public TFile(final String path, final @CheckForNull TArchiveDetector detector) {
@@ -482,10 +497,10 @@ public final class TFile extends File implements TRex {
      * {@code TConfig.current().getArchiveDetector()}.
      *
      * @param parent the parent directory.
-     *        If this is an instance of this class, then only the child path
-     *        name gets scanned for prospective archive files, otherwise the
-     *        entire path name.
-     * @param child the child path name.
+     *               If this is an instance of this class, then only the child path
+     *               name gets scanned for prospective archive files, otherwise the
+     *               entire path name.
+     * @param child  the child path name.
      */
     public TFile(@CheckForNull File parent, String child) {
         this(parent, child, null);
@@ -495,16 +510,16 @@ public final class TFile extends File implements TRex {
      * Constructs a new {@code TFile} instance which uses the given archive
      * detector to scan its path name for prospective archive files.
      *
-     * @param parent the parent directory.
-     *        If this is an instance of this class, then only the child path
-     *        name gets scanned for prospective archive files, otherwise the
-     *        entire path name.
-     * @param child the child path name.
+     * @param parent   the parent directory.
+     *                 If this is an instance of this class, then only the child path
+     *                 name gets scanned for prospective archive files, otherwise the
+     *                 entire path name.
+     * @param child    the child path name.
      * @param detector the archive detector to use for scanning the path name
-     *        for prospective archive files.
-     *        If this parameter is {@code null}, then the default archive
-     *        detector gets resolved by calling
-     *        {@code TConfig.current().getArchiveDetector()}.
+     *                 for prospective archive files.
+     *                 If this parameter is {@code null}, then the default archive
+     *                 detector gets resolved by calling
+     *                 {@code TConfig.current().getArchiveDetector()}.
      */
     @ExpertFeature(INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public TFile(
@@ -514,8 +529,11 @@ public final class TFile extends File implements TRex {
         super(parent, child);
         this.file = new File(parent, child);
         this.detector = null != detector ? detector : TConfig.current().getArchiveDetector();
-        if (parent instanceof TFile) scan((TFile) parent);
-        else scan(null);
+        if (parent instanceof TFile) {
+            scan((TFile) parent);
+        } else {
+            scan(null);
+        }
         assert invariants();
     }
 
@@ -525,10 +543,10 @@ public final class TFile extends File implements TRex {
      * {@code TConfig.current().getArchiveDetector()}.
      *
      * @param parent the parent directory.
-     *        If this is an instance of this class, then only the child path
-     *        name gets scanned for prospective archive files, otherwise the
-     *        entire path name.
-     * @param child the child path name.
+     *               If this is an instance of this class, then only the child path
+     *               name gets scanned for prospective archive files, otherwise the
+     *               entire path name.
+     * @param child  the child path name.
      */
     public TFile(@CheckForNull String parent, String child) {
         this(parent, child, null);
@@ -538,13 +556,13 @@ public final class TFile extends File implements TRex {
      * Constructs a new {@code TFile} instance which uses the given archive
      * detector to scan its path name for prospective archive files.
      *
-     * @param parent the parent directory.
-     * @param child the child path name.
+     * @param parent   the parent directory.
+     * @param child    the child path name.
      * @param detector the archive detector to use for scanning the path name
-     *        for prospective archive files.
-     *        If this parameter is {@code null}, then the default archive
-     *        detector gets resolved by calling
-     *        {@code TConfig.current().getArchiveDetector()}.
+     *                 for prospective archive files.
+     *                 If this parameter is {@code null}, then the default archive
+     *                 detector gets resolved by calling
+     *                 {@code TConfig.current().getArchiveDetector()}.
      */
     @ExpertFeature(INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public TFile(
@@ -563,13 +581,13 @@ public final class TFile extends File implements TRex {
      * This constructor is equivalent to
      * <code>new {@link #TFile(FsNodePath, TArchiveDetector) TFile(FsNodePath.create(uri, CANONICALIZE), null))}</code>,
      *
-     * @param  uri an absolute URI which has a scheme component which is
-     *         known by the current archive detector
-     *         {@code TConfig.current().getArchiveDetector()}.
+     * @param uri an absolute URI which has a scheme component which is
+     *            known by the current archive detector
+     *            {@code TConfig.current().getArchiveDetector()}.
      * @throws IllegalArgumentException if the given URI does not conform to
-     *         the syntax constraints for {@link FsNodePath}s or
-     *         {@link File#File(URI)}.
-     * @see    #getUri()
+     *                                  the syntax constraints for {@link FsNodePath}s or
+     *                                  {@link File#File(URI)}.
+     * @see #getUri()
      */
     public TFile(URI uri) {
         this(uri, null);
@@ -591,16 +609,16 @@ public final class TFile extends File implements TRex {
      * Note that the scheme component of this hierarchical URI must be
      * {@code file} in order to maintain interoperability with the super class!
      *
-     * @param  uri an absolute URI which has a scheme component which is
-     *         known by the given {@code detector}.
-     * @param  detector the archive detector to look up archive file system
-     *         drivers for the named URI scheme components.
-     *         If this parameter is {@code null}, then the default archive
-     *         detector gets resolved by calling
-     *         {@code TConfig.current().getArchiveDetector()}.
+     * @param uri      an absolute URI which has a scheme component which is
+     *                 known by the given {@code detector}.
+     * @param detector the archive detector to look up archive file system
+     *                 drivers for the named URI scheme components.
+     *                 If this parameter is {@code null}, then the default archive
+     *                 detector gets resolved by calling
+     *                 {@code TConfig.current().getArchiveDetector()}.
      * @throws IllegalArgumentException if the given URI does not conform to
-     *         the syntax constraints for {@link File#File(URI)}.
-     * @see    #getNodePath()
+     *                                  the syntax constraints for {@link File#File(URI)}.
+     * @see #getNodePath()
      */
     @ExpertFeature(INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public TFile(URI uri, @CheckForNull TArchiveDetector detector) {
@@ -612,17 +630,19 @@ public final class TFile extends File implements TRex {
      * This constructor is equivalent to
      * <code>new {@link #TFile(FsNodePath, TArchiveDetector) TFile(path, null)}</code>
      *
-     * @param  path a node path with an absolute
-     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} which
-     *         has a scheme component which is known by the current archive
-     *         detector {@code TConfig.current().getArchiveDetector()}.
+     * @param path a node path with an absolute
+     *             {@link FsNodePath#toHierarchicalUri() hierarchical URI} which
+     *             has a scheme component which is known by the current archive
+     *             detector {@code TConfig.current().getArchiveDetector()}.
      * @throws IllegalArgumentException if the
-     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} of the
-     *         given node path does not conform to the syntax constraints for
-     *         {@link File#File(URI)}.
-     * @see    #getNodePath()
+     *                                  {@link FsNodePath#toHierarchicalUri() hierarchical URI} of the
+     *                                  given node path does not conform to the syntax constraints for
+     *                                  {@link File#File(URI)}.
+     * @see #getNodePath()
      */
-    public TFile(FsNodePath path) { this(path, null); }
+    public TFile(FsNodePath path) {
+        this(path, null);
+    }
 
     /**
      * Constructs a new {@code TFile} instance for the given {@code path} and
@@ -640,20 +660,20 @@ public final class TFile extends File implements TRex {
      * Note that the scheme component of this hierarchical URI must be
      * {@code file} in order to maintain interoperability with the super class!
      *
-     * @param  path a path with an absolute
-     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} which
-     *         has a scheme component which is known by the given
-     *         {@code detector}.
-     * @param  detector the archive detector to look up archive file system
-     *         drivers for the named URI scheme components.
-     *         If this parameter is {@code null}, then the default archive
-     *         detector gets resolved by calling
-     *         {@code TConfig.current().getArchiveDetector()}.
+     * @param path     a path with an absolute
+     *                 {@link FsNodePath#toHierarchicalUri() hierarchical URI} which
+     *                 has a scheme component which is known by the given
+     *                 {@code detector}.
+     * @param detector the archive detector to look up archive file system
+     *                 drivers for the named URI scheme components.
+     *                 If this parameter is {@code null}, then the default archive
+     *                 detector gets resolved by calling
+     *                 {@code TConfig.current().getArchiveDetector()}.
      * @throws IllegalArgumentException if the
-     *         {@link FsNodePath#toHierarchicalUri() hierarchical URI} of the
-     *         given node path does not conform to the syntax constraints for
-     *         {@link File#File(URI)}.
-     * @see    #getNodePath()
+     *                                  {@link FsNodePath#toHierarchicalUri() hierarchical URI} of the
+     *                                  given node path does not conform to the syntax constraints for
+     *                                  {@link File#File(URI)}.
+     * @see #getNodePath()
      */
     @ExpertFeature(INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public TFile(final FsNodePath path, final @CheckForNull TArchiveDetector detector) {
@@ -661,34 +681,33 @@ public final class TFile extends File implements TRex {
         parse(path, null != detector ? detector : TConfig.current().getArchiveDetector());
     }
 
-    private void parse(
-            final FsNodePath path,
-            final TArchiveDetector detector) {
+    private void parse(final FsNodePath path, final TArchiveDetector detector) {
         this.file = new File(super.getPath());
         this.detector = detector;
-        final FsMountPoint mp = path.getMountPoint();
-        final FsNodePath mpp = mp.getPath();
+        val omp = path.getMountPoint();
+        val ompp = omp.flatMap(FsMountPoint::getPath);
         final FsNodeName nn;
-        if (null == mpp) {
+        if (!ompp.isPresent()) {
             assert !path.getUri().isOpaque();
             this.enclArchive = null;
             this.nodeName = null;
             this.innerArchive = null;
         } else if ((nn = path.getNodeName()).isRoot()) {
             assert path.getUri().isOpaque();
+            val mpp = ompp.get();
             if (mpp.getUri().isOpaque()) {
-                this.enclArchive = new TFile(mpp.getMountPoint(), detector);
-                this.nodeName = mpp.getNodeName();
+                this.enclArchive = new TFile(mpp.getMountPoint().get(), detector);
+                this.nodeName = ompp.get().getNodeName();
             } else {
                 this.enclArchive = null;
                 this.nodeName = null;
             }
             this.innerArchive = this;
             // See http://java.net/jira/browse/TRUEZIP-154 .
-            this.controller = getController(mp);
+            this.controller = getController(omp.get());
         } else {
             assert path.getUri().isOpaque();
-            this.enclArchive = new TFile(mp, detector);
+            this.enclArchive = new TFile(omp.get(), detector);
             this.nodeName = nn;
             this.innerArchive = this.enclArchive;
         }
@@ -696,23 +715,21 @@ public final class TFile extends File implements TRex {
         assert invariants();
     }
 
-    @SuppressWarnings("LeakingThisInConstructor")
-    private TFile(
-            final FsMountPoint mountPoint,
-            final TArchiveDetector detector) {
+    private TFile(final FsMountPoint mountPoint, final TArchiveDetector detector) {
         super(mountPoint.toHierarchicalUri());
         this.file = new File(super.getPath());
         this.detector = detector;
-        final FsNodePath mpp = mountPoint.getPath();
-        if (null == mpp) {
+        val ompp = mountPoint.getPath();
+        if (!ompp.isPresent()) {
             assert !mountPoint.getUri().isOpaque();
             this.enclArchive = null;
             this.nodeName = null;
             this.innerArchive = null;
         } else {
             assert mountPoint.getUri().isOpaque();
+            val mpp = ompp.get();
             if (mpp.getUri().isOpaque()) {
-                this.enclArchive = new TFile(mpp.getMountPoint(), detector);
+                this.enclArchive = new TFile(mpp.getMountPoint().get(), detector);
                 this.nodeName = mpp.getNodeName();
             } else {
                 this.enclArchive = null;
@@ -724,16 +741,15 @@ public final class TFile extends File implements TRex {
         assert invariants();
     }
 
-    @SuppressWarnings({"LeakingThisInConstructor", "AccessingNonPublicFieldOfAnotherObject"})
     private TFile(
             final File file,
             final @CheckForNull TFile innerArchive,
             final TArchiveDetector detector) {
         super(file.getPath());
         this.file = file;
-        final String path = file.getPath();
+        val path = file.getPath();
         if (null != innerArchive) {
-            final int iapl = innerArchive.getPath().length();
+            val iapl = innerArchive.getPath().length();
             if (path.length() == iapl) {
                 this.detector = innerArchive.detector;
                 this.enclArchive = innerArchive.enclArchive;
@@ -746,10 +762,10 @@ public final class TFile extends File implements TRex {
                 try {
                     this.nodeName = new FsNodeName(
                             new UriBuilder()
-                                .path(
-                                    path.substring(iapl + 1) // cut off leading separatorChar
-                                        .replace(separatorChar, SEPARATOR_CHAR))
-                                .toUriChecked(),
+                                    .path(
+                                            path.substring(iapl + 1) // cut off leading separatorChar
+                                                    .replace(separatorChar, SEPARATOR_CHAR))
+                                    .toUriChecked(),
                             CANONICALIZE);
                 } catch (URISyntaxException ex) {
                     throw new AssertionError(ex);
@@ -769,18 +785,18 @@ public final class TFile extends File implements TRex {
      * Must not be called to re-initialize this object!
      */
     private void scan(final @CheckForNull TFile ancestor) {
-        final String path = super.getPath();
+        val path = super.getPath();
         assert ancestor == null || path.startsWith(ancestor.getPath());
         assert file.getPath().equals(path);
         assert null != detector;
-        final StringBuilder nodeNameBuf = new StringBuilder(path.length());
+        val nodeNameBuf = new StringBuilder(path.length());
         scan(detector, ancestor, 0, path, nodeNameBuf, new PathSplitter(separatorChar, false));
         try {
             nodeName = 0 >= nodeNameBuf.length()
                     ? null
                     : new FsNodeName(
-                        new UriBuilder().path(nodeNameBuf.toString()).toUriChecked(),
-                        CANONICALIZE);
+                    new UriBuilder().path(nodeNameBuf.toString()).toUriChecked(),
+                    CANONICALIZE);
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
@@ -791,17 +807,17 @@ public final class TFile extends File implements TRex {
             TArchiveDetector detector,
             @CheckForNull TFile ancestor,
             int skip,
-            final String path,
+            final @CheckForNull String path,
             final StringBuilder enclEntryNameBuf,
             final PathSplitter splitter) {
-        if (path == null) {
+        if (null == path) {
             assert null == enclArchive;
             enclEntryNameBuf.setLength(0);
             return;
         }
 
         splitter.split(path);
-        final String parent = splitter.getParentPath().get();
+        final String parent = splitter.getParentPath().orElse(null);
         final String member = splitter.getMemberName();
 
         if (0 == member.length() || ".".equals(member)) {
@@ -843,7 +859,7 @@ public final class TFile extends File implements TRex {
                         assert enclArchive == ancestor;
                         innerArchive = this;
                         enclArchive = ancestor.enclArchive;
-                        if (ancestor.nodeName != null)
+                        if (null != ancestor.nodeName)
                             enclEntryNameBuf.append(ancestor.nodeName.getPath());
                     }
                     if (this != innerArchive)
@@ -884,8 +900,8 @@ public final class TFile extends File implements TRex {
     }
 
     private void readObject(ObjectInputStream in)
-    throws IOException, ClassNotFoundException {
-        parse(  FsNodePath.create((URI) in.readObject(), CANONICALIZE),
+            throws IOException, ClassNotFoundException {
+        parse(FsNodePath.create((URI) in.readObject(), CANONICALIZE),
                 TConfig.current().getArchiveDetector());
     }
 
@@ -900,9 +916,9 @@ public final class TFile extends File implements TRex {
      * If assertions are disabled, the call to this method is thrown away by
      * the HotSpot compiler, so there is no performance penalty.
      *
-     * @throws AssertionError If assertions are enabled and any invariant is
-     *         violated.
      * @return {@code true}
+     * @throws AssertionError If assertions are enabled and any invariant is
+     *                        violated.
      */
     private boolean invariants() {
         // Thread-safe caching
@@ -915,21 +931,23 @@ public final class TFile extends File implements TRex {
         assert !(file instanceof TFile);
         assert file.getPath().equals(super.getPath());
         assert null != detector;
-        assert (null != innerArchive) == (getInnerEntryName() != null);
+        assert (null != innerArchive) == (null != getInnerEntryName());
         assert (null != enclArchive) == (null != nodeName);
         assert this != enclArchive;
         assert (this == innerArchive)
                 ^ (innerArchive == enclArchive && null == controller);
         assert null == enclArchive
-                || Paths.contains(  enclArchive.getPath(),
-                                    file.getParentFile().getPath(),
-                                    separatorChar)
-                    && !nodeName.toString().isEmpty();
+                || Paths.contains(enclArchive.getPath(),
+                file.getParentFile().getPath(),
+                separatorChar)
+                && !nodeName.toString().isEmpty();
         return true;
     }
 
     @Override
-    public TArchiveDetector getArchiveDetector() { return detector; }
+    public TArchiveDetector getArchiveDetector() {
+        return detector;
+    }
 
     /**
      * Returns a file object for the same path name, but does not detect any
@@ -938,11 +956,11 @@ public final class TFile extends File implements TRex {
      * path name of this file object may address an entry in an archive file.
      *
      * @return A file object for the same path name, but does not detect any
-     *         archive file name patterns in the last path name segment.
-     * @see    TVFS#umount(TFile)
+     * archive file name patterns in the last path name segment.
+     * @see TVFS#umount(TFile)
      */
-    @ExpertFeature( level=INTERMEDIATE,
-                    value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
+    @ExpertFeature(level = INTERMEDIATE,
+            value = INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public TFile toNonArchiveFile() {
         if (!isArchive()) return this;
         return new TFile(getParentFile(), getName(), TArchiveDetector.NULL);
@@ -953,10 +971,11 @@ public final class TFile extends File implements TRex {
      * <em>not</em> an archive file or a file located in an archive file.
      *
      * @return The first parent directory (starting from this file) which is
-     *         <em>not</em> an archive file or a file located in an archive
-     *         file.
+     * <em>not</em> an archive file or a file located in an archive
+     * file.
      */
-    public @Nullable TFile getNonArchivedParentFile() {
+    public @Nullable
+    TFile getNonArchivedParentFile() {
         final TFile enclArchive = this.enclArchive;
         return null != enclArchive
                 ? enclArchive.getNonArchivedParentFile()
@@ -964,12 +983,14 @@ public final class TFile extends File implements TRex {
     }
 
     @Override
-    public @Nullable String getParent() {
+    public @Nullable
+    String getParent() {
         return file.getParent();
     }
 
     @Override
-    public @Nullable TFile getParentFile() {
+    public @Nullable
+    TFile getParentFile() {
         final File parent = file.getParentFile();
         if (parent == null)
             return null;
@@ -1008,9 +1029,9 @@ public final class TFile extends File implements TRex {
      * IOException.
      *
      * @return The normalized absolute file object denoting the same file or
-     *         directory as this instance.
-     * @see    #getCanonicalFile()
-     * @see    #getNormalizedFile()
+     * directory as this instance.
+     * @see #getCanonicalFile()
+     * @see #getNormalizedFile()
      */
     public TFile getNormalizedAbsoluteFile() {
         final String p = getNormalizedAbsolutePath();
@@ -1026,7 +1047,7 @@ public final class TFile extends File implements TRex {
      * IOException.
      *
      * @return The normalized absolute path string denoting the same file or
-     *         directory as this instance.
+     * directory as this instance.
      * @see #getCanonicalPath()
      * @see #getNormalizedPath()
      */
@@ -1039,7 +1060,7 @@ public final class TFile extends File implements TRex {
      * path name.
      *
      * @return The normalized file object denoting the same file or
-     *         directory as this instance.
+     * directory as this instance.
      */
     public TFile getNormalizedFile() {
         final String p = getNormalizedPath();
@@ -1051,21 +1072,21 @@ public final class TFile extends File implements TRex {
      * path name.
      *
      * @return The normalized path string denoting the same file or
-     *         directory as this instance.
+     * directory as this instance.
      */
     public String getNormalizedPath() {
         return Paths.normalize(getPath(), separatorChar);
     }
 
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
     public TFile getCanonicalFile() throws IOException {
         final String p = getCanonicalPath();
         return p.equals(getPath()) ? this : new TFile(p, getArchiveDetector());
     }
 
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
     public String getCanonicalPath() throws IOException {
         return file.getCanonicalPath();
     }
@@ -1076,7 +1097,7 @@ public final class TFile extends File implements TRex {
      * prior fails.
      *
      * @return The canonical or absolute path of this file as an
-     *         instance of this class.
+     * instance of this class.
      */
     public TFile getCanOrAbsFile() {
         final String p = getCanOrAbsPath();
@@ -1089,7 +1110,7 @@ public final class TFile extends File implements TRex {
      * prior fails.
      *
      * @return The canonical or absolute path of this file as a
-     *         {@code String} instance.
+     * {@code String} instance.
      */
     public String getCanOrAbsPath() {
         try {
@@ -1117,10 +1138,10 @@ public final class TFile extends File implements TRex {
      * - no file system tests are performed by this method!
      *
      * @return {@code true} if and only if this {@code TFile} addresses an
-     *         archive file.
-     * @see    #isEntry
-     * @see    #isDirectory
-     * @see    <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
+     * archive file.
+     * @see #isEntry
+     * @see #isDirectory
+     * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      */
     public boolean isArchive() {
         return this == innerArchive;
@@ -1134,7 +1155,7 @@ public final class TFile extends File implements TRex {
      * - no file system tests are performed by this method!
      *
      * @return {@code true} if and only if this {@code TPath} addresses an
-     *         entry located within an archive file.
+     * entry located within an archive file.
      * @see #isArchive
      * @see #isDirectory
      * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
@@ -1161,7 +1182,8 @@ public final class TFile extends File implements TRex {
      *
      * @return The innermost archive path object for this path object.
      */
-    public @CheckForNull TFile getInnerArchive() {
+    public @CheckForNull
+    TFile getInnerArchive() {
         return innerArchive;
     }
 
@@ -1180,13 +1202,14 @@ public final class TFile extends File implements TRex {
      *
      * @return The entry name relative to the innermost archive file.
      */
-    public @Nullable String getInnerEntryName() {
+    public @Nullable
+    String getInnerEntryName() {
         final FsNodeName nodeName;
         return this == innerArchive
                 ? ROOT.getPath()
                 : null == (nodeName = this.nodeName)
-                    ? null
-                    : nodeName.getPath();
+                ? null
+                : nodeName.getPath();
     }
 
     /**
@@ -1205,7 +1228,8 @@ public final class TFile extends File implements TRex {
      *
      * @return The enclosing archive file in this path.
      */
-    public @CheckForNull TFile getEnclArchive() {
+    public @CheckForNull
+    TFile getEnclArchive() {
         return enclArchive;
     }
 
@@ -1222,7 +1246,8 @@ public final class TFile extends File implements TRex {
      *
      * @return The entry name relative to the enclosing archive file.
      */
-    public @Nullable String getEnclEntryName() {
+    public @Nullable
+    String getEnclEntryName() {
         return null == nodeName ? null : nodeName.getPath();
     }
 
@@ -1231,7 +1256,7 @@ public final class TFile extends File implements TRex {
      * {@linkplain #getTopLevelArchive() top level archive file}.
      *
      * @return {@code true} if and only if this file is a
-     *         {@linkplain #getTopLevelArchive() top level archive file}.
+     * {@linkplain #getTopLevelArchive() top level archive file}.
      */
     public boolean isTopLevelArchive() {
         return getTopLevelArchive() == this;
@@ -1246,9 +1271,10 @@ public final class TFile extends File implements TRex {
      * in the platform file system.
      *
      * @return The top level archive file in the path or {@code null} if this
-     *         file object does not name an archive file.
+     * file object does not name an archive file.
      */
-    public @Nullable TFile getTopLevelArchive() {
+    public @Nullable
+    TFile getTopLevelArchive() {
         final TFile enclArchive = this.enclArchive;
         return null != enclArchive
                 ? enclArchive.getTopLevelArchive()
@@ -1263,16 +1289,18 @@ public final class TFile extends File implements TRex {
      * the decorated file object may be an instance of a sibling class, i.e.
      * another sub-class of {@link File}.
      *
-     * @return     An instance of the {@link File File} class or any of its
-     *             sub-classes, but never an instance of this class and never
-     *             {@code null}.
+     * @return An instance of the {@link File File} class or any of its
+     * sub-classes, but never an instance of this class and never
+     * {@code null}.
      * @deprecated Using the resulting {@link File} object for file system
-     *             access would compete with the TrueVFS Kernel for I/O and may
-     *             easily corrupt the state of the (virtual) file system space,
-     *             including loss of data!
+     * access would compete with the TrueVFS Kernel for I/O and may
+     * easily corrupt the state of the (virtual) file system space,
+     * including loss of data!
      */
     @Deprecated
-    public File getFile() { return file; }
+    public File getFile() {
+        return file;
+    }
 
     /**
      * Returns a file system controller if and only if the path denotes an
@@ -1282,9 +1310,10 @@ public final class TFile extends File implements TRex {
      * get access to archive entry properties.
      *
      * @return A file system controller if and only if the path denotes an
-     *         archive file, or {@code null} otherwise.
+     * archive file, or {@code null} otherwise.
      */
-    @Nullable FsController getController() {
+    @Nullable
+    FsController getController() {
         final FsController controller = this.controller;
         if (this != innerArchive || null != controller)
             return controller;
@@ -1304,11 +1333,13 @@ public final class TFile extends File implements TRex {
             final FsNodeName nodeName = this.nodeName;
             assert (null != enclArchive) == (null != nodeName);
             mountPoint = new FsMountPoint(scheme.get(), null == enclArchive
-                    ? new FsNodePath(   file)
-                    : new FsNodePath(   enclArchive .getController()
-                                                .getModel()
-                                                .getMountPoint(),
-                                    nodeName));
+                    ? new FsNodePath(file)
+                    : new FsNodePath(Optional
+                    .of(enclArchive
+                            .getController()
+                            .getModel()
+                            .getMountPoint()),
+                    nodeName));
         } catch (URISyntaxException ex) {
             throw new AssertionError(ex);
         }
@@ -1335,15 +1366,15 @@ public final class TFile extends File implements TRex {
      * </ul>
      *
      * @param file The file object for the path to test for being a direct or
-     *        indirect child of the path of this instance.
+     *             indirect child of the path of this instance.
      * @return {@code true} if and only if the path represented
-     *         by this instance is a direct or indirect parent of the path
-     *         represented by the given {@code file}.
+     * by this instance is a direct or indirect parent of the path
+     * represented by the given {@code file}.
      */
     public boolean isParentOf(final File file) {
         final String a = this.getAbsolutePath();
         final String b = file.getAbsoluteFile().getParent();
-        return b != null ? Paths.contains(a, b, separatorChar) : false;
+        return b != null && Paths.contains(a, b, separatorChar);
     }
 
     @Override
@@ -1369,14 +1400,16 @@ public final class TFile extends File implements TRex {
      *     It just tests the paths.
      * </ul>
      *
-     * @param  file The file object for the path to test for being contained by
-     *         the path of this instance.
+     * @param file The file object for the path to test for being contained by
+     *             the path of this instance.
      * @return {@code true} if and only if the path represented
-     *         by this instance contains the path represented by the given
-     *         {@code file}
+     * by this instance contains the path represented by the given
+     * {@code file}
      * @throws NullPointerException If the parameter is {@code null}.
      */
-    public boolean contains(File file) { return contains(this, file); }
+    public boolean contains(File file) {
+        return contains(this, file);
+    }
 
     /**
      * Returns {@code true} if and only if the path represented
@@ -1391,16 +1424,16 @@ public final class TFile extends File implements TRex {
      *     It just tests the paths.
      * </ul>
      *
-     * @param  a the file to test for containing {@code b}.
-     * @param  b the file to test for being contained by {@code a}.
+     * @param a the file to test for containing {@code b}.
+     * @param b the file to test for being contained by {@code a}.
      * @return {@code true} if and only if the path represented
-     *         by {@code a} contains the path represented by {@code b}.
+     * by {@code a} contains the path represented by {@code b}.
      * @throws NullPointerException If any parameter is {@code null}.
      */
     public static boolean contains(File a, File b) {
-        return Paths.contains(  a.getAbsolutePath(),
-                                b.getAbsolutePath(),
-                                separatorChar);
+        return Paths.contains(a.getAbsolutePath(),
+                b.getAbsolutePath(),
+                separatorChar);
     }
 
     /**
@@ -1408,7 +1441,7 @@ public final class TFile extends File implements TRex {
      * root or a UNC (if running on the Windows platform).
      *
      * @return {@code true} if and only if this file denotes a file system
-     *         root or a UNC (if running on the Windows platform).
+     * root or a UNC (if running on the Windows platform).
      */
     public boolean isFileSystemRoot() {
         final TFile canOrAbsFile = getCanOrAbsFile();
@@ -1421,13 +1454,15 @@ public final class TFile extends File implements TRex {
      *
      * @return {@code true} if and only if this file denotes a UNC.
      */
-    public boolean isUNC() { return isUNC(getCanOrAbsPath()); }
+    public boolean isUNC() {
+        return isUNC(getCanOrAbsPath());
+    }
 
     /**
      * Returns {@code true} if and only if this file denotes a UNC.
      * Note that this may be only relevant on the Windows platform.
      *
-     * @param  path a file path.
+     * @param path a file path.
      * @return {@code true} if and only if {@code path} denotes a UNC.
      */
     private static boolean isUNC(String path) {
@@ -1443,7 +1478,9 @@ public final class TFile extends File implements TRex {
      * @see #equals(Object)
      */
     @Override
-    public int hashCode() { return file.hashCode(); }
+    public int hashCode() {
+        return file.hashCode();
+    }
 
     /**
      * {@inheritDoc}
@@ -1469,12 +1506,14 @@ public final class TFile extends File implements TRex {
      * is false because {@link FsNodePath#equals(Object)} is case sensitive.
      *
      * @param that the object to get compared with this object
-     * @see   #hashCode()
-     * @see   #compareTo(File)
+     * @see #hashCode()
+     * @see #compareTo(File)
      */
     @Override
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
-    public boolean equals(Object that) { return file.equals(that); }
+    public boolean equals(Object that) {
+        return file.equals(that);
+    }
 
     /**
      * {@inheritDoc }
@@ -1500,17 +1539,19 @@ public final class TFile extends File implements TRex {
      * is false because {@link FsNodePath#equals(Object)} is case sensitive.
      *
      * @param that the file object to get compared with this object
-     * @see   #equals(Object)
+     * @see #equals(Object)
      */
     @Override
-    public int compareTo(File that) { return file.compareTo(that); }
+    public int compareTo(File that) {
+        return file.compareTo(that);
+    }
 
     /**
      * Returns a file system node path which is consistent with {@link #toURI()}.
      *
      * @return A file system node path which is consistent with {@link #toURI()}.
-     * @see    #TFile(FsNodePath)
-     * @see    #toURI()
+     * @see #TFile(FsNodePath)
+     * @see #toURI()
      */
     @Override
     public FsNodePath getNodePath() {
@@ -1520,21 +1561,20 @@ public final class TFile extends File implements TRex {
                 if (null != enclArchive) {
                     assert null != nodeName;
                     return new FsNodePath(
-                            new FsMountPoint(
-                                scheme,
-                                new FsNodePath(
-                                    new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
-                                    nodeName)),
+                            Optional.of(new FsMountPoint(scheme,
+                                    new FsNodePath(
+                                            Optional.of(new FsMountPoint(enclArchive.toURI(), CANONICALIZE)),
+                                            nodeName))),
                             ROOT);
                 } else {
                     return new FsNodePath(
-                            new FsMountPoint(scheme, new FsNodePath(file)),
+                            Optional.of(new FsMountPoint(scheme, new FsNodePath(file))),
                             ROOT);
                 }
             } else if (null != enclArchive) {
                 assert null != nodeName;
                 return new FsNodePath(
-                        new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
+                        Optional.of(new FsMountPoint(enclArchive.toURI(), CANONICALIZE)),
                         nodeName);
             } else {
                 return new FsNodePath(file);
@@ -1547,7 +1587,7 @@ public final class TFile extends File implements TRex {
     @Override
     public FsMountPoint getMountPoint() {
         // TODO: Optimize this.
-        return getNodePath().getMountPoint();
+        return getNodePath().getMountPoint().get();
     }
 
     @Override
@@ -1555,7 +1595,8 @@ public final class TFile extends File implements TRex {
         return this == innerArchive ? ROOT : nodeName;
     }
 
-    private @Nullable FsScheme getScheme() {
+    private @Nullable
+    FsScheme getScheme() {
         if (this != innerArchive) return null;
         final FsController controller = this.controller;
         if (null != controller)
@@ -1596,7 +1637,7 @@ public final class TFile extends File implements TRex {
      * </ul>
      *
      * @return A URI for this file object.
-     * @see    #getNodePath()
+     * @see #getNodePath()
      */
     @Override
     public URI getUri() {
@@ -1608,15 +1649,15 @@ public final class TFile extends File implements TRex {
                     return new FsMountPoint(
                             scheme,
                             new FsNodePath(
-                                new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
-                                nodeName)).getUri();
+                                    Optional.of(new FsMountPoint(enclArchive.toURI(), CANONICALIZE)),
+                                    nodeName)).getUri();
                 } else {
                     return new FsMountPoint(scheme, new FsNodePath(file)).getUri();
                 }
             } else if (null != enclArchive) {
                 assert null != nodeName;
                 return new FsNodePath(
-                        new FsMountPoint(enclArchive.toURI(), CANONICALIZE),
+                        Optional.of(new FsMountPoint(enclArchive.toURI(), CANONICALIZE)),
                         nodeName).getUri();
             } else {
                 return file.toURI();
@@ -1627,7 +1668,9 @@ public final class TFile extends File implements TRex {
     }
 
     @Override
-    public URI toURI() { return getUri(); }
+    public URI toURI() {
+        return getUri();
+    }
 
     @Deprecated
     @Override
@@ -1636,13 +1679,19 @@ public final class TFile extends File implements TRex {
     }
 
     @Override
-    public TFile toFile() { return this; }
+    public TFile toFile() {
+        return this;
+    }
 
     @Override
-    public TPath toPath() { return new TPath(this); }
+    public TPath toPath() {
+        return new TPath(this);
+    }
 
     @Override
-    public String toString() { return file.toString(); }
+    public String toString() {
+        return file.toString();
+    }
 
     private static BitField<FsAccessOption> getAccessPreferences() {
         return TConfig.current().getAccessPreferences();
@@ -1654,7 +1703,7 @@ public final class TFile extends File implements TRex {
      * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      */
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
     public boolean exists() {
         // DONT test existance of getNodeName() in enclArchive because
         // it doesn't need to exist - see
@@ -1684,13 +1733,15 @@ public final class TFile extends File implements TRex {
      * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      */
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
     public boolean isFile() {
         if (null != innerArchive) {
             try {
-                final FsNode entry = innerArchive.getController()
-                        .node(getAccessPreferences(), getNodeName());
-                return null != entry && entry.isType(FILE);
+                return innerArchive
+                        .getController()
+                        .node(getAccessPreferences(), getNodeName())
+                        .filter(e -> e.isType(FILE))
+                        .isPresent();
             } catch (IOException ex) {
                 return false;
             }
@@ -1712,13 +1763,15 @@ public final class TFile extends File implements TRex {
      * @see #isEntry
      */
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
     public boolean isDirectory() {
         if (null != innerArchive) {
             try {
-                final FsNode entry = innerArchive.getController()
-                        .node(getAccessPreferences(), getNodeName());
-                return null != entry && entry.isType(DIRECTORY);
+                return innerArchive
+                        .getController()
+                        .node(getAccessPreferences(), getNodeName())
+                        .filter(e -> e.isType(DIRECTORY))
+                        .isPresent();
             } catch (IOException ex) {
                 return false;
             }
@@ -1727,13 +1780,11 @@ public final class TFile extends File implements TRex {
     }
 
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
     public boolean canRead() {
         if (null != innerArchive) {
             try {
-                innerArchive.getController().checkAccess(
-                        getAccessPreferences(), getNodeName(),
-                        READ_ACCESS);
+                innerArchive.getController().checkAccess(getAccessPreferences(), getNodeName(), READ_ACCESS);
                 return true;
             } catch (IOException ex) {
                 return false;
@@ -1743,13 +1794,11 @@ public final class TFile extends File implements TRex {
     }
 
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
     public boolean canWrite() {
         if (null != innerArchive) {
             try {
-                innerArchive.getController().checkAccess(
-                        getAccessPreferences(), getNodeName(),
-                        WRITE_ACCESS);
+                innerArchive.getController().checkAccess(getAccessPreferences(), getNodeName(), WRITE_ACCESS);
                 return true;
             } catch (IOException ex) {
                 return false;
@@ -1759,13 +1808,11 @@ public final class TFile extends File implements TRex {
     }
 
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
     public boolean canExecute() {
         if (null != innerArchive) {
             try {
-                innerArchive.getController().checkAccess(
-                        getAccessPreferences(), getNodeName(),
-                        EXECUTE_ACCESS);
+                innerArchive.getController().checkAccess(getAccessPreferences(), getNodeName(), EXECUTE_ACCESS);
                 return true;
             } catch (IOException ex) {
                 return false;
@@ -1782,12 +1829,11 @@ public final class TFile extends File implements TRex {
      * archive file was mounted read only.
      */
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES)
     public boolean setReadOnly() {
         if (null != innerArchive) {
             try {
-                innerArchive.getController()
-                        .setReadOnly(getAccessPreferences(), getNodeName());
+                innerArchive.getController().setReadOnly(getAccessPreferences(), getNodeName());
                 return true;
             } catch (IOException ex) {
                 return false;
@@ -1809,19 +1855,19 @@ public final class TFile extends File implements TRex {
      * @see <a href="#falsePositives">Detecting Archive Paths and False Positives</a>
      */
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
     public long length() {
         if (null != innerArchive) {
-            final FsNode entry;
+            final Optional<? extends FsNode> entry;
             try {
-                entry = innerArchive.getController()
-                        .node(getAccessPreferences(), getNodeName());
+                entry = innerArchive.getController().node(getAccessPreferences(), getNodeName());
             } catch (final IOException ex) {
                 return 0;
             }
-            if (null == entry)
+            if (!entry.isPresent()) {
                 return 0;
-            final long size = entry.getSize(Size.DATA);
+            }
+            final long size = entry.get().getSize(Size.DATA);
             return UNKNOWN != size ? size : 0;
         }
         return file.length();
@@ -1834,22 +1880,22 @@ public final class TFile extends File implements TRex {
      * I/O error occurs or if this is a ghost directory in an archive file.
      *
      * @see <a href="package.html">Package description for more information
-     *      about ghost directories</a>
+     * about ghost directories</a>
      */
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
     public long lastModified() {
         if (null != innerArchive) {
-            final FsNode entry;
+            final Optional<? extends FsNode> entry;
             try {
-                entry = innerArchive.getController()
-                        .node(getAccessPreferences(), getNodeName());
+                entry = innerArchive.getController().node(getAccessPreferences(), getNodeName());
             } catch (final IOException ex) {
                 return 0;
             }
-            if (null == entry)
+            if (!entry.isPresent()) {
                 return 0;
-            final long time = entry.getTime(Access.WRITE);
+            }
+            final long time = entry.get().getTime(Access.WRITE);
             return UNKNOWN != time ? time : 0;
         }
         return file.lastModified();
@@ -1868,17 +1914,14 @@ public final class TFile extends File implements TRex {
      *
      * @see #cp_p(File, File)
      * @see <a href="package.html">Package description for more information
-     *      about ghost directories</a>
+     * about ghost directories</a>
      */
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES)
     public boolean setLastModified(final long time) {
         if (null != innerArchive) {
             try {
-                innerArchive.getController().setTime(
-                        getAccessPreferences(), getNodeName(),
-                        WRITE_ACCESS,
-                        time);
+                innerArchive.getController().setTime(getAccessPreferences(), getNodeName(), WRITE_ACCESS, time);
                 return true;
             } catch (IOException ex) {
                 return false;
@@ -1897,23 +1940,25 @@ public final class TFile extends File implements TRex {
      * this method and are never returned.
      *
      * @return A possibly empty array with the members of this (virtual)
-     *         directory or {@code null} if this instance does not refer to a
-     *         (virtual) directory or if the virtual directory is inaccessible
-     *         due to an I/O error.
+     * directory or {@code null} if this instance does not refer to a
+     * (virtual) directory or if the virtual directory is inaccessible
+     * due to an I/O error.
      */
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
-    public @Nullable String[] list() {
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
+    public @Nullable
+    String[] list() {
         if (null != innerArchive) {
-            final FsNode entry;
+            final Optional<? extends FsNode> entry;
             try {
-                entry = innerArchive.getController()
-                        .node(getAccessPreferences(), getNodeName());
+                entry = innerArchive.getController().node(getAccessPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
-            if (null == entry) return null;
-            final Set<String> members = entry.getMembers();
+            if (!entry.isPresent()) {
+                return null;
+            }
+            final Set<String> members = entry.get().getMembers();
             return null == members ? null : members.toArray(new String[members.size()]);
         }
         return file.list();
@@ -1928,38 +1973,43 @@ public final class TFile extends File implements TRex {
      * this method and are never returned.
      *
      * @return A possibly empty array with the members of this (virtual)
-     *         directory or {@code null} if this instance does not refer to a
-     *         (virtual) directory or if the virtual directory is inaccessible
-     *         due to an I/O error.
+     * directory or {@code null} if this instance does not refer to a
+     * (virtual) directory or if the virtual directory is inaccessible
+     * due to an I/O error.
      */
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
-    public @Nullable String[] list(final @CheckForNull FilenameFilter filter) {
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
+    public @Nullable
+    String[] list(final @CheckForNull FilenameFilter filter) {
         if (null != innerArchive) {
-            final FsNode entry;
+            final Optional<? extends FsNode> entry;
             try {
-                entry = innerArchive.getController()
-                        .node(getAccessPreferences(), getNodeName());
+                entry = innerArchive.getController().node(getAccessPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
-            final Set<String> members = members(entry);
-            if (null == members)
+            val members = entry.map(FsNode::getMembers);
+            if (!members.isPresent()) {
                 return null;
-            if (null == filter)
-                return members.toArray(new String[members.size()]);
-            final Collection<String> accepted = new ArrayList<>(members.size());
-            for (final String member : members)
-                if (filter.accept(this, member))
+            }
+            if (null == filter) {
+                return members.get().toArray(new String[members.get().size()]);
+            }
+            final Collection<String> accepted = new ArrayList<>(members.get().size());
+            for (final String member : members.get()) {
+                if (filter.accept(this, member)) {
                     accepted.add(member);
+                }
+            }
             return accepted.toArray(new String[accepted.size()]);
         }
         return file.list(filter);
     }
 
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
-    public @Nullable TFile[] listFiles() {
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
+    public @Nullable
+    TFile[] listFiles() {
         return listFiles((FilenameFilter) null);
     }
 
@@ -1970,47 +2020,50 @@ public final class TFile extends File implements TRex {
      * method and are never returned.
      */
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
-    public @Nullable TFile[] listFiles(
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
+    public @Nullable
+    TFile[] listFiles(
             final @CheckForNull FilenameFilter filter) {
         if (null != innerArchive) {
-            final FsNode entry;
+            final Optional<? extends FsNode> entry;
             try {
-                entry = innerArchive.getController()
-                        .node(getAccessPreferences(), getNodeName());
+                entry = innerArchive.getController().node(getAccessPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
-            return filter(members(entry), filter);
+            return filter(entry.map(FsNode::getMembers).orElse(null), filter);
         } else {
             return filter(list(file.list(filter)), (FilenameFilter) null);
         }
     }
 
-    private static @CheckForNull Set<String> members(@CheckForNull FsNode entry) {
-        return null == entry ? null : entry.getMembers();
-    }
-
-    private static @CheckForNull List<String> list(@CheckForNull String[] list) {
+    private static @CheckForNull
+    List<String> list(@CheckForNull String[] list) {
         return null == list ? null : Arrays.asList(list);
     }
 
-    private @Nullable TFile[] filter(
+    private @Nullable
+    TFile[] filter(
             final @CheckForNull Collection<String> members,
             final @CheckForNull FilenameFilter filter) {
-        if (null == members) return null;
+        if (null == members) {
+            return null;
+        }
         final TArchiveDetector detector = TConfig.current().getArchiveDetector();
         if (null != filter) {
             final Collection<TFile> accepted = new ArrayList<>(members.size());
-            for (final String member : members)
-                if (filter.accept(this, member))
+            for (final String member : members) {
+                if (filter.accept(this, member)) {
                     accepted.add(new TFile(this, member, detector));
+                }
+            }
             return accepted.toArray(new TFile[accepted.size()]);
         } else {
             final TFile[] accepted = new TFile[members.size()];
             int i = 0;
-            for (final String member : members)
+            for (String member : members) {
                 accepted[i++] = new TFile(this, member, detector);
+            }
             return accepted;
         }
     }
@@ -2022,23 +2075,24 @@ public final class TFile extends File implements TRex {
      * method and are never returned.
      */
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
-    public @Nullable TFile[] listFiles(final @CheckForNull FileFilter filter) {
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
+    public @Nullable
+    TFile[] listFiles(final @CheckForNull FileFilter filter) {
         if (null != innerArchive) {
-            final FsNode entry;
+            final Optional<? extends FsNode> entry;
             try {
-                entry = innerArchive.getController()
-                        .node(getAccessPreferences(), getNodeName());
+                entry = innerArchive.getController().node(getAccessPreferences(), getNodeName());
             } catch (IOException ex) {
                 return null;
             }
-            return filter(members(entry), filter);
+            return filter(entry.map(FsNode::getMembers).orElse(null), filter);
         } else {
             return filter(list(file.list()), filter);
         }
     }
 
-    private @Nullable TFile[] filter(
+    private @Nullable
+    TFile[] filter(
             final @CheckForNull Collection<String> members,
             final @CheckForNull FileFilter filter) {
         if (null == members) return null;
@@ -2047,15 +2101,17 @@ public final class TFile extends File implements TRex {
             final Collection<TFile> accepted = new ArrayList<>(members.size());
             for (final String member : members) {
                 final TFile file = new TFile(this, member, detector);
-                if (filter.accept(file))
+                if (filter.accept(file)) {
                     accepted.add(file);
+                }
             }
             return accepted.toArray(new TFile[accepted.size()]);
         } else {
             final TFile[] accepted = new TFile[members.size()];
             int i = 0;
-            for (final String member : members)
+            for (String member : members) {
                 accepted[i++] = new TFile(this, member, detector);
+            }
             return accepted;
         }
     }
@@ -2068,14 +2124,11 @@ public final class TFile extends File implements TRex {
      * @see #mkdir
      */
     @Override
-    @FsAssertion(consistent=YES, isolated=NO)
+    @FsAssertion(consistent = YES, isolated = NO)
     public boolean createNewFile() throws IOException {
         if (null != innerArchive) {
             try {
-                innerArchive.getController().make(
-                        getAccessPreferences().set(EXCLUSIVE), getNodeName(),
-                        FILE,
-                        null);
+                innerArchive.getController().make(getAccessPreferences().set(EXCLUSIVE), getNodeName(), FILE, Optional.empty());
                 return true;
             } catch (final FileAlreadyExistsException ex) {
                 return false;
@@ -2085,12 +2138,14 @@ public final class TFile extends File implements TRex {
     }
 
     @Override
-    @FsAssertion(consistent=YES, isolated=NO)
+    @FsAssertion(consistent = YES, isolated = NO)
     public boolean mkdirs() {
         if (null == innerArchive) return file.mkdirs();
 
         final TFile parent = getParentFile();
-        if (null != parent && !parent.exists()) parent.mkdirs();
+        if (null != parent && !parent.exists()) {
+            parent.mkdirs();
+        }
 
         // TODO: Profile: return parent.isDirectory() && mkdir();
         // May perform better in certain situations where (probably false
@@ -2114,14 +2169,11 @@ public final class TFile extends File implements TRex {
      * {@link TConfig#isLenient TConfig.current().isLenient()} is true.
      */
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES)
     public boolean mkdir() {
         if (null != innerArchive) {
             try {
-                innerArchive.getController().make(
-                        getAccessPreferences(), getNodeName(),
-                        DIRECTORY,
-                        null);
+                innerArchive.getController().make(getAccessPreferences(), getNodeName(), DIRECTORY, Optional.empty());
                 return true;
             } catch (IOException ex) {
                 return false;
@@ -2134,35 +2186,36 @@ public final class TFile extends File implements TRex {
      * Ensures that a (virtual) directory with {@link #getPath() this path name}
      * exists in the (federated) file system.
      *
-     * @param  recursive whether or not any missing ancestor directories shall
-     *         get created if required.
+     * @param recursive whether or not any missing ancestor directories shall
+     *                  get created if required.
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
      */
-    @FsAssertion(consistent=YES, isolated=NO)
+    @FsAssertion(consistent = YES, isolated = NO)
     public TFile mkdir(final boolean recursive) throws IOException {
         final TFile innerArchive = this.innerArchive;
         if (null != innerArchive) {
             if (recursive) {
                 final TFile parent = getParentFile();
-                if (null != parent && !parent.exists())
+                if (null != parent && !parent.exists()) {
                     parent.mkdir(recursive);
+                }
             }
             final FsController controller = innerArchive.getController();
             final FsNodeName innerEntryName = getNodeName();
             try {
-                controller.make(    getAccessPreferences(), innerEntryName,
-                                    DIRECTORY, null);
+                controller.make(getAccessPreferences(), innerEntryName, DIRECTORY, Optional.empty());
             } catch (IOException ex) {
-                final FsNode entry = controller
-                        .node(getAccessPreferences(), innerEntryName);
-                if (null == entry || !entry.isType(DIRECTORY))
+                final Optional<? extends FsNode> entry = controller.node(getAccessPreferences(), innerEntryName);
+                if (!entry.isPresent() || !entry.get().isType(DIRECTORY)) {
                     throw ex;
+                }
             }
         } else {
             final File dir = file;
-            if (!(recursive ? dir.mkdirs() : dir.mkdir()) && !dir.isDirectory())
+            if (!(recursive ? dir.mkdirs() : dir.mkdir()) && !dir.isDirectory()) {
                 throw new FileSystemException(dir.getPath(), null, "Cannot create directory!");
+            }
         }
         return this;
     }
@@ -2170,13 +2223,13 @@ public final class TFile extends File implements TRex {
     /**
      * {@inheritDoc}
      *
-     * @deprecated This method just returns a boolean value to indicate failure,
-     *             which is hard to analyze.
      * @see #rm()
+     * @deprecated This method just returns a boolean value to indicate failure,
+     * which is hard to analyze.
      */
     @Deprecated
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES)
     public boolean delete() {
         try {
             rm(this);
@@ -2191,9 +2244,9 @@ public final class TFile extends File implements TRex {
      *
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES)
     public TFile rm() throws IOException {
         rm(this);
         return this;
@@ -2203,21 +2256,20 @@ public final class TFile extends File implements TRex {
      * Deletes the given file or directory.
      * If the file is a directory, it must be empty.
      *
-     * @param  file the file or directory.
-     *         Note that although this just needs to be a plain {@code File}
-     *         object, archive files and entries are only supported for
-     *         instances of {@code TFile}.
+     * @param file the file or directory.
+     *             Note that although this just needs to be a plain {@code File}
+     *             object, archive files and entries are only supported for
+     *             instances of {@code TFile}.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES)
     @SuppressWarnings("AccessingNonPublicFieldOfAnotherObject")
     public static void rm(File file) throws IOException {
         if (file instanceof TFile) {
             TFile tfile = (TFile) file;
             if (null != tfile.innerArchive) {
-                tfile.innerArchive.getController().unlink(
-                        getAccessPreferences(), tfile.getNodeName());
+                tfile.innerArchive.getController().unlink(getAccessPreferences(), tfile.getNodeName());
                 return;
             }
             file = tfile.file;
@@ -2231,10 +2283,10 @@ public final class TFile extends File implements TRex {
      *
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
-     * @see    <a href="#traversal">Traversing Directory Trees</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#traversal">Traversing Directory Trees</a>
      */
-    @FsAssertion(consistent=YES)
+    @FsAssertion(consistent = YES)
     public TFile rm_r() throws IOException {
         TBIO.rm_r(this, getArchiveDetector());
         return this;
@@ -2252,24 +2304,23 @@ public final class TFile extends File implements TRex {
      * <p>
      * This file system operation is <em>not</em> atomic.
      *
-     * @param  file the file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
+     * @param file the file or directory tree.
+     *             Note that although this just needs to be a plain {@code File},
+     *             archive files and entries are only supported for instances of
+     *             this class.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
-     * @see    <a href="#traversal">Traversing Directory Trees</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#traversal">Traversing Directory Trees</a>
      */
-    @FsAssertion(consistent=YES)
+    @FsAssertion(consistent = YES)
     public static void rm_r(File file) throws IOException {
-        TBIO.rm_r(file,
-                file instanceof TFile
-                    ? ((TFile) file).getArchiveDetector()
-                    : TArchiveDetector.NULL);
+        TBIO.rm_r(file, file instanceof TFile
+                ? ((TFile) file).getArchiveDetector()
+                : TArchiveDetector.NULL);
     }
 
     @Override
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=YES)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = YES)
     public void deleteOnExit() {
         if (innerArchive != null) {
             // Support for this operation for archive files and entries has been
@@ -2283,18 +2334,18 @@ public final class TFile extends File implements TRex {
     /**
      * {@inheritDoc}
      *
-     * @param  dst the destination file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
+     * @param dst the destination file or directory tree.
+     *            Note that although this just needs to be a plain {@code File},
+     *            archive files and entries are only supported for instances of
+     *            this class.
      * @return {@code true} on success or {@code false} otherwise.
-     * @deprecated This method just returns a boolean value to indicate failure,
-     *             which is hard to analyze.
      * @see #mv(File)
+     * @deprecated This method just returns a boolean value to indicate failure,
+     * which is hard to analyze.
      */
     @Deprecated
     @Override
-    @FsAssertion(consistent=YES)
+    @FsAssertion(consistent = YES)
     public boolean renameTo(final File dst) {
         try {
             mv(this, dst, getArchiveDetector());
@@ -2308,16 +2359,16 @@ public final class TFile extends File implements TRex {
      * Equivalent to {@link #mv(File, File, TArchiveDetector) mv(this, dst, detector)},
      * where {@code detector} is {@code TConfig.current().getArchiveDetector()}.
      *
-     * @param  dst the destination file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
+     * @param dst the destination file or directory tree.
+     *            Note that although this just needs to be a plain {@code File},
+     *            archive files and entries are only supported for instances of
+     *            this class.
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
-     * @see    <a href="#traversal">Traversing Directory Trees</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#traversal">Traversing Directory Trees</a>
      */
-    @FsAssertion(consistent=YES)
+    @FsAssertion(consistent = YES)
     public TFile mv(File dst) throws IOException {
         mv(this, dst, TConfig.current().getArchiveDetector());
         return this;
@@ -2335,29 +2386,29 @@ public final class TFile extends File implements TRex {
      * file system driver implementation, but the minimum guarantee is to
      * copy the last modification time.
      *
-     * @param  src the source file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
-     * @param  dst the destination file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
-     * @param  detector the archive detector to use for detecting any archive
-     *         files <em>within</em> the source and destination directory
-     *         trees.
+     * @param src      the source file or directory tree.
+     *                 Note that although this just needs to be a plain {@code File},
+     *                 archive files and entries are only supported for instances of
+     *                 this class.
+     * @param dst      the destination file or directory tree.
+     *                 Note that although this just needs to be a plain {@code File},
+     *                 archive files and entries are only supported for instances of
+     *                 this class.
+     * @param detector the archive detector to use for detecting any archive
+     *                 files <em>within</em> the source and destination directory
+     *                 trees.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
-     * @see    <a href="#traversal">Traversing Directory Trees</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#traversal">Traversing Directory Trees</a>
      */
-    @ExpertFeature( level=INTERMEDIATE,
-                    value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
-    @FsAssertion(consistent=YES)
+    @ExpertFeature(level = INTERMEDIATE,
+            value = INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
+    @FsAssertion(consistent = YES)
     public static void mv(
             final File src,
             final File dst,
             final TArchiveDetector detector)
-    throws IOException {
+            throws IOException {
         final boolean srcArchived;
         final File srcDelegate;
         if (src instanceof TFile) {
@@ -2434,13 +2485,13 @@ public final class TFile extends File implements TRex {
      * </tbody>
      * </table>
      *
-     * @param  in the input stream.
-     * @param  out the output stream.
+     * @param in  the input stream.
+     * @param out the output stream.
      * @throws IOException if any I/O error occurs.
-     * @see    #cat(InputStream, OutputStream)
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see #cat(InputStream, OutputStream)
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = NO)
     public static void cp(final InputStream in, final OutputStream out) throws IOException {
         Streams.copy(in, out);
     }
@@ -2489,15 +2540,15 @@ public final class TFile extends File implements TRex {
      * </tbody>
      * </table>
      *
-     * @param  in the input stream.
-     * @param  dst the destination file.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
+     * @param in  the input stream.
+     * @param dst the destination file.
+     *            Note that although this just needs to be a plain {@code File},
+     *            archive files and entries are only supported for instances of
+     *            this class.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = NO)
     public static void cp(final InputStream in, final File dst) throws IOException {
         Objects.requireNonNull(in);
 
@@ -2561,17 +2612,16 @@ public final class TFile extends File implements TRex {
      * </tbody>
      * </table>
      *
-     * @param  src the source file.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
-     * @param  out the output stream.
+     * @param src the source file.
+     *            Note that although this just needs to be a plain {@code File},
+     *            archive files and entries are only supported for instances of
+     *            this class.
+     * @param out the output stream.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
-    public static void cp(final File src, final OutputStream out)
-    throws IOException {
+    @FsAssertion(atomic = NO, consistent = YES, isolated = NO)
+    public static void cp(final File src, final OutputStream out) throws IOException {
         Objects.requireNonNull(out);
 
         TFileInputStream in = null;
@@ -2587,14 +2637,14 @@ public final class TFile extends File implements TRex {
     /**
      * Equivalent to {@link #cp(File, File) cp(this, dst)}.
      *
-     * @param  dst the destination file.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
+     * @param dst the destination file.
+     *            Note that although this just needs to be a plain {@code File},
+     *            archive files and entries are only supported for instances of
+     *            this class.
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
      */
-    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = NO)
     public TFile cp(File dst) throws IOException {
         TBIO.cp(false, this, dst);
         return this;
@@ -2643,18 +2693,18 @@ public final class TFile extends File implements TRex {
      * </tbody>
      * </table>
      *
-     * @param  src the source file.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
-     * @param  dst the destination file.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
+     * @param src the source file.
+     *            Note that although this just needs to be a plain {@code File},
+     *            archive files and entries are only supported for instances of
+     *            this class.
+     * @param dst the destination file.
+     *            Note that although this just needs to be a plain {@code File},
+     *            archive files and entries are only supported for instances of
+     *            this class.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = NO)
     public static void cp(File src, File dst) throws IOException {
         TBIO.cp(false, src, dst);
     }
@@ -2662,14 +2712,14 @@ public final class TFile extends File implements TRex {
     /**
      * Equivalent to {@link #cp_p(File, File) cp_p(this, dst)}.
      *
-     * @param  dst the destination file.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
+     * @param dst the destination file.
+     *            Note that although this just needs to be a plain {@code File},
+     *            archive files and entries are only supported for instances of
+     *            this class.
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
      */
-    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = NO)
     public TFile cp_p(File dst) throws IOException {
         TBIO.cp(true, this, dst);
         return this;
@@ -2722,18 +2772,18 @@ public final class TFile extends File implements TRex {
      * </tbody>
      * </table>
      *
-     * @param  src the source file.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
-     * @param  dst the destination file.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
+     * @param src the source file.
+     *            Note that although this just needs to be a plain {@code File},
+     *            archive files and entries are only supported for instances of
+     *            this class.
+     * @param dst the destination file.
+     *            Note that although this just needs to be a plain {@code File},
+     *            archive files and entries are only supported for instances of
+     *            this class.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = NO)
     public static void cp_p(File src, File dst) throws IOException {
         TBIO.cp(true, src, dst);
     }
@@ -2743,16 +2793,16 @@ public final class TFile extends File implements TRex {
      * {@link #cp_r(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, detector, detector)},
      * where {@code detector} is {@code TConfig.current().getArchiveDetector()}.
      *
-     * @param  dst the destination file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
+     * @param dst the destination file or directory tree.
+     *            Note that although this just needs to be a plain {@code File},
+     *            archive files and entries are only supported for instances of
+     *            this class.
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
-     * @see    <a href="#traversal">Traversing Directory Trees</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#traversal">Traversing Directory Trees</a>
      */
-    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = NO)
     public TFile cp_r(File dst) throws IOException {
         final TArchiveDetector detector = TConfig.current().getArchiveDetector();
         TBIO.cp_r(false, this, dst, detector, detector);
@@ -2763,26 +2813,26 @@ public final class TFile extends File implements TRex {
      * Equivalent to
      * {@link #cp_r(File, File, TArchiveDetector, TArchiveDetector) cp_r(this, dst, detector, detector)}.
      *
-     * @param  src the source file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
-     * @param  dst the destination file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
-     * @param  detector the archive detector to use for detecting any archive
-     *         files <em>within</em> the source and destination directory
-     *         trees.
+     * @param src      the source file or directory tree.
+     *                 Note that although this just needs to be a plain {@code File},
+     *                 archive files and entries are only supported for instances of
+     *                 this class.
+     * @param dst      the destination file or directory tree.
+     *                 Note that although this just needs to be a plain {@code File},
+     *                 archive files and entries are only supported for instances of
+     *                 this class.
+     * @param detector the archive detector to use for detecting any archive
+     *                 files <em>within</em> the source and destination directory
+     *                 trees.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
-     * @see    <a href="#traversal">Traversing Directory Trees</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#traversal">Traversing Directory Trees</a>
      */
-    @ExpertFeature( level=INTERMEDIATE,
-                    value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
-    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
+    @ExpertFeature(level = INTERMEDIATE,
+            value = INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = NO)
     public static void cp_r(File src, File dst, TArchiveDetector detector)
-    throws IOException {
+            throws IOException {
         TBIO.cp_r(false, src, dst, detector, detector);
     }
 
@@ -2830,31 +2880,31 @@ public final class TFile extends File implements TRex {
      * </tbody>
      * </table>
      *
-     * @param  src the source file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
-     * @param  dst the destination file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
-     * @param  srcDetector the archive detector to use for detecting any
-     *         archive files <em>within</em> the source directory tree.
-     * @param  dstDetector the archive detector to use for detecting any
-     *         archive files <em>within</em> the destination directory tree.
+     * @param src         the source file or directory tree.
+     *                    Note that although this just needs to be a plain {@code File},
+     *                    archive files and entries are only supported for instances of
+     *                    this class.
+     * @param dst         the destination file or directory tree.
+     *                    Note that although this just needs to be a plain {@code File},
+     *                    archive files and entries are only supported for instances of
+     *                    this class.
+     * @param srcDetector the archive detector to use for detecting any
+     *                    archive files <em>within</em> the source directory tree.
+     * @param dstDetector the archive detector to use for detecting any
+     *                    archive files <em>within</em> the destination directory tree.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
-     * @see    <a href="#traversal">Traversing Directory Trees</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#traversal">Traversing Directory Trees</a>
      */
-    @ExpertFeature( level=INTERMEDIATE,
-                    value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
-    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
+    @ExpertFeature(level = INTERMEDIATE,
+            value = INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = NO)
     public static void cp_r(
             File src,
             File dst,
             TArchiveDetector srcDetector,
             TArchiveDetector dstDetector)
-    throws IOException {
+            throws IOException {
         TBIO.cp_r(false, src, dst, srcDetector, dstDetector);
     }
 
@@ -2863,16 +2913,16 @@ public final class TFile extends File implements TRex {
      * {@link #cp_rp(File, File, TArchiveDetector, TArchiveDetector) cp_rp(this, dst, detector, detector)},
      * where {@code detector} is {@code TConfig.current().getArchiveDetector()}.
      *
-     * @param  dst the destination file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
+     * @param dst the destination file or directory tree.
+     *            Note that although this just needs to be a plain {@code File},
+     *            archive files and entries are only supported for instances of
+     *            this class.
      * @return {@code this}
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
-     * @see    <a href="#traversal">Traversing Directory Trees</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#traversal">Traversing Directory Trees</a>
      */
-    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = NO)
     public TFile cp_rp(File dst) throws IOException {
         final TArchiveDetector detector = TConfig.current().getArchiveDetector();
         TBIO.cp_r(true, this, dst, detector, detector);
@@ -2883,26 +2933,26 @@ public final class TFile extends File implements TRex {
      * Equivalent to
      * {@link #cp_rp(File, File, TArchiveDetector, TArchiveDetector) cp_rp(this, dst, detector, detector)}.
      *
-     * @param  src the source file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
-     * @param  dst the destination file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
-     * @param  detector the archive detector to use for detecting any archive
-     *         files <em>within</em> the source and destination directory
-     *         trees.
+     * @param src      the source file or directory tree.
+     *                 Note that although this just needs to be a plain {@code File},
+     *                 archive files and entries are only supported for instances of
+     *                 this class.
+     * @param dst      the destination file or directory tree.
+     *                 Note that although this just needs to be a plain {@code File},
+     *                 archive files and entries are only supported for instances of
+     *                 this class.
+     * @param detector the archive detector to use for detecting any archive
+     *                 files <em>within</em> the source and destination directory
+     *                 trees.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
-     * @see    <a href="#traversal">Traversing Directory Trees</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#traversal">Traversing Directory Trees</a>
      */
-    @ExpertFeature( level=INTERMEDIATE,
-                    value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
-    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
+    @ExpertFeature(level = INTERMEDIATE,
+            value = INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = NO)
     public static void cp_rp(File src, File dst, TArchiveDetector detector)
-    throws IOException {
+            throws IOException {
         TBIO.cp_r(true, src, dst, detector, detector);
     }
 
@@ -2955,31 +3005,31 @@ public final class TFile extends File implements TRex {
      * </tbody>
      * </table>
      *
-     * @param  src the source file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
-     * @param  dst the destination file or directory tree.
-     *         Note that although this just needs to be a plain {@code File},
-     *         archive files and entries are only supported for instances of
-     *         this class.
-     * @param  srcDetector the archive detector to use for detecting any
-     *         archive files <em>within</em> the source directory tree.
-     * @param  dstDetector the archive detector to use for detecting any
-     *         archive files <em>within</em> the destination directory tree.
+     * @param src         the source file or directory tree.
+     *                    Note that although this just needs to be a plain {@code File},
+     *                    archive files and entries are only supported for instances of
+     *                    this class.
+     * @param dst         the destination file or directory tree.
+     *                    Note that although this just needs to be a plain {@code File},
+     *                    archive files and entries are only supported for instances of
+     *                    this class.
+     * @param srcDetector the archive detector to use for detecting any
+     *                    archive files <em>within</em> the source directory tree.
+     * @param dstDetector the archive detector to use for detecting any
+     *                    archive files <em>within</em> the destination directory tree.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
-     * @see    <a href="#traversal">Traversing Directory Trees</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#traversal">Traversing Directory Trees</a>
      */
-    @ExpertFeature( level=INTERMEDIATE,
-                    value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
-    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
+    @ExpertFeature(level = INTERMEDIATE,
+            value = INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = NO)
     public static void cp_rp(
             File src,
             File dst,
             TArchiveDetector srcDetector,
             TArchiveDetector dstDetector)
-    throws IOException {
+            throws IOException {
         TBIO.cp_r(true, src, dst, srcDetector, dstDetector);
     }
 
@@ -3028,11 +3078,11 @@ public final class TFile extends File implements TRex {
      * </tbody>
      * </table>
      *
-     * @param  in the input stream.
+     * @param in the input stream.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = NO)
     public void input(final InputStream in) throws IOException {
         Objects.requireNonNull(in);
         try {
@@ -3090,11 +3140,11 @@ public final class TFile extends File implements TRex {
      * </tbody>
      * </table>
      *
-     * @param  out the output stream.
+     * @param out the output stream.
      * @throws IOException if any I/O error occurs.
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    @FsAssertion(atomic=NO, consistent=YES, isolated=NO, durable=NOT_APPLICABLE)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = NO, durable = NOT_APPLICABLE)
     public void output(final OutputStream out) throws IOException {
         Objects.requireNonNull(out);
         try (TFileInputStream in = new TFileInputStream(this)) {
@@ -3154,13 +3204,13 @@ public final class TFile extends File implements TRex {
      * </tbody>
      * </table>
      *
-     * @param  in the input stream.
-     * @param  out the output stream.
+     * @param in  the input stream.
+     * @param out the output stream.
      * @throws IOException if any I/O error occurs.
-     * @see    #cp(InputStream, OutputStream)
-     * @see    <a href="#bulkIOMethods">Bulk I/O Methods</a>
+     * @see #cp(InputStream, OutputStream)
+     * @see <a href="#bulkIOMethods">Bulk I/O Methods</a>
      */
-    @FsAssertion(atomic=NO, consistent=YES, isolated=NO)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = NO)
     public static void cat(InputStream in, OutputStream out) throws IOException {
         Streams.cat(in, out);
     }
@@ -3208,9 +3258,9 @@ public final class TFile extends File implements TRex {
      *
      * @return this
      * @throws IOException On any I/O error.
-     * @see    FsAccessOption#GROW
+     * @see FsAccessOption#GROW
      */
-    @FsAssertion(atomic=YES, consistent=YES, isolated=NO, durable=YES)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = NO, durable = YES)
     public TFile compact() throws IOException {
         // See http://java.net/jira/browse/TRUEZIP-205 .
         if (isTopLevelArchive()) compact(this);
@@ -3259,7 +3309,8 @@ public final class TFile extends File implements TRex {
         return null != parent ? parent : CURRENT_DIRECTORY;
     }
 
-    private static @Nullable String extension(final TFile file) {
+    private static @Nullable
+    String extension(final TFile file) {
         final FsScheme scheme = file.getScheme();
         return null != scheme ? "." + scheme : null;
     }

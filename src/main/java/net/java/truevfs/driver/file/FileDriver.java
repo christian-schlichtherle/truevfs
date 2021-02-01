@@ -9,7 +9,7 @@ import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsModel;
 
-import javax.annotation.CheckForNull;
+import java.util.Optional;
 
 /**
  * A file system driver for the FILE scheme.
@@ -22,9 +22,9 @@ public final class FileDriver extends FsDriver {
     public FsController newController(
             final FsManager manager,
             final FsModel model,
-            final @CheckForNull FsController parent) {
-        assert null == parent;
-        assert null == model.getParent();
+            final Optional<? extends FsController> parent) {
+        assert !parent.isPresent();
+        assert !model.getParent().isPresent();
         return new FileController(model);
     }
 }

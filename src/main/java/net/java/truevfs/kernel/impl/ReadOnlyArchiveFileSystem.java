@@ -70,7 +70,7 @@ final class ReadOnlyArchiveFileSystem<E extends FsArchiveEntry> extends ArchiveF
     }
 
     @Override
-    ArchiveFileSystem<E>.Make make(BitField<FsAccessOption> options, FsNodeName name, Entry.Type type, Optional<Entry> template) throws IOException {
+    ArchiveFileSystem<E>.Make make(BitField<FsAccessOption> options, FsNodeName name, Entry.Type type, Optional<? extends Entry> template) throws IOException {
         throw newFsReadOnlyFileSystemException();
     }
 

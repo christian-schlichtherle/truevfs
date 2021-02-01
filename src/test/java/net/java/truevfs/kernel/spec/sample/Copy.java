@@ -8,7 +8,6 @@ import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.IoSockets;
 import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.shed.BitField;
-import net.java.truecommons.shed.Filter;
 import net.java.truevfs.kernel.spec.*;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
@@ -16,6 +15,7 @@ import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Optional;
 
 import static net.java.truevfs.kernel.spec.FsAccessOption.CREATE_PARENTS;
 import static net.java.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
@@ -74,17 +74,17 @@ public final class Copy {
             srcUri = srcUri.isAbsolute() ? srcUri : new File(src).toURI();
             FsNodePath srcPath = FsNodePath.create(srcUri, FsUriModifier.CANONICALIZE);
             InputSocket<?> srcSocket = manager
-                    .controller(driver, srcPath.getMountPoint())
+                    .controller(driver, srcPath.getMountPoint().get())
                     .input(FsAccessOptions.NONE, srcPath.getNodeName());
             // Resolve the destination socket. Again, we need an absolute URI.
             URI dstUri = URI.create(dst);
             dstUri = dstUri.isAbsolute() ? dstUri : new File(dst).toURI();
             FsNodePath dstPath = FsNodePath.create(dstUri, FsUriModifier.CANONICALIZE);
             OutputSocket<?> dstSocket = manager
-                    .controller(driver, dstPath.getMountPoint())
+                    .controller(driver, dstPath.getMountPoint().get())
                     .output(BitField.of(CREATE_PARENTS, EXCLUSIVE),
                             dstPath.getNodeName(),
-                            srcSocket.target());
+                            Optional.of(srcSocket.target()));
             IoSockets.copy(srcSocket, dstSocket);
         } finally {
             // Commit all unsynchronized changes to the contents of federated

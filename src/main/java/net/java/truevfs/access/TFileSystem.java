@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.access;
 
+import lombok.val;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.cio.InputSocket;
@@ -213,7 +214,7 @@ public final class TFileSystem extends FileSystem {
      * @throws UnsupportedOperationException always
      */
     @Override
-    public WatchService newWatchService() throws IOException {
+    public WatchService newWatchService() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -229,17 +230,17 @@ public final class TFileSystem extends FileSystem {
                     o = path.inputOptions(options).set(CACHE);
             return controller
                     .input(o, name)
-                    .channel(null);
+                    .channel(Optional.empty());
         } else {
             final BitField<FsAccessOption>
                     o = path.outputOptions(options).set(CACHE);
             try {
                 return controller
-                        .output(o, name, null)
-                        .channel(null);
+                        .output(o, name, Optional.empty())
+                        .channel(Optional.empty());
             } catch (final IOException ex) {
                 // TODO: Filter FileAlreadyExistsException.
-                if (o.get(EXCLUSIVE) && null != controller.node(o, name))
+                if (o.get(EXCLUSIVE) && controller.node(o, name).isPresent())
                     throw (IOException) new FileAlreadyExistsException(path.toString())
                             .initCause(ex);
                 throw ex;
@@ -251,21 +252,22 @@ public final class TFileSystem extends FileSystem {
             throws IOException {
         return getController()
                 .input(path.inputOptions(options), path.getNodeName())
-                .stream(null);
+                .stream(Optional.empty());
     }
 
     OutputStream newOutputStream(TPath path, OpenOption... options)
             throws IOException {
         return getController()
-                .output(path.outputOptions(options), path.getNodeName(), null)
-                .stream(null);
+                .output(path.outputOptions(options), path.getNodeName(), Optional.empty())
+                .stream(Optional.empty());
     }
 
     DirectoryStream<Path> newDirectoryStream(final TPath path, final Filter<? super Path> filter) throws IOException {
-        final FsNode entry = stat(path);
+        val entry = stat(path);
         final Set<String> set;
-        if (null == entry || null == (set = entry.getMembers()))
+        if (!entry.isPresent() || null == (set = entry.get().getMembers())) {
             throw new NotDirectoryException(path.toString());
+        }
 
         class Adapter implements Iterator<Path> {
             final Iterator<String> it = set.iterator();
@@ -315,8 +317,9 @@ public final class TFileSystem extends FileSystem {
 
         @Override
         public Iterator<Path> iterator() {
-            if (consumed)
+            if (consumed) {
                 throw new IllegalStateException();
+            }
             consumed = true;
             return it;
         }
@@ -338,11 +341,11 @@ public final class TFileSystem extends FileSystem {
             controller.make(
                     options, name,
                     DIRECTORY,
-                    null);
+                    Optional.empty());
         } catch (IOException ex) {
-            if (null != controller.node(options, name))
-                throw (IOException) new FileAlreadyExistsException(path.toString())
-                        .initCause(ex);
+            if (controller.node(options, name).isPresent()) {
+                throw (IOException) new FileAlreadyExistsException(path.toString()).initCause(ex);
+            }
             throw ex;
         }
     }
@@ -351,7 +354,7 @@ public final class TFileSystem extends FileSystem {
         getController().unlink(path.getAccessPreferences(), path.getNodeName());
     }
 
-    FsNode stat(TPath path) throws IOException {
+    Optional<? extends FsNode> stat(TPath path) throws IOException {
         return getController().node(path.getAccessPreferences(), path.getNodeName());
     }
 
@@ -363,7 +366,7 @@ public final class TFileSystem extends FileSystem {
     OutputSocket<?> output(TPath path,
                            BitField<FsAccessOption> options,
                            @CheckForNull Entry template) {
-        return getController().output(options, path.getNodeName(), template);
+        return getController().output(options, path.getNodeName(), Optional.ofNullable(template));
     }
 
     void checkAccess(final TPath path, final AccessMode... modes)
@@ -449,12 +452,15 @@ public final class TFileSystem extends FileSystem {
     }
 
     private final class FsNodeAttributes implements BasicFileAttributes {
+
         private final FsNode entry;
 
         FsNodeAttributes(final TPath path) throws IOException {
-            if (null == (entry = getController()
-                    .node(path.getAccessPreferences(), path.getNodeName())))
+            val on = getController().node(path.getAccessPreferences(), path.getNodeName());
+            if (!on.isPresent()) {
                 throw new NoSuchFileException(path.toString());
+            }
+            entry = on.get();
         }
 
         @Override

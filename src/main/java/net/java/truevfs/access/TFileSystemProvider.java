@@ -5,6 +5,7 @@
 package net.java.truevfs.access;
 
 import global.namespace.service.wight.annotation.ServiceImplementation;
+import lombok.val;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.IoSockets;
 import net.java.truecommons.cio.OutputSocket;
@@ -12,7 +13,6 @@ import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.UriBuilder;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 import net.java.truevfs.kernel.spec.FsMountPoint;
-import net.java.truevfs.kernel.spec.FsNode;
 import net.java.truevfs.kernel.spec.FsNodePath;
 import org.slf4j.LoggerFactory;
 
@@ -242,8 +242,9 @@ public final class TFileSystemProvider extends FileSystemProvider {
         final FsMountPoint mp = path.getMountPoint();
         synchronized (this) {
             TFileSystem fs = deref(fileSystems.get(mp));
-            if (null == fs)
+            if (null == fs) {
                 fileSystems.put(mp, new WeakReference<>(fs = new TFileSystem(path)));
+            }
             return fs;
         }
     }
@@ -337,21 +338,23 @@ public final class TFileSystemProvider extends FileSystemProvider {
                     throw new UnsupportedOperationException(option.toString());
             }
         }
-        final FsNode srcEntry = src.stat();
-        final FsNode dstEntry = dst.stat();
-        if (null == srcEntry)
+        val srcEntry = src.stat();
+        val dstEntry = dst.stat();
+        if (!srcEntry.isPresent()) {
             throw new NoSuchFileException(src.toString());
-        if (!srcEntry.isType(FILE))
+        }
+        if (!srcEntry.get().isType(FILE)) {
             throw new FileSystemException(src.toString(), null,
-                    "Expected type FILE, but is " + srcEntry.getTypes() + "!");
-        if (null != dstEntry) {
-            if (o.get(EXCLUSIVE))
+                    "Expected type FILE, but is " + srcEntry.get().getTypes() + "!");
+        }
+        if (dstEntry.isPresent()) {
+            if (o.get(EXCLUSIVE)) {
                 throw new FileAlreadyExistsException(dst.toString());
-            if (dstEntry.isType(DIRECTORY)) dst.delete();
+            }
+            if (dstEntry.get().isType(DIRECTORY)) dst.delete();
         }
         final InputSocket<?> input = src.input(src.getAccessPreferences());
-        final OutputSocket<?> output = dst.output(o,
-                preserve ? input.target() : null);
+        final OutputSocket<?> output = dst.output(o, preserve ? input.target() : null);
         IoSockets.copy(input, output);
     }
 

@@ -10,13 +10,15 @@ import net.java.truevfs.kernel.spec._
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks._
+import org.scalatest.prop.TableFor2
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 
 import java.net._
+import java.util.Optional
+import scala.collection.mutable
 import scala.language.implicitConversions
 
 /** @author Christian Schlichtherle */
@@ -48,7 +50,7 @@ class PaceManagerSpec extends AnyWordSpec {
     }
 
     "unmount the least recently accessed archive file systems which exceed the maximum number of mounted archive file systems" in new Fixture {
-      val controllers = {
+      val controllers: mutable.Map[FsMountPoint, FsController] = {
         implicit def mapping(string: String): (FsMountPoint, FsController) = {
           val mountPoint = parseMountPoint(string)
           (mountPoint, mockController(model(mediator, mountPoint)))
@@ -72,7 +74,7 @@ class PaceManagerSpec extends AnyWordSpec {
       }
       delegate.controllers = controllers.values
 
-      val table = Table[FsMountPoint, Expectation](
+      val table: TableFor2[FsMountPoint, Expectation] = Table[FsMountPoint, Expectation](
         ("access", "expectation"),
 
         ("p:/", Synced()),
@@ -102,10 +104,8 @@ class PaceManagerSpec extends AnyWordSpec {
           val model = controller.getModel
           reset(controller)
           when(controller.getModel) thenReturn model
-          doAnswer(new Answer[Unit] {
-            override def answer(invocation: InvocationOnMock): Unit = {
-              controller.getModel setMounted false
-            }
+          doAnswer((_: InvocationOnMock) => {
+            controller.getModel setMounted false
           }) when controller sync any()
         }
         controllers.values filter expectation foreach expectation.stub
@@ -155,12 +155,12 @@ private object PaceManagerSpec {
 
   def model(mediator: PaceMediator, mountPoint: FsMountPoint): FsModel = {
     val parent = {
-      if (null != mountPoint.getParent) {
+      if (mountPoint.getParent.isPresent) {
         val parent = mock[FsModel]
-        when(parent.getMountPoint) thenReturn mountPoint.getParent
-        parent
+        when(parent.getMountPoint) thenReturn mountPoint.getParent.get
+        Optional.of(parent)
       } else {
-        null
+        Optional.empty
       }
     }
     mediator.instrument(null, new DefaultModel(mountPoint, parent))
@@ -175,17 +175,17 @@ private object PaceManagerSpec {
   private final class TestManager(var controllers: Iterable[FsController] = Iterable.empty[FsController])
     extends FsAbstractManager {
 
-    override def newModel(context: FsDriver, mountPoint: FsMountPoint, parent: FsModel): FsModel =
+    override def newModel(context: FsDriver, mountPoint: FsMountPoint, parent: Optional[_ <: FsModel]): FsModel =
       throw new UnsupportedOperationException
 
-    override def newController(context: ArchiveDriver, model: FsModel, parent: FsController): FsController =
+    override def newController(context: ArchiveDriver, model: FsModel, parent: Optional[_ <: FsController]): FsController =
       throw new UnsupportedOperationException
 
     override def controller(driver: FsCompositeDriver, mountPoint: FsMountPoint): FsController =
       throw new UnsupportedOperationException
 
     override def accept[X <: Exception, V <: Visitor[_ >: FsController, X]](filter: ControllerFilter, visitor: V): V = {
-      controllers filter (filter accept _) foreach (visitor visit _)
+      controllers.filter(filter.accept).foreach(visitor.visit)
       visitor
     }
   }
@@ -222,7 +222,7 @@ private object PaceManagerSpec {
     }
   }
 
-  private final class DefaultModel(mountPoint: FsMountPoint, parent: FsModel)
+  private final class DefaultModel(mountPoint: FsMountPoint, parent: Optional[_ <: FsModel])
     extends FsAbstractModel(mountPoint, parent) {
 
     private var mounted: Boolean = _

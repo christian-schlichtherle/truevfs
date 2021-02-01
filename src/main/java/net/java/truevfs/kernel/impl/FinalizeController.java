@@ -59,13 +59,13 @@ abstract class FinalizeController implements FsDelegatingController {
     }
 
     @Override
-    public OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, @CheckForNull Entry template) {
+    public OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<? extends Entry> template) {
         return new DelegatingOutputSocket<Entry>() {
 
             final OutputSocket<? extends Entry> socket = getController().output(options, name, template);
 
             @Override
-            protected OutputSocket<? extends Entry> socket() throws IOException {
+            protected OutputSocket<? extends Entry> socket() {
                 return socket;
             }
 

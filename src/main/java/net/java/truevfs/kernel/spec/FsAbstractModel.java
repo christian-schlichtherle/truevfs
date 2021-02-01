@@ -6,8 +6,8 @@ package net.java.truevfs.kernel.spec;
 
 import net.java.truecommons.shed.UniqueObject;
 
-import javax.annotation.CheckForNull;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.util.Locale.ENGLISH;
 
@@ -19,16 +19,16 @@ import static java.util.Locale.ENGLISH;
  *
  * @author Christian Schlichtherle
  */
-public abstract class FsAbstractModel
-extends UniqueObject implements FsModel {
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+public abstract class FsAbstractModel extends UniqueObject implements FsModel {
 
     private final FsMountPoint mountPoint;
-    private @CheckForNull final FsModel parent;
+    private final Optional<? extends FsModel> parent;
 
     protected FsAbstractModel(
             final FsMountPoint mountPoint,
-            final @CheckForNull FsModel parent) {
-        if (!Objects.equals(mountPoint.getParent(), (null == parent ? null : parent.getMountPoint()))) {
+            final Optional<? extends FsModel> parent) {
+        if (!Objects.equals(mountPoint.getParent(), parent.map(FsModel::getMountPoint))) {
             throw new IllegalArgumentException("Parent/Member mismatch!");
         }
         this.mountPoint = mountPoint;
@@ -36,10 +36,14 @@ extends UniqueObject implements FsModel {
     }
 
     @Override
-    public final FsMountPoint getMountPoint() { return mountPoint; }
+    public final FsMountPoint getMountPoint() {
+        return mountPoint;
+    }
 
     @Override
-    public final @CheckForNull FsModel getParent() { return parent; }
+    public final Optional<? extends FsModel> getParent() {
+        return parent;
+    }
 
     /**
      * Returns a string representation of this object for debugging and logging

@@ -4,12 +4,16 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.io.*;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Objects;
-import net.java.truecommons.cio.*;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.io.Source;
 import net.java.truecommons.shed.BitField;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.channels.SeekableByteChannel;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * An adapter from an input socket to a source with access options.
@@ -43,11 +47,11 @@ public class FsInputSocketSource implements Source {
 
     @Override
     public InputStream stream() throws IOException {
-        return getSocket().stream(null);
+        return getSocket().stream(Optional.empty());
     }
 
     @Override
     public SeekableByteChannel channel() throws IOException {
-        return getSocket().channel(null);
+        return getSocket().channel(Optional.empty());
     }
 }

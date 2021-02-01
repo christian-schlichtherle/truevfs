@@ -144,8 +144,7 @@ public class Streams {
      * @param out the output stream.
      *           This method never closes this stream.
      */
-    public static void cat(final InputStream in, final OutputStream out)
-    throws IOException {
+    public static void cat(final InputStream in, final OutputStream out) throws IOException {
         Objects.requireNonNull(in);
         Objects.requireNonNull(out);
 

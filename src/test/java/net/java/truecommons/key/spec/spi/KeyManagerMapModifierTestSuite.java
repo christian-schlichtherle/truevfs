@@ -24,8 +24,6 @@ public abstract class KeyManagerMapModifierTestSuite {
 
     protected KeyManagerMapModifier modifier;
 
-    protected abstract Iterable<Class<?>> getClasses();
-
     protected abstract KeyManagerMapModifier newModifier();
 
     @Before

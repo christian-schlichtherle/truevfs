@@ -6,17 +6,17 @@ package net.java.truevfs.comp.inst;
 
 import net.java.truevfs.kernel.spec.*;
 
-import javax.annotation.CheckForNull;
+import java.util.Optional;
 import java.util.ServiceConfigurationError;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * @param  <M> the type of the mediator.
+ * @param <M> the type of the mediator.
  * @author Christian Schlichtherle
  */
 public class InstrumentingCompositeDriver<M extends Mediator<M>>
-implements FsCompositeDriver {
+        implements FsCompositeDriver {
 
     protected final M mediator;
     protected final FsCompositeDriver driver;
@@ -32,25 +32,19 @@ implements FsCompositeDriver {
     public final FsModel newModel(
             FsManager context,
             FsMountPoint mountPoint,
-            FsModel parent) {
-        assert null == parent
-                ? null == mountPoint.getParent()
-                : parent.getMountPoint().equals(mountPoint.getParent());
-        return mediator.instrument(this,
-                driver.newModel(context, mountPoint, parent));
+            Optional<? extends FsModel> parent) {
+        assert mountPoint.getParent().equals(parent.map(FsModel::getMountPoint));
+        return mediator.instrument(this, driver.newModel(context, mountPoint, parent));
     }
 
     @Override
     public FsController newController(
             final FsManager context,
             final FsModel model,
-            final @CheckForNull FsController parent)
-    throws ServiceConfigurationError {
-        assert null == parent
-                    ? null == model.getParent()
-                    : parent.getModel().equals(model.getParent());
-        return mediator.instrument(this,
-                driver.newController(context, model, parent));
+            final Optional< ? extends FsController> parent)
+            throws ServiceConfigurationError {
+        assert parent.map(FsController::getModel).equals(model.getParent());
+        return mediator.instrument(this, driver.newController(context, model, parent));
     }
 
     @Override

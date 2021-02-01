@@ -4,14 +4,16 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.io.IOException;
-import java.util.Map;
-import net.java.truecommons.shed.BitField;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.cio.Entry.Type;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.OutputSocket;
+import net.java.truecommons.shed.BitField;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Maps the access options before delegating the called operation.
@@ -73,7 +75,7 @@ public abstract class FsAccessOptionsController extends FsDecoratingController {
     map(BitField<FsAccessOption> options);
 
     @Override
-    public final FsNode node(BitField<FsAccessOption> options, FsNodeName name) throws IOException {
+    public final Optional<? extends FsNode> node(BitField<FsAccessOption> options, FsNodeName name) throws IOException {
         return controller.node(map(options), name);
     }
 
@@ -104,12 +106,12 @@ public abstract class FsAccessOptionsController extends FsDecoratingController {
     }
 
     @Override
-    public final OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Entry template) {
+    public final OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<? extends Entry> template) {
         return controller.output(map(options), name, template);
     }
 
     @Override
-    public final void make(BitField<FsAccessOption> options, FsNodeName name, Type type, Entry template) throws IOException {
+    public final void make(BitField<FsAccessOption> options, FsNodeName name, Type type, Optional<? extends Entry> template) throws IOException {
         controller.make(map(options), name, type, template);
     }
 

@@ -4,16 +4,17 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import javax.annotation.CheckForNull;
+import java.util.Optional;
 
 /**
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class FsTestModel extends FsAbstractModel {
 
     private volatile boolean mounted;
 
-    FsTestModel(FsMountPoint mountPoint, @CheckForNull FsModel parent) {
+    FsTestModel(FsMountPoint mountPoint, Optional<? extends FsModel> parent) {
         super(mountPoint, parent);
     }
 

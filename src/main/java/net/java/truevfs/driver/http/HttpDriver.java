@@ -16,6 +16,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * A file system driver for the HTTP(S) schemes.
@@ -63,11 +64,12 @@ public class HttpDriver extends FsDriver {
      */
     protected HttpResponse executeHead(HttpNode entry) throws IOException {
         // This version could be better when using a CachingHttpDriver:
-        /*HttpUriRequest request = entry.newGet();
+/*
+        HttpUriRequest request = entry.newGet();
         HttpResponse response = getClient().execute(request);
         request.abort();
-        return response;*/
-
+        return response;
+*/
         return getClient().execute(entry.newHead());
     }
 
@@ -83,9 +85,9 @@ public class HttpDriver extends FsDriver {
     public FsController newController(
             final FsManager manager,
             final FsModel model,
-            final @CheckForNull FsController parent) {
-        assert null == parent;
-        assert null == model.getParent();
+            final Optional<? extends FsController> parent) {
+        assert !parent.isPresent();
+        assert !model.getParent().isPresent();
         return new HttpController(this, model);
     }
 }

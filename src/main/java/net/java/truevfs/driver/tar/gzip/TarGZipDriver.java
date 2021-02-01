@@ -21,6 +21,7 @@ import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Optional;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -127,7 +128,7 @@ public class TarGZipDriver extends TarDriver {
         // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
         // opportunity to apply its own preferences to sort out such a conflict.
         options = options.set(STORE);
-        return new FsOutputSocketSink(options, controller.output(options, name, null));
+        return new FsOutputSocketSink(options, controller.output(options, name, Optional.empty()));
     }
 
     /**

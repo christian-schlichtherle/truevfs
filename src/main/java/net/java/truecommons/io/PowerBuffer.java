@@ -141,7 +141,9 @@ implements Comparable<This>, Cloneable {
         bb.mark();
         do {
             int read = channel.read(bb);
-            if (0 > read) throw new EOFException();
+            if (0 > read) {
+                throw new EOFException();
+            }
             remaining -= read;
         } while (0 < remaining);
         bb.reset();

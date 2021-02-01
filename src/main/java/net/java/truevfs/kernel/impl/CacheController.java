@@ -75,7 +75,7 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
     }
 
     @Override
-    public OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<Entry> template) {
+    public OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<? extends Entry> template) {
         // This class requires ON-DEMAND LOOKUP of its delegate socket!
         return new DelegatingOutputSocket<Entry>() {
 
@@ -96,7 +96,7 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
     }
 
     @Override
-    public void make(final BitField<FsAccessOption> options, final FsNodeName name, final Entry.Type type, final Optional<Entry> template) throws IOException {
+    public void make(final BitField<FsAccessOption> options, final FsNodeName name, final Entry.Type type, final Optional<? extends Entry> template) throws IOException {
         assert writeLockedByCurrentThread();
 
         getController().make(options, name, type, template);
@@ -162,6 +162,7 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
     /**
      * A cache for the contents of an individual archive entry.
      */
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final class EntryCache {
 
         final CacheEntry cache = CacheEntry.Strategy.WriteBack.newCacheEntry(getPool());
@@ -225,7 +226,7 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
             return cache.configure(new Input()).input();
         }
 
-        OutputSocket<? extends Entry> output(final BitField<FsAccessOption> options, final Optional<Entry> template) {
+        OutputSocket<? extends Entry> output(final BitField<FsAccessOption> options, final Optional<? extends Entry> template) {
 
             // This class requires lazy initialization of its channel, but no automatic decoupling on exceptions!
             final class Output extends DelegatingOutputSocket<Entry> {
@@ -237,7 +238,7 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
                         .output();
 
                 @Override
-                protected OutputSocket<? extends Entry> socket() throws IOException {
+                protected OutputSocket<? extends Entry> socket() {
                     return socket;
                 }
 
@@ -292,7 +293,7 @@ abstract class CacheController<E extends FsArchiveEntry> implements DelegatingAr
                     register();
                 }
 
-                void make(final BitField<FsAccessOption> options, final Optional<Entry> template) throws IOException {
+                void make(final BitField<FsAccessOption> options, final Optional<? extends Entry> template) throws IOException {
                     BitField<FsAccessOption> makeOpts = options;
                     while (true) {
                         try {

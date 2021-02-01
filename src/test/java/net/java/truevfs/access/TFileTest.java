@@ -367,9 +367,9 @@ public final class TFileTest extends MockArchiveDriverTestBase {
         assertEquals(abc     .getInnerArchive(), ab);
         assertEquals(abc     .getEnclArchive() , ab);
         assertEquals(ab      .getInnerArchive(), ab);
-        assertEquals(ab      .getEnclArchive() , null);
-        assertEquals(a       .getInnerArchive(), null);
-        assertEquals(a       .getEnclArchive() , null);
+        assertNull(ab.getEnclArchive());
+        assertNull(a.getInnerArchive());
+        assertNull(a.getEnclArchive());
         assertNull(n);
     }
 

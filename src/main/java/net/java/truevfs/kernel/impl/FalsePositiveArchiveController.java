@@ -70,7 +70,7 @@ abstract class FalsePositiveArchiveController implements FsDelegatingController 
 
     @Cache(NOT_THREAD_SAFE)
     FsNodePath getPath() {
-        return getModel().getMountPoint().getPath();
+        return getModel().getMountPoint().getPath().get();
     }
 
     private FsNodeName parent(FsNodeName name) {
@@ -79,7 +79,7 @@ abstract class FalsePositiveArchiveController implements FsDelegatingController 
 
     @CheckForNull
     @Override
-    public FsNode node(BitField<FsAccessOption> options, FsNodeName name) throws IOException {
+    public Optional<? extends FsNode> node(BitField<FsAccessOption> options, FsNodeName name) throws IOException {
         return apply(name, (c, n) -> c.node(options, n));
     }
 
@@ -158,7 +158,7 @@ abstract class FalsePositiveArchiveController implements FsDelegatingController 
     public OutputSocket<? extends Entry> output(
             BitField<FsAccessOption> options,
             FsNodeName name,
-            @CheckForNull Entry template
+            Optional<? extends Entry> template
     ) {
         return new AbstractOutputSocket<Entry>() {
 
@@ -196,7 +196,7 @@ abstract class FalsePositiveArchiveController implements FsDelegatingController 
             BitField<FsAccessOption> options,
             FsNodeName name,
             Entry.Type type,
-            @CheckForNull Entry template
+            Optional<? extends Entry> template
     ) throws IOException {
         apply(name, (c, n) -> {
             c.make(options, n, type, template);
@@ -212,7 +212,7 @@ abstract class FalsePositiveArchiveController implements FsDelegatingController 
                 assert c == getController();
                 // Unlink target archive file from parent file system.
                 // This operation isn't lock protected, so it's not atomic!
-                getParent().unlink(options, parent(n));
+                getParent().get().unlink(options, parent(n));
             }
             return null;
         };
@@ -280,7 +280,7 @@ abstract class FalsePositiveArchiveController implements FsDelegatingController 
         @Override
         public <T> T apply(final FsNodeName name, final Op<T> op) throws IOException {
             try {
-                return op.call(getParent(), parent(name));
+                return op.call(getParent().get(), parent(name));
             } catch (FalsePositiveArchiveException e) {
                 throw new AssertionError(e);
             } catch (final IOException e) {

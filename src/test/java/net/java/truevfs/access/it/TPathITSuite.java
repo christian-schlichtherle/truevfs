@@ -646,7 +646,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             Streams.cat(new ByteArrayInputStream(getData()), out); // write again
             fail();
-        } catch (ClosedOutputException ex) {
+        } catch (ClosedOutputException ignored) {
         }
 
         // The stream has been forcibly closed by TPath.update().
@@ -792,7 +792,7 @@ extends ConfiguredClientTestBase<D> {
         try {
             createDirectory(member);
             created = true;
-        } catch (FileAlreadyExistsException ex) {
+        } catch (FileAlreadyExistsException ignored) {
         }
         final TPath children = reversePath.getParent();
         assertDirectoryTree(member, children);
@@ -1068,7 +1068,7 @@ extends ConfiguredClientTestBase<D> {
                 } finally {
                     out.close();
                 }
-                assertTrue(Arrays.equals(getData(), out.toByteArray()));
+                assertArrayEquals(getData(), out.toByteArray());
                 try {
                     archive.toFile().rm_r();
                     fail();
@@ -1335,7 +1335,7 @@ extends ConfiguredClientTestBase<D> {
                         final TPath entry = archive.resolve("" + threadNum);
                         createTestFile(entry);
                         try {
-                            TVFS.sync(archive.getNodePath().getMountPoint(),
+                            TVFS.sync(archive.getNodePath().getMountPoint().get(),
                                     BitField.of(CLEAR_CACHE)
                                             .set(WAIT_CLOSE_IO, wait));
                         } catch (final FsSyncException ex) {

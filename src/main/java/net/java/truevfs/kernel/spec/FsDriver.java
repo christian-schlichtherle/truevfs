@@ -6,6 +6,8 @@ package net.java.truevfs.kernel.spec;
 
 import net.java.truecommons.shed.UniqueObject;
 
+import java.util.Optional;
+
 /**
  * An abstract factory for components required to access a file system.
  * <p>
@@ -37,10 +39,8 @@ public abstract class FsDriver
     public final FsModel newModel(
             FsManager context,
             FsMountPoint mountPoint,
-            FsModel parent) {
-        assert null == parent
-                ? null == mountPoint.getParent()
-                : parent.getMountPoint().equals(mountPoint.getParent());
+            Optional<? extends FsModel> parent) {
+        assert mountPoint.getParent().equals(parent.map(FsModel::getMountPoint));
         return context.newModel(this, mountPoint, parent);
     }
 

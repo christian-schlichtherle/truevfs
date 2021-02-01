@@ -23,8 +23,12 @@ final class ZipKeyController extends AbstractKeyController {
     }
 
     @Override
-    protected Class<?> getKeyType() { return AesPbeParameters.class; }
+    protected Class<?> getKeyType() {
+        return AesPbeParameters.class;
+    }
 
     @Override
-    protected Class<? extends IOException> getKeyExceptionType() { return ZipKeyException.class; }
+    protected Class<? extends IOException> getKeyExceptionType() {
+        return ZipKeyException.class;
+    }
 }

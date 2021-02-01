@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.access;
 
+import lombok.val;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.OutputSocket;
@@ -103,10 +104,14 @@ public final class TPath implements Path, TRex {
     private final URI name;
     private final TArchiveDetector detector;
     private final FsNodePath nodePath;
-    private volatile @CheckForNull TFileSystem fileSystem;
-    private volatile @CheckForNull String string;
-    private volatile @CheckForNull Integer hashCode;
-    private volatile @CheckForNull List<String> elements;
+    private volatile @CheckForNull
+    TFileSystem fileSystem;
+    private volatile @CheckForNull
+    String string;
+    private volatile @CheckForNull
+    Integer hashCode;
+    private volatile @CheckForNull
+    List<String> elements;
 
     /**
      * Constructs a new path from the given path strings.
@@ -120,30 +125,30 @@ public final class TPath implements Path, TRex {
      * the current archive detector {@code TConfig.current().getArchiveDetector()}.
      *
      * <h3>Examples</h3>
-<p>On all platforms:</p>
-<dl>
-    <dt>Relative path name:</dt>
-    <dd><code>Path path = new TPath("app.war/WEB-INF/lib", "lib.jar/META-INF/MANIFEST.MF");</code></dd>
-</dl>
-<p>On POSIX platforms (Unix, Linux, Mac OS X):</p>
-<dl>
-    <dt>Absolute path name:</dt>
-    <dd><code>Path path = new TPath("/home/christian/archive.zip");</code></dd>
-</dl>
-<p>On the Windows platform:</p>
-<dl>
-    <dt>Relative path name:</dt>
-    <dd><code>Path path = new TPath("app.war\WEB-INF\lib", "lib.jar\META-INF\MANIFEST.MF");</code></dd>
-    <dt>Absolute path name with C: drive letter and wierd case letters:</dt>
-    <dd><code>Path path = new TPath("c:\UsErS\cHrIsTiAn\ArChIvE.zIp");</code></dd>
-    <dt>Absolute path name with separated UNC host and share name and forward slash separator:</dt>
-    <dd><code>Path path = new TPath("//host", "share", "archive.zip");</code></dd>
-    <dt>Dito with mixed slash separators:</dt>
-    <dd><code>Path path = new TPath("\\host/share\archive.zip");</code></dd>
-</dl>
+     * <p>On all platforms:</p>
+     * <dl>
+     * <dt>Relative path name:</dt>
+     * <dd><code>Path path = new TPath("app.war/WEB-INF/lib", "lib.jar/META-INF/MANIFEST.MF");</code></dd>
+     * </dl>
+     * <p>On POSIX platforms (Unix, Linux, Mac OS X):</p>
+     * <dl>
+     * <dt>Absolute path name:</dt>
+     * <dd><code>Path path = new TPath("/home/christian/archive.zip");</code></dd>
+     * </dl>
+     * <p>On the Windows platform:</p>
+     * <dl>
+     * <dt>Relative path name:</dt>
+     * <dd><code>Path path = new TPath("app.war\WEB-INF\lib", "lib.jar\META-INF\MANIFEST.MF");</code></dd>
+     * <dt>Absolute path name with C: drive letter and wierd case letters:</dt>
+     * <dd><code>Path path = new TPath("c:\UsErS\cHrIsTiAn\ArChIvE.zIp");</code></dd>
+     * <dt>Absolute path name with separated UNC host and share name and forward slash separator:</dt>
+     * <dd><code>Path path = new TPath("//host", "share", "archive.zip");</code></dd>
+     * <dt>Dito with mixed slash separators:</dt>
+     * <dd><code>Path path = new TPath("\\host/share\archive.zip");</code></dd>
+     * </dl>
      *
      * @param first the first sub path string.
-     * @param more optional sub path strings.
+     * @param more  optional sub path strings.
      */
     public TPath(String first, String... more) {
         this(name(first, more), null, null);
@@ -162,8 +167,8 @@ public final class TPath implements Path, TRex {
      * the current archive detector {@code TConfig.current().getArchiveDetector()}.
      *
      * @param fileSystem the file system to access.
-     * @param first the first sub path string.
-     * @param more optional sub path strings.
+     * @param first      the first sub path string.
+     * @param more       optional sub path strings.
      */
     TPath(final TFileSystem fileSystem, String first, final String... more) {
         final URI name = name(cutLeadingSeparators(first), more);
@@ -171,7 +176,7 @@ public final class TPath implements Path, TRex {
         final TArchiveDetector detector = TConfig.current().getArchiveDetector();
         this.detector = detector;
         this.nodePath = new TUriResolver(detector).resolve(
-                new FsNodePath(fileSystem.getMountPoint(), ROOT),
+                new FsNodePath(Optional.of(fileSystem.getMountPoint()), ROOT),
                 name);
         this.fileSystem = fileSystem;
 
@@ -194,38 +199,38 @@ public final class TPath implements Path, TRex {
      * current archive detector {@code TConfig.current().getArchiveDetector()}.
      *
      * <h3>Examples</h3>
-<p>On all platforms:</p>
-<dl>
-    <dt>Relative URI with relative path component:</dt>
-    <dd><code>Path path = new TPath(new URI("app.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF"));</code></dd>
-    <dt>HTTP URI:</dt>
-    <dd><code>Path path = new TPath(new URI("http://acme.com/download/everything.tar.gz/README.TXT"));</code></dd>
-</dl>
-<p>On POSIX platforms (Unix, Linux, Mac OS X):</p>
-<dl>
-    <dt>Relative URI with absolute path component:</dt>
-    <dd><code>Path path = new TPath(new URI("/home/christian/archive.zip"));</code></dd>
-    <dt>Dito with absolute, hierarchical URI:</dt>
-    <dd><code>Path path = new TPath(new URI("file:/home/christian/archive.zip"));</code></dd>
-</dl>
-<p>On the Windows platform:</p>
-<dl>
-    <dt>Relative URI with relative path component with C: drive letter and following absolute path name:</dt>
-    <dd><code>Path path = new TPath(new URI("c%3A/Users/christian/archive.zip"));</code></dd>
-    <dt>Dito with absolute, hierarchical URI:</dt>
-    <dd><code>Path path = new TPath(new URI("file:/c:/Users/christian/archive.zip"));</code></dd>
-    <dt>Relative URI with UNC host and share name:</dt>
-    <dd><code>Path path = new TPath(new URI("//host/share/archive.zip"));</code></dd>
-    <dt>Dito with absolute, hierarchical URI:</dt>
-    <dd><code>Path path = new TPath(new URI("file://host/share/archive.zip"));</code></dd>
-</dl>
+     * <p>On all platforms:</p>
+     * <dl>
+     * <dt>Relative URI with relative path component:</dt>
+     * <dd><code>Path path = new TPath(new URI("app.war/WEB-INF/lib/lib.jar/META-INF/MANIFEST.MF"));</code></dd>
+     * <dt>HTTP URI:</dt>
+     * <dd><code>Path path = new TPath(new URI("http://acme.com/download/everything.tar.gz/README.TXT"));</code></dd>
+     * </dl>
+     * <p>On POSIX platforms (Unix, Linux, Mac OS X):</p>
+     * <dl>
+     * <dt>Relative URI with absolute path component:</dt>
+     * <dd><code>Path path = new TPath(new URI("/home/christian/archive.zip"));</code></dd>
+     * <dt>Dito with absolute, hierarchical URI:</dt>
+     * <dd><code>Path path = new TPath(new URI("file:/home/christian/archive.zip"));</code></dd>
+     * </dl>
+     * <p>On the Windows platform:</p>
+     * <dl>
+     * <dt>Relative URI with relative path component with C: drive letter and following absolute path name:</dt>
+     * <dd><code>Path path = new TPath(new URI("c%3A/Users/christian/archive.zip"));</code></dd>
+     * <dt>Dito with absolute, hierarchical URI:</dt>
+     * <dd><code>Path path = new TPath(new URI("file:/c:/Users/christian/archive.zip"));</code></dd>
+     * <dt>Relative URI with UNC host and share name:</dt>
+     * <dd><code>Path path = new TPath(new URI("//host/share/archive.zip"));</code></dd>
+     * <dt>Dito with absolute, hierarchical URI:</dt>
+     * <dd><code>Path path = new TPath(new URI("file://host/share/archive.zip"));</code></dd>
+     * </dl>
      *
-     * @param  name the path name.
-     *         This must be a hierarchical URI with an undefined fragment
-     *         component.
-     *         Any trailing separators in the path component get discarded.
+     * @param name the path name.
+     *             This must be a hierarchical URI with an undefined fragment
+     *             component.
+     *             Any trailing separators in the path component get discarded.
      * @throws IllegalArgumentException if the preconditions for the parameter
-     *         do not hold.
+     *                                  do not hold.
      */
     public TPath(URI name) {
         this(name, null, null);
@@ -247,31 +252,31 @@ public final class TPath implements Path, TRex {
      * current archive detector {@code TConfig.current().getArchiveDetector()}.
      *
      * <h3>Examples</h3>
-<p>On all platforms:</p>
-<dl>
-    <dt>Relative path name:</dt>
-    <dd><code>Path path = new TPath(new File("app.war/WEB-INF/lib", "lib.jar/META-INF/MANIFEST.MF"));</code></dd>
-</dl>
-<p>On POSIX platforms (Unix, Linux, Mac OS X):</p>
-<dl>
-    <dt>Absolute path name with plain {@code File}:</dt>
-    <dd><code>Path path = new TPath(new File("/home/christian/archive.zip"));</code></dd>
-    <dt>Absolute path name with plain {@link TFile}:</dt>
-    <dd><code>Path path = new TPath(new TFile("/home/christian/archive.zip"));</code></dd>
-</dl>
-<p>On the Windows platform:</p>
-<dl>
-    <dt>Absolute path name with plain {@code File}:</dt>
-    <dd><code>Path path = new TPath(new File("c:\home\christian\archive.zip"));</code></dd>
-    <dt>Absolute path name with {@link TFile}:</dt>
-    <dd><code>Path path = new TPath(new TFile("c:\home\christian\archive.zip"));</code></dd>
-</dl>
+     * <p>On all platforms:</p>
+     * <dl>
+     * <dt>Relative path name:</dt>
+     * <dd><code>Path path = new TPath(new File("app.war/WEB-INF/lib", "lib.jar/META-INF/MANIFEST.MF"));</code></dd>
+     * </dl>
+     * <p>On POSIX platforms (Unix, Linux, Mac OS X):</p>
+     * <dl>
+     * <dt>Absolute path name with plain {@code File}:</dt>
+     * <dd><code>Path path = new TPath(new File("/home/christian/archive.zip"));</code></dd>
+     * <dt>Absolute path name with plain {@link TFile}:</dt>
+     * <dd><code>Path path = new TPath(new TFile("/home/christian/archive.zip"));</code></dd>
+     * </dl>
+     * <p>On the Windows platform:</p>
+     * <dl>
+     * <dt>Absolute path name with plain {@code File}:</dt>
+     * <dd><code>Path path = new TPath(new File("c:\home\christian\archive.zip"));</code></dd>
+     * <dt>Absolute path name with {@link TFile}:</dt>
+     * <dd><code>Path path = new TPath(new TFile("c:\home\christian\archive.zip"));</code></dd>
+     * </dl>
      *
      * @param file a file.
-     *        If this is an instance of {@link TFile}, its
-     *        {@linkplain TFile#getArchiveDetector() archive detector} and
-     *        {@linkplain TFile#getNodePath() file system node path} get shared
-     *        with this instance.
+     *             If this is an instance of {@link TFile}, its
+     *             {@linkplain TFile#getArchiveDetector() archive detector} and
+     *             {@linkplain TFile#getNodePath() file system node path} get shared
+     *             with this instance.
      */
     public TPath(File file) {
         final URI name = name(file.getPath());
@@ -297,20 +302,20 @@ public final class TPath implements Path, TRex {
      * current archive detector {@code TConfig.current().getArchiveDetector()}.
      *
      * <h3>Examples</h3>
-<p>On all platforms:</p>
-<dl>
-    <dt>Relative path name:</dt>
-    <dd><code>Path path = new TPath(Paths.current("app.war/WEB-INF/lib", "lib.jar/META-INF/MANIFEST.MF"));</code></dd>
-</dl>
+     * <p>On all platforms:</p>
+     * <dl>
+     * <dt>Relative path name:</dt>
+     * <dd><code>Path path = new TPath(Paths.current("app.war/WEB-INF/lib", "lib.jar/META-INF/MANIFEST.MF"));</code></dd>
+     * </dl>
      *
      * @param path a path.
      */
     public TPath(Path path) {
-        this(   path instanceof TPath
-                    ? ((TPath) path).getName()
-                    : name(path.toString().replace(
-                        path.getFileSystem().getSeparator(),
-                        separator)),
+        this(path instanceof TPath
+                        ? ((TPath) path).getName()
+                        : name(path.toString().replace(
+                path.getFileSystem().getSeparator(),
+                separator)),
                 null,
                 null);
     }
@@ -445,9 +450,9 @@ public final class TPath implements Path, TRex {
      * If assertions are enabled however, a call to this method will initialize
      * all volatile fields as a side effect.
      *
-     * @throws AssertionError If assertions are enabled and any invariant is
-     *         violated.
      * @return {@code true}
+     * @throws AssertionError If assertions are enabled and any invariant is
+     *                        violated.
      */
     private boolean invariants() {
         assert null != getName();
@@ -464,14 +469,14 @@ public final class TPath implements Path, TRex {
      * - no file system tests are performed by this method!
      *
      * @return {@code true} if and only if this {@code TPath} addresses an
-     *         archive file.
-     * @see    #isEntry
+     * archive file.
+     * @see #isEntry
      */
     public boolean isArchive() {
-        final FsNodePath nodePath = getNodePath();
-        final boolean root = nodePath.getNodeName().isRoot();
-        final FsMountPoint parent = nodePath.getMountPoint().getParent();
-        return root && null != parent;
+        val nodePath = getNodePath();
+        val root = nodePath.getNodeName().isRoot();
+        val parent = nodePath.getMountPoint().flatMap(FsMountPoint::getParent);
+        return root && parent.isPresent();
     }
 
     /**
@@ -482,15 +487,15 @@ public final class TPath implements Path, TRex {
      * - no file system tests are performed by this method!
      *
      * @return {@code true} if and only if this {@code TPath} addresses an
-     *         entry located within an archive file.
+     * entry located within an archive file.
      * @see #isArchive
      */
     public boolean isEntry() {
-        final FsNodePath nodePath = getNodePath();
-        final boolean root = nodePath.getNodeName().isRoot();
-        final FsMountPoint parent = nodePath.getMountPoint().getParent();
-        return !root    ? null != parent
-                        : null != parent && null != parent.getParent();
+        val nodePath = getNodePath();
+        val root = nodePath.getNodeName().isRoot();
+        val parent = nodePath.getMountPoint().flatMap(FsMountPoint::getParent);
+        return !root ? parent.isPresent()
+                : parent.isPresent() && parent.get().getParent().isPresent();
     }
 
     /**
@@ -499,17 +504,23 @@ public final class TPath implements Path, TRex {
      *
      * @return the name of this path as a {@code URI}.
      */
-    URI getName() { return name; }
+    URI getName() {
+        return name;
+    }
 
     @Override
-    public TArchiveDetector getArchiveDetector() { return detector; }
+    public TArchiveDetector getArchiveDetector() {
+        return detector;
+    }
 
     @Override
-    public FsNodePath getNodePath() { return nodePath; }
+    public FsNodePath getNodePath() {
+        return nodePath;
+    }
 
     @Override
     public FsMountPoint getMountPoint() {
-        return getNodePath().getMountPoint();
+        return getNodePath().getMountPoint().get();
     }
 
     @Override
@@ -534,7 +545,9 @@ public final class TPath implements Path, TRex {
     }
 
     @Override
-    public boolean isAbsolute() { return hasAbsolutePath(getName()); }
+    public boolean isAbsolute() {
+        return hasAbsolutePath(getName());
+    }
 
     /**
      * Returns a path object for the same path name, but does not detect any
@@ -548,12 +561,12 @@ public final class TPath implements Path, TRex {
      * mounted by the TrueVFS Kernel!
      *
      * @return A path object for the same path name, but does not detect any
-     *         archive file name patterns in the last path name segment.
-     * @see    TFileSystem#close()
-     * @see    TVFS#umount()
+     * archive file name patterns in the last path name segment.
+     * @see TFileSystem#close()
+     * @see TVFS#umount()
      */
-    @ExpertFeature( level=INTERMEDIATE,
-                    value=INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
+    @ExpertFeature(level = INTERMEDIATE,
+            value = INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA)
     public TPath toNonArchivePath() {
         if (!isArchive()) return this;
         try (final TConfig config = TConfig.open()) {
@@ -565,7 +578,8 @@ public final class TPath implements Path, TRex {
     }
 
     @Override
-    public @Nullable TPath getRoot() {
+    public @Nullable
+    TPath getRoot() {
         final URI n = getName();
         final String ssp = n.getSchemeSpecificPart();
         final int l = prefixLength(ssp);
@@ -574,7 +588,8 @@ public final class TPath implements Path, TRex {
     }
 
     @Override
-    public @Nullable TPath getFileName() {
+    public @Nullable
+    TPath getFileName() {
         final List<String> elements = getElements();
         final int l = elements.size();
         if (l <= 0) return null;
@@ -582,7 +597,8 @@ public final class TPath implements Path, TRex {
     }
 
     @Override
-    public @Nullable TPath getParent() {
+    public @Nullable
+    TPath getParent() {
         final URI n = getName();
         {
             final int l = n.getPath().length();
@@ -619,7 +635,9 @@ public final class TPath implements Path, TRex {
     }
 
     @Override
-    public int getNameCount() { return getElements().size(); }
+    public int getNameCount() {
+        return getElements().size();
+    }
 
     @Override
     public TPath getName(int index) {
@@ -648,7 +666,7 @@ public final class TPath implements Path, TRex {
         final int ol = other.length();
         return name.startsWith(other)
                 && (name.length() == ol
-                    || separatorChar == name.charAt(ol));
+                || separatorChar == name.charAt(ol));
     }
 
     @Override
@@ -663,7 +681,7 @@ public final class TPath implements Path, TRex {
         final int ol = other.length(), tl;
         return name.endsWith(other)
                 && ((tl = name.length()) == ol
-                    || separatorChar == name.charAt(tl - ol));
+                || separatorChar == name.charAt(tl - ol));
     }
 
     @Override
@@ -672,7 +690,7 @@ public final class TPath implements Path, TRex {
     }
 
     @Override
-    public TPath resolve(Path other) {
+    public TPath resolve(final Path other) {
         if (other instanceof TPath) {
             final TPath that = (TPath) other;
             if (that.isAbsolute()) return that;
@@ -709,8 +727,8 @@ public final class TPath implements Path, TRex {
         final TArchiveDetector detector = TConfig.current().getArchiveDetector();
         final FsNodePath nodePath = new TUriResolver(detector).resolve(
                 hasAbsolutePath(other)
-                    ? TFileSystemProvider.get(getName()).getRoot()
-                    : getNodePath(),
+                        ? TFileSystemProvider.get(getName()).getRoot()
+                        : getNodePath(),
                 other);
         return new TPath(name, detector, nodePath);
     }
@@ -751,7 +769,9 @@ public final class TPath implements Path, TRex {
     }
 
     @Override
-    public URI toUri() { return getUri(); }
+    public URI toUri() {
+        return getUri();
+    }
 
     @Override
     public TPath toAbsolutePath() {
@@ -773,8 +793,8 @@ public final class TPath implements Path, TRex {
      *
      * @return A {@code TFile} object for this path.
      * @throws UnsupportedOperationException if this path is not file based,
-     *         i.e. if the scheme component of the {@link #getUri() URI} of
-     *         this path is not {@code file}.
+     *                                       i.e. if the scheme component of the {@link #getUri() URI} of
+     *                                       this path is not {@code file}.
      */
     @Override
     public TFile toFile() {
@@ -788,15 +808,21 @@ public final class TPath implements Path, TRex {
     }
 
     @Override
-    public TPath toPath() { return this; }
+    public TPath toPath() {
+        return this;
+    }
 
-    /** @throws UnsupportedOperationException always */
+    /**
+     * @throws UnsupportedOperationException always
+     */
     @Override
     public WatchKey register(WatchService watcher, Kind<?>[] events, Modifier... modifiers) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    /** @throws UnsupportedOperationException always */
+    /**
+     * @throws UnsupportedOperationException always
+     */
     @Override
     public WatchKey register(WatchService watcher, Kind<?>... events) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -854,7 +880,7 @@ public final class TPath implements Path, TRex {
     public boolean equals(final Object other) {
         return this == other
                 || other instanceof TPath
-                    && COMPARATOR.equals(this, (TPath) other);
+                && COMPARATOR.equals(this, (TPath) other);
     }
 
     /**
@@ -863,7 +889,9 @@ public final class TPath implements Path, TRex {
      * @return A hash code which is consistent with {@link #equals(Object)}.
      */
     @Override
-    public int hashCode() { return COMPARATOR.hashCode(this); }
+    public int hashCode() {
+        return COMPARATOR.hashCode(this);
+    }
 
     @Override
     public String toString() {
@@ -883,22 +911,22 @@ public final class TPath implements Path, TRex {
     SeekableByteChannel newByteChannel(
             Set<? extends OpenOption> options,
             FileAttribute<?>... attrs)
-    throws IOException {
+            throws IOException {
         return getFileSystem().newByteChannel(this, options, attrs);
     }
 
     InputStream newInputStream(OpenOption... options)
-    throws IOException {
+            throws IOException {
         return getFileSystem().newInputStream(this, options);
     }
 
     OutputStream newOutputStream(OpenOption... options)
-    throws IOException {
+            throws IOException {
         return getFileSystem().newOutputStream(this, options);
     }
 
     DirectoryStream<Path> newDirectoryStream(Filter<? super Path> filter)
-    throws IOException {
+            throws IOException {
         return getFileSystem().newDirectoryStream(this, filter);
     }
 
@@ -910,7 +938,7 @@ public final class TPath implements Path, TRex {
         getFileSystem().delete(this);
     }
 
-    FsNode stat() throws IOException {
+    Optional<? extends FsNode> stat() throws IOException {
         return getFileSystem().stat(this);
     }
 
@@ -918,8 +946,8 @@ public final class TPath implements Path, TRex {
         return getFileSystem().input(this, options);
     }
 
-    OutputSocket<?> output( BitField<FsAccessOption> options,
-                            @CheckForNull Entry template) {
+    OutputSocket<?> output(BitField<FsAccessOption> options,
+                           @CheckForNull Entry template) {
         return getFileSystem().output(this, options, template);
     }
 
@@ -937,7 +965,7 @@ public final class TPath implements Path, TRex {
     <A extends BasicFileAttributes> A readAttributes(
             Class<A> type,
             LinkOption... options)
-    throws IOException {
+            throws IOException {
         return getFileSystem().readAttributes(this, type, options);
     }
 
@@ -991,7 +1019,7 @@ public final class TPath implements Path, TRex {
     BitField<FsAccessOption> getAccessPreferences() {
         final BitField<FsAccessOption> preferences =
                 TConfig.current().getAccessPreferences();
-        return null != getMountPoint().getParent()
+        return getMountPoint().getParent().isPresent()
                 ? preferences
                 : preferences.clear(CREATE_PARENTS);
     }
@@ -1027,7 +1055,7 @@ public final class TPath implements Path, TRex {
             result = 37 * result + p.toString().hashCode();
             return p.hashCode = result;
         }
-    } // TPathComparator
+    }
 
     /**
      * The methods in this class use
@@ -1062,5 +1090,5 @@ public final class TPath implements Path, TRex {
             result = 37 * result + p.toString().toLowerCase(Locale.getDefault()).hashCode();
             return p.hashCode = result;
         }
-    } // WindowsTPathComparator
+    }
 }

@@ -10,6 +10,7 @@ import net.java.truevfs.kernel.spec.FsAccessOption;
 import net.java.truevfs.kernel.spec.FsAccessOptions;
 
 import java.io.*;
+import java.util.Optional;
 
 /**
  * A replacement for the class {@link FileOutputStream} for writing plain old
@@ -155,6 +156,6 @@ public final class TFileOutputStream extends DecoratingOutputStream {
         super(TBIO.output(
                 TConfig.current().getAccessPreferences().or(options),
                 file,
-                null).stream(null));
+                Optional.empty()).stream(Optional.empty()));
     }
 }

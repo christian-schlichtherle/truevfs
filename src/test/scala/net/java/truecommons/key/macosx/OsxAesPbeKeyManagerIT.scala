@@ -13,7 +13,7 @@ import org.scalatestplus.mockito.MockitoSugar._
 /**
  * @author Christian Schlichtherle
  */
-class OsxAesPbeKeyManagerITSpec extends KeyManagerITSuite[AesPbeParameters] {
+class OsxAesPbeKeyManagerIT extends KeyManagerITSuite[AesPbeParameters] {
 
   override protected def keyManager: KeyManager[AesPbeParameters] = {
     val parameters: AesPbeParameters = new AesPbeParameters

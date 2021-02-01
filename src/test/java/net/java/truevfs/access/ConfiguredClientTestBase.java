@@ -120,6 +120,6 @@ public abstract class ConfiguredClientTestBase<D extends FsArchiveDriver<?>>
                 .getManager()
                 .controller(
                         getConfig().getArchiveDetector(),
-                        nodePath.getMountPoint());
+                        nodePath.getMountPoint().get());
     }
 }

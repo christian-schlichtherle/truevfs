@@ -47,7 +47,7 @@ extends UniqueObject implements FsController {
      *         defined by the {@linkplain #getModel() model}.
      */
     public final FsMountPoint getMountPoint() {
-        return model.getMountPoint();
+        return getModel().getMountPoint();
     }
 
     /**

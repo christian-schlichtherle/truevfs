@@ -59,7 +59,7 @@ public class HttpInputSocket extends AbstractInputSocket<HttpNode> {
             boolean closed;
 
             BufferReadOnlyChannel() throws IOException {
-                super(buffer.input().channel(peer)); // or .channel(null)
+                super(buffer.input().channel(peer)); // or .channel(Optional.empty())
             }
 
             @Override

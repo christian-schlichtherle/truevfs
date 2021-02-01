@@ -133,8 +133,7 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_NAME;
  * @see    FsNode#getName()
  * @author Christian Schlichtherle
  */
-public final class FsNodeName
-implements Serializable, Comparable<FsNodeName> {
+public final class FsNodeName implements Serializable, Comparable<FsNodeName> {
 
     private static final long serialVersionUID = 0;
 

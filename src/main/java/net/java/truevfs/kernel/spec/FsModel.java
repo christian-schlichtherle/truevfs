@@ -4,8 +4,9 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import javax.annotation.CheckForNull;
 import net.java.truecommons.shed.ImplementationsShouldExtend;
+
+import java.util.Optional;
 
 /**
  * Defines common properties of any file system.
@@ -36,7 +37,7 @@ public interface FsModel {
      *
      * @return The nullable parent file system model.
      */
-    @CheckForNull FsModel getParent();
+    Optional<? extends FsModel> getParent();
 
     /**
      * Returns {@code true} if and only if some state associated with the
@@ -74,6 +75,7 @@ public interface FsModel {
      * @param  <Context> The type of the calling context.
      * @author Christian Schlichtherle
      */
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     interface Factory<Context> {
 
         /**
@@ -81,11 +83,7 @@ public interface FsModel {
          * This is a pure function without side effects.
          * <p>
          * When called, you may assert the following precondition:
-         * <pre>{@code
-         * assert null == parent
-         *         ? null == mountPoint.getParent()
-         *         : parent.getMountPoint().equals(mountPoint.getParent());
-         * }</pre>
+         * {@code assert mountPoint.getParent().equals(parent.map(FsModel::getMountPoint));}
          *
          * @param  context the calling context.
          * @param  mountPoint the mount point of the file system.
@@ -95,6 +93,6 @@ public interface FsModel {
         FsModel newModel(
                 Context context,
                 FsMountPoint mountPoint,
-                @CheckForNull FsModel parent);
+                Optional<? extends FsModel> parent);
     }
 }

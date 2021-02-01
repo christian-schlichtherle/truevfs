@@ -7,7 +7,6 @@ package net.java.truecommons.key.swing.util;
 import javax.annotation.Nullable;
 import javax.swing.*;
 import java.awt.*;
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
@@ -22,18 +21,10 @@ public class Windows {
 
     private static final String PROPERTY_FOCUSED_WINDOW = "focusedWindow";
 
-    private static Reference<KeyboardFocusManager> lastFocusManager
-            = new WeakReference<KeyboardFocusManager>(null);
-    private static Reference<Window> lastFocusedWindow
-            = new WeakReference<Window>(null);
+    private static Reference<KeyboardFocusManager> lastFocusManager = new WeakReference<>(null);
+    private static Reference<Window> lastFocusedWindow = new WeakReference<>(null);
 
-    private static final PropertyChangeListener focusListener
-            = new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-            setLastFocusedWindow((Window) evt.getNewValue());
-        }
-    };
+    private static final PropertyChangeListener focusListener = evt -> setLastFocusedWindow((Window) evt.getNewValue());
 
     /** You cannot instantiate this class. */
     private Windows() { }

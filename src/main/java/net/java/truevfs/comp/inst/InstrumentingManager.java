@@ -12,22 +12,17 @@ import java.util.Objects;
  * @param  <M> the type of the mediator.
  * @author Christian Schlichtherle
  */
-public class InstrumentingManager<M extends Mediator<M>>
-extends FsDecoratingManager {
+public class InstrumentingManager<M extends Mediator<M>> extends FsDecoratingManager {
 
     protected final M mediator;
 
-    public InstrumentingManager(
-            final M mediator,
-            final FsManager manager) {
+    public InstrumentingManager(final M mediator, final FsManager manager) {
         super(manager);
         this.mediator = Objects.requireNonNull(mediator);
     }
 
     @Override
-    public FsController controller(
-            FsCompositeDriver driver,
-            FsMountPoint mountPoint) {
+    public FsController controller(FsCompositeDriver driver, FsMountPoint mountPoint) {
         return mediator.instrument(this,
                 manager.controller(
                     mediator.instrument(this, driver),

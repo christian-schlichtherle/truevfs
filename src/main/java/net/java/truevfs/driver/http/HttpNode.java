@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.nio.file.NoSuchFileException;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Set;
 
 import static net.java.truecommons.cio.Entry.Access.READ;
@@ -38,6 +39,7 @@ import static net.java.truevfs.kernel.spec.FsAccessOptions.NONE;
  *
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class HttpNode extends FsAbstractNode implements IoEntry<HttpNode> {
 
     private final HttpController controller;
@@ -150,11 +152,11 @@ public class HttpNode extends FsAbstractNode implements IoEntry<HttpNode> {
     }
 
     @Override
-    public final OutputSocket<HttpNode> output() { return output(NONE, null); }
+    public final OutputSocket<HttpNode> output() { return output(NONE, Optional.empty()); }
 
     protected OutputSocket<HttpNode> output(
             BitField<FsAccessOption> options,
-            @CheckForNull Entry template) {
+            Optional<? extends Entry> template) {
         return new HttpOutputSocket(options, this, template);
     }
 }

@@ -46,13 +46,16 @@ final class DefaultManager extends FsAbstractManager implements ReentrantReadWri
     }
 
     @Override
-    public FsModel newModel(FsDriver driver, FsMountPoint mountPoint, FsModel parent) {
+    public FsModel newModel(FsDriver driver, FsMountPoint mountPoint, Optional<? extends FsModel> parent) {
+        assert mountPoint.getParent().equals(parent.map(FsModel::getMountPoint));
         return driver.decorate(new DefaultModel(mountPoint, parent));
     }
 
     @Override
-    public FsController newController(FsArchiveDriver<? extends FsArchiveEntry> driver, FsModel model, FsController parent) {
-        return ControllerModuleFactory.INSTANCE.module(driver).newControllerChain(model, parent);
+    public FsController newController(FsArchiveDriver<? extends FsArchiveEntry> driver, FsModel model, Optional<? extends FsController> parent) {
+        assert parent.isPresent();
+        assert model.getParent().equals(parent.map(FsController::getModel));
+        return ControllerModuleFactory.INSTANCE.module(driver).newControllerChain(model, parent.get());
     }
 
     @Override
@@ -87,10 +90,10 @@ final class DefaultManager extends FsAbstractManager implements ReentrantReadWri
             return oc.get();
         } else {
             checkWriteLockedByCurrentThread();
-            val opc = Optional.ofNullable(mountPoint.getParent()).map(y -> controller0(driver, y));
+            val opc = mountPoint.getParent().map(pmp -> controller0(driver, pmp));
             val opm = opc.map(FsController::getModel);
-            val m = new ManagedModel(driver.newModel(this, mountPoint, opm.orElse(null)));
-            val c = driver.newController(this, m, opc.orElse(null));
+            val m = new ManagedModel(driver.newModel(this, mountPoint, opm));
+            val c = driver.newController(this, m, opc);
             m.init(c);
             return c;
         }

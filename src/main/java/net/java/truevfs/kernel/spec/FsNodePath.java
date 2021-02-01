@@ -8,11 +8,11 @@ import net.java.truecommons.shed.QuotedUriSyntaxException;
 import net.java.truecommons.shed.UriBuilder;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.beans.ConstructorProperties;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 import static net.java.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
 import static net.java.truevfs.kernel.spec.FsUriModifier.NULL;
@@ -134,8 +134,8 @@ import static net.java.truevfs.kernel.spec.FsUriModifier.PostFix.NODE_PATH;
  * @see FsNodeName
  * @see FsScheme
  */
-public final class FsNodePath
-        implements Serializable, Comparable<FsNodePath> {
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+public final class FsNodePath implements Serializable, Comparable<FsNodePath> {
 
     private static final long serialVersionUID = 0;
 
@@ -143,19 +143,16 @@ public final class FsNodePath
 
     private URI uri; // not final for serialization only!
 
-    private transient @Nullable
-    FsMountPoint mountPoint;
+    private transient Optional<FsMountPoint> mountPoint = Optional.empty();
 
     private transient FsNodeName nodeName;
 
-    private transient volatile @Nullable
-    URI hierarchical;
+    private transient volatile Optional<URI> hierarchical = Optional.empty();
 
     /**
      * Equivalent to {@link #create(URI, FsUriModifier) create(uri, FsUriModifier.NULL)}.
      */
-    public static FsNodePath
-    create(URI uri) {
+    public static FsNodePath create(URI uri) {
         return create(uri, NULL);
     }
 
@@ -172,8 +169,7 @@ public final class FsNodePath
      * @throws IllegalArgumentException if {@code uri} does not conform to the
      *                                  syntax constraints for paths.
      */
-    public static FsNodePath
-    create(URI uri, FsUriModifier modifier) {
+    public static FsNodePath create(URI uri, FsUriModifier modifier) {
         try {
             return new FsNodePath(uri, modifier);
         } catch (URISyntaxException ex) {
@@ -209,27 +205,24 @@ public final class FsNodePath
      * @throws URISyntaxException if {@code uri} does not conform to the
      *                            syntax constraints for paths.
      */
-    public FsNodePath(URI uri, FsUriModifier modifier)
-            throws URISyntaxException {
+    public FsNodePath(URI uri, FsUriModifier modifier) throws URISyntaxException {
         parse(uri, modifier);
     }
 
     /**
-     * Constructs a new path by composing its URI from the given nullable mount
+     * Constructs a new path by composing its URI from the given optional mount
      * point and node name.
      *
-     * @param mountPoint the nullable {@link #getMountPoint() mount point}.
+     * @param mountPoint the optional {@link #getMountPoint() mount point}.
      * @param nodeName   the {@link #getNodeName() node name}.
      */
-    public FsNodePath(
-            final @CheckForNull FsMountPoint mountPoint,
-            final FsNodeName nodeName) {
+    public FsNodePath(final Optional<FsMountPoint> mountPoint, final FsNodeName nodeName) {
         URI mpu;
-        if (null == mountPoint) {
+        if (!mountPoint.isPresent()) {
             this.uri = nodeName.getUri();
         } else if (nodeName.isRoot()) {
-            this.uri = mountPoint.getUri();
-        } else if ((mpu = mountPoint.getUri()).isOpaque()) {
+            this.uri = mountPoint.get().getUri();
+        } else if ((mpu = mountPoint.get().getUri()).isOpaque()) {
             try {
                 // Compute mountPoint + nodeName, but ensure that all URI
                 // components are properly quoted.
@@ -244,8 +237,9 @@ public final class FsNodePath
                         new StringBuilder(mpusspl + enupl + enuql)
                                 .append(mpussp)
                                 .append(enup);
-                if (null != enuq)
+                if (null != enuq) {
                     ssp.append('?').append(enuq);
+                }
                 this.uri = new UriBuilder(true)
                         .scheme(mpu.getScheme())
                         .path(ssp.toString())
@@ -263,13 +257,11 @@ public final class FsNodePath
         assert invariants();
     }
 
-    private void writeObject(ObjectOutputStream out)
-            throws IOException {
+    private void writeObject(ObjectOutputStream out) throws IOException {
         out.writeObject(uri.toString());
     }
 
-    private void readObject(ObjectInputStream in)
-            throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         try {
             parse(new URI(in.readObject().toString()), NULL);
         } catch (URISyntaxException ex) {
@@ -278,23 +270,24 @@ public final class FsNodePath
         }
     }
 
-    private void parse(URI uri, final FsUriModifier modifier)
-            throws URISyntaxException {
+    private void parse(URI uri, final FsUriModifier modifier) throws URISyntaxException {
         uri = modifier.modify(uri, NODE_PATH);
-        if (null != uri.getRawFragment())
+        if (null != uri.getRawFragment()) {
             throw new QuotedUriSyntaxException(uri, "Fragment component not allowed");
+        }
         if (uri.isOpaque()) {
             final String ssp = uri.getRawSchemeSpecificPart();
             final int i = ssp.lastIndexOf(FsMountPoint.SEPARATOR);
-            if (0 > i)
+            if (0 > i){
                 throw new QuotedUriSyntaxException(uri,
                         "Missing mount point separator \"" + FsMountPoint.SEPARATOR + '"');
-            mountPoint = new FsMountPoint(
+            }
+            mountPoint = Optional.of(new FsMountPoint(
                     new UriBuilder(true)
                             .scheme(uri.getScheme())
                             .path(ssp.substring(0, i + 2))
                             .toUriChecked(),
-                    modifier);
+                    modifier));
             nodeName = new FsNodeName(
                     new UriBuilder(true)
                             .pathQuery(ssp.substring(i + 2))
@@ -302,19 +295,21 @@ public final class FsNodePath
                             .toUriChecked(),
                     modifier);
             if (NULL != modifier) {
-                URI mpu = mountPoint.getUri();
+                URI mpu = mountPoint.get().getUri();
                 URI nuri = new URI(mpu.getScheme() + ':' + mpu.getRawSchemeSpecificPart() + nodeName.getUri());
-                if (!uri.equals(nuri))
+                if (!uri.equals(nuri)) {
                     uri = nuri;
+                }
             }
         } else if (uri.isAbsolute()) {
-            mountPoint = new FsMountPoint(uri.resolve(DOT), modifier);
-            nodeName = new FsNodeName(mountPoint.getUri().relativize(uri), modifier);
+            mountPoint = Optional.of(new FsMountPoint(uri.resolve(DOT), modifier));
+            nodeName = new FsNodeName(mountPoint.get().getUri().relativize(uri), modifier);
         } else {
-            mountPoint = null;
+            mountPoint = Optional.empty();
             nodeName = new FsNodeName(uri, modifier);
-            if (NULL != modifier)
+            if (NULL != modifier) {
                 uri = nodeName.getUri();
+            }
         }
         this.uri = uri;
 
@@ -324,18 +319,13 @@ public final class FsNodePath
     private boolean invariants() {
         assert null != getUri();
         assert null == getUri().getRawFragment();
-        assert (null != getMountPoint()) == getUri().isAbsolute();
+        assert getMountPoint().isPresent() == getUri().isAbsolute();
         assert null != getNodeName();
         if (getUri().isOpaque()) {
             assert getUri().getRawSchemeSpecificPart().contains(FsMountPoint.SEPARATOR);
-            /*try {
-                assert getUri().equals(new URI(getMountPoint().getUri().getScheme(), getMountPoint().getUri().getSchemeSpecificPart() + toDecodedUri(getNodeName()), null));
-            } catch (URISyntaxException ex) {
-                throw new AssertionError(ex);
-            }*/
         } else if (getUri().isAbsolute()) {
             assert getUri().normalize() == getUri();
-            assert getUri().equals(getMountPoint().getUri().resolve(getNodeName().getUri()));
+            assert getUri().equals(getMountPoint().get().getUri().resolve(getNodeName().getUri()));
         } else {
             assert getUri().normalize() == getUri();
             assert getNodeName().getUri() == getUri();
@@ -366,24 +356,25 @@ public final class FsNodePath
      * path so that it's absolute and hierarchical.
      */
     public URI toHierarchicalUri() {
-        final URI hierarchical = this.hierarchical;
-        if (null != hierarchical) return hierarchical;
-        if (uri.isOpaque()) {
-            final URI mpu = mountPoint.toHierarchicalUri();
+        final Optional<URI> hierarchical = this.hierarchical;
+        if (hierarchical.isPresent()) {
+            return hierarchical.get();
+        } else if (uri.isOpaque()) {
+            final URI mpu = mountPoint.get().toHierarchicalUri();
             final URI enu = nodeName.getUri();
             try {
-                return this.hierarchical = enu.toString().isEmpty()
+                return (this.hierarchical = Optional.of(enu.toString().isEmpty()
                         ? mpu
                         : new UriBuilder(true)
                         .uri(mpu)
                         .path(mpu.getRawPath() + FsNodeName.SEPARATOR)
                         .toUriChecked()
-                        .resolve(enu);
+                        .resolve(enu))).get();
             } catch (URISyntaxException ex) {
                 throw new AssertionError(ex);
             }
         } else {
-            return this.hierarchical = uri;
+            return (this.hierarchical = Optional.of(uri)).get();
         }
     }
 
@@ -393,8 +384,7 @@ public final class FsNodePath
      *
      * @return The nullable mount point.
      */
-    public @Nullable
-    FsMountPoint getMountPoint() {
+    public Optional<FsMountPoint> getMountPoint() {
         return mountPoint;
     }
 
@@ -416,10 +406,10 @@ public final class FsNodePath
      */
     public FsNodePath
     resolve(final FsNodeName nodeName) {
-        if (nodeName.isRoot() && null == this.uri.getQuery()) return this;
-        return new FsNodePath(
-                this.mountPoint,
-                new FsNodeName(this.nodeName, nodeName));
+        if (nodeName.isRoot() && null == this.uri.getQuery()) {
+            return this;
+        }
+        return new FsNodePath(this.mountPoint, new FsNodeName(this.nodeName, nodeName));
     }
 
     /**
@@ -438,9 +428,7 @@ public final class FsNodePath
      */
     @Override
     public boolean equals(@CheckForNull Object that) {
-        return this == that
-                || that instanceof FsNodePath
-                && this.uri.equals(((FsNodePath) that).uri);
+        return this == that || that instanceof FsNodePath && this.uri.equals(((FsNodePath) that).uri);
     }
 
     /**

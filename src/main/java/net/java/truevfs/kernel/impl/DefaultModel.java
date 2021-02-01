@@ -8,13 +8,14 @@ import net.java.truevfs.kernel.spec.FsAbstractModel;
 import net.java.truevfs.kernel.spec.FsModel;
 import net.java.truevfs.kernel.spec.FsMountPoint;
 
-import javax.annotation.CheckForNull;
+import java.util.Optional;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 final class DefaultModel extends FsAbstractModel {
 
     private volatile boolean mounted;
 
-    DefaultModel(FsMountPoint mountPoint, @CheckForNull FsModel parent) {
+    DefaultModel(FsMountPoint mountPoint, Optional<? extends FsModel> parent) {
         super(mountPoint, parent);
     }
 

@@ -22,9 +22,9 @@ public final class ConsoleAesPbeKeyManagerMapModifier implements KeyManagerMapMo
 
     @Override
     public Map<Class<?>, KeyManager<?>> apply(final Map<Class<?>, KeyManager<?>> map) {
-        if (null != System.console())
-            map.put(AesPbeParameters.class,
-                    new PromptingKeyManager<>(new ConsoleAesPbeParametersView()));
+        if (null != System.console()) {
+            map.put(AesPbeParameters.class, new PromptingKeyManager<>(new ConsoleAesPbeParametersView()));
+        }
         return map;
     }
 }

@@ -7,7 +7,6 @@ package net.java.truevfs.kernel.spec.sample;
 import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.io.Streams;
 import net.java.truecommons.shed.BitField;
-import net.java.truecommons.shed.Filter;
 import net.java.truevfs.kernel.spec.*;
 import net.java.truevfs.kernel.spec.sl.FsDriverMapLocator;
 import net.java.truevfs.kernel.spec.sl.FsManagerLocator;
@@ -17,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 /**
  * A poor man's blend of the cat(1) and wget(1) command line utility
@@ -75,9 +75,9 @@ public final class Cat {
             uri = uri.isAbsolute() ? uri : new File(resource).toURI();
             FsNodePath path = FsNodePath.create(uri, FsUriModifier.CANONICALIZE);
             InputSocket<?> socket = manager
-                    .controller(driver, path.getMountPoint())
+                    .controller(driver, path.getMountPoint().get())
                     .input(BitField.noneOf(FsAccessOption.class), path.getNodeName());
-            try (InputStream in = socket.stream(null)) {
+            try (InputStream in = socket.stream(Optional.empty())) {
                 Streams.cat(in, System.out); // copy the data
             }
         } finally {

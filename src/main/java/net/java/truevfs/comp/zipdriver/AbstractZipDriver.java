@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.zip.Deflater;
 
 import static net.java.truecommons.cio.Entry.Access.WRITE;
@@ -350,7 +351,7 @@ implements ZipOutputStreamParameters, ZipFileParameters<E> {
         if (options.get(GROW)) {
             options = options.set(APPEND).clear(CACHE);
         }
-        return new FsOutputSocketSink(options, controller.output(options, name, null));
+        return new FsOutputSocketSink(options, controller.output(options, name, Optional.empty()));
     }
 
     @Override

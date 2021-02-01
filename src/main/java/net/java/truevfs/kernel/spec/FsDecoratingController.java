@@ -4,6 +4,8 @@
  */
 package net.java.truevfs.kernel.spec;
 
+import java.util.Optional;
+
 /**
  * An abstract decorator for a file system controller.
  *
@@ -25,7 +27,7 @@ public abstract class FsDecoratingController extends FsAbstractController implem
     }
 
     @Override
-    public FsController getParent() {
+    public Optional<? extends FsController> getParent() {
         return controller.getParent();
     }
 

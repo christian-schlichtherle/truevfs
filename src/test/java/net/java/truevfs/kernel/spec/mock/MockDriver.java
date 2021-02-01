@@ -9,7 +9,7 @@ import net.java.truevfs.kernel.spec.FsDriver;
 import net.java.truevfs.kernel.spec.FsManager;
 import net.java.truevfs.kernel.spec.FsModel;
 
-import javax.annotation.CheckForNull;
+import java.util.Optional;
 
 /**
  * @author Christian Schlichtherle
@@ -18,9 +18,10 @@ public final class MockDriver extends FsDriver {
 
     @Override
     public FsController newController(
-            final FsManager context,
-            final FsModel model,
-            final @CheckForNull FsController parent) {
-        return new MockController(model, parent, null);
+            FsManager context,
+            FsModel model,
+            Optional<? extends FsController> parent) {
+        assert model.getParent().equals(parent.map(FsController::getModel));
+        return new MockController(model, parent, Optional.empty());
     }
 }

@@ -10,6 +10,7 @@ import net.java.truevfs.kernel.spec.FsAccessOption;
 import net.java.truevfs.kernel.spec.FsAccessOptions;
 
 import java.io.*;
+import java.util.Optional;
 
 /**
  * A replacement for the class {@link FileInputStream} for reading plain old
@@ -127,6 +128,6 @@ public final class TFileInputStream extends DecoratingInputStream {
     throws IOException {
         super(TBIO.input(
                 TConfig.current().getAccessPreferences().or(options),
-                file).stream(null));
+                file).stream(Optional.empty()));
     }
 }

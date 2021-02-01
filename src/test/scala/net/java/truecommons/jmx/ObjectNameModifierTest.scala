@@ -15,7 +15,7 @@ import javax.management._
  */
 class ObjectNameModifierTest extends AnyWordSpec {
 
-  def modifier = ObjectNameModifierLocator.SINGLETON.get
+  def modifier: ObjectNameModifier = ObjectNameModifierLocator.SINGLETON.get
 
   "An object name modifier" should {
     "do a proper round trip conversion" in{

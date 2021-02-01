@@ -14,6 +14,8 @@ import net.java.truevfs.kernel.spec.FsArchiveEntry;
 import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsModel;
 
+import java.util.Optional;
+
 import static bali.CachingStrategy.NOT_THREAD_SAFE;
 
 @Module
@@ -38,8 +40,7 @@ interface ControllerModule<E extends FsArchiveEntry> {
     ArchiveController<E> newCacheController(ArchiveController<E> controller);
 
     default FsController newControllerChain(FsModel model, FsController parent) {
-        assert null != parent;
-        assert model.getParent() == parent.getModel();
+        assert model.getParent().equals(Optional.of(parent.getModel()));
         assert !(model instanceof ArchiveModel);
         // HC SVNT DRACONES!
         // The FalsePositiveArchiveController decorates the FinalizeController so that it does not need to resolve

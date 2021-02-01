@@ -49,6 +49,7 @@ import static net.java.truevfs.kernel.spec.FsSyncOption.ABORT_CHANGES;
  * @param <E> the type of the archive entries.
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSystemArchiveController<E> {
 
     private static final BitField<FsAccessOption> MOUNT_OPTIONS = BitField.of(CACHE);
@@ -66,7 +67,7 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
     private Optional<OutputArchive<E>> _outputArchive = Optional.empty();
 
     private boolean invariants() {
-        assert getModel().getParent() == getParent().getModel();
+        assert getModel().getParent().equals(Optional.of(getParent().getModel()));
         val fs = getFileSystem();
         assert !_inputArchive.isPresent() || fs.isPresent();
         assert !_outputArchive.isPresent() || fs.isPresent();
@@ -93,8 +94,8 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
     @Cache(NOT_THREAD_SAFE)
     FsNodeName getName() {
         val path = getMountPoint().getPath();
-        assert null != path;
-        return path.getNodeName();
+        assert path.isPresent();
+        return path.get().getNodeName();
     }
 
     private Optional<InputArchive<E>> getInputArchive() {
@@ -136,9 +137,9 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
         // HC SVNT DRACONES!
 
         // Check parent file system node.
-        final FsNode pn;
+        final Optional<? extends FsNode> opn;
         try {
-            pn = getParent().node(options, getName());
+            opn = getParent().node(options, getName());
         } catch (FalsePositiveArchiveException e) {
             throw new AssertionError(e);
         } catch (IOException e) {
@@ -150,20 +151,12 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
 
         // Obtain file system by creating or loading it from the parent node.
         final ArchiveFileSystem<E> fs;
-        if (null == pn) {
-            if (autoCreate) {
-                // This may fail e.g. if the container file is a RAES encrypted ZIP file and the user cancels password
-                // prompting:
-                outputArchive(options);
-                fs = ArchiveFileSystem.apply(getModel());
-            } else {
-                throw new FalsePositiveArchiveException(new NoSuchFileException(getName().toString()));
-            }
-        } else {
+        if (opn.isPresent()) {
+            val pn = opn.get();
+
             // ro must be init first because the parent filesystem controller could be a
             // net.java.truevfs.driver.file.FileController and then on Windoze this property changes to `TRUE` once the
             // file is opened for reading!
-
             // FIXME: Produce a new exception on each call!
             val ro = checkReadOnly().map(e -> (Supplier<IOException>) () -> e);
             final InputService<E> is;
@@ -181,8 +174,16 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
             fs = ArchiveFileSystem.apply(getModel(), is, pn, ro);
             setInputArchive(Optional.of(new InputArchive<>(is)));
             assert isMounted();
+        } else {
+            if (autoCreate) {
+                // This may fail e.g. if the container file is a RAES encrypted ZIP file and the user cancels password
+                // prompting:
+                outputArchive(options);
+                fs = ArchiveFileSystem.apply(getModel());
+            } else {
+                throw new FalsePositiveArchiveException(new NoSuchFileException(getName().toString()));
+            }
         }
-
         setFileSystem(Optional.of(fs));
     }
 
@@ -371,7 +372,7 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
                         if (DIRECTORY == ae.getType()) {
                             if (!cn.isRoot()) { // never output the root directory!
                                 if (UNKNOWN != ae.getTime(WRITE)) { // never output a ghost directory!
-                                    os.output(ae).stream(null).close();
+                                    os.output(ae).stream(Optional.empty()).close();
                                 }
                             }
                         } else if (null != is.entry(aen)) {
@@ -385,7 +386,7 @@ abstract class TargetArchiveController<E extends FsArchiveEntry> extends FileSys
                                 ae.setSize(size, UNKNOWN);
                             }
                             ae.setSize(DATA, 0);
-                            os.output(ae).stream(null).close();
+                            os.output(ae).stream(Optional.empty()).close();
                         }
                     } catch (IOException e) {
                         throw handler.fail(new FsSyncException(getMountPoint(), e));

@@ -4,6 +4,7 @@
  */
 package net.java.truevfs.kernel.spec;
 
+import lombok.val;
 import net.java.truecommons.cio.*;
 import net.java.truecommons.io.DecoratingInputStream;
 import net.java.truecommons.io.DecoratingOutputStream;
@@ -19,7 +20,10 @@ import javax.annotation.CheckForNull;
 import java.io.*;
 import java.net.URI;
 import java.nio.channels.SeekableByteChannel;
-import java.util.*;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static net.java.truecommons.cio.Entry.Access.*;
@@ -38,6 +42,7 @@ import static org.junit.Assert.*;
  * @param <D> The type of the archive driver.
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public abstract class FsArchiveDriverTestSuite<E extends FsArchiveEntry, D extends FsArchiveDriver<E>>
         extends FsArchiveDriverTestBase<D> {
 
@@ -66,7 +71,7 @@ public abstract class FsArchiveDriverTestSuite<E extends FsArchiveEntry, D exten
         config.setDataSize(getMaxArchiveLength());
         config.setPool(null); // reset
         model = newArchiveModel();
-        parent = newParentController(model.getParent());
+        parent = newParentController(model.getParent().get());
         assert !UTF_8.equals(getArchiveDriver().getCharset()) || null == getUnencodableName() : "Bad test setup!";
     }
 
@@ -251,7 +256,7 @@ public abstract class FsArchiveDriverTestSuite<E extends FsArchiveEntry, D exten
         assertEquals(i, service.size());
 
         boolean failure = true;
-        final OutputStream out = output.stream(null);
+        final OutputStream out = output.stream(Optional.empty());
         try {
             assertSame(entry, service.entry(name));
             assertEquals(i + 1, service.size());
@@ -304,7 +309,7 @@ public abstract class FsArchiveDriverTestSuite<E extends FsArchiveEntry, D exten
             final PowerBuffer<?> buf = PowerBuffer.allocate(getDataLength());
             SeekableByteChannel channel;
             try {
-                channel = input.channel(null);
+                channel = input.channel(Optional.empty());
             } catch (final UnsupportedOperationException ex) {
                 channel = null;
                 logger.trace(input.getClass().getName(), ex);
@@ -317,17 +322,17 @@ public abstract class FsArchiveDriverTestSuite<E extends FsArchiveEntry, D exten
                     channel.close();
                 }
                 channel.close(); // expect no issues
-                assertTrue(Arrays.equals(getData(), buf.array()));
+                assertArrayEquals(getData(), buf.array());
             }
         }
 
         {
             final byte[] buf = new byte[getDataLength()];
             boolean failure = true;
-            final DataInputStream in = new DataInputStream(input.stream(null));
+            final DataInputStream in = new DataInputStream(input.stream(Optional.empty()));
             try {
                 in.readFully(buf);
-                assertTrue(Arrays.equals(getData(), buf));
+                assertArrayEquals(getData(), buf);
                 assertEquals(-1, in.read());
                 failure = false;
             } finally {
@@ -404,11 +409,11 @@ public abstract class FsArchiveDriverTestSuite<E extends FsArchiveEntry, D exten
         assertNotNull(e);
         assertEquals(name, e.getName());
         assertSame(FILE, e.getType());
-        assertTrue(UNKNOWN == e.getSize(DATA));
-        assertTrue(UNKNOWN == e.getSize(STORAGE));
-        assertTrue(UNKNOWN == e.getTime(WRITE));
-        assertTrue(UNKNOWN == e.getTime(READ));
-        assertTrue(UNKNOWN == e.getTime(CREATE));
+        assertSame((long) UNKNOWN, e.getSize(DATA));
+        assertSame((long) UNKNOWN, e.getSize(STORAGE));
+        assertSame((long) UNKNOWN, e.getTime(WRITE));
+        assertSame((long) UNKNOWN, e.getTime(READ));
+        assertSame((long) UNKNOWN, e.getTime(CREATE));
         return e;
     }
 
@@ -417,26 +422,26 @@ public abstract class FsArchiveDriverTestSuite<E extends FsArchiveEntry, D exten
     }
 
     private MockController newParentController(final FsModel model) {
-        final FsModel pm = model.getParent();
-        final FsController pc = null == pm ? null : newParentController(pm);
+        val pm = model.getParent();
+        val pc = pm.map(this::newParentController);
         return new ParentController(model, pc);
     }
 
     private FsModel newArchiveModel() {
         final FsModel parent = newNonArchiveModel();
         return newModel(
-                FsMountPoint.create(URI.create(
-                        "scheme:" + parent.getMountPoint() + name + "!/")),
-                parent);
+                FsMountPoint.create(URI.create("scheme:" + parent.getMountPoint() + name + "!/")),
+                Optional.of(parent)
+        );
     }
 
     private FsModel newNonArchiveModel() {
         return newModel(
                 FsMountPoint.create(URI.create("file:/")),
-                null);
+                Optional.empty());
     }
 
-    protected FsModel newModel(FsMountPoint mountPoint, @CheckForNull FsModel parent) {
+    protected FsModel newModel(FsMountPoint mountPoint, Optional<? extends FsModel> parent) {
         return new FsTestModel(mountPoint, parent);
     }
 
@@ -467,10 +472,11 @@ public abstract class FsArchiveDriverTestSuite<E extends FsArchiveEntry, D exten
         return FsTestConfig.get().getNumEntries();
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private final class ParentController extends MockController {
 
-        ParentController(FsModel model, @CheckForNull FsController parent) {
-            super(model, parent, FsTestConfig.get());
+        ParentController(FsModel model, Optional<? extends FsController> parent) {
+            super(model, parent, Optional.of(FsTestConfig.get()));
         }
 
         @Override
@@ -504,7 +510,7 @@ public abstract class FsArchiveDriverTestSuite<E extends FsArchiveEntry, D exten
         public OutputSocket<?> output(
                 final BitField<FsAccessOption> options,
                 final FsNodeName name,
-                final @CheckForNull Entry template) {
+                final Optional<? extends Entry> template) {
             Objects.requireNonNull(name);
             Objects.requireNonNull(options);
 

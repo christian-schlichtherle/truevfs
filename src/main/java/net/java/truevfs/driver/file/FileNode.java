@@ -23,6 +23,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFilePermission;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.io.File.separatorChar;
@@ -36,6 +37,7 @@ import static net.java.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
  *
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 class FileNode extends FsAbstractNode implements IoBuffer {
 
     private static final Path CURRENT_DIRECTORY = Paths.get(".");
@@ -203,12 +205,12 @@ class FileNode extends FsAbstractNode implements IoBuffer {
 
     @Override
     public final OutputSocket<FileNode> output() {
-        return output(NONE, null);
+        return output(NONE, Optional.empty());
     }
 
     final OutputSocket<FileNode> output(
             BitField<FsAccessOption> options,
-            @CheckForNull Entry template) {
+            Optional<? extends Entry> template) {
         return new FileOutputSocket(options, this, template);
     }
 }

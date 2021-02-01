@@ -11,7 +11,6 @@ import net.java.truecommons.cio.IoSockets;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.FsAccessOption;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -38,10 +37,12 @@ import static net.java.truevfs.kernel.spec.FsAccessOption.*;
  * @see    FileInputSocket
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
 
     private static final int
             INITIAL_CAPACITY = initialCapacity(FsAccessOption.values().length);
+
     private static final StandardOpenOption[]
             WRITE_STANDARD_OPEN_OPTION = {
                 StandardOpenOption.WRITE,
@@ -51,12 +52,12 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
 
     private final BitField<FsAccessOption> options;
     private final FileNode node;
-    private final @CheckForNull Entry template;
+    private final Optional<? extends Entry> template;
 
     FileOutputSocket(
             final BitField<FsAccessOption> options,
             final FileNode node,
-            final @CheckForNull Entry template) {
+            final Optional<? extends Entry> template) {
         assert null != node;
         this.node = node;
         if (options.get(EXCLUSIVE) && options.get(APPEND))
@@ -72,12 +73,12 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
         final FileNode buffer;
         final Path entryFile = node.getPath();
         Boolean exists = null;
-        if (options.get(EXCLUSIVE) && (exists = exists(entryFile)))
+        if (options.get(EXCLUSIVE) && (exists = exists(entryFile))) {
             throw new FileAlreadyExistsException(node.toString());
+        }
         if (options.get(CACHE)) {
             // This is obviously NOT properly isolated.
-            if (TRUE.equals(exists)
-                    || null == exists && (exists = exists(entryFile))) {
+            if (TRUE.equals(exists) || null == exists && (exists = exists(entryFile))) {
                 //if (!isWritable(entryFile)) throw new IOException(...)
                 entryFile   .getFileSystem()
                             .provider()
@@ -109,8 +110,9 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
     }
 
     void append(final FileNode buffer) throws IOException {
-        if (buffer != node && options.get(APPEND) && exists(node.getPath()))
+        if (buffer != node && options.get(APPEND) && exists(node.getPath())){
             IoSockets.copy(node.input(), buffer.output());
+        }
     }
 
     Set<OpenOption> optionSet() {
@@ -157,13 +159,12 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
     }
 
     private void updateProperties(final Path file) throws IOException {
-        final Entry template = this.template;
-        if (null == template)
-            return;
-        getFileAttributeView(file, BasicFileAttributeView.class)
-                .setTimes(  toFileTime(template.getTime(WRITE)),
-                            toFileTime(template.getTime(READ)),
-                            toFileTime(template.getTime(CREATE)));
+        final Optional<? extends Entry> template = this.template;
+        if (template.isPresent()) {
+            final Entry t = template.get();
+            getFileAttributeView(file, BasicFileAttributeView.class)
+                    .setTimes(toFileTime(t.getTime(WRITE)), toFileTime(t.getTime(READ)), toFileTime(t.getTime(CREATE)));
+        }
     }
 
     private static @Nullable FileTime toFileTime(long time) {
@@ -196,10 +197,11 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
 
             @Override
             public void close() throws IOException {
-                if (closed) return;
-                super.close();
-                closed = true;
-                FileOutputSocket.this.close(buffer, !exception.isPresent());
+                if (!closed) {
+                    super.close();
+                    closed = true;
+                    FileOutputSocket.this.close(buffer, !exception.isPresent());
+                }
             }
         }
 
@@ -215,7 +217,7 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
     public OutputStream stream(final Optional<? extends InputSocket<? extends Entry>> peer) throws IOException {
         final FileNode buffer = begin();
 
-        final class Stream extends IOExceptionOutputStream {
+        class Stream extends IOExceptionOutputStream {
             boolean closed;
 
             Stream() throws IOException {
@@ -224,12 +226,13 @@ final class FileOutputSocket extends AbstractOutputSocket<FileNode> {
 
             @Override
             public void close() throws IOException {
-                if (closed) return;
-                super.close();
-                closed = true;
-                FileOutputSocket.this.close(buffer, null == exception);
+                if (!closed) {
+                    super.close();
+                    closed = true;
+                    FileOutputSocket.this.close(buffer, !exception.isPresent());
+                }
             }
-        } // Stream
+        }
 
         try {
             append(buffer);

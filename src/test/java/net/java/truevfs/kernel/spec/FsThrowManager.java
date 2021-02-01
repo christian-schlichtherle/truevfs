@@ -17,15 +17,16 @@ public final class FsThrowManager {
 
     private final Map<Class<?>, Throwable> throwables;
 
-    /** Default constructor. */
-    @SuppressWarnings("CollectionWithoutInitialCapacity")
+    /**
+     * Default constructor.
+     */
     public FsThrowManager() {
         this.throwables = new HashMap<>();
     }
 
     /**
      * Copy constructor.
-     * 
+     *
      * @param template The template to copy.
      */
     public FsThrowManager(final FsThrowManager template) {
@@ -47,25 +48,30 @@ public final class FsThrowManager {
         return throwables.remove(from);
     }
 
-    public <X extends Throwable> void check(Object thiz, Class<X> throwz)
-    throws X {
+    public <X extends Throwable> void check(Object thiz, Class<X> throwz) throws X {
         check(thiz.getClass(), throwz);
     }
 
-    private <X extends Throwable> void check(   final Class<?> thiz,
-                                                final Class<X> throwz)
-    throws X {
+    private <X extends Throwable> void check(final Class<?> thiz,
+                                             final Class<X> throwz)
+            throws X {
         final Throwable toThrow = throwables.remove(thiz);
-        if (null != toThrow)
-            if (throwz.isInstance(toThrow)) throw throwz.cast(wrap(toThrow));
-            else throwables.put(thiz, toThrow); // restore
+        if (null != toThrow) {
+            if (throwz.isInstance(toThrow)) {
+                throw throwz.cast(wrap(toThrow));
+            } else {
+                throwables.put(thiz, toThrow); // restore
+            }
+        }
         // No match, now recursively check interfaces first and then super
         // classes.
         // This may result in redundant checks for interfaces.
-        for (final Class<?> ic : thiz.getInterfaces())
+        for (final Class<?> ic : thiz.getInterfaces()) {
             check(ic, throwz);
+        }
         final Class<?> sc = thiz.getSuperclass();
-        if (null != sc)
+        if (null != sc) {
             check(sc, throwz);
+        }
     }
 }

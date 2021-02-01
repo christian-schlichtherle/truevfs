@@ -7,8 +7,8 @@ package net.java.truevfs.kernel.spec;
 import net.java.truecommons.shed.Filter;
 import net.java.truecommons.shed.Visitor;
 
-import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * An abstract decorator for a file system manager.
@@ -28,10 +28,8 @@ public abstract class FsDecoratingManager extends FsAbstractManager {
     public FsModel newModel(
             FsDriver context,
             FsMountPoint mountPoint,
-            FsModel parent) {
-        assert null == parent
-                    ? null == mountPoint.getParent()
-                    : parent.getMountPoint().equals(mountPoint.getParent());
+            Optional<? extends FsModel> parent) {
+        assert mountPoint.getParent().equals(parent.map(FsModel::getMountPoint));
         return manager.newModel(context, mountPoint, parent);
     }
 
@@ -39,17 +37,13 @@ public abstract class FsDecoratingManager extends FsAbstractManager {
     public FsController newController(
             FsArchiveDriver<? extends FsArchiveEntry> context,
             FsModel model,
-            @Nullable FsController parent) {
-        assert null == parent
-                    ? null == model.getParent()
-                    : parent.getModel().equals(model.getParent());
+            Optional<? extends FsController> parent) {
+        assert model.getParent().equals(parent.map(FsController::getModel));
         return manager.newController(context, model, parent);
     }
 
     @Override
-    public FsController controller(
-            FsCompositeDriver driver,
-            FsMountPoint mountPoint) {
+    public FsController controller(FsCompositeDriver driver, FsMountPoint mountPoint) {
         return manager.controller(driver, mountPoint);
     }
 

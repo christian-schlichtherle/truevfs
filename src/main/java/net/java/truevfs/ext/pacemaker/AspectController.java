@@ -44,7 +44,7 @@ abstract class AspectController extends FsDecoratingController {
 
     @CheckForNull
     @Override
-    public final FsNode node(BitField<FsAccessOption> options, FsNodeName name) throws IOException {
+    public final Optional<? extends FsNode> node(BitField<FsAccessOption> options, FsNodeName name) throws IOException {
         return apply(() -> controller.node(options, name));
     }
 
@@ -104,7 +104,7 @@ abstract class AspectController extends FsDecoratingController {
     }
 
     @Override
-    public final OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, @CheckForNull Entry template) {
+    public final OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<? extends Entry> template) {
         return new Output(controller.output(options, name, template));
     }
 
@@ -133,7 +133,7 @@ abstract class AspectController extends FsDecoratingController {
     }
 
     @Override
-    public final void make(BitField<FsAccessOption> options, FsNodeName name, Entry.Type type, @CheckForNull Entry template) throws IOException {
+    public final void make(BitField<FsAccessOption> options, FsNodeName name, Entry.Type type, Optional<? extends Entry> template) throws IOException {
         apply(() -> {
             controller.make(options, name, type, template);
             return null;

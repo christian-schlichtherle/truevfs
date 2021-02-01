@@ -22,6 +22,7 @@ import org.apache.commons.compress.archivers.tar.TarConstants;
 import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Optional;
 
 import static net.java.truecommons.cio.Entry.ALL_POSIX_ACCESS;
 import static net.java.truecommons.cio.Entry.ALL_POSIX_ENTITIES;
@@ -168,8 +169,7 @@ public class TarDriver extends FsArchiveDriver<TarDriverEntry> {
         // Leave FsAccessOption.STORE untouched - the driver shall be given
         // opportunity to get its own preferences to sort out such a conflict.
         options = options.set(COMPRESS);
-        return new FsOutputSocketSink(options,
-                controller.output(options, name, null));
+        return new FsOutputSocketSink(options, controller.output(options, name, Optional.empty()));
     }
 
     @Override

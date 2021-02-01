@@ -12,11 +12,11 @@ import net.java.truecommons.cio.OutputService;
 import net.java.truecommons.shed.BitField;
 
 import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.util.Optional;
 
 import static net.java.truecommons.cio.Entry.Type.DIRECTORY;
 import static net.java.truecommons.shed.Paths.cutTrailingSeparators;
@@ -55,8 +55,8 @@ extends FsDriver {
     public final FsController newController(
             FsManager context,
             FsModel model,
-            @Nonnull FsController parent) {
-        assert parent.getModel().equals(model.getParent());
+            Optional<? extends FsController> parent) {
+        assert model.getParent().equals(parent.map(FsController::getModel));
         return context.newController(this, model, parent);
     }
 
@@ -312,8 +312,7 @@ extends FsDriver {
             BitField<FsAccessOption> options,
             FsController controller,
             FsNodeName name) {
-        return new FsOutputSocketSink(options,
-                controller.output(options, name, null));
+        return new FsOutputSocketSink(options, controller.output(options, name, Optional.empty()));
     }
 
     /**

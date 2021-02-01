@@ -4,8 +4,8 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import javax.annotation.CheckForNull;
 import java.util.Map;
+import java.util.Optional;
 import java.util.ServiceConfigurationError;
 import java.util.function.Supplier;
 
@@ -26,10 +26,8 @@ public abstract class FsAbstractCompositeDriver
     public final FsModel newModel(
             final FsManager context,
             final FsMountPoint mountPoint,
-            final FsModel parent) {
-        assert null == parent
-                    ? null == mountPoint.getParent()
-                    : parent.getMountPoint().equals(mountPoint.getParent());
+            final Optional<? extends FsModel> parent) {
+        assert mountPoint.getParent().equals(parent.map(FsModel::getMountPoint));
         return driver(mountPoint).newModel(context, mountPoint, parent);
     }
 
@@ -37,20 +35,19 @@ public abstract class FsAbstractCompositeDriver
     public final FsController newController(
             final FsManager context,
             final FsModel model,
-            final @CheckForNull FsController parent)
+            final Optional<? extends FsController> parent)
     throws ServiceConfigurationError {
-        assert null == parent
-                    ? null == model.getParent()
-                    : parent.getModel().equals(model.getParent());
+        assert model.getParent().equals(parent.map(FsController::getModel));
         return driver(model.getMountPoint()).newController(context, model, parent);
     }
 
     private FsDriver driver(final FsMountPoint mountPoint) {
         final FsScheme scheme = mountPoint.getScheme();
         final FsDriver driver = get().get(scheme);
-        if (null == driver)
+        if (null == driver) {
             throw new ServiceConfigurationError(scheme
                     + " (Unknown file system scheme! May be the class path doesn't contain the respective driver module or it isn't set up correctly?)");
+        }
         return driver;
     }
 }

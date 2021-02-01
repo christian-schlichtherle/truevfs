@@ -24,9 +24,9 @@ public final class SwingAesPbeKeyManagerMapModifier implements KeyManagerMapModi
 
     @Override
     public Map<Class<?>, KeyManager<?>> apply(Map<Class<?>, KeyManager<?>> map) {
-        if (!GraphicsEnvironment.isHeadless())
-            map.put(AesPbeParameters.class,
-                    new PromptingKeyManager<>(new SwingAesPbeParametersView()));
+        if (!GraphicsEnvironment.isHeadless()) {
+            map.put(AesPbeParameters.class, new PromptingKeyManager<>(new SwingAesPbeParametersView()));
+        }
         return map;
     }
 }

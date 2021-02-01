@@ -25,8 +25,7 @@ extends DecoratingInputService<E> {
     private final FsTestConfig config;
     private volatile @CheckForNull FsThrowManager control;
 
-    public ThrowingInputService(
-            final InputService<E> service) {
+    public ThrowingInputService(InputService<E> service) {
         this(service, null);
     }
 

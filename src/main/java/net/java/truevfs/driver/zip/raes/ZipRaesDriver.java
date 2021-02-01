@@ -23,6 +23,7 @@ import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
+import java.util.Optional;
 
 import static net.java.truevfs.kernel.spec.FsAccessOption.*;
 
@@ -181,8 +182,7 @@ public abstract class ZipRaesDriver extends JarDriver {
         options = options.set(STORE);
         // The RAES file format cannot support GROWing.
         options = options.clear(GROW);
-        return new FsOutputSocketSink(options,
-                controller.output(options, name, null));
+        return new FsOutputSocketSink(options, controller.output(options, name, Optional.empty()));
     }
 
     /**

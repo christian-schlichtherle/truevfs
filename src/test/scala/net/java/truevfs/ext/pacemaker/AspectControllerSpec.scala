@@ -13,6 +13,8 @@ import org.mockito.Mockito._
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar.mock
 
+import java.util.Optional
+
 /** @author Christian Schlichtherle */
 class AspectControllerSpec extends AnyWordSpec {
 
@@ -20,27 +22,27 @@ class AspectControllerSpec extends AnyWordSpec {
 
   private trait Fixture1 {
 
-    val delegate = mock[FsController]
+    val delegate: FsController = mock[FsController]
     when(delegate.getModel) thenReturn mock[FsModel]
-    val controller = spy(new TestController(delegate))
+    val controller: TestController = spy(new TestController(delegate))
   }
 
   private trait Fixture2 extends Fixture1 {
 
-    val delegateSocket = mock[InputSocket[Entry]]
-    when(delegate.input(null, null).asInstanceOf[InputSocket[Entry]]) thenReturn delegateSocket
+    val delegateSocket: InputSocket[Entry] = mock[InputSocket[Entry]]
+    when(delegate.input(any, any).asInstanceOf[InputSocket[Entry]]) thenReturn delegateSocket
 
-    val socket = controller.input(null, null)
+    val socket: InputSocket[_ <: Entry] = controller.input(null, null)
     verify(delegate).input(null, null)
   }
 
   private trait Fixture3 extends Fixture1 {
 
-    val delegateSocket = mock[OutputSocket[Entry]]
-    when(delegate.output(null, null, null).asInstanceOf[OutputSocket[Entry]])
+    val delegateSocket: OutputSocket[Entry] = mock[OutputSocket[Entry]]
+    when(delegate.output(any, any, any).asInstanceOf[OutputSocket[Entry]])
       .thenReturn(delegateSocket)
 
-    val socket = controller.output(null, null, null)
+    val socket: OutputSocket[_ <: Entry] = controller.output(null, null, null)
     verify(delegate).output(null, null, null)
   }
 
@@ -49,85 +51,85 @@ class AspectControllerSpec extends AnyWordSpec {
 
       "node(**)" in new Fixture1 {
         controller.node(null, null)
-        verify(controller).apply(any())
+        verify(controller).apply(any)
         verify(delegate).node(null, null)
       }
 
       "checkAccess(**)" in new Fixture1 {
         controller.checkAccess(null, null, null)
-        verify(controller).apply(any())
+        verify(controller).apply(any)
         verify(delegate).checkAccess(null, null, null)
       }
 
       "setReadOnly(**)" in new Fixture1 {
         controller.setReadOnly(null, null)
-        verify(controller).apply(any())
+        verify(controller).apply(any)
         verify(delegate).setReadOnly(null, null)
       }
 
       "setTime(*, *, *)" in new Fixture1 {
         controller.setTime(null, null, null)
-        verify(controller).apply(any())
+        verify(controller).apply(any)
         verify(delegate).setTime(null, null, null)
       }
 
       "setTime(*, *, *, *)" in new Fixture1 {
         controller.setTime(null, null, null, 0)
-        verify(controller).apply(any())
+        verify(controller).apply(any)
         verify(delegate).setTime(null, null, null, 0)
       }
 
       "input(**)" when calling {
 
         "target()" in new Fixture2 {
-          socket.target()
-          verify(controller).apply(any())
-          verify(delegateSocket).target()
+          socket.target
+          verify(controller).apply(any)
+          verify(delegateSocket).target
         }
 
         "stream(*)" in new Fixture2 {
-          socket.stream(null)
-          verify(controller).apply(any())
-          verify(delegateSocket).stream(null)
+          socket.stream(Optional.empty())
+          verify(controller).apply(any)
+          verify(delegateSocket).stream(Optional.empty())
         }
 
         "channel(*)" in new Fixture2 {
-          socket.channel(null)
-          verify(controller).apply(any())
-          verify(delegateSocket).channel(null)
+          socket.channel(Optional.empty())
+          verify(controller).apply(any)
+          verify(delegateSocket).channel(Optional.empty())
         }
       }
 
       "output(**)" when calling {
 
         "target()" in new Fixture3 {
-          socket.target()
-          verify(controller).apply(any())
-          verify(delegateSocket).target()
+          socket.target
+          verify(controller).apply(any)
+          verify(delegateSocket).target
         }
 
         "stream(*)" in new Fixture3 {
-          socket.stream(null)
-          verify(controller).apply(any())
-          verify(delegateSocket).stream(null)
+          socket.stream(Optional.empty())
+          verify(controller).apply(any)
+          verify(delegateSocket).stream(Optional.empty())
         }
 
         "channel(*)" in new Fixture3 {
-          socket.channel(null)
-          verify(controller).apply(any())
-          verify(delegateSocket).channel(null)
+          socket.channel(Optional.empty())
+          verify(controller).apply(any)
+          verify(delegateSocket).channel(Optional.empty())
         }
       }
 
       "make(**)" in new Fixture3 {
         controller.make(null, null, null, null)
-        verify(controller).apply(any())
+        verify(controller).apply(any)
         verify(delegate).make(null, null, null, null)
       }
 
       "unlink(**)" in new Fixture3 {
         controller.unlink(null, null)
-        verify(controller).apply(any())
+        verify(controller).apply(any)
         verify(delegate).unlink(null, null)
       }
     }

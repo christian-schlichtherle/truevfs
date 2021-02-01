@@ -128,11 +128,7 @@ abstract class BasicArchiveController<E extends FsArchiveEntry> implements Archi
     abstract InputSocket<E> input(String name);
 
     @Override
-    public OutputSocket<? extends Entry> output(final BitField<FsAccessOption> options, final FsNodeName name, final Optional<Entry> template) {
-        requireNonNull(options);
-        requireNonNull(name);
-        requireNonNull(template);
-
+    public OutputSocket<? extends Entry> output(final BitField<FsAccessOption> options, final FsNodeName name, final Optional<? extends Entry> template) {
         return new AbstractOutputSocket<FsArchiveEntry>() {
 
             @Override
@@ -158,7 +154,7 @@ abstract class BasicArchiveController<E extends FsArchiveEntry> implements Archi
                 try {
                     val os = output(options, ae);
                     val out = os.stream(in.isPresent()
-                            ? null // do NOT bind when appending!
+                            ? Optional.empty() // do NOT bind when appending!
                             : peer);
                     try {
                         tx.commit();
@@ -203,7 +199,7 @@ abstract class BasicArchiveController<E extends FsArchiveEntry> implements Archi
             Optional<InputStream> append() {
                 if (options.get(APPEND)) {
                     try {
-                        return Optional.of(input(options, name).stream(null));
+                        return Optional.of(input(options, name).stream(Optional.empty()));
                     } catch (IOException ignored) {
                         // When appending, there is no need for the entry to be
                         // readable or even exist, so this can get safely ignored.
@@ -217,7 +213,7 @@ abstract class BasicArchiveController<E extends FsArchiveEntry> implements Archi
     abstract OutputSocket<E> output(BitField<FsAccessOption> options, E entry);
 
     @Override
-    public void make(final BitField<FsAccessOption> options, final FsNodeName name, final Entry.Type type, final Optional<Entry> template) throws IOException {
+    public void make(final BitField<FsAccessOption> options, final FsNodeName name, final Entry.Type type, final Optional<? extends Entry> template) throws IOException {
         if (name.isRoot()) { // TODO: Is this case differentiation still required?
             try {
                 autoMount(options, false); // detect false positives!

@@ -6,32 +6,29 @@ package net.java.truevfs.kernel.spec;
 
 import org.junit.Test;
 
-import javax.annotation.CheckForNull;
 import java.net.URI;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 /**
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class FsModelTest {
 
-    protected FsModel newModel( FsMountPoint mountPoint,
-                                @CheckForNull FsModel parent) {
+    protected FsModel newModel(FsMountPoint mountPoint, Optional<? extends FsModel> parent) {
         return new FsTestModel(mountPoint, parent);
     }
 
-    private FsModel newModel(final FsMountPoint mountPoint) {
-        return newModel(mountPoint,
-                        null == mountPoint.getParent()
-                            ? null
-                            : newModel(mountPoint.getParent()));
+    private FsModel newModel(FsMountPoint mountPoint) {
+        return newModel(mountPoint, mountPoint.getParent().map(this::newModel));
     }
 
     @Test
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithNull() {
         try {
             newModel(null, null);
@@ -41,22 +38,20 @@ public class FsModelTest {
     }
 
     @Test
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithMountPoint() {
         for (final String[] params : new String[][] {
             { "foo:/bar/" },
         }) {
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[0]));
-            final FsModel model = newModel(mountPoint, null);
+            final FsModel model = newModel(mountPoint, Optional.empty());
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
-            assertThat(model.getMountPoint().getPath(), nullValue());
-            assertThat(model.getParent(), nullValue());
+            assertFalse(model.getMountPoint().getPath().isPresent());
+            assertFalse(model.getParent().isPresent());
             assertThat(model.isMounted(), is(false));
         }
     }
 
     @Test
-    @SuppressWarnings("ResultOfObjectAllocationIgnored")
     public void testConstructorWithMountPointAndParent() {
         for (final String[] params : new String[][] {
             { "foo:/bar/baz/", "foo:/bar/" },
@@ -64,9 +59,9 @@ public class FsModelTest {
         }) {
             final FsMountPoint mountPoint = FsMountPoint.create(URI.create(params[0]));
             final FsMountPoint parentMountPoint = FsMountPoint.create(URI.create(params[1]));
-            final FsModel parent = newModel(parentMountPoint, null);
+            final FsModel parent = newModel(parentMountPoint, Optional.empty());
             try {
-                newModel(mountPoint, parent);
+                newModel(mountPoint, Optional.of(parent));
                 fail(params[0]);
             } catch (RuntimeException expected) {
             }
@@ -84,11 +79,11 @@ public class FsModelTest {
             final FsNodeName parentEntryName = FsNodeName.create(URI.create(params[3]));
             final FsNodePath path = FsNodePath.create(URI.create(params[4]));
             FsModel parent = newModel(parentMountPoint);
-            FsModel model = newModel(mountPoint, parent);
+            FsModel model = newModel(mountPoint, Optional.of(parent));
 
             assertThat(model.getMountPoint(), sameInstance(mountPoint));
-            assertThat(model.getParent(), sameInstance(parent));
-            assertThat(model.getMountPoint().getPath().resolve(entryName).getNodeName(), equalTo(parentEntryName));
+            assertThat(model.getParent().get(), sameInstance(parent));
+            assertThat(model.getMountPoint().getPath().get().resolve(entryName).getNodeName(), equalTo(parentEntryName));
             assertThat(model.getMountPoint().resolve(entryName), equalTo(path));
             assertThat(model.isMounted(), is(false));
         }

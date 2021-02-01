@@ -16,6 +16,7 @@ import javax.management.MBeanInfo;
 import javax.management.MBeanOperationInfo;
 import javax.management.StandardMBean;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -107,8 +108,8 @@ final class TotalTopLevelArchiveFileSystemsFilter
 
     @Override
     public boolean accept(final FsController controller) {
-        final FsController parent = controller.getParent();
-        return null != parent && null == parent.getParent();
+        final Optional<? extends FsController> parent = controller.getParent();
+        return parent.filter(p -> !p.getParent().isPresent()).isPresent();
     }
 }
 

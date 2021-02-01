@@ -4,12 +4,16 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.io.*;
-import java.nio.channels.SeekableByteChannel;
-import java.util.Objects;
-import net.java.truecommons.cio.*;
+import net.java.truecommons.cio.Entry;
+import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.io.Sink;
 import net.java.truecommons.shed.BitField;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.channels.SeekableByteChannel;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * An adapter from an output socket to a sink with access options.
@@ -43,11 +47,11 @@ public class FsOutputSocketSink implements Sink {
 
     @Override
     public OutputStream stream() throws IOException {
-        return getSocket().stream(null);
+        return getSocket().stream(Optional.empty());
     }
 
     @Override
     public SeekableByteChannel channel() throws IOException {
-        return getSocket().channel(null);
+        return getSocket().channel(Optional.empty());
     }
 }

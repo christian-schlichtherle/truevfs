@@ -13,8 +13,8 @@ import net.java.truevfs.kernel.spec.FsController;
 import net.java.truevfs.kernel.spec.FsDecoratingController;
 import net.java.truevfs.kernel.spec.FsNodeName;
 
-import javax.annotation.CheckForNull;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @param  <M> the type of the mediator.
@@ -33,16 +33,14 @@ public class InstrumentingController<M extends Mediator<M>> extends FsDecorating
     public InputSocket<? extends Entry> input(
             BitField<FsAccessOption> options,
             FsNodeName name) {
-        return mediator.instrument(this,
-                getController().input(options, name));
+        return mediator.instrument(this, getController().input(options, name));
     }
 
     @Override
     public OutputSocket<? extends Entry> output(
             BitField<FsAccessOption> options,
             FsNodeName name,
-            @CheckForNull Entry template) {
-        return mediator.instrument(this,
-                getController().output(options, name, template));
+            Optional<? extends Entry> template) {
+        return mediator.instrument(this, getController().output(options, name, template));
     }
 }

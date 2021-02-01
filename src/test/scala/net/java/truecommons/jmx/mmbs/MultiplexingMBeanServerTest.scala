@@ -61,7 +61,7 @@ class MultiplexingMBeanServerTest extends AnyWordSpec {
 
 private object MultiplexingMBeanServerTest {
 
-  private trait MessengerMBean {
+  trait MessengerMBean {
     def getMessage: String
   }
 

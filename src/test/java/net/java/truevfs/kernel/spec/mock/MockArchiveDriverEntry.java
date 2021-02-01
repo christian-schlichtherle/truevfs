@@ -30,7 +30,7 @@ public final class MockArchiveDriverEntry implements FsArchiveEntry {
             = new Boolean[Access.values().length][PosixEntity.values().length];
     private @CheckForNull IoBuffer buffer;
 
-    public MockArchiveDriverEntry(final String name, final Type type) {
+    public MockArchiveDriverEntry(String name, Type type) {
         this(name, type, null);
     }
 

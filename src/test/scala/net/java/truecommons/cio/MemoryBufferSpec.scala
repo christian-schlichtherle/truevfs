@@ -10,6 +10,7 @@ import org.scalatest.matchers.should.Matchers._
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks._
 
+import java.util.Optional
 import scala.util._
 
 /** @author Christian Schlichtherle */
@@ -27,7 +28,7 @@ class MemoryBufferSpec extends AnyWordSpec {
               val mb = new MemoryBuffer("name", capacity)
               mb.getSize(Size.DATA) should be(UNKNOWN)
               mb.getSize(Size.STORAGE) should be(UNKNOWN)
-              val out = mb.output.stream(null)
+              val out = mb.output.stream(Optional.empty())
               try {
                 var off = 0
                 do {
@@ -44,7 +45,7 @@ class MemoryBufferSpec extends AnyWordSpec {
               mb.getSize(Size.DATA) should be(limit)
               mb.getSize(Size.STORAGE) should be(limit)
               val ia = new Array[Byte](limit)
-              val in = mb.input.stream(null)
+              val in = mb.input.stream(Optional.empty())
               try {
                 in.markSupported should be(true)
                 in.mark(limit)

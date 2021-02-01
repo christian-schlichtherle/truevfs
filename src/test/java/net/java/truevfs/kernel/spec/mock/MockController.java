@@ -13,8 +13,6 @@ import net.java.truevfs.kernel.spec.io.ThrowingInputStream;
 import net.java.truevfs.kernel.spec.io.ThrowingOutputStream;
 import net.java.truevfs.kernel.spec.io.ThrowingSeekableChannel;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,20 +26,19 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * @author Christian Schlichtherle
  */
-public class MockController
-        extends FsAbstractController {
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+public class MockController extends FsAbstractController {
 
-    private final @Nullable
-    FsController parent;
-    @SuppressWarnings("CollectionWithoutInitialCapacity")
-    private final ConcurrentMap<FsNodeName, IoEntry<?>>
-            map = new ConcurrentHashMap<>();
+    private final Optional<? extends FsController> parent;
+
+    private final ConcurrentMap<FsNodeName, IoEntry<?>> map = new ConcurrentHashMap<>();
+
     private final FsTestConfig config;
-    private volatile @CheckForNull
-    FsThrowManager control;
 
-    public MockController(FsModel model, @CheckForNull FsController parent) {
-        this(model, parent, null);
+    private volatile Optional<FsThrowManager> control = Optional.empty();
+
+    public MockController(FsModel model, Optional<? extends FsController> parent) {
+        this(model, parent, Optional.empty());
     }
 
     /**
@@ -52,19 +49,17 @@ public class MockController
      * @param config The mocking configuration.
      */
     public MockController(final FsModel model,
-                          final @CheckForNull FsController parent,
-                          final @CheckForNull FsTestConfig config) {
+                          final Optional<? extends FsController> parent,
+                          final Optional<FsTestConfig> config) {
         super(model);
-        assert null == model.getParent()
-                ? null == parent
-                : model.getParent().equals(parent.getModel());
+        assert model.getParent().equals(parent.map(FsController::getModel));
         this.parent = parent;
-        this.config = null != config ? config : FsTestConfig.get();
+        this.config = config.orElseGet(FsTestConfig::get);
     }
 
     private FsThrowManager getThrowControl() {
-        final FsThrowManager control = this.control;
-        return null != control ? control : (this.control = config.getThrowControl());
+        final Optional<FsThrowManager> control = this.control;
+        return control.orElseGet(() -> (this.control = Optional.of(config.getThrowControl())).get());
     }
 
     private void checkAllExceptions(final Object thiz) throws IOException {
@@ -78,13 +73,13 @@ public class MockController
     }
 
     @Override
-    public FsController getParent() {
+    public Optional<? extends FsController> getParent() {
         checkUndeclaredExceptions(this);
         return parent;
     }
 
     @Override
-    public FsNode node(
+    public Optional<? extends FsNode> node(
             final BitField<FsAccessOption> options,
             final FsNodeName name)
             throws IOException {
@@ -154,8 +149,7 @@ public class MockController
         class Input extends DelegatingInputSocket<Entry> {
 
             @Override
-            protected InputSocket<? extends Entry> socket()
-                    throws IOException {
+            protected InputSocket<? extends Entry> socket() throws IOException {
                 checkAllExceptions(this);
                 final IoEntry<?> buffer = map.get(name);
                 if (null == buffer) {
@@ -184,7 +178,7 @@ public class MockController
     public OutputSocket<?> output(
             final BitField<FsAccessOption> options,
             final FsNodeName name,
-            final @CheckForNull Entry template) {
+            final Optional<? extends Entry> template) {
         checkUndeclaredExceptions(this);
         assert null != name;
         assert null != options;
@@ -222,7 +216,7 @@ public class MockController
             final BitField<FsAccessOption> options,
             final FsNodeName name,
             final Type type,
-            final Entry template)
+            final Optional<? extends Entry> template)
             throws IOException {
         checkAllExceptions(this);
         assert null != name;

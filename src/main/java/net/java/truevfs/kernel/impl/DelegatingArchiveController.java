@@ -66,12 +66,12 @@ interface DelegatingArchiveController<E extends FsArchiveEntry> extends ArchiveC
     }
 
     @Override
-    default OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<Entry> template) {
+    default OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<? extends Entry> template) {
         return getController().output(options, name, template);
     }
 
     @Override
-    default void make(BitField<FsAccessOption> options, FsNodeName name, Entry.Type type, Optional<Entry> template) throws IOException {
+    default void make(BitField<FsAccessOption> options, FsNodeName name, Entry.Type type, Optional<? extends Entry> template) throws IOException {
         getController().make(options, name, type, template);
     }
 

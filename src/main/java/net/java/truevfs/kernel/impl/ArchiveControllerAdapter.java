@@ -12,7 +12,6 @@ import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
 
-import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
@@ -32,13 +31,13 @@ interface ArchiveControllerAdapter extends FsController {
 
     @Cache(NOT_THREAD_SAFE)
     @Override
-    default FsController getParent() {
-        return getController().getParent();
+    default Optional<? extends FsController> getParent() {
+        return Optional.of(getController().getParent());
     }
 
     @Override
-    default FsNode node(BitField<FsAccessOption> options, FsNodeName name) throws IOException {
-        return getController().node(options, name).orElse(null);
+    default Optional<? extends FsNode> node(BitField<FsAccessOption> options, FsNodeName name) throws IOException {
+        return getController().node(options, name);
     }
 
     @Override
@@ -67,13 +66,13 @@ interface ArchiveControllerAdapter extends FsController {
     }
 
     @Override
-    default OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, @CheckForNull Entry template) {
-        return getController().output(options, name, Optional.ofNullable(template));
+    default OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<? extends Entry> template) {
+        return getController().output(options, name, template);
     }
 
     @Override
-    default void make(BitField<FsAccessOption> options, FsNodeName name, Entry.Type type, @CheckForNull Entry template) throws IOException {
-        getController().make(options, name, type, Optional.ofNullable(template));
+    default void make(BitField<FsAccessOption> options, FsNodeName name, Entry.Type type, Optional<? extends Entry> template) throws IOException {
+        getController().make(options, name, type, template);
     }
 
     @Override

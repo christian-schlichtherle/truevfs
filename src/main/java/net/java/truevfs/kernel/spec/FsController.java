@@ -4,11 +4,6 @@
  */
 package net.java.truevfs.kernel.spec;
 
-import java.io.IOException;
-import java.lang.annotation.Inherited;
-import java.util.Map;
-import javax.annotation.CheckForNull;
-import javax.annotation.Nullable;
 import net.java.truecommons.cio.Entry;
 import net.java.truecommons.cio.Entry.Access;
 import net.java.truecommons.cio.Entry.Type;
@@ -16,6 +11,12 @@ import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.shed.BitField;
 import net.java.truecommons.shed.ImplementationsShouldExtend;
+
+import java.io.IOException;
+import java.lang.annotation.Inherited;
+import java.util.Map;
+import java.util.Optional;
+
 import static net.java.truevfs.kernel.spec.FsAssertion.Level.*;
 
 /**
@@ -30,7 +31,7 @@ import static net.java.truevfs.kernel.spec.FsAssertion.Level.*;
  * {@link FsNodeName file system node name} as a parameter, this MUST get
  * resolved against the {@link FsModel#getMountPoint() mount point} URI of this
  * controller's file system model.
-  * <p>
+ * <p>
  * As of TrueVFS 0.10, application level transactions are not supported,
  * that is, multiple file system operations cannot get composed into a single
  * application level transaction - support for this feature may be added in a
@@ -64,11 +65,12 @@ import static net.java.truevfs.kernel.spec.FsAssertion.Level.*;
  * <p>
  * Implementations should be safe for multi-threaded access.
  *
- * @see    FsManager
- * @see    FsModel
- * @see    <a href="http://www.ietf.org/rfc/rfc2119.txt">RFC 2119: Key words for use in RFCs to Indicate Requirement Levels</a>
  * @author Christian Schlichtherle
+ * @see FsManager
+ * @see FsModel
+ * @see <a href="http://www.ietf.org/rfc/rfc2119.txt">RFC 2119: Key words for use in RFCs to Indicate Requirement Levels</a>
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @ImplementationsShouldExtend(FsAbstractController.class)
 public interface FsController {
 
@@ -80,7 +82,7 @@ public interface FsController {
      *
      * @return The nullable controller for the parent file system.
      */
-    @Nullable FsController getParent();
+    Optional<? extends FsController> getParent();
 
     /**
      * Returns the file system model.
@@ -95,48 +97,48 @@ public interface FsController {
      * Modifying the returned node does not show any effect on the file system
      * and should result in an {@link UnsupportedOperationException}.
      *
-     * @param  options the options for accessing the file system node.
-     * @param  name the name of the file system node.
+     * @param options the options for accessing the file system node.
+     * @param name    the name of the file system node.
      * @return A file system node or {@code null} if no file system node
-     *         exists for the given name.
+     * exists for the given name.
      * @throws IOException on any I/O error.
      */
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
-    @CheckForNull FsNode node(
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
+    Optional<? extends FsNode> node(
             BitField<FsAccessOption> options,
             FsNodeName name)
-    throws IOException;
+            throws IOException;
 
     /**
      * Checks if the file system node for the given {@code name} exists when
      * constrained by the given access {@code options} and permits the given
      * access {@code types}.
      *
-     * @param  options the options for accessing the file system node.
-     * @param  name the name of the file system node.
-     * @param  types the types of the desired access.
+     * @param options the options for accessing the file system node.
+     * @param name    the name of the file system node.
+     * @param types   the types of the desired access.
      * @throws IOException on any I/O error.
      */
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
     void checkAccess(
             BitField<FsAccessOption> options,
             FsNodeName name,
             BitField<Access> types)
-    throws IOException;
+            throws IOException;
 
     /**
      * Sets the named file system node as read-only.
      * This method will fail for typical archive file system controller
      * implementations because they do not support it.
      *
-     * @param  options the options for accessing the file system node.
-     * @param  name the name of the file system node.
+     * @param options the options for accessing the file system node.
+     * @param name    the name of the file system node.
      * @throws IOException on any I/O error or if this operation is not
-     *         supported.
+     *                     supported.
      */
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES)
     void setReadOnly(BitField<FsAccessOption> options, FsNodeName name)
-    throws IOException;
+            throws IOException;
 
     /**
      * Makes an attempt to set the last access time of all types in the given
@@ -146,21 +148,21 @@ public interface FsController {
      * Whether or not this is an atomic operation is specific to the
      * implementation.
      *
-     * @param  options the options for accessing the file system node.
-     * @param  name the name of the file system node.
-     * @param  times the access times.
+     * @param options the options for accessing the file system node.
+     * @param name    the name of the file system node.
+     * @param times   the access times.
      * @return {@code true} if and only if setting the access time for all
-     *         types in {@code times} succeeded.
-     * @throws IOException on any I/O error.
+     * types in {@code times} succeeded.
+     * @throws IOException          on any I/O error.
      * @throws NullPointerException if any key or value in the map is
-     *         {@code null}.
+     *                              {@code null}.
      */
-    @FsAssertion(atomic=NO, consistent=YES, isolated=YES)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = YES)
     boolean setTime(
             BitField<FsAccessOption> options,
             FsNodeName name,
             Map<Access, Long> times)
-    throws IOException;
+            throws IOException;
 
     /**
      * Makes an attempt to set the last access time of all types in the given
@@ -168,21 +170,21 @@ public interface FsController {
      * If {@code false} is returned or an {@link IOException} is thrown, then
      * still some of the last access times may have been set.
      *
-     * @param  options the options for accessing the file system node.
-     * @param  name the name of the file system node.
-     * @param  types the access types.
-     * @param  value the last access time.
+     * @param options the options for accessing the file system node.
+     * @param name    the name of the file system node.
+     * @param types   the access types.
+     * @param value   the last access time.
      * @return {@code true} if and only if setting the access time for all
-     *         types in {@code types} succeeded.
+     * types in {@code types} succeeded.
      * @throws IOException on any I/O error.
      */
-    @FsAssertion(atomic=NO, consistent=YES, isolated=YES)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = YES)
     boolean setTime(
             BitField<FsAccessOption> options,
             FsNodeName name,
             BitField<Access> types,
             long value)
-    throws IOException;
+            throws IOException;
 
     /**
      * Returns an input socket for reading the contents of the file system
@@ -190,11 +192,11 @@ public interface FsController {
      * Note that the assertions for this file system operation equally apply to
      * any channel or stream created by the returned input socket!
      *
-     * @param  options the options for accessing the file system node.
-     * @param  name the name of the file system node.
+     * @param options the options for accessing the file system node.
+     * @param name    the name of the file system node.
      * @return An {@code InputSocket}.
      */
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES, durable=NOT_APPLICABLE)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES, durable = NOT_APPLICABLE)
     InputSocket<? extends Entry> input(
             BitField<FsAccessOption> options,
             FsNodeName name);
@@ -205,69 +207,69 @@ public interface FsController {
      * Note that the assertions for this file system operation equally apply to
      * any channel or stream created by the returned output socket!
      *
-     * @param  options the options for accessing the file system node.
-     *         If {@link FsAccessOption#CREATE_PARENTS} is set, any missing
-     *         parent directories shall get created with an undefined last
-     *         modification time.
-     * @param  name the name of the file system node.
-     * @param  template if not {@code null}, then the file system node
-     *         at the end of the chain shall inherit as much properties from
-     *         this node as possible - with the exception of its name and type.
+     * @param options  the options for accessing the file system node.
+     *                 If {@link FsAccessOption#CREATE_PARENTS} is set, any missing
+     *                 parent directories shall get created with an undefined last
+     *                 modification time.
+     * @param name     the name of the file system node.
+     * @param template if not {@code null}, then the file system node
+     *                 at the end of the chain shall inherit as much properties from
+     *                 this node as possible - with the exception of its name and type.
      * @return An {@code OutputSocket}.
      */
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES)
     OutputSocket<? extends Entry> output(
             BitField<FsAccessOption> options,
             FsNodeName name,
-            @CheckForNull Entry template);
+            Optional<? extends Entry> template);
 
     /**
      * Creates or replaces and finally links a chain of one or more entries
      * for the given node {@code name} into the file system.
      *
-     * @param  options the options for accessing the file system node.
-     *         If {@link FsAccessOption#CREATE_PARENTS} is set, any missing
-     *         parent directories shall get created with an undefined last
-     *         modification time.
-     * @param  name the name of the file system node.
-     * @param  type the file system node type.
-     * @param  template if not {@code null}, then the file system node
-     *         at the end of the chain shall inherit as much properties from
-     *         this node as possible - with the exception of its name and type.
+     * @param options  the options for accessing the file system node.
+     *                 If {@link FsAccessOption#CREATE_PARENTS} is set, any missing
+     *                 parent directories shall get created with an undefined last
+     *                 modification time.
+     * @param name     the name of the file system node.
+     * @param type     the file system node type.
+     * @param template if not {@code null}, then the file system node
+     *                 at the end of the chain shall inherit as much properties from
+     *                 this node as possible - with the exception of its name and type.
      * @throws IOException on any I/O error, including but not limited to
-     *         these reasons:
-     *         <ul>
-     *         <li>The file system is read only.
-     *         <li>{@code name} contains characters which are not
-     *             supported by the file system.
-     *         <li>The node already exists and either the option
-     *             {@link FsAccessOption#EXCLUSIVE} is set or the node is a
-     *             directory.
-     *         <li>The node exists as a different type.
-     *         <li>A parent node exists but is not a directory.
-     *         <li>A parent node is missing and {@code createParents} is
-     *             {@code false}.
-     *         </ul>
+     *                     these reasons:
+     *                     <ul>
+     *                     <li>The file system is read only.
+     *                     <li>{@code name} contains characters which are not
+     *                         supported by the file system.
+     *                     <li>The node already exists and either the option
+     *                         {@link FsAccessOption#EXCLUSIVE} is set or the node is a
+     *                         directory.
+     *                     <li>The node exists as a different type.
+     *                     <li>A parent node exists but is not a directory.
+     *                     <li>A parent node is missing and {@code createParents} is
+     *                         {@code false}.
+     *                     </ul>
      */
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES)
     void make(
             BitField<FsAccessOption> options,
             FsNodeName name,
             Type type,
-            @CheckForNull Entry template)
-    throws IOException;
+            Optional<? extends Entry> template)
+            throws IOException;
 
     /**
      * Removes the named file system node from the file system.
      * If the named file system node is a directory, it must be empty.
      *
-     * @param  options the options for accessing the file system node.
-     * @param  name the name of the file system node.
+     * @param options the options for accessing the file system node.
+     * @param name    the name of the file system node.
      * @throws IOException on any I/O error.
      */
-    @FsAssertion(atomic=YES, consistent=YES, isolated=YES)
+    @FsAssertion(atomic = YES, consistent = YES, isolated = YES)
     void unlink(BitField<FsAccessOption> options, FsNodeName name)
-    throws IOException;
+            throws IOException;
 
     /**
      * Commits all unsynchronized changes to the contents of this file system
@@ -283,15 +285,15 @@ public interface FsController {
      * <p>
      * An implementation may ignore calls to this method if its stateless.
      *
-     * @param  options the options for synchronizing the file system.
+     * @param options the options for synchronizing the file system.
      * @throws FsSyncWarningException if <em>only</em> warning conditions
-     *         apply.
-     *         This implies that the respective parent file system has been
-     *         synchronized with constraints, e.g. if an unclosed archive entry
-     *         stream gets forcibly closed.
-     * @throws FsSyncException if any error conditions apply.
+     *                                apply.
+     *                                This implies that the respective parent file system has been
+     *                                synchronized with constraints, e.g. if an unclosed archive entry
+     *                                stream gets forcibly closed.
+     * @throws FsSyncException        if any error conditions apply.
      */
-    @FsAssertion(atomic=NO, consistent=YES, isolated=YES)
+    @FsAssertion(atomic = NO, consistent = YES, isolated = YES)
     void sync(BitField<FsSyncOption> options) throws FsSyncException;
 
     /**
@@ -299,7 +301,7 @@ public interface FsController {
      * <p>
      * Implementations should be safe for multi-threaded access.
      *
-     * @param  <Context> The type of the calling context.
+     * @param <Context> The type of the calling context.
      * @author Christian Schlichtherle
      */
     interface Factory<Context> {
@@ -310,21 +312,16 @@ public interface FsController {
          * This is a pure function without side effects.
          * <p>
          * When called, you may assert the following precondition:
-         * <pre>{@code
-         * assert null == parent
-         *         ? null == model.getParent()
-         *         : parent.getModel().equals(model.getParent())
-         * }</pre>
+         * {@code assert model.getParent().equals(parent.map(FsController::getModel));}
          *
-         * @param  context the calling context.
-         * @param  model the file system model.
-         * @param  parent the nullable parent file system controller.
-         * @return A new file system controller for the mount point of the
-         *         given file system model.
+         * @param context the calling context.
+         * @param model   the file system model.
+         * @param parent  the nullable parent file system controller.
+         * @return A new file system controller for the mount point of the given file system model.
          */
         FsController newController(
                 Context context,
                 FsModel model,
-                @CheckForNull FsController parent);
+                Optional<? extends FsController> parent);
     }
 }

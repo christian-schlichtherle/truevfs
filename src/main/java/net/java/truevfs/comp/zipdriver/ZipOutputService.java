@@ -319,7 +319,7 @@ extends AbstractZipOutputStream<E> implements OutputService<E> {
             final IoBuffer buffer = this.buffer = getPool().allocate();
             try {
                 this.out = new CheckedOutputStream(
-                        buffer.output().stream(null), new CRC32());
+                        buffer.output().stream(Optional.empty()), new CRC32());
             } catch (final Throwable ex) {
                 try {
                     buffer.release();

@@ -8,6 +8,7 @@ import net.java.truecommons.shed.BitField;
 import net.java.truevfs.kernel.spec.*;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -41,7 +42,7 @@ abstract class ArchiveModel<E extends FsArchiveEntry>
      * @param name the node name.
      */
     final FsNodePath path(FsNodeName name) {
-        return new FsNodePath(getMountPoint(), name);
+        return new FsNodePath(Optional.of(getMountPoint()), name);
     }
 
     abstract void touch(BitField<FsAccessOption> options) throws IOException;

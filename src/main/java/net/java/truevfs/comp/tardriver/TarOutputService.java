@@ -224,7 +224,7 @@ public final class TarOutputService implements OutputService<TarDriverEntry> {
             this.local = local;
             final IoBuffer buffer = this.buffer = getPool().allocate();
             try {
-                this.out = buffer.output().stream(null);
+                this.out = buffer.output().stream(Optional.empty());
             } catch (final Throwable ex) {
                 try {
                     buffer.release();

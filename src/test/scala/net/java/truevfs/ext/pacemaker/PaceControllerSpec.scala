@@ -56,8 +56,8 @@ class PaceControllerSpec extends AnyWordSpec {
       "forward the call to the decorated controller and not apply() its aspect" in new Fixture {
         val io = Mockito.inOrder(delegate, manager)
         import io._
-        controller.sync(null)
-        verify(delegate).sync(null)
+        controller.sync(FsSyncOptions.NONE)
+        verify(delegate).sync(FsSyncOptions.NONE)
         verify(manager, never()).recordAccess(mountPoint)
         verifyNoMoreInteractions()
       }

@@ -21,6 +21,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Optional;
 
 import static net.java.truevfs.kernel.spec.FsAccessOption.STORE;
 
@@ -127,7 +128,7 @@ public class TarBZip2Driver extends TarDriver {
         // Leave FsAccessOption.COMPRESS untouched - the driver shall be given
         // opportunity to apply its own preferences to sort out such a conflict.
         options = options.set(STORE);
-        return new FsOutputSocketSink(options, controller.output(options, name, null));
+        return new FsOutputSocketSink(options, controller.output(options, name, Optional.empty()));
     }
 
     private static final class FixedBZip2CompressorOutputStream extends BZip2CompressorOutputStream {

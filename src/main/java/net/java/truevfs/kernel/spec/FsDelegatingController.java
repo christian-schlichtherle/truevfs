@@ -12,9 +12,9 @@ import net.java.truecommons.cio.InputSocket;
 import net.java.truecommons.cio.OutputSocket;
 import net.java.truecommons.shed.BitField;
 
-import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * A file system controller which delegates its calls to another file system controller.
@@ -30,7 +30,7 @@ public interface FsDelegatingController extends FsController {
     FsController getController();
 
     @Override
-    default FsController getParent() {
+    default Optional<? extends FsController> getParent() {
         return getController().getParent();
     }
 
@@ -40,8 +40,7 @@ public interface FsDelegatingController extends FsController {
     }
 
     @Override
-    default @CheckForNull
-    FsNode node(
+    default Optional<? extends FsNode> node(
             BitField<FsAccessOption> options,
             FsNodeName name)
             throws IOException {
@@ -93,7 +92,7 @@ public interface FsDelegatingController extends FsController {
     default OutputSocket<? extends Entry> output(
             BitField<FsAccessOption> options,
             FsNodeName name,
-            @CheckForNull Entry template) {
+            Optional<? extends Entry> template) {
         return getController().output(options, name, template);
     }
 
@@ -102,7 +101,7 @@ public interface FsDelegatingController extends FsController {
             BitField<FsAccessOption> options,
             FsNodeName name,
             Type type,
-            @CheckForNull Entry template)
+            Optional<? extends Entry> template)
             throws IOException {
         getController().make(options, name, type, template);
     }

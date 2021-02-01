@@ -28,6 +28,7 @@ import static bali.CachingStrategy.NOT_THREAD_SAFE;
  *
  * @author Christian Schlichtherle
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 interface ArchiveController<E extends FsArchiveEntry> extends ArchiveModelAspect<E>, ReentrantReadWriteLockAspect {
 
     /**
@@ -53,9 +54,9 @@ interface ArchiveController<E extends FsArchiveEntry> extends ArchiveModelAspect
 
     InputSocket<? extends Entry> input(BitField<FsAccessOption> options, FsNodeName name);
 
-    OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<Entry> template);
+    OutputSocket<? extends Entry> output(BitField<FsAccessOption> options, FsNodeName name, Optional<? extends Entry> template);
 
-    void make(BitField<FsAccessOption> options, FsNodeName name, Type type, Optional<Entry> template) throws IOException;
+    void make(BitField<FsAccessOption> options, FsNodeName name, Type type, Optional<? extends Entry> template) throws IOException;
 
     void unlink(BitField<FsAccessOption> options, FsNodeName name) throws IOException;
 

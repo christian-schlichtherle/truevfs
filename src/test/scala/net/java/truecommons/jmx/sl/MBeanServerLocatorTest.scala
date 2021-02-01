@@ -17,7 +17,7 @@ class MBeanServerLocatorTest extends AnyWordSpec {
 
   "The MBean server locator singleton" should {
     "provide an MBean server" in {
-      MBeanServerLocator.SINGLETON.get should not be (null)
+      MBeanServerLocator.SINGLETON.get shouldNot be(null)
     }
   }
 }
