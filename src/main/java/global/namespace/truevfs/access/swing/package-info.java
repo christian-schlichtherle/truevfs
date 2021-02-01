@@ -1,0 +1,11 @@
+/*
+ * Copyright © 2005 - 2021 Schlichtherle IT Services.
+ * All rights reserved. Use is subject to license terms.
+ */
+/**
+ * Provides Swing GUI classes for viewing file trees and choosing entries in
+ * archive files.
+ * 
+ * @author Christian Schlichtherle
+ */
+package global.namespace.truevfs.access.swing;
