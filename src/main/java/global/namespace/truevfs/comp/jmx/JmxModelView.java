@@ -4,13 +4,13 @@
  */
 package global.namespace.truevfs.comp.jmx;
 
-import lombok.val;
 import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.cio.Entry.Size;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.*;
-import global.namespace.truevfs.kernel.spec.sl.FsDriverMapLocator;
-import global.namespace.truevfs.kernel.spec.sl.FsManagerLocator;
+import global.namespace.truevfs.kernel.api.*;
+import global.namespace.truevfs.kernel.api.sl.FsDriverMapLocator;
+import global.namespace.truevfs.kernel.api.sl.FsManagerLocator;
+import lombok.val;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;

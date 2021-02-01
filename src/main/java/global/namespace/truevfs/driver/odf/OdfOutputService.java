@@ -7,7 +7,7 @@ package global.namespace.truevfs.driver.odf;
 import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.zipdriver.JarDriverEntry;
 import global.namespace.truevfs.comp.zipdriver.ZipOutputService;
-import global.namespace.truevfs.kernel.spec.cio.MultiplexingOutputService;
+import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputService;
 
 import java.io.IOException;
 import java.io.OutputStream;

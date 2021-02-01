@@ -6,9 +6,9 @@ package global.namespace.truevfs.ext.logging;
 
 import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.inst.*;
-import global.namespace.truevfs.kernel.spec.FsCompositeDriver;
-import global.namespace.truevfs.kernel.spec.FsController;
-import global.namespace.truevfs.kernel.spec.FsManager;
+import global.namespace.truevfs.kernel.api.FsCompositeDriver;
+import global.namespace.truevfs.kernel.api.FsController;
+import global.namespace.truevfs.kernel.api.FsManager;
 
 import java.io.InputStream;
 import java.io.OutputStream;

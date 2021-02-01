@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.driver.file;
 
-import global.namespace.truevfs.kernel.spec.sl.IoBufferPoolLocator;
+import global.namespace.truevfs.kernel.api.sl.IoBufferPoolLocator;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;

@@ -10,8 +10,8 @@ import global.namespace.truevfs.comp.cio.IoSockets;
 import global.namespace.truevfs.comp.cio.OutputSocket;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.shed.Paths;
-import global.namespace.truevfs.kernel.spec.FsAccessOption;
-import global.namespace.truevfs.kernel.spec.FsNodePath;
+import global.namespace.truevfs.kernel.api.FsAccessOption;
+import global.namespace.truevfs.kernel.api.FsNodePath;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +22,7 @@ import java.nio.file.NotDirectoryException;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.CREATE_PARENTS;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.CREATE_PARENTS;
 
 /**
  * Provides fast bulk I/O operations for {@link File}s and {@link TFile}s.

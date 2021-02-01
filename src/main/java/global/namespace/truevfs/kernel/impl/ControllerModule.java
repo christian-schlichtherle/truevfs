@@ -9,10 +9,10 @@ import bali.Lookup;
 import bali.Make;
 import bali.Module;
 import global.namespace.truevfs.comp.cio.IoBufferPool;
-import global.namespace.truevfs.kernel.spec.FsArchiveDriver;
-import global.namespace.truevfs.kernel.spec.FsArchiveEntry;
-import global.namespace.truevfs.kernel.spec.FsController;
-import global.namespace.truevfs.kernel.spec.FsModel;
+import global.namespace.truevfs.kernel.api.FsArchiveDriver;
+import global.namespace.truevfs.kernel.api.FsArchiveEntry;
+import global.namespace.truevfs.kernel.api.FsController;
+import global.namespace.truevfs.kernel.api.FsModel;
 
 import java.util.Optional;
 

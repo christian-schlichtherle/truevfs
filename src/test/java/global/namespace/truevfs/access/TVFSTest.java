@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.access;
 
-import global.namespace.truevfs.kernel.spec.FsMountPoint;
+import global.namespace.truevfs.kernel.api.FsMountPoint;
 import org.junit.Test;
 
 import java.net.URI;

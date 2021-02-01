@@ -4,9 +4,10 @@
  */
 package global.namespace.truevfs.kernel.impl.cio
 
-import language.implicitConversions
-import global.namespace.truevfs.kernel.spec._
 import global.namespace.truevfs.comp.cio.Entry._
+import global.namespace.truevfs.kernel.api._
+
+import scala.language.implicitConversions
 
 /**
   * @author Christian Schlichtherle

@@ -6,10 +6,10 @@ package global.namespace.truevfs.driver.http;
 
 import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.FsAbstractNode;
-import global.namespace.truevfs.kernel.spec.FsAccessOption;
-import global.namespace.truevfs.kernel.spec.FsNodeName;
-import global.namespace.truevfs.kernel.spec.FsReadOnlyFileSystemException;
+import global.namespace.truevfs.kernel.api.FsAbstractNode;
+import global.namespace.truevfs.kernel.api.FsAccessOption;
+import global.namespace.truevfs.kernel.api.FsNodeName;
+import global.namespace.truevfs.kernel.api.FsReadOnlyFileSystemException;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -32,7 +32,7 @@ import static global.namespace.truevfs.comp.cio.Entry.Access.READ;
 import static global.namespace.truevfs.comp.cio.Entry.Access.WRITE;
 import static global.namespace.truevfs.comp.cio.Entry.Size.DATA;
 import static global.namespace.truevfs.comp.cio.Entry.Type.FILE;
-import static global.namespace.truevfs.kernel.spec.FsAccessOptions.NONE;
+import static global.namespace.truevfs.kernel.api.FsAccessOptions.NONE;
 
 /**
  * An HTTP(S) entry.

@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.comp.jmx;
 
-import global.namespace.truevfs.kernel.spec.FsModel;
-import global.namespace.truevfs.kernel.spec.FsSyncException;
+import global.namespace.truevfs.kernel.api.FsModel;
+import global.namespace.truevfs.kernel.api.FsSyncException;
 
 import javax.annotation.Nullable;
 

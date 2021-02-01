@@ -16,8 +16,8 @@ import global.namespace.truevfs.comp.zipdriver.ZipOutputService;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesOutputStream;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesParameters;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesReadOnlyChannel;
-import global.namespace.truevfs.kernel.spec.*;
-import global.namespace.truevfs.kernel.spec.cio.MultiplexingOutputService;
+import global.namespace.truevfs.kernel.api.*;
+import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputService;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;
@@ -25,7 +25,7 @@ import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Optional;
 
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.*;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.*;
 
 /**
  * An abstract archive driver for RAES encrypted ZIP files which optionally

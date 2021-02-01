@@ -5,7 +5,7 @@
 package global.namespace.truevfs.access;
 
 import global.namespace.truevfs.comp.shed.Paths;
-import global.namespace.truevfs.kernel.spec.FsNodePath;
+import global.namespace.truevfs.kernel.api.FsNodePath;
 import org.junit.Test;
 
 import java.net.URI;
@@ -13,9 +13,9 @@ import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.ServiceConfigurationError;
 
+import static global.namespace.truevfs.kernel.api.FsNodeName.SEPARATOR;
+import static global.namespace.truevfs.kernel.api.FsNodeName.SEPARATOR_CHAR;
 import static java.io.File.separatorChar;
-import static global.namespace.truevfs.kernel.spec.FsNodeName.SEPARATOR;
-import static global.namespace.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;

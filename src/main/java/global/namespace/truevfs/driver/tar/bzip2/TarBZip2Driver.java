@@ -11,8 +11,8 @@ import global.namespace.truevfs.comp.io.AbstractSource;
 import global.namespace.truevfs.comp.io.Streams;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.tardriver.*;
-import global.namespace.truevfs.kernel.spec.*;
-import global.namespace.truevfs.kernel.spec.cio.MultiplexingOutputService;
+import global.namespace.truevfs.kernel.api.*;
+import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputService;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorOutputStream;
 
@@ -23,7 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Optional;
 
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.STORE;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.STORE;
 
 /**
  * An archive driver for BZIP2 compressed TAR files (TAR.BZIP2).

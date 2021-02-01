@@ -4,7 +4,6 @@
  */
 package global.namespace.truevfs.access;
 
-import lombok.val;
 import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.cio.InputSocket;
 import global.namespace.truevfs.comp.cio.OutputSocket;
@@ -12,7 +11,8 @@ import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.shed.Paths;
 import global.namespace.truevfs.comp.shed.QuotedUriSyntaxException;
 import global.namespace.truevfs.comp.shed.UriBuilder;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
+import lombok.val;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -32,14 +32,14 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileAttributeView;
 import java.util.*;
 
-import static java.io.File.separator;
-import static java.io.File.separatorChar;
-import static global.namespace.truevfs.comp.shed.HashMaps.initialCapacity;
 import static global.namespace.truevfs.access.ExpertFeature.Level.INTERMEDIATE;
 import static global.namespace.truevfs.access.ExpertFeature.Reason.INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA;
 import static global.namespace.truevfs.access.TUriHelper.*;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.*;
-import static global.namespace.truevfs.kernel.spec.FsNodeName.*;
+import static global.namespace.truevfs.comp.shed.HashMaps.initialCapacity;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.*;
+import static global.namespace.truevfs.kernel.api.FsNodeName.*;
+import static java.io.File.separator;
+import static java.io.File.separatorChar;
 
 /**
  * A {@link Path} implementation for use with NIO.2.

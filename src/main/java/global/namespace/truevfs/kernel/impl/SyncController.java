@@ -4,13 +4,13 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import lombok.val;
 import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.io.DecoratingInputStream;
 import global.namespace.truevfs.comp.io.DecoratingOutputStream;
 import global.namespace.truevfs.comp.io.DecoratingSeekableChannel;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
+import lombok.val;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,8 +19,8 @@ import java.nio.channels.SeekableByteChannel;
 import java.util.Map;
 import java.util.Optional;
 
-import static global.namespace.truevfs.kernel.spec.FsSyncOptions.RESET;
-import static global.namespace.truevfs.kernel.spec.FsSyncOptions.SYNC;
+import static global.namespace.truevfs.kernel.api.FsSyncOptions.RESET;
+import static global.namespace.truevfs.kernel.api.FsSyncOptions.SYNC;
 
 /**
  * Performs a `sync` operation if required.

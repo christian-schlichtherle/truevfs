@@ -5,7 +5,7 @@
 package global.namespace.truevfs.kernel.impl;
 
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
 
 import java.io.IOException;
 import java.util.Optional;

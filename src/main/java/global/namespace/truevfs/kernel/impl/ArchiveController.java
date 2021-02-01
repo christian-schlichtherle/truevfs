@@ -12,7 +12,7 @@ import global.namespace.truevfs.comp.cio.Entry.Type;
 import global.namespace.truevfs.comp.cio.InputSocket;
 import global.namespace.truevfs.comp.cio.OutputSocket;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
 
 import java.io.IOException;
 import java.util.Map;
@@ -23,7 +23,7 @@ import static bali.CachingStrategy.NOT_THREAD_SAFE;
 
 /**
  * Provides read/write access to an archive file system.
- * This is a mirror of {@link global.namespace.truevfs.kernel.spec.FsController} which has been customized to ease the
+ * This is a mirror of {@link global.namespace.truevfs.kernel.api.FsController} which has been customized to ease the
  * implementation.
  *
  * @author Christian Schlichtherle

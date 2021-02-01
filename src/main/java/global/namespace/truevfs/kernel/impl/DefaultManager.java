@@ -4,11 +4,11 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import lombok.val;
 import global.namespace.truevfs.comp.shed.Filter;
 import global.namespace.truevfs.comp.shed.Link;
 import global.namespace.truevfs.comp.shed.Visitor;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
+import lombok.val;
 
 import java.util.*;
 import java.util.concurrent.locks.ReentrantReadWriteLock;

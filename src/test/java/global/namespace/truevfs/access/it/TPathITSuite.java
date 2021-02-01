@@ -4,14 +4,14 @@
  */
 package global.namespace.truevfs.access.it;
 
+import global.namespace.truevfs.access.*;
 import global.namespace.truevfs.comp.io.ClosedInputException;
 import global.namespace.truevfs.comp.io.ClosedOutputException;
 import global.namespace.truevfs.comp.io.Streams;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.shed.ConcurrencyUtils.TaskFactory;
 import global.namespace.truevfs.comp.shed.ConcurrencyUtils.TaskJoiner;
-import global.namespace.truevfs.access.*;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,14 +26,14 @@ import java.nio.file.attribute.FileTime;
 import java.util.*;
 import java.util.concurrent.Callable;
 
-import static java.io.File.separatorChar;
-import static java.nio.file.Files.*;
 import static global.namespace.truevfs.comp.shed.ConcurrencyUtils.NUM_IO_THREADS;
 import static global.namespace.truevfs.comp.shed.ConcurrencyUtils.start;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.GROW;
-import static global.namespace.truevfs.kernel.spec.FsSyncOption.CLEAR_CACHE;
-import static global.namespace.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
-import static global.namespace.truevfs.kernel.spec.FsSyncOptions.SYNC;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.GROW;
+import static global.namespace.truevfs.kernel.api.FsSyncOption.CLEAR_CACHE;
+import static global.namespace.truevfs.kernel.api.FsSyncOption.WAIT_CLOSE_IO;
+import static global.namespace.truevfs.kernel.api.FsSyncOptions.SYNC;
+import static java.io.File.separatorChar;
+import static java.nio.file.Files.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.MatcherAssert.assertThat;

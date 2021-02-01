@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.comp.jmx;
 
-import global.namespace.truevfs.kernel.spec.FsManager;
-import global.namespace.truevfs.kernel.spec.FsSyncException;
-import global.namespace.truevfs.kernel.spec.FsSyncWarningException;
+import global.namespace.truevfs.kernel.api.FsManager;
+import global.namespace.truevfs.kernel.api.FsSyncException;
+import global.namespace.truevfs.kernel.api.FsSyncWarningException;
 
 /**
  * An MXBean interface for a {@linkplain FsManager file system manager}.

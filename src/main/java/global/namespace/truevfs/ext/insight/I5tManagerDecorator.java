@@ -5,8 +5,8 @@
 package global.namespace.truevfs.ext.insight;
 
 import global.namespace.service.wight.annotation.ServiceImplementation;
-import global.namespace.truevfs.kernel.spec.FsManager;
-import global.namespace.truevfs.kernel.spec.spi.FsManagerDecorator;
+import global.namespace.truevfs.kernel.api.FsManager;
+import global.namespace.truevfs.kernel.api.spi.FsManagerDecorator;
 
 import static global.namespace.truevfs.ext.insight.I5tMediators.syncOperationsMediator;
 

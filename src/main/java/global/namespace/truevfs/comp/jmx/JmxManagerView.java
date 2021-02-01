@@ -6,10 +6,10 @@ package global.namespace.truevfs.comp.jmx;
 
 import global.namespace.truevfs.comp.shed.Filter;
 import global.namespace.truevfs.comp.shed.Visitor;
-import global.namespace.truevfs.kernel.spec.FsController;
-import global.namespace.truevfs.kernel.spec.FsManager;
-import global.namespace.truevfs.kernel.spec.FsSync;
-import global.namespace.truevfs.kernel.spec.FsSyncException;
+import global.namespace.truevfs.kernel.api.FsController;
+import global.namespace.truevfs.kernel.api.FsManager;
+import global.namespace.truevfs.kernel.api.FsSync;
+import global.namespace.truevfs.kernel.api.FsSyncException;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;

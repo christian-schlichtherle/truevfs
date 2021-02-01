@@ -4,14 +4,14 @@
  */
 package global.namespace.truevfs.comp.zipdriver;
 
-import lombok.val;
 import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.cio.Entry.Access;
 import global.namespace.truevfs.comp.key.spec.KeyManager;
 import global.namespace.truevfs.comp.key.spec.KeyManagerMap;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.shed.ControlFlowException;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
+import lombok.val;
 
 import java.io.IOException;
 import java.net.URI;
@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static global.namespace.truevfs.comp.cio.Entry.Type.SPECIAL;
-import static global.namespace.truevfs.kernel.spec.FsNodeName.ROOT;
+import static global.namespace.truevfs.kernel.api.FsNodeName.ROOT;
 
 /**
  * This file system controller decorates another file system controller in

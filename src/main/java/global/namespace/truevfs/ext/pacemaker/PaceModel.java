@@ -4,10 +4,10 @@
  */
 package global.namespace.truevfs.ext.pacemaker;
 
-import lombok.val;
 import global.namespace.truevfs.comp.inst.InstrumentingModel;
-import global.namespace.truevfs.kernel.spec.FsModel;
-import global.namespace.truevfs.kernel.spec.FsMountPoint;
+import global.namespace.truevfs.kernel.api.FsModel;
+import global.namespace.truevfs.kernel.api.FsMountPoint;
+import lombok.val;
 
 /**
  * A pace model.

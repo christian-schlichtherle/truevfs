@@ -6,9 +6,9 @@ package global.namespace.truevfs.access;
 
 import global.namespace.service.wight.core.ServiceLocator;
 import global.namespace.truevfs.comp.shed.ExtensionSet;
-import global.namespace.truevfs.kernel.spec.*;
-import global.namespace.truevfs.kernel.spec.spi.FsManagerDecorator;
-import global.namespace.truevfs.kernel.spec.spi.FsManagerFactory;
+import global.namespace.truevfs.kernel.api.*;
+import global.namespace.truevfs.kernel.api.spi.FsManagerDecorator;
+import global.namespace.truevfs.kernel.api.spi.FsManagerFactory;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;

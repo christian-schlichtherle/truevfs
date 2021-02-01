@@ -4,7 +4,6 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import lombok.val;
 import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.io.DecoratingInputStream;
 import global.namespace.truevfs.comp.io.DecoratingOutputStream;
@@ -12,7 +11,8 @@ import global.namespace.truevfs.comp.io.DecoratingSeekableChannel;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.shed.ControlFlowException;
 import global.namespace.truevfs.comp.shed.ExceptionHandler;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
+import lombok.val;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -21,8 +21,8 @@ import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 import java.util.Optional;
 
-import static global.namespace.truevfs.kernel.spec.FsSyncOption.FORCE_CLOSE_IO;
-import static global.namespace.truevfs.kernel.spec.FsSyncOption.WAIT_CLOSE_IO;
+import static global.namespace.truevfs.kernel.api.FsSyncOption.FORCE_CLOSE_IO;
+import static global.namespace.truevfs.kernel.api.FsSyncOption.WAIT_CLOSE_IO;
 
 /**
  * Accounts input and output resources returned by its decorated controller.

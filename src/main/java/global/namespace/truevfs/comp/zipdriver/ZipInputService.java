@@ -7,8 +7,8 @@ package global.namespace.truevfs.comp.zipdriver;
 import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.zip.AbstractZipFile;
 import global.namespace.truevfs.comp.zip.ZipCryptoParameters;
-import global.namespace.truevfs.kernel.spec.FsInputSocketSource;
-import global.namespace.truevfs.kernel.spec.FsModel;
+import global.namespace.truevfs.kernel.api.FsInputSocketSource;
+import global.namespace.truevfs.kernel.api.FsModel;
 
 import java.io.IOException;
 import java.io.InputStream;

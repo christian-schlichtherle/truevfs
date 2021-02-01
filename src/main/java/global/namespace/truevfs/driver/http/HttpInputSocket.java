@@ -7,7 +7,7 @@ package global.namespace.truevfs.driver.http;
 import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.io.ReadOnlyChannel;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.FsAccessOption;
+import global.namespace.truevfs.kernel.api.FsAccessOption;
 
 import java.io.IOException;
 import java.io.InputStream;

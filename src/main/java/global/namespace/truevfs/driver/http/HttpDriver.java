@@ -5,11 +5,11 @@
 package global.namespace.truevfs.driver.http;
 
 import global.namespace.truevfs.comp.cio.IoBufferPool;
-import global.namespace.truevfs.kernel.spec.FsController;
-import global.namespace.truevfs.kernel.spec.FsDriver;
-import global.namespace.truevfs.kernel.spec.FsManager;
-import global.namespace.truevfs.kernel.spec.FsModel;
-import global.namespace.truevfs.kernel.spec.sl.IoBufferPoolLocator;
+import global.namespace.truevfs.kernel.api.FsController;
+import global.namespace.truevfs.kernel.api.FsDriver;
+import global.namespace.truevfs.kernel.api.FsManager;
+import global.namespace.truevfs.kernel.api.FsModel;
+import global.namespace.truevfs.kernel.api.sl.IoBufferPoolLocator;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;

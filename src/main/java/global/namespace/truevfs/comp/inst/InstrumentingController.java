@@ -8,10 +8,10 @@ import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.cio.InputSocket;
 import global.namespace.truevfs.comp.cio.OutputSocket;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.FsAccessOption;
-import global.namespace.truevfs.kernel.spec.FsController;
-import global.namespace.truevfs.kernel.spec.FsDecoratingController;
-import global.namespace.truevfs.kernel.spec.FsNodeName;
+import global.namespace.truevfs.kernel.api.FsAccessOption;
+import global.namespace.truevfs.kernel.api.FsController;
+import global.namespace.truevfs.kernel.api.FsDecoratingController;
+import global.namespace.truevfs.kernel.api.FsNodeName;
 
 import java.util.Objects;
 import java.util.Optional;

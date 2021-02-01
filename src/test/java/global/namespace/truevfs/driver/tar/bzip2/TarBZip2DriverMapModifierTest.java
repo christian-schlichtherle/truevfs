@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.driver.tar.bzip2;
 
-import global.namespace.truevfs.kernel.spec.spi.FsDriverMapModifier;
-import global.namespace.truevfs.kernel.spec.spi.FsDriverMapModifierTestSuite;
+import global.namespace.truevfs.kernel.api.spi.FsDriverMapModifier;
+import global.namespace.truevfs.kernel.api.spi.FsDriverMapModifierTestSuite;
 
 /**
  * @author Christian Schlichtherle

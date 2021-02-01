@@ -4,21 +4,19 @@
  */
 package global.namespace.truevfs.comp.zipdriver;
 
-import java.io.*;
-import java.util.Arrays;
-import java.util.Random;
-import global.namespace.truevfs.access.TArchiveDetector;
-import global.namespace.truevfs.access.TFile;
-import global.namespace.truevfs.access.TFileInputStream;
-import global.namespace.truevfs.access.TFileOutputStream;
-import global.namespace.truevfs.access.TVFS;
-import global.namespace.truevfs.kernel.spec.FsSyncException;
+import global.namespace.truevfs.access.*;
+import global.namespace.truevfs.kernel.api.FsSyncException;
 import org.junit.After;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.util.Arrays;
+import java.util.Random;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Christian Schlichtherle

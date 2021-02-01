@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.samples.access;
 
-import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.access.*;
+import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.tardriver.TarDriver;
 import global.namespace.truevfs.comp.zipdriver.JarDriver;
 import global.namespace.truevfs.comp.zipdriver.ZipDriver;
@@ -13,7 +13,7 @@ import global.namespace.truevfs.driver.sfx.ReadOnlySfxDriver;
 import global.namespace.truevfs.driver.tar.bzip2.TarBZip2Driver;
 import global.namespace.truevfs.driver.tar.gzip.TarGZipDriver;
 import global.namespace.truevfs.driver.tar.xz.TarXZDriver;
-import global.namespace.truevfs.kernel.spec.FsAccessOption;
+import global.namespace.truevfs.kernel.api.FsAccessOption;
 
 import javax.annotation.Nullable;
 import java.io.IOException;

@@ -5,9 +5,9 @@
 package global.namespace.truevfs.driver.file;
 
 import global.namespace.service.wight.annotation.ServiceImplementation;
-import global.namespace.truevfs.kernel.spec.FsDriver;
-import global.namespace.truevfs.kernel.spec.FsScheme;
-import global.namespace.truevfs.kernel.spec.spi.FsDriverMapModifier;
+import global.namespace.truevfs.kernel.api.FsDriver;
+import global.namespace.truevfs.kernel.api.FsScheme;
+import global.namespace.truevfs.kernel.api.spi.FsDriverMapModifier;
 
 import java.util.Map;
 

@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.comp.inst;
 
-import global.namespace.truevfs.kernel.spec.FsDecoratingModel;
-import global.namespace.truevfs.kernel.spec.FsModel;
+import global.namespace.truevfs.kernel.api.FsDecoratingModel;
+import global.namespace.truevfs.kernel.api.FsModel;
 
 import java.util.Objects;
 

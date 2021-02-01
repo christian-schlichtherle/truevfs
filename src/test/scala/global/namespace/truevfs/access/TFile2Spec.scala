@@ -7,7 +7,7 @@ package global.namespace.truevfs.access
 import global.namespace.fun.io.api.Socket
 import global.namespace.fun.io.bios.BIOS
 import global.namespace.truevfs.access.TFile2Spec._
-import global.namespace.truevfs.kernel.spec._
+import global.namespace.truevfs.kernel.api._
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.wordspec.AnyWordSpec

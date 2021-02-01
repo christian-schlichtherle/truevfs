@@ -4,12 +4,12 @@
  */
 package global.namespace.truevfs.access;
 
-import lombok.val;
 import global.namespace.truevfs.comp.shed.ExtensionSet;
-import global.namespace.truevfs.kernel.spec.FsAbstractCompositeDriver;
-import global.namespace.truevfs.kernel.spec.FsDriver;
-import global.namespace.truevfs.kernel.spec.FsScheme;
-import global.namespace.truevfs.kernel.spec.sl.FsDriverMapLocator;
+import global.namespace.truevfs.kernel.api.FsAbstractCompositeDriver;
+import global.namespace.truevfs.kernel.api.FsDriver;
+import global.namespace.truevfs.kernel.api.FsScheme;
+import global.namespace.truevfs.kernel.api.sl.FsDriverMapLocator;
+import lombok.val;
 
 import java.io.File;
 import java.net.URISyntaxException;

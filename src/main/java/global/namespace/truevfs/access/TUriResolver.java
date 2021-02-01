@@ -4,14 +4,14 @@
  */
 package global.namespace.truevfs.access;
 
-import lombok.val;
 import global.namespace.truevfs.comp.shed.PathSplitter;
 import global.namespace.truevfs.comp.shed.QuotedUriSyntaxException;
 import global.namespace.truevfs.comp.shed.UriBuilder;
-import global.namespace.truevfs.kernel.spec.FsMountPoint;
-import global.namespace.truevfs.kernel.spec.FsNodeName;
-import global.namespace.truevfs.kernel.spec.FsNodePath;
-import global.namespace.truevfs.kernel.spec.FsScheme;
+import global.namespace.truevfs.kernel.api.FsMountPoint;
+import global.namespace.truevfs.kernel.api.FsNodeName;
+import global.namespace.truevfs.kernel.api.FsNodePath;
+import global.namespace.truevfs.kernel.api.FsScheme;
+import lombok.val;
 
 import javax.annotation.Nullable;
 import java.net.URI;
@@ -19,9 +19,9 @@ import java.net.URISyntaxException;
 import java.util.Optional;
 
 import static global.namespace.truevfs.access.TUriHelper.*;
-import static global.namespace.truevfs.kernel.spec.FsNodeName.*;
-import static global.namespace.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
-import static global.namespace.truevfs.kernel.spec.FsUriModifier.NULL;
+import static global.namespace.truevfs.kernel.api.FsNodeName.*;
+import static global.namespace.truevfs.kernel.api.FsUriModifier.CANONICALIZE;
+import static global.namespace.truevfs.kernel.api.FsUriModifier.NULL;
 
 /**
  * Scans {@link URI}s for prospective archive files and resolves them against

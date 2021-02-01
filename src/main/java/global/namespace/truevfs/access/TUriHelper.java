@@ -11,8 +11,8 @@ import global.namespace.truevfs.comp.shed.UriBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import static global.namespace.truevfs.kernel.spec.FsNodeName.SEPARATOR;
-import static global.namespace.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
+import static global.namespace.truevfs.kernel.api.FsNodeName.SEPARATOR;
+import static global.namespace.truevfs.kernel.api.FsNodeName.SEPARATOR_CHAR;
 
 /**
  * Utility functions for {@link URI}s which represent file system path names.

@@ -6,7 +6,7 @@ package global.namespace.truevfs.ext.pacemaker
 
 import global.namespace.truevfs.comp.shed.{Filter, _}
 import global.namespace.truevfs.ext.pacemaker.PaceManagerSpec.{Expectation, _}
-import global.namespace.truevfs.kernel.spec._
+import global.namespace.truevfs.kernel.api._
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock

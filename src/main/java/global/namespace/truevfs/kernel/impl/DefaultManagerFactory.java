@@ -5,8 +5,8 @@
 package global.namespace.truevfs.kernel.impl;
 
 import global.namespace.service.wight.annotation.ServiceImplementation;
-import global.namespace.truevfs.kernel.spec.FsManager;
-import global.namespace.truevfs.kernel.spec.spi.FsManagerFactory;
+import global.namespace.truevfs.kernel.api.FsManager;
+import global.namespace.truevfs.kernel.api.spi.FsManagerFactory;
 
 /**
  * Creates a default file system manager.

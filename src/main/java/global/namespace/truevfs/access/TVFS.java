@@ -7,14 +7,14 @@ package global.namespace.truevfs.access;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.shed.Filter;
 import global.namespace.truevfs.comp.shed.Visitor;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import static global.namespace.truevfs.access.ExpertFeature.Reason.THE_PRESENCE_OR_ABSENCE_OF_SOME_OPTIONS_MAY_YIELD_UNWANTED_SIDE_EFFECTS;
-import static global.namespace.truevfs.kernel.spec.FsSyncOptions.UMOUNT;
-import static global.namespace.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
+import static global.namespace.truevfs.kernel.api.FsSyncOptions.UMOUNT;
+import static global.namespace.truevfs.kernel.api.FsUriModifier.CANONICALIZE;
 
 /**
  * Static utility methods for virtual file system operations with global scope.

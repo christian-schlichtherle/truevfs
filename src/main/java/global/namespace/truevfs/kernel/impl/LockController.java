@@ -9,7 +9,7 @@ import global.namespace.truevfs.comp.io.DecoratingInputStream;
 import global.namespace.truevfs.comp.io.DecoratingOutputStream;
 import global.namespace.truevfs.comp.io.DecoratingSeekableChannel;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
 
 import java.io.IOException;
 import java.io.InputStream;

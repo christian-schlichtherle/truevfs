@@ -7,8 +7,8 @@ package global.namespace.truevfs.comp.zipdriver;
 import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.zip.DateTimeConverter;
 import global.namespace.truevfs.comp.zip.ZipEntry;
-import global.namespace.truevfs.kernel.spec.FsArchiveEntries;
-import global.namespace.truevfs.kernel.spec.FsArchiveEntry;
+import global.namespace.truevfs.kernel.api.FsArchiveEntries;
+import global.namespace.truevfs.kernel.api.FsArchiveEntry;
 
 import static global.namespace.truevfs.comp.cio.Entry.Access.WRITE;
 import static global.namespace.truevfs.comp.cio.Entry.Size.DATA;

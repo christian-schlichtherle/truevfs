@@ -4,14 +4,15 @@
  */
 package global.namespace.truevfs.access.sample;
 
+import global.namespace.truevfs.access.TPath;
+import global.namespace.truevfs.access.TVFS;
+import global.namespace.truevfs.comp.io.Streams;
+import global.namespace.truevfs.kernel.api.FsSyncException;
+import global.namespace.truevfs.kernel.api.FsSyncWarningException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import global.namespace.truevfs.comp.io.Streams;
-import global.namespace.truevfs.access.TPath;
-import global.namespace.truevfs.access.TVFS;
-import global.namespace.truevfs.kernel.spec.FsSyncException;
-import global.namespace.truevfs.kernel.spec.FsSyncWarningException;
 
 /**
  * A collection of code snippets to demonstrate the usage of the TPath class.

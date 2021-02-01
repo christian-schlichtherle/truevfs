@@ -14,8 +14,8 @@ import global.namespace.truevfs.comp.tardriver.TarDriver;
 import global.namespace.truevfs.comp.tardriver.TarDriverEntry;
 import global.namespace.truevfs.comp.tardriver.TarInputService;
 import global.namespace.truevfs.comp.tardriver.TarOutputService;
-import global.namespace.truevfs.kernel.spec.*;
-import global.namespace.truevfs.kernel.spec.cio.MultiplexingOutputService;
+import global.namespace.truevfs.kernel.api.*;
+import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputService;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;
@@ -26,7 +26,7 @@ import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.STORE;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.STORE;
 
 /**
  * An archive driver for GZIP compressed TAR files (TAR.GZIP).

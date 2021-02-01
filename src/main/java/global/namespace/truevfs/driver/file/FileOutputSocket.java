@@ -9,7 +9,7 @@ import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.cio.InputSocket;
 import global.namespace.truevfs.comp.cio.IoSockets;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.FsAccessOption;
+import global.namespace.truevfs.kernel.api.FsAccessOption;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -23,13 +23,13 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static java.lang.Boolean.TRUE;
-import static java.nio.file.Files.*;
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static global.namespace.truevfs.comp.cio.Entry.Access.*;
 import static global.namespace.truevfs.comp.cio.Entry.UNKNOWN;
 import static global.namespace.truevfs.comp.shed.HashMaps.initialCapacity;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.*;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.*;
+import static java.lang.Boolean.TRUE;
+import static java.nio.file.Files.*;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 /**
  * An output socket for a file entry.

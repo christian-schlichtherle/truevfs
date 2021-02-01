@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.kernel.impl
 
-import global.namespace.truevfs.kernel.spec._
+import global.namespace.truevfs.kernel.api._
 
 /**
   * @author Christian Schlichtherle

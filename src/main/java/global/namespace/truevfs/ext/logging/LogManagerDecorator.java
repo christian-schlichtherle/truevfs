@@ -5,8 +5,8 @@
 package global.namespace.truevfs.ext.logging;
 
 import global.namespace.service.wight.annotation.ServiceImplementation;
-import global.namespace.truevfs.kernel.spec.FsManager;
-import global.namespace.truevfs.kernel.spec.spi.FsManagerDecorator;
+import global.namespace.truevfs.kernel.api.FsManager;
+import global.namespace.truevfs.kernel.api.spi.FsManagerDecorator;
 
 /**
  * @author Christian Schlichtherle

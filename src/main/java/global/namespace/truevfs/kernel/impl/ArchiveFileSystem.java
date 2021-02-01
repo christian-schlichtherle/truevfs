@@ -4,17 +4,17 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import lombok.Value;
-import lombok.val;
 import global.namespace.truevfs.comp.cio.Container;
 import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.shed.PathNormalizer;
 import global.namespace.truevfs.comp.shed.PathSplitter;
-import global.namespace.truevfs.kernel.spec.FsAccessOption;
-import global.namespace.truevfs.kernel.spec.FsArchiveEntry;
-import global.namespace.truevfs.kernel.spec.FsCovariantNode;
-import global.namespace.truevfs.kernel.spec.FsNodeName;
+import global.namespace.truevfs.kernel.api.FsAccessOption;
+import global.namespace.truevfs.kernel.api.FsArchiveEntry;
+import global.namespace.truevfs.kernel.api.FsCovariantNode;
+import global.namespace.truevfs.kernel.api.FsNodeName;
+import lombok.Value;
+import lombok.val;
 
 import javax.annotation.Nonnull;
 import java.io.CharConversionException;
@@ -24,7 +24,6 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.function.Supplier;
 
-import static java.util.Objects.requireNonNull;
 import static global.namespace.truevfs.comp.cio.Entry.*;
 import static global.namespace.truevfs.comp.cio.Entry.Access.WRITE;
 import static global.namespace.truevfs.comp.cio.Entry.Type.DIRECTORY;
@@ -32,10 +31,11 @@ import static global.namespace.truevfs.comp.cio.Entry.Type.FILE;
 import static global.namespace.truevfs.comp.shed.HashMaps.OVERHEAD_SIZE;
 import static global.namespace.truevfs.comp.shed.HashMaps.initialCapacity;
 import static global.namespace.truevfs.comp.shed.Paths.*;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.CREATE_PARENTS;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
-import static global.namespace.truevfs.kernel.spec.FsAccessOptions.NONE;
-import static global.namespace.truevfs.kernel.spec.FsNodeName.*;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.CREATE_PARENTS;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.EXCLUSIVE;
+import static global.namespace.truevfs.kernel.api.FsAccessOptions.NONE;
+import static global.namespace.truevfs.kernel.api.FsNodeName.*;
+import static java.util.Objects.requireNonNull;
 
 /**
  * A read/write virtual file system for archive entries.
@@ -96,7 +96,7 @@ class ArchiveFileSystem<E extends FsArchiveEntry>
      *                     the returned archive file system.
      * @param readOnly     if not empty, any subsequent
      *                     modifying operation on the file system will result in a
-     *                     {@link global.namespace.truevfs.kernel.spec.FsReadOnlyFileSystemException} with the contained
+     *                     {@link global.namespace.truevfs.kernel.api.FsReadOnlyFileSystemException} with the contained
      *                     {@link java.lang.Throwable} as its cause.
      * @param <E>          the type of the archive entries.
      * @return A new archive file system.

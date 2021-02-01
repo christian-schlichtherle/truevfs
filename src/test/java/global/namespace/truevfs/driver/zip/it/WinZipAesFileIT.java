@@ -4,18 +4,19 @@
  */
 package global.namespace.truevfs.driver.zip.it;
 
-import java.io.IOException;
-import global.namespace.truevfs.comp.key.spec.prompting.TestView.Action;
-import static global.namespace.truevfs.comp.key.spec.prompting.TestView.Action.CANCEL;
-import static global.namespace.truevfs.comp.key.spec.prompting.TestView.Action.ENTER;
 import global.namespace.truevfs.access.TConfig;
 import global.namespace.truevfs.access.TFile;
 import global.namespace.truevfs.access.it.TFileITSuite;
+import global.namespace.truevfs.comp.key.spec.prompting.TestView.Action;
 import global.namespace.truevfs.comp.zipdriver.TestWinZipAesDriver;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.ENCRYPT;
-import static org.junit.Assert.*;
-
 import org.junit.Test;
+
+import java.io.IOException;
+
+import static global.namespace.truevfs.comp.key.spec.prompting.TestView.Action.CANCEL;
+import static global.namespace.truevfs.comp.key.spec.prompting.TestView.Action.ENTER;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.ENCRYPT;
+import static org.junit.Assert.*;
 
 /**
  * @author Christian Schlichtherle

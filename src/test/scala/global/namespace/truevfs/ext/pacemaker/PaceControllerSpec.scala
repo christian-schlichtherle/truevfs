@@ -5,7 +5,7 @@
 package global.namespace.truevfs.ext.pacemaker
 
 import global.namespace.truevfs.comp.cio.Entry
-import global.namespace.truevfs.kernel.spec._
+import global.namespace.truevfs.kernel.api._
 import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.scalatest.wordspec.AnyWordSpec

@@ -4,12 +4,12 @@
  */
 package global.namespace.truevfs.access.it;
 
-import global.namespace.truevfs.comp.shed.ConcurrencyUtils.*;
 import global.namespace.truevfs.access.ConfiguredClientTestBase;
 import global.namespace.truevfs.access.TFile;
 import global.namespace.truevfs.access.TFileOutputStream;
 import global.namespace.truevfs.access.TVFS;
-import global.namespace.truevfs.kernel.spec.FsArchiveDriver;
+import global.namespace.truevfs.comp.shed.ConcurrencyUtils.*;
+import global.namespace.truevfs.kernel.api.FsArchiveDriver;
 import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -19,7 +19,7 @@ import java.io.OutputStream;
 import java.util.concurrent.ExecutionException;
 
 import static global.namespace.truevfs.comp.shed.ConcurrencyUtils.*;
-import static global.namespace.truevfs.kernel.spec.FsSyncOptions.SYNC;
+import static global.namespace.truevfs.kernel.api.FsSyncOptions.SYNC;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 

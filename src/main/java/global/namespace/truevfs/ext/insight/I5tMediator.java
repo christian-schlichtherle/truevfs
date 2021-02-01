@@ -12,17 +12,17 @@ import global.namespace.truevfs.comp.jmx.JmxMediator;
 import global.namespace.truevfs.comp.jmx.JmxModel;
 import global.namespace.truevfs.ext.insight.stats.FsLogger;
 import global.namespace.truevfs.ext.insight.stats.FsStats;
-import global.namespace.truevfs.kernel.spec.FsCompositeDriver;
-import global.namespace.truevfs.kernel.spec.FsController;
-import global.namespace.truevfs.kernel.spec.FsManager;
-import global.namespace.truevfs.kernel.spec.FsModel;
+import global.namespace.truevfs.kernel.api.FsCompositeDriver;
+import global.namespace.truevfs.kernel.api.FsController;
+import global.namespace.truevfs.kernel.api.FsManager;
+import global.namespace.truevfs.kernel.api.FsModel;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.SeekableByteChannel;
 
-import static java.util.Locale.ENGLISH;
 import static global.namespace.truevfs.ext.insight.I5tMediators.*;
+import static java.util.Locale.ENGLISH;
 
 /**
  * A base mediator for the instrumentation of the TrueVFS Kernel with JMX.

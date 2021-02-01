@@ -6,14 +6,14 @@ package global.namespace.truevfs.access
 
 import global.namespace.fun.io.api.Socket
 import global.namespace.service.wight.core.ServiceLocator
-import global.namespace.truevfs.comp.shed._
 import global.namespace.truevfs.access.TConfig._
 import global.namespace.truevfs.access.TConfigSpec._
-import global.namespace.truevfs.kernel.spec.FsAccessOption._
-import global.namespace.truevfs.kernel.spec.FsManager
-import global.namespace.truevfs.kernel.spec.mock.MockArchiveDriver
-import global.namespace.truevfs.kernel.spec.sl._
-import global.namespace.truevfs.kernel.spec.spi._
+import global.namespace.truevfs.comp.shed._
+import global.namespace.truevfs.kernel.api.FsAccessOption._
+import global.namespace.truevfs.kernel.api.FsManager
+import global.namespace.truevfs.kernel.api.mock.MockArchiveDriver
+import global.namespace.truevfs.kernel.api.sl._
+import global.namespace.truevfs.kernel.api.spi._
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks._
 import org.scalatest.wordspec.AnyWordSpec

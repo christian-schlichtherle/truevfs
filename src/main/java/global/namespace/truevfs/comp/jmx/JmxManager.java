@@ -5,7 +5,7 @@
 package global.namespace.truevfs.comp.jmx;
 
 import global.namespace.truevfs.comp.inst.InstrumentingManager;
-import global.namespace.truevfs.kernel.spec.FsManager;
+import global.namespace.truevfs.kernel.api.FsManager;
 
 import javax.management.ObjectName;
 

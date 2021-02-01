@@ -6,7 +6,7 @@ package global.namespace.truevfs.ext.pacemaker;
 
 import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;

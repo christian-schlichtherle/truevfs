@@ -6,13 +6,13 @@ package global.namespace.truevfs.kernel.impl;
 
 import bali.Cache;
 import bali.Lookup;
-import lombok.val;
 import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.io.ClosedInputException;
 import global.namespace.truevfs.comp.io.ClosedOutputException;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.shed.ControlFlowException;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
+import lombok.val;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -33,10 +33,10 @@ import static global.namespace.truevfs.comp.cio.Entry.Size.DATA;
 import static global.namespace.truevfs.comp.cio.Entry.Type.DIRECTORY;
 import static global.namespace.truevfs.comp.cio.Entry.Type.SPECIAL;
 import static global.namespace.truevfs.comp.cio.Entry.UNKNOWN;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.CACHE;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.GROW;
-import static global.namespace.truevfs.kernel.spec.FsAccessOptions.ACCESS_PREFERENCES_MASK;
-import static global.namespace.truevfs.kernel.spec.FsSyncOption.ABORT_CHANGES;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.CACHE;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.GROW;
+import static global.namespace.truevfs.kernel.api.FsAccessOptions.ACCESS_PREFERENCES_MASK;
+import static global.namespace.truevfs.kernel.api.FsSyncOption.ABORT_CHANGES;
 
 /**
  * Manages I/O to the entry which represents the target archive file in its parent file system, detects archive entry

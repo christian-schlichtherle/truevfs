@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.access;
 
-import global.namespace.truevfs.kernel.spec.FsMountPoint;
-import global.namespace.truevfs.kernel.spec.FsNodeName;
-import global.namespace.truevfs.kernel.spec.FsNodePath;
+import global.namespace.truevfs.kernel.api.FsMountPoint;
+import global.namespace.truevfs.kernel.api.FsNodeName;
+import global.namespace.truevfs.kernel.api.FsNodePath;
 
 import java.net.URI;
 

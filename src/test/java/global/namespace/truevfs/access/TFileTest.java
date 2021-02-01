@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.access;
 
-import global.namespace.truevfs.kernel.spec.FsNodePath;
+import global.namespace.truevfs.kernel.api.FsNodePath;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +14,9 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ServiceConfigurationError;
 
+import static global.namespace.truevfs.kernel.api.FsNodeName.ROOT;
 import static java.io.File.separator;
 import static java.io.File.separatorChar;
-import static global.namespace.truevfs.kernel.spec.FsNodeName.ROOT;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;

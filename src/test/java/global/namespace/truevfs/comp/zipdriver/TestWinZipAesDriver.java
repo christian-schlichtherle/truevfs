@@ -8,7 +8,7 @@ import global.namespace.truevfs.comp.cio.IoBufferPool;
 import global.namespace.truevfs.comp.key.spec.KeyManagerMap;
 import global.namespace.truevfs.comp.key.spec.common.AesPbeParameters;
 import global.namespace.truevfs.comp.key.spec.prompting.TestView;
-import global.namespace.truevfs.kernel.spec.FsTestConfig;
+import global.namespace.truevfs.kernel.api.FsTestConfig;
 
 /**
  * @author Christian Schlichtherle

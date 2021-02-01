@@ -4,9 +4,10 @@
  */
 package global.namespace.truevfs.driver.tar.gzip;
 
-import java.util.zip.Deflater;
-import global.namespace.truevfs.kernel.spec.FsTestConfig;
 import global.namespace.truevfs.comp.cio.IoBufferPool;
+import global.namespace.truevfs.kernel.api.FsTestConfig;
+
+import java.util.zip.Deflater;
 
 /**
  * Extends its super class to configure it for minimizing heap usage.

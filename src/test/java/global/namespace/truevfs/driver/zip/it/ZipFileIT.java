@@ -4,10 +4,10 @@
  */
 package global.namespace.truevfs.driver.zip.it;
 
-import global.namespace.truevfs.comp.cio.IoBufferPool;
 import global.namespace.truevfs.access.it.TFileITSuite;
+import global.namespace.truevfs.comp.cio.IoBufferPool;
 import global.namespace.truevfs.comp.zipdriver.ZipDriver;
-import global.namespace.truevfs.kernel.spec.FsTestConfig;
+import global.namespace.truevfs.kernel.api.FsTestConfig;
 
 /**
  * @author Christian Schlichtherle

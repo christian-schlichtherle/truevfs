@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.access;
 
-import global.namespace.truevfs.kernel.spec.mock.MockArchiveDriver;
+import global.namespace.truevfs.kernel.api.mock.MockArchiveDriver;
 
 /**
  * @author Christian Schlichtherle

@@ -4,9 +4,9 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import global.namespace.truevfs.kernel.spec.FsAbstractModel;
-import global.namespace.truevfs.kernel.spec.FsModel;
-import global.namespace.truevfs.kernel.spec.FsMountPoint;
+import global.namespace.truevfs.kernel.api.FsAbstractModel;
+import global.namespace.truevfs.kernel.api.FsModel;
+import global.namespace.truevfs.kernel.api.FsMountPoint;
 
 import java.util.Optional;
 

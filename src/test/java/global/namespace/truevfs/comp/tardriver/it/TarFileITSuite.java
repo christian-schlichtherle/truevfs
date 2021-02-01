@@ -4,12 +4,13 @@
  */
 package global.namespace.truevfs.comp.tardriver.it;
 
-import java.io.IOException;
 import global.namespace.truevfs.access.TFile;
 import global.namespace.truevfs.access.it.TFileITSuite;
-import global.namespace.truevfs.kernel.spec.FsArchiveDriver;
+import global.namespace.truevfs.kernel.api.FsArchiveDriver;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.io.IOException;
 
 /**
  * @param  <D> The type of the archive driver.

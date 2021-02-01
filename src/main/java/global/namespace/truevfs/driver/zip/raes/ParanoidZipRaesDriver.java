@@ -8,8 +8,8 @@ import global.namespace.truevfs.comp.cio.InputService;
 import global.namespace.truevfs.comp.zipdriver.JarDriverEntry;
 import global.namespace.truevfs.comp.zipdriver.ZipInputService;
 import global.namespace.truevfs.comp.zipdriver.ZipOutputService;
-import global.namespace.truevfs.kernel.spec.FsModel;
-import global.namespace.truevfs.kernel.spec.FsOutputSocketSink;
+import global.namespace.truevfs.kernel.api.FsModel;
+import global.namespace.truevfs.kernel.api.FsOutputSocketSink;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;

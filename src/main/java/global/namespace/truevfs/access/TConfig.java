@@ -7,15 +7,15 @@ package global.namespace.truevfs.access;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.shed.InheritableThreadLocalStack;
 import global.namespace.truevfs.comp.shed.Resource;
-import global.namespace.truevfs.kernel.spec.FsAccessOption;
-import global.namespace.truevfs.kernel.spec.FsAccessOptions;
-import global.namespace.truevfs.kernel.spec.FsManager;
-import global.namespace.truevfs.kernel.spec.sl.FsManagerLocator;
+import global.namespace.truevfs.kernel.api.FsAccessOption;
+import global.namespace.truevfs.kernel.api.FsAccessOptions;
+import global.namespace.truevfs.kernel.api.FsManager;
+import global.namespace.truevfs.kernel.api.sl.FsManagerLocator;
 
 import java.util.Objects;
 
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.*;
-import static global.namespace.truevfs.kernel.spec.FsAccessOptions.ACCESS_PREFERENCES_MASK;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.*;
+import static global.namespace.truevfs.kernel.api.FsAccessOptions.ACCESS_PREFERENCES_MASK;
 
 /**
  * A mutable container for configuration options with global or inheritable

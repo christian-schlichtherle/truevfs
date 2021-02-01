@@ -7,10 +7,10 @@ package global.namespace.truevfs.kernel.impl;
 import global.namespace.truevfs.comp.cio.Container;
 import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.FsAccessOption;
-import global.namespace.truevfs.kernel.spec.FsArchiveEntry;
-import global.namespace.truevfs.kernel.spec.FsNodeName;
-import global.namespace.truevfs.kernel.spec.FsReadOnlyFileSystemException;
+import global.namespace.truevfs.kernel.api.FsAccessOption;
+import global.namespace.truevfs.kernel.api.FsArchiveEntry;
+import global.namespace.truevfs.kernel.api.FsNodeName;
+import global.namespace.truevfs.kernel.api.FsReadOnlyFileSystemException;
 
 import java.io.IOException;
 import java.util.Map;
@@ -22,7 +22,7 @@ import static global.namespace.truevfs.comp.cio.Entry.Access.READ;
 /**
  * A read-only virtual file system for archive entries.
  * <p>
- * All modifying methods throw a {@link global.namespace.truevfs.kernel.spec.FsReadOnlyFileSystemException}.
+ * All modifying methods throw a {@link global.namespace.truevfs.kernel.api.FsReadOnlyFileSystemException}.
  *
  * @param <E> The type of the archive entries.
  * @author Christian Schlichtherle

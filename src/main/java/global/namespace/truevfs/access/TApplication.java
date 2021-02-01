@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.access;
 
-import global.namespace.truevfs.kernel.spec.FsSyncException;
-import global.namespace.truevfs.kernel.spec.FsSyncWarningException;
+import global.namespace.truevfs.kernel.api.FsSyncException;
+import global.namespace.truevfs.kernel.api.FsSyncWarningException;
 
 /**
  * A template class which aids in establishing the typical

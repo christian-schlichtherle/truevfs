@@ -11,8 +11,8 @@ import global.namespace.truevfs.comp.io.AbstractSource;
 import global.namespace.truevfs.comp.io.Streams;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.tardriver.*;
-import global.namespace.truevfs.kernel.spec.*;
-import global.namespace.truevfs.kernel.spec.cio.MultiplexingOutputService;
+import global.namespace.truevfs.kernel.api.*;
+import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputService;
 import org.tukaani.xz.LZMA2Options;
 import org.tukaani.xz.XZInputStream;
 import org.tukaani.xz.XZOutputStream;
@@ -24,7 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Optional;
 
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.STORE;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.STORE;
 
 /**
  * An archive driver for XZ compressed TAR files (TAR.XZ).

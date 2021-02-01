@@ -5,8 +5,8 @@
 package global.namespace.truevfs.kernel.impl;
 
 import bali.Module;
-import global.namespace.truevfs.kernel.spec.FsArchiveDriver;
-import global.namespace.truevfs.kernel.spec.FsArchiveEntry;
+import global.namespace.truevfs.kernel.api.FsArchiveDriver;
+import global.namespace.truevfs.kernel.api.FsArchiveEntry;
 
 @Module
 interface ControllerModuleFactory {

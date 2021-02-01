@@ -4,10 +4,16 @@
  */
 package global.namespace.truevfs.access;
 
-import java.lang.annotation.*;
-import static java.lang.annotation.ElementType.*;
+import global.namespace.truevfs.kernel.api.FsSyncOption;
+import global.namespace.truevfs.kernel.api.FsSyncOptions;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Target;
 import java.util.Locale;
-import global.namespace.truevfs.kernel.spec.*;
+
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.METHOD;
 
 /**
  * Indicates a feature which requires a certain experience level for safe use.

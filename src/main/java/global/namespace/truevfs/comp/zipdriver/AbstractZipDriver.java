@@ -19,9 +19,9 @@ import global.namespace.truevfs.comp.zip.ZipCryptoParameters;
 import global.namespace.truevfs.comp.zip.ZipEntry;
 import global.namespace.truevfs.comp.zip.ZipFileParameters;
 import global.namespace.truevfs.comp.zip.ZipOutputStreamParameters;
-import global.namespace.truevfs.kernel.spec.*;
-import global.namespace.truevfs.kernel.spec.cio.MultiplexingOutputService;
-import global.namespace.truevfs.kernel.spec.sl.IoBufferPoolLocator;
+import global.namespace.truevfs.kernel.api.*;
+import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputService;
+import global.namespace.truevfs.kernel.api.sl.IoBufferPoolLocator;
 import org.slf4j.Logger;
 
 import javax.annotation.CheckForNull;
@@ -36,7 +36,7 @@ import static global.namespace.truevfs.comp.cio.Entry.Access.WRITE;
 import static global.namespace.truevfs.comp.cio.Entry.Size.DATA;
 import static global.namespace.truevfs.comp.cio.Entry.Type.DIRECTORY;
 import static global.namespace.truevfs.comp.zip.ZipEntry.*;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.*;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.*;
 
 /**
  * An abstract archive driver for the ZIP file format.

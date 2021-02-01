@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.comp.inst;
 
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
 
 import java.util.Objects;
 

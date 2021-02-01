@@ -6,7 +6,7 @@ package global.namespace.truevfs.ext.logging;
 
 import global.namespace.service.wight.annotation.ServiceImplementation;
 import global.namespace.truevfs.comp.cio.IoBufferPool;
-import global.namespace.truevfs.kernel.spec.spi.IoBufferPoolDecorator;
+import global.namespace.truevfs.kernel.api.spi.IoBufferPoolDecorator;
 
 /**
  * @author Christian Schlichtherle

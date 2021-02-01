@@ -4,7 +4,7 @@
  */
 package global.namespace.truevfs.access;
 
-import global.namespace.truevfs.kernel.spec.FsMountPoint;
+import global.namespace.truevfs.kernel.api.FsMountPoint;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static global.namespace.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
+import static global.namespace.truevfs.kernel.api.FsUriModifier.CANONICALIZE;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;

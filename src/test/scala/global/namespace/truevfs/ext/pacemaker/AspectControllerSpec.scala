@@ -7,7 +7,7 @@ package global.namespace.truevfs.ext.pacemaker
 import global.namespace.truevfs.comp.cio.{Entry, _}
 import global.namespace.truevfs.ext.pacemaker.AspectController.Op
 import global.namespace.truevfs.ext.pacemaker.AspectControllerSpec.TestController
-import global.namespace.truevfs.kernel.spec._
+import global.namespace.truevfs.kernel.api._
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.wordspec.AnyWordSpec

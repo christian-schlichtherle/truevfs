@@ -10,7 +10,7 @@ import global.namespace.truevfs.comp.cio.Entry.Type;
 import global.namespace.truevfs.comp.cio.InputSocket;
 import global.namespace.truevfs.comp.cio.OutputSocket;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -24,12 +24,12 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.io.File.separatorChar;
-import static java.nio.file.Files.*;
 import static global.namespace.truevfs.comp.cio.Entry.Access.*;
 import static global.namespace.truevfs.comp.cio.Entry.UNKNOWN;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
-import static global.namespace.truevfs.kernel.spec.FsNodeName.SEPARATOR;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.EXCLUSIVE;
+import static global.namespace.truevfs.kernel.api.FsNodeName.SEPARATOR;
+import static java.io.File.separatorChar;
+import static java.nio.file.Files.*;
 
 /**
  * A file system controller with a prospective directory in the platform file

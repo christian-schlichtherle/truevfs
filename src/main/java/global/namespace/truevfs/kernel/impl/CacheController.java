@@ -4,14 +4,14 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import lombok.val;
 import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.io.DecoratingInputStream;
 import global.namespace.truevfs.comp.io.DecoratingOutputStream;
 import global.namespace.truevfs.comp.io.DecoratingSeekableChannel;
 import global.namespace.truevfs.comp.logging.LocalizedLogger;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
+import lombok.val;
 import org.slf4j.Logger;
 
 import java.io.IOException;
@@ -23,17 +23,17 @@ import java.util.Map;
 import java.util.Optional;
 
 import static global.namespace.truevfs.comp.cio.Entry.Type.FILE;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.*;
-import static global.namespace.truevfs.kernel.spec.FsSyncOption.ABORT_CHANGES;
-import static global.namespace.truevfs.kernel.spec.FsSyncOption.CLEAR_CACHE;
-import static global.namespace.truevfs.kernel.spec.FsSyncOptions.SYNC;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.*;
+import static global.namespace.truevfs.kernel.api.FsSyncOption.ABORT_CHANGES;
+import static global.namespace.truevfs.kernel.api.FsSyncOption.CLEAR_CACHE;
+import static global.namespace.truevfs.kernel.api.FsSyncOptions.SYNC;
 
 /**
  * A selective cache for file system entries.
  * Decorating a file system controller with this class has the following effects:
  * <p>
  * - Caching and buffering for an entry needs to get activated by using the methods {@code input} or {@code output} with
- * the access option {@link global.namespace.truevfs.kernel.spec.FsAccessOption#CACHE}.
+ * the access option {@link global.namespace.truevfs.kernel.api.FsAccessOption#CACHE}.
  * - Unless a write operation succeeds, upon each read operation the entry data gets copied from the backing store for
  * buffering purposes only.
  * - Upon a successful write operation, the entry data gets cached for subsequent read operations until the file system

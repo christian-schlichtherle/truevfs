@@ -11,7 +11,7 @@ import global.namespace.truevfs.comp.key.spec.UnknownKeyException;
 import global.namespace.truevfs.comp.key.spec.common.AesKeyStrength;
 import global.namespace.truevfs.comp.key.spec.common.AesPbeParameters;
 import global.namespace.truevfs.comp.zip.*;
-import global.namespace.truevfs.kernel.spec.FsModel;
+import global.namespace.truevfs.kernel.api.FsModel;
 import org.bouncycastle.crypto.PBEParametersGenerator;
 
 import java.net.URI;

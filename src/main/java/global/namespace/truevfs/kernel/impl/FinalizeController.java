@@ -4,7 +4,6 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import lombok.val;
 import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.io.DecoratingInputStream;
 import global.namespace.truevfs.comp.io.DecoratingOutputStream;
@@ -12,9 +11,10 @@ import global.namespace.truevfs.comp.io.DecoratingSeekableChannel;
 import global.namespace.truevfs.comp.logging.LocalizedLogger;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.shed.ControlFlowException;
-import global.namespace.truevfs.kernel.spec.FsAccessOption;
-import global.namespace.truevfs.kernel.spec.FsDelegatingController;
-import global.namespace.truevfs.kernel.spec.FsNodeName;
+import global.namespace.truevfs.kernel.api.FsAccessOption;
+import global.namespace.truevfs.kernel.api.FsDelegatingController;
+import global.namespace.truevfs.kernel.api.FsNodeName;
+import lombok.val;
 import org.slf4j.Logger;
 
 import javax.annotation.CheckForNull;

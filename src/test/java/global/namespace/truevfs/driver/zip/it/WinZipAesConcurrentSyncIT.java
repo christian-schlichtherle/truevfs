@@ -4,11 +4,13 @@
  */
 package global.namespace.truevfs.driver.zip.it;
 
-import java.io.IOException;
 import global.namespace.truevfs.access.TConfig;
 import global.namespace.truevfs.access.it.ConcurrentSyncITSuite;
 import global.namespace.truevfs.comp.zipdriver.TestWinZipAesDriver;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.ENCRYPT;
+
+import java.io.IOException;
+
+import static global.namespace.truevfs.kernel.api.FsAccessOption.ENCRYPT;
 
 /**
  * @author Christian Schlichtherle

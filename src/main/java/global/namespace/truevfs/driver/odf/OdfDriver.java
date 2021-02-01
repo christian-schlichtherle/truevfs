@@ -11,14 +11,14 @@ import global.namespace.truevfs.comp.zipdriver.JarDriver;
 import global.namespace.truevfs.comp.zipdriver.JarDriverEntry;
 import global.namespace.truevfs.comp.zipdriver.ZipInputService;
 import global.namespace.truevfs.comp.zipdriver.ZipOutputService;
-import global.namespace.truevfs.kernel.spec.FsModel;
-import global.namespace.truevfs.kernel.spec.FsOutputSocketSink;
-import global.namespace.truevfs.kernel.spec.cio.MultiplexingOutputService;
+import global.namespace.truevfs.kernel.api.FsModel;
+import global.namespace.truevfs.kernel.api.FsOutputSocketSink;
+import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputService;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;
 
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.GROW;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.GROW;
 
 /**
  * An archive driver for application archive files according to the Open

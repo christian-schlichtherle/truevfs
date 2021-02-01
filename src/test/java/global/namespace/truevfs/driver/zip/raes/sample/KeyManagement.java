@@ -4,6 +4,8 @@
  */
 package global.namespace.truevfs.driver.zip.raes.sample;
 
+import global.namespace.truevfs.access.TArchiveDetector;
+import global.namespace.truevfs.access.TConfig;
 import global.namespace.truevfs.comp.key.spec.KeyManagerMap;
 import global.namespace.truevfs.comp.key.spec.UnknownKeyException;
 import global.namespace.truevfs.comp.key.spec.common.AesKeyStrength;
@@ -11,14 +13,12 @@ import global.namespace.truevfs.comp.key.spec.common.AesPbeParameters;
 import global.namespace.truevfs.comp.key.spec.prompting.PromptingKey.Controller;
 import global.namespace.truevfs.comp.key.spec.prompting.PromptingKey.View;
 import global.namespace.truevfs.comp.key.spec.prompting.PromptingKeyManagerMap;
-import global.namespace.truevfs.access.TArchiveDetector;
-import global.namespace.truevfs.access.TConfig;
 import global.namespace.truevfs.driver.zip.raes.SafeZipRaesDriver;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesKeyException;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesParameters;
 import global.namespace.truevfs.driver.zip.raes.crypto.Type0RaesParameters;
-import global.namespace.truevfs.kernel.spec.FsController;
-import global.namespace.truevfs.kernel.spec.FsModel;
+import global.namespace.truevfs.kernel.api.FsController;
+import global.namespace.truevfs.kernel.api.FsModel;
 
 import java.util.Optional;
 

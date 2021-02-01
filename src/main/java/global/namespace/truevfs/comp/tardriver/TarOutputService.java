@@ -9,7 +9,7 @@ import global.namespace.truevfs.comp.io.DecoratingOutputStream;
 import global.namespace.truevfs.comp.io.DisconnectingOutputStream;
 import global.namespace.truevfs.comp.io.Sink;
 import global.namespace.truevfs.comp.io.Streams;
-import global.namespace.truevfs.kernel.spec.FsModel;
+import global.namespace.truevfs.kernel.api.FsModel;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 
 import javax.annotation.CheckForNull;

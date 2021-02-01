@@ -8,7 +8,7 @@ import bali.Cache;
 import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.shed.ControlFlowException;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static bali.CachingStrategy.NOT_THREAD_SAFE;
-import static global.namespace.truevfs.kernel.spec.FsNodeName.ROOT;
+import static global.namespace.truevfs.kernel.api.FsNodeName.ROOT;
 
 /**
  * Implements a chain of responsibility for resolving

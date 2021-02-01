@@ -6,8 +6,8 @@ package global.namespace.truevfs.access;
 
 import global.namespace.truevfs.comp.io.DecoratingOutputStream;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.FsAccessOption;
-import global.namespace.truevfs.kernel.spec.FsAccessOptions;
+import global.namespace.truevfs.kernel.api.FsAccessOption;
+import global.namespace.truevfs.kernel.api.FsAccessOptions;
 
 import java.io.*;
 import java.util.Optional;

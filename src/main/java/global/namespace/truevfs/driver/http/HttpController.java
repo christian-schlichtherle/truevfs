@@ -11,7 +11,7 @@ import global.namespace.truevfs.comp.cio.InputSocket;
 import global.namespace.truevfs.comp.cio.IoBufferPool;
 import global.namespace.truevfs.comp.cio.OutputSocket;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
 import org.apache.http.HttpResponse;
 
 import java.io.IOException;

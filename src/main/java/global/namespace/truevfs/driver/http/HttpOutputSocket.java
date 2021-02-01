@@ -8,7 +8,7 @@ import global.namespace.truevfs.comp.cio.AbstractOutputSocket;
 import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.cio.InputSocket;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.FsAccessOption;
+import global.namespace.truevfs.kernel.api.FsAccessOption;
 
 import java.io.IOException;
 import java.io.OutputStream;

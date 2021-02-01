@@ -4,8 +4,8 @@
  */
 package global.namespace.truevfs.ext.pacemaker;
 
-import global.namespace.truevfs.kernel.spec.FsController;
-import global.namespace.truevfs.kernel.spec.FsSyncException;
+import global.namespace.truevfs.kernel.api.FsController;
+import global.namespace.truevfs.kernel.api.FsSyncException;
 
 import java.io.IOException;
 

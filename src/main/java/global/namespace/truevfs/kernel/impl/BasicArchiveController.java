@@ -4,12 +4,12 @@
  */
 package global.namespace.truevfs.kernel.impl;
 
-import lombok.val;
 import global.namespace.truevfs.comp.cio.*;
 import global.namespace.truevfs.comp.io.Streams;
 import global.namespace.truevfs.comp.logging.LocalizedLogger;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
+import lombok.val;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
@@ -23,13 +23,13 @@ import java.nio.file.NoSuchFileException;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.util.Objects.requireNonNull;
 import static global.namespace.truevfs.comp.cio.Entry.Access.*;
 import static global.namespace.truevfs.comp.cio.Entry.Type.DIRECTORY;
 import static global.namespace.truevfs.comp.cio.Entry.Type.FILE;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.APPEND;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.CREATE_PARENTS;
-import static global.namespace.truevfs.kernel.spec.FsAccessOptions.NONE;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.APPEND;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.CREATE_PARENTS;
+import static global.namespace.truevfs.kernel.api.FsAccessOptions.NONE;
+import static java.util.Objects.requireNonNull;
 
 /**
  * An abstract base class for any archive file system controller which provides all the essential services required for

@@ -12,9 +12,9 @@ import global.namespace.truevfs.comp.cio.InputService;
 import global.namespace.truevfs.comp.cio.IoBufferPool;
 import global.namespace.truevfs.comp.cio.OutputService;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.*;
-import global.namespace.truevfs.kernel.spec.cio.MultiplexingOutputService;
-import global.namespace.truevfs.kernel.spec.sl.IoBufferPoolLocator;
+import global.namespace.truevfs.kernel.api.*;
+import global.namespace.truevfs.kernel.api.cio.MultiplexingOutputService;
+import global.namespace.truevfs.kernel.api.sl.IoBufferPoolLocator;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.archivers.tar.TarConstants;
@@ -28,8 +28,8 @@ import static global.namespace.truevfs.comp.cio.Entry.ALL_POSIX_ACCESS;
 import static global.namespace.truevfs.comp.cio.Entry.ALL_POSIX_ENTITIES;
 import static global.namespace.truevfs.comp.cio.Entry.Access.WRITE;
 import static global.namespace.truevfs.comp.cio.Entry.Size.DATA;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.CACHE;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.COMPRESS;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.CACHE;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.COMPRESS;
 
 /**
  * An archive driver for Tape Archive files (TAR).

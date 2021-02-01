@@ -7,8 +7,8 @@ package global.namespace.truevfs.comp.tardriver;
 import global.namespace.truevfs.comp.cio.Entry;
 import global.namespace.truevfs.comp.cio.IoBuffer;
 import global.namespace.truevfs.comp.shed.Releasable;
-import global.namespace.truevfs.kernel.spec.FsArchiveEntries;
-import global.namespace.truevfs.kernel.spec.FsArchiveEntry;
+import global.namespace.truevfs.kernel.api.FsArchiveEntries;
+import global.namespace.truevfs.kernel.api.FsArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 
 import javax.annotation.CheckForNull;

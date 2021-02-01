@@ -7,7 +7,7 @@ package global.namespace.truevfs.kernel.impl;
 import bali.Cache;
 import bali.Lookup;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
 
 import java.io.IOException;
 

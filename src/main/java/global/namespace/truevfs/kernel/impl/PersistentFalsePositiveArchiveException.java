@@ -10,7 +10,7 @@ import java.io.IOException;
 
 /**
  * Indicates that a file system is a false positive file system and that this exception may get cached until the
- * federated (archive) file system gets {@linkplain global.namespace.truevfs.kernel.spec.FsController#sync(BitField) synced}
+ * federated (archive) file system gets {@linkplain global.namespace.truevfs.kernel.api.FsController#sync(BitField) synced}
  * again.
  * <p>
  * This exception type is reserved for non-local control flow in file system controller chains in order to reroute file

@@ -4,11 +4,11 @@
  */
 package global.namespace.truevfs.access;
 
-import lombok.val;
 import global.namespace.truevfs.comp.shed.ExtensionSet;
-import global.namespace.truevfs.kernel.spec.FsArchiveDriver;
-import global.namespace.truevfs.kernel.spec.FsScheme;
-import global.namespace.truevfs.kernel.spec.mock.MockArchiveDriver;
+import global.namespace.truevfs.kernel.api.FsArchiveDriver;
+import global.namespace.truevfs.kernel.api.FsScheme;
+import global.namespace.truevfs.kernel.api.mock.MockArchiveDriver;
+import lombok.val;
 import org.junit.Test;
 
 import java.io.File;

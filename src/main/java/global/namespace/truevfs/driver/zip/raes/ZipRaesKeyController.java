@@ -7,7 +7,7 @@ package global.namespace.truevfs.driver.zip.raes;
 import global.namespace.truevfs.comp.key.spec.common.AesPbeParameters;
 import global.namespace.truevfs.comp.zipdriver.AbstractKeyController;
 import global.namespace.truevfs.driver.zip.raes.crypto.RaesKeyException;
-import global.namespace.truevfs.kernel.spec.FsController;
+import global.namespace.truevfs.kernel.api.FsController;
 
 import java.io.IOException;
 

@@ -11,8 +11,8 @@ import global.namespace.truevfs.comp.io.Streams;
 import global.namespace.truevfs.comp.shed.CompoundIterator;
 import global.namespace.truevfs.comp.zip.AbstractZipOutputStream;
 import global.namespace.truevfs.comp.zip.ZipCryptoParameters;
-import global.namespace.truevfs.kernel.spec.FsModel;
-import global.namespace.truevfs.kernel.spec.FsOutputSocketSink;
+import global.namespace.truevfs.kernel.api.FsModel;
+import global.namespace.truevfs.kernel.api.FsOutputSocketSink;
 
 import javax.annotation.CheckForNull;
 import java.io.IOException;
@@ -28,7 +28,7 @@ import java.util.zip.CheckedOutputStream;
 import static global.namespace.truevfs.comp.cio.Entry.Size.DATA;
 import static global.namespace.truevfs.comp.cio.Entry.UNKNOWN;
 import static global.namespace.truevfs.comp.zip.ZipEntry.STORED;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.GROW;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.GROW;
 
 /**
  * An output service for writing ZIP files.

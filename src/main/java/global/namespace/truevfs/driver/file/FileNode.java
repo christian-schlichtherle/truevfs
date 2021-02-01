@@ -9,10 +9,10 @@ import global.namespace.truevfs.comp.cio.InputSocket;
 import global.namespace.truevfs.comp.cio.IoBuffer;
 import global.namespace.truevfs.comp.cio.OutputSocket;
 import global.namespace.truevfs.comp.shed.BitField;
-import global.namespace.truevfs.kernel.spec.FsAbstractNode;
-import global.namespace.truevfs.kernel.spec.FsAccessOption;
-import global.namespace.truevfs.kernel.spec.FsNode;
-import global.namespace.truevfs.kernel.spec.FsNodeName;
+import global.namespace.truevfs.kernel.api.FsAbstractNode;
+import global.namespace.truevfs.kernel.api.FsAccessOption;
+import global.namespace.truevfs.kernel.api.FsNode;
+import global.namespace.truevfs.kernel.api.FsNodeName;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -26,11 +26,11 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import static global.namespace.truevfs.kernel.api.FsAccessOptions.NONE;
+import static global.namespace.truevfs.kernel.api.FsNodeName.SEPARATOR_CHAR;
 import static java.io.File.separatorChar;
 import static java.nio.file.Files.*;
 import static java.nio.file.attribute.PosixFilePermission.*;
-import static global.namespace.truevfs.kernel.spec.FsAccessOptions.NONE;
-import static global.namespace.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
 
 /**
  * Adapts a {@link Path} instance to a {@link FsNode}.

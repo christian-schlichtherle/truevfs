@@ -4,7 +4,6 @@
  */
 package global.namespace.truevfs.access;
 
-import lombok.val;
 import global.namespace.truevfs.comp.cio.Entry.Access;
 import global.namespace.truevfs.comp.cio.Entry.Size;
 import global.namespace.truevfs.comp.io.Streams;
@@ -12,7 +11,8 @@ import global.namespace.truevfs.comp.shed.BitField;
 import global.namespace.truevfs.comp.shed.PathSplitter;
 import global.namespace.truevfs.comp.shed.Paths;
 import global.namespace.truevfs.comp.shed.UriBuilder;
-import global.namespace.truevfs.kernel.spec.*;
+import global.namespace.truevfs.kernel.api.*;
+import lombok.val;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nullable;
@@ -25,18 +25,18 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystemException;
 import java.util.*;
 
+import static global.namespace.truevfs.access.ExpertFeature.Level.INTERMEDIATE;
+import static global.namespace.truevfs.access.ExpertFeature.Reason.INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA;
 import static global.namespace.truevfs.comp.cio.Entry.Access.*;
 import static global.namespace.truevfs.comp.cio.Entry.Type.DIRECTORY;
 import static global.namespace.truevfs.comp.cio.Entry.Type.FILE;
 import static global.namespace.truevfs.comp.cio.Entry.UNKNOWN;
-import static global.namespace.truevfs.access.ExpertFeature.Level.INTERMEDIATE;
-import static global.namespace.truevfs.access.ExpertFeature.Reason.INJECTING_A_DIFFERENT_DETECTOR_FOR_THE_SAME_PATH_MAY_CORRUPT_DATA;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.EXCLUSIVE;
-import static global.namespace.truevfs.kernel.spec.FsAccessOption.GROW;
-import static global.namespace.truevfs.kernel.spec.FsAssertion.Level.*;
-import static global.namespace.truevfs.kernel.spec.FsNodeName.ROOT;
-import static global.namespace.truevfs.kernel.spec.FsNodeName.SEPARATOR_CHAR;
-import static global.namespace.truevfs.kernel.spec.FsUriModifier.CANONICALIZE;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.EXCLUSIVE;
+import static global.namespace.truevfs.kernel.api.FsAccessOption.GROW;
+import static global.namespace.truevfs.kernel.api.FsAssertion.Level.*;
+import static global.namespace.truevfs.kernel.api.FsNodeName.ROOT;
+import static global.namespace.truevfs.kernel.api.FsNodeName.SEPARATOR_CHAR;
+import static global.namespace.truevfs.kernel.api.FsUriModifier.CANONICALIZE;
 
 /**
  * A replacement for the class {@link File} which provides transparent

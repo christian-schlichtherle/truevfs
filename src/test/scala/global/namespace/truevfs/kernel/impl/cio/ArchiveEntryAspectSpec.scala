@@ -9,8 +9,8 @@ import global.namespace.truevfs.comp.cio.Entry.PosixEntity._
 import global.namespace.truevfs.comp.cio.Entry.Size._
 import global.namespace.truevfs.comp.cio.Entry.Type._
 import global.namespace.truevfs.comp.cio.Entry._
-import global.namespace.truevfs.kernel.spec._
-import global.namespace.truevfs.kernel.spec.mock.MockArchiveDriverEntry
+import global.namespace.truevfs.kernel.api._
+import global.namespace.truevfs.kernel.api.mock.MockArchiveDriverEntry
 import org.scalatest.matchers.should.Matchers._
 import org.scalatest.prop.TableDrivenPropertyChecks.{whenever, _}
 import org.scalatest.wordspec.AnyWordSpec

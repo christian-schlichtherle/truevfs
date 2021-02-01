@@ -4,6 +4,8 @@
  */
 package global.namespace.truevfs.driver.zip.sample;
 
+import global.namespace.truevfs.access.TArchiveDetector;
+import global.namespace.truevfs.access.TConfig;
 import global.namespace.truevfs.comp.key.spec.KeyManagerMap;
 import global.namespace.truevfs.comp.key.spec.UnknownKeyException;
 import global.namespace.truevfs.comp.key.spec.common.AesKeyStrength;
@@ -11,14 +13,12 @@ import global.namespace.truevfs.comp.key.spec.common.AesPbeParameters;
 import global.namespace.truevfs.comp.key.spec.prompting.PromptingKey.Controller;
 import global.namespace.truevfs.comp.key.spec.prompting.PromptingKey.View;
 import global.namespace.truevfs.comp.key.spec.prompting.PromptingKeyManagerMap;
-import global.namespace.truevfs.access.TArchiveDetector;
-import global.namespace.truevfs.access.TConfig;
 import global.namespace.truevfs.comp.zip.WinZipAesParameters;
 import global.namespace.truevfs.comp.zip.ZipKeyException;
 import global.namespace.truevfs.comp.zipdriver.AbstractZipDriverEntry;
 import global.namespace.truevfs.comp.zipdriver.ZipDriver;
-import global.namespace.truevfs.kernel.spec.FsController;
-import global.namespace.truevfs.kernel.spec.FsModel;
+import global.namespace.truevfs.kernel.api.FsController;
+import global.namespace.truevfs.kernel.api.FsModel;
 
 import java.nio.charset.Charset;
 import java.util.Optional;
